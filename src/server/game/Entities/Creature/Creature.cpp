@@ -454,13 +454,22 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetAttackTime(RANGED_ATTACK, cInfo->RangeAttackTime);
 
     uint32 previousHealth = GetHealth();
+    uint32 previousMaxHealth = GetMaxHealth();
     uint32 previousPlayerDamageReq = m_PlayerDamageReq;
 
     SelectLevel(changelevel);
     if (previousHealth > 0)
     {
         SetHealth(previousHealth);
-        m_PlayerDamageReq = previousPlayerDamageReq;
+
+        if (previousMaxHealth && previousMaxHealth > GetMaxHealth())
+        {
+            m_PlayerDamageReq = (uint32)(previousPlayerDamageReq * GetMaxHealth() / previousMaxHealth);
+        }
+        else
+        {
+            m_PlayerDamageReq = previousPlayerDamageReq;
+        }
     }
 
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
@@ -2236,8 +2245,8 @@ bool Creature::_IsTargetAcceptable(const Unit* target) const
 
     if (target->HasUnitState(UNIT_STATE_DIED))
     {
-        // guards can detect fake death
-        if (IsGuard() && target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
+        // some creatures can detect fake death
+        if (CanIgnoreFeignDeath() && target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
             return true;
         else
             return false;
@@ -3085,8 +3094,9 @@ void Creature::FocusTarget(Spell const* focusSpell, WorldObject const* target)
         return;
 
     _focusSpell = focusSpell;
+
     SetGuidValue(UNIT_FIELD_TARGET, this == target ? ObjectGuid::Empty : target->GetGUID());
-    if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
+    if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AI_DOESNT_FACE_TARGET))
         AddUnitState(UNIT_STATE_ROTATING);
 
     // Set serverside orientation if needed (needs to be after attribute check)
@@ -3118,7 +3128,7 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
     else
         SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
 
-    if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
+    if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AI_DOESNT_FACE_TARGET))
         ClearUnitState(UNIT_STATE_ROTATING);
 }
 

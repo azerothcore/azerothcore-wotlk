@@ -6,7 +6,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
-enum Spels
+enum Spells
 {
     SPELL_SMITE_STOMP       = 6432,
     SPELL_SMITE_SLAM        = 6435,
@@ -73,10 +73,6 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case EVENT_SMITE_SLAM:
-                    me->CastSpell(me->GetVictim(), SPELL_SMITE_SLAM, false);
-                    events.ScheduleEvent(EVENT_SMITE_SLAM, 15000);
-                    break;
                 case EVENT_CHECK_HEALTH1:
                     if (me->HealthBelowPct(67) && !health67)
                     {
@@ -106,6 +102,15 @@ public:
                         break;
                     }
                     events.ScheduleEvent(EVENT_CHECK_HEALTH2, 500);
+                    break;
+                case EVENT_SMITE_SLAM:
+                    if (me->HealthBelowPct(33))
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_SMITE_SLAM, false);
+                        events.ScheduleEvent(EVENT_SMITE_SLAM, 6000);
+                        break;
+                    }
+                    events.ScheduleEvent(EVENT_SMITE_SLAM, 500);
                     break;
                 case EVENT_SWAP_WEAPON1:
                     me->LoadEquipment(EQUIP_TWO_SWORDS);

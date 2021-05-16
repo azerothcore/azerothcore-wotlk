@@ -479,8 +479,8 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     if (!spellInfo)
         return;
 
-    // not allow remove non positive spells and spells with attr SPELL_ATTR0_CANT_CANCEL
-    if ((!spellInfo->IsPositive() || spellInfo->HasAttribute(SPELL_ATTR0_CANT_CANCEL) || spellInfo->IsPassive()) && spellId != 605)
+    // not allow remove non positive spells and spells with attr SPELL_ATTR0_NO_AURA_CANCEL
+    if ((!spellInfo->IsPositive() || spellInfo->HasAttribute(SPELL_ATTR0_NO_AURA_CANCEL) || spellInfo->IsPassive()) && spellId != 605)
         return;
 
     // channeled spell case (it currently casted then)

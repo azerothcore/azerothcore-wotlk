@@ -11,6 +11,7 @@
 #    PERFORMANCE SETTINGS
 #    SERVER LOGGING
 #    SERVER SETTINGS
+#    CRYPTOGRAPHY
 #    WARDEN SETTINGS
 #    PLAYER INTERACTION
 #    CREATURE SETTINGS
@@ -94,6 +95,18 @@ LogsDir = ""
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
 CharacterDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_characters"
+
+#
+#    Database.Reconnect.Seconds
+#    Database.Reconnect.Attempts
+#
+#        Description: How many seconds between every reconnection attempt
+#                     and how many attempts will be performed in total
+#        Default:     20 attempts every 15 seconds
+#
+
+Database.Reconnect.Seconds = 15
+Database.Reconnect.Attempts = 20
 
 #
 #    LoginDatabase.WorkerThreads
@@ -1199,6 +1212,25 @@ IsContinentTransport.Enabled = 1
 #
 
 IsPreloadedContinentTransport.Enabled = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+# CRYPTOGRAPHY
+#
+#    TOTPMasterSecret
+#        Description: The key used by authserver to decrypt TOTP secrets from database storage.
+#                     You only need to set this here if you plan to use the in-game 2FA
+#                     management commands (.account 2fa), otherwise this can be left blank.
+#
+#                     The server will auto-detect if this does not match your authserver setting,
+#                     in which case any commands reliant on the secret will be disabled.
+#
+#        Default:     <blank>
+#
+
+TOTPMasterSecret =
 
 #
 ###################################################################################################
@@ -2364,12 +2396,24 @@ Battleground.CastDeserter = 1
 Battleground.QueueAnnouncer.Enable = 0
 
 #
-#    Battleground.QueueAnnouncer.Limited.Enable
-#        Description: Show announce only if left players in queue = 1
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#    Battleground.QueueAnnouncer.Limit.MinLevel
+#        Description: Limit the QueueAnnouncer starting from a certain level.
+#                     When limited, it announces only if there are at least MinPlayers queued (see below)
+#                     At 80 it only limits RBG, at lower level only limits Warsong Gulch.
+#        Default:     0 - (Disabled, no limits)
+#                     10 - (Enabled for all, because BGs start at 10)
+#                     20 - (Enabled for 20 and higher)
+#                     80 - (Enabled only for 80)
 
-Battleground.QueueAnnouncer.Limited.Enable = 0
+Battleground.QueueAnnouncer.Limit.MinLevel = 0
+
+#
+#    Battleground.QueueAnnouncer.Limit.MinPlayers
+#        Description: When the Battleground.QueueAnnouncer.Limit.MinLevel limit is enabled (not 0)
+#                     only show when at least MinPlayers are queued.
+#        Default:     3 - (Show only when 3 or more players are queued)
+
+Battleground.QueueAnnouncer.Limit.MinPlayers = 3
 
 #
 #    Battleground.QueueAnnouncer.SpamProtection.Delay
@@ -3412,7 +3456,7 @@ Logger.server=4,Console Server
 Logger.commands.gm=4,Console GM
 Logger.scripts.hotswap=4,Console Server
 Logger.sql.sql=2,Console DBErrors
-Logger.sql.updates=4,Console Server
+Logger.sql=4,Console Server
 Logger.mmaps=4,Server
 
 #Logger.achievement=4,Console Server

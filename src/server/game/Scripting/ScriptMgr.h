@@ -72,6 +72,7 @@ struct TargetInfo;
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
+// Check out our guide on how to create new hooks in our wiki! https://www.azerothcore.org/wiki/hooks-script
 /*
     TODO: Add more script type classes.
 
@@ -79,72 +80,6 @@ struct TargetInfo;
     CollisionScript
     ArenaTeamScript
 
-*/
-
-/*
-    Standard procedure when adding new script type classes:
-
-    First of all, define the actual class, and have it inherit from ScriptObject, like so:
-
-    class MyScriptType : public ScriptObject
-    {
-        uint32 _someId;
-
-        private:
-
-            void RegisterSelf();
-
-        protected:
-
-            MyScriptType(const char* name, uint32 someId)
-                : ScriptObject(name), _someId(someId)
-            {
-                ScriptRegistry<MyScriptType>::AddScript(this);
-            }
-
-        public:
-
-            // If a virtual function in your script type class is not necessarily
-            // required to be overridden, just declare it virtual with an empty
-            // body. If, on the other hand, it's logical only to override it (i.e.
-            // if it's the only method in the class), make it pure virtual, by adding
-            // = 0 to it.
-            virtual void OnSomeEvent(uint32 someArg1, std::string& someArg2) { }
-
-            // This is a pure virtual function:
-            virtual void OnAnotherEvent(uint32 someArg) = 0;
-    }
-
-    Next, you need to add a specialization for ScriptRegistry. Put this in the bottom of
-    ScriptMgr.cpp:
-
-    template class ScriptRegistry<MyScriptType>;
-
-    Now, add a cleanup routine in ScriptMgr::~ScriptMgr:
-
-    SCR_CLEAR(MyScriptType);
-
-    Now your script type is good to go with the script system. What you need to do now
-    is add functions to ScriptMgr that can be called from the core to actually trigger
-    certain events. For example, in ScriptMgr.h:
-
-    void OnSomeEvent(uint32 someArg1, std::string& someArg2);
-    void OnAnotherEvent(uint32 someArg);
-
-    In ScriptMgr.cpp:
-
-    void ScriptMgr::OnSomeEvent(uint32 someArg1, std::string& someArg2)
-    {
-        FOREACH_SCRIPT(MyScriptType)->OnSomeEvent(someArg1, someArg2);
-    }
-
-    void ScriptMgr::OnAnotherEvent(uint32 someArg)
-    {
-        FOREACH_SCRIPT(MyScriptType)->OnAnotherEvent(someArg1, someArg2);
-    }
-
-    Now you simply call these two functions from anywhere in the core to trigger the
-    event on all registered scripts of that type.
 */
 
 class ScriptObject
@@ -797,6 +732,7 @@ public:
 
     // Called for player::update
     virtual void OnBeforeUpdate(Player* /*player*/, uint32 /*p_time*/) { }
+    virtual void OnUpdate(Player* /*player*/, uint32 /*p_time*/) { }
 
     // Called when a player's money is modified (before the modification is done)
     virtual void OnMoneyChanged(Player* /*player*/, int32& /*amount*/) { }
@@ -1079,6 +1015,16 @@ public:
     virtual void OnSetServerSideVisibility(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 
     virtual void OnSetServerSideVisibilityDetect(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
+
+    // Passive Anticheat System
+    virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
+    virtual void AnticheatSetCanFlybyServer(Player* /*player*/, bool /*apply*/) { }
+    virtual void AnticheatSetUnderACKmount(Player* /*player*/) { }
+    virtual void AnticheatSetRootACKUpd(Player* /*player*/) { }
+    virtual void AnticheatSetJumpingbyOpcode(Player* /*player*/, bool /*jump*/) { }
+    virtual void AnticheatUpdateMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/) { }
+    [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/) { return true; }
+    [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, bool /*jump*/) { return true; }
 };
 
 class AccountScript : public ScriptObject
@@ -1607,6 +1553,7 @@ public: /* AchievementCriteriaScript */
 
 public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
+    void OnPlayerUpdate(Player* player, uint32 p_time);
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
@@ -1732,6 +1679,14 @@ public: /* PlayerScript */
     bool CanInitTrade(Player* player, Player* target);
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+    void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
+    void AnticheatSetCanFlybyServer(Player* player, bool apply);
+    void AnticheatSetUnderACKmount(Player* player);
+    void AnticheatSetRootACKUpd(Player* player);
+    void AnticheatUpdateMovementInfo(Player* player, MovementInfo const& movementInfo);
+    void AnticheatSetJumpingbyOpcode(Player* player, bool jump);
+    bool AnticheatHandleDoubleJump(Player* player, Unit* mover);
+    bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);

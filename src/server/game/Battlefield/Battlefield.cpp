@@ -461,10 +461,8 @@ void Battlefield::BroadcastPacketToWar(WorldPacket& data) const
 
 void Battlefield::SendWarningToAllInZone(uint32 entry)
 {
-    if (Map* map = sMapMgr->CreateBaseMap(m_MapId))
-        if (Unit* unit = map->GetCreature(StalkerGuid))
-            if (Creature* stalker = unit->ToCreature())
-                sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+    if (Creature* stalker = GetCreature(StalkerGuid))
+        sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
 }
 
 void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)
@@ -787,7 +785,14 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
     if (!map)
     {
         LOG_ERROR("server", "Battlefield::SpawnCreature: Can't create creature entry: %u map not found", entry);
-        return 0;
+        return nullptr;
+    }
+
+    CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(entry);
+    if (!cinfo)
+    {
+        LOG_ERROR("sql.sql", "Battlefield::SpawnCreature: entry %u does not exist.", entry);
+        return nullptr;
     }
 
     Creature* creature = new Creature(true);
@@ -801,18 +806,13 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
     creature->setFaction(BattlefieldFactions[teamId]);
     creature->SetHomePosition(x, y, z, o);
 
-    CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(entry);
-    if (!cinfo)
-    {
-        LOG_ERROR("sql.sql", "Battlefield::SpawnCreature: entry %u does not exist.", entry);
-        return nullptr;
-    }
     // force using DB speeds -- do we really need this?
     creature->SetSpeed(MOVE_WALK, cinfo->speed_walk);
     creature->SetSpeed(MOVE_RUN, cinfo->speed_run);
 
     // Set creature in world
     map->AddToMap(creature);
+    creature->setActive(true);
 
     return creature;
 }
@@ -821,7 +821,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z, float o)
 {
     // Get map object
-    Map* map = sMapMgr->CreateBaseMap(571); // *vomits*
+    Map* map = sMapMgr->CreateBaseMap(m_MapId);
     if (!map)
         return 0;
 

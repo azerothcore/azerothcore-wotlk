@@ -13,6 +13,15 @@
 #include "Spell.h"
 #include "Util.h"
 
+template<class T>
+RandomMovementGenerator<T>::~RandomMovementGenerator() { }
+
+template<>
+RandomMovementGenerator<Creature>::~RandomMovementGenerator()
+{
+    delete _pathGenerator;
+}
+
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 {

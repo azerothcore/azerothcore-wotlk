@@ -17,7 +17,6 @@
 #include <map>
 #include <vector>
 
-
 enum RollType
 {
     ROLL_PASS         = 0,
@@ -111,6 +110,7 @@ enum LootSlotType
 class Player;
 class LootStore;
 class ConditionMgr;
+class GameObject;
 struct Loot;
 
 struct LootStoreItem
@@ -313,6 +313,7 @@ struct Loot
 
     // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
     ObjectGuid containerGUID;
+    GameObject* sourceGameObject{nullptr};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
     ~Loot() { clear(); }

@@ -39,28 +39,42 @@ void ChannelMgr::LoadChannels()
     uint32 count = 0;
 
     //                                                    0          1     2     3         4          5
-    QueryResult result = CharacterDatabase.PQuery("SELECT channelId, name, team, announce, ownership, password FROM channels WHERE team = %u ORDER BY channelId ASC", _teamId);
+    QueryResult result = CharacterDatabase.PQuery("SELECT channelId, name, team, announce, ownership, password FROM channels ORDER BY channelId ASC");
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 channels for %s", _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde");
+        LOG_INFO("server", ">> Loaded 0 channels. DB table `channels` is empty.");
         return;
     }
 
+    std::vector<std::pair<std::string, uint32>> toDelete;
     do
     {
         Field* fields = result->Fetch();
-        if (!fields)
-            break;
 
         uint32 channelDBId = fields[0].GetUInt32();
         std::string channelName = fields[1].GetString();
+        TeamId team = TeamId(fields[2].GetUInt32());
         std::string password = fields[5].GetString();
-        std::wstring channelWName;
-        Utf8toWStr(channelName, channelWName);
 
-        Channel* newChannel = new Channel(channelName, 0, channelDBId, TeamId(fields[2].GetUInt32()), fields[3].GetUInt8(), fields[4].GetUInt8());
+        std::wstring channelWName;
+        if (!Utf8toWStr(channelName, channelWName))
+        {
+            LOG_ERROR("server", "Failed to load channel '%s' from database - invalid utf8 sequence? Deleted.", channelName.c_str());
+            toDelete.push_back({ channelName, team });
+            continue;
+        }
+
+        ChannelMgr* mgr = forTeam(team);
+        if (!mgr)
+        {
+            LOG_ERROR("server", "Failed to load custom chat channel '%s' from database - invalid team %u. Deleted.", channelName.c_str(), team);
+            toDelete.push_back({ channelName, team });
+            continue;
+        }
+
+        Channel* newChannel = new Channel(channelName, 0, channelDBId, team, fields[3].GetUInt8(), fields[4].GetUInt8());
         newChannel->SetPassword(password);
-        channels[channelWName] = newChannel;
+        mgr->channels[channelWName] = newChannel;
 
         if (QueryResult banResult = CharacterDatabase.PQuery("SELECT playerGUID, banTime FROM channels_bans WHERE channelId = %u", channelDBId))
         {
@@ -78,7 +92,15 @@ void ChannelMgr::LoadChannels()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u channels for %s in %ums", count, _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde", GetMSTimeDiffToNow(oldMSTime));
+    for (auto pair : toDelete)
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL);
+        stmt->setString(0, pair.first);
+        stmt->setUInt32(1, pair.second);
+        CharacterDatabase.Execute(stmt);
+    }
+
+    LOG_INFO("server", ">> Loaded %u channels in %ums", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server", " ");
 }
 

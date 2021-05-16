@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 export CCACHE_CPP2=true
-export CCACHE_MAXSIZE='1G'
-export CCACHE_COMPRESS=9
+export CCACHE_MAXSIZE='500M'
+export CCACHE_COMPRESS=1
+export CCACHE_COMPRESSLEVEL=9
 ccache -s
 
 cd var/build/obj
@@ -11,7 +12,7 @@ time cmake ../../../ \
 -DTOOLS=1 \
 -DBUILD_TESTING=1 \
 -DSCRIPTS=1 \
--DCMAKE_BUILD_TYPE=Debug \
+-DCMAKE_BUILD_TYPE=Release \
 -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include \
 -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib \
 -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include \
