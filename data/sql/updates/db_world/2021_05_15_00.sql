@@ -1,3 +1,19 @@
+-- DB update 2021_05_14_06 -> 2021_05_15_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_14_06';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_14_06 2021_05_15_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1616252753401265600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1616252753401265600');
 /*
  * Zone: Netherstorm
@@ -193,3 +209,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21089, 0, 0, 0, 0, 0, 100, 0, 3700, 5500, 9800, 13600, 11, 35871, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunfury Blood Knight - In Combat - Cast \'35871\''),
 (21089, 0, 1, 0, 2, 0, 100, 1, 40, 80, 0, 0, 11, 36476, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sunfury Blood Knight - Between 40-80% Health - Cast \'36476\' (No Repeat)'),
 (21089, 0, 2, 0, 2, 0, 100, 1, 10, 30, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sunfury Blood Knight - Between 10-30% Health - Cast \'8599\' (No Repeat)');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
