@@ -3262,9 +3262,12 @@ void SpellMgr::LoadSpellCustomAttr()
         {
             if (SpellVisualEntry const* spellVisual = sSpellVisualStore.LookupEntry(spellInfo->SpellVisual[0]))
             {
-                if (spellVisual->HasMissile && (spellVisual->MissileModel == -4 || spellVisual->MissileModel == -5))
+                if (spellVisual->HasMissile)
                 {
-                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEEDS_AMMO_DATA;
+                    if (spellVisual->MissileModel == -4 || spellVisual->MissileModel == -5)
+                    {
+                        spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEEDS_AMMO_DATA;
+                    }
                 }
             }
         }
