@@ -1293,7 +1293,7 @@ bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
     if (!aura || aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
     {
         return false;
-    }   
+    }
 
     // these spells pierce all avalible spells (Resurrection Sickness for example)
     if (HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
