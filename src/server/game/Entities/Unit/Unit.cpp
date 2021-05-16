@@ -1372,7 +1372,6 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
     {
         damageInfo->hitOutCome = MELEE_HIT_CRIT;
     }
-    
     switch (damageInfo->hitOutCome)
     {
         case MELEE_HIT_EVADE:
