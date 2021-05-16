@@ -1369,7 +1369,9 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
 
     // If the victim was a sitting player and we didn't roll a miss, then crit.
     if (sittingVictim && damageInfo->hitOutCome != MELEE_HIT_MISS)
+    {
         damageInfo->hitOutCome = MELEE_HIT_CRIT;
+    }
     
     switch (damageInfo->hitOutCome)
     {
