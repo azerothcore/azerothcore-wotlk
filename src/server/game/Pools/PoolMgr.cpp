@@ -141,6 +141,34 @@ bool PoolGroup<T>::CheckPool() const
     return true;
 }
 
+template <class T>
+PoolObject* PoolGroup<T>::RollOne(ActivePoolData& spawns, uint32 triggerFrom)
+{
+    if (!ExplicitlyChanced.empty())
+    {
+        float roll = (float)rand_chance();
+
+        for (uint32 i = 0; i < ExplicitlyChanced.size(); ++i)
+        {
+            roll -= ExplicitlyChanced[i].chance;
+            // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
+            // so this need explicit check for this case
+            if (roll < 0 && (ExplicitlyChanced[i].guid == triggerFrom || !spawns.IsActiveObject<T>(ExplicitlyChanced[i].guid)))
+                return &ExplicitlyChanced[i];
+        }
+    }
+    if (!EqualChanced.empty())
+    {
+        int32 index = irand(0, EqualChanced.size() - 1);
+        // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
+        // so this need explicit check for this case
+        if (EqualChanced[index].guid == triggerFrom || !spawns.IsActiveObject<T>(EqualChanced[index].guid))
+            return &EqualChanced[index];
+    }
+
+    return nullptr;
+}
+
 // Main method to despawn a creature or gameobject in a pool
 // If no guid is passed, the pool is just removed (event end case)
 // If guid is filled, cache will be used and no removal will occur, it just fill the cache
@@ -293,70 +321,40 @@ void PoolGroup<Pool>::RemoveOneRelation(uint32 child_pool_id)
 template <class T>
 void PoolGroup<T>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 triggerFrom)
 {
+    uint32 lastDespawned = 0;
     int count = limit - spawns.GetActiveObjectCount(poolId);
 
     // If triggered from some object respawn this object is still marked as spawned
     // and also counted into m_SpawnedPoolAmount so we need increase count to be
     // spawned by 1
     if (triggerFrom)
-    {
         ++count;
-    }
 
-    if (count > 0)
+    // This will try to spawn the rest of pool, not guaranteed
+    for (int i = 0; i < count; ++i)
     {
-        PoolObjectList rolledObjects;
-        rolledObjects.reserve(count);
+        PoolObject* obj = RollOne(spawns, triggerFrom);
+        if (!obj)
+            continue;
+        if (obj->guid == lastDespawned)
+            continue;
 
-        // roll objects to be spawned
-        if (!ExplicitlyChanced.empty())
+        if (obj->guid == triggerFrom)
         {
-            float roll = (float)rand_chance();
-
-            for (PoolObject& obj : ExplicitlyChanced)
-            {
-                roll -= obj.chance;
-
-                // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
-                // so this need explicit check for this case
-                if (roll < 0 && (/*obj.guid == triggerFrom ||*/ !spawns.IsActiveObject<T>(obj.guid)))
-                {
-                    rolledObjects.push_back(obj);
-                    break;
-                }
-            }
+            ReSpawn1Object(obj);
+            triggerFrom = 0;
+            continue;
         }
+        spawns.ActivateObject<T>(obj->guid, poolId);
+        Spawn1Object(obj);
 
-        if (!EqualChanced.empty() && rolledObjects.empty())
+        if (triggerFrom)
         {
-            std::copy_if(EqualChanced.begin(), EqualChanced.end(), std::back_inserter(rolledObjects), [/*triggerFrom, */&spawns](PoolObject const& object)
-            {
-                 return /*object.guid == triggerFrom ||*/ !spawns.IsActiveObject<T>(object.guid);
-            });
-
-            acore::Containers::RandomResize(rolledObjects, count);
+            // One spawn one despawn no count increase
+            DespawnObject(spawns, triggerFrom);
+            lastDespawned = triggerFrom;
+            triggerFrom = 0;
         }
-
-        // try to spawn rolled objects
-        for (PoolObject& obj : rolledObjects)
-        {
-            if (obj.guid == triggerFrom)
-            {
-                ReSpawn1Object(&obj);
-                triggerFrom = 0;
-            }
-            else
-            {
-                spawns.ActivateObject<T>(obj.guid, poolId);
-                Spawn1Object(&obj);
-            }
-        }
-    }
-
-    // One spawn one despawn no count increase
-    if (triggerFrom)
-    {
-        DespawnObject(spawns, triggerFrom);
     }
 }
 

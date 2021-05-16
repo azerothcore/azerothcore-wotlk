@@ -55,10 +55,8 @@ public:
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
-                if (Encounter[i] == IN_PROGRESS && i != BRANN_BRONZEBEARD)
-                {
+                if (Encounter[i] == IN_PROGRESS)
                     return true;
-                }
             }
             return false;
         }

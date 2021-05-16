@@ -130,7 +130,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     if (!i_path || moveToward != _movingTowards)
-        i_path = std::make_unique<PathGenerator>(owner);
+        i_path = new PathGenerator(owner);
 
     float x, y, z;
     bool shortenPath;
@@ -188,7 +188,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 template<>
 void ChaseMovementGenerator<Player>::DoInitialize(Player* owner)
 {
-    i_path = nullptr;
     _lastTargetPosition.reset();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
@@ -196,7 +195,6 @@ void ChaseMovementGenerator<Player>::DoInitialize(Player* owner)
 template<>
 void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
-    i_path = nullptr;
     _lastTargetPosition.reset();
     owner->SetWalk(false);
     owner->AddUnitState(UNIT_STATE_CHASE);
@@ -307,7 +305,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         return true;
 
     if (!i_path)
-        i_path = std::make_unique<PathGenerator>(owner);
+        i_path = new PathGenerator(owner);
 
     float x, y, z;
     // select angle
@@ -378,7 +376,6 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature* owner)
 template<class T>
 void FollowMovementGenerator<T>::DoInitialize(T* owner)
 {
-    i_path = nullptr;
     _lastTargetPosition.reset();
     owner->AddUnitState(UNIT_STATE_FOLLOW);
     _updateSpeed(owner);

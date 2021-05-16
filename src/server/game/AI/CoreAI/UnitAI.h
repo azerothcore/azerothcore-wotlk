@@ -261,7 +261,7 @@ public:
             targetList.reverse();
 
         if (targetType == SELECT_TARGET_RANDOM)
-            acore::Containers::RandomResize(targetList, maxTargets);
+            acore::Containers::RandomResizeList(targetList, maxTargets);
         else
             targetList.resize(maxTargets);
     }

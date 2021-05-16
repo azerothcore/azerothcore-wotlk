@@ -1308,9 +1308,6 @@ void WorldSession::ProcessQueryCallbackPet()
         Player* player = GetPlayer();
         if (!player)
         {
-            SQLQueryHolder* param;
-            _loadPetFromDBSecondCallback.get(param);
-            delete param;
             _loadPetFromDBSecondCallback.cancel();
         }
         else if (!player->IsInWorld())

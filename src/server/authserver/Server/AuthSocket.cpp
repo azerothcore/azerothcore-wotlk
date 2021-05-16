@@ -4,23 +4,21 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "AES.h"
+#include <algorithm>
+#include <openssl/md5.h>
+
 #include "Common.h"
-#include "CryptoGenerics.h"
 #include "CryptoRandom.h"
 #include "CryptoHash.h"
-#include "DatabaseEnv.h"
+#include "Database/DatabaseEnv.h"
 #include "ByteBuffer.h"
-#include "Config.h"
+#include "Configuration/Config.h"
 #include "Log.h"
 #include "RealmList.h"
 #include "AuthSocket.h"
 #include "AuthCodes.h"
-#include "SecretMgr.h"
 #include "TOTP.h"
-#include <algorithm>
-#include <openssl/crypto.h>
-#include <openssl/md5.h>
+#include "openssl/crypto.h"
 
 #define ChunkSize 2048
 
@@ -373,7 +371,6 @@ bool AuthSocket::_HandleLogonChallenge()
     std::string const& ip_address = socket().getRemoteAddress();
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED);
     stmt->setString(0, ip_address);
-
     PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (result)
     {
@@ -441,26 +438,6 @@ bool AuthSocket::_HandleLogonChallenge()
                 }
             }
 
-            uint8 securityFlags = 0;
-            _totpSecret = fields[7].GetBinary();
-
-            // Check if a TOTP token is needed
-            if (!_totpSecret || !_totpSecret.value().empty())
-            {
-                securityFlags = 4;
-
-                if (auto const& secret = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY))
-                {
-                    bool success = acore::Crypto::AEDecrypt<acore::Crypto::AES>(*_totpSecret, *secret);
-                    if (!success)
-                    {
-                        pkt << uint8(WOW_FAIL_DB_BUSY);
-                        LOG_ERROR("server.authserver", "[AuthChallenge] Account '%s' has invalid ciphertext for TOTP token key stored", _login.c_str());
-                        locked = true;
-                    }
-                }
-            }
-
             if (!locked)
             {
                 //set expired bans to inactive
@@ -469,19 +446,18 @@ bool AuthSocket::_HandleLogonChallenge()
                 // If the account is banned, reject the logon attempt
                 stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
                 stmt->setUInt32(0, fields[0].GetUInt32());
-
                 PreparedQueryResult banresult = LoginDatabase.Query(stmt);
                 if (banresult)
                 {
                     if ((*banresult)[0].GetUInt32() == (*banresult)[1].GetUInt32())
                     {
                         pkt << uint8(WOW_FAIL_BANNED);
-                        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] Banned account %s tried to login!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str());
+                        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] Banned account %s tried to login!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str ());
                     }
                     else
                     {
                         pkt << uint8(WOW_FAIL_SUSPENDED);
-                        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] Temporarily banned account %s tried to login!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str());
+                        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] Temporarily banned account %s tried to login!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str ());
                     }
                 }
                 else
@@ -505,6 +481,12 @@ bool AuthSocket::_HandleLogonChallenge()
                     pkt.append(_srp6->N);
                     pkt.append(_srp6->s);
                     pkt.append(unk3.ToByteArray<16>());
+                    uint8 securityFlags = 0;
+
+                    // Check if token is used
+                    _tokenKey = fields[7].GetString();
+                    if (!_tokenKey.empty())
+                        securityFlags = 4;
 
                     pkt << uint8(securityFlags);            // security flags (0x0...0x04)
 
@@ -533,9 +515,9 @@ bool AuthSocket::_HandleLogonChallenge()
                     for (int i = 0; i < 4; ++i)
                         _localizationName[i] = ch->country[4 - i - 1];
 
-                    LOG_DEBUG("network", "'%s:%d' [AuthChallenge] account %s is using '%c%c%c%c' locale (%u)",
-                        socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
-
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                    LOG_DEBUG("network", "'%s:%d' [AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName) );
+#endif
                     ///- All good, await client's proof
                     _status = STATUS_LOGON_PROOF;
                 }
@@ -595,24 +577,23 @@ bool AuthSocket::_HandleLogonProof()
         acore::Crypto::SHA1::Digest M2 = acore::Crypto::SRP6::GetSessionVerifier(lp.A, lp.clientM, _sessionKey);
 
         // Check auth token
-        bool tokenSuccess = false;
-        bool sentToken = (lp.securityFlags & 0x04);
-
-        if (sentToken && _totpSecret)
+        if ((lp.securityFlags & 0x04) || !_tokenKey.empty())
         {
             uint8 size;
             socket().recv((char*)&size, 1);
             char* token = new char[size + 1];
             token[size] = '\0';
             socket().recv(token, size);
+            unsigned int validToken = TOTP::GenerateToken(_tokenKey.c_str());
             unsigned int incomingToken = atoi(token);
             delete[] token;
-
-            tokenSuccess = acore::Crypto::TOTP::ValidateToken(*_totpSecret, incomingToken);
-            memset(_totpSecret->data(), 0, _totpSecret->size());
+            if (validToken != incomingToken)
+            {
+                char data[] = { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0 };
+                socket().send(data, sizeof(data));
+                return false;
+            }
         }
-        else if (!sentToken && !_totpSecret)
-            tokenSuccess = true;
 
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
         {
@@ -633,12 +614,6 @@ bool AuthSocket::_HandleLogonProof()
             proof.error = 0;
             proof.unk2 = 0x00;
             socket().send((char*)&proof, sizeof(proof));
-        }
-
-        if (!tokenSuccess)
-        {
-            char data[4] = { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0 };
-            socket().send(data, sizeof(data));
         }
 
         ///- Set _status to authed!

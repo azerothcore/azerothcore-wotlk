@@ -142,7 +142,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
             .SendMailTo(trans, MailReceiver(bidder, auction->bidder.GetCounter()), auction, MAIL_CHECK_MASK_COPIED);
     }
     else
-        sAuctionMgr->RemoveAItem(auction->item_guid, true, &trans);
+        sAuctionMgr->RemoveAItem(auction->item_guid, true);
 }
 
 void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail)
@@ -229,7 +229,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
             .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, 0);
     }
     else
-        sAuctionMgr->RemoveAItem(auction->item_guid, true, &trans);
+        sAuctionMgr->RemoveAItem(auction->item_guid, true);
 }
 
 //this function sends mail to old bidder
@@ -377,7 +377,7 @@ void AuctionHouseMgr::AddAItem(Item* it)
     mAitems[it->GetGUID()] = it;
 }
 
-bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB, SQLTransaction* trans /*= nullptr*/)
+bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB)
 {
     ItemMap::iterator i = mAitems.find(itemGuid);
     if (i == mAitems.end())
@@ -385,9 +385,10 @@ bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB, SQLTra
 
     if (deleteFromDB)
     {
-        ASSERT(trans);
+        SQLTransaction trans = CharacterDatabase.BeginTransaction();
         i->second->FSetState(ITEM_REMOVED);
-        i->second->SaveToDB(*trans);
+        i->second->SaveToDB(trans);
+        CharacterDatabase.CommitTransaction(trans);
     }
 
     mAitems.erase(i);
@@ -783,7 +784,7 @@ std::string AuctionEntry::BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint
 {
     std::ostringstream strm;
     strm.width(16);
-    strm << std::right << std::hex << guid.GetRawValue();
+    strm << guid.ToString();
     strm << std::dec << ':' << bid << ':' << buyout;
     strm << ':' << deposit << ':' << cut;
     return strm.str();

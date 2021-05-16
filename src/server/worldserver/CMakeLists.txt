@@ -61,7 +61,7 @@ target_link_libraries(worldserver
     scripts
     gsoap
     readline
-    gperftools)
+    ${GPERFTOOLS_LIBRARIES})
 
 set_target_properties(worldserver
   PROPERTIES

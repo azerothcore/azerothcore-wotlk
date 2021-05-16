@@ -30,7 +30,6 @@
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
 #include "DatabaseLoader.h"
-#include "SecretMgr.h"
 #include <ace/Sig_Handler.h>
 
 #ifdef _WIN32
@@ -137,7 +136,6 @@ int Master::Run()
     sConfigMgr->LoadModulesConfigs();
 
     ///- Initialize the World
-    sSecretMgr->Initialize();
     sWorld->SetInitialWorldSettings();
 
     sScriptMgr->OnStartup();

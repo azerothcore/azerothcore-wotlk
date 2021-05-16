@@ -2943,20 +2943,24 @@ void AchievementGlobalMgr::LoadRewardLocales()
     {
         Field* fields = result->Fetch();
 
-        uint32 ID = fields[0].GetUInt32();
+        uint32 ID               = fields[0].GetUInt32();
+        std::string LocaleName  = fields[1].GetString();
+        std::string Subject     = fields[2].GetString();
+        std::string Text        = fields[3].GetString();
+
         if (m_achievementRewards.find(ID) == m_achievementRewards.end())
         {
             LOG_ERROR("sql.sql", "Table `achievement_reward_locale` (Entry: %u) has locale strings for non-existing achievement reward.", ID);
             continue;
         }
 
-        LocaleConstant locale = GetLocaleByName(fields[1].GetString());
+        AchievementRewardLocale& data = m_achievementRewardLocales[ID];
+        LocaleConstant locale = GetLocaleByName(LocaleName);
         if (locale == LOCALE_enUS)
             continue;
 
-        AchievementRewardLocale& data = m_achievementRewardLocales[ID];
-        ObjectMgr::AddLocaleString(fields[2].GetString(), locale, data.Subject);
-        ObjectMgr::AddLocaleString(fields[3].GetString(), locale, data.Text);
+        ObjectMgr::AddLocaleString(Subject, locale, data.Subject);
+        ObjectMgr::AddLocaleString(Text, locale, data.Text);
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %lu Achievement Reward Locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));

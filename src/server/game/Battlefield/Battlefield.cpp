@@ -461,8 +461,10 @@ void Battlefield::BroadcastPacketToWar(WorldPacket& data) const
 
 void Battlefield::SendWarningToAllInZone(uint32 entry)
 {
-    if (Creature* stalker = GetCreature(StalkerGuid))
-        sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+    if (Map* map = sMapMgr->CreateBaseMap(m_MapId))
+        if (Unit* unit = map->GetCreature(StalkerGuid))
+            if (Creature* stalker = unit->ToCreature())
+                sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
 }
 
 void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)
@@ -812,7 +814,6 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 
     // Set creature in world
     map->AddToMap(creature);
-    creature->setActive(true);
 
     return creature;
 }
@@ -821,7 +822,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z, float o)
 {
     // Get map object
-    Map* map = sMapMgr->CreateBaseMap(m_MapId);
+    Map* map = sMapMgr->CreateBaseMap(571); // *vomits*
     if (!map)
         return 0;
 
