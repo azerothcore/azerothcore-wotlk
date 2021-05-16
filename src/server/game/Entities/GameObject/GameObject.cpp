@@ -266,7 +266,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         return false;
     }
 
-    GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(guidlow);
+    GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(GetSpawnId());
 
     // hackfix for the hackfix down below
     switch (goinfo->entry)
