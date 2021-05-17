@@ -69,8 +69,8 @@ public:
     bool GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo);
     void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo);
     uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
-    uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
-    bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
+    [[nodiscard]] uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
+    [[nodiscard]] bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
     void SendMessageBGQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
     void SendMessageArenaQueue(GroupQueueInfo* ginfo, bool IsJoin);
 
