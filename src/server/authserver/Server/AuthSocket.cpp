@@ -313,30 +313,6 @@ bool AuthSocket::_HandleLogonChallenge()
     ///- Session is closed unless overriden
     _status = STATUS_CLOSED;
 
-    // pussywizard: logon flood protection:
-    {
-        std::lock_guard<std::mutex> guard(LastLoginAttemptMutex);
-        std::string ipaddr = socket().getRemoteAddress();
-        uint32 currTime = time(nullptr);
-        std::map<std::string, uint32>::iterator itr = LastLoginAttemptTimeForIP.find(ipaddr);
-        if (itr != LastLoginAttemptTimeForIP.end() && itr->second >= currTime)
-        {
-            ByteBuffer pkt;
-            pkt << uint8(AUTH_LOGON_CHALLENGE);
-            pkt << uint8(0x00);
-            pkt << uint8(WOW_FAIL_UNKNOWN_ACCOUNT);
-            socket().send((char const*)pkt.contents(), pkt.size());
-            return true;
-        }
-        if (LastLoginAttemptCleanTime + 60 < currTime)
-        {
-            LastLoginAttemptTimeForIP.clear();
-            LastLoginAttemptCleanTime = currTime;
-        }
-        else
-            LastLoginAttemptTimeForIP[ipaddr] = currTime;
-    }
-
     // Read the first 4 bytes (header) to get the length of the remaining of the packet
     std::vector<uint8> buf;
     buf.resize(4);
@@ -630,6 +606,12 @@ bool AuthSocket::_HandleLogonProof()
         else if (!sentToken && !_totpSecret)
             tokenSuccess = true;
 
+        if (!tokenSuccess)
+        {
+            char data[4] = { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0 };
+            socket().send(data, sizeof(data));
+        }
+
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
         {
             sAuthLogonProof_S proof;
@@ -649,12 +631,6 @@ bool AuthSocket::_HandleLogonProof()
             proof.error = 0;
             proof.unk2 = 0x00;
             socket().send((char*)&proof, sizeof(proof));
-        }
-
-        if (!tokenSuccess)
-        {
-            char data[4] = { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0 };
-            socket().send(data, sizeof(data));
         }
 
         ///- Set _status to authed!
