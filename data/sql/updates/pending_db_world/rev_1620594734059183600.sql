@@ -7,10 +7,6 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 4764) AND (`OptionID` IN (0, 1, 2, 3));
 
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
-(1013, 0, 0, 'Kel''Thuzad is my answer.', 8377, 1, 1, 0, 0, 0, 0, '', 0, 0);
-
-INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
-(1013, 1, 0, 'Gul''dan is my answer.', 8378, 1, 1, 0, 0, 0, 0, '', 0, 0);
-
-INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+(1013, 0, 0, 'Kel''Thuzad is my answer.', 8377, 1, 1, 0, 0, 0, 0, '', 0, 0),
+(1013, 1, 0, 'Gul''dan is my answer.', 8378, 1, 1, 0, 0, 0, 0, '', 0, 0),
 (1013, 2, 0, 'Ner''zhul is my answer.', 8380, 1, 1, 0, 0, 0, 0, '', 0, 0);
