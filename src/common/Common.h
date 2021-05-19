@@ -7,48 +7,9 @@
 #ifndef AZEROTHCORE_COMMON_H
 #define AZEROTHCORE_COMMON_H
 
-// config.h needs to be included 1st
-/// @todo this thingy looks like hack, but its not, need to
-// make separate header however, because It makes mess here.
-#ifdef HAVE_CONFIG_H
-// Remove Some things that we will define
-// This is in case including another config.h
-// before trinity config.h
-#ifdef PACKAGE
-#undef PACKAGE
-#endif //PACKAGE
-#ifdef PACKAGE_BUGREPORT
-#undef PACKAGE_BUGREPORT
-#endif //PACKAGE_BUGREPORT
-#ifdef PACKAGE_NAME
-#undef PACKAGE_NAME
-#endif //PACKAGE_NAME
-#ifdef PACKAGE_STRING
-#undef PACKAGE_STRING
-#endif //PACKAGE_STRING
-#ifdef PACKAGE_TARNAME
-#undef PACKAGE_TARNAME
-#endif //PACKAGE_TARNAME
-#ifdef PACKAGE_VERSION
-#undef PACKAGE_VERSION
-#endif //PACKAGE_VERSION
-#ifdef VERSION
-#undef VERSION
-#endif //VERSION
-
-# include "Config.h"
-
-#undef PACKAGE
-#undef PACKAGE_BUGREPORT
-#undef PACKAGE_NAME
-#undef PACKAGE_STRING
-#undef PACKAGE_TARNAME
-#undef PACKAGE_VERSION
-#undef VERSION
-#endif //HAVE_CONFIG_H
-
 #include "Define.h"
-
+#include <algorithm>
+#include <array>
 #include <cassert>
 #include <cerrno>
 #include <cmath>
@@ -57,68 +18,46 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <fstream>
+#include <list>
+#include <map>
+#include <memory>
+#include <queue>
+#include <set>
+#include <sstream>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
-#include <set>
-#include <list>
-#include <string>
-#include <map>
-#include <queue>
-#include <sstream>
-#include <fstream>
-#include <algorithm>
+#include <utility>
 #include <vector>
 
-#include "Threading/LockedQueue.h"
-#include "Threading/Threading.h"
-#include <ace/Stack_Trace.h>
-
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#  include <ace/config-all.h>
-// XP winver - needed to compile with standard leak check in MemoryLeaks.h
-// uncomment later if needed
-//#define _WIN32_WINNT 0x0501
-#  include <ws2tcpip.h>
-//#undef WIN32_WINNT
+#include <ws2tcpip.h>
+#if AC_COMPILER == AC_COMPILER_INTEL
+#    if !defined(BOOST_ASIO_HAS_MOVE)
+#      define BOOST_ASIO_HAS_MOVE
+#    endif // !defined(BOOST_ASIO_HAS_MOVE)
+#  endif // if WARHEAD_COMPILER == WARHEAD_COMPILER_INTEL
 #else
-#  include <sys/types.h>
-#  include <sys/ioctl.h>
-#  include <sys/socket.h>
-#  include <netinet/in.h>
-#  include <unistd.h>
-#  include <netdb.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <cstdlib>
 #endif
 
 #if AC_COMPILER == AC_COMPILER_MICROSOFT
-
-#include <float.h>
-
-#define I32FMT "%08I32X"
-#define I64FMT "%016I64X"
 #define atoll _atoi64
-#define vsnprintf _vsnprintf
 #define llabs _abs64
-
 #else
-
 #define stricmp strcasecmp
-#define strnicmp strncasecmp
-#define I32FMT "%08X"
-#define I64FMT "%016llX"
-
 #endif
 
 using namespace std;
 
 inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
-
 inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 
 #define STRINGIZE(a) #a
