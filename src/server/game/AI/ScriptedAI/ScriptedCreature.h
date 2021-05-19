@@ -100,24 +100,26 @@ public:
     }
 
     template <class Predicate>
-    void DoAction(int32 info, Predicate& predicate, uint16 max = 0)
+    void DoAction(int32 info, Predicate&& predicate, uint16 max = 0)
     {
         if (max)
             RemoveNotExisting(); // pussywizard: when max is set, non existing can be chosen and nothing will happen
 
         // We need to use a copy of SummonList here, otherwise original SummonList would be modified
         StorageType listCopy = storage_;
-        acore::Containers::RandomResize(listCopy, predicate, max);
-        for (StorageType::iterator i = listCopy.begin(); i != listCopy.end(); ++i)
+        acore::Containers::RandomResize<StorageType, Predicate>(listCopy, std::forward<Predicate>(predicate), max);
+
+        for (auto const& guid : listCopy)
         {
-            Creature* summon = ObjectAccessor::GetCreature(*me, *i);
-            if (summon)
+            Creature* summon = ObjectAccessor::GetCreature(*me, guid);
+            if (summon && summon->IsAIEnabled)
             {
-                if (summon->IsAIEnabled)
-                    summon->AI()->DoAction(info);
+                summon->AI()->DoAction(info);
             }
-            else
-                storage_.remove(*i);
+            else if (!summon)
+            {
+                storage_.remove(guid);
+            }
         }
     }
 
