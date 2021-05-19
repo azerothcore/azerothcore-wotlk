@@ -22,7 +22,7 @@ public:
 
     struct npc_pet_warlock_impAI : public ScriptedAI
     {
-        npc_pet_warlock_impAI(Creature* c) : ScriptedAI(c) { }
+        npc_pet_warlock_impAI(Creature* creature) : ScriptedAI(creature) { }
 
         void EnterCombat(Unit* /*who*/) override
         {
@@ -30,9 +30,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pet_warlock_impAI(pCreature);
+        return new npc_pet_warlock_impAI(creature);
     }
 };
 
