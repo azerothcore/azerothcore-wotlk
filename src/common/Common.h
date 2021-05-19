@@ -37,9 +37,6 @@
 #define stricmp strcasecmp
 #endif
 
-inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
-inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
-
 #define STRINGIZE(a) #a
 
 #define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
