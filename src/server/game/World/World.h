@@ -14,6 +14,7 @@
 #include "Callback.h"
 #include "Common.h"
 #include "IWorld.h"
+#include "LockedQueue.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"

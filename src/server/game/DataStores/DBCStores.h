@@ -11,6 +11,7 @@
 #include "DBCStore.h"
 #include "DBCStructure.h"
 #include <list>
+#include <unordered_map>
 
 typedef std::list<uint32> SimpleFactionsList;
 typedef std::vector<FlyByCamera> FlyByCameraCollection;

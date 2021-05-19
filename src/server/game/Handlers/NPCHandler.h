@@ -7,6 +7,9 @@
 #ifndef __NPCHANDLER_H
 #define __NPCHANDLER_H
 
+#include "Define.h"
+#include <vector>
+
 struct QEmote
 {
     uint32 _Emote;
