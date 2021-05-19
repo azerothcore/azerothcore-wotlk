@@ -11,4 +11,3 @@ WHERE `Reference` = @REF_TIGERSTRIKE_MANTLE AND `entry` IN (4287, 4291, 4296, 42
 -- 4299 - Scarlet Chaplain
 -- 4306 - Scarlet Torturer
 -- 4540 - Scarlet Monk
-
