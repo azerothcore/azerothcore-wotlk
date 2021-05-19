@@ -5,8 +5,9 @@
  */
 
 #include "MMapFactory.h"
-#include <memory>
 #include <set>
+#include <stdio.h>
+#include <stdlib.h>
 
 namespace MMAP
 {
