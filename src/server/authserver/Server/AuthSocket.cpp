@@ -371,7 +371,6 @@ bool AuthSocket::_HandleLogonChallenge()
     auto SendAuthPacket = [&]()
     {
         socket().send((char const*)pkt.contents(), pkt.size());
-        return true;
     };
 
     // Verify that this IP is not in the ip_banned table
@@ -414,12 +413,11 @@ bool AuthSocket::_HandleLogonChallenge()
     {
         LOG_DEBUG("network", "[AuthChallenge] Account '%s' is not locked to ip", _accountInfo.Login.c_str());
 
-        std::string accountCountry = fields[2].GetString();
-        if (accountCountry.empty() || accountCountry == "00")
+        if (_accountInfo.LockCountry.empty() || _accountInfo.LockCountry == "00")
         {
             LOG_DEBUG("network", "[AuthChallenge] Account '%s' is not locked to country", _accountInfo.Login.c_str());
         }
-        else if (!accountCountry.empty())
+        else if (!_accountInfo.LockCountry.empty())
         {
             uint32 ip = inet_addr(ipAddress.c_str());
             EndianConvertReverse(ip);
@@ -461,12 +459,14 @@ bool AuthSocket::_HandleLogonChallenge()
     }
 
     uint8 securityFlags = 0;
-    _totpSecret = fields[7].GetBinary();
 
     // Check if a TOTP token is needed
-    if (!_totpSecret || !_totpSecret.value().empty())
+    if (!fields[7].IsNull())
     {
+        LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' using TOTP", _accountInfo.Login.c_str());
+
         securityFlags = 4;
+        _totpSecret = fields[7].GetBinary();
         if (auto const& secret = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY))
         {
             bool success = acore::Crypto::AEDecrypt<acore::Crypto::AES>(*_totpSecret, *secret);
@@ -551,7 +551,9 @@ bool AuthSocket::_HandleLogonProof()
     sAuthLogonProof_C lp;
 
     if (!socket().recv((char*)&lp, sizeof(sAuthLogonProof_C)))
+    {
         return false;
+    }
 
     _status = STATUS_CLOSED;
 
@@ -559,9 +561,7 @@ bool AuthSocket::_HandleLogonProof()
     if (_expversion == NO_VALID_EXP_FLAG)
     {
         // Check if we have the appropriate patch on the disk
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "Client with invalid version, patching is not implemented");
-#endif
         socket().shutdown();
         return true;
     }
@@ -569,9 +569,7 @@ bool AuthSocket::_HandleLogonProof()
     if (std::optional<SessionKey> K = _srp6->VerifyChallengeResponse(lp.A, lp.clientM))
     {
         _sessionKey = *K;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "'%s:%d' User '%s' successfully authenticated", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _accountInfo.Login.c_str());
-#endif
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
@@ -608,6 +606,7 @@ bool AuthSocket::_HandleLogonProof()
 
         if (!tokenSuccess)
         {
+            LOG_DEBUG("server.authsrver", "[AuthChallenge] account %s failed token", _accountInfo.Login.c_str());
             char data[4] = { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0 };
             socket().send(data, sizeof(data));
         }
