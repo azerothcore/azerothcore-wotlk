@@ -8,28 +8,10 @@
 #define AZEROTHCORE_COMMON_H
 
 #include "Define.h"
-#include <algorithm>
 #include <array>
-#include <cassert>
-#include <cerrno>
-#include <cmath>
-#include <csignal>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <fstream>
-#include <list>
-#include <map>
 #include <memory>
-#include <queue>
-#include <set>
-#include <sstream>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <utility>
-#include <vector>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include <ws2tcpip.h>
@@ -54,8 +36,6 @@
 #else
 #define stricmp strcasecmp
 #endif
-
-using namespace std;
 
 inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
 inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
@@ -94,21 +74,20 @@ enum LocaleConstant
     LOCALE_zhTW = 5,
     LOCALE_esES = 6,
     LOCALE_esMX = 7,
-    LOCALE_ruRU = 8
+    LOCALE_ruRU = 8,
+
+    TOTAL_LOCALES
 };
 
-const uint8 TOTAL_LOCALES = 9;
 #define DEFAULT_LOCALE LOCALE_enUS
 
 #define MAX_LOCALES 8
 #define MAX_ACCOUNT_TUTORIAL_VALUES 8
 
-extern char const* localeNames[TOTAL_LOCALES];
+AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 
-LocaleConstant GetLocaleByName(const std::string& name);
-void CleanStringForMysqlQuery(std::string& str);
-
-typedef std::vector<std::string> StringVector;
+AC_COMMON_API LocaleConstant GetLocaleByName(const std::string& name);
+AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 
 // we always use stdlibc++ std::max/std::min, undefine some not C++ standard defines (Win API and some other platforms)
 #ifdef max
