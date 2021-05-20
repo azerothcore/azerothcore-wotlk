@@ -15513,6 +15513,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             return;
 
         // Update skills here for players
+        // only when you are not fighting other players or their pets/totems (pvp)
         if (GetTypeId() == TYPEID_PLAYER &&
                 target->GetTypeId() != TYPEID_PLAYER &&
                 !(target->IsTotem() && target->ToTotem()->GetOwner()->IsPlayer()) &&
