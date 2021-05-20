@@ -298,7 +298,7 @@ enum ParqualFintallas
 {
     SPELL_MARK_OF_SHAME             = 6767,
     QUEST_ID_TEST_OF_LORE           = 6628,
-    GOSSIP_MENU_ID_TEST_OF_LORE     = 1013,
+    GOSSIP_MENU_ID_TEST_OF_LORE     = 4764,
     GOSSIP_TEXTID_PARQUAL_FINTALLAS = 5821,
     GOSSIP_TEXTID_TEST_OF_LORE      = 5822,
 };
@@ -335,7 +335,7 @@ public:
         {
             AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             SendGossipMenuFor(player, GOSSIP_TEXTID_TEST_OF_LORE, creature->GetGUID());
         }
         else
