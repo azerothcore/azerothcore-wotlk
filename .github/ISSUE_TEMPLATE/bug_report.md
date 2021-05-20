@@ -7,91 +7,40 @@ assignees: ''
 
 ---
 
-<!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE -->
+<!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE
+     You should always read how to properly fill out the bug report before continuing. https://www.azerothcore.org/wiki/issue-tracker-standards
+     For issues containing a fix, please create a Pull Request following this tutorial: https://www.azerothcore.org/wiki/How-to-create-a-PR -->
 
-<!-- This template is for problem reports. If this is a crash report, upload the crash log on https://gist.github.com/
- For issues containing a fix, please create a Pull Request following this tutorial: https://www.azerothcore.org/wiki/How-to-create-a-PR -->
+**CURRENT BEHAVIOUR:**
+<!-- If this is a crash report you should post the crashlog. Upload it to https://gist.github.com/ -->
 
+**EXPECTED BLIZZLIKE BEHAVIOUR:**
+<!-- What should happen instead -->
 
-## CURRENT BEHAVIOUR:
-<!-- Describe the bug or issue in detail, if it includes any quest/spell/item/NPC/object from the game, please use database links from https://wowgaming.altervista.org/aowow/ 
--->
+**SOURCE:**
+<!-- If you can, include a source that can strengthen your claim -->
 
-
-
-
-## EXPECTED BLIZZLIKE BEHAVIOUR:
-<!-- Describe how it should be working without the bug/issue 
--->
-
-
-
-
-## SOURCE:
-<!-- If this report IS linked with in-game content, please include any evidence/documentation/video or further proof in order to guarantee that the behavior described above is the correct one.
- - If it is described in a guide/post or Wowhead comment, please include the link.
- - Can you link a video that confirms it?
- - Please share the source which states how it should work.
- - If this report IS NOT linked with in-game content, please leave this field as N/A
--->
-
-
-
-
-## STEPS TO REPRODUCE THE PROBLEM:
-<!-- Describe precisely how to reproduce the bug so we can fix it or confirm its existence:
- - Which commands to use? Which NPC to teleport to?
- - Do we need to have debug flags on Cmake?
- - Do we need to look at the console while the bug happens?
- - Describe as much as possible how to detect or check the bug -->
+**STEPS TO REPRODUCE THE PROBLEM:**
+<!-- Describe in a detailed step-by-step order how to reproduce the issue -->
 
 1. 
 2. 
 3. 
 
-## EXTRA NOTES:
-<!-- Please share any additional information that can help the developers to identify and fix the issue.
-Examples:
-- Was this bug always present in AzerothCore? if no, from which change/commit it started?
-- Is there any code line(s) causing the bug/issue?
-- Does this feature work in other server applications like CMaNGOS or TrinityCore? 
--->
+**EXTRA NOTES:**
+<!-- Any extra notes that can help solve the issue -->
 
+**AC HASH/COMMIT:**
+<!-- Always include the exact hash/commit you are using. Never write "latest"! --> 
 
+**OPERATING SYSTEM:**
+<!-- Which OS are you running -->
 
+**MODULES:**
+<!-- Are you using any modules? List them here -->
 
-## AC HASH/COMMIT:
-<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! NEVER WRITE "LATEST", ALWAYS PUT THE ACTUAL VALUE INSTEAD.
-Find the commit hash (unique identifier) by running "git log" on your own clone of AzerothCore or by looking at here https://github.com/azerothcore/azerothcore-wotlk/commits/master 
--->
-
-
-
-
-## OPERATING SYSTEM:
-<!-- On which operating system the bug/issue was found?
- Examples: Windows 7/10, Debian 8/9/10, Ubuntu 16/18 or macOS 10/11 
- -->
-
-
-
-
-## MODULES:
-<!-- Are you using modules? if yes, please list them all 
--->
-
-
-
-
-## CUSTOMIZATIONS:
-<!-- Are you using any extra content that could affect your client/server?
- - Did you apply any core patch/diff?
- - Did you modify your database?
- - Do you have any other client/server customizations? If yes please specify them here 
--->
-
-
-
+**CUSTOMIZATIONS:**
+<!-- Do you have any other customizations? List them here -->
 
 <!-- ------------------------- THE END ------------------------------
 Thank you for your contribution.

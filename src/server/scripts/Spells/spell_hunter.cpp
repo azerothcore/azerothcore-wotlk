@@ -693,10 +693,8 @@ public:
 
         SpellCastResult DoCheckCast()
         {
-            Guardian* pet = GetCaster()->ToPlayer()->GetGuardianPet();
-            ASSERT(pet); // checked in Spell::CheckCast
-
-            if (!pet->IsPet() || !pet->IsAlive())
+            Pet* pet = GetCaster()->ToPlayer()->GetPet();
+            if (!pet || !pet->IsAlive())
                 return SPELL_FAILED_NO_PET;
 
             // Do a mini Spell::CheckCasterAuras on the pet, no other way of doing this
