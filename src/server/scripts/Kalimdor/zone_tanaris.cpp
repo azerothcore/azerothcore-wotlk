@@ -321,13 +321,6 @@ public:
 ## npc_stone_watcher_of_norgannon
 ######*/
 
-#define GOSSIP_ITEM_NORGANNON_1     "What function do you serve?" // 57000
-#define GOSSIP_ITEM_NORGANNON_2     "What are the Plates of Uldum?" // 57001
-#define GOSSIP_ITEM_NORGANNON_3     "Where are the Plates of Uldum?" // 57002
-#define GOSSIP_ITEM_NORGANNON_4     "Excuse me? We've been \"reschedueled for visitations\"? What does that mean?!" // 57003
-#define GOSSIP_ITEM_NORGANNON_5     "So, what's inside Uldum?" // 57004
-#define GOSSIP_ITEM_NORGANNON_6     "I will return when i have the Plates of Uldum." // 57005
-
 class npc_stone_watcher_of_norgannon : public CreatureScript
 {
 public:
