@@ -466,7 +466,7 @@ bool AuthSocket::_HandleLogonChallenge()
         LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' using TOTP", _accountInfo.Login.c_str());
 
         securityFlags = 4;
-        _totpSecret = fields[7].GetBinary();
+        _totpSecret = fields[9].GetBinary();
         if (auto const& secret = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY))
         {
             bool success = acore::Crypto::AEDecrypt<acore::Crypto::AES>(*_totpSecret, *secret);
