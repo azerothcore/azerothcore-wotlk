@@ -419,4 +419,4 @@ struct TrainerSpellData
 
 typedef std::map<uint32, time_t> CreatureSpellCooldowns;
 
-#endif
+#endif // AZEROTHCORE_CREATUREDATA_H
