@@ -6,6 +6,7 @@
 
 #include "PacketLog.h"
 #include "Config.h"
+#include "Util.h"
 #include "WorldPacket.h"
 
 #pragma pack(push, 1)
