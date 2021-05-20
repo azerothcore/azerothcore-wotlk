@@ -461,7 +461,7 @@ bool AuthSocket::_HandleLogonChallenge()
     uint8 securityFlags = 0;
 
     // Check if a TOTP token is needed
-    if (!fields[7].IsNull())
+    if (!fields[9].IsNull())
     {
         LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' using TOTP", _accountInfo.Login.c_str());
 
