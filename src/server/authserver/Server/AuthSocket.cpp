@@ -935,7 +935,7 @@ bool AuthSocket::_HandleRealmList()
         // We don't need the port number from which client connects with but the realm's port
         clientAddr.set_port_number(realm.ExternalAddress->get_port_number());
 
-        uint8 lock = (realm.allowedSecurityLevel > _accountInfo.SecurityLevel) ? 1 : 0;
+        uint8 lock = (realm.AllowedSecurityLevel > _accountInfo.SecurityLevel) ? 1 : 0;
 
         uint8 AmountOfCharacters = 0;
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_NUM_CHARS_ON_REALM);
