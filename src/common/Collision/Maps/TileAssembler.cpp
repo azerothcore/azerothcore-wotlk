@@ -8,7 +8,7 @@
 #include "MapTree.h"
 #include "BoundingIntervalHierarchy.h"
 #include "VMapDefinitions.h"
-#include "SharedDefines.h"
+#include "MapDefines.h"
 #include <set>
 #include <sstream>
 #include <iomanip>
