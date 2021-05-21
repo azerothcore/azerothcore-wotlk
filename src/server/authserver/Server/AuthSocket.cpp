@@ -565,7 +565,7 @@ bool AuthSocket::_HandleLogonProof()
 
     if (std::optional<SessionKey> K = _srp6->VerifyChallengeResponse(lp.A, lp.clientM))
     {
-        _sessionKey = *K;        
+        _sessionKey = *K;
 
         // Check auth token
         bool tokenSuccess = false;
