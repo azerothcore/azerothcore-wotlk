@@ -186,6 +186,7 @@ LoginDatabase.SynchThreads = 1
 ###################################################################################################
 # CRYPTOGRAPHY
 
+#
 #    EnableTOTP
 #        Description: Check if a TOTP token is needed on account login
 #
