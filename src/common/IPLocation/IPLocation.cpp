@@ -94,7 +94,7 @@ void IpLocationStore::Load()
     databaseFile.close();
 
     LOG_INFO("server.loading", ">> Loaded %u ip location entries.", static_cast<uint32>(_ipLocationStore.size()));
-    LOG_INFO("server.loading", "");
+    LOG_INFO("server.loading", " ");
 }
 
 IpLocationRecord const* IpLocationStore::GetLocationRecord(std::string const& ipAddress) const

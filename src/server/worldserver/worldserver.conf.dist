@@ -75,7 +75,6 @@ DataDir = "."
 
 PidFile = ""
 
-
 #
 #    LogsDir
 #        Description: Logs directory setting.
