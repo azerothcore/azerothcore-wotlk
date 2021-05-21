@@ -395,7 +395,7 @@ void LoadDBCStores(const std::string& dataPath)
     for (SkillLineAbilityEntry const* skillLine : sSkillLineAbilityStore)
     {
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->spellId);
-        if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+        if (spellInfo && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
         {
             for (CreatureFamilyEntry const* cFamily : sCreatureFamilyStore)
             {
