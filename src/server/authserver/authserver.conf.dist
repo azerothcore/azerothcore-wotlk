@@ -187,9 +187,8 @@ LoginDatabase.SynchThreads = 1
 # CRYPTOGRAPHY
 
 #    EnableTOTP
-#        Description: Check if a TOTP token is needed
+#        Description: Check if a TOTP token is needed on account login
 #
-#        Default:     <blank> - (Store TOTP secrets unencrypted)
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
