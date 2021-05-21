@@ -186,6 +186,8 @@ private:
     bool m_OutActive;
 
     std::array<uint8, 4> m_Seed;
+
+    std::string _ipCountry;
 };
 
 #endif  /* _WORLDSOCKET_H */

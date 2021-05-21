@@ -12,27 +12,27 @@
 * authentication server
 */
 
+#include "AppenderDB.h"
 #include "Banner.h"
 #include "Common.h"
-#include "AppenderDB.h"
-#include "DatabaseEnv.h"
 #include "Config.h"
-#include "Log.h"
-#include "GitRevision.h"
-#include "Util.h"
-#include "SignalHandler.h"
-#include "RealmList.h"
-#include "RealmAcceptor.h"
+#include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
+#include "GitRevision.h"
+#include "IPLocation.h"
+#include "Log.h"
+#include "RealmAcceptor.h"
+#include "RealmList.h"
 #include "SecretMgr.h"
 #include "SharedDefines.h"
-#include "IPLocation.h"
-#include <ace/Dev_Poll_Reactor.h>
-#include <ace/TP_Reactor.h>
+#include "SignalHandler.h"
+#include "Util.h"
 #include <ace/ACE.h>
+#include <ace/Dev_Poll_Reactor.h>
 #include <ace/Sig_Handler.h>
-#include <openssl/opensslv.h>
+#include <ace/TP_Reactor.h>
 #include <openssl/crypto.h>
+#include <openssl/opensslv.h>
 
 #ifdef __linux__
 #include <sched.h>
