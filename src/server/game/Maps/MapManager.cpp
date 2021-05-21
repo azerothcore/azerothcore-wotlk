@@ -406,7 +406,7 @@ uint32 MapManager::GenerateInstanceId()
 
     if (_nextInstanceId == 0xFFFFFFFF)
     {
-        LOG_ERROR("server", "Instance ID overflow!! Can't continue, shutting down server. ");
+        LOG_ERROR("server.worldserver", "Instance ID overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
 

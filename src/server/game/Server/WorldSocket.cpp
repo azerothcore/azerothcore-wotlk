@@ -809,10 +809,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> DosResponse;
     recvPacket.read(digest);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "WorldSocket::HandleAuthSession: client %u, loginServerID %u, accountName %s, loginServerType %u",
+    LOG_DEBUG("network", "WorldSocket::HandleAuthSession: client %u, loginServerID %u, accountName %s, loginServerType %u",
         BuiltNumberClient, loginServerID, accountName.c_str(), loginServerType);
-#endif
+
     // Get the account information from the realmd database
     //         0           1        2       3        4            5         6       7          8      9      10
     // SELECT id, sessionkey, last_ip, locked, lock_country, expansion, mutetime, locale, recruiter, os, totaltime FROM account WHERE username = ?
@@ -858,7 +857,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         packet << uint8(AUTH_REJECT);
         SendPacket(packet);
 
-        LOG_ERROR("server", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", address.c_str());
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", address.c_str());
         sScriptMgr->OnFailedAccountLogin(account.Id);
         return -1;
     }
@@ -869,7 +868,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         packet << uint8(REALM_LIST_REALM_NOT_FOUND);
         SendPacket(packet);
 
-        LOG_ERROR("server", "WorldSocket::HandleAuthSession: Client %s requested connecting with realm id %u but this realm has id %u set in config.",
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s requested connecting with realm id %u but this realm has id %u set in config.",
             address.c_str(), realm, realmID);
         sScriptMgr->OnFailedAccountLogin(account.Id);
         return -1;
@@ -902,10 +901,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     {
         packet.Initialize(SMSG_AUTH_RESPONSE, 1);
         packet << uint8(AUTH_FAILED);
-
         SendPacket(packet);
-
-        LOG_ERROR("server", "WorldSocket::HandleAuthSession: Authentication failed for account: %u ('%s') address: %s", account.Id, accountName.c_str(), address.c_str());
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Authentication failed for account: %u ('%s') address: %s", account.Id, accountName.c_str(), address.c_str());
         return -1;
     }
 

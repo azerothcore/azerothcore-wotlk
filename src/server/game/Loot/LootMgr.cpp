@@ -160,7 +160,7 @@ uint32 LootStore::LoadLootTable()
 
         if (lootmode == 0)
         {
-            LOG_ERROR("server", "Table '%s' Entry %d Item %d: LootMode is equal to 0, item will never drop - setting mode 1", GetName(), entry, item);
+            LOG_ERROR("sql.sql", "Table '%s' Entry %d Item %d: LootMode is equal to 0, item will never drop - setting mode 1", GetName(), entry, item);
             lootmode = 1;
         }
 
@@ -1552,7 +1552,7 @@ bool LootTemplate::addConditionItem(Condition* cond)
 {
     if (!cond || !cond->isLoaded())//should never happen, checked at loading
     {
-        LOG_ERROR("server", "LootTemplate::addConditionItem: condition is null");
+        LOG_ERROR("condition", "LootTemplate::addConditionItem: condition is null");
         return false;
     }
 

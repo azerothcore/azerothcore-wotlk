@@ -59,7 +59,7 @@ ObjectGuid::LowType GroupMgr::GenerateGroupId()
 
     if (_nextGroupId == 0xFFFFFFFF)
     {
-        LOG_ERROR("server", "Group ID overflow!! Can't continue, shutting down server.");
+        LOG_ERROR("server.worldserver", "Group ID overflow!! Can't continue, shutting down server.");
         World::StopNow(ERROR_EXIT_CODE);
     }
 

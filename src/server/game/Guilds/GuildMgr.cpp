@@ -36,7 +36,7 @@ uint32 GuildMgr::GenerateGuildId()
 {
     if (NextGuildId >= 0xFFFFFFFE)
     {
-        LOG_ERROR("server", "Guild ids overflow!! Can't continue, shutting down server.");
+        LOG_ERROR("server.worldserver", "Guild ids overflow!! Can't continue, shutting down server.");
         World::StopNow(ERROR_EXIT_CODE);
     }
     return NextGuildId++;

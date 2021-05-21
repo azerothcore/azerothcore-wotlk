@@ -59,7 +59,7 @@ void ChannelMgr::LoadChannels()
         std::wstring channelWName;
         if (!Utf8toWStr(channelName, channelWName))
         {
-            LOG_ERROR("server", "Failed to load channel '%s' from database - invalid utf8 sequence? Deleted.", channelName.c_str());
+            LOG_ERROR("server.loading", "Failed to load channel '%s' from database - invalid utf8 sequence? Deleted.", channelName.c_str());
             toDelete.push_back({ channelName, team });
             continue;
         }
@@ -67,7 +67,7 @@ void ChannelMgr::LoadChannels()
         ChannelMgr* mgr = forTeam(team);
         if (!mgr)
         {
-            LOG_ERROR("server", "Failed to load custom chat channel '%s' from database - invalid team %u. Deleted.", channelName.c_str(), team);
+            LOG_ERROR("server.loading", "Failed to load custom chat channel '%s' from database - invalid team %u. Deleted.", channelName.c_str(), team);
             toDelete.push_back({ channelName, team });
             continue;
         }
