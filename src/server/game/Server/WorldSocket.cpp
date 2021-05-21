@@ -822,7 +822,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     //         0           1        2       3        4            5         6       7          8      9      10
     // SELECT id, sessionkey, last_ip, locked, lock_country, expansion, mutetime, locale, recruiter, os, totaltime FROM account WHERE username = ?
     auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO_BY_NAME);
-    stmt->setInt32(0, int32(realmID));
+    stmt->setInt32(0, int32(realm.Id.Realm));
     stmt->setString(1, accountName);
 
     PreparedQueryResult result = LoginDatabase.Query(stmt);
@@ -849,11 +849,10 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_ATTEMPT_IP);
     stmt->setString(0, address);
     stmt->setString(1, accountName);
-
     LoginDatabase.Execute(stmt);
     // This also allows to check for possible "hack" attempts on account
 
-     // even if auth credentials are bad, try using the session key we have - client cannot read auth response error without it
+    // even if auth credentials are bad, try using the session key we have - client cannot read auth response error without it
     m_Crypt.Init(account.SessionKey);
 
     // First reject the connection if packet contains invalid data or realm state doesn't allow logging in
@@ -868,14 +867,14 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         return -1;
     }
 
-    if (realm != realmID)
+    if (realmid != realm.Id.Realm)
     {
         packet.Initialize(SMSG_AUTH_RESPONSE, 1);
         packet << uint8(REALM_LIST_REALM_NOT_FOUND);
         SendPacket(packet);
 
         LOG_ERROR("server", "WorldSocket::HandleAuthSession: Client %s requested connecting with realm id %u but this realm has id %u set in config.",
-            address.c_str(), realm, realmID);
+            address.c_str(), realmid, realm.Id.Realm);
         sScriptMgr->OnFailedAccountLogin(account.Id);
         return -1;
     }
