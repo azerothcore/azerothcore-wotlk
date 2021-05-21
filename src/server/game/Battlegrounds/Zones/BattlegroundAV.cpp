@@ -5,6 +5,7 @@
  */
 
 #include "BattlegroundAV.h"
+#include "CreatureTextMgr.h"
 #include "Formulas.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
@@ -398,12 +399,8 @@ void BattlegroundAV::PostUpdateImpl(uint32 diff)
                     Creature* creature = GetBGCreature(AV_CPLACE_MAX + 61);
                     if (creature)
                     {
-                        BroadcastText const* broadcastText = sObjectMgr->GetBroadcastText(LANG_BG_AV_A_CAPTAIN_BUFF);
-                        if (broadcastText)
-                        {
-                            std::string creatureText = (creature->getGender() == GENDER_MALE ? broadcastText->MaleText : broadcastText->FemaleText)[DEFAULT_LOCALE];
-                            YellToAll(creature, creatureText.c_str(), LANG_COMMON);
-                        }
+                        std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 0, 0, DEFAULT_LOCALE);
+                        YellToAll(creature, creatureText.c_str(), LANG_COMMON);
                     }
                 }
                 else
@@ -412,12 +409,8 @@ void BattlegroundAV::PostUpdateImpl(uint32 diff)
                     Creature* creature = GetBGCreature(AV_CPLACE_MAX + 59); //TODO: make the captains a dynamic creature
                     if (creature)
                     {
-                        BroadcastText const* broadcastText = sObjectMgr->GetBroadcastText(LANG_BG_AV_H_CAPTAIN_BUFF);
-                        if (broadcastText)
-                        {
-                            std::string creatureText = (creature->getGender() == GENDER_MALE ? broadcastText->MaleText : broadcastText->FemaleText)[DEFAULT_LOCALE];
-                            YellToAll(creature, creatureText.c_str(), LANG_ORCISH);
-                        }
+                        std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 2, 0, DEFAULT_LOCALE);
+                        YellToAll(creature, creatureText.c_str(), LANG_ORCISH);
                     }
                 }
                 m_CaptainBuffTimer[i] = 120000 + urand(0, 4) * 60000; //as far as i could see, the buff is randomly so i make 2minutes (thats the duration of the buff itself) + 0-4minutes TODO get the right times
@@ -764,12 +757,8 @@ void BattlegroundAV::ChangeMineOwner(uint8 mine, TeamId teamId, bool initial)
         {
             if (Creature* creature = GetBGCreature(AV_CPLACE_MINE_S_3))
             {
-                BroadcastText const* broadcastText = sObjectMgr->GetBroadcastText(LANG_BG_AV_S_MINE_BOSS_CLAIMS);
-                if (broadcastText)
-                {
-                    std::string creatureText = (creature->getGender() == GENDER_MALE ? broadcastText->MaleText : broadcastText->FemaleText)[DEFAULT_LOCALE];
-                    YellToAll(creature, creatureText.c_str(), LANG_UNIVERSAL);
-                }
+                std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 0, 0, DEFAULT_LOCALE);
+                YellToAll(creature, creatureText.c_str(), LANG_UNIVERSAL);
             }
         }
     }

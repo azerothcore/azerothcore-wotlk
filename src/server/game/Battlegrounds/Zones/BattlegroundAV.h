@@ -9,10 +9,6 @@
 
 #include "Battleground.h"
 
-#define LANG_BG_AV_A_CAPTAIN_BUFF       10054
-#define LANG_BG_AV_H_CAPTAIN_BUFF       10057
-#define LANG_BG_AV_S_MINE_BOSS_CLAIMS   10025
-
 #define BG_AV_CAPTIME                    240000  //4:00
 #define BG_AV_SNOWFALL_FIRSTCAP          300000  //5:00 but i also have seen 4:05
 
