@@ -1,3 +1,19 @@
+-- DB update 2021_05_20_01 -> 2021_05_21_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_20_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_20_01 2021_05_21_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1621071094020971520'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1621071094020971520');
 
 DELETE FROM `gossip_menu` WHERE `MenuID` IN (281, 283,433);
@@ -32,3 +48,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (15,21212,0,0,0,9,0,1950,0,0,0,0,0,"","Show gossip option if quest 'Get the Scoop' is taken"), -- Gnome Pit Crewman
 (15,21217,0,0,0,9,0,1950,0,0,0,0,0,"","Show gossip option if quest 'Get the Scoop' is taken"), -- Race Master Kronkrider
 (14,231,739,0,0,9,0,1950,0,0,1,0,0,"","Show gossip text 739 if quest 'Get the Scoop' is not taken");  -- "Plucky" Johnson
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
