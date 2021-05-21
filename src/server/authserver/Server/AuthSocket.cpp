@@ -389,7 +389,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
         if (_accountInfo.LastIP != ipAddress)
         {
-            LOG_DEBUG("network", "[AuthChallenge] Account IP differs");
+            LOG_DEBUG("server.authserver", "[AuthChallenge] Account IP differs");
             pkt << uint8(WOW_FAIL_LOCKED_ENFORCED);
             SendAuthPacket();
             return true;
@@ -397,11 +397,11 @@ bool AuthSocket::_HandleLogonChallenge()
     }
     else
     {
-        LOG_DEBUG("network", "[AuthChallenge] Account '%s' is not locked to ip", _accountInfo.Login.c_str());
+        LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is not locked to ip", _accountInfo.Login.c_str());
 
         if (_accountInfo.LockCountry.empty() || _accountInfo.LockCountry == "00")
         {
-            LOG_DEBUG("network", "[AuthChallenge] Account '%s' is not locked to country", _accountInfo.Login.c_str());
+            LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is not locked to country", _accountInfo.Login.c_str());
         }
         else if (!_accountInfo.LockCountry.empty())
         {
@@ -414,10 +414,10 @@ bool AuthSocket::_HandleLogonChallenge()
             if (PreparedQueryResult sessionCountryQuery = LoginDatabase.Query(stmt))
             {
                 std::string loginCountry = (*sessionCountryQuery)[0].GetString();
-                LOG_DEBUG("network", "[AuthChallenge] Account '%s' is locked to country: '%s' Player country is '%s'", _accountInfo.Login.c_str(), _accountInfo.LockCountry.c_str(), loginCountry.c_str());
+                LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is locked to country: '%s' Player country is '%s'", _accountInfo.Login.c_str(), _accountInfo.LockCountry.c_str(), loginCountry.c_str());
                 if (loginCountry != _accountInfo.LockCountry)
                 {
-                    LOG_DEBUG("network", "[AuthChallenge] Account country differs.");
+                    LOG_DEBUG("server.authserver", "[AuthChallenge] Account country differs.");
                     pkt << uint8(WOW_FAIL_UNLOCKABLE_LOCK);
                     SendAuthPacket();
                     return true;
@@ -517,7 +517,7 @@ bool AuthSocket::_HandleLogonChallenge()
     for (int i = 0; i < 4; ++i)
         _localizationName[i] = ch->country[4 - i - 1];
 
-    LOG_DEBUG("network", "'%s:%d' [AuthChallenge] account %s is using locale (%u)",
+    LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s is using locale (%u)",
         ipAddress.c_str(), port, _accountInfo.Login.c_str(), GetLocaleByName(_localizationName));
 
     ///- All good, await client's proof
@@ -545,7 +545,7 @@ bool AuthSocket::_HandleLogonProof()
     if (_expversion == NO_VALID_EXP_FLAG)
     {
         // Check if we have the appropriate patch on the disk
-        LOG_DEBUG("network", "Client with invalid version, patching is not implemented");
+        LOG_DEBUG("server.authserver", "Client with invalid version, patching is not implemented");
         socket().shutdown();
         return true;
     }
@@ -553,7 +553,7 @@ bool AuthSocket::_HandleLogonProof()
     if (std::optional<SessionKey> K = _srp6->VerifyChallengeResponse(lp.A, lp.clientM))
     {
         _sessionKey = *K;
-        LOG_DEBUG("network", "'%s:%d' User '%s' successfully authenticated", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _accountInfo.Login.c_str());
+        LOG_DEBUG("server.authserver", "'%s:%d' User '%s' successfully authenticated", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _accountInfo.Login.c_str());
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
@@ -625,7 +625,7 @@ bool AuthSocket::_HandleLogonProof()
         socket().send(data, sizeof(data));
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] account %s tried to login with invalid password!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _accountInfo.Login.c_str());
+        LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s tried to login with invalid password!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _accountInfo.Login.c_str());
 #endif
 
         uint32 MaxWrongPassCount = sConfigMgr->GetOption<int32>("WrongPass.MaxCount", 0);
@@ -669,7 +669,7 @@ bool AuthSocket::_HandleLogonProof()
                         LoginDatabase.Execute(stmt);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _accountInfo.Login.c_str(), WrongPassBanTime, failed_logins);
+                        LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _accountInfo.Login.c_str(), WrongPassBanTime, failed_logins);
 #endif
                     }
                     else
@@ -680,7 +680,7 @@ bool AuthSocket::_HandleLogonProof()
                         LoginDatabase.Execute(stmt);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] IP %s got banned for '%u' seconds because account %s failed to authenticate '%u' times",
+                        LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] IP %s got banned for '%u' seconds because account %s failed to authenticate '%u' times",
                                        socket().getRemoteAddress().c_str(), socket().getRemotePort(), socket().getRemoteAddress().c_str(), WrongPassBanTime, _accountInfo.Login.c_str(), failed_logins);
 #endif
                     }
