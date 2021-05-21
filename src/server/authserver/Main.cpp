@@ -99,7 +99,7 @@ extern int main(int argc, char** argv)
         {
             LOG_INFO("server.authserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
             LOG_INFO("server.authserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            LOG_INFO("server.authserver", "> Using ACE version:             %s", ACE_VERSION);
+            LOG_INFO("server.authserver", "> Using ACE version:             %s\n", ACE_VERSION);
         }
     );
 
