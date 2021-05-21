@@ -185,7 +185,16 @@ LoginDatabase.SynchThreads = 1
 
 ###################################################################################################
 # CRYPTOGRAPHY
+
 #
+#    EnableTOTP
+#        Description: Check if a TOTP token is needed on account login
+#
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+EnableTOTP = 0
+
 #    TOTPMasterSecret
 #        Description: The master key used to encrypt TOTP secrets for database storage.
 #                     If you want to change this, uncomment TOTPOldMasterSecret, then copy
