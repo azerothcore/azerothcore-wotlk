@@ -12,7 +12,7 @@
 
 class MessageBuffer
 {
-    typedef std::vector<uint8>::size_type size_type;
+    using size_type = std::vector<uint8>::size_type;
 
 public:
     MessageBuffer() : _wpos(0), _rpos(0), _storage()
@@ -43,20 +43,15 @@ public:
     }
 
     uint8* GetBasePointer() { return _storage.data(); }
-
     uint8* GetReadPointer() { return GetBasePointer() + _rpos; }
-
     uint8* GetWritePointer() { return GetBasePointer() + _wpos; }
 
     void ReadCompleted(size_type bytes) { _rpos += bytes; }
-
     void WriteCompleted(size_type bytes) { _wpos += bytes; }
 
-    size_type GetActiveSize() const { return _wpos - _rpos; }
-
-    size_type GetRemainingSpace() const { return _storage.size() - _wpos; }
-
-    size_type GetBufferSize() const { return _storage.size(); }
+    [[nodiscard]] size_type GetActiveSize() const { return _wpos - _rpos; }
+    [[nodiscard]] size_type GetRemainingSpace() const { return _storage.size() - _wpos; }
+    [[nodiscard]] size_type GetBufferSize() const { return _storage.size(); }
 
     // Discards inactive data
     void Normalize()

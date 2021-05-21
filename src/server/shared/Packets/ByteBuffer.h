@@ -78,9 +78,7 @@ public:
     }
 
     ByteBuffer(ByteBuffer const& right) = default;
-
     ByteBuffer(MessageBuffer&& buffer);
-
     virtual ~ByteBuffer() = default;
 
     ByteBuffer& operator=(ByteBuffer const& right)
@@ -120,7 +118,7 @@ public:
     {
         static_assert(std::is_fundamental<T>::value, "append(compound)");
         EndianConvert(value);
-        append((uint8 *)&value, sizeof(value));
+        append((uint8*)&value, sizeof(value));
     }
 
     template <typename T>
@@ -128,7 +126,7 @@ public:
     {
         static_assert(std::is_fundamental<T>::value, "append(compound)");
         EndianConvert(value);
-        put(pos, (uint8 *)&value, sizeof(value));
+        put(pos, (uint8*)&value, sizeof(value));
     }
 
     ByteBuffer& operator<<(bool value)
@@ -202,7 +200,10 @@ public:
     ByteBuffer& operator<<(std::string_view value)
     {
         if (size_t len = value.length())
+        {
             append(reinterpret_cast<uint8 const*>(value.data()), len);
+        }
+
         append(static_cast<uint8>(0));
         return *this;
     }
@@ -284,7 +285,9 @@ public:
     uint8& operator[](size_t const pos)
     {
         if (pos >= size())
+        {
             throw ByteBufferPositionException(false, pos, 1, size());
+        }
 
         return _storage[pos];
     }
@@ -292,12 +295,14 @@ public:
     uint8 const& operator[](size_t const pos) const
     {
         if (pos >= size())
+        {
             throw ByteBufferPositionException(false, pos, 1, size());
+        }
 
         return _storage[pos];
     }
 
-    size_t rpos() const { return _rpos; }
+    [[nodiscard]] size_t rpos() const { return _rpos; }
 
     size_t rpos(size_t rpos_)
     {
@@ -310,7 +315,7 @@ public:
         _rpos = wpos();
     }
 
-    size_t wpos() const { return _wpos; }
+    [[nodiscard]] size_t wpos() const { return _wpos; }
 
     size_t wpos(size_t wpos_)
     {
@@ -324,7 +329,9 @@ public:
     void read_skip(size_t skip)
     {
         if (_rpos + skip > size())
+        {
             throw ByteBufferPositionException(false, _rpos, skip, size());
+        }
 
         _rpos += skip;
     }
@@ -339,17 +346,21 @@ public:
     template <typename T> T read(size_t pos) const
     {
         if (pos + sizeof(T) > size())
+        {
             throw ByteBufferPositionException(false, pos, sizeof(T), size());
+        }
 
         T val = *((T const*)&_storage[pos]);
         EndianConvert(val);
         return val;
     }
 
-    void read(uint8 *dest, size_t len)
+    void read(uint8* dest, size_t len)
     {
         if (_rpos  + len > size())
+        {
             throw ByteBufferPositionException(false, _rpos, len, size());
+        }
 
         std::memcpy(dest, &_storage[_rpos], len);
         _rpos += len;
@@ -364,7 +375,9 @@ public:
     void readPackGUID(uint64& guid)
     {
         if (rpos() + 1 > size())
+        {
             throw ByteBufferPositionException(false, _rpos, 1, size());
+        }
 
         guid = 0;
 
@@ -376,7 +389,9 @@ public:
             if (guidmark & (uint8(1) << i))
             {
                 if (rpos() + 1 > size())
+                {
                     throw ByteBufferPositionException(false, _rpos, 1, size());
+                }
 
                 uint8 bit;
                 (*this) >> bit;
@@ -386,7 +401,6 @@ public:
     }
 
     std::string ReadCString(bool requireValidUtf8 = true);
-
     uint32 ReadPackedTime();
 
     ByteBuffer& ReadPackedTime(uint32& time)
@@ -398,21 +412,25 @@ public:
     uint8* contents()
     {
         if (_storage.empty())
+        {
             throw ByteBufferException();
+        }
 
         return _storage.data();
     }
 
-    uint8 const* contents() const
+    [[nodiscard]] uint8 const* contents() const
     {
         if (_storage.empty())
+        {
             throw ByteBufferException();
+        }
 
         return _storage.data();
     }
 
-    size_t size() const { return _storage.size(); }
-    bool empty() const { return _storage.empty(); }
+    [[nodiscard]] size_t size() const { return _storage.size(); }
+    [[nodiscard]] bool empty() const { return _storage.empty(); }
 
     void resize(size_t newsize)
     {
@@ -424,7 +442,9 @@ public:
     void reserve(size_t ressize)
     {
         if (ressize > size())
+        {
             _storage.reserve(ressize);
+        }
     }
 
     void shrink_to_fit()
@@ -437,9 +457,9 @@ public:
         return append((const uint8 *)src, cnt);
     }
 
-    template<class T> void append(const T *src, size_t cnt)
+    template<class T> void append(const T* src, size_t cnt)
     {
-        return append((const uint8 *)src, cnt * sizeof(T));
+        return append((const uint8*)src, cnt * sizeof(T));
     }
 
     void append(uint8 const* src, size_t cnt);
@@ -447,7 +467,9 @@ public:
     void append(ByteBuffer const& buffer)
     {
         if (buffer.wpos())
+        {
             append(buffer.contents(), buffer.wpos());
+        }
     }
 
     template <size_t Size>
@@ -468,11 +490,11 @@ public:
 
     void appendPackGUID(uint64 guid)
     {
-        uint8 packGUID[8+1];
+        uint8 packGUID[8 + 1];
         packGUID[0] = 0;
         size_t size = 1;
 
-        for (uint8 i = 0;guid != 0;++i)
+        for (uint8 i = 0; guid != 0;++i)
         {
             if (guid & 0xFF)
             {
@@ -488,13 +510,9 @@ public:
     }
 
     void AppendPackedTime(time_t time);
-
     void put(size_t pos, const uint8 *src, size_t cnt);
-
     void print_storage() const;
-
     void textlike() const;
-
     void hexlike() const;
 
 protected:
@@ -503,7 +521,8 @@ protected:
 };
 
 /// @todo Make a ByteBuffer.cpp and move all this inlining to it.
-template<> inline std::string ByteBuffer::read<std::string>()
+template<>
+inline std::string ByteBuffer::read<std::string>()
 {
     std::string tmp;
     *this >> tmp;
