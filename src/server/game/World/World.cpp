@@ -431,7 +431,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
     // Set realm id and enable db logging
-    sLog->SetRealmId(realmID);
+    sLog->SetRealmId(realm.Id.Realm);
 
 #ifdef ELUNA
     ///- Initialize Lua Engine
