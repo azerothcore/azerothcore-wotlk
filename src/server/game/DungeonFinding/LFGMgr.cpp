@@ -26,7 +26,6 @@
 
 namespace lfg
 {
-
     LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK))
     {
         new LFGPlayerScript();
@@ -1673,7 +1672,7 @@ namespace lfg
             if (itPlayers->second.accept != LFG_ANSWER_AGREE)   // No answer (-1) or not accepted (0)
                 allAnswered = false;
 
-        if (!allAnswered)
+        if (!_isTesing && !allAnswered)
         {
             for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
                 SendLfgUpdateProposal(it->first, proposal);
@@ -2695,6 +2694,11 @@ namespace lfg
                 randomDungeons.insert(dungeon.Entry());
         }
         return randomDungeons;
+    }
+
+    void LFGMgr::ToggleTesting()
+    {
+        _isTesing = !_isTesing;
     }
 
 } // namespace lfg

@@ -77,6 +77,7 @@ public:
             { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "" },
             { "los",            SEC_ADMINISTRATOR,  false, &HandleDebugLoSCommand,             "" },
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
+            { "lfg",            SEC_ADMINISTRATOR,  false, &HandleDebugLFGCommand,             "" },
             { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" }
         };
         static std::vector<ChatCommand> commandTable =
@@ -1396,6 +1397,13 @@ public:
         LOG_INFO("sql.dev", "(@PATH, XX, %.3f, %.3f, %.5f, 0,0, 0,100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
+        return true;
+    }
+
+    static bool HandleDebugLFGCommand(ChatHandler* /*handler*/, char const* /*args*/)
+    {
+        sLFGMgr->ToggleTestingLFG();
+        sWorld->SendWorldText(LANG_DEBUG_LFG, sLFGMgr->IsTestingLFG() ? "On" : "Off");
         return true;
     }
 };
