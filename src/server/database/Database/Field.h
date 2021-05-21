@@ -242,6 +242,10 @@ public:
 
     [[nodiscard]] bool IsNull() const
     {
+        if (IsBinary() && data.length == 0)
+        {
+            return true;
+        }
         return data.value == nullptr;
     }
 
@@ -349,6 +353,18 @@ protected:
                 data.type == MYSQL_TYPE_FLOAT ||
                 data.type == MYSQL_TYPE_DOUBLE ||
                 data.type == MYSQL_TYPE_LONGLONG );
+    }
+
+    [[nodiscard]] bool IsBinary() const
+    {
+        return (
+            data.type == MYSQL_TYPE_TINY_BLOB ||
+            data.type == MYSQL_TYPE_MEDIUM_BLOB ||
+            data.type == MYSQL_TYPE_LONG_BLOB ||
+            data.type == MYSQL_TYPE_BLOB ||
+            data.type == MYSQL_TYPE_VAR_STRING ||
+            data.type == MYSQL_TYPE_STRING
+        );
     }
 
     void GetBinarySizeChecked(uint8* buf, size_t size) const;
