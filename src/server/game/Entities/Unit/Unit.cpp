@@ -16,6 +16,7 @@
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
+#include "DisableMgr.h"
 #include "DynamicVisibility.h"
 #include "Formulas.h"
 #include "GridNotifiersImpl.h"
@@ -1297,7 +1298,7 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss)
 }
 
 // TODO for melee need create structure as in
-void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType)
+void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType, const bool sittingVictim)
 {
     damageInfo->attacker         = this;
     damageInfo->target           = victim;
@@ -1367,6 +1368,11 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
 
     damageInfo->hitOutCome = RollMeleeOutcomeAgainst(damageInfo->target, damageInfo->attackType);
 
+    // If the victim was a sitting player and we didn't roll a miss, then crit.
+    if (sittingVictim && damageInfo->hitOutCome != MELEE_HIT_MISS)
+    {
+        damageInfo->hitOutCome = MELEE_HIT_CRIT;
+    }
     switch (damageInfo->hitOutCome)
     {
         case MELEE_HIT_EVADE:
@@ -2198,6 +2204,9 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
     if ((attType == BASE_ATTACK || attType == OFF_ATTACK) && !IsWithinLOSInMap(victim))
         return;
 
+    // CombatStart puts the target into stand state, so we need to cache sit state here to know if we should crit later
+    const bool sittingVictim = victim->GetTypeId() == TYPEID_PLAYER && (victim->IsSitState() || victim->getStandState() == UNIT_STAND_STATE_SLEEP) ? true : false;
+
     CombatStart(victim);
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
 
@@ -2211,9 +2220,9 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
     {
         // attack can be redirected to another target
         victim = GetMeleeHitRedirectTarget(victim);
-
         CalcDamageInfo damageInfo;
-        CalculateMeleeDamage(victim, 0, &damageInfo, attType);
+        CalculateMeleeDamage(victim, 0, &damageInfo, attType, sittingVictim);
+
         // Send log damage message to client
         Unit::DealDamageMods(victim, damageInfo.damage, &damageInfo.absorb);
         SendAttackStateUpdate(&damageInfo);
@@ -2358,7 +2367,9 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
 MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance) const
 {
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks())
+    {
         return MELEE_HIT_EVADE;
+    }
 
     int32 attackerMaxSkillValueForLevel = GetMaxSkillValueForLevel(victim);
     int32 victimMaxSkillValueForLevel = victim->GetMaxSkillValueForLevel(this);
@@ -2373,7 +2384,9 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
     int32    sum = 0, tmp = 0;
     int32    roll = urand (0, 10000);
 
-    //LOG_DEBUG("server", "RollMeleeOutcomeAgainst: skill bonus of %d for attacker", skillBonus);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    LOG_DEBUG("server", "RollMeleeOutcomeAgainst: skill bonus of %d for attacker", skillBonus);
+#endif
     //LOG_DEBUG("server", "RollMeleeOutcomeAgainst: rolled %d, miss %d, dodge %d, parry %d, block %d, crit %d",
     //    roll, miss_chance, dodge_chance, parry_chance, block_chance, crit_chance);
 
@@ -2381,17 +2394,10 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
 
     if (tmp > 0 && roll < (sum += tmp))
     {
-        //LOG_DEBUG("server", "RollMeleeOutcomeAgainst: MISS");
-        return MELEE_HIT_MISS;
-    }
-
-    // always crit against a sitting target (except 0 crit chance)
-    if (victim->GetTypeId() == TYPEID_PLAYER && crit_chance > 0 && !victim->IsStandState())
-    {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "RollMeleeOutcomeAgainst: CRIT (sitting victim)");
+        LOG_DEBUG("server", "RollMeleeOutcomeAgainst: MISS");
 #endif
-        return MELEE_HIT_CRIT;
+        return MELEE_HIT_MISS;
     }
 
     // Dodge chance
@@ -9815,6 +9821,12 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         return false;
     }
 
+    // creatures should not try to attack the player during polymorph
+    if (creature && creature->IsPolymorphed())
+    {
+        return false;
+    }
+
     //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: wtf? why having this flag prevents from entering combat? it should just prevent melee attack
     //    return false;
 
@@ -12681,11 +12693,11 @@ void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, 
         if (spellId == 0 && std::find_if(m_spellImmune[op].begin(), m_spellImmune[op].end(), spellIdImmunityPredicate(type)) != m_spellImmune[op].end())
             return;
 
-        SpellImmune Immune;
-        Immune.spellId = spellId;
-        Immune.type = type;
-        Immune.blockType = blockType;
-        m_spellImmune[op].push_back(Immune);
+        SpellImmune immune;
+        immune.spellId = spellId;
+        immune.type = type;
+        immune.blockType = blockType;
+        m_spellImmune[op].push_back(std::move(immune));
     }
     else
     {
@@ -12758,6 +12770,8 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
 
     if (Player* player = ToPlayer())
     {
+        sScriptMgr->AnticheatSetUnderACKmount(player);
+
         // mount as a vehicle
         if (VehicleId)
         {
@@ -12846,6 +12860,8 @@ void Unit::Dismount()
     // (it could probably happen when logging in after a previous crash)
     if (Player* player = ToPlayer())
     {
+        sScriptMgr->AnticheatSetUnderACKmount(player);
+
         if (Pet* pPet = player->GetPet())
         {
             if (pPet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED) && !pPet->HasUnitState(UNIT_STATE_STUNNED))
@@ -13703,6 +13719,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 return;
         }
 
+        data << GetPackGUID();
         BuildMovementPacket(&data);
         data << float(GetSpeed(mtype));
         SendMessageToSet(&data, true);
@@ -17291,6 +17308,11 @@ void Unit::SetControlled(bool apply, UnitState state)
             default:
                 break;
         }
+
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            sScriptMgr->AnticheatSetRootACKUpd(ToPlayer());
+        }
     }
     else
     {
@@ -17382,7 +17404,10 @@ void Unit::SetStunned(bool apply)
         if (GetTypeId() != TYPEID_PLAYER)
             StopMoving();
         else
+        {
             SetStandState(UNIT_STAND_STATE_STAND);
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
+        }
 
         CastStop();
     }
@@ -17446,6 +17471,8 @@ void Unit::SetRooted(bool apply)
             data << GetPackGUID();
             data << m_rootTimes;
             SendMessageToSet(&data, true);
+
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
         }
         else
         {
@@ -17502,6 +17529,11 @@ void Unit::SetFeared(bool apply)
         if (!caster)
             caster = getAttackerForHelper();
         GetMotionMaster()->MoveFleeing(caster, fearAuras.empty() ? sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY) : 0);             // caster == nullptr processed in MoveFleeing
+
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
+        }
     }
     else
     {
@@ -17534,6 +17566,11 @@ void Unit::SetConfused(bool apply)
     {
         SetTarget();
         GetMotionMaster()->MoveConfused();
+
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
+        }
     }
     else
     {
@@ -17860,6 +17897,11 @@ void Unit::RemoveCharmedBy(Unit* charmer)
             default:
                 break;
         }
+    }
+
+    if (Player* player = ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(player);
     }
 
     // xinef: restore threat
@@ -18361,6 +18403,8 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
 
         if (player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || player->HasAuraType(SPELL_AURA_FLY))
             player->SetCanFly(true, true);
+
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
     }
 }
 
@@ -18795,6 +18839,12 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
 void Unit::EnterVehicle(Unit* base, int8 seatId)
 {
     CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, seatId + 1, base, TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE);
+
+    if (Player* player = ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(player);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
+    }
 }
 
 void Unit::EnterVehicleUnattackable(Unit* base, int8 seatId)
@@ -18838,6 +18888,9 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
     {
         if (vehicle->GetBase()->GetTypeId() == TYPEID_PLAYER && player->IsInCombat())
             return;
+
+        sScriptMgr->AnticheatSetUnderACKmount(player);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
 
         InterruptNonMeleeSpells(false);
         player->StopCastingCharm();
@@ -18902,6 +18955,12 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     //! init spline movement based on those coordinates in unapply handlers, and
     //! relocate exiting passengers based on Unit::moveSpline data. Either way,
     //! Coming Soon(TM)
+
+    if (Player* player = ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(player);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
+    }
 }
 
 bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
@@ -18957,7 +19016,12 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     AddUnitState(UNIT_STATE_MOVE);
 
     if (player)
+    {
         player->SetFallInformation(time(nullptr), GetPositionZ());
+
+        sScriptMgr->AnticheatSetUnderACKmount(player);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(player, true);
+    }
     else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
     {
         WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
@@ -19518,7 +19582,7 @@ void Unit::PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result)
     if (!charmInfo || GetTypeId() != TYPEID_UNIT)
         return;
 
-    if ((MMAP::MMapFactory::IsPathfindingEnabled(GetMap()) || result != SPELL_FAILED_LINE_OF_SIGHT) && target)
+    if ((DisableMgr::IsPathfindingEnabled(GetMap()) || result != SPELL_FAILED_LINE_OF_SIGHT) && target)
     {
         if ((result == SPELL_FAILED_LINE_OF_SIGHT || result == SPELL_FAILED_OUT_OF_RANGE) || !ToCreature()->HasReactState(REACT_PASSIVE))
             if (Unit* owner = GetOwner())
