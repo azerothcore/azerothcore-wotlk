@@ -102,5 +102,5 @@ void PacketLog::LogPacket(WorldPacket const& packet, Direction direction)
         fwrite(packet.contents(), 1, packet.size(), _file);
     }
 
-    fflush(_file);        
+    fflush(_file);
 }
