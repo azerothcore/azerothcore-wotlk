@@ -34,10 +34,10 @@
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
-    HandleMoveWorldportAckOpcode();
+    HandleMoveWorldportAck();
 }
 
-void WorldSession::HandleMoveWorldportAckOpcode()
+void WorldSession::HandleMoveWorldportAck()
 {
     // ignore unexpected far teleports
     if (!GetPlayer()->IsBeingTeleportedFar())
@@ -567,7 +567,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 {
     uint32 opcode = recvData.GetOpcode();
-    LOG_DEBUG("network", "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
+    LOG_DEBUG("network", "WORLD: Recvd %s (%u, 0x%X) opcode", GetOpcodeNameForLogging(static_cast<OpcodeClient>(opcode)).c_str(), opcode, opcode);
 
     /* extract packet */
     ObjectGuid guid;
