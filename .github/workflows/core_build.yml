@@ -2,8 +2,7 @@ name: core-build
 on:
   push:
     branches:
-      - '**'         # matches every branch
-      - '!coverity_scan'   # excludes coverity_scan
+      - 'master'
   pull_request:
 
 jobs:
@@ -27,11 +26,11 @@ jobs:
             modules: without
             extra_logs: false
           - os: ubuntu-20.04
-            compiler: clang9
+            compiler: clang8
             modules: without
             extra_logs: false
           - os: ubuntu-18.04
-            compiler: clang # default in 18.04 is clang 6
+            compiler: clang7
             modules: without
             extra_logs: false
           - os: ubuntu-18.04
@@ -60,7 +59,7 @@ jobs:
       - name: Cache
         uses: actions/cache@v2
         with:
-          path: /home/runner/.ccache
+          path: var/ccache
           key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}

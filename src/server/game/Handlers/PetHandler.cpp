@@ -7,6 +7,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "CreatureAI.h"
+#include "DisableMgr.h"
 #include "Group.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -33,8 +34,8 @@ private:
     const uint32 m_savedMana;
 
 public:
-    LoadPetFromDBQueryHolder(uint32 petNumber, bool current, uint32 diffTime, std::string actionBar, uint32 health, uint32 mana)
-        : m_petNumber(petNumber), m_current(current), m_diffTime(diffTime), m_actionBar(actionBar),
+    LoadPetFromDBQueryHolder(uint32 petNumber, bool current, uint32 diffTime, std::string&& actionBar, uint32 health, uint32 mana)
+        : m_petNumber(petNumber), m_current(current), m_diffTime(diffTime), m_actionBar(std::move(actionBar)),
           m_savedHealth(health), m_savedMana(mana) { }
 
     uint32 GetPetNumber() const { return m_petNumber; }
@@ -128,8 +129,14 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     Map* map = owner->GetMap();
     ObjectGuid::LowType guid = map->GenerateLowGuid<HighGuid::Pet>();
     Pet* pet = new Pet(owner, pet_type);
+    if (!pet->Create(guid, map, owner->GetPhaseMask(), petentry, pet_number))
+    {
+        delete pet;
+        return PET_LOAD_ERROR;
+    }
+
     LoadPetFromDBQueryHolder* holder = new LoadPetFromDBQueryHolder(pet_number, current, uint32(time(nullptr) - fields[14].GetUInt32()), fields[13].GetString(), savedhealth, savedmana);
-    if (!pet->Create(guid, map, owner->GetPhaseMask(), petentry, pet_number) || !holder->Initialize())
+    if (!holder->Initialize())
     {
         delete pet;
         delete holder;
@@ -559,7 +566,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spe
                                 return;
 
                         // Not let attack through obstructions
-                        bool checkLos = !MMAP::MMapFactory::IsPathfindingEnabled(pet->GetMap()) ||
+                        bool checkLos = !DisableMgr::IsPathfindingEnabled(pet->GetMap()) ||
                                         (TargetUnit->GetTypeId() == TYPEID_UNIT && (TargetUnit->ToCreature()->isWorldBoss() || TargetUnit->ToCreature()->IsDungeonBoss()));
 
                         if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))

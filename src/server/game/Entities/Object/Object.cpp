@@ -3019,7 +3019,7 @@ ObjectGuid WorldObject::GetTransGUID() const
 float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/, float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/) const
 {
     if (z != MAX_HEIGHT)
-        z += Z_OFFSET_FIND_HEIGHT;
+        z += std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT);
 
     return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
 }
@@ -3028,7 +3028,7 @@ float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* gr
 {
     return GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, ground,
         isType(TYPEMASK_UNIT) ? !static_cast<Unit const*>(this)->HasAuraType(SPELL_AURA_WATER_WALK) : false,
-        GetCollisionHeight());
+        std::max(GetCollisionHeight(),  Z_OFFSET_FIND_HEIGHT));
 }
 
 float WorldObject::GetFloorZ() const
@@ -3036,5 +3036,5 @@ float WorldObject::GetFloorZ() const
     if (!IsInWorld())
         return m_staticFloorZ;
 
-    return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + Z_OFFSET_FIND_HEIGHT));
+    return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT)));
 }

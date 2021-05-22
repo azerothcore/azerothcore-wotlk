@@ -17,7 +17,6 @@
 #include <map>
 #include <vector>
 
-
 enum RollType
 {
     ROLL_PASS         = 0,
@@ -111,6 +110,7 @@ enum LootSlotType
 class Player;
 class LootStore;
 class ConditionMgr;
+class GameObject;
 struct Loot;
 
 struct LootStoreItem
@@ -309,10 +309,12 @@ struct Loot
     uint32 gold;
     uint8 unlootedCount{0};
     ObjectGuid roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
+    ObjectGuid lootOwnerGUID;
     LootType loot_type{LOOT_NONE};      // required for achievement system
 
     // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
     ObjectGuid containerGUID;
+    GameObject* sourceGameObject{nullptr};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
     ~Loot() { clear(); }
