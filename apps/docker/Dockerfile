@@ -187,8 +187,8 @@ ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
 ENV AC_CCACHE=true
 ENV CCACHE_CPP2=true
-ENV CSCRIPTPCH=ON
-ENV CCOREPCH=ON
+ENV CSCRIPTPCH=OFF
+ENV CCOREPCH=OFF
 ENV CTOOLS=ON
 RUN bash apps/docker/docker-build-prod.sh
 
