@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
  */
 
 #include "MySQLThreading.h"
