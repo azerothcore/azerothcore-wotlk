@@ -3113,21 +3113,21 @@ void World::LoadDBRevision()
 
     if (resultWorld)
     {
-        Field* fieldsWorld = resultWorld->Fetch();
+        Field* fields = resultWorld->Fetch();
 
-        m_WorldDBRevision = fieldsWorld[0].GetCString();
+        m_WorldDBRevision = fields[0].GetCString();
     }
     if (resultCharacter)
     {
-        Field* fieldsCharacter = resultCharacter->Fetch();
+        Field* fields = resultCharacter->Fetch();
 
-        m_CharacterDBRevision = fieldsCharacter[0].GetString();
+        m_CharacterDBRevision = fields[0].GetString();
     }
     if (resultAuth)
     {
-        Field* fieldsAuth = resultAuth->Fetch();
+        Field* fields = resultAuth->Fetch();
 
-        m_AuthDBRevision = fieldsAuth[0].GetString();
+        m_AuthDBRevision = fields[0].GetString();
     }
 
     if (m_WorldDBRevision.empty())

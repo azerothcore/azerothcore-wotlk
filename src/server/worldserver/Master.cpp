@@ -405,6 +405,7 @@ bool Master::_StartDB()
     WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_revision = '%s'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
 
     sWorld->LoadDBVersion();
+    sWorld->LoadDBRevision();
 
     LOG_INFO("server", "Using World DB: %s", sWorld->GetDBVersion());
     return true;
