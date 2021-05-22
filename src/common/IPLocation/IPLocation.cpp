@@ -30,7 +30,7 @@ void IpLocationStore::Load()
     std::string databaseFilePath = sConfigMgr->GetOption<std::string>("IPLocationFile", "");
     if (databaseFilePath.empty())
     {
-        LOG_INFO("server.loading", "");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
