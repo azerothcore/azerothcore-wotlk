@@ -427,6 +427,9 @@ void World::LoadConfigSettings(bool reload)
         sLog->LoadFromConfig();
     }
 
+    // Set realm id and enable db logging
+    sLog->SetRealmId(realmID);
+
 #ifdef ELUNA
     ///- Initialize Lua Engine
     if (!reload)
@@ -926,7 +929,6 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_GM_LEVEL_IN_GM_LIST]   = sConfigMgr->GetOption<int32>("GM.InGMList.Level", SEC_ADMINISTRATOR);
     m_int_configs[CONFIG_GM_LEVEL_IN_WHO_LIST]  = sConfigMgr->GetOption<int32>("GM.InWhoList.Level", SEC_ADMINISTRATOR);
-    m_bool_configs[CONFIG_GM_LOG_TRADE]         = sConfigMgr->GetOption<bool>("GM.LogTrade", false);
     m_int_configs[CONFIG_START_GM_LEVEL]        = sConfigMgr->GetOption<int32>("GM.StartLevel", 1);
     if (m_int_configs[CONFIG_START_GM_LEVEL] < m_int_configs[CONFIG_START_PLAYER_LEVEL])
     {
@@ -1979,6 +1981,9 @@ void World::SetInitialWorldSettings()
     // Delete all custom channels which haven't been used for PreserveCustomChannelDuration days.
     Channel::CleanOldChannelsInDB();
 
+    LOG_INFO("server.loading", "Initializing Opcodes...");
+    opcodeTable.Initialize();
+
     LOG_INFO("server", "Starting Arena Season...");
     LOG_INFO("server", " ");
     sGameEventMgr->StartArenaSeason();
@@ -2077,15 +2082,6 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server", " ");
     LOG_INFO("server", "WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000)); // outError for red color in console
     LOG_INFO("server", " ");
-
-    // possibly enable db logging; avoid massive startup spam by doing it here.
-    if (sConfigMgr->GetOption<bool>("EnableLogDB", false))
-    {
-        LOG_INFO("server", "Enabling database logging...");
-
-        if (uint32 realmId = sConfigMgr->GetOption<uint32>("RealmID", 0)) // 0 reserved for auth
-            sLog->SetRealmId(realmId);
-    }
 
     if (sConfigMgr->isDryRun())
     {

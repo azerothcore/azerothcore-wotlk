@@ -10,62 +10,11 @@
 #include "Log.h"
 #include "Errors.h"
 #include "TypeList.h"
-#include <ace/Task.h>
-#include "SFMT.h"
 #include "Errors.h" // for ASSERT
-#include <ace/TSS_T.h>
 #include <array>
 #include <cwchar>
 #include <string>
-#include <random>
-
-typedef ACE_TSS<SFMTRand> SFMTRandTSS;
-static SFMTRandTSS sfmtRand;
-static SFMTEngine engine;
-
-int32 irand(int32 min, int32 max)
-{
-    ASSERT(max >= min);
-    return int32(sfmtRand->IRandom(min, max));
-}
-
-uint32 urand(uint32 min, uint32 max)
-{
-    ASSERT(max >= min);
-    return sfmtRand->URandom(min, max);
-}
-
-float frand(float min, float max)
-{
-    ASSERT(max >= min);
-    return float(sfmtRand->Random() * (max - min) + min);
-}
-
-uint32 rand32()
-{
-    return int32(sfmtRand->BRandom());
-}
-
-double rand_norm()
-{
-    return sfmtRand->Random();
-}
-
-double rand_chance()
-{
-    return sfmtRand->Random() * 100.0;
-}
-
-uint32 urandweighted(size_t count, double const* chances)
-{
-    std::discrete_distribution<uint32> dd(chances, chances + count);
-    return dd(SFMTEngine::Instance());
-}
-
-SFMTEngine& SFMTEngine::Instance()
-{
-    return engine;
-}
+#include <ace/Default_Constants.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
 {
