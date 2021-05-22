@@ -3107,9 +3107,9 @@ void World::LoadDBVersion()
 
 void World::LoadDBRevision()
 {
-    QueryResult resultWorld     = WorldDatabase.Query("SELECT COLUMN_NAME FROM Information_Schema.Columns WHERE TABLE_NAME = 'version_db_world' AND ORDINAL_POSITION = 3");
-    QueryResult resultCharacter = CharacterDatabase.Query("SELECT COLUMN_NAME FROM Information_Schema.Columns WHERE TABLE_NAME = 'version_db_characters' AND ORDINAL_POSITION = 3");
-    QueryResult resultAuth      = LoginDatabase.Query("SELECT COLUMN_NAME FROM Information_Schema.Columns WHERE TABLE_NAME = 'version_db_auth' AND ORDINAL_POSITION = 3");
+    QueryResult resultWorld     = WorldDatabase.Query("SELECT date FROM version_db_world ORDER BY date DESC LIMIT 1");
+    QueryResult resultCharacter = CharacterDatabase.Query("SELECT date FROM version_db_characters ORDER BY date DESC LIMIT 1");
+    QueryResult resultAuth      = LoginDatabase.Query("SELECT date FROM version_db_auth ORDER BY date DESC LIMIT 1");
 
     if (resultWorld)
     {
