@@ -24,8 +24,8 @@ time cmake ../../../ \
 -DCMAKE_CXX_FLAGS="-Werror" \
 -DCMAKE_C_COMPILER_LAUNCHER=ccache \
 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
--DUSE_SCRIPTPCH=0 \
--DUSE_COREPCH=0 \
+-DUSE_SCRIPTPCH=1 \
+-DUSE_COREPCH=1 \
 ;
 
 time make -j $(($(sysctl -n hw.ncpu ) + 2))
