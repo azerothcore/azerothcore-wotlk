@@ -534,9 +534,9 @@ namespace lfg
         void RBPacketBuildFull(WorldPacket& fullPacket, uint32 dungeonId, RBInternalInfoMap& infoMap);
 
         /// Toggle LFG in testing mode
-        void ToggleTestingLFG();
+        void ToggleTesting();
         /// Check if tesing mode
-        bool IsTestingLFG() const { return _isTesing; }
+        bool IsTesting() const { return _isTesing; }
 
         // LfgQueue
         /// Get last lfg state (NONE, DUNGEON or FINISHED_DUNGEON)

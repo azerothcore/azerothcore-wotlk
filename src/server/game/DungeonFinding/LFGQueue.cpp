@@ -290,7 +290,7 @@ namespace lfg
             return LFG_INCOMPATIBLES_MULTIPLE_LFG_GROUPS;
 
         // Group with less that MAXGROUPSIZE members always compatible
-        if (!sLFGMgr->IsTestingLFG() && numPlayers != MAXGROUPSIZE) // Tesing mode
+        if (!sLFGMgr->IsTesting() && numPlayers != MAXGROUPSIZE) // Tesing mode
         {
             LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(check.front());
             LfgRolesMap roles = itQueue->second.roles;
@@ -387,7 +387,7 @@ namespace lfg
         }
 
         // Enough players?
-        if (!sLFGMgr->IsTestingLFG() && numPlayers != MAXGROUPSIZE) // Testing mode
+        if (!sLFGMgr->IsTesting() && numPlayers != MAXGROUPSIZE) // Testing mode
         {
             strGuids.addRoles(proposalRoles);
             for (uint8 i = 0; i < 5 && check.guids[i]; ++i)

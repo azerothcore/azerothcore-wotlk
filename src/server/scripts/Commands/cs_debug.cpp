@@ -1402,8 +1402,8 @@ public:
 
     static bool HandleDebugLFGCommand(ChatHandler* /*handler*/, char const* /*args*/)
     {
-        sLFGMgr->ToggleTestingLFG();
-        sWorld->SendWorldText(LANG_DEBUG_LFG, sLFGMgr->IsTestingLFG() ? "On" : "Off");
+        sLFGMgr->ToggleTesting();
+        sWorld->SendWorldText(LANG_DEBUG_LFG, sLFGMgr->IsTesting() ? "On" : "Off");
         return true;
     }
 };
