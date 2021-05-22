@@ -69,7 +69,7 @@ jobs:
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf.sh
+        run: source ./apps/ci/ci-conf.sh ON
       - name: Import db
         run: source ./apps/ci/ci-import-db.sh
       - name: Build

@@ -32,7 +32,7 @@ jobs:
         env:
           CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf-no-pch.sh
+        run: source ./apps/ci/ci-conf.sh OFF
       - name: Import db
         run: source ./apps/ci/ci-import-db.sh
       - name: Build
