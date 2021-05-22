@@ -595,7 +595,7 @@ namespace lfg
         uint32 lastProposalId;                             ///< pussywizard, store it here because of splitting LFGMgr update into tasks
         uint32 m_raidBrowserUpdateTimer[2];                ///< pussywizard
         uint32 m_raidBrowserLastUpdatedDungeonId[2];       ///< pussywizard: for 2 factions
-        bool _isTesing = false;                            ///< Tesing mode
+        bool _isTesing = false;                            ///< Testing mode
 
         LfgQueueContainer QueuesStore;                     ///< Queues
         LfgCachedDungeonContainer CachedDungeonMapStore;   ///< Stores all dungeons by groupType
