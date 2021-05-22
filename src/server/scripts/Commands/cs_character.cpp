@@ -356,7 +356,7 @@ public:
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
             return false;
 
-        int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromStorage(targetGuid.GetCounter());
+        int32 oldlevel = target ? target->GetLevel() : Player::GetLevelFromStorage(targetGuid.GetCounter());
         int32 newlevel = levelStr ? atoi(levelStr) : oldlevel;
 
         if (newlevel < 1)
@@ -738,7 +738,7 @@ public:
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
             return false;
 
-        int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromStorage(targetGuid.GetCounter());
+        int32 oldlevel = target ? target->GetLevel() : Player::GetLevelFromStorage(targetGuid.GetCounter());
         int32 addlevel = levelStr ? atoi(levelStr) : 1;
         int32 newlevel = oldlevel + addlevel;
 

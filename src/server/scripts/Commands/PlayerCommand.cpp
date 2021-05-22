@@ -55,7 +55,7 @@ bool PlayerCommand::Learn(ChatHandler* handler, Player* targetPlayer, uint32 spe
     if (allRanks)
         targetPlayer->learnSpellHighRank(spell);
     else
-        targetPlayer->learnSpell(spell);
+        targetPlayer->LearnSpell(spell);
 
     uint32 firstSpell = sSpellMgr->GetFirstSpellInChain(spell);
     if (GetTalentSpellCost(firstSpell))

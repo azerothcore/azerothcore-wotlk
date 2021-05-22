@@ -132,10 +132,10 @@ public:
                             return;
 
                     if (GetSpellInfo()->Id != SPELL_AMPLIFY_10S)
-                        if (target->getLevel() > 60)
+                        if (target->GetLevel() > 60)
                             return;
 
-                    uint8 pct = std::max(0, 20 + player->getLevel() - target->getLevel());
+                    uint8 pct = std::max(0, 20 + player->GetLevel() - target->GetLevel());
                     if (roll_chance_i(pct))
                         player->CastSpell(target, SPELL_MENTAL_BATTLE, true);
                     else if (roll_chance_i(pct))
@@ -171,7 +171,7 @@ public:
 
             if (Unit* target = GetHitUnit())
             {
-                if (target->getLevel() < 70)
+                if (target->GetLevel() < 70)
                     return;
 
                 target->CastSpell(target, 72590, true); // Stamina spell (Fortitude)
@@ -306,7 +306,7 @@ public:
         void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            if (target->getLevel() <= 70)
+            if (target->GetLevel() <= 70)
             {
                 if (uint16 spellId = getMountSpellId())
                 {
@@ -349,9 +349,9 @@ public:
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            if (target->getLevel() >= 30)
+            if (target->GetLevel() >= 30)
             {
-                uint8 chance = 100 - std::min<uint8>(100, target->getLevel() - 30 * urand(3, 10));
+                uint8 chance = 100 - std::min<uint8>(100, target->GetLevel() - 30 * urand(3, 10));
                 if (!roll_chance_i(chance))
                     PreventDefaultAction();
             }
@@ -1735,7 +1735,7 @@ public:
 
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
-            int32 diff = GetUnitOwner()->getLevel() - 60;
+            int32 diff = GetUnitOwner()->GetLevel() - 60;
             if (diff > 0)
                 amount += 2 * diff;
         }
@@ -2634,7 +2634,7 @@ public:
                     break;
             }
 
-            if (caster->getLevel() > maxSafeLevel)
+            if (caster->GetLevel() > maxSafeLevel)
             {
                 caster->CastSpell(caster, SPELL_LOST, true);
 
@@ -3013,7 +3013,7 @@ public:
 
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
-            int32 diff = GetUnitOwner()->getLevel() - 60;
+            int32 diff = GetUnitOwner()->GetLevel() - 60;
             if (diff > 0)
                 amount += diff;
         }
@@ -3131,7 +3131,7 @@ public:
 
             // learn random explicit discovery recipe (if any)
             if (uint32 discoveredSpellId = GetExplicitDiscoverySpell(spellId, caster))
-                caster->learnSpell(discoveredSpellId);
+                caster->LearnSpell(discoveredSpellId);
         }
 
         void Register() override

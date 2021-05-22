@@ -60,7 +60,7 @@ void Totem::InitStats(uint32 duration)
             SetDisplayId(owner->GetModelForTotem(PlayerTotemType(m_Properties->Id)));
         }
 
-        SetLevel(owner->getLevel());
+        SetLevel(owner->GetLevel());
     }
 
     Minion::InitStats(duration);

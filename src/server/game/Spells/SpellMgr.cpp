@@ -2775,9 +2775,9 @@ void SpellMgr::LoadSpellCustomAttr()
                 if (const SpellInfo* spellInfo = GetSpellInfo(spellId))
                     for (uint8 k = 0; k < MAX_SPELL_EFFECTS; ++k)
                         if (spellInfo->Effects[k].Effect == SPELL_EFFECT_LEARN_SPELL)
-                            if (const SpellInfo* learnSpell = GetSpellInfo(spellInfo->Effects[k].TriggerSpell))
-                                if (learnSpell->IsRanked() && !learnSpell->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)))
-                                    mTalentSpellAdditionalSet.insert(learnSpell->Id);
+                            if (const SpellInfo* LearnSpell = GetSpellInfo(spellInfo->Effects[k].TriggerSpell))
+                                if (LearnSpell->IsRanked() && !LearnSpell->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)))
+                                    mTalentSpellAdditionalSet.insert(LearnSpell->Id);
     }
 
     SpellInfo* spellInfo = nullptr;
