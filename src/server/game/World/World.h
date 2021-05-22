@@ -495,7 +495,6 @@ private:
     std::string m_CharacterDBRevision;
     std::string m_AuthDBRevision;
 
-
     typedef std::map<uint8, std::string> AutobroadcastsMap;
     AutobroadcastsMap m_Autobroadcasts;
 

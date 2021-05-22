@@ -3136,11 +3136,11 @@ void World::LoadDBRevision()
     }
     if (m_CharacterDBRevision.empty())
     {
-        m_CharacterDBRevision = "Unkown World Database Revision";
+        m_CharacterDBRevision = "Unkown Character Database Revision";
     }
     if (m_AuthDBRevision.empty())
     {
-        m_AuthDBRevision = "Unkown World Database Revision";
+        m_AuthDBRevision = "Unkown Auth Database Revision";
     }
 }
 

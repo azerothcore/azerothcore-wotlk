@@ -15,10 +15,8 @@ EndScriptData */
 #include "Chat.h"
 #include "Config.h"
 #include "GitRevision.h"
-
 #include "VMapManager2.h"
 #include "VMapFactory.h"
-
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
