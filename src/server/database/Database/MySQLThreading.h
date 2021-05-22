@@ -11,8 +11,8 @@
 
 namespace MySQL
 {
-    static void Thread_Init();
-    static void Thread_End();
+    void Thread_Init();
+    void Thread_End();
     void Library_Init();
     void Library_End();
     uint32 GetLibraryVersion();

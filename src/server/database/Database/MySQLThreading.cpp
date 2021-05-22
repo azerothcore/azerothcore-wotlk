@@ -13,7 +13,7 @@
     on the same MySQL connection. Seperate MySQL connections implicitly
     create a mirror thread.
 */
-static void Thread_Init()
+void Thread_Init()
 {
     mysql_thread_init();
 }
@@ -22,7 +22,7 @@ static void Thread_Init()
     when we terminate. MySQL threads and connections are not configurable
     during runtime.
 */
-static void Thread_End()
+void Thread_End()
 {
     mysql_thread_end();
 }
