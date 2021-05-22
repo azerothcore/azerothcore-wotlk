@@ -26,6 +26,7 @@
 #include "DatabaseLoader.h"
 #include "SecretMgr.h"
 #include "SharedDefines.h"
+#include "Util.h"
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
 #include <ace/ACE.h>
