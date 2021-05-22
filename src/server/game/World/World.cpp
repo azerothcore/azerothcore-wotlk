@@ -3105,6 +3105,45 @@ void World::LoadDBVersion()
         m_DBVersion = "Unknown world database.";
 }
 
+void World::LoadDBRevision()
+{
+    QueryResult resultWorld     = WorldDatabase.Query("SELECT COLUMN_NAME FROM Information_Schema.Columns WHERE TABLE_NAME = 'version_db_world' AND ORDINAL_POSITION = 3");
+    QueryResult resultCharacter = CharacterDatabase.Query("SELECT COLUMN_NAME FROM Information_Schema.Columns WHERE TABLE_NAME = 'version_db_characters' AND ORDINAL_POSITION = 3");
+    QueryResult resultAuth      = LoginDatabase.Query("SELECT COLUMN_NAME FROM Information_Schema.Columns WHERE TABLE_NAME = 'version_db_auth' AND ORDINAL_POSITION = 3");
+
+    if (resultWorld)
+    {
+        Field* fieldsWorld = resultWorld->Fetch();
+
+        m_WorldDBRevision = fieldsWorld[0].GetCString();
+    }
+    if (resultCharacter)
+    {
+        Field* fieldsCharacter = resultCharacter->Fetch();
+
+        m_CharacterDBRevision = fieldsCharacter[0].GetString();
+    }
+    if (resultAuth)
+    {
+        Field* fieldsAuth = resultAuth->Fetch();
+
+        m_AuthDBRevision = fieldsAuth[0].GetString();
+    }
+
+    if (m_WorldDBRevision.empty())
+    {
+        m_WorldDBRevision = "Unkown World Database Revision";
+    }
+    if (m_CharacterDBRevision.empty())
+    {
+        m_CharacterDBRevision = "Unkown World Database Revision";
+    }
+    if (m_AuthDBRevision.empty())
+    {
+        m_AuthDBRevision = "Unkown World Database Revision";
+    }
+}
+
 void World::UpdateAreaDependentAuras()
 {
     SessionMap::const_iterator itr;
