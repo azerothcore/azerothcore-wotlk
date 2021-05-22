@@ -209,7 +209,6 @@ public:
     void List(Player const* player);
     void Announce(Player const* player);
     void Say(ObjectGuid guid, std::string const& what, uint32 lang);
-    void EveryoneSayToSelf(const char* what);
     void Invite(Player const* player, std::string const& newp);
     void Voice(ObjectGuid guid1, ObjectGuid guid2);
     void DeVoice(ObjectGuid guid1, ObjectGuid guid2);
