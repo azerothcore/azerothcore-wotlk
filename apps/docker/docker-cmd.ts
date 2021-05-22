@@ -1,4 +1,4 @@
-import { Command } from "https://cdn.depjs.com/cmd/mod.ts";
+import { Command } from "https://cdn.deno.land/cmd/versions/v1.2.0/raw/mod.ts";
 import * as ink from "https://deno.land/x/ink/mod.ts";
 import {
   Input,
@@ -108,7 +108,10 @@ shellCommandFactory(
 shellCommandFactory(
   "dev:shell [args...]",
   "Open an interactive shell within the dev server",
-  ["docker-compose run --rm ac-dev-server bash"],
+  [
+    "docker-compose up -d ac-dev-server",
+    "docker-compose exec ac-dev-server bash",
+  ],
   env,
 );
 

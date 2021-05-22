@@ -12,7 +12,7 @@
 #include <cassert>
 
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
-constexpr float Z_OFFSET_FIND_HEIGHT = 0.5f;
+constexpr float Z_OFFSET_FIND_HEIGHT = 2.0f;
 
 enum SpellEffIndex
 {
@@ -3566,5 +3566,24 @@ enum PartyResult
     ERR_PARTY_LFG_BOOT_LOOT_ROLLS       = 29,
     ERR_PARTY_LFG_TELEPORT_IN_COMBAT    = 30
 };
+
+enum ServerProcessTypes
+{
+    SERVER_PROCESS_AUTHSERVER = 0,
+    SERVER_PROCESS_WORLDSERVER = 1,
+
+    NUM_SERVER_PROCESS_TYPES
+};
+
+namespace acore::Impl
+{
+    struct AC_SHARED_API CurrentServerProcessHolder
+    {
+        static ServerProcessTypes type() { return _type; }
+        static ServerProcessTypes _type;
+    };
+}
+
+#define THIS_SERVER_PROCESS (acore::Impl::CurrentServerProcessHolder::type())
 
 #endif
