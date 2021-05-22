@@ -527,11 +527,10 @@ int WorldSocket::handle_input_header(void)
     EndianConvertReverse(header.size);
     EndianConvert(header.cmd);
 
-    if ((header.size < 4) || (header.size > 10240) || (header.cmd  > 10240))
+    if ((header.size < 4) || (header.size > 10240) || (header.cmd > 10240))
     {
-        Player* _player = m_Session ? m_Session->GetPlayer() : nullptr;
-        LOG_ERROR("server", "WorldSocket::handle_input_header(): client (account: %u, char [%s, name: %s]) sent malformed packet (size: %d, cmd: %d)",
-            m_Session ? m_Session->GetAccountId() : 0, _player ? _player->GetGUID().ToString().c_str() : "", _player ? _player->GetName().c_str() : "<none>", header.size, header.cmd);
+        LOG_ERROR("server", "WorldSocket::handle_input_header(): client (%s) sent malformed packet (size: %hd, cmd: %d)",
+            GetRemoteAddress().c_str(), header.size, header.cmd);
 
         errno = EINVAL;
         return -1;
@@ -706,9 +705,9 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     ASSERT(new_pct);
 
     // manage memory ;)
-    std::unique_ptr<WorldPacket> aptr (new_pct);
+    std::unique_ptr<WorldPacket> aptr(new_pct);
 
-    const uint16 opcode = new_pct->GetOpcode();
+    OpcodeClient opcode = static_cast<OpcodeClient>(aptr->GetOpcode());
 
     if (closing_)
         return -1;
@@ -749,7 +748,9 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     }
     catch (ByteBufferException const&)
     {
-        LOG_ERROR("server", "WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i. Disconnected client.", opcode, GetRemoteAddress().c_str(), m_Session ? m_Session->GetAccountId() : -1);
+        LOG_ERROR("server", "WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%u. Disconnected client.",
+            aptr->GetOpcode(), GetRemoteAddress().c_str(), m_Session ? m_Session->GetAccountId() : 0);
+
         if (sLog->ShouldLog("network", LogLevel::LOG_LEVEL_DEBUG))
         {
             LOG_DEBUG("network", "Dumping error causing packet:");
@@ -760,6 +761,13 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     }
 
     std::lock_guard<std::mutex> guard(m_SessionLock);
+
+    OpcodeHandler const* handler = opcodeTable[opcode];
+    if (!handler)
+    {
+        LOG_ERROR("network.opcode", "No defined handler for opcode %s sent by %s", GetOpcodeNameForLogging(static_cast<OpcodeClient>(aptr->GetOpcode())).c_str(), m_Session->GetPlayerInfo().c_str());
+        return -1;
+    }
 
     if (m_Session != nullptr)
     {
@@ -776,7 +784,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
         return 0;
     }
 
-    LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
+    LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", aptr->GetOpcode());
     return -1;
 }
 
