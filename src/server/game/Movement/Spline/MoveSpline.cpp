@@ -192,7 +192,7 @@ namespace Movement
         if (!(exp)) \
         { \
             if (unit) \
-                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '%s' failed for %s", #exp, unit->GetDebugInfo().c_str()); \
+                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '%s' failed for %s", #exp, unit->GetGUID().ToString().c_str()); \
             else \
                 LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '%s' failed for cyclic spline continuation", #exp); \
             return false;\
