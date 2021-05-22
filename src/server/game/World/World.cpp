@@ -61,6 +61,7 @@
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
+#include "Metric.h"
 #include "TemporarySummon.h"
 #include "TicketMgr.h"
 #include "Transport.h"
@@ -425,6 +426,7 @@ void World::LoadConfigSettings(bool reload)
         }
 
         sLog->LoadFromConfig();
+        sMetric->LoadFromConfigs();
     }
 
     // Set realm id and enable db logging
@@ -2080,6 +2082,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server", "WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000)); // outError for red color in console
     LOG_INFO("server", " ");
 
+    METRIC_EVENT("events", "World initialized", "World initialized in " + std::to_string(startupDuration / 60000) + " minutes " + std::to_string((startupDuration % 60000) / 1000) + " seconds");
+
     if (sConfigMgr->isDryRun())
     {
         LOG_INFO("server", "AzerothCore dry run completed, terminating.");
@@ -2360,6 +2364,10 @@ void World::Update(uint32 diff)
     ProcessCliCommands();
 
     sScriptMgr->OnWorldUpdate(diff);
+
+    // Stats logger update
+    sMetric->Update();
+    METRIC_VALUE("update_time_diff", diff);
 
     SavingSystemMgr::Update(diff);
 }

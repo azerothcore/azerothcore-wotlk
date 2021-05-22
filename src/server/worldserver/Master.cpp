@@ -18,6 +18,7 @@
 #include "GitRevision.h"
 #include "Log.h"
 #include "Master.h"
+#include "Metric.h"
 #include "OpenSSLCrypto.h"
 #include "RARunnable.h"
 #include "RealmList.h"
@@ -135,6 +136,13 @@ int Master::Run()
 
     // Loading modules configs
     sConfigMgr->LoadModulesConfigs();
+
+    sMetric->Initialize(realm.Name, _ioService, []()
+    {
+        METRIC_VALUE("online_players", sWorld->GetPlayerCount());
+    });
+
+    METRIC_EVENT("events", "Worldserver started", "");
 
     ///- Initialize the World
     sSecretMgr->Initialize();
@@ -301,6 +309,9 @@ int Master::Run()
     ClearOnlineAccounts();
 
     _StopDB();
+
+    METRIC_EVENT("events", "Worldserver shutdown", "");
+    sMetric->ForceSend();
 
     LOG_INFO("server", "Halting process...");
 

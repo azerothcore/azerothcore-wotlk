@@ -10,6 +10,7 @@
 #include "Geometry.h"
 #include "Log.h"
 #include "Map.h"
+#include "Metric.h"
 #include "MMapFactory.h"
 #include "MMapManager.h"
 #include "PathGenerator.h"
@@ -50,6 +51,8 @@ bool PathGenerator::CalculatePath(float x, float y, float z, float destX, float 
 {
     if (!acore::IsValidMapCoord(destX, destY, destZ) || !acore::IsValidMapCoord(x, y, z))
         return false;
+
+    METRIC_EVENT("mmap_events", "CalculatePath", "");
 
     G3D::Vector3 dest(destX, destY, destZ);
     SetEndPosition(dest);
