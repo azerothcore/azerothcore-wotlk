@@ -3556,7 +3556,7 @@ PacketSpoof.BanDuration = 86400
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Metric.Enable = 0
+Metric.Enable = 1
 
 #
 #    Metric.Interval
