@@ -4,23 +4,30 @@
  */
 
 #include "Metric.h"
-#include "Log.h"
+#include "AsioHacksImpl.h"
+#include "Common.h"
 #include "Config.h"
+#include "Log.h"
 #include "Util.h"
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 void Metric::Initialize(std::string const& realmName, boost::asio::io_service& ioService, std::function<void()> overallStatusLogger)
 {
-    _realmName = realmName;
-    _batchTimer = Trinity::make_unique<boost::asio::deadline_timer>(ioService);
-    _overallStatusTimer = Trinity::make_unique<boost::asio::deadline_timer>(ioService);
+    _dataStream = acore::make_unique<boost::asio::ip::tcp::iostream>();
+    _realmName = FormatInfluxDBTagValue(realmName);
+    _batchTimer = acore::make_unique<boost::asio::deadline_timer>(ioService);
+    _overallStatusTimer = acore::make_unique<boost::asio::deadline_timer>(ioService);
     _overallStatusLogger = overallStatusLogger;
     LoadFromConfigs();
 }
 
 bool Metric::Connect()
 {
-    _dataStream.connect(_hostname, _port);
-    auto error = _dataStream.error();
+    auto& stream = static_cast<boost::asio::ip::tcp::iostream&>(GetDataStream());
+    stream.connect(_hostname, _port);
+    auto error = stream.error();
     if (error)
     {
         LOG_ERROR("metric", "Error connecting to '%s:%s', disabling Metric. Error message : %s",
@@ -28,7 +35,7 @@ bool Metric::Connect()
         _enabled = false;
         return false;
     }
-    _dataStream.clear();
+    stream.clear();
     return true;
 }
 
@@ -144,22 +151,22 @@ void Metric::SendBatch()
         return;
     }
 
-    if (!_dataStream.good() && !Connect())
+    if (!GetDataStream().good() && !Connect())
         return;
 
-    _dataStream << "POST " << "/write?db=" << _databaseName << " HTTP/1.1\r\n";
-    _dataStream << "Host: " << _hostname << ":" << _port << "\r\n";
-    _dataStream << "Accept: */*\r\n";
-    _dataStream << "Content-Type: application/octet-stream\r\n";
-    _dataStream << "Content-Transfer-Encoding: binary\r\n";
+    GetDataStream() << "POST " << "/write?db=" << _databaseName << " HTTP/1.1\r\n";
+    GetDataStream() << "Host: " << _hostname << ":" << _port << "\r\n";
+    GetDataStream() << "Accept: */*\r\n";
+    GetDataStream() << "Content-Type: application/octet-stream\r\n";
+    GetDataStream() << "Content-Transfer-Encoding: binary\r\n";
 
-    _dataStream << "Content-Length: " << std::to_string(batchedData.tellp()) << "\r\n\r\n";
-    _dataStream << batchedData.rdbuf();
+    GetDataStream() << "Content-Length: " << std::to_string(batchedData.tellp()) << "\r\n\r\n";
+    GetDataStream() << batchedData.rdbuf();
 
     std::string http_version;
-    _dataStream >> http_version;
+    GetDataStream() >> http_version;
     unsigned int status_code = 0;
-    _dataStream >> status_code;
+    GetDataStream() >> status_code;
     if (status_code != 204)
     {
         LOG_ERROR("metric", "Error sending data, returned HTTP code: %u", status_code);
@@ -167,13 +174,13 @@ void Metric::SendBatch()
 
     // Read and ignore the status description
     std::string status_description;
-    std::getline(_dataStream, status_description);
+    std::getline(GetDataStream(), status_description);
     // Read headers
     std::string header;
-    while (std::getline(_dataStream, header) && header != "\r")
+    while (std::getline(GetDataStream(), header) && header != "\r")
     {
         if (header == "Connection: close\r")
-            _dataStream.close();
+            static_cast<boost::asio::ip::tcp::iostream&>(GetDataStream()).close();
     }
 
     ScheduleSend();
@@ -188,7 +195,7 @@ void Metric::ScheduleSend()
     }
     else
     {
-        _dataStream.close();
+        static_cast<boost::asio::ip::tcp::iostream&>(GetDataStream()).close();
         MetricData* data;
         // Clear the queue
         while (_queuedData.Dequeue(data))
@@ -200,7 +207,12 @@ void Metric::ForceSend()
 {
     // Send what's queued only if io_service is stopped (so only on shutdown)
     if (_enabled && _batchTimer->get_io_service().stopped())
+    {
+        _enabled = false;
         SendBatch();
+        _batchTimer->cancel();
+        _overallStatusTimer->cancel();
+    }
 }
 
 void Metric::ScheduleOverallStatusLog()
@@ -216,8 +228,62 @@ void Metric::ScheduleOverallStatusLog()
     }
 }
 
+std::string Metric::FormatInfluxDBValue(bool value)
+{
+    return value ? "t" : "f";
+}
+
+template<class T>
+std::string Metric::FormatInfluxDBValue(T value)
+{
+    return std::to_string(value) + 'i';
+}
+
+std::string Metric::FormatInfluxDBValue(std::string const& value)
+{
+    return '"' + boost::replace_all_copy(value, "\"", "\\\"") + '"';
+}
+
+std::string Metric::FormatInfluxDBValue(char const* value)
+{
+    return FormatInfluxDBValue(std::string(value));
+}
+
+std::string Metric::FormatInfluxDBValue(double value)
+{
+    return std::to_string(value);
+}
+
+std::string Metric::FormatInfluxDBValue(float value)
+{
+    return FormatInfluxDBValue(double(value));
+}
+
+std::string Metric::FormatInfluxDBTagValue(std::string const& value)
+{
+    // ToDo: should handle '=' and ',' characters too
+    return boost::replace_all_copy(value, " ", "\\ ");
+}
+
+Metric::Metric()
+{
+}
+
+Metric::~Metric()
+{
+}
+
 Metric* Metric::instance()
 {
     static Metric instance;
     return &instance;
 }
+
+template std::string Metric::FormatInfluxDBValue(int8);
+template std::string Metric::FormatInfluxDBValue(uint8);
+template std::string Metric::FormatInfluxDBValue(int16);
+template std::string Metric::FormatInfluxDBValue(uint16);
+template std::string Metric::FormatInfluxDBValue(int32);
+template std::string Metric::FormatInfluxDBValue(uint32);
+template std::string Metric::FormatInfluxDBValue(int64);
+template std::string Metric::FormatInfluxDBValue(uint64);
