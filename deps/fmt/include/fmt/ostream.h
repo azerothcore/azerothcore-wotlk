@@ -9,10 +9,15 @@
 #define FMT_OSTREAM_H_
 
 #include <ostream>
+
 #include "format.h"
 
 FMT_BEGIN_NAMESPACE
-namespace internal {
+
+template <typename Char> class basic_printf_parse_context;
+template <typename OutputIt, typename Char> class basic_printf_context;
+
+namespace detail {
 
 template <class Char> class formatbuf : public std::basic_streambuf<Char> {
  private:
@@ -44,21 +49,35 @@ template <class Char> class formatbuf : public std::basic_streambuf<Char> {
   }
 };
 
+struct converter {
+  template <typename T, FMT_ENABLE_IF(is_integral<T>::value)> converter(T);
+};
+
 template <typename Char> struct test_stream : std::basic_ostream<Char> {
  private:
-  struct null;
-  // Hide all operator<< from std::basic_ostream<Char>.
-  void operator<<(null);
+  void_t<> operator<<(converter);
 };
+
+// Hide insertion operators for built-in types.
+template <typename Char, typename Traits>
+void_t<> operator<<(std::basic_ostream<Char, Traits>&, Char);
+template <typename Char, typename Traits>
+void_t<> operator<<(std::basic_ostream<Char, Traits>&, char);
+template <typename Traits>
+void_t<> operator<<(std::basic_ostream<char, Traits>&, char);
+template <typename Traits>
+void_t<> operator<<(std::basic_ostream<char, Traits>&, signed char);
+template <typename Traits>
+void_t<> operator<<(std::basic_ostream<char, Traits>&, unsigned char);
 
 // Checks if T has a user-defined operator<< (e.g. not a member of
 // std::ostream).
 template <typename T, typename Char> class is_streamable {
  private:
   template <typename U>
-  static decltype((void)(std::declval<test_stream<Char>&>()
-                         << std::declval<U>()),
-                  std::true_type())
+  static bool_constant<!std::is_same<decltype(std::declval<test_stream<Char>&>()
+                                              << std::declval<U>()),
+                                     void_t<>>::value>
   test(int);
 
   template <typename> static std::false_type test(...);
@@ -66,17 +85,18 @@ template <typename T, typename Char> class is_streamable {
   using result = decltype(test<T>(0));
 
  public:
+  is_streamable() = default;
+
   static const bool value = result::value;
 };
 
 // Write the content of buf to os.
 template <typename Char>
-void write(std::basic_ostream<Char>& os, buffer<Char>& buf) {
+void write_buffer(std::basic_ostream<Char>& os, buffer<Char>& buf) {
   const Char* buf_data = buf.data();
   using unsigned_streamsize = std::make_unsigned<std::streamsize>::type;
   unsigned_streamsize size = buf.size();
-  unsigned_streamsize max_size =
-      to_unsigned((std::numeric_limits<std::streamsize>::max)());
+  unsigned_streamsize max_size = to_unsigned(max_value<std::streamsize>());
   do {
     unsigned_streamsize n = size <= max_size ? size : max_size;
     os.write(buf_data, static_cast<std::streamsize>(n));
@@ -86,34 +106,58 @@ void write(std::basic_ostream<Char>& os, buffer<Char>& buf) {
 }
 
 template <typename Char, typename T>
-void format_value(buffer<Char>& buf, const T& value) {
+void format_value(buffer<Char>& buf, const T& value,
+                  locale_ref loc = locale_ref()) {
   formatbuf<Char> format_buf(buf);
   std::basic_ostream<Char> output(&format_buf);
-  output.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+#if !defined(FMT_STATIC_THOUSANDS_SEPARATOR)
+  if (loc) output.imbue(loc.get<std::locale>());
+#endif
   output << value;
-  buf.resize(buf.size());
+  output.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+  buf.try_resize(buf.size());
 }
 
 // Formats an object of type T that has an overloaded ostream operator<<.
 template <typename T, typename Char>
 struct fallback_formatter<T, Char, enable_if_t<is_streamable<T, Char>::value>>
-    : formatter<basic_string_view<Char>, Char> {
-  template <typename Context>
-  auto format(const T& value, Context& ctx) -> decltype(ctx.out()) {
+    : private formatter<basic_string_view<Char>, Char> {
+  FMT_CONSTEXPR auto parse(basic_format_parse_context<Char>& ctx)
+      -> decltype(ctx.begin()) {
+    return formatter<basic_string_view<Char>, Char>::parse(ctx);
+  }
+  template <typename ParseCtx,
+            FMT_ENABLE_IF(std::is_same<
+                          ParseCtx, basic_printf_parse_context<Char>>::value)>
+  auto parse(ParseCtx& ctx) -> decltype(ctx.begin()) {
+    return ctx.begin();
+  }
+
+  template <typename OutputIt>
+  auto format(const T& value, basic_format_context<OutputIt, Char>& ctx)
+      -> OutputIt {
     basic_memory_buffer<Char> buffer;
-    format_value(buffer, value);
+    format_value(buffer, value, ctx.locale());
     basic_string_view<Char> str(buffer.data(), buffer.size());
     return formatter<basic_string_view<Char>, Char>::format(str, ctx);
   }
+  template <typename OutputIt>
+  auto format(const T& value, basic_printf_context<OutputIt, Char>& ctx)
+      -> OutputIt {
+    basic_memory_buffer<Char> buffer;
+    format_value(buffer, value, ctx.locale());
+    return std::copy(buffer.begin(), buffer.end(), ctx.out());
+  }
 };
-}  // namespace internal
+}  // namespace detail
 
+FMT_MODULE_EXPORT
 template <typename Char>
 void vprint(std::basic_ostream<Char>& os, basic_string_view<Char> format_str,
-            basic_format_args<buffer_context<Char>> args) {
+            basic_format_args<buffer_context<type_identity_t<Char>>> args) {
   basic_memory_buffer<Char> buffer;
-  internal::vformat_to(buffer, format_str, args);
-  internal::write(os, buffer);
+  detail::vformat_to(buffer, format_str, args);
+  detail::write_buffer(os, buffer);
 }
 
 /**
@@ -125,11 +169,12 @@ void vprint(std::basic_ostream<Char>& os, basic_string_view<Char> format_str,
     fmt::print(cerr, "Don't {}!", "panic");
   \endrst
  */
+FMT_MODULE_EXPORT
 template <typename S, typename... Args,
-          typename Char = enable_if_t<internal::is_string<S>::value, char_t<S>>>
+          typename Char = enable_if_t<detail::is_string<S>::value, char_t<S>>>
 void print(std::basic_ostream<Char>& os, const S& format_str, Args&&... args) {
   vprint(os, to_string_view(format_str),
-         {internal::make_args_checked<Args...>(format_str, args...)});
+         fmt::make_args_checked<Args...>(format_str, args...));
 }
 FMT_END_NAMESPACE
 

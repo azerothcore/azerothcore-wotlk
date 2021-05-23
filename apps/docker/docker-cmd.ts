@@ -1,4 +1,4 @@
-import { Command } from "https://cdn.depjs.com/cmd/mod.ts";
+import { Command } from "https://cdn.deno.land/cmd/versions/v1.2.0/raw/mod.ts";
 import * as ink from "https://deno.land/x/ink/mod.ts";
 import {
   Input,
