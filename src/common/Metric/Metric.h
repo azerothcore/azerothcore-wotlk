@@ -77,6 +77,7 @@ private:
     static std::string FormatInfluxDBValue(char const* value);
     static std::string FormatInfluxDBValue(double value);
     static std::string FormatInfluxDBValue(float value);
+    static std::string FormatInfluxDBValue(std::chrono::nanoseconds value);
 
     static std::string FormatInfluxDBValue(std::string const& value)
     {
@@ -119,6 +120,33 @@ public:
 
 #define sMetric Metric::instance()
 
+template<typename LoggerType>
+class MetricStopWatch
+{
+public:
+    MetricStopWatch(LoggerType&& loggerFunc) :
+        _logger(std::forward<LoggerType>(loggerFunc)),
+        _startTime(sMetric->IsEnabled() ? std::chrono::steady_clock::now() : TimePoint())
+    {
+    }
+
+    ~MetricStopWatch()
+    {
+        if (sMetric->IsEnabled())
+            _logger(_startTime);
+    }
+
+private:
+    LoggerType _logger;
+    TimePoint _startTime;
+};
+
+template<typename LoggerType>
+MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
+{
+    return { std::forward<LoggerType>(loggerFunc) };
+}
+
 #define TC_METRIC_TAG(name, value) { name, value }
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
@@ -150,5 +178,10 @@ public:
         } while (0)                                                     \
         __pragma(warning(pop))
 #endif
+#define METRIC_TIMER(category, ...)                                 \
+        MetricStopWatch __tc_metric_stop_watch = MakeMetricStopWatch([&](TimePoint start) \
+        {                                                                                                             \
+            sMetric->LogValue(category, std::chrono::steady_clock::now() - start, { __VA_ARGS__ });               \
+        });
 
 #endif // METRIC_H__
