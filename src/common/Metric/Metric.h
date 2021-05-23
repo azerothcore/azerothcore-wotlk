@@ -159,7 +159,7 @@ MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
 
 #if defined PERFORMANCE_PROFILING || defined WITHOUT_METRICS
 #define AC_METRIC_EVENT(category, title, description) ((void)0)
-#define AC_METRIC_VALUE(category, value) ((void)0)
+#define AC_METRIC_VALUE(category, value, ...) ((void)0)
 #define AC_METRIC_TIMER(category, ...) ((void)0)
 #define AC_METRIC_DETAILED_EVENT(category, title, description) ((void)0)
 #define AC_METRIC_DETAILED_TIMER(category, ...) ((void)0)
