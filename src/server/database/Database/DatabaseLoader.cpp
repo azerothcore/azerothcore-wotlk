@@ -10,6 +10,7 @@
 #include "Duration.h"
 #include <mysqld_error.h>
 #include <errmsg.h>
+#include <thread>
 
 template <class T>
 DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::string const& name)
