@@ -15,10 +15,10 @@
 
 void Metric::Initialize(std::string const& realmName, acore::Asio::IoContext& ioContext, std::function<void()> overallStatusLogger)
 {
-    _dataStream = acore::make_unique<boost::asio::ip::tcp::iostream>();
+    _dataStream = std::make_unique<boost::asio::ip::tcp::iostream>();
     _realmName = FormatInfluxDBTagValue(realmName);
-    _batchTimer = acore::make_unique<boost::asio::deadline_timer>(ioContext);
-    _overallStatusTimer = acore::make_unique<boost::asio::deadline_timer>(ioContext);
+    _batchTimer = std::make_unique<boost::asio::deadline_timer>(ioContext);
+    _overallStatusTimer = std::make_unique<boost::asio::deadline_timer>(ioContext);
     _overallStatusLogger = overallStatusLogger;
     LoadFromConfigs();
 }
