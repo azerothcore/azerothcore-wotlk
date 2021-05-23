@@ -53,6 +53,7 @@ target_link_libraries(common
     acore-core-interface
   PUBLIC
     ace
+    boost
     argon2
     g3dlib
     Detour
