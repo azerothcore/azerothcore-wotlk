@@ -54,6 +54,9 @@ CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, ui
 LFGDungeonEntry const* GetLFGDungeon(uint32 mapId, Difficulty difficulty);
 uint32 GetDefaultMapLight(uint32 mapId);
 
+typedef std::unordered_multimap<uint32, SkillRaceClassInfoEntry const*> SkillRaceClassInfoMap;
+typedef std::pair<SkillRaceClassInfoMap::iterator, SkillRaceClassInfoMap::iterator> SkillRaceClassInfoBounds;
+
 extern DBCStorage <AchievementEntry>             sAchievementStore;
 extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;
 extern DBCStorage <AchievementCategoryEntry>     sAchievementCategoryStore;

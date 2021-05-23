@@ -81,6 +81,7 @@ char constexpr RandomPropertiesPointsfmt[] = "niiiiiiiiiiiiiii";
 char constexpr ScalingStatDistributionfmt[] = "niiiiiiiiiiiiiiiiiiiii";
 char constexpr ScalingStatValuesfmt[] = "iniiiiiiiiiiiiiiiiiiiiii";
 char constexpr SkillLinefmt[] = "nixssssssssssssssssxxxxxxxxxxxxxxxxxxixxxxxxxxxxxxxxxxxi";
+char constexpr SkillRaceClassInfofmt[] = "diiiixix";
 char constexpr SkillLineAbilityfmt[] = "niiiixxiiiiixx";
 char constexpr SoundEntriesfmt[] = "nxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 char constexpr SpellCastTimefmt[] = "nixx";
