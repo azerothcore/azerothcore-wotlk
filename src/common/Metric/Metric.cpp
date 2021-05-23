@@ -77,7 +77,7 @@ void Metric::LoadFromConfigs()
             return;
         }
 
-        Tokenizer tokens(connectionInfo, ';');
+        std::vector<std::string_view> tokens = acore::Tokenize(connectionInfo, ';', true);
         if (tokens.size() != 3)
         {
             LOG_ERROR("metric", "'Metric.ConnectionInfo' specified with wrong format in configuration file.");
