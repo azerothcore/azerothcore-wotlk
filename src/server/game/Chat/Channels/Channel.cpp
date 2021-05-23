@@ -68,6 +68,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
         // If storing custom channels in the db is enabled either load or save the channel
         if (sWorld->getBoolConfig(CONFIG_PRESERVE_CUSTOM_CHANNELS))
         {
+            METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Save custom channels"));
             _channelDBId = ++ChannelMgr::_channelIdMax;
 
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHANNEL);

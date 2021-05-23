@@ -25,6 +25,7 @@ if(WITH_DYNAMIC_LINKING OR WITH_DYNAMIC_LINKING_FORCED)
 else()
   set(BUILD_SHARED_LIBS OFF)
 endif()
+option(WITHOUT_METRICS  "Disable metrics reporting (i.e. InfluxDB and Grafana)"         0)
 
 # Source tree in IDE
 set(WITH_SOURCE_TREE       "hierarchical" CACHE STRING "Build the source tree for IDE's.")

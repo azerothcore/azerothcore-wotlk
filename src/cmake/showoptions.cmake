@@ -144,6 +144,13 @@ else()
   message("* Show source tree                : No (For UNIX default)")
 endif()
 
+if(WITHOUT_METRICS)
+  message("")
+  message(" *** WITHOUT_METRICS - WARNING!")
+  message(" *** Please note that this will disable all metrics output (i.e. InfluxDB and Grafana)")
+  add_definitions(-DWITHOUT_METRICS)
+endif()
+
 if(BUILD_SHARED_LIBS)
   message("")
   message(" *** WITH_DYNAMIC_LINKING - INFO!")
