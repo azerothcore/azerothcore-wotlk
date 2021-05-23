@@ -199,7 +199,7 @@ void Metric::ScheduleSend()
         MetricData* data;
         // Clear the queue
         while (_queuedData.Dequeue(data))
-            ;
+            delete data;;
     }
 }
 
