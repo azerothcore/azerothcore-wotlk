@@ -14,6 +14,7 @@
 #include "WorldPacket.h"
 #include <array>
 #include <map>
+#include <sstream>
 
 namespace lfg
 {
