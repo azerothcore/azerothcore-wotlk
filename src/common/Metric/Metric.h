@@ -187,11 +187,21 @@ MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
         } while (0)                                                     \
         __pragma(warning(pop))
 #  endif
-#define METRIC_TIMER(category, ...)                                 \
-        MetricStopWatch METRIC_UNIQUE_NAME(__tc_metric_stop_watch) = MakeMetricStopWatch([&](TimePoint start) \
-        {                                                                                                             \
-            sMetric->LogValue(category, std::chrono::steady_clock::now() - start, { __VA_ARGS__ });               \
+#define METRIC_TIMER(category, ...)                                                                             \
+        MetricStopWatch METRIC_UNIQUE_NAME(__ac_metric_stop_watch) = MakeMetricStopWatch([&](TimePoint start)   \
+        {                                                                                                       \
+            sMetric->LogValue(category, std::chrono::steady_clock::now() - start, { __VA_ARGS__ });             \
         });
+#  if defined WITH_DETAILED_METRICS
+#define AC_METRIC_DETAILED_TIMER(category, ...)                                                                 \
+        MetricStopWatch AC_METRIC_UNIQUE_NAME(__ac_metric_stop_watch) = MakeMetricStopWatch([&](TimePoint start)   \
+        {                                                                                                       \
+            sMetric->LogValue(category, std::chrono::steady_clock::now() - start, { __VA_ARGS__ });             \
+        });
+#  else
+#define AC_METRIC_DETAILED_TIMER(category, ...) ((void)0)
+#  endif
+
 #endif
 
 #endif // METRIC_H__

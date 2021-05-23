@@ -26,6 +26,7 @@ else()
   set(BUILD_SHARED_LIBS OFF)
 endif()
 option(WITHOUT_METRICS  "Disable metrics reporting (i.e. InfluxDB and Grafana)"         0)
+option(WITH_DETAILED_METRICS  "Enable detailed metrics reporting (i.e. time each session takes to update)" 0)
 
 # Source tree in IDE
 set(WITH_SOURCE_TREE       "hierarchical" CACHE STRING "Build the source tree for IDE's.")

@@ -2777,6 +2777,9 @@ void World::UpdateSessions(uint32 diff)
         WorldSession* pSession = itr->second;
         WorldSessionFilter updater(pSession);
 
+        [[maybe_unused]] uint32 currentSessionId = itr->first;
+        METRIC_DETAILED_TIMER("world_update_sessions_time", METRIC_TAG("account_id", std::to_string(currentSessionId)));
+
         // pussywizard:
         if (pSession->HandleSocketClosed())
         {
