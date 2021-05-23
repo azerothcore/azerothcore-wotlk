@@ -36,7 +36,6 @@ public:
     }
 };
 
-
 void AddSC_warlock_pet_scripts()
 {
     new npc_pet_warlock_imp();
