@@ -565,6 +565,7 @@ void AddSC_hunter_pet_scripts();
 void AddSC_mage_pet_scripts();
 void AddSC_priest_pet_scripts();
 void AddSC_shaman_pet_scripts();
+void AddSC_warlock_pet_scripts();
 
 // battlegrounds
 
@@ -1171,6 +1172,7 @@ void AddPetScripts()
     AddSC_mage_pet_scripts();
     AddSC_priest_pet_scripts();
     AddSC_shaman_pet_scripts();
+    AddSC_warlock_pet_scripts();
 #endif
 }
 
