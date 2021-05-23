@@ -26,6 +26,7 @@
 #include "SignalHandler.h"
 #include "Timer.h"
 #include "Util.h"
+#include "IWorld.h"
 #include "World.h"
 #include "WorldRunnable.h"
 #include "WorldSocket.h"
@@ -137,7 +138,9 @@ int Master::Run()
     // Loading modules configs
     sConfigMgr->LoadModulesConfigs();
 
-    sMetric->Initialize(realm.Name, ioContext, []()
+    std::shared_ptr<acore::Asio::IoContext> ioContext = std::make_shared<acore::Asio::IoContext>();
+
+    sMetric->Initialize(GetRealmName(), ioContext, []()
     {
         AC_METRIC_VALUE("online_players", sWorld->GetPlayerCount());
     });

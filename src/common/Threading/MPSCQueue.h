@@ -152,6 +152,6 @@ private:
 }
 
 template<typename T, std::atomic<T*> T::* IntrusiveLink = nullptr>
-using MPSCQueue = std::conditional_t<IntrusiveLink != nullptr, Trinity::Impl::MPSCQueueIntrusive<T, IntrusiveLink>, Trinity::Impl::MPSCQueueNonIntrusive<T>>;
+using MPSCQueue = std::conditional_t<IntrusiveLink != nullptr, acore::Impl::MPSCQueueIntrusive<T, IntrusiveLink>, acore::Impl::MPSCQueueNonIntrusive<T>>;
 
 #endif // MPSCQueue_h__

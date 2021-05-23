@@ -4,10 +4,12 @@
  */
 
 #include "Metric.h"
+#include "AsioHacksFwd.h"
 #include "Common.h"
 #include "Config.h"
 #include "Log.h"
 #include "Strand.h"
+#include "Tokenize.h"
 #include "Util.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/asio/deadline_timer.hpp>
@@ -17,8 +19,8 @@ void Metric::Initialize(std::string const& realmName, acore::Asio::IoContext& io
 {
     _dataStream = std::make_unique<boost::asio::ip::tcp::iostream>();
     _realmName = FormatInfluxDBTagValue(realmName);
-    _batchTimer = std::make_unique<boost::asio::deadline_timer>(ioContext);
-    _overallStatusTimer = std::make_unique<boost::asio::deadline_timer>(ioContext);
+    _batchTimer = std::make_unique<acore::Asio::DeadlineTimer>(ioContext);
+    _overallStatusTimer = std::make_unique<acore::Asio::DeadlineTimer>(ioContext);
     _overallStatusLogger = overallStatusLogger;
     LoadFromConfigs();
 }

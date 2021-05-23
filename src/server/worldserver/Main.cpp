@@ -15,6 +15,7 @@
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Master.h"
+#include "IoContext.h"
 #include "SharedDefines.h"
 #include <ace/Version.h>
 #include <openssl/crypto.h>
@@ -122,6 +123,8 @@ extern int main(int argc, char** argv)
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
+
+    std::shared_ptr<acore::Asio::IoContext> ioContext = std::make_shared<acore::Asio::IoContext>();
 
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
