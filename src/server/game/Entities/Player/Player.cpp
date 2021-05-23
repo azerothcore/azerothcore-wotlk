@@ -844,7 +844,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_mailsUpdated = false;
     unReadMails = 0;
-    m_nextMailDelivereTime = 0;
+    m_nextMailDelivereTime = time_t(0);
 
     m_resetTalentsCost = 0;
     m_resetTalentsTime = 0;
@@ -1605,7 +1605,7 @@ void Player::Update(uint32 p_time)
         ++unReadMails;
 
         // It will be recalculate at mailbox open (for unReadMails important non-0 until mailbox open, it also will be recalculated)
-        m_nextMailDelivereTime = 0;
+        m_nextMailDelivereTime = time_t(0);
     }
 
     // Update cinematic location, if 500ms have passed and we're doing a cinematic now.
@@ -3735,18 +3735,18 @@ void Player::UpdateNextMailTimeAndUnreads()
     //Get the next delivery time
     PreparedStatement* stmtNextDeliveryTime = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
     stmtNextDeliveryTime->setUInt32(0, GetGUID().GetCounter());
-    stmtNextDeliveryTime->setUInt64(1, cTime);
+    stmtNextDeliveryTime->setUInt32(1, uint32(cTime));
     PreparedQueryResult resultNextDeliveryTime = CharacterDatabase.Query(stmtNextDeliveryTime);
     if (resultNextDeliveryTime)
     {
         Field* fields = resultNextDeliveryTime->Fetch();
-        m_nextMailDelivereTime = fields[0].GetUInt64();
+        m_nextMailDelivereTime = time_t(fields[0].GetUInt32());
     }
 
     //Get unread mails count
     PreparedStatement* stmtUnreadAmount = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
     stmtUnreadAmount->setUInt32(0, GetGUID().GetCounter());
-    stmtUnreadAmount->setUInt64(1, cTime);
+    stmtUnreadAmount->setUInt32(1, uint32(cTime));
     PreparedQueryResult resultUnreadAmount = CharacterDatabase.Query(stmtUnreadAmount);
     if (resultUnreadAmount)
     {
@@ -19309,13 +19309,13 @@ void Player::_LoadMail()
     }
 
     //This should in theory always be < 100
-    for (PlayerMails::iterator itr = GetMailBegin(); itr != GetMailEnd();)
+    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end();)
     {
-        Mail* m = *itr;
-        m_mailCache.erase(itr);
-        if(m)
-            delete m;
-        itr = GetMailBegin();
+        Mail* mail = *itr;
+        itr = m_mailCache.erase(itr);
+
+        if (mail)
+            delete mail;
     }
 
     // Delete mailed items aswell
@@ -19323,13 +19323,19 @@ void Player::_LoadMail()
     for (ItemMap::iterator iter = mMitems.begin(); iter != mMitems.end(); ++iter)
         delete iter->second;
 
+    std::set<uint32> pendingAuctions;
+    std::unordered_map<uint32, Mail*> pendingAuctionMails;
+
     mMitems.clear();
 
     //Now load the new ones
     m_mailCache.clear();
+
+    SQLTransaction pendingAuctionsTrans = CharacterDatabase.BeginTransaction();
+
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL);
     stmt->setUInt32(0, GetGUID().GetCounter());
-    stmt->setUInt64(1, time(nullptr));
+    stmt->setUInt32(1, uint32(time(nullptr)));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (result)
     {
@@ -19353,6 +19359,7 @@ void Player::_LoadMail()
             m->checked = fields[11].GetUInt8();
             m->stationery = fields[12].GetUInt8();
             m->mailTemplateId = fields[13].GetInt16();
+            m->auctionId = fields[14].GetInt32();
 
             if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
             {
@@ -19365,10 +19372,60 @@ void Player::_LoadMail()
             if (has_items)
                 _LoadMailedItems(m);
 
+            // Do not load expired pending sale mail if there is already delivery auction mail
+            if (m->auctionId < 0 && m->expire_time <= time(nullptr))
+            {
+                uint32 auctionId = std::abs(m->auctionId);
+                if (pendingAuctions.count(auctionId))
+                {
+                    PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
+                    stmt2->setUInt32(0, m->messageID);
+                    pendingAuctionsTrans->Append(stmt2);
+
+                    if (totalMailCount > 0)
+                        --totalMailCount;
+
+                    if (unReadMails > 0 && (m->checked & MAIL_CHECK_MASK_READ) == 0)
+                        --unReadMails;
+
+                    delete m;
+                    continue;
+                }
+
+                pendingAuctionMails[auctionId] = m;
+            }
+            else if (m->auctionId > 0)
+                pendingAuctions.insert(m->auctionId);
+
             m_mailCache.push_back(m);
         }
         while (result->NextRow());
     }
+
+    for (auto itr : pendingAuctionMails)
+    {
+        uint32 auctionId = itr.first;
+        if (pendingAuctions.count(auctionId))
+        {
+            Mail* mail = itr.second;
+
+            PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
+            stmt2->setUInt32(0, mail->messageID);
+            pendingAuctionsTrans->Append(stmt2);
+
+            if (totalMailCount > 0)
+                --totalMailCount;
+
+            if (unReadMails > 0 && (mail->checked & MAIL_CHECK_MASK_READ) == 0)
+                --unReadMails;
+
+            m_mailCache.erase(std::remove(m_mailCache.begin(), m_mailCache.end(), mail));
+
+            delete mail;
+        }
+    }
+
+    CharacterDatabase.CommitTransaction(pendingAuctionsTrans);
 }
 
 void Player::LoadPet()
