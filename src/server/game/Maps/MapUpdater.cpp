@@ -29,7 +29,7 @@ public:
 
     void call() override
     {
-        METRIC_TIMER("map_update_time_diff", TC_METRIC_TAG("map_id", std::to_string(m_map.GetId())));
+        AC_METRIC_TIMER("map_update_time_diff", TC_AC_METRIC_TAG("map_id", std::to_string(m_map.GetId())));
         m_map.Update(m_diff, s_diff);
         m_updater.update_finished();
     }

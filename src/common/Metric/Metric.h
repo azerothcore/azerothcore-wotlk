@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
  */
 
-#ifndef METRIC_H__
-#define METRIC_H__
+#ifndef AC_METRIC_H__
+#define AC_METRIC_H__
 
 #include "Define.h"
 #include "Duration.h"
@@ -27,8 +27,8 @@ namespace acore
 
 enum MetricDataType
 {
-    METRIC_DATA_VALUE,
-    METRIC_DATA_EVENT
+    AC_METRIC_DATA_VALUE,
+    AC_METRIC_DATA_EVENT
 };
 
 typedef std::pair<std::string, std::string> MetricTag;
@@ -105,7 +105,7 @@ public:
         MetricData* data = new MetricData;
         data->Category = category;
         data->Timestamp = system_clock::now();
-        data->Type = METRIC_DATA_VALUE;
+        data->Type = AC_METRIC_DATA_VALUE;
         data->Value = FormatInfluxDBValue(value);
         data->Tags = std::move(tags);
 
@@ -147,30 +147,30 @@ MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
     return { std::forward<LoggerType>(loggerFunc) };
 }
 
-#define TC_METRIC_TAG(name, value) { name, value }
+#define TC_AC_METRIC_TAG(name, value) { name, value }
 
-#define METRIC_DO_CONCAT(a, b) a##b
-#define METRIC_CONCAT(a, b) TC_METRIC_DO_CONCAT(a, b)
-#define METRIC_UNIQUE_NAME(name) METRIC_CONCAT(name, __LINE__)
+#define AC_METRIC_DO_CONCAT(a, b) a##b
+#define AC_METRIC_CONCAT(a, b) TC_AC_METRIC_DO_CONCAT(a, b)
+#define AC_METRIC_UNIQUE_NAME(name) AC_METRIC_CONCAT(name, __LINE__)
 
 #if defined PERFORMANCE_PROFILING || defined WITHOUT_METRICS
-#define METRIC_EVENT(category, title, description) ((void)0)
-#define METRIC_VALUE(category, value) ((void)0)
-#define METRIC_TIMER(category, ...) ((void)0)
+#define AC_METRIC_EVENT(category, title, description) ((void)0)
+#define AC_METRIC_VALUE(category, value) ((void)0)
+#define AC_METRIC_TIMER(category, ...) ((void)0)
 #else
 #  if AC_PLATFORM != AC_PLATFORM_WINDOWS
-#define METRIC_EVENT(category, title, description)                      \
+#define AC_METRIC_EVENT(category, title, description)                      \
         do {                                                            \
             if (sMetric->IsEnabled())                                   \
                 sMetric->LogEvent(category, title, description);        \
         } while (0)
-#define METRIC_VALUE(category, value, ...)                              \
+#define AC_METRIC_VALUE(category, value, ...)                              \
         do {                                                            \
             if (sMetric->IsEnabled())                                   \
                 sMetric->LogValue(category, value, { __VA_ARGS__ }););  \
         } while (0)
 # else
-#define METRIC_EVENT(category, title, description)                      \
+#define AC_METRIC_EVENT(category, title, description)                      \
         __pragma(warning(push))                                         \
         __pragma(warning(disable:4127))                                 \
         do {                                                            \
@@ -178,7 +178,7 @@ MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
                 sMetric->LogEvent(category, title, description);        \
         } while (0)                                                     \
         __pragma(warning(pop))
-#define METRIC_VALUE(category, value, ...)                              \
+#define AC_METRIC_VALUE(category, value, ...)                              \
         __pragma(warning(push))                                         \
         __pragma(warning(disable:4127))                                 \
         do {                                                            \
@@ -187,14 +187,14 @@ MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
         } while (0)                                                     \
         __pragma(warning(pop))
 #  endif
-#define METRIC_TIMER(category, ...)                                                                             \
-        MetricStopWatch METRIC_UNIQUE_NAME(__ac_metric_stop_watch) = MakeMetricStopWatch([&](TimePoint start)   \
+#define AC_METRIC_TIMER(category, ...)                                                                             \
+        MetricStopWatch AC_METRIC_UNIQUE_NAME(__AC_METRIC_stop_watch) = MakeMetricStopWatch([&](TimePoint start)   \
         {                                                                                                       \
             sMetric->LogValue(category, std::chrono::steady_clock::now() - start, { __VA_ARGS__ });             \
         });
 #  if defined WITH_DETAILED_METRICS
 #define AC_METRIC_DETAILED_TIMER(category, ...)                                                                 \
-        MetricStopWatch AC_METRIC_UNIQUE_NAME(__ac_metric_stop_watch) = MakeMetricStopWatch([&](TimePoint start)   \
+        MetricStopWatch AC_METRIC_UNIQUE_NAME(__AC_METRIC_stop_watch) = MakeMetricStopWatch([&](TimePoint start)   \
         {                                                                                                       \
             sMetric->LogValue(category, std::chrono::steady_clock::now() - start, { __VA_ARGS__ });             \
         });
@@ -204,4 +204,4 @@ MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
 
 #endif
 
-#endif // METRIC_H__
+#endif // AC_METRIC_H__

@@ -139,10 +139,10 @@ int Master::Run()
 
     sMetric->Initialize(realm.Name, ioContext, []()
     {
-        METRIC_VALUE("online_players", sWorld->GetPlayerCount());
+        AC_METRIC_VALUE("online_players", sWorld->GetPlayerCount());
     });
 
-    METRIC_EVENT("events", "Worldserver started", "");
+    AC_METRIC_EVENT("events", "Worldserver started", "");
 
     ///- Initialize the World
     sSecretMgr->Initialize();
@@ -312,7 +312,7 @@ int Master::Run()
 
     std::shared_ptr<void> sMetricHandle(nullptr, [](void*)
     {
-        METRIC_EVENT("events", "Worldserver shutdown", "");
+        AC_METRIC_EVENT("events", "Worldserver shutdown", "");
         sMetric->Unload();
     });
 

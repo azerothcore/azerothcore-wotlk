@@ -101,7 +101,7 @@ void Metric::LogEvent(std::string const& category, std::string const& title, std
     MetricData* data = new MetricData;
     data->Category = category;
     data->Timestamp = system_clock::now();
-    data->Type = METRIC_DATA_EVENT;
+    data->Type = AC_METRIC_DATA_EVENT;
     data->Title = title;
     data->Text = description;
 
@@ -131,10 +131,10 @@ void Metric::SendBatch()
 
         switch (data->Type)
         {
-            case METRIC_DATA_VALUE:
+            case AC_METRIC_DATA_VALUE:
                 batchedData << "value=" << data->Value;
                 break;
-            case METRIC_DATA_EVENT:
+            case AC_METRIC_DATA_EVENT:
                 batchedData << "title=\"" << data->Title << "\",text=\"" << data->Text << "\"";
                 break;
         }

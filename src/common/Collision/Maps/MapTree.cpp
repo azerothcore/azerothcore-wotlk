@@ -335,7 +335,7 @@ namespace VMAP
             // currently, core creates grids for all maps, whether it has terrain tiles or not
             // so we need "fake" tile loads to know when we can unload map geometry
             iLoadedTiles[packTileID(tileX, tileY)] = false;
-            METRIC_EVENT("map_events", "LoadMapTile",
+            AC_METRIC_EVENT("map_events", "LoadMapTile",
                 "Map: " + std::to_string(iMapID) + " TileX: " + std::to_string(tileX) + " TileY: " + std::to_string(tileY));
             return true;
         }
@@ -464,7 +464,7 @@ namespace VMAP
             }
         }
         iLoadedTiles.erase(tile);
-        METRIC_EVENT("map_events", "UnloadMapTile",
+        AC_METRIC_EVENT("map_events", "UnloadMapTile",
             "Map: " + std::to_string(iMapID) + " TileX: " + std::to_string(tileX) + " TileY: " + std::to_string(tileY));
     }
 

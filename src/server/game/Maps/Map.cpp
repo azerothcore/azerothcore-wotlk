@@ -871,13 +871,13 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
     sScriptMgr->OnMapUpdate(this, t_diff);
 
-    METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),
-        METRIC_TAG("map_id", std::to_string(GetId())),
-        METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
+    AC_METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),
+        AC_METRIC_TAG("map_id", std::to_string(GetId())),
+        AC_METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
 
-    METRIC_VALUE("map_gameobjects", uint64(GetObjectsStore().Size<GameObject>()),
-        METRIC_TAG("map_id", std::to_string(GetId())),
-        METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
+    AC_METRIC_VALUE("map_gameobjects", uint64(GetObjectsStore().Size<GameObject>()),
+        AC_METRIC_TAG("map_id", std::to_string(GetId())),
+        AC_METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
 }
 
 void Map::HandleDelayedVisibility()

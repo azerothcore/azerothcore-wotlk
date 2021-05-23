@@ -408,7 +408,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             break;
     }
 
-    METRIC_VALUE("processed_packets", processedPackets);
+    AC_METRIC_VALUE("processed_packets", processedPackets);
 
     if (m_Socket && !m_Socket->IsClosed())
         ProcessQueryCallbacks();
@@ -637,7 +637,7 @@ void WorldSession::LogoutPlayer(bool save)
         //! Call script hook before deletion
         sScriptMgr->OnPlayerLogout(_player);
 
-        METRIC_EVENT("player_events", "Logout", _player->GetName());
+        AC_METRIC_EVENT("player_events", "Logout", _player->GetName());
 
         LOG_INFO("entities.player", "Account: %d (IP: %s) Logout Character:[%s] (%s) Level: %d",
             GetAccountId(), GetRemoteAddress().c_str(), _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), _player->getLevel());

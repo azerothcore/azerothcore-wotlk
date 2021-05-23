@@ -1200,7 +1200,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         sScriptMgr->OnFirstLogin(pCurrChar);
     }
 
-    METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
+    AC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
     delete holder;
 }
