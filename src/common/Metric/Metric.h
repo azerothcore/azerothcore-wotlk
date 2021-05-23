@@ -151,16 +151,18 @@ MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
     return { std::forward<LoggerType>(loggerFunc) };
 }
 
-#define TC_AC_METRIC_TAG(name, value) { name, value }
+#define AC_METRIC_TAG(name, value) { name, value }
 
 #define AC_METRIC_DO_CONCAT(a, b) a##b
-#define AC_METRIC_CONCAT(a, b) TC_AC_METRIC_DO_CONCAT(a, b)
+#define AC_METRIC_CONCAT(a, b) AC_METRIC_DO_CONCAT(a, b)
 #define AC_METRIC_UNIQUE_NAME(name) AC_METRIC_CONCAT(name, __LINE__)
 
 #if defined PERFORMANCE_PROFILING || defined WITHOUT_METRICS
 #define AC_METRIC_EVENT(category, title, description) ((void)0)
 #define AC_METRIC_VALUE(category, value) ((void)0)
 #define AC_METRIC_TIMER(category, ...) ((void)0)
+#define AC_METRIC_DETAILED_TIMER(category, ...) ((void)0)
+#define AC_METRIC_DETAILED_NO_THRESHOLD_TIMER(category, ...) ((void)0)
 #else
 #  if AC_PLATFORM != AC_PLATFORM_WINDOWS
 #define AC_METRIC_EVENT(category, title, description)                      \
@@ -204,8 +206,10 @@ MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
             if (sMetric->ShouldLog(category, duration))                                                          \
                 sMetric->LogValue(category, duration, { __VA_ARGS__ });                                          \
         });
+#define AC_METRIC_DETAILED_NO_THRESHOLD_TIMER(category, ...) AC_METRIC_TIMER(category, __VA_ARGS__)
 #  else
 #define AC_METRIC_DETAILED_TIMER(category, ...) ((void)0)
+#define AC_METRIC_DETAILED_NO_THRESHOLD_TIMER(category, ...) ((void)0)
 #  endif
 
 #endif
