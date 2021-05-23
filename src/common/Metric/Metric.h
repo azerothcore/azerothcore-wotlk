@@ -7,7 +7,7 @@
 #define METRIC_H__
 
 #include "Define.h"
-#include "AsioHacksFwd.h"
+#include "Duration.h"
 #include "MPSCQueue.h"
 #include <chrono>
 #include <functional>
@@ -36,7 +36,7 @@ typedef std::pair<std::string, std::string> MetricTag;
 struct MetricData
 {
     std::string Category;
-    std::chrono::system_clock::time_point Timestamp;
+    SystemTimePoint Timestamp;
     MetricDataType Type;
     std::vector<MetricTag> Tags;
 
