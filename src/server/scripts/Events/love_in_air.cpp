@@ -33,6 +33,11 @@ enum Quests
     QUEST_PILGRIM_ALLIANCE          = 24656
 };
 
+enum SupplySentrySay
+{
+    SAY_SUPPLY_SENTRY_0 = 0
+};
+
 class npc_love_in_air_supply_sentry : public CreatureScript
 {
 public:
@@ -52,9 +57,13 @@ public:
             {
                 lock = 0;
                 if (urand(0, 1))
-                    me->MonsterSay("Time is money, friend. Go go go!", LANG_UNIVERSAL, who->ToPlayer());
+                {
+                    me->AI()->Talk(SAY_SUPPLY_SENTRY_0, who->ToPlayer());
+                }
                 else
-                    me->MonsterSay("That crate won't deliver itself, friend. Get a move on!", LANG_UNIVERSAL, who->ToPlayer());
+                {
+                    me->AI()->Talk(SAY_SUPPLY_SENTRY_0, who->ToPlayer());
+                }
 
                 if (who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
                 {
@@ -155,6 +164,14 @@ public:
     }
 };
 
+enum SnivelRealSay
+{
+    SAY_SNIVEL_REAL_0 = 0,
+    SAY_SNIVEL_REAL_1 = 1,
+    SAY_SNIVEL_REAL_2 = 2,
+    SAY_SNIVEL_REAL_3 = 3
+};
+
 class npc_love_in_air_snivel_real : public CreatureScript
 {
 public:
@@ -181,10 +198,10 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->MonsterSay("What are you staring at? Haven't you ever seen a genius before?", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0);
                                 return false;
                             case 2:
-                                me->MonsterSay("This'll teach you to mind your own business!", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1);
                                 return true;
                         }
                         break;
@@ -195,13 +212,13 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->MonsterSay("That's right. I'd like to list some of these 'fireworks'.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0);
                                 return false;
                             case 2:
-                                me->MonsterSay("Those'll net me a nice profit when I return from the South Seas.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1);
                                 return false;
                             case 3:
-                                me->MonsterSay("You... Don't think I don't see you. Leave me alone!", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_2);
                                 return true;
                         }
                         break;
@@ -213,16 +230,16 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->MonsterSay("Thanks for the great cut and shave, buddy.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0);
                                 return false;
                             case 2:
-                                me->MonsterSay("Here's a little something extra since I'll be away.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1);
                                 return false;
                             case 3:
-                                me->MonsterSay("On second thought, keep the whole bag. I have to, uh, get going.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_2);
                                 return false;
                             case 4:
-                                me->MonsterSay("Did you really think you could corner me this easily?", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_3);
                                 return true;
                         }
                         break;
@@ -290,6 +307,14 @@ enum hummel
     EVENT_SPELL_THROW               = 5,
 };
 
+enum HummelSay
+{
+    SAY_HUMMEL_0 = 0,
+    SAY_HUMMEL_1 = 1,
+    SAY_HUMMEL_2 = 2,
+    SAY_HUMMEL_5 = 5
+};
+
 class npc_love_in_air_hummel : public CreatureScript
 {
 public:
@@ -323,7 +348,7 @@ public:
 
         void JustDied(Unit* ) override
         {
-            me->MonsterSay("...please don't think less of me.", LANG_UNIVERSAL, 0);
+            me->AI()->Talk(SAY_HUMMEL_5);
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
                 sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 288, me->FindMap());
@@ -344,17 +369,17 @@ public:
                 speachTimer += diff;
                 if (speachTimer < 10000)
                 {
-                    me->MonsterSay("Did they bother to tell you who I am and why I am doing this?", LANG_UNIVERSAL, 0);
+                    me->AI()->Talk(SAY_HUMMEL_0);
                     speachTimer = 10000;
                 }
                 else if (speachTimer >= 16000 && speachTimer < 20000)
                 {
-                    me->MonsterSay("...or are they just using you like they do everybody else?", LANG_UNIVERSAL, 0);
+                    me->AI()->Talk(SAY_HUMMEL_1);
                     speachTimer = 20000;
                 }
                 else if (speachTimer >= 26000 && speachTimer < 30000)
                 {
-                    me->MonsterSay("But what does it matter. It is time for this to end.", LANG_UNIVERSAL, 0);
+                    me->AI()->Talk(SAY_HUMMEL_2);
                     speachTimer = 0;
                     me->setFaction(16);
                     me->SetInCombatWithZone();
@@ -423,6 +448,11 @@ public:
     }
 };
 
+enum HummelHelperSay
+{
+    SAY_HUMMEL_HELPER_SAY_5 = 5,
+};
+
 class npc_love_in_air_hummel_helper : public CreatureScript
 {
 public:
@@ -461,7 +491,10 @@ public:
             }
         }
 
-        void JustDied(Unit* ) override { me->MonsterSay("...please don't think less of me.", LANG_UNIVERSAL, 0); }
+        void JustDied(Unit* ) override
+        {
+            me->AI()->Talk(SAY_HUMMEL_HELPER_SAY_5);
+        }
 
         void UpdateAI(uint32 diff) override
         {
