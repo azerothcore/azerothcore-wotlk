@@ -5,6 +5,7 @@
 
 #include "MySQLThreading.h"
 #include "Log.h"
+#include <mysql.h>
 
 void MySQL::Library_Init()
 {
