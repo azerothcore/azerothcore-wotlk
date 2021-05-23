@@ -4,21 +4,21 @@
  */
 
 #include "Metric.h"
-#include "AsioHacksImpl.h"
 #include "Common.h"
 #include "Config.h"
 #include "Log.h"
+#include "Strand.h"
 #include "Util.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
-void Metric::Initialize(std::string const& realmName, boost::asio::io_service& ioService, std::function<void()> overallStatusLogger)
+void Metric::Initialize(std::string const& realmName, acore::Asio::IoContext& ioContext, std::function<void()> overallStatusLogger)
 {
     _dataStream = acore::make_unique<boost::asio::ip::tcp::iostream>();
     _realmName = FormatInfluxDBTagValue(realmName);
-    _batchTimer = acore::make_unique<boost::asio::deadline_timer>(ioService);
-    _overallStatusTimer = acore::make_unique<boost::asio::deadline_timer>(ioService);
+    _batchTimer = acore::make_unique<boost::asio::deadline_timer>(ioContext);
+    _overallStatusTimer = acore::make_unique<boost::asio::deadline_timer>(ioContext);
     _overallStatusLogger = overallStatusLogger;
     LoadFromConfigs();
 }
@@ -203,16 +203,17 @@ void Metric::ScheduleSend()
     }
 }
 
-void Metric::ForceSend()
+void Metric::Unload()
 {
     // Send what's queued only if io_service is stopped (so only on shutdown)
-    if (_enabled && _batchTimer->get_io_service().stopped())
+    if (_enabled && acore::Asio::get_io_context(*_batchTimer).stopped())
     {
         _enabled = false;
         SendBatch();
-        _batchTimer->cancel();
-        _overallStatusTimer->cancel();
     }
+
+    _batchTimer->cancel();
+    _overallStatusTimer->cancel();
 }
 
 void Metric::ScheduleOverallStatusLog()

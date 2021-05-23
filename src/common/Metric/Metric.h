@@ -15,11 +15,11 @@
 #include <memory>
 #include <string>
 
-namespace boost
+namespace acore
 {
-    namespace asio
+    namespace Asio
     {
-        class io_service;
+        class IoContext;
     }
 }
 
@@ -87,7 +87,7 @@ public:
     ~Metric();
     static Metric* instance();
 
-    void Initialize(std::string const& realmName, boost::asio::io_service& ioService, std::function<void()> overallStatusLogger);
+    void Initialize(std::string const& realmName, acore::Asio::IoContext& ioContext, std::function<void()> overallStatusLogger);
     void LoadFromConfigs();
     void Update();
 
@@ -107,7 +107,7 @@ public:
 
     void LogEvent(std::string const& category, std::string const& title, std::string const& description);
 
-    void ForceSend();
+    void Unload();
     bool IsEnabled() const { return _enabled; }
 };
 

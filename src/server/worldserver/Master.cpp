@@ -137,7 +137,7 @@ int Master::Run()
     // Loading modules configs
     sConfigMgr->LoadModulesConfigs();
 
-    sMetric->Initialize(realm.Name, _ioService, []()
+    sMetric->Initialize(realm.Name, ioContext, []()
     {
         METRIC_VALUE("online_players", sWorld->GetPlayerCount());
     });
@@ -310,8 +310,11 @@ int Master::Run()
 
     _StopDB();
 
-    METRIC_EVENT("events", "Worldserver shutdown", "");
-    sMetric->ForceSend();
+    std::shared_ptr<void> sMetricHandle(nullptr, [](void*)
+    {
+        METRIC_EVENT("events", "Worldserver shutdown", "");
+        sMetric->Unload();
+    });
 
     LOG_INFO("server", "Halting process...");
 
