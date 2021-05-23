@@ -304,6 +304,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     {
         OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
         ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
+        AC_METRIC_DETAILED_TIMER("worldsession_update_opcode_time", AC_METRIC_TAG("opcode", opHandle->Name));
 
         try
         {
