@@ -14,7 +14,7 @@
 #include "SRP6.h"
 
 class ACE_INET_Addr;
-class Fields;
+class Field;
 struct Realm;
 
 enum eStatus
