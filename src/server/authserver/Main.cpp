@@ -31,7 +31,7 @@
 #include <ace/TP_Reactor.h>
 #include <ace/ACE.h>
 #include <ace/Sig_Handler.h>
-#include <boost/filesystem/operations.hpp>
+#include <boost/version.hpp>
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 

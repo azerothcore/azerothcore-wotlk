@@ -17,7 +17,7 @@
 #include "Master.h"
 #include "SharedDefines.h"
 #include <ace/Version.h>
-#include <boost/filesystem/operations.hpp>
+#include <boost/version.hpp>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
