@@ -98,6 +98,8 @@ INSERT INTO `creature` VALUES
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 4543;
 
+
+-- (OLD SAI) (4543, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 12, 14693, 8, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1797.53, 1233.85, 18.26, 1.57, 'Bloodmage Thalnos - On Just Died - Summon Creature \'Scorn\''); (OLD SAI) --
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 4543);
 INSERT INTO `smart_scripts` VALUES
 (4543, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - On Aggro - Say Line 0'),
@@ -107,4 +109,3 @@ INSERT INTO `smart_scripts` VALUES
 (4543, 0, 4, 0, 0, 0, 100, 0, 7000, 7000, 20000, 20000, 0, 11, 8814, 0, 0, 0, 0, 0, 5, 30, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - In Combat - Cast \'Flame Spike\''),
 (4543, 0, 5, 0, 0, 0, 100, 0, 3000, 6000, 20000, 20000, 0, 11, 8053, 0, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - In Combat - Cast \'Flame Shock\''),
 (4543, 0, 6, 0, 0, 0, 100, 0, 12000, 12000, 20000, 20000, 0, 11, 12470, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bloodmage Thalnos - In Combat - Cast \'Fire Nova\'');
--- (OLD SAI) (4543, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 12, 14693, 8, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1797.53, 1233.85, 18.26, 1.57, 'Bloodmage Thalnos - On Just Died - Summon Creature \'Scorn\''); (OLD SAI) --
