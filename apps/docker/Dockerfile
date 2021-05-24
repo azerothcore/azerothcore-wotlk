@@ -64,6 +64,8 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
 # Download deno and make sure the dashboard works
 RUN bash /azerothcore/acore.sh quit
+# Install node to allow working with Eluna-TS mainly
+RUN bash /azerothcore/bin/acore-install-node
 
 WORKDIR /azerothcore
 

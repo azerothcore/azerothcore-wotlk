@@ -15,6 +15,8 @@ source "$AC_PATH_SHARED/common.sh"
 
 source "$AC_PATH_SHARED/deno.sh"
 
+source "$AC_PATH_SHARED/node.sh"
+
 denoInstall
 
 [[ "$OSTYPE" = "msys" ]] && AC_BINPATH_FULL="$BINPATH" || AC_BINPATH_FULL="$BINPATH/bin"
