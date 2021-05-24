@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INSTALLER_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-source "$CURRENT_PATH/includes/includes.sh"
+source "$INSTALLER_PATH/includes/includes.sh"
 
 PS3='[Please enter your choice]: '
 options=(
@@ -12,7 +12,7 @@ options=(
     "reset (r): Reset & Clean Repository"           # 4
     "compiler (c): Run compiler tool"               # 5
     "db-assembler (a): Run db assembler tool"       # 6
-    "module-search (ms): Module Search by keyword" # 7
+    "module (m): Module installer dashboard" # 7
     "module-install (mi): Module Install by name"  # 8
     "module-update (mu): Module Update by name"    # 9
     "module-remove: (mr): Module Remove by name"   # 10
@@ -46,8 +46,9 @@ function _switch() {
         ""|"a"|"db-assembler"|"6")
             bash "$AC_PATH_APPS/db_assembler/db_assembler.sh" $_opt
             ;;
-        ""|"ms"|"module-search"|"7")
-            inst_module_search "$_opt"
+        ""|"m"|"module"|"7")
+            denoRunFile "$INSTALLER_PATH/module.ts" "${@:2}"
+            exit
             ;;
         ""|"mi"|"module-install"|"8")
             inst_module_install "$_opt"

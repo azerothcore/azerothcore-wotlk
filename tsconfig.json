@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "strict": true
+    },
+    "include": [
+        "deps/**/*.ts",
+        "apps/**/*.ts"
+    ]
+}

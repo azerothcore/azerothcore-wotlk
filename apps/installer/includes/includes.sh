@@ -7,7 +7,7 @@ source "$CURRENT_PATH/../../bash_shared/includes.sh"
 AC_PATH_INSTALLER="$AC_PATH_APPS/installer"
 
 J_PATH="$AC_PATH_DEPS/acore/joiner"
-J_PATH_MODULES="$AC_PATH_MODULES"
+export J_PATH_MODULES="$AC_PATH_MODULES"
 
 source "$J_PATH/joiner.sh"
 

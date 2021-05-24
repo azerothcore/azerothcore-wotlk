@@ -19,5 +19,5 @@ function denoCmd() {
 }
 
 function denoRunFile() {
-    denoCmd run --allow-all --unstable "$@"
+    denoCmd run --config "$AC_PATH_ROOT/tsconfig.json" --allow-all --unstable "$@"
 }
