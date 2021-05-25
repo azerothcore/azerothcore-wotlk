@@ -1,14 +1,19 @@
 
-if ! command -v lsb_release &>/dev/null ; then
-       sudo apt-get install -y lsb-release
-fi
+# if ! command -v lsb_release &>/dev/null ; then
+#     sudo apt-get install -y lsb-release
+# fi
 
-UBUNTU_VERSION=$(lsb_release -sr);
+# UBUNTU_VERSION=$(lsb_release -sr);
 
-sudo apt-get update -y
+# Added repo for newest lib
+sudo add-apt-repository -y ppa:mhier/libboost-latest
+sudo apt update
 
 # shared deps
 sudo apt-get -y install make cmake clang curl unzip libmysqlclient-dev libace-dev ccache google-perftools
+
+# Insstall boost 1.74 from ppa:mhier/libboost-latest for all os versions
+sudo apt-get -y install libboost1.74-dev
 
 if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   sudo apt-get -y install build-essential libtool cmake-data openssl libgoogle-perftools-dev \
