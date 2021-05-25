@@ -20,7 +20,7 @@ struct EnumText
     char const* const Description;
 };
 
-namespace acore::Impl::EnumUtilsImpl
+namespace Acore::Impl::EnumUtilsImpl
 {
     template <typename Enum>
     struct EnumUtils

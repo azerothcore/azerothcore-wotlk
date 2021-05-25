@@ -10,7 +10,7 @@
 #include "Define.h"
 #include <string>
 
-namespace acore
+namespace Acore
 {
     DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message) ATTR_NORETURN;
     DECLSPEC_NORETURN void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message, char const* format, ...) ATTR_NORETURN ATTR_PRINTF(6, 7);
@@ -27,7 +27,7 @@ namespace acore
 
     DECLSPEC_NORETURN void AbortHandler(int sigval) ATTR_NORETURN;
 
-} // namespace acore
+} // namespace Acore
 
 std::string GetDebugInfo();
 

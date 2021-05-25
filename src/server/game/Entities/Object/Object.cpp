@@ -1900,7 +1900,7 @@ void Object::ForceValuesUpdateAtIndex(uint32 i)
     AddToObjectUpdateIfNeeded();
 }
 
-namespace acore
+namespace Acore
 {
     class MonsterChatBuilder
     {
@@ -1948,7 +1948,7 @@ namespace acore
         Language i_language;
         WorldObject const* i_target;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 void WorldObject::MonsterSay(const char* text, uint32 language, WorldObject const* target)
 {
@@ -2466,7 +2466,7 @@ void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureL
 }
 
 /*
-namespace acore
+namespace Acore
 {
     class NearUsedPosDo
     {
@@ -2535,7 +2535,7 @@ namespace acore
             float              i_angle;
             ObjectPosSelector& i_selector;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 */
 
 //===================================================================================================

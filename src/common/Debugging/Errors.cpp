@@ -54,7 +54,7 @@ namespace
     }
 }
 
-namespace acore
+namespace Acore
 {
     void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message)
     {
@@ -138,7 +138,7 @@ namespace acore
         Crash(formattedMessage.c_str());
     }
 
-} // namespace acore
+} // namespace Acore
 
 std::string GetDebugInfo()
 {

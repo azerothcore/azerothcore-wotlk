@@ -16,7 +16,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace acore::Impl::StringConvertImpl
+namespace Acore::Impl::StringConvertImpl
 {
     template <typename T, typename = void> struct For
     {
@@ -241,7 +241,7 @@ namespace acore::Impl::StringConvertImpl
 #endif
 }
 
-namespace acore
+namespace Acore
 {
     template <typename Result, typename... Params>
     Optional<Result> StringTo(std::string_view str, Params&&... params)

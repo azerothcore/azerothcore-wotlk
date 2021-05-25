@@ -182,7 +182,7 @@ typedef std::vector<std::string> StringVector;
 
 #define MAX_QUERY_LEN 32*1024
 
-namespace acore
+namespace Acore
 {
     template<class ArgumentType, class ResultType>
     struct unary_function

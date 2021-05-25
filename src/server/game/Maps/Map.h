@@ -48,7 +48,7 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 class PathGenerator;
-namespace acore
+namespace Acore
 {
     struct ObjectUpdater;
     struct LargeObjectUpdater;

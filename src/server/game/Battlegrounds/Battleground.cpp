@@ -37,7 +37,7 @@
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
-namespace acore
+namespace Acore
 {
     class BattlegroundChatBuilder
     {
@@ -101,7 +101,7 @@ namespace acore
         uint32 _arg1;
         uint32 _arg2;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 template<class Do>
 void Battleground::BroadcastWorker(Do& _do)

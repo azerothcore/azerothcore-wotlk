@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-namespace acore
+namespace Acore
 {
     template<class T>
     constexpr inline T* AddressOrSelf(T* ptr)
@@ -60,7 +60,7 @@ namespace acore
     };
 }
 
-namespace acore::Containers
+namespace Acore::Containers
 {
     // resizes <container> to have at most <requestedSize> elements
     // if it has more than <requestedSize> elements, the elements to keep are selected randomly

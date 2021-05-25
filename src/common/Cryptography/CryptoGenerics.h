@@ -13,7 +13,7 @@
 #include <iterator>
 #include <vector>
 
-namespace acore::Impl
+namespace Acore::Impl
 {
     struct CryptoGenericsImpl
     {
@@ -44,7 +44,7 @@ namespace acore::Impl
     };
 }
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     template <typename Cipher>
     void AEEncryptWithRandomIV(std::vector<uint8>& data, typename Cipher::Key const& key)

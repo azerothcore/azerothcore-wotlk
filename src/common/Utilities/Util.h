@@ -314,7 +314,7 @@ uint32 GetPID();
 
 bool StringEqualI(std::string_view str1, std::string_view str2);
 
-namespace acore::Impl
+namespace Acore::Impl
 {
     std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
     void HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse = false);

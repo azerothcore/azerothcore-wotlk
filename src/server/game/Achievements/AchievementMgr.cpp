@@ -32,7 +32,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-namespace acore
+namespace Acore
 {
     class AchievementChatBuilder
     {
@@ -52,7 +52,7 @@ namespace acore
         int32 i_textId;
         uint32 i_achievementId;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {

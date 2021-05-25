@@ -732,7 +732,7 @@ protected:
 #endif
 };
 
-namespace acore
+namespace Acore
 {
     struct WorldObjectSpellTargetCheck
     {

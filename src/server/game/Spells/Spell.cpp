@@ -8241,7 +8241,7 @@ void Spell::OnSpellLaunch()
     }
 }
 
-namespace acore
+namespace Acore
 {
 
     WorldObjectSpellTargetCheck::WorldObjectSpellTargetCheck(Unit* caster, Unit* referer, SpellInfo const* spellInfo,
@@ -8400,4 +8400,4 @@ namespace acore
         return WorldObjectSpellAreaTargetCheck::operator ()(target);
     }
 
-} //namespace acore
+} //namespace Acore

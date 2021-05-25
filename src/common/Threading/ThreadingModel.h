@@ -14,7 +14,7 @@
 
 #include "Define.h"
 
-namespace acore
+namespace Acore
 {
     template<typename MUTEX>
     class GeneralLock

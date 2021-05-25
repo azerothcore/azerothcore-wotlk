@@ -636,7 +636,7 @@ void WorldSession::HandleEmoteOpcode(WorldPacket& recvData)
     GetPlayer()->HandleEmoteCommand(emote);
 }
 
-namespace acore
+namespace Acore
 {
     class EmoteChatBuilder
     {
@@ -666,7 +666,7 @@ namespace acore
         uint32        i_emote_num;
         Unit const*   i_target;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 {

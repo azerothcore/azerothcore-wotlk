@@ -8,7 +8,7 @@
 
 #include "advstd.h"
 
-namespace acore
+namespace Acore
 {
     // end "iterator" tag for find_type_if
     struct find_type_end;
