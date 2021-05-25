@@ -3584,6 +3584,6 @@ namespace Acore::Impl
     };
 }
 
-#define THIS_SERVER_PROCESS (acore::Impl::CurrentServerProcessHolder::type())
+#define THIS_SERVER_PROCESS (Acore::Impl::CurrentServerProcessHolder::type())
 
 #endif

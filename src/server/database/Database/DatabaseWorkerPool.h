@@ -63,10 +63,10 @@ public:
     template<typename Format, typename... Args>
     void PExecute(Format&& sql, Args&& ... args)
     {
-        if (acore::IsFormatEmptyOrNull(sql))
+        if (Acore::IsFormatEmptyOrNull(sql))
             return;
 
-        Execute(acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
+        Execute(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
     }
 
     //! Enqueues a one-way SQL operation in prepared statement format that will be executed asynchronously.
@@ -86,10 +86,10 @@ public:
     template<typename Format, typename... Args>
     void DirectPExecute(Format&& sql, Args&& ... args)
     {
-        if (acore::IsFormatEmptyOrNull(sql))
+        if (Acore::IsFormatEmptyOrNull(sql))
             return;
 
-        DirectExecute(acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
+        DirectExecute(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
     }
 
     //! Directly executes a one-way SQL operation in prepared statement format, that will block the calling thread until finished.
@@ -109,10 +109,10 @@ public:
     template<typename Format, typename... Args>
     QueryResult PQuery(Format&& sql, T* conn, Args&& ... args)
     {
-        if (acore::IsFormatEmptyOrNull(sql))
+        if (Acore::IsFormatEmptyOrNull(sql))
             return QueryResult(nullptr);
 
-        return Query(acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str(), conn);
+        return Query(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str(), conn);
     }
 
     //! Directly executes an SQL query in string format -with variable args- that will block the calling thread until finished.
@@ -120,10 +120,10 @@ public:
     template<typename Format, typename... Args>
     QueryResult PQuery(Format&& sql, Args&& ... args)
     {
-        if (acore::IsFormatEmptyOrNull(sql))
+        if (Acore::IsFormatEmptyOrNull(sql))
             return QueryResult(nullptr);
 
-        return Query(acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
+        return Query(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
     }
 
     //! Directly executes an SQL query in prepared format that will block the calling thread until finished.
@@ -144,10 +144,10 @@ public:
     template<typename Format, typename... Args>
     QueryResultFuture AsyncPQuery(Format&& sql, Args&& ... args)
     {
-        if (acore::IsFormatEmptyOrNull(sql))
+        if (Acore::IsFormatEmptyOrNull(sql))
             return QueryResult(nullptr);
 
-        return AsyncQuery(acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
+        return AsyncQuery(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
     }
 
     //! Enqueues a query in prepared format that will set the value of the PreparedQueryResultFuture return object as soon as the query is executed.

@@ -100,8 +100,8 @@ namespace Acore::Impl
 
 namespace Acore::Crypto
 {
-    using SHA1 = acore::Impl::GenericHash<EVP_sha1, Constants::SHA1_DIGEST_LENGTH_BYTES>;
-    using SHA256 = acore::Impl::GenericHash<EVP_sha256, Constants::SHA256_DIGEST_LENGTH_BYTES>;
+    using SHA1 = Acore::Impl::GenericHash<EVP_sha1, Constants::SHA1_DIGEST_LENGTH_BYTES>;
+    using SHA256 = Acore::Impl::GenericHash<EVP_sha256, Constants::SHA256_DIGEST_LENGTH_BYTES>;
 }
 
 #endif

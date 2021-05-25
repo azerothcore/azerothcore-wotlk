@@ -199,7 +199,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            acore::Containers::RandomResize(unitList, 1);
+            Acore::Containers::RandomResize(unitList, 1);
         }
 
         void HandleDummy(SpellEffIndex effIndex)

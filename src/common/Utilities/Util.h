@@ -323,13 +323,13 @@ namespace Acore::Impl
 template<typename Container>
 std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
 {
-    return acore::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
+    return Acore::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
 }
 
 template<size_t Size>
 void HexStrToByteArray(std::string const& str, std::array<uint8, Size>& buf, bool reverse = false)
 {
-    acore::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
+    Acore::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
 }
 template<size_t Size>
 std::array<uint8, Size> HexStrToByteArray(std::string const& str, bool reverse = false)

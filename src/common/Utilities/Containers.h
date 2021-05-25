@@ -67,7 +67,7 @@ namespace Acore::Containers
     template<class C>
     void RandomResize(C& container, std::size_t requestedSize)
     {
-        static_assert(std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<typename C::iterator>::iterator_category>::value, "Invalid container passed to acore::Containers::RandomResize");
+        static_assert(std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<typename C::iterator>::iterator_category>::value, "Invalid container passed to Acore::Containers::RandomResize");
 
         if (std::size(container) <= requestedSize)
             return;
@@ -166,7 +166,7 @@ namespace Acore::Containers
     }
 
     /*
-     * @fn void acore::Containers::RandomShuffle(C& container)
+     * @fn void Acore::Containers::RandomShuffle(C& container)
      *
      * @brief Reorder the elements of the container randomly.
      *
