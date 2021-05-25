@@ -1,3 +1,19 @@
+-- DB update 2021_05_25_06 -> 2021_05_25_07
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_25_06';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_25_06 2021_05_25_07 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1621301896942678800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1621301896942678800');
 
 UPDATE `item_template_locale` SET `name` = 'Sangrita brillante perfecta' WHERE (`ID` = 41433) AND `locale` IN('esMX','esES');
@@ -245,3 +261,12 @@ UPDATE `item_template_locale` SET `Description` = 'Cuenta como un tótem de aire
 UPDATE `item_template_locale` SET `Description` = 'Cuenta como un tótem de aire, tierra, fuego y agua.' WHERE (`ID` = 33505) AND `locale` IN('esMX','esES');
 UPDATE `item_template_locale` SET `Description` = 'Cuenta como un tótem de aire, tierra, fuego y agua.' WHERE (`ID` = 33506) AND `locale` IN('esMX','esES');
 UPDATE `item_template_locale` SET `Description` = 'Cuenta como un tótem de aire, tierra, fuego y agua.' WHERE (`ID` = 33507) AND `locale` IN('esMX','esES');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
