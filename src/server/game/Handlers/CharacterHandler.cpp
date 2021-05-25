@@ -826,7 +826,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
                         LOG_INFO("misc", "HandlePlayerLoginOpcode B");
                         break;
                     }
-                    sess->HandleMoveWorldportAckOpcode();
+                    sess->HandleMoveWorldportAck();
                 }
                 while (sess->GetPlayer() && sess->GetPlayer()->IsInWorld() && sess->GetPlayer()->IsBeingTeleportedNear())
                 {
