@@ -5,15 +5,10 @@
 
 # UBUNTU_VERSION=$(lsb_release -sr);
 
-# Added repo for newest lib
-sudo add-apt-repository -y ppa:mhier/libboost-latest
 sudo apt update
 
 # shared deps
-sudo apt-get -y install make cmake clang curl unzip libmysqlclient-dev libace-dev ccache google-perftools
-
-# Insstall boost 1.74 from ppa:mhier/libboost-latest for all os versions
-sudo apt-get -y install libboost1.74-dev
+sudo apt-get -y install make cmake clang curl unzip libboost-all-dev libmysqlclient-dev libace-dev ccache google-perftools
 
 if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   sudo apt-get -y install build-essential libtool cmake-data openssl libgoogle-perftools-dev \
@@ -24,4 +19,3 @@ else
   libssl-dev libbz2-dev libreadline-dev libncurses-dev \
   mysql-server libace-6.*
 fi
-
