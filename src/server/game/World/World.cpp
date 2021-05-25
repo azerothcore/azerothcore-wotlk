@@ -1978,6 +1978,9 @@ void World::SetInitialWorldSettings()
     // Delete all custom channels which haven't been used for PreserveCustomChannelDuration days.
     Channel::CleanOldChannelsInDB();
 
+    LOG_INFO("server.loading", "Initializing Opcodes...");
+    opcodeTable.Initialize();
+
     LOG_INFO("server", "Starting Arena Season...");
     LOG_INFO("server", " ");
     sGameEventMgr->StartArenaSeason();
