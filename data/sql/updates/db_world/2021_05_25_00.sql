@@ -1,3 +1,19 @@
+-- DB update 2021_05_24_00 -> 2021_05_25_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_24_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_24_00 2021_05_25_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617919703551999441'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617919703551999441');
 
 SET @ENTRY := 10505;
@@ -21,3 +37,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 0, 4, 0, 2, 0, 100, 0, 0, 40, 18000, 25000, 0, 11, 15586, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - Between 0-40% Health - Cast \'Heal\''),
 (@ENTRY, 0, 5, 0, 0, 0, 100, 0, 13000, 15000, 20000, 35000, 0, 11, 13747, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - In Combat - Cast \'Slow\''),
 (@ENTRY, 0, 6, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 34, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - On Just Died - Set Instance Data 1 to 1');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
