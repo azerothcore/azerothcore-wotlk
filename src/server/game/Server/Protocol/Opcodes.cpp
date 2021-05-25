@@ -130,7 +130,7 @@ void OpcodeTable::Initialize()
     /*0x00B*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_ZONE_MAP,                                           STATUS_NEVER);
     /*0x00C*/ DEFINE_HANDLER(CMSG_DEBUG_CHANGECELLZONE,                                             STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x00D*/ DEFINE_HANDLER(CMSG_MOVE_CHARACTER_CHEAT,                                             STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
-    /*0x00E*/ DEFINE_HANDLER(SMSG_MOVE_CHARACTER_CHEAT,                                             STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x00E*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_CHARACTER_CHEAT,                               STATUS_NEVER);
     /*0x00F*/ DEFINE_HANDLER(CMSG_RECHARGE,                                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x010*/ DEFINE_HANDLER(CMSG_LEARN_SPELL,                                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x011*/ DEFINE_HANDLER(CMSG_CREATEMONSTER,                                                    STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
