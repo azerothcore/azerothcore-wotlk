@@ -207,7 +207,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 {
     if (packet->GetOpcode() == NULL_OPCODE)
     {
-        LOG_ERROR("server", "WorldSession::SendPacket(packet) called, but packet->GetOpcode() was NULL_OPCODE");
+        LOG_ERROR("network.opcode", "%s send NULL_OPCODE", GetPlayerInfo().c_str());
         return;
     }
 
