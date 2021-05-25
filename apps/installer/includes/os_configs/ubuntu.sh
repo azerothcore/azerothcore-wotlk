@@ -1,9 +1,8 @@
+if ! command -v lsb_release &>/dev/null ; then
+    sudo apt-get install -y lsb-release
+fi
 
-# if ! command -v lsb_release &>/dev/null ; then
-#     sudo apt-get install -y lsb-release
-# fi
-
-# UBUNTU_VERSION=$(lsb_release -sr);
+UBUNTU_VERSION=$(lsb_release -sr);
 
 sudo apt update
 
@@ -15,7 +14,16 @@ if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   libboost1.74-dev libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
   libncurses5-dev
 else
-  sudo apt-get install -y git gcc g++ gdb gdbserver \
-  libboost-all-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev \
-  mysql-server libace-6.*
+  case $UBUNTU_VERSION in
+     "20.04")
+       sudo apt-get install -y git gcc g++ gdb gdbserver \
+       libboost-all-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev \
+       mysql-server libace-6.*
+       ;;
+     *)
+       sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get install -y git gcc g++ gdb gdbserver \
+       libboost-all-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev \
+       mysql-server libace-6.*
+       ;;
+  esac
 fi
