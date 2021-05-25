@@ -200,7 +200,11 @@ ObjectGuid::LowType WorldSession::GetGuidLow() const
 /// Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
 {
-    ASSERT(packet->GetOpcode() != NULL_OPCODE);
+    if (packet->GetOpcode() == NULL_OPCODE)
+    {
+        LOG_ERROR("server", "WorldSession::SendPacket(packet) called, but packet->GetOpcode() was NULL_OPCODE");
+        return;
+    }
 
     if (!m_Socket)
         return;
