@@ -676,7 +676,7 @@ void OpcodeTable::Initialize()
     /*0x22D*/ DEFINE_HANDLER(CMSG_GM_FREEZE,                                                        STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x22E*/ DEFINE_HANDLER(CMSG_GM_UBERINVIS,                                                     STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x22F*/ DEFINE_HANDLER(CMSG_GM_REQUEST_PLAYER_INFO,                                           STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
-    /*0x230*/ DEFINE_HANDLER(SMSG_GM_PLAYER_INFO,                                                   STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x230*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_GM_PLAYER_INFO,                                     STATUS_NEVER);
     /*0x231*/ DEFINE_HANDLER(CMSG_GUILD_RANK,                                                       STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleGuildRankOpcode                    );
     /*0x232*/ DEFINE_HANDLER(CMSG_GUILD_ADD_RANK,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleGuildAddRankOpcode                 );
     /*0x233*/ DEFINE_HANDLER(CMSG_GUILD_DEL_RANK,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleGuildDelRankOpcode                 );
