@@ -1,3 +1,19 @@
+-- DB update 2021_05_25_07 -> 2021_05_25_08
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_25_07';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_25_07 2021_05_25_08 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1621427242858236100'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1621427242858236100');
 
 UPDATE `item_template_locale` SET `Name` = 'Boceto: ámbar del rey luminoso' WHERE (`ID` = 46930) AND `locale` IN ('esMX','esES');
@@ -104,3 +120,11 @@ UPDATE `item_template_locale` SET `Name` = 'Boceto: ópalo crepuscular enjundios
 UPDATE `item_template_locale` SET `Name` = 'Boceto: ópalo crepuscular real', `Description` = 'Te enseña a tallar un ópalo crepuscular real.' WHERE (`ID` = 41701) AND `locale` IN ('esMX','esES');
 UPDATE `item_template_locale` SET `Name` = 'Boceto: ópalo crepuscular regio', `Description` = 'Te enseña a tallar un ópalo crepuscular regio.' WHERE (`ID` = 41703) AND `locale` IN ('esMX','esES');
 UPDATE `item_template_locale` SET `Name` = 'Boceto: lágrima de pesadilla', `Description` = 'Te enseña a tallar una lágrima de pesadilla.' WHERE (`ID` = 49112) AND `locale` IN ('esMX','esES');
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
