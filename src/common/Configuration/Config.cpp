@@ -20,6 +20,39 @@ namespace
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
     std::mutex _configLock;
 
+    // Check system configs like *server.conf*
+    bool IsAppConfig(std::string_view fileName)
+    {
+        size_t found = fileName.find_first_of("authserver.conf");
+        if (found != std::string::npos)
+        {
+            return true;
+        }
+
+        found = fileName.find_first_of("worldserver.conf");
+        if (found != std::string::npos)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    template<typename Format, typename... Args>
+    inline void PrintError(std::string_view filename, Format&& fmt, Args&& ... args)
+    {
+        std::string message = acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
+
+        if (IsAppConfig(filename))
+        {
+            printf("%s\n", message.c_str());
+        }
+        else
+        {
+            LOG_ERROR("server.loading", "%s", message.c_str());
+        }
+    }
+
     void AddKey(std::string const& optionName, std::string const& optionKey, bool replace = true)
     {
         auto const& itr = _configOptions.find(optionName);
@@ -27,7 +60,7 @@ namespace
         {
             if (!replace)
             {
-                sLog->outError("> Config: Option '%s' is exist! Option key - '%s'", optionName.c_str(), itr->second.c_str());
+                LOG_ERROR("server", "> Config: Option '%s' is exist! Option key - '%s'", optionName.c_str(), itr->second.c_str());
                 return;
             }
 
@@ -42,45 +75,91 @@ namespace
         std::ifstream in(file);
 
         if (in.fail())
+        {
             throw ConfigException(acore::StringFormat("Config::LoadFile: Failed open file '%s'", file.c_str()));
+        }
 
         uint32 count = 0;
+        uint32 lineNumber = 0;
+        std::unordered_map<std::string /*name*/, std::string /*value*/> fileConfigs;
+
+        auto IsDuplicateOption = [&](std::string const& confOption)
+        {
+            auto const& itr = fileConfigs.find(confOption);
+            if (itr != fileConfigs.end())
+            {
+                PrintError(file, "> Config::LoadFile: Dublicate key name '%s' in config file '%s'", std::string(confOption).c_str(), file.c_str());
+                return true;
+            }
+
+            return false;
+        };
 
         while (in.good())
         {
+            lineNumber++;
             std::string line;
             std::getline(in, line);
 
-            if (line.empty())
-                continue;
+            // read line error
+            if (!in.good() && !in.eof())
+            {
+                throw ConfigException(acore::StringFormat("> Config::LoadFile: Failure to read line number %u in file '%s'", lineNumber, file.c_str()));
+            }
 
+            // remove whitespace in line
             line = acore::String::Trim(line, in.getloc());
+
+            if (line.empty())
+            {
+                continue;
+            }
 
             // comments
             if (line[0] == '#' || line[0] == '[')
+            {
                 continue;
+            }
 
             size_t found = line.find_first_of('#');
             if (found != std::string::npos)
+            {
                 line = line.substr(0, found);
+            }
 
             auto const equal_pos = line.find('=');
 
             if (equal_pos == std::string::npos || equal_pos == line.length())
-                return;
+            {
+                PrintError(file, "> Config::LoadFile: Failure to read line number %u in file '%s'. Skip this line", lineNumber, file.c_str());
+                continue;
+            }
 
             auto entry = acore::String::Trim(line.substr(0, equal_pos), in.getloc());
-            auto value = acore::String::Trim(line.substr(equal_pos + 1), in.getloc());
+            auto value = acore::String::Trim(line.substr(equal_pos + 1, std::string::npos), in.getloc());
 
             value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
 
-            AddKey(entry, value);
+            // Skip if 2+ same options in one config file
+            if (IsDuplicateOption(entry))
+            {
+                continue;
+            }
 
+            // Add to temp container
+            fileConfigs.emplace(entry, value);
             count++;
         }
 
+        // No lines read
         if (!count)
             throw ConfigException(acore::StringFormat("Config::LoadFile: Empty file '%s'", file.c_str()));
+
+        // Add correct keys if file load without errors
+        for (auto const& [entry, key] : fileConfigs)
+        {
+            AddKey(entry, key);
+        }
     }
 
     bool LoadFile(std::string const& file)
@@ -92,7 +171,7 @@ namespace
         }
         catch (const std::exception& e)
         {
-            sLog->outError("> Config: %s", e.what());
+            PrintError(file, "> %s", e.what());
         }
 
         return false;
@@ -134,7 +213,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            sLog->outError("> Config: Missing name %s in config, add \"%s = %s\"",
+            LOG_ERROR("server", "> Config: Missing name %s in config, add \"%s = %s\"",
                 name.c_str(), name.c_str(), acore::ToString(def).c_str());
         }
 
@@ -146,7 +225,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            sLog->outError("> Config: Bad value defined for name '%s', going to use '%s' instead",
+            LOG_ERROR("server", "> Config: Bad value defined for name '%s', going to use '%s' instead",
                 name.c_str(), acore::ToString(def).c_str());
         }
 
@@ -164,7 +243,7 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            sLog->outError("> Config: Missing name %s in config, add \"%s = %s\"",
+            LOG_ERROR("server", "> Config: Missing name %s in config, add \"%s = %s\"",
                 name.c_str(), name.c_str(), def.c_str());
         }
 
@@ -190,7 +269,7 @@ bool ConfigMgr::GetOption<bool>(std::string const& name, bool const& def, bool s
     {
         if (showLogs)
         {
-            sLog->outError("> Config: Bad value defined for name '%s', going to use '%s' instead",
+            LOG_ERROR("server", "> Config: Bad value defined for name '%s', going to use '%s' instead",
                 name.c_str(), def ? "true" : "false");
         }
 
@@ -299,13 +378,13 @@ bool ConfigMgr::LoadModulesConfigs()
         return false;
 
     // Print modules configurations
-    sLog->outString();
-    sLog->outString("Using modules configuration:");
+    LOG_INFO("server", " ");
+    LOG_INFO("server", "Using modules configuration:");
 
     for (auto const& itr : moduleConfigFiles)
-        sLog->outString("> %s", itr.c_str());
+        LOG_INFO("server", "> %s", itr.c_str());
 
-    sLog->outString("");
+    LOG_INFO("server", " ");
 
     return true;
 }

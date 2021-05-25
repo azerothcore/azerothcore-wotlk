@@ -87,11 +87,11 @@ public:
     struct netherspite_infernalAI : public ScriptedAI
     {
         netherspite_infernalAI(Creature* creature) : ScriptedAI(creature),
-            HellfireTimer(0), CleanupTimer(0), malchezaar(0), point(nullptr) { }
+            HellfireTimer(0), CleanupTimer(0), point(nullptr) { }
 
         uint32 HellfireTimer;
         uint32 CleanupTimer;
-        uint64 malchezaar;
+        ObjectGuid malchezaar;
         InfernalPoint* point;
 
         void Reset() override { }
@@ -176,9 +176,9 @@ public:
         uint32 InfernalCleanupTimer;
         uint32 phase;
         uint32 enfeeble_health[5];
-        uint64 enfeeble_targets[5];
+        ObjectGuid enfeeble_targets[5];
 
-        std::vector<uint64> infernals;
+        GuidVector infernals;
         std::vector<InfernalPoint*> positions;
 
         void Initialize()
@@ -194,7 +194,7 @@ public:
             phase = 1;
             clearweapons();
             positions.clear();
-            instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
         }
 
         void clearweapons()
@@ -216,7 +216,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-            instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
             if (Creature*  Axe = me->FindNearestCreature(MALCHEZARS_AXE, 100.0f))
             {
                 Axe->DespawnOrUnsummon();
@@ -227,7 +227,7 @@ public:
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
-            instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), false);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
         }
 
         void SummonAxes()
@@ -278,7 +278,7 @@ public:
                 Unit* target = ObjectAccessor::GetUnit(*me, enfeeble_targets[i]);
                 if (target && target->IsAlive())
                     target->SetHealth(enfeeble_health[i]);
-                enfeeble_targets[i] = 0;
+                enfeeble_targets[i].Clear();
                 enfeeble_health[i] = 0;
             }
         }

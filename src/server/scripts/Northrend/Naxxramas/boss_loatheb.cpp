@@ -67,7 +67,7 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(BOSS_LOATHEB, NOT_STARTED);
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_LOATHEB_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_LOATHEB_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -108,7 +108,7 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(BOSS_LOATHEB, IN_PROGRESS);
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_LOATHEB_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_LOATHEB_GATE)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }

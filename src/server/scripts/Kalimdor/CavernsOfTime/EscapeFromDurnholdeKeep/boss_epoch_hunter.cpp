@@ -66,7 +66,7 @@ public:
                 return;
             Talk(SAY_DEATH);
             me->GetInstanceScript()->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_EPOCH_KILLED);
-            if (Creature* taretha = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_TARETHA_GUID)))
+            if (Creature* taretha = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_TARETHA_GUID)))
                 taretha->AI()->DoAction(me->GetEntry());
         }
 

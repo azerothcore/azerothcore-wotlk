@@ -139,8 +139,7 @@ public:
 
     struct npc_tiger_matriarchAI : public ScriptedAI
     {
-        npc_tiger_matriarchAI(Creature* creature) : ScriptedAI(creature),
-            _tigerGuid(0)
+        npc_tiger_matriarchAI(Creature* creature) : ScriptedAI(creature)
         {
         }
 
@@ -240,7 +239,7 @@ public:
 
     private:
         EventMap _events;
-        uint64 _tigerGuid;
+        ObjectGuid _tigerGuid;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

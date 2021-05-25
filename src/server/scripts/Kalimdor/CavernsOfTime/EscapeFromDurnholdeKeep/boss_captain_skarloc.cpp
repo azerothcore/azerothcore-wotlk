@@ -67,7 +67,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_THRALL_GUID)))
+            if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_THRALL_GUID)))
                 thrall->AI()->JustSummoned(summon);
             summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 

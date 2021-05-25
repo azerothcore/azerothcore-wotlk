@@ -57,14 +57,13 @@ public:
     {
         npc_kernobeeAI(Creature* creature) : PassiveAI(creature)
         {
-            playerGUID = 0;
             checkTimer = 0;
         }
 
         uint32 checkTimer;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             playerGUID = guid;
         }

@@ -13,6 +13,7 @@
 #include "GridReference.h"
 #include "Map.h"
 #include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include <set>
@@ -22,35 +23,6 @@
 #ifdef ELUNA
 class ElunaEventProcessor;
 #endif
-
-enum TypeMask
-{
-    TYPEMASK_OBJECT         = 0x0001,
-    TYPEMASK_ITEM           = 0x0002,
-    TYPEMASK_CONTAINER      = 0x0006,                       // TYPEMASK_ITEM | 0x0004
-    TYPEMASK_UNIT           = 0x0008, // creature
-    TYPEMASK_PLAYER         = 0x0010,
-    TYPEMASK_GAMEOBJECT     = 0x0020,
-    TYPEMASK_DYNAMICOBJECT  = 0x0040,
-    TYPEMASK_CORPSE         = 0x0080,
-    TYPEMASK_SEER           = TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT
-};
-
-enum TypeID
-{
-    TYPEID_OBJECT        = 0,
-    TYPEID_ITEM          = 1,
-    TYPEID_CONTAINER     = 2,
-    TYPEID_UNIT          = 3,
-    TYPEID_PLAYER        = 4,
-    TYPEID_GAMEOBJECT    = 5,
-    TYPEID_DYNAMICOBJECT = 6,
-    TYPEID_CORPSE        = 7
-};
-
-#define NUM_CLIENT_OBJECT_TYPES             8
-
-uint32 GuidHigh2TypeId(uint32 guid_hi);
 
 enum TempSummonType
 {
@@ -97,7 +69,7 @@ class StaticTransport;
 class MotionTransport;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
-typedef std::unordered_set<uint32> UpdatePlayerSet;
+typedef GuidUnorderedSet UpdatePlayerSet;
 
 class Object
 {
@@ -109,11 +81,9 @@ public:
     virtual void AddToWorld();
     virtual void RemoveFromWorld();
 
-    [[nodiscard]] uint64 GetGUID() const { return GetUInt64Value(0); }
-    [[nodiscard]] uint32 GetGUIDLow() const { return GUID_LOPART(GetUInt64Value(0)); }
-    [[nodiscard]] uint32 GetGUIDMid() const { return GUID_ENPART(GetUInt64Value(0)); }
-    [[nodiscard]] uint32 GetGUIDHigh() const { return GUID_HIPART(GetUInt64Value(0)); }
-    [[nodiscard]] const ByteBuffer& GetPackGUID() const { return m_PackGUID; }
+    [[nodiscard]] static ObjectGuid GetGUID(Object const* o) { return o ? o->GetGUID() : ObjectGuid::Empty; }
+    [[nodiscard]] ObjectGuid GetGUID() const { return GetGuidValue(OBJECT_FIELD_GUID); }
+    [[nodiscard]] PackedGuid const& GetPackGUID() const { return m_PackGUID; }
     [[nodiscard]] uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
     void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
 
@@ -170,6 +140,12 @@ public:
         return *(((uint16*)&m_uint32Values[index]) + offset);
     }
 
+    [[nodiscard]] ObjectGuid GetGuidValue(uint16 index) const
+    {
+        ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, false));
+        return *((ObjectGuid*)&(m_uint32Values[index]));
+    }
+
     void SetInt32Value(uint16 index, int32 value);
     void SetUInt32Value(uint16 index, uint32 value);
     void UpdateUInt32Value(uint16 index, uint32 value);
@@ -178,11 +154,12 @@ public:
     void SetByteValue(uint16 index, uint8 offset, uint8 value);
     void SetUInt16Value(uint16 index, uint8 offset, uint16 value);
     void SetInt16Value(uint16 index, uint8 offset, int16 value) { SetUInt16Value(index, offset, (uint16)value); }
+    void SetGuidValue(uint16 index, ObjectGuid value);
     void SetStatFloatValue(uint16 index, float value);
     void SetStatInt32Value(uint16 index, int32 value);
 
-    bool AddUInt64Value(uint16 index, uint64 value);
-    bool RemoveUInt64Value(uint16 index, uint64 value);
+    bool AddGuidValue(uint16 index, ObjectGuid value);
+    bool RemoveGuidValue(uint16 index, ObjectGuid value);
 
     void ApplyModUInt32Value(uint16 index, int32 val, bool apply);
     void ApplyModInt32Value(uint16 index, int32 val, bool apply);
@@ -311,7 +288,7 @@ protected:
     Object();
 
     void _InitValues();
-    void _Create(uint32 guidlow, uint32 entry, HighGuid guidhigh);
+    void _Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhigh);
     [[nodiscard]] std::string _ConcatFields(uint16 startIndex, uint16 size) const;
     void _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
@@ -338,12 +315,16 @@ protected:
 
     uint16 _fieldNotifyFlags;
 
+    virtual void AddToObjectUpdate() = 0;
+    virtual void RemoveFromObjectUpdate() = 0;
+    void AddToObjectUpdateIfNeeded();
+
     bool m_objectUpdated;
 
 private:
     bool m_inWorld;
 
-    ByteBuffer m_PackGUID;
+    PackedGuid m_PackGUID;
 
     // for output helpfull error messages from asserts
     [[nodiscard]] bool PrintIndexError(uint32 index, bool set) const;
@@ -586,7 +567,7 @@ ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZOStreamer const& 
 struct MovementInfo
 {
     // common
-    uint64 guid{0};
+    ObjectGuid guid;
     uint32 flags{0};
     uint16 flags2{0};
     Position pos;
@@ -597,14 +578,14 @@ struct MovementInfo
     {
         void Reset()
         {
-            guid = 0;
+            guid.Clear();
             pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
             seat = -1;
             time = 0;
             time2 = 0;
         }
 
-        uint64 guid;
+        ObjectGuid guid;
         Position pos;
         int8 seat;
         uint32 time;
@@ -672,6 +653,12 @@ public:
     {
         m_mapId = loc.GetMapId();
         Relocate(loc);
+    }
+
+    void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+    {
+        m_mapId = mapId;
+        Relocate(x, y, z, o);
     }
 
     [[nodiscard]] uint32 GetMapId() const
@@ -758,7 +745,7 @@ public:
 #else
     virtual void Update(uint32 /*time_diff*/) { };
 #endif
-    void _Create(uint32 guidlow, HighGuid guidhigh, uint32 phaseMask);
+    void _Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask);
 
     void RemoveFromWorld() override
     {
@@ -928,7 +915,7 @@ public:
     void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
     void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
 
-    void SendObjectDeSpawnAnim(uint64 guid);
+    void SendObjectDeSpawnAnim(ObjectGuid guid);
 
     virtual void SaveRespawnTime() {}
     void AddObjectToRemoveList();
@@ -962,6 +949,7 @@ public:
     [[nodiscard]] Map const* GetBaseMap() const;
 
     void SetZoneScript();
+    void ClearZoneScript();
     [[nodiscard]] ZoneScript* GetZoneScript() const { return m_zoneScript; }
 
     TempSummon* SummonCreature(uint32 id, const Position& pos, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, uint32 vehId = 0, SummonPropertiesEntry const* properties = nullptr) const;
@@ -992,6 +980,9 @@ public:
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
+
+    void AddToObjectUpdate() override;
+    void RemoveFromObjectUpdate() override;
 
     //relocation and visibility system functions
     void AddToNotify(uint16 f);
@@ -1037,7 +1028,7 @@ public:
     [[nodiscard]] float GetTransOffsetO() const { return m_movementInfo.transport.pos.GetOrientation(); }
     [[nodiscard]] uint32 GetTransTime()   const { return m_movementInfo.transport.time; }
     [[nodiscard]] int8 GetTransSeat()     const { return m_movementInfo.transport.seat; }
-    [[nodiscard]] virtual uint64 GetTransGUID()   const;
+    [[nodiscard]] virtual ObjectGuid GetTransGUID()   const;
     void SetTransport(Transport* t) { m_transport = t; }
 
     MovementInfo m_movementInfo;

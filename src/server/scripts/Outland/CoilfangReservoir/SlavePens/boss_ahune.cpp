@@ -81,7 +81,7 @@ public:
             SetCombatMovement(false);
             SetEquipmentSlots(false, 54806, EQUIP_UNEQUIP, EQUIP_UNEQUIP);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            InvokerGUID = 0;
+            InvokerGUID.Clear();
             events.Reset();
             events.RescheduleEvent(EVENT_EMERGE, 12000);
             events.RescheduleEvent(EVENT_INVOKER_SAY_1, 1000);
@@ -90,7 +90,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 InvokerGUID;
+        ObjectGuid InvokerGUID;
 
         void StartPhase1()
         {

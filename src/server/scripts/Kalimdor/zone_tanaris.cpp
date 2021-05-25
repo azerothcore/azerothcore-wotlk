@@ -520,7 +520,7 @@ public:
         uint32 PostEventTimer;
         uint32 PhasePostEvent;
 
-        uint64 TortaGUID;
+        ObjectGuid TortaGUID;
 
         void Reset() override
         {
@@ -528,7 +528,7 @@ public:
             PostEventTimer = 1000;
             PhasePostEvent = 0;
 
-            TortaGUID = 0;
+            TortaGUID.Clear();
         }
 
         void MoveInLineOfSight(Unit* who) override

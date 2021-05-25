@@ -18,11 +18,11 @@
 
 void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_ATTACKSWING Message guidlow:%u guidhigh:%u", GUID_LOPART(guid), GUID_HIPART(guid));
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_ATTACKSWING: %s", guid.ToString().c_str());
 #endif
 
     Unit* pEnemy = ObjectAccessor::GetUnit(*_player, guid);
@@ -68,11 +68,9 @@ void WorldSession::HandleSetSheathedOpcode(WorldPacket& recvData)
     uint32 sheathed;
     recvData >> sheathed;
 
-    //sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: Recvd CMSG_SETSHEATHED Message guidlow:%u value1:%u", GetPlayer()->GetGUIDLow(), sheathed);
-
     if (sheathed >= MAX_SHEATH_STATE)
     {
-        sLog->outError("Unknown sheath state %u ??", sheathed);
+        LOG_ERROR("server", "Unknown sheath state %u ??", sheathed);
         return;
     }
 
@@ -82,8 +80,8 @@ void WorldSession::HandleSetSheathedOpcode(WorldPacket& recvData)
 void WorldSession::SendAttackStop(Unit const* enemy)
 {
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));         // we guess size
-    data.append(GetPlayer()->GetPackGUID());
-    data.append(enemy ? enemy->GetPackGUID() : 0);          // must be packed guid
+    data << GetPlayer()->GetPackGUID();
+    data << (enemy ? enemy->GetPackGUID() : PackedGuid());  // must be packed guid
     data << uint32(0);                                      // unk, can be 1 also
     SendPacket(&data);
 }

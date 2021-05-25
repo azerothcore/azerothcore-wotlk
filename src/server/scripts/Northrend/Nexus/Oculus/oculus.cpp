@@ -62,7 +62,7 @@ enum DrakeGiverTexts
 class npc_oculus_drakegiver : public CreatureScript
 {
 public:
-    std::unordered_map<uint32, bool>openedMenu;
+    std::unordered_map<ObjectGuid, bool>openedMenu;
 
     npc_oculus_drakegiver() : CreatureScript("npc_oculus_drakegiver") { }
 
@@ -887,7 +887,7 @@ public:
     {
         PrepareAuraScript(spell_oculus_rider_auraAuraScript);
 
-        uint64 _drakeGUID;
+        ObjectGuid _drakeGUID;
 
         void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
@@ -929,7 +929,7 @@ public:
 
             if (drake)
             {
-                drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
                 drake->RemoveAurasDueToSpell(GetId());
                 drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
                 drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);

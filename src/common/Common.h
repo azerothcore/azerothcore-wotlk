@@ -78,9 +78,6 @@
 
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
-
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <ace/Stack_Trace.h>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
@@ -123,8 +120,6 @@ using namespace std;
 inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
 
 inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
-
-#define atol(a) strtoul( a, nullptr, 10)
 
 #define STRINGIZE(a) #a
 
@@ -186,22 +181,6 @@ typedef std::vector<std::string> StringVector;
 #endif
 
 #define MAX_QUERY_LEN 32*1024
-
-#define ACORE_GUARD(MUTEX, LOCK) \
-  ACE_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
-    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
-
-//! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
-# define ACORE_WRITE_GUARD(MUTEX, LOCK) \
-  ACE_Write_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
-    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
-
-//! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
-# define ACORE_READ_GUARD(MUTEX, LOCK) \
-  ACE_Read_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
-    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 namespace acore
 {

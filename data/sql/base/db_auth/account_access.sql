@@ -17,25 +17,9 @@ CREATE TABLE `account_access`
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `account_access` WRITE;
-/*!40000 ALTER TABLE `account_access` DISABLE KEYS */;
-INSERT INTO `account_access` VALUES 
-(1,4,-1,'Test account - Console Admin'),
-(2,4,-1,'Test account - Console Admin'),
-(3,3,-1,'Test account - Ingame Admin'),
-(4,3,-1,'Test account - Ingame Admin'),
-(5,2,-1,'Test account - Major Game Master'),
-(6,2,-1,'Test account - Major Game Master'),
-(7,1,-1,'Test account - Minor Game Master'),
-(8,1,-1,'Test account - Minor Game Master'),
-(9,0,-1,'Test account - Player'),
-(10,0,-1,'Test account - Player');
-/*!40000 ALTER TABLE `account_access` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-

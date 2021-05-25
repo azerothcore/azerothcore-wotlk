@@ -130,7 +130,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     if (!i_path || moveToward != _movingTowards)
-        i_path = new PathGenerator(owner);
+        i_path = std::make_unique<PathGenerator>(owner);
 
     float x, y, z;
     bool shortenPath;
@@ -151,12 +151,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (owner->IsHovering())
         owner->UpdateAllowedPositionZ(x, y, z);
 
+    i_recalculateTravel = true;
+
     bool success = i_path->CalculatePath(x, y, z, forceDest);
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
         if (cOwner)
             cOwner->SetCannotReachTarget(true);
-        owner->StopMoving();
         return true;
     }
 
@@ -173,7 +174,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
-    i_recalculateTravel = true;
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
@@ -188,6 +188,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 template<>
 void ChaseMovementGenerator<Player>::DoInitialize(Player* owner)
 {
+    i_path = nullptr;
     _lastTargetPosition.reset();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
@@ -195,6 +196,7 @@ void ChaseMovementGenerator<Player>::DoInitialize(Player* owner)
 template<>
 void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
+    i_path = nullptr;
     _lastTargetPosition.reset();
     owner->SetWalk(false);
     owner->AddUnitState(UNIT_STATE_CHASE);
@@ -222,7 +224,7 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 
     // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
     if (CreatureAI* AI = owner->ToCreature()->AI())
-        AI->MovementInform(CHASE_MOTION_TYPE, i_target.getTarget()->GetGUIDLow());
+        AI->MovementInform(CHASE_MOTION_TYPE, i_target.getTarget()->GetGUID().GetCounter());
 }
 
 //-----------------------------------------------//
@@ -305,7 +307,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         return true;
 
     if (!i_path)
-        i_path = new PathGenerator(owner);
+        i_path = std::make_unique<PathGenerator>(owner);
 
     float x, y, z;
     // select angle
@@ -333,16 +335,17 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     target->GetNearPoint(owner, x, y, z, _range, 0.f, target->ToAbsoluteAngle(tAngle));
 
+    i_recalculateTravel = true;
+
     bool success = i_path->CalculatePath(x, y, z, forceDest);
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
-        owner->StopMoving();
+        if (cOwner)
+            cOwner->SetCannotReachTarget(true);
         return true;
     }
 
     owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
-
-    i_recalculateTravel = true;
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
@@ -364,7 +367,7 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature* owner)
 {
     // pet only sync speed with owner
     /// Make sure we are not in the process of a map change (IsInWorld)
-    if (!IS_PLAYER_GUID(owner->GetOwnerGUID()) || !owner->IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner->GetOwnerGUID())
+    if (!owner->GetOwnerGUID().IsPlayer() || !owner->IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner->GetOwnerGUID())
         return;
 
     owner->UpdateSpeed(MOVE_RUN, true);
@@ -375,6 +378,7 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature* owner)
 template<class T>
 void FollowMovementGenerator<T>::DoInitialize(T* owner)
 {
+    i_path = nullptr;
     _lastTargetPosition.reset();
     owner->AddUnitState(UNIT_STATE_FOLLOW);
     _updateSpeed(owner);
@@ -401,7 +405,7 @@ void FollowMovementGenerator<T>::MovementInform(T* owner)
 
     // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
     if (CreatureAI* AI = owner->ToCreature()->AI())
-        AI->MovementInform(FOLLOW_MOTION_TYPE, i_target.getTarget()->GetGUIDLow());
+        AI->MovementInform(FOLLOW_MOTION_TYPE, i_target.getTarget()->GetGUID().GetCounter());
 }
 
 //-----------------------------------------------//

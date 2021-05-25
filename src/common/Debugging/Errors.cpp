@@ -56,7 +56,6 @@ namespace
 
 namespace acore
 {
-
     void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message)
     {
         std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + debugInfo + '\n';
@@ -113,6 +112,20 @@ namespace acore
         std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ABORTED.\n", file, line, function);
         fprintf(stderr, "%s", formattedMessage.c_str());
         fflush(stderr);
+        Crash(formattedMessage.c_str());
+    }
+
+    void Abort(char const* file, int line, char const* function, char const* message, ...)
+    {
+        va_list args;
+        va_start(args, message);
+
+        std::string formattedMessage = StringFormat("\n%s:%i in %s ABORTED:\n", file, line, function) + FormatAssertionMessage(message, args) + '\n';
+        va_end(args);
+
+        fprintf(stderr, "%s", formattedMessage.c_str());
+        fflush(stderr);
+
         Crash(formattedMessage.c_str());
     }
 

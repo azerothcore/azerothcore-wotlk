@@ -142,7 +142,7 @@ public:
             return true;
         }
 
-        void SetData64(uint32 type, uint64 data) override
+        void SetGuidData(uint32 type, ObjectGuid data) override
         {
             if (type == DATA_IMAGE_OF_MEDIVH)
                 ImageGUID = data;
@@ -228,43 +228,12 @@ public:
                     return OperaEvent;
                 case DATA_OPERA_OZ_DEATHCOUNT:
                     return OzDeathCount;
-
-                case DATA_KILREK:
-                    return m_uiKilrekGUID;
-                case DATA_TERESTIAN:
-                    return m_uiTerestianGUID;
-                case DATA_MOROES:
-                    return m_uiMoroesGUID;
-                case DATA_GO_STAGEDOORLEFT:
-                    return m_uiStageDoorLeftGUID;
-                case DATA_GO_STAGEDOORRIGHT:
-                    return m_uiStageDoorRightGUID;
-                case DATA_GO_CURTAINS:
-                    return m_uiCurtainGUID;
-                case DATA_GO_LIBRARY_DOOR:
-                    return m_uiLibraryDoor;
-                case DATA_GO_MASSIVE_DOOR:
-                    return m_uiMassiveDoor;
-                case DATA_GO_SIDE_ENTRANCE_DOOR:
-                    return m_uiSideEntranceDoor;
-                case DATA_GO_GAME_DOOR:
-                    return m_uiGamesmansDoor;
-                case DATA_GO_GAME_EXIT_DOOR:
-                    return m_uiGamesmansExitDoor;
-                case DATA_GO_NETHER_DOOR:
-                    return m_uiNetherspaceDoor;
-                case DATA_MASTERS_TERRACE_DOOR_1:
-                    return MastersTerraceDoor[0];
-                case DATA_MASTERS_TERRACE_DOOR_2:
-                    return MastersTerraceDoor[1];
-                case DATA_IMAGE_OF_MEDIVH:
-                    return ImageGUID;
             }
 
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -302,7 +271,7 @@ public:
                     return m_uiNightBaneGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
     private:
@@ -311,25 +280,25 @@ public:
         uint32 OptionalBossCount;
         //uint32 m_auiEncounter[MAX_ENCOUNTERS];
         //uint32 m_uiTeam;
-        uint64 m_uiCurtainGUID;
-        uint64 m_uiStageDoorLeftGUID;
-        uint64 m_uiStageDoorRightGUID;
-        uint64 m_uiKilrekGUID;
-        uint64 m_uiTerestianGUID;
-        uint64 m_uiMoroesGUID;
-        uint64 m_uiNightBaneGUID;
-        //uint64 EchoOfMedivhGUID;
-        uint64 m_uiLibraryDoor;                                     // Door at Shade of Aran
-        uint64 m_uiMassiveDoor;                                     // Door at Netherspite
-        uint64 m_uiSideEntranceDoor;                                // Side Entrance
-        uint64 m_uiGamesmansDoor;                                   // Door before Chess
-        uint64 m_uiGamesmansExitDoor;                               // Door after Chess
-        uint64 m_uiNetherspaceDoor;                                // Door at Malchezaar
-        //uint64 m_uiServantsAccessDoor;                              // Door to Brocken Stair
-        uint64 MastersTerraceDoor[2];
-        uint64 ImageGUID;
-        uint64 DustCoveredChest;
-        uint64 m_uiRelayGUID;
+        ObjectGuid m_uiCurtainGUID;
+        ObjectGuid m_uiStageDoorLeftGUID;
+        ObjectGuid m_uiStageDoorRightGUID;
+        ObjectGuid m_uiKilrekGUID;
+        ObjectGuid m_uiTerestianGUID;
+        ObjectGuid m_uiMoroesGUID;
+        ObjectGuid m_uiNightBaneGUID;
+        //ObjectGuid EchoOfMedivhGUID;
+        ObjectGuid m_uiLibraryDoor;                                 // Door at Shade of Aran
+        ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
+        ObjectGuid m_uiSideEntranceDoor;                            // Side Entrance
+        ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
+        ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
+        ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar
+        //ObjectGuid m_uiServantsAccessDoor;                        // Door to Brocken Stair
+        ObjectGuid MastersTerraceDoor[2];
+        ObjectGuid ImageGUID;
+        ObjectGuid DustCoveredChest;
+        ObjectGuid m_uiRelayGUID;
     };
 };
 
