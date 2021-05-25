@@ -184,9 +184,14 @@ std::string WorldSession::GetPlayerInfo() const
 {
     std::ostringstream ss;
 
-    ss << "[Player: " << GetPlayerName()
-       << " (Guid: " << (_player != nullptr ? _player->GetGUID() : 0)
-       << ", Account: " << GetAccountId() << ")]";
+    ss << "[Player: ";
+
+    if (!m_playerLoading && _player)
+    {
+        ss << _player->GetName() << ' ' << _player->GetGUID().ToString() << ", ";
+    }
+
+    ss << "Account: " << GetAccountId() << "]";
 
     return ss.str();
 }
@@ -247,6 +252,8 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (!sEluna->OnPacketSend(this, *packet))
         return;
 #endif
+
+    LOG_TRACE("network.opcode", "S->C: %s %s", GetPlayerInfo().c_str(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet->GetOpcode())).c_str());
 
     if (m_Socket->SendPacket(*packet) == -1)
         m_Socket->CloseSocket("m_Socket->SendPacket(*packet) == -1");
