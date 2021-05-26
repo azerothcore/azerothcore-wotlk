@@ -6,8 +6,7 @@ UPDATE `gossip_menu_option` SET `ActionMenuID`= 0 WHERE `MenuID`= 5502 AND `Opti
 -- Add conditions to be met for gossip option to be available
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 5502) AND (`SourceEntry` = 0) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` IN (2,8)) AND (`ConditionTarget` = 0) AND (`ConditionValue1` IN (1046,5462)) AND (`ConditionValue2` IN (0,1)) AND (`ConditionValue3` IN (0,1));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(15, 5502, 0, 0, 0, 2, 0, 5462, 1, 1, 1, 0, 0, '', 'Only show gossip option if player doesn\'t have item Dartol\'s Rod of Transformation');
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(15, 5502, 0, 0, 0, 2, 0, 5462, 1, 1, 1, 0, 0, '', 'Only show gossip option if player doesn\'t have item Dartol\'s Rod of Transformation'),
 (15, 5502, 0, 0, 0, 8, 0, 1046, 0, 0, 0, 0, 0, '', 'Only show gossip option if player has completed quest 1046');
 
 -- Add SAI for Raene Wolfrunner for the actual item creation
