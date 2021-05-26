@@ -361,7 +361,7 @@ ObjectMgr* ObjectMgr::instance()
     return &instance;
 }
 
-void ObjectMgr::AddLocaleString(std::string&& s, LocaleConstant locale, StringVector& data)
+void ObjectMgr::AddLocaleString(std::string&& s, LocaleConstant locale, std::vector<std::string>& data)
 {
     if (!s.empty())
     {
@@ -6893,8 +6893,8 @@ void ObjectMgr::LoadPetNumber()
 
 std::string ObjectMgr::GeneratePetName(uint32 entry)
 {
-    StringVector& list0 = _petHalfName0[entry];
-    StringVector& list1 = _petHalfName1[entry];
+    std::vector<std::string>& list0 = _petHalfName0[entry];
+    std::vector<std::string>& list1 = _petHalfName1[entry];
 
     if (list0.empty() || list1.empty())
     {
