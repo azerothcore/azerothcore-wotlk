@@ -31,8 +31,6 @@
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/Sig_Handler.h>
 #include <ace/TP_Reactor.h>
-#include <ace/ACE.h>
-#include <ace/Sig_Handler.h>
 #include <boost/version.hpp>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
