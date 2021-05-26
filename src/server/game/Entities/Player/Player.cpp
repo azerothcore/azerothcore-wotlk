@@ -57,6 +57,7 @@
 #include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "revision.h"
+#include "Realm.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
