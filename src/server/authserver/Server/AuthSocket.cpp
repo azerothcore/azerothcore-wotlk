@@ -14,8 +14,6 @@
 #include "CryptoHash.h"
 #include "CryptoRandom.h"
 #include "DatabaseEnv.h"
-#include "ByteBuffer.h"
-#include "Config.h"
 #include "IPLocation.h"
 #include "Log.h"
 #include "RealmList.h"
