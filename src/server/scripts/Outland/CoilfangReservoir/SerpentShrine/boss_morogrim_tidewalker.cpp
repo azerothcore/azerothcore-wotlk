@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "serpent_shrine.h"
 
 enum Yells
@@ -57,7 +57,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_morogrim_tidewalkerAI>(creature);
+        return GetSerpentShrineAI<boss_morogrim_tidewalkerAI>(creature);
     }
 
     struct boss_morogrim_tidewalkerAI : public BossAI
@@ -199,7 +199,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            acore::Containers::RandomResizeList(unitList, 1);
+            acore::Containers::RandomResize(unitList, 1);
         }
 
         void HandleDummy(SpellEffIndex effIndex)

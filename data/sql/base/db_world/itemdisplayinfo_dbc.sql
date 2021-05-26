@@ -6,24 +6,24 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `itemdisplayinfo_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `itemdisplayinfo_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `ModelName_1` varchar(100) DEFAULT NULL,
   `ModelName_2` varchar(100) DEFAULT NULL,
   `ModelTexture_1` varchar(100) DEFAULT NULL,
   `ModelTexture_2` varchar(100) DEFAULT NULL,
   `InventoryIcon_1` varchar(100) DEFAULT NULL,
   `InventoryIcon_2` varchar(100) DEFAULT NULL,
-  `GeosetGroup_1` int(11) NOT NULL DEFAULT 0,
-  `GeosetGroup_2` int(11) NOT NULL DEFAULT 0,
-  `GeosetGroup_3` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `SpellVisualID` int(11) NOT NULL DEFAULT 0,
-  `GroupSoundIndex` int(11) NOT NULL DEFAULT 0,
-  `HelmetGeosetVis_1` int(11) NOT NULL DEFAULT 0,
-  `HelmetGeosetVis_2` int(11) NOT NULL DEFAULT 0,
+  `GeosetGroup_1` INT NOT NULL DEFAULT 0,
+  `GeosetGroup_2` INT NOT NULL DEFAULT 0,
+  `GeosetGroup_3` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `SpellVisualID` INT NOT NULL DEFAULT 0,
+  `GroupSoundIndex` INT NOT NULL DEFAULT 0,
+  `HelmetGeosetVis_1` INT NOT NULL DEFAULT 0,
+  `HelmetGeosetVis_2` INT NOT NULL DEFAULT 0,
   `Texture_1` varchar(100) DEFAULT NULL,
   `Texture_2` varchar(100) DEFAULT NULL,
   `Texture_3` varchar(100) DEFAULT NULL,
@@ -32,10 +32,10 @@ CREATE TABLE `itemdisplayinfo_dbc`
   `Texture_6` varchar(100) DEFAULT NULL,
   `Texture_7` varchar(100) DEFAULT NULL,
   `Texture_8` varchar(100) DEFAULT NULL,
-  `ItemVisual` int(11) NOT NULL DEFAULT 0,
-  `ParticleColorID` int(11) NOT NULL DEFAULT 0,
+  `ItemVisual` INT NOT NULL DEFAULT 0,
+  `ParticleColorID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `itemdisplayinfo_dbc` WRITE;

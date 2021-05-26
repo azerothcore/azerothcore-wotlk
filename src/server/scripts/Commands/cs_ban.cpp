@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,13 +12,13 @@ Category: commandscripts
 EndScriptData */
 
 #include "AccountMgr.h"
+#include "BanManager.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "BanManager.h"
 
 /// Ban function modes
 enum BanMode
@@ -304,7 +304,7 @@ public:
             return false;
 
         Player* target = ObjectAccessor::FindPlayerByName(args, false);
-        uint32 targetGuid = 0;
+        ObjectGuid targetGuid;
         std::string name(args);
 
         if (!target)
@@ -317,10 +317,10 @@ public:
             }
         }
         else
-            targetGuid = target->GetGUIDLow();
+            targetGuid = target->GetGUID();
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANINFO);
-        stmt->setUInt32(0, targetGuid);
+        stmt->setUInt32(0, targetGuid.GetCounter());
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
         if (!result)
         {

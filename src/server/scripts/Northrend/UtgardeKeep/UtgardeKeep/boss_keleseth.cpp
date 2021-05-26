@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
-#include "utgarde_keep.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "PassiveAI.h"
+#include "utgarde_keep.h"
 
 enum eTexts
 {
@@ -50,12 +50,12 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_frost_tombAI(pCreature);
+        return GetUtgardeKeepAI<npc_frost_tombAI>(pCreature);
     }
 
     struct npc_frost_tombAI : public NullCreatureAI
     {
-        npc_frost_tombAI(Creature* c) : NullCreatureAI(c), PrisonerGUID(0)
+        npc_frost_tombAI(Creature* c) : NullCreatureAI(c)
         {
             if (TempSummon* t = c->ToTempSummon())
                 if (Unit* s = t->GetSummoner())
@@ -64,13 +64,13 @@ public:
                     if( me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic() )
                     {
                         const int32 dmg = 2000;
-                        c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, NULL, &dmg, NULL, true);
+                        c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, nullptr, &dmg, nullptr, true);
                     }
                     else
                         c->CastSpell(s, SPELL_FROST_TOMB_AURA, true);
                 }
         }
-        uint64 PrisonerGUID;
+        ObjectGuid PrisonerGUID;
 
         void JustDied(Unit* killer) override
         {
@@ -107,7 +107,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_kelesethAI (pCreature);
+        return GetUtgardeKeepAI<boss_kelesethAI>(pCreature);
     }
 
     struct boss_kelesethAI : public ScriptedAI
@@ -235,7 +235,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_vrykul_skeletonAI (pCreature);
+        return GetUtgardeKeepAI<npc_vrykul_skeletonAI>(pCreature);
     }
 
     struct npc_vrykul_skeletonAI : public ScriptedAI
@@ -269,7 +269,7 @@ public:
                 me->GetMotionMaster()->MoveIdle();
                 me->StopMoving();
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 events.RescheduleEvent(EVENT_RESURRECT, 12000);
@@ -304,14 +304,14 @@ public:
                     break;
                 case EVENT_SPELL_BONE_ARMOR:
                     if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
-                        me->CastSpell((Unit*)NULL, SPELL_BONE_ARMOR, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_BONE_ARMOR, false);
                     events.RepeatEvent(urand(40000, 120000));
                     break;
                 case EVENT_RESURRECT:
                     events.DelayEvents(3500);
                     DoCast(me, SPELL_SCOURGE_RESURRECTION, true);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     events.RescheduleEvent(EVENT_RESURRECT_2, 3000);
@@ -343,7 +343,7 @@ public:
             PreventDefaultAction();
             if (aurEff->GetTickNumber() == 1)
                 if( Unit* target = GetTarget() )
-                    target->CastSpell((Unit*)NULL, SPELL_FROST_TOMB_SUMMON, true);
+                    target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
         }
 
         void Register() override

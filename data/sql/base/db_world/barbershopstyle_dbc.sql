@@ -6,11 +6,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `barbershopstyle_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `barbershopstyle_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Type` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Type` INT NOT NULL DEFAULT 0,
   `DisplayName_Lang_enUS` varchar(100) DEFAULT NULL,
   `DisplayName_Lang_enGB` varchar(100) DEFAULT NULL,
   `DisplayName_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE `barbershopstyle_dbc`
   `DisplayName_Lang_ptBR` varchar(100) DEFAULT NULL,
   `DisplayName_Lang_itIT` varchar(100) DEFAULT NULL,
   `DisplayName_Lang_Unk` varchar(100) DEFAULT NULL,
-  `DisplayName_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `DisplayName_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   `Description_Lang_enUS` varchar(100) DEFAULT NULL,
   `Description_Lang_enGB` varchar(100) DEFAULT NULL,
   `Description_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -44,13 +44,13 @@ CREATE TABLE `barbershopstyle_dbc`
   `Description_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Description_Lang_itIT` varchar(100) DEFAULT NULL,
   `Description_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Description_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Description_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   `Cost_Modifier` float NOT NULL DEFAULT 0,
-  `Race` int(11) NOT NULL DEFAULT 0,
-  `Sex` int(11) NOT NULL DEFAULT 0,
-  `Data` int(11) NOT NULL DEFAULT 0,
+  `Race` INT NOT NULL DEFAULT 0,
+  `Sex` INT NOT NULL DEFAULT 0,
+  `Data` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `barbershopstyle_dbc` WRITE;

@@ -6,19 +6,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creaturefamily_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creaturefamily_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `MinScale` float NOT NULL DEFAULT 0,
-  `MinScaleLevel` int(11) NOT NULL DEFAULT 0,
+  `MinScaleLevel` INT NOT NULL DEFAULT 0,
   `MaxScale` float NOT NULL DEFAULT 0,
-  `MaxScaleLevel` int(11) NOT NULL DEFAULT 0,
-  `SkillLine_1` int(11) NOT NULL DEFAULT 0,
-  `SkillLine_2` int(11) NOT NULL DEFAULT 0,
-  `PetFoodMask` int(11) NOT NULL DEFAULT 0,
-  `PetTalentType` int(11) NOT NULL DEFAULT 0,
-  `CategoryEnumID` int(11) NOT NULL DEFAULT 0,
+  `MaxScaleLevel` INT NOT NULL DEFAULT 0,
+  `SkillLine_1` INT NOT NULL DEFAULT 0,
+  `SkillLine_2` INT NOT NULL DEFAULT 0,
+  `PetFoodMask` INT NOT NULL DEFAULT 0,
+  `PetTalentType` INT NOT NULL DEFAULT 0,
+  `CategoryEnumID` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -35,10 +35,10 @@ CREATE TABLE `creaturefamily_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   `IconFile` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creaturefamily_dbc` WRITE;

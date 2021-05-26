@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -18,13 +18,13 @@ npc_darrowshire_spirit
 npc_tirion_fordring
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
-#include "WorldSession.h"
-#include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "WorldSession.h"
 
 // Ours
 
@@ -74,7 +74,7 @@ public:
 
         SummonList summons;
         EventMap events;
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
         uint8 _counter;
         uint8 _savedCount;
         uint8 _deathCount;
@@ -88,7 +88,7 @@ public:
             _savedCount = 0;
             _deathCount = 0;
             _counter = 0;
-            _playerGUID = 0;
+            _playerGUID.Clear();
             events.Reset();
             summons.DespawnAll();
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -99,7 +99,7 @@ public:
             _faction = faction;
         }
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             _playerGUID = guid;
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -164,7 +164,7 @@ public:
                 float z = 159.65f;
                 creature->SetWalk(true);
                 creature->GetMotionMaster()->MovePoint(0, x, y, z);
-                creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+                creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
             }
         }
 
@@ -242,7 +242,7 @@ public:
 
     struct npc_balance_of_light_and_shadowAI : public NullCreatureAI
     {
-        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID = 0; }
+        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID.Clear(); }
 
         bool CanBeSeen(Player const* player) override
         {
@@ -251,7 +251,7 @@ public:
         }
 
         uint32 timer;
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
 
         void SpellHit(Unit*, const SpellInfo* spellInfo) override
         {

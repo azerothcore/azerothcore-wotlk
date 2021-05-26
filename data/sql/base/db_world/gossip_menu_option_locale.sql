@@ -6,16 +6,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `gossip_menu_option_locale`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gossip_menu_option_locale` 
 (
-  `MenuID` smallint(6) unsigned NOT NULL DEFAULT 0,
-  `OptionID` smallint(6) unsigned NOT NULL DEFAULT 0,
+  `MenuID` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `OptionID` SMALLINT unsigned NOT NULL DEFAULT 0,
   `Locale` varchar(4) NOT NULL,
   `OptionText` text DEFAULT NULL,
   `BoxText` text DEFAULT NULL,
   PRIMARY KEY (`MenuID`,`OptionID`,`Locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `gossip_menu_option_locale` WRITE;

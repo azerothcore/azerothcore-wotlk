@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,9 +7,10 @@
 #include "HomeMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "WorldPacket.h"
-#include "MoveSplineInit.h"
+#include "DisableMgr.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
+#include "WorldPacket.h"
 
 void HomeMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
@@ -26,7 +27,10 @@ void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner)
         owner->LoadCreaturesAddon(true);
         owner->AI()->JustReachedHome();
     }
-    owner->m_targetsNotAcceptable.clear();
+
+    if (!owner->HasSwimmingFlagOutOfCombat())
+        owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+
     owner->UpdateEnvironmentIfNeeded(2);
 }
 
@@ -51,7 +55,8 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature* owner)
         init.SetFacing(o);
     }
 
-    init.MoveTo(x, y, z, MMAP::MMapFactory::IsPathfindingEnabled(owner->FindMap()), true);
+    owner->UpdateAllowedPositionZ(x, y, z);
+    init.MoveTo(x, y, z, DisableMgr::IsPathfindingEnabled(owner->FindMap()), true);
     init.SetWalk(false);
     init.Launch();
 

@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Opcodes.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_eye.h"
 #include "WorldPacket.h"
-#include "Opcodes.h"
 
 enum Yells
 {
@@ -182,7 +182,7 @@ public:
         void PrepareAdvisors()
         {
             for (uint8 i = DATA_KAEL_ADVISOR1; i <= DATA_KAEL_ADVISOR4; ++i)
-                if (Creature* advisor = ObjectAccessor::GetCreature(*me, instance->GetData64(i)))
+                if (Creature* advisor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(i)))
                 {
                     advisor->Respawn(true);
                     advisor->StopMovingOnCurrentPos();
@@ -198,7 +198,7 @@ public:
             {
                 for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
                     if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
-                        if (summon->GetDBTableGUIDLow())
+                        if (summon->GetSpawnId())
                         {
                             summon->SetReactState(REACT_PASSIVE);
                             summon->setDeathState(JUST_RESPAWNED);
@@ -209,11 +209,11 @@ public:
 
         void SetRoomState(GOState state)
         {
-            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_BRIDGE_WINDOW)))
+            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_BRIDGE_WINDOW)))
                 window->SetGoState(state);
-            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_KAEL_STATUE_RIGHT)))
+            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_KAEL_STATUE_RIGHT)))
                 window->SetGoState(state);
-            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_KAEL_STATUE_LEFT)))
+            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_KAEL_STATUE_LEFT)))
                 window->SetGoState(state);
         }
 
@@ -273,11 +273,11 @@ public:
             if (phase == PHASE_FINAL)
                 return;
 
-            if (summon->GetDBTableGUIDLow() && phase == PHASE_ALL_ADVISORS)
+            if (summon->GetSpawnId() && phase == PHASE_ALL_ADVISORS)
             {
                 for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
                     if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
-                        if (summon->GetDBTableGUIDLow() && summon->IsAlive())
+                        if (summon->GetSpawnId() && summon->IsAlive())
                             return;
 
                 events2.ScheduleEvent(EVENT_PREFIGHT_PHASE71, 2000);
@@ -434,7 +434,7 @@ public:
                     for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
                     {
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
-                            if (!summon->GetDBTableGUIDLow())
+                            if (!summon->GetSpawnId())
                             {
                                 summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                                 summon->SetInCombatWithZone();
@@ -456,7 +456,7 @@ public:
                 case EVENT_PREFIGHT_PHASE63:
                     for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
-                            if (summon->GetDBTableGUIDLow())
+                            if (summon->GetSpawnId())
                             {
                                 summon->SetReactState(REACT_AGGRESSIVE);
                                 summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -486,19 +486,19 @@ public:
                     events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
                     break;
                 case EVENT_SCENE_1:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->SetFacingTo(M_PI);
                     me->SetWalk(true);
                     Talk(SAY_PHASE5_NUTS);
                     break;
                 case EVENT_SCENE_2:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->CastSpell(me, SPELL_KAEL_EXPLODES1, true);
                     me->CastSpell(me, SPELL_KAEL_GAINING_POWER, false);
                     me->SetDisableGravity(true);
                     break;
                 case EVENT_SCENE_3:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     for (uint8 i = 0; i < 2; ++i)
                         if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i], TEMPSUMMON_TIMED_DESPAWN, 60000))
                             trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
@@ -506,7 +506,7 @@ public:
                     me->CastSpell(me, SPELL_GROW, true);
                     break;
                 case EVENT_SCENE_4:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->CastSpell(me, SPELL_GROW, true);
                     me->CastSpell(me, SPELL_KAEL_EXPLODES2, true);
                     me->CastSpell(me, SPELL_NETHERBEAM_AURA1, true);
@@ -515,7 +515,7 @@ public:
                             trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
                     break;
                 case EVENT_SCENE_5:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->CastSpell(me, SPELL_GROW, true);
                     me->CastSpell(me, SPELL_KAEL_EXPLODES3, true);
                     me->CastSpell(me, SPELL_NETHERBEAM_AURA2, true);
@@ -676,7 +676,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_NETHER_VAPOR, 0);
                     me->CastSpell(me, SPELL_SHOCK_BARRIER, false);
                     me->CastSpell(me, SPELL_GRAVITY_LAPSE, false);
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->GetMotionMaster()->Clear();
                     me->StopMoving();
                     Talk(SAY_GRAVITYLAPSE);
@@ -706,7 +706,7 @@ public:
     };
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kaelthasAI>(creature);
+        return GetTheEyeAI<boss_kaelthasAI>(creature);
     }
 };
 
@@ -723,7 +723,7 @@ public:
         {
             if (GetCaster()->GetTypeId() == TYPEID_UNIT)
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (Creature* kael = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(NPC_KAELTHAS)))
+                    if (Creature* kael = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_KAELTHAS)))
                         kael->AI()->SummonedCreatureDies(GetCaster()->ToCreature(), nullptr);
             return true;
         }
@@ -993,7 +993,7 @@ public:
                     targetList.push_back(target);
             }
 
-            acore::Containers::RandomResizeList(targetList, 5);
+            acore::Containers::RandomResize(targetList, 5);
             for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                 GetCaster()->CastSpell(*itr, SPELL_NETHER_BEAM_DAMAGE, true);
         }

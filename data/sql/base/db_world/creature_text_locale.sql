@@ -6,16 +6,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_text_locale`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_text_locale` 
 (
-  `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `GroupID` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `ID` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `GroupID` TINYINT unsigned NOT NULL DEFAULT 0,
+  `ID` TINYINT unsigned NOT NULL DEFAULT 0,
   `Locale` varchar(4) NOT NULL,
   `Text` text DEFAULT NULL,
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`,`Locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_text_locale` WRITE;

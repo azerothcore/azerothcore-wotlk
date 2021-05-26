@@ -6,30 +6,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `gameobjectdisplayinfo_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gameobjectdisplayinfo_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `ModelName` varchar(200) DEFAULT NULL,
-  `Sound_1` int(11) NOT NULL DEFAULT 0,
-  `Sound_2` int(11) NOT NULL DEFAULT 0,
-  `Sound_3` int(11) NOT NULL DEFAULT 0,
-  `Sound_4` int(11) NOT NULL DEFAULT 0,
-  `Sound_5` int(11) NOT NULL DEFAULT 0,
-  `Sound_6` int(11) NOT NULL DEFAULT 0,
-  `Sound_7` int(11) NOT NULL DEFAULT 0,
-  `Sound_8` int(11) NOT NULL DEFAULT 0,
-  `Sound_9` int(11) NOT NULL DEFAULT 0,
-  `Sound_10` int(11) NOT NULL DEFAULT 0,
+  `Sound_1` INT NOT NULL DEFAULT 0,
+  `Sound_2` INT NOT NULL DEFAULT 0,
+  `Sound_3` INT NOT NULL DEFAULT 0,
+  `Sound_4` INT NOT NULL DEFAULT 0,
+  `Sound_5` INT NOT NULL DEFAULT 0,
+  `Sound_6` INT NOT NULL DEFAULT 0,
+  `Sound_7` INT NOT NULL DEFAULT 0,
+  `Sound_8` INT NOT NULL DEFAULT 0,
+  `Sound_9` INT NOT NULL DEFAULT 0,
+  `Sound_10` INT NOT NULL DEFAULT 0,
   `GeoBoxMinX` float NOT NULL DEFAULT 0,
   `GeoBoxMinY` float NOT NULL DEFAULT 0,
   `GeoBoxMinZ` float NOT NULL DEFAULT 0,
   `GeoBoxMaxX` float NOT NULL DEFAULT 0,
   `GeoBoxMaxY` float NOT NULL DEFAULT 0,
   `GeoBoxMaxZ` float NOT NULL DEFAULT 0,
-  `ObjectEffectPackageID` int(11) NOT NULL DEFAULT 0,
+  `ObjectEffectPackageID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `gameobjectdisplayinfo_dbc` WRITE;

@@ -6,15 +6,15 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `version`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `version` 
 (
   `core_version` varchar(255) NOT NULL DEFAULT '' COMMENT 'Core revision dumped at startup.',
   `core_revision` varchar(120) DEFAULT NULL,
   `db_version` varchar(120) DEFAULT NULL COMMENT 'Version of world DB.',
-  `cache_id` int(11) DEFAULT 0,
+  `cache_id` INT DEFAULT 0,
   PRIMARY KEY (`core_version`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Version Notes';
+) ENGINE=INNODB DEFAULT CHARSET=UTF8MB4 COMMENT='Version Notes';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `version` WRITE;

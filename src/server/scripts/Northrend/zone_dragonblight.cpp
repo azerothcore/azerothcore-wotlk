@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,19 +14,19 @@ EndScriptData */
 /* ContentData
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
-#include "Player.h"
-#include "Vehicle.h"
+#include "CellImpl.h"
+#include "Chat.h"
+#include "CombatAI.h"
 #include "CreatureTextMgr.h"
 #include "PassiveAI.h"
-#include "CombatAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
-#include "Chat.h"
-#include "CellImpl.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 /********
@@ -64,8 +64,8 @@ public:
         bool secondpart;
         int32 timer;
         uint8 step;
-        uint64 pGUID;
-        uint64 oachanoaGUID;
+        ObjectGuid pGUID;
+        ObjectGuid oachanoaGUID;
 
         void Reset() override
         {
@@ -73,8 +73,8 @@ public:
             secondpart = false;
             timer = 0;
             step = 0;
-            pGUID = 0;
-            oachanoaGUID = 0;
+            pGUID.Clear();
+            oachanoaGUID.Clear();
         }
 
         void NextStep(const uint32 time)
@@ -234,7 +234,7 @@ public:
             }
         }
 
-        void Start(uint64 g)
+        void Start(ObjectGuid g)
         {
             running = true;
             pGUID = g;
@@ -301,8 +301,8 @@ public:
     {
         npc_hourglass_of_eternityAI(Creature* c) : ScriptedAI(c) {}
 
-        uint64 summonerGUID;
-        uint64 futureGUID;
+        ObjectGuid summonerGUID;
+        ObjectGuid futureGUID;
         EventMap events;
         uint8 count[3];
         uint8 phase;
@@ -571,7 +571,7 @@ public:
                 if (TempSummon* summon = me->ToTempSummon())
                     if (Unit* owner = summon->GetSummoner())
                         if (Player* player = owner->ToPlayer())
-                            player->KilledMonsterCredit(me->GetEntry(), 0);
+                            player->KilledMonsterCredit(me->GetEntry());
             }
         }
     };
@@ -753,7 +753,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
         void CleanAll(bool fromReset = true)
         {
@@ -784,7 +784,7 @@ public:
             events.ScheduleEvent(999, 0);
             events.ScheduleEvent(1, 3000);
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
 
             CleanAll();
 
@@ -800,10 +800,11 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(uint64 guid, int32  /*id*/) override
+        void SetGUID(ObjectGuid guid, int32  /*id*/) override
         {
             if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
                 return;
+
             me->setActive(true);
             playerGUID = guid;
             events.ScheduleEvent(2, 900000);
@@ -837,7 +838,7 @@ public:
                     c->CastSpell(c, SPELL_SAC_HOLY_ZONE_AURA, true);
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_3, 150.0f))
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                    playerGUID = 0;
+                    playerGUID.Clear();
                     events.RescheduleEvent(2, 60000);
                 }
             }
@@ -902,7 +903,7 @@ public:
                     events.ScheduleEvent(7, 11000);
                     break;
                 case 6: // repel hammer
-                    me->CastSpell((Unit*)NULL, SPELL_SAC_REPEL_HAMMER, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SAC_REPEL_HAMMER, false);
                     if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_1, 150.0f, true))
                         c->CastSpell(c, SPELL_SAC_BLUE_EXPLOSION, true);
 
@@ -921,7 +922,7 @@ public:
                     events.ScheduleEvent(9, 11500);
                     break;
                 case 8: // summon ghouls
-                    me->CastSpell((Unit*)NULL, SPELL_SAC_SUMMON_GHOULS_AURA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SAC_SUMMON_GHOULS_AURA, false);
                     break;
                 case 9: // talk 3
                     Talk(3);
@@ -1030,7 +1031,7 @@ public:
         {
             if (spell->Id == SPELL_SAC_REPEL_HAMMER && target->GetTypeId() == TYPEID_UNIT)
             {
-                target->CastSpell((Unit*)NULL, SPELL_SAC_THROW_HAMMER, true);
+                target->CastSpell((Unit*)nullptr, SPELL_SAC_THROW_HAMMER, true);
                 target->ToCreature()->DespawnOrUnsummon(1);
                 if (Unit* c = target->GetVehicleBase())
                     c->RemoveAurasDueToSpell(SPELL_SAC_HOLY_ZONE_AURA);
@@ -1192,7 +1193,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
-            acore::Containers::RandomResizeList(targets, 2);
+            acore::Containers::RandomResize(targets, 2);
         }
 
         void HandleScript(SpellEffIndex effIndex)
@@ -1304,7 +1305,7 @@ public:
                         AttackStart(t);
                     break;
                 case 2:
-                    me->CastSpell((Unit*)NULL, 70866, false);
+                    me->CastSpell((Unit*)nullptr, 70866, false);
                     events.RepeatEvent(urand(30000, 35000));
                     break;
                 case 3:
@@ -1504,8 +1505,13 @@ public:
         void Reset() override
         {
             talkWing = 0;
-            memset(audienceList, 0, sizeof(audienceList));
-            memset(imageList, 0, sizeof(imageList));
+
+            for (uint8 i = 0; i < 10; ++i)
+                audienceList[i].Clear();
+
+            for (uint8 i = 0; i < 5; ++i)
+                imageList[i].Clear();
+
             _events.ScheduleEvent(EVENT_GET_TARGETS, 5000);
             _events.ScheduleEvent(EVENT_START_RANDOM, 20000);
         }
@@ -1730,9 +1736,9 @@ public:
         }
     private:
         EventMap _events;
-        uint64   audienceList[10];
-        uint64   imageList[5];
-        uint8    talkWing;
+        ObjectGuid audienceList[10];
+        ObjectGuid imageList[5];
+        uint8 talkWing;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1862,13 +1868,13 @@ public:
     {
         npc_torturer_lecraftAI(Creature* creature) : ScriptedAI(creature)
         {
-            _playerGUID = 0;
+            _playerGUID.Clear();
         }
 
         void Reset() override
         {
             _textCounter = 1;
-            _playerGUID  = 0;
+            _playerGUID.Clear();
         }
 
         void EnterCombat(Unit* who) override
@@ -1896,7 +1902,7 @@ public:
                 Talk(_textCounter, player);
 
                 if (_textCounter == 5)
-                    player->KilledMonsterCredit(NPC_TORTURER_LECRAFT, 0);
+                    player->KilledMonsterCredit(NPC_TORTURER_LECRAFT);
 
                 ++_textCounter;
 
@@ -1933,7 +1939,7 @@ public:
     private:
         EventMap _events;
         uint8    _textCounter;
-        uint64   _playerGUID;
+        ObjectGuid   _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

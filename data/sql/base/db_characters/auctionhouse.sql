@@ -6,22 +6,22 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `auctionhouse`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `auctionhouse` 
 (
-  `id` int(10) unsigned NOT NULL DEFAULT 0,
-  `auctioneerguid` int(10) unsigned NOT NULL DEFAULT 0,
-  `itemguid` int(10) unsigned NOT NULL DEFAULT 0,
-  `itemowner` int(10) unsigned NOT NULL DEFAULT 0,
-  `buyoutprice` int(10) unsigned NOT NULL DEFAULT 0,
-  `time` int(10) unsigned NOT NULL DEFAULT 0,
-  `buyguid` int(10) unsigned NOT NULL DEFAULT 0,
-  `lastbid` int(10) unsigned NOT NULL DEFAULT 0,
-  `startbid` int(10) unsigned NOT NULL DEFAULT 0,
-  `deposit` int(10) unsigned NOT NULL DEFAULT 0,
+  `id` INT unsigned NOT NULL DEFAULT 0,
+  `auctioneerguid` INT unsigned NOT NULL DEFAULT 0,
+  `itemguid` INT unsigned NOT NULL DEFAULT 0,
+  `itemowner` INT unsigned NOT NULL DEFAULT 0,
+  `buyoutprice` INT unsigned NOT NULL DEFAULT 0,
+  `time` INT unsigned NOT NULL DEFAULT 0,
+  `buyguid` INT unsigned NOT NULL DEFAULT 0,
+  `lastbid` INT unsigned NOT NULL DEFAULT 0,
+  `startbid` INT unsigned NOT NULL DEFAULT 0,
+  `deposit` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `item_guid` (`itemguid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `auctionhouse` WRITE;

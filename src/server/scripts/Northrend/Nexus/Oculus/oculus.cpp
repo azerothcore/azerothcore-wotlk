@@ -2,19 +2,19 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "CombatAI.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
+#include "oculus.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "oculus.h"
-#include "Vehicle.h"
-#include "CombatAI.h"
-#include "Player.h"
-#include "SpellInfo.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellInfo.h"
 #include "SpellScript.h"
+#include "Vehicle.h"
 #include <unordered_map>
 
 enum Drakes
@@ -62,13 +62,13 @@ enum DrakeGiverTexts
 class npc_oculus_drakegiver : public CreatureScript
 {
 public:
-    std::unordered_map<uint32, bool>openedMenu;
+    std::unordered_map<ObjectGuid, bool>openedMenu;
 
     npc_oculus_drakegiver() : CreatureScript("npc_oculus_drakegiver") { }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_oculus_drakegiverAI(creature);
+        return GetOculusAI<npc_oculus_drakegiverAI>(creature);
     }
 
     struct  npc_oculus_drakegiverAI : public ScriptedAI {
@@ -324,7 +324,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_oculus_drakeAI (creature);
+        return GetOculusAI<npc_oculus_drakeAI>(creature);
     }
 
     struct npc_oculus_drakeAI : public VehicleAI
@@ -509,7 +509,7 @@ public:
     };
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_centrifuge_constructAI(creature);
+        return GetOculusAI<npc_centrifuge_constructAI>(creature);
     }
 };
 
@@ -525,9 +525,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
         }
 
         void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -565,9 +563,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_RUBY_EVASIVE_CHARGES))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_RUBY_EVASIVE_CHARGES });
         }
 
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
@@ -602,9 +598,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
         }
 
         void CalcDamage()
@@ -644,9 +638,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -895,7 +887,7 @@ public:
     {
         PrepareAuraScript(spell_oculus_rider_auraAuraScript);
 
-        uint64 _drakeGUID;
+        ObjectGuid _drakeGUID;
 
         void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
@@ -937,7 +929,7 @@ public:
 
             if (drake)
             {
-                drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
                 drake->RemoveAurasDueToSpell(GetId());
                 drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
                 drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);

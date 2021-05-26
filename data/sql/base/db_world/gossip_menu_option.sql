@@ -6,25 +6,25 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `gossip_menu_option`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gossip_menu_option` 
 (
-  `MenuID` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `OptionID` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `OptionIcon` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `MenuID` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `OptionID` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `OptionIcon` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `OptionText` text DEFAULT NULL,
-  `OptionBroadcastTextID` mediumint(6) NOT NULL DEFAULT 0,
-  `OptionType` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `OptionNpcFlag` int(10) unsigned NOT NULL DEFAULT 0,
-  `ActionMenuID` int(10) unsigned NOT NULL DEFAULT 0,
-  `ActionPoiID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `BoxCoded` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `BoxMoney` int(10) unsigned NOT NULL DEFAULT 0,
+  `OptionBroadcastTextID` MEDIUMINT NOT NULL DEFAULT 0,
+  `OptionType` TINYINT unsigned NOT NULL DEFAULT 0,
+  `OptionNpcFlag` INT unsigned NOT NULL DEFAULT 0,
+  `ActionMenuID` INT unsigned NOT NULL DEFAULT 0,
+  `ActionPoiID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `BoxCoded` TINYINT unsigned NOT NULL DEFAULT 0,
+  `BoxMoney` INT unsigned NOT NULL DEFAULT 0,
   `BoxText` text DEFAULT NULL,
-  `BoxBroadcastTextID` mediumint(6) NOT NULL DEFAULT 0,
-  `VerifiedBuild` smallint(5) NOT NULL DEFAULT 0,
+  `BoxBroadcastTextID` MEDIUMINT NOT NULL DEFAULT 0,
+  `VerifiedBuild` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`MenuID`,`OptionID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `gossip_menu_option` WRITE;

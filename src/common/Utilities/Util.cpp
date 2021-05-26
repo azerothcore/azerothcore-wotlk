@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,65 +8,13 @@
 #include "Common.h"
 #include "utf8.h"
 #include "Log.h"
-#include "DatabaseWorker.h"
-#include "SQLOperation.h"
 #include "Errors.h"
 #include "TypeList.h"
-#include "SFMT.h"
 #include "Errors.h" // for ASSERT
-#include <ace/TSS_T.h>
 #include <array>
 #include <cwchar>
 #include <string>
-#include <random>
-
-typedef ACE_TSS<SFMTRand> SFMTRandTSS;
-static SFMTRandTSS sfmtRand;
-static SFMTEngine engine;
-
-int32 irand(int32 min, int32 max)
-{
-    ASSERT(max >= min);
-    return int32(sfmtRand->IRandom(min, max));
-}
-
-uint32 urand(uint32 min, uint32 max)
-{
-    ASSERT(max >= min);
-    return sfmtRand->URandom(min, max);
-}
-
-float frand(float min, float max)
-{
-    ASSERT(max >= min);
-    return float(sfmtRand->Random() * (max - min) + min);
-}
-
-uint32 rand32()
-{
-    return int32(sfmtRand->BRandom());
-}
-
-double rand_norm()
-{
-    return sfmtRand->Random();
-}
-
-double rand_chance()
-{
-    return sfmtRand->Random() * 100.0;
-}
-
-uint32 urandweighted(size_t count, double const* chances)
-{
-    std::discrete_distribution<uint32> dd(chances, chances + count);
-    return dd(SFMTEngine::Instance());
-}
-
-SFMTEngine& SFMTEngine::Instance()
-{
-    return engine;
-}
+#include <ace/Default_Constants.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
 {
@@ -633,7 +581,7 @@ bool Utf8ToUpperOnlyLatin(std::string& utf8String)
     return WStrToUtf8(wstr, utf8String);
 }
 
-std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse /* = false */)
+std::string acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, bool reverse /* = false */)
 {
     int32 init = 0;
     int32 end = arrayLen;
@@ -657,11 +605,9 @@ std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse 
     return ss.str();
 }
 
-void HexStrToByteArray(std::string const& str, uint8* out, bool reverse /*= false*/)
+void acore::Impl::HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse /*= false*/)
 {
-    // string must have even number of characters
-    if (str.length() & 1)
-        return;
+    ASSERT(str.size() == (2 * outlen));
 
     int32 init = 0;
     int32 end = int32(str.length());
@@ -682,15 +628,13 @@ void HexStrToByteArray(std::string const& str, uint8* out, bool reverse /*= fals
     }
 }
 
-bool StringToBool(std::string const& str)
-{
-    std::string lowerStr = str;
-    std::transform(str.begin(), str.end(), lowerStr.begin(), ::tolower);
-    return lowerStr == "1" || lowerStr == "true" || lowerStr == "yes";
-}
-
 bool StringContainsStringI(std::string const& haystack, std::string const& needle)
 {
     return haystack.end() !=
     std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), [](char c1, char c2) { return std::toupper(c1) == std::toupper(c2); });
+}
+
+bool StringEqualI(std::string_view a, std::string_view b)
+{
+    return std::equal(a.begin(), a.end(), b.begin(), b.end(), [](char c1, char c2) { return std::tolower(c1) == std::tolower(c2); });
 }

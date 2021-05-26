@@ -6,18 +6,18 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `cinematiccamera_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `cinematiccamera_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `model` varchar(100) DEFAULT NULL,
-  `soundEntry` int(11) NOT NULL DEFAULT 0,
+  `soundEntry` INT NOT NULL DEFAULT 0,
   `locationX` float NOT NULL DEFAULT 0,
   `locationY` float NOT NULL DEFAULT 0,
   `locationZ` float NOT NULL DEFAULT 0,
   `rotation` float NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Cinematic camera DBC';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC COMMENT='Cinematic camera DBC';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `cinematiccamera_dbc` WRITE;

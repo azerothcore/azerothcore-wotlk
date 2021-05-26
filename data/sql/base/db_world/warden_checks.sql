@@ -6,19 +6,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `warden_checks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `warden_checks` 
 (
-  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `type` tinyint(3) unsigned DEFAULT NULL,
+  `id` SMALLINT unsigned NOT NULL AUTO_INCREMENT,
+  `type` TINYINT unsigned DEFAULT NULL,
   `data` varchar(48) DEFAULT NULL,
   `str` varchar(170) DEFAULT NULL,
-  `address` int(10) unsigned DEFAULT NULL,
-  `length` tinyint(3) unsigned DEFAULT NULL,
+  `address` INT unsigned DEFAULT NULL,
+  `length` TINYINT unsigned DEFAULT NULL,
   `result` varchar(24) DEFAULT NULL,
   `comment` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=793 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=793 DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `warden_checks` WRITE;

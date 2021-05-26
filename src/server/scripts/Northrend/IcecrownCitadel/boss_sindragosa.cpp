@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "GridNotifiers.h"
 #include "icecrown_citadel.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {
@@ -174,24 +174,24 @@ private:
 class FrostBombExplosion : public BasicEvent
 {
 public:
-    FrostBombExplosion(Creature* owner, uint64 sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
+    FrostBombExplosion(Creature* owner, ObjectGuid sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
-        _owner->CastSpell((Unit*)NULL, SPELL_FROST_BOMB, false, nullptr, nullptr, _sindragosaGUID);
+        _owner->CastSpell((Unit*)nullptr, SPELL_FROST_BOMB, false, nullptr, nullptr, _sindragosaGUID);
         _owner->RemoveAurasDueToSpell(SPELL_FROST_BOMB_VISUAL);
         return true;
     }
 
 private:
     Creature* _owner;
-    uint64 _sindragosaGUID;
+    ObjectGuid _sindragosaGUID;
 };
 
 class IceTombSummonEvent : public BasicEvent
 {
 public:
-    IceTombSummonEvent(Unit* owner, uint64 sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
+    IceTombSummonEvent(Unit* owner, ObjectGuid sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -201,18 +201,16 @@ public:
         {
             if (!sindragosa->IsAlive())
                 return true;
+
             Position pos;
             _owner->GetPosition(&pos);
-            _owner->m_positionZ -= 1.0f; // +2.0f in UpdateGroundPositionZ, prevent going over GO model of another ice block, because new would be spawned on top of the old one xd
             _owner->UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-            if (pos.GetPositionZ() < 203.0f)
-                pos.m_positionZ = 203.0f;
+
             if (TempSummon* summon = sindragosa->SummonCreature(NPC_ICE_TOMB, pos))
             {
-                summon->m_positionZ = summon->GetPositionZ() + 5.0f;
                 summon->AI()->SetGUID(_owner->GetGUID(), DATA_TRAPPED_PLAYER);
                 _owner->CastSpell(_owner, SPELL_ICE_TOMB_UNTARGETABLE, true);
-                if (GameObject* go = summon->SummonGameObject(GO_ICE_BLOCK, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ() - 3.5f, pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                if (GameObject* go = summon->SummonGameObject(GO_ICE_BLOCK, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
                 {
                     go->SetSpellId(SPELL_ICE_TOMB_DAMAGE);
                     summon->AddGameObject(go);
@@ -224,7 +222,7 @@ public:
 
 private:
     Unit* _owner;
-    uint64 _sindragosaGUID;
+    ObjectGuid _sindragosaGUID;
 };
 
 struct LastPhaseIceTombTargetSelector : public acore::unary_function<Unit*, bool>
@@ -283,9 +281,8 @@ public:
 
             if (!_summoned)
             {
-                me->SetDisableGravity(true);
-                me->SetHover(true);
                 me->SetCanFly(true);
+                me->SetDisableGravity(true);
             }
         }
 
@@ -356,9 +353,8 @@ public:
             instance->SetBossState(DATA_SINDRAGOSA, FAIL);
             if (_summoned)
             {
-                me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
             }
         }
 
@@ -400,7 +396,6 @@ public:
                 me->setActive(true);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
@@ -426,9 +421,8 @@ public:
             {
                 case POINT_FROSTWYRM_LAND:
                     me->setActive(false);
-                    me->SetDisableGravity(false);
-                    me->SetHover(false);
                     me->SetCanFly(false);
+                    me->SetDisableGravity(false);
                     me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                     me->SetHomePosition(SindragosaLandPos);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -454,9 +448,9 @@ public:
                     break;
                 case POINT_LAND_GROUND:
                     {
-                        me->SetDisableGravity(false);
-                        me->SetHover(false);
+                        _isInAirPhase = false;
                         me->SetCanFly(false);
+                        me->SetDisableGravity(false);
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         me->SetReactState(REACT_AGGRESSIVE);
                         if (Unit* target = me->SelectVictim())
@@ -564,11 +558,11 @@ public:
                     break;
                 case EVENT_UNCHAINED_MAGIC:
                     Talk(SAY_UNCHAINED_MAGIC);
-                    me->CastSpell((Unit*)NULL, SPELL_UNCHAINED_MAGIC, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_UNCHAINED_MAGIC, false);
                     events.ScheduleEvent(EVENT_UNCHAINED_MAGIC, urand(30000, 35000), EVENT_GROUP_LAND_PHASE);
                     break;
                 case EVENT_ICY_GRIP:
-                    me->CastSpell((Unit*)NULL, SPELL_ICY_GRIP, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ICY_GRIP, false);
                     events.DelayEventsToMax(1001, 0);
                     events.ScheduleEvent(EVENT_BLISTERING_COLD, 1000, EVENT_GROUP_LAND_PHASE);
                     if (uint32 evTime = events.GetNextEventTime(EVENT_ICE_TOMB))
@@ -596,6 +590,7 @@ public:
                         me->SetControlled(false, UNIT_STATE_ROOT);
                     }
 
+                    _isInAirPhase = true;
                     _didFirstFlyPhase = true;
                     Talk(SAY_AIR_PHASE);
                     me->SetReactState(REACT_PASSIVE);
@@ -606,7 +601,6 @@ public:
                     me->StopMoving();
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
-                    me->SetHover(true);
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, 10.0f);
                     events.CancelEventGroup(EVENT_GROUP_LAND_PHASE);
@@ -661,7 +655,7 @@ public:
                     me->GetMotionMaster()->MoveLand(POINT_LAND_GROUND, SindragosaLandPos, 10.0f);
                     break;
                 case EVENT_THIRD_PHASE_CHECK:
-                    if (!me->HasByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER))
+                    if (!_isInAirPhase)
                     {
                         Talk(SAY_PHASE_2);
                         events.ScheduleEvent(EVENT_ICE_TOMB, urand(7000, 10000));
@@ -699,6 +693,7 @@ public:
         bool _didFirstFlyPhase;
         bool _isBelow20Pct;
         bool _isThirdPhase;
+        bool _isInAirPhase;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -717,16 +712,15 @@ public:
         npc_ice_tombAI(Creature* creature) : NullCreatureAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
-            _trappedPlayerGUID = 0;
             _existenceCheckTimer = 1000;
             _asphyxiationTimer = 22500;
         }
 
-        uint64 _trappedPlayerGUID;
+        ObjectGuid _trappedPlayerGUID;
         uint32 _existenceCheckTimer;
         uint16 _asphyxiationTimer;
 
-        void SetGUID(uint64 guid, int32 type) override
+        void SetGUID(ObjectGuid guid, int32 type) override
         {
             if (type == DATA_TRAPPED_PLAYER)
                 _trappedPlayerGUID = guid;
@@ -744,7 +738,7 @@ public:
 
             if (Player* player = ObjectAccessor::GetPlayer(*me, _trappedPlayerGUID))
             {
-                _trappedPlayerGUID = 0;
+                _trappedPlayerGUID.Clear();
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_DAMAGE);
                 player->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
@@ -914,10 +908,10 @@ public:
             uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
             healList.remove_if(UnchainedMagicTargetSelector(false));
             if (healList.size() > maxSize)
-                acore::Containers::RandomResizeList(healList, maxSize);
+                acore::Containers::RandomResize(healList, maxSize);
             dpsList.remove_if(UnchainedMagicTargetSelector(true));
             if (dpsList.size() > maxSize)
-                acore::Containers::RandomResizeList(dpsList, maxSize);
+                acore::Containers::RandomResize(dpsList, maxSize);
             unitList.splice(unitList.begin(), healList);
             unitList.splice(unitList.begin(), dpsList);
         }
@@ -1016,15 +1010,13 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_BACKLASH))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_BACKLASH });
         }
 
         void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, NULL, aurEff, GetCasterGUID());
+                GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
         }
 
         void Register() override
@@ -1050,9 +1042,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ICY_GRIP_JUMP))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ICY_GRIP_JUMP });
         }
 
         void HandleScript(SpellEffIndex effIndex)
@@ -1128,9 +1118,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ICE_TOMB_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ICE_TOMB_DAMAGE });
         }
 
         void PeriodicTick(AuraEffect const* /*aurEff*/)
@@ -1284,7 +1272,7 @@ public:
 
         // for standard creatures check full LOS
         if (Creature* c = unit->ToCreature())
-            if (!c->IsPet() && c->GetDBTableGUIDLow())
+            if (!c->IsPet() && c->GetSpawnId())
                 return !_caster->IsWithinLOSInMap(unit);
 
         // for players and pets check only dynamic los (ice block gameobjects)
@@ -1386,7 +1374,7 @@ public:
         {
             if (!me->isDead())
             {
-                _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+                _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
                 Reset();
             }
         }
@@ -1403,7 +1391,6 @@ public:
             {
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
             }
         }
 
@@ -1414,14 +1401,13 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
             }
         }
 
         void JustRespawned() override
         {
             ScriptedAI::JustRespawned();
-            _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+            _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1459,7 +1445,6 @@ public:
             me->setActive(false);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->SetHover(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1523,7 +1508,7 @@ public:
         {
             if (!me->isDead())
             {
-                _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+                _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
                 Reset();
             }
         }
@@ -1540,7 +1525,6 @@ public:
             {
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
             }
         }
 
@@ -1551,14 +1535,13 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
             }
         }
 
         void JustRespawned() override
         {
             ScriptedAI::JustRespawned();
-            _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+            _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1598,7 +1581,6 @@ public:
                 me->setActive(false);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1607,7 +1589,6 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetReactState(REACT_DEFENSIVE);
                 if (Unit* victim = me->SelectVictim())
                     AttackStart(victim);
@@ -1652,9 +1633,8 @@ public:
                         me->AttackStop();
                         me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SetHover(true);
                         me->SendMovementFlagUpdate();
-                        float floorZ = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+                        float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ + 25.0f;
                         else destZ = me->GetPositionZ() + 25.0f;
@@ -1676,7 +1656,7 @@ public:
                     }
                     else
                     {
-                        float floorZ = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+                        float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ;
                         else destZ = me->GetPositionZ() - 25.0f;
@@ -1715,9 +1695,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ICY_BLAST_AREA))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ICY_BLAST_AREA });
         }
 
         void HandleTriggerMissile(SpellEffIndex effIndex)
@@ -1750,14 +1728,14 @@ public:
         if (InstanceScript* instance = player->GetInstanceScript())
         {
             if (!instance->GetData(DATA_SPINESTALKER))
-                if (Creature* spinestalker = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_SPINESTALKER)))
+                if (Creature* spinestalker = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_SPINESTALKER)))
                     spinestalker->AI()->DoAction(ACTION_START_FROSTWYRM);
 
             if (!instance->GetData(DATA_RIMEFANG))
-                if (Creature* rimefang = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_RIMEFANG)))
+                if (Creature* rimefang = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_RIMEFANG)))
                     rimefang->AI()->DoAction(ACTION_START_FROSTWYRM);
 
-            if (!instance->GetData(DATA_SINDRAGOSA_FROSTWYRMS) && !instance->GetData64(DATA_SINDRAGOSA) && instance->GetBossState(DATA_SINDRAGOSA) != DONE)
+            if (!instance->GetData(DATA_SINDRAGOSA_FROSTWYRMS) && !instance->GetGuidData(DATA_SINDRAGOSA) && instance->GetBossState(DATA_SINDRAGOSA) != DONE)
             {
                 if (instance->GetData(DATA_HAS_LIMITED_ATTEMPTS) && !instance->GetData(DATA_HEROIC_ATTEMPTS))
                     return true;
@@ -1792,7 +1770,7 @@ public:
             if (!me->isDead())
             {
                 if (me->GetEntry() == NPC_FROSTWING_WHELP)
-                    _instance->SetData(_frostwyrmId, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+                    _instance->SetData(_frostwyrmId, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
                 Reset();
             }
         }
@@ -1835,7 +1813,7 @@ public:
 
             // Increase add count
             if (me->GetEntry() == NPC_FROSTWING_WHELP)
-                _instance->SetData(_frostwyrmId, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+                _instance->SetData(_frostwyrmId, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -1923,9 +1901,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_FOCUS_FIRE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_FOCUS_FIRE });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)

@@ -6,24 +6,25 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_text`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_text` 
 (
-  `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `GroupID` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `ID` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `GroupID` TINYINT unsigned NOT NULL DEFAULT 0,
+  `ID` TINYINT unsigned NOT NULL DEFAULT 0,
   `Text` longtext DEFAULT NULL,
-  `Type` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `Language` tinyint(3) NOT NULL DEFAULT 0,
-  `Probability` float unsigned NOT NULL DEFAULT 0,
-  `Emote` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Duration` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Sound` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `BroadcastTextId` mediumint(6) NOT NULL DEFAULT 0,
-  `TextRange` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `Type` TINYINT unsigned NOT NULL DEFAULT 0,
+  `Language` TINYINT NOT NULL DEFAULT 0,
+  `Probability` FLOAT NOT NULL DEFAULT 0,
+  `Emote` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Duration` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Sound` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `BroadcastTextId` MEDIUMINT NOT NULL DEFAULT 0,
+  `TextRange` TINYINT unsigned NOT NULL DEFAULT 0,
   `comment` varchar(255) DEFAULT '',
+  CHECK (`Probability`>=0),
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_text` WRITE;

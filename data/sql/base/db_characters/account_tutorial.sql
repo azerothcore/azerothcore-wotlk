@@ -6,20 +6,20 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `account_tutorial`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `account_tutorial` 
 (
-  `accountId` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Account Identifier',
-  `tut0` int(10) unsigned NOT NULL DEFAULT 0,
-  `tut1` int(10) unsigned NOT NULL DEFAULT 0,
-  `tut2` int(10) unsigned NOT NULL DEFAULT 0,
-  `tut3` int(10) unsigned NOT NULL DEFAULT 0,
-  `tut4` int(10) unsigned NOT NULL DEFAULT 0,
-  `tut5` int(10) unsigned NOT NULL DEFAULT 0,
-  `tut6` int(10) unsigned NOT NULL DEFAULT 0,
-  `tut7` int(10) unsigned NOT NULL DEFAULT 0,
+  `accountId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account Identifier',
+  `tut0` INT unsigned NOT NULL DEFAULT 0,
+  `tut1` INT unsigned NOT NULL DEFAULT 0,
+  `tut2` INT unsigned NOT NULL DEFAULT 0,
+  `tut3` INT unsigned NOT NULL DEFAULT 0,
+  `tut4` INT unsigned NOT NULL DEFAULT 0,
+  `tut5` INT unsigned NOT NULL DEFAULT 0,
+  `tut6` INT unsigned NOT NULL DEFAULT 0,
+  `tut7` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`accountId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `account_tutorial` WRITE;

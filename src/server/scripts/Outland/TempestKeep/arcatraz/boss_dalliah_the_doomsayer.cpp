@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "arcatraz.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Say
 {
@@ -68,7 +68,7 @@ public:
             _JustDied();
             Talk(SAY_DEATH);
 
-            if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SOCCOTHRATES)))
+            if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SOCCOTHRATES)))
                 if (soccothrates->IsAlive() && !soccothrates->IsInCombat())
                     soccothrates->AI()->SetData(1, 1);
         }
@@ -137,14 +137,14 @@ public:
                     events.ScheduleEvent(EVENT_SHADOW_WAVE, urand(11000, 16000));
                     break;
                 case EVENT_ME_FIRST:
-                    if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SOCCOTHRATES)))
+                    if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SOCCOTHRATES)))
                         if (soccothrates->IsAlive() && !soccothrates->IsInCombat())
                             soccothrates->AI()->Talk(SAY_AGGRO_DALLIAH_FIRST);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(25))
                     {
-                        if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SOCCOTHRATES)))
+                        if (Creature* soccothrates = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SOCCOTHRATES)))
                             soccothrates->AI()->Talk(SAY_DALLIAH_25_PERCENT);
                         break;
                     }
@@ -161,7 +161,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_dalliah_the_doomsayerAI(creature);
+        return GetArcatrazAI<boss_dalliah_the_doomsayerAI>(creature);
     }
 };
 

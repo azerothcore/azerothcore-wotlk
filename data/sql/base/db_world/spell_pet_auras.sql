@@ -6,15 +6,15 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spell_pet_auras`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_pet_auras` 
 (
-  `spell` mediumint(8) unsigned NOT NULL COMMENT 'dummy spell id',
-  `effectId` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `pet` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'pet id; 0 = all',
-  `aura` mediumint(8) unsigned NOT NULL COMMENT 'pet aura id',
+  `spell` MEDIUMINT unsigned NOT NULL COMMENT 'dummy spell id',
+  `effectId` TINYINT unsigned NOT NULL DEFAULT 0,
+  `pet` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'pet id; 0 = all',
+  `aura` MEDIUMINT unsigned NOT NULL COMMENT 'pet aura id',
   PRIMARY KEY (`spell`,`effectId`,`pet`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spell_pet_auras` WRITE;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,10 +7,10 @@
 #ifndef __ACORE_VEHICLE_H
 #define __ACORE_VEHICLE_H
 
-#include "ObjectDefines.h"
-#include "VehicleDefines.h"
 #include "EventProcessor.h"
+#include "ObjectDefines.h"
 #include "Unit.h"
+#include "VehicleDefines.h"
 
 struct VehicleEntry;
 class Unit;
@@ -65,7 +65,7 @@ private:
     void InitMovementInfoForBase();
 
     /// This method transforms supplied transport offsets into global coordinates
-    void CalculatePassengerPosition(float& x, float& y, float& z, float* o /*= NULL*/) const override
+    void CalculatePassengerPosition(float& x, float& y, float& z, float* o /*= nullptr*/) const override
     {
         TransportBase::CalculatePassengerPosition(x, y, z, o,
                 GetBase()->GetPositionX(), GetBase()->GetPositionY(),
@@ -73,7 +73,7 @@ private:
     }
 
     /// This method transforms supplied global coordinates into local offsets
-    void CalculatePassengerOffset(float& x, float& y, float& z, float* o /*= NULL*/) const override
+    void CalculatePassengerOffset(float& x, float& y, float& z, float* o /*= nullptr*/) const override
     {
         TransportBase::CalculatePassengerOffset(x, y, z, o,
                                                 GetBase()->GetPositionX(), GetBase()->GetPositionY(),

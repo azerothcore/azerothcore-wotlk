@@ -6,26 +6,26 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `mail`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `mail` 
 (
-  `id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `messageType` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `stationery` tinyint(3) NOT NULL DEFAULT 41,
-  `mailTemplateId` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `sender` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
-  `receiver` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
+  `id` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `messageType` TINYINT unsigned NOT NULL DEFAULT 0,
+  `stationery` TINYINT NOT NULL DEFAULT 41,
+  `mailTemplateId` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `sender` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
+  `receiver` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Character Global Unique Identifier',
   `subject` longtext DEFAULT NULL,
   `body` longtext DEFAULT NULL,
-  `has_items` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `expire_time` int(10) unsigned NOT NULL DEFAULT 0,
-  `deliver_time` int(10) unsigned NOT NULL DEFAULT 0,
-  `money` int(10) unsigned NOT NULL DEFAULT 0,
-  `cod` int(10) unsigned NOT NULL DEFAULT 0,
-  `checked` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `has_items` TINYINT unsigned NOT NULL DEFAULT 0,
+  `expire_time` INT unsigned NOT NULL DEFAULT 0,
+  `deliver_time` INT unsigned NOT NULL DEFAULT 0,
+  `money` INT unsigned NOT NULL DEFAULT 0,
+  `cod` INT unsigned NOT NULL DEFAULT 0,
+  `checked` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `idx_receiver` (`receiver`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Mail System';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Mail System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `mail` WRITE;

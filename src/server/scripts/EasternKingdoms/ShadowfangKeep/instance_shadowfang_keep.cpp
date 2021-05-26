@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "shadowfang_keep.h"
 #include "TemporarySummon.h"
 
@@ -40,15 +40,15 @@ public:
             {
                 case GO_COURTYARD_DOOR:
                     if (_encounters[TYPE_COURTYARD] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
                 case GO_SORCERER_DOOR:
                     if (_encounters[TYPE_FENRUS_THE_DEVOURER] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
                 case GO_ARUGAL_DOOR:
                     if (_encounters[TYPE_WOLF_MASTER_NANDOS] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
             }
         }
@@ -116,7 +116,7 @@ public:
 
         void HandleDummyTick(AuraEffect const* aurEff)
         {
-            GetTarget()->CastSpell((Unit*)NULL, aurEff->GetAmount(), true);
+            GetTarget()->CastSpell((Unit*)nullptr, aurEff->GetAmount(), true);
         }
 
         void HandleUpdatePeriodic(AuraEffect* aurEff)

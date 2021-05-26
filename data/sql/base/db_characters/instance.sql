@@ -6,20 +6,20 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `instance`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `instance` 
 (
-  `id` int(10) unsigned NOT NULL DEFAULT 0,
-  `map` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `resettime` int(10) unsigned NOT NULL DEFAULT 0,
-  `difficulty` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `completedEncounters` int(10) unsigned NOT NULL DEFAULT 0,
+  `id` INT unsigned NOT NULL DEFAULT 0,
+  `map` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `resettime` INT unsigned NOT NULL DEFAULT 0,
+  `difficulty` TINYINT unsigned NOT NULL DEFAULT 0,
+  `completedEncounters` INT unsigned NOT NULL DEFAULT 0,
   `data` tinytext NOT NULL,
   PRIMARY KEY (`id`),
   KEY `map` (`map`),
   KEY `resettime` (`resettime`),
   KEY `difficulty` (`difficulty`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `instance` WRITE;

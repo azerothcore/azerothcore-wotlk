@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -69,7 +69,7 @@ void BattlegroundNA::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        sLog->outError("BattlegroundNA: Killer player not found");
+        LOG_ERROR("server", "BattlegroundNA: Killer player not found");
         return;
     }
 
@@ -130,7 +130,7 @@ bool BattlegroundNA::SetupBattleground()
             || !AddObject(BG_NA_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 4090.46f, 2875.43f, 12.16f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
             || !AddObject(BG_NA_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 4022.82f, 2966.61f, 12.17f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
     {
-        sLog->outErrorDb("BatteGroundNA: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundNA: Failed to spawn some object!");
         return false;
     }
 

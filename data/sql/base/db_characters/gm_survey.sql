@@ -6,17 +6,17 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `gm_survey`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gm_survey` 
 (
-  `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `guid` int(10) unsigned NOT NULL DEFAULT 0,
-  `mainSurvey` int(10) unsigned NOT NULL DEFAULT 0,
+  `surveyId` INT unsigned NOT NULL AUTO_INCREMENT,
+  `guid` INT unsigned NOT NULL DEFAULT 0,
+  `mainSurvey` INT unsigned NOT NULL DEFAULT 0,
   `comment` longtext NOT NULL,
-  `createTime` int(10) unsigned NOT NULL DEFAULT 0,
-  `maxMMR` smallint(5) NOT NULL,
+  `createTime` INT unsigned NOT NULL DEFAULT 0,
+  `maxMMR` SMALLINT NOT NULL,
   PRIMARY KEY (`surveyId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `gm_survey` WRITE;

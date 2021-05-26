@@ -6,25 +6,25 @@
 #ifndef SC_PRECOMPILED_H
 #define SC_PRECOMPILED_H
 
-#include "ScriptMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "Chat.h"
+#include "CombatAI.h"
+#include "DBCStores.h"
+#include "DBCStructure.h"
 #include "GameEventMgr.h"
+#include "GameObject.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Unit.h"
-#include "GameObject.h"
+#include "InstanceScript.h"
+#include "ObjectMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "InstanceScript.h"
-#include "CombatAI.h"
-#include "PassiveAI.h"
-#include "Chat.h"
-#include "DBCStructure.h"
-#include "DBCStores.h"
-#include "ObjectMgr.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "Unit.h"
 
 #ifdef _WIN32
 #include <windows.h>

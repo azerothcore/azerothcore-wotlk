@@ -6,30 +6,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `destructiblemodeldata_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `destructiblemodeldata_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `State0Wmo` int(11) NOT NULL DEFAULT 0,
-  `State0DestructionDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State0ImpactEffectDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State0AmbientDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State1Wmo` int(11) NOT NULL DEFAULT 0,
-  `State1DestructionDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State1ImpactEffectDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State1AmbientDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State2Wmo` int(11) NOT NULL DEFAULT 0,
-  `State2DestructionDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State2ImpactEffectDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State2AmbientDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State3Wmo` int(11) NOT NULL DEFAULT 0,
-  `State3DestructionDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State3ImpactEffectDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `State3AmbientDoodadSet` int(11) NOT NULL DEFAULT 0,
-  `Field17` int(11) NOT NULL DEFAULT 0,
-  `Field18` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `State0Wmo` INT NOT NULL DEFAULT 0,
+  `State0DestructionDoodadSet` INT NOT NULL DEFAULT 0,
+  `State0ImpactEffectDoodadSet` INT NOT NULL DEFAULT 0,
+  `State0AmbientDoodadSet` INT NOT NULL DEFAULT 0,
+  `State1Wmo` INT NOT NULL DEFAULT 0,
+  `State1DestructionDoodadSet` INT NOT NULL DEFAULT 0,
+  `State1ImpactEffectDoodadSet` INT NOT NULL DEFAULT 0,
+  `State1AmbientDoodadSet` INT NOT NULL DEFAULT 0,
+  `State2Wmo` INT NOT NULL DEFAULT 0,
+  `State2DestructionDoodadSet` INT NOT NULL DEFAULT 0,
+  `State2ImpactEffectDoodadSet` INT NOT NULL DEFAULT 0,
+  `State2AmbientDoodadSet` INT NOT NULL DEFAULT 0,
+  `State3Wmo` INT NOT NULL DEFAULT 0,
+  `State3DestructionDoodadSet` INT NOT NULL DEFAULT 0,
+  `State3ImpactEffectDoodadSet` INT NOT NULL DEFAULT 0,
+  `State3AmbientDoodadSet` INT NOT NULL DEFAULT 0,
+  `Field17` INT NOT NULL DEFAULT 0,
+  `Field18` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `destructiblemodeldata_dbc` WRITE;

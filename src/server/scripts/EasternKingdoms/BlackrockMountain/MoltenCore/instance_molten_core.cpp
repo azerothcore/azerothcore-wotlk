@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,11 +11,11 @@ SDComment: Place Holder
 SDCategory: Molten Core
 EndScriptData */
 
+#include "CreatureAI.h"
+#include "InstanceScript.h"
+#include "molten_core.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "CreatureAI.h"
-#include "molten_core.h"
 #include "TemporarySummon.h"
 
 Position const SummonPositions[10] =
@@ -42,9 +42,6 @@ public:
         instance_molten_core_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(MAX_ENCOUNTER);
-            _golemaggTheIncineratorGUID = 0;
-            _majordomoExecutusGUID = 0;
-            _cacheOfTheFirelordGUID = 0;
             _deadBossCount = 0;
             _ragnarosAddDeaths = 0;
         }
@@ -125,7 +122,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const  override
+        ObjectGuid GetGuidData(uint32 type) const  override
         {
             switch (type)
             {
@@ -135,7 +132,7 @@ public:
                     return _majordomoExecutusGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         bool SetBossState(uint32 bossId, EncounterState state) override
@@ -236,12 +233,12 @@ public:
         }
 
     private:
-        uint64 _golemaggTheIncineratorGUID;
-        uint64 _majordomoExecutusGUID;
-        uint64 _cacheOfTheFirelordGUID;
+        ObjectGuid _golemaggTheIncineratorGUID;
+        ObjectGuid _majordomoExecutusGUID;
+        ObjectGuid _cacheOfTheFirelordGUID;
         uint8 _deadBossCount;
         uint8 _ragnarosAddDeaths;
-        std::unordered_map<uint8, uint64> _circlesGUIDs;
+        std::unordered_map<uint8, ObjectGuid> _circlesGUIDs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

@@ -6,27 +6,27 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creaturedisplayinfo_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creaturedisplayinfo_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `ModelID` int(11) NOT NULL DEFAULT 0,
-  `SoundID` int(11) NOT NULL DEFAULT 0,
-  `ExtendedDisplayInfoID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `ModelID` INT NOT NULL DEFAULT 0,
+  `SoundID` INT NOT NULL DEFAULT 0,
+  `ExtendedDisplayInfoID` INT NOT NULL DEFAULT 0,
   `CreatureModelScale` float NOT NULL DEFAULT 0,
-  `CreatureModelAlpha` int(11) NOT NULL DEFAULT 0,
+  `CreatureModelAlpha` INT NOT NULL DEFAULT 0,
   `TextureVariation_1` varchar(100) DEFAULT NULL,
   `TextureVariation_2` varchar(100) DEFAULT NULL,
   `TextureVariation_3` varchar(100) DEFAULT NULL,
   `PortraitTextureName` varchar(100) DEFAULT NULL,
-  `BloodLevel` int(11) NOT NULL DEFAULT 0,
-  `BloodID` int(11) NOT NULL DEFAULT 0,
-  `NPCSoundID` int(11) NOT NULL DEFAULT 0,
-  `ParticleColorID` int(11) NOT NULL DEFAULT 0,
-  `CreatureGeosetData` int(11) NOT NULL DEFAULT 0,
-  `ObjectEffectPackageID` int(11) NOT NULL DEFAULT 0,
+  `BloodLevel` INT NOT NULL DEFAULT 0,
+  `BloodID` INT NOT NULL DEFAULT 0,
+  `NPCSoundID` INT NOT NULL DEFAULT 0,
+  `ParticleColorID` INT NOT NULL DEFAULT 0,
+  `CreatureGeosetData` INT NOT NULL DEFAULT 0,
+  `ObjectEffectPackageID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creaturedisplayinfo_dbc` WRITE;

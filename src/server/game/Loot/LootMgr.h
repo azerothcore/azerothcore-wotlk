@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,15 +7,15 @@
 #ifndef ACORE_LOOTMGR_H
 #define ACORE_LOOTMGR_H
 
-#include "ItemEnchantmentMgr.h"
 #include "ByteBuffer.h"
+#include "ConditionMgr.h"
+#include "ItemEnchantmentMgr.h"
+#include "ObjectGuid.h"
 #include "RefManager.h"
 #include "SharedDefines.h"
-#include "ConditionMgr.h"
-
+#include <list>
 #include <map>
 #include <vector>
-#include <list>
 
 enum RollType
 {
@@ -110,6 +110,7 @@ enum LootSlotType
 class Player;
 class LootStore;
 class ConditionMgr;
+class GameObject;
 struct Loot;
 
 struct LootStoreItem
@@ -136,7 +137,7 @@ struct LootStoreItem
     // Checks correctness of values
 };
 
-typedef std::set<uint32> AllowedLooterSet;
+typedef GuidSet AllowedLooterSet;
 
 struct LootItem
 {
@@ -145,7 +146,7 @@ struct LootItem
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition
     AllowedLooterSet allowedGUIDs;
-    uint64  rollWinnerGUID;                                 // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
+    ObjectGuid rollWinnerGUID;                              // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
     uint8   count             : 8;
     bool    is_looted         : 1;
     bool    is_blocked        : 1;
@@ -162,7 +163,7 @@ struct LootItem
     LootItem() = default;
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-    bool AllowedForPlayer(Player const* player) const;
+    bool AllowedForPlayer(Player const* player, bool isGivenByMasterLooter = false, bool allowQuestLoot = true) const;
 
     void AddAllowedLooter(Player const* player);
     [[nodiscard]] const AllowedLooterSet& GetAllowedLooters() const { return allowedGUIDs; }
@@ -184,7 +185,7 @@ class LootTemplate;
 
 typedef std::vector<QuestItem> QuestItemList;
 typedef std::vector<LootItem> LootItemList;
-typedef std::map<uint32, QuestItemList*> QuestItemMap;
+typedef std::map<ObjectGuid, QuestItemList*> QuestItemMap;
 typedef std::list<LootStoreItem*> LootStoreItemList;
 typedef std::unordered_map<uint32, LootTemplate*> LootTemplateMap;
 
@@ -307,11 +308,13 @@ struct Loot
     std::vector<LootItem> quest_items;
     uint32 gold;
     uint8 unlootedCount{0};
-    uint64 roundRobinPlayer{0};                                // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
-    LootType loot_type{LOOT_NONE};                                     // required for achievement system
+    ObjectGuid roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
+    ObjectGuid lootOwnerGUID;
+    LootType loot_type{LOOT_NONE};      // required for achievement system
 
-    // GUIDLow of container that holds this loot (item_instance.entry), set for items that can be looted
-    uint32 containerId{0};
+    // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
+    ObjectGuid containerGUID;
+    GameObject* sourceGameObject{nullptr};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
     ~Loot() { clear(); }
@@ -342,7 +345,7 @@ struct Loot
         quest_items.clear();
         gold = 0;
         unlootedCount = 0;
-        roundRobinPlayer = 0;
+        roundRobinPlayer.Clear();
         i_LootValidatorRefManager.clearReferences();
         loot_type = LOOT_NONE;
     }
@@ -353,8 +356,8 @@ struct Loot
     void NotifyItemRemoved(uint8 lootIndex);
     void NotifyQuestItemRemoved(uint8 questIndex);
     void NotifyMoneyRemoved();
-    void AddLooter(uint64 GUID) { PlayersLooting.insert(GUID); }
-    void RemoveLooter(uint64 GUID) { PlayersLooting.erase(GUID); }
+    void AddLooter(ObjectGuid GUID) { PlayersLooting.insert(GUID); }
+    void RemoveLooter(ObjectGuid GUID) { PlayersLooting.erase(GUID); }
 
     void generateMoneyLoot(uint32 minAmount, uint32 maxAmount);
     bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT);
@@ -364,6 +367,7 @@ struct Loot
 
     LootItem* LootItemInSlot(uint32 lootslot, Player* player, QuestItem** qitem = nullptr, QuestItem** ffaitem = nullptr, QuestItem** conditem = nullptr);
     uint32 GetMaxSlotInLootFor(Player* player) const;
+    bool hasItemForAll() const;
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
 
@@ -373,7 +377,7 @@ private:
     QuestItemList* FillQuestLoot(Player* player);
     QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting);
 
-    typedef std::set<uint64> PlayersLootingSet;
+    typedef GuidSet PlayersLootingSet;
     PlayersLootingSet PlayersLooting;
     QuestItemMap PlayerQuestItems;
     QuestItemMap PlayerFFAItems;

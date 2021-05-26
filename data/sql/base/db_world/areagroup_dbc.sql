@@ -6,19 +6,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `areagroup_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `areagroup_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `AreaID_1` int(11) NOT NULL DEFAULT 0,
-  `AreaID_2` int(11) NOT NULL DEFAULT 0,
-  `AreaID_3` int(11) NOT NULL DEFAULT 0,
-  `AreaID_4` int(11) NOT NULL DEFAULT 0,
-  `AreaID_5` int(11) NOT NULL DEFAULT 0,
-  `AreaID_6` int(11) NOT NULL DEFAULT 0,
-  `NextAreaID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `AreaID_1` INT NOT NULL DEFAULT 0,
+  `AreaID_2` INT NOT NULL DEFAULT 0,
+  `AreaID_3` INT NOT NULL DEFAULT 0,
+  `AreaID_4` INT NOT NULL DEFAULT 0,
+  `AreaID_5` INT NOT NULL DEFAULT 0,
+  `AreaID_6` INT NOT NULL DEFAULT 0,
+  `NextAreaID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `areagroup_dbc` WRITE;

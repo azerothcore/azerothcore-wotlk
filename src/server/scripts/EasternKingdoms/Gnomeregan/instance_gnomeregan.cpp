@@ -2,11 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "Player.h"
-#include "SpellScript.h"
-#include "ScriptMgr.h"
+#include "gnomeregan.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 class instance_gnomeregan : public InstanceMapScript
 {
@@ -38,7 +39,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_kernobeeAI(creature);
+        return GetGnomereganAI<npc_kernobeeAI>(creature);
     }
 
     bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
@@ -56,14 +57,13 @@ public:
     {
         npc_kernobeeAI(Creature* creature) : PassiveAI(creature)
         {
-            playerGUID = 0;
             checkTimer = 0;
         }
 
         uint32 checkTimer;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             playerGUID = guid;
         }

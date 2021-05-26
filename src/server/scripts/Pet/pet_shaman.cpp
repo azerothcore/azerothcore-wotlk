@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -10,8 +10,8 @@
  */
 
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum ShamanSpells
 {
@@ -46,10 +46,7 @@ public:
             _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, 0);
         }
 
-        void InitializeAI() override
-        {
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
-        }
+        void InitializeAI() override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -97,10 +94,7 @@ public:
     {
         npc_pet_shaman_fire_elementalAI(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
 
-        void InitializeAI() override
-        {
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
-        }
+        void InitializeAI() override { }
 
         void EnterCombat(Unit*) override
         {

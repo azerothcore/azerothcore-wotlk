@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,14 +9,14 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_dk_".
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "CombatAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CombatAI.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
 enum DeathKnightSpells
@@ -41,7 +41,7 @@ public:
             _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
             _despawning = false;
             _initialSelection = true;
-            _targetGUID = 0;
+            _targetGUID.Clear();
         }
 
         void MovementInform(uint32 type, uint32 point) override
@@ -67,11 +67,12 @@ public:
                         if (aur->GetEffect(0))
                             aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
 
-            float tz = me->GetMap()->GetHeight(me->GetPhaseMask(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
-            me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
-            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
+
+            float tz = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
+            me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
+            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             _selectionTimer = 2000;
             _initialCastTimer = 0;
         }
@@ -198,7 +199,7 @@ public:
         }
 
     private:
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
         uint32 _despawnTimer;
         uint32 _selectionTimer;
         uint32 _initialCastTimer;

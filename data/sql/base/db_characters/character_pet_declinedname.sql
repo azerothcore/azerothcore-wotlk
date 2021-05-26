@@ -6,11 +6,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `character_pet_declinedname`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_pet_declinedname` 
 (
-  `id` int(10) unsigned NOT NULL DEFAULT 0,
-  `owner` int(10) unsigned NOT NULL DEFAULT 0,
+  `id` INT unsigned NOT NULL DEFAULT 0,
+  `owner` INT unsigned NOT NULL DEFAULT 0,
   `genitive` varchar(12) NOT NULL DEFAULT '',
   `dative` varchar(12) NOT NULL DEFAULT '',
   `accusative` varchar(12) NOT NULL DEFAULT '',
@@ -18,7 +18,7 @@ CREATE TABLE `character_pet_declinedname`
   `prepositional` varchar(12) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `owner_key` (`owner`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `character_pet_declinedname` WRITE;

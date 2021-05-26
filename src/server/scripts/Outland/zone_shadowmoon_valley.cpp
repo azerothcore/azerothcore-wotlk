@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -26,13 +26,13 @@ go_crystal_prison
 npc_enraged_spirit
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Group.h"
-#include "SpellScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 #include "WorldSession.h"
 
 // Ours
@@ -70,7 +70,7 @@ public:
                 }
 
                 go->SetLootState(GO_JUST_DEACTIVATED);
-                charmer->KilledMonsterCredit(21959, 0);
+                charmer->KilledMonsterCredit(21959);
             }
         }
 
@@ -99,7 +99,7 @@ public:
         {
             if (Player* player = GetTarget()->ToPlayer())
             {
-                player->KilledMonsterCredit(21502, 0);
+                player->KilledMonsterCredit(21502);
                 player->SetControlled(false, UNIT_STATE_STUNNED);
             }
         }
@@ -156,7 +156,7 @@ public:
 
         void Reset() override
         {
-            ground = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+            ground = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             SummonInfernal();
             events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, urand(1000, 3000));
         }
@@ -197,7 +197,7 @@ public:
 
     private:
         EventMap events;
-        uint64 infernalGUID;
+        ObjectGuid infernalGUID;
         float ground;
     };
 
@@ -259,7 +259,7 @@ public:
         }
 
     private:
-        uint64 casterGUID;
+        ObjectGuid casterGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -301,7 +301,7 @@ public:
     {
         npc_mature_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 uiPlayerGUID;
+        ObjectGuid uiPlayerGUID;
 
         bool bCanEat;
         bool bIsEating;
@@ -311,7 +311,7 @@ public:
 
         void Reset() override
         {
-            uiPlayerGUID = 0;
+            uiPlayerGUID.Clear();
 
             bCanEat = false;
             bIsEating = false;
@@ -380,7 +380,7 @@ public:
 
                         if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
                         {
-                            player->KilledMonsterCredit(NPC_EVENT_PINGER, 0);
+                            player->KilledMonsterCredit(NPC_EVENT_PINGER);
 
                             if (GameObject* go = player->FindNearestGameObject(GO_CARCASS, 10))
                                 go->Delete();
@@ -444,12 +444,12 @@ public:
     {
         npc_enslaved_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature)
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
             Tapped = false;
             Reset();
         }
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
         uint32 FlyTimer;
         bool Tapped;
 
@@ -497,7 +497,7 @@ public:
             {
                 me->SetVisible(false);
                 me->SetDisableGravity(false);
-                Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 me->RemoveCorpse();
             }
             me->DespawnOrUnsummon(1);
@@ -590,13 +590,13 @@ public:
         npc_dragonmaw_peonAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
         bool Tapped;
 
         void Reset() override
         {
             events.Reset();
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
             Tapped = false;
         }
 
@@ -639,7 +639,7 @@ public:
             {
                 Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
                 if (player && player->GetQuestStatus(QUEST_A_SLOW_DEATH) == QUEST_STATUS_INCOMPLETE)
-                    player->KilledMonsterCredit(DRAGONMAW_PEON_KILL_CREDIT, 0);
+                    player->KilledMonsterCredit(DRAGONMAW_PEON_KILL_CREDIT);
             }
         }
 
@@ -667,7 +667,7 @@ public:
                         events.ScheduleEvent(EVENT_KILL, 5000);
                         break;
                     case EVENT_KILL:
-                        Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                        Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                         break;
                 }
                 return;
@@ -1089,8 +1089,8 @@ public:
 
         uint8 AnimationCount;
 
-        uint64 LordIllidanGUID;
-        uint64 AggroTargetGUID;
+        ObjectGuid LordIllidanGUID;
+        ObjectGuid AggroTargetGUID;
 
         bool Timers;
 
@@ -1098,13 +1098,13 @@ public:
         {
             AnimationTimer = 4000;
             AnimationCount = 0;
-            LordIllidanGUID = 0;
-            AggroTargetGUID = 0;
+            LordIllidanGUID.Clear();
+            AggroTargetGUID.Clear();
             Timers = false;
 
             me->AddUnitState(UNIT_STATE_ROOT);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetTarget(0);
+            me->SetTarget();
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -1245,7 +1245,7 @@ public:
     {
         npc_lord_illidan_stormrageAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 WaveTimer;
         uint32 AnnounceTimer;
@@ -1259,7 +1259,7 @@ public:
 
         void Reset() override
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
 
             WaveTimer = 10000;
             AnnounceTimer = 7000;
@@ -1390,13 +1390,13 @@ public:
     {
         npc_illidari_spawnAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 LordIllidanGUID;
+        ObjectGuid LordIllidanGUID;
         uint32 SpellTimer1, SpellTimer2, SpellTimer3;
         bool Timers;
 
         void Reset() override
         {
-            LordIllidanGUID = 0;
+            LordIllidanGUID.Clear();
             Timers = false;
         }
 
@@ -1706,7 +1706,7 @@ public:
 
                     if (Unit* owner = totemOspirits->GetOwner())
                         if (Player* player = owner->ToPlayer())
-                            player->KilledMonsterCredit(credit, 0);
+                            player->KilledMonsterCredit(credit);
                     DoCast(totemOspirits, SPELL_SOUL_CAPTURED);
                 }
             }
@@ -1739,7 +1739,7 @@ public:
         void Reset() override
         {
             tapped = false;
-            tuberGUID = 0;
+            tuberGUID.Clear();
             resetTimer = 60000;
         }
 
@@ -1794,7 +1794,7 @@ public:
         }
     private:
         bool tapped;
-        uint64 tuberGUID;
+        ObjectGuid tuberGUID;
         uint32 resetTimer;
     };
 

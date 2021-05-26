@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -13,24 +13,28 @@
 #ifndef _WORLDSOCKET_H
 #define _WORLDSOCKET_H
 
-#include <ace/Synch_Traits.h>
-#include <ace/Svc_Handler.h>
-#include <ace/SOCK_Stream.h>
-#include <ace/Thread_Mutex.h>
-#include <ace/Unbounded_Queue.h>
+#include "AuthCrypt.h"
+#include "Common.h"
+#include "Duration.h"
 #include <ace/Message_Block.h>
+#include <ace/SOCK_Stream.h>
+#include <ace/Svc_Handler.h>
+#include <ace/Synch_Traits.h>
+#include <ace/Unbounded_Queue.h>
+#include <mutex>
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 #pragma once
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
-#include "Common.h"
-#include "AuthCrypt.h"
-#include "Duration.h"
-
 class ACE_Message_Block;
 class WorldPacket;
 class WorldSession;
+
+namespace WorldPackets
+{
+    class ServerPacket;
+}
 
 /// Handler that can communicate over stream sockets.
 typedef ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH> WorldHandler;
@@ -78,10 +82,6 @@ public:
     virtual ~WorldSocket (void);
 
     friend class WorldSocketMgr;
-
-    /// Mutex type used for various synchronizations.
-    typedef ACE_Thread_Mutex LockType;
-    typedef ACE_Guard<LockType> GuardType;
 
     /// Check if socket is closed.
     bool IsClosed (void) const;
@@ -132,11 +132,11 @@ private:
 
     /// Help functions to mark/unmark the socket for output.
     /// @param g the guard is for m_OutBufferLock, the function will release it
-    int cancel_wakeup_output (GuardType& g);
-    int schedule_wakeup_output (GuardType& g);
+    int cancel_wakeup_output();
+    int schedule_wakeup_output();
 
     /// Drain the queue if its not empty.
-    int handle_output_queue (GuardType& g);
+    int handle_output_queue();
 
     /// process one incoming packet.
     /// @param new_pct received packet, note that you need to delete it.
@@ -162,7 +162,7 @@ private:
     AuthCrypt m_Crypt;
 
     /// Mutex lock to protect m_Session
-    LockType m_SessionLock;
+    std::mutex m_SessionLock;
 
     /// Session to which received packets are routed
     WorldSession* m_Session;
@@ -179,7 +179,7 @@ private:
     ACE_Message_Block m_Header;
 
     /// Mutex for protecting output related data.
-    LockType m_OutBufferLock;
+    std::mutex m_OutBufferLock;
 
     /// Buffer used for writing output.
     ACE_Message_Block* m_OutBuffer;
@@ -190,7 +190,7 @@ private:
     /// True if the socket is registered with the reactor for output
     bool m_OutActive;
 
-    uint32 m_Seed;
+    std::array<uint8, 4> m_Seed;
 };
 
 #endif  /* _WORLDSOCKET_H */

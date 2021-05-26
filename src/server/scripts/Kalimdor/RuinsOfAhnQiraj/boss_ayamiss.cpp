@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "Player.h"
 #include "ruins_of_ahnqiraj.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -180,15 +180,15 @@ public:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
                         {
                             DoCast(target, SPELL_PARALYZE);
-                            instance->SetData64(DATA_PARALYZED, target->GetGUID());
+                            instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
                             uint8 Index = urand(0, 1);
                             me->SummonCreature(NPC_LARVA, LarvaPos[Index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
                         }
                         events.ScheduleEvent(EVENT_PARALYZE, 15000);
                         break;
                     case EVENT_SWARMER_ATTACK:
-                        for (std::list<uint64>::iterator i = _swarmers.begin(); i != _swarmers.end(); ++i)
-                            if (Creature* swarmer = me->GetMap()->GetCreature(*i))
+                        for (ObjectGuid guid : _swarmers)
+                            if (Creature* swarmer = me->GetMap()->GetCreature(guid))
                                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                                     swarmer->AI()->AttackStart(target);
 
@@ -215,14 +215,14 @@ public:
             }
         }
     private:
-        std::list<uint64> _swarmers;
+        GuidList _swarmers;
         uint8 _phase;
         bool _enraged;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ayamissAI>(creature);
+        return GetRuinsOfAhnQirajAI<boss_ayamissAI>(creature);
     }
 };
 
@@ -242,7 +242,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE)
                 if (id == POINT_PARALYZE)
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetData64(DATA_PARALYZED)))
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetGuidData(DATA_PARALYZED)))
                         DoCast(target, SPELL_FEED); // Omnomnom
         }
 
@@ -276,7 +276,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_hive_zara_larvaAI>(creature);
+        return GetRuinsOfAhnQirajAI<npc_hive_zara_larvaAI>(creature);
     }
 };
 

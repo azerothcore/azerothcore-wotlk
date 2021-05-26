@@ -1,20 +1,20 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ThreatManager.h"
-#include "Unit.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Map.h"
-#include "Player.h"
 #include "ObjectAccessor.h"
-#include "UnitEvents.h"
+#include "Player.h"
 #include "SpellAuras.h"
-#include "SpellMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "ThreatManager.h"
+#include "Unit.h"
+#include "UnitEvents.h"
 
 //==============================================================
 //================= ThreatCalcHelper ===========================
@@ -238,13 +238,13 @@ void ThreatContainer::clearReferences()
 }
 
 //============================================================
-// Return the HostileReference of NULL, if not found
+// Return the HostileReference of nullptr, if not found
 HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
 {
     if (!victim)
         return nullptr;
 
-    uint64 const guid = victim->GetGUID();
+    ObjectGuid const guid = victim->GetGUID();
     for (ThreatContainer::StorageType::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
     {
         HostileReference* ref = (*i);
@@ -296,13 +296,12 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
     HostileReference* currentRef = nullptr;
     bool found = false;
     bool noPriorityTargetFound = false;
-    uint32 currTime = sWorld->GetGameTime();
 
     // pussywizard: currentVictim is needed to compare if threat was exceeded by 10%/30% for melee/range targets (only then switching current target)
     if (currentVictim)
     {
         Unit* cvUnit = currentVictim->getTarget();
-        if (!attacker->_CanDetectFeignDeathOf(cvUnit) || !attacker->CanCreatureAttack(cvUnit) || attacker->isTargetNotAcceptableByMMaps(cvUnit->GetGUID(), currTime, cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
+        if (!attacker->_CanDetectFeignDeathOf(cvUnit) || !attacker->CanCreatureAttack(cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
             currentVictim = nullptr;
         else if (cvUnit->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || cvUnit->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE)) // pussywizard: no 10%/30% if currentVictim is immune to damage or has auras breakable by damage
             currentVictim = nullptr;
@@ -337,9 +336,9 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
         }
 
         // pussywizard: skip not valid targets
-        if (attacker->_CanDetectFeignDeathOf(target) && attacker->CanCreatureAttack(target) && !attacker->isTargetNotAcceptableByMMaps(target->GetGUID(), currTime, target))
+        if (attacker->_CanDetectFeignDeathOf(target) && attacker->CanCreatureAttack(target))
         {
-            if (currentVictim) // pussywizard: if not NULL then target must have 10%/30% more threat
+            if (currentVictim) // pussywizard: if not nullptr then target must have 10%/30% more threat
             {
                 if (currentVictim == currentRef) // pussywizard: nothing found previously was good and enough, currentRef passed all necessary tests, so end now
                 {
@@ -461,7 +460,7 @@ Unit* ThreatManager::getHostilTarget()
     iThreatContainer.update();
     HostileReference* nextVictim = iThreatContainer.selectNextVictim(GetOwner()->ToCreature(), getCurrentVictim());
     setCurrentVictim(nextVictim);
-    return getCurrentVictim() != NULL ? getCurrentVictim()->getTarget() : nullptr;
+    return getCurrentVictim() != nullptr ? getCurrentVictim()->getTarget() : nullptr;
 }
 
 //============================================================

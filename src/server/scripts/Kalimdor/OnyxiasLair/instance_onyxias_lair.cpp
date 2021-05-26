@@ -2,9 +2,9 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "onyxias_lair.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 class instance_onyxias_lair : public InstanceMapScript
 {
@@ -20,17 +20,16 @@ public:
     {
         instance_onyxias_lair_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        uint64 m_uiOnyxiasGUID;
+        ObjectGuid m_uiOnyxiasGUID;
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
         uint16 ManyWhelpsCounter;
-        std::vector<uint64> minions;
+        GuidVector minions;
         bool bDeepBreath;
 
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            m_uiOnyxiasGUID = 0;
             ManyWhelpsCounter = 0;
             bDeepBreath = true;
         }
@@ -63,7 +62,7 @@ public:
             switch( go->GetEntry() )
             {
                 case GO_WHELP_SPAWNER:
-                    go->CastSpell((Unit*)NULL, 17646);
+                    go->CastSpell((Unit*)nullptr, 17646);
                     if( Creature* onyxia = instance->GetCreature(m_uiOnyxiasGUID) )
                         onyxia->AI()->DoAction(-1);
                     break;
@@ -80,8 +79,8 @@ public:
                     bDeepBreath = true;
                     if( uiData == NOT_STARTED )
                     {
-                        for( std::vector<uint64>::iterator itr = minions.begin(); itr != minions.end(); ++itr )
-                            if( Creature* c = instance->GetCreature(*itr) )
+                        for (ObjectGuid guid : minions)
+                            if (Creature* c = instance->GetCreature(guid))
                                 c->DespawnOrUnsummon();
                         minions.clear();
                     }
@@ -109,15 +108,15 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiData) const override
+        ObjectGuid GetGuidData(uint32 uiData) const override
         {
-            switch(uiData)
+            switch (uiData)
             {
                 case DATA_ONYXIA:
                     return m_uiOnyxiasGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

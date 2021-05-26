@@ -6,19 +6,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `character_entry_point`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_entry_point` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
+  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
   `joinX` float NOT NULL DEFAULT 0,
   `joinY` float NOT NULL DEFAULT 0,
   `joinZ` float NOT NULL DEFAULT 0,
   `joinO` float NOT NULL DEFAULT 0,
-  `joinMapId` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Map Identifier',
+  `joinMapId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Map Identifier',
   `taxiPath` text DEFAULT NULL,
-  `mountSpell` int(10) unsigned NOT NULL DEFAULT 0,
+  `mountSpell` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `character_entry_point` WRITE;

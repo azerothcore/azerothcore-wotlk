@@ -2,18 +2,18 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "CombatAI.h"
 #include "eye_of_eternity.h"
-#include "Vehicle.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
-#include "CombatAI.h"
-#include "Player.h"
-#include "WorldSession.h"
 #include "Opcodes.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
+#include "WorldSession.h"
 
 enum MovementInformPoints
 {
@@ -188,7 +188,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_malygosAI (pCreature);
+        return GetEyeOfEternityAI<boss_malygosAI>(pCreature);
     }
 
     struct boss_malygosAI : public ScriptedAI
@@ -222,7 +222,6 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            //me->SetHover(true);
             me->SendMovementFlagUpdate();
 
             if (pInstance)
@@ -277,7 +276,6 @@ public:
                     case MI_POINT_INTRO_LAND:
                         me->SetCanFly(false);
                         me->SetDisableGravity(false);
-                        //me->SetHover(false);
                         events.RescheduleEvent(EVENT_START_FIGHT, 0, 1);
                         break;
                     case MI_POINT_VORTEX_TAKEOFF:
@@ -286,7 +284,6 @@ public:
                     case MI_POINT_VORTEX_LAND:
                         me->SetCanFly(false);
                         me->SetDisableGravity(false);
-                        //me->SetHover(false);
                         events.RescheduleEvent(EVENT_VORTEX_LAND_1, 0, 1);
                         break;
                     case MI_POINT_CENTER_AIR_PH_2:
@@ -331,7 +328,7 @@ public:
 
             if (me->GetVictim() && me->GetVictim()->GetGUID() == victim->GetGUID() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
             {
-                if (!me->GetUInt64Value(UNIT_FIELD_TARGET))
+                if (!me->GetGuidValue(UNIT_FIELD_TARGET))
                     me->SetTarget(victim->GetGUID());
             }
             else if (me->Attack(victim, true))
@@ -339,7 +336,7 @@ public:
                 if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
                     me->GetMotionMaster()->MoveChase(victim);
                 else
-                    me->SetTarget(0);
+                    me->SetTarget();
             }
         }
 
@@ -452,13 +449,12 @@ public:
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->SetTarget((uint64)0);
+                        me->SetTarget();
 
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
                         me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        //me->SetHover(true);
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
 
@@ -521,11 +517,17 @@ public:
 
                                             pPlayer->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
                                             pPlayer->SetDisableGravity(true, true);
+
+                                            sScriptMgr->AnticheatSetCanFlybyServer(pPlayer, true);
+
                                             WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-                                            data.append(pPlayer->GetPackGUID());
+                                            data << pPlayer->GetPackGUID();
                                             pPlayer->SendMessageToSet(&data, true);
 
-                                            pPlayer->SetUInt64Value(PLAYER_FARSIGHT, vp->GetGUID());
+                                            sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                            sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
+
+                                            pPlayer->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
                                             c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                         }
                                     }
@@ -557,7 +559,7 @@ public:
                     Talk(SAY_END_P1);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
                     me->SendMeleeAttackStop();
-                    me->SetTarget((uint64)0);
+                    me->SetTarget();
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
                     me->GetMotionMaster()->MovePoint(MI_POINT_CENTER_GROUND_PH_2, CenterPos);
@@ -659,7 +661,7 @@ public:
                     break;
                 case EVENT_CLEAR_TARGET:
                     me->SendMeleeAttackStop();
-                    me->SetTarget(0);
+                    me->SetTarget();
                     break;
                 case EVENT_CHECK_TRASH_DEAD:
                     {
@@ -668,7 +670,7 @@ public:
                         else
                         {
                             me->SendMeleeAttackStop();
-                            me->SetTarget(0);
+                            me->SetTarget();
                             events.CancelEventGroup(1);
                             summons.DespawnAll();
                             // start phase 3
@@ -708,6 +710,9 @@ public:
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
+                                    sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                    sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
+
                                     if (!pPlayer->IsAlive() || pPlayer->IsGameMaster())
                                         continue;
 
@@ -852,7 +857,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_vortex_rideAI (pCreature);
+        return GetEyeOfEternityAI<npc_vortex_rideAI> (pCreature);
     }
 
     struct npc_vortex_rideAI : public VehicleAI
@@ -887,7 +892,11 @@ public:
                 plr->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
                 plr->SetDisableGravity(false, true);
-                plr->SetUInt64Value(PLAYER_FARSIGHT, 0);;
+                plr->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
+
+                sScriptMgr->AnticheatSetCanFlybyServer(plr, false);
+                sScriptMgr->AnticheatSetUnderACKmount(plr);
+                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
             }
         }
 
@@ -925,6 +934,10 @@ public:
                             {
                                 bUpdatedFlying = true;
                                 plr->SetDisableGravity(true, true);
+
+                                sScriptMgr->AnticheatSetCanFlybyServer(plr, true);
+                                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
+                                sScriptMgr->AnticheatSetUnderACKmount(plr);
                             }
 
                             plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
@@ -950,7 +963,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_power_sparkAI (pCreature);
+        return GetEyeOfEternityAI<npc_power_sparkAI>(pCreature);
     }
 
     struct npc_power_sparkAI : public NullCreatureAI
@@ -1011,7 +1024,7 @@ public:
             if (CheckTimer <= diff)
             {
                 if (pInstance)
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MALYGOS_GUID)))
+                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MALYGOS_GUID)))
                         if (me->IsWithinDist3d(c, 12.0f))
                         {
                             me->CastSpell(c, SPELL_POWER_SPARK_MALYGOS_BUFF, true);
@@ -1028,7 +1041,7 @@ public:
                 if (MoveTimer <= diff)
                 {
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MALYGOS_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MALYGOS_GUID)))
                             me->GetMotionMaster()->MovePoint(0, *c);
                     MoveTimer = 2000;
                 }
@@ -1046,7 +1059,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_nexus_lordAI (pCreature);
+        return GetEyeOfEternityAI<npc_nexus_lordAI>(pCreature);
     }
 
     struct npc_nexus_lordAI : public ScriptedAI
@@ -1139,7 +1152,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_scion_of_eternityAI (pCreature);
+        return GetEyeOfEternityAI<npc_scion_of_eternityAI>(pCreature);
     }
 
     struct npc_scion_of_eternityAI : public ScriptedAI
@@ -1172,7 +1185,7 @@ public:
                     break;
                 case EVENT_SCION_OF_ETERNITY_ARCANE_BARRAGE:
                     {
-                        std::vector<uint64> guids;
+                        GuidVector guids;
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -1213,7 +1226,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_hover_diskAI (pCreature);
+        return GetEyeOfEternityAI<npc_hover_diskAI>(pCreature);
     }
 
     struct npc_hover_diskAI : public VehicleAI
@@ -1355,7 +1368,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_alexstraszaAI (pCreature);
+        return GetEyeOfEternityAI<npc_alexstraszaAI>(pCreature);
     }
 
     struct npc_alexstraszaAI : public ScriptedAI
@@ -1366,7 +1379,6 @@ public:
             events.ScheduleEvent(1, 9000);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            me->SetHover(true);
         }
 
         EventMap events;
@@ -1412,7 +1424,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_eoe_wyrmrest_skytalonAI (pCreature);
+        return GetEyeOfEternityAI<npc_eoe_wyrmrest_skytalonAI>(pCreature);
     }
 
     struct npc_eoe_wyrmrest_skytalonAI : public VehicleAI
@@ -1467,11 +1479,10 @@ public:
     {
         PrepareSpellScript(spell_eoe_ph3_surge_of_power_SpellScript);
 
-        uint64 DrakeGUID[3];
+        ObjectGuid DrakeGUID[3];
 
         bool Load() override
         {
-            memset(&DrakeGUID, 0, sizeof(DrakeGUID));
             if (Unit* caster = GetCaster())
                 if (Creature* c = caster->ToCreature())
                 {

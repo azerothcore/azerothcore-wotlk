@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_black_morass.h"
 
 enum Enums
@@ -53,7 +53,7 @@ public:
 
         void JustReachedHome() override
         {
-            if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_MEDIVH)))
+            if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
                 if (me->GetDistance2d(medivh) < 20.0f)
                     me->CastSpell(me, SPELL_CORRUPT_MEDIVH, false);
         }
@@ -63,7 +63,7 @@ public:
             Talk(SAY_ENTER);
             ScriptedAI::InitializeAI();
 
-            if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_MEDIVH)))
+            if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
             {
                 me->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(medivh->GetAngle(me)), medivh->GetPositionY() + 14.0f * sin(medivh->GetAngle(me)), medivh->GetPositionZ(), me->GetAngle(medivh));
                 me->GetMotionMaster()->MoveTargetedHome();
@@ -143,7 +143,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_aeonusAI(creature);
+        return GetTheBlackMorassAI<boss_aeonusAI>(creature);
     }
 };
 

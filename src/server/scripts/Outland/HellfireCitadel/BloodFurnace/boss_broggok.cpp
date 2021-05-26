@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
 #include "blood_furnace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum eEnums
 {
@@ -98,8 +98,8 @@ public:
         {
             if (instance)
             {
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR4), true);
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR5), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR4), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR5), true);
                 instance->SetData(DATA_BROGGOK, DONE);
             }
         }
@@ -126,7 +126,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_broggokAI(creature);
+        return GetBloodFurnaceAI<boss_broggokAI>(creature);
     }
 };
 
@@ -139,7 +139,7 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
             if (instance->GetData(DATA_BROGGOK) != DONE && instance->GetData(DATA_BROGGOK) != IN_PROGRESS)
-                if (Creature* broggok = ObjectAccessor::GetCreature(*go, instance->GetData64(DATA_BROGGOK)))
+                if (Creature* broggok = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_BROGGOK)))
                 {
                     instance->SetData(DATA_BROGGOK, IN_PROGRESS);
                     broggok->AI()->DoAction(ACTION_PREPARE_BROGGOK);
@@ -173,7 +173,7 @@ public:
 
             uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
             int32 mod = int32(((float(aurEff->GetTickNumber()) / aurEff->GetTotalTicks()) * 0.9f + 0.1f) * 10000 * 2 / 3);
-            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_RADIUS_MOD, mod, (Unit*)NULL, TRIGGERED_FULL_MASK, NULL, aurEff);
+            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_RADIUS_MOD, mod, (Unit*)nullptr, TRIGGERED_FULL_MASK, nullptr, aurEff);
         }
 
         void Register() override

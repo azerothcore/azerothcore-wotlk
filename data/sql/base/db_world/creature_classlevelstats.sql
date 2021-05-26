@@ -6,24 +6,24 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_classlevelstats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_classlevelstats` 
 (
-  `level` tinyint(3) unsigned NOT NULL,
-  `class` tinyint(3) unsigned NOT NULL,
-  `basehp0` smallint(5) unsigned NOT NULL DEFAULT 1,
-  `basehp1` smallint(5) unsigned NOT NULL DEFAULT 1,
-  `basehp2` smallint(5) unsigned NOT NULL DEFAULT 1,
-  `basemana` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `basearmor` smallint(5) unsigned NOT NULL DEFAULT 1,
-  `attackpower` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `rangedattackpower` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `level` TINYINT unsigned NOT NULL,
+  `class` TINYINT unsigned NOT NULL,
+  `basehp0` SMALLINT unsigned NOT NULL DEFAULT 1,
+  `basehp1` SMALLINT unsigned NOT NULL DEFAULT 1,
+  `basehp2` SMALLINT unsigned NOT NULL DEFAULT 1,
+  `basemana` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `basearmor` SMALLINT unsigned NOT NULL DEFAULT 1,
+  `attackpower` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `rangedattackpower` SMALLINT unsigned NOT NULL DEFAULT 0,
   `damage_base` float NOT NULL DEFAULT 0,
   `damage_exp1` float NOT NULL DEFAULT 0,
   `damage_exp2` float NOT NULL DEFAULT 0,
   `comment` text DEFAULT NULL,
   PRIMARY KEY (`level`,`class`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_classlevelstats` WRITE;

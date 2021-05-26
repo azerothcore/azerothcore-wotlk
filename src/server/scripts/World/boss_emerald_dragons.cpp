@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "GridNotifiers.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
-#include "PassiveAI.h"
-#include "GridNotifiers.h"
+#include "SpellScript.h"
 
 //
 //  Emerald Dragon NPCs and IDs (kept here for reference)
@@ -364,7 +364,7 @@ public:
             switch (eventId)
             {
                 case EVENT_SHADOW_BOLT_WHIRL:
-                    me->CastSpell((Unit*)NULL, SPELL_SHADOW_BOLT_WHIRL, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SHADOW_BOLT_WHIRL, false);
                     events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, urand(15000, 30000));
                     break;
                 default:
@@ -390,7 +390,7 @@ public:
 
     struct npc_spirit_shadeAI : public PassiveAI
     {
-        npc_spirit_shadeAI(Creature* creature) : PassiveAI(creature), _summonerGuid(0)
+        npc_spirit_shadeAI(Creature* creature) : PassiveAI(creature)
         {
         }
 
@@ -405,15 +405,15 @@ public:
 
         void MovementInform(uint32 moveType, uint32 data) override
         {
-            if (moveType == FOLLOW_MOTION_TYPE && data == _summonerGuid)
+            if (moveType == FOLLOW_MOTION_TYPE && data == _summonerGuid.GetCounter())
             {
-                me->CastSpell((Unit*)NULL, SPELL_DARK_OFFERING, false);
+                me->CastSpell((Unit*)nullptr, SPELL_DARK_OFFERING, false);
                 me->DespawnOrUnsummon(1000);
             }
         }
 
     private:
-        uint64 _summonerGuid;
+        ObjectGuid _summonerGuid;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -715,11 +715,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_MARK_OF_NATURE))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_AURA_OF_NATURE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_MARK_OF_NATURE, SPELL_AURA_OF_NATURE });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)

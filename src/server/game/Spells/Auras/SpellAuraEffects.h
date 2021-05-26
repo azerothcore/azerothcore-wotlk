@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,22 +12,22 @@ class AuraEffect;
 class Aura;
 class SpellInfo;
 
-#include "SpellAuras.h"
 #include "Spell.h"
+#include "SpellAuras.h"
 
 typedef void(AuraEffect::*pAuraEffectHandler)(AuraApplication const* aurApp, uint8 mode, bool apply) const;
 
 class AuraEffect
 {
     friend void Aura::_InitEffects(uint8 effMask, Unit* caster, int32* baseAmount);
-    friend Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount, Item* castItem, uint64 casterGUID, bool noPeriodicReset);
+    friend Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, bool noPeriodicReset);
     friend Aura::~Aura();
 private:
     ~AuraEffect();
     explicit AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* caster);
 public:
     Unit* GetCaster() const { return GetBase()->GetCaster(); }
-    uint64 GetCasterGUID() const { return GetBase()->GetCasterGUID(); }
+    ObjectGuid GetCasterGUID() const { return GetBase()->GetCasterGUID(); }
     Aura* GetBase() const { return m_base; }
     void GetTargetList(std::list<Unit*>& targetList) const;
     void GetApplicationList(std::list<AuraApplication*>& applicationList) const;
@@ -148,6 +148,7 @@ public:
     void HandleModStealth(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModStealthLevel(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModStealthDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleDetectAmore(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleSpiritOfRedemption(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandlePhase(AuraApplication const* aurApp, uint8 mode, bool apply) const;

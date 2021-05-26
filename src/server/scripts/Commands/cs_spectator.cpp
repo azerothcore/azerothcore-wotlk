@@ -1,14 +1,14 @@
 
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
-#include "Chat.h"
 #include "AccountMgr.h"
-#include "World.h"
-#include "Player.h"
-#include "Opcodes.h"
 #include "ArenaSpectator.h"
-#include "LFGMgr.h"
 #include "BattlegroundMgr.h"
+#include "Chat.h"
+#include "LFGMgr.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "World.h"
 
 class spectator_commandscript : public CommandScript
 {
@@ -239,7 +239,7 @@ bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, char cons
                 return true;
         }
 
-    if (player->GetUInt64Value(PLAYER_FARSIGHT) || player->m_seer != player) // pussywizard: below this point we must not have a viewpoint!
+    if (player->GetGuidValue(PLAYER_FARSIGHT) || player->m_seer != player) // pussywizard: below this point we must not have a viewpoint!
         return true;
 
     if (player->HaveAtClient(spectate))

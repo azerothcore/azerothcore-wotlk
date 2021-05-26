@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -80,27 +80,23 @@ namespace VMAP
 
     class TileAssembler
     {
-    private:
-        std::string iDestDir;
-        std::string iSrcDir;
-        bool (*iFilterMethod)(char* pName);
-        G3D::Table<std::string, unsigned int > iUniqueNameIds;
-        unsigned int iCurrentUniqueNameId;
-        MapData mapData;
-        std::set<std::string> spawnedModelFiles;
+        private:
+            std::string iDestDir;
+            std::string iSrcDir;
+            G3D::Table<std::string, unsigned int > iUniqueNameIds;
+            MapData mapData;
+            std::set<std::string> spawnedModelFiles;
 
-    public:
-        TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName);
-        virtual ~TileAssembler();
+        public:
+            TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName);
+            virtual ~TileAssembler();
 
-        bool convertWorld2();
-        bool readMapSpawns();
-        bool calculateTransformedBound(ModelSpawn& spawn);
-        void exportGameobjectModels();
+            bool convertWorld2();
+            bool readMapSpawns();
+            bool calculateTransformedBound(ModelSpawn &spawn);
+            void exportGameobjectModels();
 
-        bool convertRawFile(const std::string& pModelFilename);
-        void setModelNameFilterMethod(bool (*pFilterMethod)(char* pName)) { iFilterMethod = pFilterMethod; }
-        std::string getDirEntryNameFromModName(unsigned int pMapId, const std::string& pModPosName);
+            bool convertRawFile(const std::string& pModelFilename);
     };
 
 }                                                           // VMAP

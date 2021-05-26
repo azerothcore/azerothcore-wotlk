@@ -6,14 +6,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `account_instance_times`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `account_instance_times` 
 (
-  `accountId` int(10) unsigned NOT NULL,
-  `instanceId` int(10) unsigned NOT NULL DEFAULT 0,
-  `releaseTime` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `accountId` INT unsigned NOT NULL,
+  `instanceId` INT unsigned NOT NULL DEFAULT 0,
+  `releaseTime` BIGINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`accountId`,`instanceId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `account_instance_times` WRITE;

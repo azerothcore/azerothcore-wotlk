@@ -6,23 +6,23 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `pet_levelstats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `pet_levelstats` 
 (
-  `creature_entry` mediumint(8) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
-  `hp` smallint(5) unsigned NOT NULL,
-  `mana` smallint(5) unsigned NOT NULL,
-  `armor` int(10) unsigned NOT NULL DEFAULT 0,
-  `str` smallint(5) unsigned NOT NULL,
-  `agi` smallint(5) unsigned NOT NULL,
-  `sta` smallint(5) unsigned NOT NULL,
-  `inte` smallint(5) unsigned NOT NULL,
-  `spi` smallint(5) unsigned NOT NULL,
-  `min_dmg` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `max_dmg` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `creature_entry` MEDIUMINT unsigned NOT NULL,
+  `level` TINYINT unsigned NOT NULL,
+  `hp` SMALLINT unsigned NOT NULL,
+  `mana` SMALLINT unsigned NOT NULL,
+  `armor` INT unsigned NOT NULL DEFAULT 0,
+  `str` SMALLINT unsigned NOT NULL,
+  `agi` SMALLINT unsigned NOT NULL,
+  `sta` SMALLINT unsigned NOT NULL,
+  `inte` SMALLINT unsigned NOT NULL,
+  `spi` SMALLINT unsigned NOT NULL,
+  `min_dmg` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `max_dmg` SMALLINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`creature_entry`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `pet_levelstats` WRITE;

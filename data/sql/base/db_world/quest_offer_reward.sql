@@ -6,22 +6,22 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `quest_offer_reward`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `quest_offer_reward` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Emote1` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `Emote2` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `Emote3` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `Emote4` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `EmoteDelay1` int(10) unsigned NOT NULL DEFAULT 0,
-  `EmoteDelay2` int(10) unsigned NOT NULL DEFAULT 0,
-  `EmoteDelay3` int(10) unsigned NOT NULL DEFAULT 0,
-  `EmoteDelay4` int(10) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Emote1` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `Emote2` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `Emote3` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `Emote4` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay1` INT unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay2` INT unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay3` INT unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay4` INT unsigned NOT NULL DEFAULT 0,
   `RewardText` text DEFAULT NULL,
-  `VerifiedBuild` smallint(5) NOT NULL DEFAULT 0,
+  `VerifiedBuild` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `quest_offer_reward` WRITE;

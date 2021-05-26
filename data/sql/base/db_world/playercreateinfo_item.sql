@@ -6,17 +6,17 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `playercreateinfo_item`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `playercreateinfo_item` 
 (
-  `race` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `class` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `itemid` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `amount` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `race` TINYINT unsigned NOT NULL DEFAULT 0,
+  `class` TINYINT unsigned NOT NULL DEFAULT 0,
+  `itemid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `amount` SMALLINT unsigned NOT NULL DEFAULT 1,
   `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`race`,`class`,`itemid`),
   KEY `playercreateinfo_race_class_index` (`race`,`class`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `playercreateinfo_item` WRITE;

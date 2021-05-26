@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
 #include "gruuls_lair.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
 
 DoorData const doorData[] =
 {
@@ -35,7 +35,6 @@ public:
             LoadDoorData(doorData);
             LoadMinionData(minionData);
 
-            _maulgarGUID = 0;
             _addsKilled = 0;
         }
 
@@ -160,7 +159,7 @@ public:
 
     protected:
         uint32 _addsKilled;
-        uint64 _maulgarGUID;
+        ObjectGuid _maulgarGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

@@ -1,19 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "TotemAI.h"
-#include "Totem.h"
+#include "CellImpl.h"
 #include "Creature.h"
 #include "DBCStores.h"
-#include "ObjectAccessor.h"
-#include "SpellMgr.h"
-
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "ObjectAccessor.h"
+#include "SpellMgr.h"
+#include "Totem.h"
+#include "TotemAI.h"
 
 int TotemAI::Permissible(Creature const* creature)
 {
@@ -23,7 +22,7 @@ int TotemAI::Permissible(Creature const* creature)
     return PERMIT_BASE_NO;
 }
 
-TotemAI::TotemAI(Creature* c) : CreatureAI(c), i_victimGuid(0)
+TotemAI::TotemAI(Creature* c) : CreatureAI(c)
 {
     ASSERT(c->IsTotem());
 }
@@ -77,6 +76,11 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
         me->VisitNearbyObject(max_range, checker);
     }
 
+    if (!victim && me->GetCharmerOrOwnerOrSelf()->IsInCombat())
+    {
+        victim = me->GetCharmerOrOwnerOrSelf()->GetVictim();
+    }
+
     // If have target
     if (victim)
     {
@@ -88,7 +92,7 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
         me->CastSpell(victim, me->ToTotem()->GetSpell(), false);
     }
     else
-        i_victimGuid = 0;
+        i_victimGuid.Clear();
 }
 
 void TotemAI::AttackStart(Unit* /*victim*/)

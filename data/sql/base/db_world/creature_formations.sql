@@ -6,18 +6,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_formations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_formations` 
 (
-  `leaderGUID` int(10) unsigned NOT NULL DEFAULT 0,
-  `memberGUID` int(10) unsigned NOT NULL DEFAULT 0,
-  `dist` float unsigned NOT NULL,
-  `angle` float unsigned NOT NULL,
-  `groupAI` int(10) unsigned NOT NULL,
-  `point_1` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `point_2` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `leaderGUID` INT unsigned NOT NULL DEFAULT 0,
+  `memberGUID` INT unsigned NOT NULL DEFAULT 0,
+  `dist` FLOAT NOT NULL,
+  `angle` FLOAT NOT NULL,
+  `groupAI` INT unsigned NOT NULL,
+  `point_1` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `point_2` SMALLINT unsigned NOT NULL DEFAULT 0,
+  CHECK (`dist`>=0 AND `angle`>=0),
   PRIMARY KEY (`memberGUID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_formations` WRITE;

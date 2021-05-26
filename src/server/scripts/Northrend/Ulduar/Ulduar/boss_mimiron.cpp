@@ -2,16 +2,16 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "MapManager.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "Spell.h"
-#include "MapManager.h"
-#include "SpellAuraEffects.h"
-#include "PassiveAI.h"
-#include "Player.h"
 
 enum SpellData
 {
@@ -267,10 +267,10 @@ enum ComputerTalks
     TALK_COMPUTER_ZERO = 12,
 };
 
-#define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_MIMIRON))
-#define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_LEVIATHAN_MKII))
-#define GetVX001() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_VX001))
-#define GetACU() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_ACU))
+#define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_MIMIRON))
+#define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_LEVIATHAN_MKII))
+#define GetVX001() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_VX001))
+#define GetACU() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_ACU))
 
 class boss_mimiron : public CreatureScript
 {
@@ -279,7 +279,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_mimironAI (pCreature);
+        return GetUlduarAI<boss_mimironAI>(pCreature);
     }
 
     struct boss_mimironAI : public ScriptedAI
@@ -688,8 +688,6 @@ public:
                         VX001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
                         VX001->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
                         VX001->EnterVehicle(LMK2, 3);
-                        LMK2->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                        LMK2->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
                         events.ScheduleEvent(EVENT_JOIN_TOGETHER, 3000);
                     }
                     break;
@@ -703,6 +701,7 @@ public:
                             return;
                         }
 
+                        ACU->SetDisableGravity(false);
                         ACU->EnterVehicle(VX001, 3);
                         me->EnterVehicle(VX001, 1);
                         me->MonsterYell(TEXT_VOLTRON_ACTIVATE, LANG_UNIVERSAL, 0);
@@ -780,7 +779,7 @@ public:
 
                         if( pInstance )
                             for( uint16 i = 0; i < 3; ++i )
-                                if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                                if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                                     if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                                         if( door->GetGoState() != GO_STATE_ACTIVE )
                                         {
@@ -863,7 +862,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_ACTIVE )
                             {
@@ -894,7 +893,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_READY )
                             {
@@ -987,7 +986,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_leviathan_mkiiAI (pCreature);
+        return GetUlduarAI<npc_ulduar_leviathan_mkiiAI>(pCreature);
     }
 
     struct npc_ulduar_leviathan_mkiiAI : public ScriptedAI
@@ -1269,7 +1268,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_vx001AI (pCreature);
+        return GetUlduarAI<npc_ulduar_vx001AI>(pCreature);
     }
 
     struct npc_ulduar_vx001AI : public ScriptedAI
@@ -1339,7 +1338,7 @@ public:
                         events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
                         events.ScheduleEvent(EVENT_HAND_PULSE, 1);
-                        //events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, 30000);
+                        events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, 30000);
                         if (Creature* c = GetMimiron())
                             if (c->AI()->GetData(1))
                                 events.ScheduleEvent(EVENT_FROST_BOMB, 1000);
@@ -1419,8 +1418,8 @@ public:
                 if (spinningUpTimer <= diff)
                 {
                     float angle = (spinningUpOrientation * 2 * M_PI) / 100.0f;
-                    me->SetOrientation(angle);
                     me->SetFacingTo(angle);
+
                     spinningUpTimer = 0;
                 }
                 else
@@ -1485,12 +1484,12 @@ public:
                 case EVENT_HAND_PULSE:
                     if (Player* p = SelectTargetFromPlayerList(80.0f))
                     {
-                        me->SetOrientation(me->GetAngle(p));
-                        me->SetFacingTo(me->GetAngle(p));
+                        me->SetFacingToObject(p);
                         if (Unit* vb = me->GetVehicleBase())
                         {
                             vb->SendMeleeAttackStop();
-                            vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                            vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+
                             if( !leftarm )
                             {
                                 vb->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_03);
@@ -1512,9 +1511,16 @@ public:
                     if (Player* p = SelectTargetFromPlayerList(80.0f))
                     {
                         float angle = me->GetAngle(p);
+
+                        if (Unit* vehicle = me->GetVehicleBase())
+                        {
+                            vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                            vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+                            angle -= vehicle->GetOrientation();
+                        }
+
                         spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
                         spinningUpTimer = 1500;
-                        me->SetOrientation(angle);
                         me->SetFacingTo(angle);
                         me->CastSpell(p, SPELL_SPINNING_UP, true);
                         events.RescheduleEvent((Phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14500);
@@ -1525,7 +1531,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_FROST_BOMB:
-                    me->CastCustomSpell(SPELL_VX001_FROST_BOMB, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, false);
+                    me->CastCustomSpell(SPELL_VX001_FROST_BOMB, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     events.RepeatEvent(45000);
                     break;
             }
@@ -1607,7 +1613,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_aerial_command_unitAI (pCreature);
+        return GetUlduarAI<npc_ulduar_aerial_command_unitAI>(pCreature);
     }
 
     struct npc_ulduar_aerial_command_unitAI : public ScriptedAI
@@ -1801,7 +1807,7 @@ public:
                         {
                             if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 27.5f, true))
                             {
-                                me->SetFacingTo(me->GetAngle(victim));
+                                me->SetFacingToObject(victim);
                                 me->CastSpell(victim, SPELL_PLASMA_BALL, false);
                             }
                         }
@@ -1936,7 +1942,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_proximity_mineAI (pCreature);
+        return GetUlduarAI<npc_ulduar_proximity_mineAI>(pCreature);
     }
 
     struct npc_ulduar_proximity_mineAI : public ScriptedAI
@@ -2001,7 +2007,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_mimiron_rocketAI (pCreature);
+        return GetUlduarAI<npc_ulduar_mimiron_rocketAI>(pCreature);
     }
 
     struct npc_ulduar_mimiron_rocketAI : public NullCreatureAI
@@ -2044,7 +2050,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_magnetic_coreAI (pCreature);
+        return GetUlduarAI<npc_ulduar_magnetic_coreAI>(pCreature);
     }
 
     struct npc_ulduar_magnetic_coreAI : public NullCreatureAI
@@ -2093,7 +2099,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_bot_summon_triggerAI (pCreature);
+        return GetUlduarAI<npc_ulduar_bot_summon_triggerAI>(pCreature);
     }
 
     struct npc_ulduar_bot_summon_triggerAI : public NullCreatureAI
@@ -2167,7 +2173,7 @@ public:
             if (Unit* c = GetCaster())
             {
                 uint32 id = ( c->GetMap()->Is25ManRaid() ? ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_25_2 : SPELL_RAPID_BURST_DAMAGE_25_1) : ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_10_2 : SPELL_RAPID_BURST_DAMAGE_10_1) );
-                c->CastSpell((Unit*)NULL, id, true);
+                c->CastSpell((Unit*)nullptr, id, true);
             }
         }
 
@@ -2217,10 +2223,10 @@ public:
                 float new_o = Position::NormalizeOrientation(lastOrientation - (M_PI / 60) * (diff / 250.0f));
                 lastMSTime = World::GetGameTimeMS();
                 lastOrientation = new_o;
-                c->SetOrientation(new_o);
                 c->SetFacingTo(new_o);
-                c->CastSpell((Unit*)NULL, 63297, true);
-                c->CastSpell((Unit*)NULL, 64042, true);
+
+                c->CastSpell((Unit*)nullptr, 63297, true);
+                c->CastSpell((Unit*)nullptr, 64042, true);
             }
         }
 
@@ -2251,7 +2257,7 @@ public:
             if(instance->GetData(TYPE_MIMIRON) != NOT_STARTED)
                 return false;
 
-            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetData64(TYPE_MIMIRON)))
+            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetGuidData(TYPE_MIMIRON)))
             {
                 c->AI()->SetData(0, 7);
                 c->AI()->AttackStart(player);
@@ -2269,7 +2275,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_flames_initialAI (pCreature);
+        return GetUlduarAI<npc_ulduar_flames_initialAI>(pCreature);
     }
 
     struct npc_ulduar_flames_initialAI : public NullCreatureAI
@@ -2286,7 +2292,7 @@ public:
             }
         }
 
-        std::list<uint64> FlameList;
+        GuidList FlameList;
         EventMap events;
         uint32 CreateTime;
 
@@ -2308,15 +2314,15 @@ public:
             }
         }
 
-        void RemoveFlame(uint64 guid)
+        void RemoveFlame(ObjectGuid guid)
         {
             FlameList.remove(guid);
         }
 
         void RemoveAll()
         {
-            for( std::list<uint64>::iterator itr = FlameList.begin(); itr != FlameList.end(); ++itr )
-                if (Creature* c = ObjectAccessor::GetCreature(*me, (*itr)))
+            for (ObjectGuid guid : FlameList)
+                if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                     c->DespawnOrUnsummon();
             FlameList.clear();
             me->DespawnOrUnsummon();
@@ -2389,7 +2395,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_flames_spreadAI (pCreature);
+        return GetUlduarAI<npc_ulduar_flames_spreadAI>(pCreature);
     }
 
     struct npc_ulduar_flames_spreadAI : public NullCreatureAI
@@ -2431,7 +2437,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_emergency_fire_botAI (pCreature);
+        return GetUlduarAI<npc_ulduar_emergency_fire_botAI>(pCreature);
     }
 
     struct npc_ulduar_emergency_fire_botAI : public ScriptedAI
@@ -2473,7 +2479,7 @@ public:
                     }
                     break;
                 case EVENT_EMERGENCY_BOT_ATTACK:
-                    me->CastSpell((Unit*)NULL, SPELL_WATER_SPRAY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_WATER_SPRAY, false);
                     events.RescheduleEvent(EVENT_EMERGENCY_BOT_CHECK, 5000);
                     break;
             }
@@ -2488,7 +2494,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_rocket_strike_triggerAI (pCreature);
+        return GetUlduarAI<npc_ulduar_rocket_strike_triggerAI>(pCreature);
     }
 
     struct npc_ulduar_rocket_strike_triggerAI : public NullCreatureAI

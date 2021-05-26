@@ -6,6 +6,9 @@
 #define DEF_FORGE_OF_SOULS_H
 
 #include "GridNotifiers.h"
+#include "CreatureAIImpl.h"
+
+#define ForgeOfSoulsScriptName "instance_forge_of_souls"
 
 enum Data
 {
@@ -74,5 +77,11 @@ const outroPosition outroPositions[] =
 };
 
 const Position outroSpawnPoint = {5618.139f, 2451.873f, 705.854f, 0.0f};
+
+template <class AI, class T>
+inline AI* GetForgeOfSoulsAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, ForgeOfSoulsScriptName);
+}
 
 #endif

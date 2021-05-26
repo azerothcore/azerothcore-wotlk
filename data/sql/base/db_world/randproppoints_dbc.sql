@@ -6,27 +6,27 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `randproppoints_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `randproppoints_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Epic_1` int(11) NOT NULL DEFAULT 0,
-  `Epic_2` int(11) NOT NULL DEFAULT 0,
-  `Epic_3` int(11) NOT NULL DEFAULT 0,
-  `Epic_4` int(11) NOT NULL DEFAULT 0,
-  `Epic_5` int(11) NOT NULL DEFAULT 0,
-  `Superior_1` int(11) NOT NULL DEFAULT 0,
-  `Superior_2` int(11) NOT NULL DEFAULT 0,
-  `Superior_3` int(11) NOT NULL DEFAULT 0,
-  `Superior_4` int(11) NOT NULL DEFAULT 0,
-  `Superior_5` int(11) NOT NULL DEFAULT 0,
-  `Good_1` int(11) NOT NULL DEFAULT 0,
-  `Good_2` int(11) NOT NULL DEFAULT 0,
-  `Good_3` int(11) NOT NULL DEFAULT 0,
-  `Good_4` int(11) NOT NULL DEFAULT 0,
-  `Good_5` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Epic_1` INT NOT NULL DEFAULT 0,
+  `Epic_2` INT NOT NULL DEFAULT 0,
+  `Epic_3` INT NOT NULL DEFAULT 0,
+  `Epic_4` INT NOT NULL DEFAULT 0,
+  `Epic_5` INT NOT NULL DEFAULT 0,
+  `Superior_1` INT NOT NULL DEFAULT 0,
+  `Superior_2` INT NOT NULL DEFAULT 0,
+  `Superior_3` INT NOT NULL DEFAULT 0,
+  `Superior_4` INT NOT NULL DEFAULT 0,
+  `Superior_5` INT NOT NULL DEFAULT 0,
+  `Good_1` INT NOT NULL DEFAULT 0,
+  `Good_2` INT NOT NULL DEFAULT 0,
+  `Good_3` INT NOT NULL DEFAULT 0,
+  `Good_4` INT NOT NULL DEFAULT 0,
+  `Good_5` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `randproppoints_dbc` WRITE;

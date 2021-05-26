@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "blackrock_depths.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "blackrock_depths.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 uint32 braziersUsed = 0;
@@ -29,7 +29,7 @@ public:
             else
                 instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
             // If used brazier open linked doors (North or South)
-            if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_N))
+            if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_N))
             {
                 if (braziersUsed == 0)
                 {
@@ -37,12 +37,12 @@ public:
                 }
                 else if(braziersUsed == 2)
                 {
-                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
-                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);
                     braziersUsed = 0;
                 }
             }
-            else if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_S))
+            else if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_S))
             {
                 if (braziersUsed == 0)
                 {
@@ -50,8 +50,8 @@ public:
                 }
                 else if (braziersUsed == 1)
                 {
-                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
-                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);
                     braziersUsed = 0;
                 }
             }
@@ -134,7 +134,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_grimstoneAI>(creature);
+        return GetBlackrockDepthsAI<npc_grimstoneAI>(creature);
     }
 
     struct npc_grimstoneAI : public npc_escortAI
@@ -214,7 +214,7 @@ public:
 
         void HandleGameObject(uint32 id, bool open)
         {
-            instance->HandleGameObject(instance->GetData64(id), open);
+            instance->HandleGameObject(instance->GetGuidData(id), open);
         }
 
         void SummonBoss()
@@ -294,11 +294,11 @@ public:
                             if (theldrenEvent)
                             {
                                 if (GameObject* go = me->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
-                                    go->SetOwnerGUID(0);
+                                    go->SetOwnerGUID(ObjectGuid::Empty);
 
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                    itr->GetSource()->KilledMonsterCredit(16166, 0);
+                                    itr->GetSource()->KilledMonsterCredit(16166);
                             }
 
                             HandleGameObject(DATA_ARENA2, false);
@@ -331,7 +331,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_phalanxAI(creature);
+        return GetBlackrockDepthsAI<npc_phalanxAI>(creature);
     }
 
     struct npc_phalanxAI : public ScriptedAI
@@ -500,7 +500,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_rocknotAI>(creature);
+        return GetBlackrockDepthsAI<npc_rocknotAI>(creature);
     }
 
     struct npc_rocknotAI : public npc_escortAI
@@ -526,7 +526,7 @@ public:
 
         void DoGo(uint32 id, uint32 state)
         {
-            if (GameObject* go = instance->instance->GetGameObject(instance->GetData64(id)))
+            if (GameObject* go = instance->instance->GetGameObject(instance->GetGuidData(id)))
                 go->SetGoState((GOState)state);
         }
 
@@ -574,7 +574,7 @@ public:
                     DoGo(DATA_GO_BAR_KEG_TRAP, 0);               //doesn't work very well, leaving code here for future
                     //spell by trap has effect61, this indicate the bar go hostile
 
-                    if (Unit* tmp = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_PHALANX)))
+                    if (Unit* tmp = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_PHALANX)))
                         tmp->setFaction(14);
 
                     //for later, this event(s) has alot more to it.

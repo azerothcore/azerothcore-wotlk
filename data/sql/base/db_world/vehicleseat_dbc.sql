@@ -6,12 +6,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `vehicleseat_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `vehicleseat_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `AttachmentID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `AttachmentID` INT NOT NULL DEFAULT 0,
   `AttachmentOffsetX` float NOT NULL DEFAULT 0,
   `AttachmentOffsetY` float NOT NULL DEFAULT 0,
   `AttachmentOffsetZ` float NOT NULL DEFAULT 0,
@@ -22,12 +22,12 @@ CREATE TABLE `vehicleseat_dbc`
   `EnterMaxDuration` float NOT NULL DEFAULT 0,
   `EnterMinArcHeight` float NOT NULL DEFAULT 0,
   `EnterMaxArcHeight` float NOT NULL DEFAULT 0,
-  `EnterAnimStart` int(11) NOT NULL DEFAULT 0,
-  `EnterAnimLoop` int(11) NOT NULL DEFAULT 0,
-  `RideAnimStart` int(11) NOT NULL DEFAULT 0,
-  `RideAnimLoop` int(11) NOT NULL DEFAULT 0,
-  `RideUpperAnimStart` int(11) NOT NULL DEFAULT 0,
-  `RideUpperAnimLoop` int(11) NOT NULL DEFAULT 0,
+  `EnterAnimStart` INT NOT NULL DEFAULT 0,
+  `EnterAnimLoop` INT NOT NULL DEFAULT 0,
+  `RideAnimStart` INT NOT NULL DEFAULT 0,
+  `RideAnimLoop` INT NOT NULL DEFAULT 0,
+  `RideUpperAnimStart` INT NOT NULL DEFAULT 0,
+  `RideUpperAnimLoop` INT NOT NULL DEFAULT 0,
   `ExitPreDelay` float NOT NULL DEFAULT 0,
   `ExitSpeed` float NOT NULL DEFAULT 0,
   `ExitGravity` float NOT NULL DEFAULT 0,
@@ -35,26 +35,26 @@ CREATE TABLE `vehicleseat_dbc`
   `ExitMaxDuration` float NOT NULL DEFAULT 0,
   `ExitMinArcHeight` float NOT NULL DEFAULT 0,
   `ExitMaxArcHeight` float NOT NULL DEFAULT 0,
-  `ExitAnimStart` int(11) NOT NULL DEFAULT 0,
-  `ExitAnimLoop` int(11) NOT NULL DEFAULT 0,
-  `ExitAnimEnd` int(11) NOT NULL DEFAULT 0,
+  `ExitAnimStart` INT NOT NULL DEFAULT 0,
+  `ExitAnimLoop` INT NOT NULL DEFAULT 0,
+  `ExitAnimEnd` INT NOT NULL DEFAULT 0,
   `PassengerYaw` float NOT NULL DEFAULT 0,
   `PassengerPitch` float NOT NULL DEFAULT 0,
   `PassengerRoll` float NOT NULL DEFAULT 0,
-  `PassengerAttachmentID` int(11) NOT NULL DEFAULT 0,
-  `VehicleEnterAnim` int(11) NOT NULL DEFAULT 0,
-  `VehicleExitAnim` int(11) NOT NULL DEFAULT 0,
-  `VehicleRideAnimLoop` int(11) NOT NULL DEFAULT 0,
-  `VehicleEnterAnimBone` int(11) NOT NULL DEFAULT 0,
-  `VehicleExitAnimBone` int(11) NOT NULL DEFAULT 0,
-  `VehicleRideAnimLoopBone` int(11) NOT NULL DEFAULT 0,
+  `PassengerAttachmentID` INT NOT NULL DEFAULT 0,
+  `VehicleEnterAnim` INT NOT NULL DEFAULT 0,
+  `VehicleExitAnim` INT NOT NULL DEFAULT 0,
+  `VehicleRideAnimLoop` INT NOT NULL DEFAULT 0,
+  `VehicleEnterAnimBone` INT NOT NULL DEFAULT 0,
+  `VehicleExitAnimBone` INT NOT NULL DEFAULT 0,
+  `VehicleRideAnimLoopBone` INT NOT NULL DEFAULT 0,
   `VehicleEnterAnimDelay` float NOT NULL DEFAULT 0,
   `VehicleExitAnimDelay` float NOT NULL DEFAULT 0,
-  `VehicleAbilityDisplay` int(11) NOT NULL DEFAULT 0,
-  `EnterUISoundID` int(11) NOT NULL DEFAULT 0,
-  `ExitUISoundID` int(11) NOT NULL DEFAULT 0,
-  `UiSkin` int(11) NOT NULL DEFAULT 0,
-  `FlagsB` int(11) NOT NULL DEFAULT 0,
+  `VehicleAbilityDisplay` INT NOT NULL DEFAULT 0,
+  `EnterUISoundID` INT NOT NULL DEFAULT 0,
+  `ExitUISoundID` INT NOT NULL DEFAULT 0,
+  `UiSkin` INT NOT NULL DEFAULT 0,
+  `FlagsB` INT NOT NULL DEFAULT 0,
   `CameraEnteringDelay` float NOT NULL DEFAULT 0,
   `CameraEnteringDuration` float NOT NULL DEFAULT 0,
   `CameraExitingDelay` float NOT NULL DEFAULT 0,
@@ -68,7 +68,7 @@ CREATE TABLE `vehicleseat_dbc`
   `CameraSeatZoomMin` float NOT NULL DEFAULT 0,
   `CameraSeatZoomMax` float NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `vehicleseat_dbc` WRITE;

@@ -2,8 +2,8 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "utgarde_keep.h"
 
 enum eDisplayId
@@ -93,7 +93,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_ingvar_the_plundererAI(pCreature);
+        return GetUtgardeKeepAI<boss_ingvar_the_plundererAI>(pCreature);
     }
 
     struct boss_ingvar_the_plundererAI : public ScriptedAI
@@ -106,13 +106,13 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 ValkyrGUID;
-        uint64 ThrowGUID;
+        ObjectGuid ValkyrGUID;
+        ObjectGuid ThrowGUID;
 
         void Reset() override
         {
-            ValkyrGUID = 0;
-            ThrowGUID = 0;
+            ValkyrGUID.Clear();
+            ThrowGUID.Clear();
             events.Reset();
             summons.DespawnAll();
             me->SetDisplayId(DISPLAYID_DEFAULT);
@@ -170,7 +170,6 @@ public:
                 ValkyrGUID = s->GetGUID();
                 s->SetCanFly(true);
                 s->SetDisableGravity(true);
-                s->SetHover(true);
                 s->SetPosition(s->GetPositionX(), s->GetPositionY(), s->GetPositionZ() + 35.0f, s->GetOrientation());
                 s->SetFacingTo(s->GetOrientation());
             }
@@ -195,14 +194,14 @@ public:
             if (apply)
             {
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             }
             else
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             }
@@ -309,9 +308,9 @@ public:
                     me->_AddCreatureSpellCooldown(SPELL_DREADFUL_ROAR, 0);
 
                     if (me->GetDisplayId() == DISPLAYID_DEFAULT)
-                        me->CastSpell((Unit*)NULL, SPELL_STAGGERING_ROAR, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_STAGGERING_ROAR, false);
                     else
-                        me->CastSpell((Unit*)NULL, SPELL_DREADFUL_ROAR, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_DREADFUL_ROAR, false);
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_CLEAVE_OR_WOE_STRIKE:
@@ -336,9 +335,9 @@ public:
                     me->DisableRotate(true);
                     me->SendMovementFlagUpdate();
                     if (me->GetDisplayId() == DISPLAYID_DEFAULT)
-                        me->CastSpell((Unit*)NULL, SPELL_SMASH, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_SMASH, false);
                     else
-                        me->CastSpell((Unit*)NULL, SPELL_DARK_SMASH, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_DARK_SMASH, false);
                     events.RepeatEvent(urand(9000, 11000));
                     events.RescheduleEvent(EVENT_UNROOT, 3750);
                     break;
@@ -350,7 +349,7 @@ public:
                     }
                     else
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_SHADOW_AXE, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_SHADOW_AXE, true);
                         SetEquipmentSlots(false, EQUIP_UNEQUIP, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
                         events.RepeatEvent(35000);
                         events.RescheduleEvent(EVENT_AXE_RETURN, 10000);
@@ -358,7 +357,7 @@ public:
                     break;
                 case EVENT_AXE_RETURN:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, ThrowGUID))
-                        c->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.5f);
+                        c->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                     events.RescheduleEvent(EVENT_AXE_PICKUP, 1500);
                     break;
                 case EVENT_AXE_PICKUP:
@@ -368,7 +367,7 @@ public:
                         c->DespawnOrUnsummon();
                         summons.DespawnAll();
                     }
-                    ThrowGUID = 0;
+                    ThrowGUID.Clear();
                     SetEquipmentSlots(true);
                     break;
             }

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "magtheridons_lair.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum Yells
@@ -69,7 +69,7 @@ enum Events
 class DealDebrisDamage : public BasicEvent
 {
 public:
-    DealDebrisDamage(Creature& creature, uint64 targetGUID) : _owner(creature), _targetGUID(targetGUID) { }
+    DealDebrisDamage(Creature& creature, ObjectGuid targetGUID) : _owner(creature), _targetGUID(targetGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -80,7 +80,7 @@ public:
 
 private:
     Creature& _owner;
-    uint64 _targetGUID;
+    ObjectGuid _targetGUID;
 };
 
 class boss_magtheridon : public CreatureScript
@@ -246,7 +246,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_magtheridonAI>(creature);
+        return GetMagtheridonsLairAI<boss_magtheridonAI>(creature);
     }
 };
 
@@ -288,7 +288,7 @@ public:
 
         void HandleDummyApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetUnitOwner()->CastSpell((Unit*)NULL, SPELL_SHADOW_GRASP_VISUAL, false);
+            GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_SHADOW_GRASP_VISUAL, false);
         }
 
         void HandleDummyRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

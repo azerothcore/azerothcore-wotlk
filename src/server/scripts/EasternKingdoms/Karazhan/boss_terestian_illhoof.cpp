@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,10 +11,10 @@ SDComment: Complete! Needs adjustments to use spell though.
 SDCategory: Karazhan
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "karazhan.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum TerestianIllhoof
 {
@@ -58,7 +58,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_kilrekAI>(creature);
+        return GetKarazhanAI<npc_kilrekAI>(creature);
     }
 
     struct npc_kilrekAI : public ScriptedAI
@@ -70,13 +70,13 @@ public:
 
         InstanceScript* instance;
 
-        uint64 TerestianGUID;
+        ObjectGuid TerestianGUID;
 
         uint32 AmplifyTimer;
 
         void Reset() override
         {
-            TerestianGUID = 0;
+            TerestianGUID.Clear();
             AmplifyTimer = 2000;
         }
 
@@ -86,7 +86,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            uint64 TerestianGUID = instance->GetData64(DATA_TERESTIAN);
+            ObjectGuid TerestianGUID = instance->GetGuidData(DATA_TERESTIAN);
             if (TerestianGUID)
             {
                 Unit* Terestian = ObjectAccessor::GetUnit(*me, TerestianGUID);
@@ -123,18 +123,18 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_demon_chainAI(creature);
+        return GetKarazhanAI<npc_demon_chainAI>(creature);
     }
 
     struct npc_demon_chainAI : public ScriptedAI
     {
         npc_demon_chainAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 SacrificeGUID;
+        ObjectGuid SacrificeGUID;
 
         void Reset() override
         {
-            SacrificeGUID = 0;
+            SacrificeGUID.Clear();
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -160,7 +160,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_fiendish_portalAI(creature);
+        return GetKarazhanAI<npc_fiendish_portalAI>(creature);
     }
 
     struct npc_fiendish_portalAI : public PassiveAI
@@ -194,7 +194,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_fiendish_impAI(creature);
+        return GetKarazhanAI<npc_fiendish_impAI>(creature);
     }
 
     struct npc_fiendish_impAI : public ScriptedAI
@@ -206,8 +206,6 @@ public:
         void Reset() override
         {
             FireboltTimer = 2000;
-
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -238,21 +236,19 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_terestianAI>(creature);
+        return GetKarazhanAI<boss_terestianAI>(creature);
     }
 
     struct boss_terestianAI : public ScriptedAI
     {
         boss_terestianAI(Creature* creature) : ScriptedAI(creature)
         {
-            for (uint8 i = 0; i < 2; ++i)
-                PortalGUID[i] = 0;
             instance = creature->GetInstanceScript();
         }
 
         InstanceScript* instance;
 
-        uint64 PortalGUID[2];
+        ObjectGuid PortalGUID[2];
         uint8 PortalsCount;
 
         uint32 SacrificeTimer;
@@ -276,7 +272,7 @@ public:
                         pPortal->DespawnOrUnsummon();
                     }
 
-                    PortalGUID[i] = 0;
+                    PortalGUID[i].Clear();
                 }
             }
 
@@ -341,7 +337,7 @@ public:
                     if (Creature* pPortal = ObjectAccessor::GetCreature((*me), PortalGUID[i]))
                         pPortal->DespawnOrUnsummon();
 
-                    PortalGUID[i] = 0;
+                    PortalGUID[i].Clear();
                 }
             }
 

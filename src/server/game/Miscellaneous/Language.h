@@ -94,7 +94,17 @@ enum AcoreStrings
     LANG_RBAC_PERM_REVOKED_NOT_IN_LIST  = 79,
     LANG_PVPSTATS                       = 80,
     LANG_PVPSTATS_DISABLED              = 81,
-    // Free 82 - 95
+    // Free 82 - 86
+
+    LANG_UNKNOWN_ERROR                  = 87,
+    LANG_2FA_COMMANDS_NOT_SETUP         = 88,
+    LANG_2FA_ALREADY_SETUP              = 89,
+    LANG_2FA_INVALID_TOKEN              = 90,
+    LANG_2FA_SECRET_SUGGESTION          = 91,
+    LANG_2FA_SETUP_COMPLETE             = 92,
+    LANG_2FA_NOT_SETUP                  = 93,
+    LANG_2FA_REMOVE_NEED_TOKEN          = 94,
+    LANG_2FA_REMOVE_COMPLETE            = 95,
 
     LANG_GUILD_RENAME_ALREADY_EXISTS    = 96,
     LANG_GUILD_RENAME_DONE              = 97,
@@ -191,7 +201,11 @@ enum AcoreStrings
     LANG_GRID_POSITION                  = 178,
     // 179-185 used in other client versions
     LANG_TRANSPORT_POSITION             = 186,
-    // Room for more level 1              187-199 not used
+    // 187
+    LANG_2FA_SECRET_TOO_LONG            = 188,
+    LANG_2FA_SECRET_INVALID             = 189,
+    LANG_2FA_SECRET_SET_COMPLETE        = 190,
+    // free 191 - 199
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -844,6 +858,18 @@ enum AcoreStrings
     LANG_RBAC_EMAIL_REQUIRED            = 881,
     // Room for in-game strings           882-999 not used
 
+    //Access Requirements
+    LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS = 882,
+    LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS = 883,
+    LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS = 884,
+    LANG_ACCESS_REQUIREMENT_NOTE = 885,
+    LANG_ACCESS_REQUIREMENT_NOT_MET = 886,
+    LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET = 887,
+    LANG_ACCESS_REQUIREMENT_MAX_LEVEL = 888,
+    LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS = 889,
+    LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS = 890,
+    LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS = 891,
+
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,
     LANG_ACCOUNT_DELETED                = 1001,
@@ -1321,5 +1347,7 @@ enum AcoreStrings
 
     LANG_DEBUG_BG_CONF                            = 30085,
     LANG_DEBUG_ARENA_CONF                         = 30086
+
+    // 30087-30095 reserved for passive anticheat
 };
 #endif

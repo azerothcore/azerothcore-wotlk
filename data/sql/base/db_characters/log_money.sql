@@ -6,17 +6,17 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `log_money`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `log_money` 
 (
-  `sender_acc` int(11) unsigned NOT NULL,
-  `sender_guid` int(11) unsigned NOT NULL,
-  `sender_name` char(32) CHARACTER SET utf8 NOT NULL,
-  `sender_ip` char(32) CHARACTER SET utf8 NOT NULL,
-  `receiver_acc` int(11) unsigned NOT NULL,
-  `receiver_name` char(32) CHARACTER SET utf8 NOT NULL,
-  `money` bigint(20) unsigned NOT NULL,
-  `topic` char(255) CHARACTER SET utf8 NOT NULL,
+  `sender_acc` INT unsigned NOT NULL,
+  `sender_guid` INT unsigned NOT NULL,
+  `sender_name` char(32) CHARACTER SET UTF8MB4 NOT NULL,
+  `sender_ip` char(32) CHARACTER SET UTF8MB4 NOT NULL,
+  `receiver_acc` INT unsigned NOT NULL,
+  `receiver_name` char(32) CHARACTER SET UTF8MB4 NOT NULL,
+  `money` BIGINT unsigned NOT NULL,
+  `topic` char(255) CHARACTER SET UTF8MB4 NOT NULL,
   `date` datetime NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,6 +17,7 @@
 #include <list>
 #include <map>
 #include <ace/INET_Addr.h>
+#include <array>
 
 // Searcher for map of structs
 template<typename T, class S> struct Finder
@@ -69,38 +70,6 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText = false);
 uint32 TimeStringToSecs(const std::string& timestring);
 std::string TimeToTimestampStr(time_t t);
 std::string TimeToHumanReadable(time_t t);
-
-/* Return a random number in the range min..max. */
-int32 irand(int32 min, int32 max);
-
-/* Return a random number in the range min..max (inclusive). */
-uint32 urand(uint32 min, uint32 max);
-
-/* Return a random number in the range 0 .. UINT32_MAX. */
-uint32 rand32();
-
-/* Return a random number in the range min..max */
-float frand(float min, float max);
-
-/* Return a random double from 0.0 to 1.0 (exclusive). */
-double rand_norm();
-
-/* Return a random double from 0.0 to 100.0 (exclusive). */
-double rand_chance();
-
-uint32 urandweighted(size_t count, double const* chances);
-
-/* Return true if a random roll fits in the specified chance (range 0-100). */
-inline bool roll_chance_f(float chance)
-{
-    return chance > rand_chance();
-}
-
-/* Return true if a random roll fits in the specified chance (range 0-100). */
-inline bool roll_chance_i(int32 chance)
-{
-    return chance > irand(0, 99);
-}
 
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 {
@@ -343,9 +312,32 @@ std::string GetAddressString(ACE_INET_Addr const& addr);
 uint32 CreatePIDFile(const std::string& filename);
 uint32 GetPID();
 
-std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
-void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
-bool StringToBool(std::string const& str);
+bool StringEqualI(std::string_view str1, std::string_view str2);
+
+namespace acore::Impl
+{
+    std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
+    void HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse = false);
+}
+
+template<typename Container>
+std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
+{
+    return acore::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
+}
+
+template<size_t Size>
+void HexStrToByteArray(std::string const& str, std::array<uint8, Size>& buf, bool reverse = false)
+{
+    acore::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
+}
+template<size_t Size>
+std::array<uint8, Size> HexStrToByteArray(std::string const& str, bool reverse = false)
+{
+    std::array<uint8, Size> arr;
+    HexStrToByteArray(str, arr, reverse);
+    return arr;
+}
 
 bool StringContainsStringI(std::string const& haystack, std::string const& needle);
 template <typename T>
@@ -557,21 +549,6 @@ bool CompareValues(ComparisionType type, T val1, T val2)
             return false;
     }
 }
-
-/*
-* SFMT wrapper satisfying UniformRandomNumberGenerator concept for use in <random> algorithms
-*/
-class SFMTEngine
-{
-public:
-    typedef uint32 result_type;
-
-    static constexpr result_type min() { return std::numeric_limits<result_type>::min(); }
-    static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
-    result_type operator()() const { return rand32(); }
-
-    static SFMTEngine& Instance();
-};
 
 class EventMap
 {

@@ -2,10 +2,10 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "violet_hold.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "violet_hold.h"
 
 enum Yells
 {
@@ -48,7 +48,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_zuramatAI (pCreature);
+        return GetVioletHoldAI<boss_zuramatAI>(pCreature);
     }
 
     struct boss_zuramatAI : public ScriptedAI
@@ -108,7 +108,7 @@ public:
                     events.RepeatEvent(urand(18000, 22000));
                     break;
                 case EVENT_SPELL_SUMMON_VOID_SENTRY:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_VOID_SENTRY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOID_SENTRY, false);
                     events.RepeatEvent(12000);
                     break;
             }
@@ -139,7 +139,7 @@ public:
                 summons.Summon(pSummoned);
                 pSummoned->SetPhaseMask(16, true);
                 if (pInstance)
-                    pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -151,7 +151,7 @@ public:
                 if (pSummoned->IsAIEnabled)
                     pSummoned->AI()->DoAction(-1337);
                 if (pInstance)
-                    pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -175,7 +175,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_vh_void_sentryAI (pCreature);
+        return GetVioletHoldAI<npc_vh_void_sentryAI>(pCreature);
     }
 
     struct npc_vh_void_sentryAI : public NullCreatureAI
@@ -183,19 +183,19 @@ public:
         npc_vh_void_sentryAI(Creature* c) : NullCreatureAI(c)
         {
             pInstance = c->GetInstanceScript();
-            SummonedGUID = 0;
+            SummonedGUID.Clear();
             checkTimer = 5000;
             //me->CastSpell(me, SPELL_SUMMON_VOID_SENTRY_BALL, true);
             if (Creature* pSummoned = me->SummonCreature(NPC_VOID_SENTRY_BALL, *me, TEMPSUMMON_TIMED_DESPAWN, 300000))
             {
                 pSummoned->SetPhaseMask(1, true);
                 SummonedGUID = pSummoned->GetGUID();
-                pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
         InstanceScript* pInstance;
-        uint64 SummonedGUID;
+        ObjectGuid SummonedGUID;
         uint16 checkTimer;
 
         void DoAction(int32 a) override
@@ -219,7 +219,7 @@ public:
         void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
-                pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
         }
 
         void UpdateAI(uint32 diff) override

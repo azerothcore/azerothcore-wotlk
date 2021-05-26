@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "wailing_caverns.h"
 
 class instance_wailing_caverns : public InstanceMapScript
@@ -23,9 +23,6 @@ public:
         void Initialize() override
         {
             memset(&_encounters, 0, sizeof(_encounters));
-
-            DiscipleOfNaralexGUID = 0;
-            SerpentisGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -109,8 +106,8 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-        uint64 DiscipleOfNaralexGUID;
-        uint64 SerpentisGUID;
+        ObjectGuid DiscipleOfNaralexGUID;
+        ObjectGuid SerpentisGUID;
     };
 };
 

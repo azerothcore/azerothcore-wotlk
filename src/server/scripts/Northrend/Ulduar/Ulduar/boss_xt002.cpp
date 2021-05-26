@@ -2,15 +2,15 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Opcodes.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
-#include "Opcodes.h"
 
 enum XT002Spells
 {
@@ -112,7 +112,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_xt002AI (pCreature);
+        return GetUlduarAI<boss_xt002AI>(pCreature);
     }
 
     struct boss_xt002AI : public ScriptedAI
@@ -152,7 +152,7 @@ public:
             _nerfAchievement = true;
             _gravityAchievement = true;
 
-            me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND); // emerge
+            me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
@@ -160,7 +160,7 @@ public:
             {
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
                 m_pInstance->SetData(TYPE_XT002, NOT_STARTED);
-                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_XT002_DOORS)))
                     pGo->SetGoState(GO_STATE_ACTIVE);
             }
         }
@@ -197,7 +197,7 @@ public:
             {
                 m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
                 m_pInstance->SetData(TYPE_XT002, IN_PROGRESS);
-                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_XT002_DOORS)))
                     pGo->SetGoState(GO_STATE_READY);
             }
 
@@ -231,7 +231,7 @@ public:
             if (m_pInstance)
             {
                 m_pInstance->SetData(TYPE_XT002, DONE);
-                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_XT002_DOORS)))
                     pGo->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -262,7 +262,7 @@ public:
                 me->SetLootMode(3); // hard mode + normal loot
                 me->SetMaxHealth(me->GetMaxHealth());
                 me->SetHealth(me->GetMaxHealth());
-                me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND); // emerge
+                me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
 
                 me->CastSpell(me, SPELL_HEARTBREAK, true);
 
@@ -314,7 +314,7 @@ public:
                     {
                         _healthCheck -= 25;
                         me->SetControlled(true, UNIT_STATE_STUNNED);
-                        me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
+                        me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
 
                         me->MonsterYell("So tired. I will rest for just a moment!", LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(XT_SOUND_HEART_OPEN);
@@ -373,7 +373,7 @@ public:
                     me->MonsterYell("I'm ready to play!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(XT_SOUND_HEART_CLOSED);
 
-                    me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND); // emerge
+                    me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
                     // Hide heart
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_HIDE_HEART);
@@ -401,7 +401,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_heartAI (pCreature);
+        return GetUlduarAI<npc_xt002_heartAI>(pCreature);
     }
 
     struct npc_xt002_heartAI : public PassiveAI
@@ -458,7 +458,7 @@ public:
             }
             else if (param == ACTION_HIDE_HEART)
             {
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                     if (pXT002->AI())
                     {
                         pXT002->AI()->DoAction(_damageDone);
@@ -524,7 +524,7 @@ public:
         {
             me->SetVisible(false);
             if (me->GetInstanceScript())
-                if (Creature* XT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* XT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                     if (XT002->AI())
                         XT002->AI()->DoAction(ACTION_HEART_BROKEN);
         }
@@ -551,7 +551,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_scrapbotAI (pCreature);
+        return GetUlduarAI<npc_xt002_scrapbotAI>(pCreature);
     }
 
     struct npc_xt002_scrapbotAI : public PassiveAI
@@ -566,7 +566,7 @@ public:
             me->SetWalk(true);
 
             if (me->GetInstanceScript())
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                 {
                     if (pXT002->GetPositionZ() > 411.0f) // he is on stairs... idiot cryness protection
                         me->GetMotionMaster()->MovePoint(0, 884.028931f, -14.593809f, 409.786987f);
@@ -597,7 +597,7 @@ public:
 
             // we reached the target :)
             if (type == FOLLOW_MOTION_TYPE && me->GetInstanceScript())
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                 {
                     if (pXT002->IsAlive())
                     {
@@ -617,7 +617,7 @@ public:
             if (!_locked)
             {
                 if (me->GetInstanceScript())
-                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                     {
                         me->GetMotionMaster()->MoveFollow(pXT002, 0.0f, 0.0f);
                         _locked = true;
@@ -634,7 +634,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_pummellerAI (pCreature);
+        return GetUlduarAI<npc_xt002_pummellerAI>(pCreature);
     }
 
     struct npc_xt002_pummellerAI : public ScriptedAI
@@ -720,7 +720,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_boombotAI (pCreature);
+        return GetUlduarAI<npc_xt002_boombotAI>(pCreature);
     }
 
     struct npc_xt002_boombotAI : public PassiveAI
@@ -737,7 +737,7 @@ public:
             me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
 
             if (me->GetInstanceScript())
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                 {
                     if (pXT002->GetPositionZ() > 411.0f) // he is on stairs... idiot cryness protection
                         me->GetMotionMaster()->MovePoint(0, 884.028931f, -14.593809f, 409.786987f);
@@ -754,8 +754,8 @@ public:
             _boomed = true; // Prevent recursive calls
 
             WorldPacket data(SMSG_SPELLINSTAKILLLOG, 8 + 8 + 4);
-            data << uint64(me->GetGUID());
-            data << uint64(me->GetGUID());
+            data << me->GetGUID();
+            data << me->GetGUID();
             data << uint32(SPELL_BOOM);
             me->SendMessageToSet(&data, false);
 
@@ -804,7 +804,7 @@ public:
             if (!_locked)
             {
                 if (me->GetInstanceScript())
-                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_XT002)))
+                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                     {
                         me->GetMotionMaster()->MoveFollow(pXT002, 0.0f, 0.0f);
                         _locked = true;
@@ -821,7 +821,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_life_sparkAI (pCreature);
+        return GetUlduarAI<npc_xt002_life_sparkAI>(pCreature);
     }
 
     struct npc_xt002_life_sparkAI : public ScriptedAI
@@ -1047,7 +1047,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_XT002)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_XT002)))
                     return cr->AI()->GetData(DATA_XT002_NERF_ENGINEERING);
 
         return false;
@@ -1063,7 +1063,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_XT002)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_XT002)))
                     return cr->AI()->GetData(DATA_XT002_GRAVITY_ACHIEV);
 
         return false;

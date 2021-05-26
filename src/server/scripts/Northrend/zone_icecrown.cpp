@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,18 +15,18 @@ EndScriptData */
 npc_arete
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuras.h"
-#include "Player.h"
 #include "CombatAI.h"
 #include "MoveSplineInit.h"
-#include "ScriptedEscortAI.h"
-#include "Vehicle.h"
-#include "SmartScriptMgr.h"
-#include "SpellScript.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SmartScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum eBKG
@@ -105,20 +105,19 @@ public:
     {
         npc_battle_at_valhalasAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
-            playerGUID2 = 0;
         }
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
-        uint64 playerGUID2;
+        ObjectGuid playerGUID;
+        ObjectGuid playerGUID2;
         uint32 currentQuest;
 
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
             currentQuest = 0;
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
@@ -161,7 +160,7 @@ public:
             }
         }
 
-        void StartBattle(uint64 guid, uint32 questId)
+        void StartBattle(ObjectGuid guid, uint32 questId)
         {
             events.ScheduleEvent(EVENT_VALHALAS_FIRST, 6000);
             events.ScheduleEvent(EVENT_VALHALAS_CHECK_PLAYER, 30000);
@@ -172,8 +171,8 @@ public:
         void CheckSummons()
         {
             bool allow = true;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
+            for (ObjectGuid guid : summons)
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     if (cr->IsAlive())
                         allow = false;
 
@@ -232,7 +231,7 @@ public:
                                 break;
                             case QUEST_BFV_SIGRID:
                                 PrepareSummons();
-                                me->MonsterTextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", NULL, true);
+                                me->MonsterTextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
@@ -258,20 +257,20 @@ public:
                         {
                             case QUEST_BFV_FALLEN_HEROES:
                                 me->MonsterYell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                me->MonsterTextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", NULL, true);
+                                me->MonsterTextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", nullptr, true);
                                 break;
                             case QUEST_BFV_DARK_MASTER:
-                                me->MonsterTextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", NULL, true);
+                                me->MonsterTextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
-                                me->MonsterTextEmote("Lumbering in from the south, the smell of Carnage precedes him!", NULL, true);
+                                me->MonsterTextEmote("Lumbering in from the south, the smell of Carnage precedes him!", nullptr, true);
                                 break;
                             case QUEST_BFV_THANE:
-                                me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", NULL, true);
+                                me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", nullptr, true);
                                 break;
                             case QUEST_BFV_FINAL:
                                 me->MonsterYell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL, nullptr);
-                                me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", NULL, true);
+                                me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", nullptr, true);
                                 break;
                         }
 
@@ -448,13 +447,13 @@ public:
         npc_lord_areteAI(Creature* creature) : ScriptedAI(creature) {}
 
         EventMap events;
-        uint64 _landgrenGUID;
-        uint64 _landgrenSoulGUID;
+        ObjectGuid _landgrenGUID;
+        ObjectGuid _landgrenSoulGUID;
 
         void InitializeAI() override
         {
-            _landgrenGUID = 0;
-            _landgrenSoulGUID = 0;
+            _landgrenGUID.Clear();
+            _landgrenSoulGUID.Clear();
 
             events.Reset();
             events.RescheduleEvent(EVENT_START, 1000);
@@ -1368,7 +1367,7 @@ public:
                                         fireCount++;
 
                         if (fireCount)
-                            Unit::DealDamage(me, me, 3000 * fireCount, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE);
+                            Unit::DealDamage(me, me, 3000 * fireCount, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE);
                         else // Heal
                             me->ModifyHealth(2000);
 
@@ -1731,10 +1730,10 @@ public:
 
         SummonList Summons;
 
-        uint64 guidDalfors;
-        uint64 guidPriest[3];
-        uint64 guidMason[3];
-        uint64 guidHalof;
+        ObjectGuid guidDalfors;
+        ObjectGuid guidPriest[3];
+        ObjectGuid guidMason[3];
+        ObjectGuid guidHalof;
 
         void Reset() override
         {

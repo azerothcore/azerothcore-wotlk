@@ -2,14 +2,14 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
 
 #define SPELL_FLAME_JETS_10             62680
 #define SPELL_FLAME_JETS_25             63472
@@ -83,7 +83,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_iron_constructAI (pCreature);
+        return GetUlduarAI<npc_ulduar_iron_constructAI>(pCreature);
     }
 
     struct npc_ulduar_iron_constructAI : public ScriptedAI
@@ -115,7 +115,7 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
+                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
                     {
                         ignis->CastSpell(ignis, SPELL_STRENGTH_OF_THE_CREATOR, true);
                         AttackStart(ignis->GetVictim());
@@ -147,7 +147,7 @@ public:
                 Unit::Kill(attacker, me);
 
                 if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
+                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
                         ignis->AI()->SetData(1337, 0);
             }
         }
@@ -155,7 +155,7 @@ public:
         void JustDied(Unit*  /*killer*/) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
+                if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
                     ignis->RemoveAuraFromStack(SPELL_STRENGTH_OF_THE_CREATOR);
         }
 
@@ -191,7 +191,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_ignisAI (pCreature);
+        return GetUlduarAI<boss_ignisAI>(pCreature);
     }
 
     struct boss_ignisAI : public ScriptedAI
@@ -343,7 +343,7 @@ public:
                 case 0:
                     break;
                 case EVENT_ACTIVATE_CONSTRUCT:
-                    me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, false);
+                    me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     if (++counter >= 20)
                     {
                         me->MonsterYell(TEXT_BERSERK, LANG_UNIVERSAL, 0);
@@ -385,7 +385,7 @@ public:
                         std::list<Creature*> icl;
                         me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
 
-                        std::vector<uint64> playerGUIDs;
+                        GuidVector playerGUIDs;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         Player* temp = nullptr;
 

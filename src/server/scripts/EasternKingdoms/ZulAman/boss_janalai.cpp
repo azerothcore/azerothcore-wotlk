@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,11 +11,11 @@ SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "zulaman.h"
-#include "GridNotifiers.h"
 #include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "zulaman.h"
 
 enum Yells
 {
@@ -126,7 +126,7 @@ public:
 
         bool isFlameBreathing;
 
-        uint64 FireBombGUIDs[40];
+        ObjectGuid FireBombGUIDs[40];
 
         void Reset() override
         {
@@ -146,7 +146,7 @@ public:
             isFlameBreathing = false;
 
             for (uint8 i = 0; i < 40; ++i)
-                FireBombGUIDs[i] = 0;
+                FireBombGUIDs[i].Clear();
 
             HatchAllEggs(1);
         }
@@ -436,7 +436,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_janalaiAI>(creature);
+        return GetZulAmanAI<boss_janalaiAI>(creature);
     }
 };
 
@@ -471,7 +471,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_janalai_firebombAI(creature);
+        return GetZulAmanAI<npc_janalai_firebombAI>(creature);
     }
 };
 
@@ -603,7 +603,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_janalai_hatcherAI>(creature);
+        return GetZulAmanAI<npc_janalai_hatcherAI>(creature);
     }
 };
 
@@ -662,7 +662,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_janalai_hatchlingAI>(creature);
+        return GetZulAmanAI<npc_janalai_hatchlingAI>(creature);
     }
 };
 
@@ -673,7 +673,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_janalai_eggAI(creature);
+        return GetZulAmanAI<npc_janalai_eggAI>(creature);
     }
 
     struct npc_janalai_eggAI : public ScriptedAI

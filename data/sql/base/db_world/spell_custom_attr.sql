@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spell_custom_attr`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_custom_attr` 
 (
-  `spell_id` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'spell id',
-  `attributes` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'SpellCustomAttributes',
+  `spell_id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'spell id',
+  `attributes` INT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellCustomAttributes',
   PRIMARY KEY (`spell_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='SpellInfo custom attributes';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 COMMENT='SpellInfo custom attributes';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spell_custom_attr` WRITE;

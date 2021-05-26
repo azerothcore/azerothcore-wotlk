@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuras.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
 
 enum Orphans
 {
@@ -120,13 +120,13 @@ enum Misc
     DISPLAY_INVISIBLE                       = 11686,
 };
 
-uint64 getOrphanGUID(Player* player, uint32 orphan)
+ObjectGuid getOrphanGUID(Player* player, uint32 orphan)
 {
     if (Aura* orphanOut = player->GetAura(SPELL_ORPHAN_OUT))
         if (orphanOut->GetCaster() && orphanOut->GetCaster()->GetEntry() == orphan)
             return orphanOut->GetCaster()->GetGUID();
 
-    return 0;
+    return ObjectGuid::Empty;
 }
 
 /*######
@@ -145,8 +145,8 @@ public:
         {
             timer = 0;
             phase = 0;
-            playerGUID = 0;
-            orphanGUID = 0;
+            playerGUID.Clear();
+            orphanGUID.Clear();
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -216,8 +216,8 @@ public:
     private:
         uint32 timer;
         int8 phase;
-        uint64 playerGUID;
-        uint64 orphanGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -242,8 +242,8 @@ public:
         {
             timer = 0;
             phase = 0;
-            playerGUID = 0;
-            orphanGUID = 0;
+            playerGUID.Clear();
+            orphanGUID.Clear();
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -313,8 +313,8 @@ public:
     private:
         uint32 timer;
         int8 phase;
-        uint64 playerGUID;
-        uint64 orphanGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* pCreature) const override
@@ -342,8 +342,8 @@ public:
         {
             timer = 1000;
             phase = 0;
-            playerGUID = 0;
-            orphanGUID = 0;
+            playerGUID.Clear();
+            orphanGUID.Clear();
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -401,8 +401,8 @@ public:
     private:
         uint32 timer;
         uint8 phase;
-        uint64 playerGUID;
-        uint64 orphanGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -427,8 +427,8 @@ public:
         {
             timer = 0;
             phase = 0;
-            playerGUID = 0;
-            orphanGUID = 0;
+            playerGUID.Clear();
+            orphanGUID.Clear();
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -488,8 +488,8 @@ public:
     private:
         uint32 timer;
         int8 phase;
-        uint64 playerGUID;
-        uint64 orphanGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -514,8 +514,8 @@ public:
         {
             timer = 0;
             phase = 0;
-            playerGUID = 0;
-            orphanGUID = 0;
+            playerGUID.Clear();
+            orphanGUID.Clear();
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -574,8 +574,8 @@ public:
     private:
         uint32 timer;
         int8 phase;
-        uint64 playerGUID;
-        uint64 orphanGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -601,8 +601,8 @@ public:
         {
             timer = 0;
             phase = 0;
-            playerGUID = 0;
-            orphanGUID = 0;
+            playerGUID.Clear();
+            orphanGUID.Clear();
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -669,8 +669,8 @@ public:
     private:
         uint32 timer;
         int8 phase;
-        uint64 playerGUID;
-        uint64 orphanGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -695,8 +695,8 @@ public:
         {
             timer = 0;
             phase = 0;
-            playerGUID = 0;
-            orphanGUID = 0;
+            playerGUID.Clear();
+            orphanGUID.Clear();
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -828,8 +828,8 @@ public:
     private:
         int8 phase;
         uint32 timer;
-        uint64 playerGUID;
-        uint64 orphanGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

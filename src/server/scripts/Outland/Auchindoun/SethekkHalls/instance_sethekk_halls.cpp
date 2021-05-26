@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "sethekk_halls.h"
 
 class instance_sethekk_halls : public InstanceMapScript
@@ -21,14 +21,12 @@ public:
         instance_sethekk_halls_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
         uint32 AnzuEncounter;
-        uint64 m_uiIkissDoorGUID;
-        uint64 _talonKingsCofferGUID;
+        ObjectGuid m_uiIkissDoorGUID;
+        ObjectGuid _talonKingsCofferGUID;
 
         void Initialize() override
         {
             AnzuEncounter = NOT_STARTED;
-            m_uiIkissDoorGUID = 0;
-            _talonKingsCofferGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override

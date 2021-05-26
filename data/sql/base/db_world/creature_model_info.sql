@@ -6,16 +6,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_model_info`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_model_info` 
 (
-  `DisplayID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `DisplayID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `BoundingRadius` float NOT NULL DEFAULT 0,
   `CombatReach` float NOT NULL DEFAULT 0,
-  `Gender` tinyint(3) unsigned NOT NULL DEFAULT 2,
-  `DisplayID_Other_Gender` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `Gender` TINYINT unsigned NOT NULL DEFAULT 2,
+  `DisplayID_Other_Gender` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`DisplayID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Creature System (Model related info)';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 COMMENT='Creature System (Model related info)';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_model_info` WRITE;

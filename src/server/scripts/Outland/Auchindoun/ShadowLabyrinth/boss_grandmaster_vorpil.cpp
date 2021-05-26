@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "shadow_labyrinth.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "shadow_labyrinth.h"
 
 enum GrandmasterVorpil
 {
@@ -55,7 +55,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_grandmaster_vorpilAI (creature);
+        return GetShadowLabyrinthAI<boss_grandmaster_vorpilAI>(creature);
     }
 
     struct boss_grandmaster_vorpilAI : public ScriptedAI
@@ -201,23 +201,22 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_voidtravelerAI (creature);
+        return GetShadowLabyrinthAI<npc_voidtravelerAI>(creature);
     }
 
     struct npc_voidtravelerAI : public ScriptedAI
     {
         npc_voidtravelerAI(Creature* creature) : ScriptedAI(creature)
         {
-            VorpilGUID = 0;
             moveTimer = 1000;
             sacrificed = false;
         }
 
-        uint64 VorpilGUID;
+        ObjectGuid VorpilGUID;
         uint32 moveTimer;
         bool sacrificed;
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             VorpilGUID = guid;
         }

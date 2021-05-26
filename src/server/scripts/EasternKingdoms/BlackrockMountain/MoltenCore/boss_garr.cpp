@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,10 +11,10 @@ SDComment: Adds NYI
 SDCategory: Molten Core
 EndScriptData */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "molten_core.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -48,8 +48,8 @@ public:
         void EnterCombat(Unit* victim) override
         {
             BossAI::EnterCombat(victim);
-            events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 25000);
-            events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 15000);
+            events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15000);
+            events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -68,11 +68,11 @@ public:
                 {
                     case EVENT_ANTIMAGIC_PULSE:
                         DoCast(me, SPELL_ANTIMAGIC_PULSE);
-                        events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, urand(10000, 15000));
+                        events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 20000);
                         break;
                     case EVENT_MAGMA_SHACKLES:
                         DoCast(me, SPELL_MAGMA_SHACKLES);
-                        events.ScheduleEvent(EVENT_MAGMA_SHACKLES, urand(8000, 12000));
+                        events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 15000);
                         break;
                     default:
                         break;
@@ -85,7 +85,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_garrAI(creature);
+        return GetMoltenCoreAI<boss_garrAI>(creature);
     }
 };
 
@@ -137,7 +137,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_fireswornAI(creature);
+        return GetMoltenCoreAI<npc_fireswornAI>(creature);
     }
 };
 

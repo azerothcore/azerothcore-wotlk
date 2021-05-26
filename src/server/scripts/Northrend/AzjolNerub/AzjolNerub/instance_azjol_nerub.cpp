@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "azjol_nerub.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 DoorData const doorData[] =
 {
@@ -26,8 +26,6 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-            _krikthirGUID = 0;
-            _hadronoxGUID = 0;
         };
 
         void OnCreatureCreate(Creature* creature) override
@@ -114,8 +112,8 @@ public:
         }
 
     private:
-        uint64 _krikthirGUID;
-        uint64 _hadronoxGUID;
+        ObjectGuid _krikthirGUID;
+        ObjectGuid _hadronoxGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

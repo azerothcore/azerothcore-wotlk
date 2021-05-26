@@ -6,17 +6,17 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `account_banned`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `account_banned` 
 (
-  `id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Account id',
-  `bandate` int(10) unsigned NOT NULL DEFAULT 0,
-  `unbandate` int(10) unsigned NOT NULL DEFAULT 0,
+  `id` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account id',
+  `bandate` INT unsigned NOT NULL DEFAULT 0,
+  `unbandate` INT unsigned NOT NULL DEFAULT 0,
   `bannedby` varchar(50) NOT NULL,
   `banreason` varchar(255) NOT NULL,
-  `active` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `active` TINYINT unsigned NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`,`bandate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ban List';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Ban List';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `account_banned` WRITE;

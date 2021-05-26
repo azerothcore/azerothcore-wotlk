@@ -6,28 +6,28 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `quest_template_addon`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `quest_template_addon` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `MaxLevel` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `AllowableClasses` int(10) unsigned NOT NULL DEFAULT 0,
-  `SourceSpellID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `PrevQuestID` mediumint(8) NOT NULL DEFAULT 0,
-  `NextQuestID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ExclusiveGroup` mediumint(8) NOT NULL DEFAULT 0,
-  `RewardMailTemplateID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `RewardMailDelay` int(10) unsigned NOT NULL DEFAULT 0,
-  `RequiredSkillID` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `RequiredSkillPoints` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `RequiredMinRepFaction` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `RequiredMaxRepFaction` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `RequiredMinRepValue` mediumint(8) NOT NULL DEFAULT 0,
-  `RequiredMaxRepValue` mediumint(8) NOT NULL DEFAULT 0,
-  `ProvidedItemCount` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `SpecialFlags` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `MaxLevel` TINYINT unsigned NOT NULL DEFAULT 0,
+  `AllowableClasses` INT unsigned NOT NULL DEFAULT 0,
+  `SourceSpellID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `PrevQuestID` MEDIUMINT NOT NULL DEFAULT 0,
+  `NextQuestID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ExclusiveGroup` MEDIUMINT NOT NULL DEFAULT 0,
+  `RewardMailTemplateID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `RewardMailDelay` INT unsigned NOT NULL DEFAULT 0,
+  `RequiredSkillID` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `RequiredSkillPoints` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `RequiredMinRepFaction` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `RequiredMaxRepFaction` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `RequiredMinRepValue` MEDIUMINT NOT NULL DEFAULT 0,
+  `RequiredMaxRepValue` MEDIUMINT NOT NULL DEFAULT 0,
+  `ProvidedItemCount` TINYINT unsigned NOT NULL DEFAULT 0,
+  `SpecialFlags` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `quest_template_addon` WRITE;

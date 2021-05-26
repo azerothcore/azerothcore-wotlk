@@ -6,16 +6,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `group_member`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `group_member` 
 (
-  `guid` int(10) unsigned NOT NULL,
-  `memberGuid` int(10) unsigned NOT NULL,
-  `memberFlags` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `subgroup` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `roles` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL,
+  `memberGuid` INT unsigned NOT NULL,
+  `memberFlags` TINYINT unsigned NOT NULL DEFAULT 0,
+  `subgroup` TINYINT unsigned NOT NULL DEFAULT 0,
+  `roles` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`memberGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Groups';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Groups';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `group_member` WRITE;

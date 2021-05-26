@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,13 +11,13 @@ Comment: All list related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
-#include "SpellAuraEffects.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 
 class list_commandscript : public CommandScript
 {
@@ -94,12 +94,12 @@ public:
         {
             do
             {
-                Field* fields   = result->Fetch();
-                uint32 guid     = fields[0].GetUInt32();
-                float x         = fields[1].GetFloat();
-                float y         = fields[2].GetFloat();
-                float z         = fields[3].GetFloat();
-                uint16 mapId    = fields[4].GetUInt16();
+                Field* fields               = result->Fetch();
+                ObjectGuid::LowType guid    = fields[0].GetUInt32();
+                float x                     = fields[1].GetFloat();
+                float y                     = fields[2].GetFloat();
+                float z                     = fields[3].GetFloat();
+                uint16 mapId                = fields[4].GetUInt16();
 
                 if (handler->GetSession())
                     handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId);
@@ -378,13 +378,13 @@ public:
         {
             do
             {
-                Field* fields   = result->Fetch();
-                uint32 guid     = fields[0].GetUInt32();
-                float x         = fields[1].GetFloat();
-                float y         = fields[2].GetFloat();
-                float z         = fields[3].GetFloat();
-                uint16 mapId    = fields[4].GetUInt16();
-                uint32 entry    = fields[5].GetUInt32();
+                Field* fields               = result->Fetch();
+                ObjectGuid::LowType guid    = fields[0].GetUInt32();
+                float x                     = fields[1].GetFloat();
+                float y                     = fields[2].GetFloat();
+                float z                     = fields[3].GetFloat();
+                uint16 mapId                = fields[4].GetUInt16();
+                uint32 entry                = fields[5].GetUInt32();
 
                 if (handler->GetSession())
                     handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gInfo->name.c_str(), x, y, z, mapId);
@@ -427,8 +427,8 @@ public:
             handler->PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, aura->GetId(), (handler->GetSession() ? ss_name.str().c_str() : name),
                                      aurApp->GetEffectMask(), aura->GetCharges(), aura->GetStackAmount(), aurApp->GetSlot(),
                                      aura->GetDuration(), aura->GetMaxDuration(), (aura->IsPassive() ? passiveStr : ""),
-                                     (talent ? talentStr : ""), IS_PLAYER_GUID(aura->GetCasterGUID()) ? "player" : "creature",
-                                     GUID_LOPART(aura->GetCasterGUID()));
+                                     (talent ? talentStr : ""), aura->GetCasterGUID().IsPlayer() ? "player" : "creature",
+                                     aura->GetCasterGUID().GetCounter());
         }
 
         if (!args || std::string(args) != "all")

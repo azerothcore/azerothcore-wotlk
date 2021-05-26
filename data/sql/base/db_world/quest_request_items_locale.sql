@@ -6,15 +6,15 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `quest_request_items_locale`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `quest_request_items_locale` 
 (
-  `ID` int(10) unsigned NOT NULL DEFAULT 0,
+  `ID` INT unsigned NOT NULL DEFAULT 0,
   `locale` varchar(4) NOT NULL,
   `CompletionText` text DEFAULT NULL,
-  `VerifiedBuild` smallint(6) NOT NULL DEFAULT 0,
+  `VerifiedBuild` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`,`locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `quest_request_items_locale` WRITE;

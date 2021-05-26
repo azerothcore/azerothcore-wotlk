@@ -2,13 +2,14 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "PassiveAI.h"
-#include "Player.h"
 #include "Group.h"
 #include "LFGMgr.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "the_slave_pens.h"
 
 #define GOSSIP_TEXT_ID          15864
 #define QUEST_SUMMON_AHUNE      11691
@@ -20,17 +21,6 @@
 const Position AhuneSummonPos = {-97.3473f, -233.139f, -1.27587f, M_PI / 2};
 const Position TotemPos[3] = { {-115.141f, -143.317f, -2.09467f, 4.92772f}, {-120.178f, -144.398f, -2.23786f, 4.92379f}, {-125.277f, -145.463f, -1.95209f, 4.97877f} };
 const Position MinionSummonPos = {-97.154404f, -204.382675f, -1.19f, M_PI / 2};
-
-enum NPCs
-{
-    NPC_AHUNE                   = 25740,
-    NPC_FROZEN_CORE             = 25865,
-    NPC_AHUNE_SUMMON_LOC_BUNNY  = 25745,
-    NPC_TOTEM                   = 25961,
-    NPC_TOTEM_BUNNY_1           = 25971,
-    NPC_TOTEM_BUNNY_2           = 25972,
-    NPC_TOTEM_BUNNY_3           = 25973,
-};
 
 enum EventSpells
 {
@@ -81,7 +71,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_ahuneAI (pCreature);
+        return GetTheSlavePensAI<boss_ahuneAI>(pCreature);
     }
 
     struct boss_ahuneAI : public ScriptedAI
@@ -91,7 +81,7 @@ public:
             SetCombatMovement(false);
             SetEquipmentSlots(false, 54806, EQUIP_UNEQUIP, EQUIP_UNEQUIP);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            InvokerGUID = 0;
+            InvokerGUID.Clear();
             events.Reset();
             events.RescheduleEvent(EVENT_EMERGE, 12000);
             events.RescheduleEvent(EVENT_INVOKER_SAY_1, 1000);
@@ -100,7 +90,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 InvokerGUID;
+        ObjectGuid InvokerGUID;
 
         void StartPhase1()
         {
@@ -360,7 +350,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ahune_frozen_coreAI (pCreature);
+        return GetTheSlavePensAI<npc_ahune_frozen_coreAI>(pCreature);
     }
 
     struct npc_ahune_frozen_coreAI : public NullCreatureAI

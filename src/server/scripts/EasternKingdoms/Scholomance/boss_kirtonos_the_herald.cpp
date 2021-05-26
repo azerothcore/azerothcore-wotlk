@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "scholomance.h"
-#include "MoveSplineInit.h"
 #include "GameObjectAI.h"
+#include "MoveSplineInit.h"
 #include "Player.h"
+#include "scholomance.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -18,7 +18,8 @@ enum Spells
     SPELL_KIRTONOS_TRANSFORM          = 16467,
     SPELL_SHADOW_BOLT_VOLLEY          = 17228,
     SPELL_CURSE_OF_TONGUES            = 12889,
-    SPELL_DOMINATE_MIND               = 14515
+    SPELL_DOMINATE_MIND               = 14515,
+    SPELL_TRANSFORM_VISUAL            = 24085
 };
 
 enum Events
@@ -66,31 +67,37 @@ public:
             instance = me->GetInstanceScript();
         }
 
+        int TransformsCount;
         EventMap events;
         EventMap events2;
         InstanceScript* instance;
 
         void EnterCombat(Unit* /*who*/) override
         {
+            TransformsCount = 0;
+
             events.Reset();
             events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2000);
             events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 6000);
-            events.ScheduleEvent(EVENT_DOMINATE_MIND, 20000);
-            events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 5000);
+            events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 20000);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
+            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GATE_KIRTONOS)))
+            {
                 gate->SetGoState(GO_STATE_ACTIVE);
+            }
 
             instance->SetData(DATA_KIRTONOS_THE_HERALD, DONE);
         }
 
         void EnterEvadeMode() override
         {
-            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
+            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GATE_KIRTONOS)))
+            {
                 gate->SetGoState(GO_STATE_ACTIVE);
+            }
 
             instance->SetData(DATA_KIRTONOS_THE_HERALD, NOT_STARTED);
             me->DespawnOrUnsummon(1);
@@ -102,7 +109,7 @@ public:
             events2.ScheduleEvent(INTRO_1, 500);
             me->SetDisableGravity(true);
             me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             Talk(EMOTE_SUMMONED);
         }
 
@@ -130,33 +137,42 @@ public:
                     me->GetMotionMaster()->MovePoint(0, PosMove[0]);
                     break;
                 case INTRO_3:
-                    if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
+                    if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GATE_KIRTONOS)))
+                    {
                         gate->SetGoState(GO_STATE_READY);
+                    }
                     me->SetFacingTo(0.01745329f);
                     break;
                 case INTRO_4:
                     me->SetWalk(true);
+                    me->SetCanFly(false);
                     me->SetDisableGravity(false);
                     me->CastSpell(me, SPELL_KIRTONOS_TRANSFORM, true);
-                    me->SetCanFly(false);
                     break;
                 case INTRO_5:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_KIRTONOS_STAFF));
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     break;
                 case INTRO_6:
-                    me->GetMotionMaster()->MovePoint(0, PosMove[1]);
+                    if (!me->IsInCombat())
+                    {
+                        me->GetMotionMaster()->MovePoint(0, PosMove[1]);
+                    }
                     break;
             }
 
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
             switch (events.ExecuteEvent())
             {
@@ -186,33 +202,53 @@ public:
                     break;
                 case EVENT_DOMINATE_MIND:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 20.0f, true))
+                    {
                         me->CastSpell(target, SPELL_DOMINATE_MIND, false);
-                    events.ScheduleEvent(EVENT_DOMINATE_MIND, urand(44000, 48000));
+                    }
                     break;
                 case EVENT_KIRTONOS_TRANSFORM:
-                    if (me->HealthBelowPct(50))
+                    TransformsCount++;
+
+                    if (me->HasAura(SPELL_KIRTONOS_TRANSFORM))
                     {
                         events.Reset();
                         events.ScheduleEvent(EVENT_SWOOP, 4000);
                         events.ScheduleEvent(EVENT_WING_FLAP, 7000);
                         events.ScheduleEvent(EVENT_PIERCE_ARMOR, 11000);
                         events.ScheduleEvent(EVENT_DISARM, 15000);
+                        // show shape-shift animation before aura removal
+                        me->CastSpell(me, SPELL_TRANSFORM_VISUAL, true);
                         me->RemoveAura(SPELL_KIRTONOS_TRANSFORM);
                         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
-                        break;
+                    }
+                    else
+                    {
+                        events.Reset();
+                        events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2000);
+                        events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 6000);
+                        events.ScheduleEvent(EVENT_WING_FLAP, 13000);
+                        me->CastSpell(me, SPELL_KIRTONOS_TRANSFORM, true);
+                        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_KIRTONOS_STAFF));
+
+                        // Schedule Dominate Mind on every 2nd caster transform
+                        if ((TransformsCount - 2) % 4 == 0)
+                        {
+                            events.ScheduleEvent(EVENT_DOMINATE_MIND, urand(4000, 8000));
+                        }
                     }
 
-                    events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 2000);
+                    events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 20000);
                     break;
             }
 
+            DoZoneInCombat();
             DoMeleeAttackIfReady();
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kirtonos_the_heraldAI>(creature);
+        return GetScholomanceAI<boss_kirtonos_the_heraldAI>(creature);
     }
 };
 

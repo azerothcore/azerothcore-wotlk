@@ -6,32 +6,32 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `faction_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `faction_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `ReputationIndex` int(11) NOT NULL DEFAULT 0,
-  `ReputationRaceMask_1` int(11) NOT NULL DEFAULT 0,
-  `ReputationRaceMask_2` int(11) NOT NULL DEFAULT 0,
-  `ReputationRaceMask_3` int(11) NOT NULL DEFAULT 0,
-  `ReputationRaceMask_4` int(11) NOT NULL DEFAULT 0,
-  `ReputationClassMask_1` int(11) NOT NULL DEFAULT 0,
-  `ReputationClassMask_2` int(11) NOT NULL DEFAULT 0,
-  `ReputationClassMask_3` int(11) NOT NULL DEFAULT 0,
-  `ReputationClassMask_4` int(11) NOT NULL DEFAULT 0,
-  `ReputationBase_1` int(11) NOT NULL DEFAULT 0,
-  `ReputationBase_2` int(11) NOT NULL DEFAULT 0,
-  `ReputationBase_3` int(11) NOT NULL DEFAULT 0,
-  `ReputationBase_4` int(11) NOT NULL DEFAULT 0,
-  `ReputationFlags_1` int(11) NOT NULL DEFAULT 0,
-  `ReputationFlags_2` int(11) NOT NULL DEFAULT 0,
-  `ReputationFlags_3` int(11) NOT NULL DEFAULT 0,
-  `ReputationFlags_4` int(11) NOT NULL DEFAULT 0,
-  `ParentFactionID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `ReputationIndex` INT NOT NULL DEFAULT 0,
+  `ReputationRaceMask_1` INT NOT NULL DEFAULT 0,
+  `ReputationRaceMask_2` INT NOT NULL DEFAULT 0,
+  `ReputationRaceMask_3` INT NOT NULL DEFAULT 0,
+  `ReputationRaceMask_4` INT NOT NULL DEFAULT 0,
+  `ReputationClassMask_1` INT NOT NULL DEFAULT 0,
+  `ReputationClassMask_2` INT NOT NULL DEFAULT 0,
+  `ReputationClassMask_3` INT NOT NULL DEFAULT 0,
+  `ReputationClassMask_4` INT NOT NULL DEFAULT 0,
+  `ReputationBase_1` INT NOT NULL DEFAULT 0,
+  `ReputationBase_2` INT NOT NULL DEFAULT 0,
+  `ReputationBase_3` INT NOT NULL DEFAULT 0,
+  `ReputationBase_4` INT NOT NULL DEFAULT 0,
+  `ReputationFlags_1` INT NOT NULL DEFAULT 0,
+  `ReputationFlags_2` INT NOT NULL DEFAULT 0,
+  `ReputationFlags_3` INT NOT NULL DEFAULT 0,
+  `ReputationFlags_4` INT NOT NULL DEFAULT 0,
+  `ParentFactionID` INT NOT NULL DEFAULT 0,
   `ParentFactionMod_1` float NOT NULL DEFAULT 0,
   `ParentFactionMod_2` float NOT NULL DEFAULT 0,
-  `ParentFactionCap_1` int(11) NOT NULL DEFAULT 0,
-  `ParentFactionCap_2` int(11) NOT NULL DEFAULT 0,
+  `ParentFactionCap_1` INT NOT NULL DEFAULT 0,
+  `ParentFactionCap_2` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE `faction_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   `Description_Lang_enUS` varchar(300) DEFAULT NULL,
   `Description_Lang_enGB` varchar(300) DEFAULT NULL,
   `Description_Lang_koKR` varchar(300) DEFAULT NULL,
@@ -65,9 +65,9 @@ CREATE TABLE `faction_dbc`
   `Description_Lang_ptBR` varchar(300) DEFAULT NULL,
   `Description_Lang_itIT` varchar(300) DEFAULT NULL,
   `Description_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Description_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Description_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `faction_dbc` WRITE;

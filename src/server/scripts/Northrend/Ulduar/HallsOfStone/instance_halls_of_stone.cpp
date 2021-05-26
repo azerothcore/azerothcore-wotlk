@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_stone.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 class instance_halls_of_stone : public InstanceMapScript
 {
@@ -22,19 +22,19 @@ public:
 
         uint32 Encounter[MAX_ENCOUNTER];
 
-        uint64 goKaddrakGUID;
-        uint64 goMarnakGUID;
-        uint64 goAbedneumGUID;
-        uint64 goTribunalConsoleGUID;
-        uint64 goSkyRoomFloorGUID;
-        uint64 goSjonnirConsoleGUID;
-        uint64 goSjonnirDoorGUID;
-        uint64 goLeftPipeGUID;
-        uint64 goRightPipeGUID;
-        uint64 goTribunalDoorGUID;
+        ObjectGuid goKaddrakGUID;
+        ObjectGuid goMarnakGUID;
+        ObjectGuid goAbedneumGUID;
+        ObjectGuid goTribunalConsoleGUID;
+        ObjectGuid goSkyRoomFloorGUID;
+        ObjectGuid goSjonnirConsoleGUID;
+        ObjectGuid goSjonnirDoorGUID;
+        ObjectGuid goLeftPipeGUID;
+        ObjectGuid goRightPipeGUID;
+        ObjectGuid goTribunalDoorGUID;
 
-        uint64 SjonnirGUID;
-        uint64 BrannGUID;
+        ObjectGuid SjonnirGUID;
+        ObjectGuid BrannGUID;
 
         bool brannAchievement;
         bool sjonnirAchievement;
@@ -44,20 +44,6 @@ public:
         void Initialize() override
         {
             memset(&Encounter, 0, sizeof(Encounter));
-
-            goKaddrakGUID = 0;
-            goMarnakGUID = 0;
-            goAbedneumGUID = 0;
-            goTribunalConsoleGUID = 0;
-            goSkyRoomFloorGUID = 0;
-            goSjonnirConsoleGUID = 0;
-            goSjonnirDoorGUID = 0;
-            goLeftPipeGUID = 0;
-            goRightPipeGUID = 0;
-            goTribunalDoorGUID = 0;
-
-            SjonnirGUID = 0;
-            BrannGUID = 0;
 
             brannAchievement = false;
             sjonnirAchievement = false;
@@ -69,8 +55,10 @@ public:
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
-                if (Encounter[i] == IN_PROGRESS)
+                if (Encounter[i] == IN_PROGRESS && i != BRANN_BRONZEBEARD)
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -132,9 +120,9 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const override
+        ObjectGuid GetGuidData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
                 case GO_TRIBUNAL_CONSOLE:
                     return goTribunalConsoleGUID;
@@ -160,12 +148,13 @@ public:
                 case NPC_BRANN:
                     return BrannGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         uint32 GetData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
                 case BOSS_KRYSTALLUS:
                 case BOSS_MAIDEN_OF_GRIEF:
@@ -174,18 +163,20 @@ public:
                 case BRANN_BRONZEBEARD:
                     return Encounter[id];
             }
+
             return 0;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7590: // Brann Spankin' New (2154)
                     return brannAchievement;
                 case 7593: // Abuse the Ooze (2155)
                     return sjonnirAchievement;
             }
+
             return false;
         }
 

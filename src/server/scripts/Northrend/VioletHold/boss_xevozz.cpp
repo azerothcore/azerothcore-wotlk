@@ -2,8 +2,8 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "violet_hold.h"
 
 enum Yells
@@ -52,7 +52,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_xevozzAI (pCreature);
+        return GetVioletHoldAI<boss_xevozzAI>(pCreature);
     }
 
     struct boss_xevozzAI : public ScriptedAI
@@ -96,7 +96,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_ARCANE_BARRAGE_VOLLEY:
-                    me->CastSpell((Unit*)NULL, SPELL_ARCANE_BARRAGE_VOLLEY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ARCANE_BARRAGE_VOLLEY, false);
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_ARCANE_BUFFET:
@@ -107,13 +107,13 @@ public:
                         Talk(SAY_SUMMON_ENERGY);
                         spheres.DespawnAll();
                         uint32 entry1 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3);
-                        me->CastSpell((Unit*)NULL, entry1, true);
+                        me->CastSpell((Unit*)nullptr, entry1, true);
                         if (IsHeroic())
                         {
                             uint32 entry2;
                             do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); }
                             while (entry1 == entry2);
-                            me->CastSpell((Unit*)NULL, entry2, true);
+                            me->CastSpell((Unit*)nullptr, entry2, true);
                         }
                         events.RepeatEvent(45000);
                         events.RescheduleEvent(EVENT_SPELL_ARCANE_BUFFET, 5000);
@@ -124,8 +124,8 @@ public:
                     {
                         bool found = false;
                         if (pInstance)
-                            for (std::list<uint64>::iterator itr = spheres.begin(); itr != spheres.end(); ++itr)
-                                if (Creature* c = pInstance->instance->GetCreature(*itr))
+                            for (ObjectGuid guid : spheres)
+                                if (Creature* c = pInstance->instance->GetCreature(guid))
                                     if (me->GetDistance(c) < 3.0f)
                                     {
                                         c->CastSpell(me, SPELL_ARCANE_POWER, false);
@@ -155,7 +155,7 @@ public:
                 pSummoned->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                 spheres.Summon(pSummoned);
                 if (pInstance)
-                    pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -165,7 +165,7 @@ public:
             {
                 spheres.Despawn(pSummoned);
                 if (pInstance)
-                    pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 

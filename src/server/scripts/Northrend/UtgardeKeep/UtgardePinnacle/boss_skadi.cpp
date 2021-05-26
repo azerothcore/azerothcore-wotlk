@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "utgarde_pinnacle.h"
-#include "Vehicle.h"
 #include "CombatAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "utgarde_pinnacle.h"
+#include "Vehicle.h"
 
 enum Misc
 {
@@ -100,7 +100,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_skadiAI (pCreature);
+        return GetUtgardePinnacleAI<boss_skadiAI>(pCreature);
     }
 
     struct boss_skadiAI : public ScriptedAI
@@ -113,7 +113,7 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
-        uint64 GraufGUID;
+        ObjectGuid GraufGUID;
         bool SecondPhase, EventStarted;
 
         void Reset() override
@@ -239,7 +239,7 @@ public:
             if (m_pInstance)
             {
                 m_pInstance->SetData(DATA_SKADI_THE_RUTHLESS, DONE);
-                m_pInstance->HandleGameObject(m_pInstance->GetData64(SKADI_DOOR), true);
+                m_pInstance->HandleGameObject(m_pInstance->GetGuidData(SKADI_DOOR), true);
             }
         }
 
@@ -260,7 +260,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_skadi_graufAI (pCreature);
+        return GetUtgardePinnacleAI<boss_skadi_graufAI>(pCreature);
     }
 
     struct boss_skadi_graufAI : public VehicleAI
@@ -495,7 +495,7 @@ public:
                 uint8 count = m_pInstance->GetData(SKADI_HITS) + 1;
                 m_pInstance->SetData(SKADI_HITS, count);
 
-                if (Creature* grauf = ObjectAccessor::GetCreature(*pPlayer, m_pInstance->GetData64(DATA_GRAUF)))
+                if (Creature* grauf = ObjectAccessor::GetCreature(*pPlayer, m_pInstance->GetGuidData(DATA_GRAUF)))
                 {
                     if (count >= 3)
                     {
@@ -505,7 +505,7 @@ public:
 
                     grauf->AI()->DoAction(ACTION_MYGIRL_ACHIEVEMENT);
                 }
-                go->CastSpell((Unit*)NULL, SPELL_LAUNCH_HARPOON);
+                go->CastSpell((Unit*)nullptr, SPELL_LAUNCH_HARPOON);
             }
 
         return true;

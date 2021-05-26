@@ -2,15 +2,15 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "Group.h"
-#include "Spell.h"
-#include "icecrown_citadel.h"
-#include "Vehicle.h"
 #include "GridNotifiers.h"
+#include "Group.h"
+#include "icecrown_citadel.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "Vehicle.h"
 
 enum ScriptTexts
 {
@@ -140,7 +140,7 @@ class AbominationDespawner
 public:
     explicit AbominationDespawner(Unit* owner) : _owner(owner) { }
 
-    bool operator()(uint64 guid)
+    bool operator()(ObjectGuid guid)
     {
         if (Unit* summon = ObjectAccessor::GetUnit(*_owner, guid))
         {
@@ -335,7 +335,7 @@ public:
             if (Is25ManRaid() && me->HasAura(SPELL_SHADOWS_FATE))
                 DoCastAOE(SPELL_UNHOLY_INFUSION_CREDIT, true); // ReqTargetAura in dbc
 
-            me->CastSpell((Unit*)NULL, SPELL_MUTATED_PLAGUE_CLEAR, true);
+            me->CastSpell((Unit*)nullptr, SPELL_MUTATED_PLAGUE_CLEAR, true);
         }
 
         void JustSummoned(Creature* summon) override
@@ -411,7 +411,7 @@ public:
             switch (id)
             {
                 case POINT_FESTERGUT:
-                    if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_FESTERGUT)))
+                    if (Creature* c = instance->instance->GetCreature(instance->GetGuidData(DATA_FESTERGUT)))
                     {
                         if (c->IsInCombat())
                         {
@@ -427,7 +427,7 @@ public:
                     }
                     break;
                 case POINT_ROTFACE:
-                    if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_ROTFACE)))
+                    if (Creature* c = instance->instance->GetCreature(instance->GetGuidData(DATA_ROTFACE)))
                     {
                         if (c->IsInCombat())
                         {
@@ -730,13 +730,12 @@ public:
     npc_putricide_oozeAI(Creature* creature, uint32 hitTargetSpellId) : ScriptedAI(creature),
         _hitTargetSpellId(hitTargetSpellId), _newTargetSelectTimer(0)
     {
-        targetGUID = 0;
         me->SetReactState(REACT_PASSIVE);
     }
 
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
-    void SetGUID(uint64 guid, int32 type) override
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
         if (type == -1)
             targetGUID = guid;
@@ -745,7 +744,7 @@ public:
     void IsSummonedBy(Unit* /*summoner*/) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
             {
                 if (!professor->IsInCombat())
                     me->DespawnOrUnsummon(1);
@@ -756,7 +755,7 @@ public:
 
     void SelectNewTarget()
     {
-        targetGUID = 0;
+        targetGUID.Clear();
         me->InterruptNonMeleeSpells(true);
         me->AttackStop();
         me->GetMotionMaster()->Clear();
@@ -1085,11 +1084,7 @@ public:
 
         bool Validate(SpellInfo const* spell) override
         {
-            if (!spell->ExcludeTargetAuraSpell)
-                return false;
-            if (!sSpellMgr->GetSpellInfo(spell->ExcludeTargetAuraSpell))
-                return false;
-            return true;
+            return ValidateSpellInfo({ spell->ExcludeTargetAuraSpell });
         }
 
         // set up initial variables and check if caster is creature
@@ -1208,7 +1203,7 @@ public:
             int32 damage = spell->Effects[EFFECT_0].CalcValue(caster);
             damage = damage * pow(2.5f, GetStackAmount());
 
-            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true, NULL, aurEff, GetCasterGUID());
+            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true, nullptr, aurEff, GetCasterGUID());
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1247,11 +1242,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_UNBOUND_PLAGUE))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_UNBOUND_PLAGUE_SEARCHER))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_UNBOUND_PLAGUE, SPELL_UNBOUND_PLAGUE_SEARCHER });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)
@@ -1266,7 +1257,7 @@ public:
             }
 
             targets.remove_if(acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
-            acore::Containers::RandomResizeList(targets, 1);
+            acore::Containers::RandomResize(targets, 1);
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
@@ -1282,7 +1273,7 @@ public:
 
             if (!GetHitUnit()->HasAura(plagueId))
             {
-                if (Creature* professor = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                if (Creature* professor = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 {
                     if (Aura* oldPlague = GetCaster()->GetAura(plagueId, professor->GetGUID()))
                     {
@@ -1422,7 +1413,7 @@ public:
             if (!instance)
                 return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
-            Creature* professor = ObjectAccessor::GetCreature(*GetExplTargetUnit(), instance->GetData64(DATA_PROFESSOR_PUTRICIDE));
+            Creature* professor = ObjectAccessor::GetCreature(*GetExplTargetUnit(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
             if (!professor)
                 return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
@@ -1516,7 +1507,7 @@ public:
             if (!instance)
                 return;
 
-            Creature* putricide = ObjectAccessor::GetCreature(*caster, instance->GetData64(DATA_PROFESSOR_PUTRICIDE));
+            Creature* putricide = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
             if (!putricide)
                 return;
 

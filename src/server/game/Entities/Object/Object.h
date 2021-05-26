@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,69 +9,20 @@
 
 #include "Common.h"
 #include "DataMap.h"
-#include "UpdateMask.h"
-#include "UpdateData.h"
-#include "GridReference.h"
-#include "ObjectDefines.h"
 #include "GridDefines.h"
+#include "GridReference.h"
 #include "Map.h"
-
-#ifdef ELUNA
-class ElunaEventProcessor;
-#endif
-
+#include "ObjectDefines.h"
+#include "ObjectGuid.h"
+#include "UpdateData.h"
+#include "UpdateMask.h"
 #include <set>
 #include <string>
 #include <sstream>
 
-#define CONTACT_DISTANCE            0.5f
-#define INTERACTION_DISTANCE        5.5f
-#define ATTACK_DISTANCE             5.0f
-#define MAX_SEARCHER_DISTANCE       150.0f // pussywizard: replace the use of MAX_VISIBILITY_DISTANCE in searchers, because MAX_VISIBILITY_DISTANCE is quite too big for this purpose
-#define MAX_VISIBILITY_DISTANCE     250.0f // max distance for visible objects, experimental
-#define VISIBILITY_INC_FOR_GOBJECTS 30.0f // pussywizard
-#define VISIBILITY_COMPENSATION     15.0f // increase searchers
-#define SPELL_SEARCHER_COMPENSATION 30.0f // increase searchers size in case we have large npc near cell border
-#define VISIBILITY_DIST_WINTERGRASP 175.0f
-#define SIGHT_RANGE_UNIT            50.0f
-#define DEFAULT_VISIBILITY_DISTANCE 90.0f // default visible distance, 90 yards on continents
-#define DEFAULT_VISIBILITY_INSTANCE 120.0f // default visible distance in instances, 120 yards
-#define DEFAULT_VISIBILITY_BGARENAS 150.0f // default visible distance in BG/Arenas, 150 yards
-
-#define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // player size, also currently used (correctly?) for any non Unit world objects
-#define DEFAULT_COMBAT_REACH        1.5f
-#define MIN_MELEE_REACH             2.0f
-#define NOMINAL_MELEE_RANGE         5.0f
-#define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2) //center to center for players
-
-enum TypeMask
-{
-    TYPEMASK_OBJECT         = 0x0001,
-    TYPEMASK_ITEM           = 0x0002,
-    TYPEMASK_CONTAINER      = 0x0006,                       // TYPEMASK_ITEM | 0x0004
-    TYPEMASK_UNIT           = 0x0008, // creature
-    TYPEMASK_PLAYER         = 0x0010,
-    TYPEMASK_GAMEOBJECT     = 0x0020,
-    TYPEMASK_DYNAMICOBJECT  = 0x0040,
-    TYPEMASK_CORPSE         = 0x0080,
-    TYPEMASK_SEER           = TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT
-};
-
-enum TypeID
-{
-    TYPEID_OBJECT        = 0,
-    TYPEID_ITEM          = 1,
-    TYPEID_CONTAINER     = 2,
-    TYPEID_UNIT          = 3,
-    TYPEID_PLAYER        = 4,
-    TYPEID_GAMEOBJECT    = 5,
-    TYPEID_DYNAMICOBJECT = 6,
-    TYPEID_CORPSE        = 7
-};
-
-#define NUM_CLIENT_OBJECT_TYPES             8
-
-uint32 GuidHigh2TypeId(uint32 guid_hi);
+#ifdef ELUNA
+class ElunaEventProcessor;
+#endif
 
 enum TempSummonType
 {
@@ -118,7 +69,7 @@ class StaticTransport;
 class MotionTransport;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
-typedef std::unordered_set<uint32> UpdatePlayerSet;
+typedef GuidUnorderedSet UpdatePlayerSet;
 
 class Object
 {
@@ -130,14 +81,13 @@ public:
     virtual void AddToWorld();
     virtual void RemoveFromWorld();
 
-    [[nodiscard]] uint64 GetGUID() const { return GetUInt64Value(0); }
-    [[nodiscard]] uint32 GetGUIDLow() const { return GUID_LOPART(GetUInt64Value(0)); }
-    [[nodiscard]] uint32 GetGUIDMid() const { return GUID_ENPART(GetUInt64Value(0)); }
-    [[nodiscard]] uint32 GetGUIDHigh() const { return GUID_HIPART(GetUInt64Value(0)); }
-    [[nodiscard]] const ByteBuffer& GetPackGUID() const { return m_PackGUID; }
+    [[nodiscard]] static ObjectGuid GetGUID(Object const* o) { return o ? o->GetGUID() : ObjectGuid::Empty; }
+    [[nodiscard]] ObjectGuid GetGUID() const { return GetGuidValue(OBJECT_FIELD_GUID); }
+    [[nodiscard]] PackedGuid const& GetPackGUID() const { return m_PackGUID; }
     [[nodiscard]] uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
     void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
 
+    float GetObjectScale() const { return GetFloatValue(OBJECT_FIELD_SCALE_X); }
     virtual void SetObjectScale(float scale) { SetFloatValue(OBJECT_FIELD_SCALE_X, scale); }
 
     [[nodiscard]] TypeID GetTypeId() const { return m_objectTypeId; }
@@ -190,6 +140,12 @@ public:
         return *(((uint16*)&m_uint32Values[index]) + offset);
     }
 
+    [[nodiscard]] ObjectGuid GetGuidValue(uint16 index) const
+    {
+        ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, false));
+        return *((ObjectGuid*)&(m_uint32Values[index]));
+    }
+
     void SetInt32Value(uint16 index, int32 value);
     void SetUInt32Value(uint16 index, uint32 value);
     void UpdateUInt32Value(uint16 index, uint32 value);
@@ -198,11 +154,12 @@ public:
     void SetByteValue(uint16 index, uint8 offset, uint8 value);
     void SetUInt16Value(uint16 index, uint8 offset, uint16 value);
     void SetInt16Value(uint16 index, uint8 offset, int16 value) { SetUInt16Value(index, offset, (uint16)value); }
+    void SetGuidValue(uint16 index, ObjectGuid value);
     void SetStatFloatValue(uint16 index, float value);
     void SetStatInt32Value(uint16 index, int32 value);
 
-    bool AddUInt64Value(uint16 index, uint64 value);
-    bool RemoveUInt64Value(uint16 index, uint64 value);
+    bool AddGuidValue(uint16 index, ObjectGuid value);
+    bool RemoveGuidValue(uint16 index, ObjectGuid value);
 
     void ApplyModUInt32Value(uint16 index, int32 val, bool apply);
     void ApplyModInt32Value(uint16 index, int32 val, bool apply);
@@ -331,7 +288,7 @@ protected:
     Object();
 
     void _InitValues();
-    void _Create(uint32 guidlow, uint32 entry, HighGuid guidhigh);
+    void _Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhigh);
     [[nodiscard]] std::string _ConcatFields(uint16 startIndex, uint16 size) const;
     void _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
@@ -358,12 +315,16 @@ protected:
 
     uint16 _fieldNotifyFlags;
 
+    virtual void AddToObjectUpdate() = 0;
+    virtual void RemoveFromObjectUpdate() = 0;
+    void AddToObjectUpdateIfNeeded();
+
     bool m_objectUpdated;
 
 private:
     bool m_inWorld;
 
-    ByteBuffer m_PackGUID;
+    PackedGuid m_PackGUID;
 
     // for output helpfull error messages from asserts
     [[nodiscard]] bool PrintIndexError(uint32 index, bool set) const;
@@ -540,11 +501,23 @@ struct Position
 
     float GetAngle(const Position* pos) const;
     [[nodiscard]] float GetAngle(float x, float y) const;
+    [[nodiscard]] float GetAbsoluteAngle(float x, float y) const
+    {
+        return NormalizeOrientation(std::atan2(
+            static_cast<float>(y - m_positionY),
+            static_cast<float>(x - m_positionX))
+            );
+    }
+    [[nodiscard]] float GetAbsoluteAngle(Position const& pos) const { return GetAbsoluteAngle(pos.m_positionX, pos.m_positionY); }
+    [[nodiscard]] float GetAbsoluteAngle(Position const* pos) const { return GetAbsoluteAngle(*pos); }
+
     float GetRelativeAngle(const Position* pos) const
     {
         return GetAngle(pos) - m_orientation;
     }
     [[nodiscard]] float GetRelativeAngle(float x, float y) const { return GetAngle(x, y) - m_orientation; }
+    float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
+
     void GetSinCos(float x, float y, float& vsin, float& vcos) const;
 
     [[nodiscard]] bool IsInDist2d(float x, float y, float dist) const
@@ -594,7 +567,7 @@ ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZOStreamer const& 
 struct MovementInfo
 {
     // common
-    uint64 guid{0};
+    ObjectGuid guid;
     uint32 flags{0};
     uint16 flags2{0};
     Position pos;
@@ -605,14 +578,14 @@ struct MovementInfo
     {
         void Reset()
         {
-            guid = 0;
+            guid.Clear();
             pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
             seat = -1;
             time = 0;
             time2 = 0;
         }
 
-        uint64 guid;
+        ObjectGuid guid;
         Position pos;
         int8 seat;
         uint32 time;
@@ -680,6 +653,12 @@ public:
     {
         m_mapId = loc.GetMapId();
         Relocate(loc);
+    }
+
+    void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+    {
+        m_mapId = mapId;
+        Relocate(x, y, z, o);
     }
 
     [[nodiscard]] uint32 GetMapId() const
@@ -766,7 +745,7 @@ public:
 #else
     virtual void Update(uint32 /*time_diff*/) { };
 #endif
-    void _Create(uint32 guidlow, HighGuid guidhigh, uint32 phaseMask);
+    void _Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask);
 
     void RemoveFromWorld() override
     {
@@ -782,6 +761,7 @@ public:
     ElunaEventProcessor* elunaEvents;
 #endif
 
+    void GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance, float absAngle) const;
     void GetNearPoint2D(float& x, float& y, float distance, float absAngle) const;
     void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0) const;
     void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
@@ -793,16 +773,13 @@ public:
         MovePosition(pos, dist, angle);
     }
     void MovePositionToFirstCollision(Position& pos, float dist, float angle);
+    Position GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY);
+    Position GetFirstCollisionPosition(float destX, float destY, float destZ);
+    Position GetFirstCollisionPosition(float dist, float angle);
     void GetFirstCollisionPosition(Position& pos, float dist, float angle)
     {
         GetPosition(&pos);
         MovePositionToFirstCollision(pos, dist, angle);
-    }
-    void MovePositionToFirstCollisionForTotem(Position& pos, float dist, float angle, bool forGameObject);
-    void GetFirstCollisionPositionForTotem(Position& pos, float dist, float angle, bool forGameObject)
-    {
-        GetPosition(&pos);
-        MovePositionToFirstCollisionForTotem(pos, dist, angle, forGameObject);
     }
     void GetRandomNearPosition(Position& pos, float radius)
     {
@@ -815,12 +792,12 @@ public:
 
     [[nodiscard]] float GetObjectSize() const
     {
-        return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE;
+        return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE * GetObjectScale();
     }
 
     [[nodiscard]] virtual float GetCombatReach() const { return 0.0f; } // overridden (only) in Unit
     void UpdateGroundPositionZ(float x, float y, float& z) const;
-    void UpdateAllowedPositionZ(float x, float y, float& z) const;
+    void UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ = nullptr) const;
 
     void GetRandomPoint(const Position& srcPos, float distance, float& rand_x, float& rand_y, float& rand_z) const;
     void GetRandomPoint(const Position& srcPos, float distance, Position& pos) const
@@ -938,7 +915,7 @@ public:
     void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
     void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
 
-    void SendObjectDeSpawnAnim(uint64 guid);
+    void SendObjectDeSpawnAnim(ObjectGuid guid);
 
     virtual void SaveRespawnTime() {}
     void AddObjectToRemoveList();
@@ -972,6 +949,7 @@ public:
     [[nodiscard]] Map const* GetBaseMap() const;
 
     void SetZoneScript();
+    void ClearZoneScript();
     [[nodiscard]] ZoneScript* GetZoneScript() const { return m_zoneScript; }
 
     TempSummon* SummonCreature(uint32 id, const Position& pos, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, uint32 vehId = 0, SummonPropertiesEntry const* properties = nullptr) const;
@@ -1002,6 +980,9 @@ public:
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
+
+    void AddToObjectUpdate() override;
+    void RemoveFromObjectUpdate() override;
 
     //relocation and visibility system functions
     void AddToNotify(uint16 f);
@@ -1047,7 +1028,7 @@ public:
     [[nodiscard]] float GetTransOffsetO() const { return m_movementInfo.transport.pos.GetOrientation(); }
     [[nodiscard]] uint32 GetTransTime()   const { return m_movementInfo.transport.time; }
     [[nodiscard]] int8 GetTransSeat()     const { return m_movementInfo.transport.seat; }
-    [[nodiscard]] virtual uint64 GetTransGUID()   const;
+    [[nodiscard]] virtual ObjectGuid GetTransGUID()   const;
     void SetTransport(Transport* t) { m_transport = t; }
 
     MovementInfo m_movementInfo;
@@ -1057,12 +1038,24 @@ public:
     [[nodiscard]] virtual float GetStationaryZ() const { return GetPositionZ(); }
     [[nodiscard]] virtual float GetStationaryO() const { return GetOrientation(); }
 
+    [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
+    [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
+
+    [[nodiscard]] float GetFloorZ() const;
+    [[nodiscard]] float GetMinHeightInWater() const;
+
+    [[nodiscard]] virtual float GetCollisionHeight() const { return 0.0f; }
+    [[nodiscard]] virtual float GetCollisionWidth() const { return GetObjectSize(); }
+    [[nodiscard]] virtual float GetCollisionRadius() const { return GetObjectSize() / 2; }
+
 protected:
     std::string m_name;
     bool m_isActive;
     bool m_isVisibilityDistanceOverride;
     const bool m_isWorldObject;
     ZoneScript* m_zoneScript;
+
+    float m_staticFloorZ;
 
     // transports
     Transport* m_transport;

@@ -6,32 +6,32 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `liquidtype_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `liquidtype_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `Name` varchar(100) DEFAULT NULL,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `Type` int(11) NOT NULL DEFAULT 0,
-  `SoundID` int(11) NOT NULL DEFAULT 0,
-  `SpellID` int(11) NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `Type` INT NOT NULL DEFAULT 0,
+  `SoundID` INT NOT NULL DEFAULT 0,
+  `SpellID` INT NOT NULL DEFAULT 0,
   `MaxDarkenDepth` float NOT NULL DEFAULT 0,
   `FogDarkenintensity` float NOT NULL DEFAULT 0,
   `AmbDarkenintensity` float NOT NULL DEFAULT 0,
   `DirDarkenintensity` float NOT NULL DEFAULT 0,
-  `LightID` int(11) NOT NULL DEFAULT 0,
+  `LightID` INT NOT NULL DEFAULT 0,
   `ParticleScale` float NOT NULL DEFAULT 0,
-  `ParticleMovement` int(11) NOT NULL DEFAULT 0,
-  `ParticleTexSlots` int(11) NOT NULL DEFAULT 0,
-  `MaterialID` int(11) NOT NULL DEFAULT 0,
+  `ParticleMovement` INT NOT NULL DEFAULT 0,
+  `ParticleTexSlots` INT NOT NULL DEFAULT 0,
+  `MaterialID` INT NOT NULL DEFAULT 0,
   `Texture_1` varchar(100) DEFAULT NULL,
   `Texture_2` varchar(100) DEFAULT NULL,
   `Texture_3` varchar(100) DEFAULT NULL,
   `Texture_4` varchar(100) DEFAULT NULL,
   `Texture_5` varchar(100) DEFAULT NULL,
   `Texture_6` varchar(100) DEFAULT NULL,
-  `Color_1` int(11) NOT NULL DEFAULT 0,
-  `Color_2` int(11) NOT NULL DEFAULT 0,
+  `Color_1` INT NOT NULL DEFAULT 0,
+  `Color_2` INT NOT NULL DEFAULT 0,
   `Float_1` float NOT NULL DEFAULT 0,
   `Float_2` float NOT NULL DEFAULT 0,
   `Float_3` float NOT NULL DEFAULT 0,
@@ -50,12 +50,12 @@ CREATE TABLE `liquidtype_dbc`
   `Float_16` float NOT NULL DEFAULT 0,
   `Float_17` float NOT NULL DEFAULT 0,
   `Float_18` float NOT NULL DEFAULT 0,
-  `Int_1` int(11) NOT NULL DEFAULT 0,
-  `Int_2` int(11) NOT NULL DEFAULT 0,
-  `Int_3` int(11) NOT NULL DEFAULT 0,
-  `Int_4` int(11) NOT NULL DEFAULT 0,
+  `Int_1` INT NOT NULL DEFAULT 0,
+  `Int_2` INT NOT NULL DEFAULT 0,
+  `Int_3` INT NOT NULL DEFAULT 0,
+  `Int_4` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `liquidtype_dbc` WRITE;

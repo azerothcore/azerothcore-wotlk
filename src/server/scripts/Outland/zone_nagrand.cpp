@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,11 +15,12 @@ EndScriptData */
 npc_maghar_captive
 npc_creditmarker_visit_with_ancestors
 EndContentData */
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
+
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*#####
@@ -286,7 +287,7 @@ public:
             {
                 corki->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 5, go->GetPositionY(), go->GetPositionZ());
                 if (player)
-                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_1, 0);
+                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_1);
             }
         }
 
@@ -296,7 +297,7 @@ public:
             {
                 corki->GetMotionMaster()->MovePoint(1, go->GetPositionX() - 5, go->GetPositionY(), go->GetPositionZ());
                 if (player)
-                    player->KilledMonsterCredit(NPC_CORKI_2, 0);
+                    player->KilledMonsterCredit(NPC_CORKI_2);
             }
         }
 
@@ -306,7 +307,7 @@ public:
             {
                 corki->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 4, go->GetPositionY(), go->GetPositionZ());
                 if (player)
-                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_3, 0);
+                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_3);
             }
         }
 
@@ -424,7 +425,7 @@ public:
         uint32 HealTimer;
         uint32 FrostShockTimer;
 
-        void SetGUID(uint64 guid, int32  /*questId*/) override
+        void SetGUID(ObjectGuid guid, int32  /*questId*/) override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             Start(true, false, guid);
@@ -582,7 +583,7 @@ public:
 
         if (Creature* prisoner = go->FindNearestCreature(NPC_MAGHAR_PRISONER, 5.0f))
         {
-            player->KilledMonsterCredit(NPC_MAGHAR_PRISONER, 0);
+            player->KilledMonsterCredit(NPC_MAGHAR_PRISONER);
 
             prisoner->AI()->Talk(SAY_FREE, player);
             prisoner->DespawnOrUnsummon(6000);

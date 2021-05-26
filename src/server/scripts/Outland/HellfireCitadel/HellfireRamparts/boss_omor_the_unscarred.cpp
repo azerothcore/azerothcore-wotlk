@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "hellfire_ramparts.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Says
 {
@@ -52,7 +52,7 @@ public:
         {
             Talk(SAY_WIPE);
             BossAI::Reset();
-            _targetGUID = 0;
+            _targetGUID.Clear();
         }
 
         void EnterCombat(Unit* who) override
@@ -139,7 +139,7 @@ public:
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
                         me->CastSpell(target, SPELL_SHADOW_WHIP, false);
-                    _targetGUID = 0;
+                    _targetGUID.Clear();
                     break;
             }
 
@@ -160,12 +160,12 @@ public:
         }
 
     private:
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_omor_the_unscarredAI>(creature);
+        return GetHellfireRampartsAI<boss_omor_the_unscarredAI>(creature);
     }
 };
 

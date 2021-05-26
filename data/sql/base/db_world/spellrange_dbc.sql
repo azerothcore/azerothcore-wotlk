@@ -6,15 +6,15 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spellrange_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spellrange_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `RangeMin_1` float NOT NULL DEFAULT 0,
   `RangeMin_2` float NOT NULL DEFAULT 0,
   `RangeMax_1` float NOT NULL DEFAULT 0,
   `RangeMax_2` float NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
   `DisplayName_Lang_enUS` text DEFAULT NULL,
   `DisplayName_Lang_enGB` text DEFAULT NULL,
   `DisplayName_Lang_koKR` text DEFAULT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE `spellrange_dbc`
   `DisplayName_Lang_ptBR` text DEFAULT NULL,
   `DisplayName_Lang_itIT` text DEFAULT NULL,
   `DisplayName_Lang_Unk` text DEFAULT NULL,
-  `DisplayName_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `DisplayName_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   `DisplayNameShort_Lang_enUS` text DEFAULT NULL,
   `DisplayNameShort_Lang_enGB` text DEFAULT NULL,
   `DisplayNameShort_Lang_koKR` text DEFAULT NULL,
@@ -48,9 +48,9 @@ CREATE TABLE `spellrange_dbc`
   `DisplayNameShort_Lang_ptBR` text DEFAULT NULL,
   `DisplayNameShort_Lang_itIT` text DEFAULT NULL,
   `DisplayNameShort_Lang_Unk` text DEFAULT NULL,
-  `DisplayNameShort_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `DisplayNameShort_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spellrange_dbc` WRITE;

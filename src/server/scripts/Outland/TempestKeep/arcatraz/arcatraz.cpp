@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "arcatraz.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum MillhouseSays
 {
@@ -231,7 +231,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_millhouse_manastormAI(creature);
+        return GetArcatrazAI<npc_millhouse_manastormAI>(creature);
     }
 };
 
@@ -355,14 +355,14 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-            me->CastSpell((Unit*)NULL, SPELL_TARGET_OMEGA, false);
-            instance->HandleGameObject(instance->GetData64(DATA_WARDENS_SHIELD), true);
+            me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
+            instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), true);
             instance->SetBossState(DATA_WARDEN_MELLICHAR, NOT_STARTED);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (attacker && IS_PLAYER_GUID(attacker->GetCharmerOrOwnerOrOwnGUID()) && damage > 0 && !me->isActiveObject())
+            if (attacker && attacker->GetCharmerOrOwnerOrOwnGUID().IsPlayer() && damage > 0 && !me->isActiveObject())
             {
                 me->setActive(true);
                 me->InterruptNonMeleeSpells(false);
@@ -418,7 +418,7 @@ public:
                     events.ScheduleEvent(EVENT_WARDEN_INTRO2, 1400);
                     break;
                 case EVENT_WARDEN_INTRO2:
-                    instance->HandleGameObject(instance->GetData64(DATA_WARDENS_SHIELD), false);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO3, 20000);
                     break;
                 case EVENT_WARDEN_INTRO3:
@@ -427,7 +427,7 @@ public:
                     break;
                 case EVENT_WARDEN_INTRO4:
                     me->SetFacingTo(0.5f);
-                    me->CastSpell((Unit*)NULL, SPELL_TARGET_ALPHA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_TARGET_ALPHA, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO5, 2000);
                     break;
                 case EVENT_WARDEN_INTRO5:
@@ -436,7 +436,7 @@ public:
                     break;
                 case EVENT_WARDEN_INTRO6:
                     me->SetFacingTo(M_PI * 1.5f);
-                    me->CastSpell((Unit*)NULL, SPELL_TARGET_OMEGA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO7, 5000);
                     break;
                 case EVENT_WARDEN_INTRO7:
@@ -450,7 +450,7 @@ public:
                     events.ScheduleEvent(EVENT_WARDEN_INTRO10, 4000);
                     break;
                 case EVENT_WARDEN_INTRO10:
-                    me->CastSpell((Unit*)NULL, SPELL_TARGET_BETA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_TARGET_BETA, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO11, 2000);
                     break;
                 case EVENT_WARDEN_INTRO11:
@@ -460,7 +460,7 @@ public:
                     break;
                 case EVENT_WARDEN_INTRO12:
                     me->SetFacingTo(M_PI * 1.5f);
-                    me->CastSpell((Unit*)NULL, SPELL_TARGET_OMEGA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO13, 6000);
                     break;
                 case EVENT_WARDEN_INTRO13:
@@ -474,7 +474,7 @@ public:
                     events.ScheduleEvent(EVENT_WARDEN_INTRO15, 5000);
                     break;
                 case EVENT_WARDEN_INTRO15:
-                    me->CastSpell((Unit*)NULL, SPELL_TARGET_DELTA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_TARGET_DELTA, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO16, 2000);
                     break;
                 case EVENT_WARDEN_INTRO16:
@@ -483,7 +483,7 @@ public:
                     break;
                 case EVENT_WARDEN_INTRO17:
                     me->SetFacingTo(M_PI * 1.5f);
-                    me->CastSpell((Unit*)NULL, SPELL_TARGET_OMEGA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO18, 6000);
                     break;
                 case EVENT_WARDEN_INTRO18:
@@ -497,7 +497,7 @@ public:
                     events.ScheduleEvent(EVENT_WARDEN_INTRO20, 4000);
                     break;
                 case EVENT_WARDEN_INTRO20:
-                    me->CastSpell((Unit*)NULL, SPELL_TARGET_GAMMA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_TARGET_GAMMA, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO21, 2000);
                     break;
                 case EVENT_WARDEN_INTRO21:
@@ -506,7 +506,7 @@ public:
                     break;
                 case EVENT_WARDEN_INTRO22:
                     me->SetFacingTo(M_PI * 1.5f);
-                    me->CastSpell((Unit*)NULL, SPELL_TARGET_OMEGA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO23, 6000);
                     break;
                 case EVENT_WARDEN_INTRO23:
@@ -537,9 +537,9 @@ public:
                     events.ScheduleEvent(EVENT_WARDEN_INTRO28, 5000);
                     break;
                 case EVENT_WARDEN_INTRO28:
-                    instance->HandleGameObject(instance->GetData64(DATA_WARDENS_SHIELD), true);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), true);
                     if (Creature* creature = summons.GetCreatureWithEntry(NPC_HARBINGER_SKYRISS))
-                        creature->CastSpell((Unit*)NULL, SPELL_MIND_REND, false);
+                        creature->CastSpell((Unit*)nullptr, SPELL_MIND_REND, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO29, 4000);
                     break;
 
@@ -560,7 +560,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_warden_mellicharAI(creature);
+        return GetArcatrazAI<npc_warden_mellicharAI>(creature);
     }
 };
 

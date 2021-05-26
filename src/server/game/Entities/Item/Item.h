@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,10 +8,10 @@
 #define AZEROTHCORE_ITEM_H
 
 #include "Common.h"
-#include "Object.h"
-#include "LootMgr.h"
-#include "ItemTemplate.h"
 #include "DatabaseEnv.h"
+#include "ItemTemplate.h"
+#include "LootMgr.h"
+#include "Object.h"
 
 class SpellInfo;
 class Bag;
@@ -204,12 +204,12 @@ public:
 
     Item();
 
-    virtual bool Create(uint32 guidlow, uint32 itemid, Player const* owner);
+    virtual bool Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner);
 
     [[nodiscard]] ItemTemplate const* GetTemplate() const;
 
-    [[nodiscard]] uint64 GetOwnerGUID()    const { return GetUInt64Value(ITEM_FIELD_OWNER); }
-    void SetOwnerGUID(uint64 guid) { SetUInt64Value(ITEM_FIELD_OWNER, guid); }
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(ITEM_FIELD_OWNER); }
+    void SetOwnerGUID(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
     [[nodiscard]] Player* GetOwner() const;
 
     void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val); }
@@ -219,10 +219,10 @@ public:
     [[nodiscard]] bool IsBoundByEnchant() const;
     [[nodiscard]] bool IsBoundByTempEnchant() const;
     virtual void SaveToDB(SQLTransaction& trans);
-    virtual bool LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entry);
-    static void DeleteFromDB(SQLTransaction& trans, uint32 itemGuid);
+    virtual bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry);
+    static void DeleteFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
     virtual void DeleteFromDB(SQLTransaction& trans);
-    static void DeleteFromInventoryDB(SQLTransaction& trans, uint32 itemGuid);
+    static void DeleteFromInventoryDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
     void DeleteFromInventoryDB(SQLTransaction& trans);
     void SaveRefundDataToDB();
     void DeleteRefundDataFromDB(SQLTransaction* trans);
@@ -274,7 +274,7 @@ public:
     void SetItemRandomProperties(int32 randomPropId);
     void UpdateItemSuffixFactor();
     static int32 GenerateItemRandomPropertyId(uint32 item_id);
-    void SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges, uint64 caster = 0);
+    void SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges, ObjectGuid caster = ObjectGuid::Empty);
     void SetEnchantmentDuration(EnchantmentSlot slot, uint32 duration, Player* owner);
     void SetEnchantmentCharges(EnchantmentSlot slot, uint32 charges);
     void ClearEnchantment(EnchantmentSlot slot);
@@ -318,10 +318,10 @@ public:
 
     // Item Refund system
     void SetNotRefundable(Player* owner, bool changestate = true, SQLTransaction* trans = nullptr);
-    void SetRefundRecipient(uint32 pGuidLow) { m_refundRecipient = pGuidLow; }
+    void SetRefundRecipient(ObjectGuid::LowType pGuidLow) { m_refundRecipient = pGuidLow; }
     void SetPaidMoney(uint32 money) { m_paidMoney = money; }
     void SetPaidExtendedCost(uint32 iece) { m_paidExtendedCost = iece; }
-    uint32 GetRefundRecipient() { return m_refundRecipient; }
+    ObjectGuid::LowType GetRefundRecipient() { return m_refundRecipient; }
     uint32 GetPaidMoney() { return m_paidMoney; }
     uint32 GetPaidExtendedCost() { return m_paidExtendedCost; }
 
@@ -335,6 +335,8 @@ public:
     bool CheckSoulboundTradeExpire();
 
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
+    void AddToObjectUpdate() override;
+    void RemoveFromObjectUpdate() override;
 
     [[nodiscard]] uint32 GetScriptId() const { return GetTemplate()->ScriptId; }
 private:

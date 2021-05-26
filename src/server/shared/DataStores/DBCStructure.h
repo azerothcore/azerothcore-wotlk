@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -10,8 +10,8 @@
 #include "Common.h"
 #include "DBCEnums.h"
 #include "Define.h"
-#include "Util.h"
 #include "SharedDefines.h"
+#include "Util.h"
 
 // Structures using to access raw DBC data and required packing to portability
 
@@ -522,6 +522,11 @@ struct AreaTableEntry
             return true;
         return (flags & AREA_FLAG_SANCTUARY);
     }
+
+    [[nodiscard]] bool IsFlyable() const
+    {
+        return flags & AREA_FLAG_OUTLAND && !(flags & AREA_FLAG_NO_FLY_ZONE);
+    }
 };
 
 #define MAX_GROUP_AREA_IDS 6
@@ -741,7 +746,7 @@ struct CreatureModelDataEntry
     //float Unk8
     //uint32 Unk9
     //uint32 Unk10
-    //float CollisionWidth;
+    float CollisionWidth;
     float CollisionHeight;
     float MountHeight;                                       // Used in calculation of unit collision data when mounted
     //float Unks[11]
@@ -1556,31 +1561,31 @@ struct SpellEntry
     uint32    TargetAuraState;                              // 21       m_targetAuraState
     uint32    CasterAuraStateNot;                           // 22       m_excludeCasterAuraState
     uint32    TargetAuraStateNot;                           // 23       m_excludeTargetAuraState
-    uint32    casterAuraSpell;                              // 24       m_casterAuraSpell
-    uint32    targetAuraSpell;                              // 25       m_targetAuraSpell
-    uint32    excludeCasterAuraSpell;                       // 26       m_excludeCasterAuraSpell
-    uint32    excludeTargetAuraSpell;                       // 27       m_excludeTargetAuraSpell
+    uint32    CasterAuraSpell;                              // 24       m_casterAuraSpell
+    uint32    TargetAuraSpell;                              // 25       m_targetAuraSpell
+    uint32    ExcludeCasterAuraSpell;                       // 26       m_excludeCasterAuraSpell
+    uint32    ExcludeTargetAuraSpell;                       // 27       m_excludeTargetAuraSpell
     uint32    CastingTimeIndex;                             // 28       m_castingTimeIndex
     uint32    RecoveryTime;                                 // 29       m_recoveryTime
     uint32    CategoryRecoveryTime;                         // 30       m_categoryRecoveryTime
     uint32    InterruptFlags;                               // 31       m_interruptFlags
     uint32    AuraInterruptFlags;                           // 32       m_auraInterruptFlags
     uint32    ChannelInterruptFlags;                        // 33       m_channelInterruptFlags
-    uint32    procFlags;                                    // 34       m_procTypeMask
-    uint32    procChance;                                   // 35       m_procChance
-    uint32    procCharges;                                  // 36       m_procCharges
-    uint32    maxLevel;                                     // 37       m_maxLevel
-    uint32    baseLevel;                                    // 38       m_baseLevel
-    uint32    spellLevel;                                   // 39       m_spellLevel
+    uint32    ProcFlags;                                    // 34       m_procTypeMask
+    uint32    ProcChance;                                   // 35       m_procChance
+    uint32    ProcCharges;                                  // 36       m_procCharges
+    uint32    MaxLevel;                                     // 37       m_maxLevel
+    uint32    BaseLevel;                                    // 38       m_baseLevel
+    uint32    SpellLevel;                                   // 39       m_spellLevel
     uint32    DurationIndex;                                // 40       m_durationIndex
-    uint32    powerType;                                    // 41       m_powerType
-    uint32    manaCost;                                     // 42       m_manaCost
-    uint32    manaCostPerlevel;                             // 43       m_manaCostPerLevel
-    uint32    manaPerSecond;                                // 44       m_manaPerSecond
-    uint32    manaPerSecondPerLevel;                        // 45       m_manaPerSecondPerLeve
-    uint32    rangeIndex;                                   // 46       m_rangeIndex
-    float     speed;                                        // 47       m_speed
-    //uint32    modalNextSpell;                             // 48       m_modalNextSpell not used
+    uint32    PowerType;                                    // 41       m_powerType
+    uint32    ManaCost;                                     // 42       m_manaCost
+    uint32    ManaCostPerlevel;                             // 43       m_manaCostPerLevel
+    uint32    ManaPerSecond;                                // 44       m_manaPerSecond
+    uint32    ManaPerSecondPerLevel;                        // 45       m_manaPerSecondPerLeve
+    uint32    RangeIndex;                                   // 46       m_rangeIndex
+    float     Speed;                                        // 47       m_speed
+    //uint32    ModalNextSpell;                             // 48       m_modalNextSpell not used
     uint32    StackAmount;                                  // 49       m_cumulativeAura
     uint32    Totem[2];                                     // 50-51    m_totem
     int32     Reagent[MAX_SPELL_REAGENTS];                  // 52-59    m_reagent
@@ -1608,8 +1613,8 @@ struct SpellEntry
     flag96    EffectSpellClassMask[MAX_SPELL_EFFECTS];      // 122-130
     uint32    SpellVisual[2];                               // 131-132  m_spellVisualID
     uint32    SpellIconID;                                  // 133      m_spellIconID
-    uint32    activeIconID;                                 // 134      m_activeIconID
-    //uint32    spellPriority;                              // 135 not used
+    uint32    ActiveIconID;                                 // 134      m_activeIconID
+    //uint32    SpellPriority;                              // 135 not used
     char*     SpellName[16];                                // 136-151  m_name_lang
     //uint32    SpellNameFlag;                              // 152 not used
     char*     Rank[16];                                     // 153-168  m_nameSubtext_lang
@@ -1635,11 +1640,11 @@ struct SpellEntry
     uint32    TotemCategory[2];                             // 222-223  m_requiredTotemCategoryID
     int32     AreaGroupId;                                  // 224      m_requiredAreaGroupId
     uint32    SchoolMask;                                   // 225      m_schoolMask
-    uint32    runeCostID;                                   // 226      m_runeCostID
-    //uint32    spellMissileID;                             // 227      m_spellMissileID not used
+    uint32    RuneCostID;                                   // 226      m_runeCostID
+    //uint32    SpellMissileID;                             // 227      m_spellMissileID not used
     //uint32  PowerDisplayId;                               // 228      PowerDisplay.dbc, new in 3.1
     float     EffectBonusMultiplier[MAX_SPELL_EFFECTS];     // 229-231  3.2.0
-    //uint32  spellDescriptionVariableID;                   // 232      3.2.0
+    //uint32  SpellDescriptionVariableID;                   // 232      3.2.0
     //uint32  SpellDifficultyId;                            // 233      3.3.0
 };
 

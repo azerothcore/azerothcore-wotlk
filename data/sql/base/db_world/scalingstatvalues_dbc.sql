@@ -6,35 +6,35 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `scalingstatvalues_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `scalingstatvalues_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Charlevel` int(11) NOT NULL DEFAULT 0,
-  `ShoulderBudget` int(11) NOT NULL DEFAULT 0,
-  `TrinketBudget` int(11) NOT NULL DEFAULT 0,
-  `WeaponBudget1H` int(11) NOT NULL DEFAULT 0,
-  `RangedBudget` int(11) NOT NULL DEFAULT 0,
-  `ClothShoulderArmor` int(11) NOT NULL DEFAULT 0,
-  `LeatherShoulderArmor` int(11) NOT NULL DEFAULT 0,
-  `MailShoulderArmor` int(11) NOT NULL DEFAULT 0,
-  `PlateShoulderArmor` int(11) NOT NULL DEFAULT 0,
-  `WeaponDPS1H` int(11) NOT NULL DEFAULT 0,
-  `WeaponDPS2H` int(11) NOT NULL DEFAULT 0,
-  `SpellcasterDPS1H` int(11) NOT NULL DEFAULT 0,
-  `SpellcasterDPS2H` int(11) NOT NULL DEFAULT 0,
-  `RangedDPS` int(11) NOT NULL DEFAULT 0,
-  `WandDPS` int(11) NOT NULL DEFAULT 0,
-  `SpellPower` int(11) NOT NULL DEFAULT 0,
-  `PrimaryBudget` int(11) NOT NULL DEFAULT 0,
-  `TertiaryBudget` int(11) NOT NULL DEFAULT 0,
-  `ClothCloakArmor` int(11) NOT NULL DEFAULT 0,
-  `ClothChestArmor` int(11) NOT NULL DEFAULT 0,
-  `LeatherChestArmor` int(11) NOT NULL DEFAULT 0,
-  `MailChestArmor` int(11) NOT NULL DEFAULT 0,
-  `PlateChestArmor` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Charlevel` INT NOT NULL DEFAULT 0,
+  `ShoulderBudget` INT NOT NULL DEFAULT 0,
+  `TrinketBudget` INT NOT NULL DEFAULT 0,
+  `WeaponBudget1H` INT NOT NULL DEFAULT 0,
+  `RangedBudget` INT NOT NULL DEFAULT 0,
+  `ClothShoulderArmor` INT NOT NULL DEFAULT 0,
+  `LeatherShoulderArmor` INT NOT NULL DEFAULT 0,
+  `MailShoulderArmor` INT NOT NULL DEFAULT 0,
+  `PlateShoulderArmor` INT NOT NULL DEFAULT 0,
+  `WeaponDPS1H` INT NOT NULL DEFAULT 0,
+  `WeaponDPS2H` INT NOT NULL DEFAULT 0,
+  `SpellcasterDPS1H` INT NOT NULL DEFAULT 0,
+  `SpellcasterDPS2H` INT NOT NULL DEFAULT 0,
+  `RangedDPS` INT NOT NULL DEFAULT 0,
+  `WandDPS` INT NOT NULL DEFAULT 0,
+  `SpellPower` INT NOT NULL DEFAULT 0,
+  `PrimaryBudget` INT NOT NULL DEFAULT 0,
+  `TertiaryBudget` INT NOT NULL DEFAULT 0,
+  `ClothCloakArmor` INT NOT NULL DEFAULT 0,
+  `ClothChestArmor` INT NOT NULL DEFAULT 0,
+  `LeatherChestArmor` INT NOT NULL DEFAULT 0,
+  `MailChestArmor` INT NOT NULL DEFAULT 0,
+  `PlateChestArmor` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `scalingstatvalues_dbc` WRITE;

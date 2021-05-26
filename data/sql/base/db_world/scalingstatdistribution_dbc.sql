@@ -6,33 +6,33 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `scalingstatdistribution_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `scalingstatdistribution_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `StatID_1` int(11) NOT NULL DEFAULT 0,
-  `StatID_2` int(11) NOT NULL DEFAULT 0,
-  `StatID_3` int(11) NOT NULL DEFAULT 0,
-  `StatID_4` int(11) NOT NULL DEFAULT 0,
-  `StatID_5` int(11) NOT NULL DEFAULT 0,
-  `StatID_6` int(11) NOT NULL DEFAULT 0,
-  `StatID_7` int(11) NOT NULL DEFAULT 0,
-  `StatID_8` int(11) NOT NULL DEFAULT 0,
-  `StatID_9` int(11) NOT NULL DEFAULT 0,
-  `StatID_10` int(11) NOT NULL DEFAULT 0,
-  `Bonus_1` int(11) NOT NULL DEFAULT 0,
-  `Bonus_2` int(11) NOT NULL DEFAULT 0,
-  `Bonus_3` int(11) NOT NULL DEFAULT 0,
-  `Bonus_4` int(11) NOT NULL DEFAULT 0,
-  `Bonus_5` int(11) NOT NULL DEFAULT 0,
-  `Bonus_6` int(11) NOT NULL DEFAULT 0,
-  `Bonus_7` int(11) NOT NULL DEFAULT 0,
-  `Bonus_8` int(11) NOT NULL DEFAULT 0,
-  `Bonus_9` int(11) NOT NULL DEFAULT 0,
-  `Bonus_10` int(11) NOT NULL DEFAULT 0,
-  `Maxlevel` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `StatID_1` INT NOT NULL DEFAULT 0,
+  `StatID_2` INT NOT NULL DEFAULT 0,
+  `StatID_3` INT NOT NULL DEFAULT 0,
+  `StatID_4` INT NOT NULL DEFAULT 0,
+  `StatID_5` INT NOT NULL DEFAULT 0,
+  `StatID_6` INT NOT NULL DEFAULT 0,
+  `StatID_7` INT NOT NULL DEFAULT 0,
+  `StatID_8` INT NOT NULL DEFAULT 0,
+  `StatID_9` INT NOT NULL DEFAULT 0,
+  `StatID_10` INT NOT NULL DEFAULT 0,
+  `Bonus_1` INT NOT NULL DEFAULT 0,
+  `Bonus_2` INT NOT NULL DEFAULT 0,
+  `Bonus_3` INT NOT NULL DEFAULT 0,
+  `Bonus_4` INT NOT NULL DEFAULT 0,
+  `Bonus_5` INT NOT NULL DEFAULT 0,
+  `Bonus_6` INT NOT NULL DEFAULT 0,
+  `Bonus_7` INT NOT NULL DEFAULT 0,
+  `Bonus_8` INT NOT NULL DEFAULT 0,
+  `Bonus_9` INT NOT NULL DEFAULT 0,
+  `Bonus_10` INT NOT NULL DEFAULT 0,
+  `Maxlevel` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `scalingstatdistribution_dbc` WRITE;
