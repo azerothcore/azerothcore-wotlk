@@ -204,7 +204,7 @@ namespace acore
 
     inline bool IsValidMapCoord(float c)
     {
-        return isfinite(c) && (std::fabs(c) <= MAP_HALFSIZE - 0.5f);
+        return std::isfinite(c) && (std::fabs(c) <= MAP_HALFSIZE - 0.5f);
     }
 
     inline bool IsValidMapCoord(float x, float y)
@@ -219,7 +219,7 @@ namespace acore
 
     inline bool IsValidMapCoord(float x, float y, float z, float o)
     {
-        return IsValidMapCoord(x, y, z) && isfinite(o);
+        return IsValidMapCoord(x, y, z) && std::isfinite(o);
     }
 }
 #endif
