@@ -12,7 +12,7 @@ UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 177525) AND (`source_type` = 1) AND (`id` IN (0));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(177525, 1, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 50, 177644, 60, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Moonkin Stone - On Data Set - Summon \'Moonkin Stone Aura\'');
+(177525, 1, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 50, 177644, 60, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Moonkin Stone - On Data Set - Summon \'Moonkin Stone Aura\'');
 
 -- Update Lunaclaw spawn position in Darkshore
 UPDATE `event_scripts` SET `x` = 6359.26, `y` = 143.38, `z` = 23.61, `o` = 4.124 WHERE  `id`= 5991 AND `delay` = 0 AND `command` = 10;
