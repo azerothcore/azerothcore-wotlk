@@ -67,7 +67,6 @@ void RealmList::LoadBuildInfo()
             {
                 HexStrToByteArray(macHash, build.MacHash);
             }
-
         } while (result->NextRow());
     }
 }
