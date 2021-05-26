@@ -35,35 +35,41 @@ public:
     {
         static std::vector<ChatCommand> accountSetCommandTable =
         {
-            { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,      "" },
-            { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,    "" },
-            { "password",   SEC_CONSOLE,        true,   &HandleAccountSetPasswordCommand,   "" },
-            { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,        "" }
+            { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,          "" },
+            { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,        "" },
+            { "password",   SEC_CONSOLE,        true,   &HandleAccountSetPasswordCommand,       "" },
+            { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,            "" }
         };
 
         static std::vector<ChatCommand> accountLockCommandTable
         {
-            { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,   "" },
-            { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,        "" }
+            { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,       "" },
+            { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,            "" }
         };
 
         static std::vector<ChatCommand> account2faCommandTable
         {
-            { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,      "" },
-            { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,     "" },
+            { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,          "" },
+            { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,         "" },
+        };
+
+        static std::vector<ChatCommand> accountRemoveCommandTable
+        {
+            { "country",    SEC_ADMINISTRATOR,  true,  &HandleAccountRemoveLockCountryCommand,  "" }
         };
 
         static std::vector<ChatCommand> accountCommandTable =
         {
-            { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable    },
-            { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,         "" },
-            { "create",     SEC_CONSOLE,        true,   &HandleAccountCreateCommand,        "" },
-            { "delete",     SEC_CONSOLE,        true,   &HandleAccountDeleteCommand,        "" },
-            { "onlinelist", SEC_CONSOLE,        true,   &HandleAccountOnlineListCommand,    "" },
-            { "lock",       SEC_PLAYER,         false,  nullptr, "", accountLockCommandTable   },
-            { "set",        SEC_ADMINISTRATOR,  true,   nullptr, "", accountSetCommandTable    },
-            { "password",   SEC_PLAYER,         false,  &HandleAccountPasswordCommand,      "" },
-            { "",           SEC_PLAYER,         false,  &HandleAccountCommand,              "" }
+            { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable        },
+            { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,             "" },
+            { "create",     SEC_CONSOLE,        true,   &HandleAccountCreateCommand,            "" },
+            { "delete",     SEC_CONSOLE,        true,   &HandleAccountDeleteCommand,            "" },
+            { "onlinelist", SEC_CONSOLE,        true,   &HandleAccountOnlineListCommand,        "" },
+            { "lock",       SEC_PLAYER,         false,  nullptr, "", accountLockCommandTable       },
+            { "set",        SEC_ADMINISTRATOR,  true,   nullptr, "", accountSetCommandTable        },
+            { "password",   SEC_PLAYER,         false,  &HandleAccountPasswordCommand,          "" },
+            { "remove",     SEC_ADMINISTRATOR,  true,   nullptr, "", accountRemoveCommandTable     },
+            { "",           SEC_PLAYER,         false,  &HandleAccountCommand,                  "" }
         };
 
         static std::vector<ChatCommand> commandTable =
@@ -409,6 +415,45 @@ public:
         } while (result->NextRow());
 
         handler->SendSysMessage(LANG_ACCOUNT_LIST_BAR);
+        return true;
+    }
+
+    static bool HandleAccountRemoveLockCountryCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        ///- %Parse the command line arguments
+        char* _accountName = strtok((char*)args, " ");
+        if (!_accountName)
+            return false;
+
+        std::string accountName = _accountName;
+        if (!Utf8ToUpperOnlyLatin(accountName))
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 accountId = AccountMgr::GetId(accountName);
+        if (!accountId)
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+        stmt->setString(0, "00");
+        stmt->setUInt32(1, accountId);
+        LoginDatabase.Execute(stmt);
+        handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
+
         return true;
     }
 
