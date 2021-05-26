@@ -23,7 +23,8 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "StringConvert.h"
-#include <boost/filesystem/operations.hpp>
+// #include <boost/filesystem/operations.hpp>
+#include <boost/version.hpp>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
