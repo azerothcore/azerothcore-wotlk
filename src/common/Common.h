@@ -14,6 +14,7 @@
 #include <utility>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
+#include <ace/config-all.h>
 #include <ws2tcpip.h>
 #if AC_COMPILER == AC_COMPILER_INTEL
 #    if !defined(BOOST_ASIO_HAS_MOVE)
