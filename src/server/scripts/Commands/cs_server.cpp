@@ -23,10 +23,11 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "StringConvert.h"
-// #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/version.hpp>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
+#include <numeric>
 
 class server_commandscript : public CommandScript
 {
@@ -149,7 +150,7 @@ public:
         else
             handler->SendSysMessage("MMAPs status: Disabled");
 
-        /*for (std::string const& subDir : subDirs)
+        for (std::string const& subDir : subDirs)
         {
             boost::filesystem::path mapPath(dataDir);
             mapPath /= subDir;
@@ -169,7 +170,7 @@ public:
             });
 
             handler->PSendSysMessage("%s directory located in %s. Total size: " SZFMTD " bytes", subDir.c_str(), mapPath.generic_string().c_str(), folderSize);
-        }*/
+        }
 
         LocaleConstant defaultLocale = sWorld->GetDefaultDbcLocale();
         uint32 availableLocalesMask = (1 << defaultLocale);
