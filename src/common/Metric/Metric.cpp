@@ -7,9 +7,9 @@
 #include "Common.h"
 #include "Config.h"
 #include "DeadlineTimer.h"
+#include "Tokenize.h"
 #include "Log.h"
 #include "Strand.h"
-#include "Tokenize.h"
 #include "Util.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -120,7 +120,7 @@ void Metric::LogEvent(std::string const& category, std::string const& title, std
     MetricData* data = new MetricData;
     data->Category = category;
     data->Timestamp = system_clock::now();
-    data->Type = AC_METRIC_DATA_EVENT;
+    data->Type = METRIC_DATA_EVENT;
     data->Title = title;
     data->Text = description;
 
@@ -150,10 +150,10 @@ void Metric::SendBatch()
 
         switch (data->Type)
         {
-            case AC_METRIC_DATA_VALUE:
+            case METRIC_DATA_VALUE:
                 batchedData << "value=" << data->Value;
                 break;
-            case AC_METRIC_DATA_EVENT:
+            case METRIC_DATA_EVENT:
                 batchedData << "title=\"" << data->Title << "\",text=\"" << data->Text << "\"";
                 break;
         }
@@ -307,11 +307,11 @@ Metric* Metric::instance()
     return &instance;
 }
 
-template std::string Metric::FormatInfluxDBValue(int8);
-template std::string Metric::FormatInfluxDBValue(uint8);
-template std::string Metric::FormatInfluxDBValue(int16);
-template std::string Metric::FormatInfluxDBValue(uint16);
-template std::string Metric::FormatInfluxDBValue(int32);
-template std::string Metric::FormatInfluxDBValue(uint32);
-template std::string Metric::FormatInfluxDBValue(int64);
-template std::string Metric::FormatInfluxDBValue(uint64);
+template /*AC_COMMON_API*/ std::string Metric::FormatInfluxDBValue(int8);
+template /*AC_COMMON_API*/ std::string Metric::FormatInfluxDBValue(uint8);
+template /*AC_COMMON_API*/ std::string Metric::FormatInfluxDBValue(int16);
+template /*AC_COMMON_API*/ std::string Metric::FormatInfluxDBValue(uint16);
+template /*AC_COMMON_API*/ std::string Metric::FormatInfluxDBValue(int32);
+template /*AC_COMMON_API*/ std::string Metric::FormatInfluxDBValue(uint32);
+template /*AC_COMMON_API*/ std::string Metric::FormatInfluxDBValue(int64);
+template /*AC_COMMON_API*/ std::string Metric::FormatInfluxDBValue(uint64);

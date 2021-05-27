@@ -1458,7 +1458,7 @@ CreatureFamilyAssistanceDelay = 2000
 #    CreatureFamilyAssistancePeriod
 #        Description: Time (in milliseconds) before next creature assistance call.
 #        Default:     3000 - (3 Seconds)
-                      0    - (Disabled)
+#                     0    - (Disabled)
 
 CreatureFamilyAssistancePeriod = 3000
 
@@ -3564,7 +3564,7 @@ PacketSpoof.BanDuration = 86400
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Metric.Enable = 1
+Metric.Enable = 0
 
 #
 #    Metric.Interval

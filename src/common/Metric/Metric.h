@@ -3,13 +3,12 @@
  * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
  */
 
-#ifndef AC_METRIC_H__
-#define AC_METRIC_H__
+#ifndef METRIC_H__
+#define METRIC_H__
 
 #include "Define.h"
 #include "Duration.h"
 #include "MPSCQueue.h"
-#include <chrono>
 #include <functional>
 #include <iosfwd>
 #include <memory>
@@ -17,7 +16,6 @@
 #include <unordered_map>
 #include <vector>
 #include <utility>
-
 
 namespace acore
 {
@@ -30,8 +28,8 @@ namespace acore
 
 enum MetricDataType
 {
-    AC_METRIC_DATA_VALUE,
-    AC_METRIC_DATA_EVENT
+    METRIC_DATA_VALUE,
+    METRIC_DATA_EVENT
 };
 
 typedef std::pair<std::string, std::string> MetricTag;
@@ -55,7 +53,8 @@ class /*AC_COMMON_API*/ Metric
 {
 private:
     std::iostream& GetDataStream() { return *_dataStream; }
-    std::unique_ptr<std::iostream> _dataStream;    MPSCQueue<MetricData> _queuedData;
+    std::unique_ptr<std::iostream> _dataStream;
+    MPSCQueue<MetricData> _queuedData;
     std::unique_ptr<acore::Asio::DeadlineTimer> _batchTimer;
     std::unique_ptr<acore::Asio::DeadlineTimer> _overallStatusTimer;
     int32 _updateInterval = 0;
@@ -105,7 +104,7 @@ public:
         MetricData* data = new MetricData;
         data->Category = category;
         data->Timestamp = system_clock::now();
-        data->Type = AC_METRIC_DATA_VALUE;
+        data->Type = METRIC_DATA_VALUE;
         data->Value = FormatInfluxDBValue(value);
         data->Tags = std::move(tags);
 

@@ -27,6 +27,7 @@
 #include "Timer.h"
 #include "Util.h"
 #include "IoContext.h"
+#include "Resolver.h"
 #include "IWorld.h"
 #include "World.h"
 #include "WorldRunnable.h"
@@ -459,6 +460,8 @@ bool LoadRealmInfo(acore::Asio::IoContext& ioContext)
         LOG_ERROR("server.worldserver", "> Not found realm with ID %u", realm.Id.Realm);
         return false;
     }
+
+    acore::Asio::Resolver resolver(ioContext);
 
     Field* fields = result->Fetch();
     realm.Name = fields[1].GetString();
