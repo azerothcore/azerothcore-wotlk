@@ -1,3 +1,19 @@
+-- DB update 2021_05_25_01 -> 2021_05_25_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_25_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_25_01 2021_05_25_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1621252516106793022'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1621252516106793022');
 
 -- https://github.com/azerothcore/azerothcore-wotlk/issues/5902
@@ -19,3 +35,12 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH, 8, -748.391, 1469.193, 18.1120, 2.840, 20000, 0, 0, 100, 0),
 (@PATH, 9, -722.820, 1506.920, 12.6463, 0, 0, 0, 0, 100, 0),
 (@PATH, 10, -693.943, 1542.735, 16.3801 , 0, 0, 0, 0, 100, 0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
