@@ -11,6 +11,8 @@
 #ifndef __CLIRUNNABLE_H
 #define __CLIRUNNABLE_H
 
+#include "Threading.h"
+
 /// Command Line Interface handling thread
 class CliRunnable : public acore::Runnable
 {

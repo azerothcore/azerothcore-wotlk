@@ -57,6 +57,7 @@
 #include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "revision.h"
+#include "Realm.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
@@ -27000,6 +27001,8 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
 {
     PreparedStatement* stmt = nullptr;
     uint8 index = 0;
+
+    auto finiteAlways = [](float f) { return std::isfinite(f) ? f : 0.0f; };
 
     if (create)
     {

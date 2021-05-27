@@ -131,7 +131,7 @@ public:
                             }
                         }
                         counter = 0;
-                        list<Unit*, std::allocator<Unit*>>::iterator itr;
+                        std::list<Unit*, std::allocator<Unit*>>::iterator itr;
                         for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr, ++counter)
                         {
                             // if there is only one target available

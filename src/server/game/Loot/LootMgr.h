@@ -15,6 +15,7 @@
 #include "SharedDefines.h"
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 enum RollType
