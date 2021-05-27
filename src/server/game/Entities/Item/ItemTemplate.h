@@ -824,8 +824,8 @@ typedef std::unordered_map<uint32, ItemTemplate> ItemTemplateContainer;
 
 struct ItemLocale
 {
-    StringVector Name;
-    StringVector Description;
+    std::vector<std::string> Name;
+    std::vector<std::string> Description;
 };
 
 struct ItemSetNameEntry
@@ -836,7 +836,7 @@ struct ItemSetNameEntry
 
 struct ItemSetNameLocale
 {
-    StringVector Name;
+    std::vector<std::string> Name;
 };
 
 #endif
