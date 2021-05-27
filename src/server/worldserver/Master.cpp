@@ -26,6 +26,7 @@
 #include "SignalHandler.h"
 #include "Timer.h"
 #include "Util.h"
+#include "IoContext.h"
 #include "IWorld.h"
 #include "World.h"
 #include "WorldRunnable.h"
@@ -103,7 +104,7 @@ public:
     }
 };
 
-bool LoadRealmInfo();
+bool LoadRealmInfo(acore::Asio::IoContext& ioContext);
 
 Master* Master::instance()
 {
@@ -117,6 +118,8 @@ int Master::Run()
     OpenSSLCrypto::threadsSetup();
     BigNumber seed1;
     seed1.SetRand(16 * 8);
+
+    std::shared_ptr<acore::Asio::IoContext> ioContext = std::make_shared<acore::Asio::IoContext>();
 
     /// worldserver PID file creation
     std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
@@ -138,19 +141,15 @@ int Master::Run()
     // set server offline (not connectable)
     LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
 
-    LoadRealmInfo();
+    LoadRealmInfo(*ioContext);
 
     // Loading modules configs
     sConfigMgr->LoadModulesConfigs();
 
-    std::shared_ptr<acore::Asio::IoContext> ioContext = std::make_shared<acore::Asio::IoContext>();
-
-    sMetric->Initialize(GetRealmName(), ioContext, []()
+    sMetric->Initialize(realm.Name, *ioContext, []()
     {
         AC_METRIC_VALUE("online_players", sWorld->GetPlayerCount());
     });
-
-    AC_METRIC_EVENT("events", "Worldserver started", "");
 
     ///- Initialize the World
     sSecretMgr->Initialize();
@@ -452,7 +451,7 @@ void Master::ClearOnlineAccounts()
     CharacterDatabase.DirectExecute("UPDATE characters SET online = 0 WHERE online <> 0");
 }
 
-bool LoadRealmInfo()
+bool LoadRealmInfo(acore::Asio::IoContext& ioContext)
 {
     QueryResult result = LoginDatabase.PQuery("SELECT id, name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild FROM realmlist WHERE id = %u", realm.Id.Realm);
     if (!result)

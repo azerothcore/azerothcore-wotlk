@@ -1403,8 +1403,8 @@
         "allValue": null,
         "current": {
           "selected": true,
-          "text": "Trinity",
-          "value": "Trinity"
+          "text": "AzerothCore",
+          "value": "AzerothCore"
         },
         "datasource": "Influx",
         "definition": "show tag values from events with key = realm",

@@ -24,6 +24,7 @@ namespace acore
     namespace Asio
     {
         class IoContext;
+        class DeadlineTimer;
     }
 }
 
@@ -81,11 +82,6 @@ private:
     static std::string FormatInfluxDBValue(double value);
     static std::string FormatInfluxDBValue(float value);
     static std::string FormatInfluxDBValue(std::chrono::nanoseconds value);
-
-    static std::string FormatInfluxDBValue(std::string const& value)
-    {
-        return '"' + boost::replace_all_copy(value, "\"", "\\\"") + '"';
-    }
 
     static std::string FormatInfluxDBTagValue(std::string const& value);
 
@@ -165,50 +161,50 @@ MetricStopWatch<LoggerType> MakeMetricStopWatch(LoggerType&& loggerFunc)
 #define AC_METRIC_DETAILED_TIMER(category, ...) ((void)0)
 #define AC_METRIC_DETAILED_NO_THRESHOLD_TIMER(category, ...) ((void)0)
 #else
-#  if AC_PLATFORM != AC_PLATFORM_WINDOWS
-#define AC_METRIC_EVENT(category, title, description)                      \
-        do {                                                            \
-            if (sMetric->IsEnabled())                                   \
-                sMetric->LogEvent(category, title, description);        \
+#  if TRINITY_PLATFORM != TRINITY_PLATFORM_WINDOWS
+#define AC_METRIC_EVENT(category, title, description)                  \
+        do {                                                           \
+            if (sMetric->IsEnabled())                                  \
+                sMetric->LogEvent(category, title, description);       \
         } while (0)
-#define AC_METRIC_VALUE(category, value, ...)                              \
-        do {                                                            \
-            if (sMetric->IsEnabled())                                   \
-                sMetric->LogValue(category, value, { __VA_ARGS__ }););  \
+#define AC_METRIC_VALUE(category, value, ...)                          \
+        do {                                                           \
+            if (sMetric->IsEnabled())                                  \
+                sMetric->LogValue(category, value, { __VA_ARGS__ });   \
         } while (0)
-# else
-#define AC_METRIC_EVENT(category, title, description)                      \
-        __pragma(warning(push))                                         \
-        __pragma(warning(disable:4127))                                 \
-        do {                                                            \
-            if (sMetric->IsEnabled())                                   \
-                sMetric->LogEvent(category, title, description);        \
-        } while (0)                                                     \
+#  else
+#define AC_METRIC_EVENT(category, title, description)                  \
+        __pragma(warning(push))                                        \
+        __pragma(warning(disable:4127))                                \
+        do {                                                           \
+            if (sMetric->IsEnabled())                                  \
+                sMetric->LogEvent(category, title, description);       \
+        } while (0)                                                    \
         __pragma(warning(pop))
-#define AC_METRIC_VALUE(category, value, ...)                              \
-        __pragma(warning(push))                                         \
-        __pragma(warning(disable:4127))                                 \
-        do {                                                            \
-            if (sMetric->IsEnabled())                                   \
-                sMetric->LogValue(category, value, { __VA_ARGS__ }););  \
-        } while (0)                                                     \
+#define AC_METRIC_VALUE(category, value, ...)                          \
+        __pragma(warning(push))                                        \
+        __pragma(warning(disable:4127))                                \
+        do {                                                           \
+            if (sMetric->IsEnabled())                                  \
+                sMetric->LogValue(category, value, { __VA_ARGS__ });   \
+        } while (0)                                                    \
         __pragma(warning(pop))
 #  endif
-#define AC_METRIC_TIMER(category, ...)                                                                             \
-        MetricStopWatch AC_METRIC_UNIQUE_NAME(__AC_METRIC_stop_watch) = MakeMetricStopWatch([&](TimePoint start)   \
-        {                                                                                                       \
-            sMetric->LogValue(category, std::chrono::steady_clock::now() - start, { __VA_ARGS__ });             \
+#define AC_METRIC_TIMER(category, ...)                                                                           \
+        MetricStopWatch AC_METRIC_UNIQUE_NAME(__AC_metric_stop_watch) = MakeMetricStopWatch([&](TimePoint start) \
+        {                                                                                                        \
+            sMetric->LogValue(category, std::chrono::steady_clock::now() - start, { __VA_ARGS__ });              \
         });
 #  if defined WITH_DETAILED_METRICS
-#define AC_METRIC_DETAILED_TIMER(category, ...)                                                                 \
-        MetricStopWatch AC_METRIC_UNIQUE_NAME(__AC_METRIC_stop_watch) = MakeMetricStopWatch([&](TimePoint start)   \
-        {                                                                                                       \
+#define AC_METRIC_DETAILED_TIMER(category, ...)                                                                  \
+        MetricStopWatch AC_METRIC_UNIQUE_NAME(__AC_metric_stop_watch) = MakeMetricStopWatch([&](TimePoint start) \
+        {                                                                                                        \
             int64 duration = int64(std::chrono::duration_cast<Milliseconds>(std::chrono::steady_clock::now() - start).count()); \
             if (sMetric->ShouldLog(category, duration))                                                          \
                 sMetric->LogValue(category, duration, { __VA_ARGS__ });                                          \
         });
 #define AC_METRIC_DETAILED_NO_THRESHOLD_TIMER(category, ...) AC_METRIC_TIMER(category, __VA_ARGS__)
-#define AC_METRIC_DETAILED_EVENT(category, title, description) TC_METRIC_EVENT(category, title, description)
+#define AC_METRIC_DETAILED_EVENT(category, title, description) AC_METRIC_EVENT(category, title, description)
 #  else
 #define AC_METRIC_DETAILED_EVENT(category, title, description) ((void)0)
 #define AC_METRIC_DETAILED_TIMER(category, ...) ((void)0)

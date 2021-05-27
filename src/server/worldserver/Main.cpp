@@ -16,6 +16,7 @@
 #include "Log.h"
 #include "Master.h"
 #include "IoContext.h"
+#include "Metric.h"
 #include "SharedDefines.h"
 #include <ace/Version.h>
 #include <boost/version.hpp>
@@ -141,6 +142,8 @@ extern int main(int argc, char** argv)
             LOG_INFO("server.worldserver", "> Using ACE version:             %s\n", ACE_VERSION);
         }
     );
+
+    AC_METRIC_EVENT("events", "Worldserver started", "");
 
     ///- and run the 'Master'
     /// @todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

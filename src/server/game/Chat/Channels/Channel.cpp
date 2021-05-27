@@ -8,6 +8,7 @@
 #include "ChannelMgr.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
+#include "Metric.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SocialMgr.h"
@@ -68,7 +69,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
         // If storing custom channels in the db is enabled either load or save the channel
         if (sWorld->getBoolConfig(CONFIG_PRESERVE_CUSTOM_CHANNELS))
         {
-            AC_METRIC_TIMER("world_update_time", TC_AC_METRIC_TAG("type", "Save custom channels"));
+            AC_METRIC_TIMER("world_update_time", AC_METRIC_TAG("type", "Save custom channels"));
             _channelDBId = ++ChannelMgr::_channelIdMax;
 
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHANNEL);
