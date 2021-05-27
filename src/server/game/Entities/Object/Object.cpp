@@ -2079,7 +2079,7 @@ void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, b
     Cell::VisitWorldObjects(this, notifier, dist);
 }
 
-void WorldObject::SendMessageToSetInRange(WorldPacket const* data, Player const* skipped_rcvr) const
+void WorldObject::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
 {
     acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
     Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());

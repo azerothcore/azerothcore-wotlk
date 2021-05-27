@@ -1287,7 +1287,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
             const PlayerSpellMap& sp_list = player->GetSpellMap();
             for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
             {
-                if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->IsInSpec(player->GetActiveSpec()))
+                if (itr->second->state == PLAYERSPELL_REMOVED || !itr->second->IsInSpec(player->GetActiveSpec()))
                     continue;
 
                 if (itr->first == spellId || itr->first == spellId2)
@@ -2034,7 +2034,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                         PlayerSpellMap const& sp_list = target->ToPlayer()->GetSpellMap();
                         for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
                         {
-                            if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->IsInSpec(target->ToPlayer()->GetActiveSpec()))
+                            if (itr->second->state == PLAYERSPELL_REMOVED || !itr->second->IsInSpec(target->ToPlayer()->GetActiveSpec()))
                                 continue;
 
                             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);

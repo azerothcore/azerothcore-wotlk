@@ -3613,10 +3613,10 @@ void Player::SendInitialSpells()
 
     for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
-        if (itr->second->State == PLAYERSPELL_REMOVED)
+        if (itr->second->state == PLAYERSPELL_REMOVED)
             continue;
 
-        if (!itr->second->Active || !itr->second->IsInSpec(GetActiveSpec()))
+        if (!itr->second->active || !itr->second->IsInSpec(GetActiveSpec()))
             continue;
 
         data << uint32(itr->first);
@@ -3628,7 +3628,7 @@ void Player::SendInitialSpells()
     // xinef: we have to send talents, but not those on m_spells list
     for (PlayerTalentMap::iterator itr = m_talents.begin(); itr != m_talents.end(); ++itr)
     {
-        if (itr->second->State == PLAYERSPELL_REMOVED)
+        if (itr->second->state == PLAYERSPELL_REMOVED)
             continue;
 
         // xinef: remove all active talent auras
@@ -3848,7 +3848,7 @@ bool Player::addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank)
     {
         PlayerSpellState state = isBeingLoaded() ? PLAYERSPELL_UNCHANGED : PLAYERSPELL_NEW;
         PlayerTalent* newTalent = new PlayerTalent();
-        newTalent->State = state;
+        newTalent->state = state;
         newTalent->specMask = addSpecMask;
         newTalent->talentID = talentInfo->TalentID;
         newTalent->inSpellBook = talentInfo->addToSpellBook && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL);
@@ -3860,8 +3860,8 @@ bool Player::addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank)
     else if (!(itr->second->specMask & addSpecMask))
     {
         itr->second->specMask |= addSpecMask;
-        if (itr->second->State != PLAYERSPELL_NEW)
-            itr->second->State = PLAYERSPELL_CHANGED;
+        if (itr->second->state != PLAYERSPELL_NEW)
+            itr->second->state = PLAYERSPELL_CHANGED;
 
         return true;
     }
@@ -3897,7 +3897,7 @@ static bool IsUnlearnSpellsPacketNeededForSpell(uint32 spellId)
 void Player::_removeTalent(uint32 spellId, uint8 specMask)
 {
     PlayerTalentMap::iterator itr = m_talents.find(spellId);
-    if (itr == m_talents.end() || itr->second->State == PLAYERSPELL_REMOVED)
+    if (itr == m_talents.end() || itr->second->state == PLAYERSPELL_REMOVED)
         return;
 
     _removeTalent(itr, specMask);
@@ -3911,18 +3911,18 @@ void Player::_removeTalent(PlayerTalentMap::iterator& itr, uint8 specMask)
     // xinef: if talent is not present in any spec - remove
     if (itr->second->specMask == 0)
     {
-        if (itr->second->State == PLAYERSPELL_NEW)
+        if (itr->second->state == PLAYERSPELL_NEW)
         {
             delete itr->second;
             m_talents.erase(itr);
             return;
         }
         else
-            itr->second->State = PLAYERSPELL_REMOVED;
+            itr->second->state = PLAYERSPELL_REMOVED;
     }
     // xinef: otherwise save changes to DB
-    else if (itr->second->State != PLAYERSPELL_NEW)
-        itr->second->State = PLAYERSPELL_CHANGED;
+    else if (itr->second->state != PLAYERSPELL_NEW)
+        itr->second->state = PLAYERSPELL_CHANGED;
 }
 
 void Player::_removeTalentAurasAndSpells(uint32 spellId)
@@ -4008,11 +4008,11 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
         while (nextSpellInfo)
         {
             PlayerSpellMap::iterator itr = m_spells.find(nextSpellInfo->Id);
-            if (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->Active)
+            if (itr != m_spells.end() && itr->second->state != PLAYERSPELL_REMOVED && itr->second->active)
             {
                 if (nextSpellInfo->GetRank() < spellInfo->GetRank())
                 {
-                    itr->second->Active = false;
+                    itr->second->active = false;
                     if (IsInWorld())
                     {
                         WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
@@ -4026,7 +4026,7 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                 {
                     PlayerSpellMap::iterator itr2 = m_spells.find(spellInfo->Id);
                     if (itr2 != m_spells.end())
-                        itr2->second->Active = false;
+                        itr2->second->active = false;
                     return false;
                 }
             }
@@ -4049,7 +4049,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
 
     // pussywizard: already found and temporary, nothing to do
     PlayerSpellMap::iterator itr = m_spells.find(spellId);
-    if (itr != m_spells.end() && itr->second->State == PLAYERSPELL_TEMPORARY)
+    if (itr != m_spells.end() && itr->second->state == PLAYERSPELL_TEMPORARY)
         return false;
 
     // xinef: send packet so client can properly recognize this new spell
@@ -4084,7 +4084,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
     if (itr != m_spells.end()) // pussywizard: already know this spell, so update information
     {
         // pussywizard: do nothing if already set as wanted
-        if (itr->second->State != PLAYERSPELL_REMOVED && (itr->second->specMask & addSpecMask) == addSpecMask)
+        if (itr->second->state != PLAYERSPELL_REMOVED && (itr->second->specMask & addSpecMask) == addSpecMask)
             return false;
 
         // pussywizard: need cast auras, learn linked spells, do professions stuff, etc.
@@ -4092,15 +4092,15 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
         bool spellIsNew = true;
 
         // pussywizard: present in m_spells, not removed, already in current spec, already active
-        if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec))
+        if (itr->second->state != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec))
             spellIsNew = false;
 
         needsUnlearnSpellsPacket = needsUnlearnSpellsPacket || IsUnlearnSpellsPacketNeededForSpell(spellId);
 
         // pussywizard: update info in m_spells
-        if (itr->second->State != PLAYERSPELL_NEW && (itr->second->specMask & addSpecMask) != addSpecMask)
-            itr->second->State = PLAYERSPELL_CHANGED;
-        itr->second->Active = true;
+        if (itr->second->state != PLAYERSPELL_NEW && (itr->second->specMask & addSpecMask) != addSpecMask)
+            itr->second->state = PLAYERSPELL_CHANGED;
+        itr->second->active = true;
         itr->second->specMask |= addSpecMask;
 
         if (!spellIsNew)
@@ -4109,8 +4109,8 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
     else // pussywizard: not found in m_spells
     {
         PlayerSpell* newspell = new PlayerSpell;
-        newspell->Active = true;
-        newspell->State = temporary ? PLAYERSPELL_TEMPORARY : (isBeingLoaded() ? PLAYERSPELL_UNCHANGED : PLAYERSPELL_NEW);
+        newspell->active = true;
+        newspell->state = temporary ? PLAYERSPELL_TEMPORARY : (isBeingLoaded() ? PLAYERSPELL_UNCHANGED : PLAYERSPELL_NEW);
         newspell->specMask = addSpecMask;
 
         m_spells[spellId] = newspell;
@@ -4269,7 +4269,7 @@ void Player::LearnSpell(uint32 spellId)
         // pussywizard: lookup next rank in m_spells (the only talents on m_spella are for example pyroblast, that have all ranks restored upon learning rank 1)
         // pussywizard: next ranks must not be in current spec (otherwise no need to learn already learnt)
         PlayerSpellMap::iterator itr = m_spells.find(nextSpell);
-        if (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && !itr->second->IsInSpec(m_activeSpec))
+        if (itr != m_spells.end() && itr->second->state != PLAYERSPELL_REMOVED && !itr->second->IsInSpec(m_activeSpec))
             LearnSpell(nextSpell);
     }
 
@@ -4278,7 +4278,7 @@ void Player::LearnSpell(uint32 spellId)
     for (SpellsRequiringSpellMap::const_iterator itr = spellsRequiringSpell.first; itr != spellsRequiringSpell.second; ++itr)
     {
         PlayerSpellMap::iterator itr2 = m_spells.find(itr->second);
-        if (itr2 != m_spells.end() && itr2->second->State != PLAYERSPELL_REMOVED && !itr2->second->IsInSpec(m_activeSpec))
+        if (itr2 != m_spells.end() && itr2->second->state != PLAYERSPELL_REMOVED && !itr2->second->IsInSpec(m_activeSpec))
             LearnSpell(itr2->first);
     }
 }
@@ -4290,11 +4290,11 @@ void Player::removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporar
         return;
 
     // pussywizard: nothing to do if already removed or not in specs of removeSpecMask
-    if (itr->second->State == PLAYERSPELL_REMOVED || (itr->second->specMask & removeSpecMask) == 0)
+    if (itr->second->state == PLAYERSPELL_REMOVED || (itr->second->specMask & removeSpecMask) == 0)
         return;
 
     // pussywizard: avoid any possible bugs
-    if (onlyTemporary && itr->second->State != PLAYERSPELL_TEMPORARY)
+    if (onlyTemporary && itr->second->state != PLAYERSPELL_TEMPORARY)
         return;
 
     // pussywizard: remove non-talent higher ranks (recursive)
@@ -4322,16 +4322,16 @@ void Player::removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporar
     // pussywizard: some more conditions needed for spells like pyroblast (shouldn't be fully removed when not available in any spec, should stay in db with specMask = 0)
     if (GetTalentSpellCost(firstRankSpellId) == 0 && !sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId) && itr->second->specMask == 0)
     {
-        if (itr->second->State == PLAYERSPELL_NEW || itr->second->State == PLAYERSPELL_TEMPORARY)
+        if (itr->second->state == PLAYERSPELL_NEW || itr->second->state == PLAYERSPELL_TEMPORARY)
         {
             delete itr->second;
             m_spells.erase(itr);
         }
         else
-            itr->second->State = PLAYERSPELL_REMOVED;
+            itr->second->state = PLAYERSPELL_REMOVED;
     }
-    else if (itr->second->State != PLAYERSPELL_NEW && itr->second->State != PLAYERSPELL_TEMPORARY)
-        itr->second->State = PLAYERSPELL_CHANGED;
+    else if (itr->second->state != PLAYERSPELL_NEW && itr->second->state != PLAYERSPELL_TEMPORARY)
+        itr->second->state = PLAYERSPELL_CHANGED;
 
     // xinef: this is used for talents and they are not removed in removeSpell function...
     // xinef: however ill leave this here just in case
@@ -4449,7 +4449,7 @@ bool Player::Has310Flyer(bool checkAllSpells, uint32 excludeSpellId)
         for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
         {
             // pussywizard:
-            if (itr->second->State == PLAYERSPELL_REMOVED)
+            if (itr->second->state == PLAYERSPELL_REMOVED)
                 continue;
 
             if (itr->first == excludeSpellId)
@@ -4692,7 +4692,7 @@ bool Player::resetTalents(bool noResetCost)
     {
         PlayerTalentMap::iterator itr = iter++;
 
-        if (itr->second->State == PLAYERSPELL_REMOVED)
+        if (itr->second->state == PLAYERSPELL_REMOVED)
             continue;
 
         // xinef: talent not in current spec
@@ -4835,19 +4835,19 @@ void Player::DestroyForPlayer(Player* target, bool onDeath) const
 bool Player::HasSpell(uint32 spell) const
 {
     PlayerSpellMap::const_iterator itr = m_spells.find(spell);
-    return (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec));
+    return (itr != m_spells.end() && itr->second->state != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec));
 }
 
 bool Player::HasTalent(uint32 spell, uint8  /*spec*/) const
 {
     PlayerTalentMap::const_iterator itr = m_talents.find(spell);
-    return (itr != m_talents.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec));
+    return (itr != m_talents.end() && itr->second->state != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec));
 }
 
 bool Player::HasActiveSpell(uint32 spell) const
 {
     PlayerSpellMap::const_iterator itr = m_spells.find(spell);
-    return (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->Active && itr->second->IsInSpec(m_activeSpec));
+    return (itr != m_spells.end() && itr->second->state != PLAYERSPELL_REMOVED && itr->second->active && itr->second->IsInSpec(m_activeSpec));
 }
 
 /**
@@ -20888,14 +20888,14 @@ void Player::_SaveSpells(SQLTransaction& trans)
     for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end();)
     {
         // xinef: skip temporary spells
-        if (itr->second->State == PLAYERSPELL_TEMPORARY)
+        if (itr->second->state == PLAYERSPELL_TEMPORARY)
         {
             ++itr;
             continue;
         }
 
         // xinef: Delete statement for removed / updated spell
-        if (itr->second->State == PLAYERSPELL_REMOVED || itr->second->State == PLAYERSPELL_CHANGED)
+        if (itr->second->state == PLAYERSPELL_REMOVED || itr->second->state == PLAYERSPELL_CHANGED)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_BY_SPELL);
             stmt->setUInt32(0, GetGUID().GetCounter());
@@ -20904,7 +20904,7 @@ void Player::_SaveSpells(SQLTransaction& trans)
         }
 
         // xinef: insert statement for new / updated spell
-        if (itr->second->State == PLAYERSPELL_NEW || itr->second->State == PLAYERSPELL_CHANGED)
+        if (itr->second->state == PLAYERSPELL_NEW || itr->second->state == PLAYERSPELL_CHANGED)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SPELL);
             stmt->setUInt32(0, GetGUID().GetCounter());
@@ -20913,14 +20913,14 @@ void Player::_SaveSpells(SQLTransaction& trans)
             trans->Append(stmt);
         }
 
-        if (itr->second->State == PLAYERSPELL_REMOVED)
+        if (itr->second->state == PLAYERSPELL_REMOVED)
         {
             delete itr->second;
             m_spells.erase(itr++);
         }
         else
         {
-            itr->second->State = PLAYERSPELL_UNCHANGED;
+            itr->second->state = PLAYERSPELL_UNCHANGED;
             ++itr;
         }
     }
@@ -22492,7 +22492,7 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
 
     for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
-        if (itr->second->State == PLAYERSPELL_REMOVED)
+        if (itr->second->state == PLAYERSPELL_REMOVED)
             continue;
         uint32 unSpellId = itr->first;
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(unSpellId);
@@ -26391,7 +26391,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
             if (TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first))
                 if (TalentEntry const* itrTalentInfo = sTalentStore.LookupEntry(talentPos->talent_id))
                     if (itrTalentInfo->TalentTab == talentInfo->TalentTab)
-                        if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec())) // pussywizard
+                        if (itr->second->state != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec())) // pussywizard
                             spentPoints += talentPos->rank + 1;
     }
 
@@ -27547,7 +27547,7 @@ void Player::ActivateSpec(uint8 spec)
     // pussywizard: remove spells that are in previous spec, but are not present in new one (or are in new spec, but not in the old one)
     for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
-        if (!itr->second->Active || itr->second->State == PLAYERSPELL_REMOVED)
+        if (!itr->second->active || itr->second->state == PLAYERSPELL_REMOVED)
             continue;
 
         // pussywizard: was => isn't
@@ -27737,7 +27737,7 @@ void Player::PrepareCharmAISpells()
 
     for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
-        if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active || !itr->second->IsInSpec(GetActiveSpec()))
+        if (itr->second->state == PLAYERSPELL_REMOVED || !itr->second->active || !itr->second->IsInSpec(GetActiveSpec()))
             continue;
 
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
