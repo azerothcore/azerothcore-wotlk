@@ -36,6 +36,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "zlib.h"
+#include "Metric.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -307,6 +308,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     {
         OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
         ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
+        AC_METRIC_DETAILED_TIMER("worldsession_update_opcode_time", AC_METRIC_TAG("opcode", opHandle->Name));
 
         try
         {
@@ -410,6 +412,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         if (getMSTimeDiff(_startMSTime, getMSTime()) >= 3) // limit (by time) packets processed in one update, prevent DDoS
             break;
     }
+
+    AC_METRIC_VALUE("processed_packets", processedPackets);
 
     if (m_Socket && !m_Socket->IsClosed())
         ProcessQueryCallbacks();
@@ -637,6 +641,8 @@ void WorldSession::LogoutPlayer(bool save)
 
         //! Call script hook before deletion
         sScriptMgr->OnPlayerLogout(_player);
+
+        AC_METRIC_EVENT("player_events", "Logout", _player->GetName());
 
         LOG_INFO("entities.player", "Account: %d (IP: %s) Logout Character:[%s] (%s) Level: %d",
             GetAccountId(), GetRemoteAddress().c_str(), _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), _player->getLevel());

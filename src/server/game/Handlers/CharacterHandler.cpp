@@ -40,6 +40,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Metric.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -1199,6 +1200,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
         sScriptMgr->OnFirstLogin(pCurrChar);
     }
+
+    AC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
     delete holder;
 }
