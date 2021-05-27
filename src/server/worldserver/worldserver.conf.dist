@@ -1449,9 +1449,17 @@ CreatureFamilyAssistanceRadius = 10
 #
 #    CreatureFamilyAssistanceDelay
 #        Description: Time (in milliseconds) before creature assistance call.
-#        Default:     1500 - (1.5 Seconds)
+#        Default:     2000 - (2 Seconds)
 
-CreatureFamilyAssistanceDelay = 1500
+CreatureFamilyAssistanceDelay = 2000
+
+#
+#    CreatureFamilyAssistancePeriod
+#        Description: Time (in milliseconds) before next creature assistance call.
+#        Default:     3000 - (3 Seconds)
+                      0    - (Disabled)
+
+CreatureFamilyAssistancePeriod = 3000
 
 #
 #    CreatureFamilyFleeDelay

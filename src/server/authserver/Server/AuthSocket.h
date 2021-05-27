@@ -12,8 +12,10 @@
 #include "Optional.h"
 #include "RealmSocket.h"
 #include "SRP6.h"
+#include <mutex>
 
 class ACE_INET_Addr;
+class Field;
 struct Realm;
 
 enum eStatus
@@ -24,6 +26,21 @@ enum eStatus
     STATUS_PATCH,      // unused
     STATUS_AUTHED,
     STATUS_CLOSED
+};
+
+struct AccountInfo
+{
+    void LoadResult(Field* fields);
+
+    uint32 Id = 0;
+    std::string Login;
+    bool IsLockedToIP = false;
+    std::string LockCountry;
+    std::string LastIP;
+    uint32 FailedLogins = 0;
+    bool IsBanned = false;
+    bool IsPermanenetlyBanned = false;
+    AccountTypes SecurityLevel = SEC_PLAYER;
 };
 
 // Handle login commands
@@ -65,7 +82,7 @@ private:
 
     eStatus _status;
 
-    std::string _login;
+    AccountInfo _accountInfo;
     Optional<std::vector<uint8>> _totpSecret;
 
     // Since GetLocaleByName() is _NOT_ bijective, we have to store the locale as a string. Otherwise we can't differ
@@ -74,7 +91,6 @@ private:
     std::string _os;
     uint16 _build;
     uint8 _expversion;
-    AccountTypes _accountSecurityLevel;
 };
 
 #endif
