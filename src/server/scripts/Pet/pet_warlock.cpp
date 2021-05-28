@@ -24,7 +24,7 @@
       {
           npc_pet_warlock_impAI(Creature* creature) : ScriptedAI(creature) { }
 
-          void EnterCombat(Unit* /*who) override
+          void EnterCombat(Unit* who) override
           {
               me->RemoveAurasDueToSpell(SPELL_WARLOCK_PHASE_SHIFT);
           }
