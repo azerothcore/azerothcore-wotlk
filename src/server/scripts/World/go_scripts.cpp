@@ -1267,29 +1267,6 @@ public:
     }
 };
 
-enum TableTheka
-{
-    GOSSIP_TABLE_THEKA = 1653,
-
-    QUEST_SPIDER_GOLD = 2936
-};
-
-class go_table_theka : public GameObjectScript
-{
-public:
-    go_table_theka() : GameObjectScript("go_table_theka") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        if (player->GetQuestStatus(QUEST_SPIDER_GOLD) == QUEST_STATUS_INCOMPLETE)
-            player->AreaExploredOrEventHappens(QUEST_SPIDER_GOLD);
-
-        SendGossipMenuFor(player, GOSSIP_TABLE_THEKA, go->GetGUID());
-
-        return true;
-    }
-};
-
 /*######
 ## go_inconspicuous_landmark
 ######*/
@@ -1670,7 +1647,6 @@ void AddSC_go_scripts()
     new go_scourge_cage();
     new go_arcane_prison();
     new go_jotunheim_cage();
-    new go_table_theka();
     new go_inconspicuous_landmark();
     new go_soulwell();
     new go_dragonflayer_cage();
