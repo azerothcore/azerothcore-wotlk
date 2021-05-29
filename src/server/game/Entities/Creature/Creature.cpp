@@ -888,15 +888,10 @@ void Creature::DoFleeToGetAssistance()
     {
         Creature* creature = nullptr;
 
-        CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
-        Cell cell(p);
-        cell.SetNoCreate();
         acore::NearestAssistCreatureInCreatureRangeCheck u_check(this, GetVictim(), radius);
         acore::CreatureLastSearcher<acore::NearestAssistCreatureInCreatureRangeCheck> searcher(this, creature, u_check);
 
-        TypeContainerVisitor<acore::CreatureLastSearcher<acore::NearestAssistCreatureInCreatureRangeCheck>, GridTypeMapContainer > grid_creature_searcher(searcher);
-
-        cell.Visit(p, grid_creature_searcher, *GetMap(), *this, radius);
+        Cell::VisitGridObjects(this, searcher, radius);
 
         SetNoSearchAssistance(true);
         UpdateSpeed(MOVE_RUN, false);
@@ -2077,53 +2072,29 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
 // select nearest hostile unit within the given distance (regardless of threat list).
 Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) const
 {
-    CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
-    Cell cell(p);
-    cell.SetNoCreate();
+    if (dist == 0.0f)
+        dist = MAX_VISIBILITY_DISTANCE;
 
     Unit* target = nullptr;
 
-    {
-        if (dist == 0.0f)
-            dist = MAX_SEARCHER_DISTANCE;
-
-        acore::NearestHostileUnitCheck u_check(this, dist, playerOnly);
-        acore::UnitLastSearcher<acore::NearestHostileUnitCheck> searcher(this, target, u_check);
-
-        TypeContainerVisitor<acore::UnitLastSearcher<acore::NearestHostileUnitCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
-        TypeContainerVisitor<acore::UnitLastSearcher<acore::NearestHostileUnitCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
-
-        cell.Visit(p, world_unit_searcher, *GetMap(), *this, dist);
-        cell.Visit(p, grid_unit_searcher, *GetMap(), *this, dist);
-    }
-
+    acore::NearestHostileUnitCheck u_check(this, dist, playerOnly);
+    acore::UnitLastSearcher<acore::NearestHostileUnitCheck> searcher(this, target, u_check);
+    Cell::VisitAllObjects(this, searcher, dist);
     return target;
 }
 
 // select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
 Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 {
-    CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    Unit* target = nullptr;
-
     if (dist < ATTACK_DISTANCE)
         dist = ATTACK_DISTANCE;
     if (dist > MAX_SEARCHER_DISTANCE)
         dist = MAX_SEARCHER_DISTANCE;
 
-    {
-        acore::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
-        acore::UnitLastSearcher<acore::NearestHostileUnitInAttackDistanceCheck> searcher(this, target, u_check);
-
-        TypeContainerVisitor<acore::UnitLastSearcher<acore::NearestHostileUnitInAttackDistanceCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
-        TypeContainerVisitor<acore::UnitLastSearcher<acore::NearestHostileUnitInAttackDistanceCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
-
-        cell.Visit(p, world_unit_searcher, *GetMap(), *this, dist);
-        cell.Visit(p, grid_unit_searcher, *GetMap(), *this, dist);
-    }
+    Unit* target = nullptr;
+    acore::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
+    acore::UnitLastSearcher<acore::NearestHostileUnitInAttackDistanceCheck> searcher(this, target, u_check);
+    Cell::VisitAllObjects(this, searcher, std::max(dist, ATTACK_DISTANCE));
 
     return target;
 }
@@ -2154,18 +2125,9 @@ void Creature::CallAssistance()
         {
             std::list<Creature*> assistList;
 
-            {
-                CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
-                Cell cell(p);
-                cell.SetNoCreate();
-
-                acore::AnyAssistCreatureInRangeCheck u_check(this, GetVictim(), radius);
-                acore::CreatureListSearcher<acore::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
-
-                TypeContainerVisitor<acore::CreatureListSearcher<acore::AnyAssistCreatureInRangeCheck>, GridTypeMapContainer >  grid_creature_searcher(searcher);
-
-                cell.Visit(p, grid_creature_searcher, *GetMap(), *this, radius);
-            }
+            acore::AnyAssistCreatureInRangeCheck u_check(this, GetVictim(), radius);
+            acore::CreatureListSearcher<acore::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
+            Cell::VisitGridObjects(this, searcher, radius);
 
             if (!assistList.empty())
             {
@@ -2187,16 +2149,10 @@ void Creature::CallForHelp(float radius)
     if (radius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
         return;
 
-    CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
-    Cell cell(p);
-    cell.SetNoCreate();
-
     acore::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
     acore::CreatureWorker<acore::CallOfHelpCreatureInRangeDo> worker(this, u_do);
 
-    TypeContainerVisitor<acore::CreatureWorker<acore::CallOfHelpCreatureInRangeDo>, GridTypeMapContainer >  grid_creature_searcher(worker);
-
-    cell.Visit(p, grid_creature_searcher, *GetMap(), *this, radius);
+    Cell::VisitGridObjects(this, worker, radius);
 }
 
 bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /*= true*/) const

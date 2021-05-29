@@ -812,7 +812,7 @@ public:
             std::list<Player*> players;
             acore::AnyPlayerInObjectRangeCheck checker(me, radius);
             acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
-            me->VisitNearbyWorldObject(radius, searcher);
+            Cell::VisitWorldObjects(me, searcher, radius);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {

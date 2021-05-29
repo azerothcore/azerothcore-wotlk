@@ -699,7 +699,7 @@ public:
             std::list<WorldObject*> ClusterList;
             acore::AllWorldObjectsInRange objects(me, searchDistance);
             acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
-            me->VisitNearbyObject(searchDistance, searcher);
+            Cell::VisitAllObjects(me, searcher, searchDistance);
 
             for (std::list<WorldObject*>::const_iterator i = ClusterList.begin(); i != ClusterList.end(); ++i)
             {

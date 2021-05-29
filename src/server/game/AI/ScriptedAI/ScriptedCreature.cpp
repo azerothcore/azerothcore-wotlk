@@ -381,7 +381,7 @@ Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
     Unit* unit = nullptr;
     acore::MostHPMissingInRange u_check(me, range, minHPDiff);
     acore::UnitLastSearcher<acore::MostHPMissingInRange> searcher(me, unit, u_check);
-    me->VisitNearbyObject(range, searcher);
+    Cell::VisitAllObjects(me, searcher, range);
 
     return unit;
 }
@@ -391,7 +391,7 @@ std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
     std::list<Creature*> list;
     acore::FriendlyCCedInRange u_check(me, range);
     acore::CreatureListSearcher<acore::FriendlyCCedInRange> searcher(me, list, u_check);
-    me->VisitNearbyObject(range, searcher);
+    Cell::VisitAllObjects(me, searcher, range);
     return list;
 }
 
@@ -400,7 +400,7 @@ std::list<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 u
     std::list<Creature*> list;
     acore::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
     acore::CreatureListSearcher<acore::FriendlyMissingBuffInRange> searcher(me, list, u_check);
-    me->VisitNearbyObject(range, searcher);
+    Cell::VisitAllObjects(me, searcher, range);
     return list;
 }
 
@@ -408,15 +408,10 @@ Player* ScriptedAI::GetPlayerAtMinimumRange(float minimumRange)
 {
     Player* player = nullptr;
 
-    CellCoord pair(acore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
-    Cell cell(pair);
-    cell.SetNoCreate();
-
     acore::PlayerAtMinimumRangeAway check(me, minimumRange);
     acore::PlayerSearcher<acore::PlayerAtMinimumRangeAway> searcher(me, player, check);
-    TypeContainerVisitor<acore::PlayerSearcher<acore::PlayerAtMinimumRangeAway>, GridTypeMapContainer> visitor(searcher);
 
-    cell.Visit(pair, visitor, *me->GetMap(), *me, minimumRange);
+    Cell::VisitWorldObjects(me, searcher, minimumRange);
 
     return player;
 }

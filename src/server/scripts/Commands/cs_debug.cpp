@@ -918,7 +918,7 @@ public:
             Creature* passenger = nullptr;
             acore::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
             acore::CreatureSearcher<acore::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
-            handler->GetSession()->GetPlayer()->VisitNearbyObject(30.0f, searcher);
+            Cell::VisitAllObjects(handler->GetSession()->GetPlayer(), searcher, 30.0f);
             if (!passenger || passenger == target)
                 return false;
             passenger->EnterVehicle(target, seatId);

@@ -351,7 +351,7 @@ public:
                 std::list<Player*> players;
                 acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
                 acore::PlayerListSearcher<acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                go->VisitNearbyWorldObject(0.3f, searcher);
+                Cell::VisitWorldObjects(go, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
@@ -398,7 +398,7 @@ public:
                 std::list<Player*> players;
                 acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
                 acore::PlayerListSearcher<acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                go->VisitNearbyWorldObject(0.3f, searcher);
+                Cell::VisitWorldObjects(go, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
