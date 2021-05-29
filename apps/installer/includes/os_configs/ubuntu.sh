@@ -10,7 +10,7 @@ sudo add-apt-repository -y ppa:mhier/libboost-latest
 sudo apt update
 
 # shared deps
-sudo apt-get -y install make cmake clang curl unzip libmysqlclient-dev libace-dev ccache google-perftools
+sudo apt-get -y install make cmake clang curl unzip libmysqlclient-dev ccache google-perftools
 
 # Insstall boost 1.74 from ppa:mhier/libboost-latest for all os versions
 sudo apt-get -y install libboost1.74-dev
@@ -22,6 +22,6 @@ if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
 else
   sudo apt-get install -y git gcc g++ gdb gdbserver \
   libssl-dev libbz2-dev libreadline-dev libncurses-dev \
-  mysql-server libace-6.*
+  mysql-server
 fi
 
