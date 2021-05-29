@@ -82,17 +82,20 @@ namespace acore
 
     struct MessageDistDeliverer
     {
-        WorldObject* i_source;
+        WorldObject const* i_source;
         WorldPacket* i_message;
         uint32 i_phaseMask;
         float i_distSq;
-        TeamId teamId;
+        uint32 team;
         Player const* skipped_receiver;
-        MessageDistDeliverer(WorldObject* src, WorldPacket* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
+        MessageDistDeliverer(WorldObject const* src, WorldPacket* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
-            , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
+            , team(0)
             , skipped_receiver(skipped)
         {
+            if (own_team_only)
+                if (Player const* player = src->ToPlayer())
+                    team = player->GetTeam();            
         }
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
@@ -102,7 +105,7 @@ namespace acore
         void SendPacket(Player* player)
         {
             // never send packet to self
-            if (player == i_source || (teamId != TEAM_NEUTRAL && player->GetTeamId() != teamId) || skipped_receiver == player)
+            if (player == i_source || (team && player->GetTeam() != team) || skipped_receiver == player)
                 return;
 
             if (!player->HaveAtClient(i_source))
