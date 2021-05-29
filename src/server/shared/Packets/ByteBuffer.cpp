@@ -141,7 +141,7 @@ void ByteBuffer::put(size_t pos, uint8 const* src, size_t cnt)
 
 void ByteBuffer::print_storage() const
 {
-    if (!sLog->ShouldLog("network", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
+    if (!sLog->ShouldLog("network.opcode.buffer", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
         return;
 
     std::ostringstream o;
@@ -152,12 +152,12 @@ void ByteBuffer::print_storage() const
 
     o << " ";
 
-    LOG_TRACE("network", "%s", o.str().c_str());
+    LOG_TRACE("network.opcode.buffer", "%s", o.str().c_str());
 }
 
 void ByteBuffer::textlike() const
 {
-    if (!sLog->ShouldLog("network", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
+    if (!sLog->ShouldLog("network.opcode.buffer", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
         return;
 
     std::ostringstream o;
@@ -172,12 +172,12 @@ void ByteBuffer::textlike() const
 
     o << " ";
 
-    LOG_TRACE("network", "%s", o.str().c_str());
+    LOG_TRACE("network.opcode.buffer", "%s", o.str().c_str());
 }
 
 void ByteBuffer::hexlike() const
 {
-    if (!sLog->ShouldLog("network", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
+    if (!sLog->ShouldLog("network.opcode.buffer", LogLevel::LOG_LEVEL_TRACE)) // optimize disabled trace output
         return;
 
     uint32 j = 1, k = 1;
@@ -207,5 +207,5 @@ void ByteBuffer::hexlike() const
 
     o << " ";
 
-    LOG_TRACE("network", "%s", o.str().c_str());
+    LOG_TRACE("network.opcode.buffer", "%s", o.str().c_str());
 }
