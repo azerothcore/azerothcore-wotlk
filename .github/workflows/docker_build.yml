@@ -27,6 +27,7 @@ jobs:
 
       - name: Configure
         run: |
+          sudo rm -rf /usr/local/lib/android
           sudo rm -rf /usr/share/dotnet
           docker --version
           docker-compose --version
