@@ -170,7 +170,9 @@ inline void Cell::VisitGridObjects(WorldObject const* center_obj, T& visitor, fl
     CellCoord p(acore::ComputeCellCoord(center_obj->GetPositionX(), center_obj->GetPositionY()));
     Cell cell(p);
     if (dont_load)
+    {
         cell.SetNoCreate();
+    }
 
     TypeContainerVisitor<T, GridTypeMapContainer> gnotifier(visitor);
     cell.Visit(p, gnotifier, *center_obj->GetMap(), *center_obj, radius);
@@ -182,7 +184,9 @@ inline void Cell::VisitWorldObjects(WorldObject const* center_obj, T& visitor, f
     CellCoord p(acore::ComputeCellCoord(center_obj->GetPositionX(), center_obj->GetPositionY()));
     Cell cell(p);
     if (dont_load)
+    {
         cell.SetNoCreate();
+    }
 
     TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
     cell.Visit(p, wnotifier, *center_obj->GetMap(), *center_obj, radius);
@@ -194,7 +198,9 @@ inline void Cell::VisitAllObjects(WorldObject const* center_obj, T& visitor, flo
     CellCoord p(acore::ComputeCellCoord(center_obj->GetPositionX(), center_obj->GetPositionY()));
     Cell cell(p);
     if (dont_load)
+    {
         cell.SetNoCreate();
+    }
 
     TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
     cell.Visit(p, wnotifier, *center_obj->GetMap(), *center_obj, radius);
@@ -208,7 +214,9 @@ inline void Cell::VisitGridObjects(float x, float y, Map* map, T& visitor, float
     CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     if (dont_load)
+    {
         cell.SetNoCreate();
+    }
 
     TypeContainerVisitor<T, GridTypeMapContainer> gnotifier(visitor);
     cell.Visit(p, gnotifier, *map, x, y, radius);
@@ -220,7 +228,9 @@ inline void Cell::VisitWorldObjects(float x, float y, Map* map, T& visitor, floa
     CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     if (dont_load)
+    {
         cell.SetNoCreate();
+    }
 
     TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
     cell.Visit(p, wnotifier, *map, x, y, radius);
@@ -232,7 +242,9 @@ inline void Cell::VisitAllObjects(float x, float y, Map* map, T& visitor, float 
     CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     if (dont_load)
+    {
         cell.SetNoCreate();
+    }
 
     TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
     cell.Visit(p, wnotifier, *map, x, y, radius);

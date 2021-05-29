@@ -2073,7 +2073,9 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
 Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) const
 {
     if (dist == 0.0f)
+    {
         dist = MAX_VISIBILITY_DISTANCE;
+    } 
 
     Unit* target = nullptr;
 
