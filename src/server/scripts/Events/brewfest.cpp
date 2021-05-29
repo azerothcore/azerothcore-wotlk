@@ -1109,7 +1109,7 @@ public:
                 Player* player = nullptr;
                 acore::AnyPlayerInObjectRangeCheck checker(me, 2.0f);
                 acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, checker);
-                me->VisitNearbyWorldObject(2.0f, searcher);
+                Cell::VisitWorldObjects(me, searcher, 2.0f);
                 if (player)
                 {
                     player->CastSpell(player, SPELL_DRUNKEN_MASTER, true);

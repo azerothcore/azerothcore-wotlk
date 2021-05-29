@@ -2233,9 +2233,7 @@ public:
 
         acore::RespawnDo u_do;
         acore::WorldObjectWorker<acore::RespawnDo> worker(player, u_do);
-
-        TypeContainerVisitor<acore::WorldObjectWorker<acore::RespawnDo>, GridTypeMapContainer > obj_worker(worker);
-        cell.Visit(p, obj_worker, *player->GetMap(), *player, player->GetGridActivationRange());
+        Cell::VisitGridObjects(player, worker, player->GetGridActivationRange());
 
         return true;
     }
