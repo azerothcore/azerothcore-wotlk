@@ -9902,6 +9902,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
         creature->SendAIReaction(AI_REACTION_HOSTILE);
         creature->CallAssistance();
+        creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
     }
 
     // delay offhand weapon attack to next attack time
@@ -13058,6 +13059,8 @@ void Unit::ClearInCombat()
         if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED))
             SetUInt32Value(UNIT_DYNAMIC_FLAGS, creature->GetCreatureTemplate()->dynamicflags);
 
+        creature->SetAssistanceTimer(0);
+
         // Xinef: will be recalculated at follow movement generator initialization
         if (!IsPet() && !IsCharmed())
             return;
@@ -15515,7 +15518,12 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             return;
 
         // Update skills here for players
-        if (GetTypeId() == TYPEID_PLAYER)
+        // only when you are not fighting other players or their pets/totems (pvp)
+        if (GetTypeId() == TYPEID_PLAYER &&
+                target->GetTypeId() != TYPEID_PLAYER &&
+                !(target->IsTotem() && target->ToTotem()->GetOwner()->IsPlayer()) &&
+                !target->IsPet()
+           )
         {
             // On melee based hit/miss/resist need update skill (for victim and attacker)
             if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST))
