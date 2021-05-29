@@ -12,6 +12,7 @@
 #define _ACORE_RARUNNABLE_H_
 
 #include "Common.h"
+#include "Threading.h"
 #include <ace/Reactor.h>
 
 class RARunnable : public acore::Runnable
