@@ -132,7 +132,7 @@ void WorldSession::SendTrainerList(Creature* npc)
     Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(npc->GetEntry());
     if (!trainer)
     {
-        LOG_DEBUG("network", "WorldSession: SendTrainerList - Training spells not found for creature (%s)", packet.Unit.ToString().c_str());
+        LOG_DEBUG("network", "WorldSession: SendTrainerList - Training spells not found for creature (%s)", npc->GetGUID().ToString().c_str());
         return;
     }
 
