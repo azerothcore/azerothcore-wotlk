@@ -7,7 +7,6 @@
 #include "ChannelMgr.h"
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
-#include "utf8.h"
 #include <cctype>
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
@@ -40,7 +39,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     // pussywizard: restrict allowed characters in channel name to avoid |0 and possibly other exploits
     //if (!ObjectMgr::IsValidChannelName(channelName))
-    if (channelName.find("|") != std::string::npos || channelName.size() >= 100 || !utf8::is_valid(channelName.begin(), channelName.end()))
+    if (channelName.find("|") != std::string::npos || channelName.size() >= 100)
         return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
