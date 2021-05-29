@@ -2030,6 +2030,7 @@ public:
     [[nodiscard]] Corpse* GetCorpse() const;
     void SpawnCorpseBones(bool triggerSave = true);
     Corpse* CreateCorpse();
+    void RemoveCorpse();
     void KillPlayer();
     static void OfflineResurrect(ObjectGuid const guid, SQLTransaction& trans);
     bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }

@@ -190,6 +190,17 @@ void WorldSession::HandleMoveWorldportAck()
         }
     }
 
+    if (!corpse && mEntry->IsDungeon())
+    {
+        // resurrect character upon entering instance when the corpse is not available anymore
+        if (GetPlayer()->GetCorpseLocation().GetMapId() == mEntry->MapID)
+        {
+            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->RemoveCorpse();
+        }
+    }
+
+
     bool allowMount = !mEntry->IsDungeon() || mEntry->IsBattlegroundOrArena();
     if (mInstance)
     {

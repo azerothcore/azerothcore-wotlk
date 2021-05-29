@@ -5484,6 +5484,18 @@ Corpse* Player::CreateCorpse()
     return corpse;
 }
 
+void Player::RemoveCorpse()
+{
+    if (GetCorpse())
+    {
+        GetCorpse()->RemoveFromWorld();
+    }
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    Corpse::DeleteFromDB(GetGUID(), trans);
+    CharacterDatabase.CommitTransaction(trans);
+}
+
 void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
 {
     _corpseLocation.WorldRelocate();
