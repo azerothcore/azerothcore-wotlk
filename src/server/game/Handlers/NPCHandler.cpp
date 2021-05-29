@@ -113,7 +113,7 @@ void WorldSession::HandleTrainerListOpcode(WorldPackets::NPC::Hello& packet)
     Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(packet.Unit, UNIT_NPC_FLAG_TRAINER);
     if (!npc)
     {
-        LOG_DEBUG("network", "WorldSession: SendTrainerList - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
+        LOG_DEBUG("network", "WorldSession: SendTrainerList - Unit (%s) not found or you can not interact with him.", packet.Unit.ToString().c_str());
         return;
     }
 
@@ -132,7 +132,7 @@ void WorldSession::SendTrainerList(Creature* npc)
     Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(npc->GetEntry());
     if (!trainer)
     {
-        LOG_DEBUG("network", "WorldSession: SendTrainerList - Training spells not found for creature (%s)", guid.ToString().c_str());
+        LOG_DEBUG("network", "WorldSession: SendTrainerList - Training spells not found for creature (%s)", packet.Unit.ToString().c_str());
         return;
     }
 

@@ -95,7 +95,7 @@ namespace Trainer
         if (trainerSpell->IsCastable())
             player->CastSpell(player, trainerSpell->SpellId, true);
         else
-            player->LearnSpell(trainerSpell->SpellId, false);
+            player->learnSpell(trainerSpell->SpellId, false);
 
         SendTeachSucceeded(npc, player, spellId);
     }
