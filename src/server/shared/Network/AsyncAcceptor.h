@@ -26,8 +26,8 @@ class AsyncAcceptor
 public:
     typedef void(*AcceptCallback)(tcp::socket&& newSocket, uint32 threadIndex);
 
-    AsyncAcceptor(acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port) :
-        _acceptor(ioContext), _endpoint(acore::Net::make_address(bindIp), port),
+    AsyncAcceptor(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port) :
+        _acceptor(ioContext), _endpoint(Acore::Net::make_address(bindIp), port),
         _socket(ioContext), _closed(false), _socketFactory(std::bind(&AsyncAcceptor::DefeaultSocketFactory, this))
     {
     }

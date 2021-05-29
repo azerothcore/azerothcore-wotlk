@@ -609,7 +609,7 @@ bool AuthSocket::_HandleLogonProof()
         LoginDatabase.DirectExecute(stmt);
 
         // Finish SRP6 and send the final result to the client
-        acore::Crypto::SHA1::Digest M2 = acore::Crypto::SRP6::GetSessionVerifier(lp.A, lp.clientM, _sessionKey);
+        Acore::Crypto::SHA1::Digest M2 = Acore::Crypto::SRP6::GetSessionVerifier(lp.A, lp.clientM, _sessionKey);
 
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
         {
