@@ -401,7 +401,7 @@ bool Master::_StartDB()
         return false;
     }
 
-    LOG_INFO("server.worldserver", "Realm running as realm ID %d", realmID);
+    LOG_INFO("server.worldserver", "Realm running as realm ID %d", realm.Id.Realm);
 
     ///- Clean the database before starting
     ClearOnlineAccounts();
