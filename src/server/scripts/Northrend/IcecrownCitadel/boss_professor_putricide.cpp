@@ -1197,7 +1197,7 @@ public:
                 return;
 
             uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(triggerSpell);
+            SpellInfo const* spell = sSpellMgr->AssertSpellInfo(triggerSpell);
             spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, caster);
 
             int32 damage = spell->Effects[EFFECT_0].CalcValue(caster);
