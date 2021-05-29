@@ -95,7 +95,7 @@ namespace acore
         {
             if (own_team_only)
                 if (Player const* player = src->ToPlayer())
-                    team = player->GetTeam();            
+                    team = player->GetTeamId();            
         }
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
@@ -105,7 +105,7 @@ namespace acore
         void SendPacket(Player* player)
         {
             // never send packet to self
-            if (player == i_source || (team && player->GetTeam() != team) || skipped_receiver == player)
+            if (player == i_source || (team && player->GetTeamId() != team) || skipped_receiver == player)
                 return;
 
             if (!player->HaveAtClient(i_source))
