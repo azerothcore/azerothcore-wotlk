@@ -157,7 +157,7 @@ public:
                 std::list<Unit*> targets;
                 acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50);
                 acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-                Cell::VisitAllObjects(me, searcher, 50.0f);
+                me->VisitNearbyObject(50, searcher);
                 for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                     if ((*iter)->GetAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID()))
                     {

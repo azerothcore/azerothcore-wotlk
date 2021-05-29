@@ -841,7 +841,7 @@ public:
                 std::list<Creature*> temp;
                 FrostwingVrykulSearcher check(me, 150.0f);
                 acore::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
-                Cell::VisitGridObjects(me, searcher, 150.0f);
+                me->VisitNearbyGridObject(150.0f, searcher);
 
                 _aliveTrash.clear();
                 for (std::list<Creature*>::iterator itr = temp.begin(); itr != temp.end(); ++itr)
@@ -886,14 +886,14 @@ public:
                 Player* player = nullptr;
                 acore::AnyPlayerInObjectRangeCheck check(me, 140.0f);
                 acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
-                Cell::VisitWorldObjects(me, searcher, 140.0f);
+                me->VisitNearbyWorldObject(140.0f, searcher);
                 // wipe
                 if (!player || me->GetExactDist(4357.0f, 2606.0f, 350.0f) > 125.0f)
                 {
                     //Talk(SAY_CROK_DEATH);
                     FrostwingGauntletRespawner respawner;
                     acore::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
-                    Cell::VisitGridObjects(me, worker, 333.0f);
+                    me->VisitNearbyGridObject(333.0f, worker);
                     return;
                 }
             }
@@ -1363,7 +1363,7 @@ public:
             Creature* target = nullptr;
             acore::MostHPMissingInRange u_check(me, 60.0f, 0);
             acore::CreatureLastSearcher<acore::MostHPMissingInRange> searcher(me, target, u_check);
-            Cell::VisitGridObjects(me, searcher, 60.0f);
+            me->VisitNearbyGridObject(60.0f, searcher);
             return target;
         }
     };
@@ -2333,7 +2333,7 @@ public:
                     {
                         FrostwingGauntletRespawner respawner;
                         acore::CreatureWorker<FrostwingGauntletRespawner> worker(crok, respawner);
-                        Cell::VisitGridObjects(crok, worker, 333.0f);
+                        crok->VisitNearbyGridObject(333.0f, worker);
                         return true;
                     }
                     else

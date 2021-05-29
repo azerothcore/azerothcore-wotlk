@@ -2428,7 +2428,7 @@ public:
             std::list<Player*> playerList;
             acore::AnyPlayerInObjectRangeCheck checker(caster, 65.0f);
             acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(caster, playerList, checker);
-            Cell::VisitWorldObjects(caster, searcher, 65.0f);
+            caster->VisitNearbyWorldObject(65.0f, searcher);
             for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
                 // Check if found player target is on fly mount or using flying form
                 if ((*itr)->HasAuraType(SPELL_AURA_FLY) || (*itr)->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))

@@ -1896,13 +1896,18 @@ void Spell::SearchTargets(SEARCHER& searcher, uint32 containerMask, Unit* refere
         Cell cell(p);
         cell.SetNoCreate();
 
-        Map* map = referer->GetMap();
+        Map& map = *(referer->GetMap());
 
         if (searchInWorld)
-            Cell::VisitWorldObjects(x, y, map, searcher, radius);
-
+        {
+            TypeContainerVisitor<SEARCHER, WorldTypeMapContainer> world_object_notifier(searcher);
+            cell.Visit(p, world_object_notifier, map, radius + SPELL_SEARCHER_COMPENSATION, x, y);
+        }
         if (searchInGrid)
-            Cell::VisitGridObjects(x, y, map, searcher, radius);
+        {
+            TypeContainerVisitor<SEARCHER, GridTypeMapContainer >  grid_object_notifier(searcher);
+            cell.Visit(p, grid_object_notifier, map, radius + SPELL_SEARCHER_COMPENSATION, x, y);
+        }
     }
 }
 

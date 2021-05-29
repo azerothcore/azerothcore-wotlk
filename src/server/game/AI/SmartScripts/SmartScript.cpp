@@ -3881,7 +3881,7 @@ ObjectList* SmartScript::GetWorldObjectsInDist(float dist)
     {
         acore::AllWorldObjectsInRange u_check(obj, dist);
         acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
-        Cell::VisitAllObjects(obj, searcher, dist);
+        obj->VisitNearbyObject(dist, searcher);
     }
     return targets;
 }
@@ -4864,7 +4864,7 @@ Unit* SmartScript::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
 
     acore::MostHPMissingInRange u_check(me, range, MinHPDiff);
     acore::UnitLastSearcher<acore::MostHPMissingInRange> searcher(me, unit, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    me->VisitNearbyObject(range, searcher);
     return unit;
 }
 
@@ -4875,7 +4875,7 @@ void SmartScript::DoFindFriendlyCC(std::list<Creature*>& _list, float range)
 
     acore::FriendlyCCedInRange u_check(me, range);
     acore::CreatureListSearcher<acore::FriendlyCCedInRange> searcher(me, _list, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    me->VisitNearbyObject(range, searcher);
 }
 
 void SmartScript::DoFindFriendlyMissingBuff(std::list<Creature*>& list, float range, uint32 spellid)
@@ -4885,7 +4885,7 @@ void SmartScript::DoFindFriendlyMissingBuff(std::list<Creature*>& list, float ra
 
     acore::FriendlyMissingBuffInRange u_check(me, range, spellid);
     acore::CreatureListSearcher<acore::FriendlyMissingBuffInRange> searcher(me, list, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    me->VisitNearbyObject(range, searcher);
 }
 
 Unit* SmartScript::DoFindClosestFriendlyInRange(float range, bool playerOnly)
@@ -4896,7 +4896,7 @@ Unit* SmartScript::DoFindClosestFriendlyInRange(float range, bool playerOnly)
     Unit* unit = nullptr;
     acore::AnyFriendlyNotSelfUnitInObjectRangeCheck u_check(me, me, range, playerOnly);
     acore::UnitLastSearcher<acore::AnyFriendlyNotSelfUnitInObjectRangeCheck> searcher(me, unit, u_check);
-    Cell::VisitAllObjects(me, searcher, range);
+    me->VisitNearbyObject(range, searcher);
     return unit;
 }
 

@@ -16292,7 +16292,7 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
     std::list<Unit*> targets;
     acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
     acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
-    Cell::VisitAllObjects(this, searcher, dist);
+    VisitNearbyObject(dist, searcher);
 
     // remove current target
     if (GetVictim())
@@ -16327,7 +16327,7 @@ Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
     std::list<Unit*> targets;
     acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
     acore::UnitListSearcher<acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
-    Cell::VisitAllObjects(this, searcher, dist);
+    VisitNearbyObject(dist, searcher);
 
     // remove current target
     if (GetVictim())
@@ -18367,7 +18367,7 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
         {
             acore::AIRelocationNotifier notifier(*this);
             float radius = 60.0f;
-            Cell::VisitAllObjects(this, notifier, radius);
+            VisitNearbyObject(radius, notifier);
         }
     }
 }
@@ -19740,10 +19740,10 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
                 }
 
                 acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
-                Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
+                viewPoint->VisitNearbyObject(player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS, relocateNoLarge);
                 relocateNoLarge.SendToSelf();
                 acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
-                Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
+                viewPoint->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, relocateLarge);
                 relocateLarge.SendToSelf();
             }
 
@@ -19774,10 +19774,10 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
         }
 
         acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
-        Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
+        viewPoint->VisitNearbyObject(player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS, relocateNoLarge);
         relocateNoLarge.SendToSelf();
         acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
-        Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
+        viewPoint->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, relocateLarge);
         relocateLarge.SendToSelf();
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
@@ -19798,7 +19798,7 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
         unit->m_last_notify_position.Relocate(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ());
 
         acore::CreatureRelocationNotifier relocate(*unit);
-        Cell::VisitAllObjects(unit, relocate, unit->GetVisibilityRange() + VISIBILITY_COMPENSATION);
+        unit->VisitNearbyObject(unit->GetVisibilityRange() + VISIBILITY_COMPENSATION, relocate);
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
     }
@@ -19812,7 +19812,7 @@ void Unit::ExecuteDelayedUnitAINotifyEvent()
 
     acore::AIRelocationNotifier notifier(*this);
     float radius = 60.0f;
-    Cell::VisitAllObjects(this, notifier, radius);
+    this->VisitNearbyObject(radius, notifier);
 }
 
 void Unit::SetInFront(WorldObject const* target)

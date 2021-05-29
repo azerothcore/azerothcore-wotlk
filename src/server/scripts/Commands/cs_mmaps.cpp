@@ -263,11 +263,18 @@ public:
         float radius = 40.0f;
         WorldObject* object = handler->GetSession()->GetPlayer();
 
-        // Get Creatures
+        CellCoord pair(acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY()));
+        Cell cell(pair);
+        cell.SetNoCreate();
+
         std::list<Creature*> creatureList;
+
         acore::AnyUnitInObjectRangeCheck go_check(object, radius);
         acore::CreatureListSearcher<acore::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
-        Cell::VisitGridObjects(object, go_search, radius);
+        TypeContainerVisitor<acore::CreatureListSearcher<acore::AnyUnitInObjectRangeCheck>, GridTypeMapContainer> go_visit(go_search);
+
+        // Get Creatures
+        cell.Visit(pair, go_visit, *(object->GetMap()), *object, radius);
 
         if (!creatureList.empty())
         {

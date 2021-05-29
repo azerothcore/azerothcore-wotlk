@@ -182,7 +182,7 @@ public:
                             std::list<WorldObject*> ClusterList;
                             acore::AllWorldObjectsInRange objects(me, 50.0f);
                             acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
-                            Cell::VisitAllObjects(me, searcher, 50.0f);
+                            me->VisitNearbyObject(50.0f, searcher);
                             for (std::list<WorldObject*>::const_iterator itr = ClusterList.begin(); itr != ClusterList.end(); ++itr)
                             {
                                 if (Player* player = (*itr)->ToPlayer())

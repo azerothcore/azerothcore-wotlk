@@ -715,7 +715,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
         acore::LocalizedPacketDo<acore::AchievementChatBuilder> say_do(say_builder);
         acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::AchievementChatBuilder> > say_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
         TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
-        Cell::VisitWorldObjects(GetPlayer(), say_worker, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
+        cell.Visit(p, message, *GetPlayer()->GetMap(), *GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
     }
 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8 + 4 + 8);

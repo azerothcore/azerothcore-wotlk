@@ -727,7 +727,7 @@ public:
             std::list<Player*> playerList;
             acore::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE * 2);
             acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
-            Cell::VisitWorldObjects(target, searcher, INTERACTION_DISTANCE * 2);
+            target->VisitNearbyWorldObject(INTERACTION_DISTANCE * 2, searcher);
             for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
             {
                 if ((*itr) != target && (*itr)->HasAura(GetId())) // && (*itr)->getStandState() == UNIT_STAND_STATE_SIT)

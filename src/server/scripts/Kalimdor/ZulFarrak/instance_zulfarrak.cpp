@@ -141,7 +141,7 @@ public:
             std::list<WorldObject*> cagesList;
             acore::AllWorldObjectsInRange objects(GetCaster(), 15.0f);
             acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(GetCaster(), cagesList, objects);
-            Cell::VisitAllObjects(GetCaster(), searcher, 15.0f);
+            GetCaster()->VisitNearbyObject(15.0f, searcher);
             for (std::list<WorldObject*>::const_iterator itr = cagesList.begin(); itr != cagesList.end(); ++itr)
             {
                 if (GameObject* go = (*itr)->ToGameObject())

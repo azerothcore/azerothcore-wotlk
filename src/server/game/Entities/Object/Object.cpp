@@ -2073,7 +2073,7 @@ void WorldObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
     acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
-    Cell::VisitWorldObjects(this, notifier, dist);
+    VisitNearbyWorldObject(dist, notifier);
 }
 
 void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
@@ -2406,7 +2406,7 @@ Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive
     Creature* creature = nullptr;
     acore::NearestCreatureEntryWithLiveStateInObjectRangeCheck checker(*this, entry, alive, range);
     acore::CreatureLastSearcher<acore::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(this, creature, checker);
-    Cell::VisitAllObjects(this, searcher, range);
+    VisitNearbyObject(range, searcher);
     return creature;
 }
 
@@ -2415,7 +2415,7 @@ GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
     GameObject* go = nullptr;
     acore::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range);
     acore::GameObjectLastSearcher<acore::NearestGameObjectEntryInObjectRangeCheck> searcher(this, go, checker);
-    Cell::VisitGridObjects(this, searcher, range);
+    VisitNearbyGridObject(range, searcher);
     return go;
 }
 
@@ -2424,7 +2424,7 @@ GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float
     GameObject* go = nullptr;
     acore::NearestGameObjectTypeInObjectRangeCheck checker(*this, type, range);
     acore::GameObjectLastSearcher<acore::NearestGameObjectTypeInObjectRangeCheck> searcher(this, go, checker);
-    Cell::VisitGridObjects(this, searcher, range);
+    VisitNearbyGridObject(range, searcher);
     return go;
 }
 
@@ -2434,23 +2434,35 @@ Player* WorldObject::SelectNearestPlayer(float distance) const
 
     acore::NearestPlayerInObjectRangeCheck checker(this, distance);
     acore::PlayerLastSearcher<acore::NearestPlayerInObjectRangeCheck> searcher(this, target, checker);
-    Cell::VisitWorldObjects(this, searcher, distance);
+    VisitNearbyObject(distance, searcher);
 
     return target;
 }
 
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, uint32 entry, float maxSearchRange) const
 {
+    CellCoord pair(acore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
+    Cell cell(pair);
+    cell.SetNoCreate();
+
     acore::AllGameObjectsWithEntryInRange check(this, entry, maxSearchRange);
     acore::GameObjectListSearcher<acore::AllGameObjectsWithEntryInRange> searcher(this, gameobjectList, check);
-    Cell::VisitGridObjects(this, searcher, maxSearchRange);
+    TypeContainerVisitor<acore::GameObjectListSearcher<acore::AllGameObjectsWithEntryInRange>, GridTypeMapContainer> visitor(searcher);
+
+    cell.Visit(pair, visitor, *(this->GetMap()), *this, maxSearchRange);
 }
 
 void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, uint32 entry, float maxSearchRange) const
 {
+    CellCoord pair(acore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
+    Cell cell(pair);
+    cell.SetNoCreate();
+
     acore::AllCreaturesOfEntryInRange check(this, entry, maxSearchRange);
     acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
-    Cell::VisitGridObjects(this, searcher, maxSearchRange);;
+    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> visitor(searcher);
+
+    cell.Visit(pair, visitor, *(this->GetMap()), *this, maxSearchRange);
 }
 
 /*
@@ -2831,7 +2843,7 @@ void WorldObject::DestroyForNearbyPlayers()
     std::list<Player*> targets;
     acore::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange() + VISIBILITY_COMPENSATION, false);
     acore::PlayerListSearcherWithSharedVision<acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
-    Cell::VisitWorldObjects(this, searcher, GetVisibilityRange());
+    VisitNearbyWorldObject(GetVisibilityRange() + VISIBILITY_COMPENSATION, searcher);
     for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
         Player* player = (*iter);
@@ -2854,7 +2866,7 @@ void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
 {
     //updates object's visibility for nearby players
     acore::VisibleChangesNotifier notifier(*this);
-    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
+    VisitNearbyWorldObject(GetVisibilityRange() + VISIBILITY_COMPENSATION, notifier);
 }
 
 void WorldObject::AddToNotify(uint16 f)
@@ -2958,9 +2970,14 @@ struct WorldObjectChangeAccumulator
 
 void WorldObject::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set)
 {
+    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    Cell cell(p);
+    cell.SetNoCreate();
     WorldObjectChangeAccumulator notifier(*this, data_map, player_set);
+    TypeContainerVisitor<WorldObjectChangeAccumulator, WorldTypeMapContainer > player_notifier(notifier);
+    Map& map = *GetMap();
     //we must build packets for all visible players
-    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
+    cell.Visit(p, player_notifier, map, *this, GetVisibilityRange() + VISIBILITY_COMPENSATION);
 
     ClearUpdateMask(false);
 }

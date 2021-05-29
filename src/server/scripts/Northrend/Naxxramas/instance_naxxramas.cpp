@@ -1198,7 +1198,7 @@ public:
                 Unit* target = nullptr;
                 acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
                 acore::UnitLastSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
-                Cell::VisitAllObjects(me, searcher, 1.5f);
+                me->VisitNearbyObject(1.5f, searcher);
                 if (target)
                 {
                     me->CastSpell(me, SPELL_FROGGER_EXPLODE, true);

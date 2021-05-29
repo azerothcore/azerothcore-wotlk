@@ -888,7 +888,7 @@ GameObject* ChatHandler::GetNearbyGameObject()
     GameObject* obj = nullptr;
     acore::NearestGameObjectCheck check(*pl);
     acore::GameObjectLastSearcher<acore::NearestGameObjectCheck> searcher(pl, obj, check);
-    Cell::VisitGridObjects(pl, searcher, SIZE_OF_GRIDS);
+    pl->VisitNearbyGridObject(SIZE_OF_GRIDS, searcher);
     return obj;
 }
 
