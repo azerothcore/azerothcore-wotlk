@@ -161,4 +161,5 @@ protected:
     bool m_has_result;
     PreparedQueryResultFuture m_result;
 };
+
 #endif

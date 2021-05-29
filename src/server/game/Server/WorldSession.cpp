@@ -184,9 +184,14 @@ std::string WorldSession::GetPlayerInfo() const
 {
     std::ostringstream ss;
 
-    ss << "[Player: " << GetPlayerName()
-       << " (Guid: " << (_player != nullptr ? _player->GetGUID() : 0)
-       << ", Account: " << GetAccountId() << ")]";
+    ss << "[Player: ";
+
+    if (!m_playerLoading && _player)
+    {
+        ss << _player->GetName() << ' ' << _player->GetGUID().ToString() << ", ";
+    }
+
+    ss << "Account: " << GetAccountId() << "]";
 
     return ss.str();
 }
@@ -200,7 +205,11 @@ ObjectGuid::LowType WorldSession::GetGuidLow() const
 /// Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
 {
-    ASSERT(packet->GetOpcode() != NULL_OPCODE);
+    if (packet->GetOpcode() == NULL_OPCODE)
+    {
+        LOG_ERROR("network.opcode", "%s send NULL_OPCODE", GetPlayerInfo().c_str());
+        return;
+    }
 
     if (!m_Socket)
         return;
@@ -247,6 +256,8 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (!sEluna->OnPacketSend(this, *packet))
         return;
 #endif
+
+    LOG_TRACE("network.opcode", "S->C: %s %s", GetPlayerInfo().c_str(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet->GetOpcode())).c_str());
 
     if (m_Socket->SendPacket(*packet) == -1)
         m_Socket->CloseSocket("m_Socket->SendPacket(*packet) == -1");
@@ -395,7 +406,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
         deletePacket = true;
 
-#define MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE 100
+#define MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE 150
         processedPackets++;
 
         //process only a max amout of packets in 1 Update() call.
