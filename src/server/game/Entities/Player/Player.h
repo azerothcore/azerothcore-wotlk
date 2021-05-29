@@ -92,7 +92,6 @@ struct PlayerSpell
     bool active            : 1;                             // show in spellbook
     bool dependent         : 1;                             // learned as result another spell learn, skill grow, quest reward, etc
     bool disabled          : 1;                             // first rank has been learned in result talent learn but currently talent unlearned, save max learned ranks
-    bool IsInSpec(uint8 spec) { return (specMask & (1 << spec)); }
 };
 
 struct PlayerTalent

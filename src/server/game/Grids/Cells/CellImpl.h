@@ -128,7 +128,7 @@ inline void Cell::VisitWorldObjects(WorldObject const* center_obj, T& visitor, f
 template<class T>
 inline void Cell::VisitWorldObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load /*= true*/)
 {
-    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    CellCoord p(acore::ComputeCellCoord(x, y));
     Cell cell(p);
     if (dont_load)
         cell.SetNoCreate();

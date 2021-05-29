@@ -188,6 +188,7 @@ namespace Trainer
         {
             return true;
         }
+
         switch (GetTrainerType())
         {
             case Type::Class:
