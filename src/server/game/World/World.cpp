@@ -3119,7 +3119,7 @@ void World::LoadDBRevision()
     {
         Field* fields = resultWorld->Fetch();
 
-        m_WorldDBRevision = fields[0].GetCString();
+        m_WorldDBRevision = fields[0].GetString();
     }
     if (resultCharacter)
     {
