@@ -2062,6 +2062,9 @@ AuraStateType SpellInfo::LoadAuraState() const
         case 35325: // Glowing Blood
         case 16498: // Faerie Fire
         case 6950:
+        case 20656:
+        case 25602:
+        case 32129:
             return AURA_STATE_FAERIE_FIRE;
         default:
             break;
