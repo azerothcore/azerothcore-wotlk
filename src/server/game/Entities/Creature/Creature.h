@@ -358,6 +358,8 @@ public:
     }
     void RefreshSwimmingFlag(bool recheck = false);
 
+    void SetAssistanceTimer(uint32 value) { m_assistanceTimer = value; }
+
 protected:
     bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
@@ -417,6 +419,8 @@ protected:
 private:
     void ForcedDespawn(uint32 timeMSToDespawn = 0);
 
+    [[nodiscard]] bool CanPeriodicallyCallForAssistance() const;
+
     //WaypointMovementGenerator vars
     uint32 m_waypointID;
     uint32 m_path_id;
@@ -433,6 +437,8 @@ private:
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
 
     bool _isMissingSwimmingFlagOutOfCombat;
+
+    uint32 m_assistanceTimer;
 
     void applyInhabitFlags();
 };

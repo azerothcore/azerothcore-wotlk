@@ -39,8 +39,6 @@ char serviceDescription[] = "AzerothCore World of Warcraft emulator world servic
 int m_ServiceStatus = -1;
 #endif
 
-uint32 realmID;                                             ///< Id of the realm
-
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {

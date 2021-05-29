@@ -2067,7 +2067,7 @@ public:
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
-    void UpdateWeaponSkill (WeaponAttackType attType);
+    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType);
     void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence);
 
     void SetSkill(uint16 id, uint16 step, uint16 currVal, uint16 maxVal);

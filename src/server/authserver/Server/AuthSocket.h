@@ -12,9 +12,10 @@
 #include "Optional.h"
 #include "RealmSocket.h"
 #include "SRP6.h"
+#include <mutex>
 
 class ACE_INET_Addr;
-class Fields;
+class Field;
 struct Realm;
 
 enum eStatus
