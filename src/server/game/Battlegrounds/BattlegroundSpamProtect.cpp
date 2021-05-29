@@ -5,6 +5,8 @@
 
 #include "BattlegroundSpamProtect.h"
 #include "Battleground.h"
+#include "ObjectGuid.h"
+#include "Player.h"
 #include "World.h"
 
 namespace
