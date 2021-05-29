@@ -26,6 +26,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "PlayerDump.h"
+#include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
@@ -647,13 +648,13 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
 
                 PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REALM_CHARACTERS_BY_REALM);
                 stmt->setUInt32(0, GetAccountId());
-                stmt->setUInt32(1, realmID);
+                stmt->setUInt32(1, realm.Id.Realm);
                 trans->Append(stmt);
 
                 stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_REALM_CHARACTERS);
                 stmt->setUInt32(0, createInfo->CharCount);
                 stmt->setUInt32(1, GetAccountId());
-                stmt->setUInt32(2, realmID);
+                stmt->setUInt32(2, realm.Id.Realm);
                 trans->Append(stmt);
 
                 LoginDatabase.CommitTransaction(trans);
@@ -996,7 +997,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     CharacterDatabase.Execute(stmt);
 
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_ONLINE);
-    stmt->setUInt32(0, realmID);
+    stmt->setUInt32(0, realm.Id.Realm);
     stmt->setUInt32(1, GetAccountId());
     LoginDatabase.Execute(stmt);
 
