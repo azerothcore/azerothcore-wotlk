@@ -19,7 +19,6 @@ endif()
 add_subdirectory(threads)
 
 if(SERVERS OR TOOLS)
-  add_subdirectory(acelite)
   add_subdirectory(boost)
   add_subdirectory(zlib)
   add_subdirectory(g3dlite)
