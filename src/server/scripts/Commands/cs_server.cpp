@@ -20,6 +20,7 @@ EndScriptData */
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "StringConvert.h"
@@ -104,13 +105,13 @@ public:
 
         {
             uint16 dbPort = 0;
-            if (QueryResult res = LoginDatabase.PQuery("SELECT port FROM realmlist WHERE id = %u", realmID))
+            if (QueryResult res = LoginDatabase.PQuery("SELECT port FROM realmlist WHERE id = %u", realm.Id.Realm))
                 dbPort = (*res)[0].GetUInt16();
 
             if (dbPort)
-                dbPortOutput = acore::StringFormat("Realmlist (Realm Id: %u) configured in port %" PRIu16, realmID, dbPort);
+                dbPortOutput = acore::StringFormat("Realmlist (Realm Id: %u) configured in port %" PRIu16, realm.Id.Realm, dbPort);
             else
-                dbPortOutput = acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realmID);
+                dbPortOutput = acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
         }
 
         handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
