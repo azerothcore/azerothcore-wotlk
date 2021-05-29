@@ -382,7 +382,7 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
     if (!IsGridLoaded(GridCoord(cell.data.Part.grid_x, cell.data.Part.grid_y)))
         return;
 
-    //TC_LOG_DEBUG(LOG_FILTER_MAPS, "Switch object %s from grid[%u, %u] %u", obj->GetGUID().ToString().c_str(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
+    //LOG_DEBUG(LOG_FILTER_MAPS, "Switch object %s from grid[%u, %u] %u", obj->GetGUID().ToString().c_str(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
     ASSERT(ngrid != nullptr);
 

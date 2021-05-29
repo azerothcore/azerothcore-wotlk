@@ -8167,19 +8167,19 @@ void ObjectMgr::LoadTrainers()
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell.SpellId);
             if (!spellInfo)
             {
-                TC_LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (SpellId: %u) for TrainerId %u, ignoring", spell.SpellId, trainerId);
+                LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (SpellId: %u) for TrainerId %u, ignoring", spell.SpellId, trainerId);
                 continue;
             }
 
             if (GetTalentSpellCost(spell.SpellId))
             {
-                TC_LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (SpellId: %u) which is a talent, for TrainerId %u, ignoring", spell.SpellId, trainerId);
+                LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (SpellId: %u) which is a talent, for TrainerId %u, ignoring", spell.SpellId, trainerId);
                 continue;
             }
 
             if (spell.ReqSkillLine && !sSkillLineStore.LookupEntry(spell.ReqSkillLine))
             {
-                TC_LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing skill (ReqSkillLine: %u) for TrainerId %u and SpellId %u, ignoring",
+                LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing skill (ReqSkillLine: %u) for TrainerId %u and SpellId %u, ignoring",
                     spell.ReqSkillLine, spell.SpellId, trainerId);
                 continue;
             }
@@ -8190,7 +8190,7 @@ void ObjectMgr::LoadTrainers()
                 uint32 requiredSpell = spell.ReqAbility[i];
                 if (requiredSpell && !sSpellMgr->GetSpellInfo(requiredSpell))
                 {
-                    TC_LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (ReqAbility" SZFMTD ": %u) for TrainerId %u and SpellId %u, ignoring",
+                    LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (ReqAbility" SZFMTD ": %u) for TrainerId %u and SpellId %u, ignoring",
                         i + 1, requiredSpell, trainerId, spell.SpellId);
                     allReqValid = false;
                 }
@@ -8245,10 +8245,10 @@ void ObjectMgr::LoadTrainers()
             if (locale == LOCALE_enUS)
                 continue;
 
-            if (Trainer::Trainer* trainer = Trinity::Containers::MapGetValuePtr(_trainers, trainerId))
+            if (Trainer::Trainer* trainer = acore::Containers::MapGetValuePtr(_trainers, trainerId))
                 trainer->AddGreetingLocale(locale, fields[2].GetString());
             else
-                TC_LOG_ERROR("sql.sql", "Table `trainer_locale` references non-existing trainer (TrainerId: %u) for locale %s, ignoring",
+                LOG_ERROR("sql.sql", "Table `trainer_locale` references non-existing trainer (TrainerId: %u) for locale %s, ignoring",
                     trainerId, localeName.c_str());
         } while (trainerLocalesResult->NextRow());
     }
@@ -8488,7 +8488,7 @@ Trainer::Trainer const* ObjectMgr::GetTrainer(uint32 creatureId) const
 {
     auto itr = _creatureDefaultTrainers.find(creatureId);
     if (itr != _creatureDefaultTrainers.end())
-        return Trinity::Containers::MapGetValuePtr(_trainers, itr->second);
+        return acore::Containers::MapGetValuePtr(_trainers, itr->second);
 
     return nullptr;
 }

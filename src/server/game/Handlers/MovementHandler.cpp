@@ -391,7 +391,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-                //TC_LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
+                //LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
             }
             recvData.rfinish();                 // prevent warnings spam
             return;

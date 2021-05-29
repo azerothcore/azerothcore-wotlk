@@ -2080,7 +2080,7 @@ void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, b
 
 void WorldObject::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
 {
-    Trinity::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
+    acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
     Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
 }
 

@@ -120,7 +120,7 @@ void WorldSession::HandleTrainerListOpcode(WorldPackets::NPC::Hello& packet)
     if (sObjectMgr->GetTrainer(npc->GetEntry()))
         SendTrainerList(npc);
     else
-        TC_LOG_DEBUG("network", "WorldSession::SendTrainerList - Creature id %u has no trainer data.", npc->GetEntry());
+        LOG_DEBUG("network", "WorldSession::SendTrainerList - Creature id %u has no trainer data.", npc->GetEntry());
 }
 
 void WorldSession::SendTrainerList(Creature* npc)
