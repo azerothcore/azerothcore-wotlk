@@ -1075,14 +1075,14 @@ bool SpellInfo::IsSelfCast() const
 
 bool SpellInfo::IsPassive() const
 {
-    return Attributes & SPELL_ATTR0_PASSIVE;
+    return HasAttribute(SPELL_ATTR0_PASSIVE);
 }
 
 bool SpellInfo::IsAutocastable() const
 {
-    if (Attributes & SPELL_ATTR0_PASSIVE)
+    if (HasAttribute(SPELL_ATTR0_PASSIVE))
         return false;
-    if (AttributesEx & SPELL_ATTR1_NO_AUTOCAST_AI)
+    if (HasAttribute(SPELL_ATTR1_NO_AUTOCAST_AI))
         return false;
     return true;
 }
@@ -1189,7 +1189,7 @@ bool SpellInfo::IsMultiSlotAura() const
 
 bool SpellInfo::IsCooldownStartedOnEvent() const
 {
-    return Attributes & SPELL_ATTR0_COOLDOWN_ON_EVENT || (CategoryEntry && CategoryEntry->Flags & SPELL_CATEGORY_FLAG_COOLDOWN_STARTS_ON_EVENT);
+    return HasAttribute(SPELL_ATTR0_COOLDOWN_ON_EVENT) || (CategoryEntry && CategoryEntry->Flags & SPELL_CATEGORY_FLAG_COOLDOWN_STARTS_ON_EVENT);
 }
 
 bool SpellInfo::IsDeathPersistent() const
@@ -1209,7 +1209,7 @@ bool SpellInfo::IsAllowingDeadTarget() const
 
 bool SpellInfo::CanBeUsedInCombat() const
 {
-    return !(Attributes & SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL);
+    return !(HasAttribute(SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL));
 }
 
 bool SpellInfo::IsPositive() const
@@ -1255,7 +1255,7 @@ bool SpellInfo::IsRangedWeaponSpell() const
 {
     return (SpellFamilyName == SPELLFAMILY_HUNTER && !(SpellFamilyFlags[1] & 0x10000000)) // for 53352, cannot find better way
            || (EquippedItemSubClassMask & ITEM_SUBCLASS_MASK_WEAPON_RANGED)
-           || (Attributes & SPELL_ATTR0_USES_RANGED_SLOT); // Xinef: added
+           || (HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT)); // Xinef: added
 }
 
 bool SpellInfo::IsAutoRepeatRangedSpell() const
@@ -1290,7 +1290,7 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
 bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
 {
     // these spells pierce all avalible spells (Resurrection Sickness for example)
-    if (Attributes & SPELL_ATTR0_NO_IMMUNITIES)
+    if (HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
         return true;
 
     // these spells (Cyclone for example) can pierce all...
@@ -1427,7 +1427,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
 
     if (actAsShifted)
     {
-        if (Attributes & SPELL_ATTR0_NOT_SHAPESHIFTED) // not while shapeshifted
+        if (HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFTED)) // not while shapeshifted
             return SPELL_FAILED_NOT_SHAPESHIFT;
         else if (Stances != 0)                   // needs other shapeshift
             return SPELL_FAILED_ONLY_SHAPESHIFT;
@@ -2292,7 +2292,7 @@ uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
         return 0;
 
     int32 castTime = CastTimeEntry->CastTime;
-    if (Attributes & SPELL_ATTR0_USES_RANGED_SLOT && (!IsAutoRepeatRangedSpell()))
+    if (HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) && (!IsAutoRepeatRangedSpell()))
         castTime += 500;
 
     if (caster)
@@ -2407,7 +2407,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
 
     if (!caster->IsControlledByPlayer())
     {
-        if (Attributes & SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL)
+        if (HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
         {
             GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(SpellLevel - 1);
             GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->getLevel() - 1);
@@ -2557,7 +2557,7 @@ uint32 SpellInfo::_GetExplicitTargetMask() const
 bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
 {
     // not found a single positive spell with this attribute
-    if (Attributes & SPELL_ATTR0_AURA_IS_DEBUFF)
+    if (HasAttribute(SPELL_ATTR0_AURA_IS_DEBUFF))
         return false;
 
     switch (Mechanic)
@@ -2698,7 +2698,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                         if (Effects[effIndex].TargetA.GetTarget() != TARGET_UNIT_CASTER)
                             return false;
                         // but not this if this first effect (didn't find better check)
-                        if (Attributes & SPELL_ATTR0_AURA_IS_DEBUFF && effIndex == 0)
+                        if (HasAttribute(SPELL_ATTR0_AURA_IS_DEBUFF) && effIndex == 0)
                             return false;
                         break;
                     case SPELL_AURA_MECHANIC_IMMUNITY:
