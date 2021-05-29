@@ -8,6 +8,8 @@
 #define ACORE_PACKETLOG_H
 
 #include "Common.h"
+#include <boost/asio/ip/address.hpp>
+#include <mutex>
 
 enum Direction
 {
@@ -17,7 +19,7 @@ enum Direction
 
 class WorldPacket;
 
-class PacketLog
+class AC_GAME_API PacketLog
 {
 private:
     PacketLog();
@@ -28,7 +30,7 @@ public:
 
     void Initialize();
     bool CanLogPacket() const { return (_file != nullptr); }
-    void LogPacket(WorldPacket const& packet, Direction direction);
+    void LogPacket(WorldPacket const& packet, Direction direction, boost::asio::ip::address const& addr, uint16 port);
 
 private:
     FILE* _file;

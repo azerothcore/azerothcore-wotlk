@@ -8,7 +8,7 @@
     \ingroup u2w
 */
 
-#include "WorldSocket.h"                                    // must be first to make ACE happy with ACE includes in it
+#include "WorldSession.h"
 #include "AccountMgr.h"
 #include "BattlegroundMgr.h"
 #include "Common.h"
@@ -34,7 +34,7 @@
 #include "WardenWin.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include "WorldSocket.h"
 #include "zlib.h"
 
 #ifdef ELUNA
@@ -90,7 +90,7 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 }
 
 /// WorldSession constructor
-WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime) :
+WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime) :
     m_muteTime(mute_time),
     m_timeOutTime(0),
     _lastAuctionListItemsMSTime(0),
@@ -102,6 +102,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     _security(sec),
     _skipQueue(skipQueue),
     _accountId(id),
+    _accountName(std::move(name)),
     m_expansion(expansion),
     m_total_time(TotalTime),
     _logoutTime(0),
@@ -124,7 +125,6 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
-    _warden = nullptr;
     _offlineTime = 0;
     _kicked = false;
     _shouldSetOfflineInDB = true;
@@ -134,10 +134,9 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
 
     if (sock)
     {
-        m_Address = sock->GetRemoteAddress();
-        sock->AddReference();
+        m_Address = sock->GetRemoteIpAddress().to_string();
         ResetTimeOutTime(false);
-        LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = %u;", GetAccountId());
+        LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = %u;", GetAccountId()); // One-time query
     }
 
     InitializeQueryCallbackParameters();
@@ -155,15 +154,8 @@ WorldSession::~WorldSession()
     /// - If have unclosed socket, close it
     if (m_Socket)
     {
-        m_Socket->CloseSocket("WorldSession destructor");
-        m_Socket->RemoveReference();
+        m_Socket->CloseSocket();
         m_Socket = nullptr;
-    }
-
-    if (_warden)
-    {
-        delete _warden;
-        _warden = nullptr;
     }
 
     ///- empty incoming packet queue
@@ -258,9 +250,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 #endif
 
     LOG_TRACE("network.opcode", "S->C: %s %s", GetPlayerInfo().c_str(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet->GetOpcode())).c_str());
-
-    if (m_Socket->SendPacket(*packet) == -1)
-        m_Socket->CloseSocket("m_Socket->SendPacket(*packet) == -1");
+    m_Socket->SendPacket(*packet);
 }
 
 /// Add an incoming packet to the queue
@@ -291,14 +281,15 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
+    ///- Before we process anything:
+    /// If necessary, kick the player because the client didn't send anything for too long
+    /// (or they've been idling in character select)
+    if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle() && m_Socket)
+        m_Socket->CloseSocket();
+    
     if (updater.ProcessUnsafe())
     {
         UpdateTimeOutTime(diff);
-
-        /// If necessary, kick the player because the client didn't send anything for too long
-        /// (or they've been idling in character select)
-        if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle() && m_Socket)
-            m_Socket->CloseSocket("Client didn't send anything for too long");
     }
 
     HandleTeleportTimeout(updater.ProcessUnsafe());
@@ -310,7 +301,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     uint32 processedPackets = 0;
     time_t currentTime = time(nullptr);
 
-    while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
+    while (m_Socket && _recvQueue.next(packet, updater))
     {
         OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
         ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
@@ -467,13 +458,13 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
 bool WorldSession::HandleSocketClosed()
 {
-    if (m_Socket && m_Socket->IsClosed() && !IsKicked() && GetPlayer() && !PlayerLogout() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
+    if (m_Socket && !m_Socket->IsOpen() && !IsKicked() && GetPlayer() && !PlayerLogout() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
     {
-        m_Socket->RemoveReference();
         m_Socket = nullptr;
         GetPlayer()->TradeCancel(false);
         return true;
     }
+
     return false;
 }
 
@@ -684,7 +675,12 @@ void WorldSession::LogoutPlayer(bool save)
 void WorldSession::KickPlayer(std::string const& reason, bool setKicked)
 {
     if (m_Socket)
-        m_Socket->CloseSocket(reason);
+    {
+        LOG_INFO("network.kick", "Account: %u Character: '%s' %s kicked with reason: %s", GetAccountId(), _player ? _player->GetName().c_str() : "<none>",
+            _player ? _player->GetGUID().ToString().c_str() : "", reason.c_str());
+
+        m_Socket->CloseSocket();
+    }
 
     if (setKicked)
         SetKicked(true); // pussywizard: the session won't be left ingame for 60 seconds and to also kick offline session
@@ -1043,7 +1039,7 @@ void WorldSession::WriteMovementInfo(WorldPacket* data, MovementInfo* mi)
         *data << mi->splineElevation;
 }
 
-void WorldSession::ReadAddonsInfo(WorldPacket& data)
+void WorldSession::ReadAddonsInfo((ByteBuffer& data)
 {
     if (data.rpos() + 4 > data.size())
         return;
@@ -1393,7 +1389,7 @@ void WorldSession::InitWarden(SessionKey const& k, std::string const& os)
 {
     if (os == "Win")
     {
-        _warden = new WardenWin();
+        _warden = std::make_unique<WardenWin>();
         _warden->Init(this, k);
     }
     else if (os == "OSX")
@@ -1707,6 +1703,9 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
 
     return maxPacketCounterAllowed;
 }
+
+WorldSession::DosProtection::DosProtection(WorldSession* s) :
+    Session(s), _policy((Policy)sWorld->getIntConfig(CONFIG_PACKET_SPOOF_POLICY)) { }
 
 void WorldSession::ResetTimeSync()
 {
