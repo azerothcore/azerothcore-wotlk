@@ -347,7 +347,6 @@ bool ConfigMgr::LoadModulesConfigs()
         return true;
 
     // Start loading module configs
-    std::vector<std::string /*config variant*/> moduleConfigFiles;
     std::string const& moduleConfigPath = GetConfigPath() + "modules/";
     bool isExistDefaultConfig = true;
     bool isExistDistConfig = true;
@@ -368,25 +367,25 @@ bool ConfigMgr::LoadModulesConfigs()
             isExistDefaultConfig = false;
 
         if (isExistDefaultConfig && isExistDistConfig)
-            moduleConfigFiles.emplace_back(defaultFileName);
+            _moduleConfigFiles.emplace_back(defaultFileName);
         else if (!isExistDefaultConfig && isExistDistConfig)
-            moduleConfigFiles.emplace_back(distFileName);
+            _moduleConfigFiles.emplace_back(distFileName);
     }
 
     // If module configs not exist - no load
-    if (moduleConfigFiles.empty())
-        return false;
+    return !_moduleConfigFiles.empty();
+}
 
+void ConfigMgr::PrintLoadedModulesConfigs()
+{
     // Print modules configurations
     LOG_INFO("server", " ");
     LOG_INFO("server", "Using modules configuration:");
 
-    for (auto const& itr : moduleConfigFiles)
+    for (auto const& itr : _moduleConfigFiles)
         LOG_INFO("server", "> %s", itr.c_str());
 
     LOG_INFO("server", " ");
-
-    return true;
 }
 
 /*

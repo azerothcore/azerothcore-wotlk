@@ -139,7 +139,7 @@ int Master::Run()
     LoadRealmInfo();
 
     // Loading modules configs
-    sConfigMgr->LoadModulesConfigs();
+    sConfigMgr->PrintLoadedModulesConfigs();
 
     ///- Initialize the World
     sSecretMgr->Initialize();
