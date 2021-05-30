@@ -32,12 +32,7 @@ namespace
     bool IsCorrectDelay(ObjectGuid guid)
     {
         // Skip if spam time < 30 secs (default)
-        if (sWorld->GetGameTime() - GetTime(guid) < sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY))
-        {
-            return false;
-        }
-
-        return true;
+        return sWorld->GetGameTime() - GetTime(guid) >= sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY))
     }
 }
 
