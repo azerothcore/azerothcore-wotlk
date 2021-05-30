@@ -14,6 +14,7 @@
 #include "Callback.h"
 #include "Common.h"
 #include "IWorld.h"
+#include "LockedQueue.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
@@ -28,7 +29,9 @@ class WorldPacket;
 class WorldSocket;
 class SystemMgr;
 
-extern uint32 realmID;
+struct Realm;
+
+AC_GAME_API extern Realm realm;
 
 enum ShutdownMask
 {
@@ -71,18 +74,6 @@ enum BillingPlanFlags
     SESSION_TIME_MIXTURE    = 0x20,
     SESSION_RESTRICTED      = 0x40,
     SESSION_ENABLE_CAIS     = 0x80,
-};
-
-/// Type of server, this is values from second column of Cfg_Configs.dbc
-enum RealmType
-{
-    REALM_TYPE_NORMAL = 0,
-    REALM_TYPE_PVP = 1,
-    REALM_TYPE_NORMAL2 = 4,
-    REALM_TYPE_RP = 6,
-    REALM_TYPE_RPPVP = 8,
-    REALM_TYPE_FFA_PVP = 16                                 // custom, free for all pvp mode like arena PvP in all zones except rest activated places and sanctuaries
-                         // replaced by REALM_PVP in realm list
 };
 
 enum RealmZone
@@ -334,8 +325,8 @@ public:
     void LoadWorldStates();
 
     /// Are we on a "Player versus Player" server?
-    bool IsPvPRealm() const { return (getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP || getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP); }
-    bool IsFFAPvPRealm() const { return getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP; }
+    [[nodiscard]] bool IsPvPRealm() const;
+    [[nodiscard]] bool IsFFAPvPRealm() const;
 
     void KickAll();
     void KickAllLess(AccountTypes sec);
@@ -379,7 +370,11 @@ public:
 
     // used World DB version
     void LoadDBVersion();
+    void LoadDBRevision();
     char const* GetDBVersion() const { return m_DBVersion.c_str(); }
+    char const* GetWorldDBRevision() const { return m_WorldDBRevision.c_str(); }
+    char const* GetCharacterDBRevision() const { return m_CharacterDBRevision.c_str(); }
+    char const* GetAuthDBRevision() const { return m_AuthDBRevision.c_str(); }
 
     void LoadAutobroadcasts();
 
@@ -487,6 +482,9 @@ private:
 
     // used versions
     std::string m_DBVersion;
+    std::string m_WorldDBRevision;
+    std::string m_CharacterDBRevision;
+    std::string m_AuthDBRevision;
 
     typedef std::map<uint8, std::string> AutobroadcastsMap;
     AutobroadcastsMap m_Autobroadcasts;

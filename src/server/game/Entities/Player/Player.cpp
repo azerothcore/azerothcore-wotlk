@@ -57,6 +57,7 @@
 #include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "revision.h"
+#include "Realm.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
@@ -5483,6 +5484,18 @@ Corpse* Player::CreateCorpse()
     return corpse;
 }
 
+void Player::RemoveCorpse()
+{
+    if (GetCorpse())
+    {
+        GetCorpse()->RemoveFromWorld();
+    }
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    Corpse::DeleteFromDB(GetGUID(), trans);
+    CharacterDatabase.CommitTransaction(trans);
+}
+
 void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
 {
     _corpseLocation.WorldRelocate();
@@ -6510,29 +6523,40 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(WeaponAttackType attType)
+void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
 {
-    // no skill gain in pvp
-    Unit* victim = GetVictim();
-    if (victim && victim->GetTypeId() == TYPEID_PLAYER)
-        return;
-
     if (IsInFeralForm())
         return;                                             // always maximized SKILL_FERAL_COMBAT in fact
 
     if (GetShapeshiftForm() == FORM_TREE)
         return;                                             // use weapon but not skill up
 
-    if (victim && victim->GetTypeId() == TYPEID_UNIT && (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
+    if (victim->GetTypeId() == TYPEID_UNIT && (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
         return;
 
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
 
     Item* tmpitem = GetWeaponForAttack(attType, true);
     if (!tmpitem && attType == BASE_ATTACK)
+    {
+        // Keep unarmed & fist weapon skills in sync
         UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
-    else if (tmpitem && tmpitem->GetTemplate()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-        UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
+        UpdateSkill(SKILL_FIST_WEAPONS, weapon_skill_gain);
+    }
+    else if (tmpitem)
+    {
+        switch (tmpitem->GetTemplate()->SubClass)
+        {
+            case ITEM_SUBCLASS_WEAPON_FISHING_POLE:
+                break;
+            case ITEM_SUBCLASS_WEAPON_FIST:
+                UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
+                [[fallthrough]];
+            default:
+                UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
+                break;
+        }
+    }
 
     UpdateAllCritPercentages();
 }
@@ -6568,7 +6592,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
         if (defence)
             UpdateDefense();
         else
-            UpdateWeaponSkill(attType);
+            UpdateWeaponSkill(victim, attType);
     }
     else
         return;
@@ -23113,18 +23137,30 @@ void Player::SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId /*= 0*/
     SendDirectMessage(&data);
 }
 
-void Player::UpdatePotionCooldown()
+void Player::UpdatePotionCooldown(Spell* spell)
 {
     // no potion used i combat or still in combat
     if (!GetLastPotionId() || IsInCombat())
         return;
 
-    // spell/item pair let set proper cooldown (except not existed charged spell cooldown spellmods for potions)
-    if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(GetLastPotionId()))
-        for (uint8 idx = 0; idx < MAX_ITEM_SPELLS; ++idx)
-            if (proto->Spells[idx].SpellId && proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[idx].SpellId))
-                    SendCooldownEvent(spellInfo, GetLastPotionId());
+    // Call not from spell cast, send cooldown event for item spells if no in combat
+    if (!spell)
+    {
+        // spell/item pair let set proper cooldown (except not existed charged spell cooldown spellmods for potions)
+        if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(GetLastPotionId()))
+            for (uint8 idx = 0; idx < MAX_ITEM_SPELLS; ++idx)
+                if (proto->Spells[idx].SpellId && proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+                    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[idx].SpellId))
+                        SendCooldownEvent(spellInfo, GetLastPotionId());
+    }
+    // from spell cases (m_lastPotionId set in Spell::SendSpellCooldown)
+    else
+    {
+        if (spell->IsIgnoringCooldowns())
+            return;
+        else
+            SendCooldownEvent(spell->m_spellInfo, m_lastPotionId, spell);
+    }
 
     SetLastPotionId(0);
 }
@@ -27000,6 +27036,8 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
 {
     PreparedStatement* stmt = nullptr;
     uint8 index = 0;
+
+    auto finiteAlways = [](float f) { return std::isfinite(f) ? f : 0.0f; };
 
     if (create)
     {

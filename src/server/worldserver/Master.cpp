@@ -20,7 +20,7 @@
 #include "Master.h"
 #include "OpenSSLCrypto.h"
 #include "RARunnable.h"
-#include "RealmList.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "SignalHandler.h"
 #include "Timer.h"
@@ -30,6 +30,7 @@
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
 #include "DatabaseLoader.h"
+#include "Optional.h"
 #include "SecretMgr.h"
 #include <ace/Sig_Handler.h>
 
@@ -100,6 +101,8 @@ public:
     }
 };
 
+bool LoadRealmInfo();
+
 Master* Master::instance()
 {
     static Master instance;
@@ -131,7 +134,9 @@ int Master::Run()
         return 1;
 
     // set server offline (not connectable)
-    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_INVALID, realmID);
+    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
+
+    LoadRealmInfo();
 
     // Loading modules configs
     sConfigMgr->LoadModulesConfigs();
@@ -242,13 +247,16 @@ int Master::Run()
 #endif
 #endif
 
-    // Start soap serving thread
-    acore::Thread* soapThread = nullptr;
+    // Start soap serving thread if enabled
+    std::shared_ptr<std::thread> soapThread;
     if (sConfigMgr->GetOption<bool>("SOAP.Enabled", false))
     {
-        ACSoapRunnable* runnable = new ACSoapRunnable();
-        runnable->SetListenArguments(sConfigMgr->GetOption<std::string>("SOAP.IP", "127.0.0.1"), uint16(sConfigMgr->GetOption<int32>("SOAP.Port", 7878)));
-        soapThread = new acore::Thread(runnable);
+        soapThread.reset(new std::thread(ACSoapThread, sConfigMgr->GetOption<std::string>("SOAP.IP", "127.0.0.1"), sConfigMgr->GetOption<uint16>("SOAP.Port", 7878)),
+            [](std::thread* thr)
+        {
+            thr->join();
+            delete thr;
+        });
     }
 
     // Start up freeze catcher thread
@@ -271,7 +279,7 @@ int Master::Run()
     }
 
     // set server online (allow connecting now)
-    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag & ~%u, population = 0 WHERE id = '%u'", REALM_FLAG_INVALID, realmID);
+    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag & ~%u, population = 0 WHERE id = '%u'", REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
 
     LOG_INFO("server", "%s (worldserver-daemon) ready...", GitRevision::GetFullVersion());
 
@@ -281,13 +289,6 @@ int Master::Run()
     rarThread.wait();
     auctionLising_thread.wait();
 
-    if (soapThread)
-    {
-        soapThread->wait();
-        soapThread->destroy();
-        delete soapThread;
-    }
-
     if (freezeThread)
     {
         freezeThread->wait();
@@ -295,7 +296,7 @@ int Master::Run()
     }
 
     // set server offline
-    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, realmID);
+    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, realm.Id.Realm);
 
     ///- Clean database before leaving
     ClearOnlineAccounts();
@@ -379,16 +380,16 @@ bool Master::_StartDB()
         return false;
 
     ///- Get the realm Id from the configuration file
-    realmID = sConfigMgr->GetOption<int32>("RealmID", 0);
-    if (!realmID)
+    realm.Id.Realm = sConfigMgr->GetOption<int32>("RealmID", 0);
+    if (!realm.Id.Realm)
     {
         LOG_ERROR("server", "Realm ID not defined in configuration file");
         return false;
     }
-    else if (realmID > 255)
+    else if (realm.Id.Realm > 255)
     {
         /*
-         * Due to the client only being able to read a realmID
+         * Due to the client only being able to read a realm.Id.Realm
          * with a size of uint8 we can "only" store up to 255 realms
          * anything further the client will behave anormaly
         */
@@ -396,7 +397,7 @@ bool Master::_StartDB()
         return false;
     }
 
-    LOG_INFO("server", "Realm running as realm ID %d", realmID);
+    LOG_INFO("server", "Realm running as realm ID %d", realm.Id.Realm);
 
     ///- Clean the database before starting
     ClearOnlineAccounts();
@@ -405,6 +406,7 @@ bool Master::_StartDB()
     WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_revision = '%s'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
 
     sWorld->LoadDBVersion();
+    sWorld->LoadDBRevision();
 
     LOG_INFO("server", "Using World DB: %s", sWorld->GetDBVersion());
     return true;
@@ -424,8 +426,55 @@ void Master::ClearOnlineAccounts()
 {
     // Reset online status for all accounts with characters on the current realm
     // pussywizard: tc query would set online=0 even if logged in on another realm >_>
-    LoginDatabase.DirectPExecute("UPDATE account SET online = 0 WHERE online = %u", realmID);
+    LoginDatabase.DirectPExecute("UPDATE account SET online = 0 WHERE online = %u", realm.Id.Realm);
 
     // Reset online status for all characters
     CharacterDatabase.DirectExecute("UPDATE characters SET online = 0 WHERE online <> 0");
+}
+
+bool LoadRealmInfo()
+{
+    QueryResult result = LoginDatabase.PQuery("SELECT id, name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild FROM realmlist WHERE id = %u", realm.Id.Realm);
+    if (!result)
+    {
+        LOG_ERROR("server.worldserver", "> Not found realm with ID %u", realm.Id.Realm);
+        return false;
+    }
+
+    Field* fields = result->Fetch();
+    realm.Name = fields[1].GetString();
+    realm.Port = fields[5].GetUInt16();
+
+    Optional<ACE_INET_Addr> externalAddress = ACE_INET_Addr(realm.Port, fields[2].GetCString(), AF_INET);
+    if (!externalAddress)
+    {
+        LOG_ERROR("server.worldserver", "Could not resolve address %s", fields[2].GetString().c_str());
+        return false;
+    }
+
+    Optional<ACE_INET_Addr> localAddress = ACE_INET_Addr(realm.Port, fields[3].GetCString(), AF_INET);
+    if (!localAddress)
+    {
+        LOG_ERROR("server.worldserver", "Could not resolve address %s", fields[3].GetString().c_str());
+        return false;
+    }
+
+    Optional<ACE_INET_Addr> localSubmask = ACE_INET_Addr(0, fields[4].GetCString(), AF_INET);
+    if (!localSubmask)
+    {
+        LOG_ERROR("server.worldserver", "Could not resolve address %s", fields[4].GetString().c_str());
+        return false;
+    }
+
+    realm.ExternalAddress = std::make_unique<ACE_INET_Addr>(*externalAddress);
+    realm.LocalAddress = std::make_unique<ACE_INET_Addr>(*localAddress);
+    realm.LocalSubnetMask = std::make_unique<ACE_INET_Addr>(*localSubmask);
+
+    realm.Type = fields[6].GetUInt8();
+    realm.Flags = RealmFlags(fields[7].GetUInt8());
+    realm.Timezone = fields[8].GetUInt8();
+    realm.AllowedSecurityLevel = AccountTypes(fields[9].GetUInt8());
+    realm.PopulationLevel = fields[10].GetFloat();
+    realm.Build = fields[11].GetUInt32();
+    return true;
 }
