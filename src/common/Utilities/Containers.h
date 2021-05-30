@@ -165,6 +165,16 @@ namespace acore::Containers
         return SelectRandomWeightedContainerElement(container, weights);
     }
 
+    /**
+     * Returns a pointer to mapped value (or the value itself if map stores pointers)
+     */
+    template<class M>
+    inline auto MapGetValuePtr(M& map, typename M::key_type const& key) -> decltype(AddressOrSelf(map.find(key)->second))
+    {
+        auto itr = map.find(key);
+        return itr != map.end() ? AddressOrSelf(itr->second) : nullptr;
+    }
+
     /*
      * @fn void acore::Containers::RandomShuffle(C& container)
      *
