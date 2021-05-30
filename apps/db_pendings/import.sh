@@ -72,6 +72,7 @@ function import() {
             fi
 
             echo "$startTransaction" >> "$newFile";
+            echo "$updHeader" >> "$newFile";
 
             if [[ $isRev -eq 1 ]]; then
                 echo "SELECT sql_rev INTO OK FROM version_db_"$db" WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
