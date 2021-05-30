@@ -3109,45 +3109,6 @@ void World::LoadDBVersion()
         m_DBVersion = "Unknown world database.";
 }
 
-void World::LoadDBRevision()
-{
-    QueryResult resultWorld     = WorldDatabase.Query("SELECT date FROM version_db_world ORDER BY date DESC LIMIT 1");
-    QueryResult resultCharacter = CharacterDatabase.Query("SELECT date FROM version_db_characters ORDER BY date DESC LIMIT 1");
-    QueryResult resultAuth      = LoginDatabase.Query("SELECT date FROM version_db_auth ORDER BY date DESC LIMIT 1");
-
-    if (resultWorld)
-    {
-        Field* fields = resultWorld->Fetch();
-
-        m_WorldDBRevision = fields[0].GetString();
-    }
-    if (resultCharacter)
-    {
-        Field* fields = resultCharacter->Fetch();
-
-        m_CharacterDBRevision = fields[0].GetString();
-    }
-    if (resultAuth)
-    {
-        Field* fields = resultAuth->Fetch();
-
-        m_AuthDBRevision = fields[0].GetString();
-    }
-
-    if (m_WorldDBRevision.empty())
-    {
-        m_WorldDBRevision = "Unkown World Database Revision";
-    }
-    if (m_CharacterDBRevision.empty())
-    {
-        m_CharacterDBRevision = "Unkown Character Database Revision";
-    }
-    if (m_AuthDBRevision.empty())
-    {
-        m_AuthDBRevision = "Unkown Auth Database Revision";
-    }
-}
-
 void World::UpdateAreaDependentAuras()
 {
     SessionMap::const_iterator itr;
