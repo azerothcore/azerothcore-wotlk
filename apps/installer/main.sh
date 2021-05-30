@@ -6,21 +6,18 @@ source "$INSTALLER_PATH/includes/includes.sh"
 
 PS3='[Please enter your choice]: '
 options=(
-    "init (i): First Installation"                  # 1
-    "install-deps (d): Configure OS dep"            # 2
-    "pull (u): Update Repository"                   # 3
-    "reset (r): Reset & Clean Repository"           # 4
-    "compiler (c): Run compiler tool"               # 5
-    "db-assembler (a): Run db assembler tool"       # 6
-    "module (m): Module installer dashboard" # 7
-    "module-install (mi): Module Install by name"  # 8
-    "module-update (mu): Module Update by name"    # 9
-    "module-remove: (mr): Module Remove by name"   # 10
+    "init (i): First Installation"
+    "install-deps (d): Configure OS dep"
+    "pull (u): Update Repository"
+    "reset (r): Reset & Clean Repository"
+    "compiler (c): Run compiler tool"
+    "db-assembler (a): Run db assembler tool"
+    "module (m): Module installer dashboard"
     "client-data: (gd): download client data from github repository (beta)"   # 11
-    "run-worldserver (rw): execute a simple restarter for worldserver" # 12
-    "run-authserver (ra): execute a simple restarter for authserver" # 13
-    "docker (dr): Run docker tools" # 14
-    "quit: Exit from this menu"                     # 15
+    "run-worldserver (rw): execute a simple restarter for worldserver"
+    "run-authserver (ra): execute a simple restarter for authserver"
+    "docker (dr): Run docker tools"
+    "quit: Exit from this menu"
     )
 
 function _switch() {
@@ -28,51 +25,42 @@ function _switch() {
     _opt="$2"
 
     case $_reply in
-        ""|"i"|"init"|"1")
+        ""|"i"|"init")
             inst_allInOne
             ;;
-        ""|"d"|"install-deps"|"2")
+        ""|"d"|"install-deps")
             inst_configureOS
             ;;
-        ""|"u"|"pull"|"3")
+        ""|"u"|"pull")
             inst_updateRepo
             ;;
-        ""|"r"|"reset"|"4")
+        ""|"r"|"reset")
             inst_resetRepo
             ;;
-        ""|"c"|"compiler"|"5")
+        ""|"c"|"compiler")
             bash "$AC_PATH_APPS/compiler/compiler.sh" $_opt
             ;;
-        ""|"a"|"db-assembler"|"6")
+        ""|"a"|"db-assembler")
             bash "$AC_PATH_APPS/db_assembler/db_assembler.sh" $_opt
             ;;
-        ""|"m"|"module"|"7")
+        ""|"m"|"module")
             denoRunFile "$INSTALLER_PATH/module.ts" "${@:2}"
             exit
             ;;
-        ""|"mi"|"module-install"|"8")
-            inst_module_install "$_opt"
-            ;;
-        ""|"mu"|"module-update"|"9")
-            inst_module_update "$_opt"
-            ;;
-        ""|"mr"|"module-remove"|"10")
-            inst_module_remove "$_opt"
-            ;;
-        ""|"gd"|"client-data"|"11")
+        ""|"gd"|"client-data")
             inst_download_client_data
             ;;
-        ""|"rw"|"run-worldserver"|"12")
+        ""|"rw"|"run-worldserver")
             inst_simple_restarter worldserver
             ;;
-        ""|"ra"|"run-authserver"|"13")
+        ""|"ra"|"run-authserver")
             inst_simple_restarter authserver
             ;;
-        ""|"dr"|"docker"|"14")
+        ""|"dr"|"docker")
             DOCKER=1 denoRunFile "$AC_PATH_APPS/docker/docker-cmd.ts" "${@:2}"
             exit
             ;;
-        ""|"quit"|"15")
+        ""|"q"|"quit")
             echo "Goodbye!"
             exit
             ;;
