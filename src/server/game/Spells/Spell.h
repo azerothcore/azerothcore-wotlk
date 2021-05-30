@@ -509,6 +509,7 @@ public:
     bool IsTriggered() const { return _triggeredCastFlags & TRIGGERED_FULL_MASK; };
     bool IsChannelActive() const { return m_caster->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0; }
     bool IsAutoActionResetSpell() const;
+    bool IsIgnoringCooldowns() const;
 
     bool IsDeletable() const { return !m_referencedFromCurrentSpell && !m_executedCurrently; }
     void SetReferencedFromCurrent(bool yes) { m_referencedFromCurrentSpell = yes; }
