@@ -329,7 +329,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
             throw;
         }
 
-        SQLTransaction trans;
+        CharacterDatabaseTransaction trans;
         if (inviteCount > 1)
             trans = CharacterDatabase.BeginTransaction();
 
@@ -489,7 +489,7 @@ void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
         sCalendarMgr->AddEvent(newEvent, CALENDAR_SENDTYPE_COPY);
 
         CalendarInviteStore invites = sCalendarMgr->GetEventInvites(eventId);
-        SQLTransaction trans;
+        CharacterDatabaseTransaction trans;
         if (invites.size() > 1)
             trans = CharacterDatabase.BeginTransaction();
 
@@ -794,7 +794,7 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
     instanceBind->extended = (bool)toggleExtendOn;
 
     // update in db
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
     stmt->setUInt8(0, toggleExtendOn ? 1 : 0);
     stmt->setUInt32(1, GetPlayer()->GetGUID().GetCounter());
     stmt->setUInt32(2, instanceBind->save->GetInstanceId());

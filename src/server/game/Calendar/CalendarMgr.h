@@ -307,11 +307,10 @@ public:
     void RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover);
     void UpdateEvent(CalendarEvent* calendarEvent);
 
-    void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite);
-    void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite, SQLTransaction& trans);
+    void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite, CharacterDatabaseTransaction trans = nullptr);
     void RemoveInvite(uint64 inviteId, uint64 eventId, ObjectGuid remover);
-    void UpdateInvite(CalendarInvite* invite);
-    void UpdateInvite(CalendarInvite* invite, SQLTransaction& trans);
+    void RemoveInvite(uint64 inviteId, uint64 eventId, uint64 remover);
+    void UpdateInvite(CalendarInvite* invite, CharacterDatabaseTransaction trans = nullptr);
 
     void RemoveAllPlayerEventsAndInvites(ObjectGuid guid);
     void RemovePlayerGuildEventsAndSignups(ObjectGuid guid, uint32 guildId);

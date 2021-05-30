@@ -178,7 +178,7 @@ int RASocket::check_access_level(const std::string& user)
 
     Utf8ToUpperOnlyLatin(safeUser);
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS);
     stmt->setString(0, safeUser);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -212,8 +212,7 @@ int RASocket::check_password(const std::string& user, const std::string& pass)
     std::string safe_pass = pass;
     Utf8ToUpperOnlyLatin(safe_pass);
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD_BY_NAME);
-
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD_BY_NAME);
     stmt->setString(0, safe_user);
 
     if (PreparedQueryResult result = LoginDatabase.Query(stmt))

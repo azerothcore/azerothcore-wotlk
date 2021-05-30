@@ -26,7 +26,7 @@ void LootItemStorage::LoadStorageFromDB()
     uint32 oldMSTime = getMSTime();
     lootItemStore.clear();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEMCONTAINER_ITEMS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEMCONTAINER_ITEMS);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
@@ -52,9 +52,9 @@ void LootItemStorage::LoadStorageFromDB()
 
 void LootItemStorage::RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count)
 {
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_SINGLE_ITEM);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_SINGLE_ITEM);
     stmt->setUInt32(0, containerGUID.GetCounter());
     stmt->setUInt32(1, itemid);
     stmt->setUInt32(2, count);
@@ -71,8 +71,8 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
         return;
     }
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = nullptr;
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabasePreparedStatement* stmt = nullptr;
 
     StoredLootItemList& itemList = lootItemStore[loot->containerGUID];
 
@@ -203,9 +203,9 @@ void LootItemStorage::RemoveStoredLoot(ObjectGuid containerGUID)
 {
     lootItemStore.erase(containerGUID);
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_CONTAINER);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_CONTAINER);
     stmt->setUInt32(0, containerGUID.GetCounter());
     trans->Append(stmt);
 

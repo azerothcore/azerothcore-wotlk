@@ -9,6 +9,7 @@
 
 #include "Battlefield.h"
 #include "ObjectAccessor.h"
+#include "Log.h"
 #include "World.h"
 #include "WorldPacket.h"
 

@@ -8,6 +8,7 @@
 #define _PLAYER_H
 
 #include "Battleground.h"
+#include "DatabaseEnvFwd.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
 #include "InstanceSaveMgr.h"
@@ -1548,7 +1549,7 @@ public:
     /***                   LOAD SYSTEM                     ***/
     /*********************************************************/
 
-    bool LoadFromDB(ObjectGuid guid, SQLQueryHolder* holder);
+    bool LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& holder);
     [[nodiscard]] bool isBeingLoaded() const override;
 
     void Initialize(ObjectGuid::LowType guid);
@@ -1565,13 +1566,15 @@ public:
     /*********************************************************/
 
     void SaveToDB(bool create, bool logout);
-    void SaveInventoryAndGoldToDB(SQLTransaction& trans);                    // fast save function for item/money cheating preventing
-    void SaveGoldToDB(SQLTransaction& trans);
+    void SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logout);
+    void SaveInventoryAndGoldToDB(CharacterDatabaseTransaction trans);                    // fast save function for item/money cheating preventing
+    void SaveGoldToDB(CharacterDatabaseTransaction trans);
 
     static void SetUInt32ValueInArray(Tokenizer& data, uint16 index, uint32 value);
     static void SetFloatValueInArray(Tokenizer& data, uint16 index, float value);
-    static void Customize(ObjectGuid guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
+    static void Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDatabaseTransaction trans);
     static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid);
+    static void SavePositionInDB(WorldLocation const& loc, uint16 zoneId, ObjectGuid guid, CharacterDatabaseTransaction trans);
 
     static void DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally);
     static void DeleteOldCharacters();
@@ -1728,6 +1731,7 @@ public:
     [[nodiscard]] uint8 GetSpecsCount() const { return m_specsCount; }
     void SetSpecsCount(uint8 count) { m_specsCount = count; }
     void ActivateSpec(uint8 spec);
+    void LoadActions(PreparedQueryResult result);
     void GetTalentTreePoints(uint8 (&specPoints)[3]) const;
     [[nodiscard]] uint8 GetMostPointsTalentTree() const;
     bool HasTankSpec();
@@ -1800,7 +1804,7 @@ public:
     void RemoveArenaSpellCooldowns(bool removeActivePetCooldowns = false);
     void RemoveAllSpellCooldown();
     void _LoadSpellCooldowns(PreparedQueryResult result);
-    void _SaveSpellCooldowns(SQLTransaction& trans, bool logout);
+    void _SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout);
     uint32 GetLastPotionId() { return m_lastPotionId; }
     void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
     void UpdatePotionCooldown(Spell* spell = nullptr);
@@ -2032,7 +2036,7 @@ public:
     Corpse* CreateCorpse();
     void RemoveCorpse();
     void KillPlayer();
-    static void OfflineResurrect(ObjectGuid const guid, SQLTransaction& trans);
+    static void OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans);
     bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
     WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
@@ -2147,8 +2151,8 @@ public:
     bool RewardHonor(Unit* victim, uint32 groupsize, int32 honor = -1, bool awardXP = true);
     [[nodiscard]] uint32 GetHonorPoints() const { return GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY); }
     [[nodiscard]] uint32 GetArenaPoints() const { return GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY); }
-    void ModifyHonorPoints(int32 value, SQLTransaction* trans = nullptr);      //! If trans is specified, honor save query will be added to trans
-    void ModifyArenaPoints(int32 value, SQLTransaction* trans = nullptr);      //! If trans is specified, arena point save query will be added to trans
+    void ModifyHonorPoints(int32 value, CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr));      //! If trans is specified, honor save query will be added to trans
+    void ModifyArenaPoints(int32 value, CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr));      //! If trans is specified, arena point save query will be added to trans
     [[nodiscard]] uint32 GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const;
     void SetHonorPoints(uint32 value);
     void SetArenaPoints(uint32 value);
@@ -2723,24 +2727,24 @@ protected:
     /***                   SAVE SYSTEM                     ***/
     /*********************************************************/
 
-    void _SaveActions(SQLTransaction& trans);
-    void _SaveAuras(SQLTransaction& trans, bool logout);
-    void _SaveInventory(SQLTransaction& trans);
-    void _SaveMail(SQLTransaction& trans);
-    void _SaveQuestStatus(SQLTransaction& trans);
-    void _SaveDailyQuestStatus(SQLTransaction& trans);
-    void _SaveWeeklyQuestStatus(SQLTransaction& trans);
-    void _SaveMonthlyQuestStatus(SQLTransaction& trans);
-    void _SaveSeasonalQuestStatus(SQLTransaction& trans);
-    void _SaveSkills(SQLTransaction& trans);
-    void _SaveSpells(SQLTransaction& trans);
-    void _SaveEquipmentSets(SQLTransaction& trans);
-    void _SaveEntryPoint(SQLTransaction& trans);
-    void _SaveGlyphs(SQLTransaction& trans);
-    void _SaveTalents(SQLTransaction& trans);
-    void _SaveStats(SQLTransaction& trans);
-    void _SaveCharacter(bool create, SQLTransaction& trans);
-    void _SaveInstanceTimeRestrictions(SQLTransaction& trans);
+    void _SaveActions(CharacterDatabaseTransaction trans);
+    void _SaveAuras(CharacterDatabaseTransaction trans, bool logout);
+    void _SaveInventory(CharacterDatabaseTransaction trans);
+    void _SaveMail(CharacterDatabaseTransaction trans);
+    void _SaveQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveDailyQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveWeeklyQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveMonthlyQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveSeasonalQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveSkills(CharacterDatabaseTransaction trans);
+    void _SaveSpells(CharacterDatabaseTransaction trans);
+    void _SaveEquipmentSets(CharacterDatabaseTransaction trans);
+    void _SaveEntryPoint(CharacterDatabaseTransaction trans);
+    void _SaveGlyphs(CharacterDatabaseTransaction trans);
+    void _SaveTalents(CharacterDatabaseTransaction trans);
+    void _SaveStats(CharacterDatabaseTransaction trans);
+    void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
+    void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
 
     /*********************************************************/
     /***              ENVIRONMENTAL SYSTEM                 ***/
@@ -2915,7 +2919,7 @@ private:
     InventoryResult CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
     InventoryResult CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
-    Item* _LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, Field* fields);
+    Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;

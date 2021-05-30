@@ -24,9 +24,9 @@
 #include "RealmList.h"
 #include "RealmAcceptor.h"
 #include "DatabaseLoader.h"
+#include "MySQLThreading.h"
 #include "SecretMgr.h"
 #include "SharedDefines.h"
-#include "Util.h"
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
 #include <ace/ACE.h>
@@ -278,7 +278,7 @@ bool StartDB()
     // Load databases
     // NOTE: While authserver is singlethreaded you should keep synch_threads == 1.
     // Increasing it is just silly since only 1 will be used ever.
-    DatabaseLoader loader;
+    DatabaseLoader loader("server.authserver");
     loader
         .AddDatabase(LoginDatabase, "Login");
 

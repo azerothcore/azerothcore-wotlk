@@ -31,6 +31,7 @@
 #include "WorldSocketMgr.h"
 #include "DatabaseLoader.h"
 #include "Optional.h"
+#include "MySQLThreading.h"
 #include "SecretMgr.h"
 #include <ace/Sig_Handler.h>
 
@@ -374,7 +375,7 @@ bool Master::_StartDB()
     MySQL::Library_Init();
 
     // Load databases
-    DatabaseLoader loader;
+    DatabaseLoader loader("server.worldserver");
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")

@@ -8,6 +8,7 @@
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "DBCStores.h"
+#include "Log.h"
 #include "SpellMgr.h"
 #include "World.h"
 

@@ -195,7 +195,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     Petition const* petition = sPetitionMgr->GetPetitionByOwnerWithType(_player->GetGUID(), type);
 
     CharacterDatabase.EscapeString(name);
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     if (petition)
     {
@@ -203,15 +203,16 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
         LOG_DEBUG("network", "Invalid petition: %s", petition->petitionGuid.ToString().c_str());
 #endif
 
-        trans->PAppend("DELETE FROM petition WHERE petitionguid = %u", petition->petitionGuid);
-        trans->PAppend("DELETE FROM petition_sign WHERE petitionguid = %u", petition->petitionGuid);
+        trans->PAppend("DELETE FROM petition WHERE petitionguid = %u", petition->petitionGuid.GetCounter());
+        trans->PAppend("DELETE FROM petition_sign WHERE petitionguid = %u", petition->petitionGuid.GetCounter());
+
         // xinef: clear petition store
         sPetitionMgr->RemovePetition(petition->petitionGuid);
     }
 
     // xinef: petition pointer is invalid from now on
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION);
     stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt32(1, charter->GetGUID().GetCounter());
     stmt->setString(2, name);
@@ -385,7 +386,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
         }
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PETITION_NAME);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PETITION_NAME);
 
     stmt->setString(0, newName);
     stmt->setUInt32(1, petitionGuid.GetCounter());
@@ -511,7 +512,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
         return;
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION_SIGNATURE);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION_SIGNATURE);
 
     stmt->setUInt32(0, petition->ownerGuid.GetCounter());
     stmt->setUInt32(1, petitionGuid.GetCounter());
@@ -818,9 +819,9 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
             }
     }
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_GUID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_GUID);
     stmt->setUInt32(0, petitionGuid.GetCounter());
     trans->Append(stmt);
 
