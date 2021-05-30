@@ -581,7 +581,11 @@ public:
     virtual void UpdateRealmCharCount(uint32 accid) = 0;
     virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
+    virtual void LoadDBRevision() = 0;
     virtual char const* GetDBVersion() const = 0;
+    virtual char const* GetWorldDBRevision() const = 0;
+    virtual char const* GetCharacterDBRevision() const = 0;
+    virtual char const* GetAuthDBRevision() const = 0;
     virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     virtual uint32 GetCleaningFlags() const = 0;
