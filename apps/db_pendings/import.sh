@@ -78,7 +78,6 @@ function import() {
                 echo "SELECT sql_rev INTO OK FROM version_db_"$db" WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
             fi;
 
-            echo "UPDATE version_db_"$db" SET date = '"$newVer"' WHERE sql_rev = '"$rev"';" >> "$newFile";
             echo "--" >> "$newFile";
             echo "-- START UPDATING QUERIES" >> "$newFile";
             echo "--" >> "$newFile";
@@ -90,6 +89,7 @@ function import() {
             echo "--" >> "$newFile";
             echo "-- END UPDATING QUERIES" >> "$newFile";
             echo "--" >> "$newFile";
+            echo "UPDATE version_db_"$db" SET date = '"$newVer"' WHERE sql_rev = '"$rev"';" >> "$newFile";
 
             echo "$endTransaction" >> "$newFile";
 
