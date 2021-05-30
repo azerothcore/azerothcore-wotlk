@@ -1356,6 +1356,14 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     return;
                 }
 
+                if (!m_caster->IsWithinLOS(x, y, z))
+                {
+                    SendCastResult(SPELL_FAILED_LINE_OF_SIGHT);
+                    SendChannelUpdate(0);
+                    finish(false);
+                    return;
+                }
+
                 dest = SpellDestination(x, y, liquidLevel, m_caster->GetOrientation());
                 break;
             }
