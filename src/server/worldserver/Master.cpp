@@ -248,13 +248,16 @@ int Master::Run()
 #endif
 #endif
 
-    // Start soap serving thread
-    acore::Thread* soapThread = nullptr;
+    // Start soap serving thread if enabled
+    std::shared_ptr<std::thread> soapThread;
     if (sConfigMgr->GetOption<bool>("SOAP.Enabled", false))
     {
-        ACSoapRunnable* runnable = new ACSoapRunnable();
-        runnable->SetListenArguments(sConfigMgr->GetOption<std::string>("SOAP.IP", "127.0.0.1"), uint16(sConfigMgr->GetOption<int32>("SOAP.Port", 7878)));
-        soapThread = new acore::Thread(runnable);
+        soapThread.reset(new std::thread(ACSoapThread, sConfigMgr->GetOption<std::string>("SOAP.IP", "127.0.0.1"), sConfigMgr->GetOption<uint16>("SOAP.Port", 7878)),
+            [](std::thread* thr)
+        {
+            thr->join();
+            delete thr;
+        });
     }
 
     // Start up freeze catcher thread
@@ -286,13 +289,6 @@ int Master::Run()
     worldThread.wait();
     rarThread.wait();
     auctionLising_thread.wait();
-
-    if (soapThread)
-    {
-        soapThread->wait();
-        soapThread->destroy();
-        delete soapThread;
-    }
 
     if (freezeThread)
     {
@@ -411,6 +407,7 @@ bool Master::_StartDB()
     WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_revision = '%s'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
 
     sWorld->LoadDBVersion();
+    sWorld->LoadDBRevision();
 
     LOG_INFO("server", "Using World DB: %s", sWorld->GetDBVersion());
     return true;
