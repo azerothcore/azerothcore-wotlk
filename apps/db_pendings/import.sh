@@ -44,8 +44,6 @@ function import() {
 
             startTransaction="START TRANSACTION;";
             updHeader="ALTER TABLE version_db_"$db" CHANGE COLUMN "$oldVer" "$newVer" bit;";
-            updDate="UPDATE version_db_"$db" SET date = '"$newVer"' WHERE sql_rev = '"$rev"';";
-
             endTransaction="COMMIT;";
 
             newFile="$updPath/"$dateToday"_"$cnt".sql"
@@ -80,7 +78,7 @@ function import() {
                 echo "SELECT sql_rev INTO OK FROM version_db_"$db" WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
             fi;
 
-            echo "$updDate" >> "$newFile";
+            echo "UPDATE version_db_"$db" SET date = '"$newVer"' WHERE sql_rev = '"$rev"';" >> "$newFile";
             echo "--" >> "$newFile";
             echo "-- START UPDATING QUERIES" >> "$newFile";
             echo "--" >> "$newFile";
