@@ -75,12 +75,12 @@ function import() {
 
             echo "$startTransaction" >> "$newFile";
             echo "$updHeader" >> "$newFile";
-            echo "$updDate" >> "$newFile";
 
             if [[ $isRev -eq 1 ]]; then
                 echo "SELECT sql_rev INTO OK FROM version_db_"$db" WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
             fi;
 
+            echo "$updDate" >> "$newFile";
             echo "--" >> "$newFile";
             echo "-- START UPDATING QUERIES" >> "$newFile";
             echo "--" >> "$newFile";
