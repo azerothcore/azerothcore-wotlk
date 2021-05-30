@@ -5,12 +5,13 @@
  */
 
 #include "ACSoap.h"
+#include "AccountMgr.h"
 #include "Log.h"
 #include "soapH.h"
 #include "soapStub.h"
 #include "World.h"
 
-void ACSoapRunnable::run()
+void ACSoapThread(const std::string& host, uint16 port)
 {
     struct soap soap;
     soap_init(&soap);
@@ -21,13 +22,14 @@ void ACSoapRunnable::run()
     soap.accept_timeout = 3;
     soap.recv_timeout = 5;
     soap.send_timeout = 5;
-    if (!soap_valid_socket(soap_bind(&soap, _host.c_str(), _port, 100)))
+
+    if (!soap_valid_socket(soap_bind(&soap, host.c_str(), port, 100)))
     {
-        LOG_ERROR("server", "ACSoap: couldn't bind to %s:%d", _host.c_str(), _port);
+        LOG_ERROR("server", "ACSoap: couldn't bind to %s:%d", host.c_str(), port);
         exit(-1);
     }
 
-    LOG_INFO("server", "ACSoap: bound to http://%s:%d", _host.c_str(), _port);
+    LOG_INFO("server", "ACSoap: bound to http://%s:%d", host.c_str(), port);
 
     while (!World::IsStopped())
     {
@@ -39,32 +41,26 @@ void ACSoapRunnable::run()
 #endif
         struct soap* thread_soap = soap_copy(&soap);// make a safe copy
 
-        ACE_Message_Block* mb = new ACE_Message_Block(sizeof(struct soap*));
-        ACE_OS::memcpy(mb->wr_ptr(), &thread_soap, sizeof(struct soap*));
-        process_message(mb);
+        process_message(thread_soap);
     }
 
     soap_done(&soap);
 }
 
-void ACSoapRunnable::process_message(ACE_Message_Block* mb)
+void process_message(struct soap* soap_message)
 {
-    ACE_TRACE (ACE_TEXT ("SOAPWorkingThread::process_message"));
+    //LOG_TRACE("network.soap", "SOAPWorkingThread::process_message");
 
-    struct soap* soap;
-    ACE_OS::memcpy(&soap, mb->rd_ptr (), sizeof(struct soap*));
-    mb->release();
-
-    soap_serve(soap);
-    soap_destroy(soap); // dealloc C++ data
-    soap_end(soap); // dealloc data and clean up
-    soap_done(soap); // detach soap struct
-    free(soap);
+    soap_serve(soap_message);
+    soap_destroy(soap_message); // dealloc C++ data
+    soap_end(soap_message); // dealloc data and clean up
+    soap_done(soap_message); // detach soap struct
+    free(soap_message);
 }
-/*
-Code used for generating stubs:
 
-int ns1__executeCommand(char* command, char** result);
+/*
+    Code used for generating stubs:
+    int ns1__executeCommand(char* command, char** result);
 */
 int ns1__executeCommand(soap* soap, char* command, char** result)
 {
@@ -117,16 +113,10 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         sWorld->QueueCliCommand(cmd);
     }
 
-    // wait for callback to complete command
+    // Wait until the command has finished executing
+    connection.finishedPromise.get_future().wait();
 
-    int acc = connection.pendingCommands.acquire();
-    if (acc)
-    {
-        LOG_ERROR("server", "ACSoap: Error while acquiring lock, acc = %i, errno = %u", acc, errno);
-    }
-
-    // alright, command finished
-
+    // The command has finished executing already
     char* printBuffer = soap_strdup(soap, connection.m_printBuffer.c_str());
     if (connection.hasCommandSucceeded())
     {
@@ -141,7 +131,6 @@ void SOAPCommand::commandFinished(void* soapconnection, bool success)
 {
     SOAPCommand* con = (SOAPCommand*)soapconnection;
     con->setCommandSuccess(success);
-    con->pendingCommands.release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
