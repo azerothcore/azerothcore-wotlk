@@ -7555,6 +7555,22 @@ bool ObjectMgr::IsReservedName(const std::string& name) const
     return _reservedNamesStore.find(wstr) != _reservedNamesStore.end();
 }
 
+void ObjectMgr::AddReservedPlayerName(std::string const& name)
+{
+    if (!IsReservedName(name))
+    {
+        std::wstring wstr;
+        if (!Utf8toWStr(name, wstr))
+        {
+            LOG_ERROR("server", "Could not add invalid name to reserved player names: %s", name.c_str());
+            return;
+        }
+        wstrToLower(wstr);
+
+        _reservedNamesStore.insert(wstr);
+    }
+}
+
 enum LanguageType
 {
     LT_BASIC_LATIN    = 0x0000,

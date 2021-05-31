@@ -302,10 +302,20 @@ public:
     //rename characters
     static bool HandleCharacterRenameCommand(ChatHandler* handler, char const* args)
     {
+        char* nameStr = strtok((char*)args, " ");
+        char* reserveNameStr = strtok(nullptr, " ");
+
+        if (reserveNameStr == nullptr && nameStr != nullptr && atoi(nameStr) == 1)
+        {
+            reserveNameStr = nameStr;
+            nameStr = nullptr;
+        }
+        bool reserveName = reserveNameStr != nullptr && atoi(reserveNameStr) == 1;
+
         Player* target;
         ObjectGuid targetGuid;
         std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+        if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
             return false;
 
         if (target)
@@ -330,6 +340,15 @@ public:
             stmt->setUInt16(0, uint16(AT_LOGIN_RENAME));
             stmt->setUInt32(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
+        }
+
+        if (reserveName)
+        {
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RESERVED_PLAYER_NAME);
+            stmt->setString(0, targetName);
+            CharacterDatabase.Execute(stmt);
+
+            sObjectMgr->AddReservedPlayerName(targetName);
         }
 
         return true;
