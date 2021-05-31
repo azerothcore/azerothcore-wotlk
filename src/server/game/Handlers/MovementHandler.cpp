@@ -200,7 +200,6 @@ void WorldSession::HandleMoveWorldportAck()
         }
     }
 
-
     bool allowMount = !mEntry->IsDungeon() || mEntry->IsBattlegroundOrArena();
     if (mInstance)
     {
