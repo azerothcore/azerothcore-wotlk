@@ -443,7 +443,7 @@ public:
         if (!type || !name || !level || *name == '\0' || *level == '\0' || (*type != 'a' && *type != 'l'))
             return false;
 
-        sLog->SetLogLevel(name, *acore::StringTo<uint32>(level), *type == 'l');
+        sLog->SetLogLevel(name, *Acore::StringTo<uint32>(level), *type == 'l');
         return true;
     }
 

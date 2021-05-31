@@ -2627,7 +2627,7 @@ private:
     float processDummyAuras(float TakenTotalMod) const;
 };
 
-namespace acore
+namespace Acore
 {
     // Binary predicate for sorting Units based on percent value of a power
     class PowerPctOrderPred

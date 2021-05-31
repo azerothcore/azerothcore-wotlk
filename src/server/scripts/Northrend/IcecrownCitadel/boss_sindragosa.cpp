@@ -225,7 +225,7 @@ private:
     ObjectGuid _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public acore::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector : public Acore::unary_function<Unit*, bool>
 {
 public:
     LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }
@@ -908,10 +908,10 @@ public:
             uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
             healList.remove_if(UnchainedMagicTargetSelector(false));
             if (healList.size() > maxSize)
-                acore::Containers::RandomResize(healList, maxSize);
+                Acore::Containers::RandomResize(healList, maxSize);
             dpsList.remove_if(UnchainedMagicTargetSelector(true));
             if (dpsList.size() > maxSize)
-                acore::Containers::RandomResize(dpsList, maxSize);
+                Acore::Containers::RandomResize(dpsList, maxSize);
             unitList.splice(unitList.begin(), healList);
             unitList.splice(unitList.begin(), dpsList);
         }
@@ -1202,7 +1202,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            unitList.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+            unitList.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
             targetList.clear();
             targetList = unitList;
         }
@@ -1906,11 +1906,11 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
             if (targets.empty())
                 return;
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }
@@ -1927,7 +1927,7 @@ public:
             if (unitList.empty())
                 return;
 
-            acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+            Acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
         }
 
         void Register() override

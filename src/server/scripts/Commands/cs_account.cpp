@@ -83,7 +83,7 @@ public:
             return false;
         }
 
-        auto token = acore::StringTo<uint32>(args);
+        auto token = Acore::StringTo<uint32>(args);
 
         auto const& masterKey = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY);
         if (!masterKey.IsAvailable())
@@ -117,18 +117,18 @@ public:
         }
 
         // store random suggested secrets
-        static std::unordered_map<uint32, acore::Crypto::TOTP::Secret> suggestions;
-        auto pair = suggestions.emplace(std::piecewise_construct, std::make_tuple(accountId), std::make_tuple(acore::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH)); // std::vector 1-argument size_t constructor invokes resize
+        static std::unordered_map<uint32, Acore::Crypto::TOTP::Secret> suggestions;
+        auto pair = suggestions.emplace(std::piecewise_construct, std::make_tuple(accountId), std::make_tuple(Acore::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH)); // std::vector 1-argument size_t constructor invokes resize
 
         if (pair.second) // no suggestion yet, generate random secret
-            acore::Crypto::GetRandomBytes(pair.first->second);
+            Acore::Crypto::GetRandomBytes(pair.first->second);
 
         if (!pair.second && token) // suggestion already existed and token specified - validate
         {
-            if (acore::Crypto::TOTP::ValidateToken(pair.first->second, *token))
+            if (Acore::Crypto::TOTP::ValidateToken(pair.first->second, *token))
             {
                 if (masterKey)
-                    acore::Crypto::AEEncryptWithRandomIV<acore::Crypto::AES>(pair.first->second, *masterKey);
+                    Acore::Crypto::AEEncryptWithRandomIV<Acore::Crypto::AES>(pair.first->second, *masterKey);
 
                 auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
                 stmt->setBinary(0, pair.first->second);
@@ -144,7 +144,7 @@ public:
         }
 
         // new suggestion, or no token specified, output TOTP parameters
-        handler->PSendSysMessage(LANG_2FA_SECRET_SUGGESTION, acore::Encoding::Base32::Encode(pair.first->second).c_str());
+        handler->PSendSysMessage(LANG_2FA_SECRET_SUGGESTION, Acore::Encoding::Base32::Encode(pair.first->second).c_str());
         handler->SetSentErrorMessage(true);
         return false;
     }
@@ -158,7 +158,7 @@ public:
             return false;
         }
 
-        auto token = acore::StringTo<uint32>(args);
+        auto token = Acore::StringTo<uint32>(args);
 
         auto const& masterKey = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY);
         if (!masterKey.IsAvailable())
@@ -169,7 +169,7 @@ public:
         }
 
         uint32 const accountId = handler->GetSession()->GetAccountId();
-        acore::Crypto::TOTP::Secret secret;
+        Acore::Crypto::TOTP::Secret secret;
         { // get current TOTP secret
             auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
             stmt->setUInt32(0, accountId);
@@ -198,7 +198,7 @@ public:
         {
             if (masterKey)
             {
-                bool success = acore::Crypto::AEDecrypt<acore::Crypto::AES>(secret, *masterKey);
+                bool success = Acore::Crypto::AEDecrypt<Acore::Crypto::AES>(secret, *masterKey);
                 if (!success)
                 {
                     LOG_ERROR("misc", "Account %u has invalid ciphertext in TOTP token.", accountId);
@@ -208,7 +208,7 @@ public:
                 }
             }
 
-            if (acore::Crypto::TOTP::ValidateToken(secret, *token))
+            if (Acore::Crypto::TOTP::ValidateToken(secret, *token))
             {
                 auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
                 stmt->setNull(0);
@@ -616,7 +616,7 @@ public:
             return false;
         }
 
-        Optional<std::vector<uint8>> decoded = acore::Encoding::Base32::Decode(secret);
+        Optional<std::vector<uint8>> decoded = Acore::Encoding::Base32::Decode(secret);
         if (!decoded)
         {
             handler->SendSysMessage(LANG_2FA_SECRET_INVALID);
@@ -624,7 +624,7 @@ public:
             return false;
         }
 
-        if (128 < (decoded->size() + acore::Crypto::AES::IV_SIZE_BYTES + acore::Crypto::AES::TAG_SIZE_BYTES))
+        if (128 < (decoded->size() + Acore::Crypto::AES::IV_SIZE_BYTES + Acore::Crypto::AES::TAG_SIZE_BYTES))
         {
             handler->SendSysMessage(LANG_2FA_SECRET_TOO_LONG);
             handler->SetSentErrorMessage(true);
@@ -632,7 +632,7 @@ public:
         }
 
         if (masterKey)
-            acore::Crypto::AEEncryptWithRandomIV<acore::Crypto::AES>(*decoded, *masterKey);
+            Acore::Crypto::AEEncryptWithRandomIV<Acore::Crypto::AES>(*decoded, *masterKey);
 
         auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
         stmt->setBinary(0, *decoded);
