@@ -344,10 +344,6 @@ public:
 
         if (reserveName)
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RESERVED_PLAYER_NAME);
-            stmt->setString(0, targetName);
-            CharacterDatabase.Execute(stmt);
-
             sObjectMgr->AddReservedPlayerName(targetName);
         }
 
