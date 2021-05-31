@@ -16,7 +16,7 @@ EndScriptData */
 #include "Config.h"
 #include "GitRevision.h"
 #include "Language.h"
-#include "MySQLThreading.h
+#include "MySQLThreading.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "Realm.h"
