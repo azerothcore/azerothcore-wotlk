@@ -200,7 +200,6 @@ void WorldSession::HandleMoveWorldportAck()
         }
     }
 
-
     bool allowMount = !mEntry->IsDungeon() || mEntry->IsBattlegroundOrArena();
     if (mInstance)
     {
@@ -605,7 +604,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     }
 
     // continue parse packet
-
     recvData >> unk1;                                      // counter or moveEvent
 
     MovementInfo movementInfo;
@@ -613,7 +611,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     ReadMovementInfo(recvData, &movementInfo);
 
     recvData >> newspeed;
-    /*----------------*/
 
     // client ACK send one packet for mounted/run case and need skip all except last from its
     // in other cases anti-cheat check can be fail in false case
@@ -894,16 +891,15 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     uint32 roundTripDuration = getMSTimeDiff(serverTimeAtSent, recvData.GetReceivedTime());
     uint32 lagDelay = roundTripDuration / 2;
 
-    /*
-    clockDelta = serverTime - clientTime
-    where
-    serverTime: time that was displayed on the clock of the SERVER at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
-    clientTime:  time that was displayed on the clock of the CLIENT at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
+    // clockDelta = serverTime - clientTime
+    // where
+    // serverTime: time that was displayed on the clock of the SERVER at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
+    // clientTime:  time that was displayed on the clock of the CLIENT at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
 
-    Once clockDelta has been computed, we can compute the time of an event on server clock when we know the time of that same event on the client clock,
-    using the following relation:
-    serverTime = clockDelta + clientTime
-    */
+    // Once clockDelta has been computed, we can compute the time of an event on server clock when we know the time of that same event on the client clock,
+    // using the following relation:
+    // serverTime = clockDelta + clientTime
+
     int64 clockDelta = (int64)serverTimeAtSent + (int64)lagDelay - (int64)clientTimestamp;
     _timeSyncClockDeltaQueue.put(std::pair<int64, uint32>(clockDelta, roundTripDuration));
     ComputeNewClockDelta();
