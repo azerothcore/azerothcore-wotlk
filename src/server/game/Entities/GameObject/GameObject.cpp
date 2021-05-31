@@ -175,7 +175,7 @@ void GameObject::RemoveFromWorld()
         WorldObject::RemoveFromWorld();
 
         if (m_spawnId)
-            acore::Containers::MultimapErasePair(GetMap()->GetGameObjectBySpawnIdStore(), m_spawnId, this);
+            Acore::Containers::MultimapErasePair(GetMap()->GetGameObjectBySpawnIdStore(), m_spawnId, this);
         GetMap()->GetObjectsStore().Remove<GameObject>(GetGUID());
     }
 }
@@ -459,7 +459,7 @@ void GameObject::Update(uint32 diff)
                             if (info->summoningRitual.casterTargetSpell && info->summoningRitual.casterTargetSpell != 1) // No idea why this field is a bool in some cases
                                 for (uint32 i = 0; i < info->summoningRitual.casterTargetSpellTargets; i++)
                                     // m_unique_users can contain only player GUIDs
-                                    if (Player* target = ObjectAccessor::GetPlayer(*this, acore::Containers::SelectRandomContainerElement(m_unique_users)))
+                                    if (Player* target = ObjectAccessor::GetPlayer(*this, Acore::Containers::SelectRandomContainerElement(m_unique_users)))
                                         spellCaster->CastSpell(target, info->summoningRitual.casterTargetSpell, true);
 
                             // finish owners spell
@@ -608,8 +608,8 @@ void GameObject::Update(uint32 diff)
                         // search unfriendly creature
                         if (owner)                    // hunter trap
                         {
-                            acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                            acore::UnitSearcher<acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
+                            Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
+                            Acore::UnitSearcher<Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
                             VisitNearbyGridObject(radius, searcher);
                             if (!target)
                                 VisitNearbyWorldObject(radius, searcher);
@@ -619,8 +619,8 @@ void GameObject::Update(uint32 diff)
                             // environmental damage spells already have around enemies targeting but this not help in case not existed GO casting support
                             // affect only players
                             Player* player = nullptr;
-                            acore::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
-                            acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
+                            Acore::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
+                            Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
                             VisitNearbyWorldObject(radius, searcher);
                             target = player;
                         }
@@ -1189,13 +1189,13 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
     GameObject* trapGO = nullptr;
     {
         // using original GO distance
-        CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
+        CellCoord p(Acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
         Cell cell(p);
 
-        acore::NearestGameObjectEntryInObjectRangeCheck go_check(*target, trapEntry, range);
-        acore::GameObjectLastSearcher<acore::NearestGameObjectEntryInObjectRangeCheck> checker(this, trapGO, go_check);
+        Acore::NearestGameObjectEntryInObjectRangeCheck go_check(*target, trapEntry, range);
+        Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck> checker(this, trapGO, go_check);
 
-        TypeContainerVisitor<acore::GameObjectLastSearcher<acore::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
+        TypeContainerVisitor<Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
         cell.Visit(p, object_checker, *GetMap(), *target, range);
     }
 
@@ -1209,12 +1209,12 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
 {
     GameObject* ok = nullptr;
 
-    CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
+    CellCoord p(Acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
-    acore::NearestGameObjectFishingHole u_check(*this, range);
-    acore::GameObjectSearcher<acore::NearestGameObjectFishingHole> checker(this, ok, u_check);
+    Acore::NearestGameObjectFishingHole u_check(*this, range);
+    Acore::GameObjectSearcher<Acore::NearestGameObjectFishingHole> checker(this, ok, u_check);
 
-    TypeContainerVisitor<acore::GameObjectSearcher<acore::NearestGameObjectFishingHole>, GridTypeMapContainer > grid_object_checker(checker);
+    TypeContainerVisitor<Acore::GameObjectSearcher<Acore::NearestGameObjectFishingHole>, GridTypeMapContainer > grid_object_checker(checker);
     cell.Visit(p, grid_object_checker, *GetMap(), *this, range);
 
     return ok;
@@ -1977,7 +1977,7 @@ void GameObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*s
     dist += GetObjectSize();
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION * 2.0f; // pussywizard: to ensure everyone receives all important packets
-    acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
+    Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
     VisitNearbyWorldObject(dist, notifier);
 }
 
@@ -2481,7 +2481,7 @@ void GameObject::SetPosition(float x, float y, float z, float o)
 {
     // pussywizard: do not call for MotionTransport and other gobjects not in grid
 
-    if (!acore::IsValidMapCoord(x, y, z, o))
+    if (!Acore::IsValidMapCoord(x, y, z, o))
         return;
 
     GetMap()->GameObjectRelocation(this, x, y, z, o);

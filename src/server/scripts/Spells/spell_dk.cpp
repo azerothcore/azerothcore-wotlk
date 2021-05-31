@@ -1359,7 +1359,7 @@ public:
                     FinishCast(SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
                     return;
                 }
-                target = acore::Containers::SelectRandomContainerElement(targets);
+                target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -2240,7 +2240,7 @@ public:
                 return;
             }
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
             _corpse = true;

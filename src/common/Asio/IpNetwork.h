@@ -15,7 +15,7 @@
 #include <boost/asio/ip/network_v6.hpp>
 #endif
 
-namespace acore::Net
+namespace Acore::Net
 {
     inline bool IsInNetwork(boost::asio::ip::address_v4 const& networkAddress, boost::asio::ip::address_v4 const& mask, boost::asio::ip::address_v4 const& clientAddress)
     {
