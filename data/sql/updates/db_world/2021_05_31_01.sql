@@ -1,3 +1,19 @@
+-- DB update 2021_05_31_00 -> 2021_05_31_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_31_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_31_00 2021_05_31_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1621682307665630800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1621682307665630800');
 
 UPDATE `creature_template` SET `unit_flags` = 768, `InhabitType` = 1 WHERE (`entry` = 25584);
@@ -7,3 +23,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25584, 0, 5, 7, 25, 0, 100, 0, 0, 0, 0, 0, 0, 60, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Inquisitor Salrand - On Respawn - Set Fly'),
 (25584, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 11, 45775, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Inquisitor Salrand - On Reset - Cast \'Cosmetic - Divine Shield Blue\'');
 
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_05_31_01' WHERE sql_rev = '1621682307665630800';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
