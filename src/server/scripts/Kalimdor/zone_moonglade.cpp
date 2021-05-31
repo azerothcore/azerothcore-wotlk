@@ -311,8 +311,8 @@ public:
         void IsSummonedBy(Unit* /*summoner*/) override
         {
             std::list<Player*> playerOnQuestList;
-            acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
-            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
+            Acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
             Cell::VisitWorldObjects(me, searcher, 5.0f);
             for (std::list<Player*>::const_iterator itr = playerOnQuestList.begin(); itr != playerOnQuestList.end(); ++itr)
             {

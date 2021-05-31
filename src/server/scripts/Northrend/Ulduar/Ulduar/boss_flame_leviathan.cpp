@@ -1660,7 +1660,7 @@ public:
             else
             {
                 //! In the end, only one target should be selected
-                WorldObject* _target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 if (_target)
                     targets.push_back(_target);

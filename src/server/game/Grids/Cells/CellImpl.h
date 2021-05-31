@@ -24,7 +24,7 @@ inline Cell::Cell(CellCoord const& p)
 
 inline Cell::Cell(float x, float y)
 {
-    CellCoord p = acore::ComputeCellCoord(x, y);
+    CellCoord p = Acore::ComputeCellCoord(x, y);
     data.Part.grid_x = p.x_coord / MAX_NUMBER_OF_CELLS;
     data.Part.grid_y = p.y_coord / MAX_NUMBER_OF_CELLS;
     data.Part.cell_x = p.x_coord % MAX_NUMBER_OF_CELLS;
@@ -37,12 +37,12 @@ inline CellArea Cell::CalculateCellArea(float x, float y, float radius)
 {
     if (radius <= 0.0f)
     {
-        CellCoord center = acore::ComputeCellCoord(x, y).normalize();
+        CellCoord center = Acore::ComputeCellCoord(x, y).normalize();
         return CellArea(center, center);
     }
 
-    CellCoord centerX = acore::ComputeCellCoord(x - radius, y - radius).normalize();
-    CellCoord centerY = acore::ComputeCellCoord(x + radius, y + radius).normalize();
+    CellCoord centerX = Acore::ComputeCellCoord(x - radius, y - radius).normalize();
+    CellCoord centerY = Acore::ComputeCellCoord(x + radius, y + radius).normalize();
 
     return CellArea(centerX, centerY);
 }

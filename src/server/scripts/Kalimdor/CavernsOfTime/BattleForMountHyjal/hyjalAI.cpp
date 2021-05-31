@@ -890,8 +890,8 @@ void hyjalAI::HideNearPos(float x, float y)
 {
     // First get all creatures.
     std::list<Creature*> creatures;
-    acore::AllFriendlyCreaturesInGrid creature_check(me);
-    acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
+    Acore::AllFriendlyCreaturesInGrid creature_check(me);
+    Acore::CreatureListSearcher<Acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
 
     Cell::VisitGridObjects(x, y, me->GetMap(), creature_searcher, me->GetGridActivationRange());
 
@@ -907,8 +907,8 @@ void hyjalAI::HideNearPos(float x, float y)
 
 void hyjalAI::RespawnNearPos(float x, float y)
 {
-    acore::RespawnDo u_do;
-    acore::WorldObjectWorker<acore::RespawnDo> worker(me, u_do);
+    Acore::RespawnDo u_do;
+    Acore::WorldObjectWorker<Acore::RespawnDo> worker(me, u_do);
     Cell::VisitGridObjects(x, y, me->GetMap(), worker, me->GetGridActivationRange());
 }
 
@@ -935,8 +935,8 @@ void hyjalAI::WaypointReached(uint32 waypointId)
         //all alive guards walk near here
         // First get all creatures.
         std::list<Creature*> creatures;
-        acore::AllFriendlyCreaturesInGrid creature_check(me);
-        acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
+        Acore::AllFriendlyCreaturesInGrid creature_check(me);
+        Acore::CreatureListSearcher<Acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
         Cell::VisitGridObjects(me, creature_searcher, me->GetGridActivationRange());
 
         if (!creatures.empty())
@@ -967,8 +967,8 @@ void hyjalAI::DoOverrun(uint32 faction, const uint32 diff)
         if (TeleportTimer <= diff)
         {
             std::list<Creature*> creatures;
-            acore::AllFriendlyCreaturesInGrid creature_check(me);
-            acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
+            Acore::AllFriendlyCreaturesInGrid creature_check(me);
+            Acore::CreatureListSearcher<Acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
             Cell::VisitGridObjects(me, creature_searcher, me->GetGridActivationRange());
 
             if (!creatures.empty())

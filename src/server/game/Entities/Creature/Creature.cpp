@@ -254,7 +254,7 @@ void Creature::RemoveFromWorld()
         Unit::RemoveFromWorld();
 
         if (m_spawnId)
-            acore::Containers::MultimapErasePair(GetMap()->GetCreatureBySpawnIdStore(), m_spawnId, this);
+            Acore::Containers::MultimapErasePair(GetMap()->GetCreatureBySpawnIdStore(), m_spawnId, this);
 
         GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
     }
@@ -888,8 +888,8 @@ void Creature::DoFleeToGetAssistance()
     {
         Creature* creature = nullptr;
 
-        acore::NearestAssistCreatureInCreatureRangeCheck u_check(this, GetVictim(), radius);
-        acore::CreatureLastSearcher<acore::NearestAssistCreatureInCreatureRangeCheck> searcher(this, creature, u_check);
+        Acore::NearestAssistCreatureInCreatureRangeCheck u_check(this, GetVictim(), radius);
+        Acore::CreatureLastSearcher<Acore::NearestAssistCreatureInCreatureRangeCheck> searcher(this, creature, u_check);
 
         Cell::VisitGridObjects(this, searcher, radius);
 
@@ -1540,7 +1540,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         if (CanFly())
         {
             float tz = map->GetHeight(GetPhaseMask(), data->posX, data->posY, data->posZ, true, MAX_FALL_DISTANCE);
-            if (data->posZ - tz > 0.1f && acore::IsValidMapCoord(tz))
+            if (data->posZ - tz > 0.1f && Acore::IsValidMapCoord(tz))
             {
                 Relocate(data->posX, data->posY, tz);
             }
@@ -2079,8 +2079,8 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
 
     Unit* target = nullptr;
 
-    acore::NearestHostileUnitCheck u_check(this, dist, playerOnly);
-    acore::UnitLastSearcher<acore::NearestHostileUnitCheck> searcher(this, target, u_check);
+    Acore::NearestHostileUnitCheck u_check(this, dist, playerOnly);
+    Acore::UnitLastSearcher<Acore::NearestHostileUnitCheck> searcher(this, target, u_check);
     Cell::VisitAllObjects(this, searcher, dist);
     return target;
 }
@@ -2094,8 +2094,8 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
         dist = MAX_SEARCHER_DISTANCE;
 
     Unit* target = nullptr;
-    acore::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
-    acore::UnitLastSearcher<acore::NearestHostileUnitInAttackDistanceCheck> searcher(this, target, u_check);
+    Acore::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
+    Acore::UnitLastSearcher<Acore::NearestHostileUnitInAttackDistanceCheck> searcher(this, target, u_check);
     Cell::VisitAllObjects(this, searcher, std::max(dist, ATTACK_DISTANCE));
 
     return target;
@@ -2127,8 +2127,8 @@ void Creature::CallAssistance()
         {
             std::list<Creature*> assistList;
 
-            acore::AnyAssistCreatureInRangeCheck u_check(this, GetVictim(), radius);
-            acore::CreatureListSearcher<acore::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
+            Acore::AnyAssistCreatureInRangeCheck u_check(this, GetVictim(), radius);
+            Acore::CreatureListSearcher<Acore::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
             Cell::VisitGridObjects(this, searcher, radius);
 
             if (!assistList.empty())
@@ -2151,8 +2151,8 @@ void Creature::CallForHelp(float radius)
     if (radius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
         return;
 
-    acore::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
-    acore::CreatureWorker<acore::CallOfHelpCreatureInRangeDo> worker(this, u_do);
+    Acore::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
+    Acore::CreatureWorker<Acore::CallOfHelpCreatureInRangeDo> worker(this, u_do);
 
     Cell::VisitGridObjects(this, worker, radius);
 }
@@ -2786,7 +2786,7 @@ std::string const& Creature::GetNameForLocaleIdx(LocaleConstant loc_idx) const
 
 void Creature::SetPosition(float x, float y, float z, float o)
 {
-    if (!acore::IsValidMapCoord(x, y, z, o))
+    if (!Acore::IsValidMapCoord(x, y, z, o))
         return;
 
     GetMap()->CreatureRelocation(this, x, y, z, o);
