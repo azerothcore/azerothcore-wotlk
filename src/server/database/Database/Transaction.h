@@ -31,7 +31,7 @@ public:
     template<typename Format, typename... Args>
     void PAppend(Format&& sql, Args&&... args)
     {
-        Append(acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
+        Append(Acore::StringFormat(std::forward<Format>(sql), std::forward<Args>(args)...).c_str());
     }
 
     std::size_t GetSize() const { return m_queries.size(); }

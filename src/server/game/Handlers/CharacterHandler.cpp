@@ -2031,7 +2031,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
     // pussywizard: check titles here to prevent return while building queries
     const uint32 ktcount = KNOWN_TITLES_SIZE * 2;
-    std::vector<std::string_view> tokens = acore::Tokenize(knownTitlesStr, ' ', false);
+    std::vector<std::string_view> tokens = Acore::Tokenize(knownTitlesStr, ' ', false);
 
     if (factionChangeInfo->FactionChange && tokens.size() != ktcount)
     {
@@ -2404,7 +2404,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                 {
                     std::optional<uint32> thisMask;
                     if (index < tokens.size())
-                        thisMask = acore::StringTo<uint32>(tokens[index]);
+                        thisMask = Acore::StringTo<uint32>(tokens[index]);
 
                     if (thisMask)
                         knownTitles[index] = *thisMask;
