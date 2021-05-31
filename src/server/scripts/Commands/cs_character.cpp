@@ -305,7 +305,7 @@ public:
         char* nameStr = strtok((char*)args, " ");
         char* reserveNameStr = strtok(nullptr, " ");
 
-        if (reserveNameStr == nullptr && nameStr != nullptr && atoi(nameStr) == 1)
+        if (!reserveNameStr && nameStr && atoi(nameStr) == 1)
         {
             reserveNameStr = nameStr;
             nameStr = nullptr;
