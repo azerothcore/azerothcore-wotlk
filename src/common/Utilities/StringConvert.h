@@ -16,11 +16,11 @@
 #include <string_view>
 #include <type_traits>
 
-namespace acore::Impl::StringConvertImpl
+namespace Acore::Impl::StringConvertImpl
 {
     template <typename T, typename = void> struct For
     {
-        static_assert(acore::dependant_false_v<T>, "Unsupported type used for ToString or StringTo");
+        static_assert(Acore::dependant_false_v<T>, "Unsupported type used for ToString or StringTo");
     };
 
     template <typename T>
@@ -241,18 +241,18 @@ namespace acore::Impl::StringConvertImpl
 #endif
 }
 
-namespace acore
+namespace Acore
 {
     template <typename Result, typename... Params>
     Optional<Result> StringTo(std::string_view str, Params&&... params)
     {
-        return acore::Impl::StringConvertImpl::For<Result>::FromString(str, std::forward<Params>(params)...);
+        return Acore::Impl::StringConvertImpl::For<Result>::FromString(str, std::forward<Params>(params)...);
     }
 
     template <typename Type, typename... Params>
     std::string ToString(Type&& val, Params&&... params)
     {
-        return acore::Impl::StringConvertImpl::For<std::decay_t<Type>>::ToString(std::forward<Type>(val), std::forward<Params>(params)...);
+        return Acore::Impl::StringConvertImpl::For<std::decay_t<Type>>::ToString(std::forward<Type>(val), std::forward<Params>(params)...);
     }
 }
 

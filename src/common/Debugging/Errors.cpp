@@ -54,11 +54,11 @@ namespace
     }
 }
 
-namespace acore
+namespace Acore
 {
     void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message)
     {
-        std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + debugInfo + '\n';
+        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + debugInfo + '\n';
         fprintf(stderr, "%s", formattedMessage.c_str());
         fflush(stderr);
         Crash(formattedMessage.c_str());
@@ -69,7 +69,7 @@ namespace acore
         va_list args;
         va_start(args, format);
 
-        std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + FormatAssertionMessage(format, args) + '\n' + debugInfo + '\n';
+        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s ASSERTION FAILED:\n  %s\n", file, line, function, message) + FormatAssertionMessage(format, args) + '\n' + debugInfo + '\n';
         va_end(args);
 
         fprintf(stderr, "%s", formattedMessage.c_str());
@@ -83,7 +83,7 @@ namespace acore
         va_list args;
         va_start(args, message);
 
-        std::string formattedMessage = acore::StringFormat("\n%s:%i in %s FATAL ERROR:\n", file, line, function) + FormatAssertionMessage(message, args) + '\n';
+        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s FATAL ERROR:\n", file, line, function) + FormatAssertionMessage(message, args) + '\n';
         va_end(args);
 
         fprintf(stderr, "%s", formattedMessage.c_str());
@@ -95,7 +95,7 @@ namespace acore
 
     void Error(char const* file, int line, char const* function, char const* message)
     {
-        std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ERROR:\n  %s\n", file, line, function, message);
+        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s ERROR:\n  %s\n", file, line, function, message);
         fprintf(stderr, "%s", formattedMessage.c_str());
         fflush(stderr);
         Crash(formattedMessage.c_str());
@@ -109,7 +109,7 @@ namespace acore
 
     void Abort(char const* file, int line, char const* function)
     {
-        std::string formattedMessage = acore::StringFormat("\n%s:%i in %s ABORTED.\n", file, line, function);
+        std::string formattedMessage = Acore::StringFormat("\n%s:%i in %s ABORTED.\n", file, line, function);
         fprintf(stderr, "%s", formattedMessage.c_str());
         fflush(stderr);
         Crash(formattedMessage.c_str());
@@ -132,13 +132,13 @@ namespace acore
     void AbortHandler(int sigval)
     {
         // nothing useful to log here, no way to pass args
-        std::string formattedMessage = acore::StringFormat("Caught signal %i\n", sigval);
+        std::string formattedMessage = Acore::StringFormat("Caught signal %i\n", sigval);
         fprintf(stderr, "%s", formattedMessage.c_str());
         fflush(stderr);
         Crash(formattedMessage.c_str());
     }
 
-} // namespace acore
+} // namespace Acore
 
 std::string GetDebugInfo()
 {

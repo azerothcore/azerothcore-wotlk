@@ -61,7 +61,7 @@ void usage(const char* prog)
 /// Launch the auth server
 extern int main(int argc, char** argv)
 {
-    acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
+    Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
 
     // Command line parsing to get the configuration file name
     std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
@@ -92,7 +92,7 @@ extern int main(int argc, char** argv)
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
-    acore::Banner::Show("authserver",
+    Acore::Banner::Show("authserver",
         [](char const* text)
         {
             LOG_INFO("server.authserver", "%s", text);
@@ -164,7 +164,7 @@ extern int main(int argc, char** argv)
     LOG_INFO("server.authserver", "Authserver listening to %s:%d", bind_ip.c_str(), rmport);
 
     // Initialize the signal handlers
-    acore::SignalHandler signalHandler;
+    Acore::SignalHandler signalHandler;
     auto const _handler = [](int) { stopEvent = true; };
 
     // Register authservers's signal handlers

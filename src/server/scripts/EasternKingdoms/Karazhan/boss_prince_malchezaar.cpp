@@ -294,7 +294,7 @@ public:
             }
             else
             {
-                point = acore::Containers::SelectRandomContainerElement(positions);
+                point = Acore::Containers::SelectRandomContainerElement(positions);
                 pos.Relocate(point->x, point->y, INFERNAL_Z, frand(0.0f, float(M_PI * 2)));
             }
 
