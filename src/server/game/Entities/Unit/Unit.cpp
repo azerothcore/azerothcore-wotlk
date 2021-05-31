@@ -12922,6 +12922,7 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
 
         SetInCombatWith(target);
         target->SetInCombatWith(this);
+        target->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
         // Xinef: If pet started combat - put owner in combat
         if (Unit* owner = GetOwner())
