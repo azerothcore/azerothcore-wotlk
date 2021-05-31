@@ -217,7 +217,7 @@ void AddSC_redridge_mountains();
 void AddSC_silverpine_forest();
 void AddSC_stormwind_city();
 void AddSC_stranglethorn_vale();
-void AddSC_swamp_of_sorrows();
+//void AddSC_swamp_of_sorrows();
 void AddSC_tirisfal_glades();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
@@ -565,6 +565,7 @@ void AddSC_hunter_pet_scripts();
 void AddSC_mage_pet_scripts();
 void AddSC_priest_pet_scripts();
 void AddSC_shaman_pet_scripts();
+void AddSC_warlock_pet_scripts();
 
 // battlegrounds
 
@@ -807,7 +808,7 @@ void AddEasternKingdomsScripts()
     AddSC_silverpine_forest();
     AddSC_stormwind_city();
     AddSC_stranglethorn_vale();
-    AddSC_swamp_of_sorrows();
+    //AddSC_swamp_of_sorrows();
     AddSC_tirisfal_glades();
     AddSC_undercity();
     AddSC_western_plaguelands();
@@ -1171,6 +1172,7 @@ void AddPetScripts()
     AddSC_mage_pet_scripts();
     AddSC_priest_pet_scripts();
     AddSC_shaman_pet_scripts();
+    AddSC_warlock_pet_scripts();
 #endif
 }
 

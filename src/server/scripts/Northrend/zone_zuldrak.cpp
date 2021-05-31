@@ -40,27 +40,27 @@ public:
     {
         npc_finklesteinAI(Creature* creature) : ScriptedAI(creature) {}
 
-        std::map<uint64, uint32> questList;
+        std::map<ObjectGuid, uint32> questList;
 
-        void ClearPlayerOnTask(uint64 guid)
+        void ClearPlayerOnTask(ObjectGuid guid)
         {
-            std::map<uint64, uint32>::iterator itr = questList.find(guid);
+            std::map<ObjectGuid, uint32>::iterator itr = questList.find(guid);
             if (itr != questList.end())
                 questList.erase(itr);
         }
 
-        bool IsPlayerOnTask(uint64 guid)
+        bool IsPlayerOnTask(ObjectGuid guid)
         {
-            std::map<uint64, uint32>::const_iterator itr = questList.find(guid);
+            std::map<ObjectGuid, uint32>::const_iterator itr = questList.find(guid);
             return itr != questList.end();
         }
 
-        void RightClickCauldron(uint64 guid)
+        void RightClickCauldron(ObjectGuid guid)
         {
             if (questList.empty())
                 return;
 
-            std::map<uint64, uint32>::iterator itr = questList.find(guid);
+            std::map<ObjectGuid, uint32>::iterator itr = questList.find(guid);
             if (itr == questList.end())
                 return;
 
@@ -88,7 +88,7 @@ public:
                         return;
                     }
                     else
-                        player->KilledMonsterCredit(28248, 0);
+                        player->KilledMonsterCredit(28248);
                 }
                 else
                 {
@@ -100,7 +100,7 @@ public:
         }
 
         // Generate a Task and announce it to the player
-        void StartNextTask(uint64 playerGUID, uint32 counter)
+        void StartNextTask(ObjectGuid playerGUID, uint32 counter)
         {
             if (counter > 6)
                 return;
@@ -241,11 +241,11 @@ public:
 
     struct npc_feedin_da_goolzAI : public NullCreatureAI
     {
-        npc_feedin_da_goolzAI(Creature* creature) : NullCreatureAI(creature) { findTimer = 1; checkTimer = 0; ghoulFed = 0; }
+        npc_feedin_da_goolzAI(Creature* creature) : NullCreatureAI(creature) { findTimer = 1; checkTimer = 0; }
 
         uint32 findTimer;
         uint32 checkTimer;
-        uint64 ghoulFed;
+        ObjectGuid ghoulFed;
 
         void UpdateAI(uint32 diff) override
         {
@@ -295,7 +295,7 @@ public:
 
                         if (Unit* owner = me->ToTempSummon()->GetSummoner())
                             if (Player* player = owner->ToPlayer())
-                                player->KilledMonsterCredit(me->GetEntry(), 0);
+                                player->KilledMonsterCredit(me->GetEntry());
 
                         me->DespawnOrUnsummon(1);
                     }
@@ -376,8 +376,8 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
-        uint64 lichGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid lichGUID;
 
         void EnterEvadeMode() override
         {
@@ -394,8 +394,8 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
-            lichGUID = 0;
+            playerGUID.Clear();
+            lichGUID.Clear();
             me->setFaction(974);
             me->SetVisible(false);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -563,7 +563,7 @@ public:
                     events.ScheduleEvent(EVENT_BETRAYAL_14, 7000);
                     break;
                 case EVENT_BETRAYAL_14:
-                    playerGUID = 0;
+                    playerGUID.Clear();
                     EnterEvadeMode();
                     break;
             }
@@ -620,7 +620,7 @@ public:
     {
         npc_drakuru_shacklesAI(Creature* creature) : NullCreatureAI(creature)
         {
-            _rageclawGUID = 0;
+            _rageclawGUID.Clear();
             timer = 0;
         }
 
@@ -660,7 +660,7 @@ public:
         {
             // pointer check not needed
             DoCast(rageclaw, SPELL_FREE_RAGECLAW, true);
-            _rageclawGUID = 0;
+            _rageclawGUID.Clear();
             me->DespawnOrUnsummon(1);
         }
 
@@ -683,7 +683,7 @@ public:
         }
 
     private:
-        uint64 _rageclawGUID;
+        ObjectGuid _rageclawGUID;
         uint32 timer;
     };
 

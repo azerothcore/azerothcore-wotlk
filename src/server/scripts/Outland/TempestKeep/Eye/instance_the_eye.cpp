@@ -15,28 +15,19 @@ public:
     {
         instance_the_eye_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-        uint64 ThaladredTheDarkenerGUID;
-        uint64 LordSanguinarGUID;
-        uint64 GrandAstromancerCapernianGUID;
-        uint64 MasterEngineerTelonicusGUID;
-        uint64 AlarGUID;
-        uint64 KaelthasGUID;
-        uint64 BridgeWindowGUID;
-        uint64 KaelStateRightGUID;
-        uint64 KaelStateLeftGUID;
+        ObjectGuid ThaladredTheDarkenerGUID;
+        ObjectGuid LordSanguinarGUID;
+        ObjectGuid GrandAstromancerCapernianGUID;
+        ObjectGuid MasterEngineerTelonicusGUID;
+        ObjectGuid AlarGUID;
+        ObjectGuid KaelthasGUID;
+        ObjectGuid BridgeWindowGUID;
+        ObjectGuid KaelStateRightGUID;
+        ObjectGuid KaelStateLeftGUID;
 
         void Initialize() override
         {
             SetBossNumber(MAX_ENCOUNTER);
-            AlarGUID = 0;
-            KaelthasGUID = 0;
-            ThaladredTheDarkenerGUID = 0;
-            LordSanguinarGUID = 0;
-            GrandAstromancerCapernianGUID = 0;
-            MasterEngineerTelonicusGUID = 0;
-            BridgeWindowGUID = 0;
-            KaelStateRightGUID = 0;
-            KaelStateLeftGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -80,7 +71,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -103,7 +94,8 @@ public:
                 case DATA_KAEL_ADVISOR4:
                     return MasterEngineerTelonicusGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

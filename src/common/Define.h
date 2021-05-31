@@ -7,17 +7,10 @@
 #ifndef ACORE_DEFINE_H
 #define ACORE_DEFINE_H
 
+#include "CompilerDefs.h"
 #include <cstddef>
-#include <cstdint>
 #include <cinttypes>
 #include <climits>
-#include <cstring>
-#include <sys/types.h>
-#include "CompilerDefs.h"
-
-#if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
-#define OS_WIN
-#endif
 
 #define ACORE_LITTLEENDIAN 0
 #define ACORE_BIGENDIAN    1
@@ -63,6 +56,45 @@
 #  define ATTR_PRINTF(F, V)
 #  define ATTR_DEPRECATED
 #endif //AC_COMPILER == AC_COMPILER_GNU
+
+#ifdef ACORE_API_USE_DYNAMIC_LINKING
+#  if AC_COMPILER == AC_COMPILER_MICROSOFT
+#    define AC_API_EXPORT __declspec(dllexport)
+#    define AC_API_IMPORT __declspec(dllimport)
+#  elif AC_COMPILER == AC_COMPILER_GNU
+#    define AC_API_EXPORT __attribute__((visibility("default")))
+#    define AC_API_IMPORT
+#  else
+#    error compiler not supported!
+#  endif
+#else
+#  define AC_API_EXPORT
+#  define AC_API_IMPORT
+#endif
+
+#ifdef ACORE_API_EXPORT_COMMON
+#  define AC_COMMON_API AC_API_EXPORT
+#else
+#  define AC_COMMON_API AC_API_IMPORT
+#endif
+
+#ifdef ACORE_API_EXPORT_DATABASE
+#  define AC_DATABASE_API AC_API_EXPORT
+#else
+#  define AC_DATABASE_API AC_API_IMPORT
+#endif
+
+#ifdef ACORE_API_EXPORT_SHARED
+#  define AC_SHARED_API AC_API_EXPORT
+#else
+#  define AC_SHARED_API AC_API_IMPORT
+#endif
+
+#ifdef ACORE_API_EXPORT_GAME
+#  define AC_GAME_API AC_API_EXPORT
+#else
+#  define AC_GAME_API AC_API_IMPORT
+#endif
 
 #define UI64FMTD "%" PRIu64
 #define UI64LIT(N) UINT64_C(N)

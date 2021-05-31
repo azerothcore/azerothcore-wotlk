@@ -168,7 +168,7 @@ public:
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
 
-            if (Creature* xerestrasza = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_XERESTRASZA)))
+            if (Creature* xerestrasza = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_XERESTRASZA)))
                 xerestrasza->AI()->DoAction(ACTION_BALTHARUS_DEATH);
         }
 
@@ -364,7 +364,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->RemoveFlag(UNIT_NPC_FLAGS, GOSSIP_OPTION_QUESTGIVER);
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
             // Xinef: after soft reset npc is no longer present
             if (me->GetInstanceScript()->GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE)
@@ -426,7 +426,7 @@ public:
                     Talk(SAY_XERESTRASZA_EVENT_6);
                     break;
                 case EVENT_XERESTRASZA_EVENT_7:
-                    me->SetFlag(UNIT_NPC_FLAGS, GOSSIP_OPTION_QUESTGIVER);
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_XERESTRASZA_EVENT_7);
                     me->setActive(false);
                     break;
@@ -454,10 +454,10 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
-            if (Creature* xerestrasza = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_XERESTRASZA)))
+            if (Creature* xerestrasza = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_XERESTRASZA)))
                 xerestrasza->AI()->DoAction(ACTION_INTRO_BALTHARUS);
 
-            if (Creature* baltharus = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_BALTHARUS_THE_WARBORN)))
+            if (Creature* baltharus = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_BALTHARUS_THE_WARBORN)))
                 baltharus->AI()->DoAction(ACTION_INTRO_BALTHARUS);
         }
 

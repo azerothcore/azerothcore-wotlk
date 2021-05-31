@@ -9,20 +9,16 @@
 
 #include "IVMapManager.h"
 
-/**
-This is the access point to the VMapManager.
-*/
-
+// This is the access point to the VMapManager.
 namespace VMAP
 {
-    //===========================================================
+    class VMapManager2;
 
     class VMapFactory
     {
     public:
-        static IVMapManager* createOrGetVMapManager();
+        static VMapManager2* createOrGetVMapManager();
         static void clear();
     };
-
 }
 #endif

@@ -924,7 +924,7 @@ public:
 
     bool AllNodesConrolledByTeam(TeamId teamId) const override;  // overwrited
     bool IsResourceGlutAllowed(TeamId teamId) const;
-    void DoAction(uint32 action, uint64 guid) override;
+    void DoAction(uint32 action, ObjectGuid guid) override;
 private:
     uint32 closeFortressDoorsTimer;
     bool doorsClosed;
@@ -935,7 +935,7 @@ private:
     BG_IC_GateState GateStatus[6];
     ICNodePoint nodePoint[7];
 
-    typedef std::map<uint32, uint32> RespawnMap;
+    typedef std::map<ObjectGuid, uint32> RespawnMap;
     RespawnMap respawnMap;
 
     MotionTransport* gunshipAlliance;

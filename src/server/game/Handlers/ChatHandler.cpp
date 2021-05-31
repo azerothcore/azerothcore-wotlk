@@ -33,6 +33,21 @@
 #include "LuaEngine.h"
 #endif
 
+inline bool isNasty(uint8 c)
+{
+    if (c == '\t')
+    {
+        return false;
+    }
+
+    if (c <= '\037') // ASCII control block
+    {
+        return true;
+    }
+
+    return false;
+}
+
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
     uint32 type;
@@ -48,10 +63,49 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         return;
     }
 
+    if (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
+    {
+        LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: %s tried to send a message in universal language", GetPlayerInfo().c_str());
+        SendNotification(LANG_UNKNOWN_LANGUAGE);
+        recvData.rfinish();
+        return;
+    }
+
     Player* sender = GetPlayer();
+
+    // prevent talking at unknown language (cheating)
+    LanguageDesc const* langDesc = GetLanguageDescByID(lang);
+    if (!langDesc)
+    {
+        SendNotification(LANG_UNKNOWN_LANGUAGE);
+        recvData.rfinish();
+        return;
+    }
+
+    if (langDesc->skill_id != 0 && !sender->HasSkill(langDesc->skill_id))
+    {
+        // also check SPELL_AURA_COMPREHEND_LANGUAGE (client offers option to speak in that language)
+        bool foundAura = false;
+        for (auto const& auraEff : sender->GetAuraEffectsByType(SPELL_AURA_COMPREHEND_LANGUAGE))
+        {
+            if (auraEff->GetMiscValue() == int32(lang))
+            {
+                foundAura = true;
+                break;
+            }
+        }
+
+        if (!foundAura)
+        {
+            SendNotification(LANG_NOT_LEARNED_LANGUAGE);
+            recvData.rfinish();
+            return;
+        }
+    }
 
     // pussywizard: chatting on most chat types requires 2 hours played to prevent spam/abuse
     if (AccountMgr::IsPlayerAccount(GetSecurity()))
+    {
         switch (type)
         {
             case CHAT_MSG_ADDON:
@@ -68,6 +122,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             case CHAT_MSG_PARTY_LEADER:
                 break;
             default:
+            {
                 if (sWorld->getBoolConfig(CONFIG_CHAT_MUTE_FIRST_LOGIN))
                 {
                     uint32 minutes = sWorld->getIntConfig(CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN);
@@ -79,7 +134,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         return;
                     }
                 }
+            }
         }
+    }
 
     // pussywizard:
     switch (type)
@@ -90,11 +147,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_TEXT_EMOTE:
         case CHAT_MSG_AFK:
         case CHAT_MSG_DND:
-            if (sender->IsSpectator())
-            {
-                recvData.rfinish();
-                return;
-            }
+        if (sender->IsSpectator())
+        {
+            recvData.rfinish();
+            return;
+        }
     }
 
     if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
@@ -102,36 +159,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         SendNotification(GetAcoreString(LANG_GM_SILENCE), sender->GetName().c_str());
         recvData.rfinish();
         return;
-    }
-
-    // prevent talking at unknown language (cheating)
-    LanguageDesc const* langDesc = GetLanguageDescByID(lang);
-    if (!langDesc)
-    {
-        SendNotification(LANG_UNKNOWN_LANGUAGE);
-        recvData.rfinish();
-        return;
-    }
-
-    if (langDesc->skill_id != 0 && !sender->HasSkill(langDesc->skill_id))
-    {
-        // also check SPELL_AURA_COMPREHEND_LANGUAGE (client offers option to speak in that language)
-        Unit::AuraEffectList const& langAuras = sender->GetAuraEffectsByType(SPELL_AURA_COMPREHEND_LANGUAGE);
-        bool foundAura = false;
-        for (Unit::AuraEffectList::const_iterator i = langAuras.begin(); i != langAuras.end(); ++i)
-        {
-            if ((*i)->GetMiscValue() == int32(lang))
-            {
-                foundAura = true;
-                break;
-            }
-        }
-        if (!foundAura)
-        {
-            SendNotification(LANG_NOT_LEARNED_LANGUAGE);
-            recvData.rfinish();
-            return;
-        }
     }
 
     if (lang == LANG_ADDON)
@@ -152,8 +179,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
                 break;
             default:
-                LOG_ERROR("network", "Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination",
-                    GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
+                LOG_ERROR("network", "Player %s (%s) sent a chatmessage with an invalid language/message type combination",
+                               GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
 
                 recvData.rfinish();
                 return;
@@ -226,29 +253,25 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_RAID_WARNING:
         case CHAT_MSG_BATTLEGROUND:
         case CHAT_MSG_BATTLEGROUND_LEADER:
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         case CHAT_MSG_WHISPER:
             recvData >> to;
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         case CHAT_MSG_CHANNEL:
             recvData >> channel;
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         case CHAT_MSG_AFK:
         case CHAT_MSG_DND:
-            recvData >> msg;
+            msg = recvData.ReadCString(lang != LANG_ADDON);
             ignoreChecks = true;
             break;
     }
 
-    // Strip invisible characters for non-addon messages
-    if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
-        stripLineInvisibleChars(msg);
-
     // Our Warden module also uses SendAddonMessage as a way to communicate Lua check results to the server, see if this is that
-    if ((type == CHAT_MSG_GUILD) && (lang == LANG_ADDON) && _warden && _warden->ProcessLuaCheckResponse(msg))
+    if (type == CHAT_MSG_GUILD && lang == LANG_ADDON && _warden && _warden->ProcessLuaCheckResponse(msg))
     {
         return;
     }
@@ -276,14 +299,48 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         {
             if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
             {
-                //LOG_ERROR("server", "Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
-                //    GetPlayer()->GetGUIDLow(), msg.c_str());
+                //LOG_ERROR("server", "Player %s (%s) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
+                //    GetPlayer()->GetGUID().ToString().c_str(), msg.c_str());
 
                 if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
                     KickPlayer("CONFIG_CHAT_STRICT_LINK_CHECKING_KICK");
 
                 return;
             }
+        }
+    }
+
+    // do message validity checks
+    if (lang != LANG_ADDON)
+    {
+        // cut at the first newline or carriage return
+        std::string::size_type pos = msg.find_first_of("\n\r");
+
+        if (pos == 0)
+        {
+            return;
+        }
+        else if (pos != std::string::npos)
+        {
+            msg.erase(pos);
+        }
+
+        // abort on any sort of nasty character
+        for (uint8 c : msg)
+        {
+            if (isNasty(c))
+            {
+                LOG_ERROR("network", "Player %s %s sent a message containing invalid character %u - blocked", GetPlayer()->GetName().c_str(),
+                    GetPlayer()->GetGUID().ToString().c_str(), uint8(c));
+                return;
+            }
+        }
+
+        // collapse multiple spaces into one
+        if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
+        {
+            auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
+            msg.erase(end, msg.end());
         }
     }
 
@@ -636,7 +693,7 @@ void WorldSession::HandleEmoteOpcode(WorldPacket& recvData)
     GetPlayer()->HandleEmoteCommand(emote);
 }
 
-namespace acore
+namespace Acore
 {
     class EmoteChatBuilder
     {
@@ -666,7 +723,7 @@ namespace acore
         uint32        i_emote_num;
         Unit const*   i_target;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 {
@@ -686,7 +743,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
         return;
 
     uint32 text_emote, emoteNum;
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> text_emote;
     recvData >> emoteNum;
@@ -717,15 +774,15 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 
     Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
 
-    CellCoord p = acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
+    CellCoord p = Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    acore::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
-    acore::LocalizedPacketDo<acore::EmoteChatBuilder > emote_do(emote_builder);
-    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), emote_do);
-    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::EmoteChatBuilder> >, WorldTypeMapContainer> message(emote_worker);
+    Acore::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
+    Acore::LocalizedPacketDo<Acore::EmoteChatBuilder > emote_do(emote_builder);
+    Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), emote_do);
+    TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::EmoteChatBuilder> >, WorldTypeMapContainer> message(emote_worker);
     cell.Visit(p, message, *GetPlayer()->GetMap(), *GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 
     GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE, text_emote, 0, unit);
@@ -737,13 +794,13 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 {
-    uint64 iguid;
+    ObjectGuid iguid;
     uint8 unk;
 
     recvData >> iguid;
     recvData >> unk;                                       // probably related to spam reporting
 
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(iguid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(iguid);
     if (!player)
         return;
 

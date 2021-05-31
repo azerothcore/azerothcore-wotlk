@@ -84,7 +84,7 @@ namespace FactorySelector
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         // select NullCreatureAI if not another cases
         ainame = (ai_factory == nullptr) ? "NullCreatureAI" : ai_factory->key();
-        LOG_DEBUG("scripts.ai", "Creature %u used AI is %s.", creature->GetGUIDLow(), ainame.c_str());
+        LOG_DEBUG("scripts.ai", "Creature %s used AI is %s.", creature->GetGUID().ToString().c_str(), ainame.c_str());
 #endif
         return (ai_factory == nullptr ? new NullCreatureAI(creature) : ai_factory->Create(creature));
     }
@@ -98,9 +98,9 @@ namespace FactorySelector
         /* if (mv_factory == nullptr)
         {
             int best_val = -1;
-            StringVector l;
+            std::vector<std::string> l;
             mv_registry.GetRegisteredItems(l);
-            for (StringVector::iterator iter = l.begin(); iter != l.end(); ++iter)
+            for (std::vector<std::string>::iterator iter = l.begin(); iter != l.end(); ++iter)
             {
             const MovementGeneratorCreator *factory = mv_registry.GetRegistryItem((*iter).c_str());
             const SelectableMovement *p = dynamic_cast<const SelectableMovement *>(factory);
@@ -131,7 +131,7 @@ namespace FactorySelector
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         std::string ainame = (ai_factory == nullptr || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
-        LOG_DEBUG("scripts.ai", "GameObject %u used AI is %s.", go->GetGUIDLow(), ainame.c_str());
+        LOG_DEBUG("scripts.ai", "GameObject %s used AI is %s.", go->GetGUID().ToString().c_str(), ainame.c_str());
 #endif
 
         return (ai_factory == nullptr ? new NullGameObjectAI(go) : ai_factory->Create(go));

@@ -24,10 +24,14 @@
 #include "RealmList.h"
 #include "RealmAcceptor.h"
 #include "DatabaseLoader.h"
+#include "SecretMgr.h"
+#include "SharedDefines.h"
+#include "Util.h"
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
 #include <ace/ACE.h>
 #include <ace/Sig_Handler.h>
+#include <boost/version.hpp>
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 
@@ -57,6 +61,8 @@ void usage(const char* prog)
 /// Launch the auth server
 extern int main(int argc, char** argv)
 {
+    Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
+
     // Command line parsing to get the configuration file name
     std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
     int count = 1;
@@ -86,7 +92,7 @@ extern int main(int argc, char** argv)
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
-    acore::Banner::Show("authserver",
+    Acore::Banner::Show("authserver",
         [](char const* text)
         {
             LOG_INFO("server.authserver", "%s", text);
@@ -95,7 +101,8 @@ extern int main(int argc, char** argv)
         {
             LOG_INFO("server.authserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
             LOG_INFO("server.authserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            LOG_INFO("server.authserver", "> Using ACE version:             %s", ACE_VERSION);
+            LOG_INFO("server.authserver", "> Using Boost version:           %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+            LOG_INFO("server.authserver", "> Using ACE version:             %s\n", ACE_VERSION);
         }
     );
 
@@ -124,9 +131,11 @@ extern int main(int argc, char** argv)
     if (!StartDB())
         return 1;
 
+    sSecretMgr->Initialize();
+
     // Get the list of realms for the server
     sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
-    if (sRealmList->size() == 0)
+    if (sRealmList->GetRealms().empty())
     {
         LOG_ERROR("server.authserver", "No valid realms specified.");
         return 1;
@@ -155,7 +164,7 @@ extern int main(int argc, char** argv)
     LOG_INFO("server.authserver", "Authserver listening to %s:%d", bind_ip.c_str(), rmport);
 
     // Initialize the signal handlers
-    acore::SignalHandler signalHandler;
+    Acore::SignalHandler signalHandler;
     auto const _handler = [](int) { stopEvent = true; };
 
     // Register authservers's signal handlers

@@ -41,7 +41,7 @@ public:
             _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
             _despawning = false;
             _initialSelection = true;
-            _targetGUID = 0;
+            _targetGUID.Clear();
         }
 
         void MovementInform(uint32 type, uint32 point) override
@@ -155,8 +155,8 @@ public:
                 _initialSelection = false;
                 // Find victim of Summon Gargoyle spell
                 std::list<Unit*> targets;
-                acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50);
-                acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50);
+                Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
                 me->VisitNearbyObject(50, searcher);
                 for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                     if ((*iter)->GetAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID()))
@@ -199,7 +199,7 @@ public:
         }
 
     private:
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
         uint32 _despawnTimer;
         uint32 _selectionTimer;
         uint32 _initialCastTimer;

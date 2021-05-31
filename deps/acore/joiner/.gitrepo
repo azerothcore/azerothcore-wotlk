@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/azerothcore/joiner
+	branch = master
+	commit = 9b74caa2ca609738a944bcf25c025a2a67de78ed
+	parent = 5f910409ec1e5f27f49fe26b0662b19b37bdabb3
+	method = merge
+	cmdver = 0.4.3

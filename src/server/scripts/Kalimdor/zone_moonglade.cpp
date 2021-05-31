@@ -283,7 +283,7 @@ public:
     public:
         npc_clintar_spiritAI(Creature* creature) : npc_escortAI(creature)
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
         }
 
         uint8 Step;
@@ -291,7 +291,7 @@ public:
         uint32 EventTimer;
         uint32 checkPlayerTimer;
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         bool EventOnWait;
 
@@ -302,7 +302,7 @@ public:
                 Step = 0;
                 CurrWP = 0;
                 EventTimer = 0;
-                PlayerGUID = 0;
+                PlayerGUID.Clear();
                 checkPlayerTimer = 1000;
                 EventOnWait = false;
             }
@@ -311,8 +311,8 @@ public:
         void IsSummonedBy(Unit* /*summoner*/) override
         {
             std::list<Player*> playerOnQuestList;
-            acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
-            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
+            Acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
             me->VisitNearbyWorldObject(5.0f, searcher);
             for (std::list<Player*>::const_iterator itr = playerOnQuestList.begin(); itr != playerOnQuestList.end(); ++itr)
             {
@@ -339,7 +339,7 @@ public:
             if (player && player->GetQuestStatus(10965) == QUEST_STATUS_INCOMPLETE)
             {
                 player->FailQuest(10965);
-                PlayerGUID = 0;
+                PlayerGUID.Clear();
                 Reset();
             }
         }
@@ -518,7 +518,7 @@ public:
                                 break;
                             case 2:
                                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
-                                PlayerGUID = 0;
+                                PlayerGUID.Clear();
                                 Reset();
                                 me->setDeathState(JUST_DIED);
                                 break;
