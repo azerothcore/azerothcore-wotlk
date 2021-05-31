@@ -1196,8 +1196,8 @@ public:
             else if (me->GetEntry() == NPC_LIVING_POISON)
             {
                 Unit* target = nullptr;
-                acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
-                acore::UnitLastSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
+                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
+                Acore::UnitLastSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
                 me->VisitNearbyObject(1.5f, searcher);
                 if (target)
                 {

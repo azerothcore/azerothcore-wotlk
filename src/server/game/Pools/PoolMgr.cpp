@@ -334,7 +334,7 @@ void PoolGroup<T>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 trig
                  return /*object.guid == triggerFrom ||*/ !spawns.IsActiveObject<T>(object.guid);
             });
 
-            acore::Containers::RandomResize(rolledObjects, count);
+            Acore::Containers::RandomResize(rolledObjects, count);
         }
 
         // try to spawn rolled objects
@@ -495,7 +495,7 @@ void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 
     {
         do
         {
-            uint32 questId = acore::Containers::SelectRandomContainerElement(currentQuests);
+            uint32 questId = Acore::Containers::SelectRandomContainerElement(currentQuests);
             newQuests.insert(questId);
             currentQuests.erase(questId);
         } while (newQuests.size() < limit && !currentQuests.empty()); // failsafe
@@ -507,7 +507,7 @@ void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 
     // activate <limit> random quests
     do
     {
-        uint32 questId = acore::Containers::SelectRandomContainerElement(newQuests);
+        uint32 questId = Acore::Containers::SelectRandomContainerElement(newQuests);
         spawns.ActivateObject<Quest>(questId, poolId);
         PoolObject tempObj(questId, 0.0f);
         Spawn1Object(&tempObj);

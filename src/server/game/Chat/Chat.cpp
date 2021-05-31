@@ -886,8 +886,8 @@ GameObject* ChatHandler::GetNearbyGameObject()
 
     Player* pl = m_session->GetPlayer();
     GameObject* obj = nullptr;
-    acore::NearestGameObjectCheck check(*pl);
-    acore::GameObjectLastSearcher<acore::NearestGameObjectCheck> searcher(pl, obj, check);
+    Acore::NearestGameObjectCheck check(*pl);
+    Acore::GameObjectLastSearcher<Acore::NearestGameObjectCheck> searcher(pl, obj, check);
     pl->VisitNearbyGridObject(SIZE_OF_GRIDS, searcher);
     return obj;
 }

@@ -1181,9 +1181,9 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
 
     if (uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList))
     {
-        acore::WorldObjectSpellConeTargetCheck check(coneAngle, radius, m_caster, m_spellInfo, selectionType, condList);
-        acore::WorldObjectListSearcher<acore::WorldObjectSpellConeTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
-        SearchTargets<acore::WorldObjectListSearcher<acore::WorldObjectSpellConeTargetCheck> >(searcher, containerTypeMask, m_caster, m_caster, radius);
+        Acore::WorldObjectSpellConeTargetCheck check(coneAngle, radius, m_caster, m_spellInfo, selectionType, condList);
+        Acore::WorldObjectListSearcher<Acore::WorldObjectSpellConeTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
+        SearchTargets<Acore::WorldObjectListSearcher<Acore::WorldObjectSpellConeTargetCheck> >(searcher, containerTypeMask, m_caster, m_caster, radius);
 
         CallScriptObjectAreaTargetSelectHandlers(targets, effIndex, targetType);
 
@@ -1197,7 +1197,7 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     if ((*j)->IsAffectedOnSpell(m_spellInfo))
                         maxTargets += (*j)->GetAmount();
 
-                acore::Containers::RandomResize(targets, maxTargets);
+                Acore::Containers::RandomResize(targets, maxTargets);
             }
 
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
@@ -1280,7 +1280,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                 if ((*j)->IsAffectedOnSpell(m_spellInfo))
                     maxTargets += (*j)->GetAmount();
 
-            acore::Containers::RandomResize(targets, maxTargets);
+            Acore::Containers::RandomResize(targets, maxTargets);
         }
 
         for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
@@ -1617,13 +1617,13 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
     // xinef: supply correct target type, DEST_DEST and similar are ALWAYS undefined
     // xinef: correct target is stored in TRIGGERED SPELL, however as far as i noticed, all checks are ENTRY, ENEMY
     std::list<WorldObject*> targets;
-    acore::WorldObjectSpellTrajTargetCheck check(dist2d, m_targets.GetSrcPos(), m_caster, m_spellInfo, TARGET_CHECK_ENEMY /*targetCheckType*/, m_spellInfo->Effects[effIndex].ImplicitTargetConditions);
-    acore::WorldObjectListSearcher<acore::WorldObjectSpellTrajTargetCheck> searcher(m_caster, targets, check, GRID_MAP_TYPE_MASK_ALL);
-    SearchTargets<acore::WorldObjectListSearcher<acore::WorldObjectSpellTrajTargetCheck> > (searcher, GRID_MAP_TYPE_MASK_ALL, m_caster, m_targets.GetSrcPos(), dist2d);
+    Acore::WorldObjectSpellTrajTargetCheck check(dist2d, m_targets.GetSrcPos(), m_caster, m_spellInfo, TARGET_CHECK_ENEMY /*targetCheckType*/, m_spellInfo->Effects[effIndex].ImplicitTargetConditions);
+    Acore::WorldObjectListSearcher<Acore::WorldObjectSpellTrajTargetCheck> searcher(m_caster, targets, check, GRID_MAP_TYPE_MASK_ALL);
+    SearchTargets<Acore::WorldObjectListSearcher<Acore::WorldObjectSpellTrajTargetCheck> > (searcher, GRID_MAP_TYPE_MASK_ALL, m_caster, m_targets.GetSrcPos(), dist2d);
     if (targets.empty())
         return;
 
-    targets.sort(acore::ObjectDistanceOrderPred(m_caster));
+    targets.sort(Acore::ObjectDistanceOrderPred(m_caster));
 
     float b = tangent(m_targets.GetElevation());
     float a = (srcToDestDelta - dist2d * b) / (dist2d * dist2d);
@@ -1892,7 +1892,7 @@ void Spell::SearchTargets(SEARCHER& searcher, uint32 containerMask, Unit* refere
         x = pos->GetPositionX();
         y = pos->GetPositionY();
 
-        CellCoord p(acore::ComputeCellCoord(x, y));
+        CellCoord p(Acore::ComputeCellCoord(x, y));
         Cell cell(p);
         cell.SetNoCreate();
 
@@ -1917,9 +1917,9 @@ WorldObject* Spell::SearchNearbyTarget(float range, SpellTargetObjectTypes objec
     uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList);
     if (!containerTypeMask)
         return nullptr;
-    acore::WorldObjectSpellNearbyTargetCheck check(range, m_caster, m_spellInfo, selectionType, condList);
-    acore::WorldObjectLastSearcher<acore::WorldObjectSpellNearbyTargetCheck> searcher(m_caster, target, check, containerTypeMask);
-    SearchTargets<acore::WorldObjectLastSearcher<acore::WorldObjectSpellNearbyTargetCheck> > (searcher, containerTypeMask, m_caster, m_caster, range);
+    Acore::WorldObjectSpellNearbyTargetCheck check(range, m_caster, m_spellInfo, selectionType, condList);
+    Acore::WorldObjectLastSearcher<Acore::WorldObjectSpellNearbyTargetCheck> searcher(m_caster, target, check, containerTypeMask);
+    SearchTargets<Acore::WorldObjectLastSearcher<Acore::WorldObjectSpellNearbyTargetCheck> > (searcher, containerTypeMask, m_caster, m_caster, range);
     return target;
 }
 
@@ -1928,9 +1928,9 @@ void Spell::SearchAreaTargets(std::list<WorldObject*>& targets, float range, Pos
     uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList);
     if (!containerTypeMask)
         return;
-    acore::WorldObjectSpellAreaTargetCheck check(range, position, m_caster, referer, m_spellInfo, selectionType, condList);
-    acore::WorldObjectListSearcher<acore::WorldObjectSpellAreaTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
-    SearchTargets<acore::WorldObjectListSearcher<acore::WorldObjectSpellAreaTargetCheck> > (searcher, containerTypeMask, m_caster, position, range);
+    Acore::WorldObjectSpellAreaTargetCheck check(range, position, m_caster, referer, m_spellInfo, selectionType, condList);
+    Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
+    SearchTargets<Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> > (searcher, containerTypeMask, m_caster, position, range);
 }
 
 void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories  /*selectCategory*/, ConditionList* condList, bool isChainHeal)
@@ -7090,14 +7090,14 @@ SpellCastResult Spell::CheckSpellFocus()
     // check spell focus object
     if (m_spellInfo->RequiresSpellFocus)
     {
-        CellCoord p(acore::ComputeCellCoord(m_caster->GetPositionX(), m_caster->GetPositionY()));
+        CellCoord p(Acore::ComputeCellCoord(m_caster->GetPositionX(), m_caster->GetPositionY()));
         Cell cell(p);
 
         GameObject* ok = nullptr;
-        acore::GameObjectFocusCheck go_check(m_caster, m_spellInfo->RequiresSpellFocus);
-        acore::GameObjectSearcher<acore::GameObjectFocusCheck> checker(m_caster, ok, go_check);
+        Acore::GameObjectFocusCheck go_check(m_caster, m_spellInfo->RequiresSpellFocus);
+        Acore::GameObjectSearcher<Acore::GameObjectFocusCheck> checker(m_caster, ok, go_check);
 
-        TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectFocusCheck>, GridTypeMapContainer > object_checker(checker);
+        TypeContainerVisitor<Acore::GameObjectSearcher<Acore::GameObjectFocusCheck>, GridTypeMapContainer > object_checker(checker);
         Map& map = *m_caster->GetMap();
         cell.Visit(p, object_checker, map, *m_caster, m_caster->GetVisibilityRange());
 
@@ -8246,7 +8246,7 @@ void Spell::OnSpellLaunch()
     }
 }
 
-namespace acore
+namespace Acore
 {
 
     WorldObjectSpellTargetCheck::WorldObjectSpellTargetCheck(Unit* caster, Unit* referer, SpellInfo const* spellInfo,
@@ -8405,4 +8405,4 @@ namespace acore
         return WorldObjectSpellAreaTargetCheck::operator ()(target);
     }
 
-} //namespace acore
+} //namespace Acore

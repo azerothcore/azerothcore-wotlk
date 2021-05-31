@@ -1050,7 +1050,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            acore::Containers::RandomResize(targets, 2);
+            Acore::Containers::RandomResize(targets, 2);
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1276,7 +1276,7 @@ public:
                     return;
                 }
 
-                tempTargets.sort(acore::HealthPctOrderPred());
+                tempTargets.sort(Acore::HealthPctOrderPred());
                 targets.clear();
                 targets.push_back(tempTargets.front());
             }
@@ -1313,13 +1313,13 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::RaidCheck(GetCaster(), false));
+            targets.remove_if(Acore::RaidCheck(GetCaster(), false));
 
             uint32 const maxTargets = GetCaster()->HasAura(SPELL_DRUID_GLYPH_OF_WILD_GROWTH) ? 6 : 5;
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::HealthPctOrderPred());
+                targets.sort(Acore::HealthPctOrderPred());
                 targets.resize(maxTargets);
             }
 

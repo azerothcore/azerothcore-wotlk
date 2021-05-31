@@ -74,7 +74,7 @@ bool Corpse::Create(ObjectGuid::LowType guidlow, Player* owner)
     SetObjectScale(1);
     SetGuidValue(CORPSE_FIELD_OWNER, owner->GetGUID());
 
-    _cellCoord = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    _cellCoord = Acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     return true;
 }
@@ -162,7 +162,7 @@ bool Corpse::LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields)
         return false;
     }
 
-    _cellCoord = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    _cellCoord = Acore::ComputeCellCoord(GetPositionX(), GetPositionY());
     return true;
 }
 
