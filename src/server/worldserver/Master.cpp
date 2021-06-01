@@ -177,8 +177,8 @@ int Master::Run()
     Acore::Thread auctionLising_thread(new AuctionListingRunnable);
     auctionLising_thread.setPriority(Acore::Priority_High);
 
-    // Start soap serving thread
-    acore::Thread* soapThread = nullptr;
+    // Start soap serving thread if enabled
+    std::shared_ptr<std::thread> soapThread;
     if (sConfigMgr->GetOption<bool>("SOAP.Enabled", false))
     {
         soapThread.reset(new std::thread(ACSoapThread, sConfigMgr->GetOption<std::string>("SOAP.IP", "127.0.0.1"), sConfigMgr->GetOption<uint16>("SOAP.Port", 7878)),
