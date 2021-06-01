@@ -41,7 +41,7 @@ namespace
     template<typename Format, typename... Args>
     inline void PrintError(std::string_view filename, Format&& fmt, Args&& ... args)
     {
-        std::string message = acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
+        std::string message = Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
 
         if (IsAppConfig(filename))
         {
@@ -76,7 +76,7 @@ namespace
 
         if (in.fail())
         {
-            throw ConfigException(acore::StringFormat("Config::LoadFile: Failed open file '%s'", file.c_str()));
+            throw ConfigException(Acore::StringFormat("Config::LoadFile: Failed open file '%s'", file.c_str()));
         }
 
         uint32 count = 0;
@@ -104,11 +104,11 @@ namespace
             // read line error
             if (!in.good() && !in.eof())
             {
-                throw ConfigException(acore::StringFormat("> Config::LoadFile: Failure to read line number %u in file '%s'", lineNumber, file.c_str()));
+                throw ConfigException(Acore::StringFormat("> Config::LoadFile: Failure to read line number %u in file '%s'", lineNumber, file.c_str()));
             }
 
             // remove whitespace in line
-            line = acore::String::Trim(line, in.getloc());
+            line = Acore::String::Trim(line, in.getloc());
 
             if (line.empty())
             {
@@ -135,8 +135,8 @@ namespace
                 continue;
             }
 
-            auto entry = acore::String::Trim(line.substr(0, equal_pos), in.getloc());
-            auto value = acore::String::Trim(line.substr(equal_pos + 1, std::string::npos), in.getloc());
+            auto entry = Acore::String::Trim(line.substr(0, equal_pos), in.getloc());
+            auto value = Acore::String::Trim(line.substr(equal_pos + 1, std::string::npos), in.getloc());
 
             value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
 
@@ -153,7 +153,7 @@ namespace
 
         // No lines read
         if (!count)
-            throw ConfigException(acore::StringFormat("Config::LoadFile: Empty file '%s'", file.c_str()));
+            throw ConfigException(Acore::StringFormat("Config::LoadFile: Empty file '%s'", file.c_str()));
 
         // Add correct keys if file load without errors
         for (auto const& [entry, key] : fileConfigs)
@@ -214,19 +214,19 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
         if (showLogs)
         {
             LOG_ERROR("server", "> Config: Missing name %s in config, add \"%s = %s\"",
-                name.c_str(), name.c_str(), acore::ToString(def).c_str());
+                name.c_str(), name.c_str(), Acore::ToString(def).c_str());
         }
 
         return def;
     }
 
-    auto value = acore::StringTo<T>(itr->second);
+    auto value = Acore::StringTo<T>(itr->second);
     if (!value)
     {
         if (showLogs)
         {
             LOG_ERROR("server", "> Config: Bad value defined for name '%s', going to use '%s' instead",
-                name.c_str(), acore::ToString(def).c_str());
+                name.c_str(), Acore::ToString(def).c_str());
         }
 
         return def;
@@ -264,7 +264,7 @@ bool ConfigMgr::GetOption<bool>(std::string const& name, bool const& def, bool s
 {
     std::string val = GetValueDefault(name, std::string(def ? "1" : "0"), showLogs);
 
-    auto boolVal = acore::StringTo<bool>(val);
+    auto boolVal = Acore::StringTo<bool>(val);
     if (!boolVal)
     {
         if (showLogs)

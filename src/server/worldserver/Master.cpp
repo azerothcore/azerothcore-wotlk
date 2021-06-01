@@ -65,7 +65,7 @@ void HandleSignal(int sigNum)
     }
 }
 
-class FreezeDetectorRunnable : public acore::Runnable
+class FreezeDetectorRunnable : public Acore::Runnable
 {
 private:
     uint32 _loops;
@@ -95,7 +95,7 @@ public:
                 ABORT();
             }
 
-            acore::Thread::Sleep(1000);
+            Acore::Thread::Sleep(1000);
         }
         LOG_INFO("server", "Anti-freeze thread exiting without problems.");
     }
@@ -148,7 +148,7 @@ int Master::Run()
     sScriptMgr->OnStartup();
 
     ///- Initialize the signal handlers
-    acore::SignalHandler signalHandler;
+    Acore::SignalHandler signalHandler;
 
     signalHandler.handle_signal(SIGINT, &HandleSignal);
     signalHandler.handle_signal(SIGTERM, &HandleSignal);
@@ -158,10 +158,10 @@ int Master::Run()
 #endif
 
     ///- Launch WorldRunnable thread
-    acore::Thread worldThread(new WorldRunnable);
-    worldThread.setPriority(acore::Priority_Highest);
+    Acore::Thread worldThread(new WorldRunnable);
+    worldThread.setPriority(Acore::Priority_Highest);
 
-    acore::Thread* cliThread = nullptr;
+    Acore::Thread* cliThread = nullptr;
 
 #ifdef _WIN32
     if (sConfigMgr->GetOption<bool>("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -170,14 +170,14 @@ int Master::Run()
 #endif
     {
         ///- Launch CliRunnable thread
-        cliThread = new acore::Thread(new CliRunnable);
+        cliThread = new Acore::Thread(new CliRunnable);
     }
 
-    acore::Thread rarThread(new RARunnable);
+    Acore::Thread rarThread(new RARunnable);
 
     // pussywizard:
-    acore::Thread auctionLising_thread(new AuctionListingRunnable);
-    auctionLising_thread.setPriority(acore::Priority_High);
+    Acore::Thread auctionLising_thread(new AuctionListingRunnable);
+    auctionLising_thread.setPriority(Acore::Priority_High);
 
 #if defined(_WIN32) || defined(__linux__)
 
@@ -260,12 +260,12 @@ int Master::Run()
     }
 
     // Start up freeze catcher thread
-    acore::Thread* freezeThread = nullptr;
+    Acore::Thread* freezeThread = nullptr;
     if (uint32 freezeDelay = sConfigMgr->GetOption<int32>("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable* runnable = new FreezeDetectorRunnable(freezeDelay * 1000);
-        freezeThread = new acore::Thread(runnable);
-        freezeThread->setPriority(acore::Priority_Highest);
+        freezeThread = new Acore::Thread(runnable);
+        freezeThread->setPriority(Acore::Priority_Highest);
     }
 
     ///- Launch the world listener socket

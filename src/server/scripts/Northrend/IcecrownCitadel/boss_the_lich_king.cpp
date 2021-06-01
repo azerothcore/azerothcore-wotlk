@@ -357,7 +357,7 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
                     player->GetSession()->SendPacket(data);
 }
 
-struct ShadowTrapLKTargetSelector : public acore::unary_function<Unit*, bool>
+struct ShadowTrapLKTargetSelector : public Acore::unary_function<Unit*, bool>
 {
 public:
     ShadowTrapLKTargetSelector(Creature* source, bool playerOnly = true, bool reqLOS = false, float maxDist = 0.0f) : _source(source), _playerOnly(playerOnly), _reqLOS(reqLOS), _maxDist(maxDist) { }
@@ -383,7 +383,7 @@ private:
     float _maxDist;
 };
 
-struct NonTankLKTargetSelector : public acore::unary_function<Unit*, bool>
+struct NonTankLKTargetSelector : public Acore::unary_function<Unit*, bool>
 {
 public:
     NonTankLKTargetSelector(Creature* source, bool playerOnly = true, bool reqLOS = false, float maxDist = 0.0f, uint32 exclude1 = 0, uint32 exclude2 = 0) : _source(source), _playerOnly(playerOnly), _reqLOS(reqLOS), _maxDist(maxDist), _exclude1(exclude1), _exclude2(exclude2) { }
@@ -417,7 +417,7 @@ private:
     uint32 _exclude2;
 };
 
-struct DefileTargetSelector : public acore::unary_function<Unit*, bool>
+struct DefileTargetSelector : public Acore::unary_function<Unit*, bool>
 {
 public:
     DefileTargetSelector(Creature* source) : _source(source) { }
@@ -574,7 +574,7 @@ private:
     Creature& _owner;
 };
 
-class NecroticPlagueTargetCheck : public acore::unary_function<Unit*, bool>
+class NecroticPlagueTargetCheck : public Acore::unary_function<Unit*, bool>
 {
 public:
     NecroticPlagueTargetCheck(Unit const* obj, uint32 notAura1, uint32 notAura2) : _sourceObj(obj), _notAura1(notAura1), _notAura2(notAura2) {}
@@ -686,7 +686,7 @@ public:
 
             // Reset The Frozen Throne gameobjects
             FrozenThroneResetWorker reset;
-            acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
+            Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
             me->VisitNearbyGridObject(333.0f, worker);
 
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
@@ -1966,7 +1966,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             if (targets.size() <= 1)
                 return;
 
@@ -2431,9 +2431,9 @@ public:
         void CorrectRange(std::list<WorldObject*>& targets)
         {
             targets.remove_if(VehicleCheck());
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
             uint32 strangulatedAura[4] = {68980, 74325, 74296, 74297};
-            targets.remove_if(acore::UnitAuraCheck(true, strangulatedAura[GetCaster()->GetMap()->GetDifficulty()]));
+            targets.remove_if(Acore::UnitAuraCheck(true, strangulatedAura[GetCaster()->GetMap()->GetDifficulty()]));
         }
 
         void ChangeDamageAndGrow()
@@ -2573,7 +2573,7 @@ public:
                                     if (!triggers.empty())
                                     {
                                         valid = true;
-                                        triggers.sort(acore::ObjectDistanceOrderPred(me));
+                                        triggers.sort(Acore::ObjectDistanceOrderPred(me));
 
                                         target->GetMotionMaster()->Clear();
                                         target->UpdatePosition(*me, true);
@@ -2800,9 +2800,9 @@ public:
                 targets.clear();
                 return;
             }
-            targets.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_BOSS_HITTIN_YA_AURA)); // done in dbc, but just to be sure xd
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_HARVEST_SOUL_VALKYR));
+            targets.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_BOSS_HITTIN_YA_AURA)); // done in dbc, but just to be sure xd
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_HARVEST_SOUL_VALKYR));
             if (InstanceScript* _instance = caster->GetInstanceScript())
                 if (Creature* lichKing = ObjectAccessor::GetCreature(*caster, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     if (Spell* s = lichKing->GetCurrentSpell(CURRENT_GENERIC_SPELL))
@@ -2812,7 +2812,7 @@ public:
             if (targets.empty())
                 return;
 
-            _target = acore::Containers::SelectRandomContainerElement(targets);
+            _target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(_target);
             if (Creature* caster = GetCaster()->ToCreature())
@@ -2989,7 +2989,7 @@ public:
             if (targets.empty())
                 return;
 
-            _target = acore::Containers::SelectRandomContainerElement(targets);
+            _target = Acore::Containers::SelectRandomContainerElement(targets);
         }
 
         void HandleScript(SpellEffIndex effIndex)

@@ -9,7 +9,6 @@ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_N
 IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
 START TRANSACTION;
 ALTER TABLE version_db_world CHANGE COLUMN 2021_05_30_01 2021_05_30_02 bit;
-UPDATE version_db_world SET date = '2021_05_30_02' WHERE sql_rev = '';
 SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1621659447273280925'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
 --
 -- START UPDATING QUERIES
@@ -28,6 +27,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 --
 -- END UPDATING QUERIES
 --
+UPDATE version_db_world SET date = '2021_05_30_02' WHERE sql_rev = '1621659447273280925';
 COMMIT;
 END //
 DELIMITER ;

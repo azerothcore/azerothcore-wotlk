@@ -188,7 +188,7 @@ private:
 };
 
 // xinef: malleable goo selector, check for target validity
-struct MalleableGooSelector : public acore::unary_function<Unit*, bool>
+struct MalleableGooSelector : public Acore::unary_function<Unit*, bool>
 {
     const Unit* me;
     MalleableGooSelector(Unit const* unit) : me(unit) {}
@@ -874,7 +874,7 @@ public:
 
         void ScaleRange(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 2.5f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 2.5f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
         }
 
         // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
@@ -1024,10 +1024,10 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             // vanish rank 1-3, mage invisibility
-            targets.remove_if(acore::UnitAuraCheck(true, 11327));
-            targets.remove_if(acore::UnitAuraCheck(true, 11329));
-            targets.remove_if(acore::UnitAuraCheck(true, 26888));
-            targets.remove_if(acore::UnitAuraCheck(true, 32612));
+            targets.remove_if(Acore::UnitAuraCheck(true, 11327));
+            targets.remove_if(Acore::UnitAuraCheck(true, 11329));
+            targets.remove_if(Acore::UnitAuraCheck(true, 26888));
+            targets.remove_if(Acore::UnitAuraCheck(true, 32612));
         }
 
         void Register() override
@@ -1098,8 +1098,8 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             // dbc has only 1 field for excluding, this will prevent anyone from getting both at the same time
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_VOLATILE_OOZE_PROTECTION));
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_GASEOUS_BLOAT_PROTECTION));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VOLATILE_OOZE_PROTECTION));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_GASEOUS_BLOAT_PROTECTION));
 
             if (targets.empty())
             {
@@ -1108,7 +1108,7 @@ public:
                 return;
             }
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
             _target = target;
@@ -1256,8 +1256,8 @@ public:
                 }
             }
 
-            targets.remove_if(acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
-            acore::Containers::RandomResize(targets, 1);
+            targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
@@ -1627,7 +1627,7 @@ public:
             if (targets.empty())
                 return;
 
-            targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             WorldObject* target = targets.front();
             targets.clear();
             targets.push_back(target);

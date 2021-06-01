@@ -56,7 +56,7 @@ void usage(const char* prog)
 /// Launch the Trinity server
 extern int main(int argc, char** argv)
 {
-    acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_WORLDSERVER;
+    Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_WORLDSERVER;
 
     ///- Command line parsing to get the configuration file name
     std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG);
@@ -125,7 +125,7 @@ extern int main(int argc, char** argv)
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
-    acore::Banner::Show("worldserver-daemon",
+    Acore::Banner::Show("worldserver-daemon",
         [](char const* text)
         {
             LOG_INFO("server.worldserver", "%s", text);
