@@ -7301,7 +7301,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Flare activation speed
     ApplySpellFix({ 1543 }, [](SpellEntry* spellInfo)
     {
-	spellInfo->Speed = 0.0f;
+        spellInfo->Speed = 0.0f;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
