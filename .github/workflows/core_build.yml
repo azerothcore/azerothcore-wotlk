@@ -30,7 +30,7 @@ jobs:
             modules: without
             extra_logs: false
           - os: ubuntu-18.04
-            compiler: clang7
+            compiler: clang8
             modules: without
             extra_logs: false
           - os: ubuntu-18.04
