@@ -773,7 +773,7 @@ public:
             if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_2, 150.0f))
                 go->Delete();
             WretchedGhoulCleaner cleaner;
-            acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+            Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
             me->VisitNearbyGridObject(150.0f, worker);
         }
 
@@ -987,7 +987,7 @@ public:
                 case 17: // kill vegard
                     {
                         WretchedGhoulCleaner cleaner;
-                        acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+                        Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
                         me->VisitNearbyGridObject(150.0f, worker);
 
                         if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
@@ -1193,7 +1193,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
-            acore::Containers::RandomResize(targets, 2);
+            Acore::Containers::RandomResize(targets, 2);
         }
 
         void HandleScript(SpellEffIndex effIndex)

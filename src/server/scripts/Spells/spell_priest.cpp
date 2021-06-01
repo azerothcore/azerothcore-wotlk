@@ -152,13 +152,13 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::RaidCheck(GetCaster(), false));
+            targets.remove_if(Acore::RaidCheck(GetCaster(), false));
 
             uint32 const maxTargets = GetCaster()->HasAura(SPELL_PRIEST_GLYPH_OF_CIRCLE_OF_HEALING) ? 6 : 5; // Glyph of Circle of Healing
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::HealthPctOrderPred());
+                targets.sort(Acore::HealthPctOrderPred());
                 targets.resize(maxTargets);
             }
         }
@@ -235,13 +235,13 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::RaidCheck(GetCaster(), false));
+            targets.remove_if(Acore::RaidCheck(GetCaster(), false));
 
             uint32 const maxTargets = 3;
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::HealthPctOrderPred());
+                targets.sort(Acore::HealthPctOrderPred());
                 targets.resize(maxTargets);
             }
         }
@@ -361,14 +361,14 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::PowerCheck(POWER_MANA, false));
-            targets.remove_if(acore::RaidCheck(GetCaster(), false));
+            targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
+            targets.remove_if(Acore::RaidCheck(GetCaster(), false));
 
             uint32 const maxTargets = 3;
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::PowerPctOrderPred(POWER_MANA));
+                targets.sort(Acore::PowerPctOrderPred(POWER_MANA));
                 targets.resize(maxTargets);
             }
         }
@@ -549,7 +549,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            unitList.remove_if(acore::ObjectGUIDCheck(GetCaster()->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT), true));
+            unitList.remove_if(Acore::ObjectGUIDCheck(GetCaster()->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT), true));
         }
 
         void Register() override

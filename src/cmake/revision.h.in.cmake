@@ -4,6 +4,8 @@
  #define _HASH                      "@rev_hash@"
  #define _DATE                      "@rev_date@"
  #define _BRANCH                    "@rev_branch@"
+ #define _CMAKE_VERSION             R"(@CMAKE_VERSION@)"
+ #define _CMAKE_HOST_SYSTEM         R"(@CMAKE_HOST_SYSTEM_NAME@ @CMAKE_HOST_SYSTEM_VERSION@)"
  #define VER_COMPANYNAME_STR        "AzerothCore"
  #define VER_LEGALCOPYRIGHT_STR     "AzerothCore"
  #define VER_FILEVERSION            0,0,0
