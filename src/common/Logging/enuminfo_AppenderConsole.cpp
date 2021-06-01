@@ -16,7 +16,7 @@ namespace Acore::Impl::EnumUtilsImpl
 |* data for enum 'ColorTypes' in 'AppenderConsole.h' auto-generated *|
 \********************************************************************/
 template <>
-EnumText EnumUtils<ColorTypes>::ToString(ColorTypes value)
+AC_API_EXPORT EnumText EnumUtils<ColorTypes>::ToString(ColorTypes value)
 {
     switch (value)
     {
@@ -40,10 +40,10 @@ EnumText EnumUtils<ColorTypes>::ToString(ColorTypes value)
 }
 
 template <>
-size_t EnumUtils<ColorTypes>::Count() { return 15; }
+AC_API_EXPORT size_t EnumUtils<ColorTypes>::Count() { return 15; }
 
 template <>
-ColorTypes EnumUtils<ColorTypes>::FromIndex(size_t index)
+AC_API_EXPORT ColorTypes EnumUtils<ColorTypes>::FromIndex(size_t index)
 {
     switch (index)
     {
@@ -67,7 +67,7 @@ ColorTypes EnumUtils<ColorTypes>::FromIndex(size_t index)
 }
 
 template <>
-size_t EnumUtils<ColorTypes>::ToIndex(ColorTypes value)
+AC_API_EXPORT size_t EnumUtils<ColorTypes>::ToIndex(ColorTypes value)
 {
     switch (value)
     {

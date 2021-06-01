@@ -16,7 +16,7 @@ namespace Acore::Impl::EnumUtilsImpl
 |* data for enum 'LogLevel' in 'LogCommon.h' auto-generated *|
 \************************************************************/
 template <>
-EnumText EnumUtils<LogLevel>::ToString(LogLevel value)
+AC_API_EXPORT EnumText EnumUtils<LogLevel>::ToString(LogLevel value)
 {
     switch (value)
     {
@@ -32,10 +32,10 @@ EnumText EnumUtils<LogLevel>::ToString(LogLevel value)
 }
 
 template <>
-size_t EnumUtils<LogLevel>::Count() { return 7; }
+AC_API_EXPORT size_t EnumUtils<LogLevel>::Count() { return 7; }
 
 template <>
-LogLevel EnumUtils<LogLevel>::FromIndex(size_t index)
+AC_API_EXPORT LogLevel EnumUtils<LogLevel>::FromIndex(size_t index)
 {
     switch (index)
     {
@@ -51,7 +51,7 @@ LogLevel EnumUtils<LogLevel>::FromIndex(size_t index)
 }
 
 template <>
-size_t EnumUtils<LogLevel>::ToIndex(LogLevel value)
+AC_API_EXPORT size_t EnumUtils<LogLevel>::ToIndex(LogLevel value)
 {
     switch (value)
     {
@@ -70,7 +70,7 @@ size_t EnumUtils<LogLevel>::ToIndex(LogLevel value)
 |* data for enum 'AppenderType' in 'LogCommon.h' auto-generated *|
 \****************************************************************/
 template <>
-EnumText EnumUtils<AppenderType>::ToString(AppenderType value)
+AC_API_EXPORT EnumText EnumUtils<AppenderType>::ToString(AppenderType value)
 {
     switch (value)
     {
@@ -83,10 +83,10 @@ EnumText EnumUtils<AppenderType>::ToString(AppenderType value)
 }
 
 template <>
-size_t EnumUtils<AppenderType>::Count() { return 4; }
+AC_API_EXPORT size_t EnumUtils<AppenderType>::Count() { return 4; }
 
 template <>
-AppenderType EnumUtils<AppenderType>::FromIndex(size_t index)
+AC_API_EXPORT AppenderType EnumUtils<AppenderType>::FromIndex(size_t index)
 {
     switch (index)
     {
@@ -99,7 +99,7 @@ AppenderType EnumUtils<AppenderType>::FromIndex(size_t index)
 }
 
 template <>
-size_t EnumUtils<AppenderType>::ToIndex(AppenderType value)
+AC_API_EXPORT size_t EnumUtils<AppenderType>::ToIndex(AppenderType value)
 {
     switch (value)
     {
