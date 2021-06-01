@@ -148,7 +148,7 @@ WorldSocket::WorldSocket(void): WorldHandler(),
     m_RecvWPct(0), m_RecvPct(), m_Header(sizeof (ClientPktHeader)),
     m_OutBuffer(0), m_OutBufferSize(65536), m_OutActive(false)
 {
-    acore::Crypto::GetRandomBytes(m_Seed);
+    Acore::Crypto::GetRandomBytes(m_Seed);
 
     reference_counting_policy().value (ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 
@@ -293,7 +293,7 @@ int WorldSocket::open(void* a)
     WorldPacket packet (SMSG_AUTH_CHALLENGE, 24);
     packet << uint32(1);                                    // 1...31
     packet.append(m_Seed);
-    packet.append(acore::Crypto::GetRandomBytes<32>()); // new encryption seeds
+    packet.append(Acore::Crypto::GetRandomBytes<32>()); // new encryption seeds
 
     if (SendPacket(packet) == -1)
         return -1;
@@ -794,7 +794,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     std::string accountName;
     WorldPacket packet, SendAddonPacked;
     std::array<uint8, 4> clientSeed;
-    acore::Crypto::SHA1::Digest digest;
+    Acore::Crypto::SHA1::Digest digest;
 
     if (sWorld->IsClosed())
     {
@@ -897,7 +897,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     // Check that Key and account name are the same on client and server
     uint8 t[4] = { 0x00, 0x00, 0x00, 0x00 };
 
-    acore::Crypto::SHA1 sha;
+    Acore::Crypto::SHA1 sha;
     sha.UpdateData(accountName);
     sha.UpdateData(t);
     sha.UpdateData(clientSeed);

@@ -271,7 +271,7 @@ public:
 
         void SelectTarget(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::RandomCheck(50));
+            targets.remove_if(Acore::RandomCheck(50));
         }
 
         void HandlePull(SpellEffIndex effIndex)

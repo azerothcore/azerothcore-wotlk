@@ -71,8 +71,8 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
             me->IsFriendlyTo(victim) || !me->CanSeeOrDetect(victim))
     {
         victim = nullptr;
-        acore::NearestAttackableUnitInObjectRangeCheck u_check(me, me, max_range);
-        acore::UnitLastSearcher<acore::NearestAttackableUnitInObjectRangeCheck> checker(me, victim, u_check);
+        Acore::NearestAttackableUnitInObjectRangeCheck u_check(me, me, max_range);
+        Acore::UnitLastSearcher<Acore::NearestAttackableUnitInObjectRangeCheck> checker(me, victim, u_check);
         me->VisitNearbyObject(max_range, checker);
     }
 

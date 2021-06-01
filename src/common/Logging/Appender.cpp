@@ -49,7 +49,7 @@ void Appender::write(LogMessage* message)
         ss << message->getTimeStr() << ' ';
 
     if (flags & APPENDER_FLAGS_PREFIX_LOGLEVEL)
-        ss << acore::StringFormat("%-5s ", Appender::getLogLevelString(message->level));
+        ss << Acore::StringFormat("%-5s ", Appender::getLogLevelString(message->level));
 
     if (flags & APPENDER_FLAGS_PREFIX_LOGFILTERTYPE)
         ss << '[' << message->type << "] ";

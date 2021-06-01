@@ -352,7 +352,7 @@ public:
                                     myList.push_back(p);
                         if (!myList.empty())
                         {
-                            myList.sort(acore::ObjectDistanceOrderPred(me->GetVictim()));
+                            myList.sort(Acore::ObjectDistanceOrderPred(me->GetVictim()));
                             Player* target = myList.front();
                             if (me->GetVictim()->GetGUID() != _tankGUID || target->GetGUID() != _offtankGUID)
                             {
@@ -420,7 +420,7 @@ public:
                             if (Player* p = itr->GetSource())
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 100.0f && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
                                     myList.push_back(p);
-                        acore::Containers::RandomResize(myList, Is25ManRaid() ? 3 : 2);
+                        Acore::Containers::RandomResize(myList, Is25ManRaid() ? 3 : 2);
                         if (myList.size() > 1)
                         {
                             Talk(SAY_PACT_OF_THE_DARKFALLEN);
@@ -446,7 +446,7 @@ public:
 
                         if (!myList.empty())
                         {
-                            acore::Containers::RandomResize(myList, 1);
+                            Acore::Containers::RandomResize(myList, 1);
                             Player* target = myList.front();
                             Talk(EMOTE_SWARMING_SHADOWS, target);
                             Talk(SAY_SWARMING_SHADOWS);
@@ -468,7 +468,7 @@ public:
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && !p->HasAura(SPELL_PACT_OF_THE_DARKFALLEN) && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
                                     myList.push_back(p);
 
-                        acore::Containers::RandomResize(myList, uint32(Is25ManRaid() ? 4 : 2));
+                        Acore::Containers::RandomResize(myList, uint32(Is25ManRaid() ? 4 : 2));
                         for (std::list<Player*>::iterator itr = myList.begin(); itr != myList.end(); ++itr)
                             me->CastSpell(*itr, SPELL_TWILIGHT_BLOODBOLT, false);
                         me->CastSpell(me, SPELL_TWILIGHT_BLOODBOLT_TARGET, false);
@@ -625,7 +625,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
+            targets.remove_if(Acore::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
 
             bool remove = true;
             std::list<WorldObject*>::const_iterator itr, itr2, itrEnd = targets.end();
@@ -670,7 +670,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            unitList.remove_if(acore::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
+            unitList.remove_if(Acore::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
             unitList.push_back(GetCaster());
         }
 
@@ -723,7 +723,7 @@ public:
         {
             uint32 targetCount = (targets.size() + 2) / 3;
             targets.remove_if(BloodboltHitCheck(static_cast<LanaThelAI*>(GetCaster()->GetAI())));
-            acore::Containers::RandomResize(targets, targetCount);
+            Acore::Containers::RandomResize(targets, targetCount);
             // mark targets now, effect hook has missile travel time delay (might cast next in that time)
             for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                 GetCaster()->GetAI()->SetGUID((*itr)->GetGUID(), GUID_BLOODBOLT);
@@ -921,7 +921,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
         }
 
         void Register() override

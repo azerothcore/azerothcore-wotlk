@@ -218,10 +218,10 @@ int RASocket::check_password(const std::string& user, const std::string& pass)
 
     if (PreparedQueryResult result = LoginDatabase.Query(stmt))
     {
-        acore::Crypto::SRP6::Salt salt = (*result)[0].GetBinary<acore::Crypto::SRP6::SALT_LENGTH>();
-        acore::Crypto::SRP6::Verifier verifier = (*result)[1].GetBinary<acore::Crypto::SRP6::VERIFIER_LENGTH>();
+        Acore::Crypto::SRP6::Salt salt = (*result)[0].GetBinary<Acore::Crypto::SRP6::SALT_LENGTH>();
+        Acore::Crypto::SRP6::Verifier verifier = (*result)[1].GetBinary<Acore::Crypto::SRP6::VERIFIER_LENGTH>();
 
-        if (acore::Crypto::SRP6::CheckLogin(safe_user, safe_pass, salt, verifier))
+        if (Acore::Crypto::SRP6::CheckLogin(safe_user, safe_pass, salt, verifier))
             return 0;
     }
 

@@ -9,7 +9,7 @@
 #include "SmartEnum.h"
 #include <stdexcept>
 
-namespace acore::Impl::EnumUtilsImpl
+namespace Acore::Impl::EnumUtilsImpl
 {
 
 /********************************************************************\

@@ -39,7 +39,7 @@ static constexpr uint8 GetCheckPacketBaseSize(uint8 type)
     case LUA_EVAL_CHECK: return 1 + sizeof(_luaEvalPrefix) - 1 + sizeof(_luaEvalMidfix) - 1 + 4 + sizeof(_luaEvalPostfix) - 1;
     case PAGE_CHECK_A: return (4 + 1);
     case PAGE_CHECK_B: return (4 + 1);
-    case MODULE_CHECK: return (4 + acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);
+    case MODULE_CHECK: return (4 + Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);
     case MEM_CHECK: return (1 + 4 + 1);
     default: return 0;
     }
@@ -95,7 +95,7 @@ void WardenWin::Init(WorldSession* session, SessionKey const& k)
 {
     _session = session;
     // Generate Warden Key
-    SessionKeyGenerator<acore::Crypto::SHA1> WK(k);
+    SessionKeyGenerator<Acore::Crypto::SHA1> WK(k);
     WK.Generate(_inputKey, 16);
     WK.Generate(_outputKey, 16);
 
@@ -104,15 +104,15 @@ void WardenWin::Init(WorldSession* session, SessionKey const& k)
     _inputCrypto.Init(_inputKey);
     _outputCrypto.Init(_outputKey);
     LOG_DEBUG("warden", "Server side warden for client %u initializing...", session->GetAccountId());
-    LOG_DEBUG("warden", "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey, 16).c_str());
-    LOG_DEBUG("warden", "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey,16).c_str());
-    LOG_DEBUG("warden", "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed, 16).c_str());
+    LOG_DEBUG("warden", "C->S Key: %s", Acore::Impl::ByteArrayToHexStr(_inputKey, 16).c_str());
+    LOG_DEBUG("warden", "S->C Key: %s", Acore::Impl::ByteArrayToHexStr(_outputKey,16).c_str());
+    LOG_DEBUG("warden", "  Seed: %s", Acore::Impl::ByteArrayToHexStr(_seed, 16).c_str());
     LOG_DEBUG("warden", "Loading Module...");
 
     _module = GetModuleForClient();
 
-    LOG_DEBUG("warden", "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
-    LOG_DEBUG("warden", "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
+    LOG_DEBUG("warden", "Module Key: %s", Acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
+    LOG_DEBUG("warden", "Module ID: %s", Acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
     RequestModule();
 }
 
@@ -153,7 +153,7 @@ void WardenWin::InitializeModule()
     Request.Function1[1] = 0x000218C0;                      // 0x00400000 + 0x000218C0 SFileGetFileSize
     Request.Function1[2] = 0x00022530;                      // 0x00400000 + 0x00022530 SFileReadFile
     Request.Function1[3] = 0x00022910;                      // 0x00400000 + 0x00022910 SFileCloseFile
-    Request.CheckSumm1 = BuildChecksum(&Request.Unk1, acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);
+    Request.CheckSumm1 = BuildChecksum(&Request.Unk1, Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);
 
     Request.Command2 = WARDEN_SMSG_MODULE_INITIALIZE;
     Request.Size2 = 8;
@@ -216,7 +216,7 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
     buff.rpos(buff.wpos());
 
     // Verify key
-    if (memcmp(buff.contents() + 1, Module.ClientKeySeedHash, acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0)
+    if (memcmp(buff.contents() + 1, Module.ClientKeySeedHash, Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0)
     {
         LOG_DEBUG("warden", "Request hash reply: failed");
         ApplyPenalty(0, "Request hash reply: failed");
@@ -317,7 +317,7 @@ void WardenWin::RequestChecks()
     // Filtered checks will get passed in next checks
     uint16 expectedSize = 4;
     _PendingChecks.clear();
-    acore::Containers::EraseIf(_CurrentChecks,
+    Acore::Containers::EraseIf(_CurrentChecks,
         [this, &expectedSize](uint16 id)
         {
             uint16 const thisSize = GetCheckPacketSize(sWardenCheckMgr->GetWardenDataById(id));
@@ -404,9 +404,9 @@ void WardenWin::RequestChecks()
             }
             case MODULE_CHECK:
             {
-                std::array<uint8, 4> seed = acore::Crypto::GetRandomBytes<4>();
+                std::array<uint8, 4> seed = Acore::Crypto::GetRandomBytes<4>();
                 buff.append(seed);
-                buff.append(acore::Crypto::HMAC_SHA1::GetDigestOf(seed, check->Str));
+                buff.append(Acore::Crypto::HMAC_SHA1::GetDigestOf(seed, check->Str));
                 break;
             }
             /*case PROC_CHECK:
@@ -583,15 +583,15 @@ void WardenWin::HandleData(ByteBuffer& buff)
                     }
 
                     WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
-                    if (memcmp(buff.contents() + buff.rpos(), rs->Result.ToByteArray<20>(false).data(), acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0) // SHA1
+                    if (memcmp(buff.contents() + buff.rpos(), rs->Result.ToByteArray<20>(false).data(), Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0) // SHA1
                     {
                         LOG_DEBUG("warden", "RESULT MPQ_CHECK fail, CheckId %u account Id %u", checkId, _session->GetAccountId());
                         checkFailed = checkId;
-                        buff.rpos(buff.rpos() + acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);            // 20 bytes SHA1
+                        buff.rpos(buff.rpos() + Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);            // 20 bytes SHA1
                         continue;
                     }
 
-                    buff.rpos(buff.rpos() + acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);                // 20 bytes SHA1
+                    buff.rpos(buff.rpos() + Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);                // 20 bytes SHA1
                     LOG_DEBUG("warden", "RESULT MPQ_CHECK passed, CheckId %u account Id %u", checkId, _session->GetAccountId());
                     break;
                 }

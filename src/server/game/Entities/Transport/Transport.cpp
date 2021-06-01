@@ -609,7 +609,7 @@ void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
         CalculatePassengerPosition(x, y, z, &o);
 
         // check if position is valid
-        if (!acore::IsValidMapCoord(x, y, z))
+        if (!Acore::IsValidMapCoord(x, y, z))
             continue;
 
         switch (passenger->GetTypeId())
@@ -875,7 +875,7 @@ void StaticTransport::RelocateToProgress(uint32 progress)
         float oriRotAngle = oriRotAngleCurr + percRot * (oriRotAngleNext - oriRotAngleCurr);
 
         // check if position is valid
-        if (!acore::IsValidMapCoord(pos.x, pos.y, pos.z))
+        if (!Acore::IsValidMapCoord(pos.x, pos.y, pos.z))
             return;
 
         // update position to new one
@@ -910,7 +910,7 @@ void StaticTransport::UpdatePassengerPositions()
         CalculatePassengerPosition(x, y, z, &o);
 
         // check if position is valid
-        if (!acore::IsValidMapCoord(x, y, z))
+        if (!Acore::IsValidMapCoord(x, y, z))
             continue;
 
         switch (passenger->GetTypeId())

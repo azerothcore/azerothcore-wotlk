@@ -10,7 +10,7 @@
 #include "Player.h"
 #include "World.h"
 
-uint32 acore::XP::BaseGain(uint8 pl_level, uint8 mob_level, ContentLevels content)
+uint32 Acore::XP::BaseGain(uint8 pl_level, uint8 mob_level, ContentLevels content)
 {
     uint32 baseGain;
     uint32 nBaseExp;
@@ -56,7 +56,7 @@ uint32 acore::XP::BaseGain(uint8 pl_level, uint8 mob_level, ContentLevels conten
     return baseGain;
 }
 
-uint32 acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false*/)
+uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false*/)
 {
     Creature* creature = unit->ToCreature();
     uint32 gain = 0;
