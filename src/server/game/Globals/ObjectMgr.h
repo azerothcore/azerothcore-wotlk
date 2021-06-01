@@ -1347,7 +1347,7 @@ public:
     void LoadFactionChangeSpells();
     void LoadFactionChangeTitles();
 
-    bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
+    [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
 
 private:
     // first free id for selected id type

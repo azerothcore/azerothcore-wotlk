@@ -37,21 +37,21 @@ public:
         return (iter == i_maps.end() ? nullptr : iter->second);
     }
 
-    uint32 GetAreaId(uint32 mapid, float x, float y, float z) const
+    [[nodiscard]] uint32 GetAreaId(uint32 mapid, float x, float y, float z) const
     {
         Map const* m = const_cast<MapManager*>(this)->CreateBaseMap(mapid);
         return m->GetAreaId(x, y, z);
     }
-    uint32 GetAreaId(uint32 mapid, Position const& pos) const { return GetAreaId(mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()); }
-    uint32 GetAreaId(WorldLocation const& loc) const { return GetAreaId(loc.GetMapId(), loc); }
+    [[nodiscard]] uint32 GetAreaId(uint32 mapid, Position const& pos) const { return GetAreaId(mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()); }
+    [[nodiscard]] uint32 GetAreaId(WorldLocation const& loc) const { return GetAreaId(loc.GetMapId(), loc); }
 
-    uint32 GetZoneId(uint32 mapid, float x, float y, float z) const
+    [[nodiscard]] uint32 GetZoneId(uint32 mapid, float x, float y, float z) const
     {
         Map const* m = const_cast<MapManager*>(this)->CreateBaseMap(mapid);
         return m->GetZoneId(x, y, z);
     }
-    uint32 GetZoneId(uint32 mapid, Position const& pos) const { return GetZoneId(mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()); }
-    uint32 GetZoneId(WorldLocation const& loc) const { return GetZoneId(loc.GetMapId(), loc); }
+    [[nodiscard]] uint32 GetZoneId(uint32 mapid, Position const& pos) const { return GetZoneId(mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()); }
+    [[nodiscard]] uint32 GetZoneId(WorldLocation const& loc) const { return GetZoneId(loc.GetMapId(), loc); }
 
     void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, uint32 mapid, float x, float y, float z)
     {
