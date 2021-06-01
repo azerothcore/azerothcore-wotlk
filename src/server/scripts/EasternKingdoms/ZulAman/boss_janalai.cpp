@@ -224,14 +224,14 @@ public:
             me->GetPosition(x, y, z);
 
             {
-                CellCoord pair(acore::ComputeCellCoord(x, y));
+                CellCoord pair(Acore::ComputeCellCoord(x, y));
                 Cell cell(pair);
                 cell.SetNoCreate();
 
-                acore::AllCreaturesOfEntryInRange check(me, NPC_EGG, 100);
-                acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+                Acore::AllCreaturesOfEntryInRange check(me, NPC_EGG, 100);
+                Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
 
-                TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
+                TypeContainerVisitor<Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
 
                 cell.Visit(pair, cSearcher, *me->GetMap(), *me, me->GetGridActivationRange());
             }
@@ -257,14 +257,14 @@ public:
             me->GetPosition(x, y, z);
 
             {
-                CellCoord pair(acore::ComputeCellCoord(x, y));
+                CellCoord pair(Acore::ComputeCellCoord(x, y));
                 Cell cell(pair);
                 cell.SetNoCreate();
 
-                acore::AllCreaturesOfEntryInRange check(me, NPC_FIRE_BOMB, 100);
-                acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+                Acore::AllCreaturesOfEntryInRange check(me, NPC_FIRE_BOMB, 100);
+                Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
 
-                TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
+                TypeContainerVisitor<Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
 
                 cell.Visit(pair, cSearcher, *me->GetMap(), *me, me->GetGridActivationRange());
             }
@@ -518,14 +518,14 @@ public:
             me->GetPosition(x, y, z);
 
             {
-                CellCoord pair(acore::ComputeCellCoord(x, y));
+                CellCoord pair(Acore::ComputeCellCoord(x, y));
                 Cell cell(pair);
                 cell.SetNoCreate();
 
-                acore::AllCreaturesOfEntryInRange check(me, 23817, 50);
-                acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+                Acore::AllCreaturesOfEntryInRange check(me, 23817, 50);
+                Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
 
-                TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
+                TypeContainerVisitor<Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
 
                 cell.Visit(pair, cSearcher, *(me->GetMap()), *me, me->GetGridActivationRange());
             }

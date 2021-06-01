@@ -11,7 +11,7 @@
 #include <unordered_set>
 #include <mutex>
 
-namespace acore
+namespace Acore
 {
     /// Handle termination signals
     class SignalHandler

@@ -6,8 +6,8 @@
 #include "gtest/gtest.h"
 #include "WorldMock.h"
 
-using namespace acore::Honor;
-using namespace acore::XP;
+using namespace Acore::Honor;
+using namespace Acore::XP;
 
 TEST(FormulasTest, hk_honor_at_level)
 {

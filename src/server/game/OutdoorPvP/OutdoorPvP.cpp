@@ -302,8 +302,8 @@ bool OPvPCapturePoint::Update(uint32 diff)
     }
 
     std::list<Player*> players;
-    acore::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
-    acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
+    Acore::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
     m_capturePoint->VisitNearbyWorldObject(radius, searcher);
 
     for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)

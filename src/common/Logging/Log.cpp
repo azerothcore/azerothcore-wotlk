@@ -54,7 +54,7 @@ void Log::CreateAppenderFromConfig(std::string const& appenderName)
     // if type = Console. optional1 = Color
     std::string options = sConfigMgr->GetStringDefault(appenderName, "");
 
-    std::vector<std::string_view> tokens = acore::Tokenize(options, ',', true);
+    std::vector<std::string_view> tokens = Acore::Tokenize(options, ',', true);
 
     size_t const size = tokens.size();
     std::string name = appenderName.substr(9);
@@ -66,8 +66,8 @@ void Log::CreateAppenderFromConfig(std::string const& appenderName)
     }
 
     AppenderFlags flags = APPENDER_FLAGS_NONE;
-    AppenderType type = AppenderType(acore::StringTo<uint8>(tokens[0]).value_or(APPENDER_INVALID));
-    LogLevel level = LogLevel(acore::StringTo<uint8>(tokens[1]).value_or(LOG_LEVEL_INVALID));
+    AppenderType type = AppenderType(Acore::StringTo<uint8>(tokens[0]).value_or(APPENDER_INVALID));
+    LogLevel level = LogLevel(Acore::StringTo<uint8>(tokens[1]).value_or(LOG_LEVEL_INVALID));
 
     auto factoryFunction = appenderFactory.find(type);
     if (factoryFunction == appenderFactory.end())
@@ -84,7 +84,7 @@ void Log::CreateAppenderFromConfig(std::string const& appenderName)
 
     if (size > 2)
     {
-        if (Optional<uint8> flagsVal = acore::StringTo<uint8>(tokens[2]))
+        if (Optional<uint8> flagsVal = Acore::StringTo<uint8>(tokens[2]))
             flags = AppenderFlags(*flagsVal);
         else
         {
@@ -120,7 +120,7 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
         return;
     }
 
-    std::vector<std::string_view> tokens = acore::Tokenize(options, ',', true);
+    std::vector<std::string_view> tokens = Acore::Tokenize(options, ',', true);
 
     if (tokens.size() != 2)
     {
@@ -135,7 +135,7 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
         return;
     }
 
-    level = LogLevel(acore::StringTo<uint8>(tokens[0]).value_or(LOG_LEVEL_INVALID));
+    level = LogLevel(Acore::StringTo<uint8>(tokens[0]).value_or(LOG_LEVEL_INVALID));
     if (level > NUM_ENABLED_LOG_LEVELS)
     {
         fprintf(stderr, "Log::CreateLoggerFromConfig: Wrong Log Level '%s' for logger %s\n", std::string(tokens[0]).c_str(), name.c_str());
@@ -148,7 +148,7 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
     logger = std::make_unique<Logger>(name, level);
     //fprintf(stdout, "Log::CreateLoggerFromConfig: Created Logger %s, Level %u\n", name.c_str(), level);
 
-    for (std::string_view appenderName : acore::Tokenize(tokens[1], ' ', false))
+    for (std::string_view appenderName : Acore::Tokenize(tokens[1], ' ', false))
     {
         if (Appender* appender = GetAppenderByName(appenderName))
         {
@@ -248,7 +248,7 @@ std::string Log::GetTimestampStr()
     //       HH     hour (2 digits 00-23)
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
-    return acore::StringFormat("%04d-%02d-%02d_%02d-%02d-%02d",
+    return Acore::StringFormat("%04d-%02d-%02d_%02d-%02d-%02d",
         aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 }
 

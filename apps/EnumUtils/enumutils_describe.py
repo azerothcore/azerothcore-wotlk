@@ -98,7 +98,7 @@ def processFile(path, filename):
     output.write('#include "SmartEnum.h"\n')
     output.write('#include <stdexcept>\n')
     output.write('\n')
-    output.write('namespace acore::Impl::EnumUtilsImpl\n')
+    output.write('namespace Acore::Impl::EnumUtilsImpl\n')
     output.write('{\n')
     for name, prefix, values in enums:
         tag = ('data for enum \'%s\' in \'%s.h\' auto-generated' % (name, filename))

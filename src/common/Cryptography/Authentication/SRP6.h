@@ -14,7 +14,7 @@
 #include <array>
 #include <optional>
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     class SRP6
     {
