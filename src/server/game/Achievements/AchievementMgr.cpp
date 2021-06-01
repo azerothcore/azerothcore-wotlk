@@ -2962,3 +2962,8 @@ void AchievementGlobalMgr::LoadRewardLocales()
     LOG_INFO("server", ">> Loaded %lu Achievement Reward Locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server", " ");
 }
+
+AchievementEntry const* AchievementGlobalMgr::GetAchievement(uint32 achievementId) const
+{
+    return sAchievementStore.LookupEntry(achievementId);
+}
