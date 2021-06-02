@@ -1,3 +1,19 @@
+-- DB update 2021_06_02_04 -> 2021_06_02_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_06_02_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_06_02_04 2021_06_02_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1622046406344372400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1622046406344372400');
 
 UPDATE `creature_template` SET `speed_walk` = 0.9, `speed_run` = 1, `MovementType` = 0, `HealthModifier` = 3, `ManaModifier` = 3, `ArmorModifier` = 10, `unit_flags` = 0 WHERE (`entry` = 3678);
@@ -57,3 +73,13 @@ INSERT INTO `smart_scripts` VALUES
 (367800, 9, 14, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 12, 5763, 4, 60000, 0, 0, 0, 8, 0, 0, 0, 0, 137.94, 262.89, -102.85, 3.99, 'Disciple of Naralex - Actionlist - Summon Creature \'Nightmare Ectoplasm\''),
 (367800, 9, 15, 0, 0, 0, 100, 0, 20000, 20000, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 19, 3679, 10, 0, 0, 0, 0, 0, 0, 'Disciple of Naralex - Actionlist - Say Line 2'),
 (367800, 9, 16, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 12, 3654, 4, 60000, 0, 0, 0, 8, 0, 0, 0, 0, 151.27, 252.26, -102.82, 3.38, 'Disciple of Naralex - Actionlist - Summon Creature \'Mutanus the Devourer\'');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_06_02_05' WHERE sql_rev = '1622046406344372400';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
