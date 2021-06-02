@@ -9,30 +9,27 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 -- Add path to Strahad Farsan
 DELETE FROM `waypoints` WHERE `entry` = 6251;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
-(6251, 0, -785.912, -73723.26, 40.5153, 'Strahad Farsan'),
-(6251, 1, -781.32, -3717.15, 41.597, 'Strahad Farsan'),
-(6251, 2, -770.08, -3720.73, 42.45, 'Strahad Farsan'),
-(6251, 3, -763.68, -3720.01, 42.24, 'Strahad Farsan'),
-(6251, 4, -763.97, -3720.19, 42.25, 'Strahad Farsan'),
-(6251, 5, -782.23, -3717.17, 41.57, 'Strahad Farsan'),
-(6251, 6, -785.912, -3723.26, 40.5153, 'Strahad Farsan');
+(6251, 1, -785.912, -3723.26, 40.5153, 'Strahad Farsan'),
+(6251, 2, -781.32, -3717.15, 41.597, 'Strahad Farsan'),
+(6251, 3, -770.08, -3720.73, 42.45, 'Strahad Farsan'),
+(6251, 4, -763.68, -3720.01, 42.24, 'Strahad Farsan'),
+(6251, 5, -763.97, -3720.19, 42.25, 'Strahad Farsan'),
+(6251, 6, -782.23, -3717.17, 41.57, 'Strahad Farsan'),
+(6251, 7, -785.912, -3723.26, 40.5153, 'Strahad Farsan');
 
 -- Add Strahad Farsan SAI for event
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 6251;
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 6251) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 6251) AND (`source_type` = 0) AND (`id` IN (1, 2, 3, 4, 5, 8, 9, 10));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(6251, 0, 0, 1, 19, 0, 100, 0, 1795, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Quest \'The Binding\' Taken - Say Line 0'),
-(6251, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Quest \'The Binding\' Taken - Set Npc Flag '),
-(6251, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 53, 0, 6251, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Quest \'The Binding\' Taken - Start Waypoint'),
-(6251, 0, 3, 4, 40, 0, 100, 0, 2, 6251, 0, 0, 0, 80, 625100, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 2 Reached - Run Script'),
-(6251, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 54, 900000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 2 Reached - Pause Waypoint'),
-(6251, 0, 5, 0, 40, 0, 100, 0, 4, 6251, 0, 0, 0, 54, 120000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 4 Reached - Pause Waypoint'),
-(6251, 0, 6, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 65, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Data Set 1 1 - Resume Waypoint'),
-(6251, 0, 7, 0, 56, 0, 100, 0, 4, 6251, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 13, 0, 0, 10, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint Resumed - Set Data 1 1'),
-(6251, 0, 8, 9, 40, 0, 100, 0, 6, 6251, 0, 0, 0, 81, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 6 Reached - Set Npc Flags Gossip & Questgiver'),
-(6251, 0, 9, 10, 61, 0, 100, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 6 Reached - Stop Waypoint'),
-(6251, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2.0594, 'Strahad Farsan - On Waypoint 6 Reached - Set Orientation 2.0594');
+(6251, 0, 1, 2, 61, 0, 100, 0, 1795, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Quest \'The Binding\' Taken - Set Npc Flag '),
+(6251, 0, 2, 0, 61, 0, 100, 0, 1795, 0, 0, 0, 0, 53, 0, 6251, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Quest \'The Binding\' Taken - Start Waypoint'),
+(6251, 0, 3, 4, 40, 0, 100, 0, 3, 6251, 0, 0, 0, 80, 625100, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 3 Reached - Run Script'),
+(6251, 0, 4, 0, 61, 0, 100, 0, 3, 6251, 0, 0, 0, 54, 900000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 3 Reached - Pause Waypoint'),
+(6251, 0, 5, 0, 40, 0, 100, 0, 5, 6251, 0, 0, 0, 54, 120000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 5 Reached - Pause Waypoint'),
+(6251, 0, 8, 9, 40, 0, 100, 0, 7, 6251, 0, 0, 0, 81, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 7 Reached - Set Npc Flags Gossip & Questgiver'),
+(6251, 0, 9, 10, 61, 0, 100, 0, 7, 6251, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 7 Reached - Stop Waypoint'),
+(6251, 0, 10, 0, 61, 0, 100, 0, 7, 6251, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2.0594, 'Strahad Farsan - On Waypoint 7 Reached - Set Orientation 2.0594');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 625100);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -54,7 +51,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (92252, 1, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad\'s Summoning Circle - On Data Set 1 1 - Despawn Instant'),
 (92388, 1, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoning Circle - On Data Set 1 1 - Despawn Instant');
 
--- Add SAI to the three Acolytes (only one of them will summon the circle)
 SET @MAGAZ = 6252;
 SET @FENRICK = 6253;
 SET @WYTULA = 6254;
@@ -62,6 +58,7 @@ SET @MAGAZT = 625200;
 SET @FENRICKT = 625300;
 SET @WYTULAT = 625400;
 
+-- Add SAI to the three Acolytes (only one of them will summon the circle)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (@MAGAZ,@FENRICK,@WYTULA);
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (@MAGAZ, @FENRICK, @WYTULA, @MAGAZT, @FENRICKT, @WYTULAT));
