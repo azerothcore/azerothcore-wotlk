@@ -7,7 +7,7 @@ UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = @AKUMAI;
 
 DELETE FROM `creature_addon` WHERE `guid` = @AKUMAI;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES
-(@AKUMAI, @PATH, 0, 0, 0, 0, 0, 0);
+(@AKUMAI, @PATH, 0, 0, 0, 0, 0, NULL);
 
 DELETE FROM `waypoint_data` WHERE `id` = @PATH;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
