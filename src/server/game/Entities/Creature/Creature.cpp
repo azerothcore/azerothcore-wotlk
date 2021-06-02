@@ -622,7 +622,7 @@ void Creature::Update(uint32 diff)
                 }
 
                 Unit* owner = GetCharmerOrOwner();
-                if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()), true, false)
+                if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange(), true, false))
                 {
                     RemoveCharmAuras();
                 }
