@@ -32,17 +32,12 @@
 #include "DatabaseLoader.h"
 #include "Optional.h"
 #include "SecretMgr.h"
+#include "ProcessPriority.h"
 #include <ace/Sig_Handler.h>
 
 #ifdef _WIN32
 #include "ServiceWin32.h"
 extern int m_ServiceStatus;
-#endif
-
-#ifdef __linux__
-#include <sched.h>
-#include <sys/resource.h>
-#define PROCESS_HIGH_PRIORITY -15 // [-20, 19], default is 0
 #endif
 
 /// Handle worldservers's termination signals
@@ -129,6 +124,9 @@ int Master::Run()
         }
     }
 
+    // Set process priority according to configuration settings
+    SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
+
     ///- Start the databases
     if (!_StartDB())
         return 1;
@@ -178,74 +176,6 @@ int Master::Run()
     // pussywizard:
     Acore::Thread auctionLising_thread(new AuctionListingRunnable);
     auctionLising_thread.setPriority(Acore::Priority_High);
-
-#if defined(_WIN32) || defined(__linux__)
-
-    ///- Handle affinity for multiple processors and process priority
-    uint32 affinity = sConfigMgr->GetOption<int32>("UseProcessors", 0);
-    bool highPriority = sConfigMgr->GetOption<bool>("ProcessPriority", false);
-
-#ifdef _WIN32 // Windows
-
-    HANDLE hProcess = GetCurrentProcess();
-
-    if (affinity > 0)
-    {
-        ULONG_PTR appAff;
-        ULONG_PTR sysAff;
-
-        if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
-        {
-            ULONG_PTR currentAffinity = affinity & appAff;            // remove non accessible processors
-
-            if (!currentAffinity)
-                LOG_ERROR("server", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the worldserver. Accessible processors bitmask (hex): %x", affinity, appAff);
-            else if (SetProcessAffinityMask(hProcess, currentAffinity))
-                LOG_INFO("server", "Using processors (bitmask, hex): %x", currentAffinity);
-            else
-                LOG_ERROR("server", "Can't set used processors (hex): %x", currentAffinity);
-        }
-    }
-
-    if (highPriority)
-    {
-        if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
-            LOG_INFO("server", "worldserver process priority class set to HIGH");
-        else
-            LOG_ERROR("server", "Can't set worldserver process priority class.");
-    }
-
-#else // Linux
-
-    if (affinity > 0)
-    {
-        cpu_set_t mask;
-        CPU_ZERO(&mask);
-
-        for (unsigned int i = 0; i < sizeof(affinity) * 8; ++i)
-            if (affinity & (1 << i))
-                CPU_SET(i, &mask);
-
-        if (sched_setaffinity(0, sizeof(mask), &mask))
-            LOG_ERROR("server", "Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
-        else
-        {
-            CPU_ZERO(&mask);
-            sched_getaffinity(0, sizeof(mask), &mask);
-            LOG_INFO("server", "Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
-        }
-    }
-
-    if (highPriority)
-    {
-        if (setpriority(PRIO_PROCESS, 0, PROCESS_HIGH_PRIORITY))
-            LOG_ERROR("server", "Can't set worldserver process priority class, error: %s", strerror(errno));
-        else
-            LOG_INFO("server", "worldserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
-    }
-
-#endif
-#endif
 
     // Start soap serving thread if enabled
     std::shared_ptr<std::thread> soapThread;
