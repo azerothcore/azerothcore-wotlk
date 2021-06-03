@@ -40,7 +40,7 @@ struct CreatureTextEntry
 
 struct CreatureTextLocale
 {
-    StringVector Text;
+    std::vector<std::string> Text;
 };
 
 struct CreatureTextId
@@ -238,8 +238,8 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
     if (msgType == CHAT_MSG_RAID_BOSS_EMOTE && source->GetMap()->IsDungeon())
         dist = 250.0f;
 
-    acore::PlayerDistWorker<CreatureTextLocalizer<Builder> > worker(source, dist, localizer);
-    source->VisitNearbyWorldObject(dist, worker);
+    Acore::PlayerDistWorker<CreatureTextLocalizer<Builder> > worker(source, dist, localizer);
+    Cell::VisitWorldObjects(source, worker, dist);
 }
 
 #endif

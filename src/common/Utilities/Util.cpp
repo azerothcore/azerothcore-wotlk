@@ -6,14 +6,18 @@
 
 #include "Util.h"
 #include "Common.h"
-#include "utf8.h"
-#include "Log.h"
-#include "Errors.h"
-#include "TypeList.h"
-#include "Errors.h" // for ASSERT
-#include <array>
-#include <cwchar>
+#include "Containers.h"
+// #include "IpAddress.h"
+#include "StringConvert.h"
+#include "StringFormat.h"
+#include <utf8.h>
+#include <algorithm>
+#include <iomanip>
+#include <sstream>
 #include <string>
+#include <cctype>
+#include <cstdarg>
+#include <ctime>
 #include <ace/Default_Constants.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
@@ -339,7 +343,7 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
 {
     try
     {
-        acore::CheckedBufferOutputIterator<wchar_t> out(wstr, wsize);
+        Acore::CheckedBufferOutputIterator<wchar_t> out(wstr, wsize);
         out = utf8::utf8to16(utf8str, utf8str + csize, out);
         wsize -= out.remaining(); // remaining unused space
         wstr[wsize] = L'\0';
@@ -581,7 +585,7 @@ bool Utf8ToUpperOnlyLatin(std::string& utf8String)
     return WStrToUtf8(wstr, utf8String);
 }
 
-std::string acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, bool reverse /* = false */)
+std::string Acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, bool reverse /* = false */)
 {
     int32 init = 0;
     int32 end = arrayLen;
@@ -605,7 +609,7 @@ std::string acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, 
     return ss.str();
 }
 
-void acore::Impl::HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse /*= false*/)
+void Acore::Impl::HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse /*= false*/)
 {
     ASSERT(str.size() == (2 * outlen));
 

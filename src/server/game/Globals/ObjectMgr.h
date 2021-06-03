@@ -429,8 +429,8 @@ struct BroadcastText
 
     uint32 Id{0};
     uint32 Language{0};
-    StringVector MaleText;
-    StringVector FemaleText;
+    std::vector<std::string> MaleText;
+    std::vector<std::string> FemaleText;
     uint32 EmoteId0{0};
     uint32 EmoteId1{0};
     uint32 EmoteId2{0};
@@ -483,7 +483,7 @@ typedef std::unordered_map<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap
 
 struct AcoreString
 {
-    StringVector Content;
+    std::vector<std::string> Content;
 };
 
 typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
@@ -1326,8 +1326,8 @@ public:
         return _gossipMenuItemsStore.equal_range(uiMenuId);
     }
 
-    static void AddLocaleString(std::string&& s, LocaleConstant locale, StringVector& data);
-    static inline void GetLocaleString(const StringVector& data, int loc_idx, std::string& value)
+    static void AddLocaleString(std::string&& s, LocaleConstant locale, std::vector<std::string>& data);
+    static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
     {
         if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
             value = data[loc_idx];
@@ -1451,7 +1451,7 @@ private:
     typedef std::map<uint32, int32> FishingBaseSkillContainer; // [areaId][base skill level]
     FishingBaseSkillContainer _fishingBaseForAreaStore;
 
-    typedef std::map<uint32, StringVector> HalfNameContainer;
+    typedef std::map<uint32, std::vector<std::string>> HalfNameContainer;
     HalfNameContainer _petHalfName0;
     HalfNameContainer _petHalfName1;
 

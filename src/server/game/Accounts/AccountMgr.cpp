@@ -34,7 +34,7 @@ namespace AccountMgr
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT);
 
         stmt->setString(0, username);
-        auto [salt, verifier] = acore::Crypto::SRP6::MakeRegistrationData(username, password);
+        auto [salt, verifier] = Acore::Crypto::SRP6::MakeRegistrationData(username, password);
         stmt->setBinary(1, salt);
         stmt->setBinary(2, verifier);
         stmt->setInt8(3, uint8(sWorld->getIntConfig(CONFIG_EXPANSION)));
@@ -147,7 +147,7 @@ namespace AccountMgr
         stmt->setUInt32(1, accountId);
         LoginDatabase.Execute(stmt);
 
-        auto [salt, verifier] = acore::Crypto::SRP6::MakeRegistrationData(newUsername, newPassword);
+        auto [salt, verifier] = Acore::Crypto::SRP6::MakeRegistrationData(newUsername, newPassword);
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGON);
         stmt->setBinary(0, salt);
         stmt->setBinary(1, verifier);
@@ -176,7 +176,7 @@ namespace AccountMgr
         Utf8ToUpperOnlyLatin(username);
         Utf8ToUpperOnlyLatin(newPassword);
 
-        auto [salt, verifier] = acore::Crypto::SRP6::MakeRegistrationData(username, newPassword);
+        auto [salt, verifier] = Acore::Crypto::SRP6::MakeRegistrationData(username, newPassword);
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGON);
         stmt->setBinary(0, salt);
@@ -245,9 +245,9 @@ namespace AccountMgr
         stmt->setUInt32(0, accountId);
         if (PreparedQueryResult result = LoginDatabase.Query(stmt))
         {
-            acore::Crypto::SRP6::Salt salt = (*result)[0].GetBinary<acore::Crypto::SRP6::SALT_LENGTH>();
-            acore::Crypto::SRP6::Verifier verifier = (*result)[1].GetBinary<acore::Crypto::SRP6::VERIFIER_LENGTH>();
-            if (acore::Crypto::SRP6::CheckLogin(username, password, salt, verifier))
+            Acore::Crypto::SRP6::Salt salt = (*result)[0].GetBinary<Acore::Crypto::SRP6::SALT_LENGTH>();
+            Acore::Crypto::SRP6::Verifier verifier = (*result)[1].GetBinary<Acore::Crypto::SRP6::VERIFIER_LENGTH>();
+            if (Acore::Crypto::SRP6::CheckLogin(username, password, salt, verifier))
                 return true;
         }
 

@@ -61,7 +61,7 @@ inline std::string ReadSkip(std::istringstream& iss, char term)
 
 inline bool CheckDelimiter(std::istringstream& iss, char delimiter, const char* context)
 {
-    UNUSED(context); // used only with EXTRA_LOGS
+    (void)context; // used only with EXTRA_LOGS
     char c = iss.peek();
     if (c != delimiter)
     {
