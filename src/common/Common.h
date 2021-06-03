@@ -98,7 +98,7 @@ AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 
 #define MAX_QUERY_LEN 32*1024
 
-namespace acore
+namespace Acore
 {
     template<class ArgumentType, class ResultType>
     struct unary_function

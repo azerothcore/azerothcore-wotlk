@@ -606,7 +606,7 @@ public:
                 }
 
                 if (target)
-                    me->CastSpell(target, SPELL_HEAL, true);
+                    me->CastSpell(target, SPELL_HEAL, false);
 
                 Heal_Timer = 13000;
             }
@@ -621,15 +621,15 @@ public:
                 switch (eventId)
                 {
                     case EVENT_SPELL_POWER_WORLD_SHIELD:
-                        me->CastSpell(me, SPELL_POWER_WORD_SHIELD, true);
+                        me->CastSpell(me, SPELL_POWER_WORD_SHIELD, false);
                         events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15000);
                         break;
                     case EVENT_SPELL_HOLY_SMITE:
-                        me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, true);
+                        me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, false);
                         events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6000);
                         break;
                     case EVENT_SPELL_HEAL:
-                        me->CastSpell(me, SPELL_HEAL, true);
+                        me->CastSpell(me, SPELL_HEAL, false);
                         break;
                 }
             }
