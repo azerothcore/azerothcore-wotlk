@@ -29,7 +29,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (6251, 0, 4, 0, 61, 0, 100, 0, 3, 6251, 0, 0, 0, 54, 900000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 3 Reached - Pause Waypoint'),
 (6251, 0, 5, 0, 40, 0, 100, 0, 5, 6251, 0, 0, 0, 54, 120000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 5 Reached - Pause Waypoint'),
 (6251, 0, 6, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 65, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Data Set 1 1 - Resume Waypoint'),
-(6251, 0, 7, 0, 56, 0, 100, 0, 4, 6251, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 13, 0, 0, 10, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint Resumed - Set Data 1 1'),
+(6251, 0, 7, 0, 56, 0, 100, 0, 5, 6251, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 13, 0, 0, 10, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint Resumed - Set Data 1 1'),
 (6251, 0, 8, 9, 40, 0, 100, 0, 7, 6251, 0, 0, 0, 81, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 7 Reached - Set Npc Flags Gossip & Questgiver'),
 (6251, 0, 9, 10, 61, 0, 100, 0, 7, 6251, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Strahad Farsan - On Waypoint 7 Reached - Stop Waypoint'),
 (6251, 0, 10, 0, 61, 0, 100, 0, 7, 6251, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2.0594, 'Strahad Farsan - On Waypoint 7 Reached - Set Orientation 2.0594');
