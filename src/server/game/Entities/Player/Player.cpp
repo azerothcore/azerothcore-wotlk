@@ -20,6 +20,7 @@
 #include "ChannelMgr.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
+#include "Config.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "CreatureAI.h"
@@ -6540,6 +6541,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
             default:
                 UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
                 break;
+        }
     }
 
     UpdateAllCritPercentages();
@@ -24069,7 +24071,7 @@ void Player::resetSpells()
 
 void Player::LearnCustomSpells()
 {
-    if (!sConfigMgr->GetOption<bool>(CONFIG_START_ALL_SPELLS))
+    if (!sConfigMgr->GetOption<bool>("PlayerStart.CustomSpells", false))
         return;
 
     // learn default race/class spells
