@@ -368,6 +368,9 @@ public:
     void LoadCompletedAchievements();
     void LoadRewards();
     void LoadRewardLocales();
+
+    [[nodiscard]] AchievementEntry const* GetAchievement(uint32 achievementId) const;
+
 private:
     AchievementCriteriaDataMap m_criteriaDataMap;
 
