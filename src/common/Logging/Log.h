@@ -52,7 +52,7 @@ public:
     template<typename Format, typename... Args>
     inline void outMessage(std::string const& filter, LogLevel const level, Format&& fmt, Args&&... args)
     {
-        outMessage(filter, level, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage(filter, level, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     template<typename Format, typename... Args>
@@ -61,7 +61,7 @@ public:
         if (!ShouldLog("commands.gm", LOG_LEVEL_INFO))
             return;
 
-        outCommand(acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...), std::to_string(account));
+        outCommand(Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...), std::to_string(account));
     }
 
     void outCharDump(char const* str, uint32 account_id, uint64 guid, char const* name);
@@ -81,7 +81,7 @@ public:
     template<typename Format, typename... Args>
     inline void outString(Format&& fmt, Args&& ... args)
     {
-        outMessage("server", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("server", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     inline void outString()
@@ -92,7 +92,7 @@ public:
     template<typename Format, typename... Args>
     inline void outError(Format&& fmt, Args&& ... args)
     {
-        outMessage("server", LOG_LEVEL_ERROR, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("server", LOG_LEVEL_ERROR, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     template<typename Format, typename... Args>
@@ -101,19 +101,19 @@ public:
         if (!ShouldLog("sql.sql", LOG_LEVEL_ERROR))
             return;
 
-        outMessage("sql.sql", LOG_LEVEL_ERROR, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("sql.sql", LOG_LEVEL_ERROR, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     template<typename Format, typename... Args>
     inline void outBasic(Format&& fmt, Args&& ... args)
     {
-        outMessage("server", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("server", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     template<typename Format, typename... Args>
     inline void outDetail(Format&& fmt, Args&& ... args)
     {
-        outMessage("server", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("server", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     template<typename Format, typename... Args>
@@ -122,7 +122,7 @@ public:
         if (!ShouldLog("sql.dev", LOG_LEVEL_INFO))
             return;
 
-        outMessage("sql.dev", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("sql.dev", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     template<typename Format, typename... Args>
@@ -131,13 +131,13 @@ public:
         if (!ShouldLog("sql.driver", LOG_LEVEL_INFO))
             return;
 
-        outMessage("sql.driver", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("sql.driver", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     template<typename Format, typename... Args>
     inline void outMisc(Format&& fmt, Args&& ... args)
     {
-        outMessage("server", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("server", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     template<typename Format, typename... Args>
@@ -149,7 +149,7 @@ public:
         if (!ShouldLog("server", LOG_LEVEL_DEBUG))
             return;
 
-        outMessage("server", LOG_LEVEL_DEBUG, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("server", LOG_LEVEL_DEBUG, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
 private:

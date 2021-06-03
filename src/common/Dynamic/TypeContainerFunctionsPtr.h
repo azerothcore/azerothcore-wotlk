@@ -17,7 +17,7 @@
 #include "Utilities/TypeList.h"
 #include <map>
 
-namespace acore
+namespace Acore
 {
     /* ContainerMapList Helpers */
     // count functions

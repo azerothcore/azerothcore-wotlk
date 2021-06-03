@@ -2411,7 +2411,7 @@ void World::SendGlobalGMMessage(WorldPacket* packet, WorldSession* self, TeamId 
     }
 }
 
-namespace acore
+namespace Acore
 {
     class WorldWorldTextBuilder
     {
@@ -2453,7 +2453,7 @@ namespace acore
         uint32 i_textId;
         va_list* i_args;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 /// Send a System Message to all players (except self if mentioned)
 void World::SendWorldText(uint32 string_id, ...)
@@ -2461,8 +2461,8 @@ void World::SendWorldText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    acore::LocalizedPacketListDo<acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -2480,8 +2480,8 @@ void World::SendGMText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    acore::LocalizedPacketListDo<acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -3107,6 +3107,45 @@ void World::LoadDBVersion()
 
     if (m_DBVersion.empty())
         m_DBVersion = "Unknown world database.";
+}
+
+void World::LoadDBRevision()
+{
+    QueryResult resultWorld     = WorldDatabase.Query("SELECT date FROM version_db_world ORDER BY date DESC LIMIT 1");
+    QueryResult resultCharacter = CharacterDatabase.Query("SELECT date FROM version_db_characters ORDER BY date DESC LIMIT 1");
+    QueryResult resultAuth      = LoginDatabase.Query("SELECT date FROM version_db_auth ORDER BY date DESC LIMIT 1");
+
+    if (resultWorld)
+    {
+        Field* fields = resultWorld->Fetch();
+
+        m_WorldDBRevision = fields[0].GetString();
+    }
+    if (resultCharacter)
+    {
+        Field* fields = resultCharacter->Fetch();
+
+        m_CharacterDBRevision = fields[0].GetString();
+    }
+    if (resultAuth)
+    {
+        Field* fields = resultAuth->Fetch();
+
+        m_AuthDBRevision = fields[0].GetString();
+    }
+
+    if (m_WorldDBRevision.empty())
+    {
+        m_WorldDBRevision = "Unkown World Database Revision";
+    }
+    if (m_CharacterDBRevision.empty())
+    {
+        m_CharacterDBRevision = "Unkown Character Database Revision";
+    }
+    if (m_AuthDBRevision.empty())
+    {
+        m_AuthDBRevision = "Unkown Auth Database Revision";
+    }
 }
 
 void World::UpdateAreaDependentAuras()

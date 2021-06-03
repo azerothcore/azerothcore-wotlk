@@ -413,7 +413,7 @@ namespace lfg
         proposal.cancelTime = time(nullptr) + LFG_TIME_PROPOSAL;
         proposal.state = LFG_PROPOSAL_INITIATING;
         proposal.leader.Clear();
-        proposal.dungeonId = acore::Containers::SelectRandomContainerElement(proposalDungeons);
+        proposal.dungeonId = Acore::Containers::SelectRandomContainerElement(proposalDungeons);
 
         bool leader = false;
         for (LfgRolesMap::const_iterator itRoles = proposalRoles.begin(); itRoles != proposalRoles.end(); ++itRoles)
