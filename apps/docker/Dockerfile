@@ -28,6 +28,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # since it's not cacheable by docker
 RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sudo curl unzip \
   make cmake clang libmysqlclient-dev libace-dev \
+  libboost-system1.7*-dev libboost-filesystem1.7*-dev libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
   build-essential libtool cmake-data openssl libgoogle-perftools-dev google-perftools \
   libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
   libncurses5-dev ccache \
@@ -107,6 +108,7 @@ RUN addgroup --gid $GROUP_ID acore && \
 
 # install the required dependencies to run the server
 RUN apt-get update && apt-get install -y dos2unix gdb gdbserver google-perftools libgoogle-perftools-dev net-tools \
+    libboost-system1.7*-dev libboost-filesystem1.7*-dev libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
     tzdata libmysqlclient-dev libace-dev mysql-client curl unzip && rm -rf /var/lib/apt/lists/* ;
 
 # change timezone in container
@@ -278,7 +280,9 @@ ENV TZ=Etc/UTC
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y libmysqlclient-dev libace-dev libssl-dev libbz2-dev sudo && rm -rf /var/lib/apt/lists/* ;
+RUN apt-get update && apt-get install -y libmysqlclient-dev libace-dev libssl-dev libbz2-dev \ 
+    libboost-system1.7*-dev libboost-filesystem1.7*-dev libboost-program-options1.7*-dev libboost-iostreams1.7*-dev \
+    sudo && rm -rf /var/lib/apt/lists/* ;
 
 # Create a non-root user
 RUN addgroup --gid $GROUP_ID acore && \

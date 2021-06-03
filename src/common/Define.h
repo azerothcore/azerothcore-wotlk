@@ -7,17 +7,10 @@
 #ifndef ACORE_DEFINE_H
 #define ACORE_DEFINE_H
 
+#include "CompilerDefs.h"
 #include <cstddef>
-#include <cstdint>
 #include <cinttypes>
 #include <climits>
-#include <cstring>
-#include <sys/types.h>
-#include "CompilerDefs.h"
-
-#if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
-#define OS_WIN
-#endif
 
 #define ACORE_LITTLEENDIAN 0
 #define ACORE_BIGENDIAN    1
@@ -110,8 +103,6 @@
 #define SI64LIT(N) INT64_C(N)
 
 #define SZFMTD "%" PRIuPTR
-
-#define UNUSED(x) (void)(x)
 
 typedef std::int64_t int64;
 typedef std::int32_t int32;
