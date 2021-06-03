@@ -13,7 +13,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif // WIN32
-using namespace acore;
+using namespace Acore;
 
 Thread::Thread() : m_task(nullptr), m_iThreadId(), m_ThreadImp()
 {

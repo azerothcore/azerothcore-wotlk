@@ -2397,9 +2397,9 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         */
 
         UnitList targets;
-        acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, target, target->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-        acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
-        target->VisitNearbyObject(target->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, target, target->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
+        Cell::VisitAllObjects(target, searcher, target->GetMap()->GetVisibilityRange());
         for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))
@@ -5204,9 +5204,9 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                     return;
 
                                 Player* player = nullptr;
-                                acore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
-                                acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
-                                target->VisitNearbyWorldObject(10.0f, searcher);
+                                Acore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
+                                Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
+                                Cell::VisitWorldObjects(target, searcher, 10.0f);
 
                                 if( player && player->GetGUID() != target->GetGUID() )
                                     target->CastSpell(player, 52921, true);
@@ -6812,7 +6812,7 @@ void AuraEffect::HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp
     if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
     {
         // used only with EXTRA_LOGS
-        UNUSED(triggeredSpellInfo);
+        (void)triggeredSpellInfo;
 
         int32 basepoints0 = GetAmount();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)

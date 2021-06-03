@@ -768,7 +768,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove(GetCaster());
-            acore::Containers::RandomResize(targets, _count);
+            Acore::Containers::RandomResize(targets, _count);
         }
 
         void Register() override
@@ -1719,11 +1719,17 @@ public:
             float max_range = GetSpellInfo()->GetMaxRange(false);
             WorldObject* result = nullptr;
             // search for nearby enemy corpse in range
-            acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
-            acore::WorldObjectSearcher<acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
-            caster->GetMap()->VisitFirstFound(caster->m_positionX, caster->m_positionY, max_range, searcher);
+            Acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
+            Acore::WorldObjectSearcher<Acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
+            Cell::VisitWorldObjects(caster, searcher, max_range);
             if (!result)
+            {
+                Cell::VisitGridObjects(caster, searcher, max_range);
+            }
+            if (!result)
+            {
                 return SPELL_FAILED_NO_EDIBLE_CORPSES;
+            }
             return SPELL_CAST_OK;
         }
 
@@ -4812,13 +4818,13 @@ public:
                 }
             }
 
-            targets.remove_if(acore::PowerCheck(POWER_MANA, false));
+            targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
 
             uint8 const maxTargets = 10;
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::PowerPctOrderPred(POWER_MANA));
+                targets.sort(Acore::PowerPctOrderPred(POWER_MANA));
                 targets.resize(maxTargets);
             }
         }

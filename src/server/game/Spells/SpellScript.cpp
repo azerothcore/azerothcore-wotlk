@@ -14,26 +14,21 @@ bool _SpellScript::_Validate(SpellInfo const* entry)
 {
     if (!Validate(entry))
     {
-        LOG_ERROR("server", "_SpellScript::_Validate: Spell `%u` did not pass Validate() function of script `%s` - script will not be added to the spell", entry->Id, m_scriptName->c_str());
+        LOG_ERROR("scripts.spells", "_SpellScript::_Validate: Spell `%u` did not pass Validate() function of script `%s` - script will not be added to the spell", entry->Id, m_scriptName->c_str());
         return false;
     }
     return true;
 }
 
-bool _SpellScript::_ValidateSpellInfo(uint32 const* begin, uint32 const* end)
+bool _SpellScript::_ValidateSpellInfo(uint32 spellId)
 {
-    bool allValid = true;
-    while (begin != end)
+    if (!sSpellMgr->GetSpellInfo(spellId))
     {
-        if (!sSpellMgr->GetSpellInfo(*begin))
-        {
-            LOG_ERROR("server", "_SpellScript::_ValidateSpellInfo: Spell %u does not exist.", *begin);
-            allValid = false;
-        }
-
-        ++begin;
+        LOG_ERROR("scripts.spells", "_SpellScript::ValidateSpellInfo: Spell %u does not exist.", spellId);
+        return false;
     }
-    return allValid;
+
+    return true;
 }
 
 void _SpellScript::_Register()

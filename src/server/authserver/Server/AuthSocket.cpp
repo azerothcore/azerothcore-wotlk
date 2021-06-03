@@ -69,9 +69,9 @@ typedef struct AUTH_LOGON_CHALLENGE_C
 typedef struct AUTH_LOGON_PROOF_C
 {
     uint8   cmd;
-    acore::Crypto::SRP6::EphemeralKey A;
-    acore::Crypto::SHA1::Digest clientM;
-    acore::Crypto::SHA1::Digest crc_hash;
+    Acore::Crypto::SRP6::EphemeralKey A;
+    Acore::Crypto::SHA1::Digest clientM;
+    Acore::Crypto::SHA1::Digest crc_hash;
     uint8   number_of_keys;
     uint8   securityFlags;                                  // 0x00-0x04
 } sAuthLogonProof_C;
@@ -80,7 +80,7 @@ typedef struct AUTH_LOGON_PROOF_S
 {
     uint8   cmd;
     uint8   error;
-    acore::Crypto::SHA1::Digest M2;
+    Acore::Crypto::SHA1::Digest M2;
     uint32  unk1;
     uint32  unk2;
     uint16  unk3;
@@ -90,7 +90,7 @@ typedef struct AUTH_LOGON_PROOF_S_OLD
 {
     uint8   cmd;
     uint8   error;
-    acore::Crypto::SHA1::Digest M2;
+    Acore::Crypto::SHA1::Digest M2;
     uint32  unk2;
 } sAuthLogonProof_S_Old;
 
@@ -98,7 +98,7 @@ typedef struct AUTH_RECONNECT_PROOF_C
 {
     uint8   cmd;
     uint8   R1[16];
-    acore::Crypto::SHA1::Digest R2, R3;
+    Acore::Crypto::SHA1::Digest R2, R3;
     uint8   number_of_keys;
 } sAuthReconnectProof_C;
 
@@ -133,7 +133,7 @@ typedef struct AuthHandler
 #endif
 
 // Launch a thread to transfer a patch to the client
-class PatcherRunnable: public acore::Runnable
+class PatcherRunnable: public Acore::Runnable
 {
 public:
     PatcherRunnable(class AuthSocket*);
@@ -477,7 +477,7 @@ bool AuthSocket::_HandleLogonChallenge()
         _totpSecret = fields[9].GetBinary();
         if (auto const& secret = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY))
         {
-            bool success = acore::Crypto::AEDecrypt<acore::Crypto::AES>(*_totpSecret, *secret);
+            bool success = Acore::Crypto::AEDecrypt<Acore::Crypto::AES>(*_totpSecret, *secret);
             if (!success)
             {
                 pkt << uint8(WOW_FAIL_DB_BUSY);
@@ -490,8 +490,8 @@ bool AuthSocket::_HandleLogonChallenge()
 
     _srp6.emplace(
         _accountInfo.Login,
-        fields[10].GetBinary<acore::Crypto::SRP6::SALT_LENGTH>(),
-        fields[11].GetBinary<acore::Crypto::SRP6::VERIFIER_LENGTH>());
+        fields[10].GetBinary<Acore::Crypto::SRP6::SALT_LENGTH>(),
+        fields[11].GetBinary<Acore::Crypto::SRP6::VERIFIER_LENGTH>());
 
     // Fill the response packet with the result
     if (!AuthHelper::IsAcceptedClientBuild(_build))
@@ -583,7 +583,7 @@ bool AuthSocket::_HandleLogonProof()
             unsigned int incomingToken = atoi(token);
             delete[] token;
 
-            tokenSuccess = acore::Crypto::TOTP::ValidateToken(*_totpSecret, incomingToken);
+            tokenSuccess = Acore::Crypto::TOTP::ValidateToken(*_totpSecret, incomingToken);
             memset(_totpSecret->data(), 0, _totpSecret->size());
         }
         else if (!sentToken && !_totpSecret)
@@ -609,7 +609,7 @@ bool AuthSocket::_HandleLogonProof()
         LoginDatabase.DirectExecute(stmt);
 
         // Finish SRP6 and send the final result to the client
-        acore::Crypto::SHA1::Digest M2 = acore::Crypto::SRP6::GetSessionVerifier(lp.A, lp.clientM, _sessionKey);
+        Acore::Crypto::SHA1::Digest M2 = Acore::Crypto::SRP6::GetSessionVerifier(lp.A, lp.clientM, _sessionKey);
 
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
         {
@@ -765,7 +765,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     std::reverse(_os.begin(), _os.end());
 
     _sessionKey = fields[9].GetBinary<SESSION_KEY_LENGTH>();
-    acore::Crypto::GetRandomBytes(_reconnectProof);
+    Acore::Crypto::GetRandomBytes(_reconnectProof);
 
     ///- All good, await client's proof
     _status = STATUS_RECON_PROOF;
@@ -799,7 +799,7 @@ bool AuthSocket::_HandleReconnectProof()
     BigNumber t1;
     t1.SetBinary(lp.R1, 16);
 
-    acore::Crypto::SHA1 sha;
+    Acore::Crypto::SHA1 sha;
     sha.UpdateData(_accountInfo.Login);
     sha.UpdateData(t1.ToByteArray<16>());
     sha.UpdateData(_reconnectProof);
@@ -1005,7 +1005,7 @@ bool AuthSocket::_HandleXferResume()
     socket().recv((char*)&start, sizeof(start));
     fseek(pPatch, long(start), 0);
 
-    acore::Thread u(new PatcherRunnable(this));
+    Acore::Thread u(new PatcherRunnable(this));
     return true;
 }
 
@@ -1041,7 +1041,7 @@ bool AuthSocket::_HandleXferAccept()
     socket().recv_skip(1);                                         // clear input buffer
     fseek(pPatch, 0, 0);
 
-    acore::Thread u(new PatcherRunnable(this));
+    Acore::Thread u(new PatcherRunnable(this));
     return true;
 }
 
