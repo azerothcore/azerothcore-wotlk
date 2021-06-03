@@ -13,6 +13,7 @@
 #include "DetourExtended.h"
 #include <unordered_map>
 #include <shared_mutex>
+#include <vector>
 
 //  memory management
 inline void* dtCustomAlloc(size_t size, dtAllocHint /*hint*/)

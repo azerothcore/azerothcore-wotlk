@@ -247,9 +247,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     Signatures const* signatures = sPetitionMgr->GetSignature(petitionguid);
     uint8 signs = signatures ? signatures->signatureMap.size() : 0;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("network", "CMSG_PETITION_SHOW_SIGNATURES petition entry: '%u'", petitionguid.GetCounter());
-#endif
+    LOG_DEBUG("network", "CMSG_PETITION_SHOW_SIGNATURES petition %s", petitionguid.ToString().c_str());
 
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << petitionguid;                                   // petition guid

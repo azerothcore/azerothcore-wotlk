@@ -233,8 +233,8 @@ typedef std::map<uint32, AchievementReward> AchievementRewards;
 
 struct AchievementRewardLocale
 {
-    StringVector Subject;
-    StringVector Text;
+    std::vector<std::string> Subject;
+    std::vector<std::string> Text;
 };
 
 typedef std::map<uint32, AchievementRewardLocale> AchievementRewardLocales;
@@ -368,6 +368,9 @@ public:
     void LoadCompletedAchievements();
     void LoadRewards();
     void LoadRewardLocales();
+
+    [[nodiscard]] AchievementEntry const* GetAchievement(uint32 achievementId) const;
+
 private:
     AchievementCriteriaDataMap m_criteriaDataMap;
 

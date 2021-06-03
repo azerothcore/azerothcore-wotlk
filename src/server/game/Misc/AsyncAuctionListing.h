@@ -5,6 +5,7 @@
 #include "EventProcessor.h"
 #include "WorldPacket.h"
 #include "ObjectGuid.h"
+#include <mutex>
 
 class AuctionListOwnerItemsDelayEvent : public BasicEvent
 {
