@@ -73,17 +73,17 @@ public:
 
     static bool IsValidMapCoord(uint32 mapid, float x, float y)
     {
-        return IsValidMAP(mapid, false) && acore::IsValidMapCoord(x, y);
+        return IsValidMAP(mapid, false) && Acore::IsValidMapCoord(x, y);
     }
 
     static bool IsValidMapCoord(uint32 mapid, float x, float y, float z)
     {
-        return IsValidMAP(mapid, false) && acore::IsValidMapCoord(x, y, z);
+        return IsValidMAP(mapid, false) && Acore::IsValidMapCoord(x, y, z);
     }
 
     static bool IsValidMapCoord(uint32 mapid, float x, float y, float z, float o)
     {
-        return IsValidMAP(mapid, false) && acore::IsValidMapCoord(x, y, z, o);
+        return IsValidMAP(mapid, false) && Acore::IsValidMapCoord(x, y, z, o);
     }
 
     static bool IsValidMapCoord(WorldLocation const& loc)
