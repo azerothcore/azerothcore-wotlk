@@ -618,7 +618,7 @@ public:
                 return;
 
             // select random cultist
-            Creature* cultist = acore::Containers::SelectRandomContainerElement(temp);
+            Creature* cultist = Acore::Containers::SelectRandomContainerElement(temp);
             if (!cultist)
                 return;
 

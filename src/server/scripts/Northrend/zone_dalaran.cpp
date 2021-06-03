@@ -540,7 +540,7 @@ public:
 
             if (PlayerInDalaranList.empty())
                 return nullptr;
-            return acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
+            return Acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
         }
 
         void SendMailToPlayer(Player* player)
