@@ -2399,7 +2399,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         UnitList targets;
         Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, target, target->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
         Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
-        target->VisitNearbyObject(target->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
+        Cell::VisitAllObjects(target, searcher, target->GetMap()->GetVisibilityRange());
         for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))
@@ -5206,7 +5206,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                 Player* player = nullptr;
                                 Acore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
                                 Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
-                                target->VisitNearbyWorldObject(10.0f, searcher);
+                                Cell::VisitWorldObjects(target, searcher, 10.0f);
 
                                 if( player && player->GetGUID() != target->GetGUID() )
                                     target->CastSpell(player, 52921, true);

@@ -7066,7 +7066,7 @@ void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, b
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
     Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
-    VisitNearbyWorldObject(dist, notifier);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 // pussywizard!
@@ -7076,7 +7076,7 @@ void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool
         GetSession()->SendPacket(data);
 
     Acore::MessageDistDeliverer notifier(this, data, dist, true);
-    VisitNearbyWorldObject(dist, notifier);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void Player::SendDirectMessage(WorldPacket* data)
@@ -21528,7 +21528,7 @@ void Player::TextEmote(const std::string& text)
     std::list<Player*> players;
     Acore::AnyPlayerInObjectRangeCheck checker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
     Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, players, checker);
-    this->VisitNearbyWorldObject(sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), searcher);
+    Cell::VisitWorldObjects(this, searcher, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 
     for (auto const& itr : players)
     {
@@ -23681,10 +23681,10 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 void Player::UpdateVisibilityForPlayer(bool mapChange)
 {
     Acore::VisibleNotifier notifierNoLarge(*this, mapChange, false); // visit only objects which are not large; default distance
-    m_seer->VisitNearbyObject(GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS, notifierNoLarge);
+    Cell::VisitAllObjects(m_seer, notifierNoLarge, GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
     notifierNoLarge.SendToSelf();
     Acore::VisibleNotifier notifierLarge(*this, mapChange, true);    // visit only large objects; maximum distance
-    m_seer->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, notifierLarge);
+    Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
     notifierLarge.SendToSelf();
 
     if (mapChange)
