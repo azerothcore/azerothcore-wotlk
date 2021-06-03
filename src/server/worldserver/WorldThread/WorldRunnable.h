@@ -14,13 +14,13 @@
 #include "Threading.h"
 
 /// Heartbeat thread for the World
-class WorldRunnable : public acore::Runnable
+class WorldRunnable : public Acore::Runnable
 {
 public:
     void run() override;
 };
 
-class AuctionListingRunnable : public acore::Runnable
+class AuctionListingRunnable : public Acore::Runnable
 {
 public:
     void run() override;

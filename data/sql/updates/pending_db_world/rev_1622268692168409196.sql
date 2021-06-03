@@ -1,8 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1622268692168409196');
 
--- Silicate Feeder -> removes Silithid Husked Launcher, Antenna of Invigoration, The Lost Kris of Zedd,
--- Coif of Elemental Fury, Polished Obsidian Pauldrons
-DELETE FROM `creature_loot_template` WHERE `Entry` = 15333 AND `Item` IN (21800, 21801, 21802, 21804, 21805);
 -- Cave Creeper -> removes Lefty's Brass Knuckle
 DELETE FROM `creature_loot_template` WHERE `Entry` = 8933 AND `Item` = 22317;
 -- Borer Beetle -> removes Shroud of Arcane Mastery 
