@@ -6,7 +6,7 @@
 #include "Opcodes.h"
 #include "Log.h"
 #include "WorldSession.h"
-//#include "Packets/AllPackets.h"
+#include "Packets/AllPackets.h"
 #include <iomanip>
 #include <sstream>
 
