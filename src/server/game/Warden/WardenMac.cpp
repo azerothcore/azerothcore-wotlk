@@ -30,7 +30,7 @@ void WardenMac::Init(WorldSession* pClient, SessionKey const& K)
 {
     _session = pClient;
     // Generate Warden Key
-    SessionKeyGenerator<acore::Crypto::SHA1> WK(K);
+    SessionKeyGenerator<Acore::Crypto::SHA1> WK(K);
     WK.Generate(_inputKey, 16);
     WK.Generate(_outputKey, 16);
     /*
@@ -49,17 +49,17 @@ void WardenMac::Init(WorldSession* pClient, SessionKey const& K)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Server side warden for client %u initializing...", pClient->GetAccountId());
-    LOG_DEBUG("warden", "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey, 16).c_str());
-    LOG_DEBUG("warden", "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey, 16 ).c_str());
-    LOG_DEBUG("warden", "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed, 16).c_str());
+    LOG_DEBUG("warden", "C->S Key: %s", Acore::Impl::ByteArrayToHexStr(_inputKey, 16).c_str());
+    LOG_DEBUG("warden", "S->C Key: %s", Acore::Impl::ByteArrayToHexStr(_outputKey, 16 ).c_str());
+    LOG_DEBUG("warden", "  Seed: %s", Acore::Impl::ByteArrayToHexStr(_seed, 16).c_str());
     LOG_DEBUG("warden", "Loading Module...");
 #endif
 
     _module = GetModuleForClient();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("warden", "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
-    LOG_DEBUG("warden", "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
+    LOG_DEBUG("warden", "Module Key: %s", Acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
+    LOG_DEBUG("warden", "Module ID: %s", Acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
 #endif
     RequestModule();
 }
@@ -155,7 +155,7 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
 
     buff.rpos(buff.wpos());
 
-    acore::Crypto::SHA1 sha1;
+    Acore::Crypto::SHA1 sha1;
     sha1.UpdateData((uint8*)keyIn, 16);
     sha1.Finalize();
 
@@ -243,13 +243,13 @@ void WardenMac::HandleData(ByteBuffer& buff)
 
     std::string str = "Test string!";
 
-    acore::Crypto::SHA1 sha1;
+    Acore::Crypto::SHA1 sha1;
     sha1.UpdateData(str);
     uint32 magic = 0xFEEDFACE;                              // unsure
     sha1.UpdateData((uint8*)&magic, 4);
     sha1.Finalize();
 
-    std::array<uint8, acore::Crypto::SHA1::DIGEST_LENGTH> sha1Hash;
+    std::array<uint8, Acore::Crypto::SHA1::DIGEST_LENGTH> sha1Hash;
     buff.read(sha1Hash.data(), sha1Hash.size());
 
     if (sha1Hash != sha1.GetDigest())

@@ -1958,7 +1958,7 @@ public:
 
         void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            SpellInfo const* damageInfo = sSpellMgr->GetSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
+            SpellInfo const* damageInfo = sSpellMgr->AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
             GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), nullptr, true);
             GetTarget()->CastSpell((Unit*)nullptr, SPELL_ROCKET_BURST, true);
         }
@@ -2208,7 +2208,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             targets.remove_if(IgbExplosionCheck(GetCaster()));
-            acore::Containers::RandomResize(targets, 1);
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void Register() override
@@ -2477,7 +2477,7 @@ public:
             targets.remove_if(BurningPitchFilterCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
             if (!targets.empty())
             {
-                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -2563,7 +2563,7 @@ public:
 
             if (!targets.empty())
             {
-                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }

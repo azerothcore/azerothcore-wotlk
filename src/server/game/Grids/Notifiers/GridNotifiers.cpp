@@ -16,7 +16,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-using namespace acore;
+using namespace Acore;
 
 void VisibleNotifier::Visit(GameObjectMapType& m)
 {

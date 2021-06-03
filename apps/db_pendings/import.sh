@@ -43,6 +43,7 @@ function import() {
             newVer=$dateToday"_"$cnt
 
             startTransaction="START TRANSACTION;";
+            updHeader="ALTER TABLE version_db_"$db" CHANGE COLUMN "$oldVer" "$newVer" bit;";
             endTransaction="COMMIT;";
 
             newFile="$updPath/"$dateToday"_"$cnt".sql"
@@ -64,13 +65,14 @@ function import() {
                 echo "DELIMITER //"  >> "$newFile";
                 echo "CREATE PROCEDURE updateDb ()" >> "$newFile";
                 echo "proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';" >> "$newFile";
-                echo "SELECT date INTO @COLEXISTS" >> "$newFile";
-                echo "FROM version_db_"$db  >> "$newFile";
-                echo "ORDER BY date DESC LIMIT 1;"  >> "$newFile";
-                echo "IF @COLEXISTS <> '"$oldVer"' THEN LEAVE proc; END IF;" >> "$newFile";
+                echo "SELECT COUNT(*) INTO @COLEXISTS"  >> "$newFile";
+                echo "FROM information_schema.COLUMNS" >> "$newFile";
+                echo "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_"$db"' AND COLUMN_NAME = '"$oldVer"';" >> "$newFile";
+                echo "IF @COLEXISTS = 0 THEN LEAVE proc; END IF;" >> "$newFile";
             fi
 
             echo "$startTransaction" >> "$newFile";
+            echo "$updHeader" >> "$newFile";
 
             if [[ $isRev -eq 1 ]]; then
                 echo "SELECT sql_rev INTO OK FROM version_db_"$db" WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
@@ -87,7 +89,6 @@ function import() {
             echo "--" >> "$newFile";
             echo "-- END UPDATING QUERIES" >> "$newFile";
             echo "--" >> "$newFile";
-
             echo "UPDATE version_db_"$db" SET date = '"$newVer"' WHERE sql_rev = '"$rev"';" >> "$newFile";
 
             echo "$endTransaction" >> "$newFile";

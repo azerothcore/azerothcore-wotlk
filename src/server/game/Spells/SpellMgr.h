@@ -684,6 +684,14 @@ public:
 
     // SpellInfo object management
     [[nodiscard]] SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
+    // Use this only with 100% valid spellIds
+    SpellInfo const* AssertSpellInfo(uint32 spellId) const
+    {
+        ASSERT(spellId < GetSpellInfoStoreSize());
+        SpellInfo const* spellInfo = mSpellInfoMap[spellId];
+        ASSERT(spellInfo);
+        return spellInfo;
+    }
     [[nodiscard]] uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
     // Talent Additional Set
