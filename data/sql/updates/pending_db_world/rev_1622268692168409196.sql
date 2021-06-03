@@ -16,6 +16,6 @@ DELETE FROM `creature_loot_template` WHERE `Entry` = 1804 AND `Item` = 23198;
 DELETE FROM `creature_loot_template` WHERE `Entry` = 4308 AND `Item` = 7761;
 -- Tink Sprocketwhistle -> removes Gnomeregan Amulet 
 DELETE FROM `creature_loot_template` WHERE `Entry` = 9676 AND `Item` = 10299;
--- Scarlet Spellbinder, Stitched Horror, Eyeless Watcher, Chromatic Whelp, Risen Aberration,
--- Stonelash Flayer, Desert Rumbler, Carrion Swarmer -> removes Idol of Brutality
-DELETE FROM `creature_loot_template` WHERE `Entry` IN (4494, 8543, 8539, 10442, 10485, 11737, 11746, 13160) AND `Item` = 23198;
+-- Wailing Death, Scarlet Spellbinder, Stitched Horror, Eyeless Watcher, Chromatic Whelp, 
+-- Risen Aberration, Stonelash Flayer, Desert Rumbler, Carrion Swarmer -> removes Idol of Brutality
+DELETE FROM `creature_loot_template` WHERE `Entry` IN (1804, 4494, 8543, 8539, 10442, 10485, 11737, 11746, 13160) AND `Item` = 23198;
