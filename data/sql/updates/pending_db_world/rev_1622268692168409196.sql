@@ -10,8 +10,6 @@ DELETE FROM `creature_loot_template` WHERE `Entry` = 8927 AND `Item` IN (22317, 
 DELETE FROM `creature_loot_template` WHERE `Entry` = 8926  AND `Item` = 22305;
 -- Dredge Worm -> removes Malgen's Long Bow
 DELETE FROM `creature_loot_template` WHERE `Entry` = 8925 AND `Item` = 22318;
--- Wailing Death -> removes Idol of Brutality 
-DELETE FROM `creature_loot_template` WHERE `Entry` = 1804 AND `Item` = 23198;
 -- Unfettered Spirit -> removes Steelclaw Reaver 
 DELETE FROM `creature_loot_template` WHERE `Entry` = 4308 AND `Item` = 7761;
 -- Tink Sprocketwhistle -> removes Gnomeregan Amulet 
