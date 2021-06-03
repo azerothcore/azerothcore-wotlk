@@ -32,12 +32,12 @@ struct B32Impl
     }
 };
 
-/*static*/ std::string acore::Encoding::Base32::Encode(std::vector<uint8> const& data)
+/*static*/ std::string Acore::Encoding::Base32::Encode(std::vector<uint8> const& data)
 {
-    return acore::Impl::GenericBaseEncoding<B32Impl>::Encode(data);
+    return Acore::Impl::GenericBaseEncoding<B32Impl>::Encode(data);
 }
 
-/*static*/ Optional<std::vector<uint8>> acore::Encoding::Base32::Decode(std::string const& data)
+/*static*/ Optional<std::vector<uint8>> Acore::Encoding::Base32::Decode(std::string const& data)
 {
-    return acore::Impl::GenericBaseEncoding<B32Impl>::Decode(data);
+    return Acore::Impl::GenericBaseEncoding<B32Impl>::Decode(data);
 }
