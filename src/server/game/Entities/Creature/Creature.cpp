@@ -168,7 +168,7 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0),  m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_originalAnimTier(UNIT_BYTE1_FLAG_GROUND), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
-    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(nullptr), m_cannotReachTarget(false), m_cannotReachTimer(0),
+    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_detectionDistance(20.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(nullptr), m_cannotReachTarget(false), m_cannotReachTimer(0),
     _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
@@ -523,6 +523,8 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     }
 
     UpdateEnvironmentIfNeeded(3);
+
+    SetDetectionDistance(cInfo->detection_range);
 
     LoadSpellTemplateImmunity();
     return true;
@@ -2986,16 +2988,19 @@ float Creature::GetAggroRange(Unit const* target) const
     if (aggroRate == 0)
         return 0.0f;
 
-    uint32 targetLevel = target->getLevelForTarget(this);
-    uint32 myLevel = getLevelForTarget(target);
-    int32 levelDiff = int32(targetLevel) - int32(myLevel);
+    uint32 creaturelevel = target->getLevelForTarget(this);
+    uint32 playerlevel  = getLevelForTarget(target);
+    int32 levelDiff = int32(creaturelevel) - int32(playerlevel);
 
     // The maximum Aggro Radius is capped at 45 yards (25 level difference)
     if (levelDiff < -25)
         levelDiff = -25;
 
     // The base aggro radius for mob of same level
-    float aggroRadius = 20.0f;
+    float const detectionRange = GetDetectionRange();
+    float aggroRadius = detectionRange;
+    if (aggroRadius < 1)
+        return 0.0f;
 
     // Aggro Radius varies with level difference at a rate of roughly 1 yard/level
     aggroRadius -= (float)levelDiff;

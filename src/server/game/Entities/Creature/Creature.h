@@ -174,6 +174,7 @@ public:
 
     [[nodiscard]] CreatureTemplate const* GetCreatureTemplate() const { return m_creatureInfo; }
     [[nodiscard]] CreatureData const* GetCreatureData() const { return m_creatureData; }
+    void SetDetectionDistance(float dist){ m_detectionDistance = dist; }
     [[nodiscard]] CreatureAddon const* GetCreatureAddon() const;
 
     [[nodiscard]] std::string GetAIName() const;
@@ -222,6 +223,7 @@ public:
     bool CanStartAttack(Unit const* u) const;
     float GetAggroRange(Unit const* target) const;
     float GetAttackDistance(Unit const* player) const;
+    float GetDetectionRange() const { return m_detectionDistance; }
 
     void SendAIReaction(AiReaction reactionType);
 
@@ -411,6 +413,7 @@ protected:
     CreatureTemplate const* m_creatureInfo;                 // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
     CreatureData const* m_creatureData;
 
+    float m_detectionDistance;
     uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
 
     [[nodiscard]] bool IsInvisibleDueToDespawn() const override;
