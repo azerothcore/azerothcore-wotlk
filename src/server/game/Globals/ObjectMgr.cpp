@@ -8243,7 +8243,7 @@ void ObjectMgr::LoadTrainers()
             if (locale == LOCALE_enUS)
                 continue;
 
-            if (Trainer::Trainer* trainer = acore::Containers::MapGetValuePtr(_trainers, trainerId))
+            if (Trainer::Trainer* trainer = Acore::Containers::MapGetValuePtr(_trainers, trainerId))
                 trainer->AddGreetingLocale(locale, fields[2].GetString());
             else
                 LOG_ERROR("sql.sql", "Table `trainer_locale` references non-existing trainer (TrainerId: %u) for locale %s, ignoring",
@@ -8486,7 +8486,7 @@ Trainer::Trainer const* ObjectMgr::GetTrainer(uint32 creatureId) const
 {
     auto itr = _creatureDefaultTrainers.find(creatureId);
     if (itr != _creatureDefaultTrainers.end())
-        return acore::Containers::MapGetValuePtr(_trainers, itr->second);
+        return Acore::Containers::MapGetValuePtr(_trainers, itr->second);
 
     return nullptr;
 }
