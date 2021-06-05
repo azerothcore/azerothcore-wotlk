@@ -21,28 +21,22 @@ class WorldSession;
 class Player;
 
 /// Storage class for commands issued for delayed execution
-struct CliCommandHolder
+struct AC_GAME_API CliCommandHolder
 {
-    typedef void Print(void*, const char*);
-    typedef void CommandFinished(void*, bool success);
+    using Print = void(*)(void*, std::string_view);
+    using CommandFinished = void(*)(void*, bool success);
 
     void* m_callbackArg;
     char* m_command;
-    Print* m_print;
+    Print m_print;
+    CommandFinished m_commandFinished;
 
-    CommandFinished* m_commandFinished;
+    CliCommandHolder(void* callbackArg, char const* command, Print zprint, CommandFinished commandFinished);
+    ~CliCommandHolder();
 
-    CliCommandHolder(void* callbackArg, const char* command, Print* zprint, CommandFinished* commandFinished)
-            : m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
-    {
-        // TODO: fix Codacy warning
-        //  "Does not handle strings that are not \0-terminated; if given one it may perform an over-read (it could cause a crash if unprotected) (CWE-126)."
-        size_t len = strlen(command) + 1;
-        m_command = new char[len];
-        memcpy(m_command, command, len);
-    }
-
-    ~CliCommandHolder() { delete[] m_command; }
+private:
+    CliCommandHolder(CliCommandHolder const& right) = delete;
+    CliCommandHolder& operator=(CliCommandHolder const& right) = delete;
 };
 
 typedef std::unordered_map<uint32, WorldSession*> SessionMap;

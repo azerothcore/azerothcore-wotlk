@@ -17,26 +17,32 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class honor_commandscript : public CommandScript
 {
 public:
     honor_commandscript() : CommandScript("honor_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> honorAddCommandTable =
+        static ChatCommandTable honorAddCommandTable =
         {
             { "kill",           SEC_GAMEMASTER,     false, &HandleHonorAddKillCommand,         "" },
             { "",               SEC_GAMEMASTER,     false, &HandleHonorAddCommand,             "" }
         };
 
-        static std::vector<ChatCommand> honorCommandTable =
+        static ChatCommandTable honorCommandTable =
         {
             { "add",            SEC_GAMEMASTER,     false, nullptr,                            "", honorAddCommandTable },
             { "update",         SEC_GAMEMASTER,     false, &HandleHonorUpdateCommand,          "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "honor",          SEC_GAMEMASTER,     false, nullptr,                            "", honorCommandTable }
         };

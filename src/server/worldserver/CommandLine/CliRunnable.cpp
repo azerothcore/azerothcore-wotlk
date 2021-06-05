@@ -4,23 +4,22 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/// \addtogroup Trinityd
-/// @{
-/// \file
-
-#include "AccountMgr.h"
-#include "Chat.h"
-#include "CliRunnable.h"
 #include "Common.h"
-#include "Configuration/Config.h"
-#include "Language.h"
-#include "Log.h"
-#include "MapManager.h"
+#include "Errors.h"
 #include "ObjectMgr.h"
-#include "Player.h"
-#include "Util.h"
 #include "World.h"
-#include "WorldSession.h"
+#include "Config.h"
+#include "CliRunnable.h"
+#include "Log.h"
+#include "Util.h"
+
+#if ACORE_PLATFORM != ACORE_PLATFORM_WINDOWS
+#include "Chat.h"
+#include "ChatCommand.h"
+#include <cstring>
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
 
 static constexpr char CLI_PREFIX[] = "AC> ";
 
@@ -29,76 +28,50 @@ static inline void PrintCliPrefix()
     printf("%s", CLI_PREFIX);
 }
 
-#if AC_PLATFORM != AC_PLATFORM_WINDOWS
-#include <readline/readline.h>
-#include <readline/history.h>
-
-char* command_finder(const char* text, int state)
+#if ACORE_PLATFORM != ACORE_PLATFORM_WINDOWS
+namespace Acore::Impl::Readline
 {
-    static size_t idx, len;
-    const char* ret;
-    std::vector<ChatCommand> const& cmd = ChatHandler::getCommandTable();
-
-    if (!state)
+    static std::vector<std::string> vec;
+    char* cli_unpack_vector(char const*, int state)
     {
-        idx = 0;
-        len = strlen(text);
+        static size_t i=0;
+        if (!state)
+            i = 0;
+        if (i < vec.size())
+            return strdup(vec[i++].c_str());
+        else
+            return nullptr;
     }
 
-    while (idx < cmd.size())
+    char** cli_completion(char const* text, int /*start*/, int /*end*/)
     {
-        ret = cmd[idx].Name;
-        if (!cmd[idx].AllowConsole)
-        {
-            ++idx;
-            continue;
-        }
-
-        ++idx;
-        //printf("Checking %s \n", cmd[idx].Name);
-        if (strncmp(ret, text, len) == 0)
-            return strdup(ret);
+        ::rl_attempted_completion_over = 1;
+        vec = Acore::ChatCommands::GetAutoCompletionsFor(CliHandler(nullptr,nullptr), text);
+        return ::rl_completion_matches(text, &cli_unpack_vector);
     }
 
-    return ((char*)nullptr);
+    int cli_hook_func()
+    {
+           if (World::IsStopped())
+               ::rl_done = 1;
+           return 0;
+    }
 }
-
-char** cli_completion(const char* text, int start, int /*end*/)
-{
-    char** matches = nullptr;
-
-    if (start)
-        rl_bind_key('\t', rl_abort);
-    else
-        matches = rl_completion_matches((char*)text, &command_finder);
-    return matches;
-}
-
-int cli_hook_func()
-{
-    if (World::IsStopped())
-        rl_done = 1;
-    return 0;
-}
-
 #endif
 
-void utf8print(void* /*arg*/, const char* str)
+void utf8print(void* /*arg*/, std::string_view str)
 {
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-    wchar_t wtemp_buf[6000];
-    size_t wtemp_len = 6000 - 1;
-    if (!Utf8toWStr(str, strlen(str), wtemp_buf, wtemp_len))
+#if ACORE_PLATFORM == ACORE_PLATFORM_WINDOWS
+    std::wstring wbuf;
+    if (!Utf8toWStr(str, wbuf))
         return;
 
-    char temp_buf[6000];
-    CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], wtemp_len + 1);
-    printf(temp_buf);
+    wprintf(L"%s", wbuf.c_str());
 #else
-    {
-        printf("%s", str);
-        fflush(stdout);
-    }
+{
+    printf(STRING_VIEW_FMT, STRING_VIEW_FMT_ARG(str));
+    fflush(stdout);
+}
 #endif
 }
 
@@ -118,7 +91,7 @@ int kb_hit_return()
     tv.tv_usec = 0;
     FD_ZERO(&fds);
     FD_SET(STDIN_FILENO, &fds);
-    select(STDIN_FILENO + 1, &fds, nullptr, nullptr, &tv);
+    select(STDIN_FILENO+1, &fds, nullptr, nullptr, &tv);
     return FD_ISSET(STDIN_FILENO, &fds);
 }
 #endif
@@ -126,70 +99,69 @@ int kb_hit_return()
 /// %Thread start
 void CliRunnable::run()
 {
-    ///- Display the list of available CLI functions then beep
-    //TC_LOG_INFO("server.worldserver", "");
-#if AC_PLATFORM != AC_PLATFORM_WINDOWS
-    rl_attempted_completion_function = cli_completion;
-    rl_event_hook = cli_hook_func;
-#endif
-
-    if (sConfigMgr->GetOption<bool>("BeepAtStart", true))
-        printf("\a");                                       // \a = Alert
-
+#if ACORE_PLATFORM == ACORE_PLATFORM_WINDOWS
     // print this here the first time
     // later it will be printed after command queue updates
     PrintCliPrefix();
+#else
+    ::rl_attempted_completion_function = &Acore::Impl::Readline::cli_completion;
+    {
+        static char BLANK = '\0';
+        ::rl_completer_word_break_characters = &BLANK;
+    }
+    ::rl_event_hook = &Acore::Impl::Readline::cli_hook_func;
+#endif
+
+    if (sConfigMgr->GetBoolDefault("BeepAtStart", true))
+        printf("\a"); // \a = Alert
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
     {
         fflush(stdout);
 
-        char* command_str ;             // = fgets(commandbuf, sizeof(commandbuf), stdin);
+        std::string command;
 
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-        char commandbuf[256];
-        command_str = fgets(commandbuf, sizeof(commandbuf), stdin);
-#else
-        command_str = readline(CLI_PREFIX);
-        rl_bind_key('\t', rl_complete);
-#endif
-
-        if (command_str != nullptr)
+#if WARHEAD_PLATFORM == WARHEAD_PLATFORM_WINDOWS
+        wchar_t commandbuf[256];
+        if (fgetws(commandbuf, sizeof(commandbuf), stdin))
         {
-            for (int x = 0; command_str[x]; ++x)
-                if (command_str[x] == '\r' || command_str[x] == '\n')
-                {
-                    command_str[x] = 0;
-                    break;
-                }
-
-            if (!*command_str)
+            if (!WStrToUtf8(commandbuf, wcslen(commandbuf), command))
             {
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
                 PrintCliPrefix();
-#else
-                free(command_str);
-#endif
                 continue;
             }
-
-            std::string command;
-            if (!consoleToUtf8(command_str, command))         // convert from console encoding to utf8
-            {
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-                PrintCliPrefix();
+        }
 #else
-                free(command_str);
+        char* command_str = readline(CLI_PREFIX);
+        ::rl_bind_key('\t', ::rl_complete);
+        if (command_str != nullptr)
+        {
+            command = command_str;
+            free(command_str);
+        }
 #endif
-                continue;
+
+        if (!command.empty())
+        {
+            std::size_t nextLineIndex = command.find_first_of("\r\n");
+            if (nextLineIndex != std::string::npos)
+            {
+                if (nextLineIndex == 0)
+                {
+#if ACORE_PLATFORM == ACORE_PLATFORM_WINDOWS
+                    PrintCliPrefix();
+#endif
+                    continue;
+                }
+
+                command.erase(nextLineIndex);
             }
 
             fflush(stdout);
             sWorld->QueueCliCommand(new CliCommandHolder(nullptr, command.c_str(), &utf8print, &commandFinished));
-#if AC_PLATFORM != AC_PLATFORM_WINDOWS
+#if ACORE_PLATFORM != ACORE_PLATFORM_WINDOWS
             add_history(command.c_str());
-            free(command_str);
 #endif
         }
         else if (feof(stdin))

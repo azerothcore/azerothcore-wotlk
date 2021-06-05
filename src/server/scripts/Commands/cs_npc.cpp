@@ -23,6 +23,12 @@ EndScriptData */
 #include "Transport.h"
 #include <string>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 struct NpcFlagText
 {
     uint32 flag;
@@ -108,9 +114,9 @@ class npc_commandscript : public CommandScript
 public:
     npc_commandscript() : CommandScript("npc_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> npcAddCommandTable =
+        static ChatCommandTable npcAddCommandTable =
         {
             { "formation",      SEC_ADMINISTRATOR,  false, &HandleNpcAddFormationCommand,      "" },
             { "item",           SEC_ADMINISTRATOR,  false, &HandleNpcAddVendorItemCommand,     "" },
@@ -121,25 +127,25 @@ public:
             //}
             { "",               SEC_ADMINISTRATOR,  false, &HandleNpcAddCommand,               "" }
         };
-        static std::vector<ChatCommand> npcDeleteCommandTable =
+        static ChatCommandTable npcDeleteCommandTable =
         {
             { "item",           SEC_ADMINISTRATOR,  false, &HandleNpcDeleteVendorItemCommand,  "" },
             { "",               SEC_ADMINISTRATOR,  false, &HandleNpcDeleteCommand,            "" }
         };
-        static std::vector<ChatCommand> npcFollowCommandTable =
+        static ChatCommandTable npcFollowCommandTable =
         {
             { "stop",           SEC_GAMEMASTER,     false, &HandleNpcUnFollowCommand,          "" },
             { "",               SEC_GAMEMASTER,     false, &HandleNpcFollowCommand,            "" }
         };
 
-        static std::vector<ChatCommand> npcFactionCommandTable =
+        static ChatCommandTable npcFactionCommandTable =
         {
             { "permanent",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
             { "temp",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
             { "original",       SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" }
         };
 
-        static std::vector<ChatCommand> npcSetCommandTable =
+        static ChatCommandTable npcSetCommandTable =
         {
             { "allowmove",      SEC_ADMINISTRATOR,  false, &HandleNpcSetAllowMovementCommand,  "" },
             { "entry",          SEC_ADMINISTRATOR,  false, &HandleNpcSetEntryCommand,          "" },
@@ -158,7 +164,7 @@ public:
             { "subname",        SEC_ADMINISTRATOR,  false, &HandleNpcSetSubNameCommand,        "" }
             //}
         };
-        static std::vector<ChatCommand> npcCommandTable =
+        static ChatCommandTable npcCommandTable =
         {
             { "info",           SEC_MODERATOR,      false, &HandleNpcInfoCommand,              "" },
             { "near",           SEC_GAMEMASTER,     false, &HandleNpcNearCommand,              "" },
@@ -174,7 +180,7 @@ public:
             { "follow",         SEC_GAMEMASTER,     false, nullptr,                            "", npcFollowCommandTable },
             { "set",            SEC_ADMINISTRATOR,  false, nullptr,                            "", npcSetCommandTable }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "npc",            SEC_MODERATOR,      false, nullptr,                            "", npcCommandTable }
         };
@@ -680,7 +686,7 @@ public:
 
         creature->AI()->SetData(data_1, data_2);
         std::string AIorScript = creature->GetAIName() != "" ? "AI type: " + creature->GetAIName() : (creature->GetScriptName() != "" ? "Script Name: " + creature->GetScriptName() : "No AI or Script Name Set");
-        handler->PSendSysMessage(LANG_NPC_SETDATA, creature->GetGUID(), creature->GetEntry(), creature->GetName().c_str(), data_1, data_2, AIorScript.c_str());
+        handler->PSendSysMessage(LANG_NPC_SETDATA, creature->GetGUID().GetCounter(), creature->GetEntry(), creature->GetName().c_str(), data_1, data_2, AIorScript.c_str());
         return true;
     }
 

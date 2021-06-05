@@ -1457,7 +1457,7 @@ CreatureFamilyAssistanceDelay = 2000
 #    CreatureFamilyAssistancePeriod
 #        Description: Time (in milliseconds) before next creature assistance call.
 #        Default:     3000 - (3 Seconds)
-                      0    - (Disabled)
+#                     0    - (Disabled)
 
 CreatureFamilyAssistancePeriod = 3000
 
@@ -1625,30 +1625,34 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 #                     Collapses multiple subsequent whitespaces into a single whitespace.
 #                     Not applied to the addon language, but may break old addons that use
 #                     "normal" chat messages for sending data to other clients.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#        Default:     1 - (Enabled, Blizzlike)
+#                     0 - (Disabled)
+#
 
-ChatFakeMessagePreventing = 0
+ChatFakeMessagePreventing = 1
 
 #
 #    ChatStrictLinkChecking.Severity
 #        Description: Check chat messages for in-game links to spells, items, quests, etc.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled, Check if only valid pipe commands are used, Prevents posting
-#                         pictures.)
-#                     2 - (Enabled, Verify that pipe commands are used in a correct order)
-#                     3 - (Check if color, entry and name don't contradict each other. For this to
-#                         work correctly, please assure that you have extracted locale DBCs of
-#                         every language specific client playing on this server)
+#                     -1 - (Only verify validity of link data, but permit use of custom colors)
+#        Default:      0 - (Only verify that link data and color are valid without checking text)
+#                      1 - (Additionally verifies that the link text matches the provided data)
+#
+#        Note:        If this is set to '1', you must additionally provide .dbc files for all
+#                     client locales that are in use on your server.
+#                     If any files are missing, messages with links from clients using those
+#                     locales will likely be blocked by the server.
+#
 
 ChatStrictLinkChecking.Severity = 0
 
 #
 #    ChatStrictLinkChecking.Kick
-#        Description: Defines what should be done if a message is considered to contain invalid
-#                     pipe commands.
+#        Description: Defines what should be done if a message containing invalid control characters
+#                     is received.
 #        Default:     0 - (Silently ignore message)
-#                     1 - (Disconnect players who sent malformed messages)
+#                     1 - (Ignore message and kick player)
+#
 
 ChatStrictLinkChecking.Kick = 0
 

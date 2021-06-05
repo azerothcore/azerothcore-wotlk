@@ -7,14 +7,20 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class cheat_commandscript : public CommandScript
 {
 public:
     cheat_commandscript() : CommandScript("cheat_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> cheatCommandTable =
+        static ChatCommandTable cheatCommandTable =
         {
             { "god",            SEC_GAMEMASTER,     false, &HandleGodModeCheatCommand,         "" },
             { "casttime",       SEC_GAMEMASTER,     false, &HandleCasttimeCheatCommand,        "" },
@@ -26,7 +32,7 @@ public:
             { "explore",        SEC_GAMEMASTER,     false, &HandleExploreCheatCommand,         "" },
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "cheat",          SEC_GAMEMASTER,     false, nullptr,                  "", cheatCommandTable },
         };

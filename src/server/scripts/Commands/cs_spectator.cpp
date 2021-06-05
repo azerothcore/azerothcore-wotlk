@@ -10,14 +10,20 @@
 #include "ScriptMgr.h"
 #include "World.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class spectator_commandscript : public CommandScript
 {
 public:
     spectator_commandscript() : CommandScript("spectator_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> spectatorCommandTable =
+        static ChatCommandTable spectatorCommandTable =
         {
             { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,                  "" },
             { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,                    "" },
@@ -26,7 +32,7 @@ public:
             { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,                    "" },
             { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,                         "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "spect",          SEC_CONSOLE,        false, nullptr,                                         "", spectatorCommandTable }
         };

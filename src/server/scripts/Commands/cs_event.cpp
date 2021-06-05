@@ -17,21 +17,27 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class event_commandscript : public CommandScript
 {
 public:
     event_commandscript() : CommandScript("event_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> eventCommandTable =
+        static ChatCommandTable eventCommandTable =
         {
             { "activelist",     SEC_GAMEMASTER,     true,  &HandleEventActiveListCommand,     "" },
             { "start",          SEC_GAMEMASTER,     true,  &HandleEventStartCommand,          "" },
             { "stop",           SEC_GAMEMASTER,     true,  &HandleEventStopCommand,           "" },
             { "",               SEC_GAMEMASTER,     true,  &HandleEventInfoCommand,           "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "event",          SEC_GAMEMASTER,     false, nullptr,                  "", eventCommandTable }
         };

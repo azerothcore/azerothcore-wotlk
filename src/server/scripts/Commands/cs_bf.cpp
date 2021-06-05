@@ -15,14 +15,20 @@ EndScriptData */
 #include "Chat.h"
 #include "ScriptMgr.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class bf_commandscript : public CommandScript
 {
 public:
     bf_commandscript() : CommandScript("bf_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> battlefieldcommandTable =
+        static ChatCommandTable battlefieldcommandTable =
         {
             { "start",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldStart,            "" },
             { "stop",           SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnd,              "" },
@@ -30,7 +36,7 @@ public:
             { "timer",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldTimer,            "" },
             { "enable",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnable,           "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "bf",             SEC_ADMINISTRATOR,  false, nullptr,            "", battlefieldcommandTable }
         };
