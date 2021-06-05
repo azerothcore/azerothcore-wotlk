@@ -2344,28 +2344,6 @@ char const* Map::GetMapName() const
     return i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";
 }
 
-void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair)
-{
-    cell.SetNoCreate();
-    Acore::VisibleChangesNotifier notifier(*obj);
-    TypeContainerVisitor<Acore::VisibleChangesNotifier, WorldTypeMapContainer > player_notifier(notifier);
-    cell.Visit(cellpair, player_notifier, *this, *obj, obj->GetVisibilityRange());
-}
-
-void Map::UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair)
-{
-    Acore::VisibleNotifier notifier(*player, false, false);
-
-    cell.SetNoCreate();
-    TypeContainerVisitor<Acore::VisibleNotifier, WorldTypeMapContainer > world_notifier(notifier);
-    TypeContainerVisitor<Acore::VisibleNotifier, GridTypeMapContainer  > grid_notifier(notifier);
-    cell.Visit(cellpair, world_notifier, *this, *player->m_seer, player->GetSightRange());
-    cell.Visit(cellpair, grid_notifier, *this, *player->m_seer, player->GetSightRange());
-
-    // send data
-    notifier.SendToSelf();
-}
-
 void Map::SendInitSelf(Player* player)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
