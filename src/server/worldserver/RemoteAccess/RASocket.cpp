@@ -20,6 +20,7 @@
 #include "Util.h"
 #include "World.h"
 #include <thread>
+#include <sstream>
 
 RASocket::RASocket()
 {
