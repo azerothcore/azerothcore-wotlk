@@ -33,7 +33,7 @@ namespace boost::asio::ip
     typedef basic_endpoint<tcp> tcp_endpoint;
 }
 
-namespace acore::Asio
+namespace Acore::Asio
 {
     class DeadlineTimer;
     class IoContext;
