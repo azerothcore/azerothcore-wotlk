@@ -6,19 +6,20 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
-#include "Player.h"
 #include "ScriptMgr.h"
+#include "StringFormat.h" // del after new api support
 #include "Optional.h"
 #include <tuple>
 #include <vector>
 
-using namespace Acore::ChatCommands;
+// using namespace Acore::ChatCommands;
 
 class queue_commandscript : public CommandScript
 {
 public:
     queue_commandscript() : CommandScript("queue_commandscript") { }
 
+    /* New api chat commands
     ChatCommandTable GetCommands() const override
     {
         static ChatCommandTable queueShowArenaCommandTable = // .queue show arena
@@ -44,9 +45,37 @@ public:
         };
 
         return commandTable;
+    }*/
+
+    // Old api, need replace after start support new chat command api
+    std::vector<ChatCommand> GetCommands() const override
+    {
+        static std::vector<ChatCommand> account2faCommandTable
+        {
+            { "rated",   SEC_PLAYER,  false,  &HandleQueueShowArenaRatedCommand,      "" },
+            { "normal",  SEC_PLAYER,  false,  &HandleQueueShowArenaNormalCommand,     "" },
+        };
+
+        static std::vector<ChatCommand> queueShowCommandTable = // .queue show
+        {
+            { "arena",  SEC_PLAYER, true, nullptr, "", queueShowCommandTable },
+            { "bg",     SEC_PLAYER,         false,  &HandleQueueShowBgCommand, "" }
+        };
+
+        static std::vector<ChatCommand> queueCommandTable = // .queue
+        {
+            { "show",   SEC_PLAYER, true, nullptr, "", queueShowCommandTable }
+        };
+
+        static std::vector<ChatCommand> commandTable =
+        {
+            { "queue",  SEC_PLAYER, true, nullptr, "", queueCommandTable }
+        };
+
+        return commandTable;
     }
 
-    static bool HandleQueueShowArenaRatedCommand(ChatHandler* handler)
+    static bool HandleQueueShowArenaRatedCommand(ChatHandler* handler, char const* /*args*/)
     {
         using QueueTemplate = std::tuple<
             char const*, // team name
@@ -108,7 +137,7 @@ public:
         return true;
     }
 
-    static bool HandleQueueShowArenaNormalCommand(ChatHandler* handler)
+    static bool HandleQueueShowArenaNormalCommand(ChatHandler* handler, char const* /*args*/)
     {
         using QueueTemplate = std::tuple<
             std::string, // arena type
@@ -140,7 +169,7 @@ public:
             if (!arenaType)
                 return std::nullopt;
 
-            auto arenatype = Warhead::StringFormat("%uv%u", arenaType, arenaType);
+            auto arenatype = Acore::StringFormat("%uv%u", arenaType, arenaType);
             uint32 playersNeed = ArenaTeam::GetReqPlayersForType(arenaType);
             uint32 minLevel = std::min(bracketEntry->minLevel, (uint32)80);
             uint32 maxLevel = std::min(bracketEntry->maxLevel, (uint32)80);
@@ -189,7 +218,7 @@ public:
         return true;
     }
 
-    static bool HandleQueueShowBgCommand(ChatHandler* handler)
+    static bool HandleQueueShowBgCommand(ChatHandler* handler, char const* /*args*/)
     {
         using QueueTemplate = std::tuple<
             char const*, // bg name
