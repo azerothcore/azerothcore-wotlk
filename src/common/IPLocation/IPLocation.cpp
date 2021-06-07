@@ -78,8 +78,8 @@ void IpLocationStore::Load()
         // Convert country code to lowercase
         std::transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::tolower);
 
-        auto IpFrom = acore::StringTo<uint32>(ipFrom);
-        auto IpTo = acore::StringTo<uint32>(ipTo);
+        auto IpFrom = Acore::StringTo<uint32>(ipFrom);
+        auto IpTo = Acore::StringTo<uint32>(ipTo);
 
         if (!IpFrom || !IpTo)
             continue;
