@@ -812,7 +812,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 void WorldSession::HandleChannelDeclineInvite(WorldPacket& recvPacket)
 {
     // used only with EXTRA_LOGS
-    UNUSED(recvPacket);
+    (void)recvPacket;
 
     LOG_DEBUG("network", "Opcode %u", recvPacket.GetOpcode());
 }

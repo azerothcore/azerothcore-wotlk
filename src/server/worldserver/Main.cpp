@@ -122,6 +122,9 @@ extern int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
+    // Loading modules configs
+    sConfigMgr->LoadModulesConfigs();
+
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
