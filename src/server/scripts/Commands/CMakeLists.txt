@@ -48,6 +48,7 @@ set(scripts_STAT_SRCS
   Commands/cs_wp.cpp
   Commands/cs_spectator.cpp
   Commands/cs_player.cpp
+  Commands/cs_queue.cpp
 #  Commands/cs_pdump.cpp
 #  Commands/cs_channel.cpp
 #  Commands/cs_pet.cpp
