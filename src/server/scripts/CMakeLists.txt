@@ -396,7 +396,7 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
       endif()
     endif()
   else()
-    message(FATAL_ERROR "Unknown value \"${${MODULE_MODULE_VARIABLE}}\"!")
+    message(FATAL_ERROR "Unknown value \"${${MODULE_MODULE_VARIABLE}}\" for module (${SOURCE_MODULE})!")
   endif()
 endforeach()
 
