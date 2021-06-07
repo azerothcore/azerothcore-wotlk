@@ -9,6 +9,7 @@
 */
 
 #include "ACSoap.h"
+#include "AsyncAcceptor.h"
 #include "BigNumber.h"
 #include "CliRunnable.h"
 #include "Common.h"
@@ -16,10 +17,11 @@
 #include "DatabaseEnv.h"
 #include "DatabaseWorkerPool.h"
 #include "GitRevision.h"
+#include "IoContext.h"
 #include "Log.h"
 #include "Master.h"
 #include "OpenSSLCrypto.h"
-#include "RARunnable.h"
+#include "RASession.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SignalHandler.h"
@@ -98,6 +100,7 @@ public:
 };
 
 bool LoadRealmInfo();
+AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext);
 
 Master* Master::instance()
 {
@@ -108,6 +111,8 @@ Master* Master::instance()
 /// Main function
 int Master::Run()
 {
+    std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
+
     OpenSSLCrypto::threadsSetup();
     BigNumber seed1;
     seed1.SetRand(16 * 8);
@@ -138,7 +143,7 @@ int Master::Run()
     LoadRealmInfo();
 
     // Loading modules configs
-    sConfigMgr->LoadModulesConfigs();
+    sConfigMgr->PrintLoadedModulesConfigs();
 
     ///- Initialize the World
     sSecretMgr->Initialize();
@@ -173,11 +178,14 @@ int Master::Run()
         cliThread = new Acore::Thread(new CliRunnable);
     }
 
-    Acore::Thread rarThread(new RARunnable);
-
     // pussywizard:
     Acore::Thread auctionLising_thread(new AuctionListingRunnable);
     auctionLising_thread.setPriority(Acore::Priority_High);
+
+    // Start the Remote Access port (acceptor) if enabled
+    std::unique_ptr<AsyncAcceptor> raAcceptor;
+    if (sConfigMgr->GetOption<bool>("Ra.Enable", false))
+        raAcceptor.reset(StartRaSocketAcceptor(*ioContext));
 
     // Start soap serving thread if enabled
     std::shared_ptr<std::thread> soapThread;
@@ -218,7 +226,6 @@ int Master::Run()
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
     worldThread.wait();
-    rarThread.wait();
     auctionLising_thread.wait();
 
     if (freezeThread)
@@ -409,4 +416,21 @@ bool LoadRealmInfo()
     realm.PopulationLevel = fields[10].GetFloat();
     realm.Build = fields[11].GetUInt32();
     return true;
+}
+
+AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext)
+{
+    uint16 raPort = uint16(sConfigMgr->GetOption<int32>("Ra.Port", 3443));
+    std::string raListener = sConfigMgr->GetOption<std::string>("Ra.IP", "0.0.0.0");
+
+    AsyncAcceptor* acceptor = new AsyncAcceptor(ioContext, raListener, raPort);
+    if (!acceptor->Bind())
+    {
+        LOG_ERROR("server.worldserver", "Failed to bind RA socket acceptor");
+        delete acceptor;
+        return nullptr;
+    }
+
+    acceptor->AsyncAccept<RASession>();
+    return acceptor;
 }
