@@ -21095,7 +21095,8 @@ void Player::SendAutoRepeatCancel(Unit* target)
     SendMessageToSet(&data, true);
 
     // To properly cancel autoshot done by client
-    SendAttackSwingCancelAttack();
+    if (!HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+        SendAttackSwingCancelAttack();
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
