@@ -9,7 +9,6 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-#
 
 # Returns the base path to the script directory in the source directory
 function(GetModulesBasePath variable)
@@ -37,14 +36,7 @@ function(GetModuleSourceList variable)
     ${BASE_PATH}/*)
 
   set(${variable})
-
   foreach(SOURCE_MODULE ${LOCALE_MODULE_LIST})
-
-    # Add support old api modules disable
-    if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
-      continue()
-    endif()
-
     GetPathToModuleSource(${SOURCE_MODULE} MODULE_SOURCE_PATH)
     if(IS_DIRECTORY ${MODULE_SOURCE_PATH})
       list(APPEND ${variable} ${SOURCE_MODULE})

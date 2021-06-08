@@ -70,6 +70,7 @@ option(ENABLE_EXTRA_LOGS   "Enable extra log functions that can be CPU intensive
 option(WITH_DYNAMIC_LINKING "Enable dynamic library linking."                            0)
 
 IsDynamicLinkingRequired(WITH_DYNAMIC_LINKING_FORCED)
+IsDynamicLinkingModulesRequired(WITH_DYNAMIC_LINKING_FORCED)
 
 if(WITH_DYNAMIC_LINKING AND WITH_DYNAMIC_LINKING_FORCED)
   set(WITH_DYNAMIC_LINKING_FORCED OFF)
