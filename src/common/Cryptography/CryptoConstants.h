@@ -8,7 +8,7 @@
 
 #include "Define.h"
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     struct Constants
     {

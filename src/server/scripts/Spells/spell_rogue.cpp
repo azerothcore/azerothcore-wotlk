@@ -395,7 +395,7 @@ public:
         {
             while (!_targets.empty())
             {
-                ObjectGuid guid = acore::Containers::SelectRandomContainerElement(_targets);
+                ObjectGuid guid = Acore::Containers::SelectRandomContainerElement(_targets);
                 if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                 {
                     // xinef: target may be no longer valid
@@ -520,7 +520,7 @@ public:
             PlayerSpellMap const& spellMap = caster->GetSpellMap();
             for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
                 if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
                 {
                     if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep

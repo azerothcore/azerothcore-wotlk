@@ -1205,8 +1205,7 @@ bool ConditionMgr::addToGossipMenuItems(Condition* cond)
 bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
 {
     uint32 conditionEffMask = cond->SourceGroup;
-    SpellInfo* spellInfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(cond->SourceEntry));
-    ASSERT(spellInfo);
+    SpellInfo* spellInfo = const_cast<SpellInfo*>(sSpellMgr->AssertSpellInfo(cond->SourceEntry));
     std::list<uint32> sharedMasks;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
