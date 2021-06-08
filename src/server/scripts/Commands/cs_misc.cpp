@@ -3363,30 +3363,37 @@ public:
         return true;
     }
 
-    static bool HandleStringCommand(ChatHandler *handler, char const *args) {
-        if (!*args) {
+    static bool HandleStringCommand(ChatHandler *handler, char const *args)
+    {
+        if (!*args)
+        {
             handler->SendSysMessage(LANG_CMD_SYNTAX);
             return false;
         }
 
         uint32 id = atoi(strtok((char*)args, " "));
-        if(id == 0) {
+        if(id == 0)
+        {
             handler->SendSysMessage(LANG_CMD_SYNTAX);
             return false;
         }
 
         uint32 locale = 0;
         char* localeString = strtok(nullptr, " ");
-        if(localeString != nullptr) {
+        if(localeString != nullptr)
+        {
             locale = atoi(localeString);
         }
 
         const char* str = sObjectMgr->GetAcoreString(id, static_cast<LocaleConstant>(locale));
 
-        if(strcmp(str, "<error>") == 0) {
+        if(strcmp(str, "<error>") == 0)
+        {
             handler->PSendSysMessage(LANG_NO_ACORE_STRING_FOUND, id);
             return true;
-        } else {
+        }
+        else
+        {
             handler->SendSysMessage(str);
             return true;
         }
