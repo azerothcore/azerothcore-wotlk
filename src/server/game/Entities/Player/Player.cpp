@@ -9379,7 +9379,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         // Xinef: Store container id
         loot->containerGUID = item->GetGUID();
 
-        if (!item->m_lootGenerated && !sLootItemStorage->LoadStoredLoot(item))
+        if (!item->m_lootGenerated && !sLootItemStorage->LoadStoredLoot(item, this))
         {
             item->m_lootGenerated = true;
             loot->clear();
