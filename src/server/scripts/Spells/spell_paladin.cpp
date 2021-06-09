@@ -103,7 +103,13 @@ public:
                 if (procSpell->IsAffectingArea())
                     targets = 1;
 
-            eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, eventInfo.GetActionTarget(), false, nullptr, aurEff);
+            if (Unit* target = eventInfo.GetActionTarget())
+            {
+                if (target->IsAlive())
+                {
+                    eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, target, false, nullptr, aurEff);
+                }
+            }
         }
 
         void Register() override
