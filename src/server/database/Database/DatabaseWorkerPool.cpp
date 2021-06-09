@@ -7,11 +7,12 @@
 #include "AdhocStatement.h"
 #include "Common.h"
 #include "Errors.h"
+#include "Implementation/CharacterDatabase.h"
 #include "Implementation/LoginDatabase.h"
 #include "Implementation/WorldDatabase.h"
-#include "Implementation/CharacterDatabase.h"
 #include "Log.h"
 #include "MySQLPreparedStatement.h"
+#include "MySQLWorkaround.h"
 #include "PreparedStatement.h"
 #include "ProducerConsumerQueue.h"
 #include "QueryCallback.h"
@@ -19,12 +20,11 @@
 #include "QueryResult.h"
 #include "SQLOperation.h"
 #include "Transaction.h"
-#include "MySQLWorkaround.h"
 #include <mysqld_error.h>
 
 #ifdef ACORE_DEBUG
-#include <sstream>
 #include <boost/stacktrace.hpp>
+#include <sstream>
 #endif
 
 #define MIN_MYSQL_SERVER_VERSION 50700u

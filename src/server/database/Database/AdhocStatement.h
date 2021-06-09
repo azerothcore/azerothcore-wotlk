@@ -6,8 +6,8 @@
 #ifndef _ADHOCSTATEMENT_H
 #define _ADHOCSTATEMENT_H
 
-#include "Define.h"
 #include "DatabaseEnvFwd.h"
+#include "Define.h"
 #include "SQLOperation.h"
 
 /*! Raw, ad-hoc query. */

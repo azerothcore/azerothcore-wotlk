@@ -6,11 +6,11 @@
 #ifndef DATABASEENV_H
 #define DATABASEENV_H
 
-#include "Define.h"
 #include "DatabaseWorkerPool.h"
+#include "Define.h"
 
-#include "Implementation/LoginDatabase.h"
 #include "Implementation/CharacterDatabase.h"
+#include "Implementation/LoginDatabase.h"
 #include "Implementation/WorldDatabase.h"
 
 #include "Field.h"

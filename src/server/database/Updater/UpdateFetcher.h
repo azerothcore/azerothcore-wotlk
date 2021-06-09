@@ -6,8 +6,8 @@
 #ifndef UpdateFetcher_h__
 #define UpdateFetcher_h__
 
-#include "Define.h"
 #include "DatabaseEnv.h"
+#include "Define.h"
 #include <set>
 #include <string>
 #include <unordered_map>

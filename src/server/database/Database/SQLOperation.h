@@ -6,8 +6,8 @@
 #ifndef _SQLOPERATION_H
 #define _SQLOPERATION_H
 
-#include "Define.h"
 #include "DatabaseEnvFwd.h"
+#include "Define.h"
 
 //- Union that holds element data
 union SQLElementUnion

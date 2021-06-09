@@ -5,11 +5,11 @@
 
 #include "PreparedStatement.h"
 #include "Errors.h"
+#include "Log.h"
 #include "MySQLConnection.h"
 #include "MySQLPreparedStatement.h"
-#include "QueryResult.h"
-#include "Log.h"
 #include "MySQLWorkaround.h"
+#include "QueryResult.h"
 
 PreparedStatementBase::PreparedStatementBase(uint32 index, uint8 capacity) :
 m_index(index), statement_data(capacity) { }

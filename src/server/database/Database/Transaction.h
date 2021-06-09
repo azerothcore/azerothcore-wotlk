@@ -6,8 +6,8 @@
 #ifndef _TRANSACTION_H
 #define _TRANSACTION_H
 
-#include "Define.h"
 #include "DatabaseEnvFwd.h"
+#include "Define.h"
 #include "SQLOperation.h"
 #include "StringFormat.h"
 #include <functional>

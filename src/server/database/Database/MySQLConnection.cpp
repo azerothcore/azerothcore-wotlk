@@ -9,15 +9,15 @@
 #include "Log.h"
 #include "MySQLHacks.h"
 #include "MySQLPreparedStatement.h"
+#include "MySQLWorkaround.h"
 #include "PreparedStatement.h"
 #include "QueryResult.h"
 #include "Timer.h"
+#include "Tokenize.h"
 #include "Transaction.h"
 #include "Util.h"
-#include "Tokenize.h"
-#include "MySQLWorkaround.h"
-#include <mysqld_error.h>
 #include <errmsg.h>
+#include <mysqld_error.h>
 
 MySQLConnectionInfo::MySQLConnectionInfo(std::string const& infoString)
 {

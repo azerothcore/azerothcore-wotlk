@@ -6,8 +6,8 @@
 #ifndef DBUpdater_h__
 #define DBUpdater_h__
 
-#include "Define.h"
 #include "DatabaseEnv.h"
+#include "Define.h"
 #include <string>
 
 template <class T>

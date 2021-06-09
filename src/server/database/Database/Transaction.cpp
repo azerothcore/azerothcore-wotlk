@@ -3,8 +3,8 @@
  * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
-#include "Log.h"
 #include "Transaction.h"
+#include "Log.h"
 #include "MySQLConnection.h"
 #include "PreparedStatement.h"
 #include "Timer.h"

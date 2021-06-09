@@ -6,8 +6,8 @@
 #ifndef QUERYRESULT_H
 #define QUERYRESULT_H
 
-#include "Define.h"
 #include "DatabaseEnvFwd.h"
+#include "Define.h"
 #include <vector>
 
 class AC_DATABASE_API ResultSet

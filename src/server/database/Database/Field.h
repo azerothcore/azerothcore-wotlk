@@ -6,8 +6,8 @@
 #ifndef _FIELD_H
 #define _FIELD_H
 
-#include "Define.h"
 #include "DatabaseEnvFwd.h"
+#include "Define.h"
 #include <array>
 #include <string>
 #include <string_view>
