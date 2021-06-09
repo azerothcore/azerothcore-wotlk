@@ -1,4 +1,4 @@
-name: core-build
+name: core-modules-build
 on:
   push:
     branches:
@@ -13,38 +13,8 @@ jobs:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
         os: [ubuntu-20.04]
         compiler: [clang]
-        modules: [without]
+        modules: [with]
         extra_logs: [false]
-        # we can include specific combinations here
-        include:
-          - os: ubuntu-20.04
-            compiler: clang11
-            modules: without
-            extra_logs: true
-          - os: ubuntu-20.04
-            compiler: clang11
-            modules: without
-            extra_logs: false
-          - os: ubuntu-20.04
-            compiler: clang8
-            modules: without
-            extra_logs: false
-          - os: ubuntu-18.04
-            compiler: clang7
-            modules: without
-            extra_logs: false
-          - os: ubuntu-18.04
-            compiler: gcc8
-            modules: without
-            extra_logs: false
-          - os: ubuntu-20.04
-            compiler: gcc # default in 20.04 is gcc 9
-            modules: without
-            extra_logs: false
-          - os: ubuntu-20.04
-            compiler: gcc10
-            modules: without
-            extra_logs: false
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules-extra_logs-${{ matrix.extra_logs }}
     env:
