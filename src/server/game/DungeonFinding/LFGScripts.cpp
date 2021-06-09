@@ -179,8 +179,8 @@ namespace lfg
     void LFGGroupScript::OnRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, char const* reason)
     {
         // used only with EXTRA_LOGS
-        UNUSED(kicker);
-        UNUSED(reason);
+        (void)kicker;
+        (void)reason;
 
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
             return;
@@ -280,7 +280,7 @@ namespace lfg
     void LFGGroupScript::OnInviteMember(Group* group, ObjectGuid guid)
     {
         // used only with EXTRA_LOGS
-        UNUSED(guid);
+        (void)guid;
 
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
             return;

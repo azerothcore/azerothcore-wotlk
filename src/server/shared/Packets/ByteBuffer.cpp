@@ -40,7 +40,7 @@ ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size, si
 
 ByteBufferInvalidValueException::ByteBufferInvalidValueException(char const* type, char const* value)
 {
-    message().assign(acore::StringFormat("Invalid %s value (%s) found in ByteBuffer", type, value));
+    message().assign(Acore::StringFormat("Invalid %s value (%s) found in ByteBuffer", type, value));
 }
 
 ByteBuffer& ByteBuffer::operator>>(float& value)
