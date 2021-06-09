@@ -7,8 +7,8 @@
 #include "MMapManager.h"
 #include "Config.h"
 #include "Errors.h"
-#include "MapDefines.h"
 #include "Log.h"
+#include "MapDefines.h"
 #include "StringFormat.h"
 
 namespace MMAP

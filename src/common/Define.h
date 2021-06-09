@@ -8,9 +8,9 @@
 #define ACORE_DEFINE_H
 
 #include "CompilerDefs.h"
-#include <cstddef>
 #include <cinttypes>
 #include <climits>
+#include <cstddef>
 
 #define ACORE_LITTLEENDIAN 0
 #define ACORE_BIGENDIAN    1

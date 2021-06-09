@@ -5,13 +5,13 @@
  */
 
 #include "TileAssembler.h"
-#include "MapTree.h"
 #include "BoundingIntervalHierarchy.h"
-#include "VMapDefinitions.h"
 #include "MapDefines.h"
+#include "MapTree.h"
+#include "VMapDefinitions.h"
+#include <iomanip>
 #include <set>
 #include <sstream>
-#include <iomanip>
 
 using G3D::Vector3;
 using G3D::AABox;
