@@ -201,14 +201,11 @@ void BattlefieldWG::SpawnCreatures()
     }
 
     // Hide NPCs from the Attacker's team in the keep
-    for (GuidSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
+    for (GuidUnorderedSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
     {
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+        if (Creature* creature = GetCreature(*itr))
         {
-            if (Creature* creature = unit->ToCreature())
-            {
                 HideNpc(creature);
-            }
         }
     }
 
@@ -242,14 +239,11 @@ void BattlefieldWG::SpawnCreatures()
     }
 
     // Hide units outside the keep that are defenders
-    for (GuidSet::const_iterator itr = OutsideCreature[GetDefenderTeam()].begin(); itr != OutsideCreature[GetDefenderTeam()].end(); ++itr)
+    for (GuidUnorderedSet::const_iterator itr = OutsideCreature[GetDefenderTeam()].begin(); itr != OutsideCreature[GetDefenderTeam()].end(); ++itr)
     {
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+        if (Creature* creature = GetCreature(*itr))
         {
-            if (Creature* creature = unit->ToCreature())
-            {
                 HideNpc(creature);
-            }
         }
     }
 }
@@ -354,7 +348,7 @@ void BattlefieldWG::OnBattleStart()
                         {
                             // Using 0 and 1 instead of TeamId to avoid type error checking
                         case 0:
-                            if (IsPlayerInQueue(player->GetGUIDLow(), TEAM_ALLIANCE))
+                            if (IsPlayerInQueue(player->GetGUID(), TEAM_ALLIANCE))
                             {
                                 if (GetDefenderTeam() == TEAM_ALLIANCE)
                                 {
@@ -383,7 +377,7 @@ void BattlefieldWG::OnBattleStart()
                             }
                             break;
                         case 1:
-                            if (IsPlayerInQueue(player->GetGUIDLow(), TEAM_HORDE))
+                            if (IsPlayerInQueue(player->GetGUID(), TEAM_HORDE))
                             {
                                 if (GetDefenderTeam() == TEAM_HORDE)
                                 {
