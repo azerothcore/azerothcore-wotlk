@@ -1666,6 +1666,17 @@ void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* ac
     FOREACH_SCRIPT(PlayerScript)->OnAchiComplete(player, achievement);
 }
 
+void ScriptMgr::OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+    if (!itr->second->OnBeforeCriteriaProgress(player, criteria))
+        ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
 void ScriptMgr::OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
 {
     FOREACH_SCRIPT(PlayerScript)->OnCriteriaProgress(player, criteria);
