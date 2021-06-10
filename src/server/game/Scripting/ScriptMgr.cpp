@@ -1344,13 +1344,13 @@ void ScriptMgr::OnShutdown()
     FOREACH_SCRIPT(WorldScript)->OnShutdown();
 }
 
-bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
+bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id)
 {
     ASSERT(source);
     // target can be nullptr.
 
     GET_SCRIPT_RET(AchievementCriteriaScript, scriptId, tmpscript, false);
-    return tmpscript->OnCheck(source, target);
+    return tmpscript->OnCheck(source, target, criteria_id);
 }
 
 // Player
@@ -1648,6 +1648,17 @@ void ScriptMgr::OnPlayerAddToBattleground(Player* player, Battleground* bg)
 void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
 {
     FOREACH_SCRIPT(PlayerScript)->OnRemoveFromBattleground(player, bg);
+}
+
+bool ScriptMgr::OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+    if (!itr->second->OnBeforeAchiComplete(player, achievement))
+        ret = false; // we change ret value only when scripts return false
+
+    return ret;
 }
 
 void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* achievement)

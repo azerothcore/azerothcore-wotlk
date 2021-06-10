@@ -688,7 +688,7 @@ protected:
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
-    // deprecated/legacy
+    [[nodiscard]] virtual bool OnCheck(Player* /*source*/, Unit* /*target*/, uint32 /*criteria_id*/) { return true; };
     [[nodiscard]] virtual bool OnCheck(Player* /*source*/, Unit* /*target*/) { return true; };
 };
 
@@ -829,6 +829,9 @@ public:
 
     // Called when a player complete an achievement
     virtual void OnAchiComplete(Player* /*player*/, AchievementEntry const* /*achievement*/) { }
+
+    // Called before player complete an achievement, can be used to disable achievements in certain conditions
+    virtual bool OnBeforeAchiComplete(Player* /*player*/, AchievementEntry const* /*achievement*/) { return true; }
 
     // Called when a player complete an achievement criteria
     virtual void OnCriteriaProgress(Player* /*player*/, AchievementCriteriaEntry const* /*criteria*/) { }
@@ -1549,7 +1552,7 @@ public: /* TransportScript */
     void OnRelocate(Transport* transport, uint32 waypointId, uint32 mapId, float x, float y, float z);
 
 public: /* AchievementCriteriaScript */
-    bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target);
+    bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id);
 
 public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
@@ -1596,6 +1599,7 @@ public: /* PlayerScript */
     void OnPlayerAddToBattleground(Player* player, Battleground* bg);
     void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
     void OnAchievementComplete(Player* player, AchievementEntry const* achievement);
+    bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
     void OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
     void OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
     void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData);

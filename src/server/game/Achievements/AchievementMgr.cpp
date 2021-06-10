@@ -359,7 +359,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
             return target->getGender() == gender.gender;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT:
-            return sScriptMgr->OnCriteriaCheck(ScriptId, const_cast<Player*>(source), const_cast<Unit*>(target));
+            return sScriptMgr->OnCriteriaCheck(ScriptId, const_cast<Player*>(source), const_cast<Unit*>(target), criteria_id);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY:
             {
                 if (source->GetMap()->IsRaid())
@@ -2177,6 +2177,11 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     {
         LOG_INFO("server", "Not available in GM mode.");
         ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");
+        return;
+    }
+
+    if (!sScriptMgr->OnBeforeAchievementComplete(GetPlayer(), achievement))
+    {
         return;
     }
 
