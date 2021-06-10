@@ -86,7 +86,6 @@ public:
     // Used when player is activated/inactivated in the area
     virtual bool HandlePlayerEnter(Player* player);
     virtual GuidUnorderedSet::iterator HandlePlayerLeave(Player* player);
-    //virtual void HandlePlayerActivityChanged(Player* player);
 
     // Checks if player is in range of a capture credit marker
     bool IsInsideObjective(Player* player) const;
@@ -243,6 +242,8 @@ public:
     void ToggleBattlefield(bool enable) { m_IsEnabled = enable; }
     /// Return if battlefield is enable
     bool IsEnabled() { return m_IsEnabled; }
+
+    bool IsPlayerInQueue(uint64 guid, TeamId faction) { return m_PlayersInQueue[faction].find(guid) != m_PlayersInQueue[faction].end(); }
 
     /**
      * \brief Kick player from battlefield and teleport him to kick-point location

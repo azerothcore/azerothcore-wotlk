@@ -23,7 +23,6 @@ typedef std::set<GameObject*> GameObjectSet;
 typedef std::set<BfWGGameObjectBuilding*> GameObjectBuilding;
 typedef std::set<WGWorkshop*> Workshop;
 typedef std::set<Group*> GroupSet;
-//typedef std::set<WintergraspCapturePoint *> CapturePointSet; unused ?
 
 const uint32 VehNumWorldState[2] = { 3680, 3490 };
 const uint32 MaxVehNumWorldState[2] = { 3681, 3491 };
@@ -319,6 +318,8 @@ public:
      */
     void OnPlayerEnterZone(Player* player) override;
 
+    void SpawnCreatures();
+
     /**
      * \brief Called for update battlefield data
      * - Save battle timer in database every minutes
@@ -442,6 +443,14 @@ public:
         return false;
     }
 protected:
+    enum wg_events
+    {
+        EVENT_SAVE,
+        EVENT_UPDATE_TENACITY,
+    };
+
+    EventMap m_events;
+
     bool m_isRelicInteractible;
 
     Workshop WorkshopsList;
@@ -461,13 +470,24 @@ protected:
     uint32 m_saveTimer;
 
     ObjectGuid m_titansRelic;
+
+    // Position for Defenders, Attackers and Removing players
+    Position kicked_position{ 5728.117f, 2714.346f, 697.733f, 0.0f };
+    Position attacking_position{ 5101.284180f, 2186.563965f, 365.620117f, 3.812000f };
+    Position defending_position{ 5345.0f, 2842.0f, 410.0f, 3.14f };
+
+    // Wintergrasp relic position
+    Position relic_position{ 5440.0f, 2840.8f, 430.43f, 0.0f };
+
+    // Keep positions to avoid cheaters from winning WG
+    Position north_keep_position{ 5500.0f, 2880.0f, 480.0f, 0.0f };
+    Position south_keep_position{ 5392.0f, 2800.0f, 480.0f, 0.0f };
 };
 
 const uint8 WG_MAX_OBJ = 32;
 const uint8 WG_MAX_TURRET = 16;
 const uint8 WG_MAX_KEEP_NPC = 45;
-const uint8 WG_MAX_OUTSIDE_NPC = 14;
-const uint8 WG_OUTSIDE_ALLIANCE_NPC = 7;
+const uint8 WG_MAX_OUTSIDE_NPC = 7;
 const uint8 WG_MAX_TELEPORTER = 12;
 
 enum WintergraspGameObjectBuildingType
@@ -496,22 +516,22 @@ enum WintergraspGameObjectState
 
 enum WintergraspWorkshopIds
 {
+    BATTLEFIELD_WG_WORKSHOP_KEEP_WEST,
+    BATTLEFIELD_WG_WORKSHOP_KEEP_EAST,
     BATTLEFIELD_WG_WORKSHOP_NE,
     BATTLEFIELD_WG_WORKSHOP_NW,
     BATTLEFIELD_WG_WORKSHOP_SE,
     BATTLEFIELD_WG_WORKSHOP_SW,
-    BATTLEFIELD_WG_WORKSHOP_KEEP_WEST,
-    BATTLEFIELD_WG_WORKSHOP_KEEP_EAST,
 };
 
 enum WintergraspWorldstates
 {
+    WORLDSTATE_WORKSHOP_K_W = 3698,
+    WORLDSTATE_WORKSHOP_K_E = 3699,
     WORLDSTATE_WORKSHOP_NE = 3701,
     WORLDSTATE_WORKSHOP_NW = 3700,
     WORLDSTATE_WORKSHOP_SE = 3703,
     WORLDSTATE_WORKSHOP_SW = 3702,
-    WORLDSTATE_WORKSHOP_K_W = 3698,
-    WORLDSTATE_WORKSHOP_K_E = 3699
 };
 
 // TODO: Handle this with creature_text ?
@@ -526,8 +546,10 @@ enum eWGText
     BATTLEFIELD_WG_TEXT_WORKSHOP_NW_TAKEN        = 12, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_SE_TAKEN        = 16, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_SW_TAKEN        = 24, // Ally, horde +2
-    BATTLEFIELD_WG_TEXT_DEFEND_KEEP              = 29, // Ally, horde +2
-    BATTLEFIELD_WG_TEXT_WIN_KEEP                 = 30, // Ally, horde +2
+    BATTLEFIELD_WG_TEXT_ALLIANCE_DEFENDED = 29,
+    BATTLEFIELD_WG_TEXT_ALLIANCE_CAPTURED = 30,
+    BATTLEFIELD_WG_TEXT_HORDE_DEFENDED = 31,
+    BATTLEFIELD_WG_TEXT_HORDE_CAPTURED = 32,
     BATTLEFIELD_WG_TEXT_WILL_START               = 27,
     BATTLEFIELD_WG_TEXT_FIRSTRANK                = 37,
     BATTLEFIELD_WG_TEXT_SECONDRANK               = 38,
@@ -721,7 +743,7 @@ const WintergraspObjectPositionData WGKeepNPC[WG_MAX_KEEP_NPC] =
     { 5316.770996f, 2619.430176f, 409.027740f, 5.363431f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A }        // Standing Guard
 };
 
-const WintergraspObjectPositionData WGOutsideNPC[WG_MAX_OUTSIDE_NPC] =
+const WintergraspObjectPositionData WGOutsideNPCHorde[WG_MAX_OUTSIDE_NPC] =
 {
     { 5032.04f, 3681.79f, 362.980f, 4.210f, BATTLEFIELD_WG_NPC_VIERON_BLAZEFEATHER, 0 },
     { 5020.71f, 3626.19f, 360.150f, 4.640f, BATTLEFIELD_WG_NPC_HOODOO_MASTER_FU_JIN, 0 },
@@ -730,6 +752,10 @@ const WintergraspObjectPositionData WGOutsideNPC[WG_MAX_OUTSIDE_NPC] =
     { 5031.12f, 3663.77f, 363.500f, 3.110f, BATTLEFIELD_WG_NPC_SIEGESMITH_STRONGHOOF, 0 },
     { 5042.74f, 3675.82f, 363.060f, 3.358f, BATTLEFIELD_WG_NPC_PRIMALIST_MULFORT, 0 },
     { 5014.45f, 3640.87f, 361.390f, 3.280f, BATTLEFIELD_WG_NPC_LIEUTENANT_MURP, 0 },
+};
+
+const WintergraspObjectPositionData WGOutsideNPCAlliance[WG_MAX_OUTSIDE_NPC] =
+{
     { 5100.07f, 2168.89f, 365.779f, 1.972f, 0, BATTLEFIELD_WG_NPC_BOWYER_RANDOLPH },
     { 5081.70f, 2173.73f, 365.878f, 0.855f, 0, BATTLEFIELD_WG_NPC_SORCERESS_KAYLANA },
     { 5078.28f, 2183.70f, 365.029f, 1.466f, 0, BATTLEFIELD_WG_NPC_COMMANDER_ZANNETH },
@@ -1486,6 +1512,17 @@ struct WGWorkshop
             bf->UpdateCounterVehicle(false);
             bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
         }
+    }
+
+    /*
+     * When Wintergrasp is successfully captured the Workshops must
+     * swap their team ownership to the defeated team. So if Alliance
+     * was defending, now Hord will be the ones defending. Must update
+     * map and all the gameobjects on the new defending team.
+     */
+    void OnWintergraspCaptured(TeamId team)
+    {
+
     }
 
     void UpdateGraveyardAndWorkshop()

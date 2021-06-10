@@ -53,7 +53,11 @@ bool BattlefieldWG::SetupBattlefield()
     m_tenacityStack = 0;
     m_titansRelic.Clear();
 
-    KickPosition.Relocate(5728.117f, 2714.346f, 697.733f, 0);
+    KickPosition.Relocate(
+        kicked_position.GetPositionX(),
+        kicked_position.GetPositionY(),
+        kicked_position.GetPositionZ(),
+        kicked_position.GetOrientation());
     KickPosition.m_mapId = m_MapId;
 
     RegisterZone(m_ZoneId);
@@ -98,49 +102,30 @@ bool BattlefieldWG::SetupBattlefield()
         m_GraveyardList[i] = graveyard;
     }
 
-    // Spawn workshop creatures and gameobjects
-    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    // Spawn Workshops
+    for (uint8 workshopAmount = 0; workshopAmount < WG_MAX_WORKSHOP; workshopAmount++)
     {
-        WGWorkshop* workshop = new WGWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
-        else
-            workshop->GiveControlTo(GetDefenderTeam(), true);
+        WGWorkshop* workshop = new WGWorkshop(this, workshopAmount);
 
+        /* The only workshops that belong to the attackers when the
+         * battle begins are the southern workshops. Every other workshop
+         * belongs to the defending side.
+         */
+        switch (workshopAmount)
+        {
+            case BATTLEFIELD_WG_WORKSHOP_SE:
+            case BATTLEFIELD_WG_WORKSHOP_SW:
+                workshop->GiveControlTo(GetAttackerTeam(), true);
+                break;
+            default:
+                workshop->GiveControlTo(GetDefenderTeam(), true);
+                break;
+        }
         // Note: Capture point is added once the gameobject is created.
         WorkshopsList.insert(workshop);
     }
 
-    // Spawn NPCs in the defender's keep, both Horde and Alliance
-    for (uint8 i = 0; i < WG_MAX_KEEP_NPC; i++)
-    {
-        // Horde npc
-        if (Creature* creature = SpawnCreature(WGKeepNPC[i].entryHorde, WGKeepNPC[i].x, WGKeepNPC[i].y, WGKeepNPC[i].z, WGKeepNPC[i].o, TEAM_HORDE))
-            KeepCreature[TEAM_HORDE].insert(creature->GetGUID());
-        // Alliance npc
-        if (Creature* creature = SpawnCreature(WGKeepNPC[i].entryAlliance, WGKeepNPC[i].x, WGKeepNPC[i].y, WGKeepNPC[i].z, WGKeepNPC[i].o, TEAM_ALLIANCE))
-            KeepCreature[TEAM_ALLIANCE].insert(creature->GetGUID());
-    }
-
-    // Hide NPCs from the Attacker's team in the keep
-    for (GuidUnorderedSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
-        if (Creature* creature = GetCreature(*itr))
-            HideNpc(creature);
-
-    // Spawn Horde NPCs outside the keep
-    for (uint8 i = 0; i < WG_OUTSIDE_ALLIANCE_NPC; i++)
-        if (Creature* creature = SpawnCreature(WGOutsideNPC[i].entryHorde, WGOutsideNPC[i].x, WGOutsideNPC[i].y, WGOutsideNPC[i].z, WGOutsideNPC[i].o, TEAM_HORDE))
-            OutsideCreature[TEAM_HORDE].insert(creature->GetGUID());
-
-    // Spawn Alliance NPCs outside the keep
-    for (uint8 i = WG_OUTSIDE_ALLIANCE_NPC; i < WG_MAX_OUTSIDE_NPC; i++)
-        if (Creature* creature = SpawnCreature(WGOutsideNPC[i].entryAlliance, WGOutsideNPC[i].x, WGOutsideNPC[i].y, WGOutsideNPC[i].z, WGOutsideNPC[i].o, TEAM_ALLIANCE))
-            OutsideCreature[TEAM_ALLIANCE].insert(creature->GetGUID());
-
-    // Hide units outside the keep that are defenders
-    for (GuidUnorderedSet::const_iterator itr = OutsideCreature[GetDefenderTeam()].begin(); itr != OutsideCreature[GetDefenderTeam()].end(); ++itr)
-        if (Creature* creature = GetCreature(*itr))
-            HideNpc(creature);
+    SpawnCreatures();
 
     // Spawn turrets and hide them per default
     for (uint8 i = 0; i < WG_MAX_TURRET; i++)
@@ -175,31 +160,122 @@ bool BattlefieldWG::SetupBattlefield()
     return true;
 }
 
+/* All creatures are spawned at worldserver start to avoid performance issues
+ * when changing teams after Attackers win the battle. We hide the unwanted
+ * NPCs and then unhide them whenever needed.
+ */
+void BattlefieldWG::SpawnCreatures()
+{
+    /* WGKeepNPC stores both the position and the entry for each faction.
+     * there is a maximum amount of 45 NPCs inside the keep. The way the
+     * Keep NPCs are spawned is cycling through every position on this array
+     * and spawning both an Alliance and a Horde NPC. By spawning both faction
+     * units on server start we avoid overloading the core when running with
+     * unecessary function calls every 3 hours.
+     */
+    for (uint8 pos = 0; pos < WG_MAX_KEEP_NPC; pos++)
+    {
+        // Horde npc
+        if (Creature* creature = SpawnCreature(
+            WGKeepNPC[pos].entryHorde,
+            WGKeepNPC[pos].x,
+            WGKeepNPC[pos].y,
+            WGKeepNPC[pos].z,
+            WGKeepNPC[pos].o,
+            TEAM_HORDE))
+        {
+            KeepCreature[TEAM_HORDE].insert(creature->GetGUID());
+        }
+
+        // Alliance npc
+        if (Creature* creature = SpawnCreature(
+            WGKeepNPC[pos].entryAlliance,
+            WGKeepNPC[pos].x,
+            WGKeepNPC[pos].y,
+            WGKeepNPC[pos].z,
+            WGKeepNPC[pos].o,
+            TEAM_ALLIANCE))
+        {
+            KeepCreature[TEAM_ALLIANCE].insert(creature->GetGUID());
+        }
+    }
+
+    // Hide NPCs from the Attacker's team in the keep
+    for (GuidSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
+    {
+        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+        {
+            if (Creature* creature = unit->ToCreature())
+            {
+                HideNpc(creature);
+            }
+        }
+    }
+
+    /* Just like we did for the Keep NPCs, we do the same for the ones
+     * standing outside the Keep, where the Attacking faction is teleported
+     * to whenever Wintergrasp begins.
+     */
+    for (uint8 i = 0; i < WG_MAX_OUTSIDE_NPC; i++)
+    {
+        if (Creature* creature = SpawnCreature(
+            WGOutsideNPCHorde[i].entryHorde,
+            WGOutsideNPCHorde[i].x,
+            WGOutsideNPCHorde[i].y,
+            WGOutsideNPCHorde[i].z,
+            WGOutsideNPCHorde[i].o,
+            TEAM_HORDE))
+        {
+            OutsideCreature[TEAM_HORDE].insert(creature->GetGUID());
+        }
+
+        if (Creature* creature = SpawnCreature(
+            WGOutsideNPCAlliance[i].entryAlliance,
+            WGOutsideNPCAlliance[i].x,
+            WGOutsideNPCAlliance[i].y,
+            WGOutsideNPCAlliance[i].z,
+            WGOutsideNPCAlliance[i].o,
+            TEAM_ALLIANCE))
+        {
+            OutsideCreature[TEAM_ALLIANCE].insert(creature->GetGUID());
+        }
+    }
+
+    // Hide units outside the keep that are defenders
+    for (GuidSet::const_iterator itr = OutsideCreature[GetDefenderTeam()].begin(); itr != OutsideCreature[GetDefenderTeam()].end(); ++itr)
+    {
+        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+        {
+            if (Creature* creature = unit->ToCreature())
+            {
+                HideNpc(creature);
+            }
+        }
+    }
+}
+
 bool BattlefieldWG::Update(uint32 diff)
 {
     bool m_return = Battlefield::Update(diff);
-    if (m_saveTimer <= diff)
+
+    m_events.Update(diff);
+
+    switch (m_events.ExecuteEvent())
     {
+    case EVENT_UPDATE_TENACITY:
+        if (!m_updateTenacityList.empty())
+        {
+            UpdateTenacity();
+        }
+        m_updateTenacityList.clear();
+        m_events.ScheduleEvent(EVENT_UPDATE_TENACITY, 10000);
+        break;
+    case EVENT_SAVE:
         sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, m_isActive);
         sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, m_DefenderTeam);
         sWorld->setWorldState(ClockWorldState[0], m_Timer);
-        m_saveTimer = 60 * IN_MILLISECONDS;
-    }
-    else
-        m_saveTimer -= diff;
-
-    // Update Tenacity
-    if (IsWarTime())
-    {
-        if (m_tenacityUpdateTimer <= diff)
-        {
-            m_tenacityUpdateTimer = 10000;
-            if (!m_updateTenacityList.empty())
-                UpdateTenacity();
-            m_updateTenacityList.clear();
-        }
-        else
-            m_tenacityUpdateTimer -= diff;
+        m_events.ScheduleEvent(EVENT_SAVE, 60 * IN_MILLISECONDS);
+        break;
     }
 
     return m_return;
@@ -208,19 +284,24 @@ bool BattlefieldWG::Update(uint32 diff)
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
-    GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.0f, 2840.8f, 430.43f, 0);
-    if (go)
+    if (GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC,
+        relic_position.GetPositionX(),
+        relic_position.GetPositionY(),
+        relic_position.GetPositionZ(),
+        relic_position.GetOrientation()))
     {
         // Update faction of relic, only attacker can click on
         go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[GetAttackerTeam()]);
-        // Set in use (not allow to click on before last door is broken)
+
+        // Not selectable until the last door is destroyed
         go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
-        // save guid
         m_titansRelic = go->GetGUID();
     }
     else
+    {
         LOG_ERROR("server", "WG: Failed to spawn titan relic.");
+    }
 
     // Update tower visibility and update faction
     for (GuidUnorderedSet::const_iterator itr = CanonList.begin(); itr != CanonList.end(); ++itr)
@@ -232,7 +313,7 @@ void BattlefieldWG::OnBattleStart()
         }
     }
 
-    // Rebuild all wall
+    // Re-build the Keep's walls
     for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
     {
         if (*itr)
@@ -246,33 +327,113 @@ void BattlefieldWG::OnBattleStart()
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
 
-    // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
+    // Update graveyard ownership. While there's no war going on, they all belong to the defending team.
+    // However, during war time, they belong to the respective faction controlling a workshop.
     for (Workshop::const_iterator itr = WorkshopsList.begin(); itr != WorkshopsList.end(); ++itr)
+    {
         if (*itr)
+        {
             (*itr)->UpdateGraveyardAndWorkshop();
+        }
+    }
 
-    for (uint8 team = 0; team < 2; ++team)
+    // Player reposition to avoid cheating Wintergrasp victories
+    for (uint8 team = 0; team <= TEAM_HORDE; ++team)
+    {
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
-            // Kick player in orb room, TODO: offline player ?
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
             {
                 float x, y, z;
                 player->GetPosition(x, y, z);
-                if (5500 > x && x > 5392 && y < 2880 && y > 2800 && z < 480)
-                    player->TeleportTo(571, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
+                if (x > south_keep_position.GetPositionX() && y > south_keep_position.GetPositionY() && z < south_keep_position.GetPositionZ())
+                {
+                    if (x < north_keep_position.GetPositionX() && y < north_keep_position.GetPositionY() && z < north_keep_position.GetPositionZ())
+                    {
+                        switch (team)
+                        {
+                            // Using 0 and 1 instead of TeamId to avoid type error checking
+                        case 0:
+                            if (IsPlayerInQueue(player->GetGUIDLow(), TEAM_ALLIANCE))
+                            {
+                                if (GetDefenderTeam() == TEAM_ALLIANCE)
+                                {
+                                    player->TeleportTo(571,
+                                        defending_position.GetPositionX(),
+                                        defending_position.GetPositionY(),
+                                        defending_position.GetPositionZ(),
+                                        defending_position.GetOrientation());
+                                }
+                                else
+                                {
+                                    player->TeleportTo(571,
+                                        attacking_position.GetPositionX(),
+                                        attacking_position.GetPositionY(),
+                                        attacking_position.GetPositionZ(),
+                                        attacking_position.GetOrientation());
+                                }
+                            }
+                            else
+                            {
+                                player->TeleportTo(571,
+                                    kicked_position.GetPositionX(),
+                                    kicked_position.GetPositionY(),
+                                    kicked_position.GetPositionZ(),
+                                    kicked_position.GetOrientation());
+                            }
+                            break;
+                        case 1:
+                            if (IsPlayerInQueue(player->GetGUIDLow(), TEAM_HORDE))
+                            {
+                                if (GetDefenderTeam() == TEAM_HORDE)
+                                {
+                                    player->TeleportTo(571,
+                                        defending_position.GetPositionX(),
+                                        defending_position.GetPositionY(),
+                                        defending_position.GetPositionZ(),
+                                        defending_position.GetOrientation());
+                                }
+                                else
+                                {
+                                    player->TeleportTo(571,
+                                        attacking_position.GetPositionX(),
+                                        attacking_position.GetPositionY(),
+                                        attacking_position.GetPositionZ(),
+                                        attacking_position.GetOrientation());
+                                }
+                            }
+                            else
+                            {
+                                player->TeleportTo(571,
+                                    kicked_position.GetPositionX(),
+                                    kicked_position.GetPositionY(),
+                                    kicked_position.GetPositionZ(),
+                                    kicked_position.GetOrientation());
+                            }
+                            break;
+                        }
+                    }
+                }
                 SendInitWorldStatesTo(player);
             }
         }
+    }
+
+    // Relocate Offline players in Wintergrasp
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_WG_OFFLINE_PLAYERS);
+    CharacterDatabase.AsyncQuery(stmt);
+
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
-    // Send start warning to all players
+
+    // Reset the tenacity stacks and schedule an update
+    m_tenacityStack = 0;
+    m_events.ScheduleEvent(EVENT_UPDATE_TENACITY, 20 * IN_MILLISECONDS);
+
+    // Send start warning to all players in the zone
     SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_START);
 
-    // Xinef: reset tenacity counter
-    m_tenacityStack = 0;
-    m_tenacityUpdateTimer = 20000;
-
+    // Announce to the World that Wintergrasp is starting
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
         sWorld->SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
 }
@@ -305,34 +466,46 @@ void BattlefieldWG::UpdateCounterVehicle(bool init)
 void BattlefieldWG::UpdateVehicleCountWG()
 {
     for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
+    {
         for (GuidUnorderedSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+        {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
             {
-                player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H,     GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
+                player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H, GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
                 player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_H, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H));
-                player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_A,     GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
+                player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
                 player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A));
             }
+        }
+    }
 }
 
 void BattlefieldWG::CapturePointTaken(uint32 areaId)
 {
     for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
+    {
         for (GuidUnorderedSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+        {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
+            {
                 if (player->GetAreaId() == areaId)
+                {
                     player->UpdateAreaDependentAuras(areaId);
+                }
+            }
+        }
+    }
 }
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
-    // Remove relic
+    // Remove relic and reset Its guid
     if (GameObject* go = GetRelic())
         go->RemoveFromWorld();
 
     m_titansRelic.Clear();
 
-    // Remove turret
+    // Set the turret's visibility off
     for (GuidUnorderedSet::const_iterator itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
         if (Creature* creature = GetCreature(*itr))
@@ -464,10 +637,39 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     m_PlayersInWar[TEAM_ALLIANCE].clear();
     m_PlayersInWar[TEAM_HORDE].clear();
 
-    if (!endByTimer) // win alli/horde
-        SendWarningToAllInZone((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_WIN_KEEP : (BATTLEFIELD_WG_TEXT_WIN_KEEP + 2));
-    else // defend alli/horde
-        SendWarningToAllInZone((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_DEFEND_KEEP : (BATTLEFIELD_WG_TEXT_DEFEND_KEEP + 2));
+    /* When the time is over and the capturing team succeeded
+     * on winning Wintergrasp before time runs out, pass them
+     * the Wintergrasp ownership and display winning message
+     * ---
+     * Otherwise, the graveyard and workshop control will
+     * remain under the sucessfull defending team
+     */
+    if (!endByTimer)
+    {
+        switch (GetAttackerTeam())
+        {
+        case TEAM_ALLIANCE:
+            SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_ALLIANCE_CAPTURED);
+            // TO DO: SWAP GRAVEYARD AND WORKSHOP OWNERSHIP
+            break;
+        case TEAM_HORDE:
+            SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_HORDE_CAPTURED);
+            // TO DO: SWAP GRAVEYARD AND WORKSHOP OWNERSHIP
+            break;
+        }
+    }
+    else
+    {
+        switch (GetDefenderTeam())
+        {
+        case TEAM_ALLIANCE:
+            SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_ALLIANCE_DEFENDED);
+            break;
+        case TEAM_HORDE:
+            SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_HORDE_DEFENDED);
+            break;
+        }
+    }
 }
 
 // *******************************************************
@@ -778,19 +980,34 @@ void BattlefieldWG::RemoveAurasFromPlayer(Player* player)
 
 void BattlefieldWG::OnPlayerJoinWar(Player* player)
 {
+    if (!player)
+    {
+        return;
+    }
+
     RemoveAurasFromPlayer(player);
 
     player->CastSpell(player, SPELL_RECRUIT, true);
     AddUpdateTenacity(player);
 
+    /* Depending on which team is attacking or defending the player
+     * will be teleported to their respective starting position.
+     */
     if (player->GetTeamId() == GetDefenderTeam())
-        player->TeleportTo(571, 5345, 2842, 410, 3.14f);
+    {
+        player->TeleportTo(BATTLEFIELD_WG_MAPID,
+            defending_position.GetPositionX(),
+            defending_position.GetPositionY(),
+            defending_position.GetPositionZ(),
+            defending_position.GetOrientation());
+    }
     else
     {
-        if (player->GetTeamId() == TEAM_HORDE)
-            player->TeleportTo(571, 5025.857422f, 3674.628906f, 362.737122f, 4.135169f);
-        else
-            player->TeleportTo(571, 5101.284f, 2186.564f, 373.549f, 3.812f);
+        player->TeleportTo(BATTLEFIELD_WG_MAPID,
+            attacking_position.GetPositionX(),
+            attacking_position.GetPositionY(),
+            attacking_position.GetPositionZ(),
+            attacking_position.GetOrientation());
     }
 
     if (player->GetTeamId() == GetAttackerTeam())
