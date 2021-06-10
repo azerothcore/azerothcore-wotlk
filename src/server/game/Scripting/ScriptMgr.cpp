@@ -2018,7 +2018,7 @@ bool ScriptMgr::OnBeforeLootEqualChanced(Player const* player, LootStoreItemList
     bool ret = true; // return true by default
 
     FOR_SCRIPTS_RET(GlobalScript, itr, end, ret)
-        if (!itr->second->OnItemRoll(player, EqualChanced, loot, store))
+        if (!itr->second->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
             ret = false; // we change ret value only when a script returns false
 
     return ret;
