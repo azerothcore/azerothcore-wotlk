@@ -23,7 +23,7 @@ uint8 Field::GetUInt8() const
     if (!data.value)
         return 0;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Int8))
     {
         LogWrongType(__FUNCTION__);
@@ -41,7 +41,7 @@ int8 Field::GetInt8() const
     if (!data.value)
         return 0;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Int8))
     {
         LogWrongType(__FUNCTION__);
@@ -59,7 +59,7 @@ uint16 Field::GetUInt16() const
     if (!data.value)
         return 0;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Int16))
     {
         LogWrongType(__FUNCTION__);
@@ -77,7 +77,7 @@ int16 Field::GetInt16() const
     if (!data.value)
         return 0;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Int16))
     {
         LogWrongType(__FUNCTION__);
@@ -95,7 +95,7 @@ uint32 Field::GetUInt32() const
     if (!data.value)
         return 0;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Int32))
     {
         LogWrongType(__FUNCTION__);
@@ -113,7 +113,7 @@ int32 Field::GetInt32() const
     if (!data.value)
         return 0;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Int32))
     {
         LogWrongType(__FUNCTION__);
@@ -131,7 +131,7 @@ uint64 Field::GetUInt64() const
     if (!data.value)
         return 0;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Int64))
     {
         LogWrongType(__FUNCTION__);
@@ -149,7 +149,7 @@ int64 Field::GetInt64() const
     if (!data.value)
         return 0;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Int64))
     {
         LogWrongType(__FUNCTION__);
@@ -167,7 +167,7 @@ float Field::GetFloat() const
     if (!data.value)
         return 0.0f;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Float))
     {
         LogWrongType(__FUNCTION__);
@@ -185,7 +185,7 @@ double Field::GetDouble() const
     if (!data.value)
         return 0.0f;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (!IsType(DatabaseFieldTypes::Double) && !IsType(DatabaseFieldTypes::Decimal))
     {
         LogWrongType(__FUNCTION__);
@@ -203,7 +203,7 @@ char const* Field::GetCString() const
     if (!data.value)
         return nullptr;
 
-#ifdef WARHEAD_STRICT_DATABASE_TYPE_CHECKS
+#ifdef ACORE_STRICT_DATABASE_TYPE_CHECKS
     if (IsNumeric() && data.raw)
     {
         LogWrongType(__FUNCTION__);
