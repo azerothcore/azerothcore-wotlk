@@ -18,6 +18,11 @@ interface IAddRepoParameters extends IRepoSettings {
   saveDep?: boolean;
 }
 
+interface IRemoveRepoParameters {
+  verbose?: boolean;
+  saveDep?: boolean;
+}
+
 interface IAddFileParameters extends IFileSettings {
   verbose?: boolean;
   saveDep?: boolean;
@@ -28,7 +33,7 @@ interface IJoinerOptions extends IJoinerSettingsOptions {
   /**
    * Optional: can be used to specify a different json file for the modules
    */
-  settingsModuleFileName?: string,
+  settingsModuleFileName?: string;
 }
 
 export class Joiner {
@@ -60,23 +65,25 @@ export class Joiner {
     return output;
   }
 
-  private async installDeps(settings: JoinerSettings, _path: string) {
-    const settingsOptions: IJoinerSettingsFile = await settings
-      .getSettings();
+  private genPath(
+    dep: IRepoSettings,
+  ): string {
+    return path.join(
+      dep.modulePathOverride || this.options.modulesPath,
+      `${dep.baseDir}/${dep.name}`,
+    );
+  }
 
-    if (settingsOptions?.scripts?.postinstall) {
-      await this.bashCommand(settingsOptions.scripts.postinstall, _path);
-    }
-
-    if (settingsOptions.dependencies) {
-      for (const dep of Object.values(settingsOptions.dependencies)) {
+  private async installDeps(settings: IJoinerSettingsFile, _path: string) {
+    if (settings.dependencies) {
+      for (const dep of Object.values(settings.dependencies)) {
         if (isRepo(dep)) {
           await this.addRepo(dep);
         }
 
-        if (isFile(dep)) {
-          await this.addFile(dep);
-        }
+        // if (isFile(dep)) {
+        //   await this.addFile(dep);
+        // }
       }
     }
   }
@@ -95,7 +102,10 @@ export class Joiner {
       );
     }
 
-    await this.installDeps(this.joinerSettings, this.options.settingsPath);
+    await this.installDeps(
+      await this.joinerSettings.getSettings(),
+      this.options.settingsPath,
+    );
   }
 
   async addRepo(
@@ -136,7 +146,13 @@ export class Joiner {
       return false;
     }
 
-    let _path = path.join(this.options.modulesPath, `${baseDir}/${name}`);
+    const depInfo: IRepoSettings = {
+        ...options,
+        baseDir,
+        name
+    }
+
+    let _path = this.genPath(depInfo);
 
     verbose && console.debug("Working on path", _path);
 
@@ -184,54 +200,101 @@ export class Joiner {
     return true;
   }
 
-  async addFile(options: IAddFileParameters) {
-    let parsedUrl = urlParse(options.source);
-    let parsedPath = path.parse(parsedUrl.pathname.toLowerCase());
-    const name = parsedPath.base;
-    const destination = options.destination ??
-      path.join(this.options.modulesPath, name);
-    const parseDest = path.parse(destination);
+  async uninstallDep(name: string, options: IRemoveRepoParameters) {
+    const settings = await this.joinerSettings.getSettings();
 
-    console.log(ink.colorize(`<green>>>>>> Installing (${name})`));
-
-    // do not add already processed dependencies
-    if (
-      this.processedDeps.some((d) => isFile(d) && d.source == options.source)
-    ) {
-      return false;
+    const dep = settings.dependencies?.[name];
+    if (!dep) {
+      return;
     }
 
-    console.log(
-      ink.colorize(`<green>>>>>> Downloading file to ${destination}`),
-    );
+    if (isRepo(dep)) {
+      const _path = this.genPath(dep);
+      this.preUninstall(_path);
 
-    const res = await fetch(options.source);
+      await Deno.remove(_path, { recursive: true });
 
-    const body = new Uint8Array(await res.arrayBuffer());
-    await fs.ensureDir(parseDest.dir);
-    await Deno.writeFile(destination, body);
-
-    let finalPath: string | boolean = destination;
-    if (options.unzip) {
-      finalPath = await unZipFromFile(destination, parseDest.dir);
-
-      if (!finalPath) {
-          throw Error(`Cannot unzip ${destination}`);
+      if (options.saveDep) {
+        await this.joinerSettings.removeDep(name);
       }
+    }
+  }
 
-      console.log(
-        ink.colorize(`<green>>>>>> Unzipped ${destination} => ${finalPath}`),
-      );
-      await Deno.remove(destination);
+  // UNSUPPORTED
+  //   async addFile(options: IAddFileParameters) {
+  //     let parsedUrl = urlParse(options.source);
+  //     let parsedPath = path.parse(parsedUrl.pathname.toLowerCase());
+  //     const name = options.name ?? options.source;
+  //     const destination = options.destination ??
+  //       path.join(this.options.modulesPath, name);
+  //     const parseDest = path.parse(destination);
+
+  //     console.log(ink.colorize(`<green>>>>>> Installing (${name})`));
+
+  //     // do not add already processed dependencies
+  //     if (
+  //       this.processedDeps.some((d) => isFile(d) && d.source == options.source)
+  //     ) {
+  //       return false;
+  //     }
+
+  //     console.log(
+  //       ink.colorize(`<green>>>>>> Downloading file to ${destination}`),
+  //     );
+
+  //     const res = await fetch(options.source);
+
+  //     const body = new Uint8Array(await res.arrayBuffer());
+  //     await fs.ensureDir(parseDest.dir);
+  //     await Deno.writeFile(destination, body);
+
+  //     let finalPath: string | boolean = destination;
+  //     if (options.unzip) {
+  //       finalPath = await unZipFromFile(destination, parseDest.dir);
+
+  //       if (!finalPath) {
+  //         throw Error(`Cannot unzip ${destination}`);
+  //       }
+
+  //       console.log(
+  //         ink.colorize(`<green>>>>>> Unzipped ${destination} => ${finalPath}`),
+  //       );
+  //       await Deno.remove(destination);
+  //     }
+
+  //     await this.postInstall(
+  //       name,
+  //       options,
+  //       true,
+  //       options.saveDep ?? true,
+  //       finalPath,
+  //     );
+  //   }
+
+  async preUninstall(
+    _path: string,
+  ) {
+    const settingsFileName = this.options.settingsModuleFileName ??
+      this.options.settingsFileName;
+
+    if (
+      !await fs.exists(`${_path}/${settingsFileName}`)
+    ) {
+      return true;
     }
 
-    await this.postInstall(
-      name,
-      options,
-      true,
-      options.saveDep ?? true,
-      finalPath
-    );
+    const settings = new JoinerSettings({
+      settingsFileName: settingsFileName,
+      settingsPath: _path,
+      verbose: this.options.verbose,
+    });
+
+    const settingsOptions: IJoinerSettingsFile = await settings
+      .getSettings();
+
+    if (settingsOptions?.scripts?.preuninstall) {
+      await this.bashCommand(settingsOptions.scripts.preuninstall, _path);
+    }
   }
 
   async postInstall(
@@ -251,21 +314,22 @@ export class Joiner {
       await this.joinerSettings.saveDep(name, depInfo);
     }
 
+    const settingsFileName = this.options.settingsModuleFileName ??
+      this.options.settingsFileName;
+
     if (
-      !changed || !await fs.exists(`${_path}/${this.options.settingsFileName}`)
+      !changed ||
+      !await fs.exists(`${_path}/${settingsFileName}`)
     ) {
       return true;
     }
 
-    if (await fs.exists(this.options.settingsFileName)) {
-      console.log(this.options.settingsFileName, _path);
-      const settings = new JoinerSettings({
-        settingsFileName: this.options.settingsModuleFileName ?? this.options.settingsFileName,
-        settingsPath: _path,
-        verbose: this.options.verbose,
-      });
+    const settings = new JoinerSettings({
+      settingsFileName: settingsFileName,
+      settingsPath: _path,
+      verbose: this.options.verbose,
+    });
 
-      await this.installDeps(settings, _path);
-    }
+    await this.installDeps(await settings.getSettings(), _path);
   }
 }

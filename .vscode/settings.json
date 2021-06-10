@@ -62,7 +62,9 @@
         "thread": "cpp",
         "cfenv": "cpp",
         "typeinfo": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "charconv": "cpp",
+        "future": "cpp"
     },
     "deno.enable": true,
     "deno.path" : "deps/deno/bin/deno"

@@ -8,8 +8,8 @@ AC_PATH_INSTALLER="$AC_PATH_APPS/installer"
 
 J_PATH="$AC_PATH_DEPS/acore/joiner"
 export J_PATH_MODULES="$AC_PATH_MODULES"
-
-source "$J_PATH/joiner.sh"
+# for Eluna module
+export J_PATH_ELUNA_MODULES="$BINPATH/scripts/lua"
 
 if [ -f "$AC_PATH_INSTALLER/config.sh"  ]; then
     source "$AC_PATH_INSTALLER/config.sh" # should overwrite previous

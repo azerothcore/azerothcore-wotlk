@@ -3,6 +3,8 @@ import { isRepo } from "./type-guards.ts";
 
 export interface IDepSettings {
   name?: string;
+  /** override the installation base directory for this module only */
+  modulePathOverride?: string
 }
 
 export interface IRepoSettings extends IDepSettings {
@@ -75,6 +77,21 @@ export class JoinerSettings {
 
     // sets new data
     this.json.dependencies[name] = { name, ...dep };
+
+    // write new data
+    const newtxt = JSON.stringify(this.json, null, 2);
+    const newdata = new TextEncoder().encode(newtxt);
+    await Deno.writeFile(this.jsonPath, newdata);
+  }
+
+  async removeDep(name: string) {
+    await this.loadSettings();
+
+    if (!this.json.dependencies) {
+      return;
+    }
+
+    delete this.json.dependencies[name];
 
     // write new data
     const newtxt = JSON.stringify(this.json, null, 2);

@@ -16,15 +16,22 @@ import { Joiner } from "../../deps/acore/joiner/joiner.ts";
 import * as semver from "https://deno.land/x/semver/mod.ts";
 import { IJoinerSettingsFile } from "../../deps/acore/joiner/libs/joiner-settings.ts";
 
-const acoreInfo: IJoinerSettingsFile = JSON.parse(
+interface ACoreSettingsFile extends IJoinerSettingsFile {
+  isElunaModule?: boolean;
+}
+
+const acoreInfo: ACoreSettingsFile = JSON.parse(
   Deno.readTextFileSync("./acore.json"),
 );
 
 const modulePath = Deno.env.get("J_PATH_MODULES");
+const elunaModulePath = Deno.env.get("J_PATH_ELUNA_MODULES");
 const settingsFilePath = ".moduleSettings";
 
-if (!modulePath) {
-  throw Error("J_PATH_MODULES environment variable must be set!");
+if (!modulePath || !elunaModulePath) {
+  throw Error(
+    "J_PATH_MODULES && J_PATH_ELUNA_MODULES environment variables must be set!",
+  );
 }
 
 const sJoiner = new Joiner({
@@ -60,58 +67,74 @@ program
 
       verbose && console.debug(data);
 
-      let modNames: GenericListOption[] = [];
+      let modulesName: GenericListOption[] = [];
+      let modulesInfos: { [key: string]: ACoreSettingsFile } = {};
 
       for (const found of data?.items) {
         const res = await fetch(
           `https://raw.githubusercontent.com/azerothcore/${found.name}/master/acore-module.json`,
         );
-        const moduleInfo: IJoinerSettingsFile = await res.json();
+        const moduleInfo: ACoreSettingsFile = await res.json();
 
         let satisfy = `Not tested with AC ${acoreInfo.version}`;
         for (const compat of moduleInfo.compatibility) {
-          if (compat.branch && compat.branch != "none" && semver.satisfies(acoreInfo.version, compat.version)) {
+          if (
+            compat.branch && compat.branch != "none" &&
+            semver.satisfies(acoreInfo.version, compat.version)
+          ) {
             satisfy = compat.version;
             break;
           }
         }
 
-        modNames.push({
-          value: found.name,
-          name: `${found.name} (Compatibility: ${satisfy})`,
-        });
+        modulesInfos[found.name] = moduleInfo;
+
+        modulesName.push(
+          {
+            value: found.name,
+            name: `${found.name} (Compatibility: ${satisfy})`,
+          },
+        );
       }
 
       let repoName = await Select.prompt({
         message: `Select a module to install`,
-        options: modNames,
+        options: modulesName,
       });
+
+      let modulePathOverride: string = "";
+      if (modulesInfos[repoName].isElunaModule) {
+        modulePathOverride = elunaModulePath;
+      }
 
       await sJoiner.addRepo({
         url: `${AC_ORG}/${repoName}`,
         verbose,
         baseDir: "",
         saveDep: true,
+        modulePathOverride,
       });
     },
   );
 
 program
   .command("install [modules...]")
-  .option("-f, --file", "Specify if the modules are file or not")
-  .option(
-    "-z, --unzip",
-    "Specify if unzip the file (it only works with --file option enabled)",
-  )
+  //   .option("-f, --file", "Specify if the modules are file or not")
+  //   .option(
+  //     "-z, --unzip",
+  //     "Specify if unzip the file (it only works with --file option enabled)",
+  //   )
   .option("-s, --save", "Save dependency into the settings file")
+  .option("-v,--verbose", "Show debug info")
   .description("Install a module or a collection of modules")
   .action(
     async (
       modules: string | string[],
-      { file = false, save = true, unzip = false }: {
+      { file = false, save = true, unzip = false, verbose = false }: {
         file: boolean;
         save: boolean;
         unzip: boolean;
+        verbose: boolean;
       },
     ) => {
       if (!Array.isArray(modules)) {
@@ -122,18 +145,53 @@ program
         const url = module.includes("/") ? module : `${AC_ORG}/${module}`;
         // if it's not a path, then use AC org url as prefix
         if (file) {
-          await sJoiner.addFile({
-            source: url,
-            saveDep: save,
-            unzip,
-          });
+          //   await sJoiner.addFile({
+          //     source: url,
+          //     saveDep: save,
+          //     unzip,
+          //   });
         } else {
           await sJoiner.addRepo({
             url,
             saveDep: save,
             baseDir: "",
+            verbose,
           });
         }
+      }
+    },
+  );
+
+program
+  .command("uninstall [modules...]")
+  .alias("remove")
+  //   .option("-f, --file", "Specify if the modules are file or not")
+  //   .option(
+  //     "-z, --unzip",
+  //     "Specify if unzip the file (it only works with --file option enabled)",
+  //   )
+  .option("-s, --save", "Save dependency into the settings file")
+  .option("-v,--verbose", "Show debug info")
+  .description("Uninstall a module or a collection of modules")
+  .action(
+    async (
+      modules: string | string[],
+      { file = false, save = true, unzip = false, verbose = false }: {
+        file: boolean;
+        save: boolean;
+        unzip: boolean;
+        verbose: boolean;
+      },
+    ) => {
+      if (!Array.isArray(modules)) {
+        modules = [modules];
+      }
+
+      for (const module of modules) {
+        await sJoiner.uninstallDep(module, {
+          saveDep: save,
+          verbose,
+        });
       }
     },
   );
