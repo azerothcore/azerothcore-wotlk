@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - 'master'
-  pull_request_review:
-    types: [submitted]
+  pull_request:
+    types: ['labeled']
 
 jobs:
   windows-build:
@@ -14,7 +14,7 @@ jobs:
     name: windows-2019-MSVC16
     env:
       BOOST_ROOT: C:\local\boost_1_74_0
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk && ${{ github.event.label.name == 'run-build' }}'
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
