@@ -3632,7 +3632,6 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             }
         case SMART_TARGET_GAMEOBJECT_GUID:
             {
-                GameObject* target = nullptr;
                 if (!scriptTrigger && !GetBaseObject())
                 {
                     LOG_ERROR("server", "SMART_TARGET_GAMEOBJECT_GUID can not be used without invoker");
