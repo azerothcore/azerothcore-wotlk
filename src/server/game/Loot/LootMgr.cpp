@@ -289,9 +289,7 @@ bool LootStoreItem::Roll(bool rate, Player const* player, Loot& loot, LootStore 
 {
     float _chance = chance;
 
-    sScriptMgr->OnItemRoll(player, this, _chance, loot, store);
-
-    if (chance == 0)
+    if (!sScriptMgr->OnItemRoll(player, this, _chance, loot, store))
         return false;
 
     if (_chance >= 100.0f)
@@ -1208,10 +1206,8 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
             LootStoreItem* item = *itr;
             float chance = item->chance;
 
-            sScriptMgr->OnItemRoll(player, item, chance, loot, store);
-
-            if (chance == 0)
-                continue;
+            if (!sScriptMgr->OnItemRoll(player, item, chance, loot, store))
+                return nullptr;
 
             if (chance >= 100.0f)
                 return item;

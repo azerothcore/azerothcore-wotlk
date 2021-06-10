@@ -2003,9 +2003,15 @@ void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRa
     FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, canRate, lootMode, LootStoreItem, store);
 }
 
-void ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store)
+bool ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store)
 {
-    FOREACH_SCRIPT(GlobalScript)->OnItemRoll(player, LootStoreItem,  chance, loot, store);
+    bool ret = true; // return true by default
+
+    FOR_SCRIPTS_RET(GlobalScript, itr, end, ret)
+        if (!itr->second->OnItemRoll(player, LootStoreItem,  chance, loot, store))
+            ret = false; // we change ret value only when a script returns false
+
+    return ret;
 }
 
 void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData, lfg::LFGDungeonData const* dungeon)
