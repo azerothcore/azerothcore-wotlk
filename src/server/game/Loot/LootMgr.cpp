@@ -1218,6 +1218,9 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
         }
     }
 
+    if (!sScriptMgr->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
+        return nullptr;
+
     possibleLoot = EqualChanced;
     possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
     if (!possibleLoot.empty())                              // If nothing selected yet - an item is taken from equal-chanced part
