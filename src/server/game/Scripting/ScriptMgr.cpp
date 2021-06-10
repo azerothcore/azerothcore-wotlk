@@ -1666,7 +1666,7 @@ void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* ac
     FOREACH_SCRIPT(PlayerScript)->OnAchiComplete(player, achievement);
 }
 
-void ScriptMgr::OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
+bool ScriptMgr::OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
 {
     bool ret = true;
 
