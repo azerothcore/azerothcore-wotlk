@@ -1351,7 +1351,7 @@ class achievement_all_you_can_eat : public AchievementCriteriaScript
 public:
     achievement_all_you_can_eat() : AchievementCriteriaScript("achievement_all_you_can_eat") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target || target->GetEntry() != NPC_SINDRAGOSA)
             return false;

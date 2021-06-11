@@ -689,7 +689,6 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     [[nodiscard]] virtual bool OnCheck(Player* /*source*/, Unit* /*target*/, uint32 /*criteria_id*/) { return true; };
-    [[nodiscard]] virtual bool OnCheck(Player* /*source*/, Unit* /*target*/) { return true; };
 };
 
 class PlayerScript : public ScriptObject
