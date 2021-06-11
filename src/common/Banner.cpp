@@ -6,9 +6,9 @@
 #include "GitRevision.h"
 #include "StringFormat.h"
 
-void acore::Banner::Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)())
+void Acore::Banner::Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)())
 {
-    log(acore::StringFormat("%s (%s)", GitRevision::GetFullVersion(), applicationName).c_str());
+    log(Acore::StringFormat("%s (%s)", GitRevision::GetFullVersion(), applicationName).c_str());
     log("<Ctrl-C> to stop.\n");
     log("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");
     log("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");

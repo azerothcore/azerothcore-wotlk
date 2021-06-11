@@ -224,19 +224,19 @@ typedef std::unordered_map<uint16, CreatureBaseStats> CreatureBaseStatsContainer
 
 struct CreatureLocale
 {
-    StringVector Name;
-    StringVector Title;
+    std::vector<std::string> Name;
+    std::vector<std::string> Title;
 };
 
 struct GossipMenuItemsLocale
 {
-    StringVector OptionText;
-    StringVector BoxText;
+    std::vector<std::string> OptionText;
+    std::vector<std::string> BoxText;
 };
 
 struct PointOfInterestLocale
 {
-    StringVector Name;
+    std::vector<std::string> Name;
 };
 
 struct EquipmentInfo
@@ -274,7 +274,6 @@ struct CreatureData
     bool dbData{true};
     bool overwrittenZ{false};
 };
-
 
 struct CreatureModelInfo
 {

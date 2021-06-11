@@ -12,9 +12,10 @@
 #include "Optional.h"
 #include "RealmSocket.h"
 #include "SRP6.h"
+#include <mutex>
 
 class ACE_INET_Addr;
-class Fields;
+class Field;
 struct Realm;
 
 enum eStatus
@@ -75,7 +76,7 @@ private:
     RealmSocket& socket_;
     RealmSocket& socket() { return socket_; }
 
-    std::optional<acore::Crypto::SRP6> _srp6;
+    std::optional<Acore::Crypto::SRP6> _srp6;
     SessionKey _sessionKey = {};
     std::array<uint8, 16> _reconnectProof = {};
 

@@ -8,7 +8,7 @@
 
 #include <tuple>
 
-namespace acore
+namespace Acore
 {
     template <typename T, typename Tuple>
     struct has_type;
