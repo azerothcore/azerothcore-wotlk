@@ -32,7 +32,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-namespace acore
+namespace Acore
 {
     class AchievementChatBuilder
     {
@@ -52,7 +52,7 @@ namespace acore
         int32 i_textId;
         uint32 i_achievementId;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
@@ -668,8 +668,8 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId());
     if (guild)
     {
-        acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
-        acore::LocalizedPacketDo<acore::AchievementChatBuilder> say_do(say_builder);
+        Acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
+        Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> say_do(say_builder);
         guild->BroadcastWorker(say_do, GetPlayer());
     }
 
@@ -706,16 +706,16 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     // if player is in world he can tell his friends about new achievement
     else if (GetPlayer()->IsInWorld())
     {
-        CellCoord p = acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
+        CellCoord p = Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
         Cell cell(p);
         cell.SetNoCreate();
 
-        acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
-        acore::LocalizedPacketDo<acore::AchievementChatBuilder> say_do(say_builder);
-        acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::AchievementChatBuilder> > say_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-        TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
-        cell.Visit(p, message, *GetPlayer()->GetMap(), *GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
+        Acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
+        Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> say_do(say_builder);
+        Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> > say_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
+        TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+        Cell::VisitWorldObjects(GetPlayer(), say_worker, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
     }
 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8 + 4 + 8);
@@ -2343,8 +2343,8 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
     if (achievement->mapID != -1 && GetPlayer()->GetMapId() != uint32(achievement->mapID))
         return false;
 
-    if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE    && GetPlayer()->GetTeamId() != TEAM_HORDE) ||
-            (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && GetPlayer()->GetTeamId() != TEAM_ALLIANCE))
+    if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE    && GetPlayer()->GetTeamId(true) != TEAM_HORDE) ||
+            (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && GetPlayer()->GetTeamId(true) != TEAM_ALLIANCE))
         return false;
 
     for (uint32 i = 0; i < MAX_CRITERIA_REQUIREMENTS; ++i)
@@ -2943,26 +2943,27 @@ void AchievementGlobalMgr::LoadRewardLocales()
     {
         Field* fields = result->Fetch();
 
-        uint32 ID               = fields[0].GetUInt32();
-        std::string LocaleName  = fields[1].GetString();
-        std::string Subject     = fields[2].GetString();
-        std::string Text        = fields[3].GetString();
-
+        uint32 ID = fields[0].GetUInt32();
         if (m_achievementRewards.find(ID) == m_achievementRewards.end())
         {
             LOG_ERROR("sql.sql", "Table `achievement_reward_locale` (Entry: %u) has locale strings for non-existing achievement reward.", ID);
             continue;
         }
 
-        AchievementRewardLocale& data = m_achievementRewardLocales[ID];
-        LocaleConstant locale = GetLocaleByName(LocaleName);
+        LocaleConstant locale = GetLocaleByName(fields[1].GetString());
         if (locale == LOCALE_enUS)
             continue;
 
-        ObjectMgr::AddLocaleString(Subject, locale, data.Subject);
-        ObjectMgr::AddLocaleString(Text, locale, data.Text);
+        AchievementRewardLocale& data = m_achievementRewardLocales[ID];
+        ObjectMgr::AddLocaleString(fields[2].GetString(), locale, data.Subject);
+        ObjectMgr::AddLocaleString(fields[3].GetString(), locale, data.Text);
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %lu Achievement Reward Locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server", " ");
+}
+
+AchievementEntry const* AchievementGlobalMgr::GetAchievement(uint32 achievementId) const
+{
+    return sAchievementStore.LookupEntry(achievementId);
 }

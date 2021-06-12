@@ -342,12 +342,14 @@ enum SpellImmuneBlockType
 
 struct SpellImmune
 {
+    SpellImmune() : spellId(0), type(IMMUNITY_EFFECT), blockType(SPELL_BLOCK_TYPE_ALL) { }
+
     uint32 spellId;
-    uint32 type             : 16;
-    uint32 blockType        : 16;
+    uint32 type;
+    uint32 blockType;
 };
 
-typedef std::list<SpellImmune> SpellImmuneList;
+typedef std::vector<SpellImmune> SpellImmuneList;
 
 enum UnitModifierType
 {
@@ -500,17 +502,18 @@ enum UnitState
                                      | UNIT_STATE_EVADE | UNIT_STATE_ROAMING_MOVE | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE
                                      | UNIT_STATE_CHASE_MOVE | UNIT_STATE_FOLLOW_MOVE | UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD,
 
-    UNIT_STATE_UNATTACKABLE    = UNIT_STATE_IN_FLIGHT,
+    UNIT_STATE_UNATTACKABLE         = UNIT_STATE_IN_FLIGHT,
     // for real move using movegen check and stop (except unstoppable flight)
-    UNIT_STATE_MOVING          = UNIT_STATE_ROAMING_MOVE | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE | UNIT_STATE_CHASE_MOVE | UNIT_STATE_FOLLOW_MOVE,
-    UNIT_STATE_CONTROLLED      = (UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING),
-    UNIT_STATE_LOST_CONTROL    = (UNIT_STATE_CONTROLLED | UNIT_STATE_JUMPING | UNIT_STATE_CHARGING),
-    UNIT_STATE_SIGHTLESS       = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_EVADE),
-    UNIT_STATE_CANNOT_AUTOATTACK     = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_CASTING),
-    UNIT_STATE_CANNOT_TURN     = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_ROTATING | UNIT_STATE_ROOT),
+    UNIT_STATE_MOVING               = UNIT_STATE_ROAMING_MOVE | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE | UNIT_STATE_CHASE_MOVE | UNIT_STATE_FOLLOW_MOVE,
+    UNIT_STATE_CONTROLLED           = (UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING),
+    UNIT_STATE_LOST_CONTROL         = (UNIT_STATE_CONTROLLED | UNIT_STATE_JUMPING | UNIT_STATE_CHARGING),
+    UNIT_STATE_SIGHTLESS            = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_EVADE),
+    UNIT_STATE_CANNOT_AUTOATTACK    = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_CASTING),
+    UNIT_STATE_CANNOT_TURN          = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_ROTATING | UNIT_STATE_ROOT),
     // stay by different reasons
-    UNIT_STATE_NOT_MOVE        = UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DIED | UNIT_STATE_DISTRACTED,
-    UNIT_STATE_ALL_STATE       = 0xffffffff                      //(UNIT_STATE_STOPPED | UNIT_STATE_MOVING | UNIT_STATE_IN_COMBAT | UNIT_STATE_IN_FLIGHT)
+    UNIT_STATE_NOT_MOVE             = UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DIED | UNIT_STATE_DISTRACTED,
+    UNIT_STATE_IGNORE_ANTISPEEDHACK = UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED | UNIT_STATE_CHARGING | UNIT_STATE_DISTRACTED | UNIT_STATE_POSSESSED,
+    UNIT_STATE_ALL_STATE            = 0xffffffff                      //(UNIT_STATE_STOPPED | UNIT_STATE_MOVING | UNIT_STATE_IN_COMBAT | UNIT_STATE_IN_FLIGHT)
 };
 
 enum UnitMoveType
@@ -1630,7 +1633,7 @@ public:
     void HandleEmoteCommand(uint32 anim_id);
     void AttackerStateUpdate (Unit* victim, WeaponAttackType attType = BASE_ATTACK, bool extra = false);
 
-    void CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK);
+    void CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK, const bool sittingVictim = false);
     void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
     void HandleProcExtraAttackFor(Unit* victim);
 
@@ -2624,7 +2627,7 @@ private:
     float processDummyAuras(float TakenTotalMod) const;
 };
 
-namespace acore
+namespace Acore
 {
     // Binary predicate for sorting Units based on percent value of a power
     class PowerPctOrderPred

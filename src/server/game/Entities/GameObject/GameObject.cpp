@@ -175,7 +175,7 @@ void GameObject::RemoveFromWorld()
         WorldObject::RemoveFromWorld();
 
         if (m_spawnId)
-            acore::Containers::MultimapErasePair(GetMap()->GetGameObjectBySpawnIdStore(), m_spawnId, this);
+            Acore::Containers::MultimapErasePair(GetMap()->GetGameObjectBySpawnIdStore(), m_spawnId, this);
         GetMap()->GetObjectsStore().Remove<GameObject>(GetGUID());
     }
 }
@@ -266,7 +266,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         return false;
     }
 
-    GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(guidlow);
+    GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(GetSpawnId());
 
     // hackfix for the hackfix down below
     switch (goinfo->entry)
@@ -311,7 +311,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
     SetDisplayId(goinfo->displayId);
 
     if (!m_model)
-        m_model = GameObjectModel::Create(*this);
+        m_model = CreateModel();
 
     switch (goinfo->type)
     {
@@ -459,7 +459,7 @@ void GameObject::Update(uint32 diff)
                             if (info->summoningRitual.casterTargetSpell && info->summoningRitual.casterTargetSpell != 1) // No idea why this field is a bool in some cases
                                 for (uint32 i = 0; i < info->summoningRitual.casterTargetSpellTargets; i++)
                                     // m_unique_users can contain only player GUIDs
-                                    if (Player* target = ObjectAccessor::GetPlayer(*this, acore::Containers::SelectRandomContainerElement(m_unique_users)))
+                                    if (Player* target = ObjectAccessor::GetPlayer(*this, Acore::Containers::SelectRandomContainerElement(m_unique_users)))
                                         spellCaster->CastSpell(target, info->summoningRitual.casterTargetSpell, true);
 
                             // finish owners spell
@@ -608,20 +608,18 @@ void GameObject::Update(uint32 diff)
                         // search unfriendly creature
                         if (owner)                    // hunter trap
                         {
-                            acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                            acore::UnitSearcher<acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
-                            VisitNearbyGridObject(radius, searcher);
-                            if (!target)
-                                VisitNearbyWorldObject(radius, searcher);
+                            Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
+                            Acore::UnitSearcher<Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
+                            Cell::VisitAllObjects(this, searcher, radius);
                         }
                         else                                        // environmental trap
                         {
                             // environmental damage spells already have around enemies targeting but this not help in case not existed GO casting support
                             // affect only players
                             Player* player = nullptr;
-                            acore::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
-                            acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
-                            VisitNearbyWorldObject(radius, searcher);
+                            Acore::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
+                            Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
+                            Cell::VisitWorldObjects(this, searcher, radius);
                             target = player;
                         }
 
@@ -1189,13 +1187,13 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
     GameObject* trapGO = nullptr;
     {
         // using original GO distance
-        CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
+        CellCoord p(Acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
         Cell cell(p);
 
-        acore::NearestGameObjectEntryInObjectRangeCheck go_check(*target, trapEntry, range);
-        acore::GameObjectLastSearcher<acore::NearestGameObjectEntryInObjectRangeCheck> checker(this, trapGO, go_check);
+        Acore::NearestGameObjectEntryInObjectRangeCheck go_check(*target, trapEntry, range);
+        Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck> checker(this, trapGO, go_check);
 
-        TypeContainerVisitor<acore::GameObjectLastSearcher<acore::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
+        TypeContainerVisitor<Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
         cell.Visit(p, object_checker, *GetMap(), *target, range);
     }
 
@@ -1209,14 +1207,10 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
 {
     GameObject* ok = nullptr;
 
-    CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
-    Cell cell(p);
-    acore::NearestGameObjectFishingHole u_check(*this, range);
-    acore::GameObjectSearcher<acore::NearestGameObjectFishingHole> checker(this, ok, u_check);
+    Acore::NearestGameObjectFishingHole u_check(*this, range);
+    Acore::GameObjectSearcher<Acore::NearestGameObjectFishingHole> checker(this, ok, u_check);
 
-    TypeContainerVisitor<acore::GameObjectSearcher<acore::NearestGameObjectFishingHole>, GridTypeMapContainer > grid_object_checker(checker);
-    cell.Visit(p, grid_object_checker, *GetMap(), *this, range);
-
+    Cell::VisitGridObjects(this, checker, range);
     return ok;
 }
 
@@ -1961,7 +1955,7 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
     if (G3D::fuzzyEq(dist, 0.0f))
         return true;
 
-    float scale = GetFloatValue(OBJECT_FIELD_SCALE_X);
+    float scale = GetObjectScale();
     float sinB = dx / dist;
     float cosB = dy / dist;
     dx = dist * (cosA * cosB + sinA * sinB);
@@ -1977,8 +1971,8 @@ void GameObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*s
     dist += GetObjectSize();
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION * 2.0f; // pussywizard: to ensure everyone receives all important packets
-    acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
-    VisitNearbyWorldObject(dist, notifier);
+    Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void GameObject::EventInform(uint32 eventId)
@@ -2298,7 +2292,7 @@ void GameObject::UpdateModel()
         if (GetMap()->ContainsGameObjectModel(*m_model))
             GetMap()->RemoveGameObjectModel(*m_model);
     delete m_model;
-    m_model = GameObjectModel::Create(*this);
+    m_model = CreateModel();
     if (m_model)
         GetMap()->InsertGameObjectModel(*m_model);
 }
@@ -2481,7 +2475,7 @@ void GameObject::SetPosition(float x, float y, float z, float o)
 {
     // pussywizard: do not call for MotionTransport and other gobjects not in grid
 
-    if (!acore::IsValidMapCoord(x, y, z, o))
+    if (!Acore::IsValidMapCoord(x, y, z, o))
         return;
 
     GetMap()->GameObjectRelocation(this, x, y, z, o);
@@ -2517,4 +2511,26 @@ void GameObject::UpdateModelPosition()
     }
 }
 
-std::unordered_map<int, goEventFlag> GameObject::gameObjectToEventFlag = {};
+std::unordered_map<int, goEventFlag> GameObject::gameObjectToEventFlag = { };
+
+class GameObjectModelOwnerImpl : public GameObjectModelOwnerBase
+{
+public:
+    explicit GameObjectModelOwnerImpl(GameObject* owner) : _owner(owner) { }
+
+    bool IsSpawned() const override { return _owner->isSpawned(); }
+    uint32 GetDisplayId() const override { return _owner->GetDisplayId(); }
+    uint32 GetPhaseMask() const override { return (_owner->GetGoState() == GO_STATE_READY || _owner->IsTransport()) ? _owner->GetPhaseMask() : 0; }
+    G3D::Vector3 GetPosition() const override { return G3D::Vector3(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ()); }
+    float GetOrientation() const override { return _owner->GetOrientation(); }
+    float GetScale() const override { return _owner->GetObjectScale(); }
+    void DebugVisualizeCorner(G3D::Vector3 const& corner) const override { const_cast<GameObject*>(_owner)->SummonCreature(1, corner.x, corner.y, corner.z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000); }
+
+private:
+    GameObject* _owner;
+};
+
+GameObjectModel* GameObject::CreateModel()
+{
+    return GameObjectModel::Create(std::make_unique<GameObjectModelOwnerImpl>(this), sWorld->GetDataPath());
+}

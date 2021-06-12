@@ -15,7 +15,9 @@
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Master.h"
+#include "SharedDefines.h"
 #include <ace/Version.h>
+#include <boost/version.hpp>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
@@ -37,8 +39,6 @@ char serviceDescription[] = "AzerothCore World of Warcraft emulator world servic
 int m_ServiceStatus = -1;
 #endif
 
-uint32 realmID;                                             ///< Id of the realm
-
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
@@ -56,6 +56,8 @@ void usage(const char* prog)
 /// Launch the Trinity server
 extern int main(int argc, char** argv)
 {
+    Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_WORLDSERVER;
+
     ///- Command line parsing to get the configuration file name
     std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG);
     int c = 1;
@@ -120,10 +122,13 @@ extern int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
+    // Loading modules configs
+    sConfigMgr->LoadModulesConfigs();
+
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
-    acore::Banner::Show("worldserver-daemon",
+    Acore::Banner::Show("worldserver-daemon",
         [](char const* text)
         {
             LOG_INFO("server.worldserver", "%s", text);
@@ -132,7 +137,8 @@ extern int main(int argc, char** argv)
         {
             LOG_INFO("server.worldserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
             LOG_INFO("server.worldserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            LOG_INFO("server.worldserver", "> Using ACE version:             %s", ACE_VERSION);
+            LOG_INFO("server.worldserver", "> Using Boost version:           %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+            LOG_INFO("server.worldserver", "> Using ACE version:             %s\n", ACE_VERSION);
         }
     );
 

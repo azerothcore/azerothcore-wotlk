@@ -662,8 +662,8 @@ union GameObjectValue
 
 struct GameObjectLocale
 {
-    StringVector Name;
-    StringVector CastBarCaption;
+    std::vector<std::string> Name;
+    std::vector<std::string> CastBarCaption;
 };
 
 // `gameobject_addon` table
@@ -953,6 +953,7 @@ public:
 
 protected:
     bool AIM_Initialize();
+    GameObjectModel* CreateModel();
     void UpdateModel();                                 // updates model in case displayId were changed
     uint32      m_spellId;
     time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),

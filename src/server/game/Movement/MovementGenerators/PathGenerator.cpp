@@ -24,7 +24,7 @@ PathGenerator::PathGenerator(WorldObject const* owner) :
     memset(_pathPolyRefs, 0, sizeof(_pathPolyRefs));
 
     uint32 mapId = _source->GetMapId();
-    //if (MMAP::MMapFactory::IsPathfindingEnabled(_sourceUnit->FindMap()))
+    //if (DisableMgr::IsPathfindingEnabled(_sourceUnit->FindMap()))
     {
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
         _navMesh = mmap->GetNavMesh(mapId);
@@ -48,7 +48,7 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
 
 bool PathGenerator::CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest)
 {
-    if (!acore::IsValidMapCoord(destX, destY, destZ) || !acore::IsValidMapCoord(x, y, z))
+    if (!Acore::IsValidMapCoord(destX, destY, destZ) || !Acore::IsValidMapCoord(x, y, z))
         return false;
 
     G3D::Vector3 dest(destX, destY, destZ);

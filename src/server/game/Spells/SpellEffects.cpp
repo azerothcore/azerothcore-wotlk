@@ -1113,6 +1113,11 @@ void Spell::EffectJump(SpellEffIndex effIndex)
     float speedXY, speedZ;
     CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(unitTarget), speedXY, speedZ);
     m_caster->GetMotionMaster()->MoveJump(*unitTarget, speedXY, speedZ);
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+    }
 }
 
 void Spell::EffectJumpDest(SpellEffIndex effIndex)
@@ -1130,7 +1135,7 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     float x, y, z;
     destTarget->GetPosition(x, y, z);
     // xinef: this can happen if MovePositionToFirstCollision detects that X, Y cords are invalid and returns prematurely
-    if (!acore::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
+    if (!Acore::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
         return;
 
     float speedXY, speedZ;
@@ -1142,6 +1147,12 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     {
         speedXY = pow(speedZ * 10, 8);
         m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ, 0, ObjectAccessor::GetUnit(*m_caster, m_caster->GetGuidValue(UNIT_FIELD_TARGET)));
+
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        {
+            sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+        }
+
         return;
     }
 
@@ -1156,6 +1167,11 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
         speedXY = 1.0f;
 
     m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+    }
 }
 
 void Spell::CalculateJumpSpeeds(uint8 i, float dist, float& speedXY, float& speedZ)
@@ -1176,6 +1192,11 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
 
     if (!unitTarget || unitTarget->IsInFlight())
         return;
+
+    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
+    }
 
     // Pre effects
     switch (m_spellInfo->Id)
@@ -1976,7 +1997,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
             sSpellMgr->GetSetOfSpellsInSpellGroupWithFlag(1, SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE, availableElixirs);
         for (std::set<uint32>::iterator itr = availableElixirs.begin(); itr != availableElixirs.end();)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(*itr);
+            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(*itr);
             if (spellInfo->SpellLevel < m_spellInfo->SpellLevel || spellInfo->SpellLevel > unitTarget->getLevel())
                 availableElixirs.erase(itr++);
             else
@@ -1986,7 +2007,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         if (!availableElixirs.empty())
         {
             // cast random elixir on target
-            m_caster->CastSpell(unitTarget, acore::Containers::SelectRandomContainerElement(availableElixirs), true, m_CastItem);
+            m_caster->CastSpell(unitTarget, Acore::Containers::SelectRandomContainerElement(availableElixirs), true, m_CastItem);
         }
     }
 }
@@ -2811,7 +2832,7 @@ void Spell::EffectAddHonor(SpellEffIndex /*effIndex*/)
     // do not allow to add too many honor for player (50 * 21) = 1040 at level 70, or (50 * 31) = 1550 at level 80
     if (damage <= 50)
     {
-        uint32 honor_reward = acore::Honor::hk_honor_at_level(unitTarget->getLevel(), float(damage));
+        uint32 honor_reward = Acore::Honor::hk_honor_at_level(unitTarget->getLevel(), float(damage));
         unitTarget->ToPlayer()->RewardHonor(nullptr, 1, honor_reward, false);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("spells.aura", "SpellEffect::AddHonor (spell_id %u) rewards %u honor points (scale) to player: %s",
@@ -4274,9 +4295,9 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     }
 
     UnitList targets;
-    acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(unitTarget, unitTarget, unitTarget->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-    acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unitTarget, targets, u_check);
-    unitTarget->VisitNearbyObject(unitTarget->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
+    Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(unitTarget, unitTarget, unitTarget->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+    Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unitTarget, targets, u_check);
+    Cell::VisitAllObjects(unitTarget, searcher, unitTarget->GetVisibilityRange());
     for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
         if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))
@@ -4921,8 +4942,8 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
     data << m_caster->GetGUID();
 
     float dist = m_caster->GetVisibilityRange() + VISIBILITY_COMPENSATION;
-    acore::MessageDistDelivererToHostile notifier(m_caster, &data, dist);
-    m_caster->VisitNearbyWorldObject(dist, notifier);
+    Acore::MessageDistDelivererToHostile notifier(m_caster, &data, dist);
+    Cell::VisitWorldObjects(m_caster, notifier, dist);
 
     // xinef: we should also force pets to remove us from current target
     Unit::AttackerSet attackerSet;
@@ -4945,9 +4966,9 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
             return;
 
         UnitList targets;
-        acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(m_caster, m_caster, m_caster->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-        acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(m_caster, targets, u_check);
-        m_caster->VisitNearbyObject(m_caster->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(m_caster, m_caster, m_caster->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(m_caster, targets, u_check);
+        Cell::VisitAllObjects(m_caster, searcher, m_caster->GetVisibilityRange());
         for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))
@@ -5056,6 +5077,11 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if (!unitTarget)
             return;
 
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        {
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
+        }
+
         // charge changes fall time
         if( m_caster->GetTypeId() == TYPEID_PLAYER )
             m_caster->ToPlayer()->SetFallInformation(time(nullptr), m_caster->GetPositionZ());
@@ -5063,6 +5089,13 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if (m_pathFinder)
         {
             m_caster->GetMotionMaster()->MoveCharge(m_pathFinder->GetEndPosition().x, m_pathFinder->GetEndPosition().y, m_pathFinder->GetEndPosition().z, 42.0f, EVENT_CHARGE, &m_pathFinder->GetPath());
+
+            if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            {
+                sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+            }
+
+            m_caster->AddUnitState(UNIT_STATE_CHARGING);
         }
         else
         {
@@ -5077,6 +5110,13 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             }
 
             m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT);
+
+            if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            {
+                sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+            }
+
+            m_caster->AddUnitState(UNIT_STATE_CHARGING);
         }
     }
 
@@ -5084,6 +5124,13 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
     {
         if (!unitTarget)
             return;
+
+        m_caster->ClearUnitState(UNIT_STATE_CHARGING);
+
+        if (m_caster->ToPlayer())
+        {
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
+        }
 
         // not all charge effects used in negative spells
         if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -5095,6 +5142,11 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH)
         return;
+
+    if (m_caster->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
+    }
 
     if (m_targets.HasDst())
     {
@@ -5109,6 +5161,11 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
         }
 
         m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        {
+            sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+        }
     }
 }
 
@@ -5162,6 +5219,11 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
     }
 
     unitTarget->KnockbackFrom(x, y, speedxy, speedz);
+
+    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
+    }
 }
 
 void Spell::EffectLeapBack(SpellEffIndex effIndex)
@@ -5176,6 +5238,11 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     float speedz = damage / 10.0f;
     //1891: Disengage
     m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellFamilyName != SPELLFAMILY_HUNTER);
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+    }
 
     // xinef: changes fall time
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -5262,6 +5329,12 @@ void Spell::EffectPullTowards(SpellEffIndex effIndex)
     float speedZ = unitTarget->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
 
     unitTarget->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
+
+    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    {
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(unitTarget->ToPlayer(), true);
+        sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
+    }
 }
 
 void Spell::EffectDispelMechanic(SpellEffIndex effIndex)

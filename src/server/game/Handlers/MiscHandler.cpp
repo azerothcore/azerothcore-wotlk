@@ -543,6 +543,24 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
     recv_data >> guid;
 
     _player->SetSelection(guid);
+
+    // Change target of current autoshoot spell
+    if (guid)
+    {
+        if (Spell* autoReapeatSpell = _player->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+        {
+            if (autoReapeatSpell->m_targets.GetUnitTargetGUID() != guid)
+            {
+                if (Unit* unit = ObjectAccessor::GetUnit(*_player, guid))
+                {
+                    if (unit->IsAlive() && !_player->IsFriendlyTo(unit) && unit->isTargetableForAttack(true, _player))
+                    {
+                        autoReapeatSpell->m_targets.SetUnitTarget(unit);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recv_data)
@@ -1623,8 +1641,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid.ReadAsPacked();
 
-    // pussywizard: typical check for incomming movement packets
-    if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || guid != _player->m_mover->GetGUID())
+    if (!_player)
     {
         recv_data.rfinish(); // prevent warnings spam
         return;
@@ -1637,6 +1654,8 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
     ReadMovementInfo(recv_data, &movementInfo);
 
     recv_data.read_skip<float>();                           // unk2
+
+    sScriptMgr->AnticheatSetCanFlybyServer(_player, movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
 
     _player->m_mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
 }

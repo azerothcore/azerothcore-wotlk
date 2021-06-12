@@ -4,6 +4,7 @@ on:
     branches:
       - 'master'
   pull_request:
+    types: ['labeled']
 
 jobs:
   windows-build:
@@ -11,11 +12,13 @@ jobs:
       fail-fast: false
     runs-on: windows-2019
     name: windows-2019-MSVC16
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    env:
+      BOOST_ROOT: C:\local\boost_1_74_0
+    if: github.repository == 'azerothcore/azerothcore-wotlk && ${{ github.event.label.name == 'run-build' }}'
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
-        run: choco install --no-progress openssl
+        run: choco install --no-progress openssl boost-msvc-14.2
       - name: Build
         shell: bash
         run: |

@@ -2339,7 +2339,7 @@ void AuraEffect::HandleAuraModScale(AuraApplication const* aurApp, uint8 mode, b
 
     Unit* target = aurApp->GetTarget();
 
-    float scale = target->GetFloatValue(OBJECT_FIELD_SCALE_X);
+    float scale = target->GetObjectScale();
     ApplyPercentModFloatVar(scale, float(GetAmount()), apply);
     target->SetObjectScale(scale);
 }
@@ -2359,7 +2359,6 @@ void AuraEffect::HandleAuraCloneCaster(AuraApplication const* aurApp, uint8 mode
 
         // What must be cloned? at least display and scale
         target->SetDisplayId(caster->GetDisplayId());
-        //target->SetObjectScale(caster->GetFloatValue(OBJECT_FIELD_SCALE_X)); // we need retail info about how scaling is handled (aura maybe?)
         target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_MIRROR_IMAGE);
     }
     else
@@ -2383,6 +2382,11 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
 
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+    }
+
     if (apply)
     {
         /*
@@ -2393,9 +2397,9 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         */
 
         UnitList targets;
-        acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, target, target->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-        acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
-        target->VisitNearbyObject(target->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, target, target->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
+        Cell::VisitAllObjects(target, searcher, target->GetMap()->GetVisibilityRange());
         for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))
@@ -2875,6 +2879,11 @@ void AuraEffect::HandleAuraWaterWalk(AuraApplication const* aurApp, uint8 mode, 
 
     Unit* target = aurApp->GetTarget();
 
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+    }
+
     if (!apply)
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
@@ -2891,6 +2900,11 @@ void AuraEffect::HandleAuraFeatherFall(AuraApplication const* aurApp, uint8 mode
         return;
 
     Unit* target = aurApp->GetTarget();
+
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+    }
 
     if (!apply)
     {
@@ -2912,6 +2926,11 @@ void AuraEffect::HandleAuraHover(AuraApplication const* aurApp, uint8 mode, bool
         return;
 
     Unit* target = aurApp->GetTarget();
+
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+    }
 
     if (!apply)
     {
@@ -3227,6 +3246,11 @@ void AuraEffect::HandleAuraModIncreaseSpeed(AuraApplication const* aurApp, uint8
     Unit* target = aurApp->GetTarget();
 
     target->UpdateSpeed(MOVE_RUN, true);
+
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+    }
 }
 
 void AuraEffect::HandleAuraModIncreaseMountedSpeed(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -3267,6 +3291,11 @@ void AuraEffect::HandleAuraModIncreaseFlightSpeed(AuraApplication const* aurApp,
                 target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 16314);
         }
     }
+
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+    }
 }
 
 void AuraEffect::HandleAuraModIncreaseSwimSpeed(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
@@ -3277,6 +3306,11 @@ void AuraEffect::HandleAuraModIncreaseSwimSpeed(AuraApplication const* aurApp, u
     Unit* target = aurApp->GetTarget();
 
     target->UpdateSpeed(MOVE_SWIM, true);
+
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+    }
 }
 
 void AuraEffect::HandleAuraModDecreaseSpeed(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
@@ -3292,6 +3326,11 @@ void AuraEffect::HandleAuraModDecreaseSpeed(AuraApplication const* aurApp, uint8
     target->UpdateSpeed(MOVE_RUN_BACK, true);
     target->UpdateSpeed(MOVE_SWIM_BACK, true);
     target->UpdateSpeed(MOVE_FLIGHT_BACK, true);
+
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+    }
 }
 
 void AuraEffect::HandleAuraModUseNormalSpeed(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
@@ -3304,6 +3343,11 @@ void AuraEffect::HandleAuraModUseNormalSpeed(AuraApplication const* aurApp, uint
     target->UpdateSpeed(MOVE_RUN,  true);
     target->UpdateSpeed(MOVE_SWIM, true);
     target->UpdateSpeed(MOVE_FLIGHT,  true);
+
+    if (Player* targetPlayer = target->ToPlayer())
+    {
+        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+    }
 }
 
 /*********************************************************/
@@ -5160,9 +5204,9 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                     return;
 
                                 Player* player = nullptr;
-                                acore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
-                                acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
-                                target->VisitNearbyWorldObject(10.0f, searcher);
+                                Acore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
+                                Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
+                                Cell::VisitWorldObjects(target, searcher, 10.0f);
 
                                 if( player && player->GetGUID() != target->GetGUID() )
                                     target->CastSpell(player, 52921, true);
@@ -5212,7 +5256,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             uint32 spellId = 24659;
                             if (apply && caster)
                             {
-                                SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellId);
+                                SpellInfo const* spell = sSpellMgr->AssertSpellInfo(spellId);
 
                                 for (uint32 i = 0; i < spell->StackAmount; ++i)
                                     caster->CastSpell(target, spell->Id, true, nullptr, nullptr, GetCasterGUID());
@@ -5227,7 +5271,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             uint32 spellId = 24662;
                             if (apply && caster)
                             {
-                                SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellId);
+                                SpellInfo const* spell = sSpellMgr->AssertSpellInfo(spellId);
                                 for (uint32 i = 0; i < spell->StackAmount; ++i)
                                     caster->CastSpell(target, spell->Id, true, nullptr, nullptr, GetCasterGUID());
                                 break;
@@ -6768,7 +6812,7 @@ void AuraEffect::HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp
     if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
     {
         // used only with EXTRA_LOGS
-        UNUSED(triggeredSpellInfo);
+        (void)triggeredSpellInfo;
 
         int32 basepoints0 = GetAmount();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)

@@ -57,6 +57,7 @@
 #include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "revision.h"
+#include "Realm.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
@@ -449,11 +450,12 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 // 1. Initialize internal variables to default values.
 // 2. In case when player is in group, initialize variables necessary for group calculations:
 // 2.1. _count - number of alive group members within reward distance;
-// 2.2. _sumLevel - sum of levels of alive group members within reward distance;
-// 2.3. _maxLevel - maximum level of alive group member within reward distance;
-// 2.4. _maxNotGrayMember - maximum level of alive group member within reward distance,
+// 2.2. _aliveSumLevel - sum of levels of alive group members within reward distance;
+// 2.3. _sumLevel - sum of levels of group members within reward distance;
+// 2.4. _maxLevel - maximum level of alive group member within reward distance;
+// 2.5. _maxNotGrayMember - maximum level of alive group member within reward distance,
 //      for whom victim is not gray;
-// 2.5. _isFullXP - flag identifying that for all group members victim is not gray,
+// 2.6. _isFullXP - flag identifying that for all group members victim is not gray,
 //      so 100% XP will be rewarded (50% otherwise).
 // 3. Reward killer (and group, if necessary).
 // 3.1. If killer is in group, reward group.
@@ -479,7 +481,7 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
     // 1. Initialize internal variables to default values.
     _killer(killer), _victim(victim), _group(killer->GetGroup()),
-    _groupRate(1.0f), _maxNotGrayMember(nullptr), _count(0), _sumLevel(0), _xp(0),
+    _groupRate(1.0f), _maxNotGrayMember(nullptr), _count(0), _aliveSumLevel(0), _sumLevel(0), _xp(0),
     _isFullXP(false), _maxLevel(0), _isBattleGround(isBattleGround), _isPvP(false)
 {
     // mark the credit as pvp if victim is player
@@ -499,23 +501,32 @@ inline void KillRewarder::_InitGroupData()
         // 2. In case when player is in group, initialize variables necessary for group calculations:
         for (GroupReference* itr = _group->GetFirstMember(); itr != nullptr; itr = itr->next())
             if (Player* member = itr->GetSource())
-                if ((_killer == member || member->IsAtGroupRewardDistance(_victim)) && member->IsAlive())
+                if ((_killer == member || member->IsAtGroupRewardDistance(_victim)))
                 {
                     const uint8 lvl = member->getLevel();
-                    // 2.1. _count - number of alive group members within reward distance;
-                    ++_count;
-                    // 2.2. _sumLevel - sum of levels of alive group members within reward distance;
+                    if (member->IsAlive())
+                    {
+                        // 2.1. _count - number of alive group members within reward distance;
+                        ++_count;
+                        // 2.2. _aliveSumLevel - sum of levels of alive group members within reward distance;
+                        _aliveSumLevel += lvl;
+                        // 2.3. _maxLevel - maximum level of alive group member within reward distance;
+                        if (_maxLevel < lvl)
+                        {
+                            _maxLevel = lvl;
+                        }
+                        // 2.4. _maxNotGrayMember - maximum level of alive group member within reward distance,
+                        //      for whom victim is not gray;
+                        uint32 grayLevel = Acore::XP::GetGrayLevel(lvl);
+                        if (_victim->getLevel() > grayLevel && (!_maxNotGrayMember || _maxNotGrayMember->getLevel() < lvl))
+                        {
+                            _maxNotGrayMember = member;
+                        }
+                    }
+                    // 2.5. _sumLevel - sum of levels of group members within reward distance;
                     _sumLevel += lvl;
-                    // 2.3. _maxLevel - maximum level of alive group member within reward distance;
-                    if (_maxLevel < lvl)
-                        _maxLevel = lvl;
-                    // 2.4. _maxNotGrayMember - maximum level of alive group member within reward distance,
-                    //      for whom victim is not gray;
-                    uint32 grayLevel = acore::XP::GetGrayLevel(lvl);
-                    if (_victim->getLevel() > grayLevel && (!_maxNotGrayMember || _maxNotGrayMember->getLevel() < lvl))
-                        _maxNotGrayMember = member;
                 }
-        // 2.5. _isFullXP - flag identifying that for all group members victim is not gray,
+        // 2.6. _isFullXP - flag identifying that for all group members victim is not gray,
         //      so 100% XP will be rewarded (50% otherwise).
         _isFullXP = _maxNotGrayMember && (_maxLevel == _maxNotGrayMember->getLevel());
     }
@@ -531,7 +542,7 @@ inline void KillRewarder::_InitXP(Player* player)
     // * otherwise, not in PvP;
     // * not if killer is on vehicle.
     if (_victim && (_isBattleGround || (!_isPvP && !_killer->GetVehicle())))
-        _xp = acore::XP::Gain(player, _victim, _isBattleGround);
+        _xp = Acore::XP::Gain(player, _victim, _isBattleGround);
 
     if (_xp && !_isBattleGround && _victim) // pussywizard: npcs with relatively low hp give lower exp
         if (_victim->GetTypeId() == TYPEID_UNIT)
@@ -611,16 +622,19 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
     // Give reputation and kill credit only in PvE.
     if (!_isPvP || _isBattleGround)
     {
-        float rate = _group ? _groupRate * float(player->getLevel()) / _sumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on summary level.
+        float xpRate = _group ? _groupRate * float(player->getLevel()) / _aliveSumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on the sum of levels.
+        float reputationRate = _group ? _groupRate * float(player->getLevel()) / _sumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on the sum of levels.
+        sScriptMgr->OnRewardKillRewarder(player, isDungeon, xpRate);                                              // Personal rate is 100%.
 
-        sScriptMgr->OnRewardKillRewarder(player, isDungeon, rate);                                              // Personal rate is 100%.
         if (_xp)
+        {
             // 4.2. Give XP.
-            _RewardXP(player, rate);
+            _RewardXP(player, xpRate);
+        }
         if (!_isBattleGround)
         {
             // If killer is in dungeon then all members receive full reputation at kill.
-            _RewardReputation(player, isDungeon ? 1.0f : rate);
+            _RewardReputation(player, isDungeon ? 1.0f : reputationRate);
             _RewardKillCredit(player);
         }
     }
@@ -644,7 +658,7 @@ void KillRewarder::_RewardGroup()
             {
                 // 3.1.2. Alter group rate if group is in raid (not for battlegrounds).
                 const bool isRaid = !_isPvP && sMapStore.LookupEntry(_killer->GetMapId())->IsRaid() && _group->isRaidGroup();
-                _groupRate = acore::XP::xp_in_group_rate(_count, isRaid);
+                _groupRate = Acore::XP::xp_in_group_rate(_count, isRaid);
             }
 
             // 3.1.3. Reward each group member (even dead or corpse) within reward distance.
@@ -1824,6 +1838,8 @@ void Player::Update(uint32 p_time)
             m_zoneUpdateTimer -= p_time;
     }
 
+    sScriptMgr->OnPlayerUpdate(this, p_time);
+
     if (IsAlive())
     {
         m_regenTimer += p_time;
@@ -2221,6 +2237,9 @@ void Player::SendTeleportAckPacket()
 
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/)
 {
+    // for except kick by antispeedhack
+    sScriptMgr->AnticheatSetSkipOnePacketForASH(this, true);
+
     if (!MapManager::IsValidMapCoord(mapid, x, y, z, orientation))
     {
         LOG_ERROR("server", "TeleportTo: invalid map (%d) or invalid coordinates (X: %f, Y: %f, Z: %f, O: %f) given when teleporting player (%s, name: %s, map: %d, X: %f, Y: %f, Z: %f, O: %f).",
@@ -4348,7 +4367,7 @@ bool Player::Has310Flyer(bool checkAllSpells, uint32 excludeSpellId)
                 if (_spell_idx->second->skillId != SKILL_MOUNTS)
                     break;  // We can break because mount spells belong only to one skillline (at least 310 flyers do)
 
-                spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED &&
                             spellInfo->Effects[i].CalcValue() == 310)
@@ -4389,9 +4408,7 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
     {
         next = itr;
         ++next;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-        if (!spellInfo) // xinef: impossibru...
-            continue;
+        SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
 
         if (spellInfo->HasAttribute(SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS))
             RemoveSpellCooldown(itr->first, true);
@@ -5465,6 +5482,18 @@ Corpse* Player::CreateCorpse()
     return corpse;
 }
 
+void Player::RemoveCorpse()
+{
+    if (GetCorpse())
+    {
+        GetCorpse()->RemoveFromWorld();
+    }
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    Corpse::DeleteFromDB(GetGUID(), trans);
+    CharacterDatabase.CommitTransaction(trans);
+}
+
 void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
 {
     _corpseLocation.WorldRelocate();
@@ -6492,29 +6521,40 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(WeaponAttackType attType)
+void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
 {
-    // no skill gain in pvp
-    Unit* victim = GetVictim();
-    if (victim && victim->GetTypeId() == TYPEID_PLAYER)
-        return;
-
     if (IsInFeralForm())
         return;                                             // always maximized SKILL_FERAL_COMBAT in fact
 
     if (GetShapeshiftForm() == FORM_TREE)
         return;                                             // use weapon but not skill up
 
-    if (victim && victim->GetTypeId() == TYPEID_UNIT && (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
+    if (victim->GetTypeId() == TYPEID_UNIT && (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
         return;
 
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
 
     Item* tmpitem = GetWeaponForAttack(attType, true);
     if (!tmpitem && attType == BASE_ATTACK)
+    {
+        // Keep unarmed & fist weapon skills in sync
         UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
-    else if (tmpitem && tmpitem->GetTemplate()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-        UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
+        UpdateSkill(SKILL_FIST_WEAPONS, weapon_skill_gain);
+    }
+    else if (tmpitem)
+    {
+        switch (tmpitem->GetTemplate()->SubClass)
+        {
+            case ITEM_SUBCLASS_WEAPON_FISHING_POLE:
+                break;
+            case ITEM_SUBCLASS_WEAPON_FIST:
+                UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
+                [[fallthrough]];
+            default:
+                UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
+                break;
+        }
+    }
 
     UpdateAllCritPercentages();
 }
@@ -6522,7 +6562,7 @@ void Player::UpdateWeaponSkill(WeaponAttackType attType)
 void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence)
 {
     uint8 plevel = getLevel();                              // if defense than victim == attacker
-    uint8 greylevel = acore::XP::GetGrayLevel(plevel);
+    uint8 greylevel = Acore::XP::GetGrayLevel(plevel);
     uint8 moblevel = victim->getLevelForTarget(this);
     /*if (moblevel < greylevel)
         return;*/ // Patch 3.0.8 (2009-01-20): You can no longer skill up weapons on mobs that are immune to damage.
@@ -6550,7 +6590,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
         if (defence)
             UpdateDefense();
         else
-            UpdateWeaponSkill(attType);
+            UpdateWeaponSkill(victim, attType);
     }
     else
         return;
@@ -7023,8 +7063,8 @@ void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, b
     dist += GetObjectSize();
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
-    acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
-    VisitNearbyWorldObject(dist, notifier);
+    Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 // pussywizard!
@@ -7033,8 +7073,8 @@ void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool
     if (self)
         GetSession()->SendPacket(data);
 
-    acore::MessageDistDeliverer notifier(this, data, dist, true);
-    VisitNearbyWorldObject(dist, notifier);
+    Acore::MessageDistDeliverer notifier(this, data, dist, true);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void Player::SendDirectMessage(WorldPacket* data)
@@ -7216,7 +7256,7 @@ int32 Player::CalculateReputationGain(ReputationSource source, uint32 creatureOr
             break;
     }
 
-    if (rate != 1.0f && creatureOrQuestLevel <= acore::XP::GetGrayLevel(getLevel()))
+    if (rate != 1.0f && creatureOrQuestLevel <= Acore::XP::GetGrayLevel(getLevel()))
         percent *= rate;
 
     if (percent <= 0.0f)
@@ -7456,7 +7496,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
                 return false;
 
             uint8 k_level = getLevel();
-            uint8 k_grey = acore::XP::GetGrayLevel(k_level);
+            uint8 k_grey = Acore::XP::GetGrayLevel(k_level);
             uint8 v_level = victim->getLevel();
 
             if (v_level <= k_grey)
@@ -7485,7 +7525,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             else
                 victim_guid.Clear();                        // Don't show HK: <rank> message, only log.
 
-            honor_f = ceil(acore::Honor::hk_honor_at_level_f(k_level) * (v_level - k_grey) / (k_level - k_grey));
+            honor_f = ceil(Acore::Honor::hk_honor_at_level_f(k_level) * (v_level - k_grey) / (k_level - k_grey));
 
             // count the number of playerkills in one day
             ApplyModUInt32Value(PLAYER_FIELD_KILLS, 1, true);
@@ -8578,8 +8618,21 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
             continue;
 
         // wrong triggering type
-        if (apply && spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
-            continue;
+        if (apply)
+        {
+            if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
+            {
+                continue;
+            }
+        }
+        else
+        {
+            // Auras activated by use should not be removed on unequip
+            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+            {
+                continue;
+            }
+        }
 
         // check if it is valid spell
         SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(spellData.SpellId);
@@ -9339,7 +9392,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         // Xinef: Store container id
         loot->containerGUID = item->GetGUID();
 
-        if (!item->m_lootGenerated && !sLootItemStorage->LoadStoredLoot(item))
+        if (!item->m_lootGenerated && !sLootItemStorage->LoadStoredLoot(item, this))
         {
             item->m_lootGenerated = true;
             loot->clear();
@@ -18293,7 +18346,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
             m_movementInfo.transport.pos.Relocate(x, y, z, o);
             m_transport->CalculatePassengerPosition(x, y, z, &o);
 
-            if (!acore::IsValidMapCoord(x, y, z, o) || std::fabs(m_movementInfo.transport.pos.GetPositionX()) > 75.0f || std::fabs(m_movementInfo.transport.pos.GetPositionY()) > 75.0f || std::fabs(m_movementInfo.transport.pos.GetPositionZ()) > 75.0f)
+            if (!Acore::IsValidMapCoord(x, y, z, o) || std::fabs(m_movementInfo.transport.pos.GetPositionX()) > 75.0f || std::fabs(m_movementInfo.transport.pos.GetPositionY()) > 75.0f || std::fabs(m_movementInfo.transport.pos.GetPositionZ()) > 75.0f)
             {
                 m_transport = nullptr;
                 m_movementInfo.transport.Reset();
@@ -19235,7 +19288,6 @@ void Player::_LoadMailedItems(Mail* mail)
         }
 
         Item* item = NewItemOrBag(proto);
-
         if (!item->LoadFromDB(itemGuid, ObjectGuid::Create<HighGuid::Player>(fields[13].GetUInt32()), fields, itemTemplate))
         {
             LOG_ERROR("server", "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", mail->messageID, itemGuid);
@@ -19300,6 +19352,13 @@ void Player::_LoadMail()
             delete m;
         itr = GetMailBegin();
     }
+
+    // Delete mailed items aswell
+    // Created again below in Player::_LoadMailedItems
+    for (ItemMap::iterator iter = mMitems.begin(); iter != mMitems.end(); ++iter)
+        delete iter->second;
+
+    mMitems.clear();
 
     //Now load the new ones
     m_mailCache.clear();
@@ -21047,6 +21106,9 @@ void Player::SendAutoRepeatCancel(Unit* target)
     WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, target->GetPackGUID().size());
     data << target->GetPackGUID();                  // may be it's target guid
     SendMessageToSet(&data, true);
+
+    // To properly cancel autoshot done by client
+    SendAttackSwingCancelAttack();
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
@@ -21478,9 +21540,9 @@ void Player::TextEmote(const std::string& text)
 
     WorldPacket data;
     std::list<Player*> players;
-    acore::AnyPlayerInObjectRangeCheck checker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
-    acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(this, players, checker);
-    this->VisitNearbyWorldObject(sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), searcher);
+    Acore::AnyPlayerInObjectRangeCheck checker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, players, checker);
+    Cell::VisitWorldObjects(this, searcher, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 
     for (auto const& itr : players)
     {
@@ -22432,12 +22494,7 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
         if (itr->second->State == PLAYERSPELL_REMOVED)
             continue;
         uint32 unSpellId = itr->first;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(unSpellId);
-        if (!spellInfo)
-        {
-            ASSERT(spellInfo);
-            continue;
-        }
+        SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(unSpellId);
 
         // Not send cooldown for this spells
         if (spellInfo->IsCooldownStartedOnEvent())
@@ -23089,18 +23146,30 @@ void Player::SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId /*= 0*/
     SendDirectMessage(&data);
 }
 
-void Player::UpdatePotionCooldown()
+void Player::UpdatePotionCooldown(Spell* spell)
 {
     // no potion used i combat or still in combat
     if (!GetLastPotionId() || IsInCombat())
         return;
 
-    // spell/item pair let set proper cooldown (except not existed charged spell cooldown spellmods for potions)
-    if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(GetLastPotionId()))
-        for (uint8 idx = 0; idx < MAX_ITEM_SPELLS; ++idx)
-            if (proto->Spells[idx].SpellId && proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[idx].SpellId))
-                    SendCooldownEvent(spellInfo, GetLastPotionId());
+    // Call not from spell cast, send cooldown event for item spells if no in combat
+    if (!spell)
+    {
+        // spell/item pair let set proper cooldown (except not existed charged spell cooldown spellmods for potions)
+        if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(GetLastPotionId()))
+            for (uint8 idx = 0; idx < MAX_ITEM_SPELLS; ++idx)
+                if (proto->Spells[idx].SpellId && proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+                    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[idx].SpellId))
+                        SendCooldownEvent(spellInfo, GetLastPotionId());
+    }
+    // from spell cases (m_lastPotionId set in Spell::SendSpellCooldown)
+    else
+    {
+        if (spell->IsIgnoringCooldowns())
+            return;
+        else
+            SendCooldownEvent(spell->m_spellInfo, m_lastPotionId, spell);
+    }
 
     SetLastPotionId(0);
 }
@@ -23620,11 +23689,11 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 
 void Player::UpdateVisibilityForPlayer(bool mapChange)
 {
-    acore::VisibleNotifier notifierNoLarge(*this, mapChange, false); // visit only objects which are not large; default distance
-    m_seer->VisitNearbyObject(GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS, notifierNoLarge);
+    Acore::VisibleNotifier notifierNoLarge(*this, mapChange, false); // visit only objects which are not large; default distance
+    Cell::VisitAllObjects(m_seer, notifierNoLarge, GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
     notifierNoLarge.SendToSelf();
-    acore::VisibleNotifier notifierLarge(*this, mapChange, true);    // visit only large objects; maximum distance
-    m_seer->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, notifierLarge);
+    Acore::VisibleNotifier notifierLarge(*this, mapChange, true);    // visit only large objects; maximum distance
+    Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
     notifierLarge.SendToSelf();
 
     if (mapChange)
@@ -24693,7 +24762,7 @@ uint32 Player::GetResurrectionSpellId()
 bool Player::isHonorOrXPTarget(Unit* victim) const
 {
     uint8 v_level = victim->getLevel();
-    uint8 k_grey  = acore::XP::GetGrayLevel(getLevel());
+    uint8 k_grey  = Acore::XP::GetGrayLevel(getLevel());
 
     // Victim level less gray level
     if (v_level <= k_grey)
@@ -26977,6 +27046,8 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
     PreparedStatement* stmt = nullptr;
     uint8 index = 0;
 
+    auto finiteAlways = [](float f) { return std::isfinite(f) ? f : 0.0f; };
+
     if (create)
     {
         //! Insert query
@@ -28125,6 +28196,8 @@ bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/)
 
 bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
 {
+    sScriptMgr->AnticheatSetCanFlybyServer(this, apply);
+
     if (!packetOnly && !Unit::SetCanFly(apply))
         return false;
 

@@ -42,7 +42,7 @@ LootStore LootTemplates_Skinning("skinning_loot_template",           "creature s
 LootStore LootTemplates_Spell("spell_loot_template",                 "spell id (random item creating)", false);
 
 // Selects invalid loot items to be removed from group possible entries (before rolling)
-struct LootGroupInvalidSelector : public acore::unary_function<LootStoreItem*, bool>
+struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, bool>
 {
     explicit LootGroupInvalidSelector(Loot const& loot, uint16 lootMode) : _loot(loot), _lootMode(lootMode) { }
 
@@ -474,6 +474,36 @@ void Loot::AddItem(LootStoreItem const& item)
         lootItems.push_back(generatedLoot);
         count -= proto->GetMaxStackSize();
 
+        // In some cases, a dropped item should be visible/lootable only for some players in group
+        bool canSeeItemInLootWindow = false;
+        if (auto player = ObjectAccessor::FindPlayer(lootOwnerGUID))
+        {
+            if (auto group = player->GetGroup())
+            {
+                for (auto itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                {
+                    if (auto member = itr->GetSource())
+                    {
+                        if (generatedLoot.AllowedForPlayer(member))
+                        {
+                            canSeeItemInLootWindow = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (generatedLoot.AllowedForPlayer(player))
+            {
+                canSeeItemInLootWindow = true;
+            }
+        }
+
+        if (!canSeeItemInLootWindow)
+        {
+            LOG_DEBUG("loot", "Skipping ++unlootedCount for unlootable item: %u", item.itemid);
+            continue;
+        }
+
         // non-conditional one-player only items are counted here,
         // free for all items are counted in FillFFALoot(),
         // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
@@ -488,6 +518,8 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     // Must be provided
     if (!lootOwner)
         return false;
+
+    lootOwnerGUID = lootOwner->GetGUID();
 
     LootTemplate const* tab = store.GetLootFor(lootId);
 
@@ -1187,7 +1219,7 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
     possibleLoot = EqualChanced;
     possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
     if (!possibleLoot.empty())                              // If nothing selected yet - an item is taken from equal-chanced part
-        return acore::Containers::SelectRandomContainerElement(possibleLoot);
+        return Acore::Containers::SelectRandomContainerElement(possibleLoot);
 
     return nullptr;                                            // Empty drop from the group
 }
@@ -1343,18 +1375,93 @@ void LootTemplate::CopyConditions(ConditionList conditions)
             group->CopyConditions(conditions);
 }
 
-void LootTemplate::CopyConditions(LootItem* li) const
+bool LootTemplate::CopyConditions(LootItem* li) const
 {
-    // Copies the conditions list from a template item to a LootItem
     for (LootStoreItemList::const_iterator _iter = Entries.begin(); _iter != Entries.end(); ++_iter)
     {
         LootStoreItem* item = *_iter;
-        if (item->itemid != li->itemid)
+        if (item->reference)
+        {
+            if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
+            {
+                if (Referenced->CopyConditions(li))
+                {
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            if (item->itemid != li->itemid)
+            {
+                continue;
+            }
+
+            li->conditions = item->conditions;
+            return true;
+        }
+    }
+
+    for (LootGroups::const_iterator groupItr = Groups.begin(); groupItr != Groups.end(); ++groupItr)
+    {
+        LootGroup* group = *groupItr;
+        if (!group)
             continue;
 
-        li->conditions = item->conditions;
-        break;
+        LootStoreItemList* itemList = group->GetExplicitlyChancedItemList();
+        for (LootStoreItemList::iterator i = itemList->begin(); i != itemList->end(); ++i)
+        {
+            LootStoreItem* item = *i;
+            if (item->reference)
+            {
+                if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
+                {
+                    if (Referenced->CopyConditions(li))
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                if (item->itemid != li->itemid)
+                {
+                    continue;
+                }
+
+                li->conditions = item->conditions;
+                return true;
+            }
+        }
+
+        itemList = group->GetEqualChancedItemList();
+        for (LootStoreItemList::iterator i = itemList->begin(); i != itemList->end(); ++i)
+        {
+            LootStoreItem* item = *i;
+            if (item->reference)
+            {
+                if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
+                {
+                    if (Referenced->CopyConditions(li))
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                if (item->itemid != li->itemid)
+                {
+                    continue;
+                }
+
+                li->conditions = item->conditions;
+                return true;
+            }
+        }
     }
+
+    return false;
 }
 
 // Rolls for every item in the template and adds the rolled items the the loot

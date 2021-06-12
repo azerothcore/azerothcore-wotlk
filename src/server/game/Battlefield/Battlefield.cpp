@@ -461,10 +461,8 @@ void Battlefield::BroadcastPacketToWar(WorldPacket& data) const
 
 void Battlefield::SendWarningToAllInZone(uint32 entry)
 {
-    if (Map* map = sMapMgr->CreateBaseMap(m_MapId))
-        if (Unit* unit = map->GetCreature(StalkerGuid))
-            if (Creature* stalker = unit->ToCreature())
-                sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+    if (Creature* stalker = GetCreature(StalkerGuid))
+        sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
 }
 
 void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)
@@ -814,6 +812,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 
     // Set creature in world
     map->AddToMap(creature);
+    creature->setActive(true);
 
     return creature;
 }
@@ -822,7 +821,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z, float o)
 {
     // Get map object
-    Map* map = sMapMgr->CreateBaseMap(571); // *vomits*
+    Map* map = sMapMgr->CreateBaseMap(m_MapId);
     if (!map)
         return 0;
 
@@ -1004,9 +1003,9 @@ bool BfCapturePoint::Update(uint32 diff)
     }
 
     std::list<Player*> players;
-    acore::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
-    acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
-    capturePoint->VisitNearbyWorldObject(radius, searcher);
+    Acore::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
+    Cell::VisitWorldObjects(capturePoint, searcher, radius);
 
     for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
         if ((*itr)->IsOutdoorPvPActive())

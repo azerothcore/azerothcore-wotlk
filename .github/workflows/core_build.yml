@@ -18,6 +18,10 @@ jobs:
         # we can include specific combinations here
         include:
           - os: ubuntu-20.04
+            compiler: clang12
+            modules: without
+            extra_logs: false
+          - os: ubuntu-20.04
             compiler: clang11
             modules: without
             extra_logs: true
@@ -26,11 +30,11 @@ jobs:
             modules: without
             extra_logs: false
           - os: ubuntu-20.04
-            compiler: clang9
+            compiler: clang8
             modules: without
             extra_logs: false
           - os: ubuntu-18.04
-            compiler: clang # default in 18.04 is clang 6
+            compiler: clang7
             modules: without
             extra_logs: false
           - os: ubuntu-18.04
