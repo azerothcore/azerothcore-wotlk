@@ -1340,6 +1340,8 @@ public:
     void LoadFactionChangeSpells();
     void LoadFactionChangeTitles();
 
+    [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
+
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread

@@ -640,15 +640,11 @@ struct MovementInfo
 class WorldLocation : public Position
 {
 public:
-    explicit WorldLocation(uint32 _mapid = MAPID_INVALID, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
-        : m_mapId(_mapid) { Relocate(_x, _y, _z, _o); }
-    WorldLocation(const WorldLocation& loc) : Position () { WorldRelocate(loc); }
-    /* requried as of C++ 11 */
-#if __cplusplus >= 201103L
-    WorldLocation(WorldLocation&&) = default;
-    WorldLocation& operator=(const WorldLocation&) = default;
-    WorldLocation& operator=(WorldLocation&&) = default;
-#endif
+    explicit WorldLocation(uint32 _mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+        : Position(x, y, z, o), m_mapId(_mapId) { }
+
+    WorldLocation(uint32 mapId, Position const& position)
+        : Position(position), m_mapId(mapId) { }
 
     void WorldRelocate(const WorldLocation& loc)
     {

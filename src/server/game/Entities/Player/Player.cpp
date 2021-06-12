@@ -8550,8 +8550,21 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
             continue;
 
         // wrong triggering type
-        if (apply && spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
-            continue;
+        if (apply)
+        {
+            if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
+            {
+                continue;
+            }
+        }
+        else
+        {
+            // Auras activated by use should not be removed on unequip
+            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+            {
+                continue;
+            }
+        }
 
         // check if it is valid spell
         SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(spellData.SpellId);
@@ -9311,7 +9324,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         // Xinef: Store container id
         loot->containerGUID = item->GetGUID();
 
-        if (!item->m_lootGenerated && !sLootItemStorage->LoadStoredLoot(item))
+        if (!item->m_lootGenerated && !sLootItemStorage->LoadStoredLoot(item, this))
         {
             item->m_lootGenerated = true;
             loot->clear();
@@ -21030,6 +21043,9 @@ void Player::SendAutoRepeatCancel(Unit* target)
     WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, target->GetPackGUID().size());
     data << target->GetPackGUID();                  // may be it's target guid
     SendMessageToSet(&data, true);
+
+    // To properly cancel autoshot done by client
+    SendAttackSwingCancelAttack();
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
