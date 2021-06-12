@@ -7280,6 +7280,18 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->ManaCostPercentage = 0;
     });
 
+    // Shadowmeld
+    ApplySpellFix({ 58984 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER;
+    });
+
+    // Flare activation speed
+    ApplySpellFix({ 1543 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Speed = 0.0f;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
