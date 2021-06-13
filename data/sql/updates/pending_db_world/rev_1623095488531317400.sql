@@ -1,0 +1,10 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1623095488531317400');
+
+SET @SCALEBANE = 4328;
+SET @SCOUT = 4329;
+SET @ASHTAIL = 4331;
+SET @FLAMECALLER = 4334;
+
+UPDATE `skinning_loot_template` 
+SET `GroupId` = 1 
+WHERE `entry` IN (@SCALEBANE, @SCOUT, @ASHTAIL, @FLAMECALLER);
