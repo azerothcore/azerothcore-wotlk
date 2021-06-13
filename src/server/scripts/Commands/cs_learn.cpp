@@ -30,6 +30,7 @@ public:
     {
         static std::vector<ChatCommand> learnAllMyCommandTable =
         {
+            { "lvl",            SEC_GAMEMASTER,  false, &HandleLearnAllMyLvlCommand,         "" },
             { "class",          SEC_GAMEMASTER,  false, &HandleLearnAllMyClassCommand,       "" },
             { "pettalents",     SEC_GAMEMASTER,  false, &HandleLearnAllMyPetTalentsCommand,  "" },
             { "spells",         SEC_GAMEMASTER,  false, &HandleLearnAllMySpellsCommand,      "" },
@@ -103,6 +104,70 @@ public:
         HandleLearnAllMySpellsCommand(handler, "");
         HandleLearnAllMyTalentsCommand(handler, "");
         return true;
+    }
+
+
+    static bool HandleLearnAllMyLvlCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        const std::unordered_map<uint32, CreatureTemplate>* creatureTemplateMap = sObjectMgr->GetCreatureTemplates();
+        for (CreatureTemplateContainer::const_iterator itr = creatureTemplateMap->begin(); itr != creatureTemplateMap->end(); ++itr)
+        {
+            CreatureTemplate cInfo = itr->second;
+            if (cInfo.trainer_type == TrainerType::TRAINER_TYPE_CLASS)
+            {
+                learn(player, itr, cInfo);
+            }
+        }
+
+        for (CreatureTemplateContainer::const_iterator itr = creatureTemplateMap->begin(); itr != creatureTemplateMap->end(); ++itr)
+        {
+            CreatureTemplate cInfo = itr->second;
+            if (cInfo.trainer_type == TrainerType::TRAINER_TYPE_TRADESKILLS)
+            {
+                learn(player, itr, cInfo);
+            }
+        }
+
+        handler->PSendSysMessage("You have learned all the available skills at a this level");
+        return true;
+    }
+
+    static void learn(Player* player, CreatureTemplateContainer::const_iterator itr, CreatureTemplate cInfo)
+    {
+        if (cInfo.trainer_class == player->getClass())
+        {
+            const TrainerSpellData* tsd = sObjectMgr->GetNpcTrainerSpells(cInfo.Entry);
+            std::unordered_map<uint32 /*spellid*/, TrainerSpell> tsMap = tsd->spellList;
+            bool hadNew = false;
+            do
+            {
+                hadNew = false;
+                for (TrainerSpellMap::const_iterator itr = tsMap.begin(); itr != tsMap.end(); ++itr)
+                {
+                    if (TrainerSpell const* tSpell = &itr->second)
+                    {
+                        TrainerSpellState tsState = player->GetTrainerSpellState(tSpell);
+                        if (tsState == TrainerSpellState::TRAINER_SPELL_GREEN)
+                        {
+                            if (const SpellInfo* pS = sSpellMgr->GetSpellInfo(tSpell->spell))
+                            {
+                                if (pS->Effects[0].Effect == SpellEffects::SPELL_EFFECT_LEARN_SPELL)
+                                {
+                                    player->CastSpell(player, pS);
+                                }
+                                else
+                                {
+                                    player->learnSpell(tSpell->spell);
+                                }
+                            }
+                            hadNew = true;
+                        }
+                    }
+                }
+            } while (hadNew);
+        }
     }
 
     static bool HandleLearnAllMySpellsCommand(ChatHandler* handler, char const* /*args*/)
