@@ -114,7 +114,9 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
 
             uint32 conditionLootId = 0;
             if (!li->conditions.empty())
+            {
                 conditionLootId = li->conditions.front()->SourceGroup;
+            }
 
             itemList.push_back(StoredLootItem(li->itemid, li->count, li->randomPropertyId, li->randomSuffix, li->follow_loot_rules, li->freeforall, li->is_blocked, li->is_counted,
                 li->is_underthreshold, li->needs_quest, conditionLootId));
