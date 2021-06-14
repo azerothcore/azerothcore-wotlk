@@ -3304,6 +3304,13 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     else
         bonus_xp = victim ? GetXPRestBonus(xp) : 0; // XP resting bonus
 
+    // hooks and multipliers can modify the xp with a zero or negative value
+    // check again before sending invalid xp to the client
+    if (xp < 1)
+    {
+        return;
+    }
+
     SendLogXPGain(xp, victim, bonus_xp, recruitAFriend, group_rate);
 
     uint32 curXP = GetUInt32Value(PLAYER_XP);
@@ -21106,9 +21113,6 @@ void Player::SendAutoRepeatCancel(Unit* target)
     WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, target->GetPackGUID().size());
     data << target->GetPackGUID();                  // may be it's target guid
     SendMessageToSet(&data, true);
-
-    // To properly cancel autoshot done by client
-    SendAttackSwingCancelAttack();
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
@@ -23093,6 +23097,13 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
             {
                 if (*i_scset == spellInfo->Id)                    // skip main spell, already handled above
                     continue;
+
+                // Only within the same spellfamily
+                SpellInfo const* categorySpellInfo = sSpellMgr->GetSpellInfo(*i_scset);
+                if (!categorySpellInfo || categorySpellInfo->SpellFamilyName != spellInfo->SpellFamilyName)
+                {
+                    continue;
+                }
 
                 AddSpellCooldown(*i_scset, itemId, catrecTime, !spellInfo->IsCooldownStartedOnEvent() && spellInfo->CategoryRecoveryTime != spellInfo->RecoveryTime && spellInfo->RecoveryTime && spellInfo->CategoryRecoveryTime); // Xinef: send category cooldowns on login if category cooldown is different from base cooldown
             }

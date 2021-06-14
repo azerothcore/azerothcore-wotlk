@@ -1457,7 +1457,7 @@ CreatureFamilyAssistanceDelay = 2000
 #    CreatureFamilyAssistancePeriod
 #        Description: Time (in milliseconds) before next creature assistance call.
 #        Default:     3000 - (3 Seconds)
-                      0    - (Disabled)
+#                     0    - (Disabled)
 
 CreatureFamilyAssistancePeriod = 3000
 

@@ -688,8 +688,7 @@ protected:
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
-    // deprecated/legacy
-    [[nodiscard]] virtual bool OnCheck(Player* /*source*/, Unit* /*target*/) { return true; };
+    [[nodiscard]] virtual bool OnCheck(Player* /*source*/, Unit* /*target*/, uint32 /*criteria_id*/) { return true; };
 };
 
 class PlayerScript : public ScriptObject
@@ -830,8 +829,14 @@ public:
     // Called when a player complete an achievement
     virtual void OnAchiComplete(Player* /*player*/, AchievementEntry const* /*achievement*/) { }
 
+    // Called before player complete an achievement, can be used to disable achievements in certain conditions
+    virtual bool OnBeforeAchiComplete(Player* /*player*/, AchievementEntry const* /*achievement*/) { return true; }
+
     // Called when a player complete an achievement criteria
     virtual void OnCriteriaProgress(Player* /*player*/, AchievementCriteriaEntry const* /*criteria*/) { }
+
+    //  Called before player complete an achievement criteria, can be used to disable achievement criteria in certain conditions
+    virtual bool OnBeforeCriteriaProgress(Player* /*player*/, AchievementCriteriaEntry const* /*criteria*/) { return true; }
 
     // Called when an Achievement is saved to DB
     virtual void OnAchiSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CompletedAchievementData /*achiData*/) { }
@@ -1140,8 +1145,8 @@ public:
     // loot
     virtual void OnAfterRefCount(Player const* /*player*/, LootStoreItem* /*LootStoreItem*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, uint32& /*maxcount*/, LootStore const& /*store*/) { }
     virtual void OnBeforeDropAddItem(Player const* /*player*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, LootStoreItem* /*LootStoreItem*/, LootStore const& /*store*/) { }
-    virtual void OnItemRoll(Player const* /*player*/, LootStoreItem const* /*LootStoreItem*/, float& /*chance*/, Loot& /*loot*/, LootStore const& /*store*/) { };
-
+    virtual bool OnItemRoll(Player const* /*player*/, LootStoreItem const* /*LootStoreItem*/, float& /*chance*/, Loot& /*loot*/, LootStore const& /*store*/) { return true; };
+    virtual bool OnBeforeLootEqualChanced(Player const* /*player*/, LootStoreItemList /*EqualChanced*/, Loot& /*loot*/, LootStore const& /*store*/) { return true; }
     virtual void OnInitializeLockedDungeons(Player* /*player*/, uint8& /*level*/, uint32& /*lockData*/, lfg::LFGDungeonData const* /*dungeon*/) { }
     virtual void OnAfterInitializeLockedDungeons(Player* /*player*/) { }
 
@@ -1549,7 +1554,7 @@ public: /* TransportScript */
     void OnRelocate(Transport* transport, uint32 waypointId, uint32 mapId, float x, float y, float z);
 
 public: /* AchievementCriteriaScript */
-    bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target);
+    bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id);
 
 public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
@@ -1596,7 +1601,9 @@ public: /* PlayerScript */
     void OnPlayerAddToBattleground(Player* player, Battleground* bg);
     void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
     void OnAchievementComplete(Player* player, AchievementEntry const* achievement);
+    bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
     void OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
+    bool OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
     void OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
     void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
     void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
@@ -1727,7 +1734,8 @@ public: /* GlobalScript */
     void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap);
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);
     void OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store);
-    void OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store);
+    bool OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store);
+    bool OnBeforeLootEqualChanced(Player const* player, LootStoreItemList EqualChanced, Loot& loot, LootStore const& store);
     void OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData, lfg::LFGDungeonData const* dungeon);
     void OnAfterInitializeLockedDungeons(Player* player);
     void OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated);
