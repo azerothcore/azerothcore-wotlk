@@ -18,7 +18,7 @@ function import() {
 
     if [ -z $latestUpd ]; then
         echo "FIRST UPDATE FILE MISSING!! DID YOU ARCHIVED IT?";
-        exit;
+        exit 1;
     fi
 
     dateToday=`date +%Y_%m_%d`
