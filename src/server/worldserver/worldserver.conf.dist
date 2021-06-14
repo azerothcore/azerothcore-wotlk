@@ -1965,8 +1965,16 @@ Rate.Loyalty           = 1
 Rate.Skill.Discovery = 1
 
 #
-#    Drop Rates
-#
+#    Rate.Drop.Item.Poor
+#    Rate.Drop.Item.Normal
+#    Rate.Drop.Item.Uncommon
+#    Rate.Drop.Item.Rare
+#    Rate.Drop.Item.Epic
+#    Rate.Drop.Item.Legendary
+#    Rate.Drop.Item.Artifact
+#    Rate.Drop.Item.Referenced
+#    Rate.Drop.Money
+#    Rate.Drop.QuestMoney
 #        Description: Drop rates for money and items based on quality.
 #        Default:     1 - (Rate.Drop.Item.Poor)
 #                     1 - (Rate.Drop.Item.Normal)
