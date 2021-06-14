@@ -860,7 +860,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_int_configs[CONFIG_START_ARENA_POINTS] = sConfigMgr->GetOption<int32>("StartArenaPoints", 0);
-    if (int32(m_int_configs[CONFIG_START_ARENA_POINTS]) < 0 || int32(m_int_configs[CONFIG_START_ARENA_POINTS]) > m_int_configs[CONFIG_MAX_ARENA_POINTS])
+    if (int32(m_int_configs[CONFIG_START_ARENA_POINTS]) < 0 || int32(m_int_configs[CONFIG_START_ARENA_POINTS]) > int32(m_int_configs[CONFIG_MAX_ARENA_POINTS]))
     {
         LOG_ERROR("server", "StartArenaPoints (%i) must be in range 0..MaxArenaPoints(%u). Set to %u.",
                        m_int_configs[CONFIG_START_ARENA_POINTS], m_int_configs[CONFIG_MAX_ARENA_POINTS], 0);
