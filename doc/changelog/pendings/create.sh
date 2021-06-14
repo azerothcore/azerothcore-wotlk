@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-unamestr=`uname`
+unamestr=$(uname)
+echo "OS: $unamestr"
 if [[ "$unamestr" == 'Darwin' ]]; then
    rev=$(gdate +%s%N );
 else
