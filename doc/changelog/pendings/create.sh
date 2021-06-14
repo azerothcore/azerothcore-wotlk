@@ -2,14 +2,13 @@
 
 unamestr=`uname`
 if [[ "$unamestr" == 'Darwin' ]]; then
-   date='gdate'
+   rev=$(gdate +%s%N );
 else
-   date='date'
+   rev=$(date +%s%N );
 fi
 
 CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )";
 
-rev=$( $date +%s%N );
 filename=changes_"$rev".md
 
 echo "Insert your changelog here
