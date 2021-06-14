@@ -19,49 +19,49 @@
 enum WarriorSpells
 {
     // Ours
-    SPELL_WARRIOR_INTERVENE_TRIGGER                 = 59667,
-    SPELL_WARRIOR_SPELL_REFLECTION                  = 23920,
+    SPELL_WARRIOR_INTERVENE_TRIGGER = 59667,
+    SPELL_WARRIOR_SPELL_REFLECTION = 23920,
     SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER = 59725,
 
     // Theirs
-    SPELL_WARRIOR_BLOODTHIRST                       = 23885,
-    SPELL_WARRIOR_BLOODTHIRST_DAMAGE                = 23881,
-    SPELL_WARRIOR_CHARGE                            = 34846,
-    SPELL_WARRIOR_DAMAGE_SHIELD_DAMAGE              = 59653,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_1                = 12162,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_2                = 12850,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_3                = 12868,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC         = 12721,
-    SPELL_WARRIOR_EXECUTE                           = 20647,
-    SPELL_WARRIOR_GLYPH_OF_EXECUTION                = 58367,
-    SPELL_WARRIOR_GLYPH_OF_VIGILANCE                = 63326,
-    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF        = 65156,
-    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT      = 64976,
-    SPELL_WARRIOR_LAST_STAND_TRIGGERED              = 12976,
-    SPELL_WARRIOR_RETALIATION_DAMAGE                = 22858,
-    SPELL_WARRIOR_SLAM                              = 50783,
-    SPELL_WARRIOR_SUNDER_ARMOR                      = 58567,
-    SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK     = 26654,
-    SPELL_WARRIOR_TAUNT                             = 355,
-    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_1        = 46859,
-    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_2        = 46860,
-    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_1     = 64849,
-    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2     = 64850,
-    SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
-    SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665
+    SPELL_WARRIOR_BLOODTHIRST = 23885,
+    SPELL_WARRIOR_BLOODTHIRST_DAMAGE = 23881,
+    SPELL_WARRIOR_CHARGE = 34846,
+    SPELL_WARRIOR_DAMAGE_SHIELD_DAMAGE = 59653,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_1 = 12162,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_2 = 12850,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_3 = 12868,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC = 12721,
+    SPELL_WARRIOR_EXECUTE = 20647,
+    SPELL_WARRIOR_GLYPH_OF_EXECUTION = 58367,
+    SPELL_WARRIOR_GLYPH_OF_VIGILANCE = 63326,
+    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF = 65156,
+    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT = 64976,
+    SPELL_WARRIOR_LAST_STAND_TRIGGERED = 12976,
+    SPELL_WARRIOR_RETALIATION_DAMAGE = 22858,
+    SPELL_WARRIOR_SLAM = 50783,
+    SPELL_WARRIOR_SUNDER_ARMOR = 58567,
+    SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK = 26654,
+    SPELL_WARRIOR_TAUNT = 355,
+    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_1 = 46859,
+    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_2 = 46860,
+    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_1 = 64849,
+    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2 = 64850,
+    SPELL_WARRIOR_VIGILANCE_PROC = 50725,
+    SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT = 59665
 };
 
 enum WarriorSpellIcons
 {
-    WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989
+    WARRIOR_ICON_ID_SUDDEN_DEATH = 1989
 };
 
 enum MiscSpells
 {
-    SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
-    SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
-    SPELL_PRIEST_RENEWED_HOPE                       = 63944,
-    SPELL_GEN_DAMAGE_REDUCTION_AURA                 = 68066,
+    SPELL_PALADIN_BLESSING_OF_SANCTUARY = 20911,
+    SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY = 25899,
+    SPELL_PRIEST_RENEWED_HOPE = 63944,
+    SPELL_GEN_DAMAGE_REDUCTION_AURA = 68066,
 };
 
 // Ours
@@ -90,6 +90,41 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_warr_mocking_blow_SpellScript();
+    }
+};
+
+class spell_warr_victory_rush : public SpellScriptLoader
+{
+public:
+    spell_warr_victory_rush() : SpellScriptLoader("spell_warr_victory_rush") { }
+
+    class spell_warr_victory_rush_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warr_victory_rush_SpellScript);
+
+        void VictoryRushHit()
+        {
+            if (Unit* player = GetCaster())
+            {
+                if (Unit* victim = GetHitUnit())
+                {
+                    if (victim->isDead())
+                    {
+                        player->ModifyAuraState(AURA_STATE_WARRIOR_VICTORY_RUSH, true);
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_warr_victory_rush_SpellScript::VictoryRushHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_warr_victory_rush_SpellScript();
     }
 };
 
@@ -963,6 +998,7 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_intervene();
     new spell_warr_improved_spell_reflection();
     new spell_warr_improved_spell_reflection_trigger();
+    new spell_warr_victory_rush();
 
     // Theirs
     new spell_warr_bloodthirst();
