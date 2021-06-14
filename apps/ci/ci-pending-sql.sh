@@ -43,10 +43,10 @@ function import() {
             newVer=$dateToday"_"$cnt
 
             startTransaction="START TRANSACTION;";
-            updHeader="ALTER TABLE version_db_"$db" CHANGE COLUMN "$oldVer" "$newVer" bit;";
+            updHeader="ALTER TABLE version_db_$db CHANGE COLUMN $oldVer $newVer bit;";
             endTransaction="COMMIT;";
 
-            newFile="$updPath/"$dateToday"_"$cnt".sql"
+            newFile="$updPath/$dateToday_$cnt.sql"
 
             oldFile=$(basename "$entry")
             prefix=${oldFile%_*.sql}
