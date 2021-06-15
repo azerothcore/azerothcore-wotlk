@@ -14,14 +14,14 @@ function import() {
     pendingPath="$AC_PATH_ROOT/data/sql/updates/pending_$folder"
     updPath="$UPDATES_PATH/$folder"
 
-    latestUpd=`ls -1 $updPath/ | tail -n 1`
+    latestUpd=$(ls -1 $updPath/ | tail -n 1)
 
     if [ -z $latestUpd ]; then
         echo "FIRST UPDATE FILE MISSING!! DID YOU ARCHIVED IT?";
-        exit;
+        exit 1;
     fi
 
-    dateToday=`date +%Y_%m_%d`
+    dateToday=$(date +%Y_%m_%d)
     counter=0
 
     dateLast=$latestUpd
@@ -43,10 +43,10 @@ function import() {
             newVer=$dateToday"_"$cnt
 
             startTransaction="START TRANSACTION;";
-            updHeader="ALTER TABLE version_db_"$db" CHANGE COLUMN "$oldVer" "$newVer" bit;";
+            updHeader="ALTER TABLE version_db_$db CHANGE COLUMN $oldVer $newVer bit;";
             endTransaction="COMMIT;";
 
-            newFile="$updPath/"$dateToday"_"$cnt".sql"
+            newFile="$updPath/$dateToday_$cnt.sql"
 
             oldFile=$(basename "$entry")
             prefix=${oldFile%_*.sql}
@@ -67,7 +67,7 @@ function import() {
                 echo "proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';" >> "$newFile";
                 echo "SELECT COUNT(*) INTO @COLEXISTS"  >> "$newFile";
                 echo "FROM information_schema.COLUMNS" >> "$newFile";
-                echo "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_"$db"' AND COLUMN_NAME = '"$oldVer"';" >> "$newFile";
+                echo "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_$db' AND COLUMN_NAME = '$oldVer';" >> "$newFile";
                 echo "IF @COLEXISTS = 0 THEN LEAVE proc; END IF;" >> "$newFile";
             fi
 
@@ -75,7 +75,7 @@ function import() {
             echo "$updHeader" >> "$newFile";
 
             if [[ $isRev -eq 1 ]]; then
-                echo "SELECT sql_rev INTO OK FROM version_db_"$db" WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
+                echo "SELECT sql_rev INTO OK FROM version_db_$db WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
             fi;
 
             echo "--" >> "$newFile";
@@ -89,7 +89,7 @@ function import() {
             echo "--" >> "$newFile";
             echo "-- END UPDATING QUERIES" >> "$newFile";
             echo "--" >> "$newFile";
-            echo "UPDATE version_db_"$db" SET date = '"$newVer"' WHERE sql_rev = '"$rev"';" >> "$newFile";
+            echo "UPDATE version_db_$db SET date = '$newVer' WHERE sql_rev = '$rev';" >> "$newFile";
 
             echo "$endTransaction" >> "$newFile";
 

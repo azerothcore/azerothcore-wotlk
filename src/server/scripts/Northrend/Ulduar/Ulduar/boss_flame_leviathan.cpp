@@ -2076,7 +2076,7 @@ public:
     {
     }
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/, uint32 /*criteria_id*/) override
     {
         return target && _towerCount <= target->GetAI()->GetData(DATA_GET_TOWER_COUNT);
     }
@@ -2090,7 +2090,7 @@ class achievement_flame_leviathan_shutout : public AchievementCriteriaScript
 public:
     achievement_flame_leviathan_shutout() : AchievementCriteriaScript("achievement_flame_leviathan_shutout") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/, uint32 /*criteria_id*/) override
     {
         if (target)
             if (target->GetAI()->GetData(DATA_GET_SHUTDOWN))
@@ -2107,7 +2107,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (Vehicle* vehicle = player->GetVehicle())
             if (vehicle->GetCreatureEntry() == _entry1 || vehicle->GetCreatureEntry() == _entry2)
@@ -2125,7 +2125,7 @@ class achievement_flame_leviathan_unbroken : public AchievementCriteriaScript
 public:
     achievement_flame_leviathan_unbroken() : AchievementCriteriaScript("achievement_flame_leviathan_unbroken") {}
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (player->GetInstanceScript()->GetData(DATA_UNBROKEN_ACHIEVEMENT))
