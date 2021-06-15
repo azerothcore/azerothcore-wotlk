@@ -3376,10 +3376,11 @@ void Unit::_UpdateAutoRepeatSpell()
     static uint32 const HUNTER_AUTOSHOOT = 75;
 
     // Check "realtime" interrupts
-    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving() && spellProto->Id != HUNTER_AUTOSHOOT) ||
-        IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
+    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving() && spellProto->Id != HUNTER_AUTOSHOOT) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
     {
-        InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+        // cancel wand shoot
+        if (spellProto->Id != HUNTER_AUTOSHOOT)
+            InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
         m_AutoRepeatFirstCast = true;
         return;
     }
@@ -15535,14 +15536,14 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 !target->IsPet()
            )
         {
-            // On melee based hit/miss/resist need update skill (for victim and attacker)
-            if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST))
+            // On melee based hit/miss/resist/parry/dodge need to update skill (for victim and attacker)
+            if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST | PROC_EX_PARRY | PROC_EX_DODGE))
             {
-                if (target->GetTypeId() != TYPEID_PLAYER && !target->IsCritter())
+                if (target->GetTypeId() != TYPEID_PLAYER)
                     ToPlayer()->UpdateCombatSkills(target, attType, isVictim);
             }
-            // Update defence if player is victim and parry/dodge/block
-            else if (isVictim && procExtra & (PROC_EX_DODGE | PROC_EX_PARRY | PROC_EX_BLOCK))
+            // Update defence if player is victim and we block
+            else if (isVictim && procExtra & (PROC_EX_BLOCK))
                 ToPlayer()->UpdateCombatSkills(target, attType, true);
         }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
