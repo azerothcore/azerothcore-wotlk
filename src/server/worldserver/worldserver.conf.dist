@@ -3517,6 +3517,15 @@ Logger.mmaps=4,Server
 #Logger.sql.driver=4,Console Server
 #Logger.warden=4,Console Server
 #Logger.vehicles=4,Console Server
+
+# Logger.Timestamp.Format
+#       Description: Setup date/time format for Logger if Flag of Appender setted to 1 (Prefix Timestamp to the text)
+#       Values:     1 - YYYY-MM-DD_HH-MM-SS  2021-06-15_01-26-59
+#                   2 - DD-MM-YYYY HH:MM:SS  15-06-2021 01:26:59
+#       Default:    1
+
+Logger.Timestamp.Format = 1
+
 ###################################################################################################
 
 ###################################################################################################
