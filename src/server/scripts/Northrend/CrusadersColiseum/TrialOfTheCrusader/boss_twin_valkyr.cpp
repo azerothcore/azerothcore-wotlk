@@ -277,7 +277,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
         uint8 eventId = events.ExecuteEvent();
 
-        switch( eventId )
+        switch(eventId)
         {
             case 0:
                 break;
