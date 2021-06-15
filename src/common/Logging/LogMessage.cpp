@@ -22,11 +22,11 @@ std::string LogMessage::getTimeStr(time_t time)
 {
     tm aTm;
     localtime_r(&time, &aTm);
-    if (sConfigMgr->GetOption<int32>("Logger.Timestamp.Format", 1) == 1)
+    if (sConfigMgr->GetOption<int32>("Logger.Timestamp.Format", 1) != 1)
     {
-        return Acore::StringFormat("%04d-%02d-%02d_%02d:%02d:%02d", aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
+        return Acore::StringFormat("%02d-%02d-%04d %02d:%02d:%02d", aTm.tm_mday, aTm.tm_mon + 1, aTm.tm_year + 1900, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
     }
-    return Acore::StringFormat("%02d-%02d-%04d %02d:%02d:%02d", aTm.tm_mday, aTm.tm_mon + 1, aTm.tm_year + 1900, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
+    return Acore::StringFormat("%04d-%02d-%02d_%02d:%02d:%02d", aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 }
 
 std::string LogMessage::getTimeStr() const
