@@ -2694,7 +2694,7 @@ class achievement_im_on_a_boat : public AchievementCriteriaScript
 public:
     achievement_im_on_a_boat() : AchievementCriteriaScript("achievement_im_on_a_boat") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target->GetAI() && target->GetAI()->GetData(ACTION_SHIP_VISITS_ENEMY) == 1;
     }
