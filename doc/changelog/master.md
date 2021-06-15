@@ -1,4 +1,4 @@
-## 4.0.0-dev.2 | Commit: 8b6d7cb2ff8c3774ba9a8e253923301fd0c096a5
+## 4.0.0-dev.2 | Commit: [3f70d0b80ff483f142ffbebf8960aeb503913a35](https://github.com/azerothcore/azerothcore-wotlk/commit/3f70d0b80ff483f142ffbebf8960aeb503913a35)
 
 
 ### Added
