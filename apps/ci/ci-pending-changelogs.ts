@@ -15,6 +15,15 @@ let changelogText = await Deno.readTextFile(CHANGELOG_MASTER_FILE);
 
 const currentVersion = acoreInfo.version;
 
+const res=Deno.run({ cmd: [ "git", "rev-parse",
+                          "HEAD"],
+                   stdout: 'piped',
+                   stderr: 'piped',
+                   stdin: 'null'  });
+await res.status();
+const gitVersion = new TextDecoder().decode(await res.output());
+
+
 for await (const dirEntry of Deno.readDir(CHANGELOG_PENDING_PATH)) {
   if (!dirEntry.isFile || !dirEntry.name.endsWith(".md")) {
     continue;
@@ -29,7 +38,7 @@ for await (const dirEntry of Deno.readDir(CHANGELOG_PENDING_PATH)) {
   const data = await Deno.readTextFile(
     `${CHANGELOG_PENDING_PATH}/${dirEntry.name}`,
   );
-  changelogText = `## ${acoreInfo.version}\n\n${data}\n${changelogText}`;
+  changelogText = `## ${acoreInfo.version} | Commit: ${gitVersion}\n\n${data}\n${changelogText}`;
 
   // remove the pending file
   await Deno.remove(`${CHANGELOG_PENDING_PATH}/${dirEntry.name}`);
