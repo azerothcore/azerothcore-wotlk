@@ -3,8 +3,8 @@ Xinef
  */
 
 #include "LootItemStorage.h"
+#include "DatabaseEnv.h"
 #include "ObjectMgr.h"
-#include "PreparedStatement.h"
 #include <time.h>
 
 LootItemStorage::LootItemStorage()

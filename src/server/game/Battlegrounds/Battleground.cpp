@@ -822,7 +822,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
                 uint32 currOnline = (uint32)(sWorld->GetActiveSessionCount());
 
                 CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-                PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
+                CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
                 stmt2->setUInt32(0, fightId);
                 stmt2->setUInt8(1, m_ArenaType);
                 stmt2->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
@@ -881,7 +881,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
                 uint32 currOnline = (uint32)(sWorld->GetActiveSessionCount());
 
                 CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-                PreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
+                CharacterDatabasePreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
                 stmt3->setUInt32(0, fightId);
                 stmt3->setUInt8(1, m_ArenaType);
                 stmt3->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
