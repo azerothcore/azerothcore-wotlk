@@ -2385,6 +2385,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
     if (Player* targetPlayer = target->ToPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
     }
 
     if (apply)
@@ -2917,7 +2918,7 @@ void AuraEffect::HandleAuraFeatherFall(AuraApplication const* aurApp, uint8 mode
 
     // start fall from current height
     if (!apply && target->GetTypeId() == TYPEID_PLAYER)
-        target->ToPlayer()->SetFallInformation(time(nullptr), target->GetPositionZ());
+        target->ToPlayer()->ResetFallingData(target->GetPositionZ());
 }
 
 void AuraEffect::HandleAuraHover(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -3250,6 +3251,7 @@ void AuraEffect::HandleAuraModIncreaseSpeed(AuraApplication const* aurApp, uint8
     if (Player* targetPlayer = target->ToPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
     }
 }
 
@@ -3295,6 +3297,7 @@ void AuraEffect::HandleAuraModIncreaseFlightSpeed(AuraApplication const* aurApp,
     if (Player* targetPlayer = target->ToPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
     }
 }
 
@@ -3310,6 +3313,7 @@ void AuraEffect::HandleAuraModIncreaseSwimSpeed(AuraApplication const* aurApp, u
     if (Player* targetPlayer = target->ToPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
     }
 }
 
@@ -3330,6 +3334,7 @@ void AuraEffect::HandleAuraModDecreaseSpeed(AuraApplication const* aurApp, uint8
     if (Player* targetPlayer = target->ToPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
     }
 }
 
@@ -3347,6 +3352,7 @@ void AuraEffect::HandleAuraModUseNormalSpeed(AuraApplication const* aurApp, uint
     if (Player* targetPlayer = target->ToPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
     }
 }
 

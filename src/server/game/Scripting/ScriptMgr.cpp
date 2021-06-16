@@ -2727,6 +2727,32 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
     return ret;
 }
 
+void ScriptMgr::AnticheatResetFallingData(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatResetFallingData(player);
+}
+
+bool ScriptMgr::AnticheatNoFallingDamage(Player* player, uint16 opcode)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->AnticheatNoFallingDamage(player, opcode))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+void ScriptMgr::AnticheatHandleNoFallingDamage(Player* player, uint16 opcode)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatHandleNoFallingDamage(player, opcode);
+}
+
+void ScriptMgr::AnticheatSetSuccessfullyLanded(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetSuccessfullyLanded(player);
+}
+
 bool ScriptMgr::CanGuildSendBankList(Guild const* guild, WorldSession* session, uint8 tabId, bool sendAllSlots)
 {
     bool ret = true;

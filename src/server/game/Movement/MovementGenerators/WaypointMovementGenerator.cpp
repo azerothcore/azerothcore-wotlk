@@ -317,7 +317,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
         // this prevent cheating with landing  point at lags
         // when client side flight end early in comparison server side
         player->StopMoving();
-        player->SetFallInformation(time(nullptr), player->GetPositionZ());
+        player->ResetFallingData(player->GetPositionZ());
     }
 
     player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_TAXI_BENCHMARK);
@@ -410,7 +410,7 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
             if (i_currentNode >= i_path.size() - 1)
             {
                 player->CleanupAfterTaxiFlight();
-                player->SetFallInformation(time(nullptr), player->GetPositionZ());
+                player->ResetFallingData(player->GetPositionZ());
                 if (player->pvpInfo.IsHostile)
                     player->CastSpell(player, 2479, true);
 

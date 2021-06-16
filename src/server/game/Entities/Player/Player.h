@@ -2348,15 +2348,11 @@ public:
     /*********************************************************/
     /***                 VARIOUS SYSTEMS                   ***/
     /*********************************************************/
-    void UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode);
+    void UpdateFallInformationIfNeed(float z);
     SafeUnitPointer m_mover;
     WorldObject* m_seer;
     std::set<Unit*> m_isInSharedVisionOf;
-    void SetFallInformation(uint32 time, float z)
-    {
-        m_lastFallTime = time;
-        m_lastFallZ = z;
-    }
+    void ResetFallingData(float z);
     void HandleFall(MovementInfo const& movementInfo);
 
     [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const;
@@ -2936,7 +2932,6 @@ private:
 
     void UpdateCharmedAI();
 
-    uint32 m_lastFallTime;
     float  m_lastFallZ;
 
     int32 m_MirrorTimer[MAX_TIMERS];

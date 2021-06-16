@@ -329,6 +329,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         return;
     }
 
+    if (plrMover && !sScriptMgr->AnticheatNoFallingDamage(plrMover, opcode))
+    {
+        plrMover->GetSession()->KickPlayer();
+        recvData.rfinish();
+        return;
+    }
+
     /* extract packet */
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
@@ -351,6 +358,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
+    // [CMSG_MOVE_CHNG_TRANSPORT 0x038D (909)]
+    if (plrMover && opcode == CMSG_MOVE_CHNG_TRANSPORT)
+    {
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
+    }
+
     if (!movementInfo.pos.IsPositionValid())
     {
         if (plrMover)
@@ -359,13 +372,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
         }
 
-        recvData.rfinish();                     // prevent warnings spam
         return;
     }
 
     if (!mover->movespline->Finalized())
     {
-        recvData.rfinish();                     // prevent warnings spam
         return;
     }
 
@@ -380,8 +391,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                 sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
             }
+
             return;
         }
+
         movementInfo.pos.Relocate(mover->GetPositionX(), mover->GetPositionY(), mover->GetPositionZ());
 
         if (mover->GetTypeId() == TYPEID_UNIT)
@@ -401,9 +414,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-                //TC_LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
             }
-            recvData.rfinish();                 // prevent warnings spam
+
             return;
         }
 
@@ -416,7 +428,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
             }
 
-            recvData.rfinish();                   // prevent warnings spam
             return;
         }
 
@@ -470,8 +481,18 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         movementInfo.transport.Reset();
     }
 
+    // start falling time
+    if (plrMover && !plrMover->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) && movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_FAR))
+        plrMover->ResetFallingData(movementInfo.pos.GetPositionZ());
+
+    // check on NoFallingDamage
+    if (plrMover && plrMover->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) && !movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_FAR))
+    {
+        sScriptMgr->AnticheatHandleNoFallingDamage(plrMover, opcode);
+    }
+
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
-    if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight())
+    if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight() && !plrMover->IsFlying())
     {
         plrMover->HandleFall(movementInfo);
 
@@ -485,7 +506,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
         if (plrMover)
         {
+            sScriptMgr->AnticheatSetSuccessfullyLanded(plrMover);
             sScriptMgr->AnticheatSetJumpingbyOpcode(plrMover, false);
+
+            plrMover->ResetFallingData(movementInfo.pos.GetPositionZ()); // for MSG_MOVE_START_SWIM (no HandleFall(movementInfo))
         }
     }
 
@@ -554,7 +578,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         if (plrMover->IsSitState() && (movementInfo.flags & (MOVEMENTFLAG_MASK_MOVING | MOVEMENTFLAG_MASK_TURNING)))
             plrMover->SetStandState(UNIT_STAND_STATE_STAND);
 
-        plrMover->UpdateFallInformationIfNeed(movementInfo, opcode);
+        if (!movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_FAR))
+            plrMover->UpdateFallInformationIfNeed(movementInfo.pos.GetPositionZ()); // don't use SetFallInformation
 
         if (movementInfo.pos.GetPositionZ() < plrMover->GetMap()->GetMinHeight(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY()))
             if (!plrMover->GetBattleground() || !plrMover->GetBattleground()->HandlePlayerUnderMap(_player))
