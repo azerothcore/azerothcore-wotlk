@@ -81,8 +81,8 @@ namespace AddonMgr
                 ++count2;
             } while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u banned addons in %u ms", count2, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u banned addons in %u ms", count2, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
