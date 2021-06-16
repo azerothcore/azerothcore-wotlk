@@ -2657,6 +2657,15 @@ Arena.GamesRequired = 10
 Arena.QueueAnnouncer.Enable = 0
 
 #
+#    Battleground.QueueAnnouncer.PlayerOnly
+#        Description: Battleground queue announcement type.
+#        Default:     0 - (System message, Anyone can see it)
+#                     1 - (Private, Only queued players can see it)
+#
+
+Arena.QueueAnnouncer.PlayerOnly = 0
+
+#
 #    Arena.ArenaSeason.ID
 #        Description: Current arena season id shown in clients.
 #        Default:     8
