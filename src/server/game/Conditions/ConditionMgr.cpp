@@ -210,12 +210,12 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             }
         case CONDITION_NEAR_CREATURE:
             {
-                condMeets = static_cast<bool>(GetClosestCreatureWithEntry(object, ConditionValue1, (float) ConditionValue2,!ConditionValue3) != nullptr);
+                condMeets = static_cast<bool>(GetClosestCreatureWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2),!ConditionValue3));
                 break;
             }
         case CONDITION_NEAR_GAMEOBJECT:
             {
-                condMeets = static_cast<bool>(GetClosestGameObjectWithEntry(object, ConditionValue1, (float)ConditionValue2));
+                condMeets = static_cast<bool>(GetClosestGameObjectWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2)));
                 break;
             }
         case CONDITION_OBJECT_ENTRY_GUID:
