@@ -35,6 +35,7 @@ Versions of CLang:
 
 | CLang Version   | Supported          |
 | --------------- | ------------------ |
+| 12              | :white_check_mark: |
 | 11              | :white_check_mark: |
 | 10              | :white_check_mark: |
 | 9               | :white_check_mark: |

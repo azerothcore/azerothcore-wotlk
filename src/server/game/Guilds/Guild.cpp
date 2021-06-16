@@ -472,13 +472,13 @@ bool Guild::BankTab::WriteSlotPacket(WorldPacket& data, uint8 slotId, bool ignor
     {
         data << uint32(0);                                  // 3.3.0 (0x00018020, 0x00018000)
 
-        if (uint32 random = pItem->GetItemRandomPropertyId())
+        if (int32 random = pItem->GetItemRandomPropertyId())
         {
-            data << uint32(random);                         // Random item property id
+            data << int32(random);                          // Random item property id
             data << uint32(pItem->GetItemSuffixFactor());   // SuffixFactor
         }
         else
-            data << uint32(0);
+            data << int32(0);
 
         data << uint32(pItem->GetCount());                  // ITEM_FIELD_STACK_COUNT
         data << uint32(0);
