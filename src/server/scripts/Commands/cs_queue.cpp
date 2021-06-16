@@ -50,10 +50,10 @@ public:
     // Old api, need replace after start support new chat command api
     std::vector<ChatCommand> GetCommands() const override
     {
-        static std::vector<ChatCommand> queueShowArenaCommandTable
+        static std::vector<ChatCommand> queueShowArenaCommandTable // .queue show arena
         {
-            { "rated",   SEC_PLAYER,  false,  &HandleQueueShowArenaRatedCommand,      "" },
-            { "normal",  SEC_PLAYER,  false,  &HandleQueueShowArenaNormalCommand,     "" },
+            { "rated",   SEC_PLAYER,  true,  &HandleQueueShowArenaRatedCommand,      "" },
+            { "normal",  SEC_PLAYER,  true,  &HandleQueueShowArenaNormalCommand,     "" },
         };
 
         static std::vector<ChatCommand> queueShowCommandTable = // .queue show
