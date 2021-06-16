@@ -5,6 +5,10 @@ on:
       - 'master'
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
@@ -17,6 +21,10 @@ jobs:
         extra_logs: [false]
         # we can include specific combinations here
         include:
+          - os: ubuntu-20.04
+            compiler: clang12
+            modules: without
+            extra_logs: false
           - os: ubuntu-20.04
             compiler: clang11
             modules: without

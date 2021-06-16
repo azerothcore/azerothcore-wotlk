@@ -1,5 +1,5 @@
 {
-    "name" : "azerothcore-wotlk",
-    "version" : "3.0.0",
-    "license" : "AGPL3"
+  "name": "azerothcore-wotlk",
+  "version": "4.0.0-dev.2",
+  "license": "AGPL3"
 }
