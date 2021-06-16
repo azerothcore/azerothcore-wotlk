@@ -3294,6 +3294,13 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     else
         bonus_xp = victim ? GetXPRestBonus(xp) : 0; // XP resting bonus
 
+    // hooks and multipliers can modify the xp with a zero or negative value
+    // check again before sending invalid xp to the client
+    if (xp < 1)
+    {
+        return;
+    }
+
     SendLogXPGain(xp, victim, bonus_xp, recruitAFriend, group_rate);
 
     uint32 curXP = GetUInt32Value(PLAYER_XP);
@@ -8568,8 +8575,21 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
             continue;
 
         // wrong triggering type
-        if ((apply || form_change) && spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
-            continue;
+        if (apply)
+        {
+            if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
+            {
+                continue;
+            }
+        }
+        else
+        {
+            // Auras activated by use should not be removed on unequip
+            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+            {
+                continue;
+            }
+        }
 
         // check if it is valid spell
         SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(spellData.SpellId);
@@ -9315,7 +9335,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         // Xinef: Store container id
         loot->containerGUID = item->GetGUID();
 
-        if (!item->m_lootGenerated && !sLootItemStorage->LoadStoredLoot(item))
+        if (!item->m_lootGenerated && !sLootItemStorage->LoadStoredLoot(item, this))
         {
             item->m_lootGenerated = true;
             loot->clear();
@@ -20853,9 +20873,6 @@ void Player::SendAutoRepeatCancel(Unit* target)
     WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, target->GetPackGUID().size());
     data << target->GetPackGUID();                  // may be it's target guid
     SendMessageToSet(&data, true);
-
-    // To properly cancel autoshot done by client
-    SendAttackSwingCancelAttack();
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
@@ -22826,6 +22843,13 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
             {
                 if (*i_scset == spellInfo->Id)                    // skip main spell, already handled above
                     continue;
+
+                // Only within the same spellfamily
+                SpellInfo const* categorySpellInfo = sSpellMgr->GetSpellInfo(*i_scset);
+                if (!categorySpellInfo || categorySpellInfo->SpellFamilyName != spellInfo->SpellFamilyName)
+                {
+                    continue;
+                }
 
                 AddSpellCooldown(*i_scset, itemId, catrecTime, !spellInfo->IsCooldownStartedOnEvent() && spellInfo->CategoryRecoveryTime != spellInfo->RecoveryTime && spellInfo->RecoveryTime && spellInfo->CategoryRecoveryTime); // Xinef: send category cooldowns on login if category cooldown is different from base cooldown
             }
@@ -26544,7 +26568,7 @@ void Player::BuildEnchantmentsInfoData(WorldPacket* data)
 
         data->put<uint16>(enchantmentMaskPos, enchantmentMask);
 
-        *data << uint16(item->GetItemRandomPropertyId());                   // item random property id
+        *data << int16(item->GetItemRandomPropertyId());                    // item random property id
         *data << item->GetGuidValue(ITEM_FIELD_CREATOR).WriteAsPacked();    // item creator
         *data << uint32(item->GetItemSuffixFactor());                       // item suffix factor
     }
