@@ -180,7 +180,7 @@ namespace AccountMgr
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGON);
         stmt->setBinary(0, salt);
         stmt->setBinary(1, verifier);
-        stmt->setUInt32(2, accountId);;
+        stmt->setUInt32(2, accountId);
         LoginDatabase.Execute(stmt);
 
         sScriptMgr->OnPasswordChange(accountId);

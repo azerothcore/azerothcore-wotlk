@@ -41,7 +41,8 @@ void LootItemStorage::LoadStorageFromDB()
         Field* fields = result->Fetch();
 
         StoredLootItemList& itemList = lootItemStore[ObjectGuid::Create<HighGuid::Item>(fields[0].GetUInt32())];
-        itemList.push_back(StoredLootItem(fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetInt32(), fields[4].GetUInt32()));
+        itemList.push_back(StoredLootItem(fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetInt32(), fields[4].GetUInt32(), fields[5].GetBool(),
+            fields[6].GetBool(), fields[7].GetBool(), fields[8].GetBool(), fields[9].GetBool(), fields[10].GetBool()));
 
         ++count;
     } while (result->NextRow());
@@ -79,14 +80,21 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
     // Gold at first
     if (loot->gold)
     {
-        itemList.push_back(StoredLootItem(0, loot->gold, 0, 0));
+        itemList.push_back(StoredLootItem(0, loot->gold, 0, 0, false, false, false, false, false, false));
 
+        uint8 index = 0;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEMCONTAINER_SINGLE_ITEM);
-        stmt->setUInt32(0, loot->containerGUID.GetCounter());
-        stmt->setUInt32(1, 0);
-        stmt->setUInt32(2, loot->gold);
-        stmt->setInt32(3, 0);
-        stmt->setUInt32(4, 0);
+        stmt->setUInt32(index++, loot->containerGUID.GetCounter());
+        stmt->setUInt32(index++, 0);
+        stmt->setUInt32(index++, loot->gold);
+        stmt->setInt32(index++, 0);
+        stmt->setUInt32(index++, 0);
+        stmt->setBool(index++, false);
+        stmt->setBool(index++, false);
+        stmt->setBool(index++, false);
+        stmt->setBool(index++, false);
+        stmt->setBool(index++, false);
+        stmt->setBool(index++, false);
         trans->Append(stmt);
     }
 
@@ -104,22 +112,36 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
             if (!itemTemplate || itemTemplate->IsCurrencyToken())
                 continue;
 
-            itemList.push_back(StoredLootItem(li->itemid, li->count, li->randomPropertyId, li->randomSuffix));
+            itemList.push_back(StoredLootItem(li->itemid, li->count, li->randomPropertyId, li->randomSuffix, li->follow_loot_rules, li->freeforall, li->is_blocked, li->is_counted,
+                li->is_underthreshold, li->needs_quest));
 
+            uint8 index = 0;
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEMCONTAINER_SINGLE_ITEM);
-            stmt->setUInt32(0, loot->containerGUID.GetCounter());
-            stmt->setUInt32(1, li->itemid);
-            stmt->setUInt32(2, li->count);
-            stmt->setInt32 (3, li->randomPropertyId);
-            stmt->setUInt32(4, li->randomSuffix);
+            stmt->setUInt32(index++, loot->containerGUID.GetCounter());
+            stmt->setUInt32(index++, li->itemid);
+            stmt->setUInt32(index++, li->count);
+            stmt->setInt32 (index++, li->randomPropertyId);
+            stmt->setUInt32(index++, li->randomSuffix);
+            stmt->setBool(index++, li->follow_loot_rules);
+            stmt->setBool(index++, li->freeforall);
+            stmt->setBool(index++, li->is_blocked);
+            stmt->setBool(index++, li->is_counted);
+            stmt->setBool(index++, li->is_underthreshold);
+            stmt->setBool(index++, li->needs_quest);
             trans->Append(stmt);
         }
 
     CharacterDatabase.CommitTransaction(trans);
 }
 
-bool LootItemStorage::LoadStoredLoot(Item* item)
+bool LootItemStorage::LoadStoredLoot(Item* item, Player* player)
 {
+    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item->GetEntry());
+    if (!proto)
+    {
+        return false;
+    }
+
     Loot* loot = &item->loot;
     LootItemContainer::iterator itr = lootItemStore.find(loot->containerGUID);
     if (itr == lootItemStore.end())
@@ -134,22 +156,47 @@ bool LootItemStorage::LoadStoredLoot(Item* item)
             continue;
         }
 
-        LootItem li;
-        li.itemid = it2->itemid;
-        li.count = it2->count;
-        li.follow_loot_rules = false;
-        li.freeforall = false;
-        li.is_blocked = false;
-        li.is_counted = false;
-        li.is_underthreshold = false;
-        li.is_looted = false;
-        li.needs_quest = false;
-        li.randomPropertyId = it2->randomPropertyId;
-        li.randomSuffix = it2->randomSuffix;
-        li.rollWinnerGUID = ObjectGuid::Empty;
+        if (LootTemplate const* lt = LootTemplates_Item.GetLootFor(item->GetEntry()))
+        {
+            LootItem li;
+            li.itemid = it2->itemid;
+            li.count = it2->count;
+            li.follow_loot_rules = it2->follow_loot_rules;
+            li.freeforall = it2->freeforall;
+            li.is_blocked = it2->is_blocked;
+            li.is_counted = it2->is_counted;
+            li.is_underthreshold = it2->is_underthreshold;
+            li.is_looted = false;
+            li.needs_quest = it2->needs_quest;
+            li.randomPropertyId = it2->randomPropertyId;
+            li.randomSuffix = it2->randomSuffix;
+            li.rollWinnerGUID = ObjectGuid::Empty;
 
-        loot->items.push_back(li);
-        loot->unlootedCount++;
+            // Copy the extra loot conditions from the item in the loot template
+            lt->CopyConditions(&li);
+
+            if (li.needs_quest)
+            {
+                loot->quest_items.push_back(li);
+            }
+            else
+            {
+                loot->items.push_back(li);
+            }
+
+            // non-conditional one-player only items are counted here,
+            // free for all items are counted in FillFFALoot(),
+            // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
+            if ((!li.needs_quest && li.conditions.empty() && !(proto->Flags & ITEM_FLAG_MULTI_DROP)) || li.is_counted)
+            {
+                ++loot->unlootedCount;
+            }
+        }
+    }
+
+    if (loot->unlootedCount)
+    {
+        loot->FillNotNormalLootFor(player, true);
     }
 
     // Mark the item if it has loot so it won't be generated again on open

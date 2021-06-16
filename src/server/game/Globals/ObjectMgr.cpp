@@ -693,7 +693,7 @@ void ObjectMgr::LoadCreatureTemplateSpells()
         }
 
         CreatureTemplate& creatureTemplate = itr->second;
-        creatureTemplate.spells[index] = fields[2].GetUInt32();;
+        creatureTemplate.spells[index] = fields[2].GetUInt32();
 
         ++count;
     } while (result->NextRow());

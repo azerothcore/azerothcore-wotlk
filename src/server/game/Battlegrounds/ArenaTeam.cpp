@@ -235,7 +235,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
         //newMember.Name             = fields[6].GetString();
         newMember.Class            = fields[7].GetUInt8();
         newMember.PersonalRating   = fields[8].GetUInt16();
-        newMember.MatchMakerRating = fields[9].GetUInt16() > 0 ? fields[9].GetUInt16() : sWorld->getIntConfig(CONFIG_ARENA_START_MATCHMAKER_RATING);;
+        newMember.MatchMakerRating = fields[9].GetUInt16() > 0 ? fields[9].GetUInt16() : sWorld->getIntConfig(CONFIG_ARENA_START_MATCHMAKER_RATING);
         newMember.MaxMMR           = std::max(fields[10].GetUInt16(), newMember.MatchMakerRating);
 
         // Delete member if character information is missing

@@ -59,7 +59,7 @@ namespace AddonMgr
         result = CharacterDatabase.Query("SELECT id, name, version, UNIX_TIMESTAMP(timestamp) FROM banned_addons");
         if (result)
         {
-            uint32 count = 0;
+            uint32 count2 = 0;
             uint32 offset = 102;
 
             do
@@ -78,10 +78,10 @@ namespace AddonMgr
 
                 m_bannedAddons.push_back(addon);
 
-                ++count;
+                ++count2;
             } while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u banned addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server", ">> Loaded %u banned addons in %u ms", count2, GetMSTimeDiffToNow(oldMSTime));
             LOG_INFO("server", " ");
         }
     }
