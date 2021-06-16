@@ -5,7 +5,6 @@
  */
 
 #include "AccountMgr.h"
-#include "BigNumber.h"
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "CryptoHash.h"
@@ -25,10 +24,8 @@
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
 #include <ace/Message_Block.h>
-#include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_socket.h>
-#include <ace/os_include/sys/os_types.h>
 #include <ace/OS_NS_string.h>
 #include <ace/OS_NS_unistd.h>
 #include <ace/Reactor.h>
