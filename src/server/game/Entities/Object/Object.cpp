@@ -13,8 +13,6 @@
 #include "DynamicTree.h"
 #include "DynamicVisibility.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "Group.h"
 #include "Log.h"
 #include "MapManager.h"
 #include "MovementPacketBuilder.h"
@@ -37,8 +35,6 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "VMapFactory.h"
-#include "WaypointMovementGenerator.h"
 #include "World.h"
 #include "WorldPacket.h"
 
@@ -2740,7 +2736,7 @@ Position WorldObject::GetFirstCollisionPosition(float startX, float startY, floa
 
     MovePositionToFirstCollision(pos, distance, ang);
     return pos;
-};
+}
 
 Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float destZ)
 {
@@ -2755,7 +2751,7 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
 
     MovePositionToFirstCollision(pos, distance, ang);
     return pos;
-};
+}
 
 Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
 {

@@ -13,13 +13,11 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "SpellMgr.h"
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "ZoneScript.h"
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE)
