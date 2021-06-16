@@ -38,6 +38,10 @@
 #include "World.h"
 #include "WorldPacket.h"
 
+// NOTE: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+#include "GridNotifiersImpl.h"
+
 #ifdef ELUNA
 #include "ElunaEventMgr.h"
 #include "LuaEngine.h"
