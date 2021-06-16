@@ -1408,8 +1408,7 @@ void Pet::_SaveAuras(CharacterDatabaseTransaction trans, bool logout)
 
         uint8 index = 0;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
-        PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
+        CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
         stmt2->setUInt32(index++, m_charmInfo->GetPetNumber());
         stmt2->setUInt64(index++, casterGUID.GetRawValue());
         stmt2->setUInt32(index++, itr->second->GetId());
@@ -1425,7 +1424,6 @@ void Pet::_SaveAuras(CharacterDatabaseTransaction trans, bool logout)
         stmt2->setInt32(index++, itr->second->GetMaxDuration());
         stmt2->setInt32(index++, itr->second->GetDuration());
         stmt2->setUInt8(index++, itr->second->GetCharges());
-
         trans->Append(stmt2);
     }
 }
