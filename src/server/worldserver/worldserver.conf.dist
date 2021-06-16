@@ -1467,7 +1467,7 @@ CreatureFamilyAssistanceDelay = 2000
 #    CreatureFamilyAssistancePeriod
 #        Description: Time (in milliseconds) before next creature assistance call.
 #        Default:     3000 - (3 Seconds)
-                      0    - (Disabled)
+#                     0    - (Disabled)
 
 CreatureFamilyAssistancePeriod = 3000
 
@@ -2665,6 +2665,15 @@ Arena.GamesRequired = 10
 #                     1 - (Enabled)
 
 Arena.QueueAnnouncer.Enable = 0
+
+#
+#    Battleground.QueueAnnouncer.PlayerOnly
+#        Description: Battleground queue announcement type.
+#        Default:     0 - (System message, Anyone can see it)
+#                     1 - (Private, Only queued players can see it)
+#
+
+Arena.QueueAnnouncer.PlayerOnly = 0
 
 #
 #    Arena.ArenaSeason.ID
