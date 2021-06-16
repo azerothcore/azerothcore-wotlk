@@ -6,8 +6,6 @@
 
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
-#include "Common.h"
-#include "GossipDef.h"
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"

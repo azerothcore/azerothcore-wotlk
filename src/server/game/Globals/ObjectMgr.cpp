@@ -6,7 +6,6 @@
 
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
-#include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Chat.h"
 #include "Common.h"
@@ -16,7 +15,6 @@
 #include "GossipDef.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "InstanceSaveMgr.h"
 #include "Language.h"
 #include "LFGMgr.h"
 #include "Log.h"

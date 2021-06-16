@@ -5,7 +5,7 @@ Xinef
 #include "LootItemStorage.h"
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
-#include <time.h>
+#include "PreparedStatement.h"
 
 LootItemStorage::LootItemStorage()
 {
