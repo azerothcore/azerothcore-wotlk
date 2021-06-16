@@ -6,7 +6,6 @@
 
 #include "Creature.h"
 #include "DetourCommon.h"
-#include "DisableMgr.h"
 #include "Geometry.h"
 #include "Log.h"
 #include "Map.h"
@@ -1155,13 +1154,13 @@ bool PathGenerator::IsSwimmableSegment(float x, float y, float z, float destX, f
         (!checkSwim || !_sourceCreature || _sourceCreature->CanSwim());
 }
 
-bool PathGenerator::IsWaterPath(Movement::PointsArray _pathPoints) const
+bool PathGenerator::IsWaterPath(Movement::PointsArray pathPoints) const
 {
     bool waterPath = true;
     // Check both start and end points, if they're both in water, then we can *safely* let the creature move
-    for (uint32 i = 0; i < _pathPoints.size(); ++i)
+    for (uint32 i = 0; i < pathPoints.size(); ++i)
     {
-        NavTerrain terrain = GetNavTerrain(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
+        NavTerrain terrain = GetNavTerrain(pathPoints[i].x, pathPoints[i].y, pathPoints[i].z);
         // One of the points is not in the water
         if (terrain != NAV_MAGMA && terrain != NAV_WATER)
         {
