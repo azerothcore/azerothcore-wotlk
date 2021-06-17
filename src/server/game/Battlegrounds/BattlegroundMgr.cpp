@@ -1146,7 +1146,7 @@ std::unordered_map<int, bgTypeRef> BattlegroundMgr::getBgFromTypeID =
 
 std::unordered_map<uint32, BattlegroundQueueTypeId> BattlegroundMgr::ArenaTypeToQueue =
 {
-    { ARENA_TYPE_1v1, BATTLEGROUND_QUEUE_2v2 },
+    { ARENA_TYPE_1v1, BATTLEGROUND_QUEUE_1v1 },
     { ARENA_TYPE_2v2, BATTLEGROUND_QUEUE_2v2 },
     { ARENA_TYPE_3v3, BATTLEGROUND_QUEUE_3v3 },
     { ARENA_TYPE_5v5, BATTLEGROUND_QUEUE_5v5 }
@@ -1154,7 +1154,7 @@ std::unordered_map<uint32, BattlegroundQueueTypeId> BattlegroundMgr::ArenaTypeTo
 
 std::unordered_map<uint32, ArenaType> BattlegroundMgr::QueueToArenaType =
 {
-    { BATTLEGROUND_QUEUE_1v1, ARENA_TYPE_2v2 },
+    { BATTLEGROUND_QUEUE_1v1, ARENA_TYPE_1v1 },
     { BATTLEGROUND_QUEUE_2v2, ARENA_TYPE_2v2 },
     { BATTLEGROUND_QUEUE_3v3, ARENA_TYPE_3v3 },
     { BATTLEGROUND_QUEUE_5v5, ARENA_TYPE_5v5 }
