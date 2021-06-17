@@ -220,7 +220,7 @@ public:
 
     ByteBuffer& operator>>(bool& value)
     {
-        value = read<char> () > 0;
+        value = read<char>() > 0;
         return *this;
     }
 
