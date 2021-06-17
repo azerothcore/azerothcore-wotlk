@@ -1489,7 +1489,7 @@ class achievement_portal_jockey : public AchievementCriteriaScript
 public:
     achievement_portal_jockey() : AchievementCriteriaScript("achievement_portal_jockey") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_VALITHRIA_DREAMWALKER && !target->GetAI()->GetData(MISSED_PORTALS);
     }

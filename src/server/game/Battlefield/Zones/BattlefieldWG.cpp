@@ -10,7 +10,6 @@
 
 #include "BattlefieldWG.h"
 #include "MapManager.h"
-#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"
@@ -740,27 +739,31 @@ void BattlefieldWG::PromotePlayer(Player* killer)
     if (!m_isActive)
         return;
     // Updating rank of player
-    if (Aura* aur = killer->GetAura(SPELL_RECRUIT))
+    if (Aura* recruitAura = killer->GetAura(SPELL_RECRUIT))
     {
-        if (aur->GetStackAmount() >= 5)
+        if (recruitAura->GetStackAmount() >= 5)
         {
             killer->RemoveAura(SPELL_RECRUIT);
             killer->CastSpell(killer, SPELL_CORPORAL, true);
             SendWarningToPlayer(killer, BATTLEFIELD_WG_TEXT_FIRSTRANK);
         }
         else
+        {
             killer->CastSpell(killer, SPELL_RECRUIT, true);
+        }
     }
-    else if (Aura* aur = killer->GetAura(SPELL_CORPORAL))
+    else if (Aura* corporalAura = killer->GetAura(SPELL_CORPORAL))
     {
-        if (aur->GetStackAmount() >= 5)
+        if (corporalAura->GetStackAmount() >= 5)
         {
             killer->RemoveAura(SPELL_CORPORAL);
             killer->CastSpell(killer, SPELL_LIEUTENANT, true);
             SendWarningToPlayer(killer, BATTLEFIELD_WG_TEXT_SECONDRANK);
         }
         else
+        {
             killer->CastSpell(killer, SPELL_CORPORAL, true);
+        }
     }
 }
 
@@ -990,9 +993,13 @@ void BattlefieldWG::ProcessEvent(WorldObject* obj, uint32 eventId)
     if (go->GetEntry() == GO_WINTERGRASP_TITAN_S_RELIC)
     {
         if (CanInteractWithRelic())
+        {
             EndBattle(false);
-        else if (GameObject* go = GetRelic())
-            go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+        }
+        else if (GameObject* relic = GetRelic())
+        {
+            relic->SetRespawnTime(RESPAWN_IMMEDIATELY);
+        }
     }
 
     // if destroy or damage event, search the wall/tower and update worldstate/send warning message

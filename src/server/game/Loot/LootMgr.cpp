@@ -289,7 +289,8 @@ bool LootStoreItem::Roll(bool rate, Player const* player, Loot& loot, LootStore 
 {
     float _chance = chance;
 
-    sScriptMgr->OnItemRoll(player, this, _chance, loot, store);
+    if (!sScriptMgr->OnItemRoll(player, this, _chance, loot, store))
+        return false;
 
     if (_chance >= 100.0f)
         return true;
@@ -1205,7 +1206,8 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
             LootStoreItem* item = *itr;
             float chance = item->chance;
 
-            sScriptMgr->OnItemRoll(player, item, chance, loot, store);
+            if (!sScriptMgr->OnItemRoll(player, item, chance, loot, store))
+                return nullptr;
 
             if (chance >= 100.0f)
                 return item;
@@ -1215,6 +1217,9 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
                 return item;
         }
     }
+
+    if (!sScriptMgr->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
+        return nullptr;
 
     possibleLoot = EqualChanced;
     possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
