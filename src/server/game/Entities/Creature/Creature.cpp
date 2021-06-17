@@ -2988,9 +2988,9 @@ float Creature::GetAggroRange(Unit const* target) const
     if (aggroRate == 0)
         return 0.0f;
 
-    uint32 creaturelevel = target->getLevelForTarget(this);
-    uint32 playerlevel  = getLevelForTarget(target);
-    int32 levelDiff = int32(creaturelevel) - int32(playerlevel);
+    uint32 creatureLevel = target->getLevelForTarget(this);
+    uint32 playerLevel  = getLevelForTarget(target);
+    int32 levelDiff = int32(creatureLevel) - int32(playerLevel);
 
     // The maximum Aggro Radius is capped at 45 yards (25 level difference)
     if (levelDiff < -25)
@@ -3000,8 +3000,9 @@ float Creature::GetAggroRange(Unit const* target) const
     float const detectionRange = GetDetectionRange();
     float aggroRadius = detectionRange;
     if (aggroRadius < 1)
+    {
         return 0.0f;
-
+    }
     // Aggro Radius varies with level difference at a rate of roughly 1 yard/level
     aggroRadius -= (float)levelDiff;
 
