@@ -8,6 +8,7 @@
 #define ACORE_PACKETLOG_H
 
 #include "Common.h"
+#include <mutex>
 
 enum Direction
 {
@@ -22,6 +23,8 @@ class PacketLog
 private:
     PacketLog();
     ~PacketLog();
+    std::mutex _logPacketLock;
+    std::once_flag _initializeFlag;
 
 public:
     static PacketLog* instance();
