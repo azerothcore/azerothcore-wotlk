@@ -15,10 +15,7 @@
  */
 
 #include "Containers.h"
-#include "DBCStores.h"
-#include "DBCStructure.h"
 #include "Group.h"
-#include "GroupMgr.h"
 #include "LFGMgr.h"
 #include "LFGQueue.h"
 #include "Log.h"
@@ -274,7 +271,6 @@ namespace lfg
             // Store group so we don't need to call Mgr to get it later (if it's player group will be 0 otherwise would have joined as group)
             for (LfgRolesMap::const_iterator it2 = itQueue->second.roles.begin(); it2 != itQueue->second.roles.end(); ++it2)
                 proposalGroups[it2->first] = itQueue->first.IsGroup() ? itQueue->first : ObjectGuid::Empty;
-;
 
             numPlayers += itQueue->second.roles.size();
 
