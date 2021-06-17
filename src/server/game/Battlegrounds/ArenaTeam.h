@@ -122,7 +122,7 @@ struct ArenaTeamStats
     uint32 Rank;
 };
 
-#define MAX_ARENA_SLOT 4                                    // 0..2 slots
+#define MAX_ARENA_SLOT 4                                    // 0..3 slots
 
 class ArenaTeam
 {
