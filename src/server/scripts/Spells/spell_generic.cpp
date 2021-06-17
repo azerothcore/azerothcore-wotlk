@@ -194,7 +194,7 @@ public:
                 }
 
                 if (entry)
-                    target->ToPlayer()->KilledMonsterCredit(entry, 0);
+                    target->ToPlayer()->KilledMonsterCredit(entry);
             }
         }
 
@@ -768,7 +768,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove(GetCaster());
-            acore::Containers::RandomResizeList(targets, _count);
+            Acore::Containers::RandomResize(targets, _count);
         }
 
         void Register() override
@@ -1719,11 +1719,17 @@ public:
             float max_range = GetSpellInfo()->GetMaxRange(false);
             WorldObject* result = nullptr;
             // search for nearby enemy corpse in range
-            acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
-            acore::WorldObjectSearcher<acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
-            caster->GetMap()->VisitFirstFound(caster->m_positionX, caster->m_positionY, max_range, searcher);
+            Acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
+            Acore::WorldObjectSearcher<Acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
+            Cell::VisitWorldObjects(caster, searcher, max_range);
             if (!result)
+            {
+                Cell::VisitGridObjects(caster, searcher, max_range);
+            }
+            if (!result)
+            {
                 return SPELL_FAILED_NO_EDIBLE_CORPSES;
+            }
             return SPELL_CAST_OK;
         }
 
@@ -2281,6 +2287,7 @@ enum PvPTrinketTriggeredSpells
 {
     SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER         = 72752,
     SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF    = 72757,
+    SPELL_PVP_TRINKET                                   = 42292,
 };
 
 class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
@@ -2299,7 +2306,10 @@ public:
 
         bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            return ValidateSpellInfo({ SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER, SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF });
+            return ValidateSpellInfo({
+                SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER,
+                SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF,
+                SPELL_PVP_TRINKET });
         }
 
         void HandleScript()
@@ -2331,7 +2341,7 @@ public:
                     player->GetSession()->SendPacket(&data);
 
                     WorldPacket data2;
-                    player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, 42292, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
+                    player->BuildCooldownPacket(data2, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, SPELL_PVP_TRINKET, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
                     player->GetSession()->SendPacket(&data2);
                 }
             }
@@ -2373,7 +2383,7 @@ public:
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             // Remove all auras with spell id 46221, except the one currently being applied
-            while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, 0, 0, 0, GetAura()))
+            while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, ObjectGuid::Empty, ObjectGuid::Empty, 0, GetAura()))
                 GetUnitOwner()->RemoveOwnedAura(aur);
         }
 
@@ -3148,7 +3158,7 @@ public:
             if (Unit* target = GetHitUnit())
             {
                 WorldPacket data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
-                data << uint64(target->GetGUID());
+                data << target->GetGUID();
                 originalCaster->GetSession()->SendPacket(&data);
             }
         }
@@ -3586,7 +3596,7 @@ public:
 
         void Register() override
         {
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(m_scriptSpellId);
+            SpellInfo const* spell = sSpellMgr->AssertSpellInfo(m_scriptSpellId);
 
             if (spell->HasEffect(SPELL_EFFECT_SCRIPT_EFFECT))
                 OnEffectHitTarget += SpellEffectFn(spell_gen_mounted_charge_SpellScript::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
@@ -3659,7 +3669,7 @@ public:
 
         void Register() override
         {
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(m_scriptSpellId);
+            SpellInfo const* spell = sSpellMgr->AssertSpellInfo(m_scriptSpellId);
 
             // Defend spells cast by NPCs (add visuals)
             if (spell->Effects[EFFECT_0].ApplyAuraName == SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN)
@@ -4549,7 +4559,7 @@ public:
                 target->SetTemporaryUnsummonedPetNumber(0);
 
                 // Prevent stacking of mounts and client crashes upon dismounting
-                target->RemoveAurasByType(SPELL_AURA_MOUNTED, 0, GetHitAura());
+                target->RemoveAurasByType(SPELL_AURA_MOUNTED, ObjectGuid::Empty, GetHitAura());
 
                 // Triggered spell id dependent on riding skill and zone
                 bool canFly = false;
@@ -4808,13 +4818,13 @@ public:
                 }
             }
 
-            targets.remove_if(acore::PowerCheck(POWER_MANA, false));
+            targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
 
             uint8 const maxTargets = 10;
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::PowerPctOrderPred(POWER_MANA));
+                targets.sort(Acore::PowerPctOrderPred(POWER_MANA));
                 targets.resize(maxTargets);
             }
         }
@@ -5096,7 +5106,7 @@ public:
             bool instant_exit = true;
             if (Player* pCaster = caster->ToPlayer()) // if is a creature instant exits combat, else check if someone in party is in combat in visibility distance
             {
-                uint64 myGUID = pCaster->GetGUID();
+                ObjectGuid myGUID = pCaster->GetGUID();
                 float visibilityRange = pCaster->GetMap()->GetVisibilityRange();
                 if (Group* pGroup = pCaster->GetGroup())
                 {

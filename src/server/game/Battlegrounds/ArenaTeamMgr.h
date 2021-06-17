@@ -9,6 +9,9 @@
 
 #include "ArenaTeam.h"
 
+constexpr uint32 MAX_ARENA_TEAM_ID = 0xFFF00000;
+constexpr uint32 MAX_TEMP_ARENA_TEAM_ID = 0xFFFFFFFE;
+
 class ArenaTeamMgr
 {
     ArenaTeamMgr();
@@ -21,9 +24,9 @@ public:
 
     ArenaTeam* GetArenaTeamById(uint32 arenaTeamId) const;
     ArenaTeam* GetArenaTeamByName(std::string const& arenaTeamName) const;
-    ArenaTeam* GetArenaTeamByCaptain(uint64 guid) const;
+    ArenaTeam* GetArenaTeamByCaptain(ObjectGuid guid) const;
     ArenaTeam* GetArenaTeamByName(std::string const& arenaTeamName, const uint32 type) const;
-    ArenaTeam* GetArenaTeamByCaptain(uint64 guid, const uint32 type) const;
+    ArenaTeam* GetArenaTeamByCaptain(ObjectGuid guid, const uint32 type) const;
 
     void LoadArenaTeams();
     void AddArenaTeam(ArenaTeam* arenaTeam);

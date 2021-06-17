@@ -83,7 +83,7 @@ void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint
 void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItemID, uint32 sender, uint32 action);
 
 // Send menu text
-void SendGossipMenuFor(Player* player, uint32 npcTextID, uint64 const& guid);
+void SendGossipMenuFor(Player* player, uint32 npcTextID, ObjectGuid const guid);
 void SendGossipMenuFor(Player* player, uint32 npcTextID, Creature const* creature);
 
 // Close menu

@@ -84,7 +84,7 @@ public:
 
     //=================================================
 
-    [[nodiscard]] uint64 getUnitGuid() const { return iUnitGuid; }
+    [[nodiscard]] ObjectGuid getUnitGuid() const { return iUnitGuid; }
 
     //=================================================
     // reference is not needed anymore. realy delete it !
@@ -113,7 +113,7 @@ private:
 private:
     float iThreat;
     float iTempThreatModifier;                          // used for taunt
-    uint64 iUnitGuid;
+    ObjectGuid iUnitGuid;
     bool iOnline;
 };
 
@@ -256,7 +256,7 @@ private:
 
 //=================================================
 
-namespace acore
+namespace Acore
 {
     // Binary predicate for sorting HostileReferences based on threat value
     class ThreatOrderPred

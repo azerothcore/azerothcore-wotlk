@@ -47,10 +47,16 @@ case $COMPILER in
     echo "CCOMPILERCXX=\"clang++\"" >> ./conf/config.sh
     ;;
 
-  "clang6" )
-    time sudo apt-get install -y clang-6.0
-    echo "CCOMPILERC=\"clang-6.0\"" >> ./conf/config.sh
-    echo "CCOMPILERCXX=\"clang++-6.0\"" >> ./conf/config.sh
+  "clang7" )
+    time sudo apt-get install -y clang-7
+    echo "CCOMPILERC=\"clang-7\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++-7\"" >> ./conf/config.sh
+    ;;
+
+  "clang8" )
+    time sudo apt-get install -y clang-8
+    echo "CCOMPILERC=\"clang-8\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++-8\"" >> ./conf/config.sh
     ;;
 
   "clang9" )
@@ -69,6 +75,12 @@ case $COMPILER in
     time sudo apt-get install -y clang-11
     echo "CCOMPILERC=\"clang-11\"" >> ./conf/config.sh
     echo "CCOMPILERCXX=\"clang++-11\"" >> ./conf/config.sh
+    ;;
+
+  "clang12" )
+    time sudo apt-get install -y clang-12
+    echo "CCOMPILERC=\"clang-12\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++-12\"" >> ./conf/config.sh
     ;;
 
   * )

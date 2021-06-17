@@ -28,7 +28,7 @@ struct TempSummonData
 class TempSummon : public Creature
 {
 public:
-    explicit TempSummon(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject);
+    explicit TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
     ~TempSummon() override = default;
     void Update(uint32 time) override;
     virtual void InitStats(uint32 lifetime);
@@ -38,7 +38,7 @@ public:
     void SetTempSummonType(TempSummonType type);
     void SaveToDB(uint32 /*mapid*/, uint8 /*spawnMask*/, uint32 /*phaseMask*/) override {}
     [[nodiscard]] Unit* GetSummoner() const;
-    uint64 GetSummonerGUID() { return m_summonerGUID; }
+    ObjectGuid GetSummonerGUID() { return m_summonerGUID; }
     TempSummonType const& GetSummonType() { return m_type; }
     uint32 GetTimer() { return m_timer; }
     void SetTimer(uint32 t) { m_timer = t; }
@@ -48,13 +48,13 @@ private:
     TempSummonType m_type;
     uint32 m_timer;
     uint32 m_lifetime;
-    uint64 m_summonerGUID;
+    ObjectGuid m_summonerGUID;
 };
 
 class Minion : public TempSummon
 {
 public:
-    Minion(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject);
+    Minion(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
     void InitStats(uint32 duration) override;
     void RemoveFromWorld() override;
     [[nodiscard]] Unit* GetOwner() const;
@@ -64,14 +64,14 @@ public:
     [[nodiscard]] bool IsGuardianPet() const;
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
 protected:
-    const uint64 m_owner;
+    const ObjectGuid m_owner;
     float m_followAngle;
 };
 
 class Guardian : public Minion
 {
 public:
-    Guardian(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject);
+    Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
     void InitStats(uint32 duration) override;
     bool InitStatsForLevel(uint8 level);
     void InitSummon() override;
@@ -88,14 +88,14 @@ public:
 class Puppet : public Minion
 {
 public:
-    Puppet(SummonPropertiesEntry const* properties, uint64 owner);
+    Puppet(SummonPropertiesEntry const* properties, ObjectGuid owner);
     void InitStats(uint32 duration) override;
     void InitSummon() override;
     void Update(uint32 time) override;
     void RemoveFromWorld() override;
 protected:
     [[nodiscard]] Player* GetOwner() const;
-    const uint64 m_owner;
+    const ObjectGuid m_owner;
 };
 
 class ForcedUnsummonDelayEvent : public BasicEvent

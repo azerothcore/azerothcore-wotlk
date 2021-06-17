@@ -24,18 +24,17 @@
 #include "RealmList.h"
 #include "RealmAcceptor.h"
 #include "DatabaseLoader.h"
+#include "SecretMgr.h"
+#include "SharedDefines.h"
+#include "Util.h"
+#include "ProcessPriority.h"
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
 #include <ace/ACE.h>
 #include <ace/Sig_Handler.h>
+#include <boost/version.hpp>
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
-
-#ifdef __linux__
-#include <sched.h>
-#include <sys/resource.h>
-#define PROCESS_HIGH_PRIORITY -15 // [-20, 19], default is 0
-#endif
 
 #ifndef _ACORE_REALM_CONFIG
 #define _ACORE_REALM_CONFIG "authserver.conf"
@@ -57,6 +56,8 @@ void usage(const char* prog)
 /// Launch the auth server
 extern int main(int argc, char** argv)
 {
+    Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
+
     // Command line parsing to get the configuration file name
     std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
     int count = 1;
@@ -86,7 +87,7 @@ extern int main(int argc, char** argv)
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
-    acore::Banner::Show("authserver",
+    Acore::Banner::Show("authserver",
         [](char const* text)
         {
             LOG_INFO("server.authserver", "%s", text);
@@ -95,7 +96,8 @@ extern int main(int argc, char** argv)
         {
             LOG_INFO("server.authserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
             LOG_INFO("server.authserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            LOG_INFO("server.authserver", "> Using ACE version:             %s", ACE_VERSION);
+            LOG_INFO("server.authserver", "> Using Boost version:           %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+            LOG_INFO("server.authserver", "> Using ACE version:             %s\n", ACE_VERSION);
         }
     );
 
@@ -124,9 +126,11 @@ extern int main(int argc, char** argv)
     if (!StartDB())
         return 1;
 
+    sSecretMgr->Initialize();
+
     // Get the list of realms for the server
     sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
-    if (sRealmList->size() == 0)
+    if (sRealmList->GetRealms().empty())
     {
         LOG_ERROR("server.authserver", "No valid realms specified.");
         return 1;
@@ -155,7 +159,7 @@ extern int main(int argc, char** argv)
     LOG_INFO("server.authserver", "Authserver listening to %s:%d", bind_ip.c_str(), rmport);
 
     // Initialize the signal handlers
-    acore::SignalHandler signalHandler;
+    Acore::SignalHandler signalHandler;
     auto const _handler = [](int) { stopEvent = true; };
 
     // Register authservers's signal handlers
@@ -165,73 +169,8 @@ extern int main(int argc, char** argv)
     signalHandler.handle_signal(SIGBREAK, _handler);
 #endif
 
-#if defined(_WIN32) || defined(__linux__)
-
-    ///- Handle affinity for multiple processors and process priority
-    uint32 affinity = sConfigMgr->GetOption<int32>("UseProcessors", 0);
-    bool highPriority = sConfigMgr->GetOption<bool>("ProcessPriority", false);
-
-#ifdef _WIN32 // Windows
-
-    HANDLE hProcess = GetCurrentProcess();
-    if (affinity > 0)
-    {
-        ULONG_PTR appAff;
-        ULONG_PTR sysAff;
-
-        if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
-        {
-            // remove non accessible processors
-            ULONG_PTR currentAffinity = affinity & appAff;
-
-            if (!currentAffinity)
-                LOG_ERROR("server.authserver", "server.authserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the authserver. Accessible processors bitmask (hex): %x", affinity, appAff);
-            else if (SetProcessAffinityMask(hProcess, currentAffinity))
-                LOG_INFO("server.authserver", "server.authserver", "Using processors (bitmask, hex): %x", currentAffinity);
-            else
-                LOG_ERROR("server.authserver", "server.authserver", "Can't set used processors (hex): %x", currentAffinity);
-        }
-    }
-
-    if (highPriority)
-    {
-        if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
-            LOG_INFO("server.authserver", "server.authserver", "authserver process priority class set to HIGH");
-        else
-            LOG_ERROR("server.authserver", "server.authserver", "Can't set authserver process priority class.");
-    }
-
-#else // Linux
-
-    if (affinity > 0)
-    {
-        cpu_set_t mask;
-        CPU_ZERO(&mask);
-
-        for (unsigned int i = 0; i < sizeof(affinity) * 8; ++i)
-            if (affinity & (1 << i))
-                CPU_SET(i, &mask);
-
-        if (sched_setaffinity(0, sizeof(mask), &mask))
-            LOG_ERROR("server.authserver", "Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
-        else
-        {
-            CPU_ZERO(&mask);
-            sched_getaffinity(0, sizeof(mask), &mask);
-            LOG_INFO("server.authserver", "Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
-        }
-    }
-
-    if (highPriority)
-    {
-        if (setpriority(PRIO_PROCESS, 0, PROCESS_HIGH_PRIORITY))
-            LOG_ERROR("server.authserver", "Can't set authserver process priority class, error: %s", strerror(errno));
-        else
-            LOG_INFO("server.authserver", "authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
-    }
-
-#endif
-#endif
+    // Set process priority according to configuration settings
+    SetProcessPriority("server.authserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
     // maximum counter for next ping
     uint32 numLoops = (sConfigMgr->GetOption<int32>("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));

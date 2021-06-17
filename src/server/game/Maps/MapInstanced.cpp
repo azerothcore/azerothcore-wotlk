@@ -13,7 +13,6 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "VMapFactory.h"
-#include "World.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -202,6 +201,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     ASSERT(map->IsDungeon());
 
     map->LoadRespawnTimes();
+    map->LoadCorpseData();
 
     if (save)
         map->CreateInstanceScript(true, save->GetInstanceData(), save->GetCompletedEncounterMask());

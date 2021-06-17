@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -12,17 +11,16 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "Vehicle.h"
-#include "VehicleDefines.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
 void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("network", "WORLD: Recvd CMSG_ATTACKSWING Message guidlow:%u guidhigh:%u", GUID_LOPART(guid), GUID_HIPART(guid));
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_ATTACKSWING: %s", guid.ToString().c_str());
 #endif
 
     Unit* pEnemy = ObjectAccessor::GetUnit(*_player, guid);
@@ -80,8 +78,8 @@ void WorldSession::HandleSetSheathedOpcode(WorldPacket& recvData)
 void WorldSession::SendAttackStop(Unit const* enemy)
 {
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));         // we guess size
-    data.append(GetPlayer()->GetPackGUID());
-    data.append(enemy ? enemy->GetPackGUID() : 0);          // must be packed guid
+    data << GetPlayer()->GetPackGUID();
+    data << (enemy ? enemy->GetPackGUID() : PackedGuid());  // must be packed guid
     data << uint32(0);                                      // unk, can be 1 also
     SendPacket(&data);
 }

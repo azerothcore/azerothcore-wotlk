@@ -1,22 +1,29 @@
-
 if ! command -v lsb_release &>/dev/null ; then
-       sudo apt-get install -y lsb-release
+    sudo apt-get install -y lsb-release
 fi
 
 UBUNTU_VERSION=$(lsb_release -sr);
 
-sudo apt-get update -y
+sudo apt update
 
 # shared deps
-sudo apt-get -y install make cmake clang curl unzip libmysqlclient-dev libace-dev
+sudo apt-get -y install ccache clang cmake curl google-perftools libace-dev libmysqlclient-dev make unzip
 
 if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
-  sudo apt-get -y install build-essential libtool cmake-data openssl libgoogle-perftools-dev \
-  libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
-  libncurses5-dev ccache curl unzip
+  sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get -y install build-essential cmake-data  \
+  libboost1.74-dev libbz2-dev libncurses5-dev libmysql++-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool mysql-client \
+  openssl zlib1g-dev
 else
-  sudo apt-get install -y git gcc g++ \
-  libssl-dev libbz2-dev libreadline-dev libncurses-dev \
-  mysql-server libace-6.*
+  case $UBUNTU_VERSION in
+     "20.04")
+       sudo apt-get install -y g++ gdb gdbserver gcc git \
+       libace-6.* libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
+       libssl-dev mysql-server 
+       ;;
+     *)
+       sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get install -y g++ gdb gdbserver gcc git \
+       libace-6.* libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
+       libssl-dev mysql-server 
+       ;;
+  esac
 fi
-

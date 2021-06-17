@@ -126,7 +126,7 @@ public:
 
         bool isFlameBreathing;
 
-        uint64 FireBombGUIDs[40];
+        ObjectGuid FireBombGUIDs[40];
 
         void Reset() override
         {
@@ -146,7 +146,7 @@ public:
             isFlameBreathing = false;
 
             for (uint8 i = 0; i < 40; ++i)
-                FireBombGUIDs[i] = 0;
+                FireBombGUIDs[i].Clear();
 
             HatchAllEggs(1);
         }
@@ -223,18 +223,9 @@ public:
             float x, y, z;
             me->GetPosition(x, y, z);
 
-            {
-                CellCoord pair(acore::ComputeCellCoord(x, y));
-                Cell cell(pair);
-                cell.SetNoCreate();
-
-                acore::AllCreaturesOfEntryInRange check(me, NPC_EGG, 100);
-                acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
-
-                TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
-
-                cell.Visit(pair, cSearcher, *me->GetMap(), *me, me->GetGridActivationRange());
-            }
+            Acore::AllCreaturesOfEntryInRange check(me, NPC_EGG, 100);
+            Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+            Cell::VisitGridObjects(me, searcher, me->GetGridActivationRange());
 
             //TC_LOG_ERROR("scripts", "Eggs %d at middle", templist.size());
             if (templist.empty())
@@ -256,18 +247,10 @@ public:
             float x, y, z;
             me->GetPosition(x, y, z);
 
-            {
-                CellCoord pair(acore::ComputeCellCoord(x, y));
-                Cell cell(pair);
-                cell.SetNoCreate();
+            Acore::AllCreaturesOfEntryInRange check(me, NPC_FIRE_BOMB, 100);
+            Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+            Cell::VisitGridObjects(me, searcher, me->GetGridActivationRange());
 
-                acore::AllCreaturesOfEntryInRange check(me, NPC_FIRE_BOMB, 100);
-                acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
-
-                TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
-
-                cell.Visit(pair, cSearcher, *me->GetMap(), *me, me->GetGridActivationRange());
-            }
             for (std::list<Creature*>::const_iterator i = templist.begin(); i != templist.end(); ++i)
             {
                 (*i)->CastSpell(*i, SPELL_FIRE_BOMB_DAMAGE, true);
@@ -517,18 +500,9 @@ public:
             float x, y, z;
             me->GetPosition(x, y, z);
 
-            {
-                CellCoord pair(acore::ComputeCellCoord(x, y));
-                Cell cell(pair);
-                cell.SetNoCreate();
-
-                acore::AllCreaturesOfEntryInRange check(me, 23817, 50);
-                acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
-
-                TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
-
-                cell.Visit(pair, cSearcher, *(me->GetMap()), *me, me->GetGridActivationRange());
-            }
+            Acore::AllCreaturesOfEntryInRange check(me, 23817, 50);
+            Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
+            Cell::VisitGridObjects(me, searcher, me->GetGridActivationRange());
 
             //TC_LOG_ERROR("scripts", "Eggs %d at %d", templist.size(), side);
 

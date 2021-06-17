@@ -6,7 +6,6 @@
 
 #include "Creature.h"
 #include "DetourCommon.h"
-#include "DisableMgr.h"
 #include "Geometry.h"
 #include "Log.h"
 #include "Map.h"
@@ -24,7 +23,7 @@ PathGenerator::PathGenerator(WorldObject const* owner) :
     memset(_pathPolyRefs, 0, sizeof(_pathPolyRefs));
 
     uint32 mapId = _source->GetMapId();
-    //if (MMAP::MMapFactory::IsPathfindingEnabled(_sourceUnit->FindMap()))
+    //if (DisableMgr::IsPathfindingEnabled(_sourceUnit->FindMap()))
     {
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
         _navMesh = mmap->GetNavMesh(mapId);
@@ -48,7 +47,7 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
 
 bool PathGenerator::CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest)
 {
-    if (!acore::IsValidMapCoord(destX, destY, destZ) || !acore::IsValidMapCoord(x, y, z))
+    if (!Acore::IsValidMapCoord(destX, destY, destZ) || !Acore::IsValidMapCoord(x, y, z))
         return false;
 
     G3D::Vector3 dest(destX, destY, destZ);
@@ -369,7 +368,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             // this is probably an error state, but we'll leave it
             // and hopefully recover on the next Update
             // we still need to copy our preffix
-            LOG_ERROR("server", "PathGenerator::BuildPolyPath: Path Build failed %u", _source->GetGUIDLow());
+            LOG_ERROR("server", "PathGenerator::BuildPolyPath: Path Build failed %s", _source->GetGUID().ToString().c_str());
         }
 
         // new path = prefix + suffix - overlap
@@ -470,7 +469,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         if (!_polyLength || dtStatusFailed(dtResult))
         {
             // only happens if we passed bad data to findPath(), or navmesh is messed up
-            LOG_ERROR("server", "PathGenerator::BuildPolyPath: %u Path Build failed: 0 length path", _source->GetGUIDLow());
+            LOG_ERROR("server", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
             BuildShortcut();
             _type = PATHFIND_NOPATH;
             return;
@@ -479,7 +478,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
     if (!_polyLength)
     {
-        LOG_ERROR("server", "PathGenerator::BuildPolyPath: %u Path Build failed: 0 length path", _source->GetGUIDLow());
+        LOG_ERROR("server", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -509,7 +508,7 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     if (_useRaycast)
     {
         // _straightLine uses raycast and it currently doesn't support building a point path, only a 2-point path with start and hitpoint/end is returned
-        LOG_ERROR("server", "PathGenerator::BuildPointPath() called with _useRaycast for unit %u", _source->GetGUIDLow());
+        LOG_ERROR("server", "PathGenerator::BuildPointPath() called with _useRaycast for unit %s", _source->GetGUID().ToString().c_str());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -893,7 +892,8 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
         npolys = FixupCorridor(polys, npolys, MAX_PATH_LENGTH, visited, nvisited);
 
         if (dtStatusFailed(_navMeshQuery->getPolyHeight(polys[0], result, &result[1])))
-            LOG_DEBUG("maps", "PathGenerator::FindSmoothPath: Cannot find height at position X: %f Y: %f Z: %f for %u", result[2], result[0], result[1], _source->GetGUIDLow());
+            LOG_DEBUG("maps", "PathGenerator::FindSmoothPath: Cannot find height at position X: %f Y: %f Z: %f for %s",
+                result[2], result[0], result[1], _source->GetGUID().ToString().c_str());
         result[1] += 0.5f;
         dtVcopy(iterPos, result);
 
@@ -1154,13 +1154,13 @@ bool PathGenerator::IsSwimmableSegment(float x, float y, float z, float destX, f
         (!checkSwim || !_sourceCreature || _sourceCreature->CanSwim());
 }
 
-bool PathGenerator::IsWaterPath(Movement::PointsArray _pathPoints) const
+bool PathGenerator::IsWaterPath(Movement::PointsArray pathPoints) const
 {
     bool waterPath = true;
     // Check both start and end points, if they're both in water, then we can *safely* let the creature move
-    for (uint32 i = 0; i < _pathPoints.size(); ++i)
+    for (uint32 i = 0; i < pathPoints.size(); ++i)
     {
-        NavTerrain terrain = GetNavTerrain(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
+        NavTerrain terrain = GetNavTerrain(pathPoints[i].x, pathPoints[i].y, pathPoints[i].z);
         // One of the points is not in the water
         if (terrain != NAV_MAGMA && terrain != NAV_WATER)
         {

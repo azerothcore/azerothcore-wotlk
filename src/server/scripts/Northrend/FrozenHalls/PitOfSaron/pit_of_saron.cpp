@@ -94,7 +94,7 @@ public:
                     break;
                 case 2:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                         {
                             c->setActive(true);
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_1);
@@ -104,7 +104,7 @@ public:
                     break;
                 case 3:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_2);
 
                     events.RescheduleEvent(4, 14000);
@@ -112,8 +112,8 @@ public:
                 case 4:
                     if (pInstance)
                     {
-                        Creature* n1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_NECROLYTE_1_GUID));
-                        Creature* n2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_NECROLYTE_2_GUID));
+                        Creature* n1 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_NECROLYTE_1_GUID));
+                        Creature* n2 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_NECROLYTE_2_GUID));
                         if (n1 && n2)
                         {
                             if (!n1->IsInCombat() && n1->IsAlive())
@@ -157,7 +157,7 @@ public:
                     break;
                 case 6:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_3);
 
                     events.RescheduleEvent(7, 5000);
@@ -165,9 +165,9 @@ public:
                 case 7:
                     if (pInstance)
                     {
-                        if (Creature* n1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_NECROLYTE_1_GUID)))
+                        if (Creature* n1 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_NECROLYTE_1_GUID)))
                             n1->AI()->DoAction(1337); // remove invincibility
-                        if (Creature* n2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_NECROLYTE_2_GUID)))
+                        if (Creature* n2 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_NECROLYTE_2_GUID)))
                             n2->AI()->DoAction(1337); // remove invincibility
 
                         for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -193,7 +193,7 @@ public:
                     break;
                 case 8:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->CastSpell(c, 69753, false);
 
                     events.RescheduleEvent(9, 400);
@@ -235,7 +235,7 @@ public:
                 case 12:
                     if (pInstance)
                     {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_4);
 
                         for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -285,7 +285,7 @@ public:
                         {
                             me->CastSpell(me, 59514, false);
                             for (uint8 i = 0; i < 2; ++i)
-                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID + i)))
+                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GUARD_1_GUID + i)))
                                     c->CastSpell(c, 70513, false);
                         }
                     }
@@ -295,13 +295,13 @@ public:
                 case 15:
                     if (pInstance)
                     {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->GetMotionMaster()->MovePoint(0, SBSTyrannusStartPos);
 
                         if (me->GetEntry() == NPC_JAINA_PART1)
                         {
                             for (uint8 i = 0; i < 2; ++i)
-                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID + i)))
+                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GUARD_1_GUID + i)))
                                     c->CastSpell(c, 70464, false);
                         }
                     }
@@ -313,7 +313,7 @@ public:
                     if (pInstance)
                     {
                         for (uint8 i = 0; i < 2; ++i)
-                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID + i)))
+                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GUARD_1_GUID + i)))
                                 c->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
 
                         for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -403,11 +403,11 @@ public:
 
                     if (me->GetPositionY() < 206.0f)
                     {
-                        pInstance->SetData64(DATA_NECROLYTE_1_GUID, me->GetGUID());
+                        pInstance->SetGuidData(DATA_NECROLYTE_1_GUID, me->GetGUID());
                     }
                     else
                     {
-                        pInstance->SetData64(DATA_NECROLYTE_2_GUID, me->GetGUID());
+                        pInstance->SetGuidData(DATA_NECROLYTE_2_GUID, me->GetGUID());
                     }
                 }
             }
@@ -428,7 +428,7 @@ public:
             events.RescheduleEvent(1, 0);
             events.RescheduleEvent(2, urand(5000, 9000));
 
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_FIRST_GUID)))
+            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                 c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
@@ -524,7 +524,7 @@ public:
                 case 1:
                     {
                         if (pInstance)
-                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GARFROST_GUID)))
+                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GARFROST_GUID)))
                             {
                                 float angle = c->GetAngle(me);
                                 float x = c->GetPositionX() + cos(angle) * 12.0f;
@@ -573,14 +573,12 @@ public:
         {
             pInstance = me->GetInstanceScript();
             killsLeft = 0;
-            deathbringerGUID[0] = 0;
-            deathbringerGUID[1] = 0;
         }
 
         InstanceScript* pInstance;
         EventMap events;
         uint32 killsLeft;
-        uint64 deathbringerGUID[2];
+        ObjectGuid deathbringerGUID[2];
 
         void MovementInform(uint32 type, uint32 id) override
         {
@@ -916,7 +914,7 @@ public:
             events.RescheduleEvent(2, 15000);
 
             if (pInstance)
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_GUID)))
+                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
                 {
                     c->AI()->Talk(SAY_PREFIGHT_1);
                     c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -960,8 +958,8 @@ public:
 
                 TSSpawnPos.GetAngle(&TSMidPos);
 
-                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                    if (Creature* c = pInstance->instance->GetCreature(*itr))
+                for (ObjectGuid guid : summons)
+                    if (Creature* c = pInstance->instance->GetCreature(guid))
                     {
                         float hx, hy, hz, ho;
                         c->GetHomePosition(hx, hy, hz, ho);
@@ -974,10 +972,10 @@ public:
             else if (p == 3)
             {
                 if (pInstance)
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
+                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
                     {
-                        for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* s = pInstance->instance->GetCreature(*itr))
+                        for (ObjectGuid guid : summons)
+                            if (Creature* s = pInstance->instance->GetCreature(guid))
                                 if (s->IsAlive())
                                     Unit::Kill(c, s);
                         if (me->IsAlive())
@@ -1022,14 +1020,14 @@ public:
                     break;
                 case 3:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
                             c->AI()->Talk(SAY_PREFIGHT_2);
 
                     me->SetFacingTo(5.26f);
                     me->SetOrientation(5.26f);
                     me->SetHomePosition(*me);
-                    for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                        if (Creature* c = pInstance->instance->GetCreature(*itr))
+                    for (ObjectGuid guid : summons)
+                        if (Creature* c = pInstance->instance->GetCreature(guid))
                         {
                             c->SetFacingTo(5.26f);
                             c->SetOrientation(5.26f);
@@ -1041,14 +1039,14 @@ public:
                     break;
                 case 4:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
                             c->AI()->DoAction(1);
                     break;
                 case 5:
                     me->SetFacingTo(TSCenterPos.GetOrientation());
                     Talk(me->GetEntry() == NPC_MARTIN_VICTUS_2 ? SAY_GENERAL_ALLIANCE_OUTRO_1 : SAY_GENERAL_HORDE_OUTRO_1);
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_SECOND_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_SECOND_GUID)))
                             c->AI()->DoAction(1);
                     break;
                 case 10:
@@ -1058,8 +1056,8 @@ public:
                             float offset = frand(0.0f, 10.0f);
                             c->GetMotionMaster()->MovePoint(0, 1047.0f + offset, 118.0f + offset, 628.2f);
                             c->SetHomePosition(*me);
-                            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                                if (Creature* s = pInstance->instance->GetCreature(*itr))
+                            for (ObjectGuid guid : summons)
+                                if (Creature* s = pInstance->instance->GetCreature(guid))
                                 {
                                     if (s->GetEntry() == NPC_FALLEN_WARRIOR)
                                         continue;
@@ -1137,20 +1135,20 @@ public:
         npc_pos_leader_secondAI(Creature* creature) : NullCreatureAI(creature)
         {
             pInstance = me->GetInstanceScript();
-            barrierGUID = 0;
+            barrierGUID.Clear();
             events.Reset();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
             if (pInstance)
             {
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RIMEFANG_GUID)))
+                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                 {
                     c->RemoveAllAuras();
                     c->GetMotionMaster()->Clear();
                     c->GetMotionMaster()->MoveIdle();
                     c->SetVisible(false);
                 }
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
+                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
                 {
                     c->AI()->DoAction(2);
                 }
@@ -1159,7 +1157,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        uint64 barrierGUID;
+        ObjectGuid barrierGUID;
 
         void DoAction(int32 p) override
         {
@@ -1222,7 +1220,7 @@ public:
                     break;
                 case 2:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
                             c->AI()->Talk(SAY_GENERAL_OUTRO_2);
 
                     events.RescheduleEvent(3, me->GetEntry() == NPC_JAINA_PART2 ? 7000 : 8000);
@@ -1242,9 +1240,9 @@ public:
                     break;
                 case 5:
                     if (pInstance)
-                        if (Creature* x = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
+                        if (Creature* x = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
                         {
-                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
+                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
                                 c->CastSpell(x->GetPositionX(), x->GetPositionY(), x->GetPositionZ(), SPELL_SINDRAGOSA_FROST_BOMB_POS, true);
                         }
 
@@ -1253,18 +1251,18 @@ public:
                     break;
                 case 6:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos1);
 
                     events.RescheduleEvent(7, 4500);
                     break;
                 case 7:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
                             c->SetVisible(false);
                     if (GameObject* barrier = pInstance->instance->GetGameObject(barrierGUID))
                         barrier->Delete();
-                    barrierGUID = 0;
+                    barrierGUID.Clear();
 
                     events.RescheduleEvent(8, 2000);
                     break;
@@ -1272,7 +1270,7 @@ public:
                     me->GetMotionMaster()->MovePath(me->GetEntry() == NPC_JAINA_PART2 ? PATH_BEGIN_VALUE + 16 : PATH_BEGIN_VALUE + 17, false);
                     break;
                 case 10:
-                    if (Creature* x = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
+                    if (Creature* x = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
                         x->AI()->DoAction(3);
 
                     break;
@@ -1540,7 +1538,7 @@ public:
         if (inst->GetData(DATA_INSTANCE_PROGRESS) < INSTANCE_PROGRESS_AFTER_TUNNEL_WARN)
             return false;
 
-        if (inst->GetData(DATA_GARFROST) == DONE && inst->GetData(DATA_ICK) == DONE && inst->GetData(DATA_TYRANNUS) != DONE && !inst->GetData64(DATA_MARTIN_OR_GORKUN_GUID))
+        if (inst->GetData(DATA_GARFROST) == DONE && inst->GetData(DATA_ICK) == DONE && inst->GetData(DATA_TYRANNUS) != DONE && !inst->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID))
         {
             if (Creature* c = inst->instance->SummonCreature(NPC_GORKUN_IRONSKULL_2, TSSpawnPos))
                 c->GetMotionMaster()->MovePoint(0, TSMidPos);

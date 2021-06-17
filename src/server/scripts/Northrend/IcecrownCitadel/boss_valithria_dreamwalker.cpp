@@ -140,11 +140,11 @@ public:
     bool operator()(Creature* creature)
     {
         return creature->IsAlive() && creature->GetEntry() == NPC_RISEN_ARCHMAGE &&
-               creature->GetDBTableGUIDLow() && !creature->IsInCombat();
+               creature->GetSpawnId() && !creature->IsInCombat();
     }
 };
 
-struct ManaVoidSelector : public acore::unary_function<Unit*, bool>
+struct ManaVoidSelector : public Acore::unary_function<Unit*, bool>
 {
     explicit ManaVoidSelector(WorldObject const* source) : _source(source) { }
 
@@ -159,7 +159,7 @@ struct ManaVoidSelector : public acore::unary_function<Unit*, bool>
 class DelayedCastEvent : public BasicEvent
 {
 public:
-    DelayedCastEvent(Creature* trigger, uint32 spellId, uint64 originalCaster, uint32 despawnTime) : _trigger(trigger), _originalCaster(originalCaster), _spellId(spellId), _despawnTime(despawnTime)
+    DelayedCastEvent(Creature* trigger, uint32 spellId, ObjectGuid originalCaster, uint32 despawnTime) : _trigger(trigger), _originalCaster(originalCaster), _spellId(spellId), _despawnTime(despawnTime)
     {
     }
 
@@ -173,7 +173,7 @@ public:
 
 private:
     Creature* _trigger;
-    uint64 _originalCaster;
+    ObjectGuid _originalCaster;
     uint32 _spellId;
     uint32 _despawnTime;
 };
@@ -205,8 +205,8 @@ public:
 
     bool Execute(uint64 /*currTime*/, uint32 /*diff*/) override
     {
-        acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
-        _creature->VisitNearbyGridObject(333.0f, worker);
+        Acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
+        Cell::VisitGridObjects(_creature, worker, 333.0f);
         _creature->AI()->Reset();
         _creature->setActive(false);
         return true;
@@ -234,7 +234,7 @@ public:
                 creature->DespawnOrUnsummon();
                 return;
             case NPC_RISEN_ARCHMAGE:
-                if (!creature->GetDBTableGUIDLow())
+                if (!creature->GetSpawnId())
                 {
                     creature->DespawnOrUnsummon();
                     return;
@@ -279,7 +279,7 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             _spawnHealth = 1; // just in case if not set below
-            if (CreatureData const* data = sObjectMgr->GetCreatureData(me->GetDBTableGUIDLow()))
+            if (CreatureData const* data = sObjectMgr->GetCreatureData(me->GetSpawnId()))
                 if (data->curhealth)
                     _spawnHealth = data->curhealth;
         }
@@ -338,9 +338,9 @@ public:
                 _events.ScheduleEvent(EVENT_DREAM_SLIP, 3500);
                 _instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, DONE);
 
-                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_VALITHRIA_TRIGGER)))
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
                     trigger->AI()->EnterEvadeMode();
-                if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_VALITHRIA_LICH_KING)))
+                if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
                     lichKing->AI()->Reset();
             }
             else if (!_over75PercentTalkDone && me->HealthAbovePctHealed(75, heal))
@@ -349,7 +349,7 @@ public:
                 Talk(SAY_VALITHRIA_75_PERCENT);
             }
             else if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
-                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_VALITHRIA_TRIGGER)))
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
                     trigger->AI()->DoAction(ACTION_ENTER_COMBAT);
         }
 
@@ -371,7 +371,7 @@ public:
                         _justDied = true;
                         Talk(SAY_VALITHRIA_DEATH);
                         _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                        if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_VALITHRIA_TRIGGER)))
+                        if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
                             trigger->AI()->EnterEvadeMode();
                     }
                 }
@@ -388,7 +388,7 @@ public:
                 me->SetDisplayId(11686);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->DespawnOrUnsummon(4000);
-                if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_VALITHRIA_LICH_KING)))
+                if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
                     lichKing->CastSpell(lichKing, SPELL_SPAWN_CHEST, false);
                 _instance->SetData(DATA_WEEKLY_QUEST_ID, 0); // show hidden npc if necessary
             }
@@ -518,15 +518,15 @@ public:
             me->setActive(true);
             me->SetInCombatWithZone();
             instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, IN_PROGRESS);
-            if (Creature* valithria = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VALITHRIA_DREAMWALKER)))
+            if (Creature* valithria = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER)))
                 valithria->AI()->DoAction(ACTION_ENTER_COMBAT);
-            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VALITHRIA_LICH_KING)))
+            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
                 lichKing->AI()->DoAction(ACTION_ENTER_COMBAT);
 
             std::list<Creature*> archmages;
             RisenArchmageCheck check;
-            acore::CreatureListSearcher<RisenArchmageCheck> searcher(me, archmages, check);
-            me->VisitNearbyGridObject(100.0f, searcher);
+            Acore::CreatureListSearcher<RisenArchmageCheck> searcher(me, archmages, check);
+            Cell::VisitGridObjects(me, searcher, 100.0f);
             for (std::list<Creature*>::iterator itr = archmages.begin(); itr != archmages.end(); ++itr)
                 (*itr)->AI()->DoAction(ACTION_ENTER_COMBAT);
         }
@@ -712,8 +712,8 @@ public:
         {
             me->FinishSpell(CURRENT_CHANNELED_SPELL, false);
             me->SetInCombatWithZone();
-            if (me->GetDBTableGUIDLow())
-                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_VALITHRIA_TRIGGER)))
+            if (me->GetSpawnId())
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
                     trigger->AI()->DoAction(ACTION_ENTER_COMBAT);
         }
 
@@ -726,7 +726,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_COLUMN_OF_FROST)
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, 0, 8000), summon->m_Events.CalculateTime(2000));
+                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, ObjectGuid::Empty, 8000), summon->m_Events.CalculateTime(2000));
             else if (summon->GetEntry() == NPC_MANA_VOID)
                 summon->DespawnOrUnsummon(36000);
         }
@@ -734,7 +734,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!me->IsInCombat())
-                if (me->GetDBTableGUIDLow())
+                if (me->GetSpawnId())
                     if (!me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
                         me->CastSpell(me, SPELL_CORRUPTION, false);
 
@@ -861,7 +861,7 @@ public:
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MoveIdle();
                     // must use originalCaster the same for all clouds to allow stacking
-                    me->CastSpell(me, EMERALD_VIGOR, false, nullptr, nullptr, _instance->GetData64(DATA_VALITHRIA_DREAMWALKER));
+                    me->CastSpell(me, EMERALD_VIGOR, false, nullptr, nullptr, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
                     me->DespawnOrUnsummon(1000);
                     break;
                 default:
@@ -959,7 +959,7 @@ public:
 
         void IsSummonedBy(Unit* /*summoner*/) override
         {
-            if (Creature* valithria = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_VALITHRIA_DREAMWALKER)))
+            if (Creature* valithria = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER)))
                 AttackStart(valithria);
         }
 
@@ -969,7 +969,7 @@ public:
                 return;
 
             if (!me->GetVictim())
-                if (Creature* valithria = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_VALITHRIA_DREAMWALKER)))
+                if (Creature* valithria = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER)))
                     if (valithria->IsAlive())
                         AttackStart(valithria);
 
@@ -1169,7 +1169,7 @@ public:
                 return;
 
             if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetData64(DATA_VALITHRIA_DREAMWALKER));
+                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
         }
 
         void Register() override
@@ -1305,9 +1305,9 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
             std::list<WorldObject*> list_copy = targets;
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
             if (targets.empty())
             {
                 if (list_copy.empty())
@@ -1315,7 +1315,7 @@ public:
                 targets = list_copy;
             }
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }
@@ -1326,7 +1326,7 @@ public:
             if (!GetHitUnit())
                 return;
 
-            GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetData64(DATA_VALITHRIA_LICH_KING));
+            GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
         }
 
         void Register() override
@@ -1361,14 +1361,14 @@ public:
             std::list<Creature*> summoners;
             caster->GetCreaturesWithEntryInRange(summoners, 200.0f, NPC_WORLD_TRIGGER);
             std::list<Creature*> list_copy = summoners;
-            summoners.remove_if(acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+            summoners.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
             if (summoners.empty())
             {
                 if (list_copy.empty())
                     return;
                 summoners = list_copy;
             }
-            acore::Containers::RandomResizeList(summoners, 2);
+            Acore::Containers::RandomResize(summoners, 2);
 
             for (uint32 i = 0; i < 3; ++i)
                 caster->CastSpell(summoners.front(), SPELL_SUMMON_SUPPRESSER, true);
@@ -1410,7 +1410,7 @@ public:
             if (!GetHitUnit())
                 return;
 
-            GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetData64(DATA_VALITHRIA_LICH_KING));
+            GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
         }
 
         void Register() override
@@ -1489,7 +1489,7 @@ class achievement_portal_jockey : public AchievementCriteriaScript
 public:
     achievement_portal_jockey() : AchievementCriteriaScript("achievement_portal_jockey") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_VALITHRIA_DREAMWALKER && !target->GetAI()->GetData(MISSED_PORTALS);
     }

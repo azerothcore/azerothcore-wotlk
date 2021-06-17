@@ -61,7 +61,7 @@ inline std::string ReadSkip(std::istringstream& iss, char term)
 
 inline bool CheckDelimiter(std::istringstream& iss, char delimiter, const char* context)
 {
-    UNUSED(context); // used only with EXTRA_LOGS
+    (void)context; // used only with EXTRA_LOGS
     char c = iss.peek();
     if (c != delimiter)
     {
@@ -307,7 +307,7 @@ bool SpellChatLink::ValidateName(char* buffer, const char* context)
     ChatLink::ValidateName(buffer, context);
 
     // spells with that flag have a prefix of "$PROFESSION: "
-    if (_spell->HasAttribute(SPELL_ATTR0_TRADESPELL))
+    if (_spell->HasAttribute(SPELL_ATTR0_IS_TRADESKILL))
     {
         SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(_spell->Id);
         if (bounds.first == bounds.second)

@@ -4,11 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "UpdateData.h"
 #include "ByteBuffer.h"
-#include "Common.h"
+#include "Errors.h"
 #include "Log.h"
 #include "Opcodes.h"
-#include "UpdateData.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "zlib.h"
@@ -18,7 +18,7 @@ UpdateData::UpdateData() : m_blockCount(0)
     m_outOfRangeGUIDs.reserve(15);
 }
 
-void UpdateData::AddOutOfRangeGUID(uint64 guid)
+void UpdateData::AddOutOfRangeGUID(ObjectGuid guid)
 {
     m_outOfRangeGUIDs.push_back(guid);
 }
@@ -104,9 +104,9 @@ bool UpdateData::BuildPacket(WorldPacket* packet)
         buf << (uint8) UPDATETYPE_OUT_OF_RANGE_OBJECTS;
         buf << (uint32) m_outOfRangeGUIDs.size();
 
-        for (std::vector<uint64>::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
+        for (ObjectGuid const guid : m_outOfRangeGUIDs)
         {
-            buf.appendPackGUID(*i);
+            buf << guid.WriteAsPacked();
         }
     }
 

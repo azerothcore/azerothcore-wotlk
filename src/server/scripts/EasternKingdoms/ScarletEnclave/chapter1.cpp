@@ -73,7 +73,7 @@ public:
         void SetControl(Player* player, bool on)
         {
             WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size() + 1);
-            data.append(me->GetPackGUID());
+            data << me->GetPackGUID();
             data << uint8(on ? 1 : 0);
             player->GetSession()->SendPacket(&data);
         }
@@ -208,7 +208,7 @@ public:
             if (player->IsInCombat() || creature->IsInCombat())
                 return true;
 
-            if (!creature->AI()->GetData(player->GetGUIDLow()))
+            if (!creature->AI()->GetGUID(player->GetGUID().GetCounter()))
                 AddGossipItemFor(player, 9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
@@ -226,7 +226,7 @@ public:
         npc_death_knight_initiateAI(Creature* creature) : CombatAI(creature) { }
 
         bool _duelInProgress;
-        uint64 _duelGUID;
+        ObjectGuid _duelGUID;
         EventMap events;
         std::set<uint32> playerGUIDs;
         uint32 timer = 0;
@@ -242,7 +242,7 @@ public:
         void Reset() override
         {
             _duelInProgress = false;
-            _duelGUID = 0;
+            _duelGUID.Clear();
             me->RestoreFaction();
             CombatAI::Reset();
 
@@ -253,7 +253,7 @@ public:
         {
             if (!_duelInProgress && pSpell->Id == SPELL_DUEL)
             {
-                playerGUIDs.insert(caster->GetGUIDLow());
+                playerGUIDs.insert(caster->GetGUID().GetCounter());
                 _duelGUID = caster->GetGUID();
                 _duelInProgress = true;
 
@@ -280,7 +280,7 @@ public:
                     damage = 0;
                     events.ScheduleEvent(EVENT_DUEL_LOST, 2000);
                     events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6000);
-                    _duelGUID = 0;
+                    _duelGUID.Clear();
                     _duelInProgress = 0;
 
                     attacker->RemoveGameObject(SPELL_DUEL_FLAG, true);
@@ -453,11 +453,10 @@ public:
         }
 
         EventMap events;
-        uint64 gothikGUID;
+        ObjectGuid gothikGUID;
 
         void InitializeAI() override
         {
-            gothikGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             ScriptedAI::InitializeAI();
             me->SetReactState(REACT_PASSIVE);
@@ -472,7 +471,7 @@ public:
                 AttackStart(attacker);
         }
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             gothikGUID = guid;
             events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
@@ -701,17 +700,17 @@ public:
                 me->SetCurrentEquipmentId(me->GetOriginalEquipmentId());
         }
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         UnworthyInitiatePhase phase;
         uint32 wait_timer;
         float anchorX, anchorY;
-        uint64 anchorGUID;
+        ObjectGuid anchorGUID;
 
         EventMap events;
 
         void Reset() override
         {
-            anchorGUID = 0;
+            anchorGUID.Clear();
             phase = PHASE_CHAINED;
             events.Reset();
             me->setFaction(7);
@@ -880,17 +879,17 @@ public:
 
     struct npc_unworthy_initiate_anchorAI : public PassiveAI
     {
-        npc_unworthy_initiate_anchorAI(Creature* creature) : PassiveAI(creature), prisonerGUID(0) {}
+        npc_unworthy_initiate_anchorAI(Creature* creature) : PassiveAI(creature) {}
 
-        uint64 prisonerGUID;
+        ObjectGuid prisonerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
                 prisonerGUID = guid;
         }
 
-        uint64 GetGUID(int32 /*id*/) const override
+        ObjectGuid GetGUID(int32 /*id*/) const override
         {
             return prisonerGUID;
         }
@@ -905,7 +904,7 @@ public:
     bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (Creature* anchor = go->FindNearestCreature(29521, 15))
-            if (uint64 prisonerGUID = anchor->AI()->GetGUID())
+            if (ObjectGuid prisonerGUID = anchor->AI()->GetGUID())
                 if (Creature* prisoner = ObjectAccessor::GetCreature(*player, prisonerGUID))
                     CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
 
@@ -935,16 +934,16 @@ public:
 
     struct npc_scarlet_miner_cartAI : public PassiveAI
     {
-        npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature), minerGUID(0)
+        npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
             me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->setFaction(35);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
 
-        uint64 minerGUID;
+        ObjectGuid minerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid guid, int32 /*id*/) override
         {
             minerGUID = guid;
         }
@@ -1004,11 +1003,11 @@ public:
 
         uint32 IntroTimer;
         uint32 IntroPhase;
-        uint64 carGUID;
+        ObjectGuid carGUID;
 
         void Reset() override
         {
-            carGUID = 0;
+            carGUID.Clear();
             IntroTimer = 0;
             IntroPhase = 0;
         }

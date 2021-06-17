@@ -637,7 +637,7 @@ public:
                 case EVENT_INTRO_FINISH:
                     events.Reset();
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    if (Creature* brann = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_BRANN_BRONZBEARD_ALG)))
+                    if (Creature* brann = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_BRANN_BRONZBEARD_ALG)))
                         brann->AI()->DoAction(ACTION_FINISH_INTRO);
                     break;
                 case EVENT_START_COMBAT:
@@ -875,7 +875,7 @@ public:
                         me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
                     break;
                 case EVENT_SUMMON_ALGALON:
-                    if (me->GetInstanceScript() && !me->GetInstanceScript()->GetData64(TYPE_ALGALON))
+                    if (me->GetInstanceScript() && !me->GetInstanceScript()->GetGuidData(TYPE_ALGALON))
                         if (Creature* algalon = me->GetMap()->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
                             algalon->AI()->DoAction(ACTION_START_INTRO);
                     break;
@@ -1119,10 +1119,10 @@ public:
             if (InstanceScript* instance = go->GetInstanceScript())
             {
                 instance->SetData(DATA_ALGALON_SUMMON_STATE, 1);
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetData64(GO_DOODAD_UL_SIGILDOOR_01)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
 
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetData64(GO_DOODAD_UL_SIGILDOOR_02)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -1398,7 +1398,7 @@ class achievement_algalon_he_feeds_on_your_tears : public AchievementCriteriaScr
 public:
     achievement_algalon_he_feeds_on_your_tears() : AchievementCriteriaScript("achievement_algalon_he_feeds_on_your_tears") { }
 
-    bool OnCheck(Player*, Unit* target /*Algalon*/) override
+    bool OnCheck(Player*, Unit* target /*Algalon*/, uint32 /*criteria_id*/) override
     {
         return target && target->GetAI()->GetData(DATA_HAS_FED_ON_TEARS);
     }
@@ -1409,7 +1409,7 @@ class achievement_algalon_herald_of_the_titans : public AchievementCriteriaScrip
 public:
     achievement_algalon_herald_of_the_titans() : AchievementCriteriaScript("achievement_algalon_herald_of_the_titans") { }
 
-    bool OnCheck(Player*, Unit* target /*Algalon*/) override
+    bool OnCheck(Player*, Unit* target /*Algalon*/, uint32 /*criteria_id*/) override
     {
         return target && target->GetAI()->GetData(DATA_HERALD_OF_THE_TITANS);
     }
