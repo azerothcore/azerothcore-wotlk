@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -12,7 +11,6 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "Vehicle.h"
-#include "VehicleDefines.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
