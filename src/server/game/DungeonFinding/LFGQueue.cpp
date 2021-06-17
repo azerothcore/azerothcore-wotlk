@@ -15,10 +15,7 @@
  */
 
 #include "Containers.h"
-#include "DBCStores.h"
-#include "DBCStructure.h"
 #include "Group.h"
-#include "GroupMgr.h"
 #include "LFGMgr.h"
 #include "LFGQueue.h"
 #include "Log.h"
