@@ -6,7 +6,6 @@
 
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
-#include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Chat.h"
 #include "Common.h"
@@ -16,7 +15,6 @@
 #include "GossipDef.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "InstanceSaveMgr.h"
 #include "Language.h"
 #include "LFGMgr.h"
 #include "Log.h"
@@ -693,7 +691,7 @@ void ObjectMgr::LoadCreatureTemplateSpells()
         }
 
         CreatureTemplate& creatureTemplate = itr->second;
-        creatureTemplate.spells[index] = fields[2].GetUInt32();;
+        creatureTemplate.spells[index] = fields[2].GetUInt32();
 
         ++count;
     } while (result->NextRow());

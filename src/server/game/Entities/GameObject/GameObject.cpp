@@ -292,10 +292,10 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     SetObjectScale(goinfo->size);
 
-    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    if (GameObjectTemplateAddon const* templateAddon = GetTemplateAddon())
     {
-        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
-        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+        SetUInt32Value(GAMEOBJECT_FACTION, templateAddon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, templateAddon->flags);
     }
 
     SetEntry(goinfo->entry);
@@ -2432,12 +2432,13 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
             }
             else if (index == GAMEOBJECT_FLAGS)
             {
-                uint32 flags = m_uint32Values[GAMEOBJECT_FLAGS];
-                if (GetGoType() == GAMEOBJECT_TYPE_CHEST)
-                    if (GetGOInfo()->chest.groupLootRules && !IsLootAllowedFor(target))
-                        flags |= GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE;
+                uint32 goFlags = m_uint32Values[GAMEOBJECT_FLAGS];
+                if (GetGoType() == GAMEOBJECT_TYPE_CHEST && GetGOInfo() && GetGOInfo()->chest.groupLootRules && !IsLootAllowedFor(target))
+                {
+                    goFlags |= GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE;
+                }
 
-                fieldBuffer << flags;
+                fieldBuffer << goFlags;
             }
             else
                 fieldBuffer << m_uint32Values[index];                // other cases
