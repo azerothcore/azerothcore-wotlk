@@ -9,7 +9,6 @@
 #include "ChannelMgr.h"
 #include "Chat.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Guild.h"
