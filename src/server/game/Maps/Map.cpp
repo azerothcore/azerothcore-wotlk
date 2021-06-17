@@ -2344,28 +2344,6 @@ char const* Map::GetMapName() const
     return i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";
 }
 
-void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair)
-{
-    cell.SetNoCreate();
-    Acore::VisibleChangesNotifier notifier(*obj);
-    TypeContainerVisitor<Acore::VisibleChangesNotifier, WorldTypeMapContainer > player_notifier(notifier);
-    cell.Visit(cellpair, player_notifier, *this, *obj, obj->GetVisibilityRange());
-}
-
-void Map::UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair)
-{
-    Acore::VisibleNotifier notifier(*player, false, false);
-
-    cell.SetNoCreate();
-    TypeContainerVisitor<Acore::VisibleNotifier, WorldTypeMapContainer > world_notifier(notifier);
-    TypeContainerVisitor<Acore::VisibleNotifier, GridTypeMapContainer  > grid_notifier(notifier);
-    cell.Visit(cellpair, world_notifier, *this, *player->m_seer, player->GetSightRange());
-    cell.Visit(cellpair, grid_notifier, *this, *player->m_seer, player->GetSightRange());
-
-    // send data
-    notifier.SendToSelf();
-}
-
 void Map::SendInitSelf(Player* player)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -3008,7 +2986,7 @@ void InstanceMap::UnloadAll()
 {
     ASSERT(!HavePlayers());
 
-    if (m_resetAfterUnload == true)
+    if (m_resetAfterUnload)
     {
         DeleteRespawnTimes();
         DeleteCorpseData();
@@ -3353,9 +3331,9 @@ void Map::LogEncounterFinished(EncounterCreditType type, uint32 creditEntry)
         {
             std::string auraStr;
             const Unit::AuraApplicationMap& a = p->GetAppliedAuras();
-            for (Unit::AuraApplicationMap::const_iterator itr = a.begin(); itr != a.end(); ++itr)
+            for (auto iterator = a.begin(); iterator != a.end(); ++iterator)
             {
-                snprintf(buffer2, 255, "%u(%u) ", itr->first, itr->second->GetEffectMask());
+                snprintf(buffer2, 255, "%u(%u) ", iterator->first, iterator->second->GetEffectMask());
                 auraStr += buffer2;
             }
 
@@ -3799,7 +3777,7 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
         }
     }
 
-    return failOnCollision ? !collided : true;
+    return !failOnCollision || !collided;
 }
 
 void Map::LoadCorpseData()

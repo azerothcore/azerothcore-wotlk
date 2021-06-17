@@ -289,7 +289,8 @@ bool LootStoreItem::Roll(bool rate, Player const* player, Loot& loot, LootStore 
 {
     float _chance = chance;
 
-    sScriptMgr->OnItemRoll(player, this, _chance, loot, store);
+    if (!sScriptMgr->OnItemRoll(player, this, _chance, loot, store))
+        return false;
 
     if (_chance >= 100.0f)
         return true;
@@ -1205,7 +1206,8 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
             LootStoreItem* item = *itr;
             float chance = item->chance;
 
-            sScriptMgr->OnItemRoll(player, item, chance, loot, store);
+            if (!sScriptMgr->OnItemRoll(player, item, chance, loot, store))
+                return nullptr;
 
             if (chance >= 100.0f)
                 return item;
@@ -1215,6 +1217,9 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
                 return item;
         }
     }
+
+    if (!sScriptMgr->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
+        return nullptr;
 
     possibleLoot = EqualChanced;
     possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
@@ -1375,18 +1380,93 @@ void LootTemplate::CopyConditions(ConditionList conditions)
             group->CopyConditions(conditions);
 }
 
-void LootTemplate::CopyConditions(LootItem* li) const
+bool LootTemplate::CopyConditions(LootItem* li) const
 {
-    // Copies the conditions list from a template item to a LootItem
     for (LootStoreItemList::const_iterator _iter = Entries.begin(); _iter != Entries.end(); ++_iter)
     {
         LootStoreItem* item = *_iter;
-        if (item->itemid != li->itemid)
+        if (item->reference)
+        {
+            if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
+            {
+                if (Referenced->CopyConditions(li))
+                {
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            if (item->itemid != li->itemid)
+            {
+                continue;
+            }
+
+            li->conditions = item->conditions;
+            return true;
+        }
+    }
+
+    for (LootGroups::const_iterator groupItr = Groups.begin(); groupItr != Groups.end(); ++groupItr)
+    {
+        LootGroup* group = *groupItr;
+        if (!group)
             continue;
 
-        li->conditions = item->conditions;
-        break;
+        LootStoreItemList* itemList = group->GetExplicitlyChancedItemList();
+        for (LootStoreItemList::iterator i = itemList->begin(); i != itemList->end(); ++i)
+        {
+            LootStoreItem* item = *i;
+            if (item->reference)
+            {
+                if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
+                {
+                    if (Referenced->CopyConditions(li))
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                if (item->itemid != li->itemid)
+                {
+                    continue;
+                }
+
+                li->conditions = item->conditions;
+                return true;
+            }
+        }
+
+        itemList = group->GetEqualChancedItemList();
+        for (LootStoreItemList::iterator i = itemList->begin(); i != itemList->end(); ++i)
+        {
+            LootStoreItem* item = *i;
+            if (item->reference)
+            {
+                if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
+                {
+                    if (Referenced->CopyConditions(li))
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                if (item->itemid != li->itemid)
+                {
+                    continue;
+                }
+
+                li->conditions = item->conditions;
+                return true;
+            }
+        }
     }
+
+    return false;
 }
 
 // Rolls for every item in the template and adds the rolled items the the loot

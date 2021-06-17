@@ -292,10 +292,10 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     SetObjectScale(goinfo->size);
 
-    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    if (GameObjectTemplateAddon const* templateAddon = GetTemplateAddon())
     {
-        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
-        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+        SetUInt32Value(GAMEOBJECT_FACTION, templateAddon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, templateAddon->flags);
     }
 
     SetEntry(goinfo->entry);
@@ -610,9 +610,7 @@ void GameObject::Update(uint32 diff)
                         {
                             Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
                             Acore::UnitSearcher<Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
-                            VisitNearbyGridObject(radius, searcher);
-                            if (!target)
-                                VisitNearbyWorldObject(radius, searcher);
+                            Cell::VisitAllObjects(this, searcher, radius);
                         }
                         else                                        // environmental trap
                         {
@@ -621,7 +619,7 @@ void GameObject::Update(uint32 diff)
                             Player* player = nullptr;
                             Acore::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
                             Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
-                            VisitNearbyWorldObject(radius, searcher);
+                            Cell::VisitWorldObjects(this, searcher, radius);
                             target = player;
                         }
 
@@ -1209,14 +1207,10 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
 {
     GameObject* ok = nullptr;
 
-    CellCoord p(Acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
-    Cell cell(p);
     Acore::NearestGameObjectFishingHole u_check(*this, range);
     Acore::GameObjectSearcher<Acore::NearestGameObjectFishingHole> checker(this, ok, u_check);
 
-    TypeContainerVisitor<Acore::GameObjectSearcher<Acore::NearestGameObjectFishingHole>, GridTypeMapContainer > grid_object_checker(checker);
-    cell.Visit(p, grid_object_checker, *GetMap(), *this, range);
-
+    Cell::VisitGridObjects(this, checker, range);
     return ok;
 }
 
@@ -1978,7 +1972,7 @@ void GameObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*s
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION * 2.0f; // pussywizard: to ensure everyone receives all important packets
     Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
-    VisitNearbyWorldObject(dist, notifier);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void GameObject::EventInform(uint32 eventId)
@@ -2438,12 +2432,13 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
             }
             else if (index == GAMEOBJECT_FLAGS)
             {
-                uint32 flags = m_uint32Values[GAMEOBJECT_FLAGS];
-                if (GetGoType() == GAMEOBJECT_TYPE_CHEST)
-                    if (GetGOInfo()->chest.groupLootRules && !IsLootAllowedFor(target))
-                        flags |= GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE;
+                uint32 goFlags = m_uint32Values[GAMEOBJECT_FLAGS];
+                if (GetGoType() == GAMEOBJECT_TYPE_CHEST && GetGOInfo() && GetGOInfo()->chest.groupLootRules && !IsLootAllowedFor(target))
+                {
+                    goFlags |= GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE;
+                }
 
-                fieldBuffer << flags;
+                fieldBuffer << goFlags;
             }
             else
                 fieldBuffer << m_uint32Values[index];                // other cases

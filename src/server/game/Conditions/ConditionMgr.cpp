@@ -210,12 +210,12 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             }
         case CONDITION_NEAR_CREATURE:
             {
-                condMeets = !!GetClosestCreatureWithEntry(object, ConditionValue1, (float)ConditionValue2, !ConditionValue3);
+                condMeets = static_cast<bool>(GetClosestCreatureWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2),!ConditionValue3));
                 break;
             }
         case CONDITION_NEAR_GAMEOBJECT:
             {
-                condMeets = !!GetClosestGameObjectWithEntry(object, ConditionValue1, (float)ConditionValue2);
+                condMeets = static_cast<bool>(GetClosestGameObjectWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2)));
                 break;
             }
         case CONDITION_OBJECT_ENTRY_GUID:
@@ -1205,8 +1205,7 @@ bool ConditionMgr::addToGossipMenuItems(Condition* cond)
 bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
 {
     uint32 conditionEffMask = cond->SourceGroup;
-    SpellInfo* spellInfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(cond->SourceEntry));
-    ASSERT(spellInfo);
+    SpellInfo* spellInfo = const_cast<SpellInfo*>(sSpellMgr->AssertSpellInfo(cond->SourceEntry));
     std::list<uint32> sharedMasks;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {

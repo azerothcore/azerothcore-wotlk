@@ -187,7 +187,7 @@ protected:
     uint8 CharCount;
 
 private:
-    virtual ~CharacterCreateInfo() = default;;
+    virtual ~CharacterCreateInfo() = default;
 };
 
 struct PacketCounter

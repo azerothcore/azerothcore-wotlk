@@ -6,9 +6,7 @@
 
 #include "Battleground.h"
 #include "BattlegroundAV.h"
-#include "Common.h"
 #include "GameObjectAI.h"
-#include "GossipDef.h"
 #include "Group.h"
 #include "Language.h"
 #include "Log.h"

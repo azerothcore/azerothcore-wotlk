@@ -687,7 +687,7 @@ public:
             // Reset The Frozen Throne gameobjects
             FrozenThroneResetWorker reset;
             Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
-            me->VisitNearbyGridObject(333.0f, worker);
+            Cell::VisitGridObjects(me, worker, 333.0f);
 
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -3742,7 +3742,7 @@ class achievement_been_waiting_long_time : public AchievementCriteriaScript
 public:
     achievement_been_waiting_long_time() : AchievementCriteriaScript("achievement_been_waiting_long_time") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;
@@ -3756,7 +3756,7 @@ class achievement_neck_deep_in_vile : public AchievementCriteriaScript
 public:
     achievement_neck_deep_in_vile() : AchievementCriteriaScript("achievement_neck_deep_in_vile") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;

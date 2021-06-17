@@ -206,7 +206,7 @@ public:
     bool Execute(uint64 /*currTime*/, uint32 /*diff*/) override
     {
         Acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
-        _creature->VisitNearbyGridObject(333.0f, worker);
+        Cell::VisitGridObjects(_creature, worker, 333.0f);
         _creature->AI()->Reset();
         _creature->setActive(false);
         return true;
@@ -526,7 +526,7 @@ public:
             std::list<Creature*> archmages;
             RisenArchmageCheck check;
             Acore::CreatureListSearcher<RisenArchmageCheck> searcher(me, archmages, check);
-            me->VisitNearbyGridObject(100.0f, searcher);
+            Cell::VisitGridObjects(me, searcher, 100.0f);
             for (std::list<Creature*>::iterator itr = archmages.begin(); itr != archmages.end(); ++itr)
                 (*itr)->AI()->DoAction(ACTION_ENTER_COMBAT);
         }
@@ -1489,7 +1489,7 @@ class achievement_portal_jockey : public AchievementCriteriaScript
 public:
     achievement_portal_jockey() : AchievementCriteriaScript("achievement_portal_jockey") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_VALITHRIA_DREAMWALKER && !target->GetAI()->GetData(MISSED_PORTALS);
     }
