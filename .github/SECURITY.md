@@ -38,9 +38,7 @@ Versions of CLang:
 | 12              | :white_check_mark: |
 | 11              | :white_check_mark: |
 | 10              | :white_check_mark: |
-| 9               | :white_check_mark: |
-| 7               | :white_check_mark: |
-| 6 and lower     | :red_circle:       |
+| 9 and lower     | :red_circle:       |
 
 Versions of GCC:
 
