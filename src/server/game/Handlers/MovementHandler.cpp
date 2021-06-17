@@ -9,11 +9,9 @@
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Chat.h"
-#include "Common.h"
 #include "Corpse.h"
 #include "GameGraveyard.h"
 #include "InstanceSaveMgr.h"
-#include "Language.h"
 #include "Log.h"
 #include "MathUtil.h"
 #include "MapManager.h"
@@ -69,7 +67,7 @@ void WorldSession::HandleMoveWorldportAck()
     }
 
     // reset instance validity, except if going to an instance inside an instance
-    if (GetPlayer()->m_InstanceValid == false && !mInstance)
+    if (!GetPlayer()->m_InstanceValid && !mInstance)
     {
         GetPlayer()->m_InstanceValid = true;
         // pussywizard: m_InstanceValid can be false only by leaving a group in an instance => so remove temp binds that could not be removed because player was still on the map!
