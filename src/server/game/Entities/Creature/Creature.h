@@ -223,7 +223,7 @@ public:
     bool CanStartAttack(Unit const* u) const;
     float GetAggroRange(Unit const* target) const;
     float GetAttackDistance(Unit const* player) const;
-    float GetDetectionRange() const { return m_detectionDistance; }
+    [[nodiscard]] float GetDetectionRange() const { return m_detectionDistance; }
 
     void SendAIReaction(AiReaction reactionType);
 
