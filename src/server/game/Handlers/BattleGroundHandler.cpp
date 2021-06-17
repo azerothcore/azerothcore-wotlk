@@ -152,6 +152,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             err = ERR_IN_NON_RANDOM_BG;
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_2v2) ||
                  _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
+                 _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_1v1) ||
                  _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
             err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
         // don't let Death Knights join BG queues when they are not allowed to be teleported yet
@@ -217,6 +218,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             err = ERR_IN_NON_RANDOM_BG;
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_2v2) ||
                  _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3) ||
+                 _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_1v1) ||
                  _player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5)) // can't be already queued for arenas
             err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
 
