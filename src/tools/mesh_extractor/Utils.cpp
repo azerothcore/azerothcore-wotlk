@@ -60,7 +60,9 @@ std::string Utils::ReadString( FILE* file )
     {
         char b;
         if (fread(&b, sizeof(char), 1, file) != 1 || b == 0)
+        {
             break;
+        }
         ret.push_back(b);
     }
     return ret;
@@ -107,7 +109,9 @@ Vector3 Utils::TransformDoodadVertex(const IDefinition& def, Vector3& vec, bool 
     // And finally scale and translate it to our origin
     ret = ret * def.Scale();
     if (translate)
+    {
         ret = ret + Vector3(Constants::MaxXY - def.Position.z, Constants::MaxXY - def.Position.x, def.Position.y);
+    }
     return ret;
 }
 
@@ -118,7 +122,9 @@ Vector3 Utils::TransformWmoDoodad(const DoodadInstance& inst, const WorldModelDe
     Vector3 ret = Utils::VectorTransform(vec, G3D::Matrix4(quat.toRotationMatrix()));
     ret = ret * (inst.Scale / 1024.0f);
     if (translate)
+    {
         ret = ret + Vector3(Constants::MaxXY - inst.Position.z, Constants::MaxXY - inst.Position.x, inst.Position.y);
+    }
     return ret;
 }
 
@@ -138,7 +144,9 @@ std::string Utils::GetPathBase(const std::string& path )
 {
     size_t lastIndex = path.find_last_of(".");
     if (lastIndex != std::string::npos)
+    {
         return path.substr(0, lastIndex);
+    }
     return path;
 }
 
@@ -146,14 +154,18 @@ Vector3 Vector3::Read( FILE* file )
 {
     Vector3 ret;
     if (fread(&ret, sizeof(Vector3), 1, file) != 1)
+    {
         printf("Vector3::Read: Failed to read some data expected 1, read 0\n");
+    }
     return ret;
 }
 
 Vector3 Utils::GetLiquidVert(const IDefinition& def, Vector3 basePosition, float height, int x, int y, bool translate)
 {
     if (Utils::Distance(height, 0.0f) > 0.5f)
+    {
         basePosition.z = 0.0f;
+    }
     return Utils::TransformDoodadVertex(def, basePosition + Vector3(x * Constants::UnitSize, y * Constants::UnitSize, height), translate);
 }
 
@@ -224,7 +236,9 @@ std::string Utils::GetExtension( std::string path )
     std::string extension = "";
 
     if (idx != std::string::npos)
+    {
         extension = path.substr(idx + 1);
+    }
     return extension;
 }
 
@@ -260,7 +274,9 @@ void MapChunkHeader::Read(FILE* stream)
     count += fread(&OffsetMCCV, sizeof(uint32), 1, stream);
 
     if (count != 27)
+    {
         printf("MapChunkHeader::Read: Failed to read some data expected 27, read %d\n", count);
+    }
 }
 
 void MHDR::Read(FILE* stream)
@@ -281,7 +297,9 @@ void MHDR::Read(FILE* stream)
     count += fread(&OffsetMTFX, sizeof(uint32), 1, stream);
 
     if (count != 12)
+    {
         printf("MHDR::Read: Failed to read some data expected 12, read %d\n", count);
+    }
 }
 
 void ModelHeader::Read(FILE* stream)
@@ -343,7 +361,9 @@ void ModelHeader::Read(FILE* stream)
     count += fread(&OffsetBoundingNormals, sizeof(uint32), 1, stream);
 
     if (count != 51)
+    {
         printf("ModelHeader::Read: Failed to read some data expected 51, read %d\n", count);
+    }
 }
 
 WorldModelHeader WorldModelHeader::Read(FILE* stream)
@@ -365,7 +385,9 @@ WorldModelHeader WorldModelHeader::Read(FILE* stream)
     count += fread(&ret.LiquidTypeRelated, sizeof(uint32), 1, stream);
 
     if (count != 10)
+    {
         printf("WorldModelHeader::Read: Failed to read some data expected 10, read %d\n", count);
+    }
 
     return ret;
 }
@@ -385,7 +407,9 @@ DoodadInstance DoodadInstance::Read(FILE* stream)
     count += fread(&ret.LightColor, sizeof(uint32), 1, stream);
 
     if (count != 7)
+    {
         printf("DoodadInstance::Read: Failed to read some data expected 7, read %d\n", count);
+    }
 
     return ret;
 }
@@ -404,7 +428,9 @@ DoodadSet DoodadSet::Read(FILE* stream)
     count += fread(&ret.UnknownZero, sizeof(uint32), 1, stream);
 
     if (count != 23)
+    {
         printf("DoodadSet::Read: Failed to read some data expected 23, read %d\n", count);
+    }
 
     return ret;
 }
@@ -421,7 +447,9 @@ LiquidHeader LiquidHeader::Read(FILE* stream)
     count += fread(&ret.MaterialId, sizeof(uint16), 1, stream);
 
     if (count != 5)
+    {
         printf("LiquidHeader::Read: Failed to read some data expected 5, read %d\n", count);
+    }
 
     return ret;
 }
@@ -431,11 +459,15 @@ LiquidData LiquidData::Read(FILE* stream, LiquidHeader& header)
     LiquidData ret;
     ret.HeightMap = new float*[header.CountXVertices];
     for (uint32 i = 0; i < header.CountXVertices; ++i)
+    {
         ret.HeightMap[i] = new float[header.CountYVertices];
+    }
 
     ret.RenderFlags = new uint8*[header.Width];
     for (uint32 i = 0; i < header.Width; ++i)
+    {
         ret.RenderFlags[i] = new uint8[header.Height];
+    }
 
     for (uint32 y = 0; y < header.CountYVertices; y++)
     {
@@ -457,7 +489,9 @@ LiquidData LiquidData::Read(FILE* stream, LiquidHeader& header)
         {
             uint8 tmp = 0;
             if (fread(&tmp, sizeof(uint8), 1, stream) == 1)
+            {
                 ret.RenderFlags[x][y] = tmp;
+            }
         }
     }
 
@@ -469,19 +503,27 @@ H2ORenderMask H2ORenderMask::Read(FILE* stream)
     H2ORenderMask ret;
     int32 count;
     if ((count = fread(&ret.Mask, sizeof(uint8), 8, stream)) != 8)
+    {
         printf("H2OHeader::Read: Failed to read some data expected 8, read %d\n", count);
+    }
     return ret;
 }
 
 bool MCNKLiquidData::IsWater(int x, int y, float height)
 {
     if (!Heights)
+    {
         return false;
+    }
     if (!Mask.ShouldRender(x, y))
+    {
         return false;
+    }
     float diff = Heights[x][y] - height;
     if (diff > Constants::MaxStandableHeight)
+    {
         return true;
+    }
     return false;
 }
 
@@ -494,7 +536,9 @@ H2OHeader H2OHeader::Read(FILE* stream)
     count += fread(&ret.OffsetRender, sizeof(uint32), 1, stream);
 
     if (count != 3)
+    {
         printf("H2OHeader::Read: Failed to read some data expected 3, read %d\n", count);
+    }
 
     return ret;
 }
@@ -515,7 +559,9 @@ H2OInformation H2OInformation::Read(FILE* stream)
     count += fread(&ret.OffsetHeightmap, sizeof(uint32), 1, stream);
 
     if (count != 10)
+    {
         printf("H2OInformation::Read: Failed to read some data expected 10, read %d\n", count);
+    }
 
     return ret;
 }
@@ -525,7 +571,9 @@ char* Utils::GetPlainName(const char* FileName)
     char* temp;
 
     if ((temp = (char*)strrchr(FileName, '\\')) != nullptr)
+    {
         FileName = temp + 1;
+    }
     return (char*)FileName;
 }
 
@@ -546,7 +594,9 @@ WMOGroupHeader WMOGroupHeader::Read( FILE* stream )
     count += fread(&ret.WmoId, sizeof(uint32), 1, stream);
 
     if (count != 15)
+    {
         printf("WMOGroupHeader::Read: Failed to read some data expected 15, read %d\n", count);
+    }
 
     return ret;
 }

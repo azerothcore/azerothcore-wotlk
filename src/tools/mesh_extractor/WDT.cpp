@@ -22,7 +22,9 @@ void WDT::ReadGlobalModel()
     Chunk* fileChunk = Data->GetChunkByName("MWMO");
     Chunk* defChunk = Data->GetChunkByName("MODF");
     if (!fileChunk || !defChunk)
+    {
         return;
+    }
 
     IsGlobalModel = true;
     ModelDefinition = WorldModelDefinition::Read(defChunk->GetStream());
@@ -34,7 +36,9 @@ void WDT::ReadTileTable()
 {
     Chunk* chunk = Data->GetChunkByName("MAIN");
     if (!chunk)
+    {
         return;
+    }
     IsValid = true;
     FILE* stream = chunk->GetStream();
     for (int y = 0; y < 64; ++y)
@@ -49,10 +53,14 @@ void WDT::ReadTileTable()
             count += fread(&discard, sizeof(uint32), 1, stream);
 
             if (count != 2)
+            {
                 printf("WDT::ReadTileTable: Failed to read some data expected 2, read %d\n", count);
+            }
 
             if (flags & hasTileFlag)
+            {
                 TileTable.push_back(TilePos(x, y));
+            }
         }
     }
 }
@@ -61,6 +69,8 @@ bool WDT::HasTile( int x, int y )
 {
     for (std::vector<TilePos>::iterator itr = TileTable.begin(); itr != TileTable.end(); ++itr)
         if (itr->X == x && itr->Y == y)
+        {
             return true;
+        }
     return false;
 }

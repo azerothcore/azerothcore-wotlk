@@ -44,15 +44,25 @@ namespace MMAP
     } while (false)
 
         if (heightfield)
+        {
             DEBUG_WRITE("hf", heightfield);
+        }
         if (compactHeightfield)
+        {
             DEBUG_WRITE("chf", compactHeightfield);
+        }
         if (contours)
+        {
             DEBUG_WRITE("cs", contours);
+        }
         if (polyMesh)
+        {
             DEBUG_WRITE("pmesh", polyMesh);
+        }
         if (polyMeshDetail)
+        {
             DEBUG_WRITE("dmesh", polyMeshDetail);
+        }
 
 #undef DEBUG_WRITE
     }
@@ -60,7 +70,9 @@ namespace MMAP
     void IntermediateValues::debugWrite(FILE* file, const rcHeightfield* mesh)
     {
         if (!file || !mesh)
+        {
             return;
+        }
 
         fwrite(&(mesh->cs), sizeof(float), 1, file);
         fwrite(&(mesh->ch), sizeof(float), 1, file);
@@ -98,7 +110,9 @@ namespace MMAP
     void IntermediateValues::debugWrite(FILE* file, const rcCompactHeightfield* chf)
     {
         if (!file | !chf)
+        {
             return;
+        }
 
         fwrite(&(chf->width), sizeof(chf->width), 1, file);
         fwrite(&(chf->height), sizeof(chf->height), 1, file);
@@ -117,27 +131,37 @@ namespace MMAP
         fwrite(&(chf->ch), sizeof(chf->ch), 1, file);
 
         int tmp = 0;
-        if (chf->cells) tmp |= 1;
-        if (chf->spans) tmp |= 2;
-        if (chf->dist) tmp |= 4;
-        if (chf->areas) tmp |= 8;
+        if (chf->cells) { tmp |= 1; }
+        if (chf->spans) { tmp |= 2; }
+        if (chf->dist) { tmp |= 4; }
+        if (chf->areas) { tmp |= 8; }
 
         fwrite(&tmp, sizeof(tmp), 1, file);
 
         if (chf->cells)
+        {
             fwrite(chf->cells, sizeof(rcCompactCell), chf->width * chf->height, file);
+        }
         if (chf->spans)
+        {
             fwrite(chf->spans, sizeof(rcCompactSpan), chf->spanCount, file);
+        }
         if (chf->dist)
+        {
             fwrite(chf->dist, sizeof(unsigned short), chf->spanCount, file);
+        }
         if (chf->areas)
+        {
             fwrite(chf->areas, sizeof(unsigned char), chf->spanCount, file);
+        }
     }
 
     void IntermediateValues::debugWrite(FILE* file, const rcContourSet* cs)
     {
         if (!file || !cs)
+        {
             return;
+        }
 
         fwrite(&(cs->cs), sizeof(float), 1, file);
         fwrite(&(cs->ch), sizeof(float), 1, file);
@@ -158,7 +182,9 @@ namespace MMAP
     void IntermediateValues::debugWrite(FILE* file, const rcPolyMesh* mesh)
     {
         if (!file || !mesh)
+        {
             return;
+        }
 
         fwrite(&(mesh->cs), sizeof(float), 1, file);
         fwrite(&(mesh->ch), sizeof(float), 1, file);
@@ -177,7 +203,9 @@ namespace MMAP
     void IntermediateValues::debugWrite(FILE* file, const rcPolyMeshDetail* mesh)
     {
         if (!file || !mesh)
+        {
             return;
+        }
 
         fwrite(&(mesh->nverts), sizeof(int), 1, file);
         fwrite(mesh->verts, sizeof(float), mesh->nverts * 3, file);
@@ -215,10 +243,14 @@ namespace MMAP
         int triCount = allTris.size() / 3;
 
         for (int i = 0; i < allVerts.size() / 3; i++)
+        {
             fprintf(objFile, "v %f %f %f\n", verts[i * 3], verts[i * 3 + 1], verts[i * 3 + 2]);
+        }
 
         for (int i = 0; i < allTris.size() / 3; i++)
+        {
             fprintf(objFile, "f %i %i %i\n", tris[i * 3] + 1, tris[i * 3 + 1] + 1, tris[i * 3 + 2] + 1);
+        }
 
         fclose(objFile);
 

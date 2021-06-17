@@ -125,13 +125,17 @@ public:
     adt_MCVT* getMCVT()
     {
         if (offsMCVT)
+        {
             return (adt_MCVT*)((uint8*)this + offsMCVT);
+        }
         return nullptr;
     }
     adt_MCLQ* getMCLQ()
     {
         if (offsMCLQ)
+        {
             return (adt_MCLQ*)((uint8*)this + offsMCLQ);
+        }
         return nullptr;
     }
 };
@@ -161,7 +165,9 @@ public:
     adt_MCNK* getMCNK(int x, int y)
     {
         if (cells[x][y].offsMCNK)
+        {
             return (adt_MCNK*)((uint8*)this + cells[x][y].offsMCNK - 84);
+        }
         return nullptr;
     }
 };
@@ -208,27 +214,37 @@ public:
     adt_liquid_header* getLiquidData(int x, int y)
     {
         if (liquid[x][y].used && liquid[x][y].offsData1)
+        {
             return (adt_liquid_header*)((uint8*)this + 8 + liquid[x][y].offsData1);
+        }
         return nullptr;
     }
 
     float* getLiquidHeightMap(adt_liquid_header* h)
     {
         if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
+        {
             return nullptr;
+        }
         if (h->offsData2b)
+        {
             return (float*)((uint8*)this + 8 + h->offsData2b);
+        }
         return nullptr;
     }
 
     uint8* getLiquidLightMap(adt_liquid_header* h)
     {
         if (h->formatFlags & ADT_LIQUID_HEADER_FULL_LIGHT)
+        {
             return nullptr;
+        }
         if (h->offsData2b)
         {
             if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
+            {
                 return (uint8*)((uint8*)this + 8 + h->offsData2b);
+            }
             return (uint8*)((uint8*)this + 8 + h->offsData2b + (h->width + 1) * (h->height + 1) * 4);
         }
         return nullptr;
@@ -237,11 +253,15 @@ public:
     uint32* getLiquidFullLightMap(adt_liquid_header* h)
     {
         if (!(h->formatFlags & ADT_LIQUID_HEADER_FULL_LIGHT))
+        {
             return nullptr;
+        }
         if (h->offsData2b)
         {
             if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
+            {
                 return (uint32*)((uint8*)this + 8 + h->offsData2b);
+            }
             return (uint32*)((uint8*)this + 8 + h->offsData2b + (h->width + 1) * (h->height + 1) * 4);
         }
         return nullptr;
@@ -250,9 +270,13 @@ public:
     uint64 getLiquidShowMap(adt_liquid_header* h)
     {
         if (h->offsData2a)
+        {
             return *((uint64*)((uint8*)this + 8 + h->offsData2a));
+        }
         else
+        {
             return 0xFFFFFFFFFFFFFFFFuLL;
+        }
     }
 };
 
@@ -315,13 +339,17 @@ public:
     adt_MH2O* getMH2O()
     {
         if (offsMH2O)
+        {
             return reinterpret_cast<adt_MH2O*>(reinterpret_cast<uint8*>(&flags) + offsMH2O);
+        }
         return nullptr;
     }
     adt_MFBO* getMFBO()
     {
         if (flags & 1 && offsMFBO)
+        {
             return reinterpret_cast<adt_MFBO*>(reinterpret_cast<uint8*>(&flags) + offsMFBO);
+        }
         return nullptr;
     }
 };

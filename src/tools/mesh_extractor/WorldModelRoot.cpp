@@ -33,7 +33,9 @@ void WorldModelRoot::ReadGroups()
         sprintf(name, "%s_%03u.wmo", pathBase.c_str(), i);
         WorldModelGroup group(name, i);
         if (!group.IsBad)
+        {
             Groups.push_back(group);
+        }
     }
 }
 
@@ -41,13 +43,17 @@ void WorldModelRoot::ReadDoodadSets()
 {
     Chunk* chunk = Data->GetChunkByName("MODS");
     if (!chunk)
+    {
         return;
+    }
 
     FILE* stream = chunk->GetStream();
     ASSERT(chunk->Length / 32 == Header.CountSets && "chunk.Length / 32 == Header.CountSets");
     DoodadSets.reserve(Header.CountSets);
     for (uint32 i = 0; i < Header.CountSets; i++)
+    {
         DoodadSets.push_back(DoodadSet::Read(stream));
+    }
 }
 
 void WorldModelRoot::ReadDoodadInstances()
@@ -55,7 +61,9 @@ void WorldModelRoot::ReadDoodadInstances()
     Chunk* chunk = Data->GetChunkByName("MODD");
     Chunk* nameChunk = Data->GetChunkByName("MODN");
     if (!chunk || !nameChunk)
+    {
         return;
+    }
 
     const uint32 instanceSize = 40;
     uint32 countInstances = chunk->Length / instanceSize;
@@ -67,7 +75,9 @@ void WorldModelRoot::ReadDoodadInstances()
         DoodadInstance instance = DoodadInstance::Read(stream);
         FILE* nameStream = nameChunk->GetStream();
         if (instance.FileOffset >= nameChunk->Length)
+        {
             continue;
+        }
         fseek(nameStream, instance.FileOffset, SEEK_CUR);
         instance.File = Utils::ReadString(nameStream);
         DoodadInstances.push_back(instance);
@@ -78,7 +88,9 @@ void WorldModelRoot::ReadHeader()
 {
     Chunk* chunk = Data->GetChunkByName("MOHD");
     if (!chunk)
+    {
         return;
+    }
 
     FILE* stream = chunk->GetStream();
     Header = WorldModelHeader::Read(stream);

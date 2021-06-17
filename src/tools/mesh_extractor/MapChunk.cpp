@@ -25,7 +25,9 @@ void MapChunk::GenerateTriangles()
         for (int x = 0; x < 8; x++)
         {
             if (HasHole(Header.Holes, x / 2, y / 2))
+            {
                 continue;
+            }
 
             uint32 topLeft = (17 * y) + x;
             uint32 topRight = (17 * y) + x + 1;
@@ -42,7 +44,9 @@ void MapChunk::GenerateTriangles()
                                           std::max(std::max(Vertices[topLeft].z, Vertices[topRight].z), Vertices[bottomLeft].z),
                                           Vertices[bottomRight].z), Vertices[center].z);
                 if (data.IsWater(x, y, maxHeight))
+                {
                     triangleType = Constants::TRIANGLE_TYPE_WATER;
+                }
             }
 
             Triangles.push_back(Triangle<uint8>(triangleType, topRight, topLeft, center));
@@ -65,10 +69,14 @@ void MapChunk::GenerateVertices( FILE* stream )
         {
             float tmp;
             if (fread(&tmp, sizeof(float), 1, stream) != 1)
+            {
                 printf("MapChunk::GenerateVertices: Failed to read some data expected 1, read 0\n");
+            }
             Vector3 vert(Header.Position.x - (j * (Constants::UnitSize * 0.5f)), Header.Position.y - (i * Constants::UnitSize), Header.Position.z + tmp);
             if (values == 8)
+            {
                 vert.y -= Constants::UnitSize * 0.5f;
+            }
             Vertices.push_back(vert);
         }
     }

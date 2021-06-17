@@ -54,7 +54,9 @@ void MPQManager::InitializeDBC()
                 LocaleFiles[i] = _baseLocale;
             }
             else
+            {
                 LocaleFiles[i] = new MPQArchive(_fileName.c_str());
+            }
 
             AvailableLocales.insert(i);
             printf("Detected locale: %s\n", Languages[i]);
@@ -67,7 +69,9 @@ void MPQManager::InitializeDBC()
         ABORT();
     }
     else
+    {
         printf("Using default locale: %s\n", Languages[BaseLocale]);
+    }
 }
 
 FILE* MPQManager::GetFile(const std::string& path )
@@ -75,7 +79,9 @@ FILE* MPQManager::GetFile(const std::string& path )
     GUARD_RETURN(mutex, nullptr);
     MPQFile file(path.c_str());
     if (file.isEof())
+    {
         return nullptr;
+    }
     return file.GetFileStream();
 }
 
@@ -92,7 +98,9 @@ FILE* MPQManager::GetFileFrom(const std::string& path, MPQArchive* file )
 
     uint32_t filenum;
     if (libmpq__file_number(mpq_a, path.c_str(), &filenum))
+    {
         return nullptr;
+    }
 
     libmpq__off_t transferred;
     libmpq__off_t size = 0;
@@ -100,7 +108,9 @@ FILE* MPQManager::GetFileFrom(const std::string& path, MPQArchive* file )
 
     // HACK: in patch.mpq some files don't want to open and give 1 for filesize
     if (size <= 1)
+    {
         return nullptr;
+    }
 
     uint8* buffer = new uint8[size];
 

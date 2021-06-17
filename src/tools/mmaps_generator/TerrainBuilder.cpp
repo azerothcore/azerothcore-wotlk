@@ -127,7 +127,9 @@ namespace MMAP
 
         FILE* mapFile = fopen(mapFileName, "rb");
         if (!mapFile)
+        {
             return false;
+        }
 
         map_fileheader fheader;
         if (fread(&fheader, sizeof(map_fileheader), 1, mapFile) != 1 ||
@@ -179,15 +181,21 @@ namespace MMAP
                 count += fread(v9, sizeof(uint8), V9_SIZE_SQ, mapFile);
                 count += fread(v8, sizeof(uint8), V8_SIZE_SQ, mapFile);
                 if (count != expected)
+                {
                     printf("TerrainBuilder::loadMap: Failed to read some data expected %d, read %d\n", expected, count);
+                }
 
                 heightMultiplier = (hheader.gridMaxHeight - hheader.gridHeight) / 255;
 
                 for (int i = 0; i < V9_SIZE_SQ; ++i)
+                {
                     V9[i] = (float)v9[i] * heightMultiplier + hheader.gridHeight;
+                }
 
                 for (int i = 0; i < V8_SIZE_SQ; ++i)
+                {
                     V8[i] = (float)v8[i] * heightMultiplier + hheader.gridHeight;
+                }
             }
             else if (hheader.flags & MAP_HEIGHT_AS_INT16)
             {
@@ -197,15 +205,21 @@ namespace MMAP
                 count += fread(v9, sizeof(uint16), V9_SIZE_SQ, mapFile);
                 count += fread(v8, sizeof(uint16), V8_SIZE_SQ, mapFile);
                 if (count != expected)
+                {
                     printf("TerrainBuilder::loadMap: Failed to read some data expected %d, read %d\n", expected, count);
+                }
 
                 heightMultiplier = (hheader.gridMaxHeight - hheader.gridHeight) / 65535;
 
                 for (int i = 0; i < V9_SIZE_SQ; ++i)
+                {
                     V9[i] = (float)v9[i] * heightMultiplier + hheader.gridHeight;
+                }
 
                 for (int i = 0; i < V8_SIZE_SQ; ++i)
+                {
                     V8[i] = (float)v8[i] * heightMultiplier + hheader.gridHeight;
+                }
             }
             else
             {
@@ -213,7 +227,9 @@ namespace MMAP
                 count += fread(V9, sizeof(float), V9_SIZE_SQ, mapFile);
                 count += fread(V8, sizeof(float), V8_SIZE_SQ, mapFile);
                 if (count != expected)
+                {
                     printf("TerrainBuilder::loadMap: Failed to read some data expected %d, read %d\n", expected, count);
+                }
             }
 
             // hole data
@@ -222,7 +238,9 @@ namespace MMAP
                 memset(holes, 0, fheader.holesSize);
                 fseek(mapFile, fheader.holesOffset, SEEK_SET);
                 if (fread(holes, fheader.holesSize, 1, mapFile) != 1)
+                {
                     printf("TerrainBuilder::loadMap: Failed to read some data expected 1, read 0\n");
+                }
             }
 
             int count = meshData.solidVerts.size() / 3;
@@ -266,20 +284,26 @@ namespace MMAP
             map_liquidHeader lheader;
             fseek(mapFile, fheader.liquidMapOffset, SEEK_SET);
             if (fread(&lheader, sizeof(map_liquidHeader), 1, mapFile) != 1)
+            {
                 printf("TerrainBuilder::loadMap: Failed to read some data expected 1, read 0\n");
+            }
 
             float* liquid_map = nullptr;
 
             if (!(lheader.flags & MAP_LIQUID_NO_TYPE))
                 if (fread(liquid_type, sizeof(liquid_type), 1, mapFile) != 1)
+                {
                     printf("TerrainBuilder::loadMap: Failed to read some data expected 1, read 0\n");
+                }
 
             if (!(lheader.flags & MAP_LIQUID_NO_HEIGHT))
             {
                 uint32 toRead = lheader.width * lheader.height;
                 liquid_map = new float [toRead];
                 if (fread(liquid_map, sizeof(float), toRead, mapFile) != toRead)
+                {
                     printf("TerrainBuilder::loadMap: Failed to read some data expected 1, read 0\n");
+                }
             }
 
             if (liquid_map)
@@ -357,7 +381,9 @@ namespace MMAP
         int* ttris = ttriangles.getCArray();
 
         if ((ltriangles.size() + ttriangles.size()) == 0)
+        {
             return false;
+        }
 
         // make a copy of liquid vertices
         // used to pad right-bottom frame due to lost vertex data at extraction
@@ -381,7 +407,9 @@ namespace MMAP
 
                 // if there is no liquid, don't use liquid
                 if (!meshData.liquidVerts.size() || !ltriangles.size())
+                {
                     useLiquid = false;
+                }
                 else
                 {
                     liquidType = getLiquidType(i, liquid_type);
@@ -411,7 +439,9 @@ namespace MMAP
 
                 // if there is no terrain, don't use terrain
                 if (!ttriangles.size())
+                {
                     useTerrain = false;
+                }
 
                 // while extracting ADT data we are losing right-bottom vertices
                 // this code adds fair approximation of lost data
@@ -437,18 +467,24 @@ namespace MMAP
                         {
                             float h = lverts[ltris[idx] * 3 + 1];
                             if (h == INVALID_MAP_LIQ_HEIGHT || h > INVALID_MAP_LIQ_HEIGHT_MAX)
+                            {
                                 lverts[ltris[idx] * 3 + 1] = quadHeight;
+                            }
                         }
                     }
 
                     // no valid vertexes - don't use this poly at all
                     if (validCount == 0)
+                    {
                         useLiquid = false;
+                    }
                 }
 
                 // if there is a hole here, don't use the terrain
                 if (useTerrain && fheader.holesSize != 0)
+                {
                     useTerrain = !isHole(i, holes);
+                }
 
                 // we use only one terrain kind per quad - pick higher one
                 if (useTerrain && useLiquid)
@@ -459,10 +495,14 @@ namespace MMAP
                     {
                         float h = lverts[ltris[x] * 3 + 1];
                         if (minLLevel > h)
+                        {
                             minLLevel = h;
+                        }
 
                         if (maxLLevel < h)
+                        {
                             maxLLevel = h;
+                        }
                     }
 
                     float maxTLevel = INVALID_MAP_LIQ_HEIGHT;
@@ -471,19 +511,27 @@ namespace MMAP
                     {
                         float h = tverts[ttris[x] * 3 + 1];
                         if (maxTLevel < h)
+                        {
                             maxTLevel = h;
+                        }
 
                         if (minTLevel > h)
+                        {
                             minTLevel = h;
+                        }
                     }
 
                     // terrain under the liquid?
                     if (minLLevel > maxTLevel)
+                    {
                         useTerrain = false;
+                    }
 
                     //liquid under the terrain?
                     if (minTLevel > maxLLevel)
+                    {
                         useLiquid = false;
+                    }
                 }
 
                 // store the result
@@ -491,12 +539,16 @@ namespace MMAP
                 {
                     meshData.liquidType.append(liquidType);
                     for (int k = 0; k < 3; ++k)
+                    {
                         meshData.liquidTris.append(ltris[k]);
+                    }
                 }
 
                 if (useTerrain)
                     for (int k = 0; k < 3 * tTriCount / 2; ++k)
+                    {
                         meshData.solidTris.append(ttris[k]);
+                    }
 
                 // advance to next set of triangles
                 ltris += 3;
@@ -505,7 +557,9 @@ namespace MMAP
         }
 
         if (lverts_copy)
+        {
             delete [] lverts_copy;
+        }
 
         return meshData.solidTris.size() || meshData.liquidTris.size();
     }
@@ -643,20 +697,26 @@ namespace MMAP
         do
         {
             if (result == VMAP_LOAD_RESULT_ERROR)
+            {
                 break;
+            }
 
             InstanceTreeMap instanceTrees;
             ((VMapManager2*)vmapManager)->getInstanceMapTree(instanceTrees);
 
             if (!instanceTrees[mapID])
+            {
                 break;
+            }
 
             ModelInstance* models = nullptr;
             uint32 count = 0;
             instanceTrees[mapID]->getModelInstances(models, count);
 
             if (!models)
+            {
                 break;
+            }
 
             for (uint32 i = 0; i < count; ++i)
             {
@@ -665,7 +725,9 @@ namespace MMAP
                 // model instances exist in tree even though there are instances of that model in this tile
                 WorldModel* worldModel = instance.getWorldModel();
                 if (!worldModel)
+                {
                     continue;
+                }
 
                 // now we have a model to add to the meshdata
                 retval = true;
@@ -683,7 +745,7 @@ namespace MMAP
                 position.x -= 32 * GRID_SIZE;
                 position.y -= 32 * GRID_SIZE;
 
-                for (auto & groupModel : groupModels)
+                for (auto& groupModel : groupModels)
                 {
                     std::vector<G3D::Vector3> tempVertices;
                     std::vector<G3D::Vector3> transformedVertices;
@@ -775,7 +837,7 @@ namespace MMAP
                         }
 
                         uint32 liqOffset = meshData.liquidVerts.size() / 3;
-                        for (auto & liqVert : liqVerts)
+                        for (auto& liqVert : liqVerts)
                         {
                             meshData.liquidVerts.append(liqVert.y, liqVert.z, liqVert.x);
                         }
@@ -799,7 +861,7 @@ namespace MMAP
     /**************************************************************************/
     void TerrainBuilder::transform(std::vector<G3D::Vector3>& source, std::vector<G3D::Vector3>& transformedVertices, float scale, G3D::Matrix3& rotation, G3D::Vector3& position)
     {
-        for (auto & it : source)
+        for (auto& it : source)
         {
             // apply tranform, then mirror along the horizontal axes
             G3D::Vector3 v(it * rotation * scale + position);
@@ -812,7 +874,7 @@ namespace MMAP
     /**************************************************************************/
     void TerrainBuilder::copyVertices(std::vector<G3D::Vector3>& source, G3D::Array<float>& dest)
     {
-        for (auto & it : source)
+        for (auto& it : source)
         {
             dest.push_back(it.y);
             dest.push_back(it.z);
@@ -825,7 +887,7 @@ namespace MMAP
     {
         if (flip)
         {
-            for (auto & it : source)
+            for (auto& it : source)
             {
                 dest.push_back(it.idx2 + offset);
                 dest.push_back(it.idx1 + offset);
@@ -834,7 +896,7 @@ namespace MMAP
         }
         else
         {
-            for (auto & it : source)
+            for (auto& it : source)
             {
                 dest.push_back(it.idx0 + offset);
                 dest.push_back(it.idx1 + offset);
@@ -848,7 +910,9 @@ namespace MMAP
     {
         int* src = source.getCArray();
         for (int32 i = 0; i < source.size(); ++i)
+        {
             dest.append(src[i] + offset);
+        }
     }
 
     /**************************************************************************/
@@ -865,7 +929,9 @@ namespace MMAP
         for (int i = 0; i < tris.size(); ++i)
         {
             if (vertMap.find(t[i]) != vertMap.end())
+            {
                 continue;
+            }
             std::pair<int, int> val;
             val.first = t[i];
 
@@ -886,7 +952,9 @@ namespace MMAP
         {
             std::map<int, int>::iterator it;
             if ((it = vertMap.find(t[i])) == vertMap.end())
+            {
                 continue;
+            }
 
             t[i] = (*it).second;
         }
@@ -899,7 +967,9 @@ namespace MMAP
     {
         // no meshfile input given?
         if (offMeshFilePath == nullptr)
+        {
             return;
+        }
 
         FILE* fp = fopen(offMeshFilePath, "rb");
         if (!fp)
@@ -918,7 +988,9 @@ namespace MMAP
             float size;
             if (sscanf(buf, "%u %u,%u (%f %f %f) (%f %f %f) %f", &mid, &tx, &ty,
                        &p0[0], &p0[1], &p0[2], &p1[0], &p1[1], &p1[2], &size) != 10)
+            {
                 continue;
+            }
 
             if (mapID == mid && tileX == tx && tileY == ty)
             {

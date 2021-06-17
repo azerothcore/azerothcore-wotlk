@@ -104,7 +104,9 @@ bool ExtractSingleWmo(std::string& fname)
     sprintf(szLocalFile, "%s/%s", szWorkDirWmo, plain_name);
 
     if (FileExists(szLocalFile))
+    {
         return true;
+    }
 
     int p = 0;
     // Select root wmo files
@@ -116,12 +118,16 @@ bool ExtractSingleWmo(std::string& fname)
         for (int m : cpy)
         {
             if (isdigit(m))
+            {
                 p++;
+            }
         }
     }
 
     if (p == 3)
+    {
         return true;
+    }
 
     bool file_ok = true;
     printf("Extracting %s\n", originalName.c_str());
@@ -171,11 +177,15 @@ bool ExtractSingleWmo(std::string& fname)
             for (uint16 groupReference : fgroup.DoodadReferences)
             {
                 if (groupReference >= doodads.Spawns.size())
+                {
                     continue;
+                }
 
                 uint32 doodadNameIndex = doodads.Spawns[groupReference].NameIndex;
                 if (froot.ValidDoodadNames.find(doodadNameIndex) == froot.ValidDoodadNames.end())
+                {
                     continue;
+                }
 
                 doodads.References.insert(groupReference);
             }
@@ -188,7 +198,9 @@ bool ExtractSingleWmo(std::string& fname)
 
     // Delete the extracted file in the case of an error
     if (!file_ok)
+    {
         remove(szLocalFile);
+    }
     return true;
 }
 
@@ -198,8 +210,8 @@ void ParsMapFiles()
     //char id_filename[64];
     for (unsigned int i = 0; i < map_count; ++i)
     {
-        sprintf(fn,"World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
-        WDTFile WDT(fn,map_ids[i].name);
+        sprintf(fn, "World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
+        WDTFile WDT(fn, map_ids[i].name);
         if (WDT.init(map_ids[i].id))
         {
             printf("Processing Map %u\n[", map_ids[i].id);
@@ -264,7 +276,9 @@ bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
 bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
 {
     if (!hasInputPathParam)
+    {
         getGamePath();
+    }
 
     printf("\nGame path: %s\n", input_path);
 
@@ -285,15 +299,19 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
     searchLocales.emplace_back("esMX");
     searchLocales.emplace_back("ruRU");
 
-    for (auto & searchLocale : searchLocales)
+    for (auto& searchLocale : searchLocales)
     {
         std::string localePath = in_path + searchLocale;
         // check if locale exists:
         struct stat status;
         if (stat(localePath.c_str(), &status))
+        {
             continue;
+        }
         if ((status.st_mode & S_IFDIR) == 0)
+        {
             continue;
+        }
         printf("Found locale '%s'\n", searchLocale.c_str());
         locales.push_back(searchLocale);
     }
@@ -301,7 +319,7 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
 
     // open locale expansion and common files
     printf("Adding data files from locale directories.\n");
-    for (auto & locale : locales)
+    for (auto& locale : locales)
     {
         pArchiveNames.push_back(in_path + locale + "/locale-" + locale + ".MPQ");
         pArchiveNames.push_back(in_path + locale + "/expansion-locale-" + locale + ".MPQ");
@@ -323,12 +341,14 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
         return false;
     }
     if (!scan_patches(path, pArchiveNames))
+    {
         return (false);
+    }
 
     // now, scan for the patch levels in locale dirs
     printf("Scanning patch levels from locale directories.\n");
     bool foundOne = false;
-    for (auto & locale : locales)
+    for (auto& locale : locales)
     {
         printf("Locale: %s\n", locale.c_str());
         int ret2 = snprintf(path, 512, "%s%s/patch-%s", input_path, locale.c_str(), locale.c_str());
@@ -338,7 +358,9 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
             return false;
         }
         if (scan_patches(path, pArchiveNames))
+        {
             foundOne = true;
+        }
     }
 
     printf("\n");
@@ -371,7 +393,9 @@ bool processArgv(int argc, char** argv, const char* versionString)
                 hasInputPathParam = true;
                 strcpy(input_path, argv[i + 1]);
                 if (input_path[strlen(input_path) - 1] != '\\' && input_path[strlen(input_path) - 1] != '/')
+                {
                     strcat(input_path, "/");
+                }
                 ++i;
             }
             else
@@ -421,7 +445,9 @@ int main(int argc, char** argv)
 
     // Use command line arguments, when some
     if (!processArgv(argc, argv, versionString))
+    {
         return 1;
+    }
 
     // some simple check if working dir is dirty
     else
@@ -446,16 +472,20 @@ int main(int argc, char** argv)
               , 0711
 #endif
              ))
+    {
         success = (errno == EEXIST);
+    }
 
     // prepare archive name list
     std::vector<std::string> archiveNames;
     fillArchiveNameVector(archiveNames);
-    for (auto & archiveName : archiveNames)
+    for (auto& archiveName : archiveNames)
     {
         MPQArchive* archive = new MPQArchive(archiveName.c_str());
         if (gOpenArchives.empty() || gOpenArchives.front() != archive)
+        {
             delete archive;
+        }
     }
 
     if (gOpenArchives.empty())

@@ -30,7 +30,9 @@ Model::Model( std::string path ) : IsCollidable(false), IsBad(false)
 Model::~Model()
 {
     if (Stream)
+    {
         fclose(Stream);
+    }
 }
 
 void Model::ReadVertices()
@@ -41,7 +43,9 @@ void Model::ReadVertices()
     {
         Vertices.push_back(Vector3::Read(Stream));
         if (Constants::ToWoWCoords)
+        {
             Vertices[i] = Utils::ToWoWCoords(Vertices[i]);
+        }
     }
 }
 
@@ -58,7 +62,9 @@ void Model::ReadBoundingTriangles()
         count += fread(&tri.V1, sizeof(uint16), 1, Stream);
         count += fread(&tri.V2, sizeof(uint16), 1, Stream);
         if (count != 3)
+        {
             printf("Model::ReadBoundingTriangles: Error reading data, expected 3, read %d\n", count);
+        }
         Triangles.push_back(tri);
     }
 }
@@ -68,5 +74,7 @@ void Model::ReadBoundingNormals()
     fseek(Stream, Header.OffsetBoundingNormals, SEEK_SET);
     Normals.reserve(Header.CountBoundingNormals);
     for (uint32 i = 0; i < Header.CountBoundingNormals; i++)
+    {
         Normals.push_back(Vector3::Read(Stream));
+    }
 }

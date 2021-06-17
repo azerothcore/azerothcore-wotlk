@@ -14,7 +14,9 @@
 bool ExtractSingleModel(std::string& fname)
 {
     if (fname.length() < 4)
+    {
         return false;
+    }
 
     std::string extension = fname.substr(fname.length() - 4, 4);
     if (extension == ".mdx" || extension == ".MDX" || extension == ".mdl" || extension == ".MDL")
@@ -37,11 +39,15 @@ bool ExtractSingleModel(std::string& fname)
     output += name;
 
     if (FileExists(output.c_str()))
+    {
         return true;
+    }
 
     Model mdl(originalName);
     if (!mdl.open())
+    {
         return false;
+    }
 
     return mdl.ConvertToVMAPModel(output.c_str());
 }
@@ -70,12 +76,14 @@ void ExtractGameobjectModels()
 
     fwrite(VMAP::RAW_VMAP_MAGIC, 1, 8, model_list);
 
-    for (const auto & it : dbc)
+    for (const auto& it : dbc)
     {
         path = it.getString(1);
 
         if (path.length() < 4)
+        {
             continue;
+        }
 
         fixnamen((char*)path.c_str(), path.size());
         char* name = GetPlainName((char*)path.c_str());
@@ -83,7 +91,9 @@ void ExtractGameobjectModels()
 
         char* ch_ext = GetExtension(name);
         if (!ch_ext)
+        {
             continue;
+        }
 
         strToLower(ch_ext);
 

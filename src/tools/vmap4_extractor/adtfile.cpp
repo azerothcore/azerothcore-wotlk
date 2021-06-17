@@ -18,7 +18,9 @@ char const* GetPlainName(char const* FileName)
     const char* szTemp;
 
     if ((szTemp = strrchr(FileName, '\\')) != nullptr)
+    {
         FileName = szTemp + 1;
+    }
     return FileName;
 }
 
@@ -27,42 +29,58 @@ char* GetPlainName(char* FileName)
     char* szTemp;
 
     if ((szTemp = strrchr(FileName, '\\')) != nullptr)
+    {
         FileName = szTemp + 1;
+    }
     return FileName;
 }
 
 void fixnamen(char* name, size_t len)
 {
     if (len < 3)
+    {
         return;
+    }
 
     for (size_t i = 0; i < len - 3; i++)
     {
         if (i > 0 && name[i] >= 'A' && name[i] <= 'Z' && isalpha(name[i - 1]))
+        {
             name[i] |= 0x20;
+        }
         else if ((i == 0 || !isalpha(name[i - 1])) && name[i] >= 'a' && name[i] <= 'z')
+        {
             name[i] &= ~0x20;
+        }
     }
 
     //extension in lowercase
     for (size_t i = len - 3; i < len; i++)
+    {
         name[i] |= 0x20;
+    }
 }
 
 void fixname2(char* name, size_t len)
 {
     if (len < 3)
+    {
         return;
+    }
 
     for (size_t i = 0; i < len - 3; i++)
         if (name[i] == ' ')
+        {
             name[i] = '_';
+        }
 }
 
 char* GetExtension(char* FileName)
 {
     if (char* szTemp = strrchr(FileName, '.'))
+    {
         return szTemp;
+    }
     return nullptr;
 }
 
@@ -74,7 +92,9 @@ ADTFile::ADTFile(char* filename): _file(filename)
 bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY)
 {
     if (_file.isEof())
+    {
         return false;
+    }
 
     uint32 size;
     std::string dirname = std::string(szWorkDirWmo) + "/dir_bin";

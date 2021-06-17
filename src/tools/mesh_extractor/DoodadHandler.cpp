@@ -15,18 +15,24 @@ DoodadHandler::DoodadHandler( ADT* adt ) :
 {
     Chunk* mddf = adt->ObjectData->GetChunkByName("MDDF");
     if (mddf)
+    {
         ReadDoodadDefinitions(mddf);
+    }
 
     Chunk* mmid = adt->ObjectData->GetChunkByName("MMID");
     Chunk* mmdx = adt->ObjectData->GetChunkByName("MMDX");
     if (mmid && mmdx)
+    {
         ReadDoodadPaths(mmid, mmdx);
+    }
 }
 
 void DoodadHandler::ProcessInternal( MapChunk* mcnk )
 {
     if (!IsSane())
+    {
         return;
+    }
 
     uint32 refCount = mcnk->Header.DoodadRefs;
     FILE* stream = mcnk->Source->GetStream();
@@ -36,15 +42,23 @@ void DoodadHandler::ProcessInternal( MapChunk* mcnk )
         int32 index;
         int32 count;
         if ((count = fread(&index, sizeof(int32), 1, stream)) != 1)
+        {
             printf("DoodadHandler::ProcessInternal: Failed to read some data expected 1, read %d\n", count);
+        }
         if (index < 0 || uint32(index) >= _definitions->size())
+        {
             continue;
+        }
         DoodadDefinition doodad = (*_definitions)[index];
         if (_drawn.find(doodad.UniqueId) != _drawn.end())
+        {
             continue;
+        }
         _drawn.insert(doodad.UniqueId);
         if (doodad.MmidIndex >= _paths->size())
+        {
             continue;
+        }
 
         std::string path = (*_paths)[doodad.MmidIndex];
         Model* model = Cache->ModelCache.Get(path);
@@ -54,7 +68,9 @@ void DoodadHandler::ProcessInternal( MapChunk* mcnk )
             Cache->ModelCache.Insert(path, model);
         }
         if (!model->IsCollidable)
+        {
             continue;
+        }
 
         Vertices.reserve(refCount * model->Vertices.size() * 0.2);
         Triangles.reserve(refCount * model->Triangles.size() * 0.2);
@@ -90,7 +106,9 @@ void DoodadHandler::ReadDoodadPaths( Chunk* id, Chunk* data )
         fseek(idStream, i * 4, SEEK_CUR);
         uint32 offset;
         if (fread(&offset, sizeof(uint32), 1, idStream) != 1)
+        {
             printf("DoodadHandler::ReadDoodadPaths: Failed to read some data expected 1, read 0\n");
+        }
         FILE* dataStream = data->GetStream();
         fseek(dataStream, offset + data->Offset, SEEK_SET);
         _paths->push_back(Utils::ReadString(dataStream));
@@ -102,10 +120,14 @@ void DoodadHandler::InsertModelGeometry(const DoodadDefinition& def, Model* mode
     uint32 vertOffset = Vertices.size();
 
     for (std::vector<Vector3>::iterator itr = model->Vertices.begin(); itr != model->Vertices.end(); ++itr)
-        Vertices.push_back(Utils::TransformDoodadVertex(def, *itr)); // Vertices have to be converted based on the information from the DoodadDefinition struct
+    {
+        Vertices.push_back(Utils::TransformDoodadVertex(def, *itr));    // Vertices have to be converted based on the information from the DoodadDefinition struct
+    }
 
     for (std::vector<Triangle<uint16>>::iterator itr = model->Triangles.begin(); itr != model->Triangles.end(); ++itr)
+    {
         Triangles.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_DOODAD, itr->V0 + vertOffset, itr->V1 + vertOffset, itr->V2 + vertOffset));
+    }
 }
 
 DoodadHandler::~DoodadHandler()

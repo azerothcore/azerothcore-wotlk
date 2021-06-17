@@ -26,7 +26,7 @@ enum ModelFlags
 
 struct WMODoodadData;
 
-extern const char * szWorkDirWmo;
+extern const char* szWorkDirWmo;
 extern std::unordered_map<std::string, WMODoodadData> WmoDoodads;
 
 uint32 GenerateUniqueObjectId(uint32 clientId, uint16 clientDoodadId);

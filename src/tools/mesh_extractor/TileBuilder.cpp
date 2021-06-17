@@ -127,9 +127,13 @@ uint8* TileBuilder::BuildInstance( dtNavMeshParams& navMeshParams )
     for (int i = 0; i < pmesh->npolys; i++)
     {
         if (pmesh->areas[i] == Constants::POLY_AREA_ROAD || pmesh->areas[i] == Constants::POLY_AREA_TERRAIN)
+        {
             pmesh->flags[i] = Constants::POLY_FLAG_WALK;
+        }
         else if (pmesh->areas[i] == Constants::POLY_AREA_WATER)
+        {
             pmesh->flags[i] = Constants::POLY_FLAG_SWIM;
+        }
     }
 
     dtNavMeshCreateParams params;
@@ -215,7 +219,9 @@ uint8* TileBuilder::BuildTiled(dtNavMeshParams& navMeshParams)
     delete adt;
 
     if (_Geometry->Vertices.empty() && _Geometry->Triangles.empty())
+    {
         return nullptr;
+    }
 
     float* bmin = nullptr, *bmax = nullptr;
     CalculateTileBounds(bmin, bmax, navMeshParams);
@@ -228,7 +234,9 @@ uint8* TileBuilder::BuildTiled(dtNavMeshParams& navMeshParams)
         {
             // don't load main tile again
             if (tx == X && ty == Y)
+            {
                 continue;
+            }
 
             ADT* _adt = new ADT(Utils::GetAdtPath(World, tx, ty), tx, ty);
             // If this condition is met, it means that this WDT does not contain the ADT
@@ -291,9 +299,13 @@ uint8* TileBuilder::BuildTiled(dtNavMeshParams& navMeshParams)
     for (int i = 0; i < pmesh->npolys; i++)
     {
         if (pmesh->areas[i] == Constants::POLY_AREA_ROAD || pmesh->areas[i] == Constants::POLY_AREA_TERRAIN)
+        {
             pmesh->flags[i] = Constants::POLY_FLAG_WALK;
+        }
         else if (pmesh->areas[i] == Constants::POLY_AREA_WATER)
+        {
             pmesh->flags[i] = Constants::POLY_FLAG_SWIM;
+        }
     }
 
     dtNavMeshCreateParams params;

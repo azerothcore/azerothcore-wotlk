@@ -75,7 +75,9 @@ void ContinentBuilder::getTileBounds(uint32 tileX, uint32 tileY, float* verts, i
 {
     // this is for elevation
     if (verts && vertCount)
+    {
         rcCalcBounds(verts, vertCount, bmin, bmax);
+    }
     else
     {
         bmin[1] = FLT_MIN;
@@ -168,7 +170,9 @@ void ContinentBuilder::Build()
         fclose(mmap);
 
         for (uint32 i = 0; i < NumberOfThreads; ++i)
+        {
             Threads.push_back(new BuilderThread(this, params));
+        }
         printf("Map %s ( %u ) has %u tiles. Building them with %u threads\n", Continent.c_str(), MapId, uint32(TileMap->TileTable.size()), NumberOfThreads);
         for (std::vector<TilePos>::iterator itr = TileMap->TileTable.begin(); itr != TileMap->TileTable.end(); ++itr)
         {
