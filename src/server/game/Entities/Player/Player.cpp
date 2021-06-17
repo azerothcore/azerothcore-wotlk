@@ -4229,8 +4229,10 @@ void Player::removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporar
     if (GetTalentSpellCost(firstRankSpellId))
     {
         SpellsRequiringSpellMapBounds spellsRequiringSpell = sSpellMgr->GetSpellsRequiringSpellBounds(spellId);
-        for (SpellsRequiringSpellMap::const_iterator itr = spellsRequiringSpell.first; itr != spellsRequiringSpell.second; ++itr)
-            removeSpell(itr->second, removeSpecMask, onlyTemporary);
+        for (auto spellsItr = spellsRequiringSpell.first; spellsItr != spellsRequiringSpell.second; ++spellsItr)
+        {
+            removeSpell(spellsItr->second, removeSpecMask, onlyTemporary);
+        }
     }
 
     // pussywizard: re-search, it can be corrupted in prev loop
@@ -7732,12 +7734,14 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
         // stored zone is zero, use generic and slow zone detection
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION_XYZ);
         stmt->setUInt32(0, guidLow);
-        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+        PreparedQueryResult posResult = CharacterDatabase.Query(stmt);
 
-        if (!result)
+        if (!posResult)
+        {
             return 0;
+        }
 
-        fields = result->Fetch();
+        fields = posResult->Fetch();
         uint32 map = fields[0].GetUInt16();
         float posx = fields[1].GetFloat();
         float posy = fields[2].GetFloat();
@@ -19073,9 +19077,11 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                     }
                     else if (invalidBagMap.find(bagGuid) != invalidBagMap.end())
                     {
-                        std::map<ObjectGuid::LowType, Item*>::iterator itr = invalidBagMap.find(bagGuid);
-                        if (std::find(problematicItems.begin(), problematicItems.end(), itr->second) != problematicItems.end())
+                        std::map<ObjectGuid::LowType, Item*>::iterator iterator = invalidBagMap.find(bagGuid);
+                        if (std::find(problematicItems.begin(), problematicItems.end(), iterator->second) != problematicItems.end())
+                        {
                             err = EQUIP_ERR_INT_BAG_ERROR;
+                        }
                     }
                     else
                     {
@@ -21113,9 +21119,6 @@ void Player::SendAutoRepeatCancel(Unit* target)
     WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, target->GetPackGUID().size());
     data << target->GetPackGUID();                  // may be it's target guid
     SendMessageToSet(&data, true);
-
-    // To properly cancel autoshot done by client
-    SendAttackSwingCancelAttack();
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
@@ -26835,7 +26838,7 @@ void Player::BuildEnchantmentsInfoData(WorldPacket* data)
 
         data->put<uint16>(enchantmentMaskPos, enchantmentMask);
 
-        *data << uint16(item->GetItemRandomPropertyId());                   // item random property id
+        *data << int16(item->GetItemRandomPropertyId());                    // item random property id
         *data << item->GetGuidValue(ITEM_FIELD_CREATOR).WriteAsPacked();    // item creator
         *data << uint32(item->GetItemSuffixFactor());                       // item suffix factor
     }
