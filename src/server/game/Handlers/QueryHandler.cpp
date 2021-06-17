@@ -5,8 +5,6 @@
  */
 
 #include "Common.h"
-#include "DatabaseEnv.h"
-#include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
 #include "NPCHandler.h"
@@ -14,7 +12,6 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
-#include "UpdateMask.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"

@@ -11,7 +11,6 @@
 #include "ObjectMgr.h"
 #include "Util.h"
 #include <functional>
-#include <list>
 #include <stdlib.h>
 #include <vector>
 

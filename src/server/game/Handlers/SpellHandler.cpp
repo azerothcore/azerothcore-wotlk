@@ -4,8 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "CreatureAI.h"
 #include "DBCStores.h"
 #include "GameObjectAI.h"
 #include "Log.h"
@@ -15,7 +13,6 @@
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"

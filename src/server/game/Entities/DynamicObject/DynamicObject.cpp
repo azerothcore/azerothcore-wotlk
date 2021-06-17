@@ -4,9 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "CellImpl.h"
-#include "Common.h"
-#include "DatabaseEnv.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectAccessor.h"

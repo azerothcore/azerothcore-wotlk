@@ -12,8 +12,6 @@
 #include "QuestDef.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Formulas.h"
-#include "Player.h"
 
 GossipMenu::GossipMenu()
 {

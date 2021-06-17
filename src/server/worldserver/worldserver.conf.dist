@@ -68,14 +68,6 @@ RealmID = 1
 DataDir = "."
 
 #
-#    PidFile
-#        Description: World daemon PID file
-#        Example:     "./world.pid" - (Enabled)
-#        Default:     ""            - (Disabled)
-
-PidFile = ""
-
-#
 #    LogsDir
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
@@ -457,6 +449,29 @@ PreloadAllNonInstancedMapGrids = 0
 
 SetAllCreaturesWithWaypointMovementActive = 0
 
+#
+###################################################################################################
+
+###################################################################################################
+# SERVER LOGGING
+#
+#    PidFile
+#        Description: World daemon PID file.
+#        Example:     "./world.pid" - (Enabled)
+#        Default:     ""            - (Disabled)
+
+PidFile = ""
+
+#
+#    PacketLogFile
+#        Description: Binary packet logging file for the world server.
+#                     Filename extension must be .pkt to be parsable with WowPacketParser.
+#        Example:     "World.pkt" - (Enabled)
+#        Default:     ""          - (Disabled)
+
+PacketLogFile = ""
+
+# Extended Logging system configuration moved to end of file (on purpose)
 #
 ###################################################################################################
 

@@ -4,14 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "DatabaseEnv.h"
-#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
-#include "UpdateMask.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 

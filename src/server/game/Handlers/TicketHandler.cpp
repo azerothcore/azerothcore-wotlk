@@ -5,9 +5,7 @@
  */
 
 #include "Chat.h"
-#include "Common.h"
 #include "Language.h"
-#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "TicketMgr.h"

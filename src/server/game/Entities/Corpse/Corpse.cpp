@@ -7,7 +7,6 @@
 #include "Common.h"
 #include "Corpse.h"
 #include "DatabaseEnv.h"
-#include "GossipDef.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
