@@ -304,7 +304,7 @@ public:
             return false;
 
         Player* target = ObjectAccessor::FindPlayerByName(args, false);
-        uint32 targetGuid = 0;
+        ObjectGuid targetGuid;
         std::string name(args);
 
         if (!target)
@@ -317,10 +317,10 @@ public:
             }
         }
         else
-            targetGuid = target->GetGUIDLow();
+            targetGuid = target->GetGUID();
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANINFO);
-        stmt->setUInt32(0, targetGuid);
+        stmt->setUInt32(0, targetGuid.GetCounter());
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
         if (!result)
         {

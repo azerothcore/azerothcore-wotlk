@@ -133,18 +133,18 @@ public:
 
         bool _creditBloodQuickening;
         bool _killMinchar;
-        uint64 _tankGUID;
-        uint64 _offtankGUID;
-        std::set<uint64> _bloodboltedPlayers;
-        std::set<uint64> _vampires;
+        ObjectGuid _tankGUID;
+        ObjectGuid _offtankGUID;
+        GuidSet _bloodboltedPlayers;
+        GuidSet _vampires;
         bool bEnteredCombat; // needed for failing an attempt in JustReachedHome()
 
         void Reset() override
         {
             _creditBloodQuickening = false;
             _killMinchar = false;
-            _tankGUID = 0;
-            _offtankGUID = 0;
+            _tankGUID.Clear();
+            _offtankGUID.Clear();
             _vampires.clear();
             CleanAuras();
             me->SetReactState(REACT_AGGRESSIVE);
@@ -202,7 +202,7 @@ public:
                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                     if (Player* p = itr->GetSource())
-                        p->KilledMonsterCredit(RAID_MODE(NPC_INFILTRATOR_MINCHAR_BQ, NPC_BLOOD_QUICKENING_CREDIT_25), 0);
+                        p->KilledMonsterCredit(RAID_MODE(NPC_INFILTRATOR_MINCHAR_BQ, NPC_BLOOD_QUICKENING_CREDIT_25));
                 if (Creature* minchar = me->FindNearestCreature(NPC_INFILTRATOR_MINCHAR_BQ, 200.0f))
                 {
                     minchar->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
@@ -352,7 +352,7 @@ public:
                                     myList.push_back(p);
                         if (!myList.empty())
                         {
-                            myList.sort(acore::ObjectDistanceOrderPred(me->GetVictim()));
+                            myList.sort(Acore::ObjectDistanceOrderPred(me->GetVictim()));
                             Player* target = myList.front();
                             if (me->GetVictim()->GetGUID() != _tankGUID || target->GetGUID() != _offtankGUID)
                             {
@@ -369,8 +369,8 @@ public:
 
                                 if (target->GetDistance(me->GetVictim()) > 39.0f || me->GetDistance(me->GetVictim()) > 39.0f)
                                 {
-                                    _tankGUID = 0;
-                                    _offtankGUID = 0;
+                                    _tankGUID.Clear();
+                                    _offtankGUID.Clear();
                                     events.ScheduleEvent(EVENT_BLOOD_MIRROR, 2500);
                                     break;
                                 }
@@ -420,7 +420,7 @@ public:
                             if (Player* p = itr->GetSource())
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 100.0f && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
                                     myList.push_back(p);
-                        acore::Containers::RandomResizeList(myList, Is25ManRaid() ? 3 : 2);
+                        Acore::Containers::RandomResize(myList, Is25ManRaid() ? 3 : 2);
                         if (myList.size() > 1)
                         {
                             Talk(SAY_PACT_OF_THE_DARKFALLEN);
@@ -446,7 +446,7 @@ public:
 
                         if (!myList.empty())
                         {
-                            acore::Containers::RandomResizeList(myList, 1);
+                            Acore::Containers::RandomResize(myList, 1);
                             Player* target = myList.front();
                             Talk(EMOTE_SWARMING_SHADOWS, target);
                             Talk(SAY_SWARMING_SHADOWS);
@@ -468,7 +468,7 @@ public:
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && !p->HasAura(SPELL_PACT_OF_THE_DARKFALLEN) && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
                                     myList.push_back(p);
 
-                        acore::Containers::RandomResizeList<Player*>(myList, uint32(Is25ManRaid() ? 4 : 2));
+                        Acore::Containers::RandomResize(myList, uint32(Is25ManRaid() ? 4 : 2));
                         for (std::list<Player*>::iterator itr = myList.begin(); itr != myList.end(); ++itr)
                             me->CastSpell(*itr, SPELL_TWILIGHT_BLOODBOLT, false);
                         me->CastSpell(me, SPELL_TWILIGHT_BLOODBOLT_TARGET, false);
@@ -514,17 +514,17 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(PRESENCE_OF_THE_DARKFALLEN);
         }
 
-        bool WasVampire(uint64 guid)
+        bool WasVampire(ObjectGuid guid)
         {
             return _vampires.count(guid) != 0;
         }
 
-        bool WasBloodbolted(uint64 guid)
+        bool WasBloodbolted(ObjectGuid guid)
         {
             return _bloodboltedPlayers.count(guid) != 0;
         }
 
-        void SetGUID(uint64 guid, int32 type = 0) override
+        void SetGUID(ObjectGuid guid, int32 type = 0) override
         {
             switch (type)
             {
@@ -594,7 +594,7 @@ public:
         {
             if ((aurEff->GetTickNumber() % 2) == 0)
                 return;
-            SpellInfo const* damageSpell = sSpellMgr->GetSpellInfo(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE);
+            SpellInfo const* damageSpell = sSpellMgr->AssertSpellInfo(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE);
             int32 damage = damageSpell->Effects[EFFECT_0].CalcValue();
             float herobonus = ((GetTarget()->FindMap() && GetTarget()->FindMap()->IsHeroic()) ? 0.2f : 0.0f);
             float multiplier = 0.5f + herobonus + 0.1f * uint32(aurEff->GetTickNumber() / 10); // do not convert to 0.01f - we need tick number/10 as INT (damage increases every 10 ticks)
@@ -625,7 +625,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
+            targets.remove_if(Acore::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
 
             bool remove = true;
             std::list<WorldObject*>::const_iterator itr, itr2, itrEnd = targets.end();
@@ -670,7 +670,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            unitList.remove_if(acore::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
+            unitList.remove_if(Acore::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
             unitList.push_back(GetCaster());
         }
 
@@ -723,7 +723,7 @@ public:
         {
             uint32 targetCount = (targets.size() + 2) / 3;
             targets.remove_if(BloodboltHitCheck(static_cast<LanaThelAI*>(GetCaster()->GetAI())));
-            acore::Containers::RandomResizeList(targets, targetCount);
+            Acore::Containers::RandomResize(targets, targetCount);
             // mark targets now, effect hook has missile travel time delay (might cast next in that time)
             for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                 GetCaster()->GetAI()->SetGUID((*itr)->GetGUID(), GUID_BLOODBOLT);
@@ -760,7 +760,7 @@ public:
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetTarget(), instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL)))
+                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
                     bloodQueen->AI()->Talk(EMOTE_BLOODTHIRST, GetTarget());
         }
 
@@ -769,7 +769,7 @@ public:
             Unit* target = GetTarget();
             if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
                 if (InstanceScript* instance = target->GetInstanceScript())
-                    if (Creature* bloodQueen = ObjectAccessor::GetCreature(*target, instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL)))
+                    if (Creature* bloodQueen = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
                         if (bloodQueen->IsAlive() && bloodQueen->IsInCombat())
                         {
                             // this needs to be done BEFORE charm aura or we hit an assert in Unit::SetCharmedBy
@@ -871,7 +871,7 @@ public:
                 return;
 
             uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
-            GetCaster()->RemoveAura(spellId, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            GetCaster()->RemoveAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
             GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, TRIGGERED_FULL_MASK);
 
             if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))
@@ -886,7 +886,7 @@ public:
             }
 
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL)))
+                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
                     bloodQueen->AI()->SetGUID(GetHitUnit()->GetGUID(), GUID_VAMPIRE);
         }
 
@@ -921,7 +921,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
         }
 
         void Register() override
@@ -952,7 +952,7 @@ public:
                 return;
 
             if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL));
+                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL));
         }
 
         void Register() override
@@ -972,7 +972,7 @@ class achievement_once_bitten_twice_shy : public AchievementCriteriaScript
 public:
     achievement_once_bitten_twice_shy(const char* name, uint8 spawnMode, bool wasVampire) : AchievementCriteriaScript(name), _spawnMode(spawnMode), _wasVampire(wasVampire) { }
 
-    bool OnCheck(Player* source, Unit* target) override
+    bool OnCheck(Player* source, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target || !target->FindMap())
             return false;

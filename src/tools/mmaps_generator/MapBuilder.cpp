@@ -5,44 +5,13 @@
  */
 
 #include "MapBuilder.h"
+#include "MapDefines.h"
 #include "MapTree.h"
 #include "ModelInstance.h"
 #include "PathCommon.h"
-
 #include <DetourCommon.h>
 #include <DetourNavMesh.h>
 #include <DetourNavMeshBuilder.h>
-
-#include "DisableMgr.h"
-
-namespace DisableMgr
-{
-    bool IsDisabledFor(DisableType /*type*/, uint32 /*entry*/, Unit const* /*unit*/, uint8 /*flags*/ /*= 0*/) { return false; }
-}
-
-#define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 11
-
-struct MmapTileHeader
-{
-    uint32 mmapMagic{MMAP_MAGIC};
-    uint32 dtVersion;
-    uint32 mmapVersion{MMAP_VERSION};
-    uint32 size{0};
-    char usesLiquids{true};
-    char padding[3]{};
-
-    MmapTileHeader() :  dtVersion(DT_NAVMESH_VERSION) {}
-};
-
-// All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files
-static_assert(sizeof(MmapTileHeader) == 20, "MmapTileHeader size is not correct, adjust the padding field size");
-static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
-              sizeof(MmapTileHeader::dtVersion) +
-              sizeof(MmapTileHeader::mmapVersion) +
-              sizeof(MmapTileHeader::size) +
-              sizeof(MmapTileHeader::usesLiquids) +
-              sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
 
 namespace MMAP
 {

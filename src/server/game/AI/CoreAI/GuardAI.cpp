@@ -5,11 +5,8 @@
  */
 
 #include "CreatureAIImpl.h"
-#include "Errors.h"
 #include "GuardAI.h"
-#include "ObjectAccessor.h"
 #include "Player.h"
-#include "World.h"
 
 int GuardAI::Permissible(Creature const* creature)
 {
@@ -40,7 +37,7 @@ void GuardAI::EnterEvadeMode()
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_UNITS, "Guard entry: %u enters evade mode.", me->GetEntry());
+    LOG_DEBUG("entities.unit", "Guard entry: %u enters evade mode.", me->GetEntry());
 #endif
 
     me->RemoveAllAuras();

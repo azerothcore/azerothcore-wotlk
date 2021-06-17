@@ -9,7 +9,7 @@
 #include "Define.h"
 #include <array>
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     void GetRandomBytes(uint8* buf, size_t len);
 

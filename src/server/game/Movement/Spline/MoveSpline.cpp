@@ -137,7 +137,7 @@ namespace Movement
         // TODO: what to do in such cases? problem is in input data (all points are at same coords)
         if (spline.length() < minimal_duration)
         {
-            //sLog->outError("MoveSpline::init_spline: zero length spline, wrong input data?"); // ZOMG! temp comment to avoid console spam from transports
+            //LOG_ERROR("server", "MoveSpline::init_spline: zero length spline, wrong input data?"); // ZOMG! temp comment to avoid console spam from transports
             spline.set_length(spline.last(), spline.isCyclic() ? 1000 : 1);
         }
         point_Idx = spline.first();
@@ -189,11 +189,14 @@ namespace Movement
     bool MoveSplineInitArgs::Validate(Unit* unit) const
     {
 #define CHECK(exp) \
-    if (!(exp))\
-    {\
-        sLog->outError("MoveSplineInitArgs::Validate: expression '%s' failed for GUID: %u Entry: %u", #exp, unit->GetTypeId() == TYPEID_PLAYER ? unit->GetGUIDLow() : unit->ToCreature()->GetDBTableGUIDLow(), unit->GetEntry());\
-        return false;\
-    }
+        if (!(exp)) \
+        { \
+            if (unit) \
+                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '%s' failed for %s", #exp, unit->GetGUID().ToString().c_str()); \
+            else \
+                LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '%s' failed for cyclic spline continuation", #exp); \
+            return false;\
+        }
         CHECK(path.size() > 1);
         CHECK(velocity > 0.01f);
         CHECK(time_perc >= 0.f && time_perc <= 1.f);
@@ -219,7 +222,7 @@ namespace Movement
                 offset = path[i] - middle;
                 if (fabs(offset.x) >= MAX_OFFSET || fabs(offset.y) >= MAX_OFFSET || fabs(offset.z) >= MAX_OFFSET)
                 {
-                    sLog->outError("MoveSplineInitArgs::_checkPathBounds check failed");
+                    LOG_ERROR("server", "MoveSplineInitArgs::_checkPathBounds check failed");
                     return false;
                 }
             }

@@ -24,14 +24,6 @@ public:
     {
         instance_culling_of_stratholme_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
-            // NPCs
-            _arthasGUID = 0;
-            _infiniteGUID = 0;
-
-            // GOs
-            _shkafGateGUID = 0;
-            _exitGateGUID = 0;
-
             // Instance
             _crateCount = 0;
             _showCrateTimer = 0;
@@ -137,7 +129,7 @@ public:
                         Map::PlayerList const& PlayerList = instance->GetPlayers();
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                i->GetSource()->KilledMonsterCredit(NPC_GRAIN_CREATE_TRIGGER, 0);
+                                i->GetSource()->KilledMonsterCredit(NPC_GRAIN_CREATE_TRIGGER);
 
                         _showCrateTimer++;
                         if (GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_CRATES_FOUND)
@@ -184,7 +176,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -195,7 +187,8 @@ public:
                 case DATA_EXIT_GATE:
                     return _exitGateGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void Update(uint32 diff) override
@@ -398,12 +391,12 @@ public:
 
     private:
         // NPCs
-        uint64 _arthasGUID;
-        uint64 _infiniteGUID;
+        ObjectGuid _arthasGUID;
+        ObjectGuid _infiniteGUID;
 
         // GOs
-        uint64 _shkafGateGUID;
-        uint64 _exitGateGUID;
+        ObjectGuid _shkafGateGUID;
+        ObjectGuid _exitGateGUID;
         uint32 _encounterState;
         uint32 _crateCount;
         uint32 _showCrateTimer;

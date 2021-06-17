@@ -125,7 +125,7 @@ public:
             AddWaypoint(13, 1281.2f, -26.8f, 33.5f, 0);
             AddWaypoint(14, 1262, -26.9f, 33.5f, 0);
 
-            Start(true, false, 0, nullptr, false, true);
+            Start(true, false, ObjectGuid::Empty, nullptr, false, true);
         }
 
         InstanceScript* m_pInstance;
@@ -372,14 +372,14 @@ public:
         npc_stormforged_lieutenantAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 BjarngrimGUID;
+        ObjectGuid BjarngrimGUID;
 
         void Reset() override
         {
             if (me->IsSummon())
                 BjarngrimGUID = me->ToTempSummon()->GetSummonerGUID();
             else
-                BjarngrimGUID = 0;
+                BjarngrimGUID.Clear();
         }
 
         void EnterCombat(Unit*) override

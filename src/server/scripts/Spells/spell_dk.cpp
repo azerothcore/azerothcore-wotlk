@@ -430,8 +430,8 @@ public:
         {
             if (Unit* target = GetExplTargetUnit())
             {
-                std::list<Spell::TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-                for (std::list<Spell::TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+                std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+                for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
                     if (ihit->missCondition == SPELL_MISS_NONE && ihit->targetGUID == target->GetGUID())
                         GetCaster()->CastSpell(target, 55095 /*SPELL_FROST_FEVER*/, true);
             }
@@ -610,8 +610,8 @@ public:
 
         void RecalculateDamage()
         {
-            std::list<Spell::TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-            for (std::list<Spell::TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+            std::list<TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+            for (std::list<TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
                 if (ihit->targetGUID == GetCaster()->GetGUID())
                     ihit->crit = roll_chance_f(GetCaster()->GetFloatValue(PLAYER_CRIT_PERCENTAGE));
         }
@@ -1171,7 +1171,7 @@ public:
 
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
         {
-            SpellInfo const* talentSpell = sSpellMgr->GetSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
+            SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
             amount = talentSpell->Effects[EFFECT_0].CalcValue(GetCaster());
             if (Unit* totem = GetCaster())
                 if (Unit* owner = totem->ToTotem()->GetSummoner())
@@ -1294,7 +1294,7 @@ public:
 class CorpseExplosionCheck
 {
 public:
-    explicit CorpseExplosionCheck(uint64 casterGUID, bool allowGhoul) : _casterGUID(casterGUID), _allowGhoul(allowGhoul) { }
+    explicit CorpseExplosionCheck(ObjectGuid casterGUID, bool allowGhoul) : _casterGUID(casterGUID), _allowGhoul(allowGhoul) { }
 
     bool operator()(WorldObject* obj) const
     {
@@ -1310,7 +1310,7 @@ public:
     }
 
 private:
-    uint64 _casterGUID;
+    ObjectGuid _casterGUID;
     bool _allowGhoul;
 };
 
@@ -1359,7 +1359,7 @@ public:
                     FinishCast(SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
                     return;
                 }
-                target = acore::Containers::SelectRandomContainerElement(targets);
+                target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -2240,7 +2240,7 @@ public:
                 return;
             }
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
             _corpse = true;
@@ -2373,12 +2373,12 @@ public:
     {
         PrepareSpellScript(spell_dk_scourge_strike_SpellScript);
         float multiplier;
-        uint64 guid;
+        ObjectGuid guid;
 
         bool Load() override
         {
             multiplier = 1.0f;
-            guid = 0;
+            guid.Clear();
             return true;
         }
 
@@ -2563,7 +2563,7 @@ public:
         {
             // min pct of hp is stored in effect 0 of talent spell
             uint8 rank = GetSpellInfo()->GetRank();
-            SpellInfo const* talentProto = sSpellMgr->GetSpellInfo(sSpellMgr->GetSpellWithRank(SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1, rank));
+            SpellInfo const* talentProto = sSpellMgr->AssertSpellInfo(sSpellMgr->GetSpellWithRank(SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1, rank));
 
             int32 remainingHp = int32(GetTarget()->GetHealth() - dmgInfo.GetDamage());
             int32 minHp = int32(GetTarget()->CountPctFromMaxHealth(talentProto->Effects[EFFECT_0].CalcValue(GetCaster())));

@@ -4,8 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "GossipDef.h"
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Log.h"
@@ -28,7 +26,7 @@ void WorldSession::HandleGuildQueryOpcode(WorldPacket& recvPacket)
     recvPacket >> guildId;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_QUERY [%s]: Guild: %u", GetPlayerInfo().c_str(), guildId);
+    LOG_DEBUG("guild", "CMSG_GUILD_QUERY [%s]: Guild: %u", GetPlayerInfo().c_str(), guildId);
 #endif
     if (!guildId)
         return;
@@ -42,7 +40,7 @@ void WorldSession::HandleGuildCreateOpcode(WorldPacket& recvPacket)
     std::string name;
     recvPacket >> name;
 
-    sLog->outError("CMSG_GUILD_CREATE: Possible hacking-attempt: %s tried to create a guild [Name: %s] using cheats", GetPlayerInfo().c_str(), name.c_str());
+    LOG_ERROR("server", "CMSG_GUILD_CREATE: Possible hacking-attempt: %s tried to create a guild [Name: %s] using cheats", GetPlayerInfo().c_str(), name.c_str());
 }
 
 void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
@@ -51,7 +49,7 @@ void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
     recvPacket >> invitedName;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_INVITE [%s]: Invited: %s", GetPlayerInfo().c_str(), invitedName.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_INVITE [%s]: Invited: %s", GetPlayerInfo().c_str(), invitedName.c_str());
 #endif
     if (normalizePlayerName(invitedName))
         if (Guild* guild = GetPlayer()->GetGuild())
@@ -64,7 +62,7 @@ void WorldSession::HandleGuildRemoveOpcode(WorldPacket& recvPacket)
     recvPacket >> playerName;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_REMOVE [%s]: Target: %s", GetPlayerInfo().c_str(), playerName.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_REMOVE [%s]: Target: %s", GetPlayerInfo().c_str(), playerName.c_str());
 #endif
 
     if (normalizePlayerName(playerName))
@@ -75,7 +73,7 @@ void WorldSession::HandleGuildRemoveOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGuildAcceptOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_ACCEPT [%s]", GetPlayer()->GetName().c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_ACCEPT [%s]", GetPlayer()->GetName().c_str());
 #endif
 
     if (!GetPlayer()->GetGuildId())
@@ -86,7 +84,7 @@ void WorldSession::HandleGuildAcceptOpcode(WorldPacket& /*recvPacket*/)
 void WorldSession::HandleGuildDeclineOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_DECLINE [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_DECLINE [%s]", GetPlayerInfo().c_str());
 #endif
 
     GetPlayer()->SetGuildIdInvited(0);
@@ -96,7 +94,7 @@ void WorldSession::HandleGuildDeclineOpcode(WorldPacket& /*recvPacket*/)
 void WorldSession::HandleGuildInfoOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_INFO [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_INFO [%s]", GetPlayerInfo().c_str());
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -106,7 +104,7 @@ void WorldSession::HandleGuildInfoOpcode(WorldPacket& /*recvPacket*/)
 void WorldSession::HandleGuildRosterOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_ROSTER [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_ROSTER [%s]", GetPlayerInfo().c_str());
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -121,7 +119,7 @@ void WorldSession::HandleGuildPromoteOpcode(WorldPacket& recvPacket)
     recvPacket >> playerName;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_PROMOTE [%s]: Target: %s", GetPlayerInfo().c_str(), playerName.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_PROMOTE [%s]: Target: %s", GetPlayerInfo().c_str(), playerName.c_str());
 #endif
 
     if (normalizePlayerName(playerName))
@@ -135,7 +133,7 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPacket& recvPacket)
     recvPacket >> playerName;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_DEMOTE [%s]: Target: %s", GetPlayerInfo().c_str(), playerName.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_DEMOTE [%s]: Target: %s", GetPlayerInfo().c_str(), playerName.c_str());
 #endif
 
     if (normalizePlayerName(playerName))
@@ -146,7 +144,7 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGuildLeaveOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_LEAVE [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_LEAVE [%s]", GetPlayerInfo().c_str());
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -156,7 +154,7 @@ void WorldSession::HandleGuildLeaveOpcode(WorldPacket& /*recvPacket*/)
 void WorldSession::HandleGuildDisbandOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_DISBAND [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_DISBAND [%s]", GetPlayerInfo().c_str());
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -169,7 +167,7 @@ void WorldSession::HandleGuildLeaderOpcode(WorldPacket& recvPacket)
     recvPacket >> name;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_LEADER [%s]: Target: %s", GetPlayerInfo().c_str(), name.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_LEADER [%s]: Target: %s", GetPlayerInfo().c_str(), name.c_str());
 #endif
 
     if (normalizePlayerName(name))
@@ -183,7 +181,7 @@ void WorldSession::HandleGuildMOTDOpcode(WorldPacket& recvPacket)
     recvPacket >> motd;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_MOTD [%s]: MOTD: %s", GetPlayerInfo().c_str(), motd.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_MOTD [%s]: MOTD: %s", GetPlayerInfo().c_str(), motd.c_str());
 #endif
 
     // Check for overflow
@@ -204,7 +202,7 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPacket& recvPacket)
     recvPacket >> playerName >> note;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_PUBLIC_NOTE [%s]: Target: %s, Note: %s", GetPlayerInfo().c_str(), playerName.c_str(), note.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_SET_PUBLIC_NOTE [%s]: Target: %s, Note: %s", GetPlayerInfo().c_str(), playerName.c_str(), note.c_str());
 #endif
 
     // Check for overflow
@@ -226,7 +224,7 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket)
     recvPacket >> playerName >> note;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_OFFICER_NOTE [%s]: Target: %s, Note: %s",
+    LOG_DEBUG("guild", "CMSG_GUILD_SET_OFFICER_NOTE [%s]: Target: %s, Note: %s",
                    GetPlayerInfo().c_str(), playerName.c_str(), note.c_str());
 #endif
 
@@ -257,7 +255,7 @@ void WorldSession::HandleGuildRankOpcode(WorldPacket& recvPacket)
     recvPacket >> money;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_RANK [%s]: Rank: %s (%u)", GetPlayerInfo().c_str(), rankName.c_str(), rankId);
+    LOG_DEBUG("guild", "CMSG_GUILD_RANK [%s]: Rank: %s (%u)", GetPlayerInfo().c_str(), rankName.c_str(), rankId);
 #endif
 
     Guild* guild = GetPlayer()->GetGuild();
@@ -296,7 +294,7 @@ void WorldSession::HandleGuildAddRankOpcode(WorldPacket& recvPacket)
     recvPacket >> rankName;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_ADD_RANK [%s]: Rank: %s", GetPlayerInfo().c_str(), rankName.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_ADD_RANK [%s]: Rank: %s", GetPlayerInfo().c_str(), rankName.c_str());
 #endif
 
     // Check for overflow
@@ -313,7 +311,7 @@ void WorldSession::HandleGuildAddRankOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGuildDelRankOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_DEL_RANK [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_DEL_RANK [%s]", GetPlayerInfo().c_str());
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -326,7 +324,7 @@ void WorldSession::HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket)
     recvPacket >> info;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_INFO_TEXT [%s]: %s", GetPlayerInfo().c_str(), info.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_INFO_TEXT [%s]: %s", GetPlayerInfo().c_str(), info.c_str());
 #endif
 
     // Check for overflow
@@ -342,16 +340,15 @@ void WorldSession::HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
 {
-    uint64 vendorGuid;
+    ObjectGuid vendorGuid;
     recvPacket >> vendorGuid;
 
     EmblemInfo emblemInfo;
     emblemInfo.ReadPacket(recvPacket);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "MSG_SAVE_GUILD_EMBLEM [%s]: Guid: [" UI64FMTD
-                   "] Style: %d, Color: %d, BorderStyle: %d, BorderColor: %d, BackgroundColor: %d"
-                   , GetPlayerInfo().c_str(), vendorGuid, emblemInfo.GetStyle()
+    LOG_DEBUG("guild", "MSG_SAVE_GUILD_EMBLEM [%s]: Guid: [%s] Style: %d, Color: %d, BorderStyle: %d, BorderColor: %d, BackgroundColor: %d"
+                   , GetPlayerInfo().c_str(), vendorGuid.ToString().c_str(), emblemInfo.GetStyle()
                    , emblemInfo.GetColor(), emblemInfo.GetBorderStyle()
                    , emblemInfo.GetBorderColor(), emblemInfo.GetBackgroundColor());
 #endif
@@ -373,7 +370,7 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGuildEventLogQueryOpcode(WorldPacket& /* recvPacket */)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "MSG_GUILD_EVENT_LOG_QUERY [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "MSG_GUILD_EVENT_LOG_QUERY [%s]", GetPlayerInfo().c_str());
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -383,7 +380,7 @@ void WorldSession::HandleGuildEventLogQueryOpcode(WorldPacket& /* recvPacket */)
 void WorldSession::HandleGuildBankMoneyWithdrawn(WorldPacket& /* recvData */)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "MSG_GUILD_BANK_MONEY_WITHDRAWN [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "MSG_GUILD_BANK_MONEY_WITHDRAWN [%s]", GetPlayerInfo().c_str());
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -393,7 +390,7 @@ void WorldSession::HandleGuildBankMoneyWithdrawn(WorldPacket& /* recvData */)
 void WorldSession::HandleGuildPermissions(WorldPacket& /* recvData */)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "MSG_GUILD_PERMISSIONS [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "MSG_GUILD_PERMISSIONS [%s]", GetPlayerInfo().c_str());
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -403,13 +400,13 @@ void WorldSession::HandleGuildPermissions(WorldPacket& /* recvData */)
 // Called when clicking on Guild bank gameobject
 void WorldSession::HandleGuildBankerActivate(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     bool sendAllSlots;
     recvData >> guid >> sendAllSlots;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANKER_ACTIVATE [%s]: Go: [" UI64FMTD "] AllSlots: %u"
-                   , GetPlayerInfo().c_str(), guid, sendAllSlots);
+    LOG_DEBUG("guild", "CMSG_GUILD_BANKER_ACTIVATE [%s]: Go: [%s] AllSlots: %u"
+                   , GetPlayerInfo().c_str(), guid.ToString().c_str(), sendAllSlots);
 #endif
     Guild* const guild = GetPlayer()->GetGuild();
     if (!guild)
@@ -424,15 +421,15 @@ void WorldSession::HandleGuildBankerActivate(WorldPacket& recvData)
 // Called when opening guild bank tab only (first one)
 void WorldSession::HandleGuildBankQueryTab(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint8 tabId;
     bool full;
 
     recvData >> guid >> tabId >> full;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_QUERY_TAB [%s]: Go: [" UI64FMTD "], TabId: %u, ShowTabs: %u"
-                   , GetPlayerInfo().c_str(), guid, tabId, full);
+    LOG_DEBUG("guild", "CMSG_GUILD_BANK_QUERY_TAB [%s]: Go: [%s], TabId: %u, ShowTabs: %u"
+                   , GetPlayerInfo().c_str(), guid.ToString().c_str(), tabId, full);
 #endif
     if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (Guild* guild = GetPlayer()->GetGuild())
@@ -441,13 +438,13 @@ void WorldSession::HandleGuildBankQueryTab(WorldPacket& recvData)
 
 void WorldSession::HandleGuildBankDepositMoney(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 money;
     recvData >> guid >> money;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_DEPOSIT_MONEY [%s]: Go: [" UI64FMTD "], money: %u",
-                   GetPlayerInfo().c_str(), guid, money);
+    LOG_DEBUG("guild", "CMSG_GUILD_BANK_DEPOSIT_MONEY [%s]: Go: [%s], money: %u",
+                   GetPlayerInfo().c_str(), guid.ToString().c_str(), money);
 #endif
     if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (money && GetPlayer()->HasEnoughMoney(money))
@@ -457,13 +454,13 @@ void WorldSession::HandleGuildBankDepositMoney(WorldPacket& recvData)
 
 void WorldSession::HandleGuildBankWithdrawMoney(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 money;
     recvData >> guid >> money;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_WITHDRAW_MONEY [%s]: Go: [" UI64FMTD "], money: %u",
-                   GetPlayerInfo().c_str(), guid, money);
+    LOG_DEBUG("guild", "CMSG_GUILD_BANK_WITHDRAW_MONEY [%s]: Go: [%s], money: %u",
+                   GetPlayerInfo().c_str(), guid.ToString().c_str(), money);
 #endif
     if (money && GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (Guild* guild = GetPlayer()->GetGuild())
@@ -473,10 +470,10 @@ void WorldSession::HandleGuildBankWithdrawMoney(WorldPacket& recvData)
 void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_SWAP_ITEMS [%s]", GetPlayerInfo().c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_BANK_SWAP_ITEMS [%s]", GetPlayerInfo().c_str());
 #endif
 
-    uint64 GoGuid;
+    ObjectGuid GoGuid;
     recvData >> GoGuid;
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(GoGuid, GAMEOBJECT_TYPE_GUILD_BANK))
@@ -555,13 +552,13 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvData)
 
 void WorldSession::HandleGuildBankBuyTab(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint8 tabId;
 
     recvData >> guid >> tabId;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_BUY_TAB [%s]: Go: [" UI64FMTD "], TabId: %u", GetPlayerInfo().c_str(), guid, tabId);
+    LOG_DEBUG("guild", "CMSG_GUILD_BANK_BUY_TAB [%s]: Go: [%s], TabId: %u", GetPlayerInfo().c_str(), guid.ToString().c_str(), tabId);
 #endif
 
     if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
@@ -571,15 +568,15 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket& recvData)
 
 void WorldSession::HandleGuildBankUpdateTab(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint8 tabId;
     std::string name, icon;
 
     recvData >> guid >> tabId >> name >> icon;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_UPDATE_TAB [%s]: Go: [" UI64FMTD "], TabId: %u, Name: %s, Icon: %s"
-                   , GetPlayerInfo().c_str(), guid, tabId, name.c_str(), icon.c_str());
+    LOG_DEBUG("guild", "CMSG_GUILD_BANK_UPDATE_TAB [%s]: Go: [%s], TabId: %u, Name: %s, Icon: %s"
+                   , GetPlayerInfo().c_str(), guid.ToString().c_str(), tabId, name.c_str(), icon.c_str());
 #endif
 
     // Check for overflow
@@ -601,7 +598,7 @@ void WorldSession::HandleGuildBankLogQuery(WorldPacket& recvData)
     recvData >> tabId;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "MSG_GUILD_BANK_LOG_QUERY [%s]: TabId: %u", GetPlayerInfo().c_str(), tabId);
+    LOG_DEBUG("guild", "MSG_GUILD_BANK_LOG_QUERY [%s]: TabId: %u", GetPlayerInfo().c_str(), tabId);
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -614,7 +611,7 @@ void WorldSession::HandleQueryGuildBankTabText(WorldPacket& recvData)
     recvData >> tabId;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "MSG_QUERY_GUILD_BANK_TEXT [%s]: TabId: %u", GetPlayerInfo().c_str(), tabId);
+    LOG_DEBUG("guild", "MSG_QUERY_GUILD_BANK_TEXT [%s]: TabId: %u", GetPlayerInfo().c_str(), tabId);
 #endif
 
     if (Guild* guild = GetPlayer()->GetGuild())
@@ -628,7 +625,7 @@ void WorldSession::HandleSetGuildBankTabText(WorldPacket& recvData)
     recvData >> tabId >> text;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_SET_GUILD_BANK_TEXT [%s]: TabId: %u, Text: %s", GetPlayerInfo().c_str(), tabId, text.c_str());
+    LOG_DEBUG("guild", "CMSG_SET_GUILD_BANK_TEXT [%s]: TabId: %u, Text: %s", GetPlayerInfo().c_str(), tabId, text.c_str());
 #endif
 
     // Check for overflow

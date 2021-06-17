@@ -74,7 +74,7 @@ public:
 
         void Initialize()
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
             HasYelled = false;
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -173,7 +173,7 @@ public:
                         case EVENT_SPEECH_7:
                             me->setFaction(103);
                             if (PlayerGUID && ObjectAccessor::GetUnit(*me, PlayerGUID))
-                                AttackStart(ObjectAccessor::GetUnit(*me, PlayerGUID));;
+                                AttackStart(ObjectAccessor::GetUnit(*me, PlayerGUID));
                             break;
                     }
                 }
@@ -260,8 +260,8 @@ public:
         }
 
         private:
-            uint64 PlayerGUID;
-            uint64 m_nefariusGuid;
+            ObjectGuid PlayerGUID;
+            ObjectGuid m_nefariusGuid;
             bool HasYelled;
     };
 

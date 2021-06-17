@@ -1,8 +1,14 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
+
 #ifndef _GAMEGRAVEYARD_H_
 #define _GAMEGRAVEYARD_H_
 
 #include "Common.h"
 #include "SharedDefines.h"
+#include <map>
+#include <unordered_map>
 
 struct GraveyardStruct
 {

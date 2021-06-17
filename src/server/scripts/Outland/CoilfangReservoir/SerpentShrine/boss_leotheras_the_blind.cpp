@@ -273,7 +273,7 @@ public:
         {
         }
 
-        uint64 ownerGUID;
+        ObjectGuid ownerGUID;
         EventMap events;
 
         void EnterEvadeMode() override
@@ -401,7 +401,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
             if (Unit* victim = GetCaster()->GetVictim())
-                unitList.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+                unitList.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
         void Register() override
@@ -428,7 +428,7 @@ public:
         {
             if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT)
                 if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
-                    if (Creature* leotheras = ObjectAccessor::GetCreature(*GetUnitOwner(), instance->GetData64(NPC_LEOTHERAS_THE_BLIND)))
+                    if (Creature* leotheras = ObjectAccessor::GetCreature(*GetUnitOwner(), instance->GetGuidData(NPC_LEOTHERAS_THE_BLIND)))
                         leotheras->CastSpell(GetUnitOwner(), SPELL_CONSUMING_MADNESS, true);
         }
 

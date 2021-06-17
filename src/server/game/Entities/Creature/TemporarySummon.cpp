@@ -7,13 +7,12 @@
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
-#include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
 
-TempSummon::TempSummon(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject) :
+TempSummon::TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) :
     Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
     m_timer(0), m_lifetime(0)
 {
@@ -139,7 +138,7 @@ void TempSummon::Update(uint32 diff)
             }
         default:
             UnSummon();
-            sLog->outError("Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
+            LOG_ERROR("server", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
             break;
     }
 }
@@ -260,15 +259,15 @@ void TempSummon::RemoveFromWorld()
         if (uint32 slot = m_Properties->Slot)
             if (Unit* owner = GetSummoner())
                 if (owner->m_SummonSlot[slot] == GetGUID())
-                    owner->m_SummonSlot[slot] = 0;
+                    owner->m_SummonSlot[slot].Clear();
 
     //if (GetOwnerGUID())
-    //    sLog->outError("Unit %u has owner guid when removed from world", GetEntry());
+    //    LOG_ERROR("server", "Unit %u has owner guid when removed from world", GetEntry());
 
     Creature::RemoveFromWorld();
 }
 
-Minion::Minion(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject) : TempSummon(properties, owner, isWorldObject)
+Minion::Minion(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) : TempSummon(properties, owner, isWorldObject)
     , m_owner(owner)
 {
     ASSERT(m_owner);
@@ -282,11 +281,11 @@ void Minion::InitStats(uint32 duration)
 
     SetReactState(REACT_PASSIVE);
 
-    Unit* m_owner = GetOwner();
-    SetCreatorGUID(m_owner->GetGUID());
-    setFaction(m_owner->getFaction());
+    Unit* owner = GetOwner();
+    SetCreatorGUID(owner->GetGUID());
+    setFaction(owner->getFaction());
 
-    m_owner->SetMinion(this, true);
+    owner->SetMinion(this, true);
 }
 
 void Minion::RemoveFromWorld()
@@ -325,7 +324,7 @@ void Minion::setDeathState(DeathState s, bool despawn)
                     }
 }
 
-Guardian::Guardian(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject) : Minion(properties, owner, isWorldObject)
+Guardian::Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) : Minion(properties, owner, isWorldObject)
 {
     m_unitTypeMask |= UNIT_MASK_GUARDIAN;
     if (properties && properties->Type == SUMMON_TYPE_PET)
@@ -359,9 +358,9 @@ void Guardian::InitSummon()
         m_owner->ToPlayer()->CharmSpellInitialize();
 }
 
-Puppet::Puppet(SummonPropertiesEntry const* properties, uint64 owner) : Minion(properties, owner, false), m_owner(owner) //maybe true?
+Puppet::Puppet(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion(properties, owner, false), m_owner(owner) //maybe true?
 {
-    ASSERT(IS_PLAYER_GUID(owner));
+    ASSERT(owner.IsPlayer());
     m_unitTypeMask |= UNIT_MASK_PUPPET;
 }
 
@@ -378,10 +377,10 @@ void Puppet::InitSummon()
     if (!SetCharmedBy(GetOwner(), CHARM_TYPE_POSSESS))
     {
         if (Player* p = GetOwner())
-            sLog->outMisc("Puppet::InitSummon (A1) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", p->GetTypeId(), p->GetEntry(), p->GetUnitTypeMask(), p->GetGUIDLow(), p->GetMapId(), p->GetInstanceId(), p->FindMap()->GetId(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
+            LOG_INFO("misc", "Puppet::InitSummon (A1) - %s, %u, %u, %u, %u, %u, %u, %u", p->GetGUID().ToString().c_str(), p->GetMapId(), p->GetInstanceId(), p->FindMap()->GetId(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
         else
         {
-            sLog->outMisc("Puppet::InitSummon (B1)");
+            LOG_INFO("misc", "Puppet::InitSummon (B1)");
             //ABORT(); // ZOMG!
         }
     }

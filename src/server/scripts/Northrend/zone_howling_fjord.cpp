@@ -274,8 +274,7 @@ public:
 
         void Reset() override
         {
-            uint64 summonerGUID = 0;
-
+            ObjectGuid summonerGUID;
             if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (summoner->GetTypeId() == TYPEID_PLAYER)

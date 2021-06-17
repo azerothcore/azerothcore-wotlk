@@ -4,8 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "UpdateData.h"
@@ -14,7 +12,7 @@
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {
-    uint64 guid;
+    ObjectGuid guid;
     Player* player;
     Player* plTarget;
 
@@ -29,10 +27,9 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     if (player == player->duel->initiator || !plTarget || player == plTarget || player->duel->startTime != 0 || plTarget->duel->startTime != 0)
         return;
 
-    //sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: Received CMSG_DUEL_ACCEPTED");
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("Player 1 is: %u (%s)", player->GetGUIDLow(), player->GetName().c_str());
-    sLog->outStaticDebug("Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName().c_str());
+    LOG_DEBUG("server", "Player 1 is: %s (%s)", player->GetGUID().ToString().c_str(), player->GetName().c_str());
+    LOG_DEBUG("server", "Player 2 is: %s (%s)", plTarget->GetGUID().ToString().c_str(), plTarget->GetName().c_str());
 #endif
 
     time_t now = time(nullptr);
@@ -46,9 +43,9 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_DUEL_CANCELLED");
+    LOG_DEBUG("network", "WORLD: Received CMSG_DUEL_CANCELLED");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     recvPacket >> guid;
 
     // no duel requested

@@ -104,6 +104,7 @@ public:
                 pInstance->SetData(EVENT_TORAVON, DONE);
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WHITEOUT);
             }
+            summons.DespawnAll();
         }
 
         void JustSummoned(Creature* cr) override
@@ -215,7 +216,7 @@ public:
         void JustSummoned(Creature* cr) override
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (Creature* toravon = ObjectAccessor::GetCreature(*me, pInstance->GetData64(EVENT_TORAVON)))
+                if (Creature* toravon = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(EVENT_TORAVON)))
                     if (toravon->AI())
                         toravon->AI()->JustSummoned(cr);
         }
