@@ -5,10 +5,7 @@
  */
 
 #include "AvgDiffTracker.h"
-#include "CellImpl.h"
 #include "Chat.h"
-#include "Config.h"
-#include "Corpse.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "Group.h"
@@ -27,7 +24,6 @@
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -319,9 +315,13 @@ bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 
     if (startUp)
-        return !!mEntry;
+    {
+        return mEntry != nullptr;
+    }
     else
+    {
         return mEntry && (!mEntry->IsDungeon() || sObjectMgr->GetInstanceTemplate(mapid));
+    }
 
     // TODO: add check for battleground template
 }

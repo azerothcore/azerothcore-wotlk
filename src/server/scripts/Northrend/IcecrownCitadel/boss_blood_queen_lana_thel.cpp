@@ -972,7 +972,7 @@ class achievement_once_bitten_twice_shy : public AchievementCriteriaScript
 public:
     achievement_once_bitten_twice_shy(const char* name, uint8 spawnMode, bool wasVampire) : AchievementCriteriaScript(name), _spawnMode(spawnMode), _wasVampire(wasVampire) { }
 
-    bool OnCheck(Player* source, Unit* target) override
+    bool OnCheck(Player* source, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target || !target->FindMap())
             return false;
