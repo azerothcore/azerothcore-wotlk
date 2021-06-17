@@ -23,7 +23,9 @@ bool DBCFileLoader::Load(char const* filename, char const* fmt)
 
     FILE* f = fopen(filename, "rb");
     if (!f)
+    {
         return false;
+    }
 
     if (fread(&header, 4, 1, f) != 1)                        // Number of records
     {
@@ -78,9 +80,13 @@ bool DBCFileLoader::Load(char const* filename, char const* fmt)
     {
         fieldsOffset[i] = fieldsOffset[i - 1];
         if (fmt[i - 1] == 'b' || fmt[i - 1] == 'X')         // byte fields
+        {
             fieldsOffset[i] += sizeof(uint8);
+        }
         else                                                // 4 byte fields (int32/float/strings)
+        {
             fieldsOffset[i] += sizeof(uint32);
+        }
     }
 
     data = new unsigned char[recordSize * recordCount + stringSize];
@@ -151,7 +157,9 @@ uint32 DBCFileLoader::GetFormatRecordSize(char const* format, int32* index_pos)
     }
 
     if (index_pos)
+    {
         *index_pos = i;
+    }
 
     return recordsize;
 }
@@ -171,7 +179,9 @@ char* DBCFileLoader::AutoProduceData(char const* format, uint32& records, char**
 
     typedef char* ptr;
     if (strlen(format) != fieldCount)
+    {
         return nullptr;
+    }
 
     //get struct size and index pos
     int32 i;
@@ -185,7 +195,9 @@ char* DBCFileLoader::AutoProduceData(char const* format, uint32& records, char**
         {
             uint32 ind = getRecord(y).getUInt(i);
             if (ind > maxi)
+            {
                 maxi = ind;
+            }
         }
 
         ++maxi;
@@ -206,9 +218,13 @@ char* DBCFileLoader::AutoProduceData(char const* format, uint32& records, char**
     for (uint32 y = 0; y < recordCount; ++y)
     {
         if (i >= 0)
+        {
             indexTable[getRecord(y).getUInt(i)] = &dataTable[offset];
+        }
         else
+        {
             indexTable[y] = &dataTable[offset];
+        }
 
         for (uint32 x = 0; x < fieldCount; ++x)
         {
@@ -251,7 +267,9 @@ char* DBCFileLoader::AutoProduceData(char const* format, uint32& records, char**
 char* DBCFileLoader::AutoProduceStrings(char const* format, char* dataTable)
 {
     if (strlen(format) != fieldCount)
+    {
         return nullptr;
+    }
 
     char* stringPool = new char[stringSize];
     memcpy(stringPool, stringTable, stringSize);

@@ -27,7 +27,9 @@ void BigNumber::SetDword(int32 val)
 {
     SetDword(uint32(abs(val)));
     if (val < 0)
+    {
         BN_set_negative(_bn, 1);
+    }
 }
 
 void BigNumber::SetDword(uint32 val)
@@ -50,7 +52,9 @@ void BigNumber::SetBinary(uint8 const* bytes, int32 len, bool littleEndian)
         uint8* array = new uint8[len];
 
         for (int i = 0; i < len; i++)
+        {
             array[i] = bytes[len - 1 - i];
+        }
 
         BN_bin2bn(array, len, _bn);
 
@@ -60,7 +64,9 @@ void BigNumber::SetBinary(uint8 const* bytes, int32 len, bool littleEndian)
 #endif
     }
     else
+    {
         BN_bin2bn(bytes, len, _bn);
+    }
 }
 
 bool BigNumber::SetHexStr(char const* str)
@@ -77,7 +83,9 @@ void BigNumber::SetRand(int32 numbits)
 BigNumber& BigNumber::operator=(BigNumber const& bn)
 {
     if (this == &bn)
+    {
         return *this;
+    }
 
     BN_copy(_bn, bn._bn);
     return *this;
@@ -195,13 +203,17 @@ void BigNumber::GetBytes(uint8* buf, size_t bufsize, bool littleEndian) const
 
     // If we need more bytes than length of BigNumber set the rest to 0
     if (numBytes < bufsize)
+    {
         memset((void*)buf, 0, bufsize);
+    }
 
     BN_bn2bin(_bn, buf + (bufsize - numBytes));
 
     // openssl's BN stores data internally in big endian format, reverse if little endian desired
     if (littleEndian)
+    {
         std::reverse(buf, buf + bufsize);
+    }
 #else
     int res = littleEndian ? BN_bn2lebinpad(_bn, buf, bufsize) : BN_bn2binpad(_bn, buf, bufsize);
     ASSERT(res > 0, "Buffer of size %zu is too small to hold bignum with %d bytes.\n", bufsize, BN_num_bytes(_bn));

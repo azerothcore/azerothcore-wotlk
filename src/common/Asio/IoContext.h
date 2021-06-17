@@ -27,8 +27,8 @@ namespace Acore::Asio
         IoContext() : _impl() { }
         explicit IoContext(int concurrency_hint) : _impl(concurrency_hint) { }
 
-        operator IoContextBaseNamespace::IoContextBase&() { return _impl; }
-        operator IoContextBaseNamespace::IoContextBase const&() const { return _impl; }
+        operator IoContextBaseNamespace::IoContextBase& () { return _impl; }
+        operator IoContextBaseNamespace::IoContextBase const& () const { return _impl; }
 
         std::size_t run() { return _impl.run(); }
         void stop() { _impl.stop(); }

@@ -20,7 +20,9 @@ namespace MMAP
     MMapManager::~MMapManager()
     {
         for (MMapDataSet::iterator i = loadedMMaps.begin(); i != loadedMMaps.end(); ++i)
+        {
             delete i->second;
+        }
 
         // by now we should not have maps loaded
         // if we had, tiles in MMapData->mmapLoadedTiles, their actual data is lost!
@@ -30,7 +32,9 @@ namespace MMAP
     {
         // the caller must pass the list of all mapIds that will be used in the VMapManager2 lifetime
         for (const uint32& mapId : mapIds)
+        {
             loadedMMaps.emplace(mapId, nullptr);
+        }
 
         thread_safe_environment = false;
     }
@@ -40,7 +44,9 @@ namespace MMAP
         // return the iterator if found or end() if not found/NULL
         MMapDataSet::const_iterator itr = loadedMMaps.find(mapId);
         if (itr != loadedMMaps.cend() && !itr->second)
+        {
             itr = loadedMMaps.cend();
+        }
 
         return itr;
     }
@@ -52,14 +58,20 @@ namespace MMAP
         if (itr != loadedMMaps.end())
         {
             if (itr->second)
+            {
                 return true;
+            }
         }
         else
         {
             if (thread_safe_environment)
+            {
                 itr = loadedMMaps.insert(MMapDataSet::value_type(mapId, nullptr)).first;
+            }
             else
+            {
                 ASSERT(false, "Invalid mapId %u passed to MMapManager after startup in thread unsafe environment", mapId);
+            }
         }
 
         // load and init dtNavMesh - read parameters from file
@@ -107,7 +119,9 @@ namespace MMAP
     {
         // make sure the mmap is loaded and ready to load tiles
         if (!loadMapData(mapId))
+        {
             return false;
+        }
 
         // get this mmap data
         MMapData* mmap = loadedMMaps[mapId];
@@ -142,7 +156,7 @@ namespace MMAP
         if (fileHeader.mmapVersion != MMAP_VERSION)
         {
             LOG_ERROR("server", "MMAP:loadMap: %03u%02i%02i.mmtile was built with generator v%i, expected v%i",
-                           mapId, x, y, fileHeader.mmapVersion, MMAP_VERSION);
+                      mapId, x, y, fileHeader.mmapVersion, MMAP_VERSION);
             fclose(file);
             return false;
         }
@@ -247,7 +261,9 @@ namespace MMAP
             uint32 y = (i.first & 0x0000FFFF);
 
             if (dtStatusFailed(mmap->navMesh->removeTile(i.second, nullptr, nullptr)))
+            {
                 LOG_ERROR("server", "MMAP:unloadMap: Could not unload %03u%02i%02i.mmtile from navmesh", mapId, x, y);
+            }
             else
             {
                 --loadedTiles;
@@ -293,7 +309,9 @@ namespace MMAP
     {
         MMapDataSet::const_iterator itr = GetMMapData(mapId);
         if (itr == loadedMMaps.end())
+        {
             return nullptr;
+        }
 
         return itr->second->navMesh;
     }
@@ -302,7 +320,9 @@ namespace MMAP
     {
         MMapDataSet::const_iterator itr = GetMMapData(mapId);
         if (itr == loadedMMaps.end())
+        {
             return nullptr;
+        }
 
         MMapData* mmap = itr->second;
         if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())

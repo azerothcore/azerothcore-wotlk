@@ -57,7 +57,9 @@ namespace VMAP
     {
         // the caller must pass the list of all mapIds that will be used in the VMapManager2 lifetime
         for (const uint32& mapId : mapIds)
+        {
             iInstanceMapTrees.emplace(mapId, nullptr);
+        }
 
         thread_safe_environment = false;
     }
@@ -78,7 +80,9 @@ namespace VMAP
         // return the iterator if found or end() if not found/NULL
         InstanceTreeMap::const_iterator itr = iInstanceMapTrees.find(mapId);
         if (itr != iInstanceMapTrees.cend() && !itr->second)
+        {
             itr = iInstanceMapTrees.cend();
+        }
 
         return itr;
     }
@@ -99,9 +103,13 @@ namespace VMAP
         if (isMapLoadingEnabled())
         {
             if (_loadMap(mapId, basePath, x, y))
+            {
                 result = VMAP_LOAD_RESULT_OK;
+            }
             else
+            {
                 result = VMAP_LOAD_RESULT_ERROR;
+            }
         }
 
         return result;
@@ -114,10 +122,12 @@ namespace VMAP
         if (instanceTree == iInstanceMapTrees.end())
         {
             if (thread_safe_environment)
+            {
                 instanceTree = iInstanceMapTrees.insert(InstanceTreeMap::value_type(mapId, nullptr)).first;
+            }
             else
                 ASSERT(false, "Invalid mapId %u tile [%u, %u] passed to VMapManager2 after startup in thread unsafe environment",
-                    mapId, tileX, tileY);
+                       mapId, tileX, tileY);
         }
 
         if (!instanceTree->second)
@@ -167,7 +177,9 @@ namespace VMAP
     {
 #if defined(ENABLE_VMAP_CHECKS)
         if (!isLineOfSightCalcEnabled() || IsVMAPDisabledForPtr(mapId, VMAP_DISABLE_LOS))
+        {
             return true;
+        }
 #endif
 
         InstanceTreeMap::const_iterator instanceTree = GetMapTree(mapId);
@@ -232,7 +244,9 @@ namespace VMAP
                 Vector3 pos = convertPositionToInternalRep(x, y, z);
                 float height = instanceTree->second->getHeight(pos, maxSearchDist);
                 if (!(height < G3D::finf()))
-                    return height = VMAP_INVALID_HEIGHT_VALUE; // No height
+                {
+                    return height = VMAP_INVALID_HEIGHT_VALUE;    // No height
+                }
 
                 return height;
             }
@@ -278,9 +292,13 @@ namespace VMAP
                     ASSERT(floor < std::numeric_limits<float>::max());
                     type = info.hitModel->GetLiquidType();  // entry from LiquidType.dbc
                     if (reqLiquidType && !(GetLiquidFlagsPtr(type) & reqLiquidType))
+                    {
                         return false;
+                    }
                     if (info.hitInstance->GetLiquidLevel(pos, info, level))
+                    {
                         return true;
+                    }
                 }
             }
         }

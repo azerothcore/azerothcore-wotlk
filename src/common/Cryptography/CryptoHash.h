@@ -34,67 +34,69 @@ namespace Acore::Impl
     template <GenericHashImpl::HashCreator HashCreator, size_t DigestLength>
     class GenericHash
     {
-        public:
-            static constexpr size_t DIGEST_LENGTH = DigestLength;
-            using Digest = std::array<uint8, DIGEST_LENGTH>;
+    public:
+        static constexpr size_t DIGEST_LENGTH = DigestLength;
+        using Digest = std::array<uint8, DIGEST_LENGTH>;
 
-            static Digest GetDigestOf(uint8 const* data, size_t len)
+        static Digest GetDigestOf(uint8 const* data, size_t len)
+        {
+            GenericHash hash;
+            hash.UpdateData(data, len);
+            hash.Finalize();
+            return hash.GetDigest();
+        }
+
+        template <typename... Ts>
+        static auto GetDigestOf(Ts&& ... pack) -> std::enable_if_t < !(std::is_integral_v<std::decay_t<Ts>> || ...), Digest >
+        {
+            GenericHash hash;
+            (hash.UpdateData(std::forward<Ts>(pack)), ...);
+            hash.Finalize();
+            return hash.GetDigest();
+        }
+
+        GenericHash() : _ctx(GenericHashImpl::MakeCTX())
+        {
+            int result = EVP_DigestInit_ex(_ctx, HashCreator(), nullptr);
+            ASSERT(result == 1);
+        }
+
+        ~GenericHash()
+        {
+            if (!_ctx)
             {
-                GenericHash hash;
-                hash.UpdateData(data, len);
-                hash.Finalize();
-                return hash.GetDigest();
+                return;
             }
+            GenericHashImpl::DestroyCTX(_ctx);
+            _ctx = nullptr;
+        }
 
-            template <typename... Ts>
-            static auto GetDigestOf(Ts&&... pack) -> std::enable_if_t<!(std::is_integral_v<std::decay_t<Ts>> || ...), Digest>
-            {
-                GenericHash hash;
-                (hash.UpdateData(std::forward<Ts>(pack)), ...);
-                hash.Finalize();
-                return hash.GetDigest();
-            }
+        void UpdateData(uint8 const* data, size_t len)
+        {
+            int result = EVP_DigestUpdate(_ctx, data, len);
+            ASSERT(result == 1);
+        }
+        void UpdateData(std::string_view str) { UpdateData(reinterpret_cast<uint8 const*>(str.data()), str.size()); }
+        void UpdateData(std::string const& str) { UpdateData(std::string_view(str)); } /* explicit overload to avoid using the container template */
+        void UpdateData(char const* str) { UpdateData(std::string_view(str)); } /* explicit overload to avoid using the container template */
+        template <typename Container>
+        void UpdateData(Container const& c) { UpdateData(std::data(c), std::size(c)); }
 
-            GenericHash() : _ctx(GenericHashImpl::MakeCTX())
-            {
-                int result = EVP_DigestInit_ex(_ctx, HashCreator(), nullptr);
-                ASSERT(result == 1);
-            }
+        void Finalize()
+        {
+            uint32 length;
+            int result = EVP_DigestFinal_ex(_ctx, _digest.data(), &length);
+            ASSERT(result == 1);
+            ASSERT(length == DIGEST_LENGTH);
+            GenericHashImpl::DestroyCTX(_ctx);
+            _ctx = nullptr;
+        }
 
-            ~GenericHash()
-            {
-                if (!_ctx)
-                    return;
-                GenericHashImpl::DestroyCTX(_ctx);
-                _ctx = nullptr;
-            }
+        Digest const& GetDigest() const { return _digest; }
 
-            void UpdateData(uint8 const* data, size_t len)
-            {
-                int result = EVP_DigestUpdate(_ctx, data, len);
-                ASSERT(result == 1);
-            }
-            void UpdateData(std::string_view str) { UpdateData(reinterpret_cast<uint8 const*>(str.data()), str.size()); }
-            void UpdateData(std::string const& str) { UpdateData(std::string_view(str)); } /* explicit overload to avoid using the container template */
-            void UpdateData(char const* str) { UpdateData(std::string_view(str)); } /* explicit overload to avoid using the container template */
-            template <typename Container>
-            void UpdateData(Container const& c) { UpdateData(std::data(c), std::size(c)); }
-
-            void Finalize()
-            {
-                uint32 length;
-                int result = EVP_DigestFinal_ex(_ctx, _digest.data(), &length);
-                ASSERT(result == 1);
-                ASSERT(length == DIGEST_LENGTH);
-                GenericHashImpl::DestroyCTX(_ctx);
-                _ctx = nullptr;
-            }
-
-            Digest const& GetDigest() const { return _digest; }
-
-        private:
-            EVP_MD_CTX* _ctx;
-            Digest _digest = { };
+    private:
+        EVP_MD_CTX* _ctx;
+        Digest _digest = { };
     };
 }
 
