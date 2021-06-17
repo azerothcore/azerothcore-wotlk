@@ -849,7 +849,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spe
                     }
                     else if (haspositiveeffect)
                     {
-                        bool tempspellIsPositive = true;
+                        bool tmpSpellIsPositive = true;
                         pet->ClearUnitState(UNIT_STATE_FOLLOW);
                         // This is true if pet has no target or has target but targets differs.
                         Unit* victim = pet->GetVictim();
@@ -880,7 +880,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spe
                                 pet->SendPetAIReaction(guid1);
                             }
 
-                            pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, victim, tempspellIsPositive);
+                            pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, victim, tmpSpellIsPositive);
                         }
                     }
                 }
@@ -1103,21 +1103,37 @@ void WorldSession::HandlePetSetAction(WorldPacket& recvData)
                     if (act_state == ACT_ENABLED)
                     {
                         if (pet->GetTypeId() == TYPEID_UNIT && pet->IsPet())
+                        {
                             ((Pet*)pet)->ToggleAutocast(spellInfo, true);
+                        }
                         else
-                            for (Unit::ControlSet::iterator itr = GetPlayer()->m_Controlled.begin(); itr != GetPlayer()->m_Controlled.end(); ++itr)
-                                if ((*itr)->GetEntry() == pet->GetEntry())
-                                    (*itr)->GetCharmInfo()->ToggleCreatureAutocast(spellInfo, true);
+                        {
+                            for (auto iterator = GetPlayer()->m_Controlled.begin(); iterator != GetPlayer()->m_Controlled.end(); ++iterator)
+                            {
+                                if ((*iterator)->GetEntry() == pet->GetEntry())
+                                {
+                                    (*iterator)->GetCharmInfo()->ToggleCreatureAutocast(spellInfo, true);
+                                }
+                            }
+                        }
                     }
                     //sign for no/turn off autocast
                     else if (act_state == ACT_DISABLED)
                     {
                         if (pet->GetTypeId() == TYPEID_UNIT && pet->IsPet())
+                        {
                             ((Pet*)pet)->ToggleAutocast(spellInfo, false);
+                        }
                         else
-                            for (Unit::ControlSet::iterator itr = GetPlayer()->m_Controlled.begin(); itr != GetPlayer()->m_Controlled.end(); ++itr)
-                                if ((*itr)->GetEntry() == pet->GetEntry())
-                                    (*itr)->GetCharmInfo()->ToggleCreatureAutocast(spellInfo, false);
+                        {
+                            for (auto iterator = GetPlayer()->m_Controlled.begin(); iterator != GetPlayer()->m_Controlled.end(); ++iterator)
+                            {
+                                if ((*iterator)->GetEntry() == pet->GetEntry())
+                                {
+                                    (*iterator)->GetCharmInfo()->ToggleCreatureAutocast(spellInfo, false);
+                                }
+                            }
+                        }
                     }
                 }
 

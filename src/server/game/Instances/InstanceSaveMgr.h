@@ -11,6 +11,7 @@
 #include "DBCEnums.h"
 #include "Define.h"
 #include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include <list>
 #include <map>
 #include <mutex>
