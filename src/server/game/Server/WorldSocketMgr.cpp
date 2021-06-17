@@ -17,6 +17,7 @@
 #include "WorldSocketAcceptor.h"
 #include "WorldSocketMgr.h"
 #include <ace/ACE.h>
+#include <ace/Dev_Poll_Reactor.h>
 #include <ace/Log_Msg.h>
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
