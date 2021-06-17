@@ -1199,7 +1199,9 @@ public:
 
     [[nodiscard]] virtual bool CanSendMessageBGQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
 
-    [[nodiscard]] virtual bool CanSendMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/, bool /*IsJoin*/) { return true; }
+    [[nodiscard]] bool CanSendJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, GroupQueueInfo* /*ginfo*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isRated*/) { return true; }
+
+    [[nodiscard]] bool CanExitJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/) { return true; }
 };
 
 class ArenaTeamScript : public ScriptObject
@@ -1791,7 +1793,8 @@ public: /* BGScript */
                                         BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
     void OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers);
     bool CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
-    bool CanSendMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo, bool IsJoin);
+    bool CanSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
+    bool CanExitJoinMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);
