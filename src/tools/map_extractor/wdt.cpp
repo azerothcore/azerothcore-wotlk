@@ -15,21 +15,27 @@ u_map_fcc MAINMagic = { {'N', 'I', 'A', 'M'} };
 bool wdt_MWMO::prepareLoadedData()
 {
     if (fcc != MWMOMagic.fcc)
+    {
         return false;
+    }
     return true;
 }
 
 bool wdt_MPHD::prepareLoadedData()
 {
     if (fcc != MPHDMagic.fcc)
+    {
         return false;
+    }
     return true;
 }
 
 bool wdt_MAIN::prepareLoadedData()
 {
     if (fcc != MAINMagic.fcc)
+    {
         return false;
+    }
     return true;
 }
 
@@ -57,14 +63,20 @@ bool WDT_file::prepareLoadedData()
 {
     // Check parent
     if (!FileLoader::prepareLoadedData())
+    {
         return false;
+    }
 
     mphd = (wdt_MPHD*)((uint8*)version + version->size + 8);
     if (!mphd->prepareLoadedData())
+    {
         return false;
+    }
     main = (wdt_MAIN*)((uint8*)mphd + mphd->size + 8);
     if (!main->prepareLoadedData())
+    {
         return false;
+    }
     wmo = (wdt_MWMO*)((uint8*)main + main->size + 8);
     // if (!wmo->prepareLoadedData())
     //     return false;

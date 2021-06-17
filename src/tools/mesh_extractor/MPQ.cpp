@@ -54,7 +54,9 @@ MPQFile::MPQFile(const char* filename):
 
         uint32_t filenum;
         if (libmpq__file_number(mpq_a, filename, &filenum))
+        {
             continue;
+        }
         libmpq__off_t transferred;
         libmpq__file_unpacked_size(mpq_a, filenum, &size);
 
@@ -80,7 +82,9 @@ MPQFile::MPQFile(const char* filename):
 size_t MPQFile::Read(void* dest, size_t bytes)
 {
     if (eof)
+    {
         return 0;
+    }
 
     size_t rpos = pointer + bytes;
     if (rpos > size_t(size))

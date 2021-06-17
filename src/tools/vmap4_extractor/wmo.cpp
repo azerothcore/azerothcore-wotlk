@@ -20,7 +20,7 @@
 
 WMORoot::WMORoot(std::string const& filename)
     : filename(filename), color(0), nTextures(0), nGroups(0), nPortals(0), nLights(0),
-    nDoodadNames(0), nDoodadDefs(0), nDoodadSets(0), RootWMOID(0), liquidType(0)
+      nDoodadNames(0), nDoodadDefs(0), nDoodadSets(0), RootWMOID(0), liquidType(0)
 {
     memset(bbcorn1, 0, sizeof(bbcorn1));
     memset(bbcorn2, 0, sizeof(bbcorn2));
@@ -68,7 +68,7 @@ bool WMORoot::open()
             DoodadData.Sets.resize(size / sizeof(WMO::MODS));
             f.read(DoodadData.Sets.data(), size);
         }
-        else if (!strcmp(fourcc,"MODN"))
+        else if (!strcmp(fourcc, "MODN"))
         {
             char* ptr = f.getPointer();
             char* end = ptr + size;
@@ -86,10 +86,12 @@ bool WMORoot::open()
                 ptr += path.length() + 1;
 
                 if (ExtractSingleModel(path))
+                {
                     ValidDoodadNames.insert(doodadNameIndex);
+                }
             }
         }
-        else if (!strcmp(fourcc,"MODD"))
+        else if (!strcmp(fourcc, "MODD"))
         {
             DoodadData.Spawns.resize(size / sizeof(WMO::MODD));
             f.read(DoodadData.Spawns.data(), size);
@@ -225,12 +227,12 @@ bool WMOGroup::open()
             moba_size = size / 2;
             f.read(MOBA, size);
         }
-        else if (!strcmp(fourcc,"MODR"))
+        else if (!strcmp(fourcc, "MODR"))
         {
             DoodadReferences.resize(size / sizeof(uint16));
             f.read(DoodadReferences.data(), size);
         }
-        else if (!strcmp(fourcc,"MLIQ"))
+        else if (!strcmp(fourcc, "MLIQ"))
         {
             liquflags |= 1;
             hlq = new WMOLiquidHeader();
@@ -365,7 +367,9 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool precise
             bool isRenderFace = (MOPY[2 * i] & WMO_MATERIAL_RENDER) && !(MOPY[2 * i] & WMO_MATERIAL_DETAIL);
             bool isCollision = MOPY[2 * i] & WMO_MATERIAL_COLLISION || isRenderFace;
             if (!isCollision)
+            {
                 continue;
+            }
             // Use this triangle
             for (int j = 0; j < 3; ++j)
             {
@@ -404,7 +408,9 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool precise
         fwrite(VERT, 4, 3, output);
         for (uint32 i = 0; i < nVertices; ++i)
             if (IndexRenum[i] >= 0)
+            {
                 check -= fwrite(MOVT + 3 * i, sizeof(float), 3, output);
+            }
 
         assert(check == 0);
 
@@ -415,17 +421,23 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool precise
     //------LIQU------------------------
     if (LiquEx_size != 0)
     {
-        int LIQU_h[] = { 0x5551494C, static_cast<int>(sizeof(WMOLiquidHeader) + LiquEx_size) + hlq->xtiles * hlq->ytiles }; // "LIQU"
+        int LIQU_h[] = { 0x5551494C, static_cast<int>(sizeof(WMOLiquidHeader) + LiquEx_size) + hlq->xtiles* hlq->ytiles };  // "LIQU"
         fwrite(LIQU_h, 4, 2, output);
 
         // according to WoW.Dev Wiki:
         uint32 liquidEntry;
         if (rootWMO->liquidType & 4)
+        {
             liquidEntry = liquidType;
+        }
         else if (liquidType == 15)
+        {
             liquidEntry = 0;
+        }
         else
+        {
             liquidEntry = liquidType + 1;
+        }
 
         if (!liquidEntry)
         {
@@ -440,11 +452,15 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool precise
                 {
                     ++v2;
                     if (v2 >= v1)
+                    {
                         break;
+                    }
                 }
 
                 if (v2 < v1 && (LiquBytes[v2] & 0xF) != 15)
+                {
                     liquidEntry = (LiquBytes[v2] & 0xF) + 1;
+                }
             }
         }
 
@@ -477,7 +493,9 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool precise
         fwrite(hlq, sizeof(WMOLiquidHeader), 1, output);
         // only need height values, the other values are unknown anyway
         for (uint32 i = 0; i < LiquEx_size / sizeof(WMOLiquidVert); ++i)
+        {
             fwrite(&LiquEx[i].height, sizeof(float), 1, output);
+        }
         // todo: compress to bit field
         fwrite(LiquBytes, 1, hlq->xtiles * hlq->ytiles, output);
     }
@@ -501,7 +519,9 @@ void MapObject::Extract(ADT::MODF const& mapObjDef, char const* WmoInstName, uin
     // destructible wmo, do not dump. we can handle the vmap for these
     // in dynamic tree (gameobject vmaps)
     if ((mapObjDef.Flags & 0x1) != 0)
+    {
         return;
+    }
 
     //-----------add_in _dir_file----------------
 
@@ -522,7 +542,9 @@ void MapObject::Extract(ADT::MODF const& mapObjDef, char const* WmoInstName, uin
     fclose(input);
 
     if (count != 1 || nVertices == 0)
+    {
         return;
+    }
 
     Vec3D position = mapObjDef.Position;
 
@@ -542,7 +564,7 @@ void MapObject::Extract(ADT::MODF const& mapObjDef, char const* WmoInstName, uin
     float scale = 1.0f;
     uint32 uniqueId = GenerateUniqueObjectId(mapObjDef.UniqueId, 0);
     uint32 flags = MOD_HAS_BOUND;
-    if (tileX == 65 && tileY == 65) flags |= MOD_WORLDSPAWN;
+    if (tileX == 65 && tileY == 65) { flags |= MOD_WORLDSPAWN; }
     //write mapID, tileX, tileY, Flags, NameSet, UniqueId, Pos, Rot, Scale, Bound_lo, Bound_hi, name
     fwrite(&mapID, sizeof(uint32), 1, pDirfile);
     fwrite(&tileX, sizeof(uint32), 1, pDirfile);

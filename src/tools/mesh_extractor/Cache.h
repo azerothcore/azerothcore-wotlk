@@ -27,7 +27,9 @@ public:
         std::lock_guard<std::mutex> guard(mutex);
 
         if (_items.size() > FlushLimit)
+        {
             Clear();
+        }
         _items[key] = val;
     }
 
@@ -36,14 +38,18 @@ public:
         GUARD_RETURN(mutex, nullptr);
         typename std::map<K, T*>::iterator itr = _items.find(key);
         if (itr != _items.end())
+        {
             return itr->second;
+        }
         return nullptr;
     }
 
     void Clear()
     {
         for (typename std::map<K, T*>::iterator itr = _items.begin(); itr != _items.end(); ++itr)
+        {
             delete itr->second;
+        }
         _items.clear();
     }
 private:

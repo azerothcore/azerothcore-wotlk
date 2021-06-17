@@ -35,7 +35,9 @@ void ExtractMMaps(std::set<uint32>& mapIds, uint32 threads)
         if (!mapIds.empty() && mapIds.find(mapId) == mapIds.end())
         {
             if (Constants::Debug)
+            {
                 printf("Map %u will not be built.\n", mapId);
+            }
             continue;
         }
 
@@ -66,7 +68,9 @@ void ExtractDBCs()
     // Then we look in other locale files in case that they are available.
     for (std::vector<std::string>::iterator itr = MPQHandler->LocaleFiles[MPQHandler->BaseLocale]->Files.begin(); itr != MPQHandler->LocaleFiles[MPQHandler->BaseLocale]->Files.end(); ++itr)
         if (itr->rfind(".dbc") == itr->length() - extLen) // Check if the extension is ".dbc"
+        {
             DBCFiles.insert(*itr);
+        }
 
     const size_t folderLen = strlen("DBFilesClient\\");
     // Iterate over all available locales
@@ -85,7 +89,9 @@ void ExtractDBCs()
         Utils::SaveToDisk(MPQHandler->GetFileFrom(component, MPQHandler->LocaleFiles[*itr]), path + component);
         // Extract the DBC files for the given locale
         for (std::set<std::string>::iterator itr2 = DBCFiles.begin(); itr2 != DBCFiles.end(); ++itr2)
+        {
             Utils::SaveToDisk(MPQHandler->GetFileFrom(*itr2, MPQHandler->LocaleFiles[*itr]), path + (itr2->c_str() + folderLen));
+        }
     }
     printf("DBC extraction finished!\n");
 }
@@ -121,7 +127,9 @@ void ExtractGameobjectModels()
             Model model(path);
 
             if (model.IsBad)
+            {
                 continue;
+            }
 
             FILE* output = fopen((baseBuildingsPath + fileName).c_str(), "wb");
             if (!output)
@@ -229,7 +237,9 @@ void ExtractGameobjectModels()
                 uint32* MobaEx = new uint32[mobaBatch * 4];
 
                 for (uint32 i = 8; i < itr2->MOBALength; i += 12)
+                {
                     MobaEx[k++] = itr2->MOBA[i];
+                }
 
                 int mobaSizeGrp = mobaBatch * 4 + 4;
                 fwrite(&mobaSizeGrp, 4, 1, output);
@@ -260,7 +270,9 @@ bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapLis
         {
             param = argv[++i];
             if (!param)
+            {
                 return false;
+            }
 
             threads = atoi(param);
             printf("Using %u threads\n", threads);
@@ -269,7 +281,9 @@ bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapLis
         {
             param = argv[++i];
             if (!param)
+            {
                 return false;
+            }
 
             char* copy = strdup(param);
             char* token = strtok(copy, ",");
@@ -287,21 +301,29 @@ bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapLis
         {
             param = argv[++i];
             if (!param)
+            {
                 return false;
+            }
             debugOutput = atoi(param);
             if (debugOutput)
+            {
                 printf("Output will contain debug information (.obj files)\n");
+            }
         }
         else if (strcmp(argv[i], "--extract") == 0)
         {
             param = argv[++i];
             if (!param)
+            {
                 return false;
+            }
 
             extractFlags = atoi(param);
 
             if (!(extractFlags & Constants::EXTRACT_FLAG_ALLOWED)) // Tried to use an invalid flag
+            {
                 return false;
+            }
 
             printf("Detected flags: \n");
             printf("* Extract DBCs: %s\n", (extractFlags & Constants::EXTRACT_FLAG_DBC) ? "Yes" : "No");
@@ -334,15 +356,21 @@ void LoadTile(dtNavMesh*& navMesh, const char* tile)
 {
     FILE* f = fopen(tile, "rb");
     if (!f)
+    {
         return;
+    }
     MmapTileHeader header;
 
     if (fread(&header, sizeof(MmapTileHeader), 1, f) != 1)
+    {
         return;
+    }
 
     uint8* nav = new uint8[header.size];
     if (fread(nav, header.size, 1, f) != 1)
+    {
         return;
+    }
 
     navMesh->addTile(nav, header.size, DT_TILE_FREE_DATA, 0, nullptr);
 
@@ -373,13 +401,19 @@ int main(int argc, char* argv[])
     MPQHandler->Initialize();
 
     if (extractFlags & Constants::EXTRACT_FLAG_DBC)
+    {
         ExtractDBCs();
+    }
 
     if (extractFlags & Constants::EXTRACT_FLAG_MMAPS)
+    {
         ExtractMMaps(mapIds, threads);
+    }
 
     if (extractFlags & Constants::EXTRACT_FLAG_GOB_MODELS)
+    {
         ExtractGameobjectModels();
+    }
 
     if (extractFlags & Constants::EXTRACT_FLAG_TEST)
     {

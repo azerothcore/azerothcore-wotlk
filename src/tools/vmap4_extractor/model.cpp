@@ -41,7 +41,9 @@ bool Model::open()
         vertices = new Vec3D[header.nBoundingVertices];
         f.read(vertices, header.nBoundingVertices * 12);
         for (uint32 i = 0; i < header.nBoundingVertices; i++)
+        {
             vertices[i] = fixCoordSystem(vertices[i]);
+        }
         f.seek(0);
         f.seekRelative(header.ofsBoundingTriangles);
         indices = new uint16[header.nBoundingTriangles];
@@ -132,7 +134,9 @@ void Doodad::Extract(ADT::MDDF const& doodadDef, char const* ModelInstName, uint
     FILE* input = fopen(tempname, "r+b");
 
     if (!input)
+    {
         return;
+    }
 
     fseek(input, 8, SEEK_SET); // get the correct no of vertices
     int nVertices;
@@ -140,7 +144,9 @@ void Doodad::Extract(ADT::MDDF const& doodadDef, char const* ModelInstName, uint
     fclose(input);
 
     if (count != 1 || nVertices == 0)
+    {
         return;
+    }
 
     // scale factor - divide by 1024. blizzard devs must be on crack, why not just use a float?
     float sc = doodadDef.Scale / 1024.0f;
@@ -151,7 +157,9 @@ void Doodad::Extract(ADT::MDDF const& doodadDef, char const* ModelInstName, uint
     uint32 uniqueId = GenerateUniqueObjectId(doodadDef.UniqueId, 0);
     uint32 tcflags = MOD_M2;
     if (tileX == 65 && tileY == 65)
+    {
         tcflags |= MOD_WORLDSPAWN;
+    }
 
     //write mapID, tileX, tileY, Flags, NameSet, UniqueId, Pos, Rot, Scale, name
     fwrite(&mapID, sizeof(uint32), 1, pDirfile);
@@ -171,7 +179,9 @@ void Doodad::Extract(ADT::MDDF const& doodadDef, char const* ModelInstName, uint
 void Doodad::ExtractSet(WMODoodadData const& doodadData, ADT::MODF const& wmo, uint32 mapID, uint32 tileX, uint32 tileY, FILE* pDirfile)
 {
     if (wmo.DoodadSet >= doodadData.Sets.size())
+    {
         return;
+    }
 
     G3D::Vector3 wmoPosition(wmo.Position.z, wmo.Position.x, wmo.Position.y);
     G3D::Matrix3 wmoRotation = G3D::Matrix3::fromEulerAnglesZYX(G3D::toRadians(wmo.Rotation.y), G3D::toRadians(wmo.Rotation.x), G3D::toRadians(wmo.Rotation.z));
@@ -181,8 +191,10 @@ void Doodad::ExtractSet(WMODoodadData const& doodadData, ADT::MODF const& wmo, u
     for (uint16 doodadIndex : doodadData.References)
     {
         if (doodadIndex < doodadSetData.StartIndex ||
-            doodadIndex >= doodadSetData.StartIndex + doodadSetData.Count)
+                doodadIndex >= doodadSetData.StartIndex + doodadSetData.Count)
+        {
             continue;
+        }
 
         WMO::MODD const& doodad = doodadData.Spawns[doodadIndex];
 
@@ -205,7 +217,9 @@ void Doodad::ExtractSet(WMODoodadData const& doodadData, ADT::MODF const& wmo, u
         sprintf(tempname, "%s/%s", szWorkDirWmo, ModelInstName);
         FILE* input = fopen(tempname, "r+b");
         if (!input)
+        {
             continue;
+        }
 
         fseek(input, 8, SEEK_SET); // get the correct no of vertices
         int nVertices;
@@ -213,7 +227,9 @@ void Doodad::ExtractSet(WMODoodadData const& doodadData, ADT::MODF const& wmo, u
         fclose(input);
 
         if (count != 1 || nVertices == 0)
+        {
             continue;
+        }
 
         assert(doodadId < std::numeric_limits<uint16>::max());
         ++doodadId;
@@ -233,7 +249,9 @@ void Doodad::ExtractSet(WMODoodadData const& doodadData, ADT::MODF const& wmo, u
         uint32 uniqueId = GenerateUniqueObjectId(wmo.UniqueId, doodadId);
         uint32 tcflags = MOD_M2;
         if (tileX == 65 && tileY == 65)
+        {
             tcflags |= MOD_WORLDSPAWN;
+        }
 
         //write mapID, tileX, tileY, Flags, NameSet, UniqueId, Pos, Rot, Scale, name
         fwrite(&mapID, sizeof(uint32), 1, pDirfile);

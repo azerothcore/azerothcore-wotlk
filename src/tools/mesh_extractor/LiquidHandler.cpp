@@ -16,7 +16,9 @@ void LiquidHandler::HandleNewLiquid()
 {
     Chunk* chunk = Source->Data->GetChunkByName("MH2O");
     if (!chunk)
+    {
         return;
+    }
 
     Vertices.reserve(1000);
     Triangles.reserve(1000);
@@ -25,7 +27,9 @@ void LiquidHandler::HandleNewLiquid()
     H2OHeader header[256];
     MCNKData.reserve(256);
     for (int i = 0; i < 256; i++)
+    {
         header[i] = H2OHeader::Read(stream);
+    }
 
     for (int i = 0; i < 256; i++)
     {
@@ -58,7 +62,9 @@ void LiquidHandler::HandleNewLiquid()
                 uint8* altMask = new uint8[size];
                 if (fread(altMask, sizeof(uint8), size, stream) == size)
                     for (uint32 mi = 0; mi < size; mi++)
+                    {
                         renderMask.Mask[mi + information.OffsetY] |= altMask[mi];
+                    }
                 delete[] altMask;
             }
             fseek(stream, chunk->Offset + information.OffsetHeightmap, SEEK_SET);
@@ -66,17 +72,23 @@ void LiquidHandler::HandleNewLiquid()
             for (int y = information.OffsetY; y < (information.OffsetY + information.Height); y++)
                 for (int x = information.OffsetX; x < (information.OffsetX + information.Width); x++)
                     if (fread(&heights[x][y], sizeof(float), 1, stream) != 1)
+                    {
                         return;
+                    }
         }
         else
         {
             // Fill with ocean data
             for (uint32 i = 0; i < 8; ++i)
+            {
                 renderMask.Mask[i] = 0xFF;
+            }
 
             for (uint32 y = 0; y < 9; ++y)
                 for (uint32 x = 0; x < 9; ++x)
+                {
                     heights[x][y] = information.HeightLevel1;
+                }
         }
 
         MCNKData.push_back(MCNKLiquidData(heights, renderMask));
@@ -86,7 +98,9 @@ void LiquidHandler::HandleNewLiquid()
             for (int x = information.OffsetX; x < (information.OffsetX + information.Width); x++)
             {
                 if (!renderMask.ShouldRender(x, y))
+                {
                     continue;
+                }
 
                 MapChunk* mapChunk = Source->MapChunks[i];
                 Vector3 location = mapChunk->Header.Position;

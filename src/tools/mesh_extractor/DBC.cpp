@@ -20,7 +20,9 @@ DBC::DBC( FILE* stream ) : StringBlock(nullptr), StringBlockSize(0), IsFaulty(tr
     count += fread(&RecordSize, sizeof(uint32), 1, stream);
     count += fread(&StringBlockSize, sizeof(uint32), 1, stream);
     if (count != 8)
+    {
         printf("DBC::DBC: Failed to read some data expected 8, read %u\n", count);
+    }
 
     for (int i = 0; i < RecordCount; i++)
     {
@@ -36,7 +38,9 @@ DBC::DBC( FILE* stream ) : StringBlock(nullptr), StringBlockSize(0), IsFaulty(tr
             }
             uint32 tmp;
             if (fread(&tmp, sizeof(uint32), 1, stream) != 1)
+            {
                 printf("DBC::DBC: Failed to read some data expected 1, read 0\n");
+            }
             rec->Values.push_back(tmp);
             size += 4;
         }
@@ -44,7 +48,9 @@ DBC::DBC( FILE* stream ) : StringBlock(nullptr), StringBlockSize(0), IsFaulty(tr
     StringBlock = new uint8[StringBlockSize];
     count = fread(StringBlock, sizeof(uint8), StringBlockSize, stream);
     if (count != StringBlockSize)
+    {
         printf("DBC::DBC: Failed to read some data expected %u, read %u\n", StringBlockSize, count);
+    }
 }
 
 std::string DBC::GetStringByOffset( int offset )
@@ -71,6 +77,8 @@ Record* DBC::GetRecordById( int id )
     // we assume Id is index 0
     for (std::vector<Record*>::iterator itr = Records.begin(); itr != Records.end(); ++itr)
         if ((*itr)->Values[0] == id)
+        {
             return *itr;
+        }
     return nullptr;
 }

@@ -376,7 +376,9 @@ public:
     {
         for (uint32 i = 0; i < size; ++i)
             if (arr[i])
+            {
                 return false;
+            }
         return true;
     }
     static std::string Replace( std::string str, const std::string& oldStr, const std::string& newStr );

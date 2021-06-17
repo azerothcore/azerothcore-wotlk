@@ -43,7 +43,7 @@ namespace MMAP
     /**************************************************************************/
     MapBuilder::~MapBuilder()
     {
-        for (auto & m_tile : m_tiles)
+        for (auto& m_tile : m_tiles)
         {
             m_tile.m_tiles->clear();
             delete m_tile.m_tiles;
@@ -62,7 +62,7 @@ namespace MMAP
 
         printf("Discovering maps... ");
         getDirContents(files, "maps");
-        for (auto & file : files)
+        for (auto& file : files)
         {
             mapID = uint32(atoi(file.substr(0, file.size() - 8).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
@@ -74,7 +74,7 @@ namespace MMAP
 
         files.clear();
         getDirContents(files, "vmaps", "*.vmtree");
-        for (auto & file : files)
+        for (auto& file : files)
         {
             mapID = uint32(atoi(file.substr(0, file.size() - 7).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
@@ -87,7 +87,7 @@ namespace MMAP
 
         count = 0;
         printf("Discovering tiles... ");
-        for (auto & m_tile : m_tiles)
+        for (auto& m_tile : m_tiles)
         {
             std::set<uint32>* tiles = m_tile.m_tiles;
             mapID = m_tile.m_mapId;
@@ -95,7 +95,7 @@ namespace MMAP
             sprintf(filter, "%03u*.vmtile", mapID);
             files.clear();
             getDirContents(files, "vmaps", filter);
-            for (auto & file : files)
+            for (auto& file : files)
             {
                 fsize = file.size();
 
@@ -110,7 +110,7 @@ namespace MMAP
             sprintf(filter, "%03u*", mapID);
             files.clear();
             getDirContents(files, "maps", filter);
-            for (auto & file : files)
+            for (auto& file : files)
             {
                 fsize = file.size();
 
@@ -119,7 +119,9 @@ namespace MMAP
                 tileID = StaticMapTree::packTileID(tileX, tileY);
 
                 if (tiles->insert(tileID).second)
+                {
                     count++;
+                }
             }
 
             // make sure we process maps which don't have tiles
@@ -133,16 +135,20 @@ namespace MMAP
                 for (uint32 i = minX; i <= maxX; ++i)
                     for (uint32 j = minY; j <= maxY; ++j)
                         if (tiles->insert(StaticMapTree::packTileID(i, j)).second)
+                        {
                             count++;
+                        }
             }
         }
         printf("found %u.\n\n", count);
 
         // Calculate tiles to process in total
-        for (auto & m_tile : m_tiles)
+        for (auto& m_tile : m_tiles)
         {
             if (!shouldSkipMap(m_tile.m_mapId))
+            {
                 m_totalTiles += m_tile.m_tiles->size();
+            }
         }
     }
 
@@ -151,7 +157,9 @@ namespace MMAP
     {
         TileList::iterator itr = std::find(m_tiles.begin(), m_tiles.end(), mapID);
         if (itr != m_tiles.end())
+        {
             return (*itr).m_tiles;
+        }
 
         std::set<uint32>* tiles = new std::set<uint32>();
         m_tiles.emplace_back(MapTiles(mapID, tiles));
@@ -173,15 +181,19 @@ namespace MMAP
             return a.m_tiles->size() > b.m_tiles->size();
         });
 
-        for (auto & m_tile : m_tiles)
+        for (auto& m_tile : m_tiles)
         {
             uint32 mapId = m_tile.m_mapId;
             if (!shouldSkipMap(mapId))
             {
                 if (threads > 0)
+                {
                     _queue.Push(mapId);
+                }
                 else
+                {
                     buildMap(mapId);
+                }
             }
         }
 
@@ -219,11 +231,15 @@ namespace MMAP
         // make sure we process maps which don't have tiles
         // initialize the static tree, which loads WDT models
         if (!m_terrainBuilder->loadVMap(mapID, 64, 64, meshData))
+        {
             return;
+        }
 
         // get the coord bounds of the model data
         if (meshData.solidVerts.size() + meshData.liquidVerts.size() == 0)
+        {
             return;
+        }
 
         // get the coord bounds of the model data
         if (meshData.solidVerts.size() && meshData.liquidVerts.size())
@@ -234,9 +250,13 @@ namespace MMAP
             rcVmax(bmax, lmax);
         }
         else if (meshData.solidVerts.size())
+        {
             rcCalcBounds(meshData.solidVerts.getCArray(), meshData.solidVerts.size() / 3, bmin, bmax);
+        }
         else
+        {
             rcCalcBounds(meshData.liquidVerts.getCArray(), meshData.liquidVerts.size() / 3, lmin, lmax);
+        }
 
         // convert coord bounds to grid bounds
         maxX = 32 - bmin[0] / GRID_SIZE;
@@ -249,7 +269,9 @@ namespace MMAP
     {
         FILE* file = fopen(name, "rb");
         if (!file)
+        {
             return;
+        }
 
         printf("Building mesh from file\n");
         int tileX, tileY, mapId;
@@ -313,11 +335,15 @@ namespace MMAP
         MeshData data;
 
         for (uint32 i = 0; i < verticesCount; ++i)
+        {
             data.solidVerts.append(verts[i]);
+        }
         delete[] verts;
 
         for (uint32 i = 0; i < indicesCount; ++i)
+        {
             data.solidTris.append(inds[i]);
+        }
         delete[] inds;
 
         TerrainBuilder::cleanVertices(data.solidVerts, data.solidTris);
@@ -354,7 +380,9 @@ namespace MMAP
             _queue.WaitAndPop(mapId);
 
             if (_cancelationToken)
+            {
                 return;
+            }
 
             buildMap(mapId);
         }
@@ -375,7 +403,9 @@ namespace MMAP
             // add all tiles within bounds to tile list.
             for (uint32 i = minX; i <= maxX; ++i)
                 for (uint32 j = minY; j <= maxY; ++j)
+                {
                     tiles->insert(StaticMapTree::packTileID(i, j));
+                }
         }
 
         if (!tiles->empty())
@@ -401,7 +431,9 @@ namespace MMAP
                 StaticMapTree::unpackTileID(tile, tileX, tileY);
 
                 if (shouldSkipTile(mapID, tileX, tileY))
+                {
                     continue;
+                }
 
                 buildTile(mapID, tileX, tileY, navMesh);
             }
@@ -428,7 +460,9 @@ namespace MMAP
 
         // if there is no data, give up now
         if (!meshData.solidVerts.size() && !meshData.liquidVerts.size())
+        {
             return;
+        }
 
         // remove unused vertices
         TerrainBuilder::cleanVertices(meshData.solidVerts, meshData.solidTris);
@@ -440,7 +474,9 @@ namespace MMAP
         allVerts.append(meshData.solidVerts);
 
         if (!allVerts.size())
+        {
             return;
+        }
 
         // get bounds of current tile
         float bmin[3], bmax[3];
@@ -476,14 +512,22 @@ namespace MMAP
             StaticMapTree::unpackTileID(tile, tileX, tileY);
 
             if (tileX > tileXMax)
+            {
                 tileXMax = tileX;
+            }
             else if (tileX < tileXMin)
+            {
                 tileXMin = tileX;
+            }
 
             if (tileY > tileYMax)
+            {
                 tileYMax = tileY;
+            }
             else if (tileY < tileYMin)
+            {
                 tileYMin = tileY;
+            }
         }
 
         // use Max because '32 - tileX' is negative for values over 32
@@ -730,7 +774,9 @@ namespace MMAP
         // TODO: special flags for DYNAMIC polygons, ie surfaces that can be turned on and off
         for (int i = 0; i < iv.polyMesh->npolys; ++i)
             if (iv.polyMesh->areas[i] & RC_WALKABLE_AREA)
+            {
                 iv.polyMesh->flags[i] = iv.polyMesh->areas[i];
+            }
 
         // setup mesh parameters
         dtNavMeshCreateParams params;
@@ -876,7 +922,9 @@ namespace MMAP
     {
         // this is for elevation
         if (verts && vertCount)
+        {
             rcCalcBounds(verts, vertCount, bmin, bmax);
+        }
         else
         {
             bmin[1] = FLT_MIN;
@@ -921,7 +969,9 @@ namespace MMAP
                     return true;
                 default:
                     if (isTransportMap(mapID))
+                    {
                         return true;
+                    }
                     break;
             }
 
@@ -990,19 +1040,27 @@ namespace MMAP
         sprintf(fileName, "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
         FILE* file = fopen(fileName, "rb");
         if (!file)
+        {
             return false;
+        }
 
         MmapTileHeader header;
         int count = fread(&header, sizeof(MmapTileHeader), 1, file);
         fclose(file);
         if (count != 1)
+        {
             return false;
+        }
 
         if (header.mmapMagic != MMAP_MAGIC || header.dtVersion != uint32(DT_NAVMESH_VERSION))
+        {
             return false;
+        }
 
         if (header.mmapVersion != MMAP_VERSION)
+        {
             return false;
+        }
 
         return true;
     }
@@ -1011,7 +1069,9 @@ namespace MMAP
     uint32 MapBuilder::percentageDone(uint32 totalTiles, uint32 totalTilesBuilt)
     {
         if (totalTiles)
+        {
             return totalTilesBuilt * 100 / totalTiles;
+        }
 
         return 0;
     }

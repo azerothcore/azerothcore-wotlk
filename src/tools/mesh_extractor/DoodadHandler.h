@@ -39,7 +39,9 @@ public:
         count += fread(&DecimalScale, sizeof(uint16), 1, stream);
         count += fread(&Flags, sizeof(uint16), 1, stream);
         if (count != 4)
+        {
             printf("DoodadDefinition::Read: Failed to read some data expected 4, read %d\n", count);
+        }
     }
 };
 

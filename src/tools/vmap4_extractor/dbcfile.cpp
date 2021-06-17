@@ -24,7 +24,9 @@ bool DBCFile::open()
     // Need some error checking, otherwise an unhandled exception error occurs
     // if people screw with the data path.
     if (f.isEof() == true)
+    {
         return false;
+    }
 
     unsigned char header[4];
     unsigned int na, nb, es, ss;

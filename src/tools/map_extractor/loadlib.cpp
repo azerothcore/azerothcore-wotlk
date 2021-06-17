@@ -33,7 +33,9 @@ bool FileLoader::loadFile(std::string const& fileName, bool log)
     if (mf.isEof())
     {
         if (log)
+        {
             printf("No such file %s\n", fileName.c_str());
+        }
         return false;
     }
 
@@ -43,7 +45,9 @@ bool FileLoader::loadFile(std::string const& fileName, bool log)
     mf.read(data, data_size);
     mf.close();
     if (prepareLoadedData())
+    {
         return true;
+    }
 
     printf("Error loading %s", fileName.c_str());
     mf.close();
@@ -56,9 +60,13 @@ bool FileLoader::prepareLoadedData()
     // Check version
     version = (file_MVER*) data;
     if (version->fcc != MverMagic.fcc)
+    {
         return false;
+    }
     if (version->ver != FILE_FORMAT_VERSION)
+    {
         return false;
+    }
     return true;
 }
 

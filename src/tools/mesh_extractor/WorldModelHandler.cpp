@@ -30,7 +30,9 @@ WorldModelDefinition WorldModelDefinition::Read( FILE* file )
     count += fread(&discard, sizeof(uint32), 1, file);
 
     if (count != 5)
+    {
         printf("WorldModelDefinition::Read: Error reading data, expected 5, read %d\n", count);
+    }
     return ret;
 }
 
@@ -43,7 +45,9 @@ WorldModelHandler::WorldModelHandler( ADT* adt ) : ObjectDataHandler(adt), _defi
 void WorldModelHandler::ProcessInternal( MapChunk* mcnk )
 {
     if (!IsSane())
+    {
         return;
+    }
 
     uint32 refCount = mcnk->Header.MapObjectRefs;
     FILE* stream = mcnk->Source->GetStream();
@@ -53,19 +57,27 @@ void WorldModelHandler::ProcessInternal( MapChunk* mcnk )
     {
         int32 index;
         if (fread(&index, sizeof(int32), 1, stream) != 1)
+        {
             printf("WorldModelDefinition::Read: Error reading data, expected 1, read 0\n");
+        }
 
         if (index < 0 || uint32(index) >= _definitions->size())
+        {
             continue;
+        }
 
         WorldModelDefinition wmo = (*_definitions)[index];
 
         if (_drawn.find(wmo.UniqueId) != _drawn.end())
+        {
             continue;
+        }
         _drawn.insert(wmo.UniqueId);
 
         if (wmo.MwidIndex >= _paths->size())
+        {
             continue;
+        }
 
         std::string path = (*_paths)[wmo.MwidIndex];
         WorldModelRoot* model = Cache->WorldModelCache.Get(path);
@@ -100,7 +112,9 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
         {
             // only include colliding tris
             if ((group->TriangleFlags[i] & 0x04) != 0 && group->TriangleMaterials[i] != 0xFF)
+            {
                 continue;
+            }
             Triangle<uint16> tri = group->Triangles[i];
             tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WMO, tri.V0 + vertOffset, tri.V1 + vertOffset, tri.V2 + vertOffset));
         }
@@ -114,7 +128,9 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
         for (uint32 i = set.FirstInstanceIndex; i < (set.CountInstances + set.FirstInstanceIndex); i++)
         {
             if (i >= root->DoodadInstances.size())
+            {
                 break;
+            }
             instances.push_back(root->DoodadInstances[i]);
         }
 
@@ -128,7 +144,9 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
             }
 
             if (!model->IsCollidable)
+            {
                 continue;
+            }
             int vertOffset = verts.size();
             for (std::vector<Vector3>::iterator itr2 = model->Vertices.begin(); itr2 != model->Vertices.end(); ++itr2)
             {
@@ -136,13 +154,17 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
                 verts.push_back(translate ? v : Utils::ToRecast(v));
             }
             for (std::vector<Triangle<uint16>>::iterator itr2 = model->Triangles.begin(); itr2 != model->Triangles.end(); ++itr2)
+            {
                 tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WMO, itr2->V0 + vertOffset, itr2->V1 + vertOffset, itr2->V2 + vertOffset));
+            }
         }
 
         for (std::vector<WorldModelGroup>::iterator group =  root->Groups.begin(); group != root->Groups.end(); ++group)
         {
             if (!group->HasLiquidData)
+            {
                 continue;
+            }
 
             const LiquidHeader& liquidHeader = group->LiquidDataHeader;
             LiquidData& liquidDataGeometry = group->LiquidDataGeometry;
@@ -152,7 +174,9 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
                 for (uint32 x = 0; x < liquidHeader.Width; x++)
                 {
                     if (!liquidDataGeometry.ShouldRender(x, y))
+                    {
                         continue;
+                    }
 
                     uint32 vertOffset = verts.size();
 
@@ -182,7 +206,9 @@ void WorldModelHandler::ReadDefinitions()
 {
     Chunk* chunk = Source->ObjectData->GetChunkByName("MODF");
     if (!chunk)
+    {
         return;
+    }
 
     const int32 definitionSize = 64;
     uint32 definitionCount = chunk->Length / definitionSize;
@@ -190,7 +216,9 @@ void WorldModelHandler::ReadDefinitions()
     _definitions->reserve(definitionCount);
     FILE* stream = chunk->GetStream();
     for (uint32 i = 0; i < definitionCount; i++)
+    {
         _definitions->push_back(WorldModelDefinition::Read(stream));
+    }
 }
 
 void WorldModelHandler::ReadModelPaths()
@@ -198,7 +226,9 @@ void WorldModelHandler::ReadModelPaths()
     Chunk* mwid = Source->ObjectData->GetChunkByName("MWID");
     Chunk* mwmo = Source->ObjectData->GetChunkByName("MWMO");
     if (!mwid || !mwmo)
+    {
         return;
+    }
 
     uint32 paths = mwid->Length / 4;
     _paths = new std::vector<std::string>;
@@ -209,7 +239,9 @@ void WorldModelHandler::ReadModelPaths()
         fseek(stream, i * 4, SEEK_CUR);
         uint32 offset;
         if (fread(&offset, sizeof(uint32), 1, stream) != 1)
+        {
             printf("WorldModelDefinition::Read: Error reading data, expected 1, read 0\n");
+        }
         FILE* dataStream = mwmo->GetStream();
         fseek(dataStream, offset + mwmo->Offset, SEEK_SET);
         _paths->push_back(Utils::ReadString(dataStream));
