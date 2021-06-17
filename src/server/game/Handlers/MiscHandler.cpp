@@ -8,8 +8,6 @@
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
-#include "BigNumber.h"
-#include "CellImpl.h"
 #include "Chat.h"
 #include "Common.h"
 #include "CreatureAI.h"
@@ -36,7 +34,6 @@
 #include "Spell.h"
 #include "UpdateData.h"
 #include "Vehicle.h"
-#include "WhoListCache.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -461,12 +458,14 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
     if (GetPlayer()->CanFreeMove())
     {
         if (GetPlayer()->getStandState() == UNIT_STAND_STATE_STAND)
+        {
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
+        }
 
-        WorldPacket data(SMSG_FORCE_MOVE_ROOT, (8 + 4));  // guess size
-        data << GetPlayer()->GetPackGUID();
-        data << (uint32)2;
-        SendPacket(&data);
+        WorldPacket data2(SMSG_FORCE_MOVE_ROOT, (8 + 4));  // guess size
+        data2 << GetPlayer()->GetPackGUID();
+        data2 << (uint32)2;
+        SendPacket(&data2);
         GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 
