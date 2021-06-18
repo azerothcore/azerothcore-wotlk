@@ -2020,7 +2020,7 @@ void SpellMgr::LoadSpellMixology()
             continue;
         }
 
-        mSpellMixologyMap[entry] = fields[1].GetFloat();;
+        mSpellMixologyMap[entry] = fields[1].GetFloat();
         ++count;
     } while (result->NextRow());
 

@@ -6,7 +6,6 @@
 
 #include "UpdateData.h"
 #include "ByteBuffer.h"
-#include "Common.h"
 #include "Errors.h"
 #include "Log.h"
 #include "Opcodes.h"
