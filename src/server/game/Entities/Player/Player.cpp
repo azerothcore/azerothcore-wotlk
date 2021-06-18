@@ -24146,10 +24146,16 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
         {
             uint16 skillValue = 1;
             uint16 maxValue = GetMaxSkillValueForLevel();
-            if (rcInfo->Flags & SKILL_FLAG_ALWAYS_MAX_VALUE)
+            if (sWorld->getBoolConfig(CONFIG_ALWAYS_MAXSKILL) && !IsProfessionOrRidingSkill(skillId))
+                skillValue = maxValue;
+            else if (rcInfo->Flags & SKILL_FLAG_ALWAYS_MAX_VALUE)
                 skillValue = maxValue;
             else if (getClass() == CLASS_DEATH_KNIGHT)
                 skillValue = std::min(std::max<uint16>({ 1, uint16((getLevel() - 1) * 5) }), maxValue);
+            else if (skillId == SKILL_FIST_WEAPONS)
+                skillValue = std::max<uint16>(1, GetSkillValue(SKILL_UNARMED));
+            else if (skillId == SKILL_LOCKPICKING)
+                skillValue = std::max<uint16>(1, GetSkillValue(SKILL_LOCKPICKING));
 
             SetSkill(skillId, 0, skillValue, maxValue);
             break;
