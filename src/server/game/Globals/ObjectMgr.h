@@ -1255,6 +1255,7 @@ public:
     // reserved names
     void LoadReservedPlayersNames();
     [[nodiscard]] bool IsReservedName(std::string const& name) const;
+    void AddReservedPlayerName(std::string const& name);
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string const& name, bool create = false);
