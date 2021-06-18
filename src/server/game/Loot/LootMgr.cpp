@@ -289,7 +289,8 @@ bool LootStoreItem::Roll(bool rate, Player const* player, Loot& loot, LootStore 
 {
     float _chance = chance;
 
-    sScriptMgr->OnItemRoll(player, this, _chance, loot, store);
+    if (!sScriptMgr->OnItemRoll(player, this, _chance, loot, store))
+        return false;
 
     if (_chance >= 100.0f)
         return true;
@@ -1205,7 +1206,8 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
             LootStoreItem* item = *itr;
             float chance = item->chance;
 
-            sScriptMgr->OnItemRoll(player, item, chance, loot, store);
+            if (!sScriptMgr->OnItemRoll(player, item, chance, loot, store))
+                return nullptr;
 
             if (chance >= 100.0f)
                 return item;
@@ -1215,6 +1217,9 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
                 return item;
         }
     }
+
+    if (!sScriptMgr->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
+        return nullptr;
 
     possibleLoot = EqualChanced;
     possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
@@ -1375,7 +1380,7 @@ void LootTemplate::CopyConditions(ConditionList conditions)
             group->CopyConditions(conditions);
 }
 
-bool LootTemplate::CopyConditions(LootItem* li) const
+bool LootTemplate::CopyConditions(LootItem* li, uint32 conditionLootId) const
 {
     for (LootStoreItemList::const_iterator _iter = Entries.begin(); _iter != Entries.end(); ++_iter)
     {
@@ -1384,7 +1389,7 @@ bool LootTemplate::CopyConditions(LootItem* li) const
         {
             if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
             {
-                if (Referenced->CopyConditions(li))
+                if (Referenced->CopyConditions(li, conditionLootId))
                 {
                     return true;
                 }
@@ -1393,6 +1398,11 @@ bool LootTemplate::CopyConditions(LootItem* li) const
         else
         {
             if (item->itemid != li->itemid)
+            {
+                continue;
+            }
+
+            if (!item->conditions.empty() && conditionLootId && conditionLootId != item->conditions.front()->SourceGroup)
             {
                 continue;
             }
@@ -1416,7 +1426,7 @@ bool LootTemplate::CopyConditions(LootItem* li) const
             {
                 if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
                 {
-                    if (Referenced->CopyConditions(li))
+                    if (Referenced->CopyConditions(li, conditionLootId))
                     {
                         return true;
                     }
@@ -1425,6 +1435,11 @@ bool LootTemplate::CopyConditions(LootItem* li) const
             else
             {
                 if (item->itemid != li->itemid)
+                {
+                    continue;
+                }
+
+                if (!item->conditions.empty() && conditionLootId && conditionLootId != item->conditions.front()->SourceGroup)
                 {
                     continue;
                 }
@@ -1442,7 +1457,7 @@ bool LootTemplate::CopyConditions(LootItem* li) const
             {
                 if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
                 {
-                    if (Referenced->CopyConditions(li))
+                    if (Referenced->CopyConditions(li, conditionLootId))
                     {
                         return true;
                     }
@@ -1451,6 +1466,11 @@ bool LootTemplate::CopyConditions(LootItem* li) const
             else
             {
                 if (item->itemid != li->itemid)
+                {
+                    continue;
+                }
+
+                if (!item->conditions.empty() && conditionLootId && conditionLootId != item->conditions.front()->SourceGroup)
                 {
                     continue;
                 }
