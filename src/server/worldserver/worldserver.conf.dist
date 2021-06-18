@@ -158,6 +158,16 @@ WorldServerPort = 8085
 BindIP = "0.0.0.0"
 
 #
+#    IPLocationFile
+#        Description: The path to your IP2Location database CSV file.
+#        Example:     "C:/acore/IP2LOCATION-LITE-DB1.CSV"
+#                     "/home/acore/IP2LOCATION-LITE-DB1.CSV"
+#        Default:     ""  - (Disabled)
+#
+
+IPLocationFile = ""
+
+#
 ###################################################################################################
 
 ###################################################################################################
