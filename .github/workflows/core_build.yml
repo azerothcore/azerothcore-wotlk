@@ -5,8 +5,8 @@ on:
       - 'master'
   pull_request:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || concat(github.ref, github.run_number) }}-${{ github.ref }}
+concurrency: ${{ github.head_ref || concat(github.ref, github.run_number) }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
