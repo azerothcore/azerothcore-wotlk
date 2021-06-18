@@ -5,7 +5,6 @@
  */
 
 #include "Creature.h"
-#include "DBCStores.h"
 #include "Errors.h"
 #include "Group.h"
 #include "ObjectAccessor.h"
@@ -17,8 +16,6 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
-#include "World.h"
-#include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
 {
