@@ -405,7 +405,7 @@ public:
                 continue;
 
             // wrong skill
-            if (skillLine->SkillLine != skillLine)
+            if (skillLine->SkillLine != skillId)
                 continue;
 
             // not high rank
