@@ -6,7 +6,6 @@
 
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
-#include "Common.h"
 #include "DatabaseEnv.h"
 #include "Group.h"
 #include "GroupMgr.h"
@@ -460,26 +459,28 @@ bool Group::AddMember(Player* player)
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 if (itr->GetSource() == player) // pussywizard: no check same map, adding members is single threaded
-                    continue;
-
-                if (Player* member = itr->GetSource())
                 {
-                    if (player->HaveAtClient(member))
+                    continue;
+                }
+
+                if (Player* itrMember = itr->GetSource())
+                {
+                    if (player->HaveAtClient(itrMember))
                     {
-                        member->SetFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
-                        member->BuildValuesUpdateBlockForPlayer(&groupData, player);
-                        member->RemoveFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
+                        itrMember->SetFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
+                        itrMember->BuildValuesUpdateBlockForPlayer(&groupData, player);
+                        itrMember->RemoveFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
                     }
 
-                    if (member->HaveAtClient(player))
+                    if (itrMember->HaveAtClient(player))
                     {
                         UpdateData newData;
                         WorldPacket newDataPacket;
-                        player->BuildValuesUpdateBlockForPlayer(&newData, member);
+                        player->BuildValuesUpdateBlockForPlayer(&newData, itrMember);
                         if (newData.HasData())
                         {
                             newData.BuildPacket(&newDataPacket);
-                            member->SendDirectMessage(&newDataPacket);
+                            itrMember->SendDirectMessage(&newDataPacket);
                         }
                     }
                 }

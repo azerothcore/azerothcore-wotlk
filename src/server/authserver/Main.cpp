@@ -12,29 +12,29 @@
 * authentication server
 */
 
+#include "AppenderDB.h"
 #include "Banner.h"
 #include "Common.h"
-#include "AppenderDB.h"
-#include "DatabaseEnv.h"
 #include "Config.h"
-#include "Log.h"
-#include "GitRevision.h"
-#include "Util.h"
-#include "SignalHandler.h"
-#include "RealmList.h"
-#include "RealmAcceptor.h"
+#include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
+#include "GitRevision.h"
+#include "IPLocation.h"
+#include "Log.h"
+#include "RealmAcceptor.h"
+#include "RealmList.h"
 #include "SecretMgr.h"
 #include "SharedDefines.h"
+#include "SignalHandler.h"
 #include "Util.h"
 #include "ProcessPriority.h"
-#include <ace/Dev_Poll_Reactor.h>
-#include <ace/TP_Reactor.h>
 #include <ace/ACE.h>
+#include <ace/Dev_Poll_Reactor.h>
 #include <ace/Sig_Handler.h>
+#include <ace/TP_Reactor.h>
 #include <boost/version.hpp>
-#include <openssl/opensslv.h>
 #include <openssl/crypto.h>
+#include <openssl/opensslv.h>
 
 #ifndef _ACORE_REALM_CONFIG
 #define _ACORE_REALM_CONFIG "authserver.conf"
@@ -127,6 +127,9 @@ extern int main(int argc, char** argv)
         return 1;
 
     sSecretMgr->Initialize();
+
+    // Load IP Location Database
+    sIPLocation->Load();
 
     // Get the list of realms for the server
     sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));

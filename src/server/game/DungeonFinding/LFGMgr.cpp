@@ -1132,15 +1132,21 @@ namespace lfg
                 }
 
                 if (!deletedGroupsToErase.empty())
-                    for (ObjectGuid const guid : deletedGroupsToErase)
-                        deletedGroups.erase(guid);
+                {
+                    for (ObjectGuid const toErase : deletedGroupsToErase)
+                    {
+                        deletedGroups.erase(toErase);
+                    }
+                }
 
                 if (!deletedGroups.empty())
-                    for (ObjectGuid const guid : deletedGroups)
+                {
+                    for (ObjectGuid const deletedGroup : deletedGroups)
                     {
                         ++deletedCounter;
-                        buffer_deleted << guid;
+                        buffer_deleted << deletedGroup;
                     }
+                }
 
                 WorldPacket differencePacket(SMSG_UPDATE_LFG_LIST, 1000);
                 RBPacketBuildDifference(differencePacket, dungeonId, deletedCounter, buffer_deleted, groupCounter, buffer_groups, playerCounter, buffer_players);
@@ -2419,14 +2425,14 @@ namespace lfg
         LfgState state = GetState(guid);
         // If group is being formed after proposal success do nothing more
         LfgGuidSet const& players = it->second.GetPlayers();
-        for (LfgGuidSet::const_iterator it = players.begin(); it != players.end(); ++it)
+        for (auto iterator = players.begin(); iterator != players.end(); ++iterator)
         {
-            ObjectGuid guid = (*it);
-            SetGroup(*it, ObjectGuid::Empty);
+            ObjectGuid objectGuid = (*iterator);
+            SetGroup(*iterator, ObjectGuid::Empty);
             if (state != LFG_STATE_PROPOSAL)
             {
-                SetState(*it, LFG_STATE_NONE);
-                SendLfgUpdateParty(guid, LfgUpdateData(LFG_UPDATETYPE_REMOVED_FROM_QUEUE));
+                SetState(*iterator, LFG_STATE_NONE);
+                SendLfgUpdateParty(objectGuid, LfgUpdateData(LFG_UPDATETYPE_REMOVED_FROM_QUEUE));
             }
         }
         GroupsStore.erase(it);
