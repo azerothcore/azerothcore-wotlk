@@ -16,6 +16,7 @@ EndScriptData */
 #include "Base32.h"
 #include "Chat.h"
 #include "CryptoGenerics.h"
+#include "IPLocation.h"
 #include "Language.h"
 #include "Player.h"
 #include "Realm.h"
@@ -23,8 +24,8 @@ EndScriptData */
 #include "SecretMgr.h"
 #include "StringConvert.h"
 #include "TOTP.h"
-#include <unordered_map>
 #include <openssl/rand.h>
+#include <unordered_map>
 
 class account_commandscript : public CommandScript
 {
@@ -35,35 +36,41 @@ public:
     {
         static std::vector<ChatCommand> accountSetCommandTable =
         {
-            { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,      "" },
-            { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,    "" },
-            { "password",   SEC_CONSOLE,        true,   &HandleAccountSetPasswordCommand,   "" },
-            { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,        "" }
+            { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,          "" },
+            { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,        "" },
+            { "password",   SEC_CONSOLE,        true,   &HandleAccountSetPasswordCommand,       "" },
+            { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,            "" }
         };
 
         static std::vector<ChatCommand> accountLockCommandTable
         {
-            { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,   "" },
-            { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,        "" }
+            { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,       "" },
+            { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,            "" }
         };
 
         static std::vector<ChatCommand> account2faCommandTable
         {
-            { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,      "" },
-            { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,     "" },
+            { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,          "" },
+            { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,         "" },
+        };
+
+        static std::vector<ChatCommand> accountRemoveCommandTable
+        {
+            { "country",    SEC_ADMINISTRATOR,  true,  &HandleAccountRemoveLockCountryCommand,  "" }
         };
 
         static std::vector<ChatCommand> accountCommandTable =
         {
-            { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable    },
-            { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,         "" },
-            { "create",     SEC_CONSOLE,        true,   &HandleAccountCreateCommand,        "" },
-            { "delete",     SEC_CONSOLE,        true,   &HandleAccountDeleteCommand,        "" },
-            { "onlinelist", SEC_CONSOLE,        true,   &HandleAccountOnlineListCommand,    "" },
-            { "lock",       SEC_PLAYER,         false,  nullptr, "", accountLockCommandTable   },
-            { "set",        SEC_ADMINISTRATOR,  true,   nullptr, "", accountSetCommandTable    },
-            { "password",   SEC_PLAYER,         false,  &HandleAccountPasswordCommand,      "" },
-            { "",           SEC_PLAYER,         false,  &HandleAccountCommand,              "" }
+            { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable        },
+            { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,             "" },
+            { "create",     SEC_CONSOLE,        true,   &HandleAccountCreateCommand,            "" },
+            { "delete",     SEC_CONSOLE,        true,   &HandleAccountDeleteCommand,            "" },
+            { "onlinelist", SEC_CONSOLE,        true,   &HandleAccountOnlineListCommand,        "" },
+            { "lock",       SEC_PLAYER,         false,  nullptr, "", accountLockCommandTable       },
+            { "set",        SEC_ADMINISTRATOR,  true,   nullptr, "", accountSetCommandTable        },
+            { "password",   SEC_PLAYER,         false,  &HandleAccountPasswordCommand,          "" },
+            { "remove",     SEC_ADMINISTRATOR,  true,   nullptr, "", accountRemoveCommandTable     },
+            { "",           SEC_PLAYER,         false,  &HandleAccountCommand,                  "" }
         };
 
         static std::vector<ChatCommand> commandTable =
@@ -412,6 +419,45 @@ public:
         return true;
     }
 
+    static bool HandleAccountRemoveLockCountryCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        ///- %Parse the command line arguments
+        char* _accountName = strtok((char*)args, " ");
+        if (!_accountName)
+            return false;
+
+        std::string accountName = _accountName;
+        if (!Utf8ToUpperOnlyLatin(accountName))
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 accountId = AccountMgr::GetId(accountName);
+        if (!accountId)
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+        stmt->setString(0, "00");
+        stmt->setUInt32(1, accountId);
+        LoginDatabase.Execute(stmt);
+        handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
+
+        return true;
+    }
+
     static bool HandleAccountLockCountryCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -427,30 +473,24 @@ public:
         {
             if (param == "on")
             {
-                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGON_COUNTRY);
-                uint32 ip = inet_addr(handler->GetSession()->GetRemoteAddress().c_str());
-                EndianConvertReverse(ip);
-                stmt->setUInt32(0, ip);
-                PreparedQueryResult result = LoginDatabase.Query(stmt);
-                if (result)
+                if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(handler->GetSession()->GetRemoteAddress()))
                 {
-                    Field* fields = result->Fetch();
-                    std::string country = fields[0].GetString();
-                    stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_CONTRY);
-                    stmt->setString(0, country);
+                    auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+                    stmt->setString(0, location->CountryCode);
                     stmt->setUInt32(1, handler->GetSession()->GetAccountId());
                     LoginDatabase.Execute(stmt);
                     handler->PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
                 }
                 else
                 {
-                    handler->PSendSysMessage("[IP2NATION] Table empty");
-                    ;//LOG_DEBUG("network", "[IP2NATION] Table empty");
+                    handler->PSendSysMessage("No IP2Location information - account not locked");
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
             }
             else if (param == "off")
             {
-                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_CONTRY);
+                auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
                 stmt->setString(0, "00");
                 stmt->setUInt32(1, handler->GetSession()->GetAccountId());
                 LoginDatabase.Execute(stmt);
