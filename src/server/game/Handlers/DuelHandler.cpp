@@ -4,8 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "UpdateData.h"

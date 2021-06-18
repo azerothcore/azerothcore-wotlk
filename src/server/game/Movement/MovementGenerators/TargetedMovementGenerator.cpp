@@ -50,9 +50,9 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         owner->StopMoving();
         _lastTargetPosition.reset();
-        if (Creature* cOwner = owner->ToCreature())
+        if (Creature* cOwner2 = owner->ToCreature())
         {
-            cOwner->SetCannotReachTarget(false);
+            cOwner2->SetCannotReachTarget(false);
         }
 
         return true;
@@ -82,9 +82,9 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         {
             i_recalculateTravel = false;
             i_path = nullptr;
-            if (Creature* cOwner = owner->ToCreature())
+            if (Creature* cOwner2 = owner->ToCreature())
             {
-                cOwner->SetCannotReachTarget(false);
+                cOwner2->SetCannotReachTarget(false);
             }
 
             owner->StopMoving();

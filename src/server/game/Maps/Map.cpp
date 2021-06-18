@@ -2986,7 +2986,7 @@ void InstanceMap::UnloadAll()
 {
     ASSERT(!HavePlayers());
 
-    if (m_resetAfterUnload == true)
+    if (m_resetAfterUnload)
     {
         DeleteRespawnTimes();
         DeleteCorpseData();
@@ -3331,9 +3331,9 @@ void Map::LogEncounterFinished(EncounterCreditType type, uint32 creditEntry)
         {
             std::string auraStr;
             const Unit::AuraApplicationMap& a = p->GetAppliedAuras();
-            for (Unit::AuraApplicationMap::const_iterator itr = a.begin(); itr != a.end(); ++itr)
+            for (auto iterator = a.begin(); iterator != a.end(); ++iterator)
             {
-                snprintf(buffer2, 255, "%u(%u) ", itr->first, itr->second->GetEffectMask());
+                snprintf(buffer2, 255, "%u(%u) ", iterator->first, iterator->second->GetEffectMask());
                 auraStr += buffer2;
             }
 
@@ -3777,7 +3777,7 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
         }
     }
 
-    return failOnCollision ? !collided : true;
+    return !failOnCollision || !collided;
 }
 
 void Map::LoadCorpseData()

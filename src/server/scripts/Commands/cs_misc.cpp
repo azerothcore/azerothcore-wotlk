@@ -16,6 +16,7 @@
 #include "GroupMgr.h"
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
+#include "IPLocation.h"
 #include "Language.h"
 #include "LFG.h"
 #include "MapManager.h"
@@ -1928,28 +1929,10 @@ public:
                 lastIp    = fields[4].GetString();
                 lastLogin = fields[5].GetString();
 
-                /** if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
+                if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
                 {
                     lastIp.append(" (");
                     lastIp.append(location->CountryName);
-                    lastIp.append(")");
-                } **/
-
-                uint32 ip = inet_addr(lastIp.c_str());
-#if ACORE_ENDIAN == BIGENDIAN
-                EndianConvertReverse(ip);
-#endif
-                stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP2NATION_COUNTRY);
-
-                stmt->setUInt32(0, ip);
-
-                PreparedQueryResult result2 = LoginDatabase.Query(stmt);
-
-                if (result2)
-                {
-                    Field* fields2 = result2->Fetch();
-                    lastIp.append(" (");
-                    lastIp.append(fields2[0].GetString());
                     lastIp.append(")");
                 }
             }
