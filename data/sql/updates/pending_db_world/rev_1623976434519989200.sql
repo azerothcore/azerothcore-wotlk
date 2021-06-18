@@ -3,11 +3,11 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1623976434519989200');
 -- acore_string_locale
 DROP TABLE IF EXISTS `acore_string_locale`;
 CREATE TABLE IF NOT EXISTS `acore_string_locale` (
-  `entry` int(10) unsigned NOT NULL DEFAULT '0',
-  `locale` varchar(4) NOT NULL,
-  `content` text,
-  PRIMARY KEY (`entry`, `locale`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+  `Entry` INT unsigned NOT NULL DEFAULT '0',
+  `Locale` VARCHAR(4) NOT NULL,
+  `Content` TEXT,
+  PRIMARY KEY (`Entry`, `Locale`)
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 -- koKR
 INSERT INTO `acore_string_locale` (`entry`, `locale`, `content`)
