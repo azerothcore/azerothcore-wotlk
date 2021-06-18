@@ -17,28 +17,20 @@ jobs:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
         os: [ubuntu-20.04]
         compiler: [clang]
-        modules: [with, without]
+        modules: [without]
         extra_logs: [false]
         # we can include specific combinations here
         include:
           - os: ubuntu-20.04
             compiler: clang12
             modules: without
-            extra_logs: false
-          - os: ubuntu-20.04
-            compiler: clang11
-            modules: without
             extra_logs: true
           - os: ubuntu-20.04
             compiler: clang11
             modules: without
             extra_logs: false
-          - os: ubuntu-20.04
-            compiler: clang8
-            modules: without
-            extra_logs: false
           - os: ubuntu-18.04
-            compiler: clang7
+            compiler: clang10
             modules: without
             extra_logs: false
           - os: ubuntu-18.04
