@@ -4214,7 +4214,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spell_id);
     if (GetTalentSpellCost(firstRankSpellId))
     {
-        SpellsRequiringSpellMapBounds spellsRequiringSpell = sSpellMgr->GetSpellsRequiringSpellBounds(spellId);
+        SpellsRequiringSpellMapBounds spellsRequiringSpell = sSpellMgr->GetSpellsRequiringSpellBounds(firstRankSpellId);
         for (auto spellsItr = spellsRequiringSpell.first; spellsItr != spellsRequiringSpell.second; ++spellsItr)
         {
             removeSpell(spellsItr->second, removeSpecMask, onlyTemporary);
@@ -4247,11 +4247,11 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     // pussywizard: remove owned aura obtained from currently removed spell
     RemoveOwnedAura(spell_id);
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         // pussywizard: remove pet auras
-        if (PetAura const* petSpell = sSpellMgr->GetPetAura(spellId, i))
+        if (PetAura const* petSpell = sSpellMgr->GetPetAura(spell_id, i))
             RemovePetAura(petSpell);
 
         // pussywizard: remove all triggered auras
@@ -4271,13 +4271,13 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     if (Has310Flyer(false))
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED && spellInfo->Effects[i].CalcValue() == 310)
-                Has310Flyer(true, spellId);
+                Has310Flyer(true, spell_id);
 
     // pussywizard: remove dependent skill
-    SpellLearnSkillNode const* spellLearnSkill = sSpellMgr->GetSpellLearnSkill(spellId);
+    SpellLearnSkillNode const* spellLearnSkill = sSpellMgr->GetSpellLearnSkill(spell_id);
     if (spellLearnSkill)
     {
-        uint32 prev_spell = sSpellMgr->GetPrevSpellInChain(spellId);
+        uint32 prev_spell = sSpellMgr->GetPrevSpellInChain(spell_id);
 
         if (!prev_spell) // pussywizard: first rank, remove skill
             SetSkill(spellLearnSkill->skill, 0, 0, 0);
@@ -4363,7 +4363,7 @@ bool Player::Has310Flyer(bool checkAllSpells, uint32 excludeSpellId)
             SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(itr->first);
             for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
             {
-                if (_spell_idx->second->skillId != SKILL_MOUNTS)
+                if (_spell_idx->second->SkillLine != SKILL_MOUNTS)
                     break;  // We can break because mount spells belong only to one skillline (at least 310 flyers do)
 
                 spellInfo = sSpellMgr->AssertSpellInfo(itr->first);

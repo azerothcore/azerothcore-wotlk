@@ -1482,7 +1482,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                         SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellIter->first);
                         for (SkillLineAbilityMap::const_iterator skillIter = bounds.first; skillIter != bounds.second; ++skillIter)
                         {
-                            if (skillIter->second->skillId == achievementCriteria->learn_skillline_spell.skillLine)
+                            if (skillIter->second->SkillLine == achievementCriteria->learn_skillline_spell.skillLine)
                             {
                                 // xinef: do not add couter twice if by any chance skill is listed twice in dbc (eg. skill 777 and spell 22717)
                                 ++spellCount;
@@ -1544,7 +1544,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                         SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellIter->first);
                         for (SkillLineAbilityMap::const_iterator skillIter = bounds.first; skillIter != bounds.second; ++skillIter)
                         {
-                            if (skillIter->second->skillId == achievementCriteria->learn_skill_line.skillLine)
+                            if (skillIter->second->SkillLine == achievementCriteria->learn_skill_line.skillLine)
                             {
                                 // xinef: do not add couter twice if by any chance skill is listed twice in dbc (eg. skill 777 and spell 22717)
                                 ++spellCount;
