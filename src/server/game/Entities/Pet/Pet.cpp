@@ -9,7 +9,6 @@
 #include "Common.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
-#include "Formulas.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "Log.h"
@@ -192,8 +191,10 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
         stmt->setUInt8(2, uint8(PET_SAVE_LAST_STABLE_SLOT));
     }
 
-    if (AsynchPetSummon* info = owner->GetSession()->_loadPetFromDBFirstCallback.GetSecondParam())
-        delete info;
+    if (AsynchPetSummon* infoToDelete = owner->GetSession()->_loadPetFromDBFirstCallback.GetSecondParam())
+    {
+        delete infoToDelete;
+    }
 
     owner->GetSession()->_loadPetFromDBFirstCallback.Reset();
     owner->GetSession()->_loadPetFromDBFirstCallback.SetFirstParam(asynchLoadType);
@@ -1402,24 +1403,24 @@ void Pet::_SaveAuras(SQLTransaction& trans, bool logout)
 
         uint8 index = 0;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
-        stmt->setUInt32(index++, m_charmInfo->GetPetNumber());
-        stmt->setUInt64(index++, casterGUID.GetRawValue());
-        stmt->setUInt32(index++, itr->second->GetId());
-        stmt->setUInt8(index++, effMask);
-        stmt->setUInt8(index++, recalculateMask);
-        stmt->setUInt8(index++, itr->second->GetStackAmount());
-        stmt->setInt32(index++, damage[0]);
-        stmt->setInt32(index++, damage[1]);
-        stmt->setInt32(index++, damage[2]);
-        stmt->setInt32(index++, baseDamage[0]);
-        stmt->setInt32(index++, baseDamage[1]);
-        stmt->setInt32(index++, baseDamage[2]);
-        stmt->setInt32(index++, itr->second->GetMaxDuration());
-        stmt->setInt32(index++, itr->second->GetDuration());
-        stmt->setUInt8(index++, itr->second->GetCharges());
+        PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
+        stmt2->setUInt32(index++, m_charmInfo->GetPetNumber());
+        stmt2->setUInt64(index++, casterGUID.GetRawValue());
+        stmt2->setUInt32(index++, itr->second->GetId());
+        stmt2->setUInt8(index++, effMask);
+        stmt2->setUInt8(index++, recalculateMask);
+        stmt2->setUInt8(index++, itr->second->GetStackAmount());
+        stmt2->setInt32(index++, damage[0]);
+        stmt2->setInt32(index++, damage[1]);
+        stmt2->setInt32(index++, damage[2]);
+        stmt2->setInt32(index++, baseDamage[0]);
+        stmt2->setInt32(index++, baseDamage[1]);
+        stmt2->setInt32(index++, baseDamage[2]);
+        stmt2->setInt32(index++, itr->second->GetMaxDuration());
+        stmt2->setInt32(index++, itr->second->GetDuration());
+        stmt2->setUInt8(index++, itr->second->GetCharges());
 
-        trans->Append(stmt);
+        trans->Append(stmt2);
     }
 }
 
