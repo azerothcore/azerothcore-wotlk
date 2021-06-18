@@ -16,7 +16,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Pet/pet_mage.cpp
   ${AC_SCRIPTS_DIR}/Pet/pet_priest.cpp
   ${AC_SCRIPTS_DIR}/Pet/pet_shaman.cpp
-  ${AC_SCRIPTS_DIR}/Pet/pet_warlock.cpp
 )
 
 AC_ADD_SCRIPT_LOADER("Pet" "ScriptLoader.h")
