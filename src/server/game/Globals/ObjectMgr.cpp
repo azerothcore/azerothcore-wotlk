@@ -6,7 +6,6 @@
 
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
-#include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Chat.h"
 #include "Common.h"
@@ -16,7 +15,6 @@
 #include "GossipDef.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "InstanceSaveMgr.h"
 #include "Language.h"
 #include "LFGMgr.h"
 #include "Log.h"
@@ -693,7 +691,7 @@ void ObjectMgr::LoadCreatureTemplateSpells()
         }
 
         CreatureTemplate& creatureTemplate = itr->second;
-        creatureTemplate.spells[index] = fields[2].GetUInt32();;
+        creatureTemplate.spells[index] = fields[2].GetUInt32();
 
         ++count;
     } while (result->NextRow());
@@ -7553,6 +7551,26 @@ bool ObjectMgr::IsReservedName(const std::string& name) const
     wstrToLower(wstr);
 
     return _reservedNamesStore.find(wstr) != _reservedNamesStore.end();
+}
+
+void ObjectMgr::AddReservedPlayerName(std::string const& name)
+{
+    if (!IsReservedName(name))
+    {
+        std::wstring wstr;
+        if (!Utf8toWStr(name, wstr))
+        {
+            LOG_ERROR("server", "Could not add invalid name to reserved player names: %s", name.c_str());
+            return;
+        }
+        wstrToLower(wstr);
+
+        _reservedNamesStore.insert(wstr);
+
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RESERVED_PLAYER_NAME);
+        stmt->setString(0, name);
+        CharacterDatabase.Execute(stmt);
+    }
 }
 
 enum LanguageType
