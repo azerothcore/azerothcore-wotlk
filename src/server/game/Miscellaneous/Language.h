@@ -1195,6 +1195,9 @@ enum AcoreStrings
 
     LANG_GM_SILENCE                      = 6616,              // "Silence is ON for %s" - Spell 1852
 
+    // Used for .string command
+    LANG_NO_ACORE_STRING_FOUND           = 6617,
+
     LANG_WORLD_CLOSED                    = 7523,
     LANG_WORLD_OPENED                    = 7524,
 
