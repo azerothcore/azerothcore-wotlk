@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-modules:
     strategy:
       fail-fast: false
       matrix:
