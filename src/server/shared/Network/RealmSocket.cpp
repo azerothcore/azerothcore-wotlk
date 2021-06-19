@@ -8,7 +8,6 @@
 #include "RealmSocket.h"
 #include <ace/INET_Addr.h>
 #include <ace/OS_NS_string.h>
-#include <ace/SString.h>
 
 RealmSocket::Session::Session() = default;
 

@@ -4,13 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Util.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
-#include "WorldPacket.h"
 #include "WorldSession.h"
 
 WardenCheckMgr::WardenCheckMgr()
@@ -128,9 +126,9 @@ void WardenCheckMgr::LoadWardenChecks()
                     continue;
                 }
 
-                std::string str = fmt::sprintf("%04u", id);
-                ASSERT(str.size() == 4);
-                std::copy(str.begin(), str.end(), wardenCheck.IdStr.begin());
+                std::string str2 = Acore::StringFormat("%04u", id);
+                ASSERT(str2.size() == 4);
+                std::copy(str2.begin(), str2.end(), wardenCheck.IdStr.begin());
 
                 CheckIdPool[WARDEN_CHECK_LUA_TYPE].push_back(id);
                 break;

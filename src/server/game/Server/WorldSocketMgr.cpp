@@ -9,7 +9,6 @@
 *  \author Derex <derex101@gmail.com>
 */
 
-#include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
@@ -23,7 +22,6 @@
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_socket.h>
-#include <ace/os_include/sys/os_types.h>
 #include <ace/Reactor_Impl.h>
 #include <ace/Reactor.h>
 #include <ace/TP_Reactor.h>

@@ -4,13 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "AccountMgr.h"
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "CryptoRandom.h"
-#include "Database/DatabaseEnv.h"
 #include "HMAC.h"
-#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SessionKeyGenerator.h"

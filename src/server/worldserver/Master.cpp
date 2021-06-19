@@ -15,7 +15,6 @@
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
-#include "DatabaseWorkerPool.h"
 #include "GitRevision.h"
 #include "IoContext.h"
 #include "Log.h"
