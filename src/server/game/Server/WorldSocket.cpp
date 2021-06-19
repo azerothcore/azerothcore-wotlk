@@ -5,7 +5,6 @@
  */
 
 #include "AccountMgr.h"
-#include "BigNumber.h"
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "CryptoHash.h"

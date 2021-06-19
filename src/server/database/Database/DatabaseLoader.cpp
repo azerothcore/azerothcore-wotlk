@@ -9,6 +9,7 @@
 #include "DatabaseEnv.h"
 #include "Duration.h"
 #include "Log.h"
+#include "Duration.h"
 #include <errmsg.h>
 #include <mysqld_error.h>
 #include <thread>

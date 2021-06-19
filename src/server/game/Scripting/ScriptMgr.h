@@ -1936,10 +1936,10 @@ public:
                 {
                     // Try to find an existing script.
                     bool existing = false;
-                    for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+                    for (auto iterator = ScriptPointerList.begin(); iterator != ScriptPointerList.end(); ++iterator)
                     {
                         // If the script names match...
-                        if (it->second->GetName() == script->GetName())
+                        if (iterator->second->GetName() == script->GetName())
                         {
                             // ... It exists.
                             existing = true;
