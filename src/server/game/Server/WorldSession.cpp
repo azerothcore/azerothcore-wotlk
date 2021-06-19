@@ -86,7 +86,7 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
         return true;
 
     //lets process all packets for non-in-the-world player
-    return (player->IsInWorld() == false);
+    return !player->IsInWorld();
 }
 
 /// WorldSession constructor
