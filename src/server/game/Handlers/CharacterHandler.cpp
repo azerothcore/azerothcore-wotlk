@@ -2317,18 +2317,16 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             trans->Append(stmt);
 
             // Disable all old-faction specific quests
+            for (auto const& [questID, quest] : sObjectMgr->GetQuestTemplates())
             {
-                for (auto const& [questID, quest] : sObjectMgr->GetQuestTemplates())
-                {
-                    uint32 newRaceMask = (newTeam == TEAM_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE;
+                uint32 newRaceMask = (newTeam == TEAM_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE;
 
-                    if (quest->GetAllowableRaces() && !(quest->GetAllowableRaces() & newRaceMask))
-                    {
-                        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_QUESTSTATUS_REWARDED_ACTIVE_BY_QUEST);
-                        stmt->setUInt32(0, quest->GetQuestId());
-                        stmt->setUInt32(1, lowGuid);
-                        trans->Append(stmt);
-                    }
+                if (quest->GetAllowableRaces() && !(quest->GetAllowableRaces() & newRaceMask))
+                {
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_QUESTSTATUS_REWARDED_ACTIVE_BY_QUEST);
+                    stmt->setUInt32(0, quest->GetQuestId());
+                    stmt->setUInt32(1, lowGuid);
+                    trans->Append(stmt);
                 }
             }
 
