@@ -1364,10 +1364,8 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
 
     atLoginFlags &= ~AT_LOGIN_RENAME;
 
-    ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(guidLow);
-
     // pussywizard:
-    if (ObjectAccessor::FindConnectedPlayer(guid) || sWorld->FindOfflineSessionForCharacterGUID(guidLow))
+    if (ObjectAccessor::FindConnectedPlayer(ObjectGuid::Create<HighGuid::Player>(guidLow)) || sWorld->FindOfflineSessionForCharacterGUID(guidLow))
     {
         SendCharRename(CHAR_CREATE_ERROR, renameInfo.get());
         return;
@@ -1378,7 +1376,6 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
     stmt->setString(0, renameInfo->Name);
     stmt->setUInt16(1, atLoginFlags);
     stmt->setUInt32(2, guidLow);
-
     CharacterDatabase.Execute(stmt);
 
     // Removed declined name from db
@@ -1386,7 +1383,6 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
     {
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_DECLINED_NAME);
         stmt->setUInt32(0, guidLow);
-
         CharacterDatabase.Execute(stmt);
     }
 
@@ -2081,13 +2077,16 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
     CharacterDatabasePreparedStatement* stmt = nullptr;
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
+    // resurrect the character in case he's dead
+    Player::OfflineResurrect(factionChangeInfo->Guid, trans);
+
     // Name Change and update atLogin flags
     {
         CharacterDatabase.EscapeString(factionChangeInfo->Name);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_NAME_AT_LOGIN);
         stmt->setString(0, factionChangeInfo->Name);
-        stmt->setUInt16(1, uint16((atLoginFlags) & ~usedLoginFlag));
+        stmt->setUInt16(1, uint16((atLoginFlags | AT_LOGIN_RESURRECT) & ~usedLoginFlag));
         stmt->setUInt32(2, lowGuid);
         trans->Append(stmt);
 
@@ -2107,11 +2106,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         trans->Append(stmt);
     }
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_DECLINED_NAME);
-    stmt->setUInt32(0, lowGuid);
-    trans->Append(stmt);
-
-    LOG_INFO("entities.player.character", "Account: %d (IP: %s), Character [%s] (guid: %u) Changed Race/Faction to: %s", GetAccountId(), GetRemoteAddress().c_str(), playerData->name.c_str(), lowGuid, factionChangeInfo->Name.c_str());
+    LOG_INFO("entities.player.character", "Account: %d (IP: %s), Character [%s] (guid: %u) Changed Race/Faction to: %s",
+        GetAccountId(), GetRemoteAddress().c_str(), playerData->name.c_str(), lowGuid, factionChangeInfo->Name.c_str());
 
     // xinef: update global data
     sWorld->UpdateGlobalNameData(lowGuid, playerData->name, factionChangeInfo->Name);
@@ -2400,7 +2396,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
                 for (uint32 index = 0; index < knownTitles.size(); ++index)
                 {
-                    std::optional<uint32> thisMask;
+                    Optional<uint32> thisMask;
                     if (index < tokens.size())
                         thisMask = Acore::StringTo<uint32>(tokens[index]);
 

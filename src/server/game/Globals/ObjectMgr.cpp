@@ -7567,7 +7567,7 @@ void ObjectMgr::AddReservedPlayerName(std::string const& name)
 
         _reservedNamesStore.insert(wstr);
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RESERVED_PLAYER_NAME);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RESERVED_PLAYER_NAME);
         stmt->setString(0, name);
         CharacterDatabase.Execute(stmt);
     }
