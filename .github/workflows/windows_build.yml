@@ -41,4 +41,3 @@ jobs:
         with:
           name: windows-2019-MSVC16-release
           path: build/bin/Release
-
