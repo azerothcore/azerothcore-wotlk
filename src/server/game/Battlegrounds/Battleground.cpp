@@ -1821,8 +1821,10 @@ void Battleground::HandleTriggerBuff(GameObject* gameObject)
 
     uint32 index = 0;
     for (; index < BgObjects.size() && BgObjects[index] != gameObject->GetGUID(); ++index);
-        if (BgObjects[index] != gameObject->GetGUID())
-            return;
+    if (BgObjects[index] != gameObject->GetGUID())
+    {
+        return;
+    }
 
     if (m_BuffChange)
     {
