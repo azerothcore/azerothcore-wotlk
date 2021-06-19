@@ -379,7 +379,7 @@ AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* cast
 
     m_amount = CalculateAmount(caster);
     m_casterLevel = caster ? caster->getLevel() : 0;
-    m_applyResilience = caster ? caster->CanApplyResilience() : false;
+    m_applyResilience = caster && caster->CanApplyResilience();
     m_auraGroup = sSpellMgr->GetSpellGroup(GetId());
 
     CalculateSpellMod();
@@ -5222,9 +5222,11 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             {
                                 if (target->isDead() && GetBase() && target->GetTypeId() == TYPEID_UNIT && target->GetEntry() == 24601)
                                 {
-                                    Unit* caster = GetBase()->GetCaster();
-                                    if (caster && caster->GetTypeId() == TYPEID_PLAYER)
-                                        caster->ToPlayer()->KilledMonsterCredit(25987);
+                                    auto caster2 = GetBase()->GetCaster();
+                                    if (caster2 && caster2->GetTypeId() == TYPEID_PLAYER)
+                                    {
+                                        caster2->ToPlayer()->KilledMonsterCredit(25987);
+                                    }
                                 }
                                 return;
                             }
@@ -6567,15 +6569,17 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     // xinef: caster is available, checked earlier
     if (target != caster && GetSpellInfo()->HasAttribute(SPELL_ATTR2_NO_TARGET_PER_SECOND_COST))
     {
-        uint32 damage = GetSpellInfo()->ManaPerSecond;
-        if ((int32)damage > gain && gain > 0)
-            damage = gain;
+        uint32 manaPerSecond = GetSpellInfo()->ManaPerSecond;
+        if ((int32)manaPerSecond > gain && gain > 0)
+        {
+            manaPerSecond = gain;
+        }
 
-        uint32 absorb = 0;
-        Unit::DealDamageMods(caster, damage, &absorb);
+        uint32 absorb2 = 0;
+        Unit::DealDamageMods(caster, manaPerSecond, &absorb2);
 
         CleanDamage cleanDamage =  CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-        Unit::DealDamage(caster, caster, damage, &cleanDamage, SELF_DAMAGE, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
+        Unit::DealDamage(caster, caster, manaPerSecond, &cleanDamage, SELF_DAMAGE, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
     }
 
     uint32 procAttacker = PROC_FLAG_DONE_PERIODIC;

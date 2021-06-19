@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk && ${{ github.event.label.name == 'run-build' }}'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ github.event.label.name == 'run-build' }}
     env:
       COMPOSE_DOCKER_CLI_BUILD: 1
       DOCKER_BUILDKIT: 1

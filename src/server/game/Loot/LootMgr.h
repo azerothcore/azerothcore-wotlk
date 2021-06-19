@@ -243,7 +243,7 @@ public:
     // Rolls for every item in the template and adds the rolled items the the loot
     void Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId = 0) const;
     void CopyConditions(ConditionList conditions);
-    bool CopyConditions(LootItem* li) const;
+    bool CopyConditions(LootItem* li, uint32 conditionLootId = 0) const;
 
     // True if template includes at least 1 quest drop entry
     [[nodiscard]] bool HasQuestDrop(LootTemplateMap const& store, uint8 groupId = 0) const;
