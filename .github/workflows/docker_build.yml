@@ -7,7 +7,7 @@ on:
     types: ['labeled']
 
 concurrency:
-  group: ${{ github.head_ref || github.ref github.run_number}}
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.run_number }})
   cancel-in-progress: true
 
 jobs:
