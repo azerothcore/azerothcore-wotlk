@@ -5,7 +5,6 @@
  */
 
 #include "CellImpl.h"
-#include "GossipDef.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Map.h"

@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "AccountMgr.h"
 #include "Battleground.h"
 #include "BattlegroundEY.h"
 #include "BattlegroundIC.h"
@@ -14,22 +13,17 @@
 #include "CellImpl.h"
 #include "Common.h"
 #include "Creature.h"
-#include "CreatureAI.h"
-#include "DatabaseEnv.h"
 #include "DynamicObject.h"
 #include "Formulas.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
-#include "MMapFactory.h"
-#include "MMapManager.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -39,7 +33,6 @@
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
-#include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SocialMgr.h"
 #include "Spell.h"
@@ -54,7 +47,6 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "VMapFactory.h"
 #include "World.h"
 #include "WorldPacket.h"
 
@@ -1135,7 +1127,7 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     float x, y, z;
     destTarget->GetPosition(x, y, z);
     // xinef: this can happen if MovePositionToFirstCollision detects that X, Y cords are invalid and returns prematurely
-    if (!acore::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
+    if (!Acore::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
         return;
 
     float speedXY, speedZ;
@@ -1997,7 +1989,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
             sSpellMgr->GetSetOfSpellsInSpellGroupWithFlag(1, SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE, availableElixirs);
         for (std::set<uint32>::iterator itr = availableElixirs.begin(); itr != availableElixirs.end();)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(*itr);
+            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(*itr);
             if (spellInfo->SpellLevel < m_spellInfo->SpellLevel || spellInfo->SpellLevel > unitTarget->getLevel())
                 availableElixirs.erase(itr++);
             else
@@ -2007,7 +1999,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         if (!availableElixirs.empty())
         {
             // cast random elixir on target
-            m_caster->CastSpell(unitTarget, acore::Containers::SelectRandomContainerElement(availableElixirs), true, m_CastItem);
+            m_caster->CastSpell(unitTarget, Acore::Containers::SelectRandomContainerElement(availableElixirs), true, m_CastItem);
         }
     }
 }
@@ -2832,7 +2824,7 @@ void Spell::EffectAddHonor(SpellEffIndex /*effIndex*/)
     // do not allow to add too many honor for player (50 * 21) = 1040 at level 70, or (50 * 31) = 1550 at level 80
     if (damage <= 50)
     {
-        uint32 honor_reward = acore::Honor::hk_honor_at_level(unitTarget->getLevel(), float(damage));
+        uint32 honor_reward = Acore::Honor::hk_honor_at_level(unitTarget->getLevel(), float(damage));
         unitTarget->ToPlayer()->RewardHonor(nullptr, 1, honor_reward, false);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("spells.aura", "SpellEffect::AddHonor (spell_id %u) rewards %u honor points (scale) to player: %s",
@@ -4295,9 +4287,9 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     }
 
     UnitList targets;
-    acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(unitTarget, unitTarget, unitTarget->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-    acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unitTarget, targets, u_check);
-    unitTarget->VisitNearbyObject(unitTarget->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
+    Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(unitTarget, unitTarget, unitTarget->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+    Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unitTarget, targets, u_check);
+    Cell::VisitAllObjects(unitTarget, searcher, unitTarget->GetVisibilityRange());
     for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
         if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))
@@ -4942,8 +4934,8 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
     data << m_caster->GetGUID();
 
     float dist = m_caster->GetVisibilityRange() + VISIBILITY_COMPENSATION;
-    acore::MessageDistDelivererToHostile notifier(m_caster, &data, dist);
-    m_caster->VisitNearbyWorldObject(dist, notifier);
+    Acore::MessageDistDelivererToHostile notifier(m_caster, &data, dist);
+    Cell::VisitWorldObjects(m_caster, notifier, dist);
 
     // xinef: we should also force pets to remove us from current target
     Unit::AttackerSet attackerSet;
@@ -4966,9 +4958,9 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
             return;
 
         UnitList targets;
-        acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(m_caster, m_caster, m_caster->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-        acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(m_caster, targets, u_check);
-        m_caster->VisitNearbyObject(m_caster->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(m_caster, m_caster, m_caster->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(m_caster, targets, u_check);
+        Cell::VisitAllObjects(m_caster, searcher, m_caster->GetVisibilityRange());
         for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))

@@ -158,9 +158,9 @@ private:
     std::mutex _newSocketsLock;
     SocketContainer _newSockets;
 
-    acore::Asio::IoContext _ioContext;
+    Acore::Asio::IoContext _ioContext;
     tcp::socket _acceptSocket;
-    acore::Asio::DeadlineTimer _updateTimer;
+    Acore::Asio::DeadlineTimer _updateTimer;
 };
 
 #endif // NetworkThread_h__

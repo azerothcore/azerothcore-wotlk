@@ -1255,6 +1255,7 @@ public:
     // reserved names
     void LoadReservedPlayersNames();
     [[nodiscard]] bool IsReservedName(std::string const& name) const;
+    void AddReservedPlayerName(std::string const& name);
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string const& name, bool create = false);
@@ -1346,6 +1347,8 @@ public:
     void LoadFactionChangeReputations();
     void LoadFactionChangeSpells();
     void LoadFactionChangeTitles();
+
+    [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
 
 private:
     // first free id for selected id type

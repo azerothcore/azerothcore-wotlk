@@ -5,12 +5,12 @@
  */
 
 #include "AccountMgr.h"
-#include "BigNumber.h"
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "CryptoHash.h"
 #include "CryptoRandom.h"
 #include "DatabaseEnv.h"
+#include "IPLocation.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "PacketLog.h"
@@ -25,13 +25,13 @@
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
 #include <ace/Message_Block.h>
+#include <ace/OS_NS_string.h>
+#include <ace/OS_NS_unistd.h>
+#include <ace/Reactor.h>
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_socket.h>
 #include <ace/os_include/sys/os_types.h>
-#include <ace/OS_NS_string.h>
-#include <ace/OS_NS_unistd.h>
-#include <ace/Reactor.h>
 #include <thread>
 
 #ifdef ELUNA
@@ -148,7 +148,7 @@ WorldSocket::WorldSocket(void): WorldHandler(),
     m_RecvWPct(0), m_RecvPct(), m_Header(sizeof (ClientPktHeader)),
     m_OutBuffer(0), m_OutBufferSize(65536), m_OutActive(false)
 {
-    acore::Crypto::GetRandomBytes(m_Seed);
+    Acore::Crypto::GetRandomBytes(m_Seed);
 
     reference_counting_policy().value (ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 
@@ -293,7 +293,7 @@ int WorldSocket::open(void* a)
     WorldPacket packet (SMSG_AUTH_CHALLENGE, 24);
     packet << uint32(1);                                    // 1...31
     packet.append(m_Seed);
-    packet.append(acore::Crypto::GetRandomBytes<32>()); // new encryption seeds
+    packet.append(Acore::Crypto::GetRandomBytes<32>()); // new encryption seeds
 
     if (SendPacket(packet) == -1)
         return -1;
@@ -798,7 +798,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     std::string accountName;
     WorldPacket packet, SendAddonPacked;
     std::array<uint8, 4> clientSeed;
-    acore::Crypto::SHA1::Digest digest;
+    Acore::Crypto::SHA1::Digest digest;
 
     if (sWorld->IsClosed())
     {
@@ -902,7 +902,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     // Check that Key and account name are the same on client and server
     uint8 t[4] = { 0x00, 0x00, 0x00, 0x00 };
 
-    acore::Crypto::SHA1 sha;
+    Acore::Crypto::SHA1 sha;
     sha.UpdateData(accountName);
     sha.UpdateData(t);
     sha.UpdateData(clientSeed);
@@ -921,8 +921,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         return -1;
     }
 
-    /*if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(address))
-        _ipCountry = location->CountryCode;*/
+    if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(address))
+        _ipCountry = location->CountryCode;
 
     ///- Re-check ip locking (same check as in auth).
     if (account.IsLockedToIP)
@@ -938,18 +938,18 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
             return -1;
         }
     }
-    //else if (!account.LockCountry.empty() && account.LockCountry != "00" && !_ipCountry.empty())
-    //{
-    //    if (account.LockCountry != _ipCountry)
-    //    {
-    //        packet.Initialize(SMSG_AUTH_RESPONSE, 1);
-    //        packet << uint8(AUTH_REJECT);
-    //        LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account country differs. Original country: %s, new country: %s).", account.LockCountry.c_str(), _ipCountry.c_str());
-    //        // We could log on hook only instead of an additional db log, however action logger is config based. Better keep DB logging as well
-    //        sScriptMgr->OnFailedAccountLogin(account.Id);
-    //        return -1;
-    //    }
-    //}
+    else if (!account.LockCountry.empty() && account.LockCountry != "00" && !_ipCountry.empty())
+    {
+        if (account.LockCountry != _ipCountry)
+        {
+            packet.Initialize(SMSG_AUTH_RESPONSE, 1);
+            packet << uint8(AUTH_REJECT);
+            LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account country differs. Original country: %s, new country: %s).", account.LockCountry.c_str(), _ipCountry.c_str());
+            // We could log on hook only instead of an additional db log, however action logger is config based. Better keep DB logging as well
+            sScriptMgr->OnFailedAccountLogin(account.Id);
+            return -1;
+        }
+    }
 
     if (account.IsBanned)
     {

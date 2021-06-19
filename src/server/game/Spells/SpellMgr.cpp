@@ -2021,7 +2021,7 @@ void SpellMgr::LoadSpellMixology()
             continue;
         }
 
-        mSpellMixologyMap[entry] = fields[1].GetFloat();;
+        mSpellMixologyMap[entry] = fields[1].GetFloat();
         ++count;
     } while (result->NextRow());
 
@@ -3873,24 +3873,6 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-    });
-
-    // Furious Howl
-    ApplySpellFix({ 64491, 64492, 64493, 64494, 64495 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
-        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_MASTER;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_CASTER;
-        spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_MASTER;
-    });
-
-    // Call of the Wild
-    ApplySpellFix({ 53434 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_MASTER;
-        spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_MASTER;
-        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_CASTER;
-        spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_CASTER;
     });
 
     // Wild Hunt
@@ -7296,6 +7278,18 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 61994 }, [](SpellEntry* spellInfo)
     {
         spellInfo->ManaCostPercentage = 0;
+    });
+
+    // Shadowmeld
+    ApplySpellFix({ 58984 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER;
+    });
+
+    // Flare activation speed
+    ApplySpellFix({ 1543 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Speed = 0.0f;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)

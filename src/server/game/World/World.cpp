@@ -18,7 +18,6 @@
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
 #include "CalendarMgr.h"
-#include "CellImpl.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "CharacterDatabaseCleaner.h"
@@ -41,6 +40,7 @@
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "ItemEnchantmentMgr.h"
+#include "IPLocation.h"
 #include "Language.h"
 #include "LFGMgr.h"
 #include "Log.h"
@@ -62,7 +62,6 @@
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
-#include "TemporarySummon.h"
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "TransportMgr.h"
@@ -1174,6 +1173,7 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_ARENA_LOSE_RATING_MODIFIER]               = sConfigMgr->GetOption<float>("Arena.ArenaLoseRatingModifier", 24.0f);
     m_float_configs[CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER]         = sConfigMgr->GetOption<float>("Arena.ArenaMatchmakerRatingModifier", 24.0f);
     m_bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE]              = sConfigMgr->GetOption<bool> ("Arena.QueueAnnouncer.Enable", false);
+    m_bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY]          = sConfigMgr->GetOption<bool> ("Arena.QueueAnnouncer.PlayerOnly", false);
 
     m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetOption<bool>("OffhandCheckAtSpellUnlearn", true);
 
@@ -1501,6 +1501,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server", "Initialize data stores...");
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
+
+    // Load IP Location Database
+    sIPLocation->Load();
 
     std::vector<uint32> mapIds;
     for (auto const& map : sMapStore)
@@ -2411,7 +2414,7 @@ void World::SendGlobalGMMessage(WorldPacket* packet, WorldSession* self, TeamId 
     }
 }
 
-namespace acore
+namespace Acore
 {
     class WorldWorldTextBuilder
     {
@@ -2453,7 +2456,7 @@ namespace acore
         uint32 i_textId;
         va_list* i_args;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 /// Send a System Message to all players (except self if mentioned)
 void World::SendWorldText(uint32 string_id, ...)
@@ -2461,8 +2464,8 @@ void World::SendWorldText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    acore::LocalizedPacketListDo<acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -2480,8 +2483,8 @@ void World::SendGMText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    acore::LocalizedPacketListDo<acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())

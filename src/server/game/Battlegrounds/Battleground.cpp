@@ -27,7 +27,6 @@
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "Transport.h"
 #include "Util.h"
@@ -37,7 +36,7 @@
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
-namespace acore
+namespace Acore
 {
     class BattlegroundChatBuilder
     {
@@ -101,7 +100,7 @@ namespace acore
         uint32 _arg1;
         uint32 _arg2;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 template<class Do>
 void Battleground::BroadcastWorker(Do& _do)
@@ -823,36 +822,36 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
                 uint32 currOnline = (uint32)(sWorld->GetActiveSessionCount());
 
                 SQLTransaction trans = CharacterDatabase.BeginTransaction();
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
-                stmt->setUInt32(0, fightId);
-                stmt->setUInt8(1, m_ArenaType);
-                stmt->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
-                stmt->setUInt32(3, winnerArenaTeam->GetId());
-                stmt->setUInt32(4, loserArenaTeam->GetId());
-                stmt->setUInt16(5, (uint16)winnerTeamRating);
-                stmt->setUInt16(6, (uint16)winnerMatchmakerRating);
-                stmt->setInt16(7, (int16)winnerChange);
-                stmt->setUInt16(8, (uint16)loserTeamRating);
-                stmt->setUInt16(9, (uint16)loserMatchmakerRating);
-                stmt->setInt16(10, (int16)loserChange);
-                stmt->setUInt32(11, currOnline);
-                trans->Append(stmt);
+                PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
+                stmt2->setUInt32(0, fightId);
+                stmt2->setUInt8(1, m_ArenaType);
+                stmt2->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
+                stmt2->setUInt32(3, winnerArenaTeam->GetId());
+                stmt2->setUInt32(4, loserArenaTeam->GetId());
+                stmt2->setUInt16(5, (uint16)winnerTeamRating);
+                stmt2->setUInt16(6, (uint16)winnerMatchmakerRating);
+                stmt2->setInt16(7, (int16)winnerChange);
+                stmt2->setUInt16(8, (uint16)loserTeamRating);
+                stmt2->setUInt16(9, (uint16)loserMatchmakerRating);
+                stmt2->setInt16(10, (int16)loserChange);
+                stmt2->setUInt32(11, currOnline);
+                trans->Append(stmt2);
 
                 uint8 memberId = 0;
                 for (Battleground::ArenaLogEntryDataMap::const_iterator itr = ArenaLogEntries.begin(); itr != ArenaLogEntries.end(); ++itr)
                 {
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_MEMBERSTATS);
-                    stmt->setUInt32(0, fightId);
-                    stmt->setUInt8(1, ++memberId);
-                    stmt->setString(2, itr->second.Name);
-                    stmt->setUInt32(3, itr->second.Guid);
-                    stmt->setUInt32(4, itr->second.ArenaTeamId);
-                    stmt->setUInt32(5, itr->second.Acc);
-                    stmt->setString(6, itr->second.IP);
-                    stmt->setUInt32(7, itr->second.DamageDone);
-                    stmt->setUInt32(8, itr->second.HealingDone);
-                    stmt->setUInt32(9, itr->second.KillingBlows);
-                    trans->Append(stmt);
+                    stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_MEMBERSTATS);
+                    stmt2->setUInt32(0, fightId);
+                    stmt2->setUInt8(1, ++memberId);
+                    stmt2->setString(2, itr->second.Name);
+                    stmt2->setUInt32(3, itr->second.Guid);
+                    stmt2->setUInt32(4, itr->second.ArenaTeamId);
+                    stmt2->setUInt32(5, itr->second.Acc);
+                    stmt2->setString(6, itr->second.IP);
+                    stmt2->setUInt32(7, itr->second.DamageDone);
+                    stmt2->setUInt32(8, itr->second.HealingDone);
+                    stmt2->setUInt32(9, itr->second.KillingBlows);
+                    trans->Append(stmt2);
                 }
 
                 CharacterDatabase.CommitTransaction(trans);
@@ -882,36 +881,36 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
                 uint32 currOnline = (uint32)(sWorld->GetActiveSessionCount());
 
                 SQLTransaction trans = CharacterDatabase.BeginTransaction();
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
-                stmt->setUInt32(0, fightId);
-                stmt->setUInt8(1, m_ArenaType);
-                stmt->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
-                stmt->setUInt32(3, winnerArenaTeam->GetId());
-                stmt->setUInt32(4, loserArenaTeam->GetId());
-                stmt->setUInt16(5, (uint16)winnerTeamRating);
-                stmt->setUInt16(6, (uint16)winnerMatchmakerRating);
-                stmt->setInt16(7, (int16)winnerChange);
-                stmt->setUInt16(8, (uint16)loserTeamRating);
-                stmt->setUInt16(9, (uint16)loserMatchmakerRating);
-                stmt->setInt16(10, (int16)loserChange);
-                stmt->setUInt32(11, currOnline);
-                trans->Append(stmt);
+                PreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);
+                stmt3->setUInt32(0, fightId);
+                stmt3->setUInt8(1, m_ArenaType);
+                stmt3->setUInt32(2, ((GetStartTime() <= startDelay ? 0 : GetStartTime() - startDelay) / 1000));
+                stmt3->setUInt32(3, winnerArenaTeam->GetId());
+                stmt3->setUInt32(4, loserArenaTeam->GetId());
+                stmt3->setUInt16(5, (uint16)winnerTeamRating);
+                stmt3->setUInt16(6, (uint16)winnerMatchmakerRating);
+                stmt3->setInt16(7, (int16)winnerChange);
+                stmt3->setUInt16(8, (uint16)loserTeamRating);
+                stmt3->setUInt16(9, (uint16)loserMatchmakerRating);
+                stmt3->setInt16(10, (int16)loserChange);
+                stmt3->setUInt32(11, currOnline);
+                trans->Append(stmt3);
 
                 uint8 memberId = 0;
                 for (Battleground::ArenaLogEntryDataMap::const_iterator itr = ArenaLogEntries.begin(); itr != ArenaLogEntries.end(); ++itr)
                 {
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_MEMBERSTATS);
-                    stmt->setUInt32(0, fightId);
-                    stmt->setUInt8(1, ++memberId);
-                    stmt->setString(2, itr->second.Name);
-                    stmt->setUInt32(3, itr->second.Guid);
-                    stmt->setUInt32(4, itr->second.ArenaTeamId);
-                    stmt->setUInt32(5, itr->second.Acc);
-                    stmt->setString(6, itr->second.IP);
-                    stmt->setUInt32(7, itr->second.DamageDone);
-                    stmt->setUInt32(8, itr->second.HealingDone);
-                    stmt->setUInt32(9, itr->second.KillingBlows);
-                    trans->Append(stmt);
+                    stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_MEMBERSTATS);
+                    stmt3->setUInt32(0, fightId);
+                    stmt3->setUInt8(1, ++memberId);
+                    stmt3->setString(2, itr->second.Name);
+                    stmt3->setUInt32(3, itr->second.Guid);
+                    stmt3->setUInt32(4, itr->second.ArenaTeamId);
+                    stmt3->setUInt32(5, itr->second.Acc);
+                    stmt3->setString(6, itr->second.IP);
+                    stmt3->setUInt32(7, itr->second.DamageDone);
+                    stmt3->setUInt32(8, itr->second.HealingDone);
+                    stmt3->setUInt32(9, itr->second.KillingBlows);
+                    trans->Append(stmt3);
                 }
 
                 CharacterDatabase.CommitTransaction(trans);
@@ -1067,7 +1066,7 @@ uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const
 {
     //variable kills means how many honorable kills you scored (so we need kills * honor_for_one_kill)
     uint32 maxLevel = std::min<uint32>(GetMaxLevel(), 80U);
-    return acore::Honor::hk_honor_at_level(maxLevel, float(kills));
+    return Acore::Honor::hk_honor_at_level(maxLevel, float(kills));
 }
 
 void Battleground::BlockMovement(Player* player)
@@ -1749,8 +1748,8 @@ void Battleground::SendMessageToAll(uint32 entry, ChatMsg type, Player const* so
     if (!entry)
         return;
 
-    acore::BattlegroundChatBuilder bg_builder(type, entry, source);
-    acore::LocalizedPacketDo<acore::BattlegroundChatBuilder> bg_do(bg_builder);
+    Acore::BattlegroundChatBuilder bg_builder(type, entry, source);
+    Acore::LocalizedPacketDo<Acore::BattlegroundChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }
 
@@ -1762,8 +1761,8 @@ void Battleground::PSendMessageToAll(uint32 entry, ChatMsg type, Player const* s
     va_list ap;
     va_start(ap, source);
 
-    acore::BattlegroundChatBuilder bg_builder(type, entry, source, &ap);
-    acore::LocalizedPacketDo<acore::BattlegroundChatBuilder> bg_do(bg_builder);
+    Acore::BattlegroundChatBuilder bg_builder(type, entry, source, &ap);
+    Acore::LocalizedPacketDo<Acore::BattlegroundChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 
     va_end(ap);
@@ -1796,8 +1795,8 @@ void Battleground::SendWarningToAll(uint32 entry, ...)
 
 void Battleground::SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 arg1, uint32 arg2)
 {
-    acore::Battleground2ChatBuilder bg_builder(type, entry, source, arg1, arg2);
-    acore::LocalizedPacketDo<acore::Battleground2ChatBuilder> bg_do(bg_builder);
+    Acore::Battleground2ChatBuilder bg_builder(type, entry, source, arg1, arg2);
+    Acore::LocalizedPacketDo<Acore::Battleground2ChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }
 
