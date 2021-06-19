@@ -581,6 +581,7 @@ void AddSC_outdoorpvp_gh();
 void AddSC_chat_log();
 void AddSC_character_creation();
 void AddSC_action_ip_logger();
+void AddSC_player_scripts();
 
 #endif
 
@@ -660,6 +661,7 @@ void AddWorldScripts()
     AddSC_chat_log(); // location: scripts\World\chat_log.cpp
     AddSC_character_creation();
     AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
+    AddSC_player_scripts();
 #endif
 }
 
