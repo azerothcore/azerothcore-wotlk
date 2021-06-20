@@ -716,7 +716,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 {
     // Xinef: initialize damage done for rage calculations
     // Xinef: its rare to modify damage in hooks, however training dummy's sets damage to 0
-    uint32 rage_damage = damage + ((cleanDamage != nullptr) ? cleanDamage->absorbed_damage : 0);
+    uint32 rage_damage = damage + ((cleanDamage != nullptr && cleanDamage) ? cleanDamage->absorbed_damage : 0);
 
     //if (attacker)
     {
