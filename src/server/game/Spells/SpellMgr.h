@@ -698,13 +698,13 @@ public:
     {
         if (spellId >= GetSpellInfoStoreSize())
         {
-            LOG_ERROR("server", "spellId %d is not lower than GetSpellInfoStoreSize() (%d)", spellId, GetSpellInfoStoreSize());
+            LOG_ERROR("server", "spellId %u is not lower than GetSpellInfoStoreSize() (%u)", spellId, GetSpellInfoStoreSize());
             return nullptr;
         }
         SpellInfo const* spellInfo = mSpellInfoMap[spellId];
         if (!spellInfo)
         {
-            LOG_ERROR("server", "spellId %d has invalid spellInfo", spellId);
+            LOG_ERROR("server", "spellId %u has invalid spellInfo", spellId);
             return nullptr;
         }
         return spellInfo;
