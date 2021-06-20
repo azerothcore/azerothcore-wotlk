@@ -739,7 +739,7 @@ public:                                                 // opcodes handlers
     //Pet
     void HandlePetAction(WorldPacket& recvData);
     void HandlePetStopAttack(WorldPacket& recvData);
-    void HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellid, uint16 flag, ObjectGuid guid2);
+    void HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spellid, uint16 flag, ObjectGuid guid2);
     void HandlePetNameQuery(WorldPacket& recvData);
     void HandlePetSetAction(WorldPacket& recvData);
     void HandlePetAbandon(WorldPacket& recvData);

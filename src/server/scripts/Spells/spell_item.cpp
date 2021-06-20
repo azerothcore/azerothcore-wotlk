@@ -308,7 +308,7 @@ public:
             Unit* target = GetTarget();
             if (target->getLevel() <= 70)
             {
-                if (uint32 spellId = getMountSpellId())
+                if (uint16 spellId = getMountSpellId())
                 {
                     target->CastSpell(target, spellId, aurEff);
                 }
@@ -318,7 +318,7 @@ public:
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            if (uint32 spellId = getMountSpellId())
+            if (uint16 spellId = getMountSpellId())
             {
                 target->RemoveAurasDueToSpell(spellId);
             }
