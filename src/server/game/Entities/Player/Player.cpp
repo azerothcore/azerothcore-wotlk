@@ -6546,7 +6546,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
                 break;
             case ITEM_SUBCLASS_WEAPON_FIST:
                 UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
-                // no break intended
+                [[fallthrough]]
             default:
                 UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
                 break;
