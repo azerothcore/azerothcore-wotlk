@@ -3494,7 +3494,11 @@ void ObjectMgr::LoadPlayerInfo()
     {
         uint32 oldMSTime = getMSTime();
 
+<<<<<<< HEAD
         QueryResult result = WorldDatabase.PQuery("SELECT raceMask, classMask, skill, `rank` FROM playercreateinfo_skills");
+=======
+        QueryResult result = WorldDatabase.PQuery("SELECT raceMask, classMask, skill, skillRank FROM playercreateinfo_skills");
+>>>>>>> aabd79fdc134b120253bf6d70d3f69bb76ca37fe
 
         if (!result)
         {

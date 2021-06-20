@@ -20,13 +20,13 @@ CREATE TABLE `playercreateinfo_skills` (
   `raceMask` INT UNSIGNED NOT NULL,
   `classMask` INT UNSIGNED NOT NULL,
   `skill` SMALLINT UNSIGNED NOT NULL,
-  `rank` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  `skillRank` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   `comment` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`raceMask`,`classMask`,`skill`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 DELETE FROM `playercreateinfo_skills`;
-INSERT INTO `playercreateinfo_skills` (`raceMask`, `classMask`, `skill`, `rank`, `comment`) VALUES 
+INSERT INTO `playercreateinfo_skills` (`raceMask`, `classMask`, `skill`, `skillRank`, `comment`) VALUES 
 (0, 0, 95, 0, 'Defense'),
 (0, 0, 162, 0, 'Unarmed'),
 (0, 0, 183, 0, 'GENERIC (DND)'),
