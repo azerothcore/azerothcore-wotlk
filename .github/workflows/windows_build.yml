@@ -7,18 +7,20 @@ on:
     types: ['labeled']
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
   cancel-in-progress: true
 
 jobs:
   windows-build:
     strategy:
       fail-fast: false
-    runs-on: windows-2019
-    name: windows-2019-MSVC16
+      matrix:
+        os: [windows-2019]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}-MSVC16
     env:
       BOOST_ROOT: C:\local\boost_1_74_0
-    if: github.repository == 'azerothcore/azerothcore-wotlk && ${{ github.event.label.name == 'run-build' }}'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ github.event.label.name == 'run-build' }}
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS

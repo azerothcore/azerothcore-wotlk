@@ -10,7 +10,6 @@
 
 #include "AppenderDB.h"
 #include "Banner.h"
-#include "Common.h"
 #include "Configuration/Config.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
