@@ -6,7 +6,6 @@
 #include "ByteBuffer.h"
 #include "Errors.h"
 #include "MessageBuffer.h"
-#include "Common.h"
 #include "Log.h"
 #include "Util.h"
 #include <utf8.h>
