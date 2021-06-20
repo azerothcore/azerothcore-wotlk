@@ -15186,11 +15186,15 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     break;
                 case GOSSIP_OPTION_VENDOR:
                     {
-                        VendorItemData const* vendorItems = itr->second.ActionMenuID ? sObjectMgr->GetNpcVendorItemList(itr->second.ActionMenuID) : creature->GetVendorItems();
-                        if (!vendorItems || vendorItems->Empty())
+                        if (!creature->isVendorWithIconSpeak())
                         {
-                            LOG_ERROR("sql.sql", "Creature %s have UNIT_NPC_FLAG_VENDOR but have empty trading item list.", creature->GetGUID().ToString().c_str());
-                            canTalk = false;
+                            VendorItemData const* vendorItems = itr->second.ActionMenuID ? sObjectMgr->GetNpcVendorItemList(itr->second.ActionMenuID) : creature->GetVendorItems();
+                            if (!vendorItems || vendorItems->Empty())
+                            {
+                                LOG_ERROR("sql.sql", "Creature %s have UNIT_NPC_FLAG_VENDOR but have empty trading item list.", creature->GetGUID().ToString().c_str());
+                                canTalk = false;
+                            }
+                            break;
                         }
                         break;
                     }
@@ -15229,6 +15233,15 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     }
                     break;
                 case GOSSIP_OPTION_GOSSIP:
+                    if (creature->isVendorWithIconSpeak())
+                    {
+                        VendorItemData const* vendorItems = creature->GetVendorItems();
+                        if (!vendorItems || vendorItems->Empty())
+                        {
+                            canTalk = false;
+                        }
+                    }
+                    break;
                 case GOSSIP_OPTION_SPIRITGUIDE:
                 case GOSSIP_OPTION_INNKEEPER:
                 case GOSSIP_OPTION_BANKER:

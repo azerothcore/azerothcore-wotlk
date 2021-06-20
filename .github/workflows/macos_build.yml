@@ -7,7 +7,7 @@ on:
     types: ['labeled']
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
   cancel-in-progress: true
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
  #         - macos-11.0
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk && ${{ github.event.label.name == 'run-build' }}'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ github.event.label.name == 'run-build' }}
     steps:
       - uses: actions/checkout@v2
       - name: Cache
