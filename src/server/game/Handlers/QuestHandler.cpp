@@ -6,9 +6,7 @@
 
 #include "Battleground.h"
 #include "BattlegroundAV.h"
-#include "Common.h"
 #include "GameObjectAI.h"
-#include "GossipDef.h"
 #include "Group.h"
 #include "Language.h"
 #include "Log.h"
@@ -299,10 +297,22 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
                             // Send next quest
                             if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
                             {
-                                if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
+                                if (_player->CanTakeQuest(nextQuest, false))
                                 {
                                     if (nextQuest->IsAutoAccept())
-                                        _player->AddQuestAndCheckCompletion(nextQuest, object);
+                                    {
+                                        // QUEST_FLAGS_AUTO_ACCEPT was not used by Blizzard.
+                                        if (_player->CanAddQuest(nextQuest, false))
+                                        {
+                                            _player->AddQuestAndCheckCompletion(nextQuest, object);
+                                        }
+                                        else
+                                        {
+                                            // Auto accept is set for a custom quest and there is no inventory space
+                                            _player->PlayerTalkClass->SendCloseGossip();
+                                            break;
+                                        }
+                                    }
                                     _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
                                 }
                             }

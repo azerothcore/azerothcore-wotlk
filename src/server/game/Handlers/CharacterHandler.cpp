@@ -5,7 +5,6 @@
  */
 
 #include "AccountMgr.h"
-#include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "AuctionHouseMgr.h"
 #include "Battleground.h"
@@ -18,7 +17,6 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
-#include "LFGMgr.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -747,7 +745,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     {
         std::string dump;
         if (PlayerDumpWriter().GetDump(guid.GetCounter(), dump))
-            LOG_CHAR_DUMP(dump.c_str(), GetAccountId(), guid.GetCounter(), name.c_str());
+            LOG_CHAR_DUMP(dump.c_str(), GetAccountId(), guid.GetRawValue(), name.c_str());
     }
 
     sCalendarMgr->RemoveAllPlayerEventsAndInvites(guid);

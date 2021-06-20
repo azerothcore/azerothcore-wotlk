@@ -17,7 +17,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <openssl/md5.h>
 #include <openssl/sha.h>
 
 Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
@@ -249,14 +248,14 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
         if (Player const* plr = _session->GetPlayer())
         {
             std::string const reportFormat = "Player %s (guid %u, account id: %u) failed warden %u check (%s). Action: %s";
-            reportMsg = acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(),
+            reportMsg = Acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(),
                                            checkId, ((checkData && !checkData->Comment.empty()) ? checkData->Comment.c_str() : "<warden comment is not set>"),
                                            GetWardenActionStr(action).c_str());
         }
         else
         {
             std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
-            reportMsg = acore::StringFormat(reportFormat, _session->GetAccountId(), checkId, GetWardenActionStr(action).c_str());
+            reportMsg = Acore::StringFormat(reportFormat, _session->GetAccountId(), checkId, GetWardenActionStr(action).c_str());
         }
     }
     else
@@ -264,12 +263,12 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
         if (Player const* plr = _session->GetPlayer())
         {
             std::string const reportFormat = "Player %s (guid %u, account id: %u) triggered warden penalty by reason: %s. Action: %s";
-            reportMsg = acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+            reportMsg = Acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
         }
         else
         {
             std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
-            reportMsg = acore::StringFormat(reportFormat, _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+            reportMsg = Acore::StringFormat(reportFormat, _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
         }
     }
 
@@ -281,7 +280,7 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
 {
     static constexpr char WARDEN_TOKEN[] = "_TW\t";
     // if msg starts with WARDEN_TOKEN
-    if (!(msg.rfind(WARDEN_TOKEN, 0) == 0))
+    if (msg.rfind(WARDEN_TOKEN, 0) != 0)
     {
         return false;
     }

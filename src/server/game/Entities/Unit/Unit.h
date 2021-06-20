@@ -2177,7 +2177,7 @@ public:
     bool isInBackInMap(Unit const* target, float distance, float arc = M_PI) const;
 
     // Visibility system
-    [[nodiscard]] bool IsVisible() const { return (m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM) > SEC_PLAYER) ? false : true; }
+    [[nodiscard]] bool IsVisible() const { return m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM) <= SEC_PLAYER; }
     void SetVisible(bool x);
     void SetModelVisible(bool on);
 
@@ -2627,7 +2627,7 @@ private:
     float processDummyAuras(float TakenTotalMod) const;
 };
 
-namespace acore
+namespace Acore
 {
     // Binary predicate for sorting Units based on percent value of a power
     class PowerPctOrderPred

@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "AccountMgr.h"
 #include "CalendarMgr.h"
 #include "Chat.h"
 #include "Config.h"
@@ -472,13 +471,13 @@ bool Guild::BankTab::WriteSlotPacket(WorldPacket& data, uint8 slotId, bool ignor
     {
         data << uint32(0);                                  // 3.3.0 (0x00018020, 0x00018000)
 
-        if (uint32 random = pItem->GetItemRandomPropertyId())
+        if (int32 random = pItem->GetItemRandomPropertyId())
         {
-            data << uint32(random);                         // Random item property id
+            data << int32(random);                          // Random item property id
             data << uint32(pItem->GetItemSuffixFactor());   // SuffixFactor
         }
         else
-            data << uint32(0);
+            data << int32(0);
 
         data << uint32(pItem->GetCount());                  // ITEM_FIELD_STACK_COUNT
         data << uint32(0);
@@ -1740,7 +1739,7 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
 
     CharacterDatabase.CommitTransaction(trans);
 
-    std::string aux = acore::Impl::ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
+    std::string aux = Acore::Impl::ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, ObjectGuid::Empty, aux.c_str());
 
     if (amount > 10 * GOLD)
@@ -1791,7 +1790,7 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
         CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB WITHDRAW> %s (guild id: %u, members: %u, new amount: %u, leader guid low: %u, char level: %u)\", NOW())",
             session->GetAccountId(), player->GetGUID().GetCounter(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), GetLeaderGUID().GetCounter(), player->getLevel());
 
-    std::string aux = acore::Impl::ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
+    std::string aux = Acore::Impl::ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, ObjectGuid::Empty, aux.c_str());
     return true;
 }

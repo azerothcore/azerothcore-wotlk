@@ -6,7 +6,6 @@
 #include "ByteBuffer.h"
 #include "Errors.h"
 #include "MessageBuffer.h"
-#include "Common.h"
 #include "Log.h"
 #include "Util.h"
 #include <utf8.h>
@@ -40,7 +39,7 @@ ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size, si
 
 ByteBufferInvalidValueException::ByteBufferInvalidValueException(char const* type, char const* value)
 {
-    message().assign(acore::StringFormat("Invalid %s value (%s) found in ByteBuffer", type, value));
+    message().assign(Acore::StringFormat("Invalid %s value (%s) found in ByteBuffer", type, value));
 }
 
 ByteBuffer& ByteBuffer::operator>>(float& value)

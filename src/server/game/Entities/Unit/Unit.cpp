@@ -42,6 +42,7 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "TargetedMovementGenerator.h"
 #include "TemporarySummon.h"
 #include "Totem.h"
 #include "TotemAI.h"
@@ -959,8 +960,8 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         // Rage from damage received
         if (attacker != victim && victim->getPowerType() == POWER_RAGE)
         {
-            uint32 rage_damage = damage + (cleanDamage ? cleanDamage->absorbed_damage : 0);
-            victim->RewardRage(rage_damage, 0, false);
+            uint32 rageDamage = damage + (cleanDamage ? cleanDamage->absorbed_damage : 0);
+            victim->RewardRage(rageDamage, 0, false);
         }
 
         if (attacker && attacker->GetTypeId() == TYPEID_PLAYER)
@@ -1036,7 +1037,7 @@ SpellCastResult Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const
 {
     if (!spellInfo)
     {
-        LOG_ERROR("server", "CastSpell: unknown spell by caster: %s %u)", (GetTypeId() == TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"), (GetTypeId() == TYPEID_PLAYER ? GetGUID().GetCounter() : GetEntry()));
+        LOG_ERROR("entities.unit", "CastSpell: unknown spell by caster %s", GetGUID().ToString().c_str());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
@@ -1070,7 +1071,7 @@ SpellCastResult Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags t
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
     {
-        LOG_ERROR("server", "CastSpell: unknown spell id %u by caster: %s %u)", spellId, (GetTypeId() == TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"), (GetTypeId() == TYPEID_PLAYER ? GetGUID().GetCounter() : GetEntry()));
+        LOG_ERROR("entities.unit", "CastSpell: unknown spell %u by caster %s", spellId, GetGUID().ToString().c_str());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
@@ -1120,9 +1121,10 @@ SpellCastResult Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& v
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
     {
-        LOG_ERROR("server", "CastSpell: unknown spell id %u by caster: %s %u)", spellId, (GetTypeId() == TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"), (GetTypeId() == TYPEID_PLAYER ? GetGUID().GetCounter() : GetEntry()));
+        LOG_ERROR("entities.unit", "CastSpell: unknown spell %u by caster %s", spellId, GetGUID().ToString().c_str());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
+
     SpellCastTargets targets;
     targets.SetUnitTarget(victim);
 
@@ -1134,9 +1136,10 @@ SpellCastResult Unit::CastSpell(float x, float y, float z, uint32 spellId, bool 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
     {
-        LOG_ERROR("server", "CastSpell: unknown spell id %u by caster: %s %u)", spellId, (GetTypeId() == TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"), (GetTypeId() == TYPEID_PLAYER ? GetGUID().GetCounter() : GetEntry()));
+        LOG_ERROR("entities.unit", "CastSpell: unknown spell %u by caster %s", spellId, GetGUID().ToString().c_str());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
+
     SpellCastTargets targets;
     targets.SetDst(x, y, z, GetOrientation());
 
@@ -1148,9 +1151,10 @@ SpellCastResult Unit::CastSpell(GameObject* go, uint32 spellId, bool triggered, 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
     {
-        LOG_ERROR("server", "CastSpell: unknown spell id %u by caster: %s %u)", spellId, (GetTypeId() == TYPEID_PLAYER ? "player (GUID:" : "creature (Entry:"), (GetTypeId() == TYPEID_PLAYER ? GetGUID().GetCounter() : GetEntry()));
+        LOG_ERROR("entities.unit", "CastSpell: unknown spell %u by caster %s", spellId, GetGUID().ToString().c_str());
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
+
     SpellCastTargets targets;
     targets.SetGOTarget(go);
 
@@ -1890,7 +1894,7 @@ void Unit::CalcAbsorbResist(Unit* attacker, Unit* victim, SpellSchoolMask school
     // We're going to call functions which can modify content of the list during iteration over it's elements
     // Let's copy the list so we can prevent iterator invalidation
     AuraEffectList vSchoolAbsorbCopy(victim->GetAuraEffectsByType(SPELL_AURA_SCHOOL_ABSORB));
-    vSchoolAbsorbCopy.sort(acore::AbsorbAuraOrderPred());
+    vSchoolAbsorbCopy.sort(Acore::AbsorbAuraOrderPred());
 
     // absorb without mana cost
     for (AuraEffectList::iterator itr = vSchoolAbsorbCopy.begin(); (itr != vSchoolAbsorbCopy.end()) && (dmgInfo.GetDamage() > 0); ++itr)
@@ -2205,7 +2209,7 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
         return;
 
     // CombatStart puts the target into stand state, so we need to cache sit state here to know if we should crit later
-    const bool sittingVictim = victim->GetTypeId() == TYPEID_PLAYER && (victim->IsSitState() || victim->getStandState() == UNIT_STAND_STATE_SLEEP) ? true : false;
+    const bool sittingVictim = victim->GetTypeId() == TYPEID_PLAYER && (victim->IsSitState() || victim->getStandState() == UNIT_STAND_STATE_SLEEP);
 
     CombatStart(victim);
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
@@ -3372,10 +3376,11 @@ void Unit::_UpdateAutoRepeatSpell()
     static uint32 const HUNTER_AUTOSHOOT = 75;
 
     // Check "realtime" interrupts
-    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving() && spellProto->Id != HUNTER_AUTOSHOOT) ||
-        IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
+    if ((GetTypeId() == TYPEID_PLAYER && ToPlayer()->isMoving() && spellProto->Id != HUNTER_AUTOSHOOT) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
     {
-        InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+        // cancel wand shoot
+        if (spellProto->Id != HUNTER_AUTOSHOOT)
+            InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
         m_AutoRepeatFirstCast = true;
         return;
     }
@@ -11267,8 +11272,8 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
     {
         int32 modifierMax = 0;
         int32 modifierMin = 0;
-        AuraEffectList const& mTotalAuraList = GetAuraEffectsByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
-        for (AuraEffectList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
+        AuraEffectList const& auraEffectList = GetAuraEffectsByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
+        for (AuraEffectList::const_iterator i = auraEffectList.begin(); i != auraEffectList.end(); ++i)
         {
             if (!spellProto->ValidateAttribute6SpellDamageMods(caster, *i, damagetype == DOT))
                 continue;
@@ -12922,6 +12927,7 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
 
         SetInCombatWith(target);
         target->SetInCombatWith(this);
+        target->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
         // Xinef: If pet started combat - put owner in combat
         if (Unit* owner = GetOwner())
@@ -13579,19 +13585,24 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             {
                 if (GetTypeId() == TYPEID_UNIT)
                 {
-                    Unit* pOwner = GetCharmerOrOwner();
-                    if (pOwner && !IsInCombat() && !IsVehicle() && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED) && (IsPet() || IsGuardian() || GetGUID() == pOwner->GetCritterGUID() || GetCharmerGUID() == pOwner->GetGUID()))
+                    Unit* followed = nullptr;
+                    if (GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
                     {
-                        if (pOwner->GetTypeId() != TYPEID_PLAYER)
+                        followed = static_cast<FollowMovementGenerator<Creature>const*>(GetMotionMaster()->top())->GetTarget();
+                    }
+
+                    if (followed && !IsInCombat() && !IsVehicle() && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED) && (IsPet() || IsGuardian() || GetGUID() == followed->GetCritterGUID() || GetCharmerOrOwnerGUID() == followed->GetGUID()))
+                    {
+                        if (followed->GetTypeId() != TYPEID_PLAYER)
                         {
-                            if (speed < pOwner->GetSpeedRate(mtype) + 0.1f)
-                                speed = pOwner->GetSpeedRate(mtype) + 0.1f; // pets derive speed from owner when not in combat
+                            if (speed < followed->GetSpeedRate(mtype) + 0.1f)
+                                speed = followed->GetSpeedRate(mtype) + 0.1f; // pets derive speed from owner when not in combat
                         }
                         else
                         {
                             // special treatment for player pets in order to avoid stuttering
-                            float ownerSpeed = pOwner->GetSpeedRate(mtype);
-                            float distOwner = GetDistance(pOwner);
+                            float ownerSpeed = followed->GetSpeedRate(mtype);
+                            float distOwner = GetDistance(followed);
                             float minDist = 2.5f;
 
                             if (ToCreature()->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
@@ -15525,14 +15536,14 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 !target->IsPet()
            )
         {
-            // On melee based hit/miss/resist need update skill (for victim and attacker)
-            if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST))
+            // On melee based hit/miss/resist/parry/dodge need to update skill (for victim and attacker)
+            if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST | PROC_EX_PARRY | PROC_EX_DODGE))
             {
-                if (target->GetTypeId() != TYPEID_PLAYER && !target->IsCritter())
+                if (target->GetTypeId() != TYPEID_PLAYER)
                     ToPlayer()->UpdateCombatSkills(target, attType, isVictim);
             }
-            // Update defence if player is victim and parry/dodge/block
-            else if (isVictim && procExtra & (PROC_EX_DODGE | PROC_EX_PARRY | PROC_EX_BLOCK))
+            // Update defence if player is victim and we block
+            else if (isVictim && procExtra & (PROC_EX_BLOCK))
                 ToPlayer()->UpdateCombatSkills(target, attType, true);
         }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
@@ -16290,9 +16301,9 @@ void Unit::UpdateReactives(uint32 p_time)
 Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
 {
     std::list<Unit*> targets;
-    acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
-    acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
-    VisitNearbyObject(dist, searcher);
+    Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
+    Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    Cell::VisitAllObjects(this, searcher, dist);
 
     // remove current target
     if (GetVictim())
@@ -16319,15 +16330,15 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
         return nullptr;
 
     // select random
-    return acore::Containers::SelectRandomContainerElement(targets);
+    return Acore::Containers::SelectRandomContainerElement(targets);
 }
 
 Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
 {
     std::list<Unit*> targets;
-    acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
-    acore::UnitListSearcher<acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
-    VisitNearbyObject(dist, searcher);
+    Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
+    Acore::UnitListSearcher<Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    Cell::VisitAllObjects(this, searcher, dist);
 
     // remove current target
     if (GetVictim())
@@ -16354,7 +16365,7 @@ Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
         return nullptr;
 
     // select random
-    return acore::Containers::SelectRandomContainerElement(targets);
+    return Acore::Containers::SelectRandomContainerElement(targets);
 }
 
 void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply)
@@ -16889,7 +16900,7 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
 
                 if (!nearMembers.empty())
                 {
-                    nearMembers.sort(acore::HealthPctOrderPred());
+                    nearMembers.sort(Acore::HealthPctOrderPred());
                     if (Unit* target = nearMembers.front())
                     {
                         CastSpell(target, 41637 /*Dummy visual effect triggered by main spell cast*/, true);
@@ -18088,9 +18099,9 @@ void Unit::GetPartyMembers(std::list<Unit*>& TagUnitMap)
                 if (Target->IsAlive())
                     TagUnitMap.push_back(Target);
 
-                for (Unit::ControlSet::iterator itr = Target->m_Controlled.begin(); itr != Target->m_Controlled.end(); ++itr)
+                for (Unit::ControlSet::iterator iterator = Target->m_Controlled.begin(); iterator != Target->m_Controlled.end(); ++iterator)
                 {
-                    if (Unit* pet = *itr)
+                    if (Unit* pet = *iterator)
                         if (pet->IsGuardian() && pet->IsAlive())
                             TagUnitMap.push_back(pet);
                 }
@@ -18365,9 +18376,9 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
         // pussywizard: generally this is not needed here, delayed notifier will handle this, call only for pets
         if ((IsGuardian() || IsPet()) && GetOwnerGUID().IsPlayer())
         {
-            acore::AIRelocationNotifier notifier(*this);
+            Acore::AIRelocationNotifier notifier(*this);
             float radius = 60.0f;
-            VisitNearbyObject(radius, notifier);
+            Cell::VisitAllObjects(this, notifier, radius);
         }
     }
 }
@@ -19216,7 +19227,7 @@ void Unit::SendTeleportPacket(Position& pos)
 
 bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool teleport)
 {
-    if (!acore::IsValidMapCoord(x, y, z, orientation))
+    if (!Acore::IsValidMapCoord(x, y, z, orientation))
         return false;
 
     float old_orientation = GetOrientation();
@@ -19739,11 +19750,11 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
                     //active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
                 }
 
-                acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
-                viewPoint->VisitNearbyObject(player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS, relocateNoLarge);
+                Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
+                Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
                 relocateNoLarge.SendToSelf();
-                acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
-                viewPoint->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, relocateLarge);
+                Acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
+                Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
                 relocateLarge.SendToSelf();
             }
 
@@ -19773,11 +19784,11 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
             active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
         }
 
-        acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
-        viewPoint->VisitNearbyObject(player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS, relocateNoLarge);
+        Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
+        Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
         relocateNoLarge.SendToSelf();
-        acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
-        viewPoint->VisitNearbyObject(MAX_VISIBILITY_DISTANCE, relocateLarge);
+        Acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
+        Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
         relocateLarge.SendToSelf();
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
@@ -19797,8 +19808,8 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
 
         unit->m_last_notify_position.Relocate(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ());
 
-        acore::CreatureRelocationNotifier relocate(*unit);
-        unit->VisitNearbyObject(unit->GetVisibilityRange() + VISIBILITY_COMPENSATION, relocate);
+        Acore::CreatureRelocationNotifier relocate(*unit);
+        Cell::VisitAllObjects(unit, relocate, unit->GetVisibilityRange() + VISIBILITY_COMPENSATION);
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
     }
@@ -19810,9 +19821,9 @@ void Unit::ExecuteDelayedUnitAINotifyEvent()
     if (!this->IsInWorld() || this->IsDuringRemoveFromWorld())
         return;
 
-    acore::AIRelocationNotifier notifier(*this);
+    Acore::AIRelocationNotifier notifier(*this);
     float radius = 60.0f;
-    this->VisitNearbyObject(radius, notifier);
+    Cell::VisitAllObjects(this, notifier, radius);
 }
 
 void Unit::SetInFront(WorldObject const* target)
@@ -20038,10 +20049,14 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                 if (creature)
                 {
                     if (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && appendValue & UNIT_NPC_FLAG_FLIGHTMASTER)
+                    {
                         appendValue |= UNIT_NPC_FLAG_GOSSIP; // flight masters need NPC gossip flag to show instant flight toggle option
+                    }
 
                     if (!target->CanSeeSpellClickOn(creature))
+                    {
                         appendValue &= ~UNIT_NPC_FLAG_SPELLCLICK;
+                    }
 
                     if (!creature->IsValidTrainerForPlayer(target, &appendValue))
                     {

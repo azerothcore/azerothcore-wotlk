@@ -18,7 +18,6 @@
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
 #include "CalendarMgr.h"
-#include "CellImpl.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "CharacterDatabaseCleaner.h"
@@ -41,6 +40,7 @@
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "ItemEnchantmentMgr.h"
+#include "IPLocation.h"
 #include "Language.h"
 #include "LFGMgr.h"
 #include "Log.h"
@@ -62,7 +62,6 @@
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
-#include "TemporarySummon.h"
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "TransportMgr.h"
@@ -661,7 +660,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_STATS_SAVE_ONLY_ON_LOGOUT]       = sConfigMgr->GetOption<bool>("PlayerSave.Stats.SaveOnlyOnLogout", true);
 
     m_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] = sConfigMgr->GetOption<int32>("PlayerSave.Stats.MinLevel", 0);
-    if (m_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] > MAX_LEVEL)
+    if (m_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] > MAX_LEVEL || int32(m_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE]) < 0)
     {
         LOG_ERROR("server", "PlayerSave.Stats.MinLevel (%i) must be in range 0..80. Using default, do not save character stats (0).", m_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE]);
         m_int_configs[CONFIG_MIN_LEVEL_STAT_SAVE] = 0;
@@ -807,7 +806,7 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_MAX_PLAYER_LEVEL] = sConfigMgr->GetOption<int32>("MaxPlayerLevel", DEFAULT_MAX_LEVEL);
 
-    if (m_int_configs[CONFIG_MAX_PLAYER_LEVEL] > MAX_LEVEL)
+    if (m_int_configs[CONFIG_MAX_PLAYER_LEVEL] > MAX_LEVEL || m_int_configs[CONFIG_MAX_PLAYER_LEVEL] < 1)
     {
         LOG_ERROR("server", "MaxPlayerLevel (%i) must be in range 1..%u. Set to %u.", m_int_configs[CONFIG_MAX_PLAYER_LEVEL], MAX_LEVEL, MAX_LEVEL);
         m_int_configs[CONFIG_MAX_PLAYER_LEVEL] = MAX_LEVEL;
@@ -816,42 +815,25 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_MIN_DUALSPEC_LEVEL] = sConfigMgr->GetOption<int32>("MinDualSpecLevel", 40);
 
     m_int_configs[CONFIG_START_PLAYER_LEVEL] = sConfigMgr->GetOption<int32>("StartPlayerLevel", 1);
-    if (m_int_configs[CONFIG_START_PLAYER_LEVEL] < 1)
+    if (m_int_configs[CONFIG_START_PLAYER_LEVEL] < 1 || m_int_configs[CONFIG_START_PLAYER_LEVEL] > m_int_configs[CONFIG_MAX_PLAYER_LEVEL])
     {
         LOG_ERROR("server", "StartPlayerLevel (%i) must be in range 1..MaxPlayerLevel(%u). Set to 1.", m_int_configs[CONFIG_START_PLAYER_LEVEL], m_int_configs[CONFIG_MAX_PLAYER_LEVEL]);
         m_int_configs[CONFIG_START_PLAYER_LEVEL] = 1;
     }
-    else if (m_int_configs[CONFIG_START_PLAYER_LEVEL] > m_int_configs[CONFIG_MAX_PLAYER_LEVEL])
-    {
-        LOG_ERROR("server", "StartPlayerLevel (%i) must be in range 1..MaxPlayerLevel(%u). Set to %u.", m_int_configs[CONFIG_START_PLAYER_LEVEL], m_int_configs[CONFIG_MAX_PLAYER_LEVEL], m_int_configs[CONFIG_MAX_PLAYER_LEVEL]);
-        m_int_configs[CONFIG_START_PLAYER_LEVEL] = m_int_configs[CONFIG_MAX_PLAYER_LEVEL];
-    }
 
     m_int_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] = sConfigMgr->GetOption<int32>("StartHeroicPlayerLevel", 55);
-    if (m_int_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] < 1)
+    if (m_int_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] < 1 || m_int_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] > m_int_configs[CONFIG_MAX_PLAYER_LEVEL])
     {
         LOG_ERROR("server", "StartHeroicPlayerLevel (%i) must be in range 1..MaxPlayerLevel(%u). Set to 55.",
                        m_int_configs[CONFIG_START_HEROIC_PLAYER_LEVEL], m_int_configs[CONFIG_MAX_PLAYER_LEVEL]);
         m_int_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] = 55;
     }
-    else if (m_int_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] > m_int_configs[CONFIG_MAX_PLAYER_LEVEL])
-    {
-        LOG_ERROR("server", "StartHeroicPlayerLevel (%i) must be in range 1..MaxPlayerLevel(%u). Set to %u.",
-                       m_int_configs[CONFIG_START_HEROIC_PLAYER_LEVEL], m_int_configs[CONFIG_MAX_PLAYER_LEVEL], m_int_configs[CONFIG_MAX_PLAYER_LEVEL]);
-        m_int_configs[CONFIG_START_HEROIC_PLAYER_LEVEL] = m_int_configs[CONFIG_MAX_PLAYER_LEVEL];
-    }
 
     m_int_configs[CONFIG_START_PLAYER_MONEY] = sConfigMgr->GetOption<int32>("StartPlayerMoney", 0);
-    if (int32(m_int_configs[CONFIG_START_PLAYER_MONEY]) < 0)
+    if (int32(m_int_configs[CONFIG_START_PLAYER_MONEY]) < 0 || int32(m_int_configs[CONFIG_START_PLAYER_MONEY]) > MAX_MONEY_AMOUNT)
     {
         LOG_ERROR("server", "StartPlayerMoney (%i) must be in range 0..%u. Set to %u.", m_int_configs[CONFIG_START_PLAYER_MONEY], MAX_MONEY_AMOUNT, 0);
         m_int_configs[CONFIG_START_PLAYER_MONEY] = 0;
-    }
-    else if (m_int_configs[CONFIG_START_PLAYER_MONEY] > MAX_MONEY_AMOUNT)
-    {
-        LOG_ERROR("server", "StartPlayerMoney (%i) must be in range 0..%u. Set to %u.",
-                       m_int_configs[CONFIG_START_PLAYER_MONEY], MAX_MONEY_AMOUNT, MAX_MONEY_AMOUNT);
-        m_int_configs[CONFIG_START_PLAYER_MONEY] = MAX_MONEY_AMOUNT;
     }
 
     m_int_configs[CONFIG_MAX_HONOR_POINTS] = sConfigMgr->GetOption<int32>("MaxHonorPoints", 75000);
@@ -862,17 +844,11 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_int_configs[CONFIG_START_HONOR_POINTS] = sConfigMgr->GetOption<int32>("StartHonorPoints", 0);
-    if (int32(m_int_configs[CONFIG_START_HONOR_POINTS]) < 0)
+    if (int32(m_int_configs[CONFIG_START_HONOR_POINTS]) < 0 || int32(m_int_configs[CONFIG_START_HONOR_POINTS]) > int32(m_int_configs[CONFIG_MAX_HONOR_POINTS]))
     {
         LOG_ERROR("server", "StartHonorPoints (%i) must be in range 0..MaxHonorPoints(%u). Set to %u.",
                        m_int_configs[CONFIG_START_HONOR_POINTS], m_int_configs[CONFIG_MAX_HONOR_POINTS], 0);
         m_int_configs[CONFIG_START_HONOR_POINTS] = 0;
-    }
-    else if (m_int_configs[CONFIG_START_HONOR_POINTS] > m_int_configs[CONFIG_MAX_HONOR_POINTS])
-    {
-        LOG_ERROR("server", "StartHonorPoints (%i) must be in range 0..MaxHonorPoints(%u). Set to %u.",
-                       m_int_configs[CONFIG_START_HONOR_POINTS], m_int_configs[CONFIG_MAX_HONOR_POINTS], m_int_configs[CONFIG_MAX_HONOR_POINTS]);
-        m_int_configs[CONFIG_START_HONOR_POINTS] = m_int_configs[CONFIG_MAX_HONOR_POINTS];
     }
 
     m_int_configs[CONFIG_MAX_ARENA_POINTS] = sConfigMgr->GetOption<int32>("MaxArenaPoints", 10000);
@@ -883,21 +859,16 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_int_configs[CONFIG_START_ARENA_POINTS] = sConfigMgr->GetOption<int32>("StartArenaPoints", 0);
-    if (int32(m_int_configs[CONFIG_START_ARENA_POINTS]) < 0)
+    if (int32(m_int_configs[CONFIG_START_ARENA_POINTS]) < 0 || int32(m_int_configs[CONFIG_START_ARENA_POINTS]) > int32(m_int_configs[CONFIG_MAX_ARENA_POINTS]))
     {
         LOG_ERROR("server", "StartArenaPoints (%i) must be in range 0..MaxArenaPoints(%u). Set to %u.",
                        m_int_configs[CONFIG_START_ARENA_POINTS], m_int_configs[CONFIG_MAX_ARENA_POINTS], 0);
         m_int_configs[CONFIG_START_ARENA_POINTS] = 0;
     }
-    else if (m_int_configs[CONFIG_START_ARENA_POINTS] > m_int_configs[CONFIG_MAX_ARENA_POINTS])
-    {
-        LOG_ERROR("server", "StartArenaPoints (%i) must be in range 0..MaxArenaPoints(%u). Set to %u.",
-                       m_int_configs[CONFIG_START_ARENA_POINTS], m_int_configs[CONFIG_MAX_ARENA_POINTS], m_int_configs[CONFIG_MAX_ARENA_POINTS]);
-        m_int_configs[CONFIG_START_ARENA_POINTS] = m_int_configs[CONFIG_MAX_ARENA_POINTS];
-    }
 
     m_int_configs[CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL] = sConfigMgr->GetOption<int32>("RecruitAFriend.MaxLevel", 60);
-    if (m_int_configs[CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL] > m_int_configs[CONFIG_MAX_PLAYER_LEVEL])
+    if (m_int_configs[CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL] > m_int_configs[CONFIG_MAX_PLAYER_LEVEL]
+        || int32(m_int_configs[CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL]) < 0)
     {
         LOG_ERROR("server", "RecruitAFriend.MaxLevel (%i) must be in the range 0..MaxLevel(%u). Set to %u.",
                        m_int_configs[CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL], m_int_configs[CONFIG_MAX_PLAYER_LEVEL], 60);
@@ -919,7 +890,7 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_MAX_PRIMARY_TRADE_SKILL] = sConfigMgr->GetOption<int32>("MaxPrimaryTradeSkill", 2);
     m_int_configs[CONFIG_MIN_PETITION_SIGNS]      = sConfigMgr->GetOption<int32>("MinPetitionSigns", 9);
-    if (m_int_configs[CONFIG_MIN_PETITION_SIGNS] > 9)
+    if (m_int_configs[CONFIG_MIN_PETITION_SIGNS] > 9 || int32(m_int_configs[CONFIG_MIN_PETITION_SIGNS]) < 0)
     {
         LOG_ERROR("server", "MinPetitionSigns (%i) must be in range 0..9. Set to 9.", m_int_configs[CONFIG_MIN_PETITION_SIGNS]);
         m_int_configs[CONFIG_MIN_PETITION_SIGNS] = 9;
@@ -1067,7 +1038,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR] = sConfigMgr->GetOption<int32>("Calendar.DeleteOldEventsHour", 6);
-    if (m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR] > 23)
+    if (m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR] > 23 || int32(m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR]) < 0)
     {
         LOG_ERROR("server", "Calendar.DeleteOldEventsHour (%i) can't be load. Set to 6.", m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR]);
         m_int_configs[CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR] = 6;
@@ -1174,6 +1145,7 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_ARENA_LOSE_RATING_MODIFIER]               = sConfigMgr->GetOption<float>("Arena.ArenaLoseRatingModifier", 24.0f);
     m_float_configs[CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER]         = sConfigMgr->GetOption<float>("Arena.ArenaMatchmakerRatingModifier", 24.0f);
     m_bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE]              = sConfigMgr->GetOption<bool> ("Arena.QueueAnnouncer.Enable", false);
+    m_bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY]          = sConfigMgr->GetOption<bool> ("Arena.QueueAnnouncer.PlayerOnly", false);
 
     m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetOption<bool>("OffhandCheckAtSpellUnlearn", true);
 
@@ -1501,6 +1473,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server", "Initialize data stores...");
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
+
+    // Load IP Location Database
+    sIPLocation->Load();
 
     std::vector<uint32> mapIds;
     for (auto const& map : sMapStore)
@@ -2411,7 +2386,7 @@ void World::SendGlobalGMMessage(WorldPacket* packet, WorldSession* self, TeamId 
     }
 }
 
-namespace acore
+namespace Acore
 {
     class WorldWorldTextBuilder
     {
@@ -2453,7 +2428,7 @@ namespace acore
         uint32 i_textId;
         va_list* i_args;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 /// Send a System Message to all players (except self if mentioned)
 void World::SendWorldText(uint32 string_id, ...)
@@ -2461,8 +2436,8 @@ void World::SendWorldText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    acore::LocalizedPacketListDo<acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -2480,8 +2455,8 @@ void World::SendGMText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    acore::LocalizedPacketListDo<acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())

@@ -8,11 +8,11 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
-constexpr std::size_t acore::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH;
+constexpr std::size_t Acore::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH;
 static constexpr uint32 TOTP_INTERVAL = 30;
 static constexpr uint32 HMAC_RESULT_SIZE = 20;
 
-/*static*/ uint32 acore::Crypto::TOTP::GenerateToken(Secret const& secret, time_t timestamp)
+/*static*/ uint32 Acore::Crypto::TOTP::GenerateToken(Secret const& secret, time_t timestamp)
 {
     timestamp /= TOTP_INTERVAL;
     unsigned char challenge[8];
@@ -31,7 +31,7 @@ static constexpr uint32 HMAC_RESULT_SIZE = 20;
     return (truncated % 1000000);
 }
 
-/*static*/ bool acore::Crypto::TOTP::ValidateToken(Secret const& secret, uint32 token)
+/*static*/ bool Acore::Crypto::TOTP::ValidateToken(Secret const& secret, uint32 token)
 {
     time_t now = time(nullptr);
     return (

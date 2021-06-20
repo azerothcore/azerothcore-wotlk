@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace acore::Impl
+namespace Acore::Impl
 {
     template <typename Encoding>
     struct GenericBaseEncoding

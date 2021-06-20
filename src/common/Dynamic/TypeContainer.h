@@ -91,13 +91,13 @@ template<class OBJECT_TYPES>
 class TypeMapContainer
 {
 public:
-    template<class SPECIFIC_TYPE> [[nodiscard]] size_t Count() const { return acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
+    template<class SPECIFIC_TYPE> [[nodiscard]] size_t Count() const { return Acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
 
     /// inserts a specific object into the container
     template<class SPECIFIC_TYPE>
     bool insert(SPECIFIC_TYPE* obj)
     {
-        SPECIFIC_TYPE* t = acore::Insert(i_elements, obj);
+        SPECIFIC_TYPE* t = Acore::Insert(i_elements, obj);
         return (t != nullptr);
     }
 
@@ -105,7 +105,7 @@ public:
     //template<class SPECIFIC_TYPE>
     // bool remove(SPECIFIC_TYPE* obj)
     //{
-    //    SPECIFIC_TYPE* t = acore::Remove(i_elements, obj);
+    //    SPECIFIC_TYPE* t = Acore::Remove(i_elements, obj);
     //    return (t != nullptr);
     //}
 
@@ -123,19 +123,19 @@ public:
     template<class SPECIFIC_TYPE>
     bool Insert(KEY_TYPE const& handle, SPECIFIC_TYPE* obj)
     {
-        return acore::Insert(_elements, handle, obj);
+        return Acore::Insert(_elements, handle, obj);
     }
 
     template<class SPECIFIC_TYPE>
     bool Remove(KEY_TYPE const& handle)
     {
-        return acore::Remove(_elements, handle, (SPECIFIC_TYPE*)nullptr);
+        return Acore::Remove(_elements, handle, (SPECIFIC_TYPE*)nullptr);
     }
 
     template<class SPECIFIC_TYPE>
     SPECIFIC_TYPE* Find(KEY_TYPE const& handle)
     {
-        return acore::Find(_elements, handle, (SPECIFIC_TYPE*)nullptr);
+        return Acore::Find(_elements, handle, (SPECIFIC_TYPE*)nullptr);
     }
 
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& GetElements() { return _elements; }

@@ -15,15 +15,16 @@ EndScriptData */
 #include "Chat.h"
 #include "Config.h"
 #include "GitRevision.h"
-#include "VMapManager2.h"
-#include "VMapFactory.h"
 #include "Language.h"
+#include "MySQLThreading.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "StringConvert.h"
+#include "VMapFactory.h"
+#include "VMapManager2.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/version.hpp>
 #include <openssl/crypto.h>
@@ -109,9 +110,9 @@ public:
                 dbPort = (*res)[0].GetUInt16();
 
             if (dbPort)
-                dbPortOutput = acore::StringFormat("Realmlist (Realm Id: %u) configured in port %" PRIu16, realm.Id.Realm, dbPort);
+                dbPortOutput = Acore::StringFormat("Realmlist (Realm Id: %u) configured in port %" PRIu16, realm.Id.Realm, dbPort);
             else
-                dbPortOutput = acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
+                dbPortOutput = Acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
         }
 
         handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
@@ -443,7 +444,7 @@ public:
         if (!type || !name || !level || *name == '\0' || *level == '\0' || (*type != 'a' && *type != 'l'))
             return false;
 
-        sLog->SetLogLevel(name, *acore::StringTo<uint32>(level), *type == 'l');
+        sLog->SetLogLevel(name, *Acore::StringTo<uint32>(level), *type == 'l');
         return true;
     }
 

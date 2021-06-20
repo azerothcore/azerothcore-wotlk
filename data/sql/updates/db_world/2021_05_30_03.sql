@@ -9,7 +9,6 @@ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_N
 IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
 START TRANSACTION;
 ALTER TABLE version_db_world CHANGE COLUMN 2021_05_30_02 2021_05_30_03 bit;
-UPDATE version_db_world SET date = '2021_05_30_03' WHERE sql_rev = '';
 SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1621718778456057300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
 --
 -- START UPDATING QUERIES
@@ -24,6 +23,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 --
 -- END UPDATING QUERIES
 --
+UPDATE version_db_world SET date = '2021_05_30_03' WHERE sql_rev = '1621718778456057300';
 COMMIT;
 END //
 DELIMITER ;

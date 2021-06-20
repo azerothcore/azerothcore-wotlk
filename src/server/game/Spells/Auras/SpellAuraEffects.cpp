@@ -379,7 +379,7 @@ AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* cast
 
     m_amount = CalculateAmount(caster);
     m_casterLevel = caster ? caster->getLevel() : 0;
-    m_applyResilience = caster ? caster->CanApplyResilience() : false;
+    m_applyResilience = caster && caster->CanApplyResilience();
     m_auraGroup = sSpellMgr->GetSpellGroup(GetId());
 
     CalculateSpellMod();
@@ -2397,9 +2397,9 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
         */
 
         UnitList targets;
-        acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, target, target->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
-        acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
-        target->VisitNearbyObject(target->GetVisibilityRange(), searcher); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, target, target->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
+        Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
+        Cell::VisitAllObjects(target, searcher, target->GetMap()->GetVisibilityRange());
         for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))
@@ -5204,9 +5204,9 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                     return;
 
                                 Player* player = nullptr;
-                                acore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
-                                acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
-                                target->VisitNearbyWorldObject(10.0f, searcher);
+                                Acore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
+                                Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
+                                Cell::VisitWorldObjects(target, searcher, 10.0f);
 
                                 if( player && player->GetGUID() != target->GetGUID() )
                                     target->CastSpell(player, 52921, true);
@@ -5222,9 +5222,11 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             {
                                 if (target->isDead() && GetBase() && target->GetTypeId() == TYPEID_UNIT && target->GetEntry() == 24601)
                                 {
-                                    Unit* caster = GetBase()->GetCaster();
-                                    if (caster && caster->GetTypeId() == TYPEID_PLAYER)
-                                        caster->ToPlayer()->KilledMonsterCredit(25987);
+                                    auto caster2 = GetBase()->GetCaster();
+                                    if (caster2 && caster2->GetTypeId() == TYPEID_PLAYER)
+                                    {
+                                        caster2->ToPlayer()->KilledMonsterCredit(25987);
+                                    }
                                 }
                                 return;
                             }
@@ -5256,7 +5258,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             uint32 spellId = 24659;
                             if (apply && caster)
                             {
-                                SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellId);
+                                SpellInfo const* spell = sSpellMgr->AssertSpellInfo(spellId);
 
                                 for (uint32 i = 0; i < spell->StackAmount; ++i)
                                     caster->CastSpell(target, spell->Id, true, nullptr, nullptr, GetCasterGUID());
@@ -5271,7 +5273,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             uint32 spellId = 24662;
                             if (apply && caster)
                             {
-                                SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellId);
+                                SpellInfo const* spell = sSpellMgr->AssertSpellInfo(spellId);
                                 for (uint32 i = 0; i < spell->StackAmount; ++i)
                                     caster->CastSpell(target, spell->Id, true, nullptr, nullptr, GetCasterGUID());
                                 break;
@@ -6567,15 +6569,17 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     // xinef: caster is available, checked earlier
     if (target != caster && GetSpellInfo()->HasAttribute(SPELL_ATTR2_NO_TARGET_PER_SECOND_COST))
     {
-        uint32 damage = GetSpellInfo()->ManaPerSecond;
-        if ((int32)damage > gain && gain > 0)
-            damage = gain;
+        uint32 manaPerSecond = GetSpellInfo()->ManaPerSecond;
+        if ((int32)manaPerSecond > gain && gain > 0)
+        {
+            manaPerSecond = gain;
+        }
 
-        uint32 absorb = 0;
-        Unit::DealDamageMods(caster, damage, &absorb);
+        uint32 absorb2 = 0;
+        Unit::DealDamageMods(caster, manaPerSecond, &absorb2);
 
         CleanDamage cleanDamage =  CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-        Unit::DealDamage(caster, caster, damage, &cleanDamage, SELF_DAMAGE, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
+        Unit::DealDamage(caster, caster, manaPerSecond, &cleanDamage, SELF_DAMAGE, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
     }
 
     uint32 procAttacker = PROC_FLAG_DONE_PERIODIC;
@@ -6812,7 +6816,7 @@ void AuraEffect::HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp
     if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
     {
         // used only with EXTRA_LOGS
-        UNUSED(triggeredSpellInfo);
+        (void)triggeredSpellInfo;
 
         int32 basepoints0 = GetAmount();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
