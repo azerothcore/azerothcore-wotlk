@@ -4126,14 +4126,12 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
             {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 {
-                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED && spellInfo->Effects[i].CalcValue() == 310)´
+                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED && spellInfo->Effects[i].CalcValue() == 310)
                     {
                         SetHas310Flyer(true);
                     }
                 }
             }
-
-
         }
     }
 
@@ -24128,8 +24126,10 @@ void Player::resetSpells()
 
 void Player::LearnCustomSpells()
 {
-    if (!sConfigMgr->GetOption<bool>("PlayerStart.CustomSpells", false))
+    if (!sWorld->getBoolConfig(CONFIG_START_ALL_SPELLS))
+    {
         return;
+    }
 
     // learn default race/class spells
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
