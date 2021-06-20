@@ -6,14 +6,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `worldstates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `worldstates` 
 (
-  `entry` int(10) unsigned NOT NULL DEFAULT '0',
-  `value` int(10) unsigned NOT NULL DEFAULT '0',
-  `comment` tinytext,
+  `entry` INT unsigned NOT NULL DEFAULT 0,
+  `value` INT unsigned NOT NULL DEFAULT 0,
+  `comment` tinytext DEFAULT NULL,
   PRIMARY KEY (`entry`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Variable Saves';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Variable Saves';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `worldstates` WRITE;
@@ -22,12 +22,13 @@ INSERT INTO `worldstates` VALUES
 (3781,9000000,NULL),
 (3801,0,NULL),
 (3802,1,NULL),
-(20001,1454691600,NULL),
-(20002,1471492800,NULL),
-(20003,1471060800,NULL),
-(20005,1471060800,NULL),
-(20006,1471060800,NULL),
-(20007,1472702400,NULL);
+(20001,1454691600,'NextArenaPointDistributionTime'),
+(20002,1471492800,'NextWeeklyQuestResetTime'),
+(20003,1471060800,'NextBGRandomDailyResetTime'),
+(20004,0,'cleaning_flags'),
+(20005,1471060800,'NextDailyQuestResetTime'),
+(20006,1471060800,'NextGuildDailyResetTime'),
+(20007,1472702400,'NextMonthlyQuestResetTime');
 /*!40000 ALTER TABLE `worldstates` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

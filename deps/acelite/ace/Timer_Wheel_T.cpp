@@ -311,24 +311,17 @@ ACE_Timer_Wheel_T<TYPE, FUNCTOR, ACE_LOCK, TIME_POLICY>::generate_timer_id (u_in
   if (root == root->get_next ())
     root->set_act(0);
 
-  // We use this field to keep track of the next counter value that
-  // may be in use. Of course it may have expired, so we just use
-  // this field so that we know when we don't have to check for duplicates
-#if defined (ACE_WIN64)
-  // The cast below is legit... we know that long is shorter than a
-  // pointer, but are only using it as a 'long' storage area.
-#  pragma warning(push)
-#  pragma warning(disable : 4311)
-#endif /* ACE_WIN64 */
-  long next_cnt = ACE_Utils::truncate_cast<long> ((intptr_t)root->get_act ());
-#if defined (ACE_WIN64)
-#  pragma warning(pop)
-#endif /* ACE_WIN64 */
-
   // This field is used as a counter instead of a timer_id.
   long cnt = root->get_timer_id ();
 
-  if (cnt >= max_cnt && root == root->get_next ())
+  if (cnt < max_cnt)
+    {
+      root->set_timer_id (cnt + 1);
+      return (cnt << this->spoke_bits_) | spoke;
+    }
+
+  // Count has overflowed its range.
+  if (root == root->get_next ())
     {
       // Special case when we overflow on an empty spoke. We can just
       // wrap the count around without searching for duplicates. We only
@@ -337,50 +330,20 @@ ACE_Timer_Wheel_T<TYPE, FUNCTOR, ACE_LOCK, TIME_POLICY>::generate_timer_id (u_in
       root->set_timer_id (1);
       return spoke;
     }
-  else if (cnt >= max_cnt)
-    { // overflow
-      cnt = 0; // try again starting at zero
-    }
-  else if (next_cnt == 0 || cnt < next_cnt)
-    {
-      root->set_timer_id (cnt + 1);
-      return (cnt << this->spoke_bits_) | spoke;
-    }
 
+  // Overflowed count, and the spoke is not empty. Search for an unused
+  // id value.
   //ACELIB_ERROR((LM_ERROR, "Timer id overflow. We have to search now.\n"));
-
-  // We've run out of consecutive id numbers so now we have to search
-  // for a unique id.
-  // We'll try increasing numbers until we find one that is not in use,
-  // and we'll record the next highest number so that we can avoid this
-  // search as often as possible.
-  for (; cnt < max_cnt - 1; ++cnt)
+  for (cnt = 0; cnt < max_cnt - 1; ++cnt)
     {
+      // Look for an unused id. Yes, every new id on this spoke will result in a
+      // scan until all the spoke's timers get canceled/expired then the spoke will
+      // start over like new. So, when an empty spot is found, don't reset the
+      // root node's timer_id - it stays at max until the spoke clears out and
+      // starts over.
       long id = (cnt << this->spoke_bits_) | spoke;
-      ACE_Timer_Node_T<TYPE>* n = this->find_spoke_node (spoke, id);
-      if (n == 0)
-        {
-          root->set_timer_id (cnt + 1);
-          // Now we need to find the next highest cnt in use
-          next_cnt = 0;
-          for (; n != root; n = n->get_next ())
-            {
-              long tmp = n->get_timer_id () >> this->spoke_bits_;
-              if (tmp > cnt && (tmp < next_cnt || next_cnt == 0))
-                next_cnt = tmp;
-            }
-#if defined (ACE_WIN64)
-          // The cast below is legit... we know we're storing a long in
-          // a pointer, but are only using it as a 'long' storage area.
-#  pragma warning(push)
-#  pragma warning(disable : 4312)
-#endif /* ACE_WIN64 */
-          root->set_act (reinterpret_cast<void*> (next_cnt));
-#if defined (ACE_WIN64)
-#  pragma warning(pop)
-#endif /* ACE_WIN64 */
-          return id;
-        }
+      if (0 == this->find_spoke_node (spoke, id))
+        return id;
     }
 
   return -1; // We did our best, but the spoke is full.
@@ -420,6 +383,10 @@ ACE_Timer_Wheel_T<TYPE, FUNCTOR, ACE_LOCK, TIME_POLICY>::schedule_i (const TYPE&
         {
           n->set (type, act, future_time, interval, 0, 0, id);
           this->schedule_i (n, spoke, future_time);
+        }
+      else
+        {
+          this->free_node (n);
         }
       return id;
     }

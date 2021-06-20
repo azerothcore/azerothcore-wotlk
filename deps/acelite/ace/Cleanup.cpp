@@ -8,6 +8,10 @@
 #include "ace/OS_NS_string.h"
 #include "ace/os_include/os_typeinfo.h"
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 void
@@ -52,8 +56,14 @@ ACE_Cleanup_Info_Node::ACE_Cleanup_Info_Node (void *object,
 ACE_Cleanup_Info_Node::~ACE_Cleanup_Info_Node (void)
 {
   if (this->name_)
+#if defined (ACE_HAS_ALLOC_HOOKS)
+    ACE_Allocator::instance()->free ((void *) name_);
+#else
     ACE_OS::free ((void *) name_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
+
+ACE_ALLOC_HOOK_DEFINE(ACE_Cleanup_Info_Node)
 
 bool
 ACE_Cleanup_Info_Node::operator== (const ACE_Cleanup_Info_Node &o) const

@@ -5,7 +5,7 @@
  *  @file    Dynamic_Service.h
  *
  *  @author Prashant Jain <pjain@cs.wustl.edu>
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 

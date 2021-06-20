@@ -70,10 +70,22 @@ ACE_INLINE void
 ACE_Time_Value::set (double d)
 {
   // ACE_OS_TRACE ("ACE_Time_Value::set");
-  time_t l = (time_t) d;
-  this->tv_.tv_sec = l;
-  this->tv_.tv_usec = (suseconds_t) ((d - (double) l) * ACE_ONE_SECOND_IN_USECS + .5);
-  this->normalize ();
+  if (d < ACE_Numeric_Limits<time_t>::min())
+    {
+      this->tv_.tv_sec = ACE_Numeric_Limits<time_t>::min();
+      this->tv_.tv_usec = -ACE_ONE_SECOND_IN_USECS + 1;
+    }
+  else if (d > ACE_Numeric_Limits<time_t>::max())
+    {
+      this->tv_.tv_sec = ACE_Numeric_Limits<time_t>::max();
+      this->tv_.tv_usec = ACE_ONE_SECOND_IN_USECS - 1;
+    }
+  else
+    {
+      time_t l = (time_t) d;
+      this->tv_.tv_sec = l;
+      this->tv_.tv_usec = (suseconds_t) ((d - (double) l) * ACE_ONE_SECOND_IN_USECS + (d < 0 ? -0.5 : 0.5));
+    }
 }
 
 /// Initializes a timespec_t.  Note that this approach loses precision
@@ -328,15 +340,6 @@ ACE_Time_Value::operator+= (time_t tv)
 {
   // ACE_OS_TRACE ("ACE_Time_Value::operator+=");
   this->sec (this->sec () + tv);
-  return *this;
-}
-
-ACE_INLINE ACE_Time_Value &
-ACE_Time_Value::operator= (const ACE_Time_Value &tv)
-{
-  // ACE_OS_TRACE ("ACE_Time_Value::operator=");
-  this->sec (tv.sec ());
-  this->usec (tv.usec ());
   return *this;
 }
 

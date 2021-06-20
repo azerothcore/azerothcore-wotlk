@@ -2,19 +2,19 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "oculus.h"
-#include "LFGMgr.h"
 #include "Group.h"
+#include "LFGMgr.h"
+#include "oculus.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 class instance_oculus : public InstanceMapScript
 {
 public:
     instance_oculus() : InstanceMapScript("instance_oculus", 578) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_oculus_InstanceMapScript(pMap);
     }
@@ -24,36 +24,30 @@ public:
         instance_oculus_InstanceMapScript(Map* pMap) : InstanceScript(pMap) { Initialize(); }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint64 DragonCageDoorGUID[3];
-        uint64 EregosCacheGUID;
+        ObjectGuid DragonCageDoorGUID[3];
+        ObjectGuid EregosCacheGUID;
         uint32 CentrifugeCount;
 
-        uint64 uiDrakosGUID;
-        uint64 uiVarosGUID;
-        uint64 uiUromGUID;
-        uint64 uiEregosGUID;
+        ObjectGuid uiDrakosGUID;
+        ObjectGuid uiVarosGUID;
+        ObjectGuid uiUromGUID;
+        ObjectGuid uiEregosGUID;
 
         bool bAmberVoid;
         bool bEmeraldVoid;
         bool bRubyVoid;
-        
-        void Initialize()
+
+        void Initialize() override
         {
-            EregosCacheGUID = 0;
-            uiDrakosGUID    = 0;
-            uiVarosGUID     = 0;
-            uiUromGUID      = 0;
-            uiEregosGUID    = 0;
             CentrifugeCount = 0;
             bAmberVoid = false;
             bEmeraldVoid = false;
             bRubyVoid = false;
 
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            memset(&DragonCageDoorGUID, 0, sizeof(DragonCageDoorGUID));
         }
-        
-        void OnCreatureCreate(Creature* pCreature)
+
+        void OnCreatureCreate(Creature* pCreature) override
         {
             switch( pCreature->GetEntry() )
             {
@@ -72,12 +66,12 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* pGo)
+        void OnGameObjectCreate(GameObject* pGo) override
         {
             switch( pGo->GetEntry() )
             {
                 case GO_DRAGON_CAGE_DOOR:
-                    for( uint8 i=0; i<3; ++i )
+                    for( uint8 i = 0; i < 3; ++i )
                     {
                         if( DragonCageDoorGUID[i] )
                             continue;
@@ -99,12 +93,12 @@ public:
             }
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (m_auiEncounter[DATA_DRAKOS] == DONE && m_auiEncounter[DATA_VAROS] != DONE)
             {
                 player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10-CentrifugeCount);
+                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
             }
             else
             {
@@ -113,13 +107,13 @@ public:
             }
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             if (unit->GetEntry() == NPC_CENTRIFUGE_CONSTRUCT)
                 SetData(DATA_CC_COUNT, DONE);
         }
-        
-        void SetData(uint32 type, uint32 data)
+
+        void SetData(uint32 type, uint32 data) override
         {
             switch( type )
             {
@@ -128,7 +122,7 @@ public:
                     if( data == DONE )
                     {
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10-CentrifugeCount);
+                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
 
                         if (instance->IsHeroic())
                             DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_MAKE_IT_COUNT_TIMED_EVENT);
@@ -153,13 +147,13 @@ public:
                 case DATA_EREGOS:
                     m_auiEncounter[DATA_EREGOS] = data;
                     if (data == DONE)
-                        DoRespawnGameObject(EregosCacheGUID, 7*DAY);
+                        DoRespawnGameObject(EregosCacheGUID, 7 * DAY);
                     break;
                 case DATA_CC_COUNT:
                     if( CentrifugeCount < 10 )
                     {
                         ++CentrifugeCount;
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10-CentrifugeCount);
+                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
                     }
                     if( CentrifugeCount >= 10 )
                         if( Creature* varos = instance->GetCreature(uiVarosGUID) )
@@ -170,21 +164,21 @@ public:
                         }
                     break;
                 case DATA_AMBER_VOID:
-                    bAmberVoid = data ? true : false;
+                    bAmberVoid = !!data;
                     break;
                 case DATA_EMERALD_VOID:
-                    bEmeraldVoid = data ? true : false;
+                    bEmeraldVoid = !!data;
                     break;
                 case DATA_RUBY_VOID:
-                    bRubyVoid = data ? true : false;
+                    bRubyVoid = !!data;
                     break;
             }
 
             if( data == DONE )
                 SaveToDB();
         }
-        
-        uint32 GetData(uint32 type) const
+
+        uint32 GetData(uint32 type) const override
         {
             switch( type )
             {
@@ -199,8 +193,8 @@ public:
 
             return 0;
         }
-        
-        uint64 GetData64(uint32 identifier) const
+
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch( identifier )
             {
@@ -215,14 +209,13 @@ public:
                 case DATA_DCD_1:
                 case DATA_DCD_2:
                 case DATA_DCD_3:
-                    return DragonCageDoorGUID[identifier-100];
+                    return DragonCageDoorGUID[identifier - 100];
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
-        
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -233,7 +226,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if( !in )
             {
@@ -251,10 +244,9 @@ public:
             {
                 loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> CentrifugeCount;
 
-                for( uint8 i=0; i<MAX_ENCOUNTER; ++i )
+                for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                     if( m_auiEncounter[i] == IN_PROGRESS )
                         m_auiEncounter[i] = NOT_STARTED;
-
             }
             else
                 OUT_LOAD_INST_DATA_FAIL;
@@ -262,7 +254,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {

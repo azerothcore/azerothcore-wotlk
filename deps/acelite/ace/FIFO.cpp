@@ -9,6 +9,9 @@
 #include "ace/OS_NS_errno.h"
 #include "ace/OS_NS_sys_stat.h"
 #include "ace/OS_NS_fcntl.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 

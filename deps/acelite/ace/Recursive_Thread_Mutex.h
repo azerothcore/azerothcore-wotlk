@@ -6,7 +6,7 @@
  *
  *   Moved from Synch.h.
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu> and
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu> and
  *          Abdullah Sowayan <abdullah.sowayan@lmco.com>
  */
 //==========================================================================

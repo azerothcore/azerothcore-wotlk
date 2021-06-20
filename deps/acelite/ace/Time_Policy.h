@@ -116,8 +116,12 @@ public:
   /// Set delegate
   void set_delegate (ACE_Dynamic_Time_Policy_Base const * delegate);
 
-  /// Copy policy
-  ACE_Delegating_Time_Policy& operator =(ACE_Delegating_Time_Policy const & pol);
+#if defined (ACE_HAS_CPP11)
+  ACE_Delegating_Time_Policy (const ACE_Delegating_Time_Policy&) = default;
+  ACE_Delegating_Time_Policy (ACE_Delegating_Time_Policy&&) = default;
+  ACE_Delegating_Time_Policy& operator = (ACE_Delegating_Time_Policy const &) = default;
+  ACE_Delegating_Time_Policy &operator = (ACE_Delegating_Time_Policy&&)  = default;
+#endif /* ACE_HAS_CPP11 */
 
   /// Noop. Just here to satisfy backwards compatibility demands.
   void set_gettimeofday (ACE_Time_Value (*gettimeofday)(void));

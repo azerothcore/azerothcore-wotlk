@@ -22,6 +22,7 @@
 
 #if (ACE_USES_CLASSIC_SVC_CONF == 1)
 
+#include "ace/Auto_Ptr.h"
 #include "ace/DLL.h"
 #include "ace/SString.h"
 #include "ace/Svc_Conf.h"

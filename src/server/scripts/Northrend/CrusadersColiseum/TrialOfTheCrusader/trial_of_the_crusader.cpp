@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_crusader.h"
-#include "Player.h"
 
 enum MenuTexts
 {
@@ -52,7 +52,7 @@ public:
                 return true;
         }
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1337);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
         SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
         return true;
     }
@@ -66,7 +66,7 @@ public:
         if( !pInstance )
             return true;
 
-        if( uiAction == GOSSIP_ACTION_INFO_DEF+1337 )
+        if( uiAction == GOSSIP_ACTION_INFO_DEF + 1337 )
         {
             pInstance->SetData(TYPE_ANNOUNCER_GOSSIP_SELECT, 0);
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);

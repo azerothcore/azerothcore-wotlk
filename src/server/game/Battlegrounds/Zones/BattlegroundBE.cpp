@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -29,7 +29,6 @@ BattlegroundBE::BattlegroundBE()
 
 BattlegroundBE::~BattlegroundBE()
 {
-
 }
 
 void BattlegroundBE::StartingEventCloseDoors()
@@ -73,7 +72,7 @@ void BattlegroundBE::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        sLog->outError("Killer player not found");
+        LOG_ERROR("server", "Killer player not found");
         return;
     }
 
@@ -127,7 +126,7 @@ void BattlegroundBE::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundBE::FillInitialWorldStates(WorldPacket &data)
+void BattlegroundBE::FillInitialWorldStates(WorldPacket& data)
 {
     data << uint32(0x9f3) << uint32(1);           // 9
     Battleground::UpdateArenaWorldState();
@@ -143,17 +142,17 @@ bool BattlegroundBE::SetupBattleground()
 {
     // gates
     if (!AddObject(BG_BE_OBJECT_DOOR_1, BG_BE_OBJECT_TYPE_DOOR_1, 6287.277f, 282.1877f, 3.810925f, -2.260201f, 0, 0, 0.9044551f, -0.4265689f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_BE_OBJECT_DOOR_2, BG_BE_OBJECT_TYPE_DOOR_2, 6189.546f, 241.7099f, 3.101481f, 0.8813917f, 0, 0, 0.4265689f, 0.9044551f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_BE_OBJECT_DOOR_3, BG_BE_OBJECT_TYPE_DOOR_3, 6299.116f, 296.5494f, 3.308032f, 0.8813917f, 0, 0, 0.4265689f, 0.9044551f, RESPAWN_IMMEDIATELY)
-        || !AddObject(BG_BE_OBJECT_DOOR_4, BG_BE_OBJECT_TYPE_DOOR_4, 6177.708f, 227.3481f, 3.604374f, -2.260201f, 0, 0, 0.9044551f, -0.4265689f, RESPAWN_IMMEDIATELY)
-        // buffs
-        || !AddObject(BG_BE_OBJECT_BUFF_1, BG_BE_OBJECT_TYPE_BUFF_1, 6249.042f, 275.3239f, 11.22033f, -1.448624f, 0, 0, 0.6626201f, -0.7489557f, 120)
-        || !AddObject(BG_BE_OBJECT_BUFF_2, BG_BE_OBJECT_TYPE_BUFF_2, 6228.26f, 249.566f, 11.21812f, -0.06981307f, 0, 0, 0.03489945f, -0.9993908f, 120)
-        // Arena Ready Marker
-        || !AddObject(BG_BE_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 6189.47f, 235.54f, 5.52f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
-        || !AddObject(BG_BE_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 6287.19f, 288.25f, 5.33f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
+            || !AddObject(BG_BE_OBJECT_DOOR_2, BG_BE_OBJECT_TYPE_DOOR_2, 6189.546f, 241.7099f, 3.101481f, 0.8813917f, 0, 0, 0.4265689f, 0.9044551f, RESPAWN_IMMEDIATELY)
+            || !AddObject(BG_BE_OBJECT_DOOR_3, BG_BE_OBJECT_TYPE_DOOR_3, 6299.116f, 296.5494f, 3.308032f, 0.8813917f, 0, 0, 0.4265689f, 0.9044551f, RESPAWN_IMMEDIATELY)
+            || !AddObject(BG_BE_OBJECT_DOOR_4, BG_BE_OBJECT_TYPE_DOOR_4, 6177.708f, 227.3481f, 3.604374f, -2.260201f, 0, 0, 0.9044551f, -0.4265689f, RESPAWN_IMMEDIATELY)
+            // buffs
+            || !AddObject(BG_BE_OBJECT_BUFF_1, BG_BE_OBJECT_TYPE_BUFF_1, 6249.042f, 275.3239f, 11.22033f, -1.448624f, 0, 0, 0.6626201f, -0.7489557f, 120)
+            || !AddObject(BG_BE_OBJECT_BUFF_2, BG_BE_OBJECT_TYPE_BUFF_2, 6228.26f, 249.566f, 11.21812f, -0.06981307f, 0, 0, 0.03489945f, -0.9993908f, 120)
+            // Arena Ready Marker
+            || !AddObject(BG_BE_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 6189.47f, 235.54f, 5.52f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
+            || !AddObject(BG_BE_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 6287.19f, 288.25f, 5.33f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
     {
-        sLog->outErrorDb("BatteGroundBE: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundBE: Failed to spawn some object!");
         return false;
     }
 

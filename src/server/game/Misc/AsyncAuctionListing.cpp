@@ -1,17 +1,21 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
+
 #include "AsyncAuctionListing.h"
-#include "Player.h"
-#include "Creature.h"
 #include "AuctionHouseMgr.h"
+#include "Creature.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
+#include "Player.h"
 #include "SpellAuraEffects.h"
 
 uint32 AsyncAuctionListingMgr::auctionListingDiff = 0;
 bool AsyncAuctionListingMgr::auctionListingAllowed = false;
 std::list<AuctionListItemsDelayEvent> AsyncAuctionListingMgr::auctionListingList;
 std::list<AuctionListItemsDelayEvent> AsyncAuctionListingMgr::auctionListingListTemp;
-ACE_Thread_Mutex AsyncAuctionListingMgr::auctionListingLock;
-ACE_Thread_Mutex AsyncAuctionListingMgr::auctionListingTempLock;
+std::mutex AsyncAuctionListingMgr::auctionListingLock;
+std::mutex AsyncAuctionListingMgr::auctionListingTempLock;
 
 bool AuctionListOwnerItemsDelayEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
@@ -32,10 +36,7 @@ bool AuctionListItemsDelayEvent::Execute()
 
     AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
 
-    //sLog->outDebug("Auctionhouse search (GUID: %u TypeId: %u)",, list from: %u, searchedname: %s, levelmin: %u, levelmax: %u, auctionSlotID: %u, auctionMainCategory: %u, auctionSubCategory: %u, quality: %u, usable: %u",
-    //  GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)), listfrom, searchedname.c_str(), levelmin, levelmax, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, usable);
-
-    WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4+4+4)+50*((16+MAX_INSPECTED_ENCHANTMENT_SLOT*3)*4));
+    WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4 + 4 + 4) + 50 * ((16 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3) * 4));
     uint32 count = 0;
     uint32 totalcount = 0;
     data << (uint32) 0;
@@ -48,9 +49,9 @@ bool AuctionListItemsDelayEvent::Execute()
     wstrToLower(wsearchedname);
 
     bool result = auctionHouse->BuildListAuctionItems(data, plr,
-        wsearchedname, _listfrom, _levelmin, _levelmax, _usable,
-        _auctionSlotID, _auctionMainCategory, _auctionSubCategory, _quality,
-        count, totalcount, _getAll);
+                  wsearchedname, _listfrom, _levelmin, _levelmax, _usable,
+                  _auctionSlotID, _auctionMainCategory, _auctionSubCategory, _quality,
+                  count, totalcount, _getAll);
 
     if (!result)
         return false;

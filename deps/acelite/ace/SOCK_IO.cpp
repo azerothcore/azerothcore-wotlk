@@ -4,6 +4,10 @@
 #include "ace/OS_Memory.h"
 #include "ace/Truncate.h"
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 #if !defined (__ACE_INLINE__)
 #include "ace/SOCK_IO.inl"
 #endif /* __ACE_INLINE__ */
@@ -47,9 +51,16 @@ ACE_SOCK_IO::recvv (iovec *io_vec,
     return -1;
   else if (inlen > 0)
     {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_ALLOCATOR_RETURN (io_vec->iov_base,
+                            static_cast<char*>(ACE_Allocator::instance()->malloc(sizeof(char) * inlen)),
+                            -1);
+#else
       ACE_NEW_RETURN (io_vec->iov_base,
                       char[inlen],
                       -1);
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
       // It's ok to blindly cast this value since 'inlen' is an int and, thus,
       // we can't get more than that back. Besides, if the recv() fails, we
       // don't want that value cast to unsigned and returned.
@@ -73,7 +84,7 @@ ACE_SOCK_IO::recvv (iovec *io_vec,
 // the ints (basically, an varargs version of writev).  The count N is
 // the *total* number of trailing arguments, *not* a couple of the
 // number of tuple pairs!
-
+#ifndef ACE_LACKS_VA_FUNCTIONS
 ssize_t
 ACE_SOCK_IO::send (size_t n, ...) const
 {
@@ -85,9 +96,16 @@ ACE_SOCK_IO::send (size_t n, ...) const
 #if defined (ACE_HAS_ALLOCA)
   iovp = (iovec *) alloca (total_tuples * sizeof (iovec));
 #else
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_ALLOCATOR_RETURN (iovp, (iovec *)
+                        ACE_Allocator::instance ()->malloc (total_tuples *
+                                                            sizeof (iovec)),
+                        -1);
+# else
   ACE_NEW_RETURN (iovp,
                   iovec[total_tuples],
                   -1);
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
 
   va_start (argp, n);
@@ -102,7 +120,11 @@ ACE_SOCK_IO::send (size_t n, ...) const
                                         iovp,
                                         total_tuples);
 #if !defined (ACE_HAS_ALLOCA)
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_Allocator::instance ()->free (iovp);
+# else
   delete [] iovp;
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
   va_end (argp);
   return result;
@@ -125,9 +147,16 @@ ACE_SOCK_IO::recv (size_t n, ...) const
 #if defined (ACE_HAS_ALLOCA)
   iovp = (iovec *) alloca (total_tuples * sizeof (iovec));
 #else
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_ALLOCATOR_RETURN (iovp, (iovec *)
+                        ACE_Allocator::instance ()->malloc (total_tuples *
+                                                            sizeof (iovec)),
+                        -1);
+# else
   ACE_NEW_RETURN (iovp,
                   iovec[total_tuples],
                   -1);
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
 
   va_start (argp, n);
@@ -142,10 +171,15 @@ ACE_SOCK_IO::recv (size_t n, ...) const
                                         iovp,
                                         total_tuples);
 #if !defined (ACE_HAS_ALLOCA)
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_Allocator::instance ()->free (iovp);
+# else
   delete [] iovp;
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
   va_end (argp);
   return result;
 }
+#endif // ACE_LACKS_VA_FUNCTIONS
 
 ACE_END_VERSIONED_NAMESPACE_DECL

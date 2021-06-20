@@ -17,14 +17,13 @@ namespace MMAP
     // this class gathers all debug info holding and output
     struct IntermediateValues
     {
-        rcHeightfield* heightfield;
-        rcCompactHeightfield* compactHeightfield;
-        rcContourSet* contours;
-        rcPolyMesh* polyMesh;
-        rcPolyMeshDetail* polyMeshDetail;
+        rcHeightfield* heightfield{nullptr};
+        rcCompactHeightfield* compactHeightfield{nullptr};
+        rcContourSet* contours{nullptr};
+        rcPolyMesh* polyMesh{nullptr};
+        rcPolyMeshDetail* polyMeshDetail{nullptr};
 
-        IntermediateValues() :  heightfield(NULL), compactHeightfield(NULL),
-                                contours(NULL), polyMesh(NULL), polyMeshDetail(NULL) {}
+        IntermediateValues()  {}
         ~IntermediateValues();
 
         void writeIV(uint32 mapID, uint32 tileX, uint32 tileY);
@@ -35,7 +34,7 @@ namespace MMAP
         void debugWrite(FILE* file, const rcPolyMesh* mesh);
         void debugWrite(FILE* file, const rcPolyMeshDetail* mesh);
 
-        void generateObjFile(uint32 mapID, uint32 tileX, uint32 tileY, MeshData &meshData);
+        void generateObjFile(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData);
     };
 }
 #endif

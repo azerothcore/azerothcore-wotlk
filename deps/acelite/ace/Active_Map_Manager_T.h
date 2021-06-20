@@ -4,8 +4,6 @@
 /**
  *  @file    Active_Map_Manager_T.h
  *
- *  $Id: Active_Map_Manager_T.h 84316 2009-02-03 19:46:05Z johnnyw $
- *
  *  @author Irfan Pyarali
  */
 //=============================================================================
@@ -39,7 +37,6 @@ template <class T>
 class ACE_Active_Map_Manager : public ACE_Map_Manager<ACE_Active_Map_Manager_Key, T, ACE_Null_Mutex>
 {
 public:
-
   // = Traits.
   typedef ACE_Active_Map_Manager_Key key_type;
   typedef T mapped_type;
@@ -52,7 +49,6 @@ public:
   typedef ITERATOR iterator;
   typedef REVERSE_ITERATOR reverse_iterator;
 
-  // = Initialization and termination methods.
   /// Initialize a Active_Map_Manager with the ACE_DEFAULT_MAP_SIZE.
   ACE_Active_Map_Manager (ACE_Allocator *alloc = 0);
 
@@ -187,7 +183,6 @@ protected:
   typedef ACE_Map_Manager<ACE_Active_Map_Manager_Key, T, ACE_Null_Mutex> ACE_AMM_BASE;
 
 private:
-
   // = Disallow these operations.
   ACE_UNIMPLEMENTED_FUNC (void operator= (const ACE_Active_Map_Manager<T> &))
   ACE_UNIMPLEMENTED_FUNC (ACE_Active_Map_Manager (const ACE_Active_Map_Manager<T> &))

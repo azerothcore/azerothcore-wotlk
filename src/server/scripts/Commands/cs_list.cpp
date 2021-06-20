@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,13 +11,13 @@ Comment: All list related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
-#include "SpellAuraEffects.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 
 class list_commandscript : public CommandScript
 {
@@ -84,29 +84,28 @@ public:
         {
             Player* player = handler->GetSession()->GetPlayer();
             result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM creature WHERE id = '%u' ORDER BY order_ ASC LIMIT %u",
-                player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), creatureId, count);
+                                          player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), creatureId, count);
         }
         else
             result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map FROM creature WHERE id = '%u' LIMIT %u",
-                creatureId, count);
+                                          creatureId, count);
 
         if (result)
         {
             do
             {
-                Field* fields   = result->Fetch();
-                uint32 guid     = fields[0].GetUInt32();
-                float x         = fields[1].GetFloat();
-                float y         = fields[2].GetFloat();
-                float z         = fields[3].GetFloat();
-                uint16 mapId    = fields[4].GetUInt16();
+                Field* fields               = result->Fetch();
+                ObjectGuid::LowType guid    = fields[0].GetUInt32();
+                float x                     = fields[1].GetFloat();
+                float y                     = fields[2].GetFloat();
+                float z                     = fields[3].GetFloat();
+                uint16 mapId                = fields[4].GetUInt16();
 
                 if (handler->GetSession())
                     handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId);
                 else
                     handler->PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, cInfo->Name.c_str(), x, y, z, mapId);
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
         }
 
         handler->PSendSysMessage(LANG_COMMAND_LISTCREATUREMESSAGE, creatureId, creatureCount);
@@ -185,8 +184,7 @@ public:
                     itemPos = "";
 
                 handler->PSendSysMessage(LANG_ITEMLIST_SLOT, itemGuid, ownerName.c_str(), ownerGuid, ownerAccountId, itemPos);
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
 
             uint32 resultCount = uint32(result->GetRowCount());
 
@@ -232,8 +230,7 @@ public:
                 char const* itemPos = "[in mail]";
 
                 handler->PSendSysMessage(LANG_ITEMLIST_MAIL, itemGuid, itemSenderName.c_str(), itemSender, itemSenderAccountId, itemReceiverName.c_str(), itemReceiver, itemReceiverAccount, itemPos);
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
 
             uint32 resultCount = uint32(result->GetRowCount());
 
@@ -276,8 +273,7 @@ public:
                 char const* itemPos = "[in auction]";
 
                 handler->PSendSysMessage(LANG_ITEMLIST_AUCTION, itemGuid, ownerName.c_str(), owner, ownerAccountId, itemPos);
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
         }
 
         // guild bank case
@@ -307,8 +303,7 @@ public:
                 char const* itemPos = "[in guild bank]";
 
                 handler->PSendSysMessage(LANG_ITEMLIST_GUILD, itemGuid, guildName.c_str(), guildGuid, itemPos);
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
 
             uint32 resultCount = uint32(result->GetRowCount());
 
@@ -373,30 +368,29 @@ public:
         {
             Player* player = handler->GetSession()->GetPlayer();
             result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, id, (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ FROM gameobject WHERE id = '%u' ORDER BY order_ ASC LIMIT %u",
-                player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), gameObjectId, count);
+                                          player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), gameObjectId, count);
         }
         else
             result = WorldDatabase.PQuery("SELECT guid, position_x, position_y, position_z, map, id FROM gameobject WHERE id = '%u' LIMIT %u",
-                gameObjectId, count);
+                                          gameObjectId, count);
 
         if (result)
         {
             do
             {
-                Field* fields   = result->Fetch();
-                uint32 guid     = fields[0].GetUInt32();
-                float x         = fields[1].GetFloat();
-                float y         = fields[2].GetFloat();
-                float z         = fields[3].GetFloat();
-                uint16 mapId    = fields[4].GetUInt16();
-                uint32 entry    = fields[5].GetUInt32();
+                Field* fields               = result->Fetch();
+                ObjectGuid::LowType guid    = fields[0].GetUInt32();
+                float x                     = fields[1].GetFloat();
+                float y                     = fields[2].GetFloat();
+                float z                     = fields[3].GetFloat();
+                uint16 mapId                = fields[4].GetUInt16();
+                uint32 entry                = fields[5].GetUInt32();
 
                 if (handler->GetSession())
                     handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gInfo->name.c_str(), x, y, z, mapId);
                 else
                     handler->PSendSysMessage(LANG_GO_LIST_CONSOLE, guid, gInfo->name.c_str(), x, y, z, mapId);
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
         }
 
         handler->PSendSysMessage(LANG_COMMAND_LISTOBJMESSAGE, gameObjectId, objectCount);
@@ -431,10 +425,10 @@ public:
             ss_name << "|cffffffff|Hspell:" << aura->GetId() << "|h[" << name << "]|h|r";
 
             handler->PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, aura->GetId(), (handler->GetSession() ? ss_name.str().c_str() : name),
-                aurApp->GetEffectMask(), aura->GetCharges(), aura->GetStackAmount(), aurApp->GetSlot(),
-                aura->GetDuration(), aura->GetMaxDuration(), (aura->IsPassive() ? passiveStr : ""),
-                (talent ? talentStr : ""), IS_PLAYER_GUID(aura->GetCasterGUID()) ? "player" : "creature",
-                GUID_LOPART(aura->GetCasterGUID()));
+                                     aurApp->GetEffectMask(), aura->GetCharges(), aura->GetStackAmount(), aurApp->GetSlot(),
+                                     aura->GetDuration(), aura->GetMaxDuration(), (aura->IsPassive() ? passiveStr : ""),
+                                     (talent ? talentStr : ""), aura->GetCasterGUID().IsPlayer() ? "player" : "creature",
+                                     aura->GetCasterGUID().GetCounter());
         }
 
         if (!args || std::string(args) != "all")

@@ -4,7 +4,7 @@
 /**
  *  @file    Service_Manager.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -50,12 +50,14 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Service_Manager : public ACE_Service_Object
 {
 public:
-  // = Initialization and termination hooks.
   /// Constructor.
   ACE_Service_Manager (void);
 
   /// Destructor.
   virtual ~ACE_Service_Manager (void);
+
+  /// Declare the dynamic allocation hooks.
+  ACE_ALLOC_HOOK_DECLARE;
 
 protected:
   // = Perform the various meta-services.
@@ -79,9 +81,6 @@ protected:
 
   /// Dump the state of an object.
   void dump (void) const;
-
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
 
 protected:
   int open (const ACE_INET_Addr &sia);

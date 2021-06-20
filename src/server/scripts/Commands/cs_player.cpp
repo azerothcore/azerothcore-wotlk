@@ -3,10 +3,10 @@
 */
 
 #include "Chat.h"
-#include "ScriptMgr.h"
 #include "Language.h"
 #include "Player.h"
 #include "PlayerCommand.h"
+#include "ScriptMgr.h"
 
 class player_commandscript : public CommandScript, public PlayerCommand
 {

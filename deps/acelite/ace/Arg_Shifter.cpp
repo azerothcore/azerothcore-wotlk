@@ -1,5 +1,3 @@
-// $Id: Arg_Shifter.cpp 91286 2010-08-05 09:04:31Z johnnyw $
-
 #ifndef ACE_ARG_SHIFTER_T_CPP
 #define ACE_ARG_SHIFTER_T_CPP
 
@@ -8,6 +6,9 @@
 #include "ace/OS_NS_strings.h"
 #include "ace/OS_Errno.h"
 #include "ace/OS_Memory.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -47,9 +48,13 @@ ACE_Arg_Shifter_T<CHAR_TYPE>::init (void)
 {
   // If not provided with one, allocate a temporary array.
   if (this->temp_ == 0)
+#if defined (ACE_HAS_ALLOC_HOOKS)
+    this->temp_ = reinterpret_cast<const CHAR_TYPE **>
+      (ACE_Allocator::instance ()->malloc (sizeof (CHAR_TYPE*) * this->total_size_));
+#else
     ACE_NEW (this->temp_,
              const CHAR_TYPE *[this->total_size_]);
-
+#endif /* ACE_HAS_ALLOC_HOOKS */
   if (this->temp_ != 0)
     {
       // Fill the temporary array.
@@ -72,7 +77,12 @@ template <typename CHAR_TYPE>
 ACE_Arg_Shifter_T<CHAR_TYPE>::~ACE_Arg_Shifter_T (void)
 {
   // Delete the temporary vector.
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  if (this->temp_)
+    ACE_Allocator::instance ()->free (this->temp_);
+#else
   delete [] temp_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 template <typename CHAR_TYPE>
@@ -120,33 +130,20 @@ template <typename CHAR_TYPE>
 int
 ACE_Arg_Shifter_T<CHAR_TYPE>::cur_arg_strncasecmp (const CHAR_TYPE *flag)
 {
-  // Check for a current argument
-  if (this->is_anything_left())
-    {
-      size_t const flag_length = ACE_OS::strlen (flag);
+  if (!this->is_anything_left ())
+    return -1;
 
-      // Check for presence of the flag
-      if (ACE_OS::strncasecmp(this->temp_[current_index_],
-                              flag,
-                              flag_length) == 0)
-        {
-          if (ACE_OS::strlen(temp_[current_index_]) == flag_length)
-            {
-              // match and lengths are equal
-              return 0;
-            }
-          else
-            {
-              // matches, with more info to boot!
-              size_t const remaining = ACE_OS::strspn
-                (this->temp_[current_index_] + flag_length,
-                ACE_TEXT (" ")) + flag_length;
-              return static_cast<int> (remaining);
-            }
-        }
-    }
-  // failure
-  return -1;
+  const size_t flag_length = ACE_OS::strlen (flag);
+  const CHAR_TYPE *arg = this->temp_[this->current_index_];
+
+  if (ACE_OS::strncasecmp (arg, flag, flag_length) != 0)
+    return -1;
+
+  const size_t arg_length = ACE_OS::strlen (arg);
+  size_t remaining = flag_length;
+  while (remaining < arg_length && arg[remaining] == CHAR_TYPE (' '))
+    ++remaining;
+  return (arg_length == flag_length) ? 0 : static_cast<int> (remaining);
 }
 
 template <typename CHAR_TYPE>

@@ -70,7 +70,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 /* static */
 int ACE_High_Res_Timer::global_scale_factor_status_ = 0;
 
-#if defined (ACE_LINUX)
+#if defined (ACE_LINUX) && !defined (ACE_LACKS_SSCANF)
 // Determine the apparent CPU clock speed from /proc/cpuinfo
 ACE_UINT32
 ACE_High_Res_Timer::get_cpuinfo (void)
@@ -183,8 +183,7 @@ ACE_High_Res_Timer::get_cpuinfo (void)
 
   return scale_factor;
 }
-#endif /* ACE_LINUX */
-
+#endif /* ACE_LINUX && !ACE_LACKS_SSCANF*/
 
 ACE_High_Res_Timer::global_scale_factor_type
 ACE_High_Res_Timer::global_scale_factor (void)
@@ -222,7 +221,11 @@ ACE_High_Res_Timer::global_scale_factor (void)
             ACE_High_Res_Timer::global_scale_factor_status_ = -1;
           }
 #         elif defined (ACE_LINUX)
+#          if defined (ACE_LACKS_SSCANF)
+            ACE_High_Res_Timer::global_scale_factor (1);
+#          else
           ACE_High_Res_Timer::global_scale_factor (ACE_High_Res_Timer::get_cpuinfo ());
+#          endif /* ACE_LACKS_SSCANF */
 #         endif /* ! ACE_WIN32 && ! (ACE_LINUX && __alpha__) */
 
 #         if !defined (ACE_WIN32)
@@ -440,18 +443,18 @@ ACE_High_Res_Timer::print_ave (const ACE_TCHAR *str,
   if (count > 1)
     {
       ACE_hrtime_t avg_nsecs = total_nanoseconds / (ACE_UINT32) count;
-      ACE_OS::sprintf (buf,
-                       ACE_TEXT (" count = %d, total (secs %lu, usecs %u), avg usecs = %lu\n"),
-                       count,
-                       total_secs,
-                       (extra_nsecs + 500u) / 1000u,
-                       (u_long) ((avg_nsecs + 500u) / 1000u));
+      ACE_OS::snprintf (buf, 100,
+                        ACE_TEXT (" count = %d, total (secs %lu, usecs %u), avg usecs = %lu\n"),
+                        count,
+                        total_secs,
+                        (extra_nsecs + 500u) / 1000u,
+                        (u_long) ((avg_nsecs + 500u) / 1000u));
     }
   else
-    ACE_OS::sprintf (buf,
-                     ACE_TEXT (" total %3lu.%06lu secs\n"),
-                     total_secs,
-                     (extra_nsecs + 500lu) / 1000lu);
+    ACE_OS::snprintf (buf, 100,
+                      ACE_TEXT (" total %3lu.%06lu secs\n"),
+                      total_secs,
+                      (extra_nsecs + 500lu) / 1000lu);
 
   ACE_OS::write (handle,
                  str,
@@ -483,18 +486,18 @@ ACE_High_Res_Timer::print_total (const ACE_TCHAR *str,
     {
       ACE_hrtime_t avg_nsecs = this->total_ / (ACE_UINT32) count;
 
-      ACE_OS::sprintf (buf,
-                       ACE_TEXT (" count = %d, total (secs %lu, usecs %u), avg usecs = %lu\n"),
-                       count,
-                       total_secs,
-                       (extra_nsecs + 500u) / 1000u,
-                       (u_long) ((avg_nsecs + 500u) / 1000u));
+      ACE_OS::snprintf (buf, 100,
+                        ACE_TEXT (" count = %d, total (secs %lu, usecs %u), avg usecs = %lu\n"),
+                        count,
+                        total_secs,
+                        (extra_nsecs + 500u) / 1000u,
+                        (u_long) ((avg_nsecs + 500u) / 1000u));
     }
   else
-    ACE_OS::sprintf (buf,
-                     ACE_TEXT (" total %3lu.%06u secs\n"),
-                     total_secs,
-                     (extra_nsecs + 500u) / 1000u);
+    ACE_OS::snprintf (buf, 100,
+                      ACE_TEXT (" total %3lu.%06u secs\n"),
+                      total_secs,
+                      (extra_nsecs + 500u) / 1000u);
 
   ACE_OS::write (handle,
                  str,

@@ -45,7 +45,6 @@ class ACE_Export ACE_TLI_Acceptor : public ACE_TLI
 public:
   friend class ACE_Request_Queue;
 
-  // = Initialization and termination methods.
   /// Default constructor.
   ACE_TLI_Acceptor (void);
 

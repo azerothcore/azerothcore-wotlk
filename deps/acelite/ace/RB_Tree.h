@@ -52,8 +52,6 @@ template <class EXT_ID, class INT_ID>
 class ACE_RB_Tree_Node : public ACE_RB_Tree_Node_Base
 {
 public:
-  // = Initialization and termination methods.
-
   /// Constructor.
   ACE_RB_Tree_Node (const EXT_ID &k, const INT_ID &t);
 
@@ -124,7 +122,7 @@ public:
    *       inlining is disabled and on platforms where
    *       @c ACE_TEMPLATES_REQUIRE_SOURCE is defined.  In those
    *       platform/configuration combinations, multiple definitions
-   *       of this method occured.  Placing the definition inline in
+   *       of this method occurred.  Placing the definition inline in
    *       the header avoids such errors.
    */
   ACE_Allocator * allocator (void) const { return this->allocator_; }
@@ -201,11 +199,8 @@ public:
   typedef ACE_RB_Tree_Iterator<EXT_ID, INT_ID, COMPARE_KEYS, ACE_LOCK> iterator;
   typedef ACE_RB_Tree_Reverse_Iterator<EXT_ID, INT_ID, COMPARE_KEYS, ACE_LOCK> reverse_iterator;
 
-  // = Initialization and termination methods.
-
   /// Constructor.
   ACE_RB_Tree (ACE_Allocator *alloc = 0);
-
 
   /// Copy constructor.
   ACE_RB_Tree (const ACE_RB_Tree<EXT_ID, INT_ID, COMPARE_KEYS, ACE_LOCK> &rbt);
@@ -438,6 +433,9 @@ public:
   /// Destroys all nodes and sets the root pointer null.
   void clear (void);
 
+  /// Declare the dynamic allocation hooks.
+  ACE_ALLOC_HOOK_DECLARE;
+
 protected:
   /// Reinitialize constructor.
   /**
@@ -624,9 +622,6 @@ public:
   ACE_ALLOC_HOOK_DECLARE;
 
 protected:
-
-  // = Initialization and termination methods.
-
   /// Create the singular iterator.  No valid iterator can be equal to
   /// it, it is illegal to dereference a singular iterator, etc. etc.
   ACE_RB_Tree_Iterator_Base (void);
@@ -688,10 +683,7 @@ protected:
 template <class EXT_ID, class INT_ID, class COMPARE_KEYS, class ACE_LOCK>
 class ACE_RB_Tree_Iterator : public ACE_RB_Tree_Iterator_Base<EXT_ID, INT_ID, COMPARE_KEYS, ACE_LOCK>
 {
-
 public:
-
-  // = Initialization and termination methods.
   /**
    * Create the singular iterator.
    * It is illegal to deference the iterator, no valid iterator is
@@ -806,10 +798,7 @@ public:
 template <class EXT_ID, class INT_ID, class COMPARE_KEYS, class ACE_LOCK>
 class ACE_RB_Tree_Reverse_Iterator : public ACE_RB_Tree_Iterator_Base<EXT_ID, INT_ID, COMPARE_KEYS, ACE_LOCK>
 {
-
 public:
-
-  // = Initialization and termination methods.
   /**
    * Create the singular iterator.
    * It is illegal to deference the iterator, no valid iterator is

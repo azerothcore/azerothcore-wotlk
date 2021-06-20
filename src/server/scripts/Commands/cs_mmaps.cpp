@@ -23,19 +23,19 @@
 * mmap sub-commands
 */
 
-#include "ScriptMgr.h"
+#include "CellImpl.h"
 #include "Chat.h"
 #include "DisableMgr.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "PointMovementGenerator.h"
-#include "PathGenerator.h"
-#include "MMapFactory.h"
-#include "Map.h"
-#include "TargetedMovementGenerator.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "Map.h"
+#include "MMapFactory.h"
+#include "ObjectMgr.h"
+#include "PathGenerator.h"
+#include "Player.h"
+#include "PointMovementGenerator.h"
+#include "ScriptMgr.h"
+#include "TargetedMovementGenerator.h"
 
 class mmaps_commandscript : public CommandScript
 {
@@ -55,7 +55,7 @@ public:
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "mmap", SEC_ADMINISTRATOR, true, NULL, "", mmapCommandTable },
+            { "mmap", SEC_ADMINISTRATOR, true, nullptr, "", mmapCommandTable },
         };
         return commandTable;
     }
@@ -85,9 +85,11 @@ public:
         if (para && strcmp(para, "true") == 0)
             useStraightPath = true;
 
-        bool useStraightLine = false;
-        if (para && strcmp(para, "line") == 0)
-            useStraightLine = true;
+        bool useRaycast = false;
+        if (para && (strcmp(para, "line") == 0 || strcmp(para, "ray") == 0 || strcmp(para, "raycast") == 0))
+        {
+            useRaycast = true;
+        }
 
         // unit locations
         float x, y, z;
@@ -96,16 +98,17 @@ public:
         // path
         PathGenerator path(target);
         path.SetUseStraightPath(useStraightPath);
+        path.SetUseRaycast(useRaycast);
         bool result = path.CalculatePath(x, y, z, false);
 
         Movement::PointsArray const& pointPath = path.GetPath();
         handler->PSendSysMessage("%s's path to %s:", target->GetName().c_str(), player->GetName().c_str());
-        handler->PSendSysMessage("Building: %s", useStraightPath ? "StraightPath" : useStraightLine ? "Raycast" : "SmoothPath");
+        handler->PSendSysMessage("Building: %s", useStraightPath ? "StraightPath" : useRaycast ? "Raycast" : "SmoothPath");
         handler->PSendSysMessage("Result: %s - Length: " SZFMTD " - Type: %u", (result ? "true" : "false"), pointPath.size(), path.GetPathType());
 
-        G3D::Vector3 const &start = path.GetStartPosition();
-        G3D::Vector3 const &end = path.GetEndPosition();
-        G3D::Vector3 const &actualEnd = path.GetActualEndPosition();
+        G3D::Vector3 const& start = path.GetStartPosition();
+        G3D::Vector3 const& end = path.GetEndPosition();
+        G3D::Vector3 const& actualEnd = path.GetActualEndPosition();
 
         handler->PSendSysMessage("StartPosition     (%.3f, %.3f, %.3f)", start.x, start.y, start.z);
         handler->PSendSysMessage("EndPosition       (%.3f, %.3f, %.3f)", end.x, end.y, end.z);
@@ -154,9 +157,9 @@ public:
         handler->PSendSysMessage("Calc   [%02i, %02i]", tilex, tiley);
 
         // navmesh poly -> navmesh tile location
-        dtQueryFilter filter = dtQueryFilter();
+        dtQueryFilterExt filter = dtQueryFilterExt();
         dtPolyRef polyRef = INVALID_POLYREF;
-        if (dtStatusFailed(navmeshquery->findNearestPoly(location, extents, &filter, &polyRef, NULL)))
+        if (dtStatusFailed(navmeshquery->findNearestPoly(location, extents, &filter, &polyRef, nullptr)))
         {
             handler->PSendSysMessage("Dt     [??,??] (invalid poly, probably no tile loaded)");
             return true;
@@ -260,18 +263,11 @@ public:
         float radius = 40.0f;
         WorldObject* object = handler->GetSession()->GetPlayer();
 
-        CellCoord pair(acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY()));
-        Cell cell(pair);
-        cell.SetNoCreate();
-
-        std::list<Creature*> creatureList;
-
-        acore::AnyUnitInObjectRangeCheck go_check(object, radius);
-        acore::CreatureListSearcher<acore::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
-        TypeContainerVisitor<acore::CreatureListSearcher<acore::AnyUnitInObjectRangeCheck>, GridTypeMapContainer> go_visit(go_search);
-
         // Get Creatures
-        cell.Visit(pair, go_visit, *(object->GetMap()), *object, radius);
+        std::list<Creature*> creatureList;
+        Acore::AnyUnitInObjectRangeCheck go_check(object, radius);
+        Acore::CreatureListSearcher<Acore::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
+        Cell::VisitGridObjects(object, go_search, radius);
 
         if (!creatureList.empty())
         {

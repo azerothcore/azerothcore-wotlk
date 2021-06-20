@@ -17,7 +17,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Unbounded_Queue)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Unbounded_Queue)
 
 template <class T>
 ACE_Unbounded_Queue<T>::ACE_Unbounded_Queue (ACE_Allocator *alloc)

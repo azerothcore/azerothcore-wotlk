@@ -4,7 +4,7 @@
 /**
  *  @file    Read_Buffer.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Seth Widoff
  */
 //==========================================================================
@@ -44,7 +44,6 @@ class ACE_Allocator;
 class ACE_Export ACE_Read_Buffer
 {
 public:
-  // = Initialization and termination methods.
   /// Read from a FILE *.
   ACE_Read_Buffer (FILE *fp,
                    bool close_on_delete = false,

@@ -219,6 +219,11 @@ ACE_Process_Options::set_thread_attributes (void)
 #endif /* !ACE_HAS_WINCE */
 }
 
+ACE_INLINE HANDLE ACE_Process_Options::get_user_token (void) const
+{
+  return user_token_;
+}
+
 #else /* !defined (ACE_WIN32) */
 
 ACE_INLINE ACE_HANDLE

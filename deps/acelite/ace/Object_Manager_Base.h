@@ -4,7 +4,7 @@
 /**
  *  @file    Object_Manager_Base.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
  *  @author and a cast of thousands...
  *
@@ -127,6 +127,8 @@ class ACE_Log_Msg;
 class ACE_Export ACE_OS_Object_Manager : public ACE_Object_Manager_Base
 {
 public:
+  ACE_ALLOC_HOOK_DECLARE;
+
   /// Explicitly initialize.
   virtual int init (void);
 

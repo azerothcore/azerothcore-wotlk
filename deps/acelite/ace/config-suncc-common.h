@@ -48,5 +48,10 @@
 
 #define ACE_TEMPLATES_REQUIRE_SOURCE
 
+// Solaris Studio 12.4 implements symbol lookup correctly.
+#if defined (__SUNPRO_CC) && (__SUNPRO_CC >= 0x5130)
+#define ACE_ANY_OPS_USE_NAMESPACE
+#endif
+
 #include /**/ "ace/post.h"
 #endif /* ACE_SUNCC_COMMON_H */

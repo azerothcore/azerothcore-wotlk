@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_stdio.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
  *  @author and a cast of thousands...
  *
@@ -26,6 +26,7 @@
 #include "ace/os_include/os_stdio.h"
 #include "ace/os_include/os_fcntl.h"
 #include "ace/os_include/os_inttypes.h"
+#include "ace/os_include/os_errno.h"
 #include /**/ "ace/ACE_export.h"
 
 /* OPENVMS needs unistd for cuserid() */
@@ -68,6 +69,7 @@ inline int ace_fgetc_helper (FILE *fp)
 #endif /* defined (fgetc) */
 }
 
+#if !defined (ACE_LACKS_FPUTC)
 inline int ace_fputc_helper (int ch, FILE *fp)
 {
 #if defined (fputc)
@@ -77,7 +79,9 @@ inline int ace_fputc_helper (int ch, FILE *fp)
   return ACE_STD_NAMESPACE::fputc (ch, fp);
 #endif /* defined (fputc) */
 }
+#endif /* !ACE_LACKS_FPUTC */
 
+#if !defined (ACE_LACKS_GETC)
 inline int ace_getc_helper (FILE *fp)
 {
 #if defined (getc)
@@ -87,17 +91,25 @@ inline int ace_getc_helper (FILE *fp)
   return ACE_STD_NAMESPACE::getc (fp);
 #endif /* defined (getc) */
 }
+#elif defined getc
+# undef getc
+#endif /* !ACE_LACKS_GETC */
 
 inline int ace_putc_helper (int ch, FILE *fp)
 {
 #if defined (putc)
   return putc (ch, fp);
 #undef putc
-#else
+#elif !defined (ACE_LACKS_PUTC)
   return ACE_STD_NAMESPACE::putc (ch, fp);
+#else
+  ACE_UNUSED_ARG (ch);
+  ACE_UNUSED_ARG (fp);
+  return -1;
 #endif /* defined (putc) */
 }
 
+#if !defined (ACE_LACKS_UNGETC)
 inline int ace_ungetc_helper (int ch, FILE *fp)
 {
 #if defined (ungetc)
@@ -107,6 +119,7 @@ inline int ace_ungetc_helper (int ch, FILE *fp)
   return ACE_STD_NAMESPACE::ungetc (ch, fp);
 #endif /* defined (ungetc) */
 }
+#endif /* !ACE_LACKS_UNGETC */
 
 #if !defined ACE_FILENO_EQUIVALENT
 inline ACE_HANDLE ace_fileno_helper (FILE *fp)
@@ -114,6 +127,9 @@ inline ACE_HANDLE ace_fileno_helper (FILE *fp)
 # if defined (fileno)
   return (ACE_HANDLE)fileno (fp);
 # undef fileno
+# elif defined (ACE_LACKS_FILENO)
+  ACE_UNUSED_ARG (fp);
+  ACE_NOTSUP_RETURN (ACE_INVALID_HANDLE);
 # else
   return (ACE_HANDLE)(intptr_t)ACE_STD_NAMESPACE::fileno (fp);
 # endif /* defined (fileno) */
@@ -369,9 +385,13 @@ namespace ACE_OS {
 
 #endif /* ACE_WIN32 */
 
+#ifdef ACE_STDIO_USE_STDLIB_FOR_VARARGS
+  using ::fprintf;
+#else
   extern ACE_Export
   int fprintf (FILE *fp, const char *format, ...)
     ACE_GCC_FORMAT_ATTRIBUTE (printf, 2, 3);
+#endif
 
 # if defined (ACE_HAS_WCHAR)
   extern ACE_Export
@@ -436,9 +456,13 @@ namespace ACE_OS {
   void perror (const wchar_t *s);
 #endif /* ACE_HAS_WCHAR */
 
+#if defined ACE_FACE_DEV && defined ACE_STDIO_USE_STDLIB_FOR_VARARGS
+  using ::printf;
+#else
   extern ACE_Export
   int printf (const char *format, ...)
     ACE_GCC_FORMAT_ATTRIBUTE (printf, 1, 2);
+#endif
 
 #if defined (ACE_HAS_WCHAR)
   extern ACE_Export
@@ -468,9 +492,13 @@ namespace ACE_OS {
   ACE_NAMESPACE_INLINE_FUNCTION
   void rewind (FILE *fp);
 
+#if defined ACE_STDIO_USE_STDLIB_FOR_VARARGS && !defined ACE_LACKS_SNPRINTF
+  using ::snprintf;
+#else
   extern ACE_Export
   int snprintf (char *buf, size_t maxlen, const char *format, ...)
     ACE_GCC_FORMAT_ATTRIBUTE (printf, 3, 4);
+#endif
 
 # if defined (ACE_HAS_WCHAR)
   extern ACE_Export
@@ -518,7 +546,7 @@ namespace ACE_OS {
   int vsnprintf (char *buffer, size_t maxlen, const char *format, va_list argptr)
     ACE_GCC_FORMAT_ATTRIBUTE (printf, 3, 0);
 
-# if defined (ACE_HAS_WCHAR)
+#if defined (ACE_HAS_WCHAR)
   ACE_NAMESPACE_INLINE_FUNCTION
   int vasprintf (wchar_t **bufp, const wchar_t *format, va_list argptr);
 
@@ -533,19 +561,24 @@ namespace ACE_OS {
 
   ACE_NAMESPACE_INLINE_FUNCTION
   int vsnprintf (wchar_t *buffer, size_t maxlen, const wchar_t *format, va_list argptr);
-# endif /* ACE_HAS_WCHAR */
+#endif /* ACE_HAS_WCHAR */
 
-#if !defined (ACE_HAS_VASPRINTF)
+#if defined (ACE_HAS_VSNPRINTF_EMULATION)
+  extern ACE_Export
+  int vsnprintf_emulation (char *buf, size_t max, const char *fmt, va_list ap);
+#endif
+
+#if !defined (ACE_HAS_VASPRINTF) && !defined (ACE_LACKS_VA_COPY)
   extern ACE_Export
   int vasprintf_emulation (char **bufp, const char *format, va_list argptr);
-#endif /* !ACE_HAS_VASPRINTF */
+#endif
 
+#if !defined (ACE_HAS_VASWPRINTF) && !defined (ACE_LACKS_VA_COPY)
 #if defined (ACE_HAS_WCHAR)
-#if !defined (ACE_HAS_VASWPRINTF)
   extern ACE_Export
   int vaswprintf_emulation (wchar_t **bufp, const wchar_t *format, va_list argptr);
-#endif /* !ACE_HAS_VASWPRINTF */
 #endif /* ACE_HAS_WCHAR */
+#endif /* !ACE_HAS_VASWPRINTF */
 
 } /* namespace ACE_OS */
 

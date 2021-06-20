@@ -125,6 +125,10 @@ ACE_OS::open (const char *filename,
   else {
       ACE_OSCALL_RETURN (::open (filename, mode, perms), ACE_HANDLE, -1);
   }
+#elif defined (ACE_MQX)
+  ACE_UNUSED_ARG (perms);
+  ACE_UNUSED_ARG (sa);
+  return MQX_Filesystem::inst ().open (filename, mode);
 #else
   ACE_UNUSED_ARG (sa);
   ACE_OSCALL_RETURN (::open (filename, mode, perms), ACE_HANDLE, ACE_INVALID_HANDLE);

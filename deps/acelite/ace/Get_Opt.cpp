@@ -722,7 +722,13 @@ ACE_Get_Opt::ACE_Get_Opt_Long_Option::ACE_Get_Opt_Long_Option (
 
 ACE_Get_Opt::ACE_Get_Opt_Long_Option::~ACE_Get_Opt_Long_Option (void)
 {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(const_cast<ACE_TCHAR*>(this->name_));
+#else
   delete [] this->name_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
+
+ACE_ALLOC_HOOK_DEFINE(ACE_Get_Opt::ACE_Get_Opt_Long_Option);
 
 ACE_END_VERSIONED_NAMESPACE_DECL

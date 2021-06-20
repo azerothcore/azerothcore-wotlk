@@ -56,12 +56,11 @@ ACE_OS::ioctl (ACE_HANDLE socket,
                ACE_OVERLAPPED_COMPLETION_FUNC func)
 {
 # if defined (ACE_HAS_WINSOCK2) && (ACE_HAS_WINSOCK2 != 0)
-
-  QOS qos;
-  unsigned long qos_len = sizeof (QOS);
-
   if (io_control_code == SIO_SET_QOS)
     {
+      QOS qos;
+      unsigned long qos_len = sizeof (QOS);
+
       qos.SendingFlowspec = *(ace_qos.sending_flowspec ());
       qos.ReceivingFlowspec = *(ace_qos.receiving_flowspec ());
       qos.ProviderSpecific = (WSABUF) ace_qos.provider_specific ();

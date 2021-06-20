@@ -11,6 +11,8 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Future_Set)
+
 template <class T>
 ACE_Future_Set<T>::ACE_Future_Set (ACE_Message_Queue<ACE_SYNCH> *new_queue)
   : delete_queue_ (false)

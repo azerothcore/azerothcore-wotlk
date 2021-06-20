@@ -707,28 +707,36 @@ ACE_HAS_UINT64_T                        Platform provides the uint64_t type.
 
 ACE_INT8_TYPE                           Specific type to use for ACE_INT8.
                                         If not defined, ACE will attempt to
-                                        determine the correct type.
+                                        determine the correct type
+                                        unless ACE_HAS_INT8_T has been defined
 ACE_INT16_TYPE                          Specific type to use for ACE_INT16.
                                         If not defined, ACE will attempt to
-                                        determine the correct type.
+                                        determine the correct type
+                                        unless ACE_HAS_INT16_T has been defined
 ACE_INT32_TYPE                          Specific type to use for ACE_INT32.
                                         If not defined, ACE will attempt to
-                                        determine the correct type.
+                                        determine the correct type
+                                        unless ACE_HAS_INT32_T has been defined
 ACE_INT64_TYPE                          Specific type to use for ACE_INT64.
                                         If not defined, ACE will attempt to
-                                        determine the correct type.
+                                        determine the correct type
+                                        unless ACE_HAS_INT64_T has been defined
 ACE_UINT8_TYPE                          Specific type to use for ACE_UINT8.
                                         If not defined, ACE will attempt to
-                                        determine the correct type.
+                                        determine the correct type
+                                        unless ACE_HAS_UINT8_T has been defined
 ACE_UINT16_TYPE                         Specific type to use for ACE_UINT16.
                                         If not defined, ACE will attempt to
-                                        determine the correct type.
+                                        determine the correct type
+                                        unless ACE_HAS_UINT16_T has been defined
 ACE_UINT32_TYPE                         Specific type to use for ACE_UINT32.
                                         If not defined, ACE will attempt to
-                                        determine the correct type.
+                                        determine the correct type
+                                        unless ACE_HAS_UINT32_T has been defined
 ACE_UINT64_TYPE                         Specific type to use for ACE_UINT64.
                                         If not defined, ACE will attempt to
-                                        determine the correct type.
+                                        determine the correct type
+                                        unless ACE_HAS_UINT64_T has been defined
 
 ACE_INT8_FORMAT_SPECIFIER               String literal containing *printf
                                         format specifier (including the '%')
@@ -953,6 +961,7 @@ ACE_LACKS_QSORT                         Compiler/platform lacks the
 ACE_LACKS_READLINK                      Platform lacks the readlink() function.
 ACE_LACKS_READV                         Platform doesn't define readv,
                                         so use our own
+ACE_LACKS_RENAME                        Platform lacks rename().
 ACE_LACKS_RLIMIT                        Platform/compiler lacks
                                         {get,set}rlimit() function
                                         (e.g., VxWorks, Chorus, and
@@ -1065,9 +1074,6 @@ ACE_LACKS_TIMESPEC_T                    Platform does not define
                                         struct timespec.
 ACE_LACKS_TRUNCATE                      Platform doesn't have truncate()
                                         (e.g., vxworks)
-ACE_LACKS_U_LONGLONG_T                  Platform does not have
-                                        u_longlong_t typedef, and
-                                        "sun" is defined.
 ACE_LACKS_UALARM_PROTOTYPE              Platform/compiler lacks the
                                         ualarm() prototype (e.g.,
                                         Solaris)

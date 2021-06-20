@@ -334,9 +334,15 @@ ACE_Local_Name_Space<ACE_MEM_POOL_2, ACE_LOCK>::resolve_i (
   // Makes a copy here. Caller needs to call delete to free up
   // memory.
   char *new_type = 0;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR_RETURN (new_type,
+                        static_cast<char*>(ACE_Allocator::instance()->malloc(sizeof(char) * (len + 1))),
+                        -1);
+#else
   ACE_NEW_RETURN (new_type,
                   char [len + 1],
                   -1);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   ACE_OS::strsncpy (new_type, temp, len + 1);
   type = new_type;
@@ -385,6 +391,8 @@ ACE_Local_Name_Space<ACE_MEM_POOL_2, ACE_LOCK>::~ACE_Local_Name_Space (void)
   delete this->allocator_;
   delete this->lock_;
 }
+
+ACE_ALLOC_HOOK_DEFINE_Tcc(ACE_Local_Name_Space)
 
 template <ACE_MEM_POOL_1, class ACE_LOCK> int
 ACE_Local_Name_Space<ACE_MEM_POOL_2, ACE_LOCK>::create_manager (void)
@@ -673,7 +681,11 @@ ACE_Local_Name_Space<ACE_MEM_POOL_2, ACE_LOCK>::list_types_i (
   if (compiled_regexp)
     ACE_OS::free ((void *) compiled_regexp);
 #endif /* ACE_HAS_REGEX */
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(pattern_rep);
+#else
   delete [] pattern_rep;  // delete pattern_rep;
+#endif /* ACE_HAS_ALLOC_HOOKS */
   return result;
 }
 
@@ -790,7 +802,11 @@ ACE_Local_Name_Space<ACE_MEM_POOL_2, ACE_LOCK>::list_type_entries_i (
   if (compiled_regexp)
     ACE_OS::free ((void *) compiled_regexp);
 #endif /* ACE_HAS_REGEX */
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(pattern_rep);
+#else
   delete [] pattern_rep;  // delete pattern_rep;
+#endif /* ACE_HAS_ALLOC_HOOKS */
   return 0;
 }
 
@@ -818,8 +834,13 @@ ACE_Local_Name_Space<ACE_MEM_POOL_2, ACE_LOCK>::dump_i (void) const
                   key, value, type));
       // We need to delete key and value since char_rep allocates
       // memory for them
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free(key);
+      ACE_Allocator::instance()->free(value);
+#else
       delete [] key;
       delete [] value;
+#endif /* ACE_HAS_ALLOC_HOOKS */
     }
 
   ACELIB_DEBUG ((LM_DEBUG, ACE_END_DUMP));

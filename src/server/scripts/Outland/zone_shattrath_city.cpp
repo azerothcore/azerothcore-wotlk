@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -20,11 +20,11 @@ npc_kservant
 npc_ishanah
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 /*######
@@ -48,7 +48,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
             creature->setFaction(FACTION_HOSTILE_RD);
@@ -60,7 +60,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_CRACK_SKULLS) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_RALIQ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_RALIQ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, 9440, creature->GetGUID());
         return true;
@@ -96,7 +96,8 @@ public:
             {
                 DoCastVictim(SPELL_UPPERCUT);
                 Uppercut_Timer = 15000;
-            } else Uppercut_Timer -= diff;
+            }
+            else Uppercut_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -118,7 +119,6 @@ enum Salsalabim
 
     // Spells
     SPELL_MAGNETIC_PULL            = 31705
-
 };
 
 class npc_salsalabim : public CreatureScript
@@ -159,7 +159,7 @@ public:
             me->RestoreFaction();
         }
 
-        void DamageTaken(Unit* done_by, uint32 &damage, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // xinef: some corrections
             if (done_by)
@@ -181,7 +181,8 @@ public:
             {
                 DoCastVictim(SPELL_MAGNETIC_PULL);
                 MagneticPull_Timer = 15000;
-            } else MagneticPull_Timer -= diff;
+            }
+            else MagneticPull_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -261,7 +262,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
             player->CastSpell(player, 37778, false);
 
         return true;
@@ -270,7 +271,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetReputationRank(989) >= REP_REVERED)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HZ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HZ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -313,7 +314,7 @@ class npc_kservant : public CreatureScript
 public:
     npc_kservant() : CreatureScript("npc_kservant") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_kservantAI(creature);
     }
@@ -323,7 +324,7 @@ public:
     public:
         npc_kservantAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -401,7 +402,7 @@ public:
             }
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (!summoner)
                 return;
@@ -411,7 +412,7 @@ public:
                 Start(false, false, summoner->GetGUID());
         }
 
-        void Reset() { }
+        void Reset() override { }
     };
 };
 
@@ -444,9 +445,9 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
             SendGossipMenuFor(player, 9458, creature->GetGUID());
-        else if (action == GOSSIP_ACTION_INFO_DEF+2)
+        else if (action == GOSSIP_ACTION_INFO_DEF + 2)
             SendGossipMenuFor(player, 9459, creature->GetGUID());
 
         return true;
@@ -457,8 +458,8 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -508,7 +509,7 @@ public:
 
             _events.Update(diff);
 
-            switch (uint32 eventId = _events.ExecuteEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_SPELL_ISHANAH_HOLY_SMITE:
                     me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);

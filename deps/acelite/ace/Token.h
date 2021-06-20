@@ -7,7 +7,7 @@
  *  @author Original author
  *  @author Karl-Heinz Dorn (kdorn@erlh.siemens.de)
  *  @author Ported to ACE by
- *  @author Douglas C. Schmidt (schmidt@cs.wustl.edu)
+ *  @author Douglas C. Schmidt (d.schmidt@vanderbilt.edu)
  */
 //=============================================================================
 
@@ -74,7 +74,6 @@ class ACE_Time_Value;
 class ACE_Export ACE_Token
 {
 public:
-
   /**
    * Available queueing strategies.
    */
@@ -85,8 +84,6 @@ public:
     /// LIFO, Last In, First Out
     LIFO = 0
   };
-
-  // = Initialization and termination.
 
   /// Constructor
   ACE_Token (const ACE_TCHAR *name = 0, void * = 0);

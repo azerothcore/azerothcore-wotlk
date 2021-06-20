@@ -251,6 +251,15 @@ ACE_MT_MEM_IO::init (ACE_HANDLE handle,
   return 0;
 }
 
+int
+ACE_MT_MEM_IO::fini ()
+{
+  const int ret = ACE_MEM_SAP::fini ();
+  ACE_Process_Mutex::unlink (this->recv_channel_.lock_->name ());
+  ACE_Process_Mutex::unlink (this->send_channel_.lock_->name ());
+  return ret;
+}
+
 ssize_t
 ACE_MT_MEM_IO::recv_buf (ACE_MEM_SAP_Node *&buf,
                          int flags,

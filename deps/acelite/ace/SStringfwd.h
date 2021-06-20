@@ -6,7 +6,7 @@
  *
  *  Forward declarations and typedefs of ACE string types.
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Nanbor Wang <nanbor@cs.wustl.edu>
  *  @author Ossama Othman <ossama@uci.edu>
  */

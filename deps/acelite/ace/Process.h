@@ -114,10 +114,15 @@ public:
   /// Release the standard handles previously set with set_handles;
   void release_handles (void);
 
+#ifndef ACE_LACKS_VA_FUNCTIONS
   /// @param format must be of the form "VARIABLE=VALUE".  There can not be
   /// any spaces between VARIABLE and the equal sign.
   int setenv (const ACE_TCHAR *format,
-              ...);
+              ...)
+#if !defined (ACE_USES_WCHAR)
+    ACE_GCC_FORMAT_ATTRIBUTE (printf, 2, 3)
+#endif /* !ACE_USES_WCHAR */
+    ;
 
   /**
    * Set a single environment variable, @a variable_name.  Since
@@ -129,7 +134,12 @@ public:
    */
   int setenv (const ACE_TCHAR *variable_name,
               const ACE_TCHAR *format,
-              ...);
+              ...)
+#if !defined (ACE_USES_WCHAR)
+    ACE_GCC_FORMAT_ATTRIBUTE (printf, 3, 4)
+#endif /* !ACE_USES_WCHAR */
+    ;
+#endif // ACE_LACKS_VA_FUNCTIONS
 
   /// Same as above with argv format.  @a envp must be null terminated.
   int setenv (ACE_TCHAR *envp[]);
@@ -143,6 +153,7 @@ public:
   void working_directory (const wchar_t *wd);
 #endif /* ACE_HAS_WCHAR */
 
+#ifndef ACE_LACKS_VA_FUNCTIONS
   /**
    * Set the command-line arguments.  @a format can use any printf
    * formats.  The first token in @a format should be the path to the
@@ -152,12 +163,17 @@ public:
    * path to run a process, this method *must* be called!  Returns 0
    * on success, -1 on failure.
    */
-  int command_line (const ACE_TCHAR *format, ...);
+  int command_line (const ACE_TCHAR *format, ...)
+#if !defined (ACE_USES_WCHAR)
+    ACE_GCC_FORMAT_ATTRIBUTE (printf, 2, 3)
+#endif /* !ACE_USES_WCHAR */
+    ;
 
 #if defined (ACE_HAS_WCHAR) && !defined (ACE_HAS_WINCE)
   /// Anti-TChar version of command_line ()
   int command_line (const ACE_ANTI_TCHAR *format, ...);
 #endif /* ACE_HAS_WCHAR && !ACE_HAS_WINCE */
+#endif // ACE_LACKS_VA_FUNCTIONS
 
   /// Same as above in argv format.  @a argv must be null terminated.
   int command_line (const ACE_TCHAR * const argv[]);
@@ -309,6 +325,14 @@ public:
   /// CreateProcess.
   LPSECURITY_ATTRIBUTES set_thread_attributes (void);
 
+  /// Get user token. Return ACE_INVALID_HANDLE if it has not been set.
+  HANDLE get_user_token (void) const;
+
+  /// Set user token for creating process as user.
+  /// @param token the user token is passed to \c ::CreateProcessAsUser.
+  /// @param close_token whether to close the user token when destructing.
+  void set_user_token (HANDLE token, bool close_token = false);
+
 #else /* All things not WIN32 */
 
   /// argv-style array of environment settings.
@@ -380,6 +404,11 @@ protected:
   /// Data for thread_attributes_.
   SECURITY_ATTRIBUTES security_buf2_;
 
+  /// User token for \a CreateProcessAsUser
+  HANDLE user_token_;
+
+  /// Keeps track of whether we need to close user token.
+  bool close_user_token_;
 #else /* !ACE_WIN32 */
   ACE_HANDLE stdin_;
   ACE_HANDLE stdout_;
@@ -661,6 +690,8 @@ public:
 
   /// Cleanup by deleting @c this.
   virtual void unmanage (void);
+
+  ACE_ALLOC_HOOK_DECLARE;
 
 protected:
 

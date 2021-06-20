@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,9 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "temple_of_ahnqiraj.h"
 
 enum Huhuran
 {
@@ -32,9 +33,9 @@ class boss_huhuran : public CreatureScript
 public:
     boss_huhuran() : CreatureScript("boss_huhuran") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_huhuranAI(creature);
+        return GetTempleOfAhnQirajAI<boss_huhuranAI>(creature);
     }
 
     struct boss_huhuranAI : public ScriptedAI
@@ -51,7 +52,7 @@ public:
         bool Frenzy;
         bool Berserk;
 
-        void Reset()
+        void Reset() override
         {
             Frenzy_Timer = urand(25000, 35000);
             Wyvern_Timer = urand(18000, 28000);
@@ -64,11 +65,11 @@ public:
             Berserk = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -82,7 +83,8 @@ public:
                 Frenzy = true;
                 PoisonBolt_Timer = 3000;
                 Frenzy_Timer = urand(25000, 35000);
-            } else Frenzy_Timer -= diff;
+            }
+            else Frenzy_Timer -= diff;
 
             // Wyvern Timer
             if (Wyvern_Timer <= diff)
@@ -90,21 +92,24 @@ public:
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     DoCast(target, SPELL_WYVERNSTING);
                 Wyvern_Timer = urand(15000, 32000);
-            } else Wyvern_Timer -= diff;
+            }
+            else Wyvern_Timer -= diff;
 
             //Spit Timer
             if (Spit_Timer <= diff)
             {
                 DoCastVictim(SPELL_ACIDSPIT);
                 Spit_Timer = urand(5000, 10000);
-            } else Spit_Timer -= diff;
+            }
+            else Spit_Timer -= diff;
 
             //NoxiousPoison_Timer
             if (NoxiousPoison_Timer <= diff)
             {
                 DoCastVictim(SPELL_NOXIOUSPOISON);
                 NoxiousPoison_Timer = urand(12000, 24000);
-            } else NoxiousPoison_Timer -= diff;
+            }
+            else NoxiousPoison_Timer -= diff;
 
             //PoisonBolt only if frenzy or berserk
             if (Frenzy || Berserk)
@@ -113,7 +118,8 @@ public:
                 {
                     DoCastVictim(SPELL_POISONBOLT);
                     PoisonBolt_Timer = 3000;
-                } else PoisonBolt_Timer -= diff;
+                }
+                else PoisonBolt_Timer -= diff;
             }
 
             //FrenzyBack_Timer
@@ -122,7 +128,8 @@ public:
                 me->InterruptNonMeleeSpells(false);
                 Frenzy = false;
                 FrenzyBack_Timer = 15000;
-            } else FrenzyBack_Timer -= diff;
+            }
+            else FrenzyBack_Timer -= diff;
 
             if (!Berserk && HealthBelowPct(31))
             {
@@ -135,7 +142,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_huhuran()

@@ -1,15 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "HostileRefManager.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "ThreatManager.h"
 #include "Unit.h"
-#include "DBCStructure.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
 
 HostileRefManager::~HostileRefManager()
 {
@@ -155,7 +154,7 @@ void HostileRefManager::deleteReference(Unit* creature)
 void HostileRefManager::deleteReferencesOutOfRange(float range)
 {
     HostileReference* ref = getFirst();
-    range = range*range;
+    range = range * range;
     while (ref)
     {
         HostileReference* nextRef = ref->next();
@@ -195,8 +194,8 @@ void HostileRefManager::UpdateVisibility(bool checkThreat)
     while (ref)
     {
         HostileReference* nextRef = ref->next();
-        if ((!checkThreat || ref->GetSource()->getThreatList().size() <= 1) && 
-            !ref->GetSource()->GetOwner()->CanSeeOrDetect(GetOwner()))
+        if ((!checkThreat || ref->GetSource()->getThreatList().size() <= 1) &&
+                !ref->GetSource()->GetOwner()->CanSeeOrDetect(GetOwner()))
         {
             nextRef = ref->next();
             ref->removeReference();

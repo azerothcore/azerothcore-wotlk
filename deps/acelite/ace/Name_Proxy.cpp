@@ -147,9 +147,9 @@ ACE_Name_Proxy::recv_reply (ACE_Name_Request &reply)
   switch (n)
     {
     case -1:
-      // FALLTHROUGH
       ACELIB_DEBUG ((LM_DEBUG,
                   ACE_TEXT ("****************** recv_reply returned -1\n")));
+      // FALLTHROUGH
     default:
       ACELIB_ERROR ((LM_ERROR,
                   ACE_TEXT ("%p got %d bytes, expected %d bytes\n"),

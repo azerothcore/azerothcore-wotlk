@@ -6,7 +6,7 @@
  *
  *   Moved from Synch.h.
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //==========================================================================
 
@@ -87,19 +87,16 @@ public:
   void dump (void) const;
 
 private:
-
   // = Prevent assignment and copying.
   void operator= (const ACE_Condition<ACE_Recursive_Thread_Mutex> &);
   ACE_Condition (const ACE_Condition<ACE_Recursive_Thread_Mutex> &);
 
 private:
-
   /// A normal (i.e., non-recursive) condition variable.
   ACE_cond_t cond_;
 
   /// Reference to the recursive mutex.
   ACE_Recursive_Thread_Mutex &mutex_;
-
 };
 
 typedef ACE_Condition<ACE_Recursive_Thread_Mutex> ACE_Condition_Recursive_Thread_Mutex;

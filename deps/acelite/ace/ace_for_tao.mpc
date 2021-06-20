@@ -91,9 +91,11 @@ project(ACE_FOR_TAO) : acedefaults, install, svcconf, uuid, versioned_namespace,
     Monitor_Control_Types.cpp
     Monitor_Control_Action.cpp
     Monotonic_Time_Policy.cpp
+    MQX_Filesystem.cpp
     Mutex.cpp
     Notification_Strategy.cpp
     Notification_Queue.cpp
+    Null_Mutex.cpp
     Obchunk.cpp
     Object_Manager.cpp
     Object_Manager_Base.cpp
@@ -327,6 +329,7 @@ project(ACE_FOR_TAO) : acedefaults, install, svcconf, uuid, versioned_namespace,
     Mem_Map.h
     Min_Max.h
     Monotonic_Time_Policy.h
+    MQX_Filesystem.h
     Null_Barrier.h
     Null_Condition.h
     Null_Mutex.h
@@ -384,7 +387,7 @@ project(ACE_FOR_TAO) : acedefaults, install, svcconf, uuid, versioned_namespace,
 
   Documentation_Files {
     README
-    ../VERSION
+    ../VERSION.txt
   }
 
   Pkgconfig_Files {

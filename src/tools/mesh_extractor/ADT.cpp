@@ -9,15 +9,15 @@
 #include "LiquidHandler.h"
 #include "WorldModelHandler.h"
 
-ADT::ADT( std::string file, int x, int y ) : ObjectData(NULL), Data(NULL), HasObjectData(false),
-    _DoodadHandler(NULL), _WorldModelHandler(NULL), _LiquidHandler(NULL), X(x), Y(y)
+ADT::ADT( std::string file, int x, int y ) : ObjectData(nullptr), Data(nullptr), HasObjectData(false),
+    _DoodadHandler(nullptr), _WorldModelHandler(nullptr), _LiquidHandler(nullptr), X(x), Y(y)
 {
     Data = new ChunkedData(file);
     ObjectData = new ChunkedData(file);
     if (ObjectData->Stream)
         HasObjectData = true;
     else
-        ObjectData = NULL;
+        ObjectData = nullptr;
 }
 
 ADT::~ADT()

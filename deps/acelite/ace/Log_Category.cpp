@@ -3,11 +3,9 @@
 #include "ace/Atomic_Op.h"
 #include "ace/OS_NS_Thread.h"
 
-
 #if !defined (__ACE_INLINE__)
 #include "ace/Log_Category.inl"
 #endif /* __ACE_INLINE__ */
-
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -18,7 +16,6 @@ ACE_Log_Category_tss_destroy(void * p)
   delete static_cast<ACE_Log_Category_TSS*>(p);
 }
 #endif // defined (ACE_HAS_THREADS)
-
 
 ACE_Log_Category::ACE_Log_Category(const char* name)
   : name_(name)
@@ -72,6 +69,8 @@ ACE_Log_Category_TSS::ACE_Log_Category_TSS(ACE_Log_Category* category, ACE_Log_M
 {
 }
 
+ACE_ALLOC_HOOK_DEFINE(ACE_Log_Category_TSS)
+
 ACE_Log_Category_TSS*
 ACE_Log_Category::per_thr_obj()
 {
@@ -122,8 +121,6 @@ ACE_Log_Category::per_thr_obj()
   return &per_thr_obj_;
 #endif // defined (ACE_HAS_THREADS)
 }
-
-
 
 ACE_Log_Category&
 ACE_Log_Category::ace_lib()

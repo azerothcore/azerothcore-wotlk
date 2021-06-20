@@ -4,7 +4,7 @@
 /**
  *  @file   OS_Errno.h
  *
- *  @author (Originally in OS.h)Doug Schmidt <schmidt@cs.wustl.edu>
+ *  @author (Originally in OS.h)Doug Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 

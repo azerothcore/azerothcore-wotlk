@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,18 +11,16 @@ SDComment: Shadow storm is not properly implemented in core it should only targe
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "WorldPacket.h"
-
-#include "Item.h"
-#include "Player.h"
-#include "Spell.h"
-
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "Item.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "WorldPacket.h"
 
 enum Spells
 {
@@ -52,7 +50,7 @@ class npc_anubisath_sentinel : public CreatureScript
 public:
     npc_anubisath_sentinel() : CreatureScript("npc_anubisath_sentinel") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new aqsentinelAI(creature);
     }
@@ -66,15 +64,33 @@ public:
         {
             switch (asel)
             {
-                case 0: ability = SPELL_MENDING_BUFF;break;
-                case 1: ability = SPELL_KNOCK_BUFF;break;
-                case 2: ability = SPELL_MANAB_BUFF;break;
-                case 3: ability = SPELL_REFLECTAF_BUFF;break;
-                case 4: ability = SPELL_REFLECTSFr_BUFF;break;
-                case 5: ability = SPELL_THORNS_BUFF;break;
-                case 6: ability = SPELL_THUNDER_BUFF;break;
-                case 7: ability = SPELL_MSTRIKE_BUFF;break;
-                case 8: ability = SPELL_STORM_BUFF;break;
+                case 0:
+                    ability = SPELL_MENDING_BUFF;
+                    break;
+                case 1:
+                    ability = SPELL_KNOCK_BUFF;
+                    break;
+                case 2:
+                    ability = SPELL_MANAB_BUFF;
+                    break;
+                case 3:
+                    ability = SPELL_REFLECTAF_BUFF;
+                    break;
+                case 4:
+                    ability = SPELL_REFLECTSFr_BUFF;
+                    break;
+                case 5:
+                    ability = SPELL_THORNS_BUFF;
+                    break;
+                case 6:
+                    ability = SPELL_THUNDER_BUFF;
+                    break;
+                case 7:
+                    ability = SPELL_MSTRIKE_BUFF;
+                    break;
+                case 8:
+                    ability = SPELL_STORM_BUFF;
+                    break;
             }
         }
 
@@ -84,19 +100,20 @@ public:
             abselected = 0;                                     // just initialization of variable
         }
 
-        uint64 NearbyGUID[3];
+        ObjectGuid NearbyGUID[3];
 
         void ClearBuddyList()
         {
-            NearbyGUID[0] = NearbyGUID[1] = NearbyGUID[2] = 0;
+            for (uint8 i = 0; i < 3; ++i)
+                NearbyGUID[i].Clear();
         }
 
-        void AddBuddyToList(uint64 CreatureGUID)
+        void AddBuddyToList(ObjectGuid CreatureGUID)
         {
             if (CreatureGUID == me->GetGUID())
                 return;
 
-            for (int i=0; i<3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 if (NearbyGUID[i] == CreatureGUID)
                     return;
@@ -111,7 +128,7 @@ public:
         void GiveBuddyMyList(Creature* c)
         {
             aqsentinelAI* cai = CAST_AI(aqsentinelAI, (c)->AI());
-            for (int i=0; i<3; ++i)
+            for (int i = 0; i < 3; ++i)
                 if (NearbyGUID[i] && NearbyGUID[i] != c->GetGUID())
                     cai->AddBuddyToList(NearbyGUID[i]);
             cai->AddBuddyToList(me->GetGUID());
@@ -119,14 +136,14 @@ public:
 
         void SendMyListToBuddies()
         {
-            for (int i=0; i<3; ++i)
+            for (int i = 0; i < 3; ++i)
                 if (Creature* pNearby = ObjectAccessor::GetCreature(*me, NearbyGUID[i]))
                     GiveBuddyMyList(pNearby);
         }
 
         void CallBuddiesToAttack(Unit* who)
         {
-            for (int i=0; i<3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 Creature* c = ObjectAccessor::GetCreature(*me, NearbyGUID[i]);
                 if (c)
@@ -153,11 +170,11 @@ public:
                 AddBuddyToList((*iter)->GetGUID());
         }
 
-        int pickAbilityRandom(bool *chosenAbilities)
+        int pickAbilityRandom(bool* chosenAbilities)
         {
             for (int t = 0; t < 2; ++t)
             {
-                for (int i = !t ? (rand()%9) : 0; i < 9; ++i)
+                for (int i = !t ? (rand() % 9) : 0; i < 9; ++i)
                 {
                     if (!chosenAbilities[i])
                     {
@@ -171,8 +188,8 @@ public:
 
         void GetOtherSentinels(Unit* who)
         {
-            bool *chosenAbilities = new bool[9];
-            memset(chosenAbilities, 0, 9*sizeof(bool));
+            bool* chosenAbilities = new bool[9];
+            memset(chosenAbilities, 0, 9 * sizeof(bool));
             selectAbility(pickAbilityRandom(chosenAbilities));
 
             ClearBuddyList();
@@ -201,11 +218,11 @@ public:
 
         bool gatherOthersWhenAggro;
 
-        void Reset()
+        void Reset() override
         {
             if (!me->isDead())
             {
-                for (int i=0; i<3; ++i)
+                for (int i = 0; i < 3; ++i)
                 {
                     if (!NearbyGUID[i])
                         continue;
@@ -225,7 +242,7 @@ public:
             me->AddAura(id, me);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (gatherOthersWhenAggro)
                 GetOtherSentinels(who);
@@ -234,9 +251,9 @@ public:
             DoZoneInCombat();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
-            for (int ni=0; ni<3; ++ni)
+            for (int ni = 0; ni < 3; ++ni)
             {
                 Creature* sent = ObjectAccessor::GetCreature(*me, NearbyGUID[ni]);
                 if (!sent)

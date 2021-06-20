@@ -49,7 +49,6 @@ public:
 
   typedef unsigned short ACE_IO_Cntl_Cmds;
 
-  // = Initialization method.
   /// Initialize the control message.
   ACE_IO_Cntl_Msg (ACE_IO_Cntl_Cmds c);
 

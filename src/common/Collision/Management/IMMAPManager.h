@@ -22,16 +22,16 @@ namespace MMAP
 
     class IMMapManager
     {
-        private:
-            bool iEnablePathFinding;
+    private:
+        bool iEnablePathFinding;
 
-        public:
-            IMMapManager() : iEnablePathFinding(true) {}
-            virtual ~IMMapManager(void) {}
+    public:
+        IMMapManager() : iEnablePathFinding(true) {}
+        virtual ~IMMapManager(void) {}
 
-            //Enabled/Disabled Pathfinding
-            void setEnablePathFinding(bool value) { iEnablePathFinding = value; }
-            bool isEnablePathFinding() const { return (iEnablePathFinding); }
+        //Enabled/Disabled Pathfinding
+        void setEnablePathFinding(bool value) { iEnablePathFinding = value; }
+        bool isEnablePathFinding() const { return (iEnablePathFinding); }
     };
 }
 

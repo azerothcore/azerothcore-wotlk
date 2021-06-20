@@ -1,0 +1,3 @@
+[submodule "deps/git-subrepo"]
+	path = deps/git-subrepo
+	url = https://github.com/ingydotnet/git-subrepo.git
