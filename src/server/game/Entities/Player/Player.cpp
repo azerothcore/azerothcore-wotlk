@@ -4418,6 +4418,10 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
         next = itr;
         ++next;
         SpellInfo const* spellInfo = sSpellMgr->CheckSpellInfo(itr->first);
+        if (!spellInfo)
+        {
+            continue;
+        }
 
         if (spellInfo->HasAttribute(SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS))
             RemoveSpellCooldown(itr->first, true);
