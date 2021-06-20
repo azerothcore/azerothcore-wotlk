@@ -12,20 +12,20 @@
 
 namespace Acore
 {
-    [[noreturn]] void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message) ATTR_NORETURN;
-    [[noreturn]] void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message, char const* format, ...) ATTR_NORETURN ATTR_PRINTF(6, 7);
+    [[noreturn]] void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message);
+    [[noreturn]] void Assert(char const* file, int line, char const* function, std::string const& debugInfo, char const* message, char const* format, ...) ATTR_PRINTF(6, 7);
 
-    [[noreturn]] void Fatal(char const* file, int line, char const* function, char const* message, ...) ATTR_NORETURN ATTR_PRINTF(4, 5);
+    [[noreturn]] void Fatal(char const* file, int line, char const* function, char const* message, ...) ATTR_PRINTF(4, 5);
 
-    [[noreturn]] void Error(char const* file, int line, char const* function, char const* message) ATTR_NORETURN;
+    [[noreturn]] void Error(char const* file, int line, char const* function, char const* message);
 
-    [[noreturn]] void Abort(char const* file, int line, char const* function) ATTR_NORETURN;
+    [[noreturn]] void Abort(char const* file, int line, char const* function);
 
-    [[noreturn]] void Abort(char const* file, int line, char const* function, char const* message, ...) ATTR_NORETURN;
+    [[noreturn]] void Abort(char const* file, int line, char const* function, char const* message, ...);
 
     void Warning(char const* file, int line, char const* function, char const* message);
 
-    [[noreturn]] void AbortHandler(int sigval) ATTR_NORETURN;
+    [[noreturn]] void AbortHandler(int sigval);
 
 } // namespace Acore
 
