@@ -8032,13 +8032,19 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry)
 {
     SkillLineEntry const* skill = sSkillLineStore.LookupEntry(rcEntry->SkillID);
     if (!skill)
+    {
         return SKILL_RANGE_NONE;
+    }
 
     if (sSkillTiersStore.LookupEntry(rcEntry->SkillTierID))
+    {
         return SKILL_RANGE_RANK;
+    }
 
     if (rcEntry->SkillID == SKILL_RUNEFORGING)
+    {
         return SKILL_RANGE_MONO;
+    }
 
     switch (skill->categoryId)
     {

@@ -397,8 +397,12 @@ void LoadDBCStores(const std::string& dataPath)
             sSpellsByCategoryStore[i->Category].insert(i->Id);
 
     for (SkillRaceClassInfoEntry const* entry : sSkillRaceClassInfoStore)
+    {
         if (sSkillLineStore.LookupEntry(entry->SkillID))
+        {
             SkillRaceClassInfoBySkill.emplace(entry->SkillID, entry);
+        }
+    }
 
     for (SkillLineAbilityEntry const* skillLine : sSkillLineAbilityStore)
     {
@@ -408,13 +412,19 @@ void LoadDBCStores(const std::string& dataPath)
             for (CreatureFamilyEntry const* cFamily : sCreatureFamilyStore)
             {
                 if (skillLine->SkillLine != cFamily->skillLine[0] && skillLine->SkillLine != cFamily->skillLine[1])
+                {
                     continue;
+                }
 
                 if (spellInfo->SpellLevel)
+                {
                     continue;
+                }
 
                 if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+                {
                     continue;
+                }
 
                 sPetFamilySpellsStore[cFamily->ID].insert(spellInfo->Id);
             }
@@ -1096,9 +1106,14 @@ SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, u
     for (SkillRaceClassInfoMap::iterator itr = bounds.first; itr != bounds.second; ++itr)
     {
         if (itr->second->RaceMask && !(itr->second->RaceMask & (1 << (race - 1))))
+        {
             continue;
+        }
+
         if (itr->second->ClassMask && !(itr->second->ClassMask & (1 << (class_ - 1))))
+        {
             continue;
+        }
 
         return itr->second;
     }

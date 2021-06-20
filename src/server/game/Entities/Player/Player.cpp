@@ -4113,15 +4113,26 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
         {
             SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(_spell_idx->second->SkillLine);
             if (!pSkill)
+            {
                 continue;
+            }
 
             if (_spell_idx->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && !HasSkill(pSkill->id))
+            {
                 LearnDefaultSkill(pSkill->id, 0);
+            }
 
             if (pSkill->id == SKILL_MOUNTS && !Has310Flyer(false))
+            {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED && spellInfo->Effects[i].CalcValue() == 310)
+                {
+                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED && spellInfo->Effects[i].CalcValue() == 310)´
+                    {
                         SetHas310Flyer(true);
+                    }
+                }
+            }
+
 
         }
     }
@@ -6546,7 +6557,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
                 break;
             case ITEM_SUBCLASS_WEAPON_FIST:
                 UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
-                [[fallthrough]]
+                [[fallthrough]];
             default:
                 UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
                 break;
@@ -24160,15 +24171,25 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
             uint16 skillValue = 1;
             uint16 maxValue = GetMaxSkillValueForLevel();
             if (sWorld->getBoolConfig(CONFIG_ALWAYS_MAXSKILL) && !IsProfessionOrRidingSkill(skillId))
+            {
                 skillValue = maxValue;
+            }
             else if (rcInfo->Flags & SKILL_FLAG_ALWAYS_MAX_VALUE)
+            {
                 skillValue = maxValue;
+            }
             else if (getClass() == CLASS_DEATH_KNIGHT)
+            {
                 skillValue = std::min(std::max<uint16>({ 1, uint16((getLevel() - 1) * 5) }), maxValue);
+            }
             else if (skillId == SKILL_FIST_WEAPONS)
+            {
                 skillValue = std::max<uint16>(1, GetSkillValue(SKILL_UNARMED));
+            }
             else if (skillId == SKILL_LOCKPICKING)
+            {
                 skillValue = std::max<uint16>(1, GetSkillValue(SKILL_LOCKPICKING));
+            }
 
             SetSkill(skillId, 0, skillValue, maxValue);
             break;
@@ -24179,15 +24200,21 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
         case SKILL_RANGE_RANK:
         {
             if (!rank)
+            {
                 break;
+            }
 
             SkillTiersEntry const* tier = sSkillTiersStore.LookupEntry(rcInfo->SkillTierID);
             uint16 maxValue = tier->Value[std::max<int32>(rank - 1, 0)];
             uint16 skillValue = 1;
             if (rcInfo->Flags & SKILL_FLAG_ALWAYS_MAX_VALUE)
+            {
                 skillValue = maxValue;
+            }
             else if (getClass() == CLASS_DEATH_KNIGHT)
+            {
                 skillValue = std::min(std::max<uint16>({ uint16(1), uint16((getLevel() - 1) * 5) }), maxValue);
+            }
 
             SetSkill(skillId, rank, skillValue, maxValue);
             break;
@@ -24250,31 +24277,47 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
     {
         SkillLineAbilityEntry const* pAbility = sSkillLineAbilityStore.LookupEntry(j);
         if (!pAbility || pAbility->SkillLine != skill_id)
+        {
             continue;
+        }
 
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pAbility->Spell);
         if (!spellInfo)
+        {
             continue;
+        }
 
         if (pAbility->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE && pAbility->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+        {
             continue;
+        }
 
         // Check race if set
         if (pAbility->RaceMask && !(pAbility->RaceMask & raceMask))
+        {
             continue;
+        }
 
         // Check class if set
         if (pAbility->ClassMask && !(pAbility->ClassMask & classMask))
+        {
             continue;
+        }
 
         // need unlearn spell
         if (skill_value < pAbility->MinSkillLineRank && pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
+        {
             removeSpell(pAbility->Spell, GetActiveSpec(), true);
+        }
         // need learn
         else if (!IsInWorld())
+        {
             addSpell(pAbility->Spell, true, true, true, false);
+        }
         else
+        {
             learnSpell(pAbility->Spell);
+        }
     }
 }
 
