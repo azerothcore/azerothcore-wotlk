@@ -692,6 +692,20 @@ public:
         ASSERT(spellInfo);
         return spellInfo;
     }
+    // use this instead of AssertSpellInfo to have the problem logged instead of crashing the server
+    SpellInfo const* CheckSpellInfo(uint32 spellId) const
+    {
+        if (spellId < GetSpellInfoStoreSize())
+        {
+            LOG_ERROR("server", "spellId %d is lower than GetSpellInfoStoreSize() (%d)", spellId, GetSpellInfoStoreSize());
+        }
+        SpellInfo const* spellInfo = mSpellInfoMap[spellId];
+        if (!spellInfo)
+        {
+            LOG_ERROR("server", "spellId %d has invalid spellInfo", spellId);
+        }
+        return spellInfo;
+    }
     [[nodiscard]] uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
     // Talent Additional Set
