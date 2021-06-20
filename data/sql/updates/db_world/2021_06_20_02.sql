@@ -1,3 +1,19 @@
+-- DB update 2021_06_20_01 -> 2021_06_20_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_06_20_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_06_20_01 2021_06_20_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1623852796811454700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1623852796811454700');
 
 /* Fix NPC's gossips for locales Europe Spanish and Latin America Spanish in all cities including Shattarth and Dalaran */
@@ -78,3 +94,13 @@ UPDATE `gossip_menu_option` SET `OptionBroadcastTextID` = 80006 WHERE `MenuID` =
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID` = 80006 WHERE `MenuID` = 435 AND `OptionID` = 11;
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID` = 80006 WHERE `MenuID` = 8282 AND `OptionID` = 6;
 UPDATE `gossip_menu_option` SET `OptionBroadcastTextID` = 80007 WHERE `MenuID` = 435 AND `OptionID` = 10;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_06_20_02' WHERE sql_rev = '1623852796811454700';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

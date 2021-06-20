@@ -1,3 +1,19 @@
+-- DB update 2021_06_20_02 -> 2021_06_20_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_06_20_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_06_20_02 2021_06_20_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1624112508117718400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1624112508117718400');
 
 
@@ -20,3 +36,13 @@ DELETE FROM `creature` WHERE `id` = 2870 AND `guid` = 86176;
 /* Delete npc from in-game world, not from acore_world.creature_template
 See issue #6435 */
 
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_06_20_03' WHERE sql_rev = '1624112508117718400';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
