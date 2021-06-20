@@ -4518,6 +4518,8 @@ enum Mounts
     SPELL_BIG_BLIZZARD_BEAR_310         = 58999
 };
 
+/* 75973 - X-53 Touring Rocket 
+   54729 - Winged Steed of the Ebon Blade */
 class spell_gen_mount : public SpellScriptLoader
 {
 public:
