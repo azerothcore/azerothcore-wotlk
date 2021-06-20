@@ -168,14 +168,6 @@ ACE_Sig_Action::operator struct sigaction * ()
   return &this->sa_;
 }
 
-ACE_INLINE
-ACE_Sig_Action::ACE_Sig_Action (const ACE_Sig_Action &s)
-  // : sa_ ()
-{
-  ACE_TRACE ("ACE_Sig_Action::ACE_Sig_Action");
-  *this = s; // structure copy.
-}
-
 ACE_INLINE int
 ACE_Sig_Action::register_action (int signum, ACE_Sig_Action *oaction)
 {

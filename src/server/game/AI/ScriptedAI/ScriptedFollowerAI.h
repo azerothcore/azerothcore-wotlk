@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  */
 
@@ -21,48 +21,48 @@ enum eFollowState
 
 class FollowerAI : public ScriptedAI
 {
-    public:
-        explicit FollowerAI(Creature* creature);
-        ~FollowerAI() {}
+public:
+    explicit FollowerAI(Creature* creature);
+    ~FollowerAI() override {}
 
-        //virtual void WaypointReached(uint32 uiPointId) = 0;
+    //virtual void WaypointReached(uint32 uiPointId) = 0;
 
-        void MovementInform(uint32 motionType, uint32 pointId);
+    void MovementInform(uint32 motionType, uint32 pointId) override;
 
-        void AttackStart(Unit*);
+    void AttackStart(Unit*) override;
 
-        void MoveInLineOfSight(Unit*);
+    void MoveInLineOfSight(Unit*) override;
 
-        void EnterEvadeMode();
+    void EnterEvadeMode() override;
 
-        void JustDied(Unit*);
+    void JustDied(Unit*) override;
 
-        void JustRespawned();
+    void JustRespawned() override;
 
-        void UpdateAI(uint32);                        //the "internal" update, calls UpdateFollowerAI()
-        virtual void UpdateFollowerAI(uint32);        //used when it's needed to add code in update (abilities, scripted events, etc)
+    void UpdateAI(uint32) override;                        //the "internal" update, calls UpdateFollowerAI()
+    virtual void UpdateFollowerAI(uint32);        //used when it's needed to add code in update (abilities, scripted events, etc)
 
-        void StartFollow(Player* player, uint32 factionForFollower = 0, const Quest* quest = NULL);
+    void StartFollow(Player* player, uint32 factionForFollower = 0, const Quest* quest = nullptr);
 
-        void SetFollowPaused(bool bPaused);                 //if special event require follow mode to hold/resume during the follow
-        void SetFollowComplete(bool bWithEndEvent = false);
+    void SetFollowPaused(bool bPaused);                 //if special event require follow mode to hold/resume during the follow
+    void SetFollowComplete(bool bWithEndEvent = false);
 
-        bool HasFollowState(uint32 uiFollowState) { return (m_uiFollowState & uiFollowState); }
+    bool HasFollowState(uint32 uiFollowState) { return (m_uiFollowState & uiFollowState); }
 
-    protected:
-        Player* GetLeaderForFollower();
+protected:
+    Player* GetLeaderForFollower();
 
-    private:
-        void AddFollowState(uint32 uiFollowState) { m_uiFollowState |= uiFollowState; }
-        void RemoveFollowState(uint32 uiFollowState) { m_uiFollowState &= ~uiFollowState; }
+private:
+    void AddFollowState(uint32 uiFollowState) { m_uiFollowState |= uiFollowState; }
+    void RemoveFollowState(uint32 uiFollowState) { m_uiFollowState &= ~uiFollowState; }
 
-        bool AssistPlayerInCombat(Unit* who);
+    bool AssistPlayerInCombat(Unit* who);
 
-        uint64 m_uiLeaderGUID;
-        uint32 m_uiUpdateFollowTimer;
-        uint32 m_uiFollowState;
+    ObjectGuid m_uiLeaderGUID;
+    uint32 m_uiUpdateFollowTimer;
+    uint32 m_uiFollowState;
 
-        const Quest* m_pQuestForFollow;                     //normally we have a quest
+    const Quest* m_pQuestForFollow;                     //normally we have a quest
 };
 
 #endif

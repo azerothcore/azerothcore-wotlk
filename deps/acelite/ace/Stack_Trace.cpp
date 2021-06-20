@@ -28,6 +28,8 @@
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_stdio.h"
 
+ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+
 /*
   This is ugly, simply because it's very platform-specific.
 */
@@ -55,7 +57,16 @@ determine_starting_frame (ssize_t initial_frame, ssize_t offset)
   return ACE_MAX( initial_frame + offset, static_cast<ssize_t>(0));
 }
 
-#if (defined(__GLIBC__) || defined(ACE_HAS_EXECINFO_H)) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3))
+#if defined(ACE_FACE_SAFETY_BASE) && !defined(ACE_FACE_DEV)
+void
+ACE_Stack_Trace::generate_trace (ssize_t starting_frame_offset, size_t num_frames)
+{
+  ACE_UNUSED_ARG (starting_frame_offset);
+  ACE_UNUSED_ARG (num_frames);
+  ACE_OS::strcpy (&this->buf_[0], UNABLE_TO_GET_TRACE);
+}
+
+#elif (defined(__GLIBC__) || defined(ACE_HAS_EXECINFO_H)) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3))
 // This is the code for glibc
 #  include <execinfo.h>
 
@@ -652,6 +663,22 @@ cs_operate(int (*func)(struct frame_state const *, void *), void *usrarg,
   fs.sf.AddrFrame.Mode = AddrModeFlat;
   fs.sf.AddrBStore.Mode = AddrModeFlat;
   fs.sf.AddrStack.Mode = AddrModeFlat;
+#  elif defined (_M_ARM)
+  DWORD machine = IMAGE_FILE_MACHINE_ARM;
+  fs.sf.AddrPC.Offset = c.Pc;
+  fs.sf.AddrFrame.Offset = c.R11;
+  fs.sf.AddrStack.Offset = c.Sp;
+  fs.sf.AddrPC.Mode = AddrModeFlat;
+  fs.sf.AddrFrame.Mode = AddrModeFlat;
+  fs.sf.AddrStack.Mode = AddrModeFlat;
+#  elif defined (_M_ARM64)
+  DWORD machine = IMAGE_FILE_MACHINE_ARM64;
+  fs.sf.AddrPC.Offset = c.Pc;
+  fs.sf.AddrFrame.Offset = c.Fp;
+  fs.sf.AddrStack.Offset = c.Sp;
+  fs.sf.AddrPC.Mode = AddrModeFlat;
+  fs.sf.AddrFrame.Mode = AddrModeFlat;
+  fs.sf.AddrStack.Mode = AddrModeFlat;
 #  endif
 
   fs.pSym = (PSYMBOL_INFO) GlobalAlloc (GMEM_FIXED,
@@ -724,3 +751,4 @@ ACE_Stack_Trace::generate_trace (ssize_t, size_t)
 }
 #endif
 
+ACE_END_VERSIONED_NAMESPACE_DECL

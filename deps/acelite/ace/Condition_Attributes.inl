@@ -24,7 +24,7 @@ ACE_INLINE
 ACE_Condition_Attributes_T<ACE_Monotonic_Time_Policy>::ACE_Condition_Attributes_T (int type)
  : ACE_Condition_Attributes (type)
 {
-#if (defined (_POSIX_MONOTONIC_CLOCK) && !defined (ACE_LACKS_MONOTONIC_TIME)) || defined (ACE_HAS_CLOCK_GETTIME_MONOTONIC)
+#if defined (ACE_HAS_POSIX_MONOTONIC_CONDITIONS)
   (void) ACE_OS::condattr_setclock (this->attributes_, CLOCK_MONOTONIC);
 #endif
 }

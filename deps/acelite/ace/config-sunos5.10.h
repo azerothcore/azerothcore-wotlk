@@ -20,6 +20,9 @@
 #  undef ACE_LACKS_ALPHASORT
 #endif
 
+#undef ACE_LACKS_GETADDRINFO
+#undef ACE_LACKS_GETNAMEINFO
+
 // Solaris 10 offers a useable log2() unlike previous Solaris versions.
 #if defined (ACE_LACKS_LOG2)
 #  undef ACE_LACKS_LOG2
@@ -55,5 +58,10 @@
 #endif
 
 #define ACE_HAS_SOLARIS_ATOMIC_LIB
+
+// Solaris Studio 12.4 implements symbol lookup correctly.
+#if defined (__SUNPRO_CC) && (__SUNPRO_CC >= 0x5130)
+#define ACE_ANY_OPS_USE_NAMESPACE
+#endif
 
 #endif /* ACE_CONFIG_H */

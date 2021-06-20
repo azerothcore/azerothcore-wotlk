@@ -18,6 +18,10 @@
 ## Example 3: References taken from wowpedia / wowhead / wowwiki / https://wowgaming.altervista.org/aowow/
 
 
+### CO-AUTHOR(S)
+## If there are more authors they can be mentioned like this
+## Co-authored-by: name <name@example.com>
+
 
 ## =======================================================
 ##                     EXTRA INFOS

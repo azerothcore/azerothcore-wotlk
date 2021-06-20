@@ -213,7 +213,11 @@ ACE::get_bcast_addr (ACE_UINT32 &bcast_addr,
         return -1;
       else
         ACE_OS::memcpy ((char *) &ip_addr.sin_addr.s_addr,
+# ifdef ACE_HOSTENT_H_ADDR
+                        (char *) hp->ACE_HOSTENT_H_ADDR,
+# else
                         (char *) hp->h_addr,
+# endif
                         hp->h_length);
     }
   else
@@ -336,6 +340,28 @@ ACE::get_fqdn (ACE_INET_Addr const & addr,
                char hostname[],
                size_t len)
 {
+#ifndef ACE_LACKS_GETNAMEINFO
+
+  const socklen_t addr_size =
+# ifdef ACE_HAS_IPV6
+    (addr.get_type () == PF_INET6) ? sizeof (sockaddr_in6) :
+# endif
+    sizeof (sockaddr_in);
+
+  if (ACE_OS::getnameinfo ((const sockaddr *) addr.get_addr (),
+                           addr_size, hostname,
+                           static_cast<ACE_SOCKET_LEN> (len),
+                           0, 0, NI_NAMEREQD) != 0)
+    return -1;
+
+  if (ACE::debug ())
+    ACELIB_DEBUG ((LM_DEBUG,
+                   ACE_TEXT ("(%P|%t) - ACE::get_fqdn, ")
+                   ACE_TEXT ("canonical host name is %C\n"),
+                   hostname));
+
+  return 0;
+#else // below, ACE_LACKS_GETNAMEINFO
   int h_error;  // Not the same as errno!
   hostent hentry;
   ACE_HOSTENT_DATA buf;
@@ -349,7 +375,7 @@ ACE::get_fqdn (ACE_INET_Addr const & addr,
       ip_addr_size = sizeof sock_addr->sin_addr;
       ip_addr = (char*) &sock_addr->sin_addr;
     }
-#ifdef ACE_HAS_IPV6
+# ifdef ACE_HAS_IPV6
   else
     {
       sockaddr_in6 * sock_addr =
@@ -358,7 +384,7 @@ ACE::get_fqdn (ACE_INET_Addr const & addr,
       ip_addr_size = sizeof sock_addr->sin6_addr;
       ip_addr = (char*) &sock_addr->sin6_addr;
     }
-#endif  /* ACE_HAS_IPV6 */
+# endif /* ACE_HAS_IPV6 */
 
    // get the host entry for the address in question
    hostent * const hp = ACE_OS::gethostbyaddr_r (ip_addr,
@@ -434,6 +460,7 @@ ACE::get_fqdn (ACE_INET_Addr const & addr,
      }
 
    return 0;
+#endif /* ACE_LACKS_GETNAMEINFO */
 }
 
 #if defined (ACE_WIN32)
@@ -1220,7 +1247,7 @@ ACE::get_ip_interfaces (size_t &count, ACE_INET_Addr *&addrs)
 #endif /* !defined (__QNX__) && !defined (__FreeBSD__) && !defined(__NetBSD__) && !defined (ACE_HAS_RTEMS) && !defined (__Lynx__) */
     }
 
-# if defined (ACE_HAS_IPV6)
+# if defined (ACE_HAS_IPV6) && !defined (ACE_LACKS_FSCANF)
   // Retrieve IPv6 local interfaces by scanning /proc/net/if_inet6 if
   // it exists.  If we cannot open it then ignore possible IPv6
   // interfaces, we did our best;-)
@@ -1246,12 +1273,12 @@ ACE::get_ip_interfaces (size_t &count, ACE_INET_Addr *&addrs)
           // resolve the resulting text using getaddrinfo().
 
           const char* ip_fmt = "%s:%s:%s:%s:%s:%s:%s:%s%%%d";
-          ACE_OS::sprintf (s_ipaddr,
-                           ip_fmt,
-                           addr_p[0], addr_p[1], addr_p[2], addr_p[3],
-                           addr_p[4], addr_p[5], addr_p[6], addr_p[7], scopeid);
+          ACE_OS::snprintf (s_ipaddr, 64, ip_fmt,
+                            addr_p[0], addr_p[1], addr_p[2], addr_p[3],
+                            addr_p[4], addr_p[5], addr_p[6], addr_p[7],
+                            scopeid);
 
-          error = getaddrinfo (s_ipaddr, 0, &hints, &res0);
+          error = ACE_OS::getaddrinfo (s_ipaddr, 0, &hints, &res0);
           if (error)
             continue;
 
@@ -1261,12 +1288,12 @@ ACE::get_ip_interfaces (size_t &count, ACE_INET_Addr *&addrs)
               addrs[count].set(reinterpret_cast<sockaddr_in *> (res0->ai_addr), res0->ai_addrlen);
               ++count;
             }
-          freeaddrinfo (res0);
+          ACE_OS::freeaddrinfo (res0);
 
         }
       ACE_OS::fclose (fp);
     }
-# endif /* ACE_HAS_IPV6 */
+# endif /* ACE_HAS_IPV6 && !ACE_LACKS_FSCANF */
 
   return 0;
 #else
@@ -1318,7 +1345,13 @@ return 0;
 
   struct ifconf ifcfg;
   size_t ifreq_size = num_ifs * sizeof (struct ifreq);
-  struct ifreq *p_ifs = (struct ifreq *) ACE_OS::malloc (ifreq_size);
+  struct ifreq *p_ifs;
+
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  p_ifs = (struct IFREQ *)ACE_Allocator::instance()->malloc (ifreq_size);
+#else
+  p_ifs = (struct ifreq *) ACE_OS::malloc (ifreq_size);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   if (!p_ifs)
     {
@@ -1336,7 +1369,12 @@ return 0;
                      SIOCGIFCONF_CMD,
                      (caddr_t) &ifcfg) == -1)
     {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free (ifcfg.ifc_req);
+#else
       ACE_OS::free (ifcfg.ifc_req);
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
       ACELIB_ERROR_RETURN ((LM_ERROR,
                          ACE_TEXT ("%p\n"),
                          ACE_TEXT ("ACE::count_interfaces:")
@@ -1359,9 +1397,9 @@ return 0;
         break;
 
       ++if_count;
-#if !defined (__QNX__) && !defined (__FreeBSD__) && !defined(__NetBSD__) && !defined (ACE_HAS_RTEMS) && !defined (__Lynx__)
+# if !defined (__QNX__) && !defined (__FreeBSD__) && !defined(__NetBSD__) && !defined (ACE_HAS_RTEMS) && !defined (__Lynx__)
       ++p_ifs;
-#else
+# else
      if (p_ifs->ifr_addr.sa_len <= sizeof (struct sockaddr))
        {
           ++p_ifs;
@@ -1371,10 +1409,14 @@ return 0;
           p_ifs = (struct ifreq *)
               (p_ifs->ifr_addr.sa_len + (caddr_t) &p_ifs->ifr_addr);
        }
-#endif /* !defined (__QNX__) && !defined (__FreeBSD__) && !defined(__NetBSD__) && !defined (ACE_HAS_RTEMS) && !defined (__Lynx__)*/
+# endif /* !defined (__QNX__) && !defined (__FreeBSD__) && !defined(__NetBSD__)  && !defined (ACE_HAS_RTEMS) && !defined (__Lynx__) */
     }
 
-  ACE_OS::free (ifcfg.ifc_req);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free (ifcfg.ifc_req);
+#else
+      ACE_OS::free (ifcfg.ifc_req);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 # if defined (ACE_HAS_IPV6)
   FILE* fp = 0;
@@ -1388,7 +1430,7 @@ return 0;
         }
       ACE_OS::fclose (fp);
     }
-# endif /* ACE_HAS_IPV6 */
+# endif /* ACE_HAS_IPV6  && !ACE_LACKS_FSCANF */
 
   how_many = if_count;
   return 0;
@@ -1433,7 +1475,7 @@ ip_check (int &ipvn_enabled, int pf)
 #if defined (ACE_WIN32)
       // as of the release of Windows 2008, even hosts that have IPv6 interfaces disabled
       // will still permit the creation of a PF_INET6 socket, thus rendering the socket
-      // creation test inconsistent. The reccommended solution is to get the list of
+      // creation test inconsistent. The recommended solution is to get the list of
       // endpoint addresses and see if any match the desired family.
       ACE_INET_Addr *if_addrs = 0;
       size_t if_cnt = 0;

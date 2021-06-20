@@ -36,7 +36,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_UPIPE_Acceptor : public ACE_SPIPE_Acceptor
 {
 public:
-  // = Initialization and termination.
   /// Default constructor.
   ACE_UPIPE_Acceptor (void);
 

@@ -4,7 +4,7 @@
 /**
  *  @file    Message_Queue_Vx.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -63,7 +63,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Message_Queue_Vx: public ACE_Message_Queue<ACE_NULL_SYNCH>
 {
 public:
-  // = Initialization and termination methods.
   ACE_Message_Queue_Vx (size_t max_messages,
                         size_t max_message_length,
                         ACE_Notification_Strategy * = 0);
@@ -196,9 +195,8 @@ private:
   ACE_Message_Queue_Vx (const ACE_Message_Queue_Vx &);
   void operator= (const ACE_Message_Queue_Vx &);
 
-  ACE_UNIMPLEMENTED_FUNC (virtual int peek_dequeue_head
-                            (ACE_Message_Block *&first_item,
-                             ACE_Time_Value *tv = 0))
+  virtual int peek_dequeue_head (ACE_Message_Block *&first_item,
+                                 ACE_Time_Value *tv = 0);
 
 private:
   /// Maximum number of messages that can be queued.

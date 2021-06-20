@@ -101,7 +101,6 @@ public:
   class ACE_Export ACE_Name_Node
   {
   public:
-    // = Initialization methods.
     /// Constructor.
     ACE_Name_Node (const char *name,
                    char *name_ptr,

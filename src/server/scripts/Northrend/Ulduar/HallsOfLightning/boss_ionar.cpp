@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_lightning.h"
-#include "SpellInfo.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
 
 enum IonarSpells
 {
@@ -57,9 +57,9 @@ class boss_ionar : public CreatureScript
 public:
     boss_ionar() : CreatureScript("boss_ionar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_ionarAI (creature);
+        return GetHallsOfLightningAI<boss_ionarAI>(creature);
     }
 
     struct boss_ionarAI : public ScriptedAI
@@ -74,7 +74,7 @@ public:
         SummonList summons;
         uint8 HealthCheck;
 
-        void Reset()
+        void Reset() override
         {
             HealthCheck = 50;
             events.Reset();
@@ -99,7 +99,7 @@ public:
             events.RescheduleEvent(EVENT_STATIC_OVERLOAD, 5000, 0, 1);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -110,7 +110,7 @@ public:
             ScheduleEvents(false);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             Talk(SAY_DEATH);
 
@@ -120,7 +120,7 @@ public:
                 m_pInstance->SetData(TYPE_IONAR, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -128,7 +128,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_DISPERSE)
                 Split();
@@ -146,14 +146,14 @@ public:
                     summons.Summon(spark);
                     spark->CastSpell(spark, me->GetMap()->IsHeroic() ? SPELL_SPARK_VISUAL_TRIGGER_H : SPELL_SPARK_VISUAL_TRIGGER_N, true);
                     spark->CastSpell(spark, SPELL_RANDOM_LIGHTNING, true);
-                    spark->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NON_ATTACKABLE);
+                    spark->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     spark->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0);
 
                     if (Player* tgt = SelectTargetFromPlayerList(100))
                         spark->GetMotionMaster()->MoveFollow(tgt, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
                 }
             }
-            
+
             me->SetVisible(false);
             me->SetControlled(true, UNIT_STATE_STUNNED);
 
@@ -161,7 +161,7 @@ public:
             events.ScheduleEvent(EVENT_CALL_SPARKS, 15000, 0, 2);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -171,19 +171,19 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_BALL_LIGHTNING:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_BALL_LIGHTNING_H : SPELL_BALL_LIGHTNING_N, false);
-                    
-                    events.RepeatEvent(10000 + rand()%1000);
+
+                    events.RepeatEvent(10000 + rand() % 1000);
                     break;
                 case EVENT_STATIC_OVERLOAD:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_H : SPELL_STATIC_OVERLOAD_N, false);
 
-                    events.RepeatEvent(5000 + rand()%1000);
+                    events.RepeatEvent(5000 + rand() % 1000);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(HealthCheck))
@@ -192,17 +192,15 @@ public:
                     events.RepeatEvent(1000);
                     return;
                 case EVENT_CALL_SPARKS:
-                {
-                    EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
-                    summons.DoAction(ACTION_CALLBACK, pred);
-                    events.PopEvent();
-                    events.ScheduleEvent(EVENT_RESTORE, 2000, 0, 2);
-                    return;
-                }
+                    {
+                        EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
+                        summons.DoAction(ACTION_CALLBACK, pred);
+                        events.ScheduleEvent(EVENT_RESTORE, 2000, 0, 2);
+                        return;
+                    }
                 case EVENT_RESTORE:
                     EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
                     summons.DoAction(ACTION_SPARK_DESPAWN, pred);
-                    events.PopEvent();
 
                     me->SetVisible(true);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
@@ -220,9 +218,9 @@ class npc_spark_of_ionar : public CreatureScript
 public:
     npc_spark_of_ionar() : CreatureScript("npc_spark_of_ionar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_spark_of_ionarAI (creature);
+        return GetHallsOfLightningAI<npc_spark_of_ionarAI>(creature);
     }
 
     struct npc_spark_of_ionarAI : public ScriptedAI
@@ -231,18 +229,18 @@ public:
 
         bool returning;
 
-        void MoveInLineOfSight(Unit*) { }
-        void UpdateAI(uint32) { }
-        void AttackStart(Unit*  /*who*/) { }
+        void MoveInLineOfSight(Unit*) override { }
+        void UpdateAI(uint32) override { }
+        void AttackStart(Unit*  /*who*/) override { }
 
-        void Reset() { returning = false; }
+        void Reset() override { returning = false; }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_CALLBACK)
             {

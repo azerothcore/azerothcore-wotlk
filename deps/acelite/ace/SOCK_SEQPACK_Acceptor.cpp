@@ -333,8 +333,13 @@ ACE_SOCK_SEQPACK_Acceptor::shared_open (const ACE_Multihomed_INET_Addr &local_sa
           // representations of the primary and secondary
           // addresses.
           sockaddr_in*  local_inet_addrs = 0;
+#if defined(ACE_HAS_ALLOC_HOOKS)
+          ACE_ALLOCATOR_NORETURN (local_inet_addrs,
+                                  static_cast<sockaddr_in*>(ACE_Allocator::instance()->malloc(sizeof(sockaddr_in) * num_addresses)));
+#else
           ACE_NEW_NORETURN (local_inet_addrs,
                             sockaddr_in[num_addresses]);
+#endif
 
           if (!local_inet_addrs)
             error = 1;
@@ -398,7 +403,11 @@ ACE_SOCK_SEQPACK_Acceptor::shared_open (const ACE_Multihomed_INET_Addr &local_sa
 #endif /* ACE_HAS_LKSCTP */
             }
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+          ACE_Allocator::instance()->free(local_inet_addrs);
+#else
           delete [] local_inet_addrs;
+#endif /* ACE_HAS_ALLOC_HOOKS */
         }
     }
   else if (ACE_OS::bind (this->get_handle (),

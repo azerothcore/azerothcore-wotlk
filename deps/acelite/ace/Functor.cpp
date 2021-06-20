@@ -12,7 +12,7 @@
  * Based on Command Pattern implementations originally done by
  *
  * Carlos O'Ryan        <coryan@cs.wustl.edu>
- * Douglas C. Schmidt   <schmidt@cs.wustl.edu>
+ * Douglas C. Schmidt   <d.schmidt@vanderbilt.edu>
  * Sergio Flores-Gaitan <sergio@cs.wustl.edu>
  *
  * and on STL-style functor implementations originally done by

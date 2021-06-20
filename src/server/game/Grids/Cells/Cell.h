@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,17 +7,16 @@
 #ifndef ACORE_CELL_H
 #define ACORE_CELL_H
 
+#include "GridDefines.h"
 #include "TypeContainer.h"
 #include "TypeContainerVisitor.h"
-
-#include "GridDefines.h"
 
 class Map;
 class WorldObject;
 
 struct CellArea
 {
-    CellArea() {}
+    CellArea() = default;
     CellArea(CellCoord low, CellCoord high) : low_bound(low), high_bound(high) {}
 
     bool operator!() const { return low_bound == high_bound; }
@@ -39,36 +38,36 @@ struct Cell
     explicit Cell(CellCoord const& p);
     explicit Cell(float x, float y);
 
-    void Compute(uint32 &x, uint32 &y) const
+    void Compute(uint32& x, uint32& y) const
     {
         x = data.Part.grid_x * MAX_NUMBER_OF_CELLS + data.Part.cell_x;
         y = data.Part.grid_y * MAX_NUMBER_OF_CELLS + data.Part.cell_y;
     }
 
-    bool DiffCell(const Cell &cell) const
+    [[nodiscard]] bool DiffCell(const Cell& cell) const
     {
         return(data.Part.cell_x != cell.data.Part.cell_x ||
-            data.Part.cell_y != cell.data.Part.cell_y);
+               data.Part.cell_y != cell.data.Part.cell_y);
     }
 
-    bool DiffGrid(const Cell &cell) const
+    [[nodiscard]] bool DiffGrid(const Cell& cell) const
     {
         return(data.Part.grid_x != cell.data.Part.grid_x ||
-            data.Part.grid_y != cell.data.Part.grid_y);
+               data.Part.grid_y != cell.data.Part.grid_y);
     }
 
-    uint32 CellX() const { return data.Part.cell_x; }
-    uint32 CellY() const { return data.Part.cell_y; }
-    uint32 GridX() const { return data.Part.grid_x; }
-    uint32 GridY() const { return data.Part.grid_y; }
-    bool NoCreate() const { return data.Part.nocreate; }
+    [[nodiscard]] uint32 CellX() const { return data.Part.cell_x; }
+    [[nodiscard]] uint32 CellY() const { return data.Part.cell_y; }
+    [[nodiscard]] uint32 GridX() const { return data.Part.grid_x; }
+    [[nodiscard]] uint32 GridY() const { return data.Part.grid_y; }
+    [[nodiscard]] bool NoCreate() const { return data.Part.nocreate; }
     void SetNoCreate() { data.Part.nocreate = 1; }
 
-    CellCoord GetCellCoord() const
+    [[nodiscard]] CellCoord GetCellCoord() const
     {
         return CellCoord(
-            data.Part.grid_x * MAX_NUMBER_OF_CELLS+data.Part.cell_x,
-            data.Part.grid_y * MAX_NUMBER_OF_CELLS+data.Part.cell_y);
+                   data.Part.grid_x * MAX_NUMBER_OF_CELLS + data.Part.cell_x,
+                   data.Part.grid_y * MAX_NUMBER_OF_CELLS + data.Part.cell_y);
     }
 
     Cell& operator=(Cell const& cell)
@@ -93,14 +92,21 @@ struct Cell
         uint32 All;
     } data;
 
-    template<class T, class CONTAINER> void Visit(CellCoord const&, TypeContainerVisitor<T, CONTAINER>& visitor, Map &, WorldObject const&, float) const;
-    template<class T, class CONTAINER> void Visit(CellCoord const&, TypeContainerVisitor<T, CONTAINER>& visitor, Map &, float, float, float) const;
+    template<class T, class CONTAINER> void Visit(CellCoord const&, TypeContainerVisitor<T, CONTAINER>& visitor, Map&, WorldObject const& obj, float radius) const;
+    template<class T, class CONTAINER> void Visit(CellCoord const&, TypeContainerVisitor<T, CONTAINER>& visitor, Map&, float x, float y, float radius) const;
 
     static CellArea CalculateCellArea(float x, float y, float radius);
 
+    template<class T> static void VisitGridObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
+    template<class T> static void VisitWorldObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
+    template<class T> static void VisitAllObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
+
+    template<class T> static void VisitGridObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load = true);
+    template<class T> static void VisitWorldObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load = true);
+    template<class T> static void VisitAllObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load = true);
+
 private:
-    template<class T, class CONTAINER> void VisitCircle(TypeContainerVisitor<T, CONTAINER> &, Map &, CellCoord const&, CellCoord const&) const;
+    template<class T, class CONTAINER> void VisitCircle(TypeContainerVisitor<T, CONTAINER>&, Map&, CellCoord const&, CellCoord const&) const;
 };
 
 #endif
-

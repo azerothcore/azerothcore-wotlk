@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "ahnkahet.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum Spells
@@ -62,7 +62,7 @@ public:
 
     struct boss_taldaramAI : public ScriptedAI
     {
-        boss_taldaramAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_taldaramAI(Creature* c) : ScriptedAI(c), summons(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -70,10 +70,10 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 vanishTarget;
+        ObjectGuid vanishTarget;
         uint32 vanishDamage;
 
-        void Reset()
+        void Reset() override
         {
             if (me->GetPositionZ() > 15.0f)
                 me->CastSpell(me, SPELL_BEAM_VISUAL, true);
@@ -81,7 +81,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             vanishDamage = 0;
-            vanishTarget = 0;
+            vanishTarget.Clear();
 
             if (pInstance)
             {
@@ -93,7 +93,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_FREE)
             {
@@ -105,11 +105,11 @@ public:
                 me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation(), true);
 
                 if (pInstance)
-                    pInstance->HandleGameObject(pInstance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
+                    pInstance->HandleGameObject(pInstance->GetGuidData(DATA_PRINCE_TALDARAM_PLATFORM), true);
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_PRINCE_TALDARAM_EVENT, IN_PROGRESS);
@@ -126,17 +126,17 @@ public:
             events.Reset();
             events.ScheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
             events.ScheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
-            vanishTarget = 0;
+            vanishTarget.Clear();
             vanishDamage = 0;
         }
 
-        void SpellHitTarget(Unit *, const SpellInfo *spellInfo)
+        void SpellHitTarget(Unit*, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_CONJURE_FLAME_SPHERE)
                 summons.DoAction(ACTION_SPHERE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -145,86 +145,83 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_PRINCE_BLOODTHIRST:
-                {
-                    me->CastSpell(me->GetVictim(), SPELL_BLOODTHIRST, false);
-                    events.RepeatEvent(10000);
-                    break;
-                }
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_BLOODTHIRST, false);
+                        events.RepeatEvent(10000);
+                        break;
+                    }
                 case EVENT_PRINCE_FLAME_SPHERES:
-                {
-                    me->CastSpell(me->GetVictim(), SPELL_CONJURE_FLAME_SPHERE, false);
-                    events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
-                    Creature *cr;
-                    if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS)))
-                        summons.Summon(cr);
-
-                    if (me->GetMap()->IsHeroic())
                     {
-                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS)))
+                        me->CastSpell(me->GetVictim(), SPELL_CONJURE_FLAME_SPHERE, false);
+                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
+                        Creature* cr;
+                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
                             summons.Summon(cr);
 
-                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS)))
-                            summons.Summon(cr);
+                        if (me->GetMap()->IsHeroic())
+                        {
+                            if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
+                                summons.Summon(cr);
+
+                            if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * IN_MILLISECONDS)))
+                                summons.Summon(cr);
+                        }
+                        events.RepeatEvent(15000);
+                        break;
                     }
-                    events.RepeatEvent(15000);
-                    break;
-                }
                 case EVENT_PRINCE_VANISH:
-                {
-                    events.PopEvent();
-                    //Count alive players
-                    uint8 count = 0;
-                    Unit *pTarget;
-                    std::list<HostileReference *> t_list = me->getThreatManager().getThreatList();
-                    for (std::list<HostileReference *>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                     {
-                        pTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                        if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
-                            count++;
-                    }
-                    //He only vanishes if there are 3 or more alive players
-                    if (count > 2)
-                    {
-                        Talk(SAY_VANISH);
-                        me->CastSpell(me, SPELL_VANISH, false);
+                        //Count alive players
+                        uint8 count = 0;
+                        Unit* pTarget;
+                        std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
+                        for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+                        {
+                            pTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+                            if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
+                                count++;
+                        }
+                        //He only vanishes if there are 3 or more alive players
+                        if (count > 2)
+                        {
+                            Talk(SAY_VANISH);
+                            me->CastSpell(me, SPELL_VANISH, false);
 
-                        events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
-                        events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
-                        events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
-                        if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                            vanishTarget = pEmbraceTarget->GetGUID();
+                            events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
+                            events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
+                            events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
+                            if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                                vanishTarget = pEmbraceTarget->GetGUID();
+                        }
+                        break;
                     }
-                    break;
-                }
                 case EVENT_PRINCE_VANISH_RUN:
-                {
-                    if (Unit *vT = ObjectAccessor::GetUnit(*me, vanishTarget))
                     {
-                        me->UpdatePosition(vT->GetPositionX(), vT->GetPositionY(), vT->GetPositionZ(), me->GetAngle(vT), true);
-                        me->CastSpell(vT, SPELL_EMBRACE_OF_THE_VAMPYR, false);
-                        me->RemoveAura(SPELL_VANISH);
-                    }
+                        if (Unit* vT = ObjectAccessor::GetUnit(*me, vanishTarget))
+                        {
+                            me->UpdatePosition(vT->GetPositionX(), vT->GetPositionY(), vT->GetPositionZ(), me->GetAngle(vT), true);
+                            me->CastSpell(vT, SPELL_EMBRACE_OF_THE_VAMPYR, false);
+                            me->RemoveAura(SPELL_VANISH);
+                        }
 
-                    events.PopEvent();
-                    events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
-                    break;
-                }
+                        events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
+                        break;
+                    }
                 case EVENT_PRINCE_RESCHEDULE:
-                {
-                    events.PopEvent();
-                    ScheduleEvents();
-                    break;
-                }
+                    {
+                        ScheduleEvents();
+                        break;
+                    }
             }
 
             if (me->IsVisible())
                 DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (vanishTarget)
             {
@@ -237,7 +234,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -246,9 +243,9 @@ public:
                 pInstance->SetData(DATA_PRINCE_TALDARAM_EVENT, DONE);
         }
 
-        void KilledUnit(Unit * victim)
+        void KilledUnit(Unit* victim) override
         {
-            if (urand(0,1))
+            if (urand(0, 1))
                 return;
 
             if (vanishTarget && victim->GetGUID() == vanishTarget)
@@ -258,9 +255,9 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_taldaramAI(creature);
+        return GetAhnkahetAI<boss_taldaramAI>(creature);
     }
 };
 
@@ -271,47 +268,47 @@ public:
 
     struct npc_taldaram_flamesphereAI : public ScriptedAI
     {
-        npc_taldaram_flamesphereAI(Creature *c) : ScriptedAI(c)
+        npc_taldaram_flamesphereAI(Creature* c) : ScriptedAI(c)
         {
         }
 
         uint32 uiDespawnTimer;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_SPHERE)
             {
                 me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_FLAME_SPHERE_PERIODIC_H : SPELL_FLAME_SPHERE_PERIODIC, true);
 
-                float angle = rand_norm()*2*M_PI;
+                float angle = rand_norm() * 2 * M_PI;
                 float x = me->GetPositionX() + DATA_SPHERE_DISTANCE * cos(angle);
                 float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * sin(angle);
                 me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
             }
         }
 
-        void MovementInform(uint32  /*type*/, uint32 id)
+        void MovementInform(uint32  /*type*/, uint32 id) override
         {
             if (id == 0)
                 me->DisappearAndDie();
         }
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_FLAME_SPHERE_SPAWN_EFFECT, true);
             me->CastSpell(me, SPELL_FLAME_SPHERE_VISUAL, true);
-            uiDespawnTimer = 13*IN_MILLISECONDS;
+            uiDespawnTimer = 13 * IN_MILLISECONDS;
         }
 
-        void EnterCombat(Unit * /*who*/) {}
-        void MoveInLineOfSight(Unit * /*who*/) {}
+        void EnterCombat(Unit* /*who*/) override {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void JustDied(Unit* /*who*/)
+        void JustDied(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_FLAME_SPHERE_DEATH_EFFECT, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (uiDespawnTimer <= diff)
                 me->DisappearAndDie();
@@ -320,9 +317,9 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_taldaram_flamesphereAI(creature);
+        return GetAhnkahetAI<npc_taldaram_flamesphereAI>(creature);
     }
 };
 
@@ -331,13 +328,13 @@ class go_prince_taldaram_sphere : public GameObjectScript
 public:
     go_prince_taldaram_sphere() : GameObjectScript("go_prince_taldaram_sphere") { }
 
-    bool OnGossipHello(Player * /*pPlayer*/, GameObject *go) override
+    bool OnGossipHello(Player* /*pPlayer*/, GameObject* go) override
     {
-        InstanceScript *pInstance = go->GetInstanceScript();
+        InstanceScript* pInstance = go->GetInstanceScript();
         if (!pInstance)
             return false;
 
-        Creature *pPrinceTaldaram = ObjectAccessor::GetCreature(*go, pInstance->GetData64(DATA_PRINCE_TALDARAM));
+        Creature* pPrinceTaldaram = ObjectAccessor::GetCreature(*go, pInstance->GetGuidData(DATA_PRINCE_TALDARAM));
         if (pPrinceTaldaram && pPrinceTaldaram->IsAlive())
         {
             go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,6 +8,7 @@
 #define ACORE_PACKETLOG_H
 
 #include "Common.h"
+#include <mutex>
 
 enum Direction
 {
@@ -19,19 +20,21 @@ class WorldPacket;
 
 class PacketLog
 {
-    private:
-        PacketLog();
-        ~PacketLog();
+private:
+    PacketLog();
+    ~PacketLog();
+    std::mutex _logPacketLock;
+    std::once_flag _initializeFlag;
 
-    public:
-        static PacketLog* instance();
+public:
+    static PacketLog* instance();
 
-        void Initialize();
-        bool CanLogPacket() const { return (_file != NULL); }
-        void LogPacket(WorldPacket const& packet, Direction direction);
+    void Initialize();
+    bool CanLogPacket() const { return (_file != nullptr); }
+    void LogPacket(WorldPacket const& packet, Direction direction);
 
-    private:
-        FILE* _file;
+private:
+    FILE* _file;
 };
 
 #define sPacketLog PacketLog::instance()

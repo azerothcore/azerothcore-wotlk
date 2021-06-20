@@ -34,4 +34,10 @@ enum MTDataTypes
     DATA_YOR                    = 3
 };
 
+template <class AI, class T>
+inline AI* GetManaTombsAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, MTScriptName);
+}
+
 #endif // MANA_TOMBS_H_

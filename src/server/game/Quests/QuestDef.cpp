@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "QuestDef.h"
-#include "Player.h"
-#include "World.h"
-#include "Opcodes.h"
 #include "Formulas.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "QuestDef.h"
+#include "World.h"
 
 Quest::Quest(Field* questRecord)
 {
@@ -49,8 +49,8 @@ Quest::Quest(Field* questRecord)
 
     for (int i = 0; i < QUEST_REWARDS_COUNT; ++i)
     {
-        RewardItemId[i] = questRecord[27+i*2].GetUInt32();
-        RewardItemIdCount[i] = questRecord[28+i*2].GetUInt16();
+        RewardItemId[i] = questRecord[27 + i * 2].GetUInt32();
+        RewardItemIdCount[i] = questRecord[28 + i * 2].GetUInt16();
 
         if (RewardItemId[i])
             ++_rewItemsCount;
@@ -58,8 +58,8 @@ Quest::Quest(Field* questRecord)
 
     for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
     {
-        RewardChoiceItemId[i] = questRecord[35+i*2].GetUInt32();
-        RewardChoiceItemCount[i] = questRecord[36+i*2].GetUInt16();
+        RewardChoiceItemId[i] = questRecord[35 + i * 2].GetUInt32();
+        RewardChoiceItemCount[i] = questRecord[36 + i * 2].GetUInt16();
 
         if (RewardChoiceItemId[i])
             ++_rewChoiceItemsCount;
@@ -67,9 +67,9 @@ Quest::Quest(Field* questRecord)
 
     for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
     {
-        RewardFactionId[i] = questRecord[47+i*3].GetUInt16();
-        RewardFactionValueId[i] = questRecord[48+i*3].GetInt32();
-        RewardFactionValueIdOverride[i] = questRecord[49+i*3].GetInt32();
+        RewardFactionId[i] = questRecord[47 + i * 3].GetUInt16();
+        RewardFactionValueId[i] = questRecord[48 + i * 3].GetInt32();
+        RewardFactionValueIdOverride[i] = questRecord[49 + i * 3].GetInt32();
     }
 
     POIContinent = questRecord[62].GetUInt16();
@@ -84,8 +84,8 @@ Quest::Quest(Field* questRecord)
 
     for (int i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
     {
-        RequiredNpcOrGo[i] = questRecord[71+i].GetInt32();
-        RequiredNpcOrGoCount[i] = questRecord[75+i].GetUInt16();
+        RequiredNpcOrGo[i] = questRecord[71 + i].GetInt32();
+        RequiredNpcOrGoCount[i] = questRecord[75 + i].GetUInt16();
         ObjectiveText[i] = questRecord[100 + i].GetString();
 
         if (RequiredNpcOrGo[i])
@@ -94,8 +94,8 @@ Quest::Quest(Field* questRecord)
 
     for (int i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
     {
-        ItemDrop[i] = questRecord[79+i].GetUInt32();
-        ItemDropQuantity[i] = questRecord[83+i].GetUInt16();
+        ItemDrop[i] = questRecord[79 + i].GetUInt32();
+        ItemDropQuantity[i] = questRecord[83 + i].GetUInt16();
     }
 
     for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
@@ -117,17 +117,17 @@ Quest::Quest(Field* questRecord)
         OfferRewardEmote[i] = 0;
         OfferRewardEmoteDelay[i] = 0;
     }
-        
+
     _eventIdForQuest = 0;
 }
 
 void Quest::LoadQuestDetails(Field* fields)
 {
     for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
-        DetailsEmote[i] = fields[1+i].GetUInt16();
+        DetailsEmote[i] = fields[1 + i].GetUInt16();
 
     for (int i = 0; i < QUEST_EMOTE_COUNT; ++i)
-        DetailsEmoteDelay[i] = fields[5+i].GetUInt32();
+        DetailsEmoteDelay[i] = fields[5 + i].GetUInt32();
 }
 
 void Quest::LoadQuestRequestItems(Field* fields)
@@ -208,7 +208,7 @@ int32 Quest::GetRewOrReqMoney() const
     if (RewardMoney <= 0)
         return RewardMoney;
 
-    return int32(RewardMoney  * sWorld->getRate(RATE_DROP_MONEY));
+    return static_cast<int32>(RewardMoney * sWorld->getRate(RATE_DROP_MONEY));
 }
 
 uint32 Quest::GetRewMoneyMaxLevel() const
@@ -216,7 +216,7 @@ uint32 Quest::GetRewMoneyMaxLevel() const
     if (HasFlag(QUEST_FLAGS_NO_MONEY_FROM_XP))
         return 0;
 
-    return RewardBonusMoney;
+    return static_cast<int32>(RewardBonusMoney * sWorld->getRate(RATE_REWARD_BONUS_MONEY) * sWorld->getRate(RATE_DROP_MONEY));
 }
 
 bool Quest::IsAutoAccept() const
@@ -270,7 +270,7 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
         honor = uint32(tc->value * GetRewHonorMultiplier() * 0.1000000014901161);
 
         // Xinef: exactly this is calculated above, however with higher precision...
-        //honor += acore::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
+        //honor += Acore::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
         honor += GetRewHonorAddition();
     }
 

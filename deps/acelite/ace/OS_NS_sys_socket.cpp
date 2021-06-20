@@ -108,7 +108,7 @@ ACE_OS::socket_init (int version_high, int version_low)
         {
           ACE_TCHAR fmt[] = ACE_TEXT ("%s failed, WSAGetLastError returned %d");
           ACE_TCHAR buf[80];  // @@ Eliminate magic number.
-          ACE_OS::sprintf (buf, fmt, ACE_TEXT ("WSAStartup"), error);
+          ACE_OS::snprintf (buf, 80, fmt, ACE_TEXT ("WSAStartup %d"), error);
           ::MessageBox (0, buf, ACE_TEXT ("WSAStartup failed!"), MB_OK);
         }
 #   else
@@ -139,7 +139,7 @@ ACE_OS::socket_fini (void)
 #   if defined (ACE_HAS_WINCE)
           ACE_TCHAR fmt[] = ACE_TEXT ("%s failed, WSAGetLastError returned %d");
           ACE_TCHAR buf[80];  // @@ Eliminate magic number.
-          ACE_OS::sprintf (buf, fmt, ACE_TEXT ("WSACleanup"), error);
+          ACE_OS::snprintf (buf, 80, fmt, ACE_TEXT ("WSACleanup %d"), error);
           ::MessageBox (0, buf , ACE_TEXT ("WSACleanup failed!"), MB_OK);
 #   else
           ACE_OS::fprintf (stderr,
@@ -217,13 +217,12 @@ ACE_OS::sendv_partial_i (ACE_HANDLE handle,
     }
 
   return (ssize_t) bytes_sent;
-# else
+#else
   ACE_UNUSED_ARG (handle);
   ACE_UNUSED_ARG (buffers);
   ACE_UNUSED_ARG (n);
-
-  return -1;
-# endif /* ACE_HAS_WINSOCK2 */
+  ACE_NOTSUP_RETURN (-1);
+#endif /* ACE_HAS_WINSOCK2 */
 }
 
 ssize_t
@@ -263,14 +262,96 @@ ACE_OS::send_partial_i (ACE_HANDLE handle,
     }
 
   return result;
-# else
+#else
   ACE_UNUSED_ARG (handle);
   ACE_UNUSED_ARG (buf);
   ACE_UNUSED_ARG (len);
   ACE_UNUSED_ARG (flags);
-
-  return -1;
-# endif /* ACE_LACKS_SEND && ACE_WIN32 */
+  ACE_NOTSUP_RETURN (-1);
+#endif /* ACE_LACKS_SEND && ACE_WIN32 */
 }
+
+#if !defined ACE_LACKS_RECVMSG && defined ACE_HAS_WINSOCK2 && ACE_HAS_WINSOCK2
+int ACE_OS::recvmsg_win32_i (ACE_HANDLE handle,
+                             msghdr *msg,
+                             int flags,
+                             unsigned long &bytes_received)
+{
+  static GUID wsaRcvMsgGuid = WSAID_WSARECVMSG;
+  LPFN_WSARECVMSG wsaRcvMsg = 0;
+  unsigned long ioctlN = 0;
+  SOCKET const sock = reinterpret_cast<SOCKET> (handle);
+  if (::WSAIoctl (sock, SIO_GET_EXTENSION_FUNCTION_POINTER,
+                  &wsaRcvMsgGuid, sizeof wsaRcvMsgGuid,
+                  &wsaRcvMsg, sizeof wsaRcvMsg,
+                  &ioctlN, 0, 0))
+    {
+      ACE_OS::set_errno_to_wsa_last_error ();
+      return -1;
+    }
+
+  if (!wsaRcvMsg)
+    ACE_NOTSUP_RETURN (-1);
+
+  WSAMSG wsaMsg =
+  {
+    msg->msg_name,
+    msg->msg_namelen,
+    reinterpret_cast<WSABUF *> (msg->msg_iov),
+    static_cast<unsigned long> (msg->msg_iovlen),
+    {
+      static_cast<unsigned long> (msg->msg_controllen),
+      static_cast<char *> (msg->msg_control),
+    },
+    static_cast<unsigned long> (flags),
+  };
+
+  if (wsaRcvMsg (sock, &wsaMsg, &bytes_received, 0, 0))
+    {
+      ACE_OS::set_errno_to_wsa_last_error ();
+      return -1;
+    }
+
+  msg->msg_namelen = wsaMsg.namelen;
+  msg->msg_controllen = static_cast<int> (wsaMsg.Control.len);
+  return 0;
+}
+
+int ACE_OS::sendmsg_win32_i (ACE_HANDLE handle,
+                             msghdr const *msg,
+                             int flags,
+                             unsigned long &bytes_sent)
+{
+#  if _WIN32_WINNT >= 0x0600
+  WSAMSG wsaMsg =
+  {
+    msg->msg_name,
+    msg->msg_namelen,
+    reinterpret_cast<WSABUF *> (msg->msg_iov),
+    static_cast<unsigned long> (msg->msg_iovlen),
+    {
+      static_cast<unsigned long> (msg->msg_controllen),
+      static_cast<char *> (msg->msg_control),
+    },
+    static_cast<unsigned long> (flags),
+  };
+
+  SOCKET const sock = reinterpret_cast<SOCKET> (handle);
+  if (::WSASendMsg (sock, &wsaMsg, wsaMsg.dwFlags, &bytes_sent, 0, 0))
+    {
+      ACE_OS::set_errno_to_wsa_last_error ();
+      return -1;
+    }
+
+  return 0;
+#  else
+  ACE_UNUSED_ARG (handle);
+  ACE_UNUSED_ARG (msg);
+  ACE_UNUSED_ARG (flags);
+  ACE_UNUSED_ARG (bytes_sent);
+  ACE_NOTSUP_RETURN (-1);
+#  endif
+}
+#endif
 
 ACE_END_VERSIONED_NAMESPACE_DECL

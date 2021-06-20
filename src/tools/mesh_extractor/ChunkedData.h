@@ -14,7 +14,7 @@ class ChunkedData
 {
 public:
     ChunkedData(FILE* stream, uint32 maxLength, uint32 chunksHint = 300);
-    ChunkedData(const std::string &file, uint32 chunksHint = 300);
+    ChunkedData(const std::string& file, uint32 chunksHint = 300);
     ~ChunkedData();
 
     int GetFirstIndex(const std::string& name);

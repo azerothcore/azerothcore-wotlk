@@ -5,6 +5,10 @@
 #include "ace/OS_NS_signal.h"
 #include "ace/OS_NS_stdio.h"
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 #if defined (ACE_HAS_WIN32_STRUCTURAL_EXCEPTIONS)
@@ -21,6 +25,17 @@ int ACE_SEH_Default_Exception_Handler (void *)
 }
 #endif /* ACE_HAS_WIN32_STRUCTURAL_EXCEPTIONS */
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# define ACE_OS_PREALLOCATE_OBJECT(TYPE, ID)\
+    {\
+      TYPE *obj_p = 0;\
+      ACE_ALLOCATOR_RETURN (obj_p, static_cast<TYPE *>(ACE_Allocator::instance()->malloc(sizeof(TYPE))), -1); \
+      preallocated_object[ID] = (void *) obj_p;\
+    }
+# define ACE_OS_DELETE_PREALLOCATED_OBJECT(TYPE, ID)\
+    ACE_Allocator::instance()->free (preallocated_object[ID]);     \
+    preallocated_object[ID] = 0;
+#else
 # define ACE_OS_PREALLOCATE_OBJECT(TYPE, ID)\
     {\
       TYPE *obj_p = 0;\
@@ -30,6 +45,7 @@ int ACE_SEH_Default_Exception_Handler (void *)
 # define ACE_OS_DELETE_PREALLOCATED_OBJECT(TYPE, ID)\
     delete (TYPE *) preallocated_object[ID];\
     preallocated_object[ID] = 0;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 ACE_Object_Manager_Base::ACE_Object_Manager_Base (void)
   : object_manager_state_ (OBJ_MAN_UNINITIALIZED)
@@ -104,6 +120,8 @@ ACE_OS_Object_Manager::~ACE_OS_Object_Manager (void)
   dynamically_allocated_ = false;   // Don't delete this again in fini()
   fini ();
 }
+
+ACE_ALLOC_HOOK_DEFINE(ACE_OS_Object_Manager)
 
 sigset_t *
 ACE_OS_Object_Manager::default_mask (void)
@@ -249,17 +267,32 @@ ACE_OS_Object_Manager::init (void)
           ACE_OS::set_exit_hook (&ACE_OS_Object_Manager_Internal_Exit_Hook);
         }
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_ALLOCATOR_RETURN (default_mask_, static_cast<sigset_t*>(ACE_Allocator::instance()->malloc(sizeof(sigset_t))), -1);
+#else
       ACE_NEW_RETURN (default_mask_, sigset_t, -1);
+#endif /* ACE_HAS_ALLOC_HOOKS */
       ACE_OS::sigfillset (default_mask_);
 
       // Finally, indicate that the ACE_OS_Object_Manager instance has
       // been initialized.
       object_manager_state_ = OBJ_MAN_INITIALIZED;
 
-# if defined (ACE_WIN32)
+# if defined (ACE_WIN32) && defined (ACE_HAS_WIN32_GETVERSION)
+/* Since MS found it necessary to deprecate these. */
+#   pragma warning(push)
+#   pragma warning(disable:4996)
+#   if defined(__clang__)
+#     pragma clang diagnostic push
+#     pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#   endif /* __clang__ */
       ACE_OS::win32_versioninfo_.dwOSVersionInfoSize =
         sizeof (ACE_TEXT_OSVERSIONINFO);
       ACE_TEXT_GetVersionEx (&ACE_OS::win32_versioninfo_);
+#   if defined(__clang__)
+#     pragma clang diagnostic pop
+#   endif /* __clang__ */
+#   pragma warning(pop)
 # endif /* ACE_WIN32 */
       return 0;
     } else {
@@ -313,6 +346,9 @@ ACE_OS_Object_Manager::fini (void)
       if (ACE_OS::thread_mutex_destroy
           // This line must not be broken to avoid tickling a bug with SunC++'s preprocessor.
           (reinterpret_cast <ACE_thread_mutex_t *> (ACE_OS_Object_Manager::preallocated_object[ACE_OS_MONITOR_LOCK])) != 0)
+#     ifdef ACE_LACKS_PTHREAD_MUTEX_DESTROY
+        if (errno != ENOTSUP)
+#     endif
         ACE_OS_Object_Manager::print_error_message (
           __LINE__, ACE_TEXT ("ACE_OS_MONITOR_LOCK"));
 #   endif /* ! ACE_HAS_BROKEN_PREALLOCATED_OBJECTS_AFTER_FORK */
@@ -322,6 +358,9 @@ ACE_OS_Object_Manager::fini (void)
       if (ACE_OS::recursive_mutex_destroy
           // This line must not be broken to avoid tickling a bug with SunC++'s preprocessor.
           (reinterpret_cast <ACE_recursive_thread_mutex_t *> (ACE_OS_Object_Manager::preallocated_object[ACE_TSS_CLEANUP_LOCK])) != 0)
+#     ifdef ACE_LACKS_PTHREAD_MUTEX_DESTROY
+        if (errno != ENOTSUP)
+#     endif
         ACE_OS_Object_Manager::print_error_message (
           __LINE__, ACE_TEXT ("ACE_TSS_CLEANUP_LOCK"));
 #   endif /* ! ACE_HAS_BROKEN_PREALLOCATED_OBJECTS_AFTER_FORK */
@@ -331,6 +370,9 @@ ACE_OS_Object_Manager::fini (void)
       if (ACE_OS::thread_mutex_destroy
           // This line must not be broken to avoid tickling a bug with SunC++'s preprocessor.
           (reinterpret_cast <ACE_thread_mutex_t *> (ACE_OS_Object_Manager::preallocated_object [ACE_LOG_MSG_INSTANCE_LOCK])) != 0)
+#     ifdef ACE_LACKS_PTHREAD_MUTEX_DESTROY
+        if (errno != ENOTSUP)
+#     endif
         ACE_OS_Object_Manager::print_error_message (
           __LINE__, ACE_TEXT ("ACE_LOG_MSG_INSTANCE_LOCK "));
 #   endif /* ! ACE_HAS_BROKEN_PREALLOCATED_OBJECTS_AFTER_FORK */
@@ -365,7 +407,11 @@ ACE_OS_Object_Manager::fini (void)
 #endif /* ! ACE_HAS_STATIC_PREALLOCATION */
     }
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(default_mask_);
+#else
   delete default_mask_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
   default_mask_ = 0;
 
   // Indicate that this ACE_OS_Object_Manager instance has been shut down.
@@ -399,10 +445,17 @@ ACE_OS_Object_Manager::print_error_message (unsigned int line_number,
 {
   // To avoid duplication of these const strings in OS.o.
 #if !defined (ACE_HAS_WINCE)
+# ifndef ACE_LACKS_STDERR
   fprintf (stderr, "ace/Object_Manager_Base.cpp, line %u: %s ",
            line_number,
            ACE_TEXT_ALWAYS_CHAR (message));
+# else
+  ACE_UNUSED_ARG (line_number);
+  ACE_UNUSED_ARG (message);
+# endif
+# if !defined (ACE_LACKS_PERROR)
   perror ("failed");
+# endif /* ACE_LACKS_PERROR */
 #else
   // @@ Need to use the following information.
   ACE_UNUSED_ARG (line_number);

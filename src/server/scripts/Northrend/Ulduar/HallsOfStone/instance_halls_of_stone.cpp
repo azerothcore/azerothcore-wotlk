@@ -2,62 +2,48 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_stone.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 class instance_halls_of_stone : public InstanceMapScript
 {
 public:
     instance_halls_of_stone() : InstanceMapScript("instance_halls_of_stone", 599) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_halls_of_stone_InstanceMapScript(pMap);
     }
 
     struct instance_halls_of_stone_InstanceMapScript : public InstanceScript
     {
-        instance_halls_of_stone_InstanceMapScript(Map* map) : InstanceScript(map){ Initialize(); }
+        instance_halls_of_stone_InstanceMapScript(Map* map) : InstanceScript(map) { Initialize(); }
 
         uint32 Encounter[MAX_ENCOUNTER];
 
-        uint64 goKaddrakGUID;
-        uint64 goMarnakGUID;
-        uint64 goAbedneumGUID;
-        uint64 goTribunalConsoleGUID;
-        uint64 goSkyRoomFloorGUID;
-        uint64 goSjonnirConsoleGUID;
-        uint64 goSjonnirDoorGUID;
-        uint64 goLeftPipeGUID;
-        uint64 goRightPipeGUID;
-        uint64 goTribunalDoorGUID;
+        ObjectGuid goKaddrakGUID;
+        ObjectGuid goMarnakGUID;
+        ObjectGuid goAbedneumGUID;
+        ObjectGuid goTribunalConsoleGUID;
+        ObjectGuid goSkyRoomFloorGUID;
+        ObjectGuid goSjonnirConsoleGUID;
+        ObjectGuid goSjonnirDoorGUID;
+        ObjectGuid goLeftPipeGUID;
+        ObjectGuid goRightPipeGUID;
+        ObjectGuid goTribunalDoorGUID;
 
-        uint64 SjonnirGUID;
-        uint64 BrannGUID;
+        ObjectGuid SjonnirGUID;
+        ObjectGuid BrannGUID;
 
         bool brannAchievement;
         bool sjonnirAchievement;
         bool isMaidenOfGriefDead;
         bool isKrystalusDead;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&Encounter, 0, sizeof(Encounter));
-
-            goKaddrakGUID = 0;
-            goMarnakGUID = 0;
-            goAbedneumGUID = 0;
-            goTribunalConsoleGUID = 0;
-            goSkyRoomFloorGUID = 0;
-            goSjonnirConsoleGUID = 0;
-            goSjonnirDoorGUID = 0;
-            goLeftPipeGUID = 0;
-            goRightPipeGUID = 0;
-            goTribunalDoorGUID = 0;
-
-            SjonnirGUID = 0;
-            BrannGUID = 0;
 
             brannAchievement = false;
             sjonnirAchievement = false;
@@ -65,47 +51,49 @@ public:
             isKrystalusDead = false;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
-                if (Encounter[i] == IN_PROGRESS)
+                if (Encounter[i] == IN_PROGRESS && i != BRANN_BRONZEBEARD)
+                {
                     return true;
+                }
             }
             return false;
         }
 
-        void OnGameObjectCreate(GameObject *go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch(go->GetEntry())
             {
-                case GO_KADDRAK: 
+                case GO_KADDRAK:
                     goKaddrakGUID = go->GetGUID();
                     break;
-                case GO_ABEDNEUM: 
+                case GO_ABEDNEUM:
                     goAbedneumGUID = go->GetGUID();
                     if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
-                case GO_MARNAK: 
-                    goMarnakGUID = go->GetGUID(); 
+                case GO_MARNAK:
+                    goMarnakGUID = go->GetGUID();
                     break;
-                case GO_TRIBUNAL_CONSOLE: 
-                    goTribunalConsoleGUID = go->GetGUID(); 
+                case GO_TRIBUNAL_CONSOLE:
+                    goTribunalConsoleGUID = go->GetGUID();
                     break;
                 case GO_TRIBUNAL_ACCESS_DOOR:
                     goTribunalDoorGUID = go->GetGUID();
                     go->SetGoState(GO_STATE_READY);
                     break;
-                case GO_SKY_FLOOR: 
+                case GO_SKY_FLOOR:
                     goSkyRoomFloorGUID = go->GetGUID();
                     if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
-                case GO_SJONNIR_CONSOLE: 
+                case GO_SJONNIR_CONSOLE:
                     goSjonnirConsoleGUID = go->GetGUID();
                     break;
-                case GO_SJONNIR_DOOR: 
+                case GO_SJONNIR_DOOR:
                     goSjonnirDoorGUID = go->GetGUID();
                     if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
@@ -119,43 +107,54 @@ public:
             }
         }
 
-
-        void OnCreatureCreate(Creature *creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch(creature->GetEntry())
             {
-            case NPC_SJONNIR:   
-                SjonnirGUID = creature->GetGUID();
-                break;
-            case NPC_BRANN:
-                BrannGUID = creature->GetGUID();
-                break;
+                case NPC_SJONNIR:
+                    SjonnirGUID = creature->GetGUID();
+                    break;
+                case NPC_BRANN:
+                    BrannGUID = creature->GetGUID();
+                    break;
             }
         }
 
-        uint64 GetData64(uint32 id) const
+        ObjectGuid GetGuidData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
-                case GO_TRIBUNAL_CONSOLE:       return goTribunalConsoleGUID;
-                case GO_TRIBUNAL_ACCESS_DOOR:   return goTribunalDoorGUID;
-                case GO_SJONNIR_CONSOLE:        return goSjonnirConsoleGUID;
-                case GO_SJONNIR_DOOR:           return goSjonnirDoorGUID;
-                case GO_LEFT_PIPE:              return goLeftPipeGUID;
-                case GO_RIGHT_PIPE:             return goRightPipeGUID;
-                case GO_KADDRAK:                return goKaddrakGUID;
-                case GO_MARNAK:                 return goMarnakGUID;
-                case GO_ABEDNEUM:               return goAbedneumGUID;
+                case GO_TRIBUNAL_CONSOLE:
+                    return goTribunalConsoleGUID;
+                case GO_TRIBUNAL_ACCESS_DOOR:
+                    return goTribunalDoorGUID;
+                case GO_SJONNIR_CONSOLE:
+                    return goSjonnirConsoleGUID;
+                case GO_SJONNIR_DOOR:
+                    return goSjonnirDoorGUID;
+                case GO_LEFT_PIPE:
+                    return goLeftPipeGUID;
+                case GO_RIGHT_PIPE:
+                    return goRightPipeGUID;
+                case GO_KADDRAK:
+                    return goKaddrakGUID;
+                case GO_MARNAK:
+                    return goMarnakGUID;
+                case GO_ABEDNEUM:
+                    return goAbedneumGUID;
 
-                case NPC_SJONNIR:               return SjonnirGUID;
-                case NPC_BRANN:                 return BrannGUID;
+                case NPC_SJONNIR:
+                    return SjonnirGUID;
+                case NPC_BRANN:
+                    return BrannGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
                 case BOSS_KRYSTALLUS:
                 case BOSS_MAIDEN_OF_GRIEF:
@@ -164,22 +163,24 @@ public:
                 case BRANN_BRONZEBEARD:
                     return Encounter[id];
             }
+
             return 0;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7590: // Brann Spankin' New (2154)
                     return brannAchievement;
                 case 7593: // Abuse the Ooze (2155)
                     return sjonnirAchievement;
             }
+
             return false;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type < MAX_ENCOUNTER)
                 Encounter[type] = data;
@@ -202,7 +203,7 @@ public:
                     pF->SetGoState(GO_STATE_ACTIVE);
 
                 // Make sjonnir attackable
-                if (Creature *cr = instance->GetCreature(SjonnirGUID))
+                if (Creature* cr = instance->GetCreature(SjonnirGUID))
                     cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
             if (type == BOSS_TRIBUNAL_OF_AGES && data == NOT_STARTED)
@@ -223,12 +224,12 @@ public:
                 sjonnirAchievement = (bool)data;
                 return;
             }
-            
+
             if (data == DONE)
                 SaveToDB();
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -239,7 +240,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {

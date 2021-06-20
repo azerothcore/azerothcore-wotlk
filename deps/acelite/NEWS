@@ -1,3 +1,308 @@
+USER VISIBLE CHANGES BETWEEN ACE-6.5.9 and ACE-6.5.10
+=====================================================
+
+. Add support for Embarcadero C++ Builder 10.4 Sydney using the
+  classic compiler. ACE/TAO compile with the new 32/64 bit clang
+  compilers but runtime tests show several runtime problems which
+  makes them not safe to use
+
+. Make a change in the ACE Process Manager to resolve an internal
+  compiler error with Visual Studio 2019 16.5.x compilers
+
+. Android enhancements for if_nameindex
+
+USER VISIBLE CHANGES BETWEEN ACE-6.5.8 and ACE-6.5.9
+====================================================
+
+. On Windows, ACE no longer defines _WIN32_WINNT.  ACE wrappers for
+  if_nametoindex and if_indextoname are available if the version of the
+  Windows SDK supports them.
+
+. IPv6 extended datagram receive info now supported on macOS.
+
+. ACE_(U)INT8/16/32/64 map to (u)int8/16/32/64_t when C++11 has been
+  enabled.
+
+. CDR_Base uses ACE_INT64 for LongLong, all old emulated support
+  has been removed
+
+. Updated debian and rpm packaging support
+
+USER VISIBLE CHANGES BETWEEN ACE-6.5.7 and ACE-6.5.8
+====================================================
+
+. Added instructions to ACE-INSTALL.html for building ACE/TAO for Android on
+  Windows.
+
+. Embarcadero C++ Builder Rio fixes
+
+. Renamed `VERSION` file to `VERSION.txt` to avoid conflicting with the
+  `version` standard header.
+
+USER VISIBLE CHANGES BETWEEN ACE-6.5.6 and ACE-6.5.7
+====================================================
+
+. Fixed compile problem with glibc 2.30 and newer
+
+. gnuace makefiles: Updated handling of generated files and
+  use requires/avoids to make postbuild steps conditional
+
+. Removed references to the ACE_LACKS_MONOTONIC_TIME preprocessor macro because
+  it was equivalent to ACE_LACKS_CLOCK_MONOTONIC.
+
+. Exposed support status of monotonic times features using preprocessor macros.
+  See "Testing for Monotonic Time Support" in docs/ACE-monotonic-timer.html for
+  details.
+
+. Added support for ARM and ARM64 stack traces with Microsoft Visual C++.
+
+. The "optional argument for the receive address in ACE_SOCK_Dgram::recv"
+  feature from ACE-6.5.5 is now supported on Windows.  This includes enhanced
+  support for sendmsg/recvmsg on Windows.
+
+USER VISIBLE CHANGES BETWEEN ACE-6.5.5 and ACE-6.5.6
+====================================================
+
+. On Linux, the ACE_Log_Msg format specifier `%t` is now replaced with the
+  system thread id provided by gettid(), instead of the much longer pthread id.
+
+. Added support for MQX
+
+. Enhanced Android support
+
+USER VISIBLE CHANGES BETWEEN ACE-6.5.4 and ACE-6.5.5
+====================================================
+
+. Fixed several broken links due to the removal of
+  Douglas Schmidt website at WashU
+
+. On Android:
+
+  . ACE_Log_Msg (and therefore ACE_DEBUG and ACE_ERROR) now uses
+    Android's logging system (aka Logcat) by default in addition to stderr
+    because stdout and stderr are discarded under normal circumstances.
+    To disable this at runtime, run:
+      ACE_LOG_MSG->clr_flags (ACE_Log_Msg::SYSLOG)
+    To disable this at compile time include these lines in config.h:
+      #define ACE_DEFAULT_LOG_FLAGS ACE_Log_Msg::STDERR
+      #define ACE_DEFAULT_LOG_BACKEND_FLAGS 0
+
+  . When statically linking to OpenSSL, prevent usage of the preloaded and
+    unpredictable system SSL library when using ace_openssl.
+
+. minizip has been moved from ACE to DANCE
+
+. Add initial support for Visual Studio 2019
+
+. Validated ACE for usage SLES15.0 x86_64 using 32bit g++ compiler
+
+. Add optional argument for the receive address in ACE_SOCK_Dgram::recv
+
+USER VISIBLE CHANGES BETWEEN ACE-6.5.3 and ACE-6.5.4
+====================================================
+
+. Fix ACE_Vector::end(), which now correctly
+  represents the end of the elements of the vector
+  instead of the end of the base array.
+
+USER VISIBLE CHANGES BETWEEN ACE-6.5.2 and ACE-6.5.3
+====================================================
+
+. Enhance Android support
+
+. Fix AIX and Solaris linking rpath errors
+
+. Add support for SSL_INCDIR/SSL_LIBDIR and XERCESC_INCDIR/XERCESC_LIBDIR
+  to specify a custom include/lib dir as required for vcpkg versions of
+  openssl/xercesc
+
+USER VISIBLE CHANGES BETWEEN ACE-6.5.1 and ACE-6.5.2
+====================================================
+
+. Enhanced C++Builder XE2 support
+
+. ACE_QtReactor can be built with Qt version 5 using the qt5 MPC feature
+
+USER VISIBLE CHANGES BETWEEN ACE-6.5.0 and ACE-6.5.1
+====================================================
+
+. At the moment C++11 or newer is enabled ACE_Strong_Bound_Ptr
+  doesn't provide the convenience functions to use a
+  std::auto_ptr anymore
+
+. Optimized CDR std::(w)string insertion and extraction
+  when C++11 or newer is enabled
+
+. Solved Visual Studio 2017 solution loading due to duplicate
+  files generated in a project file
+
+USER VISIBLE CHANGES BETWEEN ACE-6.4.8 and ACE-6.5.0
+====================================================
+
+. The ACE core libraries now use std::unique_ptr instead
+  of std::auto_ptr when C++11 or newer is enabled
+
+USER VISIBLE CHANGES BETWEEN ACE-6.4.7 and ACE-6.4.8
+====================================================
+
+. Enhanced Embarcadero C++ Builder support
+
+. ACE XML_Utils enhancements
+
+. Debian packaging enhancements
+
+. Support for clang6 and gcc8
+
+. Enhanced Android support
+
+. Remove addr_any restriction from ipv6_only UDP
+
+USER VISIBLE CHANGES BETWEEN ACE-6.4.6 and ACE-6.4.7
+====================================================
+
+. Added a new, optional argument named ipv6_only to:
+    ACE_Acceptor::ACE_Acceptor
+    ACE_Acceptor::open
+    ACE_SOCK_Dgram::ACE_SOCK_Dgram
+    ACE_SOCK_Dgram::open
+  If ipv6_only is 0/false (the default) the socket will accept
+  both IPv6 and IPv4 connections/datagrams. If ipv6_only is
+  1/true the socket will only accept IPv6.
+  This behavior only applies when ACE_HAS_IPV6 is true and the
+  local-side IP address is the generic localhost IP address.
+
+. Integrated some changes from XSC into XML Utils
+
+. Enable ACE_HAS_CPP11 when we have clang with C++11 enabled
+
+. Added support for cross compiling using MinGW on a Linux host
+
+. Added support for FreeBSD 11
+
+. Fixed issue ACE_Singleton was broken after ACE::fini, ACE::init (GitHub #554)
+
+USER VISIBLE CHANGES BETWEEN ACE-6.4.5 and ACE-6.4.6
+====================================================
+
+. Fixed some Codacy and C++ Core guidelines reported issues
+
+. VxWorks 7 (SR0510) support
+
+. Support make install on newer Apple MacOS versions
+
+USER VISIBLE CHANGES BETWEEN ACE-6.4.4 and ACE-6.4.5
+====================================================
+
+. Add support for OpenSSL 1.1. ACE users on Windows have
+  to add openssl11=1 to their default.features file so
+  that the correct OpenSSL library names are used.
+
+USER VISIBLE CHANGES BETWEEN ACE-6.4.3 and ACE-6.4.4
+====================================================
+
+. Enhanced support for Embarcadero C++ Builder 10.2 (Tokyo).
+  Support for bcc32/bcc64/bcc32c has been enhanced and by
+  default the clang based versions are used. When the old
+  bcc32 has to be used set the CLASSIC environment variable
+  to 1. At this moment runtime test results for bcc64/bcc32c
+  show some structural problems
+
+. Add support for Oracle Studio 12.5
+
+. Removed usage of ACE_REGISTER and register keyword because
+  they trigger deprecated warnings with newer gcc and clang
+  versions
+
+. Add support for gcc 7
+
+. Enhanced Android support
+
+. Fix ACE_INET_Addr::set(domain_name, AF_UNSPEC) to be set to IPv4 address
+  when IPv6 is enabled and the domain_name could be resolved to IPv4 address.
+
+USER VISIBLE CHANGES BETWEEN ACE-6.4.2 and ACE-6.4.3
+====================================================
+
+. Enhancements for Visual Studio 2017
+
+. Enhancements for Android
+
+USER VISIBLE CHANGES BETWEEN ACE-6.4.1 and ACE-6.4.2
+====================================================
+
+. Added support for Mac OS X on x86_64 to get the network adapter
+  address in ACE_OS::getmacaddress().
+
+. Added support for the December 2016 updates to VxWorks 7.
+
+USER VISIBLE CHANGES BETWEEN ACE-6.4.0 and ACE-6.4.1
+====================================================
+
+. The ACE_DEBUG environment variable can again be used to set the
+  internal debug flag.  This used to work but was mistakenly changed
+  in an earlier release.
+
+. Corrected usage of ACE_Singleton and template instantation to be
+  valid C++ (GCC cross-compiler arm-linux-gnueabihf-g++ requires it).
+
+. Added support for detecting the Mac OS X version when configured with
+  ace/config-macosx.h and include/makeinclude/platform_macosx.GNU.
+  Also on 10.11 El Capitan, use rpath to avoid a problem with SIP.
+
+. Added support for Android NDK r12b (Platform API 24) and improved
+  cross compilation support
+
+USER VISIBLE CHANGES BETWEEN ACE-6.3.4 and ACE-6.4.0
+====================================================
+
+. Added support for obtaining the micro version number
+
+. Reduced include of ace/Auto_Ptr.h in header files
+
+USER VISIBLE CHANGES BETWEEN ACE-6.3.3 and ACE-6.3.4
+====================================================
+
+. ACE_SSL_Context::set_mode() can no longer be used to select a specific
+  SSL/TLS protocol version, use ACE_SSL_Context::filter_versions() for that.
+  This follows general advice by the OpenSSL project to go through
+  SSL_CTX_set_options() to limit the list of protocols available. The purpose
+  of ACE_SSL_Context::set_mode() is now limited to explicitly restricting
+  behaviour to client or server (defaults to both).
+
+. Improve Oracle Studio support
+
+. CIAO and DAnCE are forked to their own github repositories
+  and are not part anymore of the ACE+TAO release packages
+
+. Fixed several Coverity reported issues
+
+. Added ACE configuration for FACE safety profiles (see config-face-safety.h).
+  FACE, or Future Airborne Capability Environment http://www.opengroup.org/face,
+  specifies a restricted subset of OS functions and rules for controlling
+  dynamic memory allocation.  When built in this configuration on a platform
+  that supports it, ACE conforms to the FACE requirements.
+
+. ACE uses new netdb.h functions (getaddrinfo/getnameinfo) if they are
+  available, in place of deprecated functions (gethostbyname/addr).
+
+USER VISIBLE CHANGES BETWEEN ACE-6.3.2 and ACE-6.3.3
+====================================================
+
+. Visual Studio 2015 has adequate C++11 support, because of this
+  ACE_HAS_CPP11 is now defined with this compiler. A large amount
+  of warnings given by this new compiler have been fixed
+
+. As part of the release script we generate vc12 and vc14
+  solution files which are packaged as part of the release
+
+. Added support for VxWorks 7 (kernel mode and RTP).
+  See the comments in include/makeinclude/platform_vxworks7.0.GNU for details.
+
+. Ended daily maintenance for OpenVMS
+
+. Fixed a defect in ACE_INET_Addr when there is a non-empty interface
+  address list and set_port_number() is called.
+
 USER VISIBLE CHANGES BETWEEN ACE-6.3.1 and ACE-6.3.2
 ====================================================
 
@@ -131,7 +436,7 @@ USER VISIBLE CHANGES BETWEEN ACE-6.2.4 and ACE-6.2.5
 USER VISIBLE CHANGES BETWEEN ACE-6.2.3 and ACE-6.2.4
 ====================================================
 
-. Added support for FC20 and ended support for FC19
+. Added support for FC20 and ended maintenance for FC19
 
 . Extended C++11 feature test suite
 

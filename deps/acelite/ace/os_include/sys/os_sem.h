@@ -23,6 +23,7 @@
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
 #include "ace/os_include/sys/os_ipc.h"
+#include "ace/os_include/os_stdint.h"
 
 #if !defined (ACE_LACKS_SYS_SEM_H)
 #  include /**/ <sys/sem.h>

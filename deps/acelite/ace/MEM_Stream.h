@@ -54,7 +54,6 @@ class ACE_MEM_Connector;
 class ACE_Export ACE_MEM_Stream : public ACE_MEM_IO
 {
 public:
-
   friend class ACE_MEM_Acceptor;
   friend class ACE_MEM_Connector;
 

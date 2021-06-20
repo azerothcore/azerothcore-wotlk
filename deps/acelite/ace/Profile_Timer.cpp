@@ -17,6 +17,9 @@
 #if (defined (ACE_HAS_PRUSAGE_T) || defined (ACE_HAS_GETRUSAGE)) && !defined (ACE_WIN32)
 
 #include "ace/OS_NS_stdio.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -43,7 +46,7 @@ ACE_Profile_Timer::ACE_Profile_Timer (void)
 #  if defined (ACE_HAS_PRUSAGE_T)
   ACE_OS::memset (&this->last_usage_, 0, sizeof this->last_usage_);
   char buf[20];
-  ACE_OS::sprintf (buf, "/proc/%d", static_cast<int> (ACE_OS::getpid ()));
+  ACE_OS::sprintf (buf, 20, "/proc/%d", static_cast<int> (ACE_OS::getpid ()));
 
   this->proc_handle_ = ACE_OS::open (buf, O_RDONLY, 0);
   if (this->proc_handle_ == -1)

@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "shadow_labyrinth.h"
 #include "SpellInfo.h"
 
@@ -15,7 +15,7 @@ enum Murmur
     SPELL_MAGNETIC_PULL             = 33689,
     SPELL_SONIC_SHOCK               = 38797,
     SPELL_THUNDERING_STORM          = 39365,
- 
+
     SPELL_SONIC_BOOM_CAST_N         = 33923,
     SPELL_SONIC_BOOM_CAST_H         = 38796,
     SPELL_SONIC_BOOM_EFFECT_N       = 38795,
@@ -37,9 +37,9 @@ class boss_murmur : public CreatureScript
 public:
     boss_murmur() : CreatureScript("boss_murmur") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_murmurAI (creature);
+        return GetShadowLabyrinthAI<boss_murmurAI>(creature);
     }
 
     struct boss_murmurAI : public ScriptedAI
@@ -53,7 +53,7 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->SetHealth(me->CountPctFromMaxHealth(40));
@@ -63,7 +63,7 @@ public:
                 instance->SetData(DATA_MURMUREVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPELL_SONIC_BOOM, 30000);
             events.ScheduleEvent(EVENT_SPELL_MURMURS_TOUCH, urand(8000, 20000));
@@ -79,19 +79,19 @@ public:
                 instance->SetData(DATA_MURMUREVENT, IN_PROGRESS);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (instance)
                 instance->SetData(DATA_MURMUREVENT, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SONIC_BOOM:
                     Talk(EMOTE_SONIC_BOOM);
@@ -102,7 +102,6 @@ public:
                     return;
                 case EVENT_SPELL_SONIC_BOOM_EFFECT:
                     me->CastSpell(me, DUNGEON_MODE(SPELL_SONIC_BOOM_EFFECT_N, SPELL_SONIC_BOOM_EFFECT_H), true);
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_MURMURS_TOUCH:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 80.0f, true))
@@ -155,58 +154,58 @@ public:
 
 class spell_murmur_sonic_boom_effect : public SpellScriptLoader
 {
+public:
+    spell_murmur_sonic_boom_effect() : SpellScriptLoader("spell_murmur_sonic_boom_effect") { }
+
+    class spell_murmur_sonic_boom_effect_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_murmur_sonic_boom_effect_SpellScript)
+
     public:
-        spell_murmur_sonic_boom_effect() : SpellScriptLoader("spell_murmur_sonic_boom_effect") { }
+        spell_murmur_sonic_boom_effect_SpellScript() : SpellScript() { }
 
-        class spell_murmur_sonic_boom_effect_SpellScript : public SpellScript
+        void RecalculateDamage()
         {
-            PrepareSpellScript(spell_murmur_sonic_boom_effect_SpellScript)
-
-        public:
-            spell_murmur_sonic_boom_effect_SpellScript() : SpellScript() { }
-
-            void RecalculateDamage()
-            {
-                SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(90));
-            }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_murmur_sonic_boom_effect_SpellScript::RecalculateDamage);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_murmur_sonic_boom_effect_SpellScript();
+            SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(90));
         }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_murmur_sonic_boom_effect_SpellScript::RecalculateDamage);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_murmur_sonic_boom_effect_SpellScript();
+    }
 };
 
 class spell_murmur_thundering_storm : public SpellScriptLoader
 {
-    public:
-        spell_murmur_thundering_storm() : SpellScriptLoader("spell_murmur_thundering_storm") { }
+public:
+    spell_murmur_thundering_storm() : SpellScriptLoader("spell_murmur_thundering_storm") { }
 
-        class spell_murmur_thundering_storm_SpellScript : public SpellScript
+    class spell_murmur_thundering_storm_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_murmur_thundering_storm_SpellScript);
+
+        void SelectTarget(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_murmur_thundering_storm_SpellScript);
-
-            void SelectTarget(std::list<WorldObject*>& targets)
-            {
-                targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
-                targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_murmur_thundering_storm_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_murmur_thundering_storm_SpellScript();
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
         }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_murmur_thundering_storm_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_murmur_thundering_storm_SpellScript();
+    }
 };
 
 void AddSC_boss_murmur()

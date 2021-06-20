@@ -6,24 +6,24 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `log_arena_fights`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `log_arena_fights` 
 (
-  `fight_id` int(10) unsigned NOT NULL,
+  `fight_id` INT unsigned NOT NULL,
   `time` datetime NOT NULL,
-  `type` tinyint(3) unsigned NOT NULL,
-  `duration` int(10) unsigned NOT NULL,
-  `winner` int(10) unsigned NOT NULL,
-  `loser` int(10) unsigned NOT NULL,
-  `winner_tr` smallint(5) unsigned NOT NULL,
-  `winner_mmr` smallint(5) unsigned NOT NULL,
-  `winner_tr_change` smallint(6) NOT NULL,
-  `loser_tr` smallint(5) unsigned NOT NULL,
-  `loser_mmr` smallint(5) unsigned NOT NULL,
-  `loser_tr_change` smallint(6) NOT NULL,
-  `currOnline` int(10) unsigned NOT NULL,
+  `type` TINYINT unsigned NOT NULL,
+  `duration` INT unsigned NOT NULL,
+  `winner` INT unsigned NOT NULL,
+  `loser` INT unsigned NOT NULL,
+  `winner_tr` SMALLINT unsigned NOT NULL,
+  `winner_mmr` SMALLINT unsigned NOT NULL,
+  `winner_tr_change` SMALLINT NOT NULL,
+  `loser_tr` SMALLINT unsigned NOT NULL,
+  `loser_mmr` SMALLINT unsigned NOT NULL,
+  `loser_tr_change` SMALLINT NOT NULL,
+  `currOnline` INT unsigned NOT NULL,
   PRIMARY KEY (`fight_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `log_arena_fights` WRITE;

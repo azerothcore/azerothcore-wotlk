@@ -9,6 +9,8 @@
 #    EXAMPLE CONFIG
 #    AUTH SERVER SETTINGS
 #    MYSQL SETTINGS
+#    CRYPTOGRAPHY
+#    LOGGING SYSTEM SETTINGS
 #
 ###################################################################################################
 
@@ -34,6 +36,7 @@
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
+#        Example:     "/home/youruser/azerothcore/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -67,116 +70,6 @@ BindIP = "0.0.0.0"
 #        Default:     ""                  - (Disabled)
 
 PidFile = ""
-
-#
-#    LogLevel
-#        Description: Server console level of logging
-#        Default:     0 - (Minimum)
-#                     1 - (Basic)
-#                     2 - (Detail)
-#                     3 - (Full/Debug)
-
-LogLevel = 0
-
-#
-#    LogFile
-#        Description: Log file for main server log.
-#        Default:     "Auth.log" - (Enabled)
-#                     ""           - (Disabled)
-
-LogFile = "Auth.log"
-
-#
-#    Debug Log Mask
-#        Description: Bitmask that determines which debug log output (level 3)
-#                     will be logged.
-#        Possible flags:
-#
-#                  64 - Anything related to network input/output,
-#                        such as packet handlers and netcode logs
-#
-#                       Simply add the values together to create a bitmask.
-#                       For more info see enum DebugLogFilters in Log.h
-#
-#             Default: 0 (nothing)
-
-DebugLogMask = 64
-
-#
-#    SQLDriverLogFile
-#        Description: Log file for SQL driver events.
-#        Example:     "SQLDriver.log" - (Enabled)
-#        Default:      ""             - (Disabled)
-
-SQLDriverLogFile = ""
-
-#
-#    SQLDriverQueryLogging
-#        Description: Log SQL queries to the SQLDriverLogFile and console.
-#        Default:     0 - (Disabled, Query errors only)
-#                     1 - (Enabled, Full query logging - may have performance impact)
-
-SQLDriverQueryLogging = 0
-
-#
-#    LogTimestamp
-#        Description: Append timestamp to the server log file name.
-#                     Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-LogTimestamp = 0
-
-#
-#    LogFileLevel
-#        Description: Server file level of logging
-#        Default:     0 - (Minimum)
-#                     1 - (Basic)
-#                     2 - (Detail)
-#                     3 - (Full/Debug)
-
-LogFileLevel = 0
-
-#
-#    LogColors
-#        Description: Colors for log messages (Format: "normal basic detail debug").
-#        Colors:      0  - Black
-#                     1  - Red
-#                     2  - Green
-#                     3  - Brown
-#                     4  - Blue
-#                     5  - Magenta
-#                     6  - Cyan
-#                     7  - Grey
-#                     8  - Yellow
-#                     9  - Lred
-#                     10 - Lgreen
-#                     11 - Lblue
-#                     12 - Lmagenta
-#                     13 - Lcyan
-#                     14 - White
-#        Example:     "13 11 9 5" - (Enabled)
-#        Default:     ""          - (Disabled)
-
-LogColors = ""
-
-#
-#    EnableLogDB
-#        Description: Write log messages to database (LogDatabaseInfo).
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-EnableLogDB = 0
-
-#
-#    DBLogLevel
-#        Description: Log level of databases logging.
-#        Default:     1 - (Basic)
-#                     0 - (Minimum)
-#                     2 - (Detail)
-#                     3 - (Full/Debug)
-
-DBLogLevel = 1
 
 #
 #    UseProcessors
@@ -241,6 +134,14 @@ WrongPass.BanType = 0
 
 WrongPass.Logging = 0
 
+#
+#    IPLocationFile
+#        Description: The path to your IP2Location database CSV file.
+#        Example:     "C:/acore/IP2LOCATION-LITE-DB1.CSV"
+#                     "/home/acore/IP2LOCATION-LITE-DB1.CSV"
+#        Default:     ""  - (Disabled)
+
+IPLocationFile = ""
 
 #
 ###################################################################################################
@@ -256,9 +157,21 @@ WrongPass.Logging = 0
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;acore;acore;auth"
+#        Default:     "127.0.0.1;3306;acore;acore;acore_auth"
 
 LoginDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_auth"
+
+#
+#    Database.Reconnect.Seconds
+#    Database.Reconnect.Attempts
+#
+#        Description: How many seconds between every reconnection attempt
+#                     and how many attempts will be performed in total
+#        Default:     20 attempts every 15 seconds
+#
+
+Database.Reconnect.Seconds = 15
+Database.Reconnect.Attempts = 20
 
 #
 #    LoginDatabase.WorkerThreads
@@ -275,6 +188,125 @@ LoginDatabase.WorkerThreads = 1
 #
 
 LoginDatabase.SynchThreads = 1
+
+#
+###################################################################################################
+
+###################################################################################################
+# CRYPTOGRAPHY
+
+#
+#    EnableTOTP
+#        Description: Check if a TOTP token is needed on account login
+#
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+EnableTOTP = 0
+
+#    TOTPMasterSecret
+#        Description: The master key used to encrypt TOTP secrets for database storage.
+#                     If you want to change this, uncomment TOTPOldMasterSecret, then copy
+#                     your old secret there and startup authserver once. Afterwards, you can re-
+#                     comment that line and get rid of your old secret.
+#
+#        Default:     <blank> - (Store TOTP secrets unencrypted)
+#        Example:     000102030405060708090A0B0C0D0E0F
+
+TOTPMasterSecret =
+# TOTPOldMasterSecret =
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+#  LOGGING SYSTEM SETTINGS
+#
+#  Appender config values: Given an appender "name"
+#    Appender.name
+#        Description: Defines 'where to log'
+#        Format:      Type,LogLevel,Flags,optional1,optional2,optional3
+#
+#                     Type
+#                         0 - (None)
+#                         1 - (Console)
+#                         2 - (File)
+#                         3 - (DB)
+#
+#                     LogLevel
+#                         0 - (Disabled)
+#                         1 - (Fatal)
+#                         2 - (Error)
+#                         3 - (Warning)
+#                         4 - (Info)
+#                         5 - (Debug)
+#                         6 - (Trace)
+#
+#                     Flags:
+#                         0 - None
+#                         1 - Prefix Timestamp to the text
+#                         2 - Prefix Log Level to the text
+#                         4 - Prefix Log Filter type to the text
+#                         8 - Append timestamp to the log file name. Format: YYYY-MM-DD_HH-MM-SS (Only used with Type = 2)
+#                        16 - Make a backup of existing file before overwrite (Only used with Mode = w)
+#
+#                     Colors (read as optional1 if Type = Console)
+#                         Format: "fatal error warn info debug trace"
+#                         0 - BLACK
+#                         1 - RED
+#                         2 - GREEN
+#                         3 - BROWN
+#                         4 - BLUE
+#                         5 - MAGENTA
+#                         6 - CYAN
+#                         7 - GREY
+#                         8 - YELLOW
+#                         9 - LRED
+#                        10 - LGREEN
+#                        11 - LBLUE
+#                        12 - LMAGENTA
+#                        13 - LCYAN
+#                        14 - WHITE
+#                         Example: "1 9 3 6 5 8"
+#
+#                     File: Name of the file (read as optional1 if Type = File)
+#                         Allows to use one "%s" to create dynamic files
+#
+#                     Mode: Mode to open the file (read as optional2 if Type = File)
+#                          a - (Append)
+#                          w - (Overwrite)
+#
+#                     MaxFileSize: Maximum file size of the log file before creating a new log file
+#                     (read as optional3 if Type = File)
+#                         Size is measured in bytes expressed in a 64-bit unsigned integer.
+#                         Maximum value is 4294967295 (4 GB). Leave blank for no limit.
+#                         NOTE: Does not work with dynamic filenames.
+#                         Example:  536870912 (512 MB)
+#
+
+Appender.Console=1,5,0,"1 9 3 6 5 8"
+Appender.Auth=2,5,0,Auth.log,w
+
+#  Logger config values: Given a logger "name"
+#    Logger.name
+#        Description: Defines 'What to log'
+#        Format:      LogLevel,AppenderList
+#
+#                     LogLevel
+#                         0 - (Disabled)
+#                         1 - (Fatal)
+#                         2 - (Error)
+#                         3 - (Warning)
+#                         4 - (Info)
+#                         5 - (Debug)
+#                         6 - (Trace)
+#
+#                     AppenderList: List of appenders linked to logger
+#                     (Using spaces as separator).
+#
+
+Logger.root=4,Console Auth
 
 #
 ###################################################################################################

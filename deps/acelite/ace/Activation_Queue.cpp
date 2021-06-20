@@ -11,6 +11,8 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
+ACE_ALLOC_HOOK_DEFINE (ACE_Activation_Queue)
+
 void
 ACE_Activation_Queue::dump (void) const
 {

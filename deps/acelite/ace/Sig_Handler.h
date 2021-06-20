@@ -4,7 +4,7 @@
 /**
  *  @file    Sig_Handler.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -195,7 +195,7 @@ public:
 
   // = Set/get the handler associated with a particular signal.
 
-  /// Return the head of the list of <ACE_Sig_Handler>s associated with
+  /// Return the head of the list of ACE_Sig_Handlers associated with
   /// SIGNUM.
   virtual ACE_Event_Handler *handler (int signum);
 
@@ -209,7 +209,7 @@ public:
 
   /**
    * Callback routine registered with sigaction(2) that dispatches the
-   * <handle_signal> method of all the pre-registered
+   * handle_signal() method of all the pre-registered
    * ACE_Event_Handlers for @a signum
    */
   static void dispatch (int signum, siginfo_t *, ucontext_t *);

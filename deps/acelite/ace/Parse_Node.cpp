@@ -47,14 +47,20 @@ ACE_Stream_Node::apply (ACE_Service_Gestalt *config, int &yyerrno)
   // reverse order from the way they should be pushed onto the stream.
   // So traverse mods_ and and reverse the list, then iterate over it to push
   // the modules in the stream in the correct order.
-  std::list<const ACE_Static_Node *> mod_list;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  typedef std::list<const ACE_Static_Node *,
+                    ACE_Allocator_Std_Adapter<const ACE_Static_Node *> > list_t;
+#else
+  typedef std::list<const ACE_Static_Node *> list_t;
+#endif /* ACE_HAS_ALLOC_HOOKS */
+  list_t mod_list;
   const ACE_Static_Node *module;
   for (module = dynamic_cast<const ACE_Static_Node*> (this->mods_);
        module != 0;
        module = dynamic_cast<ACE_Static_Node*> (module->link()))
     mod_list.push_front (module);
 
-  std::list<const ACE_Static_Node *>::const_iterator iter;
+  list_t::const_iterator iter;
   for (iter = mod_list.begin (); iter != mod_list.end (); ++iter)
     {
       module = *iter;
@@ -192,7 +198,11 @@ ACE_Parse_Node::print (void) const
 ACE_Parse_Node::~ACE_Parse_Node (void)
 {
   ACE_TRACE ("ACE_Parse_Node::~ACE_Parse_Node");
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(const_cast<ACE_TCHAR*> (this->name_));
+#else
   delete[] const_cast<ACE_TCHAR*> (this->name_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
   delete this->next_;
 }
 
@@ -409,7 +419,11 @@ ACE_Static_Node::apply (ACE_Service_Gestalt *config, int &yyerrno)
 ACE_Static_Node::~ACE_Static_Node (void)
 {
   ACE_TRACE ("ACE_Static_Node::~ACE_Static_Node");
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(this->parameters_);
+#else
   delete[] this->parameters_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 
@@ -563,7 +577,11 @@ ACE_Object_Node::symbol (ACE_Service_Gestalt *,
 ACE_Object_Node::~ACE_Object_Node (void)
 {
   ACE_TRACE ("ACE_Object_Node::~ACE_Object_Node");
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(const_cast<ACE_TCHAR *> (this->object_name_));
+#else
   delete[] const_cast<ACE_TCHAR *> (this->object_name_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 ACE_ALLOC_HOOK_DEFINE (ACE_Function_Node)
@@ -713,8 +731,13 @@ ACE_Function_Node::symbol (ACE_Service_Gestalt *,
 ACE_Function_Node::~ACE_Function_Node (void)
 {
   ACE_TRACE ("ACE_Function_Node::~ACE_Function_Node");
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(const_cast<ACE_TCHAR *> (function_name_));
+  ACE_Allocator::instance()->free(const_cast<ACE_TCHAR *> (pathname_));
+#else
   delete[] const_cast<ACE_TCHAR *> (function_name_);
   delete[] const_cast<ACE_TCHAR *> (pathname_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 ACE_ALLOC_HOOK_DEFINE (ACE_Dummy_Node)
@@ -844,7 +867,11 @@ ACE_Static_Function_Node::symbol (ACE_Service_Gestalt *config,
 ACE_Static_Function_Node::~ACE_Static_Function_Node (void)
 {
   ACE_TRACE ("ACE_Static_Function_Node::~ACE_Static_Function_Node");
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(const_cast<ACE_TCHAR *> (function_name_));
+#else
   delete[] const_cast<ACE_TCHAR *> (this->function_name_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 ACE_ALLOC_HOOK_DEFINE (ACE_Service_Type_Factory)

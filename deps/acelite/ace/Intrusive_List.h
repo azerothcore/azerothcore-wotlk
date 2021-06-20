@@ -55,7 +55,6 @@ template <class T>
 class ACE_Intrusive_List
 {
 public:
-  // = Initialization and termination methods.
   /// Constructor.  Use user specified allocation strategy
   /// if specified.
   ACE_Intrusive_List (void);

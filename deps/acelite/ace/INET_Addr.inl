@@ -228,6 +228,16 @@ ACE_INET_Addr::is_linklocal (void) const
   return false;
 }
 
+// Return @c true if the IP address is IPv6 sitelocal address.
+ACE_INLINE bool
+ACE_INET_Addr::is_sitelocal (void) const
+{
+  if (this->get_type () == AF_INET6)
+      return IN6_IS_ADDR_SITELOCAL (&this->inet_addr_.in6_.sin6_addr);
+
+  return false;
+}
+
 // Return @c true if the IP address is IPv4 mapped IPv6 address.
 ACE_INLINE bool
 ACE_INET_Addr::is_ipv4_mapped_ipv6 (void) const

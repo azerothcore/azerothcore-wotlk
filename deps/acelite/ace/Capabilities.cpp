@@ -283,7 +283,6 @@ ACE_Capabilities::getval (const ACE_TCHAR *keyname, int &val)
   return 0;
 }
 
-#if !defined (ACE_IS_SPLITTING)
 static int
 is_empty (const ACE_TCHAR *line)
 {
@@ -301,7 +300,6 @@ is_line (const ACE_TCHAR *line)
 
   return *line != ACE_TEXT ('\0');
 }
-#endif /* !ACE_IS_SPLITTING */
 
 int
 ACE_Capabilities::getent (const ACE_TCHAR *fname, const ACE_TCHAR *name)
@@ -346,5 +344,9 @@ ACE_Capabilities::getent (const ACE_TCHAR *fname, const ACE_TCHAR *name)
   ACE_OS::fclose (fp);
   return -1;
 }
+
+ACE_ALLOC_HOOK_DEFINE(ACE_StringCapEntry)
+ACE_ALLOC_HOOK_DEFINE(ACE_IntCapEntry)
+ACE_ALLOC_HOOK_DEFINE(ACE_BoolCapEntry)
 
 ACE_END_VERSIONED_NAMESPACE_DECL

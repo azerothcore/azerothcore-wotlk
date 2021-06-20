@@ -181,7 +181,7 @@ public:
   ACE_POSIX_Proactor * posix_proactor (void) const;
 
 protected:
-  /// Contructor.
+  /// Constructor.
   ACE_POSIX_Asynch_Operation (ACE_POSIX_Proactor *posix_proactor);
 
   /// Destructor.

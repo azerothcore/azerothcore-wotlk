@@ -1,7 +1,6 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 /// \addtogroup u2w
@@ -11,12 +10,12 @@
 #ifndef _OPCODES_H
 #define _OPCODES_H
 
-#include "Common.h"
+#include "Define.h"
+#include <string>
 
 /// List of Opcodes
-enum Opcodes
+enum Opcodes : uint16
 {
-    MSG_NULL_ACTION                                 = 0x000,
     CMSG_BOOTME                                     = 0x001,
     CMSG_DBLOOKUP                                   = 0x002,
     SMSG_DBLOOKUP                                   = 0x003,
@@ -846,9 +845,9 @@ enum Opcodes
     SMSG_INSTANCE_DIFFICULTY                        = 0x33B,
     MSG_GM_RESETINSTANCELIMIT                       = 0x33C,
     SMSG_MOTD                                       = 0x33D,
-    SMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY= 0x33E,
-    SMSG_MOVE_UNSET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY= 0x33F,
-    CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK= 0x340,
+    SMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY = 0x33E,
+    SMSG_MOVE_UNSET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY = 0x33F,
+    CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK = 0x340,
     MSG_MOVE_START_SWIM_CHEAT                       = 0x341,
     MSG_MOVE_STOP_SWIM_CHEAT                        = 0x342,
     SMSG_MOVE_SET_CAN_FLY                           = 0x343,
@@ -858,7 +857,7 @@ enum Opcodes
     CMSG_SOCKET_GEMS                                = 0x347,
     CMSG_ARENA_TEAM_CREATE                          = 0x348,
     SMSG_ARENA_TEAM_COMMAND_RESULT                  = 0x349,
-    MSG_MOVE_UPDATE_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY= 0x34A,
+    MSG_MOVE_UPDATE_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY = 0x34A,
     CMSG_ARENA_TEAM_QUERY                           = 0x34B,
     SMSG_ARENA_TEAM_QUERY_RESPONSE                  = 0x34C,
     CMSG_ARENA_TEAM_ROSTER                          = 0x34D,
@@ -1274,7 +1273,7 @@ enum Opcodes
     CMSG_BATTLEFIELD_MGR_EXIT_REQUEST               = 0x4E7,
     SMSG_BATTLEFIELD_MGR_STATE_CHANGE               = 0x4E8, // uint32, uint32
     CMSG_BATTLEFIELD_MANAGER_ADVANCE_STATE          = 0x4E9,
-    CMSG_BATTLEFIELD_MANAGER_SET_NEXT_TRANSITION_TIME= 0x4EA,
+    CMSG_BATTLEFIELD_MANAGER_SET_NEXT_TRANSITION_TIME = 0x4EA,
     MSG_SET_RAID_DIFFICULTY                         = 0x4EB,
     CMSG_TOGGLE_XP_GAIN                             = 0x4EC,
     SMSG_TOGGLE_XP_GAIN                             = 0x4ED, // enable/disable XP gain console message
@@ -1330,12 +1329,21 @@ enum Opcodes
     NUM_MSG_TYPES                                   = 0x51F
 };
 
+enum OpcodeMisc : uint16
+{
+    NUM_OPCODE_HANDLERS = NUM_MSG_TYPES,
+    NULL_OPCODE = 0x0000
+};
+
+typedef Opcodes OpcodeClient;
+typedef Opcodes OpcodeServer;
+
 /// Player state
 enum SessionStatus
 {
-    STATUS_AUTHED = 0,                                      // Player authenticated (_player == NULL, m_GUID has garbage)
-    STATUS_LOGGEDIN,                                        // Player in game (_player != NULL, m_GUID == _player->GetGUID(), inWorld())
-    STATUS_TRANSFER,                                        // Player transferring to another map (_player != NULL, m_GUID == _player->GetGUID(), !inWorld())
+    STATUS_AUTHED = 0,                                      // Player authenticated (_player == nullptr, m_GUID has garbage)
+    STATUS_LOGGEDIN,                                        // Player in game (_player != nullptr, m_GUID == _player->GetGUID(), inWorld())
+    STATUS_TRANSFER,                                        // Player transferring to another map (_player != nullptr, m_GUID == _player->GetGUID(), !inWorld())
     STATUS_NEVER,                                           // Opcode not accepted from client (deprecated or server side only)
     STATUS_UNHANDLED,                                       // Opcode not handled yet
 };
@@ -1350,34 +1358,63 @@ enum PacketProcessing
 class WorldSession;
 class WorldPacket;
 
-#if defined(__GNUC__)
-#pragma pack(1)
-#else
-#pragma pack(push, 1)
-#endif
-
-struct OpcodeHandler
+class OpcodeHandler
 {
-    char const* name;
-    SessionStatus status;
-    PacketProcessing packetProcessing;
-    void (WorldSession::*handler)(WorldPacket& recvPacket);
+public:
+    OpcodeHandler(char const* name, SessionStatus status) : Name(name), Status(status) { }
+    virtual ~OpcodeHandler() { }
+
+    char const* Name;
+    SessionStatus Status;
 };
 
-extern OpcodeHandler opcodeTable[NUM_MSG_TYPES];
+class ClientOpcodeHandler : public OpcodeHandler
+{
+public:
+    ClientOpcodeHandler(char const* name, SessionStatus status, PacketProcessing processing)
+        : OpcodeHandler(name, status), ProcessingPlace(processing) { }
 
-#if defined(__GNUC__)
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
+    virtual void Call(WorldSession* session, WorldPacket& packet) const = 0;
+
+    PacketProcessing ProcessingPlace;
+};
+
+class ServerOpcodeHandler : public OpcodeHandler
+{
+public:
+    ServerOpcodeHandler(char const* name, SessionStatus status)
+        : OpcodeHandler(name, status) { }
+};
+
+class OpcodeTable
+{
+public:
+    OpcodeTable();
+
+    OpcodeTable(OpcodeTable const&) = delete;
+    OpcodeTable& operator=(OpcodeTable const&) = delete;
+
+    ~OpcodeTable();
+
+    void Initialize();
+
+    ClientOpcodeHandler const* operator[](Opcodes index) const
+    {
+        return _internalTableClient[index];
+    }
+
+private:
+    template<typename Handler, Handler HandlerFunction>
+    void ValidateAndSetClientOpcode(OpcodeClient opcode, char const* name, SessionStatus status, PacketProcessing processing);
+
+    void ValidateAndSetServerOpcode(OpcodeServer opcode, char const* name, SessionStatus status);
+
+    ClientOpcodeHandler* _internalTableClient[NUM_OPCODE_HANDLERS];
+};
+
+extern OpcodeTable opcodeTable;
 
 /// Lookup opcode name for human understandable logging
-inline const char* LookupOpcodeName(uint16 id)
-{
-    if (id >= NUM_MSG_TYPES)
-        return "Received unknown opcode, it's more than max!";
-    return opcodeTable[id].name;
-}
+std::string GetOpcodeNameForLogging(Opcodes opcode);
+
 #endif
-/// @}

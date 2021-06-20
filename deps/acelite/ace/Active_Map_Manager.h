@@ -4,8 +4,6 @@
 /**
  *  @file    Active_Map_Manager.h
  *
- *  $Id: Active_Map_Manager.h 93359 2011-02-11 11:33:12Z mcorino $
- *
  *  @author Irfan Pyarali
  */
 //=============================================================================
@@ -82,7 +80,6 @@ public:
   void increment_slot_generation_count (void);
 
 private:
-
   /**
    * @brief Data for the Active Object Map Key.
    *

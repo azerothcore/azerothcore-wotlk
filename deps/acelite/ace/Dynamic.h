@@ -32,7 +32,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Dynamic
 {
 public:
-  // = Initialization and termination method.
   /// Constructor.
   ACE_Dynamic (void);
 
@@ -53,6 +52,8 @@ public:
   void reset (void);
 
   static ACE_Dynamic *instance (void);
+
+  ACE_ALLOC_HOOK_DECLARE;
 
 private:
   /**

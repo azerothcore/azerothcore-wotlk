@@ -5,6 +5,10 @@
 #ifndef DEF_ONYXIAS_LAIR_H
 #define DEF_ONYXIAS_LAIR_H
 
+#include "CreatureAIImpl.h"
+
+#define OnyxiasLairScriptName "instance_onyxias_lair"
+
 enum eInstanceData
 {
     DATA_ONYXIA                 = 0,
@@ -34,5 +38,11 @@ enum eAchievementData
     ACHIEV_CRITERIA_DEEP_BREATH_25_PLAYER                   = 12569, // Criteria for achievement 4407: She Deep Breaths More (25 player) Everybody evade Deep Breath
     ACHIEV_TIMED_START_EVENT                                =  6601, // Timed event for achievement 4402, 4005: More Dots! (10,25 player) 5 min kill
 };
+
+template <class AI, class T>
+inline AI* GetOnyxiasLairAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, OnyxiasLairScriptName);
+}
 
 #endif

@@ -1,4 +1,4 @@
-# Copyright (C) 
+# Copyright (C)
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -90,6 +90,7 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_wetlands.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_arathi_highlands.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Gnomeregan/instance_gnomeregan.cpp
+  ${AC_SCRIPTS_DIR}/EasternKingdoms/Gnomeregan/gnomeregan.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_redridge_mountains.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_ironforge.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ScarletEnclave/chapter2.cpp
@@ -110,7 +111,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/MagistersTerrace/boss_vexallus.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Uldaman/uldaman.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Uldaman/instance_uldaman.cpp
-  ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_swamp_of_sorrows.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/SunwellPlateau/boss_eredar_twins.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/SunwellPlateau/boss_kiljaeden.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/SunwellPlateau/sunwell_plateau.h
@@ -125,8 +125,8 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Deadmines/deadmines.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_duskwood.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ScarletMonastery/instance_scarlet_monastery.cpp
+  ${AC_SCRIPTS_DIR}/EasternKingdoms/ScarletMonastery/scarletmonastery.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_undercity.cpp
-  ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_loch_modan.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ShadowfangKeep/instance_shadowfang_keep.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ShadowfangKeep/shadowfang_keep.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_burning_steppes.cpp

@@ -3,14 +3,13 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  */
 
-#include "ScriptMgr.h"
 #include "Channel.h"
-#include "Guild.h"
 #include "Group.h"
+#include "Guild.h"
+#include "ScriptMgr.h"
 
 enum IPLoggingTypes
 {
-
     // AccountActionIpLogger();
     ACCOUNT_LOGIN = 0,
     ACCOUNT_FAIL_LOGIN = 1,
@@ -62,7 +61,7 @@ public:
     }
 
     // Registration Email can NOT be changed apart from GM level users. Thus, we do not require to log them...
-    // ACCOUNT_CHANGE_EMAIL = 4 
+    // ACCOUNT_CHANGE_EMAIL = 4
     void OnEmailChange(uint32 accountId) override
     {
         AccountIPLogAction(accountId, ACCOUNT_CHANGE_EMAIL); // ... they get logged by gm command logger anyway
@@ -76,7 +75,7 @@ public:
 
     /* It's impossible to log the account logout process out of character selection - shouldn't matter anyway,
      * as ip doesn't change through playing (obviously).*/
-     // ACCOUNT_LOGOUT = 6
+    // ACCOUNT_LOGOUT = 6
     void AccountIPLogAction(uint32 accountId, IPLoggingTypes aType)
     {
         if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
@@ -94,32 +93,32 @@ public:
         // Avoids Magicnumbers in SQL table
         switch (aType)
         {
-        case ACCOUNT_LOGIN:
-            systemNote = "Logged on Successful AccountLogin";
-            break;
-        case ACCOUNT_FAIL_LOGIN:
-            systemNote = "Logged on Failed AccountLogin";
-            break;
-        case ACCOUNT_CHANGE_PW:
-            systemNote = "Logged on Successful Account Password Change";
-            break;
-        case ACCOUNT_CHANGE_PW_FAIL:
-            systemNote = "Logged on Failed Account Password Change";
-            break;
-        case ACCOUNT_CHANGE_EMAIL:
-            systemNote = "Logged on Successful Account Email Change";
-            break;
-        case ACCOUNT_CHANGE_EMAIL_FAIL:
-            systemNote = "Logged on Failed Account Email Change";
-            break;
+            case ACCOUNT_LOGIN:
+                systemNote = "Logged on Successful AccountLogin";
+                break;
+            case ACCOUNT_FAIL_LOGIN:
+                systemNote = "Logged on Failed AccountLogin";
+                break;
+            case ACCOUNT_CHANGE_PW:
+                systemNote = "Logged on Successful Account Password Change";
+                break;
+            case ACCOUNT_CHANGE_PW_FAIL:
+                systemNote = "Logged on Failed Account Password Change";
+                break;
+            case ACCOUNT_CHANGE_EMAIL:
+                systemNote = "Logged on Successful Account Email Change";
+                break;
+            case ACCOUNT_CHANGE_EMAIL_FAIL:
+                systemNote = "Logged on Failed Account Email Change";
+                break;
             /*case ACCOUNT_LOGOUT:
                 systemNote = "Logged on AccountLogout"; //Can not be logged
                 break;*/
-                // Neither should happen. Ever. Period. If it does, call Ghostbusters and all your local software defences to investigate.
-        case UNKNOWN_ACTION:
-        default:
-            systemNote = "ERROR! Unknown action!";
-            break;
+            // Neither should happen. Ever. Period. If it does, call Ghostbusters and all your local software defences to investigate.
+            case UNKNOWN_ACTION:
+            default:
+                systemNote = "ERROR! Unknown action!";
+                break;
         }
 
         // Once we have done everything, we can insert the new log.
@@ -195,33 +194,33 @@ public:
 
         // We declare all the required variables
         uint32 playerGuid = player->GetSession()->GetAccountId();
-        uint32 characterGuid = player->GetGUIDLow();
+        ObjectGuid::LowType characterGuid = player->GetGUID().GetCounter();
         const std::string currentIp = player->GetSession()->GetRemoteAddress();
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it...
 
         // ... with this switch, so that we have a more accurate phrasing of what type it is
         switch (aType)
         {
-        case CHARACTER_CREATE:
-            systemNote = "Logged on CharacterCreate";
-            break;
-        case CHARACTER_LOGIN:
-            systemNote = "Logged on CharacterLogin";
-            break;
-        case CHARACTER_LOGOUT:
-            systemNote = "Logged on CharacterLogout";
-            break;
-        case CHARACTER_DELETE:
-            systemNote = "Logged on CharacterDelete";
-            break;
-        case CHARACTER_FAILED_DELETE:
-            systemNote = "Logged on Failed CharacterDelete";
-            break;
+            case CHARACTER_CREATE:
+                systemNote = "Logged on CharacterCreate";
+                break;
+            case CHARACTER_LOGIN:
+                systemNote = "Logged on CharacterLogin";
+                break;
+            case CHARACTER_LOGOUT:
+                systemNote = "Logged on CharacterLogout";
+                break;
+            case CHARACTER_DELETE:
+                systemNote = "Logged on CharacterDelete";
+                break;
+            case CHARACTER_FAILED_DELETE:
+                systemNote = "Logged on Failed CharacterDelete";
+                break;
             // Neither should happen. Ever. Period. If it does, call Mythbusters.
-        case UNKNOWN_ACTION:
-        default:
-            systemNote = "ERROR! Unknown action!";
-            break;
+            case UNKNOWN_ACTION:
+            default:
+                systemNote = "ERROR! Unknown action!";
+                break;
         }
 
         // Once we have done everything, we can insert the new log.
@@ -246,18 +245,18 @@ public:
     CharacterDeleteActionIpLogger() : PlayerScript("CharacterDeleteActionIpLogger") { }
 
     // CHARACTER_DELETE = 10
-    void OnDelete(uint64 guid, uint32 accountId) override
+    void OnDelete(ObjectGuid guid, uint32 accountId) override
     {
         DeleteIPLogAction(guid, accountId, CHARACTER_DELETE);
     }
 
     // CHARACTER_FAILED_DELETE = 11
-    void OnFailedDelete(uint64 guid, uint32 accountId) override
+    void OnFailedDelete(ObjectGuid guid, uint32 accountId) override
     {
         DeleteIPLogAction(guid, accountId, CHARACTER_FAILED_DELETE);
     }
 
-    void DeleteIPLogAction(uint64 guid, uint32 playerGuid, IPLoggingTypes aType)
+    void DeleteIPLogAction(ObjectGuid guid, ObjectGuid::LowType playerGuid, IPLoggingTypes aType)
     {
         if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
             return;
@@ -266,7 +265,7 @@ public:
         // Else, this script isn't loaded in the first place: We require no config check.
 
         // We declare all the required variables
-        uint32 characterGuid = GUID_LOPART(guid); // We have no access to any member function of Player* or WorldSession*. So use old-fashioned way.
+        ObjectGuid::LowType characterGuid = guid.GetCounter(); // We have no access to any member function of Player* or WorldSession*. So use old-fashioned way.
         // Query playerGuid/accountId, as we only have characterGuid
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it later.
 
@@ -274,17 +273,17 @@ public:
         // Avoids Magicnumbers in SQL table
         switch (aType)
         {
-        case CHARACTER_DELETE:
-            systemNote = "Logged on CharacterDelete";
-            break;
-        case CHARACTER_FAILED_DELETE:
-            systemNote = "Logged on Failed CharacterDelete";
-            break;
+            case CHARACTER_DELETE:
+                systemNote = "Logged on CharacterDelete";
+                break;
+            case CHARACTER_FAILED_DELETE:
+                systemNote = "Logged on Failed CharacterDelete";
+                break;
             // Neither should happen. Ever. Period. If it does, call to whatever god you have for mercy and guidance.
-        case UNKNOWN_ACTION:
-        default:
-            systemNote = "ERROR! Unknown action!";
-            break;
+            case UNKNOWN_ACTION:
+            default:
+                systemNote = "ERROR! Unknown action!";
+                break;
         }
 
         // Once we have done everything, we can insert the new log.
@@ -302,7 +301,6 @@ public:
         return;
     }
 };
-
 
 void AddSC_action_ip_logger()
 {

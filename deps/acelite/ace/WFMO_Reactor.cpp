@@ -1384,7 +1384,11 @@ ACE_WFMO_Reactor::register_handler_i (ACE_HANDLE event_handle,
 
   long new_network_events = 0;
   bool delete_event = false;
+#if defined (ACE_HAS_CPP11)
   std::unique_ptr <ACE_Auto_Event> event;
+#else
+  auto_ptr <ACE_Auto_Event> event;
+#endif /* ACE_HAS_CPP11 */
 
   // Look up the repository to see if the <event_handler> is already
   // there.
@@ -1401,10 +1405,15 @@ ACE_WFMO_Reactor::register_handler_i (ACE_HANDLE event_handle,
   // need to create one
   if (event_handle == ACE_INVALID_HANDLE)
     {
-      // Note: don't change this since some C++ compilers have
-      // <auto_ptr>s that don't work properly...
+#if defined (ACE_HAS_CPP11)
       std::unique_ptr<ACE_Auto_Event> tmp (new ACE_Auto_Event);
       event = std::move(tmp);
+#else
+      // Note: don't change this since some C++ compilers have
+      // <auto_ptr>s that don't work properly...
+      auto_ptr<ACE_Auto_Event> tmp (new ACE_Auto_Event);
+      event = tmp;
+#endif /* ACE_HAS_CPP11 */
       event_handle = event->handle ();
       delete_event = true;
     }

@@ -4,7 +4,7 @@
 /**
  *  @file    Timer_List_T.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -94,7 +94,6 @@ public:
   typedef ACE_Timer_Queue_T<TYPE, FUNCTOR, ACE_LOCK, TIME_POLICY> Base_Timer_Queue;
   typedef ACE_Free_List<Node> FreeList;
 
-  // = Initialization and termination methods.
   /**
    * Default constructor. @a upcall_functor is the instance of the
    * FUNCTOR to be used by the list. If @a upcall_functor is 0, a

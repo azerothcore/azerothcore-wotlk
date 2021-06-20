@@ -2,6 +2,7 @@
 
 #if defined (ACE_HAS_MONITOR_FRAMEWORK) && (ACE_HAS_MONITOR_FRAMEWORK == 1)
 
+#include "ace/ACE.h"
 #include "ace/Monitor_Admin_Manager.h"
 #include "ace/Monitor_Control_Action.h"
 #include "ace/Monitor_Point_Registry.h"
@@ -35,7 +36,11 @@ namespace ACE
         {
           for (size_t i = 0UL; i < this->data_.index_; ++i)
             {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+              ACE_Allocator::instance()->free(this->data_.list_[i]);
+#else
               delete [] this->data_.list_[i];
+#endif /* ACE_HAS_ALLOC_HOOKS */
             }
         }
     }
@@ -397,4 +402,3 @@ namespace ACE
 ACE_END_VERSIONED_NAMESPACE_DECL
 
 #endif /* ACE_HAS_MONITOR_FRAMEWORK==1 */
-

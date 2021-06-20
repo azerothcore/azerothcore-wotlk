@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,128 +7,36 @@
 #ifndef AZEROTHCORE_COMMON_H
 #define AZEROTHCORE_COMMON_H
 
-// config.h needs to be included 1st
-/// @todo this thingy looks like hack, but its not, need to
-// make separate header however, because It makes mess here.
-#ifdef HAVE_CONFIG_H
-// Remove Some things that we will define
-// This is in case including another config.h
-// before trinity config.h
-#ifdef PACKAGE
-#undef PACKAGE
-#endif //PACKAGE
-#ifdef PACKAGE_BUGREPORT
-#undef PACKAGE_BUGREPORT
-#endif //PACKAGE_BUGREPORT
-#ifdef PACKAGE_NAME
-#undef PACKAGE_NAME
-#endif //PACKAGE_NAME
-#ifdef PACKAGE_STRING
-#undef PACKAGE_STRING
-#endif //PACKAGE_STRING
-#ifdef PACKAGE_TARNAME
-#undef PACKAGE_TARNAME
-#endif //PACKAGE_TARNAME
-#ifdef PACKAGE_VERSION
-#undef PACKAGE_VERSION
-#endif //PACKAGE_VERSION
-#ifdef VERSION
-#undef VERSION
-#endif //VERSION
-
-# include "Config.h"
-
-#undef PACKAGE
-#undef PACKAGE_BUGREPORT
-#undef PACKAGE_NAME
-#undef PACKAGE_STRING
-#undef PACKAGE_TARNAME
-#undef PACKAGE_VERSION
-#undef VERSION
-#endif //HAVE_CONFIG_H
-
 #include "Define.h"
-
-#include <unordered_map>
-#include <unordered_set>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
-#include <errno.h>
-#include <signal.h>
-#include <assert.h>
-
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
-#include <set>
-#include <list>
+#include <array>
+#include <memory>
 #include <string>
-#include <map>
-#include <queue>
-#include <sstream>
-#include <fstream>
-#include <algorithm>
-#include <vector>
-
-#include "Threading/LockedQueue.h"
-#include "Threading/Threading.h"
-
-#include <ace/Basic_Types.h>
-#include <ace/Guard_T.h>
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
-#include <ace/OS_NS_time.h>
-#include <ace/Stack_Trace.h>
+#include <utility>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#  include <ace/config-all.h>
-// XP winver - needed to compile with standard leak check in MemoryLeaks.h
-// uncomment later if needed
-//#define _WIN32_WINNT 0x0501
-#  include <ws2tcpip.h>
-//#undef WIN32_WINNT
+#include <ace/config-all.h>
+#include <ws2tcpip.h>
+#if AC_COMPILER == AC_COMPILER_INTEL
+#    if !defined(BOOST_ASIO_HAS_MOVE)
+#      define BOOST_ASIO_HAS_MOVE
+#    endif // !defined(BOOST_ASIO_HAS_MOVE)
+#  endif // if WARHEAD_COMPILER == WARHEAD_COMPILER_INTEL
 #else
-#  include <sys/types.h>
-#  include <sys/ioctl.h>
-#  include <sys/socket.h>
-#  include <netinet/in.h>
-#  include <unistd.h>
-#  include <netdb.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <cstdlib>
 #endif
 
 #if AC_COMPILER == AC_COMPILER_MICROSOFT
-
-#include <float.h>
-
-#define I32FMT "%08I32X"
-#define I64FMT "%016I64X"
-#define snprintf _snprintf
 #define atoll _atoi64
-#define vsnprintf _vsnprintf
 #define llabs _abs64
-
 #else
-
 #define stricmp strcasecmp
-#define strnicmp strncasecmp
-#define I32FMT "%08X"
-#define I64FMT "%016llX"
-
 #endif
-
-using namespace std;
-
-inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
-
-inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
-
-#define atol(a) strtoul( a, NULL, 10)
 
 #define STRINGIZE(a) #a
 
@@ -137,11 +45,11 @@ inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 enum TimeConstants
 {
     MINUTE          = 60,
-    HOUR            = MINUTE*60,
-    DAY             = HOUR*24,
-    WEEK            = DAY*7,
-    MONTH           = DAY*30,
-    YEAR            = MONTH*12,
+    HOUR            = MINUTE * 60,
+    DAY             = HOUR * 24,
+    WEEK            = DAY * 7,
+    MONTH           = DAY * 30,
+    YEAR            = MONTH * 12,
     IN_MILLISECONDS = 1000
 };
 
@@ -164,21 +72,20 @@ enum LocaleConstant
     LOCALE_zhTW = 5,
     LOCALE_esES = 6,
     LOCALE_esMX = 7,
-    LOCALE_ruRU = 8
+    LOCALE_ruRU = 8,
+
+    TOTAL_LOCALES
 };
 
-const uint8 TOTAL_LOCALES = 9;
 #define DEFAULT_LOCALE LOCALE_enUS
 
 #define MAX_LOCALES 8
 #define MAX_ACCOUNT_TUTORIAL_VALUES 8
 
-extern char const* localeNames[TOTAL_LOCALES];
+AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 
-LocaleConstant GetLocaleByName(const std::string& name);
-void CleanStringForMysqlQuery(std::string& str);
-
-typedef std::vector<std::string> StringVector;
+AC_COMMON_API LocaleConstant GetLocaleByName(const std::string& name);
+AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 
 // we always use stdlibc++ std::max/std::min, undefine some not C++ standard defines (Win API and some other platforms)
 #ifdef max
@@ -189,29 +96,9 @@ typedef std::vector<std::string> StringVector;
 #undef min
 #endif
 
-#ifndef M_PI
-#define M_PI            3.14159265358979323846f
-#endif
-
 #define MAX_QUERY_LEN 32*1024
 
-#define ACORE_GUARD(MUTEX, LOCK) \
-  ACE_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
-    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
-
-//! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
-# define ACORE_WRITE_GUARD(MUTEX, LOCK) \
-  ACE_Write_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
-    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
-
-//! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
-# define ACORE_READ_GUARD(MUTEX, LOCK) \
-  ACE_Read_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
-    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
-
-namespace acore
+namespace Acore
 {
     template<class ArgumentType, class ResultType>
     struct unary_function

@@ -23,6 +23,8 @@
 #    define ACE_STACK_TRACE_SYMBUFSIZ 4096
 #  endif
 
+ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+
 /**
  *  @class ACE_Stack_Trace
  *
@@ -99,6 +101,8 @@ private:
 
   void generate_trace (ssize_t starting_frame_offset, size_t num_frames);
 };
+
+ACE_END_VERSIONED_NAMESPACE_DECL
 
 #include /**/ "ace/post.h"
 #endif /* ACE_STACK_TRACE_H */

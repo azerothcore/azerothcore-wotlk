@@ -1,41 +1,75 @@
 name: core-build
 on:
   push:
-    branches: 
-      - '**'         # matches every branch
-      - '!coverity_scan'   # excludes coverity_scan
+    branches:
+      - 'master'
   pull_request:
+
+concurrency:
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  cancel-in-progress: true
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [clang6, clang7]
-        modules: [with, without]
-    runs-on: ubuntu-18.04
-    name: ${{ matrix.compiler }}-${{ matrix.modules }}-modules
+        # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
+        os: [ubuntu-20.04]
+        compiler: [clang]
+        modules: [without]
+        extra_logs: [false]
+        # we can include specific combinations here
+        include:
+          - os: ubuntu-20.04
+            compiler: clang12
+            modules: without
+            extra_logs: true
+          - os: ubuntu-20.04
+            compiler: clang11
+            modules: without
+            extra_logs: false
+          - os: ubuntu-18.04
+            compiler: clang10
+            modules: without
+            extra_logs: false
+          - os: ubuntu-18.04
+            compiler: gcc8
+            modules: without
+            extra_logs: false
+          - os: ubuntu-20.04
+            compiler: gcc # default in 20.04 is gcc 9
+            modules: without
+            extra_logs: false
+          - os: ubuntu-20.04
+            compiler: gcc10
+            modules: without
+            extra_logs: false
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules-extra_logs-${{ matrix.extra_logs }}
     env:
       COMPILER: ${{ matrix.compiler }}
+      EXTRA_LOGS: ${{ matrix.extra_logs }}
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Checkout modules
         run: ./apps/ci/ci-install-modules.sh
         if: matrix.modules == 'with'
       - name: Cache
-        uses: actions/cache@v1.1.2
+        uses: actions/cache@v2
         with:
-          path: /home/runner/.ccache
-          key: ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
+          path: var/ccache
+          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
-            ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
-            ccache:${{ matrix.compiler }}:${{ matrix.modules }}-modules
-            ccache:${{ matrix.compiler }}
-            ccache
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
       - name: Configure OS
-        run: source ./apps/ci/ci-install.sh
+        run: source ./acore.sh install-deps
         env:
           CONTINUOUS_INTEGRATION: true
+      - name: Create conf/config.sh
+        run: source ./apps/ci/ci-conf.sh
       - name: Import db
         run: source ./apps/ci/ci-import-db.sh
       - name: Build
@@ -44,19 +78,5 @@ jobs:
         run: source ./apps/ci/ci-worldserver-dry-run.sh
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
-
-  docker-build:
-    strategy:
-      fail-fast: false
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-          ./apps/ci/docker/ci-docker-config.sh
-          ./bin/acore-docker-generate-etc
-      - name: Build
-        run: |
-          ./bin/acore-docker-build-no-scripts
+      - name: Run unit tests
+        run: source ./apps/ci/ci-run-unit-tests.sh

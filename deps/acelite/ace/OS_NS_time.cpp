@@ -73,14 +73,14 @@ ACE_OS::ctime_r (const time_t *clock, ACE_TCHAR *buf, int buflen)
   SYSTEMTIME systime;
   FileTimeToLocalFileTime (&file_time, &localtime);
   FileTimeToSystemTime (&localtime, &systime);
-  ACE_OS::sprintf (buf, ACE_OS_CTIME_R_FMTSTR,
-                   ACE_OS_day_of_week_name[systime.wDayOfWeek],
-                   ACE_OS_month_name[systime.wMonth - 1],
-                   systime.wDay,
-                   systime.wHour,
-                   systime.wMinute,
-                   systime.wSecond,
-                   systime.wYear);
+  ACE_OS::snprintf (buf, buflen, ACE_OS_CTIME_R_FMTSTR,
+                    ACE_OS_day_of_week_name[systime.wDayOfWeek],
+                    ACE_OS_month_name[systime.wMonth - 1],
+                    systime.wDay,
+                    systime.wHour,
+                    systime.wMinute,
+                    systime.wSecond,
+                    systime.wYear);
   return buf;
 }
 # endif /* ACE_HAS_WINCE */
@@ -287,7 +287,7 @@ ACE_OS::localtime_r (const time_t *t, struct tm *res)
       return res;
     }
 #else
-  ACE_OSCALL_RETURN (::localtime_r (t, res), struct tm *, 0);
+  return ace_localtime_r_helper (t, res);
 #endif /* ACE_HAS_TR24731_2005_CRT */
 }
 

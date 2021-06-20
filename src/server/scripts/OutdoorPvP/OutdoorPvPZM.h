@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -157,26 +157,24 @@ class OutdoorPvPZM;
 
 class OPvPCapturePointZM_Beacon : public OPvPCapturePoint
 {
-    public:
+public:
+    OPvPCapturePointZM_Beacon(OutdoorPvP* pvp, ZM_BeaconType type);
 
-        OPvPCapturePointZM_Beacon(OutdoorPvP* pvp, ZM_BeaconType type);
+    void ChangeState() override;
 
-        void ChangeState();
+    void SendChangePhase() override;
 
-        void SendChangePhase();
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket & data);
+    // used when player is activated/inactivated in the area
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
-        // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* player);
-        void HandlePlayerLeave(Player* player);
+    void UpdateTowerState();
 
-        void UpdateTowerState();
-
-    protected:
-
-        ZM_BeaconType m_TowerType;
-        uint32 m_TowerState;
+protected:
+    ZM_BeaconType m_TowerType;
+    uint32 m_TowerState;
 };
 
 enum ZM_GraveYardState
@@ -188,71 +186,66 @@ enum ZM_GraveYardState
 
 class OPvPCapturePointZM_GraveYard : public OPvPCapturePoint
 {
-    public:
+public:
+    OPvPCapturePointZM_GraveYard(OutdoorPvP* pvp);
 
-        OPvPCapturePointZM_GraveYard(OutdoorPvP* pvp);
+    bool Update(uint32 diff) override;
 
-        bool Update(uint32 diff);
+    void ChangeState() override {}
 
-        void ChangeState() {}
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket & data);
+    void UpdateTowerState();
 
-        void UpdateTowerState();
+    int32 HandleOpenGo(Player* player, GameObject* go) override;
 
-        int32 HandleOpenGo(Player* player, uint64 guid);
+    void SetBeaconState(TeamId controlling_teamId); // not good atm
 
-        void SetBeaconState(TeamId controlling_teamId); // not good atm
+    bool HandleGossipOption(Player* player, Creature* creature, uint32 gossipid) override;
 
-        bool HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+    bool HandleDropFlag(Player* player, uint32 spellId) override;
 
-        bool HandleDropFlag(Player* player, uint32 spellId);
+    bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso) override;
 
-        bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso);
+    uint32 GetGraveYardState() const;
 
-        uint32 GetGraveYardState() const;
+private:
+    uint32 m_GraveYardState;
 
-    private:
-
-        uint32 m_GraveYardState;
-
-    protected:
-
-        TeamId m_BothControllingFactionId;
-        uint64 m_FlagCarrierGUID;
+protected:
+    TeamId m_BothControllingFactionId;
+    ObjectGuid m_FlagCarrierGUID;
 };
 
 class OutdoorPvPZM : public OutdoorPvP
 {
-    public:
+public:
+    OutdoorPvPZM();
 
-        OutdoorPvPZM();
+    bool SetupOutdoorPvP() override;
 
-        bool SetupOutdoorPvP();
+    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
+    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
 
-        void HandlePlayerEnterZone(Player* player, uint32 zone);
-        void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    bool Update(uint32 diff) override;
 
-        bool Update(uint32 diff);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket &data);
+    void SendRemoveWorldStates(Player* player) override;
 
-        void SendRemoveWorldStates(Player* player);
+    void HandleKillImpl(Player* player, Unit* killed) override;
 
-        void HandleKillImpl(Player* player, Unit* killed);
+    uint32 GetAllianceTowersControlled() const;
+    void SetAllianceTowersControlled(uint32 count);
 
-        uint32 GetAllianceTowersControlled() const;
-        void SetAllianceTowersControlled(uint32 count);
+    uint32 GetHordeTowersControlled() const;
+    void SetHordeTowersControlled(uint32 count);
 
-        uint32 GetHordeTowersControlled() const;
-        void SetHordeTowersControlled(uint32 count);
+private:
+    OPvPCapturePointZM_GraveYard* m_GraveYard;
 
-    private:
-
-        OPvPCapturePointZM_GraveYard * m_GraveYard;
-
-        uint32 m_AllianceTowersControlled;
-        uint32 m_HordeTowersControlled;
+    uint32 m_AllianceTowersControlled;
+    uint32 m_HordeTowersControlled;
 };
 
 // todo: flag carrier death/leave/mount/activitychange should give back the gossip options

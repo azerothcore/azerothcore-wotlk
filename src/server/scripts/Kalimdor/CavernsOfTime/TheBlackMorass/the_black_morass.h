@@ -5,8 +5,11 @@
 #ifndef DEF_THEBLACKMORASS_H
 #define DEF_THEBLACKMORASS_H
 
-#include "SpellScript.h"
+#include "CreatureAIImpl.h"
 #include "PassiveAI.h"
+#include "SpellScript.h"
+
+#define TheBlackMorassScriptName "instance_the_black_morass"
 
 enum DataTypes
 {
@@ -63,7 +66,7 @@ enum CreatureIds
 };
 
 enum Misc
-{   
+{
     SPELL_RIFT_CHANNEL                  = 31387,
 
     EVENT_NEXT_PORTAL                   = 1,
@@ -71,5 +74,11 @@ enum Misc
 
     ACTION_OUTRO                        = 1
 };
+
+template <class AI, class T>
+inline AI* GetTheBlackMorassAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, TheBlackMorassScriptName);
+}
 
 #endif

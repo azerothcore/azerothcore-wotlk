@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "eye_of_eternity.h"
-#include "Vehicle.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Vehicle.h"
 
 bool EoEDrakeEnterVehicleEvent::Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
 {
@@ -37,23 +37,19 @@ public:
         uint32 EncounterStatus;
         std::string str_data;
 
-        uint64 NPC_MalygosGUID;
-        uint64 GO_IrisGUID;
-        uint64 GO_ExitPortalGUID;
-        uint64 GO_PlatformGUID;
+        ObjectGuid NPC_MalygosGUID;
+        ObjectGuid GO_IrisGUID;
+        ObjectGuid GO_ExitPortalGUID;
+        ObjectGuid GO_PlatformGUID;
         bool bPokeAchiev;
 
         void Initialize() override
         {
             EncounterStatus = NOT_STARTED;
 
-            NPC_MalygosGUID = 0;
-            GO_IrisGUID = 0;
-            GO_ExitPortalGUID = 0;
-            GO_PlatformGUID = 0;
             bPokeAchiev = false;
         }
-        
+
         bool IsEncounterInProgress() const override
         {
             return EncounterStatus == IN_PROGRESS;
@@ -75,7 +71,7 @@ public:
                     if (!pPlayer->IsAlive())
                         return;
 
-                    if (Creature* c = pPlayer->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ()-20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                    if (Creature* c = pPlayer->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() - 20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                     {
                         c->SetCanFly(true);
                         c->setFaction(pPlayer->getFaction());
@@ -150,8 +146,8 @@ public:
                             if (GameObject* go = instance->GetGameObject(GO_ExitPortalGUID))
                                 go->SetPhaseMask(1, true);
                             if (Creature* c = instance->GetCreature(NPC_MalygosGUID))
-                                if (c->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f ,TEMPSUMMON_TIMED_DESPAWN, 604800000))
-                            break;
+                                if (c->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f, TEMPSUMMON_TIMED_DESPAWN, 604800000))
+                                    break;
                     }
                     if (data == DONE)
                         SaveToDB();
@@ -173,13 +169,15 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch(type)
             {
-                case DATA_MALYGOS_GUID:         return NPC_MalygosGUID;
+                case DATA_MALYGOS_GUID:
+                    return NPC_MalygosGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override

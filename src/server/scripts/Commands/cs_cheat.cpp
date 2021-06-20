@@ -14,7 +14,6 @@ public:
 
     std::vector<ChatCommand> GetCommands() const override
     {
-
         static std::vector<ChatCommand> cheatCommandTable =
         {
             { "god",            SEC_GAMEMASTER,     false, &HandleGodModeCheatCommand,         "" },
@@ -25,13 +24,11 @@ public:
             { "status",         SEC_GAMEMASTER,     false, &HandleCheatStatusCommand,          "" },
             { "taxi",           SEC_GAMEMASTER,     false, &HandleTaxiCheatCommand,            "" },
             { "explore",        SEC_GAMEMASTER,     false, &HandleExploreCheatCommand,         "" },
-
         };
 
         static std::vector<ChatCommand> commandTable =
         {
             { "cheat",          SEC_GAMEMASTER,     false, nullptr,                  "", cheatCommandTable },
-
         };
         return commandTable;
     }
@@ -142,7 +139,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(player, 0))
+        if (handler->HasLowerSecurity(player))
             return false;
 
         if (strncmp(args, "on", 3) == 0)
@@ -185,7 +182,6 @@ public:
         return true;
     }
 
-
     static bool HandleTaxiCheatCommand(ChatHandler* handler, char const* args)
     {
         std::string argStr = (char*)args;
@@ -194,7 +190,7 @@ public:
 
         if (!chr)
             chr = handler->GetSession()->GetPlayer();
-        else if (handler->HasLowerSecurity(chr, 0)) // check online security
+        else if (handler->HasLowerSecurity(chr)) // check online security
             return false;
 
         if (!*args)

@@ -8,24 +8,29 @@
 #include "dbcfile.h"
 #include "adtfile.h"
 #include "vmapexport.h"
-
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 
 bool ExtractSingleModel(std::string& fname)
 {
-    char * name = GetPlainName((char*)fname.c_str());
-    char * ext = GetExtension(name);
+    if (fname.length() < 4)
+        return false;
 
-    // < 3.1.0 ADT MMDX section store filename.mdx filenames for corresponded .m2 file
-    if (!strcmp(ext, ".mdx"))
+    std::string extension = fname.substr(fname.length() - 4, 4);
+    if (extension == ".mdx" || extension == ".MDX" || extension == ".mdl" || extension == ".MDL")
     {
         // replace .mdx -> .m2
-        fname.erase(fname.length()-2,2);
+        fname.erase(fname.length() - 2, 2);
         fname.append("2");
     }
     // >= 3.1.0 ADT MMDX section store filename.m2 filenames for corresponded .m2 file
     // nothing do
+
+    std::string originalName = fname;
+
+    char* name = GetPlainName((char*)fname.c_str());
+    fixnamen(name, strlen(name));
+    fixname2(name, strlen(name));
 
     std::string output(szWorkDirWmo);
     output += "/";
@@ -34,7 +39,7 @@ bool ExtractSingleModel(std::string& fname)
     if (FileExists(output.c_str()))
         return true;
 
-    Model mdl(fname);
+    Model mdl(originalName);
     if (!mdl.open())
         return false;
 
@@ -45,7 +50,7 @@ void ExtractGameobjectModels()
 {
     printf("Extracting GameObject models...");
     DBCFile dbc("DBFilesClient\\GameObjectDisplayInfo.dbc");
-    if(!dbc.open())
+    if (!dbc.open())
     {
         printf("Fatal error: Invalid GameObjectDisplayInfo.dbc file format!\n");
         exit(1);
@@ -63,26 +68,30 @@ void ExtractGameobjectModels()
         return;
     }
 
-    for (DBCFile::Iterator it = dbc.begin(); it != dbc.end(); ++it)
+    fwrite(VMAP::RAW_VMAP_MAGIC, 1, 8, model_list);
+
+    for (const auto & it : dbc)
     {
-        path = it->getString(1);
+        path = it.getString(1);
 
         if (path.length() < 4)
             continue;
 
         fixnamen((char*)path.c_str(), path.size());
-        char * name = GetPlainName((char*)path.c_str());
+        char* name = GetPlainName((char*)path.c_str());
         fixname2(name, strlen(name));
 
-        char * ch_ext = GetExtension(name);
+        char* ch_ext = GetExtension(name);
         if (!ch_ext)
             continue;
 
         strToLower(ch_ext);
 
         bool result = false;
+        uint8 isWmo = 0;
         if (!strcmp(ch_ext, ".wmo"))
         {
+            isWmo = 1;
             result = ExtractSingleWmo(path);
         }
         else if (!strcmp(ch_ext, ".mdl"))
@@ -97,9 +106,10 @@ void ExtractGameobjectModels()
 
         if (result)
         {
-            uint32 displayId = it->getUInt(0);
+            uint32 displayId = it.getUInt(0);
             uint32 path_length = strlen(name);
             fwrite(&displayId, sizeof(uint32), 1, model_list);
+            fwrite(&isWmo, sizeof(uint8), 1, model_list);
             fwrite(&path_length, sizeof(uint32), 1, model_list);
             fwrite(name, sizeof(char), path_length, model_list);
         }

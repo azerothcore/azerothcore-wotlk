@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,7 +8,9 @@
 #define DEF_HYJAL_H
 
 #include "GridNotifiers.h"
+#include "CreatureAIImpl.h"
 
+#define HyjalScriptName "instance_hyjal"
 #define ERROR_INST_DATA     "TSCR: Instance data not set properly for Mount Hyjal. Encounters will be buggy."
 
 uint32 const EncounterCount     = 5;
@@ -84,5 +86,10 @@ enum GameobjectIds
     GO_ROARING_FLAME            = 182592
 };
 
-#endif
+template <class AI, class T>
+inline AI* GetHyjalAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, HyjalScriptName);
+}
 
+#endif

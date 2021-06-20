@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,12 +11,12 @@ Comment: All arena team related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ArenaTeamMgr.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 class arena_commandscript : public CommandScript
 {
@@ -141,7 +141,7 @@ public:
         if (!*_args)
             return false;
 
-        char* args = (char *)_args;
+        char* args = (char*)_args;
 
         char const* oldArenaStr = handler->extractQuotedArg(args);
         if (!oldArenaStr)
@@ -209,7 +209,7 @@ public:
             return false;
 
         Player* target;
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid))
             return false;
 
@@ -251,7 +251,7 @@ public:
         }
 
         std::string oldCaptainName;
-        sObjectMgr->GetPlayerNameByGUID(arena->GetCaptain(), oldCaptainName);
+        sObjectMgr->GetPlayerNameByGUID(arena->GetCaptain().GetCounter(), oldCaptainName);
         arena->SetCaptain(targetGuid);
 
         handler->PSendSysMessage(LANG_ARENA_CAPTAIN, arena->GetName().c_str(), arena->GetId(), oldCaptainName.c_str(), target->GetName().c_str());
@@ -279,7 +279,7 @@ public:
 
         handler->PSendSysMessage(LANG_ARENA_INFO_HEADER, arena->GetName().c_str(), arena->GetId(), arena->GetRating(), arena->GetType(), arena->GetType());
         for (ArenaTeam::MemberList::iterator itr = arena->m_membersBegin(); itr != arena->m_membersEnd(); ++itr)
-            handler->PSendSysMessage(LANG_ARENA_INFO_MEMBERS, itr->Name.c_str(), GUID_LOPART(itr->Guid), itr->PersonalRating, (arena->GetCaptain() == itr->Guid ? "- Captain" : ""));
+            handler->PSendSysMessage(LANG_ARENA_INFO_MEMBERS, itr->Name.c_str(), itr->Guid.GetCounter(), itr->PersonalRating, (arena->GetCaptain() == itr->Guid ? "- Captain" : ""));
 
         return true;
     }
@@ -311,7 +311,7 @@ public:
                     found = true;
                     continue;
                 }
-             }
+            }
         }
 
         if (!found)

@@ -2,16 +2,15 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
-#include "the_black_morass.h"
 #include "Player.h"
-#include "TemporarySummon.h"
-#include "SpellInfo.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
+#include "TemporarySummon.h"
+#include "the_black_morass.h"
 
-
-const Position PortalLocation[4]=
+const Position PortalLocation[4] =
 {
     {-2041.06f, 7042.08f, 29.99f, 1.30f},
     {-1968.18f, 7042.11f, 21.93f, 2.12f},
@@ -24,7 +23,7 @@ class instance_the_black_morass : public InstanceMapScript
 public:
     instance_the_black_morass() : InstanceMapScript("instance_the_black_morass", 269) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_the_black_morass_InstanceMapScript(map);
     }
@@ -33,16 +32,15 @@ public:
     {
         instance_the_black_morass_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        std::set<uint64> encounterNPCs;
+        GuidSet encounterNPCs;
         uint32 encounters[MAX_ENCOUNTER];
-        uint64 _medivhGUID;
+        ObjectGuid _medivhGUID;
         uint8  _currentRift;
         uint8  _shieldPercent;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&encounters, 0, sizeof(encounters));
-            _medivhGUID = 0;
             _currentRift = 0;
             _shieldPercent = 100;
             encounterNPCs.clear();
@@ -61,18 +59,18 @@ public:
                 medivh->SetRespawnTime(3);
             }
 
-            std::set<uint64> eCopy = encounterNPCs;
-            for (std::set<uint64>::const_iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
-                if (Creature* creature = instance->GetCreature(*itr))
+            GuidSet eCopy = encounterNPCs;
+            for (ObjectGuid const guid : eCopy)
+                if (Creature* creature = instance->GetCreature(guid))
                     creature->DespawnOrUnsummon();
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             return false;
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (instance->GetPlayersCountExceptGMs() <= 1 && GetData(TYPE_AEONUS) != DONE)
                 CleanupInstance();
@@ -82,7 +80,7 @@ public:
             player->SendUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -109,7 +107,7 @@ public:
             }
         }
 
-        void OnCreatureRemove(Creature* creature)
+        void OnCreatureRemove(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -133,31 +131,31 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32  /*data*/)
+        void SetData(uint32 type, uint32  /*data*/) override
         {
             switch (type)
             {
                 case TYPE_AEONUS:
-                {
-                    encounters[type] = DONE;
-                    SaveToDB();
+                    {
+                        encounters[type] = DONE;
+                        SaveToDB();
 
-                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
-                        medivh->AI()->DoAction(ACTION_OUTRO);
+                        if (Creature* medivh = instance->GetCreature(_medivhGUID))
+                            medivh->AI()->DoAction(ACTION_OUTRO);
 
-                    Map::PlayerList const& players = instance->GetPlayers();
-                    if (!players.isEmpty())
-                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            if (Player* player = itr->GetSource())
-                            {
-                                if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
-                                    player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
+                        Map::PlayerList const& players = instance->GetPlayers();
+                        if (!players.isEmpty())
+                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                                if (Player* player = itr->GetSource())
+                                {
+                                    if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
+                                        player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
 
-                                if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
-                                    player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
-                            }
-                    break;
-                }
+                                    if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
+                                        player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
+                                }
+                        break;
+                    }
                 case TYPE_CHRONO_LORD_DEJA:
                 case TYPE_TEMPORUS:
                     encounters[type] = DONE;
@@ -185,16 +183,16 @@ public:
                                 Unit::Kill(medivh, medivh);
 
                                 // Xinef: delete all spawns
-                                std::set<uint64> eCopy = encounterNPCs;
-                                for (std::set<uint64>::iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
-                                    if (Creature* creature = instance->GetCreature(*itr))
+                                GuidSet eCopy = encounterNPCs;
+                                for (ObjectGuid guid : eCopy)
+                                    if (Creature* creature = instance->GetCreature(guid))
                                         creature->DespawnOrUnsummon();
                             }
                     break;
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -210,7 +208,7 @@ public:
             return 0;
         }
 
-        void SetData64(uint32 type, uint64 data)
+        void SetGuidData(uint32 type, ObjectGuid data) override
         {
             if (type == DATA_SUMMONED_NPC)
                 encounterNPCs.insert(data);
@@ -218,19 +216,19 @@ public:
                 encounterNPCs.erase(data);
         }
 
-        uint64 GetData64(uint32 data) const
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             if (data == DATA_MEDIVH)
                 return _medivhGUID;
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void SummonPortalKeeper()
         {
-            Creature* rift = NULL;
-            for (std::set<uint64>::const_iterator itr = encounterNPCs.begin(); itr != encounterNPCs.end(); ++itr)
-                if (Creature* summon = instance->GetCreature(*itr))
+            Creature* rift = nullptr;
+            for (ObjectGuid const guid : encounterNPCs)
+                if (Creature* summon = instance->GetCreature(guid))
                     if (summon->GetEntry() == NPC_TIME_RIFT)
                     {
                         rift = summon;
@@ -243,19 +241,27 @@ public:
             int32 entry = 0;
             switch (_currentRift)
             {
-                case 6: entry = GetData(TYPE_CHRONO_LORD_DEJA) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_CHRONO_LORD : -NPC_CHRONO_LORD_DEJA) : NPC_CHRONO_LORD_DEJA; break;
-                case 12: entry = GetData(TYPE_TEMPORUS) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_TIMEREAVER : -NPC_TEMPORUS) : NPC_TEMPORUS; break;
-                case 18: entry = NPC_AEONUS; break;
-                default: entry = RAND(NPC_RIFT_KEEPER_WARLOCK, NPC_RIFT_KEEPER_MAGE, NPC_RIFT_LORD, NPC_RIFT_LORD_2); break;
+                case 6:
+                    entry = GetData(TYPE_CHRONO_LORD_DEJA) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_CHRONO_LORD : -NPC_CHRONO_LORD_DEJA) : NPC_CHRONO_LORD_DEJA;
+                    break;
+                case 12:
+                    entry = GetData(TYPE_TEMPORUS) == DONE ? (instance->IsHeroic() ? NPC_INFINITE_TIMEREAVER : -NPC_TEMPORUS) : NPC_TEMPORUS;
+                    break;
+                case 18:
+                    entry = NPC_AEONUS;
+                    break;
+                default:
+                    entry = RAND(NPC_RIFT_KEEPER_WARLOCK, NPC_RIFT_KEEPER_MAGE, NPC_RIFT_LORD, NPC_RIFT_LORD_2);
+                    break;
             }
 
             Position pos;
-            rift->GetNearPosition(pos, 10.0f, 2*M_PI*rand_norm());
+            rift->GetNearPosition(pos, 10.0f, 2 * M_PI * rand_norm());
 
             if (TempSummon* summon = instance->SummonCreature(abs(entry), pos))
             {
                 summon->SetTempSummonType(TEMPSUMMON_CORPSE_TIMED_DESPAWN);
-                summon->SetTimer(3*MINUTE*IN_MILLISECONDS);
+                summon->SetTimer(3 * MINUTE * IN_MILLISECONDS);
 
                 if (entry < 0)
                     summon->SetLootMode(0);
@@ -270,7 +276,7 @@ public:
             }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             Events.Update(diff);
             switch (Events.ExecuteEvent())
@@ -283,7 +289,7 @@ public:
 
                     if (instance->GetCreature(_medivhGUID))
                     {
-                        uint8 position = (_currentRift-1)%4;
+                        uint8 position = (_currentRift - 1) % 4;
                         instance->SummonCreature(NPC_TIME_RIFT, PortalLocation[position]);
                     }
                     break;
@@ -293,7 +299,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -304,7 +310,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -329,10 +335,9 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        protected:
-            EventMap Events;
+    protected:
+        EventMap Events;
     };
-
 };
 
 void AddSC_instance_the_black_morass()

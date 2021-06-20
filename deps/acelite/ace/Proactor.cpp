@@ -58,7 +58,7 @@ class ACE_Proactor_Timer_Handler : public ACE_Task<ACE_NULL_SYNCH>
 {
 public:
   /// Constructor.
-  ACE_Proactor_Timer_Handler (ACE_Proactor &proactor);
+  explicit ACE_Proactor_Timer_Handler (ACE_Proactor &proactor);
 
   /// Destructor.
   virtual ~ACE_Proactor_Timer_Handler (void);
@@ -243,7 +243,11 @@ ACE_Proactor_Handle_Timeout_Upcall::timeout (ACE_Proactor_Timer_Queue &,
                        ACE_TEXT ("create_asynch_timer failed")),
                       -1);
 
+#if defined (ACE_HAS_CPP11)
   std::unique_ptr<ACE_Asynch_Result_Impl> safe_asynch_timer (asynch_timer);
+#else
+  auto_ptr<ACE_Asynch_Result_Impl> safe_asynch_timer (asynch_timer);
+#endif /* ACE_HAS_CPP11 */
 
   // Post a completion.
   if (-1 == safe_asynch_timer->post_completion

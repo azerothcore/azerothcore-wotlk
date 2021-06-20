@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,6 +8,8 @@
 #define ACORE_DISABLEMGR_H
 
 #include "Define.h"
+#include "Map.h"
+#include "VMapManager2.h"
 
 class Unit;
 
@@ -38,19 +40,13 @@ enum SpellDisableTypes
                                 SPELL_DISABLE_LOS)
 };
 
-enum VmapDisableTypes
-{
-    VMAP_DISABLE_AREAFLAG       = 0x1,
-    VMAP_DISABLE_HEIGHT         = 0x2,
-    VMAP_DISABLE_LOS            = 0x4,
-    VMAP_DISABLE_LIQUIDSTATUS   = 0x8,
-};
-
 namespace DisableMgr
 {
     void LoadDisables();
     bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags = 0);
     void CheckQuestDisables();
+    bool IsVMAPDisabledFor(uint32 entry, uint8 flags);
+    bool IsPathfindingEnabled(const Map* map);
 }
 
 #endif //ACORE_DISABLEMGR_H

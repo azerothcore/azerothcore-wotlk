@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,7 +17,7 @@
 #include "Utilities/TypeList.h"
 #include <map>
 
-namespace acore
+namespace Acore
 {
     /* ContainerMapList Helpers */
     // count functions
@@ -47,48 +47,48 @@ namespace acore
     //    }
 
     // non-const find functions
-    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<SPECIFIC_TYPE> &elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
+    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<SPECIFIC_TYPE>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
     {
-        typename std::map<OBJECT_HANDLE, CountedPtr<SPECIFIC_TYPE> >::iterator iter = elements._element.find(hdl);
-        return (iter == elements._element.end() ? NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)NULL) : iter->second);
+        typename std::map<OBJECT_HANDLE, CountedPtr<SPECIFIC_TYPE>>::iterator iter = elements._element.find(hdl);
+        return (iter == elements._element.end() ? NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr) : iter->second);
     };
 
-    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<TypeNull> &elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
+    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<TypeNull>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
     {
-        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)NULL);// terminate recursion
+        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr);// terminate recursion
     }
 
-    template<class SPECIFIC_TYPE, class T> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<T> &elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
+    template<class SPECIFIC_TYPE, class T> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<T>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
     {
-        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)NULL);// this is a missed
+        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr);// this is a missed
     }
 
-    template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<TypeList<H, T> >&elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* fake)
+    template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<TypeList<H, T>>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* fake)
     {
-        CountedPtr<SPECIFIC_TYPE> &t = Find(elements._elements, hdl, fake);
+        CountedPtr<SPECIFIC_TYPE>& t = Find(elements._elements, hdl, fake);
         return (!t ? Find(elements._TailElements, hdl, fake) : t);
     }
 
     // const find functions
-    template<class SPECIFIC_TYPE> const CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<SPECIFIC_TYPE> &elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
+    template<class SPECIFIC_TYPE> const CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<SPECIFIC_TYPE>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
     {
         typename CountedPtr<SPECIFIC_TYPE>::iterator iter = elements._element.find(hdl);
-        return (iter == elements._element.end() ? NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)NULL) : iter->second);
+        return (iter == elements._element.end() ? NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr) : iter->second);
     };
 
-    template<class SPECIFIC_TYPE> const CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<TypeNull> &elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
+    template<class SPECIFIC_TYPE> const CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<TypeNull>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
     {
-        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)NULL);
+        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr);
     }
 
-    template<class SPECIFIC_TYPE, class T> const CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<T> &elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
+    template<class SPECIFIC_TYPE, class T> const CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<T>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
     {
-        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)NULL);
+        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr);
     }
 
-    template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<TypeList<H, T> >&elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* fake)
+    template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<TypeList<H, T>>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* fake)
     {
-        CountedPtr<SPECIFIC_TYPE> &t = Find(elements._elements, hdl, fake);
+        CountedPtr<SPECIFIC_TYPE>& t = Find(elements._elements, hdl, fake);
         if (!t)
             t = Find(elements._TailElement, hdl, fake);
 
@@ -96,34 +96,34 @@ namespace acore
     }
 
     // non-const insert functions
-    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE>& Insert(ContainerMapList<SPECIFIC_TYPE> &elements, CountedPtr<SPECIFIC_TYPE> &obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE>& Insert(ContainerMapList<SPECIFIC_TYPE>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
         elements._element[hdl] = obj;
         return obj;
     };
 
-    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE>& Insert(ContainerMapList<TypeNull> &elements, CountedPtr<SPECIFIC_TYPE> &obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE>& Insert(ContainerMapList<TypeNull>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
-        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)NULL);
+        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr);
     }
 
     // this is a missed
-    template<class SPECIFIC_TYPE, class T> CountedPtr<SPECIFIC_TYPE>& Insert(ContainerMapList<T> &elements, CountedPtr<SPECIFIC_TYPE> &obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE, class T> CountedPtr<SPECIFIC_TYPE>& Insert(ContainerMapList<T>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
-        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)NULL);// a missed
+        return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr);// a missed
     }
 
     // Recursion
-    template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Insert(ContainerMapList<TypeList<H, T> >&elements, CountedPtr<SPECIFIC_TYPE> &obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Insert(ContainerMapList<TypeList<H, T>>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
-        CountedPtr<SPECIFIC_TYPE> &t= Insert(elements._elements, obj, hdl);
+        CountedPtr<SPECIFIC_TYPE>& t = Insert(elements._elements, obj, hdl);
         return (!t ? Insert(elements._TailElements, obj, hdl) : t);
     }
 
     // non-const remove method
-    template<class SPECIFIC_TYPE> bool Remove(ContainerMapList<SPECIFIC_TYPE> &elements, CountedPtr<SPECIFIC_TYPE> &obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE> bool Remove(ContainerMapList<SPECIFIC_TYPE>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
-        typename std::map<OBJECT_HANDLE, CountedPtr<SPECIFIC_TYPE> >::iterator iter = elements._element.find(hdl);
+        typename std::map<OBJECT_HANDLE, CountedPtr<SPECIFIC_TYPE>>::iterator iter = elements._element.find(hdl);
         if ( iter != elements._element.end() )
         {
             elements._element.erase(iter);
@@ -133,18 +133,18 @@ namespace acore
         return false;                                       // found... terminate the search
     }
 
-    template<class SPECIFIC_TYPE> bool Remove(ContainerMapList<TypeNull> &elements, CountedPtr<SPECIFIC_TYPE> &obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE> bool Remove(ContainerMapList<TypeNull>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
         return false;
     }
 
     // this is a missed
-    template<class SPECIFIC_TYPE, class T> bool Remove(ContainerMapList<T> &elements, CountedPtr<SPECIFIC_TYPE> &obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE, class T> bool Remove(ContainerMapList<T>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
         return false;
     }
 
-    template<class SPECIFIC_TYPE, class T, class H> bool Remove(ContainerMapList<TypeList<H, T> > &elements, CountedPtr<SPECIFIC_TYPE> &obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE, class T, class H> bool Remove(ContainerMapList<TypeList<H, T>>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
         // The head element is bad
         bool t = Remove(elements._elements, obj, hdl);
@@ -153,4 +153,3 @@ namespace acore
 
 }
 #endif
-
