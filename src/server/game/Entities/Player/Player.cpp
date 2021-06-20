@@ -24269,12 +24269,12 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
 
         // need unlearn spell
         if (skill_value < pAbility->MinSkillLineRank && pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
-            removeSpell(pAbility->Spell);
+            removeSpell(pAbility->Spell, GetActiveSpec(), true);
         // need learn
         else if (!IsInWorld())
             addSpell(pAbility->Spell, true, true, true, false);
         else
-            learnSpell(pAbility->Spell, true);
+            learnSpell(pAbility->Spell);
     }
 }
 
