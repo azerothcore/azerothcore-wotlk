@@ -329,7 +329,7 @@ bool SpellChatLink::ValidateName(char* buffer, const char* context)
         if (!skillLine)
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("chat.system", "ChatHandler::isValidChatMessage('%s'): skill line not found for skill %u", context, skillInfo->skillId);
+            LOG_DEBUG("chat.system", "ChatHandler::isValidChatMessage('%s'): skill line not found for skill %u", context, skillInfo->SkillLine);
 #endif
             return false;
         }
