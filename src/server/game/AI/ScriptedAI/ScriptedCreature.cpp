@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * 
  *
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
-#include "Cell.h"
-#include "CellImpl.h"
+#include "ScriptedCreature.h"
+#include "Item.h"
+#include "Spell.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Item.h"
+#include "Cell.h"
+#include "CellImpl.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
-#include "Spell.h"
 #include "TemporarySummon.h"
 
 // Spell summary for ScriptedAI::SelectSpell
@@ -123,7 +123,7 @@ Creature* SummonList::GetCreatureWithEntry(uint32 entry) const
                 return summon;
     }
 
-    return nullptr;
+    return NULL;
 }
 
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
@@ -198,7 +198,7 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* source, uint32 soundId)
 
     if (!sSoundEntriesStore.LookupEntry(soundId))
     {
-        LOG_ERROR("server", "TSCR: Invalid soundId %u used in DoPlaySoundToSet (Source: %s)", soundId, source->GetGUID().ToString().c_str());
+        sLog->outError("TSCR: Invalid soundId %u used in DoPlaySoundToSet (Source: TypeId %u, GUID %u)", soundId, source->GetTypeId(), source->GetGUIDLow());
         return;
     }
 
@@ -207,11 +207,11 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* source, uint32 soundId)
 
 void ScriptedAI::DoPlayMusic(uint32 soundId, bool zone)
 {
-    ObjectList* targets = nullptr;
+    ObjectList* targets = NULL;
 
     if (me && me->FindMap())
     {
-        Map::PlayerList const& players = me->GetMap()->GetPlayers();
+        Map::PlayerList const &players = me->GetMap()->GetPlayers();
         targets = new ObjectList();
 
         if (!players.isEmpty())
@@ -253,22 +253,22 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
 {
     //No target so we can't cast
     if (!target)
-        return nullptr;
+        return NULL;
 
     //Silenced so we can't cast
     if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
-        return nullptr;
+        return NULL;
 
     //Using the extended script system we first create a list of viable spells
-    SpellInfo const* apSpell[MAX_CREATURE_SPELLS];
-    memset(apSpell, 0, MAX_CREATURE_SPELLS * sizeof(SpellInfo*));
+    SpellInfo const* apSpell[CREATURE_MAX_SPELLS];
+    memset(apSpell, 0, CREATURE_MAX_SPELLS * sizeof(SpellInfo*));
 
     uint32 spellCount = 0;
 
-    SpellInfo const* tempSpell = nullptr;
+    SpellInfo const* tempSpell = NULL;
 
     //Check if each spell is viable(set it to null if not)
-    for (uint32 i = 0; i < MAX_CREATURE_SPELLS; i++)
+    for (uint32 i = 0; i < CREATURE_MAX_SPELLS; i++)
     {
         tempSpell = sSpellMgr->GetSpellInfo(me->m_spells[i]);
 
@@ -278,11 +278,11 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
 
         // Targets and Effects checked first as most used restrictions
         //Check the spell targets if specified
-        if (targets && !(SpellSummary[me->m_spells[i]].Targets & (1 << (targets - 1))))
+        if (targets && !(SpellSummary[me->m_spells[i]].Targets & (1 << (targets-1))))
             continue;
 
         //Check the type of spell if we are looking for a specific spell type
-        if (effects && !(SpellSummary[me->m_spells[i]].Effects & (1 << (effects - 1))))
+        if (effects && !(SpellSummary[me->m_spells[i]].Effects & (1 << (effects-1))))
             continue;
 
         //Check for school if specified
@@ -321,7 +321,7 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
 
     //We got our usable spells so now lets randomly pick one
     if (!spellCount)
-        return nullptr;
+        return NULL;
 
     return apSpell[urand(0, spellCount - 1)];
 }
@@ -330,7 +330,7 @@ void ScriptedAI::DoResetThreat()
 {
     if (!me->CanHaveThreatList() || me->getThreatManager().isThreatListEmpty())
     {
-        LOG_ERROR("server", "DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = %d)", me->GetEntry());
+        sLog->outError("DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = %d)", me->GetEntry());
         return;
     }
 
@@ -359,8 +359,7 @@ void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o
     if (Player* player = unit->ToPlayer())
         player->TeleportTo(unit->GetMapId(), x, y, z, o, TELE_TO_NOT_LEAVE_COMBAT);
     else
-        LOG_ERROR("server", "TSCR: Creature %s Tried to teleport non-player unit %s to x: %f y:%f z: %f o: %f. Aborted.",
-            me->GetGUID().ToString().c_str(), unit->GetGUID().ToString().c_str(), x, y, z, o);
+        sLog->outError("TSCR: Creature " UI64FMTD " (Entry: %u) Tried to teleport non-player unit (Type: %u GUID: " UI64FMTD ") to x: %f y:%f z: %f o: %f. Aborted.", me->GetGUID(), me->GetEntry(), unit->GetTypeId(), unit->GetGUID(), x, y, z, o);
 }
 
 void ScriptedAI::DoTeleportAll(float x, float y, float z, float o)
@@ -378,10 +377,10 @@ void ScriptedAI::DoTeleportAll(float x, float y, float z, float o)
 
 Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
 {
-    Unit* unit = nullptr;
-    Acore::MostHPMissingInRange u_check(me, range, minHPDiff);
-    Acore::UnitLastSearcher<Acore::MostHPMissingInRange> searcher(me, unit, u_check);
-    Cell::VisitAllObjects(me, searcher, range);
+    Unit* unit = NULL;
+    acore::MostHPMissingInRange u_check(me, range, minHPDiff);
+    acore::UnitLastSearcher<acore::MostHPMissingInRange> searcher(me, unit, u_check);
+    me->VisitNearbyObject(range, searcher);
 
     return unit;
 }
@@ -389,29 +388,34 @@ Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
 std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
 {
     std::list<Creature*> list;
-    Acore::FriendlyCCedInRange u_check(me, range);
-    Acore::CreatureListSearcher<Acore::FriendlyCCedInRange> searcher(me, list, u_check);
-    Cell::VisitAllObjects(me, searcher, range);
+    acore::FriendlyCCedInRange u_check(me, range);
+    acore::CreatureListSearcher<acore::FriendlyCCedInRange> searcher(me, list, u_check);
+    me->VisitNearbyObject(range, searcher);
     return list;
 }
 
 std::list<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 uiSpellid)
 {
     std::list<Creature*> list;
-    Acore::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
-    Acore::CreatureListSearcher<Acore::FriendlyMissingBuffInRange> searcher(me, list, u_check);
-    Cell::VisitAllObjects(me, searcher, range);
+    acore::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
+    acore::CreatureListSearcher<acore::FriendlyMissingBuffInRange> searcher(me, list, u_check);
+    me->VisitNearbyObject(range, searcher);
     return list;
 }
 
 Player* ScriptedAI::GetPlayerAtMinimumRange(float minimumRange)
 {
-    Player* player = nullptr;
+    Player* player = NULL;
 
-    Acore::PlayerAtMinimumRangeAway check(me, minimumRange);
-    Acore::PlayerSearcher<Acore::PlayerAtMinimumRangeAway> searcher(me, player, check);
+    CellCoord pair(acore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
+    Cell cell(pair);
+    cell.SetNoCreate();
 
-    Cell::VisitWorldObjects(me, searcher, minimumRange);
+    acore::PlayerAtMinimumRangeAway check(me, minimumRange);
+    acore::PlayerSearcher<acore::PlayerAtMinimumRangeAway> searcher(me, player, check);
+    TypeContainerVisitor<acore::PlayerSearcher<acore::PlayerAtMinimumRangeAway>, GridTypeMapContainer> visitor(searcher);
+
+    cell.Visit(pair, visitor, *me->GetMap(), *me, minimumRange);
 
     return player;
 }
@@ -452,9 +456,9 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea()
     if (me->IsInEvadeMode() || !me->IsInCombat())
         return false;
 
-    if (_evadeCheckCooldown == time(nullptr))
+    if (_evadeCheckCooldown == time(NULL))
         return false;
-    _evadeCheckCooldown = time(nullptr);
+    _evadeCheckCooldown = time(NULL);
 
     if (!CheckEvadeIfOutOfCombatArea())
         return false;
@@ -469,7 +473,7 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
     std::vector<Player*> tList;
     for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
     {
-        if (!me->IsWithinDistInMap(itr->GetSource(), maxdist) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+        if (me->GetDistance(itr->GetSource()) > maxdist || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
             continue;
         if (excludeAura && itr->GetSource()->HasAura(excludeAura))
             continue;
@@ -478,9 +482,9 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
         tList.push_back(itr->GetSource());
     }
     if (!tList.empty())
-        return tList[urand(0, tList.size() - 1)];
+        return tList[urand(0,tList.size()-1)];
     else
-        return nullptr;
+        return NULL;
 }
 
 // BossAI - for instanced bosses
@@ -488,7 +492,7 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
 BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
     instance(creature->GetInstanceScript()),
     summons(creature),
-    _boundary(instance ? instance->GetBossBoundary(bossId) : nullptr),
+    _boundary(instance ? instance->GetBossBoundary(bossId) : NULL),
     _bossId(bossId)
 {
 }

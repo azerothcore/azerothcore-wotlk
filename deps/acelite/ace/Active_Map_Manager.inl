@@ -1,4 +1,7 @@
 // -*- C++ -*-
+//
+// $Id: Active_Map_Manager.inl 80826 2008-03-04 14:51:23Z wotte $
+
 #include "ace/OS_NS_string.h"
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL

@@ -4,7 +4,7 @@
 /**
  *  @file    Signal.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -97,6 +97,7 @@ private:
 class ACE_Export ACE_Sig_Action
 {
 public:
+  // = Initialization methods.
   /// Default constructor.  Initializes everything to 0.
   ACE_Sig_Action (void);
 
@@ -152,12 +153,8 @@ public:
                   sigset_t *sigmask = 0,
                   int flags = 0);
 
-#if defined (ACE_HAS_CPP11)
-  ACE_Sig_Action (const ACE_Sig_Action&) = default;
-  ACE_Sig_Action (ACE_Sig_Action&&) = default;
-  ACE_Sig_Action& operator = (ACE_Sig_Action const &) = default;
-  ACE_Sig_Action &operator = (ACE_Sig_Action&&)  = default;
-#endif /* ACE_HAS_CPP11 */
+  /// Copy constructor.
+  ACE_Sig_Action (const ACE_Sig_Action &s);
 
   /// Default dtor.
   ~ACE_Sig_Action (void);
@@ -222,6 +219,7 @@ private:
 class ACE_Export ACE_Sig_Guard
 {
 public:
+  // = Initialization and termination methods.
   /// This is kind of conditional Guard, needed when guard should be
   /// activated only when a specific condition met. When condition ==
   /// true (default), Guard is activated

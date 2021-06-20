@@ -9,8 +9,8 @@
 #include <string>
 #include <map>
 #include "Define.h"
-#include "PolicyLock.h"
-#include <mutex>
+#include <ace/Guard_T.h>
+#include <ace/Synch.h>
 #include "WorldModelRoot.h"
 #include "Model.h"
 
@@ -24,7 +24,7 @@ public:
 
     void Insert(K key, T* val)
     {
-        std::lock_guard<std::mutex> guard(mutex);
+        ACE_GUARD(ACE_Thread_Mutex, g, mutex);
 
         if (_items.size() > FlushLimit)
             Clear();
@@ -33,11 +33,11 @@ public:
 
     T* Get(K key)
     {
-        GUARD_RETURN(mutex, nullptr);
+        ACE_GUARD_RETURN(ACE_Thread_Mutex, g, mutex, NULL);
         typename std::map<K, T*>::iterator itr = _items.find(key);
         if (itr != _items.end())
             return itr->second;
-        return nullptr;
+        return NULL;
     }
 
     void Clear()
@@ -48,7 +48,7 @@ public:
     }
 private:
     std::map<K, T*> _items;
-    std::mutex mutex;
+    ACE_Thread_Mutex mutex;
 };
 
 class CacheClass

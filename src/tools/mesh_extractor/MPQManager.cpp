@@ -8,9 +8,9 @@
 #include "MPQ.h"
 #include "DBC.h"
 #include "Utils.h"
+#include <ace/Guard_T.h>
 
-char const* MPQManager::Files[] =
-{
+char const* MPQManager::Files[] = {
     "common.MPQ",
     "common-2.MPQ",
     "expansion.MPQ",
@@ -39,7 +39,7 @@ void MPQManager::InitializeDBC()
     BaseLocale = -1;
     std::string fileName;
     uint32 size = sizeof(Languages) / sizeof(char*);
-    MPQArchive* _baseLocale = nullptr;
+    MPQArchive* _baseLocale = NULL;
     for (uint32 i = 0; i < size; ++i)
     {
         std::string _fileName = "Data/" + std::string(Languages[i]) + "/locale-" + std::string(Languages[i]) + ".MPQ";
@@ -72,10 +72,10 @@ void MPQManager::InitializeDBC()
 
 FILE* MPQManager::GetFile(const std::string& path )
 {
-    GUARD_RETURN(mutex, nullptr);
+    ACE_GUARD_RETURN(ACE_Thread_Mutex, g, mutex, NULL);
     MPQFile file(path.c_str());
     if (file.isEof())
-        return nullptr;
+        return NULL;
     return file.GetFileStream();
 }
 
@@ -87,12 +87,12 @@ DBC* MPQManager::GetDBC(const std::string& name )
 
 FILE* MPQManager::GetFileFrom(const std::string& path, MPQArchive* file )
 {
-    GUARD_RETURN(mutex, nullptr);
+    ACE_GUARD_RETURN(ACE_Thread_Mutex, g, mutex, NULL);
     mpq_archive* mpq_a = file->mpq_a;
 
     uint32_t filenum;
-    if (libmpq__file_number(mpq_a, path.c_str(), &filenum))
-        return nullptr;
+    if(libmpq__file_number(mpq_a, path.c_str(), &filenum))
+        return NULL;
 
     libmpq__off_t transferred;
     libmpq__off_t size = 0;
@@ -100,7 +100,7 @@ FILE* MPQManager::GetFileFrom(const std::string& path, MPQArchive* file )
 
     // HACK: in patch.mpq some files don't want to open and give 1 for filesize
     if (size <= 1)
-        return nullptr;
+        return NULL;
 
     uint8* buffer = new uint8[size];
 

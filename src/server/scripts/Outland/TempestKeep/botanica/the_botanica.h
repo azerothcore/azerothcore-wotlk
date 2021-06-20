@@ -6,9 +6,6 @@
 #define DEF_THE_BOTANICA_H
 
 #include "SpellScript.h"
-#include "CreatureAIImpl.h"
-
-#define TheBotanicaScriptName "instance_the_botanica"
 
 enum DataTypes
 {
@@ -38,11 +35,5 @@ enum SpellIds
     SPELL_FROST_FORM                    = 34202,
     SPELL_SHADOW_FORM                   = 34205
 };
-
-template <class AI, class T>
-inline AI* GetTheBotanicaAI(T* obj)
-{
-    return GetInstanceAI<AI>(obj, TheBotanicaScriptName);
-}
 
 #endif

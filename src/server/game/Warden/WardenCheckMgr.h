@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,26 +7,15 @@
 #ifndef _WARDENCHECKMGR_H
 #define _WARDENCHECKMGR_H
 
-#include "Cryptography/BigNumber.h"
 #include <map>
+#include "Cryptography/BigNumber.h"
 
 enum WardenActions
 {
-    WARDEN_ACTION_LOG   = 0,
-    WARDEN_ACTION_KICK  = 1,
-    WARDEN_ACTION_BAN   = 2,
+    WARDEN_ACTION_LOG,
+    WARDEN_ACTION_KICK,
+    WARDEN_ACTION_BAN
 };
-
-constexpr uint8 MAX_WARDEN_ACTION = 3;
-
-enum WardenCheckTypes
-{
-    WARDEN_CHECK_MEM_TYPE   = 0,
-    WARDEN_CHECK_LUA_TYPE   = 1,
-    WARDEN_CHECK_OTHER_TYPE = 2,
-};
-
-constexpr uint8 MAX_WARDEN_CHECK_TYPES = 3;
 
 struct WardenCheck
 {
@@ -37,11 +26,8 @@ struct WardenCheck
     std::string Str;                                        // LUA, MPQ, DRIVER
     std::string Comment;
     uint16 CheckId;
-    std::array<char, 4> IdStr = {};                         // LUA
-    uint32 Action;
+    enum WardenActions Action;
 };
-
-constexpr uint8 WARDEN_MAX_LUA_CHECK_LENGTH = 170;
 
 struct WardenCheckResult
 {
@@ -53,25 +39,27 @@ class WardenCheckMgr
     WardenCheckMgr();
     ~WardenCheckMgr();
 
-public:
-    static WardenCheckMgr* instance();
+    public:
+        static WardenCheckMgr* instance();
 
-    // We have a linear key without any gaps, so we use vector for fast access
-    typedef std::vector<WardenCheck> CheckContainer;
-    typedef std::map<uint32, WardenCheckResult> CheckResultContainer;
+        // We have a linear key without any gaps, so we use vector for fast access
+        typedef std::vector<WardenCheck*> CheckContainer;
+        typedef std::map<uint32, WardenCheckResult*> CheckResultContainer;
 
-    uint16 GetMaxValidCheckId() const { return static_cast<uint16>(CheckStore.size()); }
-    WardenCheck const* GetWardenDataById(uint16 Id);
-    WardenCheckResult const* GetWardenResultById(uint16 Id);
+        WardenCheck* GetWardenDataById(uint16 Id);
+        WardenCheckResult* GetWardenResultById(uint16 Id);
 
-    std::vector<uint16> CheckIdPool[MAX_WARDEN_CHECK_TYPES];
+        std::vector<uint16> MemChecksIdPool;
+        std::vector<uint16> OtherChecksIdPool;
 
-    void LoadWardenChecks();
-    void LoadWardenOverrides();
+        void LoadWardenChecks();
+        void LoadWardenOverrides();
 
-private:
-    std::vector<WardenCheck> CheckStore;
-    std::map<uint32, WardenCheckResult> CheckResultStore;
+        ACE_RW_Mutex _checkStoreLock;
+
+    private:
+        CheckContainer CheckStore;
+        CheckResultContainer CheckResultStore;
 };
 
 #define sWardenCheckMgr WardenCheckMgr::instance()

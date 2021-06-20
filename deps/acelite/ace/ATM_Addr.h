@@ -63,6 +63,7 @@ public:
   static const int OPT_FLAGS_PMP;
   static const int DEFAULT_SELECTOR;
 
+  // = Initialization methods.
   /// Default constructor.
   ACE_ATM_Addr (u_char selector = DEFAULT_SELECTOR);
 
@@ -90,6 +91,7 @@ public:
   /// Default dtor.
   ~ACE_ATM_Addr (void);
 
+  // = Initialization methods (useful after object construction).
   /// Default initialization for non-address values (e.g.,
   /// t_atm_sap_addr.SVE_tag_addr, t_atm_sap_addr.SVE_tag_selector)
   void init (u_char selector = DEFAULT_SELECTOR);

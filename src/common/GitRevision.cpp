@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 */
 
@@ -21,16 +21,6 @@ char const* GitRevision::GetBranch()
     return _BRANCH;
 }
 
-char const* GitRevision::GetCMakeVersion()
-{
-    return _CMAKE_VERSION;
-}
-
-char const* GitRevision::GetHostOSVersion()
-{
-    return _CMAKE_HOST_SYSTEM;
-}
-
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  ifdef _WIN64
 #    define AZEROTH_PLATFORM_STR "Win64"
@@ -41,15 +31,9 @@ char const* GitRevision::GetHostOSVersion()
 #  define AZEROTH_PLATFORM_STR "Unix"
 #endif
 
-#ifndef ACORE_API_USE_DYNAMIC_LINKING
-#  define ACORE_LINKAGE_TYPE_STR "Static"
-#else
-#  define ACORE_LINKAGE_TYPE_STR "Dynamic"
-#endif
-
 char const* GitRevision::GetFullVersion()
 {
-    return VER_COMPANYNAME_STR " rev. " VER_PRODUCTVERSION_STR " (" AZEROTH_PLATFORM_STR ", " _BUILD_DIRECTIVE ", " ACORE_LINKAGE_TYPE_STR ")";
+    return VER_COMPANYNAME_STR " rev. " VER_PRODUCTVERSION_STR " (" AZEROTH_PLATFORM_STR ", " _BUILD_DIRECTIVE ")";
 }
 
 char const* GitRevision::GetCompanyNameStr()

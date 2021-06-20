@@ -4,7 +4,7 @@
 /**
  *  @file    LSOCK_Connector.h
  *
- *  @author Doug Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Doug Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -35,6 +35,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_LSOCK_Connector : public ACE_SOCK_Connector
 {
 public:
+  // = Initialization methods.
   /// Default constructor.
   ACE_LSOCK_Connector (void);
 

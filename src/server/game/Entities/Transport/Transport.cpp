@@ -1,26 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Common.h"
+#include "Transport.h"
+#include "MapManager.h"
+#include "ObjectMgr.h"
+#include "ScriptMgr.h"
+#include "WorldPacket.h"
+#include "DBCStores.h"
+#include "World.h"
+#include "GameObjectAI.h"
+#include "Vehicle.h"
+#include "MapReference.h"
+#include "Player.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "Common.h"
-#include "DBCStores.h"
-#include "GameObjectAI.h"
-#include "MapManager.h"
-#include "MapReference.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "Spell.h"
-#include "Transport.h"
-#include "Vehicle.h"
-#include "World.h"
 #include "WorldModel.h"
+#include "Spell.h"
 
-MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false)
+MotionTransport::MotionTransport() : Transport(), _transportInfo(NULL), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
 }
@@ -31,24 +32,24 @@ MotionTransport::~MotionTransport()
     UnloadStaticPassengers();
 }
 
-bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)
-{
+bool MotionTransport::CreateMoTrans(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)
+{ 
     Relocate(x, y, z, ang);
 
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
-                       guidlow, x, y);
+        sLog->outError("Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+            guidlow, x, y);
         return false;
     }
 
-    Object::_Create(guidlow, 0, HighGuid::Mo_Transport);
+    Object::_Create(guidlow, 0, HIGHGUID_MO_TRANSPORT);
 
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
 
     if (!goinfo)
     {
-        LOG_ERROR("server", "Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
+        sLog->outError("Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
         return false;
     }
 
@@ -57,7 +58,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     TransportTemplate const* tInfo = sTransportMgr->GetTransportTemplate(entry);
     if (!tInfo)
     {
-        LOG_ERROR("server", "Transport %u (name: %s) will not be created, missing `transport_template` entry.", entry, goinfo->name.c_str());
+        sLog->outError("Transport %u (name: %s) will not be created, missing `transport_template` entry.", entry, goinfo->name.c_str());
         return false;
     }
 
@@ -90,18 +91,18 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     // pussywizard: no PathRotation for MotionTransports
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
-    m_model = CreateModel();
+    m_model = GameObjectModel::Create(*this);
     return true;
 }
 
 void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
-{
+{ 
     UnloadStaticPassengers();
     while (!_passengers.empty())
     {
         WorldObject* obj = *_passengers.begin();
         RemovePassenger(obj);
-        obj->SetTransport(nullptr);
+        obj->SetTransport(NULL);
         obj->m_movementInfo.transport.Reset();
         obj->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     }
@@ -110,7 +111,7 @@ void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
 }
 
 void MotionTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
-{
+{ 
     Map::PlayerList const& players = GetMap()->GetPlayers();
     if (players.isEmpty())
         return;
@@ -122,13 +123,13 @@ void MotionTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
 }
 
 void MotionTransport::Update(uint32 diff)
-{
+{ 
     uint32 const positionUpdateDelay = 1;
 
     if (AI())
         AI()->UpdateAI(diff);
     else if (!AIM_Initialize())
-        LOG_ERROR("server", "Could not initialize GameObjectAI for Transport");
+        sLog->outError("Could not initialize GameObjectAI for Transport");
 
     if (GetKeyFrames().size() <= 1)
         return;
@@ -222,7 +223,7 @@ void MotionTransport::Update(uint32 diff)
 
     sScriptMgr->OnTransportUpdate(this, diff);
 }
-
+ 
 void MotionTransport::DelayedUpdate(uint32  /*diff*/)
 {
     if (GetKeyFrames().size() <= 1)
@@ -232,7 +233,7 @@ void MotionTransport::DelayedUpdate(uint32  /*diff*/)
 }
 
 void MotionTransport::UpdatePosition(float x, float y, float z, float o)
-{
+{ 
     if (!GetMap()->IsGridLoaded(x, y)) // pussywizard: should not happen, but just in case
         GetMap()->LoadGrid(x, y);
 
@@ -249,7 +250,7 @@ void MotionTransport::UpdatePosition(float x, float y, float z, float o)
 
 void MotionTransport::AddPassenger(WorldObject* passenger, bool withAll)
 {
-    std::lock_guard<std::mutex> guard(Lock);
+    ACORE_GUARD(ACE_Thread_Mutex, Lock);
     if (_passengers.insert(passenger).second)
     {
         if (Player* plr = passenger->ToPlayer())
@@ -268,48 +269,40 @@ void MotionTransport::AddPassenger(WorldObject* passenger, bool withAll)
             passenger->m_movementInfo.flags |= MOVEMENTFLAG_ONTRANSPORT;
             passenger->m_movementInfo.transport.guid = GetGUID();
             passenger->m_movementInfo.transport.pos.Relocate(x, y, z, o);
-            if (passenger->ToUnit())
-            {
-                passenger->ToUnit()->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
-            }
         }
     }
 }
 
 void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
-{
-    std::lock_guard<std::mutex> guard(Lock);
+{ 
+    ACORE_GUARD(ACE_Thread_Mutex, Lock);
     if (_passengers.erase(passenger) || _staticPassengers.erase(passenger))
     {
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(time(nullptr), plr->GetPositionZ());
+            plr->SetFallInformation(time(NULL), plr->GetPositionZ());
         }
 
         if (withAll)
         {
-            passenger->SetTransport(nullptr);
+            passenger->SetTransport(NULL);
             passenger->m_movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
-            passenger->m_movementInfo.transport.guid.Clear();
+            passenger->m_movementInfo.transport.guid = 0;
             passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
-            if (passenger->ToUnit())
-            {
-                passenger->ToUnit()->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
-            }
         }
     }
 }
 
-Creature* MotionTransport::CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData const* data)
-{
+Creature* MotionTransport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
+{ 
     Map* map = GetMap();
     Creature* creature = new Creature();
 
     if (!creature->LoadCreatureFromDB(guid, map, false))
     {
         delete creature;
-        return nullptr;
+        return NULL;
     }
 
     float x = data->posX;
@@ -332,16 +325,15 @@ Creature* MotionTransport::CreateNPCPassenger(ObjectGuid::LowType guid, Creature
 
     if (!creature->IsPositionValid())
     {
-        LOG_ERROR("server", "Creature (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
-            creature->GetGUID().ToString().c_str(), creature->GetPositionX(), creature->GetPositionY());
+        sLog->outError("Creature (guidlow %d, entry %d) not created. Suggested coordinates aren't valid (X: %f Y: %f)",creature->GetGUIDLow(),creature->GetEntry(),creature->GetPositionX(),creature->GetPositionY());
         delete creature;
-        return nullptr;
+        return NULL;
     }
 
     if (!map->AddToMap(creature))
     {
         delete creature;
-        return nullptr;
+        return NULL;
     }
 
     _staticPassengers.insert(creature);
@@ -349,8 +341,8 @@ Creature* MotionTransport::CreateNPCPassenger(ObjectGuid::LowType guid, Creature
     return creature;
 }
 
-GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObjectData const* data)
-{
+GameObject* MotionTransport::CreateGOPassenger(uint32 guid, GameObjectData const* data)
+{ 
     Map* map = GetMap();
     GameObject* go = new GameObject();
     ASSERT(!sObjectMgr->IsGameObjectStaticTransport(data->id));
@@ -358,7 +350,7 @@ GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObj
     if (!go->LoadGameObjectFromDB(guid, map, false))
     {
         delete go;
-        return nullptr;
+        return NULL;
     }
 
     float x = data->posX;
@@ -374,16 +366,15 @@ GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObj
 
     if (!go->IsPositionValid())
     {
-        LOG_ERROR("server", "GameObject (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
-            go->GetGUID().ToString().c_str(), go->GetPositionX(), go->GetPositionY());
+        sLog->outError("GameObject (guidlow %d, entry %d) not created. Suggested coordinates aren't valid (X: %f Y: %f)", go->GetGUIDLow(), go->GetEntry(), go->GetPositionX(), go->GetPositionY());
         delete go;
-        return nullptr;
+        return NULL;
     }
 
     if (!map->AddToMap(go))
     {
         delete go;
-        return nullptr;
+        return NULL;
     }
 
     _staticPassengers.insert(go);
@@ -391,7 +382,7 @@ GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObj
 }
 
 void MotionTransport::LoadStaticPassengers()
-{
+{ 
     if (PassengersLoaded())
         return;
     SetPassengersLoaded(true);
@@ -415,7 +406,7 @@ void MotionTransport::LoadStaticPassengers()
 }
 
 void MotionTransport::UnloadStaticPassengers()
-{
+{ 
     SetPassengersLoaded(false);
     while (!_staticPassengers.empty())
     {
@@ -425,7 +416,7 @@ void MotionTransport::UnloadStaticPassengers()
 }
 
 void MotionTransport::UnloadNonStaticPassengers()
-{
+{ 
     for (PassengerSet::iterator itr = _passengers.begin(); itr != _passengers.end(); )
     {
         if ((*itr)->GetTypeId() == TYPEID_PLAYER)
@@ -439,7 +430,7 @@ void MotionTransport::UnloadNonStaticPassengers()
 }
 
 void MotionTransport::EnableMovement(bool enabled)
-{
+{ 
     if (!GetGOInfo()->moTransport.canBeStopped)
         return;
 
@@ -447,7 +438,7 @@ void MotionTransport::EnableMovement(bool enabled)
 }
 
 void MotionTransport::MoveToNextWaypoint()
-{
+{ 
     // Clear events flagging
     _triggeredArrivalEvent = false;
     _triggeredDepartureEvent = false;
@@ -459,12 +450,12 @@ void MotionTransport::MoveToNextWaypoint()
 }
 
 float MotionTransport::CalculateSegmentPos(float now)
-{
+{ 
     KeyFrame const& frame = *_currentFrame;
     const float speed = float(m_goInfo->moTransport.moveSpeed);
     const float accel = float(m_goInfo->moTransport.accelRate);
-    float timeSinceStop = frame.TimeFrom + (now - (1.0f / IN_MILLISECONDS) * frame.DepartureTime);
-    float timeUntilStop = frame.TimeTo - (now - (1.0f / IN_MILLISECONDS) * frame.DepartureTime);
+    float timeSinceStop = frame.TimeFrom + (now - (1.0f/IN_MILLISECONDS) * frame.DepartureTime);
+    float timeUntilStop = frame.TimeTo - (now - (1.0f/IN_MILLISECONDS) * frame.DepartureTime);
     float segmentPos, dist;
     float accelTime = _transportInfo->accelTime;
     float accelDist = _transportInfo->accelDist;
@@ -490,7 +481,7 @@ float MotionTransport::CalculateSegmentPos(float now)
 }
 
 bool MotionTransport::TeleportTransport(uint32 newMapid, float x, float y, float z, float o)
-{
+{ 
     Map const* oldMap = GetMap();
 
     if (oldMap->GetId() != newMapid)
@@ -530,7 +521,7 @@ void MotionTransport::DelayedTeleportTransport()
     float x = _nextFrame->Node->x,
           y = _nextFrame->Node->y,
           z = _nextFrame->Node->z,
-          o = _nextFrame->InitialOrientation;
+          o =_nextFrame->InitialOrientation;
 
     PassengerSet _passengersCopy = _passengers;
     for (PassengerSet::iterator itr = _passengersCopy.begin(); itr != _passengersCopy.end(); )
@@ -589,7 +580,7 @@ void MotionTransport::DelayedTeleportTransport()
 }
 
 void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
-{
+{ 
     for (PassengerSet::iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
     {
         WorldObject* passenger = *itr;
@@ -608,7 +599,7 @@ void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
         CalculatePassengerPosition(x, y, z, &o);
 
         // check if position is valid
-        if (!Acore::IsValidMapCoord(x, y, z))
+        if (!acore::IsValidMapCoord(x, y, z))
             continue;
 
         switch (passenger->GetTypeId())
@@ -640,7 +631,7 @@ void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
 }
 
 void MotionTransport::DoEventIfAny(KeyFrame const& node, bool departure)
-{
+{ 
     if (uint32 eventid = departure ? node.Node->departureEventID : node.Node->arrivalEventID)
     {
         //TC_LOG_DEBUG("maps.script", "Taxi %s event %u of node %u of %s path", departure ? "departure" : "arrival", eventid, node.Node->index, GetName().c_str());
@@ -661,7 +652,7 @@ StaticTransport::~StaticTransport()
     ASSERT(_passengers.empty());
 }
 
-bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
+bool StaticTransport::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
 {
     ASSERT(map);
     SetMap(map);
@@ -670,7 +661,7 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     m_stationaryPosition.Relocate(x, y, z, ang);
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
+        sLog->outError("Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
         return false;
     }
 
@@ -687,17 +678,17 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(name_id);
     if (!goinfo)
     {
-        LOG_ERROR("sql.sql", "Gameobject (GUID: %u Entry: %u) not created: non-existing entry in `gameobject_template`. Map: %u (X: %f Y: %f Z: %f)", guidlow, name_id, map->GetId(), x, y, z);
+        sLog->outErrorDb("Gameobject (GUID: %u Entry: %u) not created: non-existing entry in `gameobject_template`. Map: %u (X: %f Y: %f Z: %f)", guidlow, name_id, map->GetId(), x, y, z);
         return false;
     }
 
-    Object::_Create(guidlow, 0, HighGuid::Transport);
+    Object::_Create(guidlow, 0, HIGHGUID_TRANSPORT);
 
     m_goInfo = goinfo;
 
     if (goinfo->type >= MAX_GAMEOBJECT_TYPE)
     {
-        LOG_ERROR("sql.sql", "Gameobject (GUID: %u Entry: %u) not created: non-existing GO type '%u' in `gameobject_template`. It will crash client if created.", guidlow, name_id, goinfo->type);
+        sLog->outErrorDb("Gameobject (GUID: %u Entry: %u) not created: non-existing GO type '%u' in `gameobject_template`. It will crash client if created.", guidlow, name_id, goinfo->type);
         return false;
     }
 
@@ -721,7 +712,7 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     SetDisplayId(goinfo->displayId);
 
     if (!m_model)
-        m_model = CreateModel();
+        m_model = GameObjectModel::Create(*this);
 
     SetGoType(GameobjectTypes(goinfo->type));
     SetGoState(go_state);
@@ -763,7 +754,7 @@ void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
     {
         WorldObject* obj = *_passengers.begin();
         RemovePassenger(obj);
-        obj->SetTransport(nullptr);
+        obj->SetTransport(NULL);
         obj->m_movementInfo.transport.Reset();
         obj->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     }
@@ -772,7 +763,7 @@ void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
 }
 
 void StaticTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
-{
+{ 
     Map::PlayerList const& players = GetMap()->GetPlayers();
     if (players.isEmpty())
         return;
@@ -838,7 +829,7 @@ void StaticTransport::Update(uint32 diff)
 
 void StaticTransport::RelocateToProgress(uint32 progress)
 {
-    TransportAnimationEntry const* curr = nullptr, *next = nullptr;
+    TransportAnimationEntry const *curr = NULL, *next = NULL;
     float percPos;
     if (m_goValue.Transport.AnimationInfo->GetAnimNode(progress, curr, next, percPos))
     {
@@ -854,7 +845,7 @@ void StaticTransport::RelocateToProgress(uint32 progress)
         float sign = GetFloatValue(GAMEOBJECT_PARENTROTATION + 2) >= 0.0f ? 1.0f : -1.0f;
         float pathRotAngle = sign * 2.0f * acos(GetFloatValue(GAMEOBJECT_PARENTROTATION + 3));
         float cs = cos(pathRotAngle), sn = sin(pathRotAngle);
-        float nx = pos.x * cs - pos.y * sn;
+        float nx = pos.x * cs - pos.y * sn; 
         float ny = pos.x * sn + pos.y * cs;
         pos.x = nx;
         pos.y = ny;
@@ -874,7 +865,7 @@ void StaticTransport::RelocateToProgress(uint32 progress)
         float oriRotAngle = oriRotAngleCurr + percRot * (oriRotAngleNext - oriRotAngleCurr);
 
         // check if position is valid
-        if (!Acore::IsValidMapCoord(pos.x, pos.y, pos.z))
+        if (!acore::IsValidMapCoord(pos.x, pos.y, pos.z))
             return;
 
         // update position to new one
@@ -884,7 +875,7 @@ void StaticTransport::RelocateToProgress(uint32 progress)
 }
 
 void StaticTransport::UpdatePosition(float x, float y, float z, float o)
-{
+{ 
     if (!GetMap()->IsGridLoaded(x, y)) // pussywizard: should not happen, but just in case
         GetMap()->LoadGrid(x, y);
 
@@ -893,7 +884,7 @@ void StaticTransport::UpdatePosition(float x, float y, float z, float o)
 }
 
 void StaticTransport::UpdatePassengerPositions()
-{
+{ 
     for (PassengerSet::iterator itr = _passengers.begin(); itr != _passengers.end(); ++itr)
     {
         WorldObject* passenger = *itr;
@@ -909,7 +900,7 @@ void StaticTransport::UpdatePassengerPositions()
         CalculatePassengerPosition(x, y, z, &o);
 
         // check if position is valid
-        if (!Acore::IsValidMapCoord(x, y, z))
+        if (!acore::IsValidMapCoord(x, y, z))
             continue;
 
         switch (passenger->GetTypeId())
@@ -964,14 +955,14 @@ void StaticTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(time(nullptr), plr->GetPositionZ());
+            plr->SetFallInformation(time(NULL), plr->GetPositionZ());
         }
 
         if (withAll)
         {
-            passenger->SetTransport(nullptr);
+            passenger->SetTransport(NULL);
             passenger->m_movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
-            passenger->m_movementInfo.transport.guid.Clear();
+            passenger->m_movementInfo.transport.guid = 0;
             passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         }
     }

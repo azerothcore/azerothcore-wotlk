@@ -137,7 +137,7 @@ void ExtractGameobjectModels()
             fwrite(&numVerts, sizeof(uint32), 1, output);
             uint32 numGroups = 1;
             fwrite(&numGroups, sizeof(uint32), 1, output);
-            fwrite(Nop, 4 * 3, 1, output);  // rootwmoid, flags, groupid
+            fwrite(Nop, 4 * 3 , 1, output); // rootwmoid, flags, groupid
             fwrite(Nop, sizeof(float), 3 * 2, output);//bbox, only needed for WMO currently
             fwrite(Nop, 4, 1, output);// liquidflags
             fwrite("GRP ", 4, 1, output);
@@ -157,7 +157,7 @@ void ExtractGameobjectModels()
             if (numTris > 0)
             {
                 uint32 i = 0;
-                for (std::vector<Triangle<uint16>>::iterator itr2 = model.Triangles.begin(); itr2 != model.Triangles.end(); ++itr2, ++i)
+                for (std::vector<Triangle<uint16> >::iterator itr2 = model.Triangles.begin(); itr2 != model.Triangles.end(); ++itr2, ++i)
                 {
                     indices[i * 3 + 0] = itr2->V0;
                     indices[i * 3 + 1] = itr2->V1;
@@ -166,11 +166,12 @@ void ExtractGameobjectModels()
                 fwrite(indices, sizeof(uint16), numTris, output);
             }
 
+
             fwrite("VERT", 4, 1, output);
             wsize = sizeof(int) + sizeof(float) * 3 * numVerts;
             fwrite(&wsize, sizeof(int), 1, output);
             fwrite(&numVerts, sizeof(int), 1, output);
-            float* vertices = new float[numVerts * 3];
+            float* vertices = new float[numVerts*3];
 
             if (numVerts > 0)
             {
@@ -212,7 +213,7 @@ void ExtractGameobjectModels()
             fwrite(&model.Header.CountGroups, sizeof(uint32), 1, output);
             fwrite(&model.Header.WmoId, sizeof(uint32), 1, output);
 
-            const char grp[] = { 'G', 'R', 'P', ' ' };
+            const char grp[] = { 'G' , 'R' , 'P', ' ' };
             for (std::vector<WorldModelGroup>::iterator itr2 = model.Groups.begin(); itr2 != model.Groups.end(); ++itr2)
             {
                 const WMOGroupHeader& header = itr2->Header;
@@ -226,9 +227,9 @@ void ExtractGameobjectModels()
                 fwrite(grp, sizeof(char), sizeof(grp), output);
                 uint32 k = 0;
                 uint32 mobaBatch = itr2->MOBALength / 12;
-                uint32* MobaEx = new uint32[mobaBatch * 4];
+                uint32* MobaEx = new uint32[mobaBatch*4];
 
-                for (uint32 i = 8; i < itr2->MOBALength; i += 12)
+                for(uint32 i = 8; i < itr2->MOBALength; i += 12)
                     MobaEx[k++] = itr2->MOBA[i];
 
                 int mobaSizeGrp = mobaBatch * 4 + 4;
@@ -251,7 +252,7 @@ void ExtractGameobjectModels()
 
 bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapList, bool& debugOutput, uint32& extractFlags)
 {
-    char* param = nullptr;
+    char* param = NULL;
     extractFlags = 0;
 
     for (int i = 1; i < argc; ++i)
@@ -276,9 +277,9 @@ bool HandleArgs(int argc, char** argv, uint32& threads, std::set<uint32>& mapLis
             while (token)
             {
                 mapList.insert(atoi(token));
-                token = strtok(nullptr, ",");
+                token = strtok(NULL, ",");
             }
-
+            
             free(copy);
 
             printf("Extracting only provided list of maps (%u).\n", uint32(mapList.size()));
@@ -344,7 +345,7 @@ void LoadTile(dtNavMesh*& navMesh, const char* tile)
     if (fread(nav, header.size, 1, f) != 1)
         return;
 
-    navMesh->addTile(nav, header.size, DT_TILE_FREE_DATA, 0, nullptr);
+    navMesh->addTile(nav, header.size, DT_TILE_FREE_DATA, 0, NULL);
 
     fclose(f);
 }
@@ -399,7 +400,7 @@ int main(int argc, char* argv[])
         m_epos[2] = -end[0];
 
         //
-        dtQueryFilterExt m_filter;
+        dtQueryFilter m_filter;
         m_filter.setIncludeFlags(Constants::POLY_AREA_ROAD | Constants::POLY_AREA_TERRAIN);
         m_filter.setExcludeFlags(Constants::POLY_AREA_WATER);
 
@@ -436,7 +437,7 @@ int main(int argc, char* argv[])
                 LoadTile(navMesh, buff);
             }
         }
-
+        
         navMeshQuery->init(navMesh, 2048);
 
         float nearestPt[3];
@@ -453,9 +454,9 @@ int main(int argc, char* argv[])
         int hops;
         dtPolyRef* hopBuffer = new dtPolyRef[8192];
         dtStatus status = navMeshQuery->findPath(m_startRef, m_endRef, m_spos, m_epos, &m_filter, hopBuffer, &hops, 8192);
-
+        
         int resultHopCount;
-        float* straightPath = new float[2048 * 3];
+        float* straightPath = new float[2048*3];
         unsigned char* pathFlags = new unsigned char[2048];
         dtPolyRef* pathRefs = new dtPolyRef[2048];
 

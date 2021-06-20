@@ -1,22 +1,23 @@
 /**
- \file G3D/source/TextInput.cpp
+ @file TextInput.cpp
   
- \author Morgan McGuire, http://graphics.cs.williams.edu
+ @author Morgan McGuire, graphics3d.com
  
- \cite Based on a lexer written by Aaron Orenstein. 
+ @cite Based on a lexer written by Aaron Orenstein. 
  
- \created 2001-11-27
- \edited  2012-07-22
+ @created 2001-11-27
+ @edited  2010-07-03
  */
 
 #include "G3D/fileutils.h"
 #include "G3D/TextInput.h"
 #include "G3D/BinaryInput.h"
-#include "G3D/FileSystem.h"
 #include "G3D/stringutils.h"
 
 #ifdef _MSC_VER
 #   pragma warning (push)
+// conversion from 'int' to 'char', possible loss of data (TODO: fix underlying problems)
+#   pragma warning (disable: 4244)
 #endif
 
 namespace G3D {
@@ -45,15 +46,15 @@ bool TextInput::parseBoolean(const std::string& _string) {
 
 double TextInput::parseNumber(const std::string& _string) {
     std::string s = toLower(_string);
-    if (s == "-1.#ind00" || s == "-1.#ind" || s == "nan" || s == "NaN") {
+    if (s == "-1.#ind00" || s == "nan") {
         return nan();
     }
     
-    if (s == "1.#inf00" || s == "1.#inf" || s == "inf" || s == "+inf" || s == "Infinity") {
+    if (s == "1.#inf00" || s == "inf" || s == "+inf") {
         return inf();
     }
     
-    if (s == "-1.#inf00" || s == "-1.#inf" || s == "-inf" || s == "-Infinity") {
+    if (s == "-1.#inf00" || s == "-inf") {
         return -inf();
     }
     
@@ -98,8 +99,7 @@ TextInput::Settings::Settings () :
 
 Token TextInput::peek() {
     if (stack.size() == 0) {
-        Token t;
-        nextToken(t);
+        Token t = nextToken();
         push(t);
     }
 
@@ -118,23 +118,18 @@ int TextInput::peekCharacterNumber() {
 
 
 Token TextInput::read() {
-    Token t;
-    read(t);
-    return t;
-}
-
-
-void TextInput::read(Token& t) {
     if (stack.size() > 0) {
-        t = stack.front();
+        Token t = stack.front();
         stack.pop_front();
+        return t;
     } else {
-        nextToken(t);
+        return nextToken();
     }
 }
 
 
-std::string TextInput::readUntilDelimiterAsString(const char delimiter1, const char delimiter2) {
+
+std::string TextInput::readUntilNewlineAsString() {
 /*
     // Reset the read position back to the start of that token
     currentCharOffset = t.bytePosition();
@@ -149,21 +144,11 @@ std::string TextInput::readUntilDelimiterAsString(const char delimiter1, const c
     */
     std::string s;
 
-    if (stack.size() > 0) {
-        // Need to back up.  This only works if the stack is actually
-        // in proper order reflecting the real file, and doesn't
-        // contain incorrectly pushed elements.
-        Token t = stack.back();
-        stack.clear();
-        currentCharOffset = (int)t.bytePosition();
-        lineNumber = t.line();
-        charNumber = t.character();
-    }
-
-    // Read until delimiter or eof
-    while (currentCharOffset < buffer.size()) {
-        const char c = buffer[currentCharOffset];
-        if ((c == delimiter1) || (c == delimiter2)) {
+    // Read until newline or eof
+    char c = '\0';
+    do {
+        c = buffer[currentCharOffset];
+        if (c == '\r' || c == '\n') {
             // Done
             break;
         } else {
@@ -171,14 +156,9 @@ std::string TextInput::readUntilDelimiterAsString(const char delimiter1, const c
             ++currentCharOffset;
             ++charNumber;
         }
-    }
+    } while (currentCharOffset < buffer.size());
 
     return s;    
-}
-
-
-std::string TextInput::readUntilNewlineAsString() {
-    return readUntilDelimiterAsString('\r', '\n');
 }
 
 
@@ -260,7 +240,8 @@ int TextInput::peekInputChar(int distance) {
 }
 
 
-void TextInput::nextToken(Token& t) {
+Token TextInput::nextToken() {
+    Token t;
 
     t._bytePosition = currentCharOffset;
     t._line         = lineNumber;
@@ -270,7 +251,7 @@ void TextInput::nextToken(Token& t) {
 
     int c = peekInputChar();
     if (c == EOF) {
-        return;
+        return t;
     }
 
     // loop through white space, newlines and comments
@@ -295,7 +276,7 @@ void TextInput::nextToken(Token& t) {
                 }
 
                 eatInputChar();
-                return;
+                return t;
             } else {
                 // Consume the single whitespace
                 c = eatAndPeekInputChar();
@@ -307,23 +288,7 @@ void TextInput::nextToken(Token& t) {
         t._character    = charNumber;
         t._bytePosition = currentCharOffset;
 
-        if (isDigit(c)) {
-            // This is an unsigned number.  Jump ahead for fast number reading.
-            goto numLabel;
-        }
-
         int c2 = peekInputChar(1);
-
-        if ((c == '-') && isDigit(c2) && options.signedNumbers) {
-            // This is a simple number.  Jump ahead for fast number reading.
-            // We treat this case specially because large (i.e., slow) files
-            // are usually large because they are full of numbers.
-            t._string = "-";
-            c = c2;
-            // Consume the minus sign
-            eatInputChar();
-            goto numLabel;
-        }
 
         // parse comments and generate tokens if enabled
         std::string commentString;
@@ -362,7 +327,7 @@ void TextInput::nextToken(Token& t) {
                 t._type         = Token::COMMENT;
                 t._extendedType = Token::LINE_COMMENT_TYPE;
                 t._string       = commentString;
-                return;
+                return t;
             } else {
                 // There is whitespace after the comment (in particular, the
                 // newline that terminates the comment).  There might also be
@@ -399,7 +364,7 @@ void TextInput::nextToken(Token& t) {
                 t._type         = Token::COMMENT;
                 t._extendedType = Token::BLOCK_COMMENT_TYPE;
                 t._string       = commentString;
-                return;
+                return t;
             } else {
                 // There is whitespace after the comment (in particular, the
                 // newline that terminates the comment).  There might also be
@@ -416,7 +381,7 @@ void TextInput::nextToken(Token& t) {
 
     // handle EOF
     if (c == EOF) {
-        return;
+        return t;
     }
 
     // Extended ASCII parses as itself, except for EOF
@@ -455,7 +420,7 @@ void TextInput::nextToken(Token& t) {
     case '?':
     case '%':
         SETUP_SYMBOL(c);
-        return;
+        return t;
 
     case '-':                   // negative number, -, --, -=, or ->
         SETUP_SYMBOL(c);
@@ -466,7 +431,7 @@ void TextInput::nextToken(Token& t) {
         case '=':               // -=
             t._string += c;
             eatInputChar();
-            return;
+            return t;
         }
 
         if (options.signedNumbers) {
@@ -486,14 +451,14 @@ void TextInput::nextToken(Token& t) {
                     eatInputChar(); // i
                     eatInputChar(); // n
                     eatInputChar(); // f
-                    return;
+                    return t;
                 }
             }
         }
 
 
         // plain -
-        return;
+        return t;
 
     case '+':                   // positive number, +, ++, or +=
         SETUP_SYMBOL(c);
@@ -503,7 +468,7 @@ void TextInput::nextToken(Token& t) {
         case '=':               // +=
             t._string += c;
             eatInputChar();
-            return;
+            return t;
         }
 
         if (options.signedNumbers) {
@@ -523,12 +488,12 @@ void TextInput::nextToken(Token& t) {
                     eatInputChar(); // i
                     eatInputChar(); // n
                     eatInputChar(); // f
-                    return;
+                    return t;
                 }
             }
         }
 
-        return;
+        return t;
 
     case ':':                   // : or :: or ::> or ::= or := or :>
         SETUP_SYMBOL(c);
@@ -545,11 +510,12 @@ void TextInput::nextToken(Token& t) {
                     eatInputChar();
                 }
             }
-        } else if (options.proofSymbols && (c == '=' || c == '>')) {
+        }
+        else if (options.proofSymbols && (c == '=' || c == '>')) {
             t._string += c;
             eatInputChar();
         }
-        return;
+        return t;
 
     case '=':                   // = or == or =>
         SETUP_SYMBOL(c);
@@ -557,11 +523,13 @@ void TextInput::nextToken(Token& t) {
         if (c == '=') {
             t._string += c;
             eatInputChar();
+            return t;
         } else if (options.proofSymbols && (c == '>')) {
             t._string += c;
             eatInputChar();
+            return t;
         }
-        return;
+        return t;
 
     case '*':                   // * or *=
     case '/':                   // / or /=
@@ -573,8 +541,9 @@ void TextInput::nextToken(Token& t) {
         if (c == '=') {
             t._string += c;
             eatInputChar();
+            return t;
         }
-        return;
+        return t;
 
     case '>':                   // >, >>,or >=
     case '<':                   // <<, <<, or <= or <- or <:
@@ -587,6 +556,7 @@ void TextInput::nextToken(Token& t) {
             if ((c == '=') || (orig_c == c)) {
                 t._string += c;
                 eatInputChar();
+                return t;
             } else if (options.proofSymbols) {
                 if ((orig_c == '<') && (c == '-')) {
                     t._string += c;
@@ -606,7 +576,7 @@ void TextInput::nextToken(Token& t) {
                 }
             }
         }
-        return;
+        return t;
             
     case '\\':                // backslash or escaped comment char.
         SETUP_SYMBOL(c);
@@ -621,9 +591,9 @@ void TextInput::nextToken(Token& t) {
 
             t._string = c;
             eatInputChar();
-            return;
+            return t;
         }
-        return;
+        return t;
 
     case '.':                   // number, ., .., or ...
         if (isDigit(peekInputChar(1))) {
@@ -641,10 +611,10 @@ void TextInput::nextToken(Token& t) {
                 t._string += c;
                 eatInputChar();
             }
-            return;
+            return t;
         }
 
-        return;
+        return t;
 
     } // switch (c)
 
@@ -670,7 +640,7 @@ numLabel:
         } else {
             t._extendedType = Token::INTEGER_TYPE;
         }
-
+        
         if ((c == '0') && (peekInputChar(1) == 'x')) {
             // Hex number
             t._string += "0x";
@@ -686,7 +656,7 @@ numLabel:
             }
 
         } else {
-            // Non-hex number
+			// Non-hex number
 
             // Read the part before the decimal.
             while (isDigit(c)) {
@@ -711,7 +681,6 @@ numLabel:
                     isSpecial = true;
                     // We are reading a floating point special value
                     // of the form -1.#IND00, -1.#INF00, or 1.#INF00
-                    // (with or without the trailing 00
                     c = eatAndPeekInputChar();
                     char test = c;
                     if (! options.caseSensitive) {
@@ -749,25 +718,16 @@ numLabel:
                             t.line(), charNumber);
                     }
                     t._string += c;
-
-                    // On older systems, there may be an extra 00 tacked on.
                     for (int j = 0; j < 2; ++j) {
                         c = eatAndPeekInputChar();
-                        if (c == '0') {
-                            c = eatAndPeekInputChar();
-                            if (c != '0') {
-                                throw BadMSVCSpecial
+                        if (c != '0') {
+                            throw BadMSVCSpecial
                                 (
-                                 "Incorrect floating-point special (inf or nan) "
-                                 "format.",
-                                t.line(), charNumber);
-                            } else {
-                                eatInputChar();
-                                t._string += "00";
-                            }
-                        } else {
-                            break;
+                                 "Incorrect floating-point special (inf or"
+                                 "nan) format.",
+                                 t.line(), charNumber);
                         }
+                        t._string += (char)c;
                     }
 
                 } else {
@@ -803,7 +763,7 @@ numLabel:
                 c = eatAndPeekInputChar();
             }
         }
-        return;
+        return t;
 
     } else if (isLetter(c) || (c == '_')) {
         // Identifier or keyword
@@ -838,7 +798,7 @@ numLabel:
             t._type = Token::NUMBER;
             t._extendedType = Token::FLOATING_POINT_TYPE;
         }
-        return;
+        return t;
 
     } else if (c == '\"') {
 
@@ -847,7 +807,7 @@ numLabel:
 
         // Double quoted string
         parseQuotedString('\"', t);
-        return;
+        return t;
 
     } else if (c == options.singleQuoteCharacter) {
 
@@ -862,20 +822,22 @@ numLabel:
             t._type = Token::SYMBOL;
             t._extendedType = Token::SYMBOL_TYPE;
         }
-        return;
+        return t;
 
     } // end of special case tokens
 
-    if ((c == EOF) || (c == '\0')) {
+    if (c == EOF) {
         t._type = Token::END;
         t._extendedType = Token::END_TYPE;
         t._string = "";
-        return;
+        return t;
     }
 
     // Some unknown token
-    throw format("Unrecognized token type beginning with character '%c' (ASCII %d)", c, c);
-    return;
+    debugAssertM(false, 
+                 format("Unrecognized token type beginning with character '%c' (ASCII %d)", 
+                        c, c));
+    return t;
 }
 
 
@@ -953,9 +915,8 @@ void TextInput::parseQuotedString(unsigned char delimiter, Token& t) {
     }
 }
 
-
 bool TextInput::readBoolean() {
-    const Token& t = read();
+    Token t(read());
 
     if (t._type == Token::BOOLEAN) {
         return t.boolean();
@@ -969,53 +930,10 @@ bool TextInput::readBoolean() {
                          Token::BOOLEAN, t._type); 
 }
 
-
-int TextInput::readInteger() {
-    Token t;
-    read(t);
-
-    if (t._extendedType == Token::INTEGER_TYPE) {  // common case
-        return int(t.number());
-    } else {
-        // Even if signedNumbers is disabled, readInteger attempts to
-        // read a signed number, so we handle that case here.
-        if (! options.signedNumbers
-            && (t._type == Token::SYMBOL)
-            && ((t._string == "-") 
-                 || (t._string == "+"))) {
-
-            Token t2;
-            read(t2);
-
-            if ((t2._extendedType == Token::INTEGER_TYPE)
-                && (t2._character == t._character + 1)) {
-
-                if (t._string == "-") {
-                    return (int)-t2.number();
-                } else {
-                    return (int)t2.number();
-                }
-            }
-
-            // push back the second token.
-            push(t2);
-        }
-
-        // Push initial token back, and throw an error.  We intentionally
-        // indicate that the wrong type is the type of the initial token.
-        // Logically, the number started there.
-        push(t);
-        throw WrongTokenType(options.sourceFileName, t.line(), t.character(),
-                             Token::NUMBER, t._type); 
-    }    
-}
-
-
 double TextInput::readNumber() {
-    Token t;
-    read(t);
+    Token t(read());
 
-    if (t._type == Token::NUMBER) {  // common case
+    if (t._type == Token::NUMBER) {
         return t.number();
     }
 
@@ -1052,8 +970,7 @@ double TextInput::readNumber() {
 
 
 Token TextInput::readStringToken() {
-    Token t;
-    read(t);
+    Token t(read());
 
     if (t._type == Token::STRING) {               // fast path
         return t;
@@ -1068,9 +985,8 @@ std::string TextInput::readString() {
     return readStringToken()._string;
 }
 
-
 void TextInput::readString(const std::string& s) {
-    const Token& t = readStringToken();
+    Token t(readStringToken());
 
     if (t._string == s) {                         // fast path
         return;
@@ -1081,10 +997,8 @@ void TextInput::readString(const std::string& s) {
                       s, t._string);
 }
 
-
 Token TextInput::readCommentToken() {
-    Token t;
-    read(t);
+    Token t(read());
 
     if (t._type == Token::COMMENT) {               // fast path
         return t;
@@ -1095,14 +1009,12 @@ Token TextInput::readCommentToken() {
                          Token::COMMENT, t._type);
 }
 
-
 std::string TextInput::readComment() {
     return readCommentToken()._string;
 }
 
-
 void TextInput::readComment(const std::string& s) {
-    const Token& t = readCommentToken();
+    Token t(readCommentToken());
 
     if (t._string == s) {                         // fast path
         return;
@@ -1113,10 +1025,8 @@ void TextInput::readComment(const std::string& s) {
                       s, t._string);
 }
 
-
 Token TextInput::readNewlineToken() {
-    Token t;
-    read(t);
+    Token t(read());
 
     if (t._type == Token::NEWLINE) {               // fast path
         return t;
@@ -1132,7 +1042,7 @@ std::string TextInput::readNewline() {
 }
 
 void TextInput::readNewline(const std::string& s) {
-    const Token& t = readNewlineToken();
+    Token t(readNewlineToken());
 
     if (t._string == s) {                         // fast path
         return;
@@ -1143,19 +1053,11 @@ void TextInput::readNewline(const std::string& s) {
                       s, t._string);
 }
 
-
 Token TextInput::readSymbolToken() {
-    Token t;
-    readSymbolToken(t);
-    return t;
-}
-
-
-void TextInput::readSymbolToken(Token& t) {
-    read(t);
+    Token t(read());
     
     if (t._type == Token::SYMBOL) {               // fast path
-        return;
+        return t;
     }
 
     push(t);
@@ -1168,12 +1070,10 @@ std::string TextInput::readSymbol() {
     return readSymbolToken()._string;
 }
 
-
 void TextInput::readSymbol(const std::string& symbol) {
-    Token t;
-    readSymbolToken(t);
+    Token t(readSymbolToken());
 
-    if (t._string == symbol) { // fast path
+    if (t._string == symbol) {                    // fast path
         return;
     }
 
@@ -1185,53 +1085,29 @@ void TextInput::readSymbol(const std::string& symbol) {
 
 TextInput::TextInput(const std::string& filename, const Settings& opt) : options(opt) {
     init();
+    std::string input = readWholeFile(filename);
+
     if (options.sourceFileName.empty()) {
         options.sourceFileName = filename;
     }
-
-    std::string zipfile;
-    if (FileSystem::inZipfile(filename, zipfile)) {
-        // TODO: this could be faster if we directly read the zipfile
-        const std::string& input = readWholeFile(filename);
-        size_t n = input.size();
-        buffer.resize(n);
-        System::memcpy(buffer.getCArray(), input.c_str(), n);
-    } else {
-        // Read directly into the array
-        const uint64 n = FileSystem::size(filename);
-        alwaysAssertM(n != uint64(-1), std::string("File does not exist: ") + filename);
-        buffer.resize(size_t(n));
-        FILE* f = FileSystem::fopen(filename.c_str(), "rb");
-        fread(buffer.getCArray(), 1, size_t(n), f);
-        FileSystem::fclose(f);
-    }
+    int n = input.size();
+    buffer.resize(n);
+    System::memcpy(buffer.getCArray(), input.c_str(), n);
 }
 
 
-void TextInput::initFromString(const char* str, int len, const Settings& settings) {
-    options = settings;
+TextInput::TextInput(FS fs, const std::string& str, const Settings& opt) : options(opt) {
+    (void)fs;
     init();
     if (options.sourceFileName.empty()) {
-        if (len < 14) {
-            options.sourceFileName = format("\"%.*s\"", len, str);
+        if (str.length() < 14) {
+            options.sourceFileName = std::string("\"") + str + "\"";
         } else {
-            options.sourceFileName = format("\"%.*s...\"", 10, str);
+            options.sourceFileName = std::string("\"") + str.substr(0, 10) + "...\"";
         }
     }
-    buffer.resize(len);
-    System::memcpy(buffer.getCArray(), str, buffer.size());
-}
-
-
-TextInput::TextInput(FS fs, const std::string& str, const Settings& opt) {
-    (void)fs;
-    initFromString(str.c_str(), (int)str.size(), opt);
-}
-
-
-TextInput::TextInput(FS fs, const char* str, size_t len, const Settings& opt) : options(opt) {
-    (void)fs;
-    initFromString(str, (int)len, opt);
+    buffer.resize(str.length()); // we don't bother copying trailing NUL.
+    System::memcpy(buffer.getCArray(), str.c_str(), buffer.size());
 }
 
 

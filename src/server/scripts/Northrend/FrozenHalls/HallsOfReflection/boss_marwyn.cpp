@@ -47,7 +47,7 @@ public:
         EventMap events;
         uint16 startFightTimer;
 
-        void Reset() override
+        void Reset()
         {
             startFightTimer = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
@@ -56,7 +56,7 @@ public:
                 pInstance->SetData(DATA_MARWYN, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
@@ -66,7 +66,7 @@ public:
             events.ScheduleEvent(EVENT_SHARED_SUFFERING, 5000);
         }
 
-        void DoAction(int32 a) override
+        void DoAction(int32 a)
         {
             if (a == 1)
             {
@@ -75,7 +75,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (startFightTimer)
             {
@@ -114,7 +114,7 @@ public:
                     break;
                 case EVENT_CORRUPTED_FLESH:
                     Talk(RAND(SAY_CORRUPTED_FLESH_1, SAY_CORRUPTED_FLESH_2));
-                    me->CastSpell((Unit*)nullptr, SPELL_CORRUPTED_FLESH, false);
+                    me->CastSpell((Unit*)NULL, SPELL_CORRUPTED_FLESH, false);
                     events.ScheduleEvent(EVENT_CORRUPTED_FLESH, 20000);
                     break;
                 case EVENT_SHARED_SUFFERING:
@@ -127,20 +127,20 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_MARWYN, DONE);
         }
 
-        void KilledUnit(Unit* who) override
+        void KilledUnit(Unit* who)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode()
         {
             ScriptedAI::EnterEvadeMode();
             if (startFightTimer)
@@ -148,9 +148,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetHallsOfReflectionAI<boss_marwynAI>(creature);
+        return new boss_marwynAI(creature);
     }
 };
 
@@ -179,18 +179,18 @@ public:
                                     if (p->IsAlive())
                                         ++count;
                             ticks = (a->GetDuration() / int32(a->GetSpellInfo()->Effects[0].Amplitude)) + 1;
-                            int32 dmg = (ticks * dmgPerTick) / count;
-                            caster->CastCustomSpell(GetTarget(), 72373, nullptr, &dmg, nullptr, true);
+                            int32 dmg = (ticks*dmgPerTick)/count;
+                            caster->CastCustomSpell(GetTarget(), 72373, NULL, &dmg, NULL, true);
                         }
         }
 
-        void Register() override
+        void Register()
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_hor_shared_sufferingAuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const override
+    AuraScript* GetAuraScript() const
     {
         return new spell_hor_shared_sufferingAuraScript();
     }

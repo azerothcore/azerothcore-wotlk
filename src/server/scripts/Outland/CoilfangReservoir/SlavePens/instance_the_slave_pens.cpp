@@ -22,10 +22,10 @@ Without it, the party doing random dungeon won't get satchel of spoils and
 gets instead the deserter debuff.
 */
 
+#include "ScriptMgr.h"
 #include "Creature.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
 #include "the_slave_pens.h"
 
 class instance_the_slave_pens : public InstanceMapScript
@@ -39,7 +39,7 @@ public:
         {
             counter = DATA_FLAMECALLER_000;
         }
-
+        
         void Load(char const* /*data*/) override { LoadBossState(DataHeader); }
 
         void OnCreatureCreate(Creature* creature) override
@@ -77,7 +77,7 @@ public:
                     LumaGUID = creature->GetGUID();
                     break;
                 case NPC_EARTHEN_RING_FLAMECALLER:
-                    SetGuidData(counter, creature->GetGUID());
+                    SetData64(counter, creature->GetGUID());
                     ++counter;
                     break;
                 default:
@@ -85,7 +85,7 @@ public:
             }
         }
 
-        void SetGuidData(uint32 data, ObjectGuid guid) override
+        void SetData64(uint32 data, uint64 guid) override
         {
             switch (data)
             {
@@ -103,7 +103,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        uint64 GetData64(uint32 type) const override
         {
             switch (type)
             {
@@ -136,18 +136,17 @@ public:
                 default:
                     break;
             }
-
-            return ObjectGuid::Empty;
+            return 0;
         }
 
     protected:
-        ObjectGuid AhuneGUID;
-        ObjectGuid AhuneBunnyGUID;
-        ObjectGuid FrozenCoreGUID;
-        ObjectGuid LumaGUID;
-        ObjectGuid FlameCallerGUIDs[3];
-        ObjectGuid BonfireBunnyGUIDs[3];
-        ObjectGuid BeamBunnyGUIDs[3];
+        uint64 AhuneGUID;
+        uint64 AhuneBunnyGUID;
+        uint64 FrozenCoreGUID;
+        uint64 LumaGUID;
+        uint64 FlameCallerGUIDs[3];
+        uint64 BonfireBunnyGUIDs[3];
+        uint64 BeamBunnyGUIDs[3];
         uint8 counter;
     };
 

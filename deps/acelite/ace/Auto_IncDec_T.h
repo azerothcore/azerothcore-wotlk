@@ -48,9 +48,6 @@ public:
   /// Dump the state of an object.
   void dump (void) const;
 
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
-
 protected:
   /// Reference to the @c ACE_SAFELY_INCREMENTABLE_DECREMENTABLE counter
   /// we're incrementing/decrementing.

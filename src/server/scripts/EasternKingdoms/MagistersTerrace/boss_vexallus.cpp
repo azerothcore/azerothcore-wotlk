@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "magisters_terrace.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "magisters_terrace.h"
 
 enum Yells
 {
@@ -50,9 +50,9 @@ class boss_vexallus : public CreatureScript
 public:
     boss_vexallus() : CreatureScript("boss_vexallus") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetMagistersTerraceAI<boss_vexallusAI>(creature);
+        return new boss_vexallusAI(creature);
     };
 
     struct boss_vexallusAI : public ScriptedAI
@@ -69,7 +69,7 @@ public:
         uint8 IntervalHealthAmount;
         bool Enraged;
 
-        void Reset() override
+        void Reset()
         {
             summons.DespawnAll();
             IntervalHealthAmount = 1;
@@ -78,20 +78,20 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
         }
 
-        void KilledUnit(Unit* victim) override
+        void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             summons.DespawnAll();
             instance->SetData(DATA_VEXALLUS_EVENT, DONE);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
             instance->SetData(DATA_VEXALLUS_EVENT, IN_PROGRESS);
@@ -101,7 +101,7 @@ public:
             events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
         }
 
-        void JustSummoned(Creature* summon) override
+        void JustSummoned(Creature* summon)
         {
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
             {
@@ -111,7 +111,7 @@ public:
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit* killer) override
+        void SummonedCreatureDies(Creature* summon, Unit* killer)
         {
             summons.Despawn(summon);
             summon->DespawnOrUnsummon(1);
@@ -119,7 +119,7 @@ public:
                 killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -140,7 +140,7 @@ public:
                             me->CastSpell(me, SPELL_OVERLOAD, true);
                             return;
                         }
-
+                            
                         Talk(SAY_ENERGY);
                         Talk(EMOTE_DISCHARGE_ENERGY);
 

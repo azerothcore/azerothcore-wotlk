@@ -5,12 +5,9 @@
 #ifndef DEF_SHADOW_LABYRINTH_H
 #define DEF_SHADOW_LABYRINTH_H
 
-#include "CreatureAI.h"
-#include "CreatureAIImpl.h"
-#include "GridNotifiers.h"
 #include "SpellScript.h"
-
-#define ShadowLabyrinthScriptName "instance_shadow_labyrinth"
+#include "CreatureAI.h"
+#include "GridNotifiers.h"
 
 enum slData
 {
@@ -31,10 +28,5 @@ enum slNPCandGO
     SCREAMING_HALL_DOOR         = 183295                      //door opened when grandmaster vorpil dies
 };
 
-template <class AI, class T>
-inline AI* GetShadowLabyrinthAI(T* obj)
-{
-    return GetInstanceAI<AI>(obj, ShadowLabyrinthScriptName);
-}
-
 #endif
+

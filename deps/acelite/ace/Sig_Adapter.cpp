@@ -34,8 +34,6 @@ ACE_Sig_Adapter::~ACE_Sig_Adapter ()
 {
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Sig_Adapter)
-
 int
 ACE_Sig_Adapter::sigkey (void)
 {

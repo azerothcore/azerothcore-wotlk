@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -19,16 +19,16 @@ npc_clintar_spirit
 npc_clintar_dreamwalker
 EndContentData */
 
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "SpellInfo.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "Cell.h"
+#include "CellImpl.h"
 
 /*######
 ## npc_bunthen_plainswind
@@ -92,6 +92,7 @@ public:
         }
         return true;
     }
+
 };
 
 /*######
@@ -149,6 +150,7 @@ public:
 
         return true;
     }
+
 };
 
 /*######
@@ -205,6 +207,7 @@ public:
         }
         return true;
     }
+
 };
 
 /*######
@@ -213,7 +216,7 @@ public:
 
 float const Clintar_spirit_WP[41][5] =
 {
-    //pos_x   pos_y    pos_z    orien waitTime
+     //pos_x   pos_y    pos_z    orien waitTime
     {7465.28f, -3115.46f, 439.327f, 0.83f, 4000},
     {7476.49f, -3101,    443.457f, 0.89f, 0},
     {7486.57f, -3085.59f, 439.478f, 1.07f, 0},
@@ -273,7 +276,7 @@ class npc_clintar_spirit : public CreatureScript
 public:
     npc_clintar_spirit() : CreatureScript("npc_clintar_spirit") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_clintar_spiritAI(creature);
     }
@@ -283,7 +286,7 @@ public:
     public:
         npc_clintar_spiritAI(Creature* creature) : npc_escortAI(creature)
         {
-            PlayerGUID.Clear();
+            PlayerGUID = 0;
         }
 
         uint8 Step;
@@ -291,29 +294,29 @@ public:
         uint32 EventTimer;
         uint32 checkPlayerTimer;
 
-        ObjectGuid PlayerGUID;
+        uint64 PlayerGUID;
 
         bool EventOnWait;
 
-        void Reset() override
+        void Reset()
         {
             if (!PlayerGUID)
             {
                 Step = 0;
                 CurrWP = 0;
                 EventTimer = 0;
-                PlayerGUID.Clear();
+                PlayerGUID = 0;
                 checkPlayerTimer = 1000;
                 EventOnWait = false;
             }
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             std::list<Player*> playerOnQuestList;
-            Acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
-            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
-            Cell::VisitWorldObjects(me, searcher, 5.0f);
+            acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
+            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
+            me->VisitNearbyWorldObject(5.0f, searcher);
             for (std::list<Player*>::const_iterator itr = playerOnQuestList.begin(); itr != playerOnQuestList.end(); ++itr)
             {
                 // Check if found player target has active quest
@@ -330,7 +333,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             if (!PlayerGUID)
                 return;
@@ -339,12 +342,12 @@ public:
             if (player && player->GetQuestStatus(10965) == QUEST_STATUS_INCOMPLETE)
             {
                 player->FailQuest(10965);
-                PlayerGUID.Clear();
+                PlayerGUID = 0;
                 Reset();
             }
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode()
         {
             Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
             if (player && player->IsInCombat() && player->getAttackerForHelper())
@@ -369,7 +372,7 @@ public:
             return;
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -387,8 +390,7 @@ public:
                     if (player && player->IsInCombat() && player->getAttackerForHelper())
                         AttackStart(player->getAttackerForHelper());
                     checkPlayerTimer = 1000;
-                }
-                else checkPlayerTimer -= diff;
+                } else checkPlayerTimer -= diff;
             }
 
             if (EventOnWait && EventTimer <= diff)
@@ -518,7 +520,7 @@ public:
                                 break;
                             case 2:
                                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
-                                PlayerGUID.Clear();
+                                PlayerGUID = 0;
                                 Reset();
                                 me->setDeathState(JUST_DIED);
                                 break;
@@ -528,11 +530,11 @@ public:
                         EventOnWait = false;
                         break;
                 }
-            }
-            else if (EventOnWait) EventTimer -= diff;
+
+            } else if (EventOnWait) EventTimer -= diff;
         }
 
-        void WaypointReached(uint32 waypointId) override
+        void WaypointReached(uint32 waypointId)
         {
             CurrWP = waypointId;
             EventTimer = 0;
@@ -540,6 +542,7 @@ public:
             EventOnWait = true;
         }
     };
+
 };
 
 /*####
@@ -578,7 +581,7 @@ public:
 
         EventMap events;
 
-        void MovementInform(uint32 type, uint32 pointId) override
+        void MovementInform(uint32 type, uint32 pointId)
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -592,19 +595,19 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void EnterCombat(Unit* /*attacker*/)
         {
             events.Reset();
             events.ScheduleEvent(EVENT_CAST_CLEAVE, urand(3000, 5000));
             events.ScheduleEvent(EVENT_CAST_STARFALL, urand(8000, 10000));
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             DoCast(SPELL_OMEN_SUMMON_SPOTLIGHT);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_ELUNE_CANDLE)
             {
@@ -615,7 +618,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -639,7 +642,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_omenAI(creature);
     }
@@ -656,13 +659,13 @@ public:
 
         EventMap events;
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_DESPAWN, 5*MINUTE*IN_MILLISECONDS);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -682,7 +685,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_giant_spotlightAI(creature);
     }

@@ -57,8 +57,6 @@ public:
    */
   void clear_mask(ACE_Reactor_Mask mask);
 
-  ACE_ALLOC_HOOK_DECLARE;
-
 private:
   ACE_Notification_Buffer contents_;
 };

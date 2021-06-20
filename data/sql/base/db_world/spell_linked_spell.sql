@@ -6,15 +6,15 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spell_linked_spell`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = UTF8MB4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `spell_linked_spell` 
 (
-  `spell_trigger` MEDIUMINT NOT NULL,
-  `spell_effect` MEDIUMINT NOT NULL DEFAULT 0,
-  `type` TINYINT unsigned NOT NULL DEFAULT 0,
+  `spell_trigger` mediumint(8) NOT NULL,
+  `spell_effect` mediumint(8) NOT NULL DEFAULT '0',
+  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `comment` text NOT NULL,
   UNIQUE KEY `trigger_effect_type` (`spell_trigger`,`spell_effect`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 COMMENT='Spell System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Spell System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spell_linked_spell` WRITE;
@@ -245,7 +245,6 @@ INSERT INTO `spell_linked_spell` VALUES
 (29139,29133,1,'Flame of Undercity'),
 (30658,30571,1,'Magtheridon - Quake Trigger'),
 (30843,41624,0,'Prince Enfeelble'),
-(31286,6608,1,'Lash: Cast \'Dropped Weapon\' (6608) on hit on the same target'),
 (31606,38776,1,'As the Crow Flies quest'),
 (32096,32172,2,'Thrallmar\'s Favor'),
 (32098,32172,2,'Honor Hold\'s Favor'),
@@ -458,6 +457,7 @@ INSERT INTO `spell_linked_spell` VALUES
 (55502,55475,0,'Lifeblood (Rank 5)'),
 (55503,55475,0,'Lifeblood (Rank 6)'),
 (55814,55817,1,'Trigger Eck Residue for achievement'),
+(55818,55528,0,'Summon Earthen'),
 (56397,63934,1,'Arcane Barrage - Arcane Barrage'),
 (56418,-56422,0,'remove submerge on cast'),
 (56453,67544,0,'Lock and Load Marker'),
@@ -470,7 +470,6 @@ INSERT INTO `spell_linked_spell` VALUES
 (57387,57608,0,'Argent Cannon - Powering Up The Core'),
 (57399,59699,2,'Well Fed - Well Fed (DND)'),
 (57469,7448,1,'Spread Fire triggers Fire'),
-(57620,-57935,0,'Twilight Shift aura removes Twilight Torment'),
 (57635,57636,0,'Disengage'),
 (57787,-57745,1,'Remove See Quest Invisibility 1 When hit by quest chain end spell'),
 (57852,57931,1,'link fire on hit'),

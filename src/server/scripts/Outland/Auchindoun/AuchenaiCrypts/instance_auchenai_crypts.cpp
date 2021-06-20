@@ -15,32 +15,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "auchenai_crypts.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
 
 class instance_auchenai_crypts : public InstanceMapScript
 {
-public:
-    instance_auchenai_crypts() : InstanceMapScript(ACScriptName, 558) { }
+    public:
+        instance_auchenai_crypts() : InstanceMapScript(ACScriptName, 558) { }
 
-    struct instance_auchenai_crypts_InstanceMapScript : public InstanceScript
-    {
-        instance_auchenai_crypts_InstanceMapScript(Map* map) : InstanceScript(map)
+        struct instance_auchenai_crypts_InstanceMapScript : public InstanceScript
         {
-            SetBossNumber(EncounterCount);
+            instance_auchenai_crypts_InstanceMapScript(Map* map) : InstanceScript(map)
+            {
+                SetBossNumber(EncounterCount);
+            }
+
+            void Load(char const* data) override { LoadBossState(data); }
+            
+            std::string GetSaveData() override { return DataHeader + GetBossSaveData(); }
+        };
+
+        InstanceScript* GetInstanceScript(InstanceMap* map) const override
+        {
+            return new instance_auchenai_crypts_InstanceMapScript(map);
         }
-
-        void Load(char const* data) override { LoadBossState(data); }
-
-        std::string GetSaveData() override { return DataHeader + GetBossSaveData(); }
-    };
-
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
-    {
-        return new instance_auchenai_crypts_InstanceMapScript(map);
-    }
 };
 
 void AddSC_instance_auchenai_crypts()

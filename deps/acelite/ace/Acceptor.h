@@ -4,7 +4,7 @@
 /**
  *  @file    Acceptor.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -59,6 +59,7 @@ template <typename SVC_HANDLER, typename PEER_ACCEPTOR>
 class ACE_Acceptor : public ACE_Service_Object
 {
 public:
+
   // Useful STL-style traits.
   typedef typename PEER_ACCEPTOR::PEER_ADDR addr_type;
   typedef PEER_ACCEPTOR acceptor_type;
@@ -67,7 +68,7 @@ public:
 
   /// "Do-nothing" constructor.
   ACE_Acceptor (ACE_Reactor * = 0,
-                int use_select = ACE_DEFAULT_ACCEPTOR_USE_SELECT);
+                int use_select = 1);
 
   /**
    * Open the contained @c PEER_ACCEPTOR object to begin listening, and
@@ -105,7 +106,7 @@ public:
   ACE_Acceptor (const typename PEER_ACCEPTOR::PEER_ADDR &local_addr,
                 ACE_Reactor *reactor = ACE_Reactor::instance (),
                 int flags = 0,
-                int use_select = ACE_DEFAULT_ACCEPTOR_USE_SELECT,
+                int use_select = 1,
                 int reuse_addr = 1);
 
   /**
@@ -147,7 +148,7 @@ public:
   virtual int open (const typename PEER_ACCEPTOR::PEER_ADDR &local_addr,
                     ACE_Reactor *reactor = ACE_Reactor::instance (),
                     int flags = 0,
-                    int use_select = ACE_DEFAULT_ACCEPTOR_USE_SELECT,
+                    int use_select = 1,
                     int reuse_addr = 1);
 
   /// Close down the Acceptor's resources.
@@ -280,6 +281,7 @@ class ACE_Strategy_Acceptor
   : public ACE_Acceptor <SVC_HANDLER, PEER_ACCEPTOR>
 {
 public:
+
   // Useful STL-style traits.
   typedef ACE_Creation_Strategy<SVC_HANDLER>
           creation_strategy_type;
@@ -300,7 +302,7 @@ public:
   /// Default constructor.
   ACE_Strategy_Acceptor (const ACE_TCHAR service_name[] = 0,
                          const ACE_TCHAR service_description[] = 0,
-                         int use_select = ACE_DEFAULT_ACCEPTOR_USE_SELECT,
+                         int use_select = 1,
                          int reuse_addr = 1);
 
   /**
@@ -317,7 +319,7 @@ public:
                          ACE_Scheduling_Strategy<SVC_HANDLER> * = 0,
                          const ACE_TCHAR service_name[] = 0,
                          const ACE_TCHAR service_description[] = 0,
-                         int use_select = ACE_DEFAULT_ACCEPTOR_USE_SELECT,
+                         int use_select = 1,
                          int reuse_addr = 1);
 
   /**
@@ -357,7 +359,7 @@ public:
   virtual int open (const typename PEER_ACCEPTOR::PEER_ADDR &local_addr,
                     ACE_Reactor *reactor,
                     int flags = 0,
-                    int use_select = ACE_DEFAULT_ACCEPTOR_USE_SELECT,
+                    int use_select = 1,
                     int reuse_addr = 1);
 
   /**
@@ -374,7 +376,7 @@ public:
                     ACE_Scheduling_Strategy<SVC_HANDLER> * = 0,
                     const ACE_TCHAR *service_name = 0,
                     const ACE_TCHAR *service_description = 0,
-                    int use_select = ACE_DEFAULT_ACCEPTOR_USE_SELECT,
+                    int use_select = 1,
                     int reuse_addr = 1);
 
   /// Close down the Strategy_Acceptor's resources.
@@ -536,6 +538,7 @@ template <typename SVC_HANDLER, typename PEER_ACCEPTOR>
 class ACE_Oneshot_Acceptor : public ACE_Service_Object
 {
 public:
+
   // Useful STL-style traits.
   typedef typename PEER_ACCEPTOR::PEER_ADDR addr_type;
   typedef PEER_ACCEPTOR acceptor_type;

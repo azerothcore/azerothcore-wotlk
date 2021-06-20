@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "culling_of_stratholme.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "culling_of_stratholme.h"
 #include "SpellInfo.h"
 
 enum Spells
@@ -41,9 +41,9 @@ class boss_epoch : public CreatureScript
 public:
     boss_epoch() : CreatureScript("boss_epoch") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetCullingOfStratholmeAI<boss_epochAI>(creature);
+        return new boss_epochAI (creature);
     }
 
     struct boss_epochAI : public ScriptedAI
@@ -54,13 +54,13 @@ public:
 
         EventMap events;
         uint8 warps;
-        void Reset() override
+        void Reset()
         {
             events.Reset();
             warps = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
 
@@ -72,7 +72,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_TIME_STOP, 20000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_TIME_STEP_H || spellInfo->Id == SPELL_TIME_STEP_N)
             {
@@ -89,7 +89,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -98,7 +98,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
+            switch (events.GetEvent())
             {
                 case EVENT_SPELL_CURSE_OF_EXERTION:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
@@ -126,19 +126,20 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
         }
 
-        void KilledUnit(Unit*  /*victim*/) override
+        void KilledUnit(Unit*  /*victim*/)
         {
-            if (!urand(0, 1))
+            if (!urand(0,1))
                 return;
 
             Talk(SAY_SLAY);
         }
     };
+
 };
 
 void AddSC_boss_epoch()

@@ -17,8 +17,10 @@
 #include "RecastAlloc.h"
 #include "DetourNavMeshBuilder.h"
 
+#include <ace/Synch.h>
+
 TileBuilder::TileBuilder(ContinentBuilder* _cBuilder, std::string world, int x, int y, uint32 mapId) :
-    World(world), X(x), Y(y), MapId(mapId), _Geometry(nullptr), DataSize(0), cBuilder(_cBuilder)
+    World(world), X(x), Y(y), MapId(mapId), _Geometry(NULL), DataSize(0), cBuilder(_cBuilder)
 {
     // Config for normal maps
     memset(&Config, 0, sizeof(rcConfig));
@@ -80,7 +82,7 @@ void TileBuilder::AddGeometry(WorldModelRoot* root, const WorldModelDefinition& 
 
 uint8* TileBuilder::BuildInstance( dtNavMeshParams& navMeshParams )
 {
-    float* bmin = nullptr, *bmax = nullptr;
+    float* bmin = NULL, *bmax = NULL;
 
     _Geometry->CalculateBoundingBox(bmin, bmax);
 
@@ -184,7 +186,7 @@ uint8* TileBuilder::BuildInstance( dtNavMeshParams& navMeshParams )
         printf("No polygons to build on tile, skipping.\n");
         rcFreePolyMesh(pmesh);
         rcFreePolyMeshDetail(dmesh);
-        return nullptr;
+        return NULL;
     }
 
     int navDataSize;
@@ -202,7 +204,7 @@ uint8* TileBuilder::BuildInstance( dtNavMeshParams& navMeshParams )
         return navData;
     }
 
-    return nullptr;
+    return NULL;
 }
 
 uint8* TileBuilder::BuildTiled(dtNavMeshParams& navMeshParams)
@@ -215,9 +217,9 @@ uint8* TileBuilder::BuildTiled(dtNavMeshParams& navMeshParams)
     delete adt;
 
     if (_Geometry->Vertices.empty() && _Geometry->Triangles.empty())
-        return nullptr;
+        return NULL;
 
-    float* bmin = nullptr, *bmax = nullptr;
+    float* bmin = NULL, *bmax = NULL;
     CalculateTileBounds(bmin, bmax, navMeshParams);
     _Geometry->CalculateMinMaxHeight(bmin[1], bmax[1]);
 
@@ -244,7 +246,7 @@ uint8* TileBuilder::BuildTiled(dtNavMeshParams& navMeshParams)
     }
 
     OutputDebugVertices();
-
+    
     uint32 numVerts = _Geometry->Vertices.size();
     uint32 numTris = _Geometry->Triangles.size();
     float* vertices;
@@ -324,7 +326,7 @@ uint8* TileBuilder::BuildTiled(dtNavMeshParams& navMeshParams)
     params.buildBvTree = true;
 
     // Recalculate the bounds with the added geometry
-    float* bmin2 = nullptr, *bmax2 = nullptr;
+    float* bmin2 = NULL, *bmax2 = NULL;
     CalculateTileBounds(bmin2, bmax2, navMeshParams);
     bmin2[1] = bmin[1];
     bmax2[1] = bmax[1];
@@ -352,7 +354,7 @@ uint8* TileBuilder::BuildTiled(dtNavMeshParams& navMeshParams)
         printf("[%02i, %02i] No polygons to build on tile, skipping.\n", X, Y);
         rcFreePolyMesh(pmesh);
         rcFreePolyMeshDetail(dmesh);
-        return nullptr;
+        return NULL;
     }
 
     int navDataSize;
@@ -370,7 +372,7 @@ uint8* TileBuilder::BuildTiled(dtNavMeshParams& navMeshParams)
         return navData;
     }
 
-    return nullptr;
+    return NULL;
 }
 
 void TileBuilder::OutputDebugVertices()

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "old_hillsbrad.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "old_hillsbrad.h"
 
 enum CaptainSkarloc
 {
@@ -44,9 +44,9 @@ class boss_captain_skarloc : public CreatureScript
 public:
     boss_captain_skarloc() : CreatureScript("boss_captain_skarloc") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetOldHillsbradAI<boss_captain_skarlocAI>(creature);
+        return GetInstanceAI<boss_captain_skarlocAI>(creature);
     }
 
     struct boss_captain_skarlocAI : public ScriptedAI
@@ -57,19 +57,19 @@ public:
         EventMap events2;
         SummonList summons;
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
             events2.Reset();
             summons.DespawnAll();
         }
 
-        void JustSummoned(Creature* summon) override
+        void JustSummoned(Creature* summon)
         {
             summons.Summon(summon);
-            if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_THRALL_GUID)))
+            if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_THRALL_GUID)))
                 thrall->AI()->JustSummoned(summon);
-            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
 
             if (summon->GetEntry() == NPC_SKARLOC_MOUNT)
                 return;
@@ -80,21 +80,21 @@ public:
                 summon->GetMotionMaster()->MovePoint(0, 2056.870f, 234.853f, 63.839f);
         }
 
-        void InitializeAI() override
+        void InitializeAI()
         {
-            ScriptedAI::InitializeAI();
+            ScriptedAI::InitializeAI(); 
 
             Movement::PointsArray path;
             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            for (uint8 i = 0; i < WAYPOINTS_COUNT; ++i)
+            for (uint8 i = 0; i < WAYPOINTS_COUNT; ++i) 
                 path.push_back(G3D::Vector3(startPath[i].GetPositionX(), startPath[i].GetPositionY(), startPath[i].GetPositionZ()));
 
             me->GetMotionMaster()->MoveSplinePath(&path);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
             me->Mount(SKARLOC_MOUNT_MODEL);
         }
 
-        void MovementInform(uint32 type, uint32 id) override
+        void MovementInform(uint32 type, uint32 id)
         {
             if (type != ESCORT_MOTION_TYPE)
                 return;
@@ -122,7 +122,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             me->CastSpell(me, SPELL_DEVOTION_AURA, true);
 
@@ -134,19 +134,19 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 1000);
         }
 
-        void KilledUnit(Unit*  /*victim*/) override
+        void KilledUnit(Unit*  /*victim*/)
         {
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
             me->GetInstanceScript()->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_SKARLOC_KILLED);
             me->GetInstanceScript()->SetData(DATA_THRALL_ADD_FLAG, 0);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -155,13 +155,13 @@ public:
                     Talk(SAY_ENTER);
                     break;
                 case EVENT_START_FIGHT:
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetInCombatWithZone();
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                             if (summon->GetEntry() != NPC_SKARLOC_MOUNT)
                             {
-                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                                summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                                 summon->SetInCombatWithZone();
                             }
                     break;
@@ -198,11 +198,13 @@ public:
                     me->CastSpell(me, SPELL_CONSECRATION, false);
                     events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 20000);
                     break;
+
             }
 
             DoMeleeAttackIfReady();
         }
     };
+
 };
 
 void AddSC_boss_captain_skarloc()

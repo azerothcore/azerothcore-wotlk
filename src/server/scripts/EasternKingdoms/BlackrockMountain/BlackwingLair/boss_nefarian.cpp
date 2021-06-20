@@ -1,18 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "blackwing_lair.h"
-#include "GameObject.h"
-#include "InstanceScript.h"
-#include "MotionMaster.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptMgr.h"
-#include "TemporarySummon.h"
+#include "ScriptedGossip.h"
+#include "ScriptedCreature.h"
+#include "blackwing_lair.h"
+#include "Player.h"
 
 enum Events
 {
@@ -47,7 +43,7 @@ enum Says
     // BWL
     SAY_GAMESBEGIN_1           = 12,
     SAY_GAMESBEGIN_2           = 13,
-    // SAY_VAEL_INTRO             = 14, Not used - when he corrupts Vaelastrasz
+ // SAY_VAEL_INTRO             = 14, Not used - when he corrupts Vaelastrasz
 
     // Nefarian
     SAY_RANDOM                 = 0,
@@ -69,8 +65,8 @@ enum Says
 
 enum Gossip
 {
-    GOSSIP_ID                   = 21332,
-    GOSSIP_OPTION_ID            = 0
+   GOSSIP_ID                   = 21332,
+   GOSSIP_OPTION_ID            = 0
 };
 
 enum Paths
@@ -131,10 +127,10 @@ enum Spells
     SPELL_ROGUE                 = 23414,     // Paralise
     SPELL_DEATH_KNIGHT          = 49576      // Death Grip
 
-                                  // 19484
-                                  // 22664
-                                  // 22674
-                                  // 22666
+// 19484
+// 22664
+// 22674
+// 22666
 };
 
 Position const DrakeSpawnLoc[2] = // drakonid
@@ -158,26 +154,28 @@ public:
 
     struct boss_victor_nefariusAI : public BossAI
     {
-        boss_victor_nefariusAI(Creature* creature) : BossAI(creature, DATA_NEFARIAN)
-        {
-            Initialize();
-        }
+        boss_victor_nefariusAI(Creature* creature) : BossAI(creature, BOSS_NEFARIAN) { }
 
-        void Initialize()
+        void Reset()
         {
             SpawnedAdds = 0;
-        }
-
-        void Reset() override
-        {
-            Initialize();
 
             if (me->GetMapId() == 469)
             {
-                if (!me->FindNearestCreature(NPC_NEFARIAN, 1000.0f, true))
+                // pussywizard:
+                bool reset = true;
+                if (instance)
+                    if (/*Creature* nefarian = */instance->instance->GetCreature(instance->GetData64(DATA_NEFARIAN)))
+                        reset = false;
+                if (reset)
                     _Reset();
 
-                me->SetVisible(true);
+                // pussywizard:
+                if (!instance || instance->GetBossState(BOSS_NEFARIAN) == DONE || instance->GetBossState(BOSS_NEFARIAN) == IN_PROGRESS)
+                    me->SetVisible(false);
+                else
+                    me->SetVisible(true);
+
                 me->SetPhaseMask(1, true);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
                 me->setFaction(35);
@@ -186,9 +184,9 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit*  /*target*/) const override { return me->IsVisible(); }
+        bool CanAIAttack(const Unit*  /*target*/) const { return me->IsVisible(); }
 
-        void JustReachedHome() override
+        void JustReachedHome()
         {
             Reset();
         }
@@ -203,16 +201,14 @@ public:
             me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
             DoCast(me, SPELL_NEFARIANS_BARRIER);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             AttackStart(target);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
             events.ScheduleEvent(EVENT_FEAR, urand(10000, 20000));
-            events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
+            //events.ScheduleEvent(EVENT_MIND_CONTROL, urand(30000, 35000));
             events.ScheduleEvent(EVENT_SPAWN_ADD, 10000);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
-
+        void SummonedCreatureDies(Creature* summon, Unit*)
         {
             if (summon->GetEntry() != NPC_NEFARIAN)
             {
@@ -223,9 +219,9 @@ public:
             }
         }
 
-        void JustSummoned(Creature* /*summon*/) override { }
+        void JustSummoned(Creature* /*summon*/) { }
 
-        void SetData(uint32 type, uint32 data) override
+        void SetData(uint32 type, uint32 data)
         {
             if ( type == 1 && data == 1)
             {
@@ -237,7 +233,7 @@ public:
                 events.ScheduleEvent(EVENT_SUCCESS_1, 5000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
             {
@@ -266,7 +262,7 @@ public:
                         case EVENT_SUCCESS_1:
                             if (Unit* player = me->SelectNearestPlayer(60.0f))
                             {
-                                me->SetFacingToObject(player);
+                                me->SetInFront(player);
                                 Talk(SAY_SUCCESS);
                                 if (GameObject* portcullis1 = me->FindNearestGameObject(GO_PORTCULLIS_ACTIVE, 65.0f))
                                     portcullis1->SetGoState(GO_STATE_ACTIVE);
@@ -343,36 +339,37 @@ public:
                                 {
                                     if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianLoc[0]))
                                     {
-                                        nefarian->setActive(true);
+                                        nefarian->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                                         nefarian->SetCanFly(true);
-                                        nefarian->SetDisableGravity(true);
-                                        nefarian->CastSpell(nullptr, SPELL_SHADOWFLAME_INITIAL);
-                                        nefarian->GetMotionMaster()->MovePoint(1, NefarianLoc[1]);
+                                        nefarian->SetHover(false);
+                                        nefarian->setActive(true);
+                                        nefarian->SetHomePosition(NefarianLoc[1]);
+                                        nefarian->GetMotionMaster()->MoveCharge(NefarianLoc[1].GetPositionX(), NefarianLoc[1].GetPositionY(), NefarianLoc[1].GetPositionZ(), 15.0f);
+
+                                        nefarian->AI()->DoCastAOE(SPELL_SHADOWFLAME_INITIAL);
                                     }
                                     events.CancelEvent(EVENT_MIND_CONTROL);
                                     events.CancelEvent(EVENT_FEAR);
                                     events.CancelEvent(EVENT_SHADOW_BOLT);
                                     me->SetVisible(false);
+                                    EnterEvadeMode();
                                     return;
                                 }
                             }
                             events.ScheduleEvent(EVENT_SPAWN_ADD, 4000);
                             break;
                     }
-
-                    if (me->HasUnitState(UNIT_STATE_CASTING))
-                        return;
                 }
             }
         }
 
-        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
+        void sGossipSelect(Player* player, uint32 sender, uint32 action)
         {
             if (sender == GOSSIP_ID && action == GOSSIP_OPTION_ID)
             {
                 // pussywizard:
                 InstanceScript* instance = player->GetInstanceScript();
-                if (!instance || instance->GetBossState(DATA_NEFARIAN) == DONE)
+                if (!instance || instance->GetBossState(BOSS_NEFARIAN) == DONE)
                     return;
 
                 CloseGossipMenuFor(player);
@@ -385,9 +382,9 @@ public:
             uint32 SpawnedAdds;
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackwingLairAI<boss_victor_nefariusAI>(creature);
+        return GetInstanceAI<boss_victor_nefariusAI>(creature);
     }
 };
 
@@ -398,29 +395,21 @@ public:
 
     struct boss_nefarianAI : public BossAI
     {
-        boss_nefarianAI(Creature* creature) : BossAI(creature, DATA_NEFARIAN)
-        {
-            Initialize();
-        }
+        boss_nefarianAI(Creature* creature) : BossAI(creature, BOSS_NEFARIAN) { }
 
-        void Initialize()
+        void Reset()
         {
             Phase3 = false;
             canDespawn = false;
             DespawnTimer = 30000;
         }
 
-        void Reset() override
-        {
-            Initialize();
-        }
-
-        void JustReachedHome() override
+        void JustReachedHome()
         {
             canDespawn = true;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             events.ScheduleEvent(EVENT_SHADOWFLAME, 12000);
             events.ScheduleEvent(EVENT_FEAR, urand(25000, 35000));
@@ -431,48 +420,45 @@ public:
             Talk(SAY_RANDOM);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*Killer*/)
         {
             _JustDied();
             Talk(SAY_DEATH);
         }
 
-        void KilledUnit(Unit* victim) override
+        void KilledUnit(Unit* victim)
         {
-            if (rand32() % 5)
+            if (rand()%5)
                 return;
 
             Talk(SAY_SLAY, victim);
         }
 
-        void MovementInform(uint32 type, uint32 id) override
+        void MovementInform(uint32 type, uint32  /*id*/)
         {
             if (type != POINT_MOTION_TYPE)
                 return;
 
-            if (id == 1)
-            {
-                DoZoneInCombat();
-                if (me->GetVictim())
-                    AttackStart(me->GetVictim());
-            }
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->SetWalk(false);
+            me->SetInCombatWithZone();
+            if (me->GetVictim())
+                AttackStart(me->GetVictim());
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (canDespawn && DespawnTimer <= diff)
             {
-                instance->SetBossState(DATA_NEFARIAN, FAIL);
+                instance->SetBossState(BOSS_NEFARIAN, FAIL);
 
                 std::list<Creature*> constructList;
                 me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
                 for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
                     (*itr)->DespawnOrUnsummon();
-            }
-            else
-            {
-                DespawnTimer -= diff;
-            }
+
+            } else DespawnTimer -= diff;
 
             if (!UpdateVictim())
                 return;
@@ -560,9 +546,6 @@ public:
                         events.ScheduleEvent(EVENT_CLASSCALL, urand(30000, 35000));
                         break;
                 }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
             }
 
             // Phase3 begins when health below 20 pct
@@ -574,7 +557,7 @@ public:
                     if ((*itr) && !(*itr)->IsAlive())
                     {
                         (*itr)->Respawn();
-                        DoZoneInCombat((*itr));
+                        (*itr)->SetInCombatWithZone();
                         (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         (*itr)->SetReactState(REACT_AGGRESSIVE);
                         (*itr)->SetStandState(UNIT_STAND_STATE_STAND);
@@ -591,11 +574,12 @@ public:
         bool canDespawn;
         uint32 DespawnTimer;
         bool Phase3;
+
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackwingLairAI<boss_nefarianAI>(creature);
+        return GetInstanceAI<boss_nefarianAI>(creature);
     }
 };
 

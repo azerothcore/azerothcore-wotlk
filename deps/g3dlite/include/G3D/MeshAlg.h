@@ -20,10 +20,9 @@
 #include "G3D/constants.h"
 #include "G3D/Image1.h"
 
-#ifdef G3D_WINDOWS
+#ifdef G3D_WIN32
 // Turn off "conditional expression is constant" warning; MSVC generates this
 // for debug assertions in inlined methods.
-#pragma warning( push )
 #pragma warning (disable : 4127)
 #endif
 
@@ -445,7 +444,7 @@ public:
         Array<Vector3>&       newVertexPositions,
         Array<int>&           toNew,
         Array<int>&           toOld,
-        float                 radius = fuzzyEpsilon32);
+        double                radius = fuzzyEpsilon);
 
     /**
      Modifies the face, edge, and vertex arrays in place so that
@@ -480,7 +479,7 @@ public:
         Array<Face>&          faceArray,
         Array<Edge>&          edgeArray,
         Array<Vertex>&        vertexArray,
-        float                 radius = fuzzyEpsilon32);
+        double                radius = fuzzyEpsilon);
 
 
     /**
@@ -536,7 +535,7 @@ public:
 
     /**
      Generates a unit square in the X-Z plane composed of a grid of wCells x hCells
-     squares on the unit interval and then transforms it by xform.
+     squares and then transforms it by xform.
 
      @param vertex Output vertices
      @param texCoord Output texture coordinates
@@ -546,8 +545,8 @@ public:
      @param twoSided If true, matching top and bottom planes are generated.
      \param elevation If non-NULL, values from this image are used as elevations.  Apply an \a xform to adjust the scale
      */
-    static void generateGrid
-       (Array<Vector3>&     vertex,
+    static void generateGrid(
+        Array<Vector3>&     vertex,
         Array<Vector2>&     texCoord,
         Array<int>&         index,
         int                 wCells = 10, 
@@ -556,7 +555,7 @@ public:
         bool                spaceCentered = true,
         bool                twoSided = true,
         const CoordinateFrame& xform = CoordinateFrame(),
-        const Image1::Ref&  elevation = Image1::Ref());
+        const Image1::Ref&  elevation = NULL);
 
     /** Converts quadlist (QUADS), 
         triangle fan (TRIANGLE_FAN),
@@ -680,11 +679,5 @@ protected:
         int i0, int i1, int f, double area);
 };
 }
-
-
-#ifdef G3D_WINDOWS
-#pragma warning( pop )
-#endif
-
 #endif
 

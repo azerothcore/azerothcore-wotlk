@@ -27,6 +27,7 @@
 #include "ace/Process_Semaphore.h"
 #include "ace/Process_Mutex.h"
 
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 class ACE_Export ACE_Reactive_MEM_IO : public ACE_MEM_SAP
@@ -64,7 +65,7 @@ public:
                             const ACE_Time_Value *timeout);
 
   /**
-   * Convert the buffer offset @a off to absolute address to @a buf.
+   * Convert the buffer offset <off> to absolute address to @a buf.
    * Return the size of valid information containing in the @a buf,
    * -1 if <shm_malloc_> is not initialized.
    */
@@ -75,12 +76,11 @@ public:
 class ACE_Export ACE_MT_MEM_IO : public ACE_MEM_SAP
 {
 public:
-  /// Structure for a simple queue
   typedef struct
   {
     ACE_MEM_SAP_Node::ACE_MEM_SAP_NODE_PTR head_;
     ACE_MEM_SAP_Node::ACE_MEM_SAP_NODE_PTR tail_;
-  } MQ_Struct;
+  } MQ_Struct;                  // Structure for a simple queue
 
   class Simple_Queue
   {
@@ -116,8 +116,6 @@ public:
                     const ACE_TCHAR *name,
                     MALLOC_OPTIONS *options);
 
-  int fini ();
-
   /**
    * Fetch location of next available data into <recv_buffer_>.
    * As this operation read the address of the data off the socket
@@ -144,7 +142,7 @@ private:
 /**
  * @class ACE_MEM_IO
  *
- * @brief Defines the methods for the ACE shared memory wrapper I/O
+ * @brief Defines the methods for the ACE shared memeory wrapper I/O
  * routines (e.g., send/recv).
  * The shared memory transport uses ACE_SOCK_* class to
  * implement the signaling mechanism so we can easily use the
@@ -170,6 +168,7 @@ private:
 class ACE_Export ACE_MEM_IO : public ACE_SOCK
 {
 public:
+  // = Initialization and termination methods.
   /// Constructor.
   ACE_MEM_IO (void);
 

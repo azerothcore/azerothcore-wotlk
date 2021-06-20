@@ -1,3 +1,5 @@
+//$Id: Abstract_Timer_Queue.h 95368 2011-12-19 13:38:49Z mcorino $
+
 #ifndef ACE_ABSTRACT_TIMER_QUEUE_H
 #define ACE_ABSTRACT_TIMER_QUEUE_H
 
@@ -10,8 +12,6 @@
  * Based on classes and files developed by Doug Schmidt, Darrell
  * Brunsch, Irfan Pyarali and a cast of thousands.
  */
-
-#include "ace/Versioned_Namespace.h"
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -184,7 +184,7 @@ public:
   /**
    * Determine the next event to timeout.  Returns @a max if there are
    * no pending timers or if all pending timers are longer than max.
-   * @a the_timeout should be a pointer to storage for the timeout value,
+   * <the_timeout> should be a pointer to storage for the timeout value,
    * and this value is also returned.  This method does not acquire a
    * lock internally since it doesn't modify internal state.  If you
    * need to call this method when the queue is being modified

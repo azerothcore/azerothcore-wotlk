@@ -6,26 +6,20 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `version_db_characters`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = UTF8MB4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `version_db_characters` 
 (
   `sql_rev` varchar(100) NOT NULL,
   `required_rev` varchar(100) DEFAULT NULL,
-  `2020_01_04_00` bit(1) DEFAULT NULL,
+  `2019_01_06_00` bit(1) DEFAULT NULL,
   PRIMARY KEY (`sql_rev`),
   KEY `required` (`required_rev`),
   CONSTRAINT `required` FOREIGN KEY (`required_rev`) REFERENCES `version_db_characters` (`sql_rev`)
-) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC COMMENT='Last applied sql update to DB';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Last applied sql update to DB';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `version_db_characters` WRITE;
 /*!40000 ALTER TABLE `version_db_characters` DISABLE KEYS */;
-INSERT INTO `version_db_characters` VALUES 
-('1557226918417685700',NULL,NULL),
-('1557608218190967100',NULL,NULL),
-('1572030074009407852',NULL,NULL),
-('1572815191193825836',NULL,NULL),
-('1575656087867346414',NULL,NULL);
 /*!40000 ALTER TABLE `version_db_characters` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

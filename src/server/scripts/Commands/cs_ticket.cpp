@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,9 +17,8 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "Realm.h"
-#include "ScriptMgr.h"
 #include "TicketMgr.h"
+#include "ScriptMgr.h"
 
 class ticket_commandscript : public CommandScript
 {
@@ -83,9 +82,9 @@ public:
         }
 
         // Get target information
-        ObjectGuid targetGuid = sObjectMgr->GetPlayerGUIDByName(target.c_str());
-        uint32 targetAccountId = sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
-        uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realm.Id.Realm);
+        uint64 targetGuid = sObjectMgr->GetPlayerGUIDByName(target.c_str());
+        uint64 targetAccountId = sObjectMgr->GetPlayerAccountIdByGUID(targetGuid);
+        uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realmID);
 
         // Target must exist and have administrative rights
         if (!targetGuid || AccountMgr::IsPlayerAccount(targetGmLevel))
@@ -143,7 +142,7 @@ public:
             return true;
         }
 
-        sTicketMgr->ResolveAndCloseTicket(ticket->GetId(), player ? player->GetGUID() : ObjectGuid::Empty);
+        sTicketMgr->ResolveAndCloseTicket(ticket->GetId(), player ? player->GetGUID() : -1);
         sTicketMgr->UpdateLastChange();
 
         std::string msg = ticket->FormatMessageString(*handler, player ? player->GetName().c_str() : "Console", nullptr, nullptr, nullptr);
@@ -173,13 +172,14 @@ public:
             return false;
 
         GmTicket* ticket = sTicketMgr->GetTicket(ticketId);
-        if (!ticket)
+        if (!ticket || ticket->IsClosed())
         {
             handler->PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST);
             return true;
         }
 
-        // Cannot comment ticket assigned to someone else (unless done from the Console)
+        // Cannot comment ticket assigned to someone else
+        //! Console excluded
         Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
         if (player && ticket->IsAssignedNotTo(player->GetGUID()))
         {
@@ -194,7 +194,7 @@ public:
 
         std::string const assignedName = ticket->GetAssignedToName();
         std::string msg = ticket->FormatMessageString(*handler, assignedName.empty() ? nullptr : assignedName.c_str(), nullptr, nullptr, nullptr);
-
+        
         msg += handler->PGetParseString(LANG_COMMAND_TICKETLISTADDCOMMENT, player ? player->GetName().c_str() : "Console", comment);
         handler->SendGlobalGMSysMessage(msg.c_str());
 
@@ -245,7 +245,7 @@ public:
 
         SQLTransaction trans = SQLTransaction(nullptr);
         ticket->SetCompleted();
-        ticket->SetResolvedBy(gm ? gm->GetGUID() : ObjectGuid::Empty);
+        ticket->SetResolvedBy(gm ? gm->GetGUID() : -1);
         ticket->SaveToDB(trans);
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
@@ -381,9 +381,9 @@ public:
             security = assignedPlayer->GetSession()->GetSecurity();
         else
         {
-            ObjectGuid guid = ticket->GetAssignedToGUID();
-            uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(guid.GetCounter());
-            security = AccountMgr::GetSecurity(accountId, realm.Id.Realm);
+            uint64 guid = ticket->GetAssignedToGUID();
+            uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(guid);
+            security = AccountMgr::GetSecurity(accountId, realmID);
         }
 
         // Check security
@@ -402,7 +402,7 @@ public:
         sTicketMgr->UpdateLastChange();
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, assignedTo.c_str(),
-                          handler->GetSession() ? handler->GetSession()->GetPlayer()->GetName().c_str() : "Console", nullptr);
+            handler->GetSession() ? handler->GetSession()->GetPlayer()->GetName().c_str() : "Console", nullptr);
         handler->SendGlobalGMSysMessage(msg.c_str());
 
         return true;
@@ -439,7 +439,7 @@ public:
             return false;
 
         // Detect target's GUID
-        ObjectGuid guid;
+        uint64 guid = 0;
         if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
             guid = player->GetGUID();
         else

@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `game_event_creature`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = UTF8MB4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `game_event_creature` 
 (
-  `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
-  `guid` INT unsigned NOT NULL,
+  `eventEntry` tinyint(4) NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
+  `guid` int(10) unsigned NOT NULL,
   PRIMARY KEY (`guid`,`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `game_event_creature` WRITE;
@@ -25,7 +25,6 @@ INSERT INTO `game_event_creature` VALUES
 (10,6512),
 (22,6519),
 (22,6520),
-(-24,7370),
 (32,7727),
 (23,8969),
 (23,8971),
@@ -44,8 +43,6 @@ INSERT INTO `game_event_creature` VALUES
 (12,11009),
 (12,11010),
 (12,11011),
-(-24,12369),
-(-24,12372),
 (10,12401),
 (23,12604),
 (12,17338),
@@ -64,16 +61,16 @@ INSERT INTO `game_event_creature` VALUES
 (12,20299),
 (12,20424),
 (12,20425),
-(-24,21020),
-(-24,21022),
+(-26,21020),
+(-26,21022),
 (-26,21024),
-(-24,21026),
+(-26,21026),
 (-26,21034),
 (-26,21036),
-(-24,22181),
-(-24,22188),
+(-26,22181),
+(-26,22188),
 (-26,22451),
-(-24,22473),
+(-26,22473),
 (10,23099),
 (-26,24976),
 (-5,25324),
@@ -137,8 +134,8 @@ INSERT INTO `game_event_creature` VALUES
 (4,53942),
 (5,54395),
 (71,54395),
-(15,54687),
-(15,54688),
+(62,54687),
+(62,54688),
 (14,54742),
 (3,55089),
 (4,56323),
@@ -201,15 +198,12 @@ INSERT INTO `game_event_creature` VALUES
 (7,70575),
 (7,70576),
 (7,70578),
-(55,70996),
 (7,72236),
 (7,72237),
 (7,72238),
 (7,72239),
 (10,74808),
 (7,75117),
-(56,75475),
-(56,75914),
 (22,76747),
 (7,78371),
 (7,78372),
@@ -222,7 +216,6 @@ INSERT INTO `game_event_creature` VALUES
 (7,78384),
 (10,78961),
 (10,78963),
-(56,79018),
 (-12,79648),
 (-12,79650),
 (-12,79651),
@@ -387,7 +380,6 @@ INSERT INTO `game_event_creature` VALUES
 (12,87071),
 (1,87086),
 (60,88155),
-(56,88156),
 (60,88158),
 (60,88159),
 (60,88160),
@@ -2651,7 +2643,7 @@ INSERT INTO `game_event_creature` VALUES
 (1,202862),
 (1,202863),
 (1,202864),
-(15,203521),
+(62,203521),
 (24,207000),
 (24,207001),
 (24,207002),

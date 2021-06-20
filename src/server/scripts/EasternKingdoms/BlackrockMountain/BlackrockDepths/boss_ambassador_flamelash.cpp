@@ -1,13 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "blackrock_depths.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include <vector>
+#include "ScriptedCreature.h"
+#include "blackrock_depths.h"
 
 enum Spells
 {
@@ -39,16 +38,16 @@ const Position SummonPositions[7] =
     {1012.252747f, -206.696487f, -61.980618f, 3.617599f},
 };
 
-std::vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 };
+vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 }; 
 
 class boss_ambassador_flamelash : public CreatureScript
 {
 public:
     boss_ambassador_flamelash() : CreatureScript("boss_ambassador_flamelash") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackrockDepthsAI<boss_ambassador_flamelashAI>(creature);
+        return GetInstanceAI<boss_ambassador_flamelashAI>(creature);
     }
 
     struct boss_ambassador_flamelashAI : public BossAI
@@ -61,7 +60,7 @@ public:
         SummonList summons;
 
         // This will allow to find a valid position to spawn them
-        std::vector<int> validPosition;
+        vector<int> validPosition;
         bool foundValidPosition = false;
 
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
@@ -89,14 +88,14 @@ public:
         {
             // Active makes the runes burn, ready turns them off
             GOState state = mode ? GO_STATE_ACTIVE : GO_STATE_READY;
-
+            
             for (int RuneEntry : gobjectDwarfRunesEntry)
                 if (GameObject* dwarfRune = me->FindNearestGameObject(RuneEntry, 200.0f))
                     dwarfRune->SetGoState(state);
         }
 
         void EnterCombat(Unit* /*who*/) override
-        {
+        { 
             _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2 * IN_MILLISECONDS);
 
             // Spawn 7 Embers initially
@@ -115,10 +114,10 @@ public:
             _events.Reset();
             summons.DespawnAll();
         }
-
+        
         int getValidRandomPosition()
         {
-            /* Generate a random position which
+            /* Generate a random position which 
              * have not been used in 4 summonings.
              * Since we are calling the event whenever the Spirit
              * dies and not all at the time, we need to save at
@@ -183,7 +182,7 @@ public:
             //Return since we have no target
             if (!UpdateVictim())
                 return;
-
+                
             _events.Update(diff);
 
             switch(_events.ExecuteEvent())
@@ -207,9 +206,9 @@ class npc_burning_spirit : public CreatureScript
 public:
     npc_burning_spirit() : CreatureScript("npc_burning_spirit") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackrockDepthsAI<npc_burning_spiritAI>(creature);
+        return GetInstanceAI<npc_burning_spiritAI>(creature);
     }
 
     struct npc_burning_spiritAI : public CreatureAI

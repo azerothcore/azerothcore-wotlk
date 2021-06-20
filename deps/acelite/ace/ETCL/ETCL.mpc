@@ -1,0 +1,62 @@
+// -*- MPC -*-
+project(ACE_ETCL) : acelib, install, ace_output {
+  sharedname   = ACE_ETCL
+  dynamicflags += ACE_ETCL_BUILD_DLL
+
+  Source_Files {
+    ETCL_Constraint.cpp
+    ETCL_Constraint_Visitor.cpp
+  }
+
+  Header_Files {
+    ETCL_Constraint.h
+    ETCL_Constraint_Visitor.h
+    ace_etcl_export.h
+  }
+
+  Inline_Files {
+    ETCL_Constraint.inl
+  }
+
+  Template_Files {
+  }
+
+  Pkgconfig_Files {
+    ACE_ETCL.pc.in
+  }
+
+  specific {
+    install_dir = ace/ETCL
+  }
+}
+
+project(ACE_ETCL_Parser) : acelib, ace_etcl, install, ace_output {
+  sharedname   = ACE_ETCL_Parser
+  dynamicflags += ETCL_PARSER_BUILD_DLL
+
+  Source_Files {
+    ETCL_Interpreter.cpp
+    ETCL_l.cpp
+    ETCL_y.cpp
+  }
+
+  Header_Files {
+    ETCL_Interpreter.h
+    ETCL_y.h
+    etcl_parser_export.h
+  }
+  
+  Inline_Files {
+  }
+
+  Template_Files {
+  }
+
+  Pkgconfig_Files {
+    ACE_ETCL_Parser.pc.in
+  }
+
+  specific {
+    install_dir = ace/ETCL
+  }
+}

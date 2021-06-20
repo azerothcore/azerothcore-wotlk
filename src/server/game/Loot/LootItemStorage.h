@@ -6,56 +6,47 @@ Xinef
 #define ACORE_LOOTITEMSTORAGE_H
 
 #include "Common.h"
-#include "Item.h"
 #include "LootMgr.h"
-#include <list>
+#include "Item.h"
 #include <map>
+#include <list>
 
 struct StoredLootItem
 {
-    StoredLootItem(uint32 i, uint32 c, int32 ri, uint32 rs, bool follow_loot_rules, bool freeforall,
-        bool is_blocked, bool is_counted, bool is_underthreshold, bool needs_quest, uint32 conditionLootId) :
-        itemid(i), count(c), randomPropertyId(ri), randomSuffix(rs), follow_loot_rules(follow_loot_rules), freeforall(freeforall), is_blocked(is_blocked),
-        is_counted(is_counted), is_underthreshold(is_underthreshold), needs_quest(needs_quest), conditionLootId(conditionLootId) { }
+    StoredLootItem(uint32 i, uint32 c, int32 ri, uint32 rs) : 
+        itemid(i), count(c), randomPropertyId(ri), randomSuffix(rs) { }
 
     // If itemid == 0 - money amount is stored in count value
     uint32 itemid;
     uint32 count;
     int32 randomPropertyId;
     uint32 randomSuffix;
-    bool follow_loot_rules;
-    bool freeforall;
-    bool is_blocked;
-    bool is_counted;
-    bool is_underthreshold;
-    bool needs_quest;
-    uint32 conditionLootId;
 };
 
 typedef std::list<StoredLootItem> StoredLootItemList;
-typedef std::unordered_map<ObjectGuid, StoredLootItemList> LootItemContainer;
+typedef std::unordered_map<uint32, StoredLootItemList> LootItemContainer;
 
 class LootItemStorage
 {
-private:
-    LootItemStorage();
-    ~LootItemStorage();
+    private:
+        LootItemStorage();
+        ~LootItemStorage();
 
-public:
-    static LootItemStorage* instance();
+    public:
+        static LootItemStorage* instance();
 
-    void LoadStorageFromDB();
-    void RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count);
+        void LoadStorageFromDB();
+        void RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count);
 
-    void AddNewStoredLoot(Loot* loot, Player* player);
-    bool LoadStoredLoot(Item* item, Player* player);
+        void AddNewStoredLoot(Loot* loot, Player* player);
+        bool LoadStoredLoot(Item* item);
 
-    void RemoveStoredLootItem(ObjectGuid containerGUID, uint32 itemid, uint32 count, Loot* loot);
-    void RemoveStoredLootMoney(ObjectGuid containerGUID, Loot* loot);
-    void RemoveStoredLoot(ObjectGuid containerGUID);
+        void RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot* loot);
+        void RemoveStoredLootMoney(uint32 containerId, Loot* loot);
+        void RemoveStoredLoot(uint32 containerId);
 
-private:
-    LootItemContainer lootItemStore;
+    private:
+        LootItemContainer lootItemStore;
 };
 
 #define sLootItemStorage LootItemStorage::instance()

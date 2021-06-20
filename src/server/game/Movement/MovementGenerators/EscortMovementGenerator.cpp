@@ -2,14 +2,14 @@
 Written by Xinef
  */
 
+#include "EscortMovementGenerator.h"
+#include "Errors.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "Errors.h"
-#include "EscortMovementGenerator.h"
-#include "MoveSpline.h"
-#include "MoveSplineInit.h"
-#include "Player.h"
 #include "World.h"
+#include "MoveSplineInit.h"
+#include "MoveSpline.h"
+#include "Player.h"
 
 template<class T>
 void EscortMovementGenerator<T>::DoInitialize(T* unit)
@@ -17,12 +17,12 @@ void EscortMovementGenerator<T>::DoInitialize(T* unit)
     if (!unit->IsStopped())
         unit->StopMoving();
 
-    unit->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    unit->AddUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
     i_recalculateSpeed = false;
     Movement::MoveSplineInit init(unit);
 
     if (m_precomputedPath.size() == 2) // xinef: simple case, just call move to
-        init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z, true);
+        init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z);
     else if (m_precomputedPath.size())
         init.MovebyPath(m_precomputedPath);
 
@@ -66,7 +66,7 @@ bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32  /*diff*/)
             if (m_precomputedPath.size() > 2)
                 init.MovebyPath(m_precomputedPath);
             else if (m_precomputedPath.size() == 2)
-                init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z, true);
+                init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z);
         }
 
         init.Launch();
@@ -80,7 +80,7 @@ bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32  /*diff*/)
 template<class T>
 void EscortMovementGenerator<T>::DoFinalize(T* unit)
 {
-    unit->ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    unit->ClearUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
 }
 
 template<class T>
@@ -89,7 +89,7 @@ void EscortMovementGenerator<T>::DoReset(T* unit)
     if (!unit->IsStopped())
         unit->StopMoving();
 
-    unit->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    unit->AddUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
 }
 
 template void EscortMovementGenerator<Player>::DoInitialize(Player*);

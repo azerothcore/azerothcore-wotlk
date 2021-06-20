@@ -5,10 +5,6 @@
 #ifndef DEF_DEADMINES_H
 #define DEF_DEADMINES_H
 
-#include "CreatureAIImpl.h"
-
-#define DeadminesScriptName "instance_deadmines"
-
 enum DataTypes
 {
     TYPE_RHAHK_ZOR              = 0,
@@ -22,10 +18,5 @@ enum GameObjects
     GO_IRON_CLAD_DOOR           = 16397
 };
 
-template <class AI, class T>
-inline AI* GetDeadminesAI(T* obj)
-{
-    return GetInstanceAI<AI>(obj, DeadminesScriptName);
-}
-
 #endif
+

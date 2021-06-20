@@ -4,7 +4,7 @@
 /**
  *  @file Array_Base.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -41,6 +41,7 @@ template<class T>
 class ACE_Array_Base
 {
 public:
+
   // Old/ACE-style traits.
   typedef T TYPE;
   typedef ACE_Array_Iterator<T> ITERATOR;
@@ -57,6 +58,8 @@ public:
   typedef ACE_Allocator::size_type       size_type;
 
   ACE_DECLARE_STL_REVERSE_ITERATORS
+
+  // = Initialization and termination methods.
 
   /// Dynamically create an uninitialized array.
   ACE_Array_Base (size_type size = 0,
@@ -202,6 +205,7 @@ template <class T>
 class ACE_Array_Iterator
 {
 public:
+  // = Initialization method.
   ACE_Array_Iterator (ACE_Array_Base<T> &);
 
   // = Iteration methods.

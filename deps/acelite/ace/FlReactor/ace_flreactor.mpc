@@ -1,0 +1,9 @@
+//  -*- MPC -*- now wouldn't this be cool...
+project(ACE_FlReactor) : acedefaults, install, acelib, ace_output, ace_fl{
+  sharedname   = ACE_FlReactor
+  dynamicflags += ACE_FLREACTOR_BUILD_DLL
+
+  specific {
+    install_dir = ace/FlReactor
+  }
+}

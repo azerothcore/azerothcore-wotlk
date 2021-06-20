@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ruins_of_ahnqiraj.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ruins_of_ahnqiraj.h"
 
 enum Texts
 {
@@ -42,45 +42,45 @@ enum Actions
 
 class boss_moam : public CreatureScript
 {
-public:
-    boss_moam() : CreatureScript("boss_moam") { }
+    public:
+        boss_moam() : CreatureScript("boss_moam") { }
 
-    struct boss_moamAI : public BossAI
-    {
-        boss_moamAI(Creature* creature) : BossAI(creature, DATA_MOAM)
+        struct boss_moamAI : public BossAI
         {
-        }
-
-        void Reset() override
-        {
-            _Reset();
-            me->SetPower(POWER_MANA, 0);
-            _isStonePhase = false;
-            events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
-            //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
-        }
-
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!_isStonePhase && HealthBelowPct(45))
+            boss_moamAI(Creature* creature) : BossAI(creature, DATA_MOAM)
             {
-                _isStonePhase = true;
-                DoAction(ACTION_STONE_PHASE_START);
             }
-        }
 
-        void DoAction(int32 action) override
-        {
-            switch (action)
+            void Reset()
             {
-                case ACTION_STONE_PHASE_END:
+                _Reset();
+                me->SetPower(POWER_MANA, 0);
+                _isStonePhase = false;
+                events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
+                //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
+            }
+
+            void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+            {
+                if (!_isStonePhase && HealthBelowPct(45))
+                {
+                    _isStonePhase = true;
+                    DoAction(ACTION_STONE_PHASE_START);
+                }
+            }
+
+            void DoAction(int32 action)
+            {
+                switch (action)
+                {
+                    case ACTION_STONE_PHASE_END:
                     {
                         me->RemoveAurasDueToSpell(SPELL_ENERGIZE);
                         events.ScheduleEvent(EVENT_STONE_PHASE, 90000);
                         _isStonePhase = false;
                         break;
                     }
-                case ACTION_STONE_PHASE_START:
+                    case ACTION_STONE_PHASE_START:
                     {
                         DoCast(me, SPELL_SUMMON_MANA_FIEND_1);
                         DoCast(me, SPELL_SUMMON_MANA_FIEND_2);
@@ -89,45 +89,45 @@ public:
                         events.ScheduleEvent(EVENT_STONE_PHASE_END, 90000);
                         break;
                     }
-                default:
-                    break;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
-            {
-                if (_isStonePhase)
-                    DoAction(ACTION_STONE_PHASE_END);
-                DoCastAOE(SPELL_ARCANE_ERUPTION);
-                me->SetPower(POWER_MANA, 0);
-            }
-
-            if (_isStonePhase)
-            {
-                if (events.ExecuteEvent() == EVENT_STONE_PHASE_END)
-                    DoAction(ACTION_STONE_PHASE_END);
-                return;
-            }
-
-            // Messing up mana-drain channel
-            //if (me->HasUnitState(UNIT_STATE_CASTING))
-            //    return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_STONE_PHASE:
-                        DoAction(ACTION_STONE_PHASE_START);
+                    default:
                         break;
-                    case EVENT_DRAIN_MANA:
+                }
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
+                {
+                    if (_isStonePhase)
+                        DoAction(ACTION_STONE_PHASE_END);
+                    DoCastAOE(SPELL_ARCANE_ERUPTION);
+                    me->SetPower(POWER_MANA, 0);
+                }
+
+                if (_isStonePhase)
+                {
+                    if (events.ExecuteEvent() == EVENT_STONE_PHASE_END)
+                        DoAction(ACTION_STONE_PHASE_END);
+                    return;
+                }
+
+                // Messing up mana-drain channel
+                //if (me->HasUnitState(UNIT_STATE_CASTING))
+                //    return;
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_STONE_PHASE:
+                            DoAction(ACTION_STONE_PHASE_START);
+                            break;
+                        case EVENT_DRAIN_MANA:
                         {
                             std::list<Unit*> targetList;
                             {
@@ -137,7 +137,7 @@ public:
                                         targetList.push_back((*itr)->getTarget());
                             }
 
-                            Acore::Containers::RandomResize(targetList, 5);
+                            acore::Containers::RandomResizeList(targetList, 5);
 
                             for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                                 DoCast(*itr, SPELL_DRAIN_MANA);
@@ -153,21 +153,21 @@ public:
                             DoCast(me, SPELL_TRASH);
                             events.ScheduleEvent(EVENT_WIDE_SLASH, 16000);
                             break;*/
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
+
+                DoMeleeAttackIfReady();
             }
+        private:
+            bool _isStonePhase;
+        };
 
-            DoMeleeAttackIfReady();
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new boss_moamAI(creature);
         }
-    private:
-        bool _isStonePhase;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetRuinsOfAhnQirajAI<boss_moamAI>(creature);
-    }
 };
 
 void AddSC_boss_moam()

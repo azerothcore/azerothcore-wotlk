@@ -6,7 +6,7 @@
 
 #include "G3D/platform.h"
 
-#ifdef G3D_WINDOWS
+#ifdef G3D_WIN32
 
 #include <stdio.h>
 #include <stdlib.h>

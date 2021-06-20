@@ -32,6 +32,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_UPIPE_Connector
 {
 public:
+  // = Initialization methods.
   /// Default constructor.
   ACE_UPIPE_Connector (void);
 

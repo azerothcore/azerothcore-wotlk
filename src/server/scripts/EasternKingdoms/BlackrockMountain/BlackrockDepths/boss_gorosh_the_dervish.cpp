@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "blackrock_depths.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum Spells
 {
@@ -19,9 +18,9 @@ class boss_gorosh_the_dervish : public CreatureScript
 public:
     boss_gorosh_the_dervish() : CreatureScript("boss_gorosh_the_dervish") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackrockDepthsAI<boss_gorosh_the_dervishAI>(creature);
+        return new boss_gorosh_the_dervishAI(creature);
     }
 
     struct boss_gorosh_the_dervishAI : public ScriptedAI
@@ -31,17 +30,17 @@ public:
         uint32 WhirlWind_Timer;
         uint32 MortalStrike_Timer;
 
-        void Reset() override
+        void Reset()
         {
             WhirlWind_Timer = 12000;
             MortalStrike_Timer = 22000;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -52,16 +51,14 @@ public:
             {
                 DoCast(me, SPELL_WHIRLWIND);
                 WhirlWind_Timer = 15000;
-            }
-            else WhirlWind_Timer -= diff;
+            } else WhirlWind_Timer -= diff;
 
             //MortalStrike_Timer
             if (MortalStrike_Timer <= diff)
             {
                 DoCastVictim(SPELL_MORTALSTRIKE);
                 MortalStrike_Timer = 15000;
-            }
-            else MortalStrike_Timer -= diff;
+            } else MortalStrike_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }

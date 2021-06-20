@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "MoveSplineInit.h"
-#include "old_hillsbrad.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "old_hillsbrad.h"
+#include "MoveSplineInit.h"
 #include "SmartScriptMgr.h"
 
 enum LieutenantDrake
@@ -35,9 +35,9 @@ class boss_lieutenant_drake : public CreatureScript
 public:
     boss_lieutenant_drake() : CreatureScript("boss_lieutenant_drake") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetOldHillsbradAI<boss_lieutenant_drakeAI>(creature);
+        return new boss_lieutenant_drakeAI(creature);
     }
 
     struct boss_lieutenant_drakeAI : public ScriptedAI
@@ -60,14 +60,14 @@ public:
             }
         }
 
-        void InitializeAI() override
+        void InitializeAI()
         {
             ScriptedAI::InitializeAI();
             //Talk(SAY_ENTER);
             JustReachedHome();
         }
 
-        void JustReachedHome() override
+        void JustReachedHome()
         {
             me->SetWalk(true);
             Movement::MoveSplineInit init(me);
@@ -76,12 +76,12 @@ public:
             init.Launch();
         }
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
 
@@ -92,20 +92,20 @@ public:
             events.ScheduleEvent(EVENT_EXPLODING_SHOT, 1000);
         }
 
-        void KilledUnit(Unit* victim) override
+        void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
             if (InstanceScript* instance = me->GetInstanceScript())
                 instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_DRAKE_KILLED);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -146,10 +146,11 @@ public:
             DoMeleeAttackIfReady();
         }
 
-    private:
-        EventMap events;
-        Movement::PointsArray pathPoints;
+        private:
+            EventMap events;
+            Movement::PointsArray pathPoints;
     };
+
 };
 
 void AddSC_boss_lieutenant_drake()

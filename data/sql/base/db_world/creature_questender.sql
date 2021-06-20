@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_questender`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = UTF8MB4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `creature_questender` 
 (
-  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
+  `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Creature System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_questender` WRITE;
@@ -2818,6 +2818,10 @@ INSERT INTO `creature_questender` VALUES
 (13257,6781),
 (13257,7223),
 (13278,6805),
+(13278,6821),
+(13278,6822),
+(13278,6823),
+(13278,6824),
 (13377,6861),
 (13377,6862),
 (13417,6964),
@@ -3411,6 +3415,9 @@ INSERT INTO `creature_questender` VALUES
 (15306,8737),
 (15309,8312),
 (15310,8311),
+(15351,8371),
+(15351,8385),
+(15351,13478),
 (15351,24427),
 (15378,8790),
 (15379,8801),
@@ -4970,6 +4977,11 @@ INSERT INTO `creature_questender` VALUES
 (20482,10406),
 (20482,10408),
 (20482,10974),
+(20482,10975),
+(20482,10976),
+(20482,10977),
+(20482,10981),
+(20482,10982),
 (20494,11047),
 (20500,11498),
 (20510,11043),
@@ -5493,7 +5505,6 @@ INSERT INTO `creature_questender` VALUES
 (23465,11114),
 (23466,11113),
 (23473,11119),
-(23486,11117),
 (23486,11118),
 (23546,11228),
 (23546,11243),
@@ -5797,7 +5808,6 @@ INSERT INTO `creature_questender` VALUES
 (24634,11430),
 (24643,11508),
 (24657,11120),
-(24657,11431),
 (24702,11684),
 (24703,11628),
 (24703,11630),
@@ -7384,12 +7394,12 @@ INSERT INTO `creature_questender` VALUES
 (31261,13229),
 (31261,13302),
 (31261,13481),
-(31412,13257),
 (31440,13258),
 (31440,13259),
 (31444,13386),
 (31444,13387),
 (31649,13266),
+(31650,13267),
 (31776,13280),
 (31776,13296),
 (31781,13283),
@@ -7431,7 +7441,6 @@ INSERT INTO `creature_questender` VALUES
 (32497,13399),
 (32497,13400),
 (32516,13571),
-(32518,13267),
 (32540,13559),
 (32548,13412),
 (32548,13413),

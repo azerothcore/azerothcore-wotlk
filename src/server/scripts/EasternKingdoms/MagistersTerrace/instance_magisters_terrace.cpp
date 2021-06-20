@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "magisters_terrace.h"
-#include "ScriptMgr.h"
 
 class instance_magisters_terrace : public InstanceMapScript
 {
@@ -17,22 +17,32 @@ public:
 
         uint32 Encounter[MAX_ENCOUNTER];
 
-        ObjectGuid VexallusDoorGUID;
-        ObjectGuid SelinDoorGUID;
-        ObjectGuid SelinEncounterDoorGUID;
-        ObjectGuid DelrissaDoorGUID;
-        ObjectGuid KaelDoorGUID;
-        ObjectGuid EscapeOrbGUID;
+        uint64 VexallusDoorGUID;
+        uint64 SelinDoorGUID;
+        uint64 SelinEncounterDoorGUID;
+        uint64 DelrissaDoorGUID;
+        uint64 KaelDoorGUID;
+        uint64 EscapeOrbGUID;
 
-        ObjectGuid DelrissaGUID;
-        ObjectGuid KaelGUID;
+        uint64 DelrissaGUID;
+        uint64 KaelGUID;
 
-        void Initialize() override
+        void Initialize()
         {
             memset(&Encounter, 0, sizeof(Encounter));
+            
+            VexallusDoorGUID = 0;
+            SelinDoorGUID = 0;
+            SelinEncounterDoorGUID = 0;
+            DelrissaDoorGUID = 0;
+            KaelDoorGUID = 0;
+            EscapeOrbGUID = 0;
+
+            DelrissaGUID = 0;
+            KaelGUID = 0;
         }
 
-        bool IsEncounterInProgress() const override
+        bool IsEncounterInProgress() const
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (Encounter[i] == IN_PROGRESS)
@@ -40,7 +50,7 @@ public:
             return false;
         }
 
-        uint32 GetData(uint32 identifier) const override
+        uint32 GetData(uint32 identifier) const
         {
             switch (identifier)
             {
@@ -53,7 +63,7 @@ public:
             return 0;
         }
 
-        void SetData(uint32 identifier, uint32 data) override
+        void SetData(uint32 identifier, uint32 data)
         {
             switch (identifier)
             {
@@ -84,7 +94,7 @@ public:
             SaveToDB();
         }
 
-        void OnCreatureCreate(Creature* creature) override
+        void OnCreatureCreate(Creature* creature)
         {
             switch (creature->GetEntry())
             {
@@ -102,13 +112,13 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go) override
+        void OnGameObjectCreate(GameObject* go)
         {
             switch (go->GetEntry())
             {
                 case GO_SELIN_DOOR:
                     if (GetData(DATA_SELIN_EVENT) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
+                        HandleGameObject(0, true, go);
                     SelinDoorGUID = go->GetGUID();
                     break;
                 case GO_SELIN_ENCOUNTER_DOOR:
@@ -117,13 +127,13 @@ public:
 
                 case GO_VEXALLUS_DOOR:
                     if (GetData(DATA_VEXALLUS_EVENT) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
+                        HandleGameObject(0, true, go);
                     VexallusDoorGUID = go->GetGUID();
                     break;
-
+                
                 case GO_DELRISSA_DOOR:
                     if (GetData(DATA_DELRISSA_EVENT) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
+                        HandleGameObject(0, true, go);
                     DelrissaDoorGUID = go->GetGUID();
                     break;
                 case GO_KAEL_DOOR:
@@ -137,7 +147,7 @@ public:
             }
         }
 
-        std::string GetSaveData() override
+        std::string GetSaveData()
         {
             OUT_SAVE_INST_DATA;
 
@@ -148,7 +158,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* str) override
+        void Load(const char* str)
         {
             if (!str)
             {
@@ -172,19 +182,18 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        uint64 GetData64(uint32 identifier) const
         {
             switch (identifier)
             {
                 case NPC_DELRISSA:
                     return DelrissaGUID;
             }
-
-            return ObjectGuid::Empty;
+            return 0;
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
         return new instance_magisters_terrace_InstanceMapScript(map);
     }

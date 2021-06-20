@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,8 @@ SDComment: Charging healers and casters not working. Perhaps wrong Spell Timers.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "zulgurub.h"
 
 enum Says
@@ -54,91 +54,90 @@ enum Phases
 
 class boss_marli : public CreatureScript
 {
-public:
-    boss_marli() : CreatureScript("boss_marli") { }
+    public: boss_marli() : CreatureScript("boss_marli") { }
 
-    struct boss_marliAI : public BossAI
-    {
-        boss_marliAI(Creature* creature) : BossAI(creature, DATA_MARLI) { }
-
-        void Reset() override
+        struct boss_marliAI : public BossAI
         {
-            if (events.IsInPhase(PHASE_THREE))
-                me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
-            _Reset();
-        }
+            boss_marliAI(Creature* creature) : BossAI(creature, DATA_MARLI) { }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            Talk(SAY_DEATH);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_SPAWN_START_SPIDERS, 1000, 0, PHASE_ONE);
-            Talk(SAY_AGGRO);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
+            void Reset()
             {
-                switch (eventId)
-                {
-                    case EVENT_SPAWN_START_SPIDERS:
+                if (events.IsInPhase(PHASE_THREE))
+                    me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
+                _Reset();
+            }
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        {
-                            Talk(SAY_SPIDER_SPAWN);
-                            Creature* Spider = nullptr;
-                            Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            if (Spider)
-                                Spider->AI()->AttackStart(target);
-                            Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            if (Spider)
-                                Spider->AI()->AttackStart(target);
-                            Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            if (Spider)
-                                Spider->AI()->AttackStart(target);
-                            Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            if (Spider)
-                                Spider->AI()->AttackStart(target);
-                        }
-                        events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 12000, 0, PHASE_TWO);
-                        events.ScheduleEvent(EVENT_TRANSFORM, 45000, 0, PHASE_TWO);
-                        events.ScheduleEvent(EVENT_POISON_VOLLEY, 15000);
-                        events.ScheduleEvent(EVENT_SPAWN_SPIDER, 30000);
-                        events.ScheduleEvent(EVENT_TRANSFORM, 45000, 0, PHASE_TWO);
-                        events.SetPhase(PHASE_TWO);
-                        break;
-                    case EVENT_POISON_VOLLEY:
-                        DoCastVictim(SPELL_POISON_VOLLEY, true);
-                        events.ScheduleEvent(EVENT_POISON_VOLLEY, urand(10000, 20000));
-                        break;
-                    case EVENT_ASPECT_OF_MARLI:
-                        DoCastVictim(SPELL_ASPECT_OF_MARLI, true);
-                        events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, urand(13000, 18000), 0, PHASE_TWO);
-                        break;
-                    case EVENT_SPAWN_SPIDER:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        {
-                            Creature* Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                            if (Spider)
-                                Spider->AI()->AttackStart(target);
-                        }
-                        events.ScheduleEvent(EVENT_SPAWN_SPIDER, urand(12000, 17000));
-                        break;
-                    case EVENT_TRANSFORM:
+            void JustDied(Unit* /*killer*/)
+            {
+                _JustDied();
+                Talk(SAY_DEATH);
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                _EnterCombat();
+                events.ScheduleEvent(EVENT_SPAWN_START_SPIDERS, 1000, 0, PHASE_ONE);
+                Talk(SAY_AGGRO);
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_SPAWN_START_SPIDERS:
+
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            {
+                                Talk(SAY_SPIDER_SPAWN);
+                                Creature* Spider = NULL;
+                                Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                                if (Spider)
+                                    Spider->AI()->AttackStart(target);
+                                Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                                if (Spider)
+                                    Spider->AI()->AttackStart(target);
+                                Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                                if (Spider)
+                                    Spider->AI()->AttackStart(target);
+                                Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                                if (Spider)
+                                    Spider->AI()->AttackStart(target);
+                            }
+                            events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 12000, 0, PHASE_TWO);
+                            events.ScheduleEvent(EVENT_TRANSFORM, 45000, 0, PHASE_TWO);
+                            events.ScheduleEvent(EVENT_POISON_VOLLEY, 15000);
+                            events.ScheduleEvent(EVENT_SPAWN_SPIDER, 30000);
+                            events.ScheduleEvent(EVENT_TRANSFORM, 45000, 0, PHASE_TWO);
+                            events.SetPhase(PHASE_TWO);
+                            break;
+                        case EVENT_POISON_VOLLEY:
+                            DoCastVictim(SPELL_POISON_VOLLEY, true);
+                            events.ScheduleEvent(EVENT_POISON_VOLLEY, urand(10000, 20000));
+                            break;
+                        case EVENT_ASPECT_OF_MARLI:
+                            DoCastVictim(SPELL_ASPECT_OF_MARLI, true);
+                            events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, urand(13000, 18000), 0, PHASE_TWO);
+                            break;
+                        case EVENT_SPAWN_SPIDER:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            {
+                                Creature* Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                                if (Spider)
+                                    Spider->AI()->AttackStart(target);
+                            }
+                            events.ScheduleEvent(EVENT_SPAWN_SPIDER, urand(12000, 17000));
+                            break;
+                        case EVENT_TRANSFORM:
                         {
                             Talk(SAY_TRANSFORM);
                             DoCast(me, SPELL_SPIDER_FORM); // SPELL_AURA_TRANSFORM
@@ -157,9 +156,9 @@ public:
                             events.SetPhase(PHASE_THREE);
                             break;
                         }
-                    case EVENT_CHARGE_PLAYER:
+                        case EVENT_CHARGE_PLAYER:
                         {
-                            Unit* target = nullptr;
+                            Unit* target = NULL;
                             int i = 0;
                             while (i++ < 3) // max 3 tries to get a random target with power_mana
                             {
@@ -175,7 +174,7 @@ public:
                             events.ScheduleEvent(EVENT_CHARGE_PLAYER, 8000, 0, PHASE_THREE);
                             break;
                         }
-                    case EVENT_TRANSFORM_BACK:
+                        case EVENT_TRANSFORM_BACK:
                         {
                             me->RemoveAura(SPELL_SPIDER_FORM);
                             /*
@@ -193,64 +192,62 @@ public:
                             events.SetPhase(PHASE_TWO);
                             break;
                         }
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
+
+                DoMeleeAttackIfReady();
             }
+        };
 
-            DoMeleeAttackIfReady();
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new boss_marliAI(creature);
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetZulGurubAI<boss_marliAI>(creature);
-    }
 };
 
 // Spawn of Marli
 class npc_spawn_of_marli : public CreatureScript
 {
-public:
-    npc_spawn_of_marli() : CreatureScript("npc_spawn_of_marli") { }
+    public: npc_spawn_of_marli() : CreatureScript("npc_spawn_of_marli") { }
 
-    struct npc_spawn_of_marliAI : public ScriptedAI
-    {
-        npc_spawn_of_marliAI(Creature* creature) : ScriptedAI(creature) { }
-
-        uint32 LevelUp_Timer;
-
-        void Reset() override
+        struct npc_spawn_of_marliAI : public ScriptedAI
         {
-            LevelUp_Timer = 3000;
-        }
+            npc_spawn_of_marliAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void EnterCombat(Unit* /*who*/) override
-        {
-        }
+            uint32 LevelUp_Timer;
 
-        void UpdateAI(uint32 diff) override
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            //LevelUp_Timer
-            if (LevelUp_Timer <= diff)
+            void Reset()
             {
-                DoCast(me, SPELL_LEVELUP);
                 LevelUp_Timer = 3000;
             }
-            else LevelUp_Timer -= diff;
 
-            DoMeleeAttackIfReady();
+            void EnterCombat(Unit* /*who*/)
+            {
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                //Return since we have no target
+                if (!UpdateVictim())
+                    return;
+
+                //LevelUp_Timer
+                if (LevelUp_Timer <= diff)
+                {
+                    DoCast(me, SPELL_LEVELUP);
+                    LevelUp_Timer = 3000;
+                } else LevelUp_Timer -= diff;
+
+                DoMeleeAttackIfReady();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_spawn_of_marliAI(creature);
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetZulGurubAI<npc_spawn_of_marliAI>(creature);
-    }
 };
 
 void AddSC_boss_marli()

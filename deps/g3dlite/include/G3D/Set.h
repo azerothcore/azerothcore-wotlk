@@ -125,13 +125,8 @@ public:
             return !(*this == other);
         }
 
-        bool isValid() const {
-            return it.isValid();
-        }
-
-        /** @deprecated  Use isValid */
         bool hasMore() const {
-            return it.isValid();
+            return it.hasMore();
         }
         
         bool operator==(const Iterator& other) const {

@@ -43,6 +43,8 @@ class ACE_Future_Set : public ACE_Future_Observer<T>,
                        private ACE_Copy_Disabled
 {
 public:
+  // = Initialization and termination methods.
+
   /// Constructor.
   ACE_Future_Set (ACE_Message_Queue<ACE_SYNCH> *future_notification_queue_ = 0);
 

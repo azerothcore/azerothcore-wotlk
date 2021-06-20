@@ -1,0 +1,42 @@
+project (ACE_XML_Utils) : install, acelib, xerces, ace_output {
+  sharedname   += ACE_XML_Utils
+  dynamicflags += XML_UTILS_BUILD_DLL
+
+  specific {
+    install_dir = ace/XML_Utils
+  }
+
+  Template_Files {
+    XML_Helper.tpp
+    XML_Schema_Resolver.tpp
+    XMLSchema
+    XSCRT
+  }
+
+  Inline_Files {
+    XMLSchema
+    XSCRT
+  }
+
+  Header_Files {
+    XML_Utils_Export.h
+    XML_Error_Handler.h
+    XercesString.h
+    XML_Schema_Resolver.h
+    XML_Typedefs.h
+    XML_Helper.h
+    XMLSchema
+    XSCRT
+  }
+
+  Source_Files {
+    XML_Error_Handler.cpp
+    XercesString.cpp
+    XML_Schema_Resolver.cpp
+    XML_Typedefs.cpp
+  }
+
+  Pkgconfig_Files {
+    ACE_XML_Utils.pc.in
+  }
+}

@@ -1,9 +1,8 @@
 /* MAIDEN OF GRIEF BY SILVANII (mmorcin@wp.pl), Some cleanups by Xinef */
 
-#include "halls_of_stone.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-
+#include "ScriptedCreature.h"
+#include "halls_of_stone.h"
 enum spells
 {
     PARTING_SORROW          = 59723,
@@ -38,22 +37,22 @@ class boss_maiden_of_grief : public CreatureScript
 public:
     boss_maiden_of_grief() : CreatureScript("boss_maiden_of_grief") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return GetHallsOfStoneAI<boss_maiden_of_griefAI>(pCreature);
+        return new boss_maiden_of_griefAI (pCreature);
     }
 
     struct boss_maiden_of_griefAI : public ScriptedAI
     {
-        boss_maiden_of_griefAI(Creature* c) : ScriptedAI(c)
-        {
+        boss_maiden_of_griefAI(Creature *c) : ScriptedAI(c) 
+        {   
             pInstance = me->GetInstanceScript();
         }
 
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset() override
+        void Reset() 
         {
             events.Reset();
             if (pInstance)
@@ -63,11 +62,11 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void EnterCombat(Unit*  /*who*/)
         {
             events.ScheduleEvent(EVENT_STORM, 5000);
-            events.ScheduleEvent(EVENT_SHOCK, 26000 + rand() % 6000);
-            events.ScheduleEvent(EVENT_PILLAR, 12000 + rand() % 8000);
+            events.ScheduleEvent(EVENT_SHOCK, 26000+rand()%6000);
+            events.ScheduleEvent(EVENT_PILLAR, 12000+rand()%8000);
             events.ScheduleEvent(EVENT_PARTING, 8000);
 
             Talk(SAY_AGGRO);
@@ -78,7 +77,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if(!UpdateVictim())
                 return;
@@ -88,54 +87,54 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.GetEvent() )
             {
                 case EVENT_STORM:
-                    {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(STORM_OF_GRIEF, STORM_OF_GRIEF_H), true);
-                        events.RepeatEvent(10000);
-                        break;
-                    }
+                {
+                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(STORM_OF_GRIEF, STORM_OF_GRIEF_H), true);
+                    events.RepeatEvent(10000);
+                    break;
+                }
                 case EVENT_SHOCK:
-                    {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H), false);
-                        Talk(SAY_STUN);
+                {
+                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H), false);
+                    Talk(SAY_STUN);
 
-                        events.RepeatEvent(16000 + rand() % 6000);
-                        break;
-                    }
+                    events.RepeatEvent(16000+rand()%6000);
+                    break;
+                }
                 case EVENT_PILLAR:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
-                            me->CastSpell(target, DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), false);
-
-                        events.RepeatEvent(12000 + rand() % 8000);
-                        break;
-                    }
+                {
+                    if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                        me->CastSpell(target, DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), false);
+                        
+                    events.RepeatEvent(12000+rand()%8000);
+                    break;
+                }
                 case EVENT_PARTING:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
-                            me->CastSpell(target, PARTING_SORROW, false);
-
-                        events.RepeatEvent(6000 + rand() % 10000);
-                        break;
-                    }
+                {
+                    if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true, 0))
+                        me->CastSpell(target, PARTING_SORROW, false);
+                        
+                    events.RepeatEvent(6000+rand()%10000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/) override
+        void JustDied(Unit*  /*killer*/)
         {
             Talk(SAY_DEATH);
-
+            
             if (pInstance)
                 pInstance->SetData(BOSS_MAIDEN_OF_GRIEF, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        void KilledUnit(Unit * /*victim*/)
         {
-            if (urand(0, 1))
+            if (urand(0,1))
                 return;
 
             Talk(SAY_SLAY);

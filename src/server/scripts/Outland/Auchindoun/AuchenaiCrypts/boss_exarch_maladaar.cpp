@@ -2,9 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "auchenai_crypts.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum ExarchMaladaar
 {
@@ -34,9 +33,9 @@ class boss_exarch_maladaar : public CreatureScript
 public:
     boss_exarch_maladaar() : CreatureScript("boss_exarch_maladaar") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetAuchenaiCryptsAI<boss_exarch_maladaarAI>(creature);
+        return new boss_exarch_maladaarAI (creature);
     }
 
     struct boss_exarch_maladaarAI : public ScriptedAI
@@ -49,12 +48,12 @@ public:
         bool _talked;
         EventMap events;
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void MoveInLineOfSight(Unit* who)
         {
             if (!_talked && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 150.0f))
             {
@@ -65,7 +64,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit*) override
+        void EnterCombat(Unit*)
         {
             Talk(SAY_AGGRO);
 
@@ -75,13 +74,13 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 5000);
         }
 
-        void KilledUnit(Unit*) override
+        void KilledUnit(Unit*)
         {
-            if (urand(0, 1))
+            if (urand(0,1))
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit*)
         {
             Talk(SAY_DEATH);
 
@@ -89,7 +88,7 @@ public:
             me->SummonCreature(19412, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 600000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -98,13 +97,14 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
+            switch (events.GetEvent())
             {
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(25))
                     {
                         Talk(SAY_SUMMON);
                         me->CastSpell(me, SPELL_SUMMON_AVATAR, false);
+                        events.PopEvent();
                         return;
                     }
                     events.RepeatEvent(2000);
@@ -161,9 +161,9 @@ class npc_stolen_soul : public CreatureScript
 public:
     npc_stolen_soul() : CreatureScript("npc_stolen_soul") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetAuchenaiCryptsAI<npc_stolen_soulAI>(creature);
+        return new npc_stolen_soulAI (creature);
     }
 
     struct npc_stolen_soulAI : public ScriptedAI
@@ -173,24 +173,24 @@ public:
         uint8 myClass;
         EventMap events;
 
-        void Reset() override
+        void Reset()
         {
             myClass = CLASS_WARRIOR;
             events.ScheduleEvent(EVENT_STOLEN_SOUL_SPELL, 1000);
         }
 
-        void DoAction(int32 pClass) override
+        void DoAction(int32 pClass)
         {
             myClass = pClass;
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
 
             events.Update(diff);
-            if (events.ExecuteEvent() == EVENT_STOLEN_SOUL_SPELL)
+            if (events.GetEvent() == EVENT_STOLEN_SOUL_SPELL)
             {
                 switch (myClass)
                 {

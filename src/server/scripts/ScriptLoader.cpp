@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -213,16 +213,17 @@ void AddSC_ghostlands();
 void AddSC_hinterlands();
 void AddSC_ironforge();
 void AddSC_isle_of_queldanas();
+void AddSC_loch_modan();
 void AddSC_redridge_mountains();
 void AddSC_silverpine_forest();
 void AddSC_stormwind_city();
 void AddSC_stranglethorn_vale();
-//void AddSC_swamp_of_sorrows();
+void AddSC_swamp_of_sorrows();
 void AddSC_tirisfal_glades();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
-//void AddSC_wetlands();
+void AddSC_wetlands();
 
 //kalimdor
 void AddSC_instance_blackfathom_deeps();     //Blackfathom Depths
@@ -472,7 +473,6 @@ void AddSC_boss_exarch_maladaar();           //Auchindoun Auchenai Crypts
 void AddSC_instance_auchenai_crypts();
 void AddSC_boss_shirrak_the_dead_watcher();
 void AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
-void AddSC_boss_pandemonius();
 void AddSC_instance_mana_tombs();
 void AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
 void AddSC_instance_sethekk_halls();
@@ -522,7 +522,7 @@ void AddSC_instance_shattered_halls();
 void AddSC_boss_watchkeeper_gargolmar();     //HC Ramparts
 void AddSC_boss_omor_the_unscarred();
 void AddSC_boss_vazruden_the_herald();
-void AddSC_instance_hellfire_ramparts();
+void AddSC_instance_ramparts();
 void AddSC_arcatraz();                       //TK Arcatraz
 void AddSC_boss_harbinger_skyriss();
 void AddSC_boss_wrath_scryer_soccothrates();
@@ -803,16 +803,17 @@ void AddEasternKingdomsScripts()
     AddSC_hinterlands();
     AddSC_ironforge();
     AddSC_isle_of_queldanas();
+    AddSC_loch_modan();
     AddSC_redridge_mountains();
     AddSC_silverpine_forest();
     AddSC_stormwind_city();
     AddSC_stranglethorn_vale();
-    //AddSC_swamp_of_sorrows();
+    AddSC_swamp_of_sorrows();
     AddSC_tirisfal_glades();
     AddSC_undercity();
     AddSC_western_plaguelands();
     AddSC_westfall();
-    //AddSC_wetlands();
+    AddSC_wetlands();
 #endif
 }
 
@@ -907,7 +908,6 @@ void AddOutlandScripts()
     AddSC_instance_auchenai_crypts();
     AddSC_boss_shirrak_the_dead_watcher();
     AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
-    AddSC_boss_pandemonius();
     AddSC_instance_mana_tombs();
     AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
     AddSC_instance_sethekk_halls();
@@ -957,7 +957,7 @@ void AddOutlandScripts()
     AddSC_boss_watchkeeper_gargolmar();     //HC Ramparts
     AddSC_boss_omor_the_unscarred();
     AddSC_boss_vazruden_the_herald();
-    AddSC_instance_hellfire_ramparts();
+    AddSC_instance_ramparts();
     AddSC_arcatraz();                       //TK Arcatraz
     AddSC_boss_harbinger_skyriss();
     AddSC_boss_wrath_scryer_soccothrates();
@@ -1187,13 +1187,15 @@ void AddOutdoorPvPScripts()
 #endif
 }
 
+
 //~ **********************  Put your custom scripts below, like the commented examples, uncomment and edit *************************************
+
 
 //~ void AddSC_MySuperScript();
 
 void AddCustomScripts()
 {
 #ifdef SCRIPTS
-    //~ AddSC_MySuperScript();
+	//~ AddSC_MySuperScript();
 #endif
 }

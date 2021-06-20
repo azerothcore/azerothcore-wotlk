@@ -6,7 +6,7 @@
  *
  *   Originally in Synch.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //==========================================================================
 
@@ -42,8 +42,6 @@ public:
 
   /// Perform the cleanup operation.
   void cleanup (void);
-
-  ACE_ALLOC_HOOK_DECLARE;
 
 //private:
 

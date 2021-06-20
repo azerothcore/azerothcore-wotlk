@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,9 +11,9 @@ Comment: All disable related commands
 Category: commandscripts
 EndScriptData */
 
+#include "DisableMgr.h"
 #include "AchievementMgr.h"
 #include "Chat.h"
-#include "DisableMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
@@ -48,12 +48,12 @@ public:
         };
         static std::vector<ChatCommand> disableCommandTable =
         {
-            { "add",    SEC_ADMINISTRATOR,  true, nullptr, "", addDisableCommandTable },
-            { "remove", SEC_ADMINISTRATOR,  true, nullptr, "", removeDisableCommandTable },
+            { "add",    SEC_ADMINISTRATOR,  true, NULL, "", addDisableCommandTable },
+            { "remove", SEC_ADMINISTRATOR,  true, NULL, "", removeDisableCommandTable },
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "disable", SEC_ADMINISTRATOR, false, nullptr, "", disableCommandTable },
+            { "disable", SEC_ADMINISTRATOR, false, NULL, "", disableCommandTable },
         };
         return commandTable;
     }
@@ -64,10 +64,10 @@ public:
         if (!entryStr || !atoi(entryStr))
             return false;
 
-        char* flagsStr = strtok(nullptr, " ");
+        char* flagsStr = strtok(NULL, " ");
         uint8 flags = flagsStr ? uint8(atoi(flagsStr)) : 0;
 
-        char* commentStr = strtok(nullptr, "");
+        char* commentStr = strtok(NULL, "");
         if (!commentStr)
             return false;
 
@@ -79,76 +79,76 @@ public:
         switch (disableType)
         {
             case DISABLE_TYPE_SPELL:
+            {
+                if (!sSpellMgr->GetSpellInfo(entry))
                 {
-                    if (!sSpellMgr->GetSpellInfo(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "spell";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "spell";
+                break;
+            }
             case DISABLE_TYPE_QUEST:
+            {
+                if (!sObjectMgr->GetQuestTemplate(entry))
                 {
-                    if (!sObjectMgr->GetQuestTemplate(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "quest";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "quest";
+                break;
+            }
             case DISABLE_TYPE_MAP:
+            {
+                if (!sMapStore.LookupEntry(entry))
                 {
-                    if (!sMapStore.LookupEntry(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "map";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "map";
+                break;
+            }
             case DISABLE_TYPE_BATTLEGROUND:
+            {
+                if (!sBattlemasterListStore.LookupEntry(entry))
                 {
-                    if (!sBattlemasterListStore.LookupEntry(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NO_BATTLEGROUND_FOUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "battleground";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NO_BATTLEGROUND_FOUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "battleground";
+                break;
+            }
             case DISABLE_TYPE_OUTDOORPVP:
+            {
+                if (entry > MAX_OUTDOORPVP_TYPES)
                 {
-                    if (entry > MAX_OUTDOORPVP_TYPES)
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NO_OUTDOOR_PVP_FORUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "outdoorpvp";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NO_OUTDOOR_PVP_FORUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "outdoorpvp";
+                break;
+            }
             case DISABLE_TYPE_VMAP:
+            {
+                if (!sMapStore.LookupEntry(entry))
                 {
-                    if (!sMapStore.LookupEntry(entry))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
-                        handler->SetSentErrorMessage(true);
-                        return false;
-                    }
-                    disableTypeStr = "vmap";
-                    break;
+                    handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
+                disableTypeStr = "vmap";
+                break;
+            }
             default:
                 break;
         }
 
-        PreparedStatement* stmt = nullptr;
+        PreparedStatement* stmt = NULL;
         stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_DISABLES);
         stmt->setUInt32(0, entry);
         stmt->setUInt8(1, disableType);
@@ -263,7 +263,7 @@ public:
                 break;
         }
 
-        PreparedStatement* stmt = nullptr;
+        PreparedStatement* stmt = NULL;
         stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_DISABLES);
         stmt->setUInt32(0, entry);
         stmt->setUInt8(1, disableType);

@@ -107,7 +107,9 @@ template <class ATTRIBUTES, class CACHING_UTILITY, class IMPLEMENTATION>
 class ACE_Caching_Strategy_Adapter
   : public ACE_Caching_Strategy<ATTRIBUTES, CACHING_UTILITY>
 {
+
 public:
+
   /// Constructor.
   ACE_Caching_Strategy_Adapter (IMPLEMENTATION *implementation = 0,
                                 bool delete_implementation = false);
@@ -160,10 +162,8 @@ public:
   /// Dumps the state of the object.
   void dump (void) const;
 
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
-
 private:
+
   /// Implementation class.
   IMPLEMENTATION *implementation_;
 
@@ -197,6 +197,7 @@ template <class ATTRIBUTES, class CACHING_UTILITY>
 class ACE_LRU_Caching_Strategy
 {
 public:
+
   // Traits.
   typedef ATTRIBUTES CACHING_ATTRIBUTES;
 
@@ -256,10 +257,8 @@ public:
   /// Dumps the state of the object.
   void dump (void) const;
 
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
-
 private:
+
   /// This element is the one which is the deciding factor for purging
   /// of an ITEM.
   ATTRIBUTES timer_;
@@ -297,7 +296,9 @@ private:
 template <class ATTRIBUTES, class CACHING_UTILITY>
 class ACE_LFU_Caching_Strategy
 {
+
 public:
+
   // Traits.
   typedef ATTRIBUTES CACHING_ATTRIBUTES;
 
@@ -355,10 +356,8 @@ public:
   /// Dumps the state of the object.
   void dump (void) const;
 
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
-
 private:
+
   /// The level about which the purging will happen automagically.
   double purge_percent_;
 
@@ -390,7 +389,9 @@ private:
 template<class ATTRIBUTES, class CACHING_UTILITY>
 class ACE_FIFO_Caching_Strategy
 {
+
 public:
+
   typedef ATTRIBUTES CACHING_ATTRIBUTES;
 
   // = Initialisation and termination.
@@ -446,10 +447,8 @@ public:
   /// Dumps the state of the object.
   void dump (void) const;
 
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
-
 private:
+
   /// The order is the deciding factor for the item to be removed from
   /// the cache.
   ATTRIBUTES order_;
@@ -477,7 +476,9 @@ private:
 template<class ATTRIBUTES, class CACHING_UTILITY>
 class ACE_Null_Caching_Strategy
 {
+
 public:
+
   // = Traits.
   typedef ATTRIBUTES CACHING_ATTRIBUTES;
 
@@ -523,10 +524,8 @@ public:
   /// Dumps the state of the object.
   void dump (void) const;
 
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
-
 private:
+
   /// This is the helper class which will decide and expunge entries
   /// from the cache.
   CACHING_UTILITY caching_utility_;

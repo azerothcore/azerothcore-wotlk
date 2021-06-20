@@ -1,15 +1,13 @@
-#ifndef G3D_ThreadSet_h
-#define G3D_ThreadSet_h
+#ifndef G3D_THREADSET_H
+#define G3D_THREADSET_H
 
 #include "G3D/platform.h"
 #include "G3D/Array.h"
 #include "G3D/ReferenceCount.h"
+#include "G3D/GThread.h"
 #include "G3D/GMutex.h"
-#include "G3D/SpawnBehavior.h"
 
 namespace G3D {
-
-class GThread;
 
 /** Manages a set of threads. All methods are threadsafe except for
     the iterator begin/end. 
@@ -20,8 +18,8 @@ public:
     /** Intended to allow future use with a template parameter.*/
     typedef GThread                                        Thread;
 
-    typedef shared_ptr<Thread>                ThreadRef;
-    typedef shared_ptr<ThreadSet>             Ref;
+    typedef ReferenceCountedPointer<Thread>                ThreadRef;
+    typedef ReferenceCountedPointer<ThreadSet>             Ref;
     typedef Array<ThreadRef>::Iterator                     Iterator;
     typedef Array<ThreadRef>::ConstIterator                ConstIterator;
 
@@ -43,14 +41,13 @@ public:
 
     /** Start all threads that are not currently started.
 
-        @param lastThreadBehavior If USE_CURRENT_THREAD, takes the
-        last unstarted thread and executes it manually on the current
-        thread.  This helps to take full advantage of the machine when
-        running a large number of jobs and avoids the overhead of a
-        thread start for single-thread groups.  Note that this forces
-        start() to block until that thread is complete.
+        @param lastThreadBehavior If USE_CURRENT_THREAD, takes the last unstarted thread and executes it manually on
+        the current thread.  This helps to take full advantage of the machine when
+        running a large number of jobs and avoids the overhead of a thread start for single-thread groups.
+        Note that this forces start() to block until
+        that thread is complete.        
       */
-    void start(SpawnBehavior lastThreadBehavior = USE_NEW_THREAD) const;
+    void start(GThread::SpawnBehavior lastThreadBehavior = GThread::USE_NEW_THREAD) const;
 
     /** Terminate all threads that are currently started */
     void terminate() const;

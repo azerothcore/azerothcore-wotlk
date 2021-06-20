@@ -1,17 +1,16 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "ACSoap.h"
-#include "AccountMgr.h"
-#include "Log.h"
 #include "soapH.h"
 #include "soapStub.h"
+#include "Log.h"
 #include "World.h"
 
-void ACSoapThread(const std::string& host, uint16 port)
+void ACSoapRunnable::run()
 {
     struct soap soap;
     soap_init(&soap);
@@ -22,14 +21,13 @@ void ACSoapThread(const std::string& host, uint16 port)
     soap.accept_timeout = 3;
     soap.recv_timeout = 5;
     soap.send_timeout = 5;
-
-    if (!soap_valid_socket(soap_bind(&soap, host.c_str(), port, 100)))
+    if (!soap_valid_socket(soap_bind(&soap, _host.c_str(), _port, 100)))
     {
-        LOG_ERROR("server", "ACSoap: couldn't bind to %s:%d", host.c_str(), port);
+        sLog->outError("ACSoap: couldn't bind to %s:%d", _host.c_str(), _port);
         exit(-1);
     }
 
-    LOG_INFO("server", "ACSoap: bound to http://%s:%d", host.c_str(), port);
+    sLog->outString("ACSoap: bound to http://%s:%d", _host.c_str(), _port);
 
     while (!World::IsStopped())
     {
@@ -37,30 +35,36 @@ void ACSoapThread(const std::string& host, uint16 port)
             continue;   // ran into an accept timeout
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "ACSoap: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip >> 24) & 0xFF, (int)(soap.ip >> 16) & 0xFF, (int)(soap.ip >> 8) & 0xFF, (int)soap.ip & 0xFF);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip>>24)&0xFF, (int)(soap.ip>>16)&0xFF, (int)(soap.ip>>8)&0xFF, (int)soap.ip&0xFF);
 #endif
         struct soap* thread_soap = soap_copy(&soap);// make a safe copy
 
-        process_message(thread_soap);
+        ACE_Message_Block* mb = new ACE_Message_Block(sizeof(struct soap*));
+        ACE_OS::memcpy(mb->wr_ptr(), &thread_soap, sizeof(struct soap*));
+        process_message(mb);
     }
 
     soap_done(&soap);
 }
 
-void process_message(struct soap* soap_message)
+void ACSoapRunnable::process_message(ACE_Message_Block* mb)
 {
-    //LOG_TRACE("network.soap", "SOAPWorkingThread::process_message");
+    ACE_TRACE (ACE_TEXT ("SOAPWorkingThread::process_message"));
 
-    soap_serve(soap_message);
-    soap_destroy(soap_message); // dealloc C++ data
-    soap_end(soap_message); // dealloc data and clean up
-    soap_done(soap_message); // detach soap struct
-    free(soap_message);
+    struct soap* soap;
+    ACE_OS::memcpy(&soap, mb->rd_ptr (), sizeof(struct soap*));
+    mb->release();
+
+    soap_serve(soap);
+    soap_destroy(soap); // dealloc C++ data
+    soap_end(soap); // dealloc data and clean up
+    soap_done(soap); // detach soap struct
+    free(soap);
 }
-
 /*
-    Code used for generating stubs:
-    int ns1__executeCommand(char* command, char** result);
+Code used for generating stubs:
+
+int ns1__executeCommand(char* command, char** result);
 */
 int ns1__executeCommand(soap* soap, char* command, char** result)
 {
@@ -68,7 +72,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     if (!soap->userid || !soap->passwd)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "ACSoap: Client didn't provide login information");
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: Client didn't provide login information");
 #endif
         return 401;
     }
@@ -77,7 +81,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     if (!accountId)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "ACSoap: Client used invalid username '%s'", soap->userid);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: Client used invalid username '%s'", soap->userid);
 #endif
         return 401;
     }
@@ -85,7 +89,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     if (!AccountMgr::CheckPassword(accountId, soap->passwd))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "ACSoap: invalid password for account '%s'", soap->userid);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: invalid password for account '%s'", soap->userid);
 #endif
         return 401;
     }
@@ -93,7 +97,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     if (AccountMgr::GetSecurity(accountId) < SEC_ADMINISTRATOR)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "ACSoap: %s's gmlevel is too low", soap->userid);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: %s's gmlevel is too low", soap->userid);
 #endif
         return 403;
     }
@@ -102,7 +106,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         return soap_sender_fault(soap, "Command can not be empty", "The supplied command was an empty string");
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("network", "ACSoap: got command '%s'", command);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: got command '%s'", command);
 #endif
     SOAPCommand connection;
 
@@ -113,10 +117,16 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         sWorld->QueueCliCommand(cmd);
     }
 
-    // Wait until the command has finished executing
-    connection.finishedPromise.get_future().wait();
+    // wait for callback to complete command
 
-    // The command has finished executing already
+    int acc = connection.pendingCommands.acquire();
+    if (acc)
+    {
+        sLog->outError("ACSoap: Error while acquiring lock, acc = %i, errno = %u", acc, errno);
+    }
+
+    // alright, command finished
+
     char* printBuffer = soap_strdup(soap, connection.m_printBuffer.c_str());
     if (connection.hasCommandSucceeded())
     {
@@ -131,6 +141,7 @@ void SOAPCommand::commandFinished(void* soapconnection, bool success)
 {
     SOAPCommand* con = (SOAPCommand*)soapconnection;
     con->setCommandSuccess(success);
+    con->pendingCommands.release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,11 +151,10 @@ void SOAPCommand::commandFinished(void* soapconnection, bool success)
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Namespace namespaces[] =
-{
-    { "SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", nullptr, nullptr }, // must be first
-    { "SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", nullptr, nullptr }, // must be second
-    { "xsi", "http://www.w3.org/1999/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", nullptr },
-    { "xsd", "http://www.w3.org/1999/XMLSchema",          "http://www.w3.org/*/XMLSchema", nullptr },
-    { "ns1", "urn:AC", nullptr, nullptr },     // "ns1" namespace prefix
-    { nullptr, nullptr, nullptr, nullptr }
+{   { "SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", NULL, NULL }, // must be first
+    { "SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", NULL, NULL }, // must be second
+    { "xsi", "http://www.w3.org/1999/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL },
+    { "xsd", "http://www.w3.org/1999/XMLSchema",          "http://www.w3.org/*/XMLSchema", NULL },
+    { "ns1", "urn:AC", NULL, NULL },     // "ns1" namespace prefix
+    { NULL, NULL, NULL, NULL }
 };

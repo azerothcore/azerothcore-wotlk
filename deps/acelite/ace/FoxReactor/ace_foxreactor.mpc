@@ -1,0 +1,9 @@
+//  -*- MPC -*- now wouldn't this be cool...
+project(ACE_FoxReactor) : acedefaults, install, acelib, ace_output, ace_fox {
+  sharedname   = ACE_FoxReactor
+  dynamicflags += ACE_FOXREACTOR_BUILD_DLL
+
+  specific {
+    install_dir = ace/FoxReactor
+  }
+}

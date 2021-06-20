@@ -13,10 +13,8 @@
 #include <vector>
 
 class MPQFile;
-struct WMODoodadData;
-namespace ADT { struct MDDF; struct MODF; }
 
-Vec3D fixCoordSystem(Vec3D const& v);
+Vec3D fixCoordSystem(Vec3D v);
 
 class Model
 {
@@ -25,8 +23,8 @@ private:
     {
         delete[] vertices;
         delete[] indices;
-        vertices = nullptr;
-        indices = nullptr;
+        vertices = NULL;
+        indices = NULL;
     }
     std::string filename;
 public:
@@ -41,11 +39,17 @@ public:
     ~Model() { _unload(); }
 };
 
-namespace Doodad
+class ModelInstance
 {
-    void Extract(ADT::MDDF const& doodadDef, char const* ModelInstName, uint32 mapID, uint32 tileX, uint32 tileY, FILE* pDirfile);
+public:
+    uint32 id;
+    Vec3D pos, rot;
+    uint16 scale, flags;
+    float sc;
 
-    void ExtractSet(WMODoodadData const& doodadData, ADT::MODF const& wmo, uint32 mapID, uint32 tileX, uint32 tileY, FILE* pDirfile);
-}
+    ModelInstance() : id(0), scale(0), flags(0), sc(0.0f) {}
+    ModelInstance(MPQFile& f, char const* ModelInstName, uint32 mapID, uint32 tileX, uint32 tileY, FILE* pDirfile);
+
+};
 
 #endif

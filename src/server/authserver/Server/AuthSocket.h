@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,14 +8,10 @@
 #define _AUTHSOCKET_H
 
 #include "Common.h"
-#include "CryptoHash.h"
-#include "Optional.h"
+#include "BigNumber.h"
 #include "RealmSocket.h"
-#include "SRP6.h"
-#include <mutex>
 
 class ACE_INET_Addr;
-class Field;
 struct Realm;
 
 enum eStatus
@@ -28,21 +24,6 @@ enum eStatus
     STATUS_CLOSED
 };
 
-struct AccountInfo
-{
-    void LoadResult(Field* fields);
-
-    uint32 Id = 0;
-    std::string Login;
-    bool IsLockedToIP = false;
-    std::string LockCountry;
-    std::string LastIP;
-    uint32 FailedLogins = 0;
-    bool IsBanned = false;
-    bool IsPermanenetlyBanned = false;
-    AccountTypes SecurityLevel = SEC_PLAYER;
-};
-
 // Handle login commands
 class AuthSocket: public RealmSocket::Session
 {
@@ -50,11 +31,11 @@ public:
     const static int s_BYTE_SIZE = 32;
 
     AuthSocket(RealmSocket& socket);
-    ~AuthSocket() override;
+    virtual ~AuthSocket(void);
 
-    void OnRead() override;
-    void OnAccept() override;
-    void OnClose() override;
+    virtual void OnRead(void);
+    virtual void OnAccept(void);
+    virtual void OnClose(void);
 
     static ACE_INET_Addr const& GetAddressForClient(Realm const& realm, ACE_INET_Addr const& clientAddr);
 
@@ -69,29 +50,32 @@ public:
     bool _HandleXferCancel();
     bool _HandleXferAccept();
 
+    void _SetVSFields(const std::string& rI);
+
     FILE* pPatch;
-    std::mutex patcherLock;
+    ACE_Thread_Mutex patcherLock;
 
 private:
     RealmSocket& socket_;
-    RealmSocket& socket() { return socket_; }
+    RealmSocket& socket(void) { return socket_; }
 
-    std::optional<Acore::Crypto::SRP6> _srp6;
-    SessionKey _sessionKey = {};
-    std::array<uint8, 16> _reconnectProof = {};
+    BigNumber N, s, g, v;
+    BigNumber b, B;
+    BigNumber K;
+    BigNumber _reconnectProof;
 
     eStatus _status;
 
-    AccountInfo _accountInfo;
-    Optional<std::vector<uint8>> _totpSecret;
+    std::string _login;
+    std::string _tokenKey;
 
     // Since GetLocaleByName() is _NOT_ bijective, we have to store the locale as a string. Otherwise we can't differ
     // between enUS and enGB, which is important for the patch system
     std::string _localizationName;
     std::string _os;
-    std::string _ipCountry;
     uint16 _build;
     uint8 _expversion;
+    AccountTypes _accountSecurityLevel;
 };
 
 #endif

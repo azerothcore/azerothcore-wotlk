@@ -22,9 +22,6 @@
 #include "ace/Log_Category.h"
 #include "ace/ACE.h"
 
-#ifdef ACE_HAS_TSS_EMULATION
-#include "ace/Object_Manager.h"
-#endif
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -109,7 +106,7 @@ ACE_Service_Config_Guard::ACE_Service_Config_Guard (ACE_Service_Gestalt * psg)
   if (ACE::debug ())
     ACELIB_DEBUG ((LM_DEBUG,
                 ACE_TEXT ("ACE (%P|%t) - SCG:<ctor=%@>")
-                ACE_TEXT (" - config=%@ repo=%@ superseded by repo=%@\n"),
+                ACE_TEXT (" - config=%@ repo=%@ superceded by repo=%@\n"),
                 this,
                 this->saved_.get (),
                 this->saved_->repo_,
@@ -539,12 +536,11 @@ ACE_Service_Config::reconfigure (void)
     {
 #if !defined (ACE_NLOGGING)
       time_t t = ACE_OS::time (0);
-
+#endif /* ! ACE_NLOGGING */
       if (ACE::debug ())
         ACELIB_DEBUG ((LM_DEBUG,
                     ACE_TEXT ("beginning reconfiguration at %s"),
                     ACE_OS::ctime (&t)));
-#endif /* ! ACE_NLOGGING */
     }
   if (ACE_Service_Config::process_directives () == -1)
     ACELIB_ERROR ((LM_ERROR,

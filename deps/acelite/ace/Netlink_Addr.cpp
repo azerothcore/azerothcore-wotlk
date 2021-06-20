@@ -11,10 +11,6 @@
 
 #ifdef ACE_HAS_NETLINK
 
-#if defined (ACE_HAS_ALLOC_HOOKS)
-# include "ace/Malloc_Base.h"
-#endif /* ACE_HAS_ALLOC_HOOKS */
-
 #if !defined (__ACE_INLINE__)
 #include "ace/Netlink_Addr.inl"
 #endif /* __ACE_INLINE__ */
@@ -65,3 +61,4 @@ ACE_Netlink_Addr::get_gid (void) const
 ACE_END_VERSIONED_NAMESPACE_DECL
 
 #endif
+

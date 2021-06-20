@@ -67,8 +67,6 @@ public:
   /// Accessor for the optional ACE_Thread_Manager.
   ACE_Thread_Manager *thr_mgr (void);
 
-  ACE_ALLOC_HOOK_DECLARE;
-
 protected:
   /// Ensure that this object must be allocated on the heap.
   ~ACE_Thread_Adapter (void);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,7 +12,8 @@
 #include "G3D/Set.h"
 #include "BoundingIntervalHierarchy.h"
 
-template<class T, class BoundsFunc = BoundsTrait<T>>
+
+template<class T, class BoundsFunc = BoundsTrait<T> >
 class BIHWrap
 {
     template<class RayCallback>
@@ -65,9 +66,9 @@ public:
     {
         ++unbalanced_times;
         uint32 Idx = 0;
-        const T* temp;
+        const T * temp;
         if (m_obj2Idx.getRemove(&obj, temp, Idx))
-            m_objects[Idx] = nullptr;
+            m_objects[Idx] = NULL;
         else
             m_objects_to_push.remove(&obj);
     }

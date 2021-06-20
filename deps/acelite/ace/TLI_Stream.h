@@ -40,6 +40,7 @@ public:
   friend class ACE_TLI_Acceptor;
   friend class ACE_TLI_Connector;
 
+  // = Initialization and termination methods.
   /// Default constructor.
   ACE_TLI_Stream (void);
 

@@ -11,7 +11,7 @@
 #include <string>
 
 ChunkedData::ChunkedData( FILE* stream, uint32 maxLength, uint32 chunksHint /*= 300*/ ) :
-    Stream(stream)
+Stream(stream)
 {
     if (!Stream)
         return;
@@ -66,7 +66,7 @@ Chunk* ChunkedData::GetChunkByName( const std::string& name )
     for (uint32 i = 0; i < Chunks.size(); ++i)
         if (Chunks[i]->Name == name)
             return Chunks[i];
-    return nullptr;
+    return NULL;
 }
 
 ChunkedData::~ChunkedData()

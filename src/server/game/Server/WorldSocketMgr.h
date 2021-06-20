@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,6 +14,8 @@
 #define __WORLDSOCKETMGR_H
 
 #include "Common.h"
+#include <ace/Basic_Types.h>
+#include <ace/Thread_Mutex.h>
 
 class WorldSocket;
 class ReactorRunnable;
@@ -26,7 +28,7 @@ public:
     friend class WorldSocket;
 
     static WorldSocketMgr* instance();
-
+    
     /// Start network, listen at address:port .
     int StartNetwork(uint16 port, const char* address);
 

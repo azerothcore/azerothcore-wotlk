@@ -2,9 +2,9 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "oculus.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "oculus.h"
 
 enum Spells
 {
@@ -58,14 +58,14 @@ class boss_eregos : public CreatureScript
 public:
     boss_eregos() : CreatureScript("boss_eregos") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return GetOculusAI<boss_eregosAI>(pCreature);
+        return new boss_eregosAI (pCreature);
     }
 
     struct boss_eregosAI : public ScriptedAI
     {
-        boss_eregosAI(Creature* c) : ScriptedAI(c)
+        boss_eregosAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -74,7 +74,7 @@ public:
         EventMap events;
         uint8 shiftNumber;
 
-        void Reset() override
+        void Reset()
         {
             if (pInstance)
             {
@@ -88,7 +88,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit*  /*who*/) override
+        void EnterCombat(Unit*  /*who*/)
         {
             Talk(SAY_AGGRO);
 
@@ -122,7 +122,7 @@ public:
             events.RescheduleEvent(EVENT_SUMMON_WHELPS, 40000);
         }
 
-        void JustDied(Unit*  /*killer*/) override
+        void JustDied(Unit*  /*killer*/)
         {
             Talk(SAY_DEATH);
 
@@ -132,26 +132,26 @@ public:
             me->SummonGameObject(GO_SPOTLIGHT, 1018.06f, 1051.09f, 605.619019f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32 & /*damage*/, DamageEffectType, SpellSchoolMask)
         {
             if( !me->GetMap()->IsHeroic() )
                 return;
 
-            if( shiftNumber <= uint32(1) && uint32(me->GetHealth() * 100 / me->GetMaxHealth()) <= uint32(60 - shiftNumber * 40) )
+            if( shiftNumber <= uint32(1) && uint32(me->GetHealth()*100/me->GetMaxHealth()) <= uint32(60-shiftNumber*40) )
             {
                 ++shiftNumber;
                 events.RescheduleEvent(EVENT_SPELL_PLANAR_SHIFT, 0);
             }
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        void KilledUnit(Unit * /*victim*/)
         {
             Talk(SAY_KILL);
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
 
-        void JustSummoned(Creature* pSummon) override
+        void JustSummoned(Creature* pSummon)
         {
             if( pSummon->GetEntry() != NPC_LEY_GUARDIAN_WHELP )
                 return;
@@ -159,7 +159,7 @@ public:
             DoZoneInCombat(pSummon, 300.0f);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if( !UpdateVictim() )
                 return;
@@ -174,7 +174,7 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch( events.GetEvent() )
             {
                 case 0:
                     break;
@@ -193,28 +193,30 @@ public:
                     events.RepeatEvent(35000);
                     break;
                 case EVENT_SUMMON_WHELPS:
-                    for( uint8 i = 0; i < 5; ++i )
+                    for( uint8 i=0; i<5; ++i )
                         events.ScheduleEvent(EVENT_SUMMON_SINGLE_WHELP, urand(0, 8000));
                     events.RepeatEvent(40000);
                     break;
                 case EVENT_SUMMON_SINGLE_WHELP:
                     {
-                        float x = rand_norm() * 50.0f - 25.0f;
-                        float y = rand_norm() * 50.0f - 25.0f;
-                        float z = rand_norm() * 50.0f - 25.0f;
-                        me->SummonCreature(NPC_LEY_GUARDIAN_WHELP, me->GetPositionX() + x, me->GetPositionY() + y, me->GetPositionZ() + z, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
+                        float x = rand_norm()*50.0f-25.0f;
+                        float y = rand_norm()*50.0f-25.0f;
+                        float z = rand_norm()*50.0f-25.0f;
+                        me->SummonCreature(NPC_LEY_GUARDIAN_WHELP, me->GetPositionX()+x, me->GetPositionY()+y, me->GetPositionZ()+z, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
+                        events.PopEvent();
                     }
                     break;
                 case EVENT_SPELL_PLANAR_SHIFT:
                     //me->MonsterYell(TEXT_PLANAR_SHIFT_SAY, LANG_UNIVERSAL, 0);
                     Talk(SAY_SHIELD);
                     me->CastSpell(me, SPELL_PLANAR_SHIFT, false);
-                    for( uint8 i = 0; i < 3; ++i )
+                    for( uint8 i=0; i<3; ++i )
                         if( Unit* t = SelectTarget(SELECT_TARGET_RANDOM, 0, 300.0f, false) )
                             if( Creature* pa = me->SummonCreature(NPC_PLANAR_ANOMALY, *me, TEMPSUMMON_TIMED_DESPAWN, 17000) )
                             {
                                 pa->SetCanFly(true);
                                 pa->SetDisableGravity(true);
+                                pa->SetHover(true);
                                 pa->SendMovementFlagUpdate();
                                 pa->CastSpell(pa, SPELL_PLANAR_AURA_VISUAL, true);
                                 pa->CastSpell(pa, SPELL_PLANAR_AURA_DAMAGE, true);
@@ -226,6 +228,7 @@ public:
                                     pa->GetMotionMaster()->MoveChase(t, 0.01f);
                                 }
                             }
+                    events.PopEvent();
                     break;
             }
         }

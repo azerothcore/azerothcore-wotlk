@@ -105,16 +105,15 @@ void Stopwatch::reset() {
 
 void Stopwatch::after(const std::string& s) {
     RealTime now = System::time();
-    if (m_enabled) {
-        debugPrintf("%s: %10s - %8fs since %s (%fs since start)\n",
-               myName.c_str(),
-               s.c_str(),
-               now - prevTime,
-               prevMark.c_str(),
-               now - startTime);
-    }
+    debugPrintf("%s: %10s - %8fs since %s (%fs since start)\n",
+           myName.c_str(),
+           s.c_str(),
+           now - prevTime,
+           prevMark.c_str(),
+           now - startTime);
     prevTime = now;
     prevMark = s;
 }
 
 }
+

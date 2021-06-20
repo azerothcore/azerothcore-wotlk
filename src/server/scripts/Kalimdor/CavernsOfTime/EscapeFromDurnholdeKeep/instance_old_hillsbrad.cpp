@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "InstanceScript.h"
 #include "old_hillsbrad.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
 
-const Position instancePositions[INSTANCE_POSITIONS_COUNT] =
+const Position instancePositions[INSTANCE_POSITIONS_COUNT] = 
 {
     {2188.18f, 228.90f, 53.025f, 1.77f},    // Orcs Gather Point 1
     {2103.23f, 93.55f, 53.096f, 3.78f},     // Orcs Gather Point 2
@@ -22,6 +22,7 @@ const Position thrallPositions[THRALL_POSITIONS_COUNT] =
     {2062.9f, 229.93f, 64.454f, 2.45f},     // After Captain Skarloc death
     {2486.91f, 626.356f, 58.0761f, 0.0f},   // Arrived at Tarren Mill
     {2660.47f, 659.223f, 62.0f, 5.78f}      // Taretha Met
+
 };
 
 class instance_old_hillsbrad : public InstanceMapScript
@@ -29,7 +30,7 @@ class instance_old_hillsbrad : public InstanceMapScript
 public:
     instance_old_hillsbrad() : InstanceMapScript("instance_old_hillsbrad", 560) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
         return new instance_old_hillsbrad_InstanceMapScript(map);
     }
@@ -38,11 +39,14 @@ public:
     {
         instance_old_hillsbrad_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void Initialize() override
+        void Initialize()
         {
             _encounterProgress = 0;
             _barrelCount = 0;
             _attemptsCount = 0;
+
+            _thrallGUID = 0;
+            _tarethaGUID = 0;
 
             _initalFlamesSet.clear();
             _finalFlamesSet.clear();
@@ -50,7 +54,7 @@ public:
             _events.Reset();
         }
 
-        void OnPlayerEnter(Player* player) override
+        void OnPlayerEnter(Player* player)
         {
             if (instance->GetPlayersCountExceptGMs() == 1)
                 CleanupInstance();
@@ -75,7 +79,7 @@ public:
                 SetData(DATA_THRALL_REPOSITION, 2);
         }
 
-        void OnCreatureCreate(Creature* creature) override
+        void OnCreatureCreate(Creature* creature)
         {
             switch (creature->GetEntry())
             {
@@ -97,7 +101,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* gameobject) override
+        void OnGameObjectCreate(GameObject* gameobject)
         {
             switch (gameobject->GetEntry())
             {
@@ -119,7 +123,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data) override
+        void SetData(uint32 type, uint32 data)
         {
             switch (type)
             {
@@ -134,19 +138,19 @@ public:
                     SaveToDB();
                     break;
                 case DATA_BOMBS_PLACED:
-                    {
-                        if (_barrelCount >= 5 || _encounterProgress > ENCOUNTER_PROGRESS_NONE)
-                            return;
+                {
+                    if (_barrelCount >= 5 || _encounterProgress > ENCOUNTER_PROGRESS_NONE)
+                        return;
 
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, ++_barrelCount);
-                        if (_barrelCount == 5)
-                        {
-                            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4000);
-                            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 12000);
-                            _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 18000);
-                        }
-                        break;
+                    DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, ++_barrelCount);
+                    if (_barrelCount == 5)
+                    {
+                        _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4000);
+                        _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 12000);
+                        _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 18000);
                     }
+                    break;
+                }
                 case DATA_THRALL_ADD_FLAG:
                     if (Creature* thrall = instance->GetCreature(_thrallGUID))
                         thrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -154,7 +158,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 data) const override
+        uint32 GetData(uint32 data) const
         {
             if (data == DATA_ESCORT_PROGRESS)
                 return _encounterProgress;
@@ -163,103 +167,99 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 data) const override
+        uint64 GetData64(uint32 data) const
         {
             if (data == DATA_THRALL_GUID)
                 return _thrallGUID;
             else if (data == DATA_TARETHA_GUID)
                 return _tarethaGUID;
-
-            return ObjectGuid::Empty;
+            return 0;
         }
 
-        void Update(uint32 diff) override
+        void Update(uint32 diff)
         {
             _events.Update(diff);
             switch (_events.ExecuteEvent())
             {
                 case EVENT_INITIAL_BARRELS_FLAME:
-                    {
-                        instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
-                        instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
+                {
+                    instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
+                    instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
 
-                        for (ObjectGuid const guid : _prisonersSet)
-                            if (Creature* orc = instance->GetCreature(guid))
-                            {
-                                uint8 index = orc->GetDistance(instancePositions[0]) < 80.0f ? 0 : 1;
-                                Position pos(instancePositions[index]);
-                                orc->MovePosition(pos, frand(1.0f, 3.0f) + 15.0f * (float)rand_norm(), (float)rand_norm() * static_cast<float>(2 * M_PI));
-                                orc->GetMotionMaster()->MovePoint(1, pos);
-                                orc->SetStandState(UNIT_STAND_STATE_STAND);
-                            }
+                    for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
+                        if (Creature* orc = instance->GetCreature(*itr))
+                        {
+                            uint8 index = orc->GetDistance(instancePositions[0]) < 80.0f ? 0 : 1;
+                            Position pos(instancePositions[index]);
+                            orc->MovePosition(pos, frand(1.0f, 3.0f) + 15.0f * (float)rand_norm(), (float)rand_norm() * static_cast<float>(2 * M_PI));
+                            orc->GetMotionMaster()->MovePoint(1, pos);
+                            orc->SetStandState(UNIT_STAND_STATE_STAND);
+                        }
 
-                        for (ObjectGuid const guid : _initalFlamesSet)
-                            if (GameObject* gobject = instance->GetGameObject(guid))
-                            {
-                                gobject->SetRespawnTime(0);
-                                gobject->UpdateObjectVisibility(true);
-                            }
-                        break;
-                    }
+                    for (std::set<uint64>::const_iterator itr = _initalFlamesSet.begin(); itr != _initalFlamesSet.end(); ++itr)
+                        if (GameObject* gobject = instance->GetGameObject(*itr))
+                        {
+                            gobject->SetRespawnTime(0);
+                            gobject->UpdateObjectVisibility(true);
+                        }
+                    break;
+                }
                 case EVENT_FINAL_BARRELS_FLAME:
-                    {
-                        instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
-                        instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
+                {
+                    instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
+                    instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
 
-                        if (_encounterProgress == ENCOUNTER_PROGRESS_NONE)
+                    if (_encounterProgress == ENCOUNTER_PROGRESS_NONE)
+                    {
+                        Map::PlayerList const& players = instance->GetPlayers();
+                        if (!players.isEmpty())
+                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                                if (Player* player = itr->GetSource())
+                                    player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER, 0);
+                    }
+
+                    for (std::set<uint64>::const_iterator itr = _finalFlamesSet.begin(); itr != _finalFlamesSet.end(); ++itr)
+                        if (GameObject* gobject = instance->GetGameObject(*itr))
                         {
-                            Map::PlayerList const& players = instance->GetPlayers();
-                            if (!players.isEmpty())
-                                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                                    if (Player* player = itr->GetSource())
-                                        player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER);
+                            gobject->SetRespawnTime(0);
+                            gobject->UpdateObjectVisibility(true);
                         }
 
-                        for (ObjectGuid const guid : _finalFlamesSet)
-                            if (GameObject* gobject = instance->GetGameObject(guid))
-                            {
-                                gobject->SetRespawnTime(0);
-                                gobject->UpdateObjectVisibility(true);
-                            }
-
-                        for (ObjectGuid const guid : _prisonersSet)
-                            if (Creature* orc = instance->GetCreature(guid))
-                                if (roll_chance_i(25))
-                                    orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-
-                        SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_BARRELS);
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, 0);
-                        break;
-                    }
+                    for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
+                        if (Creature* orc = instance->GetCreature(*itr))
+                            if (roll_chance_i(25))
+                                orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
+                    
+                    SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_BARRELS);
+                    DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, 0);
+                    break;
+                }
                 case EVENT_SUMMON_LIEUTENANT:
-                    {
-                        instance->LoadGrid(instancePositions[2].GetPositionX(), instancePositions[2].GetPositionY());
-                        if (Creature* drake = instance->SummonCreature(NPC_LIEUTENANT_DRAKE, instancePositions[2]))
-                        {
-                            drake->AI()->Talk(0);
-                        }
-                        [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
-                    }
+                {
+                    instance->LoadGrid(instancePositions[2].GetPositionX(), instancePositions[2].GetPositionY());
+                    if (Creature* drake = instance->SummonCreature(NPC_LIEUTENANT_DRAKE, instancePositions[2]))
+                        drake->AI()->Talk(0);
+                }
                 case EVENT_THRALL_REPOSITION:
+                {
+                    if (Creature* thrall = instance->GetCreature(_thrallGUID))
                     {
-                        if (Creature* thrall = instance->GetCreature(_thrallGUID))
+                        if (!thrall->IsAlive())
                         {
-                            if (!thrall->IsAlive())
-                            {
-                                ++_attemptsCount;
-                                EnsureGridLoaded();
-                                thrall->SetVisible(false);
-                                Reposition(thrall);
-                                thrall->setDeathState(DEAD);
-                                thrall->Respawn();
-                                thrall->SetVisible(true);
-                                SaveToDB();
-                            }
-                            else
-                                thrall->AI()->Reset();
+                            ++_attemptsCount;
+                            EnsureGridLoaded();
+                            thrall->SetVisible(false);
+                            Reposition(thrall);
+                            thrall->setDeathState(DEAD);
+                            thrall->Respawn();
+                            thrall->SetVisible(true);
+                            SaveToDB();
                         }
-                        break;
+                        else
+                            thrall->AI()->Reset();
                     }
+                    break;
+                }
             }
         }
 
@@ -285,18 +285,18 @@ public:
                 instance->LoadGrid(thrallPositions[i].GetPositionX(), thrallPositions[i].GetPositionY());
         }
 
-        std::string GetSaveData() override
+        std::string GetSaveData()
         {
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "O H " << _encounterProgress << ' ' << _attemptsCount;
+                saveStream << "O H " << _encounterProgress << ' ' << _attemptsCount;
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
         }
 
-        void Load(const char* in) override
+        void Load(const char* in)
         {
             if (!in)
             {
@@ -323,19 +323,20 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-    private:
-        uint32 _encounterProgress;
-        uint32 _barrelCount;
-        uint32 _attemptsCount;
+        private:
+            uint32 _encounterProgress;
+            uint32 _barrelCount;
+            uint32 _attemptsCount;
 
-        ObjectGuid _thrallGUID;
-        ObjectGuid _tarethaGUID;
-        GuidSet _initalFlamesSet;
-        GuidSet _finalFlamesSet;
-        GuidSet _prisonersSet;
+            uint64 _thrallGUID;
+            uint64 _tarethaGUID;
+            std::set<uint64> _initalFlamesSet;
+            std::set<uint64> _finalFlamesSet;
+            std::set<uint64> _prisonersSet;
 
-        EventMap _events;
+            EventMap _events;
     };
+
 };
 
 void AddSC_instance_old_hillsbrad()

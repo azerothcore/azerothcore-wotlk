@@ -57,8 +57,6 @@ public:
   /// singleton.
   static void cleanup (void *instance);
 
-  ACE_ALLOC_HOOK_DECLARE;
-
 private:
   /// Automatically add/remove the thread from the
   /// ACE_Thread_Manager.

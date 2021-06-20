@@ -1,16 +1,15 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef _STRING_FORMAT_H_
-#define _STRING_FORMAT_H_
+#ifndef __STRING_FORMAT_H__
+#define __STRING_FORMAT_H__
 
-#include <fmt/printf.h>
+#include "fmt/printf.h"
 
-namespace Acore
+namespace acore
 {
     /// Default AC string format function.
     template<typename Format, typename... Args>
@@ -38,12 +37,6 @@ namespace Acore
     {
         return fmt.empty();
     }
-}
-
-namespace Acore::String
-{
-    template<class Str>
-    Str Trim(const Str& s, const std::locale& loc = std::locale());
 }
 
 #endif

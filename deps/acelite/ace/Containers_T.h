@@ -4,7 +4,7 @@
 /**
  *  @file    Containers_T.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -310,13 +310,13 @@ class ACE_DNode
   friend class ACE_Ordered_MultiSet_Iterator<T>;
 
 public:
+
   /// This isn't necessary, but it keeps some compilers happy.
   ~ACE_DNode (void);
 
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
-
 private:
+
+  // = Initialization methods
   ACE_DNode (const T &i, ACE_DNode<T> *n = 0, ACE_DNode<T> *p = 0);
 
   /// Pointer to next element in the list of {ACE_DNode}s.
@@ -503,6 +503,7 @@ template <class T>
 class ACE_Unbounded_Stack_Iterator
 {
 public:
+  // = Initialization method.
   /// Move to the first element in the {stack}.
   ACE_Unbounded_Stack_Iterator (ACE_Unbounded_Stack<T> &stack);
 
@@ -583,6 +584,8 @@ public:
   ACE_ALLOC_HOOK_DECLARE;
 
 protected:
+  // = Initialization methods.
+
   /// Constructor
   ACE_Double_Linked_List_Iterator_Base (const ACE_Double_Linked_List<T> &);
 
@@ -646,6 +649,7 @@ template <class T>
 class ACE_Double_Linked_List_Iterator : public ACE_Double_Linked_List_Iterator_Base <T>
 {
 public:
+  // = Initialization method.
   ACE_Double_Linked_List_Iterator (const ACE_Double_Linked_List<T> &);
 
   /**
@@ -714,6 +718,7 @@ template <class T>
 class ACE_Double_Linked_List_Reverse_Iterator : public ACE_Double_Linked_List_Iterator_Base <T>
 {
 public:
+  // = Initialization method.
   ACE_Double_Linked_List_Reverse_Iterator (ACE_Double_Linked_List<T> &);
 
   /**
@@ -820,6 +825,7 @@ public:
   typedef ACE_Double_Linked_List_Iterator<T> ITERATOR;
   typedef ACE_Double_Linked_List_Reverse_Iterator<T> REVERSE_ITERATOR;
 
+  // = Initialization and termination methods.
   /// construction.  Use user specified allocation strategy
   /// if specified.
   /**
@@ -954,7 +960,7 @@ protected:
   /**
    * Insert a @a new_item into the list.  It will be added before
    * or after @a old_item.  Default is to insert the new item *after*
-   * {head_}.  Return 0 if succeed, -1 if error occurred.
+   * {head_}.  Return 0 if succeed, -1 if error occured.
    */
   int insert_element (T *new_item,
                       int before = 0,
@@ -1024,6 +1030,7 @@ class ACE_DLList : public ACE_DLList_Base
   friend class ACE_DLList_Reverse_Iterator<T>;
 
 public:
+
   /// Delegates to ACE_Double_Linked_List.
   void operator= (const ACE_DLList<T> &l);
 
@@ -1122,10 +1129,13 @@ public:
 template <class T>
 class ACE_DLList_Iterator : public ACE_Double_Linked_List_Iterator <ACE_DLList_Node>
 {
+
   friend class ACE_DLList<T>;
   friend class ACE_DLList_Node;
 
 public:
+
+  // = Initialization method.
   ACE_DLList_Iterator (ACE_DLList<T> &l);
 
   /**
@@ -1182,10 +1192,13 @@ private:
 template <class T>
 class ACE_DLList_Reverse_Iterator : public ACE_Double_Linked_List_Reverse_Iterator <ACE_DLList_Node>
 {
+
   friend class ACE_DLList<T>;
   friend class ACE_DLList_Node;
 
 public:
+
+  // = Initialization method.
   ACE_DLList_Reverse_Iterator (ACE_DLList<T> &l);
 
   /**
@@ -1258,6 +1271,7 @@ public:
   ACE_ALLOC_HOOK_DECLARE;
 
 protected:
+  // = Initialization method.
   ACE_Fixed_Set_Iterator_Base (ACE_Fixed_Set<T, ACE_SIZE> &s);
 
   /// Set we are iterating over.
@@ -1289,6 +1303,7 @@ template <class T, size_t ACE_SIZE>
 class ACE_Fixed_Set_Iterator : public ACE_Fixed_Set_Iterator_Base <T, ACE_SIZE>
 {
 public:
+  // = Initialization method.
   ACE_Fixed_Set_Iterator (ACE_Fixed_Set<T, ACE_SIZE> &s);
 
   // = Iteration methods.
@@ -1324,6 +1339,7 @@ template <class T, size_t ACE_SIZE>
 class ACE_Fixed_Set_Const_Iterator : public ACE_Fixed_Set_Iterator_Base <T, ACE_SIZE>
 {
 public:
+  // = Initialization method.
   ACE_Fixed_Set_Const_Iterator (const ACE_Fixed_Set<T, ACE_SIZE> &s);
 
   // = Iteration methods.
@@ -1387,6 +1403,7 @@ public:
   typedef ACE_Fixed_Set_Iterator<T, ACE_SIZE> ITERATOR;
   typedef ACE_Fixed_Set_Const_Iterator<T, ACE_SIZE> CONST_ITERATOR;
 
+  // = Initialization and termination methods.
   /// Default Constructor.
   /**
    * Creates an empy set
@@ -1495,6 +1512,7 @@ template <class T>
 class ACE_Bounded_Set_Iterator
 {
 public:
+  // = Initialization method.
   ACE_Bounded_Set_Iterator (ACE_Bounded_Set<T> &s);
 
   // = Iteration methods.
@@ -1579,6 +1597,7 @@ public:
     DEFAULT_SIZE = 10
   };
 
+  // = Initialization and termination methods.
   /// Construct a Bounded_Set using the default size.
   /**
    * The default constructor initializes the Bounded_Set to a maximum size
@@ -1703,6 +1722,7 @@ class ACE_Ordered_MultiSet_Iterator
 public:
   friend class ACE_Ordered_MultiSet<T>;
 
+  // = Initialization method.
   ACE_Ordered_MultiSet_Iterator (ACE_Ordered_MultiSet<T> &s);
 
   // = Iteration methods.
@@ -1740,6 +1760,7 @@ public:
   ACE_ALLOC_HOOK_DECLARE;
 
 private:
+
   /// Pointer to the current node in the iteration.
   ACE_DNode<T> *current_;
 
@@ -1790,6 +1811,7 @@ public:
   // Trait definition.
   typedef ACE_Ordered_MultiSet_Iterator<T> ITERATOR;
 
+  // = Initialization and termination methods.
   /// Constructor.  Use user specified allocation strategy
   /// if specified.
   /**
@@ -1877,6 +1899,7 @@ public:
   ACE_ALLOC_HOOK_DECLARE;
 
 private:
+
   /**
    * Insert @a item, starting its search at the position given,
    * and if successful updates the passed pointer to point to

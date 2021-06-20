@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -36,7 +36,7 @@ public:
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "teleport",           SEC_MODERATOR,      false, nullptr,      "", teleCommandTable }
+            { "tele",           SEC_MODERATOR,      false, nullptr,                            "", teleCommandTable }
         };
         return commandTable;
     }
@@ -86,7 +86,7 @@ public:
         if (!*args)
             return false;
 
-        // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
+         // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
         GameTele const* tele = handler->extractGameTeleFromLink((char*)args);
         if (!tele)
         {
@@ -110,7 +110,7 @@ public:
             return false;
 
         Player* target;
-        ObjectGuid target_guid;
+        uint64 target_guid;
         std::string target_name;
         if (!handler->extractPlayerTarget(nameStr, &target, &target_guid, &target_name))
             return false;
@@ -119,10 +119,11 @@ public:
         {
             if (target)
                 target->TeleportTo(target->m_homebindMapId, target->m_homebindX, target->m_homebindY, target->m_homebindZ, target->GetOrientation());
+            /* xinef: optimization, not needed function
             else
             {
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
-                stmt->setUInt32(0, target_guid.GetCounter());
+                stmt->setUInt32(0, target_guid);
                 PreparedQueryResult resultDB = CharacterDatabase.Query(stmt);
 
                 if (resultDB)
@@ -136,7 +137,7 @@ public:
 
                     Player::SavePositionInDB(mapId, posX, posY, posZ, 0, zoneId, target_guid);
                 }
-            }
+            }*/
 
             return true;
         }
@@ -153,7 +154,7 @@ public:
         if (target)
         {
             // check online security
-            if (handler->HasLowerSecurity(target))
+            if (handler->HasLowerSecurity(target, 0))
                 return false;
 
             std::string chrNameLink = handler->playerLink(target_name);
@@ -191,7 +192,7 @@ public:
 
             handler->PSendSysMessage(LANG_TELEPORTING_TO, nameLink.c_str(), handler->GetAcoreString(LANG_OFFLINE), tele->name.c_str());
             Player::SavePositionInDB(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation,
-                                     sMapMgr->GetZoneId(tele->mapId, tele->position_x, tele->position_y, tele->position_z), target_guid);
+                sMapMgr->GetZoneId(tele->mapId, tele->position_x, tele->position_y, tele->position_z), target_guid);
         }
 
         return true;
@@ -212,7 +213,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target))
+        if (handler->HasLowerSecurity(target, 0))
             return false;
 
         // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
@@ -250,7 +251,7 @@ public:
                 continue;
 
             // check online security
-            if (handler->HasLowerSecurity(player))
+            if (handler->HasLowerSecurity(player, 0))
                 return false;
 
             std::string plNameLink = handler->GetNameLink(player);

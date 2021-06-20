@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "blackrock_spire.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackrock_spire.h"
 #include "TemporarySummon.h"
 
 enum Spells
@@ -35,31 +35,31 @@ public:
 
     struct boss_gizrul_the_slavenerAI : public BossAI
     {
-        boss_gizrul_the_slavenerAI(Creature* creature) : BossAI(creature, DATA_GIZRUL_THE_SLAVENER) { }
+       boss_gizrul_the_slavenerAI(Creature* creature) : BossAI(creature, DATA_GIZRUL_THE_SLAVENER) { }
 
-        void Reset() override
+        void Reset()
         {
             _Reset();
         }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(Unit* /*summoner*/)
         {
             me->GetMotionMaster()->MovePath(GIZRUL_PATH, false);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_FATAL_BITE, urand(17000, 20000));
-            events.ScheduleEvent(EVENT_INFECTED_BITE, urand(10000, 12000));
+            events.ScheduleEvent(EVENT_FATAL_BITE, urand(17000,20000));
+            events.ScheduleEvent(EVENT_INFECTED_BITE, urand(10000,12000));
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             _JustDied();
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -75,11 +75,11 @@ public:
                 {
                     case EVENT_FATAL_BITE:
                         DoCastVictim(SPELL_FATAL_BITE);
-                        events.ScheduleEvent(EVENT_FATAL_BITE, urand(8000, 10000));
+                        events.ScheduleEvent(EVENT_FATAL_BITE, urand(8000,10000));
                         break;
                     case EVENT_INFECTED_BITE:
                         DoCast(me, SPELL_INFECTED_BITE);
-                        events.ScheduleEvent(EVENT_FATAL_BITE, urand(8000, 10000));
+                        events.ScheduleEvent(EVENT_FATAL_BITE, urand(8000,10000));
                         break;
                     default:
                         break;
@@ -89,9 +89,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackrockSpireAI<boss_gizrul_the_slavenerAI>(creature);
+        return new boss_gizrul_the_slavenerAI(creature);
     }
 };
 

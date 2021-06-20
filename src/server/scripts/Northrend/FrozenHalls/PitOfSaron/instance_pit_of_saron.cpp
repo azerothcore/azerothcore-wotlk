@@ -2,10 +2,10 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "pit_of_saron.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
 
 class instance_pit_of_saron : public InstanceMapScript
 {
@@ -21,36 +21,52 @@ public:
         uint32 InstanceProgress;
         std::string str_data;
 
-        ObjectGuid NPC_LeaderFirstGUID;
-        ObjectGuid NPC_LeaderSecondGUID;
-        ObjectGuid NPC_TyrannusEventGUID;
-        ObjectGuid NPC_Necrolyte1GUID;
-        ObjectGuid NPC_Necrolyte2GUID;
-        ObjectGuid NPC_GuardFirstGUID;
-        ObjectGuid NPC_GuardSecondGUID;
-        ObjectGuid NPC_SindragosaGUID;
+        uint64 NPC_LeaderFirstGUID;
+        uint64 NPC_LeaderSecondGUID;
+        uint64 NPC_TyrannusEventGUID;
+        uint64 NPC_Necrolyte1GUID;
+        uint64 NPC_Necrolyte2GUID;
+        uint64 NPC_GuardFirstGUID;
+        uint64 NPC_GuardSecondGUID;
+        uint64 NPC_SindragosaGUID;
 
-        ObjectGuid NPC_GarfrostGUID;
-        ObjectGuid NPC_MartinOrGorkunGUID;
-        ObjectGuid NPC_RimefangGUID;
-        ObjectGuid NPC_TyrannusGUID;
+        uint64 NPC_GarfrostGUID;
+        uint64 NPC_MartinOrGorkunGUID;
+        uint64 NPC_RimefangGUID;
+        uint64 NPC_TyrannusGUID;
 
-        ObjectGuid GO_IceWallGUID;
+        uint64 GO_IceWallGUID;
 
         bool bAchievEleven;
         bool bAchievDontLookUp;
 
-        void Initialize() override
+        void Initialize()
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             teamIdInInstance = TEAM_NEUTRAL;
             InstanceProgress = INSTANCE_PROGRESS_NONE;
 
+            NPC_LeaderFirstGUID = 0;
+            NPC_LeaderSecondGUID = 0;
+            NPC_TyrannusEventGUID = 0;
+            NPC_Necrolyte1GUID = 0;
+            NPC_Necrolyte2GUID = 0;
+            NPC_GuardFirstGUID = 0;
+            NPC_GuardSecondGUID = 0;
+            NPC_SindragosaGUID = 0;
+
+            NPC_GarfrostGUID = 0;
+            NPC_MartinOrGorkunGUID = 0;
+            NPC_RimefangGUID = 0;
+            NPC_TyrannusGUID = 0;
+
+            GO_IceWallGUID = 0;
+
             bAchievEleven = true;
             bAchievDontLookUp = true;
         }
 
-        bool IsEncounterInProgress() const override
+        bool IsEncounterInProgress() const
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS) return true;
@@ -58,18 +74,18 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player*  /*plr*/) override
+        void OnPlayerEnter(Player*  /*plr*/)
         {
             instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
-            if (Creature* c = instance->GetCreature(GetGuidData(DATA_LEADER_FIRST_GUID)))
-                c->AI()->SetData(DATA_START_INTRO, 0);
+            if (Creature* c = instance->GetCreature(GetData64(DATA_LEADER_FIRST_GUID)))
+	    	c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
-        uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
+        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data)
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
-                Map::PlayerList const& players = instance->GetPlayers();
+                Map::PlayerList const &players = instance->GetPlayers();
                 if (!players.isEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
@@ -91,11 +107,11 @@ public:
             return entry;
         }
 
-        void OnCreatureCreate(Creature* creature) override
+        void OnCreatureCreate(Creature* creature)
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
-                Map::PlayerList const& players = instance->GetPlayers();
+                Map::PlayerList const &players = instance->GetPlayers();
                 if (!players.isEmpty())
                     if (Player* player = players.begin()->GetSource())
                         teamIdInInstance = player->GetTeamId();
@@ -150,6 +166,7 @@ public:
                                 break;
                         }
                         NPC_TyrannusEventGUID = creature->GetGUID();
+                        
                     }
                     break;
                 case NPC_LORALEN:
@@ -166,38 +183,38 @@ public:
                     break;
                 case NPC_HORDE_SLAVE_1:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_ALLIANCE_SLAVE_1);
+                       creature->UpdateEntry(NPC_ALLIANCE_SLAVE_1);
                     break;
                 case NPC_HORDE_SLAVE_2:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_ALLIANCE_SLAVE_2);
+                       creature->UpdateEntry(NPC_ALLIANCE_SLAVE_2);
                     break;
                 case NPC_HORDE_SLAVE_3:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_ALLIANCE_SLAVE_3);
+                       creature->UpdateEntry(NPC_ALLIANCE_SLAVE_3);
                     break;
                 case NPC_HORDE_SLAVE_4:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_ALLIANCE_SLAVE_4);
+                       creature->UpdateEntry(NPC_ALLIANCE_SLAVE_4);
                     break;
                 case NPC_GORKUN_IRONSKULL_1:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_MARTIN_VICTUS_1);
+                       creature->UpdateEntry(NPC_MARTIN_VICTUS_1);
                     break;
                 case NPC_GARFROST:
                     NPC_GarfrostGUID = creature->GetGUID();
                     break;
                 case NPC_FREED_SLAVE_1_HORDE:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_FREED_SLAVE_1_ALLIANCE);
+                       creature->UpdateEntry(NPC_FREED_SLAVE_1_ALLIANCE);
                     break;
                 case NPC_FREED_SLAVE_2_HORDE:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_FREED_SLAVE_2_ALLIANCE);
+                       creature->UpdateEntry(NPC_FREED_SLAVE_2_ALLIANCE);
                     break;
                 case NPC_FREED_SLAVE_3_HORDE:
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_FREED_SLAVE_3_ALLIANCE);
+                       creature->UpdateEntry(NPC_FREED_SLAVE_3_ALLIANCE);
                     break;
                 case NPC_GORKUN_IRONSKULL_2:
                     if (NPC_MartinOrGorkunGUID)
@@ -207,7 +224,7 @@ public:
                             c->DespawnOrUnsummon();
                         }
                     if (teamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_MARTIN_VICTUS_2);
+                       creature->UpdateEntry(NPC_MARTIN_VICTUS_2);
                     NPC_MartinOrGorkunGUID = creature->GetGUID();
                     break;
                 case NPC_RIMEFANG:
@@ -230,7 +247,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go) override
+        void OnGameObjectCreate(GameObject* go)
         {
             switch (go->GetEntry())
             {
@@ -242,7 +259,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data) override
+        void SetData(uint32 type, uint32 data)
         {
             switch(type)
             {
@@ -287,7 +304,7 @@ public:
                 SaveToDB();
         }
 
-        void SetGuidData(uint32 type, ObjectGuid data) override
+        void SetData64(uint32 type, uint64 data)
         {
             switch(type)
             {
@@ -303,7 +320,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const override
+        uint32 GetData(uint32 type) const
         {
             switch (type)
             {
@@ -322,7 +339,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        uint64 GetData64(uint32 type) const
         {
             switch (type)
             {
@@ -352,10 +369,10 @@ public:
                     return NPC_SindragosaGUID;
             }
 
-            return ObjectGuid::Empty;
+            return 0;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
             switch(criteria_id)
             {
@@ -365,7 +382,7 @@ public:
             return false;
         }
 
-        std::string GetSaveData() override
+        std::string GetSaveData()
         {
             OUT_SAVE_INST_DATA;
 
@@ -377,7 +394,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in) override
+        void Load(const char* in)
         {
             if (!in)
             {
@@ -410,7 +427,7 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
         return new instance_pit_of_saron_InstanceScript(map);
     }

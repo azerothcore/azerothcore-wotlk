@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,9 +17,9 @@ go_mausoleum_door
 go_mausoleum_trigger
 EndContentData */
 
-#include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "Player.h"
 
 /*######
 ## npc_calvin_montague
@@ -38,7 +38,7 @@ class npc_calvin_montague : public CreatureScript
 public:
     npc_calvin_montague() : CreatureScript("npc_calvin_montague") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_590)
         {
@@ -49,7 +49,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_calvin_montagueAI(creature);
     }
@@ -60,13 +60,13 @@ public:
 
         uint32 m_uiPhase;
         uint32 m_uiPhaseTimer;
-        ObjectGuid m_uiPlayerGUID;
+        uint64 m_uiPlayerGUID;
 
-        void Reset() override
+        void Reset()
         {
             m_uiPhase = 0;
             m_uiPhaseTimer = 5000;
-            m_uiPlayerGUID.Clear();
+            m_uiPlayerGUID = 0;
 
             me->RestoreFaction();
 
@@ -74,9 +74,9 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void EnterCombat(Unit* /*who*/) { }
 
-        void AttackedBy(Unit* pAttacker) override
+        void AttackedBy(Unit* pAttacker)
         {
             if (me->GetVictim() || me->IsFriendlyTo(pAttacker))
                 return;
@@ -84,7 +84,7 @@ public:
             AttackStart(pAttacker);
         }
 
-        void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* pDoneBy, uint32 &uiDamage, DamageEffectType, SpellSchoolMask)
         {
             if (!pDoneBy)
                 return;
@@ -104,7 +104,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (m_uiPhase)
             {

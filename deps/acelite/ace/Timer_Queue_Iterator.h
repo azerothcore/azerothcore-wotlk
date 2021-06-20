@@ -121,9 +121,6 @@ public:
   /// Dump the state of an TYPE.
   void dump (void) const;
 
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
-
 private:
   /// Type of object stored in the Queue
   TYPE type_;
@@ -162,6 +159,7 @@ template <class TYPE>
 class ACE_Timer_Queue_Iterator_T
 {
 public:
+  // = Initialization and termination methods.
   /// Constructor.
   ACE_Timer_Queue_Iterator_T (void);
 

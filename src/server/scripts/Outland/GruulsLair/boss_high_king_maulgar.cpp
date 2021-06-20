@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "gruuls_lair.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "gruuls_lair.h"
 
 enum HighKingMaulgar
 {
@@ -71,13 +71,13 @@ public:
     {
         boss_high_king_maulgarAI(Creature* creature) : BossAI(creature, DATA_MAULGAR) { }
 
-        void Reset() override
+        void Reset()
         {
             _Reset();
             me->SetLootMode(0);
         }
 
-        void KilledUnit(Unit*  /*victim*/) override
+        void KilledUnit(Unit*  /*victim*/)
         {
             if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
             {
@@ -86,14 +86,14 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
             if (instance->GetData(DATA_ADDS_KILLED) == MAX_ADD_NUMBER)
                 _JustDied();
         }
 
-        void DoAction(int32 actionId) override
+        void DoAction(int32 actionId)
         {
             if (me->IsAlive())
             {
@@ -110,7 +110,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
@@ -121,7 +121,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -171,9 +171,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetGruulsLairAI<boss_high_king_maulgarAI>(creature);
+        return GetInstanceAI<boss_high_king_maulgarAI>(creature);
     }
 };
 
@@ -193,14 +193,14 @@ public:
         SummonList summons;
         InstanceScript* instance;
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
             summons.DespawnAll();
             instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
         }
 
-        void AttackStart(Unit* who) override
+        void AttackStart(Unit* who)
         {
             if (!who)
                 return;
@@ -209,7 +209,7 @@ public:
                 me->GetMotionMaster()->MoveChase(who, 25.0f);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             me->SetInCombatWithZone();
             instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
@@ -219,17 +219,17 @@ public:
             events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             instance->SetData(DATA_ADDS_KILLED, 1);
         }
 
-        void JustSummoned(Creature* summon) override
+        void JustSummoned(Creature* summon)
         {
             summons.Summon(summon);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -259,9 +259,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetGruulsLairAI<boss_olm_the_summonerAI>(creature);
+        return GetInstanceAI<boss_olm_the_summonerAI>(creature);
     }
 };
 
@@ -280,13 +280,13 @@ public:
         EventMap events;
         InstanceScript* instance;
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
             instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             me->SetInCombatWithZone();
             instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
@@ -297,12 +297,12 @@ public:
             events.ScheduleEvent(EVENT_ADD_ABILITY4, 30000);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             instance->SetData(DATA_ADDS_KILLED, 1);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -337,9 +337,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetGruulsLairAI<boss_kiggler_the_crazedAI>(creature);
+        return GetInstanceAI<boss_kiggler_the_crazedAI>(creature);
     }
 };
 
@@ -358,13 +358,13 @@ public:
         EventMap events;
         InstanceScript* instance;
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
             instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             me->SetInCombatWithZone();
             instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
@@ -374,12 +374,12 @@ public:
             events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             instance->SetData(DATA_ADDS_KILLED, 1);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -409,9 +409,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetGruulsLairAI<boss_blindeye_the_seerAI>(creature);
+        return GetInstanceAI<boss_blindeye_the_seerAI>(creature);
     }
 };
 
@@ -430,13 +430,13 @@ public:
         EventMap events;
         InstanceScript* instance;
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
             instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
         }
 
-        void AttackStart(Unit* who) override
+        void AttackStart(Unit* who)
         {
             if (!who)
                 return;
@@ -445,7 +445,7 @@ public:
                 me->GetMotionMaster()->MoveChase(who, 25.0f);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             me->SetInCombatWithZone();
             instance->SetBossState(DATA_MAULGAR, IN_PROGRESS);
@@ -455,12 +455,12 @@ public:
             events.ScheduleEvent(EVENT_ADD_ABILITY3, 20000);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             instance->SetData(DATA_ADDS_KILLED, 1);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -489,9 +489,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetGruulsLairAI<boss_krosh_firehandAI>(creature);
+        return GetInstanceAI<boss_krosh_firehandAI>(creature);
     }
 };
 

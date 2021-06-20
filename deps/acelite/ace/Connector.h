@@ -4,7 +4,7 @@
 /**
  *  @file    Connector.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -38,6 +38,7 @@ template <class SVC_HANDLER>
 class ACE_Connector_Base
 {
 public:
+
   virtual ~ACE_Connector_Base (void) {}
 
   /// Initialize the Svc_Handler.
@@ -58,6 +59,7 @@ template <class SVC_HANDLER>
 class ACE_NonBlocking_Connect_Handler : public ACE_Event_Handler
 {
 public:
+
   /// Constructor.
   ACE_NonBlocking_Connect_Handler (ACE_Connector_Base<SVC_HANDLER> &connector,
                                    SVC_HANDLER *,
@@ -68,7 +70,7 @@ public:
 
   /// Close up and return underlying SVC_HANDLER through @c sh.
   /**
-   * If the return value is true the close was performed successfully,
+   * If the return value is true the close was performed succesfully,
    * implying that this object was removed from the reactor and thereby
    * (by means of reference counting decremented to 0) deleted.
    * If the return value is false, the close was not successful.
@@ -122,6 +124,7 @@ public:
   ACE_ALLOC_HOOK_DECLARE;
 
 private:
+
   /// Connector base.
   ACE_Connector_Base<SVC_HANDLER> &connector_;
 
@@ -164,6 +167,7 @@ template <typename SVC_HANDLER, typename PEER_CONNECTOR>
 class ACE_Connector : public ACE_Connector_Base<SVC_HANDLER>, public ACE_Service_Object
 {
 public:
+
   // Useful STL-style traits.
   typedef typename SVC_HANDLER::addr_type addr_type;
   typedef PEER_CONNECTOR connector_type;
@@ -409,6 +413,7 @@ class ACE_Strategy_Connector
   : public ACE_Connector <SVC_HANDLER, PEER_CONNECTOR>
 {
 public:
+
   // Useful STL-style traits.
   typedef ACE_Creation_Strategy<SVC_HANDLER>
   creation_strategy_type;
@@ -473,9 +478,6 @@ public:
   virtual ACE_Creation_Strategy<SVC_HANDLER> *creation_strategy (void) const;
   virtual ACE_Connect_Strategy<SVC_HANDLER, PEER_CONNECTOR> *connect_strategy (void) const;
   virtual ACE_Concurrency_Strategy<SVC_HANDLER> *concurrency_strategy (void) const;
-
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
 
 protected:
   // = The following three methods define the <Connector>'s strategies

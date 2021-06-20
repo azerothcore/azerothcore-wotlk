@@ -5,10 +5,6 @@
 #include "ace/Synch_Traits.h"
 #include "ace/RW_Thread_Mutex.h"
 
-#if defined (ACE_HAS_ALLOC_HOOKS)
-# include "ace/Malloc_Base.h"
-#endif /* ACE_HAS_ALLOC_HOOKS */
-
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 /**
@@ -34,11 +30,7 @@ public:
 
   /// Synchronize concurrent access to the map.
   ACE_SYNCH_MUTEX lock_;
-
-  ACE_ALLOC_HOOK_DECLARE;
 };
-
-ACE_ALLOC_HOOK_DEFINE(ACE_Based_Pointer_Repository_Rep);
 
 ACE_Based_Pointer_Repository::ACE_Based_Pointer_Repository (void)
 {

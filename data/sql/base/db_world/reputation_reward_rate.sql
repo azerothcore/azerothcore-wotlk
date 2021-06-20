@@ -6,19 +6,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `reputation_reward_rate`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = UTF8MB4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `reputation_reward_rate` 
 (
-  `faction` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `quest_rate` float NOT NULL DEFAULT 1,
-  `quest_daily_rate` float NOT NULL DEFAULT 1,
-  `quest_weekly_rate` float NOT NULL DEFAULT 1,
-  `quest_monthly_rate` float NOT NULL DEFAULT 1,
-  `quest_repeatable_rate` float NOT NULL DEFAULT 1,
-  `creature_rate` float NOT NULL DEFAULT 1,
-  `spell_rate` float NOT NULL DEFAULT 1,
+  `faction` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `quest_rate` float NOT NULL DEFAULT '1',
+  `quest_daily_rate` float NOT NULL DEFAULT '1',
+  `quest_weekly_rate` float NOT NULL DEFAULT '1',
+  `quest_monthly_rate` float NOT NULL DEFAULT '1',
+  `quest_repeatable_rate` float NOT NULL DEFAULT '1',
+  `creature_rate` float NOT NULL DEFAULT '1',
+  `spell_rate` float NOT NULL DEFAULT '1',
   PRIMARY KEY (`faction`)
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `reputation_reward_rate` WRITE;
@@ -27,9 +27,9 @@ INSERT INTO `reputation_reward_rate` VALUES
 (529,1,1,1,1,1,1,2),
 (576,4,4,1,1,4,1,1),
 (609,1,1,1,1,1,1,2),
-(941,1,1,1,1,1,1,1),
-(970,1,1,1,1,1,1,3),
-(978,1,1,1,1,1,1,1),
+(941,2,2,1,1,2,1,1),
+(970,1,1,1,1,3,1,3),
+(978,1,2,1,1,2,1,2),
 (1073,1,2,1,1,1,2,2),
 (1090,1,1,1,1,1,1.3,1.3),
 (1091,1,1,1,1,1,1.3,1.3),

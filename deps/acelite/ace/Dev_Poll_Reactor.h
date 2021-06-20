@@ -51,6 +51,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Sig_Handler;
 class ACE_Dev_Poll_Reactor;
 
+
 // ---------------------------------------------------------------------
 
 /**
@@ -66,6 +67,7 @@ class ACE_Dev_Poll_Reactor;
 class ACE_Dev_Poll_Reactor_Notify : public ACE_Reactor_Notify
 {
 public:
+
   /// Constructor
   ACE_Dev_Poll_Reactor_Notify (void);
 
@@ -97,7 +99,7 @@ public:
   /// Unimplemented method required by pure virtual method in abstract
   /// base class.
   /**
-   * This method's interface is not very compatible with this
+   * This method's interface is not very compatibile with this
    * Reactor's design.  It's not clear why this method is pure virtual
    * either.
    */
@@ -163,8 +165,6 @@ public:
   ///            dispatch. Note that the contained event handler may be
   ///            0 if there were only wake-ups (no handlers to dispatch).
   int dequeue_one (ACE_Notification_Buffer &nb);
-
-  ACE_ALLOC_HOOK_DECLARE;
 
 protected:
 
@@ -290,8 +290,6 @@ class ACE_Export ACE_Dev_Poll_Reactor : public ACE_Reactor_Impl
 
     /// Flag to say whether or not this handle is registered with epoll.
     bool controlled;
-
-    ACE_ALLOC_HOOK_DECLARE;
   };
 
 
@@ -315,6 +313,7 @@ class ACE_Export ACE_Dev_Poll_Reactor : public ACE_Reactor_Impl
   class Handler_Repository
   {
   public:
+
     /// Constructor.
     Handler_Repository (void);
 
@@ -376,7 +375,7 @@ class ACE_Export ACE_Dev_Poll_Reactor : public ACE_Reactor_Impl
     /// Returns the current table size.
     size_t size (void) const;
 
-    /// Returns the maximum table size.
+    /// Returns the current table size.
     size_t max_size (void) const;
 
     /// Dump the state of an object.
@@ -386,6 +385,7 @@ class ACE_Export ACE_Dev_Poll_Reactor : public ACE_Reactor_Impl
     ACE_ALLOC_HOOK_DECLARE;
 
   private:
+
     /// Current number of handles.
     int size_;
 
@@ -402,6 +402,7 @@ class ACE_Export ACE_Dev_Poll_Reactor : public ACE_Reactor_Impl
   };
 
 public:
+
   /// Initialize @c ACE_Dev_Poll_Reactor with the default size.
   /**
    * The default size for the @c ACE_Dev_Poll_Reactor is the maximum
@@ -751,7 +752,7 @@ public:
    * Set the maximum number of times that ACE_Reactor_Impl will
    * iterate and dispatch the ACE_Event_Handlers that are passed in
    * via the notify queue before breaking out of its
-   * ACE_Message_Queue::dequeue() loop.  By default, this is set to
+   * <ACE_Message_Queue::dequeue> loop.  By default, this is set to
    * -1, which means "iterate until the queue is empty."  Setting this
    * to a value like "1 or 2" will increase "fairness" (and thus
    * prevent starvation) at the expense of slightly higher dispatching
@@ -763,7 +764,7 @@ public:
    * Get the maximum number of times that the ACE_Reactor_Impl will
    * iterate and dispatch the ACE_Event_Handlers that are passed in
    * via the notify queue before breaking out of its
-   * ACE_Message_Queue::dequeue() loop.
+   * <ACE_Message_Queue::dequeue> loop.
    */
   virtual int max_notify_iterations (void);
 
@@ -998,6 +999,7 @@ protected:
   short reactor_mask_to_poll_event (ACE_Reactor_Mask mask);
 
 protected:
+
   /// Has the reactor been initialized.
   bool initialized_;
 
@@ -1100,6 +1102,7 @@ protected:
   class ACE_Export Token_Guard
   {
   public:
+
     /// Constructor that will grab the token for us
     Token_Guard (ACE_Dev_Poll_Reactor_Token &token);
 
@@ -1112,7 +1115,7 @@ protected:
 
     /// Returns whether the thread that created this object owns the
     /// token or not.
-    bool is_owner (void);
+    int is_owner (void);
 
     /// A helper method that acquires the token 1) at a low priority, and
     /// 2) wait quietly for the token, not waking another thread. This
@@ -1126,17 +1129,20 @@ protected:
     int acquire (ACE_Time_Value *max_wait = 0);
 
   private:
+
     Token_Guard (void);
 
   private:
+
     /// The Reactor token.
     ACE_Dev_Poll_Reactor_Token &token_;
 
     /// Flag that indicate whether the thread that created this object
-    /// owns the token or not. A value of false indicates that this class
-    /// hasn't got the token (and hence the thread) and a value of true
+    /// owns the token or not. A value of 0 indicates that this class
+    /// hasn't got the token (and hence the thread) and a value of 1
     /// vice-versa.
-    bool owner_;
+    int owner_;
+
   };
 };
 
@@ -1155,6 +1161,7 @@ protected:
 class ACE_Dev_Poll_Handler_Guard
 {
 public:
+
   /// Constructor
   /**
    * The constructor checks to see if @a eh is a reference-counted handler and
@@ -1178,11 +1185,13 @@ public:
   void release (void);
 
 private:
+
   /// The event handler being managed.
   ACE_Event_Handler *eh_;
 
   /// true if eh_ is a reference-counted handler.
   bool refcounted_;
+
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

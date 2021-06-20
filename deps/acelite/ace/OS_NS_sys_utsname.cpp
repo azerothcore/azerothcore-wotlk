@@ -2,9 +2,8 @@
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_stdio.h"
 #include "ace/OS_NS_unistd.h"
-#include "ace/OS_NS_errno.h"
 
-#if defined (ACE_VXWORKS) && defined (ACE_LACKS_UNAME) && !defined (__RTP__)
+#if defined (ACE_VXWORKS) && defined (ACE_LACKS_UNAME)
 // for sysBspRev(), sysModel()
 #  include /**/ <sysLib.h>
 // for kernelVersion()
@@ -23,22 +22,9 @@ ACE_OS::uname (ACE_utsname *name)
   size_t maxnamelen = sizeof name->nodename;
   ACE_OS::strcpy (name->sysname, "Win32");
 
-# if defined (ACE_HAS_WIN32_GETVERSION)
-  /* Since MS found it necessary to deprecate these. */
-#   pragma warning(push)
-#   pragma warning(disable:4996)
-#   if defined(__clang__)
-#     pragma clang diagnostic push
-#     pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#   endif /* __clang__ */
   ACE_TEXT_OSVERSIONINFO vinfo;
   vinfo.dwOSVersionInfoSize = sizeof(ACE_TEXT_OSVERSIONINFO);
   ACE_TEXT_GetVersionEx (&vinfo);
-#   if defined(__clang__)
-#     pragma clang diagnostic pop
-#   endif /* __clang__ */
-#   pragma warning(pop)
-# endif
 
   SYSTEM_INFO sinfo;
 #   if defined (ACE_HAS_PHARLAP)
@@ -59,7 +45,6 @@ ACE_OS::uname (ACE_utsname *name)
 
   const char* unknown = "???";
 
-# if defined (ACE_HAS_WIN32_GETVERSION)
   if (
       vinfo.dwPlatformId == VER_PLATFORM_WIN32_NT
 #   if defined (VER_PLATFORM_WIN32_CE)
@@ -73,14 +58,14 @@ ACE_OS::uname (ACE_utsname *name)
         os = "Windows NT %d.%d";
       else
         os = "Windows CE %d.%d";
-      ACE_OS::snprintf (name->release, maxnamelen,
-                        os,
-                        (int) vinfo.dwMajorVersion,
-                        (int) vinfo.dwMinorVersion);
-      ACE_OS::snprintf (name->version, maxnamelen,
-                        "Build %d %s",
-                        (int) vinfo.dwBuildNumber,
-                        ACE_TEXT_ALWAYS_CHAR (vinfo.szCSDVersion));
+      ACE_OS::sprintf (name->release,
+                       os,
+                       (int) vinfo.dwMajorVersion,
+                       (int) vinfo.dwMinorVersion);
+      ACE_OS::sprintf (name->version,
+                       "Build %d %s",
+                       (int) vinfo.dwBuildNumber,
+                       ACE_TEXT_ALWAYS_CHAR (vinfo.szCSDVersion));
 
       // We have to make sure that the size of (processor + subtype)
       // is not greater than the size of name->machine.  So we give
@@ -91,7 +76,7 @@ ACE_OS::uname (ACE_utsname *name)
       char processor[bufsize] = "Unknown";
       char subtype[bufsize] = "Unknown";
 
-      WORD arch = sinfo.wProcessorArchitecture;
+    WORD arch = sinfo.wProcessorArchitecture;
 
       switch (arch)
         {
@@ -108,7 +93,7 @@ ACE_OS::uname (ACE_utsname *name)
           else if (sinfo.wProcessorLevel == 7)  // I'm guessing here
             ACE_OS::strcpy (subtype, "Pentium II");
           else
-            ACE_OS::snprintf (subtype, bufsize, "%d", sinfo.wProcessorLevel);
+            ACE_OS::sprintf (subtype, "%d", sinfo.wProcessorLevel);
           break;
         case PROCESSOR_ARCHITECTURE_MIPS:
           ACE_OS::strcpy (processor, "MIPS");
@@ -117,11 +102,11 @@ ACE_OS::uname (ACE_utsname *name)
           else if (sinfo.wProcessorLevel == 4)
             ACE_OS::strcpy (subtype, "R4000");
           else
-            ACE_OS::snprintf (subtype, bufsize, "%d", sinfo.wProcessorLevel);
+            ACE_OS::sprintf (subtype, "%d", sinfo.wProcessorLevel);
           break;
         case PROCESSOR_ARCHITECTURE_ALPHA:
           ACE_OS::strcpy (processor, "Alpha");
-          ACE_OS::snprintf (subtype, bufsize, "%d", sinfo.wProcessorLevel);
+          ACE_OS::sprintf (subtype, "%d", sinfo.wProcessorLevel);
           break;
         case PROCESSOR_ARCHITECTURE_PPC:
           ACE_OS::strcpy (processor, "PPC");
@@ -141,25 +126,29 @@ ACE_OS::uname (ACE_utsname *name)
 #     if defined PROCESSOR_ARCHITECTURE_IA64
         case PROCESSOR_ARCHITECTURE_IA64:
           ACE_OS::strcpy (processor, "Itanium");
-          ACE_OS::snprintf (subtype, bufsize, "%d", sinfo.wProcessorLevel);
+          ACE_OS::sprintf (subtype, "%d",
+                           sinfo.wProcessorLevel);
           break;
 #     endif
 #     if defined PROCESSOR_ARCHITECTURE_AMD64
         case PROCESSOR_ARCHITECTURE_AMD64:
           ACE_OS::strcpy (processor, "x64");
-          ACE_OS::snprintf (subtype, bufsize, "%d", sinfo.wProcessorLevel);
+          ACE_OS::sprintf (subtype, "%d",
+                           sinfo.wProcessorLevel);
           break;
 #     endif
 #     if defined PROCESSOR_ARCHITECTURE_IA32_ON_WIN64
         case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
           ACE_OS::strcpy (processor, "WOW64");
-          ACE_OS::snprintf (subtype, bufsize, "%d", sinfo.wProcessorLevel);
+          ACE_OS::sprintf (subtype, "%d",
+                           sinfo.wProcessorLevel);
           break;
 #     endif
 #     if defined PROCESSOR_ARCHITECTURE_ARM
         case PROCESSOR_ARCHITECTURE_ARM:
           ACE_OS::strcpy (processor, "ARM");
-          ACE_OS::snprintf (subtype, bufsize, "%d", sinfo.wProcessorLevel);
+          ACE_OS::sprintf (subtype, "%d",
+                           sinfo.wProcessorLevel);
           break;
 #     endif
         case PROCESSOR_ARCHITECTURE_UNKNOWN:
@@ -169,7 +158,9 @@ ACE_OS::uname (ACE_utsname *name)
           ACE_OS::strcpy (processor, "Unknown");
           break;
         }
-      ACE_OS::snprintf (name->machine, maxnamelen, "%s %s", processor, subtype);
+      ACE_OS::sprintf (name->machine,
+                       "%s %s",
+                       processor, subtype);
     }
   else if (vinfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
     {
@@ -194,8 +185,7 @@ ACE_OS::uname (ACE_utsname *name)
           ACE_OS::strcpy (name->release, unknown);
         }
 
-      ACE_OS::snprintf (name->version, maxnamelen, "%d",
-                        LOWORD (vinfo.dwBuildNumber));
+      ACE_OS::sprintf (name->version, "%d", LOWORD (vinfo.dwBuildNumber));
       if (sinfo.dwProcessorType == PROCESSOR_INTEL_386)
         ACE_OS::strcpy (name->machine, "Intel 80386");
       else if (sinfo.dwProcessorType == PROCESSOR_INTEL_486)
@@ -206,7 +196,6 @@ ACE_OS::uname (ACE_utsname *name)
         ACE_OS::strcpy (name->machine, unknown);
     }
   else
-# endif /* !ACE_HAS_WIN32_GETVERSION */
     {
       // We don't know what this is!
 
@@ -221,7 +210,7 @@ ACE_OS::uname (ACE_utsname *name)
   return ACE_OS::hostname (name->nodename, maxnamelen);
 # endif /* ACE_LACKS_HOSTNAME */
 
-#elif defined (ACE_VXWORKS) && !defined (__RTP__)
+#elif defined (ACE_VXWORKS)
   size_t const maxnamelen = sizeof name->nodename;
   ACE_OS::strcpy (name->sysname, "VxWorks");
   ACE_OS::strcpy (name->release, kernelVersion());
@@ -240,9 +229,6 @@ ACE_OS::uname (ACE_utsname *name)
   strcpy(name->version,"4.0.9");
   strcpy(name->machine,"a standard name");
   return status;
-#else
-  ACE_UNUSED_ARG (name);
-  ACE_NOTSUP_RETURN (-1);
 #endif /* ACE_WIN32 */
 }
 

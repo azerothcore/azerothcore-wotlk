@@ -4,7 +4,7 @@
  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
   
  @created 2001-07-09
- @edited  2010-11-05
+ @edited  2010-07-05
  */
 
 #include <stdlib.h>
@@ -20,12 +20,6 @@
 #include "G3D/Any.h"
 
 namespace G3D {
-
-Vector4& Vector4::operator=(const Any& a) {
-    *this = Vector4(a);
-    return *this;
-}
-
 
 Vector4::Vector4(const Any& any) {
     any.verifyName("Vector4");
@@ -46,8 +40,7 @@ Vector4::Vector4(const Any& any) {
     }
 }
 
-
-Any Vector4::toAny() const {
+Vector4::operator Any() const {
     Any any(Any::ARRAY, "Vector4");
     any.append(x, y, z, w);
     return any;
@@ -141,7 +134,7 @@ Vector4 Vector4::operator/ (float fScalar) const {
     Vector4 kQuot;
 
     if ( fScalar != 0.0 ) {
-        float fInvScalar = 1.0f / fScalar;
+		float fInvScalar = 1.0f / fScalar;
         kQuot.x = fInvScalar * x;
         kQuot.y = fInvScalar * y;
         kQuot.z = fInvScalar * z;
@@ -155,13 +148,13 @@ Vector4 Vector4::operator/ (float fScalar) const {
 //----------------------------------------------------------------------------
 Vector4& Vector4::operator/= (float fScalar) {
     if (fScalar != 0.0f) {
-        float fInvScalar = 1.0f / fScalar;
+		float fInvScalar = 1.0f / fScalar;
         x *= fInvScalar;
         y *= fInvScalar;
         z *= fInvScalar;
         w *= fInvScalar;
     } else {
-        *this = Vector4::inf();
+		*this = Vector4::inf();
     }
 
     return *this;
@@ -518,12 +511,5 @@ Vector4 Vector4::ywww() const  { return Vector4       (y, w, w, w); }
 Vector4 Vector4::zwww() const  { return Vector4       (z, w, w, w); }
 Vector4 Vector4::wwww() const  { return Vector4       (w, w, w, w); }
 
-void serialize(const Vector4& v, class BinaryOutput& b) {
-    v.serialize(b);
-}
-
-void deserialize(Vector4& v, class BinaryInput& b) {
-    v.deserialize(b);
-}
 
 }; // namespace

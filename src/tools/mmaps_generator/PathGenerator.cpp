@@ -48,22 +48,22 @@ bool checkDirectories(bool debugOutput)
 }
 
 bool handleArgs(int argc, char** argv,
-                int& mapnum,
-                int& tileX,
-                int& tileY,
-                float& maxAngle,
-                bool& skipLiquid,
-                bool& skipContinents,
-                bool& skipJunkMaps,
-                bool& skipBattlegrounds,
-                bool& debugOutput,
-                bool& silent,
-                bool& bigBaseUnit,
-                char*& offMeshInputPath,
-                char*& file,
-                unsigned int& threads)
+               int &mapnum,
+               int &tileX,
+               int &tileY,
+               float &maxAngle,
+               bool &skipLiquid,
+               bool &skipContinents,
+               bool &skipJunkMaps,
+               bool &skipBattlegrounds,
+               bool &debugOutput,
+               bool &silent,
+               bool &bigBaseUnit,
+               char* &offMeshInputPath,
+               char* &file,
+               int& threads)
 {
-    char* param = nullptr;
+    char* param = NULL;
     for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "--maxAngle") == 0)
@@ -83,7 +83,8 @@ bool handleArgs(int argc, char** argv,
             param = argv[++i];
             if (!param)
                 return false;
-            threads = static_cast<unsigned int>(std::max(0, atoi(param)));
+            threads = atoi(param);
+            printf("Using %i threads to extract mmaps\n", threads);
         }
         else if (strcmp(argv[i], "--file") == 0)
         {
@@ -99,7 +100,7 @@ bool handleArgs(int argc, char** argv,
                 return false;
 
             char* stileX = strtok(param, ",");
-            char* stileY = strtok(nullptr, ",");
+            char* stileY = strtok(NULL, ",");
             int tilex = atoi(stileX);
             int tiley = atoi(stileY);
 
@@ -229,9 +230,8 @@ int finish(const char* message, int returnValue)
 
 int main(int argc, char** argv)
 {
-    unsigned int threads = std::thread::hardware_concurrency();
-    int mapnum = -1;
-    float maxAngle = 60.0f;
+    int threads = 3, mapnum = -1;
+    float maxAngle = 70.0f;
     int tileX = -1, tileY = -1;
     bool skipLiquid = false,
          skipContinents = false,
@@ -240,8 +240,8 @@ int main(int argc, char** argv)
          debugOutput = false,
          silent = false,
          bigBaseUnit = false;
-    char* offMeshInputPath = nullptr;
-    char* file = nullptr;
+    char* offMeshInputPath = NULL;
+    char* file = NULL;
 
     bool validParam = handleArgs(argc, argv, mapnum,
                                  tileX, tileY, maxAngle,

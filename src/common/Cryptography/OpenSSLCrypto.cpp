@@ -6,44 +6,52 @@
 
 #include <OpenSSLCrypto.h>
 #include <openssl/crypto.h>
-
-#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x1010000fL
+#include <ace/Thread_Mutex.h>
 #include <vector>
-#include <thread>
-#include <mutex>
-std::vector<std::mutex*> cryptoLocks;
-static void lockingCallback(int mode, int type, char const* /*file*/, int /*line*/)
+#include <ace/Thread.h>
+
+std::vector<ACE_Thread_Mutex*> cryptoLocks;
+
+static void lockingCallback(int mode, int type, const char* /*file*/, int /*line*/)
 {
     if (mode & CRYPTO_LOCK)
-        cryptoLocks[type]->lock();
+        cryptoLocks[type]->acquire();
     else
-        cryptoLocks[type]->unlock();
+        cryptoLocks[type]->release();
 }
-static void threadIdCallback(CRYPTO_THREADID* id)
+
+static void threadIdCallback(CRYPTO_THREADID * id)
 {
     (void)id;
-    CRYPTO_THREADID_set_numeric(id, std::hash<std::thread::id>()(std::this_thread::get_id()));
+/// ACE_thread_t turns out to be a struct under Mac OS.
+#ifndef __APPLE__
+    CRYPTO_THREADID_set_numeric(id, ACE_Thread::self());
+#else
+    CRYPTO_THREADID_set_pointer(id, ACE_Thread::self());
+#endif
 }
+
 void OpenSSLCrypto::threadsSetup()
 {
     cryptoLocks.resize(CRYPTO_num_locks());
-    for (int i = 0 ; i < CRYPTO_num_locks(); ++i)
+    for(int i = 0 ; i < CRYPTO_num_locks(); ++i)
     {
-        cryptoLocks[i] = new std::mutex();
+        cryptoLocks[i] = new ACE_Thread_Mutex();
     }
     (void)&threadIdCallback;
     CRYPTO_THREADID_set_callback(threadIdCallback);
+
     (void)&lockingCallback;
     CRYPTO_set_locking_callback(lockingCallback);
 }
+
 void OpenSSLCrypto::threadsCleanup()
 {
-    CRYPTO_set_locking_callback(nullptr);
-    CRYPTO_THREADID_set_callback(nullptr);
-    for (int i = 0 ; i < CRYPTO_num_locks(); ++i)
+    CRYPTO_set_locking_callback(NULL);
+    CRYPTO_THREADID_set_callback(NULL);
+    for(int i = 0 ; i < CRYPTO_num_locks(); ++i)
     {
         delete cryptoLocks[i];
     }
     cryptoLocks.resize(0);
 }
-#endif

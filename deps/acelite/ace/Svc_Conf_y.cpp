@@ -1901,7 +1901,7 @@ ace_yyreturn:
       ace_yystos[*ace_yyssp], ace_yyvsp);
       YYPOPSTACK (1);
     }
-#if defined ace_yyoverflow && !defined ACE_LACKS_FREE
+#ifndef ace_yyoverflow
   if (ace_yyss != ace_yyssa)
     YYSTACK_FREE (ace_yyss);
 #endif

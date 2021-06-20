@@ -8,7 +8,7 @@
 #include "DBC.h"
 #include "Define.h"
 
-DBC::DBC( FILE* stream ) : StringBlock(nullptr), StringBlockSize(0), IsFaulty(true)
+DBC::DBC( FILE* stream ) : StringBlock(NULL), StringBlockSize(0), IsFaulty(true)
 {
     char magic[5];
     uint32 count = 0;
@@ -58,7 +58,7 @@ std::string DBC::GetStringByOffset( int offset )
             break;
         }
     }
-    char* d = new char[len + 1];
+    char* d = new char[len+1];
     strcpy(d, (const char*)(StringBlock + offset));
     d[len] = '\0';
     std::string val = std::string(d);
@@ -72,5 +72,5 @@ Record* DBC::GetRecordById( int id )
     for (std::vector<Record*>::iterator itr = Records.begin(); itr != Records.end(); ++itr)
         if ((*itr)->Values[0] == id)
             return *itr;
-    return nullptr;
+    return NULL;
 }

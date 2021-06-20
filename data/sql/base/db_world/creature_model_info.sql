@@ -6,16 +6,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_model_info`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = UTF8MB4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `creature_model_info` 
 (
-  `DisplayID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `BoundingRadius` float NOT NULL DEFAULT 0,
-  `CombatReach` float NOT NULL DEFAULT 0,
-  `Gender` TINYINT unsigned NOT NULL DEFAULT 2,
-  `DisplayID_Other_Gender` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `DisplayID` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `BoundingRadius` float NOT NULL DEFAULT '0',
+  `CombatReach` float NOT NULL DEFAULT '0',
+  `Gender` tinyint(3) unsigned NOT NULL DEFAULT '2',
+  `DisplayID_Other_Gender` mediumint(8) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`DisplayID`)
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 COMMENT='Creature System (Model related info)';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Creature System (Model related info)';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_model_info` WRITE;
@@ -13306,7 +13306,7 @@ INSERT INTO `creature_model_info` VALUES
 (19012,0,0,2,0),
 (19013,1.5,1.5,0,0),
 (19014,0,0,2,0),
-(19015,2,3,0,0),
+(19015,2,3,0,17612),
 (19016,2,3,0,19519),
 (19017,2,3,0,0),
 (19018,0,0,2,0),
@@ -21702,7 +21702,7 @@ INSERT INTO `creature_model_info` VALUES
 (27608,0,0,1,0),
 (27609,0.5425,1.75,1,0),
 (27610,0,0,0,0),
-(27611,2,2,0,0),
+(27611,0,0,0,0),
 (27612,0,0,0,0),
 (27613,0,0,1,0),
 (27614,0,0,1,0),
@@ -21839,7 +21839,7 @@ INSERT INTO `creature_model_info` VALUES
 (27752,0,0,0,0),
 (27753,0,0,2,0),
 (27754,0.155,0.5,2,0),
-(27755,10,10,2,0),
+(27755,0,0,2,0),
 (27756,0.208,1.5,1,0),
 (27757,0.3817,1.65,0,0),
 (27758,0.3817,1.65,1,0),
@@ -21872,7 +21872,7 @@ INSERT INTO `creature_model_info` VALUES
 (27785,0,0,2,0),
 (27786,5,1.5,2,0),
 (27787,5,1.5,2,0),
-(27788,10,10,0,0),
+(27788,0,0,0,0),
 (27789,0,0,2,0),
 (27790,0.434,1.4,2,0),
 (27791,0,0,0,0),
@@ -22074,7 +22074,7 @@ INSERT INTO `creature_model_info` VALUES
 (27989,0,0,2,0),
 (27990,0.875,1.75,0,0),
 (27991,0,0,2,0),
-(27992,10,10,2,0),
+(27992,0,0,2,0),
 (27993,0,0,2,0),
 (27994,0.4278,1.725,0,0),
 (27995,1.00338,4.3125,1,0),

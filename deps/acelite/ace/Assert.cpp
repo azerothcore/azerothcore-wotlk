@@ -14,12 +14,7 @@ __ace_assert(const char *file, int line, const ACE_TCHAR *expression)
   log->set (file, line, -1, error, log->restart (),
             log->msg_ostream (), log->msg_callback ());
 
-#ifdef ACE_LACKS_VA_FUNCTIONS
-#define LOG_ARGS
-#else
-#define LOG_ARGS(X) X
-#endif
-  log->log LOG_ARGS ((LM_ERROR, ACE_TEXT ("ACE_ASSERT: file %N, line %l assertion failed for '%s'.%a\n"), expression, -1));
+  log->log (LM_ERROR, ACE_TEXT ("ACE_ASSERT: file %N, line %l assertion failed for '%s'.%a\n"), expression, -1);
 }
 
 ACE_END_VERSIONED_NAMESPACE_DECL

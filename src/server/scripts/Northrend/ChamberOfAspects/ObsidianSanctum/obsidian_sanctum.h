@@ -2,23 +2,27 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "CreatureAIImpl.h"
-
 #ifndef DEF_OBSIDIAN_SANCTUM_H
 #define DEF_OBSIDIAN_SANCTUM_H
 
-#include "CreatureAIImpl.h"
-
-#define ObsidianSanctumScriptName "instance_obsidian_sanctum"
-
-enum Data : uint32
+enum Data
 {
-    // Encounters
-    DATA_SARTHARION                 = 0,
-    DATA_TENEBRON                   = 1,
-    DATA_VESPERON                   = 2,
-    DATA_SHADRON                    = 3,
+    // Encounter
+    BOSS_SARTHARION_EVENT           = 0,
+    BOSS_TENEBRON_EVENT             = 1,
+    BOSS_VESPERON_EVENT             = 2,
+    BOSS_SHADRON_EVENT              = 3,
     MAX_ENCOUNTERS                  = 4,
+
+    // GUIDs
+    DATA_SARTHARION                 = 10,
+    DATA_TENEBRON                   = 11,
+    DATA_SHADRON                    = 12,
+    DATA_VESPERON                   = 13,
+
+    // Portal
+    DATA_CLEAR_PORTAL               = 20,
+    DATA_ADD_PORTAL                 = 21,
 
     // Achievements
     DATA_ACHIEVEMENT_DRAGONS_COUNT  = 30,
@@ -39,18 +43,5 @@ enum Data : uint32
     SPELL_TWILIGHT_SHIFT            = 57620,
     SPELL_TWILIGHT_TORMENT_SARTHARION = 58835,
 };
-
-enum OSActions
-{
-    // Portal
-    ACTION_CLEAR_PORTAL               = -1,
-    ACTION_ADD_PORTAL                 = -2,
-};
-
-template <class AI, class T>
-inline AI* GetObsidianSanctumAI(T* obj)
-{
-    return GetInstanceAI<AI>(obj, ObsidianSanctumScriptName);
-}
 
 #endif

@@ -35,7 +35,6 @@
 #endif /* ACE_HAS_PRIOCNTL */
 
 #include "ace/os_include/sys/os_types.h"
-#include "ace/os_include/os_stdint.h"
 
 // This needs to go here *first* to avoid problems with AIX.
 # if defined (ACE_HAS_PTHREADS)
@@ -44,8 +43,11 @@
 #   undef ACE_DONT_INCLUDE_ACE_SIGNAL_H
 # endif /* ACE_HAS_PTHREADS */
 
+
 #if !defined (ACE_LACKS_PTHREAD_H)
+   extern "C" {
 #  include /**/ <pthread.h>
+   }
 #endif /* !ACE_LACKS_PTHREAD_H */
 
 #if defined (ACE_HAS_PTHREAD_NP_H)
@@ -292,7 +294,7 @@
 #  define THR_EXPLICIT_SCHED      0x00800000
 #  define THR_SCHED_IO            0x01000000
 
-#  if !defined (ACE_HAS_STHREADS) && !defined (ACE_MQX)
+#  if !defined (ACE_HAS_STHREADS)
 #    if !defined (ACE_HAS_POSIX_SEM) && !defined (ACE_USES_FIFO_SEM)
 
 // This needs to be moved out of here.
@@ -337,7 +339,7 @@ public:
 #    endif /* !ACE_HAS_POSIX_SEM */
 #  endif /* !ACE_HAS_STHREADS */
 
-#  if defined (ACE_HAS_PTHREADS_UNIX98_EXT) && !defined (ACE_LACKS_RWLOCK_T)
+#  if defined (ACE_HAS_PTHREADS_UNIX98_EXT)
      typedef pthread_rwlock_t ACE_rwlock_t;
 #   endif /* ACE_HAS_PTHREADS_UNIX98_EXT */
 

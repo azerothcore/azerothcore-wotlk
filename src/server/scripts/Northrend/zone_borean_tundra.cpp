@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -22,17 +22,17 @@ npc_lurgglbr
 npc_nexus_drake_hatchling
 EndContentData */
 
-#include "PassiveAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "SpellAuras.h"
+#include "Player.h"
 #include "SpellInfo.h"
-#include "SpellScript.h"
 #include "WorldSession.h"
+#include "SpellScript.h"
+#include "PassiveAI.h"
+#include "SpellAuras.h"
 
 // Ours
 enum eDrakeHunt
@@ -50,7 +50,7 @@ public:
     {
         PrepareAuraScript(spell_q11919_q11940_drake_hunt_AuraScript)
 
-        bool Load() override
+        bool Load()
         {
             return GetOwner()->GetTypeId() == TYPEID_UNIT;
         }
@@ -69,21 +69,22 @@ public:
             owner->CastSpell(owner, SPELL_SUBDUED, true);
             GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
             owner->setFaction(35);
-            owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
+            owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            owner->DespawnOrUnsummon(3*MINUTE*IN_MILLISECONDS);
         }
 
-        void Register() override
+        void Register()
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_q11919_q11940_drake_hunt_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const override
+    AuraScript* GetAuraScript() const
     {
         return new spell_q11919_q11940_drake_hunt_AuraScript();
     }
 };
+
 
 // Theirs
 /*######
@@ -108,20 +109,20 @@ public:
 
     struct npc_sinkhole_kill_creditAI : public NullCreatureAI
     {
-        npc_sinkhole_kill_creditAI(Creature* creature) : NullCreatureAI(creature) { }
+        npc_sinkhole_kill_creditAI(Creature* creature) : NullCreatureAI(creature){ }
 
         uint32 phaseTimer;
         uint8  phase;
-        ObjectGuid casterGuid;
+        uint64 casterGuid;
 
-        void Reset() override
+        void Reset()
         {
             phaseTimer = 30000;
             phase = 0;
-            casterGuid.Clear();
+            casterGuid = 0;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, const SpellInfo* spell)
         {
             if (phase || spell->Id != SPELL_SET_CART)
                 return;
@@ -135,7 +136,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!phase)
                 return;
@@ -195,12 +196,13 @@ public:
                         CreatureAI::EnterEvadeMode();
                         break;
                 }
-            }
-            else phaseTimer -= diff;
+            } else phaseTimer -= diff;
+
         }
+
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_sinkhole_kill_creditAI(creature);
     }
@@ -225,7 +227,7 @@ public:
     {
         npc_khunok_the_behemothAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void MoveInLineOfSight(Unit* who) override
+        void MoveInLineOfSight(Unit* who)
 
         {
             ScriptedAI::MoveInLineOfSight(who);
@@ -247,7 +249,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_khunok_the_behemothAI(creature);
     }
@@ -279,7 +281,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_ACES_HIGH) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_ACES_HIGH_DAILY) == QUEST_STATUS_INCOMPLETE) //It's the same dragon for both quests.
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_C_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_C_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -288,12 +290,13 @@ public:
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
+        if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
             CloseGossipMenuFor(player);
 
             player->CastSpell(player, SPELL_SUMMON_WYRMREST_SKYTALON, true);
             player->CastSpell(player, SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC, true);
+
         }
 
         return true;
@@ -324,7 +327,7 @@ public:
     {
         if (player->GetQuestStatus(QUEST_SPIRITS_WATCH_OVER_US) == QUEST_STATUS_INCOMPLETE)
             AddGossipItemFor(player, GOSSIP_MENU_ID_NPC_IRUK, GOSSIP_OPTION_SEARCH_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
+        
         SendGossipMenuFor(player, NPC_TEXT_THIS_YOUNG_TUSKARR, creature->GetGUID());
 
         return true;
@@ -333,13 +336,13 @@ public:
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-
+        
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             player->CastSpell(player, SPELL_CREATE_TOTEM_OF_ISSLIRUK, true);
             CloseGossipMenuFor(player);
         }
-
+        
         return true;
     }
 };
@@ -372,14 +375,11 @@ public:
     {
         npc_nerubar_victimAI(Creature* creature) : NullCreatureAI(creature) { }
 
-        void JustDied(Unit* killer) override
+        void JustDied(Unit* killer)
         {
-            if (!killer || killer->GetTypeId() != TYPEID_PLAYER)
-            {
-                return;
-            }
-
             Player* player = killer->ToPlayer();
+            if (!player)
+                return;
 
             if (player->GetQuestStatus(QUEST_TAKEN_BY_THE_SCOURGE) == QUEST_STATUS_INCOMPLETE)
             {
@@ -387,17 +387,15 @@ public:
                 if (uiRand < 40)
                 {
                     player->CastSpell(me, SPELL_FREED_WARSONG_PEON, true);
-                    player->KilledMonsterCredit(NPC_WARSONG_PEON);
+                    player->KilledMonsterCredit(NPC_WARSONG_PEON, 0);
                 }
                 else if (uiRand < 80)
-                {
                     player->CastSpell(me, nerubarVictims[urand(0, 2)], true);
-                }
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_nerubar_victimAI(creature);
     }
@@ -429,12 +427,12 @@ public:
 
     struct npc_lurgglbrAI : public npc_escortAI
     {
-        npc_lurgglbrAI(Creature* creature) : npc_escortAI(creature) { }
+        npc_lurgglbrAI(Creature* creature) : npc_escortAI(creature){ }
 
         uint32 IntroTimer;
         uint32 IntroPhase;
 
-        void Reset() override
+        void Reset()
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
             {
@@ -443,7 +441,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId) override
+        void WaypointReached(uint32 waypointId)
         {
             switch (waypointId)
             {
@@ -458,7 +456,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (IntroPhase)
             {
@@ -507,8 +505,7 @@ public:
                             IntroTimer = 0;
                             break;
                     }
-                }
-                else IntroTimer -= diff;
+                } else IntroTimer -= diff;
             }
             npc_escortAI::UpdateAI(diff);
 
@@ -517,12 +514,12 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_lurgglbrAI(creature);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_ESCAPE_WINTERFIN_CAVERNS)
         {
@@ -565,38 +562,38 @@ public:
 
         bool bEnslaved;
 
-        void Reset() override
+        void Reset()
         {
             me->UpdateEntry(NPC_BERYL_SORCERER);
             me->SetReactState(REACT_AGGRESSIVE);
             bEnslaved = false;
         }
 
-        void EnterCombat(Unit* who) override
+        void EnterCombat(Unit* who)
         {
             if (me->IsValidAttackTarget(who))
                 AttackStart(who);
         }
 
-        void SpellHit(Unit* pCaster, const SpellInfo* pSpell) override
+        void SpellHit(Unit* pCaster, const SpellInfo* pSpell)
         {
             if (pSpell->Id == SPELL_ARCANE_CHAINS && pCaster->GetTypeId() == TYPEID_PLAYER && !HealthAbovePct(50) && !bEnslaved)
             {
                 EnterEvadeMode(); //We make sure that the npc is not attacking the player!
                 me->SetReactState(REACT_PASSIVE);
-                StartFollow(pCaster->ToPlayer(), 0, nullptr);
-                me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, nullptr, false);
+                StartFollow(pCaster->ToPlayer(), 0, NULL);
+                me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, NULL, false);
                 DoCast(me, SPELL_COSMETIC_ENSLAVE_CHAINS_SELF, true);
                 me->DespawnOrUnsummon(45000);
 
                 if (Player* player = pCaster->ToPlayer())
-                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
+                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER, 0);
 
                 bEnslaved = true;
             }
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void MoveInLineOfSight(Unit* who)
 
         {
             FollowerAI::MoveInLineOfSight(who);
@@ -608,7 +605,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/) override
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -617,7 +614,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_beryl_sorcererAI(creature);
     }
@@ -652,7 +649,7 @@ public:
 
         uint32 rebuff;
 
-        void Reset() override
+        void Reset()
         {
             if (me->GetReactState() != REACT_PASSIVE)
                 me->SetReactState(REACT_PASSIVE);
@@ -664,7 +661,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_SIT_MEDIUM_CHAIR);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             UpdateVictim();
 
@@ -682,11 +679,11 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
         }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell) override
+        void SpellHit(Unit* unit, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_NEURAL_NEEDLE && unit->GetTypeId() == TYPEID_PLAYER)
             {
@@ -697,7 +694,7 @@ public:
             }
         }
 
-        void GotStinged(ObjectGuid casterGUID)
+        void GotStinged(uint64 casterGUID)
         {
             if (Player* caster = ObjectAccessor::GetPlayer(*me, casterGUID))
             {
@@ -724,14 +721,14 @@ public:
                         break;
                     case 7:
                         Talk(SAY_IMPRISIONED_BERYL_7);
-                        caster->KilledMonsterCredit(NPC_IMPRISONED_BERYL_SORCERER);
+                        caster->KilledMonsterCredit(NPC_IMPRISONED_BERYL_SORCERER, 0);
                         break;
                 }
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_imprisoned_beryl_sorcererAI(creature);
     }
@@ -757,7 +754,7 @@ class npc_mootoo_the_younger : public CreatureScript
 public:
     npc_mootoo_the_younger() : CreatureScript("npc_mootoo_the_younger") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
         {
@@ -773,18 +770,18 @@ public:
     {
         npc_mootoo_the_youngerAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() override
+        void Reset()
         {
             SetDespawnAtFar(false);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
-            if (Player* player = GetPlayerForEscort())
+            if (Player* player=GetPlayerForEscort())
                 player->FailQuest(QUEST_ESCAPING_THE_MIST);
         }
 
-        void WaypointReached(uint32 waypointId) override
+        void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -815,7 +812,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_mootoo_the_youngerAI(creature);
     }
@@ -839,7 +836,7 @@ class npc_bonker_togglevolt : public CreatureScript
 public:
     npc_bonker_togglevolt() : CreatureScript("npc_bonker_togglevolt") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
         {
@@ -855,19 +852,19 @@ public:
         npc_bonker_togglevoltAI(Creature* creature) : npc_escortAI(creature) { }
         uint32 Bonker_agro;
 
-        void Reset() override
+        void Reset()
         {
-            Bonker_agro = 0;
+            Bonker_agro=0;
             SetDespawnAtFar(false);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             if (Player* player = GetPlayerForEscort())
                 player->FailQuest(QUEST_GET_ME_OUTA_HERE);
         }
 
-        void UpdateEscortAI(uint32 /*diff*/) override
+        void UpdateEscortAI(uint32 /*diff*/)
         {
             if (GetAttack() && UpdateVictim())
             {
@@ -878,10 +875,10 @@ public:
                 }
                 DoMeleeAttackIfReady();
             }
-            else Bonker_agro = 0;
+            else Bonker_agro=0;
         }
 
-        void WaypointReached(uint32 waypointId) override
+        void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -896,7 +893,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_bonker_togglevoltAI(creature);
     }
@@ -923,12 +920,12 @@ public:
 
         uint32 uiTimer;
 
-        void Reset() override
+        void Reset()
         {
             uiTimer = urand(13000, 18000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (uiTimer <= diff)
             {
@@ -947,7 +944,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_valiance_keep_cannoneerAI(creature);
     }
@@ -984,16 +981,16 @@ public:
 
         uint32 m_uiTimer;                 //Timer until recast
 
-        void Reset() override
+        void Reset()
         {
             m_uiTimer = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void EnterCombat(Unit* /*who*/) { }
 
-        void AttackStart(Unit* /*who*/) override { }
+        void AttackStart(Unit* /*who*/) { }
 
-        void UpdateAI(uint32 uiDiff) override
+        void UpdateAI(uint32 uiDiff)
         {
             if (m_uiTimer <= uiDiff)
             {
@@ -1003,46 +1000,46 @@ public:
                 switch (me->GetEntry())
                 {
                     case NPC_WARMAGE_HOLLISTER:
+                    {
+                        if (!orbList.empty())
                         {
-                            if (!orbList.empty())
+                            for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
                             {
-                                for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
-                                {
-                                    if (Creature* pOrb = *itr)
-                                        if (pOrb->GetPositionY() > 6680)
-                                            DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
-                                }
+                                if (Creature* pOrb = *itr)
+                                    if (pOrb->GetPositionY() > 6680)
+                                        DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
                             }
-                            m_uiTimer = urand(90000, 120000);
                         }
+                        m_uiTimer = urand(90000, 120000);
+                    }
                         break;
                     case NPC_WARMAGE_CALANDRA:
+                    {
+                        if (!orbList.empty())
                         {
-                            if (!orbList.empty())
+                            for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
                             {
-                                for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
-                                {
-                                    if (Creature* pOrb = *itr)
-                                        if ((pOrb->GetPositionY() < 6680) && (pOrb->GetPositionY() > 6630))
-                                            DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
-                                }
+                                if (Creature* pOrb = *itr)
+                                    if ((pOrb->GetPositionY() < 6680) && (pOrb->GetPositionY() > 6630))
+                                        DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
                             }
-                            m_uiTimer = urand(90000, 120000);
                         }
+                        m_uiTimer = urand(90000, 120000);
+                    }
                         break;
                     case NPC_WARMAGE_WATKINS:
+                    {
+                        if (!orbList.empty())
                         {
-                            if (!orbList.empty())
+                            for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
                             {
-                                for (std::list<Creature*>::const_iterator itr = orbList.begin(); itr != orbList.end(); ++itr)
-                                {
-                                    if (Creature* pOrb = *itr)
-                                        if (pOrb->GetPositionY() < 6630)
-                                            DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
-                                }
+                                if (Creature* pOrb = *itr)
+                                    if (pOrb->GetPositionY() < 6630)
+                                        DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
                             }
-                            m_uiTimer = urand(90000, 120000);
                         }
+                        m_uiTimer = urand(90000, 120000);
+                    }
                         break;
                 }
             }
@@ -1055,7 +1052,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_warmage_coldarraAI(creature);
     }
@@ -1099,8 +1096,8 @@ public:
     {
         npc_hidden_cultistAI(Creature* creature) : ScriptedAI(creature)
         {
-            uiEmoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
-            uiNpcFlags = creature->GetUInt32Value(UNIT_NPC_FLAGS);
+           uiEmoteState = creature->GetUInt32Value(UNIT_NPC_EMOTESTATE);
+           uiNpcFlags = creature->GetUInt32Value(UNIT_NPC_FLAGS);
         }
 
         uint32 uiEmoteState;
@@ -1109,7 +1106,7 @@ public:
         uint32 uiEventTimer;
         uint8 uiEventPhase;
 
-        ObjectGuid uiPlayerGUID;
+        uint64 uiPlayerGUID;
 
         void Reset() override
         {
@@ -1122,7 +1119,7 @@ public:
             uiEventTimer = 0;
             uiEventPhase = 0;
 
-            uiPlayerGUID.Clear();
+            uiPlayerGUID = 0;
 
             DoCast(SPELL_SHROUD_OF_THE_DEATH_CULTIST);
 
@@ -1139,7 +1136,7 @@ public:
             uiEventPhase = 1;
         }
 
-        void SetGUID(ObjectGuid uiGuid, int32 /*iId*/) override
+        void SetGUID(uint64 uiGuid, int32 /*iId*/) override
         {
             uiPlayerGUID = uiGuid;
         }
@@ -1172,10 +1169,7 @@ public:
                                 uiEventPhase = 2;
                                 break;
                             case NPC_TOM_HEGGER:
-                                if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
-                                {
-                                    Talk(SAY_HIDDEN_CULTIST_3, player);
-                                }
+                                Talk(SAY_HIDDEN_CULTIST_3);
                                 uiEventTimer = 5000;
                                 uiEventPhase = 2;
                                 break;
@@ -1206,8 +1200,7 @@ public:
                         }
                         break;
                 }
-            }
-            else uiEventTimer -= uiDiff;
+            }else uiEventTimer -= uiDiff;
 
             if (!UpdateVictim())
                 return;
@@ -1246,7 +1239,7 @@ public:
         }
 
         if (player->HasAura(SPELL_RIGHTEOUS_VISION) && player->GetQuestStatus(QUEST_THE_HUNT_IS_ON) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, charGossipItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, charGossipItem, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
@@ -1260,7 +1253,7 @@ public:
     {
         ClearGossipMenuFor(player);
 
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
+        if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
             CloseGossipMenuFor(player);
             creature->AI()->SetGUID(player->GetGUID());
@@ -1272,6 +1265,7 @@ public:
 
         return true;
     }
+
 };
 
 enum BloodsporeRuination
@@ -1322,10 +1316,10 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _playerGUID.Clear();
+            _playerGUID = 0;
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*action*/) override
+        void SetGUID(uint64 guid, int32 /*action*/) override
         {
             if (_playerGUID)
                 return;
@@ -1355,7 +1349,7 @@ public:
                     case EVENT_TALK:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                             Talk(SAY_BLOODMAGE_LAURITH, player);
-                        _playerGUID.Clear();
+                        _playerGUID = 0;
                         _events.ScheduleEvent(EVENT_RESET_ORIENTATION, 5000);
                         break;
                     case EVENT_RESET_ORIENTATION:
@@ -1365,9 +1359,9 @@ public:
             }
         }
 
-    private:
-        EventMap _events;
-        ObjectGuid _playerGUID;
+        private:
+            EventMap _events;
+            uint64 _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

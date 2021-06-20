@@ -43,7 +43,7 @@ bool AreaMemoryManager::isThreadsafe() const {
 
 
 AreaMemoryManager::Ref AreaMemoryManager::create(size_t sizeHint) {
-    return shared_ptr<AreaMemoryManager>(new AreaMemoryManager(sizeHint));
+    return new AreaMemoryManager(sizeHint);
 }
 
 
@@ -80,7 +80,7 @@ void AreaMemoryManager::free(void* x) {
 
 
 void AreaMemoryManager::deallocateAll() {
-    m_bufferArray.invokeDeleteOnAllElements();
+    m_bufferArray.deleteAll();
     m_bufferArray.clear();
 }
 

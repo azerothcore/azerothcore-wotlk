@@ -64,10 +64,8 @@ struct ACE_DIR {
   /// The name of the directory we are looking into
   ACE_TCHAR *directory_name_;
 
-#if !defined (ACE_MQX)
   /// Remember the handle between calls.
   HANDLE current_handle_;
-#endif
 
   /// The struct for the results
   ACE_DIRENT *dirent_;

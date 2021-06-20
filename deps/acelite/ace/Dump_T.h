@@ -38,6 +38,7 @@ template <class Concrete>
 class ACE_Dumpable_Adapter : public ACE_Dumpable
 {
 public:
+  // = Initialization and termination methods.
   ACE_Dumpable_Adapter (const Concrete *t);
   ~ACE_Dumpable_Adapter (void);
 

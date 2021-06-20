@@ -6,9 +6,6 @@
 #define DEF_RAMPARTS_H
 
 #include "SpellScript.h"
-#include "CreatureAIImpl.h"
-
-#define HellfireRampartsScriptName "instance_hellfire_ramparts"
 
 enum DataTypes
 {
@@ -31,11 +28,5 @@ enum GameobjectIds
     GO_FEL_IRON_CHEST_NORMAL    = 185168,
     GO_FEL_IRON_CHECT_HEROIC    = 185169
 };
-
-template <class AI, class T>
-inline AI* GetHellfireRampartsAI(T* obj)
-{
-    return GetInstanceAI<AI>(obj, HellfireRampartsScriptName);
-}
 
 #endif

@@ -15,6 +15,7 @@
 
 #include /**/ "ace/pre.h"
 
+#include "ace/Auto_Ptr.h"
 #include "ace/Atomic_Op.h"
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
@@ -60,6 +61,8 @@ public:
         return rep_ == 0 ? 0: unspecified_bool;
     }
 
+
+  // = Initialization and termination methods.
 
   /// Constructor that initializes an ACE_Intrusive_Auto_Ptr to
   /// the specified pointer value.

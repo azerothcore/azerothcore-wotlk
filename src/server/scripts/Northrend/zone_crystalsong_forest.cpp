@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,13 +12,13 @@ SDComment:
 SDCategory: CrystalsongForest
 Script Data End */
 
-#include "PassiveAI.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "Player.h"
 #include "SmartScriptMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
+#include "PassiveAI.h"
 
 enum ePreparationsForWar
 {
@@ -30,110 +30,110 @@ enum ePreparationsForWar
 
 class npc_preparations_for_war_vehicle : public CreatureScript
 {
-public:
-    npc_preparations_for_war_vehicle() : CreatureScript("npc_preparations_for_war_vehicle") { }
+    public:
+        npc_preparations_for_war_vehicle() : CreatureScript("npc_preparations_for_war_vehicle") { }
 
-    struct npc_preparations_for_war_vehicleAI : public NullCreatureAI
-    {
-        npc_preparations_for_war_vehicleAI(Creature* creature) : NullCreatureAI(creature)
+        struct npc_preparations_for_war_vehicleAI : public NullCreatureAI
         {
-        }
-
-        uint8 pointId;
-        uint32 searchForShipTimer;
-        uint32 transportEntry;
-
-        void InitializeAI() override
-        {
-            WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
-            if (!path || path->empty())
+            npc_preparations_for_war_vehicleAI(Creature* creature) : NullCreatureAI(creature)
             {
-                me->DespawnOrUnsummon(1);
-                return;
             }
 
-            Movement::PointsArray pathPoints;
-            pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+            uint8 pointId;
+            uint32 searchForShipTimer;
+            uint32 transportEntry;
 
-            uint32 wpCounter = 1;
-            WPPath::const_iterator itr;
-            while ((itr = path->find(wpCounter++)) != path->end())
+            void InitializeAI()
             {
-                WayPoint* wp = itr->second;
-                pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
-            }
-
-            me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-
-            NullCreatureAI::InitializeAI();
-            pointId = 0;
-            searchForShipTimer = 0;
-            transportEntry = (me->GetEntry() == NPC_HAMMERHEAD ? TRANSPORT_ORGRIMS_HAMMER : TRANSPORT_THE_SKYBREAKER);
-        }
-
-        void MovementInform(uint32 type, uint32  /*id*/) override
-        {
-            if (type == ESCORT_MOTION_TYPE)
-                if (++pointId == 17) // path size
-                    searchForShipTimer = 3000;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            // horde 7.55f, -0.09, 34.44, 3.13, +20
-            // ally 45.18f, 0.03, 40.09, 3.14 +5
-
-            if (searchForShipTimer)
-            {
-                searchForShipTimer += diff;
-                if (searchForShipTimer >= 3000)
+                WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
+                if (!path || path->empty())
                 {
-                    searchForShipTimer = 1;
-                    TransportsContainer const& transports = me->GetMap()->GetAllTransports();
-                    for (TransportsContainer::const_iterator itr = transports.begin(); itr != transports.end(); ++itr)
+                    me->DespawnOrUnsummon(1);
+                    return;
+                }
+
+                Movement::PointsArray pathPoints;
+                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+
+                uint32 wpCounter = 1;
+                WPPath::const_iterator itr;
+                while ((itr = path->find(wpCounter++)) != path->end())
+                {
+                    WayPoint* wp = itr->second;
+                    pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                }
+
+                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                
+                NullCreatureAI::InitializeAI();
+                pointId = 0;
+                searchForShipTimer = 0;
+                transportEntry = (me->GetEntry() == NPC_HAMMERHEAD ? TRANSPORT_ORGRIMS_HAMMER : TRANSPORT_THE_SKYBREAKER);
+            }
+
+            void MovementInform(uint32 type, uint32  /*id*/)
+            {
+                if (type == ESCORT_MOTION_TYPE)
+                    if (++pointId == 17) // path size
+                        searchForShipTimer = 3000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                // horde 7.55f, -0.09, 34.44, 3.13, +20
+                // ally 45.18f, 0.03, 40.09, 3.14 +5
+
+                if (searchForShipTimer)
+                {
+                    searchForShipTimer += diff;
+                    if (searchForShipTimer >= 3000)
                     {
-                        if ((*itr)->GetEntry() == transportEntry)
+                        searchForShipTimer = 1;
+                        TransportsContainer const& transports = me->GetMap()->GetAllTransports();
+                        for (TransportsContainer::const_iterator itr = transports.begin(); itr != transports.end(); ++itr)
                         {
-                            float x, y, z;
-                            if (transportEntry == TRANSPORT_ORGRIMS_HAMMER)
+                            if ((*itr)->GetEntry() == transportEntry)
                             {
-                                x = 7.55f;
-                                y = -0.09f;
-                                z = 54.44f;
-                            }
-                            else
-                            {
-                                x = 45.18f;
-                                y = 0.03f;
-                                z = 45.09f;
-                            }
+                                float x, y, z;
+                                if (transportEntry == TRANSPORT_ORGRIMS_HAMMER)
+                                {
+                                    x = 7.55f;
+                                    y = -0.09f;
+                                    z = 54.44f;
+                                }
+                                else
+                                {
+                                    x = 45.18f;
+                                    y = 0.03f;
+                                    z = 45.09f;
+                                }
 
-                            (*itr)->CalculatePassengerPosition(x, y, z);
+                                (*itr)->CalculatePassengerPosition(x, y, z);
 
-                            if (me->GetDistance2d(x, y) < 10.0f)
-                            {
-                                me->DespawnOrUnsummon(1000);
-                                if (Vehicle* vehicle = me->GetVehicleKit())
-                                    if (Unit* passenger = vehicle->GetPassenger(0))
-                                    {
-                                        passenger->NearTeleportTo(x, y, z - (transportEntry == TRANSPORT_ORGRIMS_HAMMER ? 19.0f : 4.0f), M_PI);
-                                        passenger->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE); // maybe vehicle / seat flag should be responsible for parachute gain?
-                                    }
+                                if (me->GetDistance2d(x, y) < 10.0f)
+                                {
+                                    me->DespawnOrUnsummon(1000);
+                                    if (Vehicle* vehicle = me->GetVehicleKit())
+                                        if (Unit* passenger = vehicle->GetPassenger(0))
+                                        {
+                                            passenger->NearTeleportTo(x, y, z-(transportEntry == TRANSPORT_ORGRIMS_HAMMER ? 19.0f : 4.0f), M_PI);
+                                            passenger->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE); // maybe vehicle / seat flag should be responsible for parachute gain?
+                                        }
+                                }
+                                else
+                                    me->GetMotionMaster()->MovePoint(0, x, y, z, false, false);
+                                break;
                             }
-                            else
-                                me->GetMotionMaster()->MovePoint(0, x, y, z, false, false);
-                            break;
                         }
                     }
                 }
             }
-        }
-    };
+        };
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_preparations_for_war_vehicleAI(creature);
-    }
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_preparations_for_war_vehicleAI(creature);
+        }
 };
 
 /*******************************************************
@@ -165,14 +165,14 @@ public:
             SetCombatMovement(false);
         }
 
-        ObjectGuid targetGUID;
+        uint64 targetGUID;
 
-        void Reset() override
+        void Reset()
         {
-            targetGUID.Clear();
+            targetGUID = 0;
         }
 
-        void UpdateAI(uint32 /*diff*/) override
+        void UpdateAI(uint32 /*diff*/)
         {
             if (me->IsNonMeleeSpellCast(false))
                 return;
@@ -198,20 +198,21 @@ public:
                         }
                     }
                 }
-            }
-            else
+            }else
             {
                 if (!targetGUID)
                     if (Creature* pOrb = GetClosestCreatureWithEntry(me, NPC_TRANSITUS_SHIELD_DUMMY, 32.0f))
                         targetGUID = pOrb->GetGUID();
+
             }
 
             if (Creature* pOrb = ObjectAccessor::GetCreature(*me, targetGUID))
                 DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
+
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_warmage_violetstandAI(creature);
     }

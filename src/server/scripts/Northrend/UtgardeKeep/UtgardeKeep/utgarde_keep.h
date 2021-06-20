@@ -6,9 +6,6 @@
 #define DEF_UTGARDE_KEEP_H
 
 #include "SpellScript.h"
-#include "CreatureAIImpl.h"
-
-#define UtgardeKeepScriptName "instance_utgarde_keep"
 
 enum eData
 {
@@ -61,11 +58,5 @@ enum eCreatures
     NPC_DARK_RANGER_MARRAH          = 24137,
     NPC_ENSLAVED_PROTO_DRAKE        = 24083,
 };
-
-template <class AI, class T>
-inline AI* GetUtgardeKeepAI(T* obj)
-{
-    return GetInstanceAI<AI>(obj, UtgardeKeepScriptName);
-}
 
 #endif

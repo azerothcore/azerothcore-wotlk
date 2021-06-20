@@ -1,7 +1,11 @@
 /**
-  \file UprightFrame.cpp
+  @file UprightFrame.cpp
+  Box class
 
-  \maintainer Morgan McGuire, http://graphics.cs.williams.edu
+  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
+
+  @created 2007-05-02
+  @edited  2007-05-05
 */
 
 #include "G3D/UprightFrame.h"
@@ -13,38 +17,12 @@ namespace G3D {
 UprightFrame::UprightFrame(const CoordinateFrame& cframe) {
     Vector3 look = cframe.lookVector();
 
-    yaw = (float)(G3D::pi() + atan2(look.x, look.z));
+    yaw = G3D::pi() + atan2(look.x, look.z);
     pitch = asin(look.y);
 
     translation = cframe.translation;
 }
 
-
-UprightFrame::UprightFrame(const Any& any) {
-    any.verifyName("UprightFrame");
-    any.verifyType(Any::TABLE);
-
-    translation = any["translation"];
-    pitch = any["pitch"];
-    yaw = any["yaw"];
-}
-
-
-Any UprightFrame::toAny() const {
-    Any any(Any::TABLE, "UprightFrame");
-
-    any["translation"] = translation;
-    any["pitch"] = pitch;
-    any["yaw"] = yaw;
-
-    return any;
-}
-
-
-UprightFrame& UprightFrame::operator=(const Any& any) {
-    *this = UprightFrame(any);
-    return *this;
-}
     
 CoordinateFrame UprightFrame::toCoordinateFrame() const {
     CoordinateFrame cframe;
@@ -81,15 +59,15 @@ void UprightFrame::unwrapYaw(UprightFrame* a, int N) {
             // to be interpolated the long way.
 
             // Find canonical [0, 2pi] versions of these numbers
-            float p = (float)wrap(prev, twoPi());
-            float c = (float)wrap(cur, twoPi());
+            float p = wrap(prev, twoPi());
+            float c = wrap(cur, twoPi());
             
             // Find the difference -pi < diff < pi between the current and previous values
             float diff = c - p;
             if (diff < -G3D::pi()) {
-                diff += (float)twoPi();
+                diff += twoPi();
             } else if (diff > G3D::pi()) {
-                diff -= (float)twoPi();
+                diff -= twoPi();
             } 
 
             // Offset the current from the previous by the difference
@@ -98,6 +76,7 @@ void UprightFrame::unwrapYaw(UprightFrame* a, int N) {
         }
     }
 }
+
 
 void UprightFrame::serialize(class BinaryOutput& b) const {
     translation.serialize(b);
@@ -112,70 +91,9 @@ void UprightFrame::deserialize(class BinaryInput& b) {
     yaw = b.readFloat32();
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-
-UprightSpline::UprightSpline() : Spline<UprightFrame>() {
-}
-
-
-UprightSpline::UprightSpline(const Any& any) {
-    any.verifyName("UprightSpline");
-    any.verifyType(Any::TABLE);
-
-    extrapolationMode = any["extrapolationMode"];
-
-    const Any& controlsAny = any["control"];
-    controlsAny.verifyType(Any::ARRAY);
-
-    control.resize(controlsAny.length());
-    for (int controlIndex = 0; controlIndex < control.length(); ++controlIndex) {
-        control[controlIndex] = controlsAny[controlIndex];
-    }
-
-    const Any& timesAny = any["time"];
-    timesAny.verifyType(Any::ARRAY);
-
-    time.resize(timesAny.length());
-    for (int timeIndex = 0; timeIndex < time.length(); ++timeIndex) {
-        time[timeIndex] = timesAny[timeIndex];
-    }
-}
-
-
-Any UprightSpline::toAny(const std::string& myName) const {
-    Any any(Any::TABLE, myName);
-
-    any["extrapolationMode"] = extrapolationMode;
-
-    Any controlsAny(Any::ARRAY);
-    for (int controlIndex = 0; controlIndex < control.length(); ++controlIndex) {
-        controlsAny.append(control[controlIndex]);
-    }
-    any["control"] = controlsAny;
-
-    Any timesAny(Any::ARRAY);
-    for (int timeIndex = 0; timeIndex < time.length(); ++timeIndex) {
-        timesAny.append(Any(time[timeIndex]));
-    }
-    any["time"] = timesAny;
-
-    return any;
-}
-
-
-Any UprightSpline::toAny() const {
-    return toAny("UprightSpline");
-}
-
-
-UprightSpline& UprightSpline::operator=(const Any& any) {
-    *this = UprightSpline(any);
-    return *this;
-}
-
 
 void UprightSpline::serialize(class BinaryOutput& b) const {
-    b.writeInt32(extrapolationMode);
+    b.writeBool8(cyclic);
 
     b.writeInt32(control.size());
     for (int i = 0; i < control.size(); ++i) {
@@ -189,7 +107,7 @@ void UprightSpline::serialize(class BinaryOutput& b) const {
 
 
 void UprightSpline::deserialize(class BinaryInput& b) {
-    extrapolationMode = SplineExtrapolationMode(b.readInt32());
+    cyclic = b.readBool8();
 
     control.resize(b.readInt32());
     for (int i = 0; i < control.size(); ++i) {
@@ -206,7 +124,7 @@ void UprightSpline::deserialize(class BinaryInput& b) {
         // Import legacy path
         time.resize(control.size());
         for (int i = 0; i < time.size(); ++i) {
-            time[i] = (float)i;
+            time[i] = i;
         }
     }
 }

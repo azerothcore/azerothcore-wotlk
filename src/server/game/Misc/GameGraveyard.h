@@ -1,14 +1,8 @@
-/*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- */
-
 #ifndef _GAMEGRAVEYARD_H_
 #define _GAMEGRAVEYARD_H_
 
 #include "Common.h"
 #include "SharedDefines.h"
-#include <map>
-#include <unordered_map>
 
 struct GraveyardStruct
 {
@@ -36,12 +30,12 @@ class Graveyard
 public:
     static Graveyard* instance();
 
-    typedef std::unordered_map<uint32, GraveyardStruct> GraveyardContainer;
+    typedef std::unordered_map<uint32, GraveyardStruct> GraveyardContainer;    
 
     GraveyardStruct const* GetGraveyard(uint32 ID) const;
     GraveyardStruct const* GetGraveyard(const std::string& name) const;
     GraveyardStruct const* GetDefaultGraveyard(TeamId teamId);
-    GraveyardStruct const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId);
+    GraveyardStruct const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId);    
     GraveyardData const* FindGraveyardData(uint32 id, uint32 zone);
     GraveyardContainer const& GetGraveyardData() const { return _graveyardStore; }
     bool AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool persist = true);
@@ -50,6 +44,7 @@ public:
     void LoadGraveyardFromDB();
 
 private:
+
     GraveyardContainer _graveyardStore;
 
     // for wintergrasp only

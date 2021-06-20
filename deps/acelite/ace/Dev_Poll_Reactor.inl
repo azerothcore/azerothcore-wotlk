@@ -97,17 +97,17 @@ ACE_INLINE
 ACE_Dev_Poll_Reactor::Token_Guard::Token_Guard (ACE_Dev_Poll_Reactor_Token &token)
 
   : token_ (token),
-    owner_ (false)
+    owner_ (0)
 {
 }
 
 ACE_INLINE
 ACE_Dev_Poll_Reactor::Token_Guard::~Token_Guard (void)
 {
-  if (this->owner_)
+  if (this->owner_ == 1)
     {
       ACE_MT (this->token_.release ());
-      this->owner_ = false;
+      this->owner_ = 0;
     }
 }
 
@@ -119,11 +119,11 @@ ACE_Dev_Poll_Reactor::Token_Guard::release_token (void)
       ACE_MT (this->token_.release ());
 
       // We are not the owner anymore..
-      this->owner_ = false;
+      this->owner_ = 0;
     }
 }
 
-ACE_INLINE bool
+ACE_INLINE int
 ACE_Dev_Poll_Reactor::Token_Guard::is_owner (void)
 {
   return this->owner_;

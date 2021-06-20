@@ -15,7 +15,7 @@
 # pragma pack (pop)
 #elif defined (__BORLANDC__)
 # pragma option pop
-# if (__BORLANDC__ >= 0x660) && (__BORLANDC__ <= 0x730)
+# if (__BORLANDC__ >= 0x660) && (__BORLANDC__ <= 0x680)
 #  pragma option pop
 # endif
 # pragma nopushoptwarn

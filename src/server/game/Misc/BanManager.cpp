@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-#include "AccountMgr.h"
 #include "BanManager.h"
+#include "AccountMgr.h"
 #include "DatabaseEnv.h"
-#include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Language.h"
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
@@ -33,7 +33,7 @@ BanReturn BanManager::BanAccount(std::string const& AccountName, std::string con
 
     ///- Disconnect all affected players (for IP it can be several)
     SQLTransaction trans = LoginDatabase.BeginTransaction();
-
+        
     // pussywizard: check existing ban to prevent overriding by a shorter one! >_>
     PreparedStatement* stmtAccountBanned = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
     stmtAccountBanned->setUInt32(0, AccountID);
@@ -105,7 +105,7 @@ BanReturn BanManager::BanAccountByPlayerName(std::string const& CharacterName, s
         return BAN_LONGER_EXISTS;
 
     // make sure there is only one active ban
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
+    PreparedStatement * stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
     stmt->setUInt32(0, AccountID);
     trans->Append(stmt);
 
@@ -198,6 +198,7 @@ BanReturn BanManager::BanIP(std::string const& IP, std::string const& Duration, 
         if (WorldSession* session = sWorld->FindOfflineSession(AccountID))
             if (session->GetPlayerName() != Author)
                 session->KickPlayer("Ban IP at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
+
     } while (resultAccounts->NextRow());
 
     LoginDatabase.CommitTransaction(trans);
@@ -208,9 +209,9 @@ BanReturn BanManager::BanIP(std::string const& IP, std::string const& Duration, 
 /// Ban an character, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
 BanReturn BanManager::BanCharacter(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author)
 {
-    Player* target = ObjectAccessor::FindPlayerByName(CharacterName, false);
+    Player* target = ObjectAccessor::FindPlayerByName(CharacterName, false);    
     uint32 DurationSecs = TimeStringToSecs(Duration);
-    ObjectGuid TargetGUID;
+    uint32 TargetGUID = 0;
 
     /// Pick a player to ban if not online
     if (!target)
@@ -220,15 +221,15 @@ BanReturn BanManager::BanCharacter(std::string const& CharacterName, std::string
             return BAN_NOTFOUND;
     }
     else
-        TargetGUID = target->GetGUID();
+        TargetGUID = target->GetGUIDLow();
 
     // make sure there is only one active ban
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_BAN);
-    stmt->setUInt32(0, TargetGUID.GetCounter());
+    stmt->setUInt32(0, TargetGUID);
     CharacterDatabase.Execute(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_BAN);
-    stmt->setUInt32(0, TargetGUID.GetCounter());
+    stmt->setUInt32(0, TargetGUID);
     stmt->setUInt32(1, DurationSecs);
     stmt->setString(2, Author);
     stmt->setString(3, Reason);
@@ -297,19 +298,19 @@ bool BanManager::RemoveBanIP(std::string const& IP)
 bool BanManager::RemoveBanCharacter(std::string const& CharacterName)
 {
     Player* pBanned = ObjectAccessor::FindPlayerByName(CharacterName, false);
-    ObjectGuid guid;
+    uint32 guid = 0;
 
     /// Pick a player to ban if not online
     if (!pBanned)
         guid = sWorld->GetGlobalPlayerGUID(CharacterName);
     else
-        guid = pBanned->GetGUID();
+        guid = pBanned->GetGUIDLow();
 
     if (!guid)
         return false;
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_BAN);
-    stmt->setUInt32(0, guid.GetCounter());
+    stmt->setUInt32(0, guid);
     CharacterDatabase.Execute(stmt);
     return true;
 }

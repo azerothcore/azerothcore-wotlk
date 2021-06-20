@@ -5,7 +5,7 @@
   @created 2003-09-14
   @edited  2010-04-26
 
-  Copyright 2000-2012, Morgan McGuire.
+  Copyright 2000-2010, Morgan McGuire.
   All rights reserved.
 
  */
@@ -125,11 +125,6 @@ public:
             return *this;
         }
 
-        bool isValid() const {
-            return ! m_end;
-        }
-
-        /** @deprecated  Use isValid */
         bool hasMore() const {
             return ! m_end;
         }
@@ -259,7 +254,7 @@ void MeshAlg::computeAdjacency(
     MeshEdgeTable::Iterator cur = edgeTable.begin();
 
     Array<Edge> tempEdgeArray;
-    while (cur.isValid()) {
+    while (cur.hasMore()) {
         MeshEdgeTable::FaceIndexArray& faceIndexArray = cur.faceIndex();
 
         // Process this edge
@@ -625,7 +620,7 @@ void MeshAlg::weldAdjacency(
     Array<Face>&          faceArray,
     Array<Edge>&          edgeArray,
     Array<Vertex>&        vertexArray,
-    float                 radius) {
+    double                radius) {
 
     // Num vertices
     const int n = originalGeometry.size();

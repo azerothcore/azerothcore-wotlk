@@ -63,18 +63,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
   } while (0)
 #endif
 #if !defined (ACELIB_ERROR_RETURN)
-# ifdef ACE_LACKS_VA_FUNCTIONS
-#  define ACELIB_ERROR_RETURN(X, Y) \
-  do { \
-    int const __ace_error = ACE_Log_Msg::last_error_adapter (); \
-    ACE_Log_Category_TSS *ace___ = ACE_Log_Category::ace_lib().per_thr_obj(); \
-    if (ace___ == 0) return Y;\
-    ace___->conditional_set (__FILE__, __LINE__, Y, __ace_error); \
-    ace___->log (X);                                              \
-    return Y; \
-  } while (0)
-# else /* ACE_LACKS_VA_FUNCTIONS */
-#  define ACELIB_ERROR_RETURN(X, Y) \
+#define ACELIB_ERROR_RETURN(X, Y) \
   do { \
     int const __ace_error = ACE_Log_Msg::last_error_adapter (); \
     ACE_Log_Category_TSS *ace___ = ACE_Log_Category::ace_lib().per_thr_obj(); \
@@ -83,20 +72,9 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
     ace___->log X; \
     return Y; \
   } while (0)
-# endif /* ACE_LACKS_VA_FUNCTIONS */
 #endif
 #if !defined (ACELIB_ERROR)
-# ifdef ACE_LACKS_VA_FUNCTIONS
-#  define ACELIB_ERROR(X) \
-  do { \
-    int const __ace_error = ACE_Log_Msg::last_error_adapter (); \
-    ACE_Log_Category_TSS *ace___ = ACE_Log_Category::ace_lib().per_thr_obj(); \
-    if (ace___ == 0) break;\
-    ace___->conditional_set (__FILE__, __LINE__, -1, __ace_error); \
-    ace___->log (X);                                               \
-  } while (0)
-# else /* ACE_LACKS_VA_FUNCTIONS */
-# define ACELIB_ERROR(X) \
+#define ACELIB_ERROR(X) \
   do { \
     int const __ace_error = ACE_Log_Msg::last_error_adapter (); \
     ACE_Log_Category_TSS *ace___ = ACE_Log_Category::ace_lib().per_thr_obj(); \
@@ -104,20 +82,9 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
     ace___->conditional_set (__FILE__, __LINE__, -1, __ace_error); \
     ace___->log X; \
   } while (0)
-# endif /* ACE_LACKS_VA_FUNCTIONS */
 #endif
 #if !defined (ACELIB_DEBUG)
-# ifdef ACE_LACKS_VA_FUNCTIONS
-#  define ACELIB_DEBUG(X) \
-  do { \
-    int const __ace_error = ACE_Log_Msg::last_error_adapter (); \
-    ACE_Log_Category_TSS *ace___ = ACE_Log_Category::ace_lib().per_thr_obj(); \
-    if (ace___ == 0) break;\
-    ace___->conditional_set (__FILE__, __LINE__, 0, __ace_error); \
-    ace___->log (X);                                              \
-  } while (0)
-# else /* ACE_LACKS_VA_FUNCTIONS */
-# define ACELIB_DEBUG(X) \
+#define ACELIB_DEBUG(X) \
   do { \
     int const __ace_error = ACE_Log_Msg::last_error_adapter (); \
     ACE_Log_Category_TSS *ace___ = ACE_Log_Category::ace_lib().per_thr_obj(); \
@@ -125,7 +92,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
     ace___->conditional_set (__FILE__, __LINE__, 0, __ace_error); \
     ace___->log X; \
   } while (0)
-# endif /* ACE_LACKS_VA_FUNCTIONS */
 #endif
 #if !defined (ACELIB_ERROR_BREAK)
 #define ACELIB_ERROR_BREAK(X) { ACELIB_ERROR (X); break; }
@@ -144,17 +110,18 @@ class ACE_Log_Category;
  *
  * @see ACE_Log_Categy
  */
+
 class ACE_Export ACE_Log_Category_TSS
 {
 public:
   ACE_Log_Category_TSS(ACE_Log_Category* category, ACE_Log_Msg* logger);
 
-  const char* name() const;
-  unsigned int id() const;
+  const char* name();
+  unsigned int id();
 
   ACE_Log_Msg* logger();
   /// Get the current ACE_Log_Priority mask.
-  u_long priority_mask () const;
+  u_long priority_mask ();
 
   /// Set the ACE_Log_Priority mask, returns original mask.
   u_long priority_mask (u_long);
@@ -178,24 +145,15 @@ public:
                         int         op_status,
                         int         errnum);
 
-#if !defined (ACE_LACKS_VA_FUNCTIONS)
   ssize_t log (ACE_Log_Priority priority, const ACE_TCHAR *format, ...);
 
 #if defined (ACE_HAS_WCHAR)
   ssize_t log (ACE_Log_Priority priority, const ACE_ANTI_TCHAR *format, ...);
 #endif /* ACE_HAS_WCHAR */
-#else /* ACE_LACKS_VA_FUNCTIONS */
-  friend class ACE_Log_Formatter;
-
-  ssize_t log (const ACE_Log_Formatter &formatter);
-#endif /* ACE_LACKS_VA_FUNCTIONS */
 
   ssize_t log (const ACE_TCHAR *format,
                ACE_Log_Priority priority,
                va_list          argp);
-
-  ssize_t log (ACE_Log_Record &log_record,
-               int suppress_stderr = 0);
 
   /**
    * Method to log hex dump.  This is useful for debugging.  Calls
@@ -206,8 +164,6 @@ public:
                    const char *     buffer,
                    size_t           size,
                    const ACE_TCHAR *text = 0);
-
-  ACE_ALLOC_HOOK_DECLARE;
 
 private:
   friend class ACE_Log_Category;
@@ -232,9 +188,9 @@ private:
  * object would also be disabled regardless of the @c priority_mask
  * setting in the  @c ACE_Log_Category object.
  *
- * Each category can have a name which
+ * Each cateogry can have a name which
  * is fixed at construction. The name is not used for
- * formatting the messages. However, it can be used by a
+ * formating the messages. However, it can be used by a
  * message backend object for identification and reformat
  * accordingly.
  *
@@ -255,6 +211,7 @@ private:
 class ACE_Export ACE_Log_Category
 {
 public:
+
   /**
    * Initialize the logger with a name.
    *
@@ -269,16 +226,17 @@ public:
   ACE_Log_Category(const char* name);
   ~ACE_Log_Category();
 
-  unsigned int id() const;
-  const char* name() const;
+  unsigned int id();
+  const char* name();
 
   ACE_Log_Category_TSS* per_thr_obj();
 
   /// Get the process  ACE_Log_Priority mask.
-  u_long priority_mask () const;
+  u_long priority_mask ();
 
   /// Set the process ACE_Log_Priority mask, returns original mask.
   u_long priority_mask (u_long);
+
 
   static ACE_Log_Category& ace_lib();
 
@@ -305,6 +263,7 @@ private:
   ACE_Log_Category_TSS per_thr_obj_;
 #endif // defined (ACE_HAS_THREADS)
 };
+
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 

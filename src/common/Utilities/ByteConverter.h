@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,18 +17,18 @@
 namespace ByteConverter
 {
     template<size_t T>
-    inline void convert(char* val)
+    inline void convert(char *val)
     {
         std::swap(*val, *(val + T - 1));
-        convert < T - 2 > (val + 1);
+        convert<T - 2>(val + 1);
     }
 
-    template<> inline void convert<0>(char*) { }
-    template<> inline void convert<1>(char*) { }            // ignore central byte
+    template<> inline void convert<0>(char *) { }
+    template<> inline void convert<1>(char *) { }           // ignore central byte
 
-    template<typename T> inline void apply(T* val)
+    template<typename T> inline void apply(T *val)
     {
-        convert<sizeof(T)>((char*)(val));
+        convert<sizeof(T)>((char *)(val));
     }
 }
 
@@ -53,3 +53,4 @@ inline void EndianConvertReverse(uint8&) { }
 inline void EndianConvertReverse( int8&) { }
 
 #endif
+

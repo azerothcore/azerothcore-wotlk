@@ -1,17 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "blackwing_lair.h"
-#include "GameObject.h"
-#include "GameObjectAI.h"
-#include "InstanceScript.h"
-#include "Map.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "Player.h"
+#include "blackwing_lair.h"
 
 enum Emotes
 {
@@ -63,13 +59,8 @@ public:
 
     struct boss_chromaggusAI : public BossAI
     {
-        boss_chromaggusAI(Creature* creature) : BossAI(creature, DATA_CHROMAGGUS)
+        boss_chromaggusAI(Creature* creature) : BossAI(creature, BOSS_CHROMAGGUS)
         {
-            Initialize();
-
-            Breath1_Spell = 0;
-            Breath2_Spell = 0;
-
             // Select the 2 breaths that we are going to use until despawned
             // 5 possiblities for the first breath, 4 for the second, 20 total possiblites
             // This way we don't end up casting 2 of the same breath
@@ -170,31 +161,31 @@ public:
             EnterEvadeMode();
         }
 
-        void Initialize()
+        void Reset()
         {
+            _Reset();
+
             CurrentVurln_Spell = 0;     // We use this to store our last vulnerabilty spell so we can remove it later
             Enraged = false;
         }
 
-        void Reset() override
+        void EnterCombat(Unit* /*who*/)
         {
-            _Reset();
+            if (instance->GetBossState(BOSS_FLAMEGOR) != DONE)
+            {
+                EnterEvadeMode();
+                return;
+            }
+            _EnterCombat();
 
-            Initialize();
-        }
-
-        void EnterCombat(Unit* victim) override
-        {
-            BossAI::EnterCombat(victim);
-
-            events.ScheduleEvent(EVENT_SHIMMER, 1000);
+            events.ScheduleEvent(EVENT_SHIMMER, 0);
             events.ScheduleEvent(EVENT_BREATH_1, 30000);
             events.ScheduleEvent(EVENT_BREATH_2, 60000);
             events.ScheduleEvent(EVENT_AFFLICTION, 10000);
             events.ScheduleEvent(EVENT_FRENZY, 15000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -232,7 +223,7 @@ public:
                             break;
                     case EVENT_AFFLICTION:
                         {
-                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                            Map::PlayerList const &players = me->GetMap()->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
                                 if (Player* player = itr->GetSource()->ToPlayer())
@@ -247,6 +238,7 @@ public:
                                         {
                                             DoCast(player, SPELL_CHROMATIC_MUT_1);
                                         }
+
                                 }
                             }
                         }
@@ -254,12 +246,9 @@ public:
                         break;
                     case EVENT_FRENZY:
                         DoCast(me, SPELL_FRENZY);
-                        events.ScheduleEvent(EVENT_FRENZY, 10000, 15000);
+                        events.ScheduleEvent(EVENT_FRENZY, urand(10000, 15000));
                         break;
                 }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
             }
 
             // Enrage if not already enraged and below 20%
@@ -279,52 +268,13 @@ public:
         bool Enraged;
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackwingLairAI<boss_chromaggusAI>(creature);
+        return GetInstanceAI<boss_chromaggusAI>(creature);
     }
-};
-
-class go_chromaggus_lever : public GameObjectScript
-{
-    public:
-        go_chromaggus_lever() : GameObjectScript("go_chromaggus_lever") { }
-
-        struct go_chromaggus_leverAI : public GameObjectAI
-        {
-            go_chromaggus_leverAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()) { }
-
-            bool OnGossipHello(Player* player)
-            {
-                if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
-                {
-                    _instance->SetBossState(DATA_CHROMAGGUS, IN_PROGRESS);
-
-                    if (Creature* creature = _instance->instance->GetCreature(_instance->GetGuidData(DATA_CHROMAGGUS)))
-                        creature->AI()->AttackStart(player);
-
-                    if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_CHROMAGGUS_DOOR)))
-                        _instance->HandleGameObject(ObjectGuid::Empty, true, go);
-                }
-
-                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
-                go->SetGoState(GO_STATE_ACTIVE);
-
-                return true;
-            }
-
-        private:
-            InstanceScript* _instance;
-        };
-
-        GameObjectAI* GetAI(GameObject* go) const override
-        {
-            return GetBlackwingLairAI<go_chromaggus_leverAI>(go);
-        }
 };
 
 void AddSC_boss_chromaggus()
 {
     new boss_chromaggus();
-    new go_chromaggus_lever();
 }

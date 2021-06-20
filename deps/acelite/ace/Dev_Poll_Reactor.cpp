@@ -42,10 +42,6 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Dev_Poll_Reactor)
-ACE_ALLOC_HOOK_DEFINE(ACE_Dev_Poll_Reactor::Event_Tuple)
-ACE_ALLOC_HOOK_DEFINE(ACE_Dev_Poll_Reactor_Notify)
-
 ACE_Dev_Poll_Reactor_Notify::ACE_Dev_Poll_Reactor_Notify (void)
   : dp_reactor_ (0)
   , notification_pipe_ ()
@@ -76,16 +72,10 @@ ACE_Dev_Poll_Reactor_Notify::open (ACE_Reactor_Impl *r,
       if (this->notification_pipe_.open () == -1)
         return -1;
 
-#if defined (F_SETFD) && !defined (ACE_LACKS_FCNTL)
+#if defined (F_SETFD)
       // close-on-exec
-      if (ACE_OS::fcntl (this->notification_pipe_.read_handle (), F_SETFD, 1) == -1)
-        {
-          return -1;
-        }
-      if (ACE_OS::fcntl (this->notification_pipe_.write_handle (), F_SETFD, 1) == -1)
-        {
-          return -1;
-        }
+      ACE_OS::fcntl (this->notification_pipe_.read_handle (), F_SETFD, 1);
+      ACE_OS::fcntl (this->notification_pipe_.write_handle (), F_SETFD, 1);
 #endif /* F_SETFD */
 
 #if defined (ACE_HAS_REACTOR_NOTIFICATION_QUEUE)
@@ -2543,7 +2533,7 @@ ACE_Dev_Poll_Reactor::Token_Guard::acquire_quietly (ACE_Time_Value *max_wait)
     }
 
   // We got the token and so let us mark ourselves as owner
-  this->owner_ = true;
+  this->owner_ = 1;
 
   return result;
 }
@@ -2578,7 +2568,7 @@ ACE_Dev_Poll_Reactor::Token_Guard::acquire (ACE_Time_Value *max_wait)
     }
 
   // We got the token and so let us mark ourseleves as owner
-  this->owner_ = true;
+  this->owner_ = 1;
 
   return result;
 }

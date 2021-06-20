@@ -39,11 +39,7 @@ ACE_MEM_Acceptor::ACE_MEM_Acceptor (void)
 ACE_MEM_Acceptor::~ACE_MEM_Acceptor (void)
 {
   ACE_TRACE ("ACE_MEM_Acceptor::~ACE_MEM_Acceptor");
-#if defined (ACE_HAS_ALLOC_HOOKS)
-  ACE_Allocator::instance()->free(this->mmap_prefix_);
-#else
   delete[] this->mmap_prefix_;
-#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 // General purpose routine for performing server ACE_SOCK creation.
@@ -142,10 +138,10 @@ ACE_MEM_Acceptor::accept (ACE_MEM_Stream &new_stream,
 
   if (this->mmap_prefix_ != 0)
     {
-      ACE_OS::snprintf (buf, sizeof buf / sizeof buf[0],
-                        ACE_TEXT ("%s_%d_"),
-                        this->mmap_prefix_,
-                        local_addr.get_port_number ());
+      ACE_OS::sprintf (buf,
+                       ACE_TEXT ("%s_%d_"),
+                       this->mmap_prefix_,
+                       local_addr.get_port_number ());
     }
   else
     {
@@ -159,9 +155,9 @@ ACE_MEM_Acceptor::accept (ACE_MEM_Stream &new_stream,
           buf[0] = 0;
         }
 
-      ACE_OS::snprintf (name, 25,
-                        ACE_TEXT ("MEM_Acceptor_%d_"),
-                        local_addr.get_port_number ());
+      ACE_OS::sprintf (name,
+                       ACE_TEXT ("MEM_Acceptor_%d_"),
+                       local_addr.get_port_number ());
       ACE_OS::strcat (buf, name);
     }
   ACE_TCHAR unique [MAXPATHLEN];

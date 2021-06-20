@@ -58,8 +58,6 @@ public:
    */
   virtual ACE_THR_FUNC_RETURN invoke (void);
 
-  ACE_ALLOC_HOOK_DECLARE;
-
 protected:
 
   /// Ensure that this object is allocated on the heap.

@@ -4,7 +4,7 @@
 /**
  *  @file    Shared_Memory_MM.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -35,6 +35,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Shared_Memory_MM : public ACE_Shared_Memory
 {
 public:
+  // = Initialization and termination methods.
   /// Default constructor.
   ACE_Shared_Memory_MM (void);
 

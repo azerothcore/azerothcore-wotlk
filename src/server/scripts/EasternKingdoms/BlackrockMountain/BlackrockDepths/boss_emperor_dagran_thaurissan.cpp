@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "blackrock_depths.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackrock_depths.h"
 
 enum Yells
 {
@@ -25,9 +25,9 @@ class boss_emperor_dagran_thaurissan : public CreatureScript
 public:
     boss_emperor_dagran_thaurissan() : CreatureScript("boss_emperor_dagran_thaurissan") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackrockDepthsAI<boss_draganthaurissanAI>(creature);
+        return GetInstanceAI<boss_draganthaurissanAI>(creature);
     }
 
     struct boss_draganthaurissanAI : public ScriptedAI
@@ -42,34 +42,34 @@ public:
         uint32 AvatarOfFlame_Timer;
         //uint32 Counter;
 
-        void Reset() override
+        void Reset()
         {
             HandOfThaurissan_Timer = 4000;
             AvatarOfFlame_Timer = 25000;
             //Counter= 0;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
             me->CallForHelp(VISIBLE_RANGE);
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        void KilledUnit(Unit* /*victim*/)
         {
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
-            if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOIRA)))
+            if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOIRA)))
             {
                 Moira->AI()->EnterEvadeMode();
                 Moira->setFaction(35);
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -88,19 +88,17 @@ public:
                 //}
                 //else
                 //{
-                HandOfThaurissan_Timer = 5000;
-                //Counter = 0;
+                    HandOfThaurissan_Timer = 5000;
+                    //Counter = 0;
                 //}
-            }
-            else HandOfThaurissan_Timer -= diff;
+            } else HandOfThaurissan_Timer -= diff;
 
             //AvatarOfFlame_Timer
             if (AvatarOfFlame_Timer <= diff)
             {
                 DoCastVictim(SPELL_AVATAROFFLAME);
                 AvatarOfFlame_Timer = 18000;
-            }
-            else AvatarOfFlame_Timer -= diff;
+            } else AvatarOfFlame_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }

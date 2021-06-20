@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,32 +12,31 @@
 * authentication server
 */
 
-#include "AppenderDB.h"
-#include "Banner.h"
-#include "Common.h"
-#include "Config.h"
-#include "DatabaseEnv.h"
-#include "DatabaseLoader.h"
-#include "GitRevision.h"
-#include "IPLocation.h"
-#include "Log.h"
-#include "RealmAcceptor.h"
-#include "RealmList.h"
-#include "SecretMgr.h"
-#include "SharedDefines.h"
-#include "SignalHandler.h"
-#include "Util.h"
-#include "ProcessPriority.h"
-#include <ace/ACE.h>
 #include <ace/Dev_Poll_Reactor.h>
-#include <ace/Sig_Handler.h>
 #include <ace/TP_Reactor.h>
-#include <boost/version.hpp>
-#include <openssl/crypto.h>
+#include <ace/ACE.h>
+#include <ace/Sig_Handler.h>
 #include <openssl/opensslv.h>
+#include <openssl/crypto.h>
+
+#include "Common.h"
+#include "Database/DatabaseEnv.h"
+#include "Configuration/Config.h"
+#include "Log.h"
+#include "GitRevision.h"
+#include "Util.h"
+#include "SignalHandler.h"
+#include "RealmList.h"
+#include "RealmAcceptor.h"
+
+#ifdef __linux__
+#include <sched.h>
+#include <sys/resource.h>
+#define PROCESS_HIGH_PRIORITY -15 // [-20, 19], default is 0
+#endif
 
 #ifndef _ACORE_REALM_CONFIG
-#define _ACORE_REALM_CONFIG "authserver.conf"
+# define _ACORE_REALM_CONFIG  "authserver.conf"
 #endif
 
 bool StartDB();
@@ -45,21 +44,37 @@ void StopDB();
 
 bool stopEvent = false;                                     // Setting it to true stops the server
 
+LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the authserver database
+
+/// Handle authserver's termination signals
+class AuthServerSignalHandler : public acore::SignalHandler
+{
+public:
+    virtual void HandleSignal(int sigNum)
+    {
+        switch (sigNum)
+        {
+        case SIGINT:
+        case SIGTERM:
+            stopEvent = true;
+            break;
+        }
+    }
+};
+
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
-    LOG_INFO("server.authserver", "Usage: \n %s [<options>]\n"
-                    "    -c config_file           use config_file as configuration file\n\r",
-                    prog);
+    sLog->outString("Usage: \n %s [<options>]\n"
+        "    -c config_file           use config_file as configuration file\n\r",
+        prog);
 }
 
 /// Launch the auth server
 extern int main(int argc, char** argv)
 {
-    Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
-
     // Command line parsing to get the configuration file name
-    std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
+    char const* configFile = _ACORE_REALM_CONFIG;
     int count = 1;
     while (count < argc)
     {
@@ -77,29 +92,41 @@ extern int main(int argc, char** argv)
         ++count;
     }
 
-    // Add file and args in config
-    sConfigMgr->Configure(configFile, std::vector<std::string>(argv, argv + argc));
+    std::string cfg_def_file=_ACORE_REALM_CONFIG;
+    cfg_def_file += ".dist";
 
-    if (!sConfigMgr->LoadAppConfigs())
+    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
+        printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
         return 1;
+    }
 
-    // Init logging
-    sLog->RegisterAppender<AppenderDB>();
-    sLog->Initialize();
+    if (!sConfigMgr->LoadMore(configFile))
+    {
+        printf("WARNING: Invalid or missing configuration file : %s\n", configFile);
+        printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
+    }
 
-    Acore::Banner::Show("authserver",
-        [](char const* text)
-        {
-            LOG_INFO("server.authserver", "%s", text);
-        },
-        []()
-        {
-            LOG_INFO("server.authserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
-            LOG_INFO("server.authserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            LOG_INFO("server.authserver", "> Using Boost version:           %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
-            LOG_INFO("server.authserver", "> Using ACE version:             %s\n", ACE_VERSION);
-        }
-    );
+    sLog->outString("%s (authserver)", GitRevision::GetFullVersion());
+    sLog->outString("<Ctrl-C> to stop.\n");
+
+    sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
+    sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
+    sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
+    sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
+    sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
+    sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
+    sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
+    sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
+    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");  
+    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");  
+    sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
+    sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
+
+    sLog->outString("  	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
+
+    sLog->outString("Using configuration file %s.", configFile);
+
+    sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
@@ -107,17 +134,17 @@ extern int main(int argc, char** argv)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_TP_Reactor(), true), true);
 #endif
 
-    LOG_INFO("server.authserver", "Max allowed open files is %d", ACE::max_handles());
+    sLog->outBasic("Max allowed open files is %d", ACE::max_handles());
 
     // authserver PID file creation
-    std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
+    std::string pidFile = sConfigMgr->GetStringDefault("PidFile", "");
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            LOG_INFO("server.authserver", "Daemon PID: %u\n", pid); // outError for red color in console
+            sLog->outError("Daemon PID: %u\n", pid); // outError for red color in console
         else
         {
-            LOG_ERROR("server.authserver", "Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
+            sLog->outError("Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
             return 1;
         }
     }
@@ -126,58 +153,126 @@ extern int main(int argc, char** argv)
     if (!StartDB())
         return 1;
 
-    sSecretMgr->Initialize();
-
-    // Load IP Location Database
-    sIPLocation->Load();
+    // Initialize the log database
+    sLog->SetLogDB(false);
+    sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (authserver realmid)
 
     // Get the list of realms for the server
-    sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
-    if (sRealmList->GetRealms().empty())
+    sRealmList->Initialize(sConfigMgr->GetIntDefault("RealmsStateUpdateDelay", 20));
+    if (sRealmList->size() == 0)
     {
-        LOG_ERROR("server.authserver", "No valid realms specified.");
+        sLog->outError("No valid realms specified.");
         return 1;
     }
 
     // Launch the listening network socket
     RealmAcceptor acceptor;
 
-    int32 rmport = sConfigMgr->GetOption<int32>("RealmServerPort", 3724);
+    int32 rmport = sConfigMgr->GetIntDefault("RealmServerPort", 3724);
     if (rmport < 0 || rmport > 0xFFFF)
     {
-        LOG_ERROR("server.authserver", "The specified RealmServerPort (%d) is out of the allowed range (1-65535)", rmport);
+        sLog->outError("The specified RealmServerPort (%d) is out of the allowed range (1-65535)", rmport);
         return 1;
     }
 
-    std::string bind_ip = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
+    std::string bind_ip = sConfigMgr->GetStringDefault("BindIP", "0.0.0.0");
 
     ACE_INET_Addr bind_addr(uint16(rmport), bind_ip.c_str());
 
     if (acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
     {
-        LOG_ERROR("server.authserver", "Auth server can not bind to %s:%d (possible error: port already in use)", bind_ip.c_str(), rmport);
+        sLog->outError("Auth server can not bind to %s:%d (possible error: port already in use)", bind_ip.c_str(), rmport);
         return 1;
     }
 
-    LOG_INFO("server.authserver", "Authserver listening to %s:%d", bind_ip.c_str(), rmport);
+    sLog->outString("Authserver listening to %s:%d", bind_ip.c_str(), rmport);
 
     // Initialize the signal handlers
-    Acore::SignalHandler signalHandler;
-    auto const _handler = [](int) { stopEvent = true; };
+    AuthServerSignalHandler SignalINT, SignalTERM;
 
     // Register authservers's signal handlers
-    signalHandler.handle_signal(SIGINT, _handler);
-    signalHandler.handle_signal(SIGTERM, _handler);
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-    signalHandler.handle_signal(SIGBREAK, _handler);
+    ACE_Sig_Handler Handler;
+    Handler.register_handler(SIGINT, &SignalINT);
+    Handler.register_handler(SIGTERM, &SignalTERM);
+
+#if defined(_WIN32) || defined(__linux__)
+
+    ///- Handle affinity for multiple processors and process priority
+    uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
+    bool highPriority = sConfigMgr->GetBoolDefault("ProcessPriority", false);
+
+#ifdef _WIN32 // Windows
+
+    HANDLE hProcess = GetCurrentProcess();
+    if (affinity > 0)
+    {
+        ULONG_PTR appAff;
+        ULONG_PTR sysAff;
+
+        if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
+        {
+            // remove non accessible processors
+            ULONG_PTR currentAffinity = affinity & appAff;
+
+            if (!currentAffinity)
+                sLog->outError("server.authserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the authserver. Accessible processors bitmask (hex): %x", affinity, appAff);
+            else if (SetProcessAffinityMask(hProcess, currentAffinity))
+                sLog->outString("server.authserver", "Using processors (bitmask, hex): %x", currentAffinity);
+            else
+                sLog->outError("server.authserver", "Can't set used processors (hex): %x", currentAffinity);
+        }
+    }
+
+    if (highPriority)
+    {
+        if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
+            sLog->outString("server.authserver", "authserver process priority class set to HIGH");
+        else
+            sLog->outError("server.authserver", "Can't set authserver process priority class.");
+    }
+
+#else // Linux
+
+    if (affinity > 0)
+    {
+        cpu_set_t mask;
+        CPU_ZERO(&mask);
+
+        for (unsigned int i = 0; i < sizeof(affinity) * 8; ++i)
+            if (affinity & (1 << i))
+                CPU_SET(i, &mask);
+
+        if (sched_setaffinity(0, sizeof(mask), &mask))
+            sLog->outError("Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
+        else
+        {
+            CPU_ZERO(&mask);
+            sched_getaffinity(0, sizeof(mask), &mask);
+            sLog->outString("Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
+        }
+    }
+
+    if (highPriority)
+    {
+        if (setpriority(PRIO_PROCESS, 0, PROCESS_HIGH_PRIORITY))
+            sLog->outError("Can't set authserver process priority class, error: %s", strerror(errno));
+        else
+            sLog->outString("authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
+    }
+
+#endif
 #endif
 
-    // Set process priority according to configuration settings
-    SetProcessPriority("server.authserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
-
     // maximum counter for next ping
-    uint32 numLoops = (sConfigMgr->GetOption<int32>("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
+    uint32 numLoops = (sConfigMgr->GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
     uint32 loopCounter = 0;
+
+    // possibly enable db logging; avoid massive startup spam by doing it here.
+    if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
+    {
+        sLog->outString("Enabling database logging...");
+        sLog->SetLogDB(true);
+    }
 
     // Wait for termination signal
     while (!stopEvent)
@@ -191,7 +286,7 @@ extern int main(int argc, char** argv)
         if ((++loopCounter) == numLoops)
         {
             loopCounter = 0;
-            LOG_INFO("server.authserver", "Ping MySQL to keep connection alive");
+            sLog->outDetail("Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
         }
     }
@@ -199,7 +294,7 @@ extern int main(int argc, char** argv)
     // Close the Database Pool and library
     StopDB();
 
-    LOG_INFO("server.authserver", "Halting process...");
+    sLog->outString("Halting process...");
     return 0;
 }
 
@@ -208,18 +303,35 @@ bool StartDB()
 {
     MySQL::Library_Init();
 
-    // Load databases
-    // NOTE: While authserver is singlethreaded you should keep synch_threads == 1.
-    // Increasing it is just silly since only 1 will be used ever.
-    DatabaseLoader loader;
-    loader
-        .AddDatabase(LoginDatabase, "Login");
-
-    if (!loader.Load())
+    std::string dbstring = sConfigMgr->GetStringDefault("LoginDatabaseInfo", "");
+    if (dbstring.empty())
+    {
+        sLog->outError("Database not specified");
         return false;
+    }
 
-    LOG_INFO("server.authserver", "Started auth database connection pool.");
-    sLog->SetRealmId(0); // Enables DB appenders when realm is set.
+    int32 worker_threads = sConfigMgr->GetIntDefault("LoginDatabase.WorkerThreads", 1);
+    if (worker_threads < 1 || worker_threads > 32)
+    {
+        sLog->outError("Improper value specified for LoginDatabase.WorkerThreads, defaulting to 1.");
+        worker_threads = 1;
+    }
+
+    int32 synch_threads = sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1);
+    if (synch_threads < 1 || synch_threads > 32)
+    {
+        sLog->outError("Improper value specified for LoginDatabase.SynchThreads, defaulting to 1.");
+        synch_threads = 1;
+    }
+
+    // NOTE: While authserver is singlethreaded you should keep synch_threads == 1. Increasing it is just silly since only 1 will be used ever.
+    if (!LoginDatabase.Open(dbstring.c_str(), uint8(worker_threads), uint8(synch_threads)))
+    {
+        sLog->outError("Cannot connect to database");
+        return false;
+    }
+
+    sLog->outString("Started auth database connection pool.");
     return true;
 }
 

@@ -1,14 +1,14 @@
 /**
- \file CoordinateFrame.cpp
+ @file CoordinateFrame.cpp
 
  Coordinate frame class
 
- \maintainer Morgan McGuire, http://graphics.cs.williams.edu
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
- \created 2001-06-02
- \edited  2012-09-29
+ @created 2001-06-02
+ @edited  2010-03-13
 
- Copyright 2000-2012, Morgan McGuire.
+ Copyright 2000-2010, Morgan McGuire.
  All rights reserved.
 */
 
@@ -28,17 +28,16 @@
 #include "G3D/stringutils.h"
 #include "G3D/PhysicsFrame.h"
 #include "G3D/UprightFrame.h"
-#include "G3D/Frustum.h"
 
 namespace G3D {
 
 
 std::string CoordinateFrame::toXYZYPRDegreesString() const {
-    float x,y,z,yaw,pitch,roll;
-    getXYZYPRDegrees(x,y,z,yaw,pitch,roll);
+    UprightFrame uframe(*this);
     
     return format("CFrame::fromXYZYPRDegrees(% 5.1ff, % 5.1ff, % 5.1ff, % 5.1ff, % 5.1ff, % 5.1ff)", 
-                  x,y,z,yaw,pitch,roll);
+                  uframe.translation.x, uframe.translation.y, uframe.translation.z, 
+                  toDegrees(uframe.yaw), toDegrees(uframe.pitch), 0.0f);
 }
 
 
@@ -47,12 +46,10 @@ CoordinateFrame::CoordinateFrame(const Any& any) {
 
     const std::string& n = toUpper(any.name());
 
-    if (beginsWith(n, "VECTOR3") || beginsWith(n, "POINT3")) {
-        translation = Point3(any);
+    if (beginsWith(n, "VECTOR3")) {
+        translation = any;
     } else if (beginsWith(n, "MATRIX3")) {
-        rotation = Matrix3(any);
-    } else if (beginsWith(n, "MATRIX4")) {
-        *this = Matrix4(any).approxCoordinateFrame();
+        rotation = any;
     } else if ((n == "CFRAME") || (n == "COORDINATEFRAME")) {
         any.verifyType(Any::TABLE, Any::ARRAY);
         if (any.type() == Any::ARRAY) {
@@ -60,15 +57,19 @@ CoordinateFrame::CoordinateFrame(const Any& any) {
             rotation    = any[0];
             translation = any[1];
         } else {
-            AnyTableReader r(any);
-            r.getIfPresent("translation", translation);
-            r.getIfPresent("rotation", rotation);
-            r.verifyDone();
+            for (Any::AnyTable::Iterator it = any.table().begin(); it.hasMore(); ++it) {
+                const std::string& n = toLower(it->key);
+                if (n == "translation") {
+                    translation = Vector3(it->value);
+                } else if (n == "rotation") {
+                    rotation = Matrix3(it->value);
+                } else {
+                    any.verify(false, "Illegal table key: " + it->key);
+                }
+            }
         }
     } else if (beginsWith(n, "PHYSICSFRAME") || beginsWith(n, "PFRAME")) {
         *this = PhysicsFrame(any);
-//    } else if (beginsWith(n, "UPRIGHTFRAME") || beginsWith(n, "UFRAME")) {
-//        *this = UprightFrame(any);
     } else {
         any.verifyName("CFrame::fromXYZYPRDegrees", "CoordinateFrame::fromXYZYPRDegrees");
         any.verifyType(Any::ARRAY);
@@ -77,18 +78,18 @@ CoordinateFrame::CoordinateFrame(const Any& any) {
         int s = any.size();
 
         *this = fromXYZYPRDegrees(any[0], any[1], any[2], 
-                                  (s > 3) ? (float)any[3].number() : 0.0f,
-                                  (s > 4) ? (float)any[4].number() : 0.0f,
-                                  (s > 5) ? (float)any[5].number() : 0.0f);
+                                  (s > 3) ? any[3].number() : 0.0f,
+                                  (s > 4) ? any[4].number() : 0.0f,
+                                  (s > 5) ? any[5].number() : 0.0f);
     }
 }
 
 
-Any CoordinateFrame::toAny() const {
+CoordinateFrame::operator Any() const {
     float x, y, z, yaw, pitch, roll;
     getXYZYPRDegrees(x, y, z, yaw, pitch, roll); 
     Any a(Any::ARRAY, "CFrame::fromXYZYPRDegrees");
-    a.append(x, y, z);
+    a.append(x, y, z, yaw);
     if ( ! G3D::fuzzyEq(yaw, 0.0f) || ! G3D::fuzzyEq(pitch, 0.0f) || ! G3D::fuzzyEq(roll, 0.0f)) {
         a.append(yaw);
         if (! G3D::fuzzyEq(pitch, 0.0f) || ! G3D::fuzzyEq(roll, 0.0f)) {
@@ -113,7 +114,11 @@ CoordinateFrame::CoordinateFrame() :
 
 CoordinateFrame CoordinateFrame::fromXYZYPRRadians(float x, float y, float z, float yaw, 
                                                    float pitch, float roll) {
-    const Matrix3& rotation = Matrix3::fromEulerAnglesYXZ(yaw, pitch, roll);
+    Matrix3 rotation = Matrix3::fromAxisAngle(Vector3::unitY(), yaw);
+    
+    rotation = Matrix3::fromAxisAngle(rotation.column(0), pitch) * rotation;
+    rotation = Matrix3::fromAxisAngle(rotation.column(2), roll) * rotation;
+
     const Vector3 translation(x, y, z);
     
     return CoordinateFrame(rotation, translation);
@@ -126,7 +131,28 @@ void CoordinateFrame::getXYZYPRRadians(float& x, float& y, float& z,
     y = translation.y;
     z = translation.z;
     
-    rotation.toEulerAnglesYXZ(yaw, pitch, roll);
+    const Vector3& look = lookVector();
+
+    if (abs(look.y) > 0.99f) {
+        // Looking nearly straight up or down
+
+        yaw   = G3D::pi() + atan2(look.x, look.z);
+        pitch = asin(look.y);
+        roll  = 0.0f;
+        
+    } else {
+
+        // Yaw cannot be affected by others, so pull it first
+        yaw = G3D::pi() + atan2(look.x, look.z);
+        
+        // Pitch is the elevation of the yaw vector
+        pitch = asin(look.y);
+        
+        Vector3 actualRight = rightVector();
+        Vector3 expectedRight = look.cross(Vector3::unitY());
+
+        roll = 0;//acos(actualRight.dot(expectedRight));  TODO
+    }
 }
 
 
@@ -208,55 +234,24 @@ std::string CoordinateFrame::toXML() const {
 
 
 Plane CoordinateFrame::toObjectSpace(const Plane& p) const {
-    // TODO
     Vector3 N, P;
     double d;
     p.getEquation(N, d);
     P = N * (float)d;
     P = pointToObjectSpace(P);
     N = normalToObjectSpace(N);
-    debugAssertM(isFinite(d), "Not implemented for infinite planes");
     return Plane(N, P);
 }
 
 
-Frustum CoordinateFrame::toWorldSpace(const Frustum& f) const {
-    Frustum g;
-    g.vertexPos.resize(f.vertexPos.size());
-    g.faceArray.resize(f.faceArray.size());
-
-    for (int i = 0; i < f.vertexPos.size(); ++i) {
-        g.vertexPos[i] = toWorldSpace(f.vertexPos[i]);
-    }
-    for (int i = 0; i < f.faceArray.size(); ++i) {
-        g.faceArray[i].plane = toWorldSpace(f.faceArray[i].plane);
-        for (int j = 0; j < 4; ++j) {
-            g.faceArray[i].vertexIndex[j] = f.faceArray[i].vertexIndex[j];
-        }
-    }
-
-    return g;
-}
-
-
-Plane CoordinateFrame::toWorldSpace(const Plane& plane) const {
-    // Since there is no scale factor, we don't have to 
-    // worry about the inverse transpose of the normal.
-    Vector3 normal;
-    float d;
-        
-    plane.getEquation(normal, d);
-        
-    const Vector3& newNormal = rotation * normal;
-        
-    if (isFinite(d)) {
-        d = (newNormal * -d + translation).dot(newNormal);
-        return Plane(newNormal, newNormal * d);
-    } else {
-        // When d is infinite, we can't multiply 0's by it without
-        // generating NaNs.
-        return Plane::fromEquation(newNormal.x, newNormal.y, newNormal.z, d);
-    }
+Plane CoordinateFrame::toWorldSpace(const Plane& p) const {
+    Vector3 N, P;
+    double d;
+    p.getEquation(N, d);
+    P = N * (float)d;
+    P = pointToWorldSpace(P);
+    N = normalToWorldSpace(N);
+    return Plane(N, P);
 }
 
 
@@ -290,20 +285,6 @@ Capsule CoordinateFrame::toWorldSpace(const Capsule& c) const {
 }
 
 
-void CoordinateFrame::toWorldSpace(const AABox& b, AABox& result) const {
-    if (b.isEmpty()) {
-        result = b;
-    } else if (! b.isFinite()) {
-        // We can't combine infinite elements under a matrix
-        // multiplication: if the computation performs inf-inf we'll
-        // get NaN.  So treat the box as infinite in all directions.
-        result = AABox::inf();
-    } else {
-        toWorldSpace(Box(b)).getBounds(result);
-    }
-}
-
-
 Box CoordinateFrame::toWorldSpace(const AABox& b) const {
     Box b2(b);
     return toWorldSpace(b2);
@@ -311,17 +292,18 @@ Box CoordinateFrame::toWorldSpace(const AABox& b) const {
 
 
 Box CoordinateFrame::toWorldSpace(const Box& b) const {
-    if(!b.isFinite()) {
-        return b;
-    }
     Box out(b);
-    out._center = pointToWorldSpace(b._center);
-    for (int i = 0; i < 3; ++i) {
-        out._edgeVector[i] = vectorToWorldSpace(out._edgeVector[i]);
+
+    for (int i = 0; i < 8; ++i) {
+        out._corner[i] = pointToWorldSpace(b._corner[i]);
+        debugAssert(! isNaN(out._corner[i].x));
     }
 
-    out._area   = b._area;
-    out._volume = b._volume;
+    for (int i = 0; i < 3; ++i) {
+        out._axis[i] = vectorToWorldSpace(b._axis[i]);
+    }
+
+    out._center = pointToWorldSpace(b._center);
 
     return out;
 }
@@ -394,25 +376,17 @@ void CoordinateFrame::lookAt(
     }
 
     up -= look * look.dot(up);
-    up = up.direction();
+    up.unitize();
 
     Vector3 z = -look;
     Vector3 x = -z.cross(up);
-    x = x.direction();
+    x.unitize();
 
     Vector3 y = z.cross(x);
 
     rotation.setColumn(0, x);
     rotation.setColumn(1, y);
     rotation.setColumn(2, z);
-}
-
-
-void CoordinateFrame::moveTowards(const CoordinateFrame& goal, float maxTranslation, float maxRotation) {
-    translation.moveTowards(goal.translation, maxTranslation);
-    Quat q(rotation);
-    q.moveTowards(Quat(goal.rotation), maxRotation);
-    rotation = Matrix3(q);
 }
 
 

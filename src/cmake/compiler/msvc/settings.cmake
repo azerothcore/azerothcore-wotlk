@@ -1,19 +1,14 @@
 #
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 # Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
 #
 
 # set up output paths for executable binaries (.exe-files, and .dll-files on DLL-capable platforms)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(MSVC_EXPECTED_VERSION 19.24)
-set(MSVC_EXPECTED_VERSION_STRING "Microsoft Visual Studio 2019 16.4")
-
-if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS MSVC_EXPECTED_VERSION)
-  message(FATAL_ERROR "MSVC: AzerothCore requires version ${MSVC_EXPECTED_VERSION} (${MSVC_EXPECTED_VERSION_STRING}) to build but found ${CMAKE_CXX_COMPILER_VERSION}")
-else()
-  message(STATUS "MSVC: Minimum version required is ${MSVC_EXPECTED_VERSION}, found ${CMAKE_CXX_COMPILER_VERSION} - ok!")
-endif()
+# set up output paths ofr static libraries etc (commented out - shown here as an example only)
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # CMake sets warning flags by default, however we manage it manually
 # for different core and dependency targets
@@ -23,11 +18,6 @@ string(REGEX REPLACE "/W[0-4] " "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 string(REGEX REPLACE "/W[0-4]$" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 string(REGEX REPLACE "/W[0-4] " "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 string(REGEX REPLACE "/W[0-4]$" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-
-# https://tinyurl.com/jxnc4s83
-target_compile_options(acore-compile-option-interface
-    INTERFACE
-      /utf-8)
 
 if(PLATFORM EQUAL 64)
   # This definition is necessary to work around a bug with Intellisense described
@@ -106,18 +96,10 @@ if(NOT WITH_WARNINGS)
       /wd4267
       /wd4619
       # /wd4512
-      )
+      )    
     message(STATUS "MSVC: Disabled generic compiletime warnings")
   endif()
 endif()
-
-# Ignore specific warnings
-# C4351: new behavior: elements of array 'x' will be default initialized
-# C4091: 'typedef ': ignored on left of '' when no variable is declared
-target_compile_options(acore-compile-option-interface
-  INTERFACE
-    /wd4351
-    /wd4091)
 
 # Specify the maximum PreCompiled Header memory allocation limit
 # Fixes a compiler-problem when using PCH - the /Ym flag is adjusted by the compiler in MSVC2012, hence we need to set an upper limit with /Zm to avoid discrepancies)
@@ -132,26 +114,3 @@ target_compile_options(acore-warning-interface
   INTERFACE
     /we4263
     /we4264)
-
-if(BUILD_SHARED_LIBS)
-  # C4251: needs to have dll-interface to be used by clients of class '...'
-  # C4275: non dll-interface class ...' used as base for dll-interface class '...'
-  target_compile_options(acore-compile-option-interface
-    INTERFACE
-      /wd4251
-      /wd4275)
-
-  message(STATUS "MSVC: Enabled shared linking")
-endif()
-
-# Disable incremental linking in debug builds.
-# To prevent linking getting stuck (which might be fixed in a later VS version).
-macro(DisableIncrementalLinking variable)
-string(REGEX REPLACE "/INCREMENTAL *" "" ${variable} "${${variable}}")
-set(${variable} "${${variable}} /INCREMENTAL:NO")
-endmacro()
-
-DisableIncrementalLinking(CMAKE_EXE_LINKER_FLAGS_DEBUG)
-DisableIncrementalLinking(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO)
-DisableIncrementalLinking(CMAKE_SHARED_LINKER_FLAGS_DEBUG)
-DisableIncrementalLinking(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO)

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "black_temple.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "black_temple.h"
 
 enum Yells
 {
@@ -42,9 +42,9 @@ class boss_najentus : public CreatureScript
 public:
     boss_najentus() : CreatureScript("boss_najentus") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackTempleAI<boss_najentusAI>(creature);
+        return GetInstanceAI<boss_najentusAI>(creature);
     }
 
     struct boss_najentusAI : public BossAI
@@ -53,12 +53,12 @@ public:
         {
         }
 
-        void Reset() override
+        void Reset()
         {
             BossAI::Reset();
         }
 
-        void KilledUnit(Unit* victim) override
+        void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && events.GetNextEventTime(EVENT_KILL_SPEAK) == 0)
             {
@@ -67,13 +67,13 @@ public:
             }
         }
 
-        void JustDied(Unit* killer) override
+        void JustDied(Unit* killer)
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* who) override
+        void EnterCombat(Unit* who)
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -84,7 +84,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_SHIELD, 60000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -130,60 +130,60 @@ public:
 
 class spell_najentus_needle_spine : public SpellScriptLoader
 {
-public:
-    spell_najentus_needle_spine() : SpellScriptLoader("spell_najentus_needle_spine") { }
+    public:
+        spell_najentus_needle_spine() : SpellScriptLoader("spell_najentus_needle_spine") { }
 
-    class spell_najentus_needle_spine_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_najentus_needle_spine_SpellScript);
-
-        void HandleDummy(SpellEffIndex  /*effIndex*/)
+        class spell_najentus_needle_spine_SpellScript : public SpellScript
         {
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, SPELL_NEEDLE_SPINE_DAMAGE, true);
-        }
+            PrepareSpellScript(spell_najentus_needle_spine_SpellScript);
 
-        void Register() override
+            void HandleDummy(SpellEffIndex  /*effIndex*/)
+            {
+                if (Unit* target = GetHitUnit())
+                    GetCaster()->CastSpell(target, SPELL_NEEDLE_SPINE_DAMAGE, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_najentus_needle_spine_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            OnEffectHitTarget += SpellEffectFn(spell_najentus_needle_spine_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            return new spell_najentus_needle_spine_SpellScript();
         }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_najentus_needle_spine_SpellScript();
-    }
 };
 
 class spell_najentus_hurl_spine : public SpellScriptLoader
 {
-public:
-    spell_najentus_hurl_spine() : SpellScriptLoader("spell_najentus_hurl_spine") { }
+    public:
+        spell_najentus_hurl_spine() : SpellScriptLoader("spell_najentus_hurl_spine") { }
 
-    class spell_najentus_hurl_spine_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_najentus_hurl_spine_SpellScript);
-
-        void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
+        class spell_najentus_hurl_spine_SpellScript : public SpellScript
         {
-            Unit* target = GetHitUnit();
-            if (target && target->HasAura(SPELL_TIDAL_SHIELD))
+            PrepareSpellScript(spell_najentus_hurl_spine_SpellScript);
+
+            void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
             {
-                target->RemoveAurasDueToSpell(SPELL_TIDAL_SHIELD);
-                target->CastSpell(target, SPELL_TIDAL_BURST, true);
+                Unit* target = GetHitUnit();
+                if (target && target->HasAura(SPELL_TIDAL_SHIELD))
+                {
+                    target->RemoveAurasDueToSpell(SPELL_TIDAL_SHIELD);
+                    target->CastSpell(target, SPELL_TIDAL_BURST, true);
+                }
             }
-        }
 
-        void Register() override
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_najentus_hurl_spine_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            OnEffectHitTarget += SpellEffectFn(spell_najentus_hurl_spine_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            return new spell_najentus_hurl_spine_SpellScript();
         }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_najentus_hurl_spine_SpellScript();
-    }
 };
 
 void AddSC_boss_najentus()

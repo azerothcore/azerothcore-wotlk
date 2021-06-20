@@ -31,6 +31,7 @@ class ACE_Export ACE_Event_Handler_Handle_Timeout_Upcall
   : private ACE_Copy_Disabled
 {
 public:
+  // = Initialization and termination methods.
   /// Constructor.
   ACE_Event_Handler_Handle_Timeout_Upcall (void);
 
@@ -82,9 +83,6 @@ public:
   int deletion (ACE_Timer_Queue &timer_queue,
                 ACE_Event_Handler *handler,
                 const void *arg);
-
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
 
 private:
 

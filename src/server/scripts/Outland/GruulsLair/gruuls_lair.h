@@ -5,11 +5,8 @@
 #ifndef GRUULS_LAIR_H_
 #define GRUULS_LAIR_H_
 
-#include "CreatureAI.h"
-#include "CreatureAIImpl.h"
 #include "SpellAuraEffects.h"
-
-#define GruulsLairScriptName "instance_gruuls_lair"
+#include "CreatureAI.h"
 
 enum DataTypes
 {
@@ -35,11 +32,5 @@ enum GameObjectIds
     GO_MAULGAR_DOOR             = 184468,
     GO_GRUUL_DOOR               = 184662
 };
-
-template <class AI, class T>
-inline AI* GetGruulsLairAI(T* obj)
-{
-    return GetInstanceAI<AI>(obj, GruulsLairScriptName);
-}
 
 #endif // GRUULS_LAIR_H_

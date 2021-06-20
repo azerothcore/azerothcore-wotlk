@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "shadow_labyrinth.h"
 
 class instance_shadow_labyrinth : public InstanceMapScript
@@ -11,7 +11,7 @@ class instance_shadow_labyrinth : public InstanceMapScript
 public:
     instance_shadow_labyrinth() : InstanceMapScript("instance_shadow_labyrinth", 555) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    InstanceScript* GetInstanceScript(InstanceMap* map) const
     {
         return new instance_shadow_labyrinth_InstanceMapScript(map);
     }
@@ -22,20 +22,24 @@ public:
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-        ObjectGuid m_uiHellmawGUID;
-        ObjectGuid m_uiRefectoryDoorGUID;
-        ObjectGuid m_uiScreamingHallDoorGUID;
+        uint64 m_uiHellmawGUID;
+        uint64 m_uiRefectoryDoorGUID;
+        uint64 m_uiScreamingHallDoorGUID;
 
         uint32 m_uiFelOverseerCount;
 
-        void Initialize() override
+        void Initialize()
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
+
+            m_uiHellmawGUID = 0;
+            m_uiRefectoryDoorGUID = 0;
+            m_uiScreamingHallDoorGUID = 0;
 
             m_uiFelOverseerCount = 0;
         }
 
-        bool IsEncounterInProgress() const override
+        bool IsEncounterInProgress() const
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS)
@@ -44,7 +48,7 @@ public:
             return false;
         }
 
-        void OnGameObjectCreate(GameObject* go) override
+        void OnGameObjectCreate(GameObject* go)
         {
             switch (go->GetEntry())
             {
@@ -61,7 +65,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature) override
+        void OnCreatureCreate(Creature* creature)
         {
             switch (creature->GetEntry())
             {
@@ -75,7 +79,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 uiData) override
+        void SetData(uint32 type, uint32 uiData)
         {
             switch (type)
             {
@@ -87,7 +91,7 @@ public:
                             cr->AI()->DoAction(1);
                     }
                     break;
-
+                
                 case DATA_BLACKHEARTTHEINCITEREVENT:
                     if (uiData == DONE)
                         DoUseDoorOrButton(m_uiRefectoryDoorGUID);
@@ -110,23 +114,23 @@ public:
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const override
+        uint32 GetData(uint32 type) const
         {
             if (type == TYPE_OVERSEER)
                 return m_auiEncounter[0];
             return 0;
         }
 
-        std::string GetSaveData() override
+        std::string GetSaveData()
         {
             std::ostringstream saveStream;
             saveStream << "S L " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' '
-                       << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << m_auiEncounter[4];
+                    << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << m_auiEncounter[4];
 
             return saveStream.str();
         }
 
-        void Load(const char* in) override
+        void Load(const char* in)
         {
             if (!in)
             {
@@ -152,6 +156,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
     };
+
 };
 
 void AddSC_instance_shadow_labyrinth()

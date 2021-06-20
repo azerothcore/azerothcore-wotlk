@@ -2,8 +2,8 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "violet_hold.h"
 
 enum Yells
@@ -50,14 +50,14 @@ class boss_xevozz : public CreatureScript
 public:
     boss_xevozz() : CreatureScript("boss_xevozz") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return GetVioletHoldAI<boss_xevozzAI>(pCreature);
+        return new boss_xevozzAI (pCreature);
     }
 
     struct boss_xevozzAI : public ScriptedAI
     {
-        boss_xevozzAI(Creature* c) : ScriptedAI(c), spheres(me)
+        boss_xevozzAI(Creature *c) : ScriptedAI(c), spheres(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -66,22 +66,22 @@ public:
         EventMap events;
         SummonList spheres;
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
             spheres.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE_VOLLEY, urand(16000, 20000));
+            events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE_VOLLEY, urand(16000,20000));
             events.RescheduleEvent(EVENT_SUMMON_SPHERES, 10000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -91,29 +91,29 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch(events.GetEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_ARCANE_BARRAGE_VOLLEY:
-                    me->CastSpell((Unit*)nullptr, SPELL_ARCANE_BARRAGE_VOLLEY, false);
+                    me->CastSpell((Unit*)NULL, SPELL_ARCANE_BARRAGE_VOLLEY, false);
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_ARCANE_BUFFET:
                     me->CastSpell(me->GetVictim(), SPELL_ARCANE_BUFFET, false);
+                    events.PopEvent();
                     break;
                 case EVENT_SUMMON_SPHERES:
                     {
                         Talk(SAY_SUMMON_ENERGY);
                         spheres.DespawnAll();
                         uint32 entry1 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3);
-                        me->CastSpell((Unit*)nullptr, entry1, true);
+                        me->CastSpell((Unit*)NULL, entry1, true);
                         if (IsHeroic())
                         {
                             uint32 entry2;
-                            do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); }
-                            while (entry1 == entry2);
-                            me->CastSpell((Unit*)nullptr, entry2, true);
+                            do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); } while (entry1 == entry2);
+                            me->CastSpell((Unit*)NULL, entry2, true);
                         }
                         events.RepeatEvent(45000);
                         events.RescheduleEvent(EVENT_SPELL_ARCANE_BUFFET, 5000);
@@ -124,8 +124,8 @@ public:
                     {
                         bool found = false;
                         if (pInstance)
-                            for (ObjectGuid guid : spheres)
-                                if (Creature* c = pInstance->instance->GetCreature(guid))
+                            for (std::list<uint64>::iterator itr = spheres.begin(); itr != spheres.end(); ++itr)
+                                if (Creature* c = pInstance->instance->GetCreature(*itr))
                                     if (me->GetDistance(c) < 3.0f)
                                     {
                                         c->CastSpell(me, SPELL_ARCANE_POWER, false);
@@ -147,7 +147,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* pSummoned) override
+        void JustSummoned(Creature* pSummoned)
         {
             if (pSummoned)
             {
@@ -155,21 +155,21 @@ public:
                 pSummoned->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                 spheres.Summon(pSummoned);
                 if (pInstance)
-                    pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
-        void SummonedCreatureDespawn(Creature* pSummoned) override
+        void SummonedCreatureDespawn(Creature *pSummoned)
         {
             if (pSummoned)
             {
                 spheres.Despawn(pSummoned);
                 if (pInstance)
-                    pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
             spheres.DespawnAll();
@@ -177,7 +177,7 @@ public:
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void KilledUnit(Unit* pVictim) override
+        void KilledUnit(Unit* pVictim)
         {
             if (pVictim && pVictim->GetGUID() == me->GetGUID())
                 return;
@@ -185,9 +185,9 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) override {}
+        void MoveInLineOfSight(Unit* /*who*/) {}
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode()
         {
             ScriptedAI::EnterEvadeMode();
             events.Reset();

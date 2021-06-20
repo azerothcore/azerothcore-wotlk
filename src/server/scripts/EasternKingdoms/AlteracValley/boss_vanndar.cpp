@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 
 enum Yells
 {
     YELL_AGGRO                                    = 0,
     YELL_EVADE                                    = 1,
-    //YELL_RESPAWN1                                 = -1810010, // Missing in database
-    //YELL_RESPAWN2                                 = -1810011, // Missing in database
+  //YELL_RESPAWN1                                 = -1810010, // Missing in database
+  //YELL_RESPAWN2                                 = -1810011, // Missing in database
     YELL_RANDOM                                   = 2,
     YELL_SPELL                                    = 3,
 };
@@ -39,7 +39,7 @@ public:
         uint32 ResetTimer;
         uint32 YellTimer;
 
-        void Reset() override
+        void Reset()
         {
             AvatarTimer        = 3 * IN_MILLISECONDS;
             ThunderclapTimer   = 4 * IN_MILLISECONDS;
@@ -48,12 +48,12 @@ public:
             YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             Talk(YELL_AGGRO);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -62,29 +62,25 @@ public:
             {
                 DoCastVictim(SPELL_AVATAR);
                 AvatarTimer =  urand(15 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-            }
-            else AvatarTimer -= diff;
+            } else AvatarTimer -= diff;
 
             if (ThunderclapTimer <= diff)
             {
                 DoCastVictim(SPELL_THUNDERCLAP);
                 ThunderclapTimer = urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-            }
-            else ThunderclapTimer -= diff;
+            } else ThunderclapTimer -= diff;
 
             if (StormboltTimer <= diff)
             {
                 DoCastVictim(SPELL_STORMBOLT);
                 StormboltTimer = urand(10 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
-            }
-            else StormboltTimer -= diff;
+            } else StormboltTimer -= diff;
 
             if (YellTimer <= diff)
             {
                 Talk(YELL_RANDOM);
                 YellTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS); //20 to 30 seconds
-            }
-            else YellTimer -= diff;
+            } else YellTimer -= diff;
 
             // check if creature is not outside of building
             if (ResetTimer <= diff)
@@ -95,14 +91,13 @@ public:
                     Talk(YELL_EVADE);
                 }
                 ResetTimer = 5 * IN_MILLISECONDS;
-            }
-            else ResetTimer -= diff;
+            } else ResetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new boss_vanndarAI(creature);
     }

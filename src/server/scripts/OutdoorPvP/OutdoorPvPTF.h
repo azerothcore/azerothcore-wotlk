@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -112,62 +112,66 @@ enum TFTowerStates
 
 class OPvPCapturePointTF : public OPvPCapturePoint
 {
-public:
-    OPvPCapturePointTF(OutdoorPvP* pvp, OutdoorPvPTF_TowerType type);
+    public:
 
-    bool Update(uint32 diff) override;
+        OPvPCapturePointTF(OutdoorPvP* pvp, OutdoorPvPTF_TowerType type);
 
-    void ChangeState() override;
+        bool Update(uint32 diff);
 
-    void SendChangePhase() override;
+        void ChangeState();
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+        void SendChangePhase();
 
-    // used when player is activated/inactivated in the area
-    bool HandlePlayerEnter(Player* player) override;
-    void HandlePlayerLeave(Player* player) override;
+        void FillInitialWorldStates(WorldPacket & data);
 
-    void UpdateTowerState();
+        // used when player is activated/inactivated in the area
+        bool HandlePlayerEnter(Player* player);
+        void HandlePlayerLeave(Player* player);
 
-protected:
-    OutdoorPvPTF_TowerType m_TowerType;
+        void UpdateTowerState();
 
-    uint32 m_TowerState;
+    protected:
+
+        OutdoorPvPTF_TowerType m_TowerType;
+
+        uint32 m_TowerState;
 };
 
 class OutdoorPvPTF : public OutdoorPvP
 {
-public:
-    OutdoorPvPTF();
+    public:
 
-    bool SetupOutdoorPvP() override;
+        OutdoorPvPTF();
 
-    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
-    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
+        bool SetupOutdoorPvP();
 
-    bool Update(uint32 diff) override;
+        void HandlePlayerEnterZone(Player* player, uint32 zone);
+        void HandlePlayerLeaveZone(Player* player, uint32 zone);
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+        bool Update(uint32 diff);
 
-    void SendRemoveWorldStates(Player* player) override;
+        void FillInitialWorldStates(WorldPacket &data);
 
-    uint32 GetAllianceTowersControlled() const;
-    void SetAllianceTowersControlled(uint32 count);
+        void SendRemoveWorldStates(Player* player);
 
-    uint32 GetHordeTowersControlled() const;
-    void SetHordeTowersControlled(uint32 count);
+        uint32 GetAllianceTowersControlled() const;
+        void SetAllianceTowersControlled(uint32 count);
 
-    bool IsLocked() const;
+        uint32 GetHordeTowersControlled() const;
+        void SetHordeTowersControlled(uint32 count);
 
-private:
-    bool m_IsLocked;
-    uint32 m_LockTimer;
-    uint32 m_LockTimerUpdate;
+        bool IsLocked() const;
 
-    uint32 m_AllianceTowersControlled;
-    uint32 m_HordeTowersControlled;
+    private:
 
-    uint32 hours_left, second_digit, first_digit;
+        bool m_IsLocked;
+        uint32 m_LockTimer;
+        uint32 m_LockTimerUpdate;
+
+        uint32 m_AllianceTowersControlled;
+        uint32 m_HordeTowersControlled;
+
+        uint32 hours_left, second_digit, first_digit;
 };
 
 #endif

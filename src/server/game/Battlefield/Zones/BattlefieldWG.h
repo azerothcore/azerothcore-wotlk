@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,10 +7,10 @@
 #ifndef BATTLEFIELD_WG_
 #define BATTLEFIELD_WG_
 
-#include "Battlefield.h"
 #include "ObjectAccessor.h"
-#include "World.h"
 #include "WorldPacket.h"
+#include "Battlefield.h"
+#include "World.h"
 
 class Group;
 class BattlefieldWG;
@@ -25,11 +25,13 @@ typedef std::set<WGWorkshop*> Workshop;
 typedef std::set<Group*> GroupSet;
 //typedef std::set<WintergraspCapturePoint *> CapturePointSet; unused ?
 
+
 const uint32 VehNumWorldState[2] = { 3680, 3490 };
 const uint32 MaxVehNumWorldState[2] = { 3681, 3491 };
 const uint32 ClockWorldState[2] = { 3781, 4354 };
 const uint32 WintergraspFaction[3] = { 1, 2, 35 };
 float const WintergraspStalkerPos[4]    = { 4948.985f, 2937.789f, 550.5172f, 1.815142f };
+
 
 enum WintergraspSpells
 {
@@ -120,13 +122,13 @@ enum WintergraspAreaIds
 
 class BfGraveyardWG : public BfGraveyard
 {
-public:
-    BfGraveyardWG(BattlefieldWG* Bf);
+    public:
+        BfGraveyardWG(BattlefieldWG *Bf);
 
-    void SetTextId(uint32 textid) { m_GossipTextId = textid; }
-    uint32 GetTextId() { return m_GossipTextId; }
-protected:
-    uint32 m_GossipTextId;
+        void SetTextId(uint32 textid) { m_GossipTextId = textid; }
+        uint32 GetTextId() { return m_GossipTextId; }
+    protected:
+        uint32 m_GossipTextId;
 };
 
 enum WGGraveyardId
@@ -220,14 +222,12 @@ struct BfWGCoordGY
     TeamId startcontrol;
 };
 
-const uint32 WGQuest[2][6] =
-{
+const uint32 WGQuest[2][6] = {
     { 13186, 13181, 13222, 13538, 13177, 13179 },
     { 13185, 13183, 13223, 13539, 13178, 13180 },
 };
 // 7 in sql, 7 in header
-const BfWGCoordGY WGGraveYard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
-{
+const BfWGCoordGY WGGraveYard[BATTLEFIELD_WG_GRAVEYARD_MAX] = {
     { 5104.750f, 2300.940f, 368.579f, 0.733038f, 1329, BATTLEFIELD_WG_GY_WORKSHOP_NE, BATTLEFIELD_WG_GOSSIPTEXT_GY_NE, TEAM_NEUTRAL },
     { 5099.120f, 3466.036f, 368.484f, 5.317802f, 1330, BATTLEFIELD_WG_GY_WORKSHOP_NW, BATTLEFIELD_WG_GOSSIPTEXT_GY_NW, TEAM_NEUTRAL },
     { 4314.648f, 2408.522f, 392.642f, 6.268125f, 1333, BATTLEFIELD_WG_GY_WORKSHOP_SE, BATTLEFIELD_WG_GOSSIPTEXT_GY_SE, TEAM_NEUTRAL },
@@ -243,16 +243,16 @@ const BfWGCoordGY WGGraveYard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
 
 class WintergraspCapturePoint : public BfCapturePoint
 {
-public:
-    WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
+    public:
+        WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
 
-    void LinkToWorkshop(WGWorkshop* workshop) { m_Workshop = workshop; }
+        void LinkToWorkshop(WGWorkshop* workshop) { m_Workshop = workshop; }
 
-    void ChangeTeam(TeamId oldteam) override;
-    TeamId GetTeam() const { return m_team; }
+        void ChangeTeam(TeamId oldteam);
+        TeamId GetTeam() const { return m_team; }
 
-protected:
-    WGWorkshop* m_Workshop;
+    protected:
+        WGWorkshop* m_Workshop;
 };
 
 /* ######################### *
@@ -261,206 +261,206 @@ protected:
 
 class BattlefieldWG : public Battlefield
 {
-public:
-    ~BattlefieldWG() override;
-    /**
-     * \brief Called when the battle start
-     * - Spawn relic and turret
-     * - Rebuild tower and wall
-     * - Invite player to war
-     */
-    void OnBattleStart() override;
+    public:
+        ~BattlefieldWG();
+        /**
+         * \brief Called when the battle start
+         * - Spawn relic and turret
+         * - Rebuild tower and wall
+         * - Invite player to war
+         */
+        void OnBattleStart();
 
-    /**
-     * \brief Called when battle end
-     * - Remove relic and turret
-     * - Change banner/npc in keep if it needed
-     * - Saving battlestate
-     * - Reward honor/mark to player
-     * - Remove vehicle
-     * \param endByTimer : true if battle ended when timer is at 00:00, false if battle ended by clicking on relic
-     */
-    void OnBattleEnd(bool endByTimer) override;
+        /**
+         * \brief Called when battle end
+         * - Remove relic and turret
+         * - Change banner/npc in keep if it needed
+         * - Saving battlestate
+         * - Reward honor/mark to player
+         * - Remove vehicle
+         * \param endByTimer : true if battle ended when timer is at 00:00, false if battle ended by clicking on relic
+         */
+        void OnBattleEnd(bool endByTimer);
 
-    /**
-     * \brief Called when grouping starts (15 minutes before battlestart)
-     * - Invite all player in zone to join queue
-     */
-    void OnStartGrouping() override;
+        /**
+         * \brief Called when grouping starts (15 minutes before battlestart)
+         * - Invite all player in zone to join queue
+         */
+        void OnStartGrouping();
 
-    /**
-     * \brief Called when player accept invite to join battle
-     * - Update aura
-     * - Teleport if it needed
-     * - Update worldstate
-     * - Update tenacity
-     * \param player: Player who accepted invite
-     */
-    void OnPlayerJoinWar(Player* player) override;
+        /**
+         * \brief Called when player accept invite to join battle
+         * - Update aura
+         * - Teleport if it needed
+         * - Update worldstate
+         * - Update tenacity
+         * \param player: Player who accepted invite
+         */
+        void OnPlayerJoinWar(Player* player);
 
-    /**
-     * \brief Called when player left the battle
-     * - Update player aura
-     * \param player : Player who left the battle
-     */
-    void OnPlayerLeaveWar(Player* player) override;
+        /**
+         * \brief Called when player left the battle
+         * - Update player aura
+         * \param player : Player who left the battle
+         */
+        void OnPlayerLeaveWar(Player* player);
 
-    /**
-     * \brief Called when player left the WG zone
-     * \param player : Player who left the zone
-     */
-    void OnPlayerLeaveZone(Player* player) override;
+        /**
+         * \brief Called when player left the WG zone
+         * \param player : Player who left the zone
+         */
+        void OnPlayerLeaveZone(Player* player);
 
-    /**
-     * \brief Called when player enters in WG zone
-     * - Update aura
-     * - Update worldstate
-     * \param player : Player who enters the zone
-     */
-    void OnPlayerEnterZone(Player* player) override;
+        /**
+         * \brief Called when player enters in WG zone
+         * - Update aura
+         * - Update worldstate
+         * \param player : Player who enters the zone
+         */
+        void OnPlayerEnterZone(Player* player);
 
-    /**
-     * \brief Called for update battlefield data
-     * - Save battle timer in database every minutes
-     * - Update imunity aura from graveyard
-     * \param diff : time elapsed since the last call (in ms)
-     */
-    bool Update(uint32 diff) override;
+        /**
+         * \brief Called for update battlefield data
+         * - Save battle timer in database every minutes
+         * - Update imunity aura from graveyard
+         * \param diff : time elapsed since the last call (in ms)
+         */
+        bool Update(uint32 diff);
 
-    /**
-     * \brief Called when a creature is created
-     * - Update vehicle count
-     */
-    void OnCreatureCreate(Creature* creature) override;
+        /**
+         * \brief Called when a creature is created
+         * - Update vehicle count
+         */
+        void OnCreatureCreate(Creature* creature);
 
-    /**
-     * \brief Called when a creature is removed
-     * - Update vehicle count
-     */
-    void OnCreatureRemove(Creature* creature) override;
+        /**
+         * \brief Called when a creature is removed
+         * - Update vehicle count
+         */
+        void OnCreatureRemove(Creature* creature);
 
-    /**
-     * \brief Called when a gameobject is created
-     */
-    void OnGameObjectCreate(GameObject* go) override;
+        /**
+         * \brief Called when a gameobject is created
+         */
+        void OnGameObjectCreate(GameObject* go);
 
-    /**
-     * \brief Called when a wall/tower is broken
-     * - Update quest
-     */
-    void BrokenWallOrTower(TeamId team);
+        /**
+         * \brief Called when a wall/tower is broken
+         * - Update quest
+         */
+        void BrokenWallOrTower(TeamId team);
 
-    /**
-     * \brief Called when a tower is damaged
-     * - Update tower count (for reward calcul)
-     */
-    void UpdateDamagedTowerCount(TeamId team);
+        /**
+         * \brief Called when a tower is damaged
+         * - Update tower count (for reward calcul)
+         */
+        void UpdateDamagedTowerCount(TeamId team);
 
-    /**
-     * \brief Called when tower is broken
-     * - Update tower buff
-     * - check if three south tower is down for remove 10 minutes to wg
-     */
-    void UpdatedDestroyedTowerCount(TeamId team, GameObject* go);
+        /**
+         * \brief Called when tower is broken
+         * - Update tower buff
+         * - check if three south tower is down for remove 10 minutes to wg
+         */
+        void UpdatedDestroyedTowerCount(TeamId team, GameObject* go);
 
-    //void DoCompleteOrIncrementAchievement(uint32 achievement, Player* player, uint8 incrementNumber = 1);
+        //void DoCompleteOrIncrementAchievement(uint32 achievement, Player* player, uint8 incrementNumber = 1);
+        
+        void RemoveAurasFromPlayer(Player* player);
 
-    void RemoveAurasFromPlayer(Player* player);
+        /**
+         * \brief Called when battlefield is setup, at server start
+         */
+        bool SetupBattlefield();
 
-    /**
-     * \brief Called when battlefield is setup, at server start
-     */
-    bool SetupBattlefield() override;
+        /// Return pointer to relic object
+        GameObject* GetRelic() { return ObjectAccessor::GetObjectInWorld(m_titansRelic, (GameObject*)NULL); }
 
-    /// Return pointer to relic object
-    GameObject* GetRelic() { return GetGameObject(m_titansRelic); }
+        /// Define relic object
+        //void SetRelic(GameObject* relic) { m_titansRelic = relic; }
 
-    /// Define relic object
-    //void SetRelic(GameObject* relic) { m_titansRelic = relic; }
+        /// Check if players can interact with the relic (Only if the last door has been broken)
+        bool CanInteractWithRelic() { return m_isRelicInteractible; }
 
-    /// Check if players can interact with the relic (Only if the last door has been broken)
-    bool CanInteractWithRelic() { return m_isRelicInteractible; }
+        /// Define if player can interact with the relic
+        void SetRelicInteractible(bool allow) { m_isRelicInteractible = allow; }
 
-    /// Define if player can interact with the relic
-    void SetRelicInteractible(bool allow) { m_isRelicInteractible = allow; }
+        /// Vehicle world states update
+        void UpdateCounterVehicle(bool init);
+        void UpdateVehicleCountWG();
+        void CapturePointTaken(uint32 areaId);
 
-    /// Vehicle world states update
-    void UpdateCounterVehicle(bool init);
-    void UpdateVehicleCountWG();
-    void CapturePointTaken(uint32 areaId);
+        void SendInitWorldStatesTo(Player* player);
+        void SendInitWorldStatesToAll();
+        void FillInitialWorldStates(WorldPacket& data);
 
-    void SendInitWorldStatesTo(Player* player);
-    void SendInitWorldStatesToAll() override;
-    void FillInitialWorldStates(WorldPacket& data) override;
+        void HandleKill(Player* killer, Unit* victim);
+        void OnUnitDeath(Unit* unit);
+        void PromotePlayer(Player* killer);
 
-    void HandleKill(Player* killer, Unit* victim) override;
-    void OnUnitDeath(Unit* unit) override;
-    void PromotePlayer(Player* killer);
+        uint32 GetHonorBuff(int32 stack) const;
+        void UpdateTenacity();
+        void AddUpdateTenacity(Player* player);
+        void RemoveUpdateTenacity(Player* player);
+        void ProcessEvent(WorldObject *obj, uint32 eventId);
 
-    uint32 GetHonorBuff(int32 stack) const;
-    void UpdateTenacity();
-    void AddUpdateTenacity(Player* player);
-    void RemoveUpdateTenacity(Player* player);
-    void ProcessEvent(WorldObject* obj, uint32 eventId) override;
+        bool FindAndRemoveVehicleFromList(Unit* vehicle);
 
-    bool FindAndRemoveVehicleFromList(Unit* vehicle);
+        // returns the graveyardId in the specified area.
+        uint8 GetSpiritGraveyardId(uint32 areaId) const;
+        uint32 GetAreaByGraveyardId(uint8 gId) const;
 
-    // returns the graveyardId in the specified area.
-    uint8 GetSpiritGraveyardId(uint32 areaId) const;
-    uint32 GetAreaByGraveyardId(uint8 gId) const;
+        uint32 GetData(uint32 data) const;
 
-    uint32 GetData(uint32 data) const override;
-
-    bool IsKeepNpc(uint32 entry)
-    {
-        switch (entry)
+        bool IsKeepNpc(uint32 entry)
         {
-            case BATTLEFIELD_WG_NPC_GUARD_H:
-            case BATTLEFIELD_WG_NPC_GUARD_A:
-            case BATTLEFIELD_WG_NPC_VIERON_BLAZEFEATHER:
-            case BATTLEFIELD_WG_NPC_BOWYER_RANDOLPH:
-            case BATTLEFIELD_WG_NPC_STONE_GUARD_MUKAR:
-            case BATTLEFIELD_WG_NPC_KNIGHT_DAMERON:
-            case BATTLEFIELD_WG_NPC_HOODOO_MASTER_FU_JIN:
-            case BATTLEFIELD_WG_NPC_SORCERESS_KAYLANA:
-            case BATTLEFIELD_WG_NPC_CHAMPION_ROS_SLAI:
-            case BATTLEFIELD_WG_NPC_MARSHAL_MAGRUDER:
-            case BATTLEFIELD_WG_NPC_COMMANDER_DARDOSH:
-            case BATTLEFIELD_WG_NPC_COMMANDER_ZANNETH:
-            case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_KILRATH:
-            case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_AHBRAMIS:
-            case BATTLEFIELD_WG_NPC_HORDE_WARBRINGER:
-            case BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL:
-            case BATTLEFIELD_WG_NPC_SIEGESMITH_STRONGHOOF:
-            case BATTLEFIELD_WG_NPC_SIEGE_MASTER_STOUTHANDLE:
-            case BATTLEFIELD_WG_NPC_PRIMALIST_MULFORT:
-            case BATTLEFIELD_WG_NPC_ANCHORITE_TESSA:
-            case BATTLEFIELD_WG_NPC_LIEUTENANT_MURP:
-            case BATTLEFIELD_WG_NPC_SENIOR_DEMOLITIONIST_LEGOSO:
-                return true;
+            switch (entry)
+            {
+                case BATTLEFIELD_WG_NPC_GUARD_H:
+                case BATTLEFIELD_WG_NPC_GUARD_A:
+                case BATTLEFIELD_WG_NPC_VIERON_BLAZEFEATHER:
+                case BATTLEFIELD_WG_NPC_BOWYER_RANDOLPH:
+                case BATTLEFIELD_WG_NPC_STONE_GUARD_MUKAR:
+                case BATTLEFIELD_WG_NPC_KNIGHT_DAMERON:
+                case BATTLEFIELD_WG_NPC_HOODOO_MASTER_FU_JIN:
+                case BATTLEFIELD_WG_NPC_SORCERESS_KAYLANA:
+                case BATTLEFIELD_WG_NPC_CHAMPION_ROS_SLAI:
+                case BATTLEFIELD_WG_NPC_MARSHAL_MAGRUDER:
+                case BATTLEFIELD_WG_NPC_COMMANDER_DARDOSH:
+                case BATTLEFIELD_WG_NPC_COMMANDER_ZANNETH:
+                case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_KILRATH:
+                case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_AHBRAMIS:
+                case BATTLEFIELD_WG_NPC_HORDE_WARBRINGER:
+                case BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL:
+                case BATTLEFIELD_WG_NPC_SIEGESMITH_STRONGHOOF:
+                case BATTLEFIELD_WG_NPC_SIEGE_MASTER_STOUTHANDLE:
+                case BATTLEFIELD_WG_NPC_PRIMALIST_MULFORT:
+                case BATTLEFIELD_WG_NPC_ANCHORITE_TESSA:
+                case BATTLEFIELD_WG_NPC_LIEUTENANT_MURP:
+                case BATTLEFIELD_WG_NPC_SENIOR_DEMOLITIONIST_LEGOSO:
+                    return true;
+            }
+            return false;
         }
-        return false;
-    }
-protected:
-    bool m_isRelicInteractible;
+    protected:
+        bool m_isRelicInteractible;
 
-    Workshop WorkshopsList;
+        Workshop WorkshopsList;
 
-    GameObjectSet DefenderPortalList;
-    GameObjectSet m_KeepGameObject[2];
-    GameObjectBuilding BuildingsInZone;
+        GameObjectSet DefenderPortalList;
+        GameObjectSet m_KeepGameObject[2];
+        GameObjectBuilding BuildingsInZone;
 
-    GuidUnorderedSet m_vehicles[2];
-    GuidUnorderedSet CanonList;
-    GuidUnorderedSet KeepCreature[2];
-    GuidUnorderedSet OutsideCreature[2];
-    GuidUnorderedSet m_updateTenacityList;
+        GuidSet m_vehicles[2];
+        GuidSet CanonList;
+        GuidSet KeepCreature[2];
+        GuidSet OutsideCreature[2];
+        GuidSet m_updateTenacityList;
 
-    int32 m_tenacityStack;
-    uint32 m_tenacityUpdateTimer;
-    uint32 m_saveTimer;
+        int32 m_tenacityStack;
+        uint32 m_tenacityUpdateTimer;
+        uint32 m_saveTimer;
 
-    ObjectGuid m_titansRelic;
+        uint64 m_titansRelic;
 };
 
 const uint8 WG_MAX_OBJ = 32;
@@ -593,8 +593,7 @@ struct WintergraspBuildingSpawnData
     uint32 destroyText;
 };
 
-const WintergraspBuildingSpawnData WGGameObjectBuilding[WG_MAX_OBJ] =
-{
+const WintergraspBuildingSpawnData WGGameObjectBuilding[WG_MAX_OBJ] = {
     // Wall (Not spawned in db)
     // Entry  WS    X        Y        Z        O         type                          NameID
     { 190219, 3749, 5371.46f, 3047.47f, 407.571f, 3.14159f, BATTLEFIELD_WG_OBJECTTYPE_WALL, 0, 0 },
@@ -641,8 +640,7 @@ const WintergraspBuildingSpawnData WGGameObjectBuilding[WG_MAX_OBJ] =
     { 191810, 3773, 5397.11f, 2841.54f, 425.899f, 3.14159f, BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST, 0, 0 },
 };
 
-const Position WGTurret[WG_MAX_TURRET] =
-{
+const Position WGTurret[WG_MAX_TURRET] = {
     { 5391.19f, 3060.8f,  419.616f, 1.69557f },
     { 5266.75f, 2976.5f,  421.067f, 3.20354f },
     { 5234.86f, 2948.8f,  420.88f,  1.61311f },
@@ -786,8 +784,7 @@ struct WintergraspTowerData
 uint8 const WG_MAX_ATTACKTOWERS = 3;
 // 192414 : 0 in sql, 1 in header
 // 192278 : 0 in sql, 3 in header
-const WintergraspTowerData AttackTowers[WG_MAX_ATTACKTOWERS] =
-{
+const WintergraspTowerData AttackTowers[WG_MAX_ATTACKTOWERS] = {
     // West tower
     {
         190356,
@@ -1075,10 +1072,11 @@ const WGWorkshopData WorkshopsData[WG_MAX_WORKSHOP] =
 // Structure for different buildings that can be destroyed during battle
 struct BfWGGameObjectBuilding
 {
-    BfWGGameObjectBuilding(BattlefieldWG* WG)
+    BfWGGameObjectBuilding(BattlefieldWG *WG)
     {
         m_WG = WG;
         m_Team = TEAM_ALLIANCE;
+        m_Build = 0;
         m_Type = 0;
         m_WorldState = 0;
         m_State = 0;
@@ -1090,10 +1088,10 @@ struct BfWGGameObjectBuilding
     TeamId m_Team;
 
     // WG object
-    BattlefieldWG* m_WG;
+    BattlefieldWG *m_WG;
 
     // Linked gameobject
-    ObjectGuid m_Build;
+    uint64 m_Build;
 
     // eWGGameObjectBuildingType
     uint32 m_Type;
@@ -1112,10 +1110,10 @@ struct BfWGGameObjectBuilding
     GameObjectSet m_GameObjectList[2];
 
     // Creature associations
-    GuidUnorderedSet m_CreatureBottomList[2];
-    GuidUnorderedSet m_CreatureTopList[2];
-    GuidUnorderedSet m_TowerCannonBottomList;
-    GuidUnorderedSet m_TurretTopList;
+    GuidSet m_CreatureBottomList[2];
+    GuidSet m_CreatureTopList[2];
+    GuidSet m_TowerCannonBottomList;
+    GuidSet m_TurretTopList;
 
     void Rebuild()
     {
@@ -1135,11 +1133,11 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-        GameObject* go = m_WG->GetGameObject(m_Build);
+        GameObject* go = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
         if (go)
         {
             // Rebuild gameobject
-            go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
+            go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
             go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[m_Team]);
         }
 
@@ -1160,13 +1158,15 @@ struct BfWGGameObjectBuilding
         if (m_damagedText)                                       // tower damage + name
             m_WG->SendWarningToAllInZone(m_damagedText);
 
-        for (GuidUnorderedSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
-            if (Creature* creature = m_WG->GetCreature(*itr))
-                m_WG->HideNpc(creature);
+        for (GuidSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+                if (Creature* creature = unit->ToCreature())
+                    m_WG->HideNpc(creature);
 
-        for (GuidUnorderedSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
-            if (Creature* creature = m_WG->GetCreature(*itr))
-                m_WG->HideNpc(creature);
+        for (GuidSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+                if (Creature* creature = unit->ToCreature())
+                    m_WG->HideNpc(creature);
 
         if (m_Type == BATTLEFIELD_WG_OBJECTTYPE_TOWER)
             m_WG->UpdateDamagedTowerCount(m_WG->GetAttackerTeam());
@@ -1187,32 +1187,27 @@ struct BfWGGameObjectBuilding
         {
             // Inform the global wintergrasp script of the destruction of this object
             case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), m_WG->GetGameObject(m_Build));
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
                 m_WG->SetRelicInteractible(true);
                 if (GameObject* go = m_WG->GetRelic())
                     go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 else
-                    LOG_ERROR("server", "BattlefieldWG: Relic not found.");
+                    sLog->outError("BattlefieldWG: Relic not found.");
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
             case BATTLEFIELD_WG_OBJECTTYPE_WALL:
             case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), m_WG->GetGameObject(m_Build));
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
                 break;
         }
 
         m_WG->BrokenWallOrTower(TeamId(m_Team));
     }
 
-    void Init(GameObject* gobj, uint32 type, uint32 worldstate, uint8 damageText, uint8 destroyText)
+    void Init(GameObject *gobj, uint32 type, uint32 worldstate, uint8 damageText, uint8 destroyText)
     {
-        if (!gobj)
-        {
-            return;
-        }
-
         // GameObject associated to object
         m_Build = gobj->GetGUID();
 
@@ -1249,7 +1244,7 @@ struct BfWGGameObjectBuilding
             {
                 case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT:
                 case BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT:
-                    gobj->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
+                    gobj->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
                     break;
                 case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY:
                 case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DESTROY:
@@ -1340,7 +1335,7 @@ struct BfWGGameObjectBuilding
             {
                 Position towerCannonPos;
                 TowerCannon[towerid].TurretTop[i].GetPosition(&towerCannonPos);
-                if (Creature* turret = m_WG->SpawnCreature(NPC_WINTERGRASP_TOWER_CANNON, towerCannonPos, TEAM_ALLIANCE))
+                if (Creature *turret = m_WG->SpawnCreature(NPC_WINTERGRASP_TOWER_CANNON, towerCannonPos, TEAM_ALLIANCE))
                 {
                     m_TurretTopList.insert(turret->GetGUID());
                     m_WG->HideNpc(turret);
@@ -1352,21 +1347,25 @@ struct BfWGGameObjectBuilding
 
     void UpdateCreatureAndGo()
     {
-        for (GuidUnorderedSet::const_iterator itr = m_CreatureTopList[m_WG->GetDefenderTeam()].begin(); itr != m_CreatureTopList[m_WG->GetDefenderTeam()].end(); ++itr)
-            if (Creature* creature = m_WG->GetCreature(*itr))
-                m_WG->HideNpc(creature);
+        for (GuidSet::const_iterator itr = m_CreatureTopList[m_WG->GetDefenderTeam()].begin(); itr != m_CreatureTopList[m_WG->GetDefenderTeam()].end(); ++itr)
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+                if (Creature* creature = unit->ToCreature())
+                    m_WG->HideNpc(creature);
 
-        for (GuidUnorderedSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
-            if (Creature* creature = m_WG->GetCreature(*itr))
-                m_WG->ShowNpc(creature, true);
+        for (GuidSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+                if (Creature* creature = unit->ToCreature())
+                    m_WG->ShowNpc(creature, true);
 
-        for (GuidUnorderedSet::const_iterator itr = m_CreatureBottomList[m_WG->GetDefenderTeam()].begin(); itr != m_CreatureBottomList[m_WG->GetDefenderTeam()].end(); ++itr)
-            if (Creature* creature = m_WG->GetCreature(*itr))
-                m_WG->HideNpc(creature);
+        for (GuidSet::const_iterator itr = m_CreatureBottomList[m_WG->GetDefenderTeam()].begin(); itr != m_CreatureBottomList[m_WG->GetDefenderTeam()].end(); ++itr)
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+                if (Creature* creature = unit->ToCreature())
+                    m_WG->HideNpc(creature);
 
-        for (GuidUnorderedSet::const_iterator itr = m_CreatureBottomList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureBottomList[m_WG->GetAttackerTeam()].end(); ++itr)
-            if (Creature* creature = m_WG->GetCreature(*itr))
-                m_WG->ShowNpc(creature, true);
+        for (GuidSet::const_iterator itr = m_CreatureBottomList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureBottomList[m_WG->GetAttackerTeam()].end(); ++itr)
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+                if (Creature* creature = unit->ToCreature())
+                    m_WG->ShowNpc(creature, true);
 
         for (GameObjectSet::const_iterator itr = m_GameObjectList[m_WG->GetDefenderTeam()].begin(); itr != m_GameObjectList[m_WG->GetDefenderTeam()].end(); ++itr)
             (*itr)->SetRespawnTime(RESPAWN_ONE_DAY);
@@ -1377,7 +1376,7 @@ struct BfWGGameObjectBuilding
 
     void UpdateTurretAttack(bool disable)
     {
-        GameObject* build = m_WG->GetGameObject(m_Build);
+        GameObject* build = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
         if (!build)
             return;
 
@@ -1397,27 +1396,33 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-        for (GuidUnorderedSet::const_iterator itr = m_TowerCannonBottomList.begin(); itr != m_TowerCannonBottomList.end(); ++itr)
+        for (GuidSet::const_iterator itr = m_TowerCannonBottomList.begin(); itr != m_TowerCannonBottomList.end(); ++itr)
         {
-            if (Creature* creature = m_WG->GetCreature(*itr))
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
             {
-                creature->setFaction(faction);
-                if (disable)
-                    m_WG->HideNpc(creature);
-                else
-                    m_WG->ShowNpc(creature, true);
+                if (Creature* creature = unit->ToCreature())
+                {
+                    creature->setFaction(faction);
+                    if (disable)
+                        m_WG->HideNpc(creature);
+                    else
+                        m_WG->ShowNpc(creature, true);
+                }
             }
         }
 
-        for (GuidUnorderedSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
+        for (GuidSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
         {
-            if (Creature* creature = m_WG->GetCreature(*itr))
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
             {
-                creature->setFaction(faction);
-                if (disable)
-                    m_WG->HideNpc(creature);
-                else
-                    m_WG->ShowNpc(creature, true);
+                if (Creature* creature = unit->ToCreature())
+                {
+                    creature->setFaction(faction);
+                    if (disable)
+                        m_WG->HideNpc(creature);
+                    else
+                        m_WG->ShowNpc(creature, true);
+                }
             }
         }
     }
@@ -1454,31 +1459,31 @@ struct WGWorkshop
         switch (team)
         {
             case TEAM_NEUTRAL:
-                {
-                    // Send warning message to all player to inform a faction attack to a workshop
-                    // alliance / horde attacking a workshop
-                    bf->SendWarningToAllInZone(teamControl ? WorkshopsData[workshopId].attackText : (WorkshopsData[workshopId].attackText + 2));
-                    break;
-                }
+            {
+                // Send warning message to all player to inform a faction attack to a workshop
+                // alliance / horde attacking a workshop
+                bf->SendWarningToAllInZone(teamControl ? WorkshopsData[workshopId].attackText : (WorkshopsData[workshopId].attackText + 2));
+                break;
+            }
             case TEAM_ALLIANCE:
             case TEAM_HORDE:
-                {
-                    // Updating worldstate
-                    state = team == TEAM_ALLIANCE ? BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT : BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT;
-                    bf->SendUpdateWorldState(WorkshopsData[workshopId].worldstate, state);
+            {
+                // Updating worldstate
+                state = team == TEAM_ALLIANCE ? BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT : BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT;
+                bf->SendUpdateWorldState(WorkshopsData[workshopId].worldstate, state);
 
-                    // Warning message
-                    if (!init)                              // workshop taken - alliance
-                        bf->SendWarningToAllInZone(team == TEAM_ALLIANCE ? WorkshopsData[workshopId].takenText : (WorkshopsData[workshopId].takenText + 2));
+                // Warning message
+                if (!init)                              // workshop taken - alliance
+                    bf->SendWarningToAllInZone(team == TEAM_ALLIANCE ? WorkshopsData[workshopId].takenText : (WorkshopsData[workshopId].takenText + 2));
 
-                    // Found associate graveyard and update it
-                    if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-                        if (bf->GetGraveyardById(workshopId))
-                            bf->GetGraveyardById(workshopId)->GiveControlTo(team);
+                // Found associate graveyard and update it
+                if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+                    if (bf->GetGraveyardById(workshopId))
+                        bf->GetGraveyardById(workshopId)->GiveControlTo(team);
 
-                    teamControl = team;
-                    break;
-                }
+                teamControl = team;
+                break;
+            }
         }
 
         if (!init)

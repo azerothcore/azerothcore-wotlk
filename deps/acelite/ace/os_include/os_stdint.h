@@ -34,8 +34,7 @@ extern "C"
 
 // BSD style types
 #if defined (ACE_LACKS_SYS_TYPES_H) \
-       || (defined (__GLIBC__) && !defined (_BSD_SOURCE)) \
-       || defined (ACE_LACKS_BSD_TYPES)
+       || (defined (__GLIBC__) && !defined (_BSD_SOURCE))
       typedef unsigned char u_char;
       typedef unsigned short u_short;
       typedef unsigned int u_int;

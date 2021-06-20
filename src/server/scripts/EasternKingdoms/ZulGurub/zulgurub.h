@@ -1,13 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #ifndef DEF_ZULGURUB_H
 #define DEF_ZULGURUB_H
-
-#include "CreatureAIImpl.h"
 
 uint32 const EncounterCount = 13;
 
@@ -47,6 +45,7 @@ enum CreatureIds
     NPC_OHGAN               = 14988, // Mandokir Event
     NPC_VILEBRANCH_SPEAKER  = 11391, // Mandokir Event
     NPC_CHAINED_SPIRT       = 15117  // Mandokir Event
+
 };
 
 enum GameobjectIds
@@ -55,10 +54,10 @@ enum GameobjectIds
     GO_GONG_OF_BETHEKK      = 180526  // Arlokk Event
 };
 
-template <class AI, class T>
-inline AI* GetZulGurubAI(T* obj)
+template<class AI>
+AI* GetZulGurubAI(Creature* creature)
 {
-    return GetInstanceAI<AI>(obj, ZGScriptName);
+    return GetInstanceAI<AI>(creature, ZGScriptName);
 }
 
 #endif

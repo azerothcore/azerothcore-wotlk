@@ -1,12 +1,12 @@
 /**
- \file G3D/BinaryInput.h
+ @file BinaryInput.h
  
- \maintainer Morgan McGuire, http://graphics.cs.williams.edu
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
- \created 2001-08-09
- \edited  2013-01-03
+ @created 2001-08-09
+ @edited  2010-03-19
 
- Copyright 2000-2012, Morgan McGuire.
+ Copyright 2000-2010, Morgan McGuire.
  All rights reserved.
  */
 
@@ -26,7 +26,6 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include "G3D/platform.h"
-#include "G3D/unorm8.h"
 #include "G3D/Array.h"
 #include "G3D/Color4.h"
 #include "G3D/Color3.h"
@@ -40,7 +39,7 @@
 
 namespace G3D {
 
-#if defined(G3D_WINDOWS) || defined(G3D_LINUX)
+#if defined(G3D_WIN32) || defined(G3D_LINUX)
     // Allow writing of integers to non-word aligned locations.
     // This is legal on x86, but not on other platforms.
     #define G3D_ALLOW_UNALIGNED_WRITES
@@ -70,15 +69,8 @@ class BinaryInput {
 private:
 
     // The initial buffer will be no larger than this, but 
-    // may grow if a large memory read occurs.  750 MB
-    static const int64
-        INITIAL_BUFFER_LENGTH =
-#ifdef G3D_64BIT
-        5000000000L  // 5 GB
-#else
-        750000000 // 750 MB
-#endif
-    ;
+    // may grow if a large memory read occurs.  50 MB
+    enum {INITIAL_BUFFER_LENGTH = 50000000};
 
     /**
      is the file big or little endian
@@ -102,7 +94,6 @@ private:
 
     /** When operating on huge files, we cannot load the whole file into memory.
         This is the file position to which buffer[0] corresponds.
-        Even 32-bit code can load 64-bit files in chunks, so this is not size_t
         */
     int64           m_alreadyRead;
 
@@ -131,8 +122,14 @@ private:
     void loadIntoMemory(int64 startPosition, int64 minLength = 0);
 
     /** Verifies that at least this number of bytes can be read.*/
-    void prepareToRead(int64 nbytes);
+    inline void prepareToRead(int64 nbytes) {
+        debugAssertM(m_length > 0, m_filename + " not found or corrupt.");
+        debugAssertM(m_pos + nbytes + m_alreadyRead <= m_length, "Read past end of file.");
 
+        if (m_pos + nbytes > m_bufferLength) {
+            loadIntoMemory(m_pos + m_alreadyRead, nbytes);    
+        }
+    }
 
     // Not implemented on purpose, don't use
     BinaryInput(const BinaryInput&);
@@ -168,7 +165,6 @@ public:
 
      To decompress part of a file, you can follow the following paradigm:
 
-     \htmlonly
      <PRE>
         BinaryInput master(...);
 
@@ -180,7 +176,6 @@ public:
 
         // Now read from subset (it is ok for master to go out of scope)
      </PRE>
-     \endhtmlonly
      */
     BinaryInput(
         const uint8*        data,
@@ -205,12 +200,23 @@ public:
     }
 
     /**
+     Returns a pointer to the internal memory buffer.
+     May throw an exception for huge files.
+     */
+    const uint8* getCArray() const {
+        if (m_alreadyRead > 0) {
+            throw "Cannot getCArray for a huge file";
+        }
+        return m_buffer;
+    }
+
+    /**
      Performs bounds checks in debug mode.  [] are relative to
      the start of the file, not the current position.
      Seeks to the new position before reading (and leaves 
      that as the current position)
      */
-   uint8 operator[](int64 n) {
+    inline uint8 operator[](int64 n) {
         setPosition(n);
         return readUInt8();
     }
@@ -218,11 +224,11 @@ public:
     /**
      Returns the length of the file in bytes.
      */
-   int64 getLength() const {
+    inline int64 getLength() const {
         return m_length;
     }
 
-   int64 size() const {
+    inline int64 size() const {
         return getLength();
     }
 
@@ -230,26 +236,15 @@ public:
      Returns the current byte position in the file,
      where 0 is the beginning and getLength() - 1 is the end.
      */
-    int64 getPosition() const {
+    inline int64 getPosition() const {
         return m_pos + m_alreadyRead;
-    }
-
-    /**
-     Returns a pointer to the internal memory buffer.
-     May throw an exception for huge files.
-     */
-    const uint8* getCArray() {
-        if (m_alreadyRead > 0 || m_bufferLength < m_length) {
-            throw "Cannot getCArray for a huge file";
-        }
-        return m_buffer;
     }
 
     /**
      Sets the position.  Cannot set past length.
      May throw a char* when seeking backwards more than 10 MB on a huge file.
      */
-    void setPosition(int64 p) {
+    inline void setPosition(int64 p) {
         debugAssertM(p <= m_length, "Read past end of file");
         m_pos = p - m_alreadyRead;
         if ((m_pos < 0) || (m_pos > m_bufferLength)) {
@@ -260,31 +255,25 @@ public:
     /**
      Goes back to the beginning of the file.
      */
-   void reset() {
+    inline void reset() {
         setPosition(0);
     }
 
-    void readBytes(void* bytes, int64 n);
-
-    int8 readInt8() {
+    inline int8 readInt8() {
         prepareToRead(1);
         return m_buffer[m_pos++];
     }
-    
-    bool readBool8() {
+
+    inline bool readBool8() {
         return (readInt8() != 0);
     }
-    
-    uint8 readUInt8() {
+
+    inline uint8 readUInt8() {
         prepareToRead(1);
         return ((uint8*)m_buffer)[m_pos++];
     }
-    
-    unorm8 readUNorm8() {
-        return unorm8::fromBits(readUInt8());
-    }
 
-    uint16 readUInt16() {
+    uint16 inline readUInt16() {
         prepareToRead(2);
 
         m_pos += 2;
@@ -306,12 +295,12 @@ public:
 
     }
 
-   int16 readInt16() {
+    inline int16 readInt16() {
         uint16 a = readUInt16();
         return *(int16*)&a;
     }
 
-   uint32 readUInt32() {
+    inline uint32 readUInt32() {
         prepareToRead(4);
 
         m_pos += 4;
@@ -337,19 +326,19 @@ public:
     }
 
 
-   int32 readInt32() {
+    inline int32 readInt32() {
         uint32 a = readUInt32();
         return *(int32*)&a;
     }
 
     uint64 readUInt64();
 
-   int64 readInt64() {
+    inline int64 readInt64() {
         uint64 a = readUInt64();
         return *(int64*)&a;
     }
 
-   float32 readFloat32() {
+    inline float32 readFloat32() {
         union {
             uint32 a;
             float32 b;
@@ -358,7 +347,7 @@ public:
         return b;
     }    
 
-   float64 readFloat64() {
+    inline float64 readFloat64() {
         union {
             uint64 a;
             float64 b;
@@ -367,34 +356,31 @@ public:
         return b;
     }
 
-    /**
-     Always consumes \a maxLength characters.  Reads a string until NULL or \a maxLength characters. Does not require NULL termination.
-     */
-    std::string readString(int64 maxLength);
+    void readBytes(void* bytes, int64 n);
 
     /**
-     Reads a string until NULL or end of file.
+     Reads an n character string.  The string is not
+     required to end in NULL in the file but will
+     always be a proper std::string when returned.
+     */
+    std::string readString(int64 n);
+
+    /**
+     Reads until NULL or the end of the file is encountered.
      */
     std::string readString();
 
-    /** Read a string (which may contain NULLs) of exactly numBytes bytes, including the final terminator if there is one.  If there is a NULL in the string before
-        the end, then only the part up to the first NULL is returned although all bytes are read.*/      
-    std::string readFixedLengthString(int numBytes);
-
-    /** 
-     Reads a string until NULL, newline ("&#92;r", "&#92;n", "&#92;r&#92;n", "&#92;n&#92;r") or the end of the file is encountered. Consumes the newline.
-     */
+    /** Reads until \r, \r\n, \n\r, \n or the end of the file is encountered. Consumes the newline.*/
     std::string readStringNewline();
 
     /**
      Reads until NULL or the end of the file is encountered.
      If the string has odd length (including NULL), reads 
-     another byte.  This is a common format for 16-bit alignment
-     in files.
+     another byte.
      */
     std::string readStringEven();
 
-    /** Reads a uint32 and then calls readString(maxLength) with that value as the length. */
+
     std::string readString32();
 
     Vector4 readVector4();
@@ -407,15 +393,15 @@ public:
     /**
      Skips ahead n bytes.
      */
-   void skip(int64 n) {
+    inline void skip(int64 n) {
         setPosition(m_pos + m_alreadyRead + n);
     }
 
     /**
       Returns true if the position is not at the end of the file
     */
-   bool hasMore() const {
-    return m_pos + m_alreadyRead < m_length;
+    inline bool hasMore() const {
+	return m_pos + m_alreadyRead < m_length;
     }
 
     /** Prepares for bit reading via readBits.  Only readBits can be

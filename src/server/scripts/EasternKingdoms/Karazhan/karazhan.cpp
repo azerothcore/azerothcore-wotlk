@@ -1,8 +1,8 @@
-/*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*/
+ /*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ */
 
 /* ScriptData
 SDName: Karazhan
@@ -17,12 +17,12 @@ npc_berthold
 npc_image_of_medivh
 EndContentData */
 
-#include "karazhan.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "karazhan.h"
+#include "ScriptedEscortAI.h"
+#include "Player.h"
 
 enum Spells
 {
@@ -71,7 +71,7 @@ struct Dialogue
     uint32 timer;
 };
 
-static Dialogue OzDialogue[] =
+static Dialogue OzDialogue[]=
 {
     {0, 6000},
     {1, 18000},
@@ -79,7 +79,7 @@ static Dialogue OzDialogue[] =
     {3, 15000}
 };
 
-static Dialogue HoodDialogue[] =
+static Dialogue HoodDialogue[]=
 {
     {4, 6000},
     {5, 10000},
@@ -87,7 +87,7 @@ static Dialogue HoodDialogue[] =
     {7, 15000}
 };
 
-static Dialogue RAJDialogue[] =
+static Dialogue RAJDialogue[]=
 {
     {8, 5000},
     {9, 7000},
@@ -96,7 +96,7 @@ static Dialogue RAJDialogue[] =
 };
 
 // Entries and spawn locations for creatures in Oz event
-float Spawns[6][2] =
+float Spawns[6][2]=
 {
     {17535, -10896},                                        // Dorothee
     {17546, -10891},                                        // Roar
@@ -126,7 +126,7 @@ public:
 
         InstanceScript* instance;
 
-        ObjectGuid m_uiSpotlightGUID;
+        uint64 m_uiSpotlightGUID;
 
         uint32 TalkCount;
         uint32 TalkTimer;
@@ -138,7 +138,7 @@ public:
 
         void Reset() override
         {
-            m_uiSpotlightGUID.Clear();
+            m_uiSpotlightGUID = 0;
 
             TalkCount = 0;
             TalkTimer = 2000;
@@ -168,15 +168,15 @@ public:
             {
                 case 0:
                     DoCast(me, SPELL_TUXEDO, false);
-                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
+                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_STAGEDOORLEFT));
                     break;
                 case 4:
                     TalkCount = 0;
                     SetEscortPaused(true);
 
                     if (Creature* spotlight = me->SummonCreature(NPC_SPOTLIGHT,
-                                              me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f,
-                                              TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000))
+                        me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f,
+                        TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000))
                     {
                         spotlight->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         spotlight->CastSpell(spotlight, SPELL_SPOTLIGHT, false);
@@ -184,12 +184,12 @@ public:
                     }
                     break;
                 case 8:
-                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
+                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_STAGEDOORLEFT));
                     PerformanceReady = true;
                     break;
                 case 9:
                     PrepareEncounter();
-                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_CURTAINS));
+                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_CURTAINS));
                     break;
             }
         }
@@ -202,7 +202,7 @@ public:
             {
                 case EVENT_OZ:
                     if (OzDialogue[count].textid)
-                        text = OzDialogue[count].textid;
+                         text = OzDialogue[count].textid;
                     if (OzDialogue[count].timer)
                         TalkTimer = OzDialogue[count].timer;
                     break;
@@ -215,21 +215,21 @@ public:
                     break;
 
                 case EVENT_RAJ:
-                    if (RAJDialogue[count].textid)
-                        text = RAJDialogue[count].textid;
+                     if (RAJDialogue[count].textid)
+                         text = RAJDialogue[count].textid;
                     if (RAJDialogue[count].timer)
                         TalkTimer = RAJDialogue[count].timer;
                     break;
             }
 
             if (text)
-                CreatureAI::Talk(text);
+                 CreatureAI::Talk(text);
         }
 
         void PrepareEncounter()
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("scripts.ai", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
 #endif
             uint8 index = 0;
             uint8 count = 0;
@@ -242,11 +242,11 @@ public:
                     break;
                 case EVENT_HOOD:
                     index = 4;
-                    count = index + 1;
+                    count = index+1;
                     break;
                 case EVENT_RAJ:
                     index = 5;
-                    count = index + 1;
+                    count = index+1;
                     break;
             }
 
@@ -255,7 +255,7 @@ public:
                 uint32 entry = ((uint32)Spawns[index][0]);
                 float PosX = Spawns[index][1];
 
-                if (Creature* creature = me->SummonCreature(entry, PosX, SPAWN_Y, SPAWN_Z, SPAWN_O, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
+                if (Creature* creature = me->SummonCreature(entry, PosX, SPAWN_Y, SPAWN_Z, SPAWN_O, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*2*IN_MILLISECONDS))
                 {
                     // In case database has bad flags
                     creature->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
@@ -285,8 +285,7 @@ public:
 
                     Talk(TalkCount);
                     ++TalkCount;
-                }
-                else TalkTimer -= diff;
+                } else TalkTimer -= diff;
             }
 
             if (PerformanceReady)
@@ -299,7 +298,7 @@ public:
                         if (!map->IsDungeon())
                             return;
 
-                        Map::PlayerList const& PlayerList = map->GetPlayers();
+                        Map::PlayerList const &PlayerList = map->GetPlayers();
                         if (PlayerList.isEmpty())
                             return;
 
@@ -321,8 +320,7 @@ public:
                         }
 
                         WipeTimer = 15000;
-                    }
-                    else WipeTimer -= diff;
+                    } else WipeTimer -= diff;
                 }
             }
         }
@@ -336,7 +334,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, OZ_GOSSIP2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, OZ_GOSSIP2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 SendGossipMenuFor(player, 8971, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
@@ -395,7 +393,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetKarazhanAI<npc_barnesAI>(creature);
+        return new npc_barnesAI(creature);
     }
 };
 
@@ -413,6 +411,7 @@ public:
 #define SAY_DIALOG_ARCANAGOS_8      "What have you done, wizard? This cannot be! I'm burning from... within!"
 #define SAY_DIALOG_MEDIVH_9         "He should not have angered me. I must go... recover my strength now..."
 
+
 //static float MedivPos[4] = {-11161.49f, -1902.24f, 91.48f, 1.94f};
 static float ArcanagosPos[4] = {-11169.75f, -1881.48f, 107.39f, 4.83f};
 
@@ -421,9 +420,9 @@ class npc_image_of_medivh : public CreatureScript
 public:
     npc_image_of_medivh() : CreatureScript("npc_image_of_medivh") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetKarazhanAI<npc_image_of_medivhAI>(creature);
+        return new npc_image_of_medivhAI(creature);
     }
 
     struct npc_image_of_medivhAI : public ScriptedAI
@@ -437,7 +436,7 @@ public:
 
         InstanceScript* instance;
 
-        ObjectGuid ArcanagosGUID;
+        uint64 ArcanagosGUID;
 
         uint32 YellTimer;
         uint8 Step;
@@ -446,13 +445,13 @@ public:
 
         bool EventStarted;
 
-        void Reset() override
+        void Reset()
         {
-            ArcanagosGUID.Clear();
+            ArcanagosGUID = 0;
             MTimer = 0;
             ATimer = 0;
 
-            if (instance && !instance->GetGuidData(DATA_IMAGE_OF_MEDIVH))
+            if (instance && instance->GetData64(DATA_IMAGE_OF_MEDIVH) == 0)
             {
                 Creature* Arcanagos = me->SummonCreature(NPC_ARCANAGOS, ArcanagosPos[0], ArcanagosPos[1], ArcanagosPos[2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 if (!Arcanagos)
@@ -461,7 +460,7 @@ public:
                     return;
                 }
 
-                instance->SetGuidData(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
+                instance->SetData64(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
                 EventStarted = true;
                 ArcanagosGUID = Arcanagos->GetGUID();
 
@@ -474,97 +473,98 @@ public:
                 me->DespawnOrUnsummon();
         }
 
-        void EnterCombat(Unit* /*who*/) override {}
+        void EnterCombat(Unit* /*who*/) {}
 
         uint32 NextStep(uint32 Step)
         {
             switch(Step)
             {
-                case 1:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL, 0);
-                    return 10000;
-                case 2:
-                    if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_2, LANG_UNIVERSAL, 0);
-                    return 20000;
-                case 3:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_3, LANG_UNIVERSAL, 0);
-                    return 10000;
-                case 4:
-                    if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_4, LANG_UNIVERSAL, 0);
-                    return 20000;
-                case 5:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_5, LANG_UNIVERSAL, 0);
-                    return 20000;
-                case 6:
-                    if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL, 0);
+            case 1:
+                me->MonsterYell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL, 0);
+                return 10000;
+            case 2:
+                if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                    arca->MonsterYell(SAY_DIALOG_ARCANAGOS_2, LANG_UNIVERSAL, 0);
+                return 20000;
+            case 3:
+                me->MonsterYell(SAY_DIALOG_MEDIVH_3, LANG_UNIVERSAL, 0);
+                return 10000;
+            case 4:
+                if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                    arca->MonsterYell(SAY_DIALOG_ARCANAGOS_4, LANG_UNIVERSAL, 0);
+                return 20000;
+            case 5:
+                me->MonsterYell(SAY_DIALOG_MEDIVH_5, LANG_UNIVERSAL, 0);
+                return 20000;
+            case 6:
+                if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                    arca->MonsterYell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL, 0);
 
-                    ATimer = 5500;
-                    MTimer = 6600;
-                    return 10000;
-                case 7:
-                    return 1000;
-                case 8:
-                    me->CastSpell(me, SPELL_MANA_SHIELD, true);
-                    return 5500;
-                case 9:
-                    me->MonsterTextEmote(EMOTE_DIALOG_MEDIVH_7, 0, false);
-                    me->CastSpell(me, 30972, true);
-                    return 10000;
-                case 10:
-                    me->RemoveAurasDueToSpell(30972);
-                    if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        me->CastSpell(arca, SPELL_CONFLAGRATION_BLAST, false);
-                    return 1000;
-                case 11:
-                    if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL, 0);
-                    return 5000;
-                case 12:
-                    if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                ATimer = 5500;
+                MTimer = 6600;
+                return 10000;
+            case 7:
+                return 1000;
+            case 8:
+                me->CastSpell(me, SPELL_MANA_SHIELD, true);
+                return 5500;
+            case 9:
+                me->MonsterTextEmote(EMOTE_DIALOG_MEDIVH_7, 0, false);
+                me->CastSpell(me, 30972, true);
+                return 10000;
+            case 10:
+                me->RemoveAurasDueToSpell(30972);
+                if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                    me->CastSpell(arca, SPELL_CONFLAGRATION_BLAST, false);
+                return 1000;
+            case 11:
+                if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                    arca->MonsterYell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL, 0);
+                return 5000;
+            case 12:
+                if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                {
+                    arca->SetSpeed(MOVE_RUN, 2.0f);
+                    arca->GetMotionMaster()->MovePoint(0, -11010.82f, -1761.18f, 156.47f);
+                    arca->InterruptNonMeleeSpells(true);
+                }
+                return 10000;
+            case 13:
+                me->MonsterYell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL, 0);
+                return 10000;
+            case 14:
+                if (me->GetMap()->IsDungeon())
+                {
+                    InstanceMap::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+                    for (InstanceMap::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                     {
-                        arca->SetSpeed(MOVE_RUN, 2.0f);
-                        arca->GetMotionMaster()->MovePoint(0, -11010.82f, -1761.18f, 156.47f);
-                        arca->InterruptNonMeleeSpells(true);
-                    }
-                    return 10000;
-                case 13:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL, 0);
-                    return 10000;
-                case 14:
-                    if (me->GetMap()->IsDungeon())
-                    {
-                        InstanceMap::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                        for (InstanceMap::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        if (i->GetSource()->GetQuestStatus(9645) == QUEST_STATUS_INCOMPLETE)
                         {
-                            if (i->GetSource()->GetQuestStatus(9645) == QUEST_STATUS_INCOMPLETE)
-                            {
-                                i->GetSource()->GroupEventHappens(9645, me);
-                                break;
-                            }
+                            i->GetSource()->GroupEventHappens(9645, me);
+                            break;
                         }
                     }
+                }
 
-                    me->DespawnOrUnsummon(100);
-                    if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->DespawnOrUnsummon(100);
+                me->DespawnOrUnsummon(100);
+                if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                    arca->DespawnOrUnsummon(100);
 
-                    return 5000;
-                default:
-                    return 2000;
+                return 5000;
+            default:
+                return 2000;
             }
+
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
+
             if (YellTimer <= diff)
             {
                 if (EventStarted)
                     YellTimer = NextStep(Step++);
-            }
-            else YellTimer -= diff;
+            } else YellTimer -= diff;
 
             if (Step >= 7 && Step <= 8)
             {
@@ -585,6 +585,7 @@ public:
             }
         }
     };
+
 };
 
 void AddSC_karazhan()

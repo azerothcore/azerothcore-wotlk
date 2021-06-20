@@ -36,7 +36,7 @@ void MeshBuilder::commit(std::string& n, Array<int>& indexArray, Array<Vector3>&
         close = minEdgeLen * 0.1;
     }
 
-    MeshAlg::computeWeld(triList, outvertexArray, toNew, toOld, (float)close);
+    MeshAlg::computeWeld(triList, outvertexArray, toNew, toOld, close);
 
     // Construct triangles
     for (int t = 0; t < triList.size(); t += 3) {
@@ -62,21 +62,19 @@ void MeshBuilder::centerTriList() {
 
     computeBounds(vmin, vmax);
 
-    const Vector3 diagonal = vmax - vmin;
-    float scale = max(max(diagonal.x, diagonal.y), diagonal.z) / 2.0f;
+    Vector3 diagonal = vmax - vmin;
+    double scale = max(max(diagonal.x, diagonal.y), diagonal.z) / 2;
     debugAssert(scale > 0);
 
-    const Vector3 translation = vmin + diagonal / 2.0f;
+    Vector3 translation = vmin + diagonal / 2;
 
     // Center and scale all vertices in the input list
     int v;
 
-    if (scaleAndCenter) {
-        //Matrix3 rot90 = Matrix3::fromAxisAngle(Vector3::UNIT_Y, toRadians(180)) * Matrix3::fromAxisAngle(Vector3::UNIT_X, toRadians(90));
-        for (v = 0; v < triList.size(); ++v) {
-            triList[v] = (triList[v] - translation) / scale;
-            //triList[v] = rot90 * triList[v];
-        }
+    //Matrix3 rot90 = Matrix3::fromAxisAngle(Vector3::UNIT_Y, toRadians(180)) * Matrix3::fromAxisAngle(Vector3::UNIT_X, toRadians(90));
+    for (v = 0; v < triList.size(); ++v) {
+        triList[v] = (triList[v] - translation) / scale;
+        //triList[v] = rot90 * triList[v];
     }
 }
 
@@ -96,9 +94,9 @@ void MeshBuilder::computeBounds(Vector3& min, Vector3& max) {
 void MeshBuilder::addTriangle(const Vector3& a, const Vector3& b, const Vector3& c) {
     triList.append(a, b, c);
 
-    if (_twoSided) {
-        triList.append(c, b, a);
-    }
+	if (_twoSided) {
+	    triList.append(c, b, a);
+	}
 }
 
 
@@ -109,7 +107,7 @@ void MeshBuilder::addQuad(const Vector3& a, const Vector3& b, const Vector3& c, 
 
 
 void MeshBuilder::addTriangle(const Triangle& t) {
-    addTriangle(t.vertex(0), t.vertex(1), t.vertex(2));
+	addTriangle(t.vertex(0), t.vertex(1), t.vertex(2));
 }
 
 } // namespace

@@ -4,7 +4,7 @@
 /**
  *  @file    Pipe.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //==========================================================================
 
@@ -42,6 +42,7 @@ class ACE_Time_Value;
 class ACE_Export ACE_Pipe
 {
 public:
+  // = Initialization and termination.
   /// Default constructor (does nothing...).
   ACE_Pipe (void);
 
@@ -109,7 +110,6 @@ public:
   /// Recv iovecs via <::readv>.
   ssize_t recv (iovec iov[], int n) const;
 
-#if !defined (ACE_LACKS_VA_FUNCTIONS)
   /**
    * Send N char *ptrs and int lengths.  Note that the char *'s
    * precede the ints (basically, an varargs version of writev).  The
@@ -126,7 +126,6 @@ public:
    * number of tuple pairs!
    */
   ssize_t recv (size_t n, ...) const;
-#endif /* !ACE_LACKS_VA_FUNCTIONS */
 
   /// Send @a n bytes via Win32 WriteFile using overlapped I/O.
   ssize_t send (const void *buf,

@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "blackrock_spire.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "blackrock_spire.h"
 
 enum Spells
 {
@@ -50,12 +50,12 @@ public:
     {
         boss_drakkisathAI(Creature* creature) : BossAI(creature, DATA_GENERAL_DRAKKISATH) { }
 
-        void Reset() override
+        void Reset()
         {
             _Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             _EnterCombat();
             CallForHelp();
@@ -72,16 +72,17 @@ public:
             me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
             for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
             {
-                (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
+                if ((*itr)->GetGUID())
+                    (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
             }
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             _JustDied();
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -117,9 +118,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackrockSpireAI<boss_drakkisathAI>(creature);
+        return new boss_drakkisathAI(creature);
     }
 };
 
@@ -134,7 +135,7 @@ public:
 
         EventMap _events;
 
-        void EnterCombat(Unit* who) override
+        void EnterCombat(Unit* who)
         {
             _events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 12800));
             _events.ScheduleEvent(EVENT_KNOCKDOWN, urand(5600, 15400));
@@ -144,18 +145,20 @@ public:
             me->GetCreaturesWithEntryInRange(GeneralDrakkisath, 15.0f, GeneralDrakkisathEntry);
             for (std::list<Creature*>::const_iterator itr = GeneralDrakkisath.begin(); itr != GeneralDrakkisath.end(); ++itr)
             {
-                (*itr)->ToCreature()->AI()->AttackStart(who);
+                if ((*itr)->GetGUID())
+                    (*itr)->ToCreature()->AI()->AttackStart(who);
             }
 
             std::list<Creature*> ChromaticEliteGuards;
             me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
             for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
             {
-                (*itr)->ToCreature()->AI()->AttackStart(who);
+                if ((*itr)->GetGUID())
+                    (*itr)->ToCreature()->AI()->AttackStart(who);
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -182,7 +185,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new chromatic_elite_guardAI(creature);
     }

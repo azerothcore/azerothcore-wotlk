@@ -1,0 +1,29 @@
+//  -*- MPC -*- now wouldn't this be cool...
+project(ACE_Qt4Reactor_moc) : acedefaults, ace_qt4 {
+  custom_only = 1
+  MOC_Files {
+    QtReactor.h
+  }
+}
+
+project(ACE_Qt4Reactor) : acedefaults, install, acelib, ace_output, ace_qt4 {
+  after       += ACE_Qt4Reactor_moc
+  sharedname   = ACE_QtReactor
+  dynamicflags += ACE_QTREACTOR_BUILD_DLL
+
+  MOC_Files {
+  }
+
+  Source_Files {
+    QtReactor_moc.cpp
+    QtReactor.cpp
+  }
+
+  Header_Files {
+    ACE_QtReactor_export.h
+  }
+
+  specific {
+    install_dir = ace/QtReactor
+  }
+}

@@ -9,25 +9,25 @@
 
 #include "mpq_libmpq04.h"
 #include "wmo.h"
-#include <cstdlib>
 #include <string>
+#include "stdlib.h"
 
 class ADTFile;
 
 class WDTFile
 {
+private:
+    MPQFile WDT;
+    string filename;
 public:
     WDTFile(char* file_name, char* file_name1);
     ~WDTFile(void);
+    bool init(char* map_id, unsigned int mapID);
 
-    bool init(uint32 mapId);
+    string* gWmoInstansName;
+    int gnWMO;
+
     ADTFile* GetMap(int x, int z);
-
-    std::vector<std::string> _wmoNames;
-
-private:
-    MPQFile _file;
-    std::string filename;
 };
 
 #endif

@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "sethekk_halls.h"
 
 enum TailonkingIkiss
@@ -40,9 +40,9 @@ class boss_talon_king_ikiss : public CreatureScript
 public:
     boss_talon_king_ikiss() : CreatureScript("boss_talon_king_ikiss") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetSethekkHallsAI<boss_talon_king_ikissAI>(creature);
+        return new boss_talon_king_ikissAI (creature);
     }
 
     struct boss_talon_king_ikissAI : public ScriptedAI
@@ -54,12 +54,12 @@ public:
         EventMap events;
         bool _spoken;
 
-        void Reset() override
+        void Reset()
         {
             _spoken = false;
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void MoveInLineOfSight(Unit* who)
         {
             if (!_spoken && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -70,7 +70,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
 
@@ -82,7 +82,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_SLOW, urand(15000, 25000));
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
 
@@ -90,13 +90,13 @@ public:
                 instance->SetData(DATA_IKISSDOOREVENT, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        void KilledUnit(Unit* /*victim*/)
         {
-            if (urand(0, 1))
+            if (urand(0,1))
                 Talk(SAY_SLAY);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -105,7 +105,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
+            switch (events.GetEvent())
             {
                 case EVENT_SPELL_ARCANE_VOLLEY:
                     me->CastSpell(me, SPELL_ARCANE_VOLLEY_N, false);
@@ -124,6 +124,7 @@ public:
                     if (me->HealthBelowPct(20))
                     {
                         me->CastSpell(me, SPELL_MANA_SHIELD, false);
+                        events.PopEvent();
                         return;
                     }
                     events.RepeatEvent(1000);
@@ -144,6 +145,7 @@ public:
                 case EVENT_SPELL_BLINK_2:
                     me->CastSpell(me, SPELL_ARCANE_EXPLOSION_N, false);
                     me->CastSpell(me, SPELL_ARCANE_BUBBLE, true);
+                    events.PopEvent();
                     break;
             }
 
@@ -176,9 +178,9 @@ class boss_anzu : public CreatureScript
 public:
     boss_anzu() : CreatureScript("boss_anzu") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetSethekkHallsAI<boss_anzuAI>(creature);
+        return new boss_anzuAI (creature);
     }
 
     struct boss_anzuAI : public ScriptedAI
@@ -194,7 +196,7 @@ public:
         SummonList summons;
         uint32 talkTimer;
 
-        void Reset() override
+        void Reset()
         {
             summons.DespawnAll();
             if (InstanceScript* instance = me->GetInstanceScript())
@@ -202,13 +204,13 @@ public:
                     instance->SetData(TYPE_ANZU_ENCOUNTER, NOT_STARTED);
         }
 
-        void JustSummoned(Creature* summon) override
+        void JustSummoned(Creature* summon)
         {
             summons.Summon(summon);
             summon->AI()->AttackStart(me->GetVictim());
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*) override
+        void SummonedCreatureDies(Creature* summon, Unit*)
         {
             summons.Despawn(summon);
             summons.RemoveNotExisting();
@@ -216,7 +218,7 @@ public:
                 me->RemoveAurasDueToSpell(SPELL_BANISH_SELF);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SCREECH, 14000);
@@ -229,7 +231,7 @@ public:
                 instance->SetData(TYPE_ANZU_ENCOUNTER, IN_PROGRESS);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 instance->SetData(TYPE_ANZU_ENCOUNTER, DONE);
@@ -240,10 +242,10 @@ public:
             Talk(SAY_SUMMON);
             me->CastSpell(me, SPELL_BANISH_SELF, true);
             for (uint8 i = 0; i < 5; ++i)
-                me->SummonCreature(23132 /*NPC_BROOD_OF_ANZU*/, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                me->SummonCreature(23132 /*NPC_BROOD_OF_ANZU*/, me->GetPositionX()+20*cos((float)i), me->GetPositionY()+20*sin((float)i), me->GetPositionZ()+25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (talkTimer)
             {
@@ -266,10 +268,10 @@ public:
                 return;
 
             events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
+            if (me->HasUnitState(UNIT_STATE_CASTING|UNIT_STATE_STUNNED))
                 return;
 
-            switch (events.ExecuteEvent())
+            switch (events.GetEvent())
             {
                 case EVENT_SPELL_SCREECH:
                     me->CastSpell(me, SPELL_PARALYZING_SCREECH, false);
@@ -292,6 +294,7 @@ public:
                     if (me->HealthBelowPct(66))
                     {
                         SummonBroods();
+                        events.PopEvent();
                         events.DelayEvents(10000);
                         return;
                     }
@@ -301,6 +304,7 @@ public:
                     if (me->HealthBelowPct(33))
                     {
                         SummonBroods();
+                        events.PopEvent();
                         events.DelayEvents(10000);
                         return;
                     }

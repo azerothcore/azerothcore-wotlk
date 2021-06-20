@@ -1,19 +1,18 @@
 /** 
-  \file G3D/Crypto.h
+  @file Crypto.h
  
-  \maintainer Morgan McGuire, http://graphics.cs.williams.edu
+  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
 
-  \created 2006-03-29
-  \edited  2011-06-21
+  @created 2006-03-29
+  @edited  2006-04-06
  */
 
-#ifndef G3D_Crypto_h
-#define G3D_Crypto_h
+#ifndef G3D_CRYPTO_H
+#define G3D_CRYPTO_H
 
 #include "G3D/platform.h"
 #include "G3D/g3dmath.h"
-#include "G3D/System.h"
 #include <string>
 
 namespace G3D {
@@ -33,24 +32,6 @@ public:
     }
 
     explicit MD5Hash(class BinaryInput& b);
-
-    /** Rotates the bytes once */
-    void rotateBytes() {
-        uint8 temp = value[0];
-        for (int i = 0; i < 15; ++i) {
-            value[i] = value[i + 1];
-        }
-        value[15] = temp;
-    }
-
-    /** Rotates by n bytes */
-    void rotateBytes(int n) {
-        uint8 temp[16];
-        System::memcpy(temp, value, 16);
-        for (int i = 0; i < 16; ++i) {
-            value[i] = value[(i + n) & 15];
-        }
-    }
 
     uint8& operator[](int i) {
         return value[i];
@@ -75,18 +56,6 @@ public:
     void deserialize(class BinaryInput& b);
 
     void serialize(class BinaryOutput& b) const;
-
-    static size_t hashCode(const MD5Hash& key) {
-        size_t h = 0;
-        for (int i = 0; i < 4; ++i) {
-            const int x = i * 4;
-            h ^= (((uint32)key.value[x + 0]) << 24) |
-                (((uint32)key.value[x + 1]) << 16) |
-                (((uint32)key.value[x + 2]) << 8) |
-                ((uint32)key.value[x + 3]);
-        }
-        return h;
-    }
 };
 
 
@@ -110,7 +79,7 @@ public:
 
      @cite Based on implementation by L. Peter Deutsch, ghost@aladdin.com
      */
-    static MD5Hash md5(const void* bytes, size_t numBytes);
+    MD5Hash md5(const void* bytes, size_t numBytes);
 
     /**
      Returns the nth prime less than 2000 in constant time.  The first prime has index

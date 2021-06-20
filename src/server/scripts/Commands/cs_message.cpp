@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,11 +11,11 @@ Comment: All message related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ChannelMgr.h"
+#include "ScriptMgr.h"
 #include "Chat.h"
+#include "ChannelMgr.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 class message_commandscript : public CommandScript
 {
@@ -91,7 +91,7 @@ public:
         std::string str = handler->GetAcoreString(LANG_GLOBAL_NOTIFY);
         str += args;
 
-        WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
+        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
         data << str;
         sWorld->SendGlobalMessage(&data);
 
@@ -106,7 +106,7 @@ public:
         std::string str = handler->GetAcoreString(LANG_GM_NOTIFY);
         str += args;
 
-        WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
+        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
         data << str;
         sWorld->SendGlobalGMMessage(&data);
 

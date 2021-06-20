@@ -6,17 +6,17 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `guild_rank`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = UTF8MB4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `guild_rank` 
 (
-  `guildid` INT unsigned NOT NULL DEFAULT 0,
-  `rid` TINYINT unsigned NOT NULL,
+  `guildid` int(10) unsigned NOT NULL DEFAULT '0',
+  `rid` tinyint(3) unsigned NOT NULL,
   `rname` varchar(20) NOT NULL DEFAULT '',
-  `rights` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `BankMoneyPerDay` INT unsigned NOT NULL DEFAULT 0,
+  `rights` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `BankMoneyPerDay` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guildid`,`rid`),
   KEY `Idx_rid` (`rid`)
-) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Guild System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guild System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guild_rank` WRITE;

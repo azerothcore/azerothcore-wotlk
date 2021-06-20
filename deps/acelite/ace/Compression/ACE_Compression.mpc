@@ -1,0 +1,24 @@
+// -*- MPC -*-
+project(ACE_Compression) : acelib, install, ace_output {
+  sharedname   = *
+  dynamicflags += ACE_COMPRESSION_BUILD_DLL
+
+  //prebuild      =   perl $(ACE_ROOT)/bin/generate_export_file.pl ACE_Compression > ACE_Compression_export.h
+
+  Source_Files {
+    Compressor.cpp
+  }
+
+  Header_Files {
+    Compressor.h
+    ACE_Compression_export.h
+  }
+
+  Inline_Files {
+    Compressor.inl
+  }
+
+  specific {
+    install_dir = ace/Compression
+  }
+}

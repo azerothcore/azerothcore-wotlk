@@ -1,0 +1,9 @@
+//  -*- MPC -*- now wouldn't this be cool...
+project(ACE_TkReactor) : acedefaults, install, acelib, ace_output, ace_tk {
+  sharedname   = ACE_TkReactor
+  dynamicflags += ACE_TKREACTOR_BUILD_DLL
+
+  specific {
+    install_dir = ace/TkReactor
+  }
+}

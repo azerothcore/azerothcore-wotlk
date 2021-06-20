@@ -5,7 +5,7 @@
  *  @file    Activation_Queue.h
  *
  *  @author Andres Kruse <Andres.Kruse@cern.ch>
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -147,6 +147,7 @@ protected:
   bool delete_queue_;
 
 private:
+
   /// Allocation strategy of the queue.
   ACE_Allocator *allocator_;
 

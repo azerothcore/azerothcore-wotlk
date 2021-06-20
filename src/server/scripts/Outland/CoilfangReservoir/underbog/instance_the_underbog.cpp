@@ -22,15 +22,15 @@ Without it, the party doing random dungeon won't get satchel of spoils and
 gets instead the deserter debuff.
 */
 
+#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
 #include "the_underbog.h"
 
 class instance_the_underbog : public InstanceMapScript
 {
 public:
-    instance_the_underbog() : InstanceMapScript(TheUnderbogScriptName, 546) { }
+    instance_the_underbog() : InstanceMapScript(TheUndebogScriptName, 546) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

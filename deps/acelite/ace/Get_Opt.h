@@ -4,7 +4,7 @@
 /**
  *  @file    Get_Opt.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Don Hinton <dhinton@gmx.net> (added long option support)
  */
 //==========================================================================
@@ -38,6 +38,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  *
  * This is a C++ wrapper for getopt(3c) and getopt_long(3c).
  */
+
 class ACE_Export ACE_Get_Opt
 {
 public:
@@ -404,8 +405,6 @@ private:
     /// simplifying long option handling, see tests/Get_Opt_Test.cpp
     /// for an example of this technique.
     int val_;
-
-    ACE_ALLOC_HOOK_DECLARE;
   };
 
   /// Updates nextchar_.

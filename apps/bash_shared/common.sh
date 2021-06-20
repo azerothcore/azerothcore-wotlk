@@ -1,15 +1,12 @@
-function registerHooks() { acore_event_registerHooks "$@"; }
-function runHooks() { acore_event_runHooks "$@"; }
+function registerHooks() { hwc_event_register_hooks "$@"; }
+function runHooks() { hwc_event_run_hooks "$@"; }
 
-source "$AC_PATH_CONF/dist/config.sh" # include dist to avoid missing conf variables
+source "$AC_PATH_CONF/config.sh.dist" # "hack" to avoid missing conf variables
 
-# first check if it's defined in env, otherwise use the default
-USER_CONF_PATH=${USER_CONF_PATH:-"$AC_PATH_CONF/config.sh"}
-
-if [ -f  "$USER_CONF_PATH" ]; then
-    source "$USER_CONF_PATH" # should overwrite previous
+if [ -f "$AC_PATH_CONF/config.sh"  ]; then
+    source "$AC_PATH_CONF/config.sh" # should overwrite previous
 else
-    echo "NOTICE: file <$USER_CONF_PATH> has not been found, you should create and configure it."
+    echo "NOTICE: file <$AC_PATH_CONF/config.sh> has not been found, you should create and configure it."
 fi
 
 #
@@ -18,9 +15,9 @@ fi
 
 for entry in "$AC_PATH_MODULES/"*/include.sh
 do
-    if [ -e "$entry" ]; then
-        source "$entry"
+    if [ -e $entry ]; then 
+        source $entry
     fi
 done
 
-ACORE_VERSION=$("$AC_PATH_DEPS/jsonpath/JSONPath.sh" -f "$AC_PATH_ROOT/acore.json" -b '$.version')
+ACORE_VERSION=$("$AC_PATH_DEPS/jsonpath/JSONPath.sh" -f $AC_PATH_ROOT/acore.json -b '$.version')

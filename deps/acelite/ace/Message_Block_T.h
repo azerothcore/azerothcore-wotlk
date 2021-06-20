@@ -4,7 +4,7 @@
 /**
  *  @file    Message_Block_T.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Carlos O'Ryan <coryan@atdesk.com>
  */
 //=============================================================================
@@ -36,6 +36,7 @@ template <class ACE_LOCK>
 class ACE_Locked_Data_Block : public ACE_Data_Block
 {
 public:
+  // = Initialization and termination methods.
   /// Default "do-nothing" constructor.
   ACE_Locked_Data_Block (void);
 

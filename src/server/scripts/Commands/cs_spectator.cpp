@@ -1,14 +1,15 @@
 
-#include "AccountMgr.h"
-#include "ArenaSpectator.h"
-#include "BattlegroundMgr.h"
-#include "Chat.h"
-#include "LFGMgr.h"
-#include "ObjectMgr.h"
-#include "Opcodes.h"
-#include "Player.h"
 #include "ScriptMgr.h"
+#include "ObjectMgr.h"
+#include "Chat.h"
+#include "AccountMgr.h"
+#include "Language.h"
 #include "World.h"
+#include "Player.h"
+#include "Opcodes.h"
+#include "ArenaSpectator.h"
+#include "LFGMgr.h"
+#include "BattlegroundMgr.h"
 
 class spectator_commandscript : public CommandScript
 {
@@ -152,7 +153,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
     const Unit::VisibleAuraMap* va = player->GetVisibleAuras();
     for (Unit::VisibleAuraMap::const_iterator itr = va->begin(); itr != va->end(); ++itr)
         if (Aura* aura = itr->second->GetBase())
-            if (!itr->second->IsPositive() && !aura->IsPermanent() && aura->GetDuration() < HOUR * IN_MILLISECONDS)
+            if (!itr->second->IsPositive() && !aura->IsPermanent() && aura->GetDuration() < HOUR*IN_MILLISECONDS)
             {
                 switch (aura->GetSpellInfo()->Id)
                 {
@@ -180,7 +181,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
 
     bool bgPreparation = false;
     if ((!handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS) ||
-            (handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_WAIT_JOIN && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS))
+        (handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_WAIT_JOIN && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS))
     {
         bgPreparation = true;
         handler->SendSysMessage("Arena is not in progress yet. You will be invited as soon as it starts.");
@@ -192,7 +193,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
     {
         handler->PSendSysMessage("To spectate, please fix the following:");
         for (std::list<std::string>::const_iterator itr = errors.begin(); itr != errors.end(); ++itr)
-            handler->PSendSysMessage("- %s", (*itr).c_str());
+            handler->PSendSysMessage("- %s",(*itr).c_str());
 
         return true;
     }
@@ -203,7 +204,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
     player->SetPendingSpectatorForBG(spectate->GetBattlegroundId());
     player->SetBattlegroundId(spectate->GetBattlegroundId(), spectate->GetBattlegroundTypeId(), PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
     player->SetEntryPoint();
-    float z = spectate->GetMapId() == 618 ? std::max(28.27f, spectate->GetPositionZ() + 0.25f) : spectate->GetPositionZ() + 0.25f;
+    float z = spectate->GetMapId() == 618 ? std::max(28.27f, spectate->GetPositionZ()+0.25f) : spectate->GetPositionZ()+0.25f;
     player->TeleportTo(spectate->GetMapId(), spectate->GetPositionX(), spectate->GetPositionY(), z, spectate->GetOrientation(), TELE_TO_GM_MODE);
     return true;
 }
@@ -239,7 +240,7 @@ bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, char cons
                 return true;
         }
 
-    if (player->GetGuidValue(PLAYER_FARSIGHT) || player->m_seer != player) // pussywizard: below this point we must not have a viewpoint!
+    if (player->GetUInt64Value(PLAYER_FARSIGHT) || player->m_seer != player) // pussywizard: below this point we must not have a viewpoint!
         return true;
 
     if (player->HaveAtClient(spectate))

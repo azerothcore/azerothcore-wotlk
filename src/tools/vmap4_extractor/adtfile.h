@@ -22,7 +22,7 @@ typedef struct
     float x;
     float y;
     float z;
-} svec;
+}svec;
 
 struct vec
 {
@@ -38,9 +38,9 @@ struct triangle
 
 typedef struct
 {
-    float v9[16 * 8 + 1][16 * 8 + 1];
-    float v8[16 * 8][16 * 8];
-} Cell;
+    float v9[16*8+1][16*8+1];
+    float v8[16*8][16*8];
+}Cell;
 
 typedef struct
 {
@@ -50,12 +50,12 @@ typedef struct
     //Liquid *lq;
     float waterlevel[9][9];
     uint8 flag;
-} chunk;
+}chunk;
 
 typedef struct
 {
     chunk ch[16][16];
-} mcell;
+}mcell;
 
 struct MapChunkHeader
 {
@@ -94,62 +94,38 @@ struct MapChunkHeader
     uint32 effectId;
 };
 
-#pragma pack(push, 1)
-
-namespace ADT
-{
-    struct MDDF
-    {
-        uint32 Id;
-        uint32 UniqueId;
-        Vec3D Position;
-        Vec3D Rotation;
-        uint16 Scale;
-        uint16 Flags;
-    };
-
-    struct MODF
-    {
-        uint32 Id;
-        uint32 UniqueId;
-        Vec3D Position;
-        Vec3D Rotation;
-        AaBox3D Bounds;
-        uint16 Flags;
-        uint16 DoodadSet;   // can be larger than number of doodad sets in WMO
-        uint16 NameSet;
-        uint16 Scale;
-    };
-}
-#pragma pack(pop)
 
 class ADTFile
 {
 private:
-    MPQFile _file;
-    std::string Adtfilename;
+    //size_t mcnk_offsets[256], mcnk_sizes[256];
+    MPQFile ADT;
+    //mcell Mcell;
+    string Adtfilename;
 public:
     ADTFile(char* filename);
     ~ADTFile();
-    std::vector<std::string> WmoInstanceNames;
-    std::vector<std::string> ModelInstanceNames;
+    int nWMO;
+    int nMDX;
+    string* WmoInstansName;
+    string* ModelInstansName;
     bool init(uint32 map_num, uint32 tileX, uint32 tileY);
     //void LoadMapChunks();
 
     //uint32 wmo_count;
-    /*
-        const mcell& Getmcell() const
-        {
-            return Mcell;
-        }
-    */
+/*
+    const mcell& Getmcell() const
+    {
+        return Mcell;
+    }
+*/
 };
 
-const char* GetPlainName(const char* FileName);
-char* GetPlainName(char* FileName);
-char* GetExtension(char* FileName);
-void fixnamen(char* name, size_t len);
-void fixname2(char* name, size_t len);
+const char * GetPlainName(const char * FileName);
+char * GetPlainName(char * FileName);
+char * GetExtension(char * FileName);
+void fixnamen(char *name, size_t len);
+void fixname2(char *name, size_t len);
 //void fixMapNamen(char *name, size_t len);
 
 #endif

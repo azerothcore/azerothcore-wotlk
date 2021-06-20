@@ -1,17 +1,17 @@
 /**
- \file debug.h
+ @file debug.h
 
- \maintainer Morgan McGuire, http://graphics.cs.williams.edu
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
- \created 2001-08-26
- \edited  2008-08-16
+ @created 2001-08-26
+ @edited  2006-02-16
 
- Copyright 2000-2006, Morgan McGuire.
+  Copyright 2000-2006, Morgan McGuire.
  All rights reserved.
 */
 
-#ifndef G3D_debug_h
-#define G3D_debug_h
+#ifndef G3D_DEBUG_H
+#define G3D_DEBUG_H
 
 #include "G3D/platform.h"
 #ifdef _MSC_VER
@@ -38,9 +38,7 @@ namespace G3D {
 inline bool isValidHeapPointer(const void* x) {
     #ifdef _MSC_VER
         return 
-            (x != NULL) &&
-            (x != (void*)0xcccccccc) && (x != (void*)0xdeadbeef) && (x != (void*)0xfeeefeee) &&
-            (x != (void*)0xcdcdcdcd) && (x != (void*)0xabababab) && (x != (void*)0xfdfdfdfd);
+            (x != (void*)0xcccccccc) && (x != (void*)0xdeadbeef) && (x != (void*)0xfeeefeee);
     #else
         return x != NULL;
     #endif
@@ -53,9 +51,7 @@ inline bool isValidHeapPointer(const void* x) {
  */
 inline bool isValidPointer(const void* x) {
     #ifdef _MSC_VER
-        return (x != NULL) &&
-            (x != (void*)0xcccccccc) && (x != (void*)0xdeadbeef) && (x != (void*)0xfeeefeee) &&
-            (x != (void*)0xcdcdcdcd) && (x != (void*)0xabababab) && (x != (void*)0xfdfdfdfd);
+        return x != ((void*)0xcccccccc) && (x != (void*)0xdeadbeef) && (x != (void*)0xfeeefeee);
     #else
         return x != NULL;
     #endif

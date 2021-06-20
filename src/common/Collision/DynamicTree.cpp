@@ -1,46 +1,54 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "DynamicTree.h"
+//#include "QuadTree.h"
+//#include "RegularGrid.h"
 #include "BoundingIntervalHierarchyWrapper.h"
+
 #include "Log.h"
 #include "RegularGrid.h"
 #include "Timer.h"
 #include "GameObjectModel.h"
 #include "ModelInstance.h"
+
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
 #include <G3D/Vector3.h>
 
 using VMAP::ModelInstance;
 
-namespace
-{
-    int CHECK_TREE_PERIOD = 200;
-}
+namespace {
 
-template<> struct HashTrait< GameObjectModel>
-{
+int CHECK_TREE_PERIOD = 200;
+
+} // namespace
+
+template<> struct HashTrait< GameObjectModel>{
     static size_t hashCode(const GameObjectModel& g) { return (size_t)(void*)&g; }
 };
 
-template<> struct PositionTrait< GameObjectModel>
-{
+template<> struct PositionTrait< GameObjectModel> {
     static void getPosition(const GameObjectModel& g, G3D::Vector3& p) { p = g.getPosition(); }
 };
 
-template<> struct BoundsTrait< GameObjectModel>
-{
+template<> struct BoundsTrait< GameObjectModel> {
     static void getBounds(const GameObjectModel& g, G3D::AABox& out) { out = g.getBounds();}
     static void getBounds2(const GameObjectModel* g, G3D::AABox& out) { out = g->getBounds();}
 };
 
-typedef RegularGrid2D<GameObjectModel, BIHWrap<GameObjectModel>> ParentTree;
+/*
+static bool operator == (const GameObjectModel& mdl, const GameObjectModel& mdl2){
+    return &mdl == &mdl2;
+}
+*/
 
-struct DynTreeImpl : public ParentTree
+typedef RegularGrid2D<GameObjectModel, BIHWrap<GameObjectModel> > ParentTree;
+
+struct DynTreeImpl : public ParentTree/*, public Intersectable*/
 {
     typedef GameObjectModel Model;
     typedef ParentTree base;
@@ -140,7 +148,7 @@ struct DynamicTreeIntersectionCallback
 };
 
 bool DynamicMapTree::getIntersectionTime(const uint32 phasemask, const G3D::Ray& ray,
-        const G3D::Vector3& endPos, float& maxDist) const
+                                         const G3D::Vector3& endPos, float& maxDist) const
 {
     float distance = maxDist;
     DynamicTreeIntersectionCallback callback(phasemask);
@@ -164,7 +172,7 @@ bool DynamicMapTree::getObjectHitPos(const uint32 phasemask, const G3D::Vector3&
         resultHit = endPos;
         return false;
     }
-    G3D::Vector3 dir = (endPos - startPos) / maxDist;            // direction with length of 1
+    G3D::Vector3 dir = (endPos - startPos)/maxDist;              // direction with length of 1
     G3D::Ray ray(startPos, dir);
     float dist = maxDist;
     if (getIntersectionTime(phasemask, ray, endPos, dist))
@@ -173,12 +181,12 @@ bool DynamicMapTree::getObjectHitPos(const uint32 phasemask, const G3D::Vector3&
         if (modifyDist < 0)
         {
             if ((resultHit - startPos).magnitude() > -modifyDist)
-                resultHit = resultHit + dir * modifyDist;
+                resultHit = resultHit + dir*modifyDist;
             else
                 resultHit = startPos;
         }
         else
-            resultHit = resultHit + dir * modifyDist;
+            resultHit = resultHit + dir*modifyDist;
 
         result = true;
     }
@@ -199,7 +207,7 @@ bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, flo
     if (!G3D::fuzzyGt(maxDist, 0) )
         return true;
 
-    G3D::Ray r(v1, (v2 - v1) / maxDist);
+    G3D::Ray r(v1, (v2-v1) / maxDist);
     DynamicTreeIntersectionCallback callback(phasemask);
     impl->intersectRay(r, callback, maxDist, v2, true);
 
@@ -208,7 +216,7 @@ bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, flo
 
 float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, uint32 phasemask) const
 {
-    G3D::Vector3 v(x, y, z);
+    G3D::Vector3 v(x, y, z + 2.0f);
     G3D::Ray r(v, G3D::Vector3(0, 0, -1));
     DynamicTreeIntersectionCallback callback(phasemask);
     impl->intersectZAllignedRay(r, callback, maxSearchDist);
@@ -216,5 +224,5 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, 
     if (callback.didHit())
         return v.z - maxSearchDist;
     else
-        return -G3D::finf();
+        return -G3D::inf();
 }

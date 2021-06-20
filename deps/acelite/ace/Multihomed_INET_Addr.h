@@ -33,6 +33,8 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Multihomed_INET_Addr : public ACE_INET_Addr
 {
 public:
+  // = Initialization methods.
+
   /// Default constructor.
   ACE_Multihomed_INET_Addr (void);
 
@@ -177,9 +179,6 @@ public:
   /// IPV6 version of the above.
   void get_addresses(sockaddr_in6 *addrs, size_t size) const;
 #endif /* ACE_HAS_IPV6 */
-
-  /// Declare the dynamic allocation hooks.
-  ACE_ALLOC_HOOK_DECLARE;
 
 private:
   ACE_Array<ACE_INET_Addr> secondaries_;

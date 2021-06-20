@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "halls_of_lightning.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
-#include "SpellScript.h"
 
 enum LokenSpells
 {
@@ -51,9 +51,9 @@ class boss_loken : public CreatureScript
 public:
     boss_loken() : CreatureScript("boss_loken") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetHallsOfLightningAI<boss_lokenAI>(creature);
+        return new boss_lokenAI (creature);
     }
 
     struct boss_lokenAI : public ScriptedAI
@@ -72,9 +72,9 @@ public:
         uint32 IntroTimer;
         uint8 HealthCheck;
 
-        void MoveInLineOfSight(Unit*) override { }
+        void MoveInLineOfSight(Unit*) { }
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
             if (m_pInstance)
@@ -99,7 +99,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void EnterCombat(Unit*)
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -117,7 +117,7 @@ public:
             }
         }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit*)
         {
             Talk(SAY_DEATH);
 
@@ -131,22 +131,16 @@ public:
             {
                 switch(HealthCheck)
                 {
-                    case 75:
-                        Talk(SAY_75HEALTH);
-                        break;
-                    case 50:
-                        Talk(SAY_50HEALTH);
-                        break;
-                    case 25:
-                        Talk(SAY_25HEALTH);
-                        break;
+                    case 75: Talk(SAY_75HEALTH); break;
+                    case 50: Talk(SAY_50HEALTH); break;
+                    case 25: Talk(SAY_25HEALTH); break;
                 }
             }
             else
                 Talk(SAY_NOVA);
         }
 
-        void KilledUnit(Unit* victim) override
+        void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -154,7 +148,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!isActive)
             {
@@ -183,7 +177,7 @@ public:
 
                     me->SetControlled(false, UNIT_STATE_STUNNED);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
+                    
                     if (Player* target = SelectTargetFromPlayerList(80))
                         AttackStart(target);
                 }
@@ -200,7 +194,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
+            switch (events.GetEvent())
             {
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(HealthCheck))
@@ -223,6 +217,7 @@ public:
                     break;
                 case EVENT_SHOCKWAVE:
                     me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_PULSING_SHOCKWAVE_H : SPELL_PULSING_SHOCKWAVE_N, false);
+                    events.PopEvent();
                     break;
                 case EVENT_ARC_LIGHTNING:
                     if (Unit* target = SelectTargetFromPlayerList(100, SPELL_ARC_LIGHTNING))
@@ -232,6 +227,7 @@ public:
                     break;
                 case EVENT_AURA_REMOVE:
                     me->RemoveAura(SPELL_LIGHTNING_NOVA_THUNDERS);
+                    events.PopEvent();
                     break;
             }
 
@@ -242,33 +238,33 @@ public:
 
 class spell_loken_pulsing_shockwave : public SpellScriptLoader
 {
-public:
-    spell_loken_pulsing_shockwave() : SpellScriptLoader("spell_loken_pulsing_shockwave") { }
+    public:
+        spell_loken_pulsing_shockwave() : SpellScriptLoader("spell_loken_pulsing_shockwave") { }
 
-    class spell_loken_pulsing_shockwave_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_loken_pulsing_shockwave_SpellScript);
-
-        void CalculateDamage(SpellEffIndex /*effIndex*/)
+        class spell_loken_pulsing_shockwave_SpellScript : public SpellScript
         {
-            if (!GetHitUnit())
-                return;
+            PrepareSpellScript(spell_loken_pulsing_shockwave_SpellScript);
 
-            float distance = GetCaster()->GetDistance2d(GetHitUnit());
-            if (distance > 1.0f)
-                SetHitDamage(int32(GetHitDamage() * distance));
-        }
+            void CalculateDamage(SpellEffIndex /*effIndex*/)
+            {
+                if (!GetHitUnit())
+                    return;
 
-        void Register() override
+                float distance = GetCaster()->GetDistance2d(GetHitUnit());
+                if (distance > 1.0f)
+                    SetHitDamage(int32(GetHitDamage() * distance));
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_loken_pulsing_shockwave_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            OnEffectHitTarget += SpellEffectFn(spell_loken_pulsing_shockwave_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            return new spell_loken_pulsing_shockwave_SpellScript();
         }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_loken_pulsing_shockwave_SpellScript();
-    }
 };
 
 void AddSC_boss_loken()

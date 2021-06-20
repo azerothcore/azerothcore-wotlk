@@ -1,11 +1,11 @@
 /**
-   \file PointHashGrid.h
+   @file PointHashGrid.h
 
-   \maintainer Morgan McGuire, http://graphics.cs.williams.edu
-   \created 2008-07-01
-   \edited  2010-11-28
+   @maintainer Morgan McGuire, http://graphics.cs.williams.edu
+   @created 2008-07-01
+   @edited  2009-05-28
 
-   Copyright 2000-2012, Morgan McGuire.
+   Copyright 2000-2010, Morgan McGuire.
    All rights reserved.
 */
 #ifndef G3D_PointHashGrid_h
@@ -25,30 +25,16 @@
 namespace G3D {
 
 /** 
-    \brief A sparse 3D grid of point-based data.  
-    
-    The space cost for <I>n</I> elements is O(<I>n</I>).  For data with
+    Storage of data in a sparse 3D grid of point-based data.  The
+    space cost for <I>n</I> elements is O(<I>n</I>).  For data with
     approximately uniform density (with respect to the radius hint),
     the time cost of searching for neighbors is O(1).
 
-    You can move members of the data set by first removing them and then
-    adding them with a new location.
-    
-    Template argument \a PosFunc must provide a static <code>getPosition</code> method 
-    and \a EqualsFunc must provide a static <code>equals</code> method, as described below.  
-    You can either write classes that support these yourself, provide template specializations of
-    G3D::PositionTrait and
-    G3D::EqualsTrait, or rely on the default template specializations, which already exist for
-    common G3D classes like G3D::Point3.  For example:
+    <i>Value</i> must be supported by a G3D::PositionTrait and
+    G3D::EqualsTrait.  Overloads are provided for
+    common G3D classes like G3D::Vector3.  For example:
 
-    \code
-    class PosFunc {
-    public:
-        static void getPosition(const Data& d, Vector3& pos) {
-            pos = d.location;
-        }
-    };
-
+   <pre>
     class EqualsFunc {
     public:
         static bool equals(const Data& p, const Data& q) {
@@ -56,36 +42,21 @@ namespace G3D {
         }
     };
     
-    PointHashGrid<Data, Data::PosFunc, Data::EqualsFunc> grid;
-   \endcode
-
-   If the \a Value class defines <code>operator==</code>, then the \a Equalsfunc is optional, so you can just write:
-
-   \code
-    PointHashGrid<Data, Data::PosFunc> grid;
-   \endcode
-
-   The simplest way to define these is often to make them both methods
-   of the parameter class itself, e.g.,
-
-   \code
-   
-    class Data {
+    class PosFunc {
     public:
-        Point3     location;
-        ...
-
-        bool operator==(const Data& other) const {
-            return (location == other.location) && ...;
+        static void getPosition(const Data& d, Vector3& pos) {
+            pos = d.location;
         }
+    };
 
-        static void getPosition(const Data& p, Vector3& pos) {
-            pos = p.location;
-        } 
-   };
+    PointHashGrid<Data, Data::PosFunc, Data::EqualsFunc> grid;
+   </pre>
 
-   typedef PointHashGrid<Data, Data> DataGrid;
-   \endcode  
+   If the Value class defines operator==, the Equalsfunc is optional:
+
+   <pre>
+    PointHashGrid<Data, Data::PosFunc> grid;
+   </pre>
 
 */
 template<class Value,
@@ -94,20 +65,20 @@ template<class Value,
 class PointHashGrid {
 private:
 
-#   define expectedCellSize (10)
+#   define expectedCellSize (3)
 
 #   define ThisType PointHashGrid<Value, PosFunc, EqualsFunc>
 
     /** A value annotated with precomputed position and hash code.*/
     class Entry {
     public:
-        Point3             position;
-        Value             value;
+        Vector3			 position;
+        Value			 value;
     };
 
     /** One cell of the grid. */
     typedef SmallArray<Entry, expectedCellSize> Cell;
-    typedef Table<Point3int32, Cell >           CellTable;
+    typedef Table<Vector3int32, Cell >          CellTable;
 
     /** The cube of +/-1 along each dimension. Initialized by initOffsetArray.*/
     Vector3int32        m_offsetArray[3*3*3];
@@ -145,19 +116,18 @@ private:
 
     /** Locate the cell and index within that cell containing v. Called by
         remove() and contains(). */
-    bool find
-       (const Value&    v, 
-        Point3int32&   foundCellCoord, 
-        Cell*&          foundCell, 
-        int&            index) {
+    bool find(const Value&    v, 
+              Vector3int32&   foundCellCoord, 
+              Cell*&          foundCell, 
+              int&            index) {
         
-        Point3 pos;
+        Vector3 pos;
         PosFunc::getPosition(v, pos);
 
-        Point3int32 cellCoord;
+        Vector3int32 cellCoord;
         getCellCoord(pos, cellCoord);
         for (int i = 0; i < 27; ++i) {
-            Point3int32 c = cellCoord + m_offsetArray[i];
+            Vector3int32 c = cellCoord + m_offsetArray[i];
             Cell* cell = m_data.getPointer(c);
             if (cell != NULL) {
                 // The cell exists
@@ -176,25 +146,18 @@ private:
         return false;        
     }
 
-public:
-
-    /** \brief Compute the grid cell index of a real position. 
-        This is used extensively internally by PointHashGrid.
-        It is useful to calling code to determine when an object
-        is about to move between cells.
-     */
-    inline void getCellCoord(const Point3& pos, Point3int32& cellCoord) const {
+    /** Given a real-space position, returns the cell coord 
+        containing it.*/
+    inline void getCellCoord(const Vector3& pos, Vector3int32& cellCoord) const {
         for (int a = 0; a < 3; ++a) {
             cellCoord[a] = iFloor(pos[a] * m_invCellWidth);
         }
     }
 
-protected:
-
     /** Initializes m_offsetArray. */
     void initOffsetArray() {
         int i = 0;
-        Point3int32 d;
+        Vector3int32 d;
         for (d.x = -1; d.x <= +1; ++d.x) {
             for (d.y = -1; d.y <= +1; ++d.y) {
                 for (d.z = -1; d.z <= +1; ++d.z) {
@@ -216,10 +179,9 @@ protected:
 public:
 
     /** 
-        \param radiusHint the radius that will typically be used with 
-        beginBallIntersection and beginBoxIntersection. If two <i>Value</i>s are equal,
-        their positions must be within this radius as well.  You can later change this
-        value with clearAndSetRadiusHint().
+        @param radiusHint the radius that will typically be used with 
+        beginSphereIntersection and beginBoxIntersection. If two <i>Value</i>s are equal,
+        their positions must be within this radius as well.
     */
     PointHashGrid(float radiusHint, const MemoryManager::Ref& m = MemoryManager::create()) : m_size(0), m_memoryManager(m) {
         initOffsetArray();
@@ -230,41 +192,23 @@ public:
         m_invCellWidth = 1.0f / m_cellWidth;
     }
 
-    /** \sa clearAndSetRadiusHint() */
-    float radiusHint() const {
-        return m_cellWidth;
-    }
-    
-    void clear(float radiusHint) {
-        debugAssertM(radiusHint > 0, "Cell radius must be positive");
-        clear();
-        m_cellWidth = radiusHint;
-        m_invCellWidth = 1.0f / m_cellWidth;
-    }
-
-    void clearAndSetRadiusHint(float radiusHint) {
-        return clear(radiusHint);
-    }
-        
     /**
-       If \a radiusHint is negative, it is automatically chosen to put 
+       If radiusHint is negative, it is automatically chosen to put 
        about 5 values in each grid cell (which means about 27 * 5 
        values for each beginIntersection call).
-       
-       \sa clearAndSetRadiusHint()
     */
-    PointHashGrid(const Array<Value>& init, float radiusHint = -1.0f, const MemoryManager::Ref& m = MemoryManager::create()) : m_size(0), m_memoryManager(m) {        
+    PointHashGrid(const Array<Value>& init, float radiusHint = -1.0f, const MemoryManager::Ref& m = MemoryManager::create()) : m_size(0), m_memoryManager(m) {		
         initOffsetArray();
         m_data.clearAndSetMemoryManager(m_memoryManager);
 
-        Point3 lo(Vector3::inf());
-        Point3 hi(-lo);
+        Vector3 lo(Vector3::inf());
+        Vector3 hi(-lo);
 
         // Compute bounds
         Array<Entry> entry(init.size());
         for (int i = 0; i < entry.size(); ++i) {
             const Value& value = init[i];
-            Point3 pos;
+            Vector3 pos;
 
             entry[i].value     = value;
             entry[i].hashCode  = m_hashFunc(value);
@@ -297,7 +241,7 @@ public:
     }
 
     /** Returns the number of elements. */
-    int size() const {
+    inline int size() const {
         return m_size;
     }
 
@@ -307,19 +251,13 @@ public:
         return m_bounds;
     }
 
-    void debugPrintStatistics() const {
-        debugPrintf("Deepest bucket size    = %d\n", (int)m_data.debugGetDeepestBucketSize());
-        debugPrintf("Average bucket size    = %g\n", m_data.debugGetAverageBucketSize());
-        debugPrintf("Load factor            = %g\n", m_data.debugGetLoad());
-    }
-
     /** Insert @a v at position @a p given by <code>getPosition(v, p)</code>.  
         Multiple elements that are equal may be inserted; all copies will be
         in the data structure. */
     void insert(const Value& v) {
-        Point3 pos;
+        Vector3 pos;
         PosFunc::getPosition(v, pos);
-        Point3int32 cellCoord;
+        Vector3int32 cellCoord;
         getCellCoord(pos, cellCoord);
 
         // See if the cell already exists
@@ -378,8 +316,7 @@ public:
 
                 // Drop our pointer, which is about to dangle
                 cell = NULL;
-                const bool success = m_data.remove(cellCoord);
-                (void)success;
+                bool success = m_data.remove(cellCoord);
                 debugAssertM(success, "Data structure corrupt: "
                              "tried to remove a cell that doesn't exist.");
             }
@@ -391,7 +328,7 @@ public:
         }
     }
 
-    /** Removes all elements of \a v. */
+    /** Removes all elements of @v. */
     void remove(const Array<Value>& v, bool shrink = true) {
         for (int i = 0; i < v.size(); ++i) {
             remove(v[i], shrink);
@@ -450,11 +387,6 @@ public:
             }
         }
 
-        bool isValid() const {
-            return ! m_isEnd;
-        }
-
-        /** @deprecated  Use isValid */
         bool hasMore() const {
             return ! m_isEnd;
         }
@@ -683,12 +615,7 @@ public:
         const Value* operator->() const { return &value(); }
         operator Value*()         const { return &value(); }
 
-        /** \deprecated Use isValid */
         bool hasMore() const {
-            return ! m_isEnd;
-        }
-
-        bool isValid() const {
             return ! m_isEnd;
         }
     }; // BoxIterator
@@ -725,7 +652,7 @@ public:
         SphereIterator() : m_isEnd(true) {}
 
         void advance() {
-            if (! m_boxIterator.isValid()) {
+            if (! m_boxIterator.hasMore()) {
                 m_isEnd = true;
                 return;
             }
@@ -733,7 +660,7 @@ public:
             while (! m_sphere.contains(m_boxIterator.position())) {
                 ++m_boxIterator;
                 
-                if (! m_boxIterator.isValid()) {
+                if (! m_boxIterator.hasMore()) {
                     m_isEnd = true;
                     return;
                 }
@@ -750,13 +677,13 @@ public:
             m_isEnd(false),
             m_sphere(sphere),
             m_boxIterator(grid, false, getBoundingBox(sphere)) {
-            
+			
             // Find the first element that is actually in the sphere,
             // not just the box.
             advance();
         }
 
-        const Value& value() const {            
+        const Value& value() const {			
             return *m_boxIterator;
         }
 
@@ -766,7 +693,6 @@ public:
 
         // Intentionally unimplemented
         SphereIterator& operator=(const SphereIterator&);
-
     public:
 
         inline bool operator!=(const SphereIterator& other) const {
@@ -783,6 +709,8 @@ public:
         bool operator==(const SphereIterator& other) const {
             return !(*this != other);
         }
+
+	
 
         /** Preincrement */
         SphereIterator& operator++() {
@@ -805,55 +733,34 @@ public:
         const Value* operator->() const { return &value(); }
         operator Value*()         const { return &value(); }
 
-        /** \deprecated use isValid */
-        bool G3D_DEPRECATED hasMore() const {
-            return ! m_isEnd;
-        }
-
-        bool isValid() const {
+        bool hasMore() const {
             return ! m_isEnd;
         }
     }; // SphereIterator
 
-    /** Finds all values whose positions are within \a sphere.  It is
-        an error to mutate the PointHashGrid while iterating through
-        it. */
-    SphereIterator begin(const Sphere& sphere) const {
+    /** 
+        Finds all values whose positions are within @a sphere.  It is an error
+        to mutate the HashGrid while iterating through it.
+    */
+    SphereIterator beginSphereIntersection(const Sphere& sphere) const {
         return SphereIterator(this, sphere);
     }
 
-
-    /** \deprecated \sa beginIntersection */
-    SphereIterator G3D_DEPRECATED beginSphereIntersection(const Sphere& sphere) const {
-        return SphereIterator(this, sphere);
-    }
-
-
-    /** \deprecated \sa SphereIterator::hasMore */
     const SphereIterator& endSphereIntersection() const {
         static const SphereIterator it;
         return it;
     }
-
-    
-    /** Appends results */
-    void getIntersectingMembers(const Sphere& sphere, Array<Value>& result) const {
-        for (SphereIterator it = beginSphereIntersection(sphere); it.isValid(); ++it) {
-            result.append(*it);
-        }
-    }
-
 
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
 
     /**
        Dereference to access the bounds() and size() [element count] of the underlying
-       cell object.
+       cell objet.
 
        Example:
        <pre>
-       for(PointHashGrid<Vector3>::CellIterator iter = grid.beginCells(); iter != grid.endCells(); ++iter) {    
+       for(PointHashGrid<Vector3>::CellIterator iter = grid.beginCells(); iter != grid.endCells(); ++iter) {	
        entriesFound += iter->size();
        }
        </pre>
@@ -886,8 +793,8 @@ public:
             /** Returns the bounds on this cell */
             AABox bounds() const {
                 const Vector3int32& k = m_parent->m_tableIterator->key;
-                return AABox(Vector3(k) * m_parent->m_grid->m_cellWidth, 
-                             Vector3(k + Vector3int32(1, 1, 1)) * m_parent->m_grid->m_cellWidth);
+                return AABox(Vector3(k) * m_parent->m_cellWidth, 
+                             Vector3(k + Vector3int32(1, 1, 1)) * m_parent->m_cellWidth);
             }
 
             /** Number of elements inside this cell */
@@ -916,7 +823,7 @@ public:
             m_tableIterator( grid->m_data.begin()),
             m_epoch(grid->m_epoch) {
             m_indirection.m_parent = this;
-            m_isEnd = ! m_tableIterator.isValid();
+            m_isEnd = ! m_tableIterator.hasMore();
         }
         
         // Intentionally unimplemented
@@ -946,7 +853,7 @@ public:
                          "It is illegal to mutate the HashGrid while "
                          "iterating through it.");
             ++m_tableIterator;
-            m_isEnd = ! m_tableIterator.isValid();
+            m_isEnd = ! m_tableIterator.hasMore();
             return *this;
         }
 
@@ -957,12 +864,7 @@ public:
             return old;
         }
 
-        /** \deprecated Use isValid */
         bool hasMore() const {
-            return ! m_isEnd;
-        }
-
-        bool isValid() const {
             return ! m_isEnd;
         }
     }; // CellIterator
@@ -995,11 +897,11 @@ public:
         This is a helper to avoid requiring you to iterate through the data 
         structure, removing and deleting each one. Clears the PointHashGrid at the
         end.
-        
+		
         Using objects (instead of pointers) or reference counted pointers is 
         recommended over using pointers and this deleteAll method.*/
     void deleteAll() {
-        for (Iterator it = begin(); it.isValid(); ++it) {
+        for (Iterator it = begin(); it.hasMore(); ++it) {
             delete *it;
         }
         clear();
@@ -1022,7 +924,7 @@ public:
         m_bounds = AABox();
         if (! shrink) {
             // Remove all data
-            for (CellIterator it = beginCells(); it.isValid(); ++it) {
+            for (CellIterator it = beginCells(); it.hasMore(); ++it) {
                 it.cell().clear(true);
             }
         } else {
@@ -1032,7 +934,7 @@ public:
     }
 
     int debugGetDeepestBucketSize() const {
-        return (int)m_data.debugGetDeepestBucketSize();
+        return m_data.debugGetDeepestBucketSize();
     }
 
     float debugGetAverageBucketSize() const {

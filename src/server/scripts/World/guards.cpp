@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,10 +17,10 @@ guard_shattrath_aldor
 guard_shattrath_scryer
 EndContentData */
 
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "GuardAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum GuardShattrath
@@ -40,15 +40,15 @@ public:
     {
         guard_shattrath_scryerAI(Creature* creature) : GuardAI(creature) { }
 
-        void Reset() override
+        void Reset()
         {
             banishTimer = 5000;
             exileTimer = 8500;
-            playerGUID.Clear();
+            playerGUID = 0;
             canTeleport = false;
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -62,11 +62,10 @@ public:
                         temp->CastSpell(temp, SPELL_EXILE, true);
                         temp->CastSpell(temp, SPELL_BANISH_TELEPORT, true);
                     }
-                    playerGUID.Clear();
+                    playerGUID = 0;
                     exileTimer = 8500;
                     canTeleport = false;
-                }
-                else exileTimer -= diff;
+                } else exileTimer -= diff;
             }
             else if (banishTimer <= diff)
             {
@@ -79,8 +78,7 @@ public:
                     if (playerGUID)
                         canTeleport = true;
                 }
-            }
-            else banishTimer -= diff;
+            } else banishTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -88,11 +86,11 @@ public:
     private:
         uint32 exileTimer;
         uint32 banishTimer;
-        ObjectGuid playerGUID;
+        uint64 playerGUID;
         bool canTeleport;
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new guard_shattrath_scryerAI(creature);
     }
@@ -107,15 +105,15 @@ public:
     {
         guard_shattrath_aldorAI(Creature* creature) : GuardAI(creature) { }
 
-        void Reset() override
+        void Reset()
         {
             banishTimer = 5000;
             exileTimer = 8500;
-            playerGUID.Clear();
+            playerGUID = 0;
             canTeleport = false;
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -129,11 +127,10 @@ public:
                         temp->CastSpell(temp, SPELL_EXILE, true);
                         temp->CastSpell(temp, SPELL_BANISH_TELEPORT, true);
                     }
-                    playerGUID.Clear();
+                    playerGUID = 0;
                     exileTimer = 8500;
                     canTeleport = false;
-                }
-                else exileTimer -= diff;
+                } else exileTimer -= diff;
             }
             else if (banishTimer <= diff)
             {
@@ -146,19 +143,18 @@ public:
                     if (playerGUID)
                         canTeleport = true;
                 }
-            }
-            else banishTimer -= diff;
+            } else banishTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     private:
         uint32 exileTimer;
         uint32 banishTimer;
-        ObjectGuid playerGUID;
+        uint64 playerGUID;
         bool canTeleport;
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new guard_shattrath_aldorAI(creature);
     }

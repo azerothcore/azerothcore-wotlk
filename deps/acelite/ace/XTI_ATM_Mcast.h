@@ -35,6 +35,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_XTI_ATM_Mcast : public ACE_TLI_Connector
 {
 public:
+  // = Initialization methods.
   /// Default constructor.
   ACE_XTI_ATM_Mcast (void);
 

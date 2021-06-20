@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,15 +14,16 @@ EndScriptData */
 /* ContentData
 npc_lady_jaina_proudmoore
 npc_nat_pagle
+npc_private_hendel
 npc_cassa_crimsonwing - handled by npc_taxi
 EndContentData */
 
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "Player.h"
 #include "WorldSession.h"
 
 /*######
@@ -65,6 +66,7 @@ public:
 
         return true;
     }
+
 };
 
 /*######
@@ -105,6 +107,121 @@ public:
 
         return true;
     }
+
+};
+
+/*######
+## npc_private_hendel
+######*/
+
+enum Hendel
+{
+    SAY_PROGRESS_1_TER          = 0,
+    SAY_PROGRESS_2_HEN          = 1,
+    SAY_PROGRESS_3_TER          = 2,
+    SAY_PROGRESS_4_TER          = 3,
+    EMOTE_SURRENDER             = 4,
+
+    QUEST_MISSING_DIPLO_PT16    = 1324,
+    FACTION_HOSTILE             = 168,                      //guessed, may be different
+
+    NPC_SENTRY                  = 5184,                     //helps hendel
+    NPC_JAINA                   = 4968,                     //appears once hendel gives up
+    NPC_TERVOSH                 = 4967
+};
+
+/// @todo develop this further, end event not created
+class npc_private_hendel : public CreatureScript
+{
+public:
+    npc_private_hendel() : CreatureScript("npc_private_hendel") { }
+
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, const Quest* quest)
+    {
+        if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT16)
+            creature->setFaction(FACTION_HOSTILE);
+
+        return true;
+    }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_private_hendelAI(creature);
+    }
+
+    struct npc_private_hendelAI : public ScriptedAI
+    {
+        npc_private_hendelAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset()
+        {
+            me->RestoreFaction();
+        }
+
+        void AttackedBy(Unit* pAttacker)
+        {
+            if (me->GetVictim())
+                return;
+
+            if (me->IsFriendlyTo(pAttacker))
+                return;
+
+            AttackStart(pAttacker);
+        }
+
+        void DamageTaken(Unit* pDoneBy, uint32 &Damage, DamageEffectType, SpellSchoolMask)
+        {
+            if (Damage >= me->GetHealth() || me->HealthBelowPctDamaged(20, Damage))
+            {
+                Damage = 0;
+
+                if (pDoneBy)
+                    if (Player* player = pDoneBy->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        player->GroupEventHappens(QUEST_MISSING_DIPLO_PT16, me);
+
+                Talk(EMOTE_SURRENDER);
+                EnterEvadeMode();
+            }
+        }
+    };
+
+};
+
+/*######
+## npc_tervosh
+######*/
+
+enum Tervosh
+{
+    QUEST_MISSING_DIPLO_PT14    = 1265,
+    SPELL_PROUDMOORE_DEFENSE    = 7120,
+    SAY1                        = 0
+};
+
+class npc_archmage_tervosh : public CreatureScript
+{
+public:
+    npc_archmage_tervosh() : CreatureScript("npc_archmage_tervosh") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, const Quest* quest, uint32 /*opt*/)
+    {
+        if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT14)
+        {
+            creature->CastSpell(player, SPELL_PROUDMOORE_DEFENSE);
+            creature->AI()->Talk(SAY1);
+        }
+        return true;
+    }
+
+   CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_archmage_tervoshAI(creature);
+    }
+
+    struct npc_archmage_tervoshAI : public ScriptedAI
+    {
+        npc_archmage_tervoshAI(Creature* creature) : ScriptedAI(creature) { }
+    };
 };
 
 /*######
@@ -124,7 +241,7 @@ class npc_zelfrax : public CreatureScript
 public:
     npc_zelfrax() : CreatureScript("npc_zelfrax") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_zelfraxAI(creature);
     }
@@ -136,7 +253,7 @@ public:
             MoveToDock();
         }
 
-        void AttackStart(Unit* who) override
+        void AttackStart(Unit* who)
         {
             if (!who)
                 return;
@@ -151,7 +268,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 Type, uint32 /*Id*/) override
+        void MovementInform(uint32 Type, uint32 /*Id*/)
         {
             if (Type != POINT_MOTION_TYPE)
                 return;
@@ -173,7 +290,7 @@ public:
             Talk(SAY_ZELFRAX2);
         }
 
-        void UpdateAI(uint32 /*Diff*/) override
+        void UpdateAI(uint32 /*Diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -181,6 +298,7 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
 };
 
 enum SpellScripts
@@ -193,133 +311,141 @@ enum SpellScripts
 
 class spell_ooze_zap : public SpellScriptLoader
 {
-public:
-    spell_ooze_zap() : SpellScriptLoader("spell_ooze_zap") { }
+    public:
+        spell_ooze_zap() : SpellScriptLoader("spell_ooze_zap") { }
 
-    class spell_ooze_zap_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_ooze_zap_SpellScript);
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
+        class spell_ooze_zap_SpellScript : public SpellScript
         {
-            return ValidateSpellInfo({ SPELL_OOZE_ZAP });
-        }
+            PrepareSpellScript(spell_ooze_zap_SpellScript);
 
-        SpellCastResult CheckRequirement()
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP))
+                    return false;
+                return true;
+            }
+
+            SpellCastResult CheckRequirement()
+            {
+                if (!GetCaster()->HasAura(GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
+                    return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW; // This is actually correct
+
+                if (!GetExplTargetUnit())
+                    return SPELL_FAILED_BAD_TARGETS;
+
+                return SPELL_CAST_OK;
+            }
+
+            void HandleDummy(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                if (GetHitUnit())
+                    GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                OnCheckCast += SpellCheckCastFn(spell_ooze_zap_SpellScript::CheckRequirement);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            if (!GetCaster()->HasAura(GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
-                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW; // This is actually correct
-
-            if (!GetExplTargetUnit())
-                return SPELL_FAILED_BAD_TARGETS;
-
-            return SPELL_CAST_OK;
+            return new spell_ooze_zap_SpellScript();
         }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (GetHitUnit())
-                GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            OnCheckCast += SpellCheckCastFn(spell_ooze_zap_SpellScript::CheckRequirement);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_ooze_zap_SpellScript();
-    }
 };
 
 class spell_ooze_zap_channel_end : public SpellScriptLoader
 {
-public:
-    spell_ooze_zap_channel_end() : SpellScriptLoader("spell_ooze_zap_channel_end") { }
+    public:
+        spell_ooze_zap_channel_end() : SpellScriptLoader("spell_ooze_zap_channel_end") { }
 
-    class spell_ooze_zap_channel_end_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_ooze_zap_channel_end_SpellScript);
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
+        class spell_ooze_zap_channel_end_SpellScript : public SpellScript
         {
-            return ValidateSpellInfo({ SPELL_OOZE_ZAP_CHANNEL_END });
-        }
+            PrepareSpellScript(spell_ooze_zap_channel_end_SpellScript);
 
-        void HandleDummy(SpellEffIndex effIndex)
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP_CHANNEL_END))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                if (Player* player = GetCaster()->ToPlayer())
+                    player->CastSpell(player, SPELL_OOZE_CHANNEL_CREDIT, true);
+                Unit::Kill(GetHitUnit(), GetHitUnit());
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_channel_end_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            PreventHitDefaultEffect(effIndex);
-            if (Player* player = GetCaster()->ToPlayer())
-                player->CastSpell(player, SPELL_OOZE_CHANNEL_CREDIT, true);
-            Unit::Kill(GetHitUnit(), GetHitUnit());
+            return new spell_ooze_zap_channel_end_SpellScript();
         }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_channel_end_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_ooze_zap_channel_end_SpellScript();
-    }
 };
 
 class spell_energize_aoe : public SpellScriptLoader
 {
-public:
-    spell_energize_aoe() : SpellScriptLoader("spell_energize_aoe") { }
+    public:
+        spell_energize_aoe() : SpellScriptLoader("spell_energize_aoe") { }
 
-    class spell_energize_aoe_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_energize_aoe_SpellScript);
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
+        class spell_energize_aoe_SpellScript : public SpellScript
         {
-            return ValidateSpellInfo({ SPELL_ENERGIZED });
-        }
+            PrepareSpellScript(spell_energize_aoe_SpellScript);
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end();)
+            bool Validate(SpellInfo const* /*spellInfo*/)
             {
-                if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->ToPlayer()->GetQuestStatus(GetSpellInfo()->Effects[EFFECT_1].CalcValue()) == QUEST_STATUS_INCOMPLETE)
-                    ++itr;
-                else
-                    targets.erase(itr++);
+                if (!sSpellMgr->GetSpellInfo(SPELL_ENERGIZED))
+                    return false;
+                return true;
             }
-            targets.push_back(GetCaster());
-        }
 
-        void HandleScript(SpellEffIndex effIndex)
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end();)
+                {
+                    if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->ToPlayer()->GetQuestStatus(GetSpellInfo()->Effects[EFFECT_1].CalcValue()) == QUEST_STATUS_INCOMPLETE)
+                        ++itr;
+                    else
+                        targets.erase(itr++);
+                }
+                targets.push_back(GetCaster());
+            }
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_energize_aoe_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+            return new spell_energize_aoe_SpellScript();
         }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_energize_aoe_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_energize_aoe_SpellScript();
-    }
 };
 
 void AddSC_dustwallow_marsh()
 {
     new npc_lady_jaina_proudmoore();
     new npc_nat_pagle();
+    new npc_private_hendel();
+    new npc_archmage_tervosh();
     new npc_zelfrax();
     new spell_ooze_zap();
     new spell_ooze_zap_channel_end();

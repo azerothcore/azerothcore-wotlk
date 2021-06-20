@@ -5,8 +5,8 @@
 
   @maintainer Morgan McGuire, http://graphics.cs.williams.edu
   @created 2001-04-22
-  @edited  2013-01-22
-  Copyright 2000-2013, Morgan McGuire.
+  @edited  2010-01-28
+  Copyright 2000-2010, Morgan McGuire.
   All rights reserved.
  */
 
@@ -90,8 +90,7 @@ namespace G3D {
     };
   </PRE>
 
-  And rely on the default enum operator==.
-
+  and rely on the default enum operator==.
 
   Periodically check that debugGetLoad() is low (> 0.1).  When it gets near
   1.0 your hash function is badly designed and maps too many inputs to
@@ -133,12 +132,10 @@ private:
         // Private to require use of the allocator
         Node(const Key& k, const Value& v, size_t h, Node* n) 
             : entry(k, v), hashCode(h), next(n) {
-                debugAssert((next == NULL) || isValidHeapPointer(next));
         }
 
         Node(const Key& k, size_t h, Node* n) 
             : entry(k), hashCode(h), next(n) {
-                debugAssert((next == NULL) || isValidHeapPointer(next));
         }
 
     public:
@@ -216,9 +213,9 @@ private:
 
         // Allocate a new m_bucket array with the new size
         m_bucket = (Node**)alloc(sizeof(Node*) * newSize);
-        alwaysAssertM(m_bucket != NULL, "MemoryManager::alloc returned NULL. Out of memory.");
         // Set all pointers to NULL
         System::memset(m_bucket, 0, newSize * sizeof(Node*));
+        debugAssertM(m_bucket != NULL, "MemoryManager::alloc returned NULL. Out of memory.");
         // Move each node to its new hash location
         for (size_t b = 0; b < m_numBuckets; ++b) {
             Node* node = oldBucket[b];
@@ -277,7 +274,7 @@ private:
     void freeMemory() {
         checkIntegrity();
 
-        for (size_t b = 0; b < m_numBuckets; ++b) {
+        for (size_t b = 0; b < m_numBuckets; b++) {
             Node* node = m_bucket[b];
             while (node != NULL) {
                 Node* next = node->next;
@@ -360,7 +357,7 @@ public:
     size_t debugGetDeepestBucketSize() const {
         size_t deepest = 0;
 
-        for (size_t b = 0; b < m_numBuckets; ++b) {
+        for (size_t b = 0; b < m_numBuckets; b++) {
             size_t  count = 0;
             Node*   node = m_bucket[b];
             while (node != NULL) {
@@ -380,16 +377,21 @@ public:
        Returns the average size of non-empty buckets.
     */
     float debugGetAverageBucketSize() const {
-        uint64 num = 0;
+        size_t num = 0;
+        size_t count = 0;
 
-        for (size_t b = 0; b < m_numBuckets; ++b) {
+        for (size_t b = 0; b < m_numBuckets; b++) {
             Node* node = m_bucket[b];
             if (node != NULL) {
                 ++num;
+                while (node != NULL) {
+                    node = node->next;
+                    ++count;
+                }
             }
         }
 
-        return (float)((double)size() / num);
+        return (float)((double)count / num);
     }
 
     /**
@@ -400,7 +402,7 @@ public:
      many keys to the same code.
      */
     double debugGetLoad() const {
-        return (double)size() / m_numBuckets;
+        return debugGetDeepestBucketSize() / (double)size();
     }
 
     /**
@@ -426,7 +428,7 @@ public:
          Linked list node.
          */
         Node*               node;
-
+        ThisType*           table;
         size_t              m_numBuckets;
         Node**              m_bucket;
         bool                isDone;
@@ -434,14 +436,13 @@ public:
         /**
          Creates the end iterator.
          */
-        Iterator() : index(0), node(NULL), m_bucket(NULL) {
+        Iterator(const ThisType* table) : table(const_cast<ThisType*>(table)) {
             isDone = true;
         }
 
-        Iterator(size_t numBuckets, Node** m_bucket) :
-            index(0), 
-            node(NULL),
-            m_numBuckets(numBuckets),
+        Iterator(const ThisType* table, size_t m_numBuckets, Node** m_bucket) :
+            table(const_cast<ThisType*>(table)),
+            m_numBuckets(m_numBuckets),
             m_bucket(m_bucket) {
             
             if (m_numBuckets == 0) {
@@ -450,38 +451,26 @@ public:
                 return;
             }
 
-#           ifdef G3D_DEBUG
-                for (unsigned int i = 0; i < m_numBuckets; ++i) {
-                    debugAssert((m_bucket[i] == NULL) || isValidHeapPointer(m_bucket[i]));
-                }
-#           endif
-
             index = 0;
             node = m_bucket[index];
-            debugAssert((node == NULL) || isValidHeapPointer(node));
             isDone = false;
             findNext();
-            debugAssert((node == NULL) || isValidHeapPointer(node));
         }
 
         /**
-         If node is NULL, then finds the next element by searching through the bucket array.
-         Sets isDone if no more nodes are available.
+         Finds the next element, setting isDone if one can't be found.
+         Looks at the current element first.
          */
         void findNext() {
             while (node == NULL) {
-                ++index;
+                index++;
                 if (index >= m_numBuckets) {
-                    m_bucket = NULL;
-                    index = 0;
                     isDone = true;
-                    return;
+                    break;
                 } else {
                     node = m_bucket[index];
-                    debugAssert((node == NULL) || isValidHeapPointer(node));
                 }
             }
-            debugAssert(isValidHeapPointer(node));
         }
 
     public:
@@ -492,9 +481,12 @@ public:
         bool operator==(const Iterator& other) const {
             if (other.isDone || isDone) {
                 // Common case; check against isDone.
-                return (isDone == other.isDone);
+                return (isDone == other.isDone) && (other.table == table);
             } else {
-                return (node == other.node) && (index == other.index);
+                return
+                    (table == other.table) &&
+                    (node == other.node) && 
+                    (index == other.index);
             }
         }
 
@@ -502,13 +494,8 @@ public:
          Pre increment.
          */
         Iterator& operator++() {
-            debugAssert(! isDone);
-            debugAssert(node != NULL);
-            debugAssert(isValidHeapPointer(node));
-            debugAssert((node->next == NULL) || isValidHeapPointer(node->next));
             node = node->next;
             findNext();
-            debugAssert(isDone || isValidHeapPointer(node));
             return *this;
         }
 
@@ -525,32 +512,17 @@ public:
             return node->entry;
         }
 
-        const Value& value() const {
-            return node->entry.value;
-        }
-
-        const Key& key() const {
-            return node->entry.key;
-        }
-
         Entry* operator->() const {
-            debugAssert(isValidHeapPointer(node));
             return &(node->entry);
         }
 
         operator Entry*() const {
-            debugAssert(isValidHeapPointer(node));
             return &(node->entry);
         }
 
-        bool isValid() const {
-            return ! isDone;
-        }
-
-        /** @deprecated  Use isValid */
-        bool hasMore() const {
-            return ! isDone;
-        }
+		bool hasMore() const {
+			return ! isDone;
+		}
     };
 
 
@@ -560,7 +532,7 @@ public:
      the next element.  Do not modify the table while iterating.
      */
     Iterator begin() const {
-        return Iterator(m_numBuckets, m_bucket);
+        return Iterator(this, m_numBuckets, m_bucket);
     }
 
     /**
@@ -568,12 +540,11 @@ public:
      element.
      */
     const Iterator end() const {
-        return Iterator();
+        return Iterator(this);
     }
 
     /**
-     Removes all elements. Guaranteed to free all memory associated with
-     the table.
+     Removes all elements
      */
     void clear() {
         freeMemory();
@@ -607,21 +578,20 @@ private:
         if (m_numBuckets == 0) {
             return false;
         }
-       
-        const size_t code = HashFunc::hashCode(key);
-        const size_t b = code % m_numBuckets;
+       size_t code = HashFunc::hashCode(key);
+       size_t b = code % m_numBuckets;
 
-        // Go to the m_bucket
-        Node* n = m_bucket[b];
+       // Go to the m_bucket
+       Node* n = m_bucket[b];
 
-        if (n == NULL) {
-            return false;
-        }
+       if (n == NULL) {
+           return false;
+       }
 
-        Node* previous = NULL;
+       Node* previous = NULL;
       
-        // Try to find the node
-        do {
+       // Try to find the node
+       do {
           if ((code == n->hashCode) && EqualsFunc::equals(n->entry.key, key)) {
               // This is the node; remove it
 
@@ -639,8 +609,6 @@ private:
               // Delete the node
               Node::destroy(n, m_memoryManager);
               --m_size;
-
-              //checkIntegrity();
               return true;
           }
 
@@ -648,8 +616,8 @@ private:
           n = n->next;
       } while (n != NULL);
 
-      //checkIntegrity();
       return false;
+      //alwaysAssertM(false, "Tried to remove a key that was not in the table.");
    }
 
 public:
@@ -690,7 +658,7 @@ private:
            node = node->next;
        }
 
-       return NULL;
+        return NULL;
    }
 
 public:
@@ -765,6 +733,7 @@ public:
    }
 
 
+
     /** Called by getCreate() and set() 
         
         \param created Set to true if the entry was created by this method.
@@ -787,7 +756,6 @@ public:
             m_bucket[b] = Node::create(key, code, NULL, m_memoryManager);
             ++m_size;
             created = true;
-            //checkIntegrity();
             return m_bucket[b]->entry;
         }
 
@@ -804,7 +772,6 @@ public:
 
             if ((code == n->hashCode) && EqualsFunc::equals(n->entry.key, key)) {
                // This is the a pre-existing node
-               //checkIntegrity();
                return n->entry;
             }
 
@@ -812,18 +779,12 @@ public:
             ++bucketLength;
         } while (n != NULL);
 
-        // Allow the load factor to rise as the table gets huge
-        const int bucketsPerElement = 
-            (m_size > 50000) ? 3 :
-                ((m_size > 10000) ? 5 :
-                 ((m_size > 5000) ? 10 : 15));
-
         const size_t maxBucketLength = 3;
         // (Don't bother changing the size of the table if all entries
         // have the same hashcode--they'll still collide)
         if ((bucketLength > maxBucketLength) && 
             ! allSameCode && 
-            (m_numBuckets < m_size * bucketsPerElement)) {
+            (m_numBuckets < m_size * 15)) {
 
             // This m_bucket was really large; rehash if all elements
             // don't have the same hashcode the number of buckets is
@@ -846,10 +807,8 @@ public:
         m_bucket[b] = Node::create(key, code, m_bucket[b], m_memoryManager);
         ++m_size;
         created = true;
-
-        //checkIntegrity();
         return m_bucket[b]->entry;
-    }
+   }
 
     Entry& getCreateEntry(const Key& key) {
         bool ignore;
@@ -912,22 +871,10 @@ public:
 
    void getKeys(Array<Key>& keyArray) const {
        keyArray.resize(0, DONT_SHRINK_UNDERLYING_ARRAY);
-       for (size_t i = 0; i < m_numBuckets; ++i) {
+       for (size_t i = 0; i < m_numBuckets; i++) {
            Node* node = m_bucket[i];
            while (node != NULL) {
                keyArray.append(node->entry.key);
-               node = node->next;
-           }
-       }
-   }
-
-   /** Will contain duplicate values if they exist in the table.  This array is parallel to the one returned by getKeys() if the table has not been modified. */
-   void getValues(Array<Value>& valueArray) const {
-       valueArray.resize(0, DONT_SHRINK_UNDERLYING_ARRAY);
-       for (size_t i = 0; i < m_numBuckets; ++i) {
-           Node* node = m_bucket[i];
-           while (node != NULL) {
-               valueArray.append(node->entry.value);
                node = node->next;
            }
        }
@@ -937,11 +884,10 @@ public:
     Calls delete on all of the keys and then clears the table.
     */
    void deleteKeys() {
-       for (size_t i = 0; i < m_numBuckets; ++i) {
+       for (size_t i = 0; i < m_numBuckets; i++) {
            Node* node = m_bucket[i];
            while (node != NULL) {
                delete node->entry.key;
-               node->entry.key = NULL;
                node = node->next;
            }
        }
@@ -966,37 +912,6 @@ public:
            }
        }
    }
-
-    template<class H, class E>
-    bool operator==(const Table<Key, Value, H, E>& other) const {
-        if (size() != other.size()) {
-            return false;
-        }
-
-        for (Iterator it = begin(); it.hasMore(); ++it) {
-            const Value* v = other.getPointer(it->key);
-            if ((v == NULL) || (*v != it->value)) {
-                // Either the key did not exist or the value was not the same
-                return false;
-            }
-        }
-
-        // this and other have the same number of keys, so we don't
-        // have to check for extra keys in other.
-
-        return true;
-    }
-
-    template<class H, class E>
-    bool operator!=(const Table<Key, Value, H, E>& other) const {
-        return ! (*this == other);
-    }
-
-    void debugPrintStatus() {
-        debugPrintf("Deepest bucket size    = %d\n", (int)debugGetDeepestBucketSize());
-        debugPrintf("Average bucket size    = %g\n", debugGetAverageBucketSize());
-        debugPrintf("Load factor            = %g\n", debugGetLoad());
-    }
 };
 
 } // namespace

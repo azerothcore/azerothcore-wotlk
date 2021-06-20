@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+cp src/server/worldserver/worldserver.conf.dist docker/worldserver/etc/worldserver.conf.dist
+cp src/server/authserver/authserver.conf.dist docker/authserver/etc/authserver.conf.dist
+
+cp docker/worldserver/etc/worldserver.conf.dockerdist docker/worldserver/etc/worldserver.conf
+cp docker/authserver/etc/authserver.conf.dockerdist docker/authserver/etc/authserver.conf

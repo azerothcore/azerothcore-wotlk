@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_queststarter`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = UTF8MB4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `creature_queststarter` 
 (
-  `id` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
+  `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Creature System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_queststarter` WRITE;
@@ -953,6 +953,7 @@ INSERT INTO `creature_queststarter` VALUES
 (3170,2380),
 (3171,6062),
 (3171,6065),
+(3171,6069),
 (3171,6081),
 (3171,6082),
 (3171,6083),
@@ -1133,6 +1134,7 @@ INSERT INTO `creature_queststarter` VALUES
 (3516,952),
 (3516,3764),
 (3516,3781),
+(3516,3803),
 (3516,6761),
 (3517,923),
 (3517,2498),
@@ -1307,7 +1309,6 @@ INSERT INTO `creature_queststarter` VALUES
 (4215,8233),
 (4217,26),
 (4217,3785),
-(4217,3803),
 (4217,5921),
 (4217,6001),
 (4217,6121),
@@ -2796,6 +2797,11 @@ INSERT INTO `creature_queststarter` VALUES
 (13257,6781),
 (13257,7223),
 (13278,6805),
+(13278,6821),
+(13278,6822),
+(13278,6823),
+(13278,6824),
+(13278,7486),
 (13283,8233),
 (13377,6861),
 (13377,6862),
@@ -3285,6 +3291,9 @@ INSERT INTO `creature_queststarter` VALUES
 (15306,8364),
 (15309,8312),
 (15310,8311),
+(15350,8367),
+(15350,8388),
+(15350,13476),
 (15362,8733),
 (15378,8790),
 (15379,8802),
@@ -4797,6 +4806,11 @@ INSERT INTO `creature_queststarter` VALUES
 (20482,10405),
 (20482,10406),
 (20482,10408),
+(20482,10975),
+(20482,10976),
+(20482,10977),
+(20482,10981),
+(20482,10982),
 (20518,10271),
 (20551,10345),
 (20552,10353),
@@ -5190,7 +5204,6 @@ INSERT INTO `creature_queststarter` VALUES
 (22919,10976),
 (22919,10977),
 (22919,10981),
-(22919,10982),
 (22924,10980),
 (22924,10986),
 (22924,10990),
@@ -5300,7 +5313,6 @@ INSERT INTO `creature_queststarter` VALUES
 (23464,11110),
 (23465,11114),
 (23466,11113),
-(23486,11117),
 (23486,11118),
 (23534,8419),
 (23535,7562),
@@ -5591,7 +5603,6 @@ INSERT INTO `creature_queststarter` VALUES
 (24634,11436),
 (24643,11509),
 (24657,11120),
-(24657,11431),
 (24702,11684),
 (24702,11685),
 (24703,11628),

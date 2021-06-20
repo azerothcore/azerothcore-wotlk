@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,8 @@ SDComment: No model for submerging. Currently just invisible.
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -29,9 +29,9 @@ class boss_ouro : public CreatureScript
 public:
     boss_ouro() : CreatureScript("boss_ouro") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetTempleOfAhnQirajAI<boss_ouroAI>(creature);
+        return new boss_ouroAI(creature);
     }
 
     struct boss_ouroAI : public ScriptedAI
@@ -48,7 +48,7 @@ public:
         bool Enrage;
         bool Submerged;
 
-        void Reset() override
+        void Reset()
         {
             Sweep_Timer = urand(5000, 10000);
             SandBlast_Timer = urand(20000, 35000);
@@ -61,12 +61,12 @@ public:
             Submerged = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             DoCastVictim(SPELL_BIRTH);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -77,16 +77,14 @@ public:
             {
                 DoCastVictim(SPELL_SWEEP);
                 Sweep_Timer = urand(15000, 30000);
-            }
-            else Sweep_Timer -= diff;
+            } else Sweep_Timer -= diff;
 
             //SandBlast_Timer
             if (!Submerged && SandBlast_Timer <= diff)
             {
                 DoCastVictim(SPELL_SANDBLAST);
                 SandBlast_Timer = urand(20000, 35000);
-            }
-            else SandBlast_Timer -= diff;
+            } else SandBlast_Timer -= diff;
 
             //Submerge_Timer
             if (!Submerged && Submerge_Timer <= diff)
@@ -99,21 +97,19 @@ public:
 
                 Submerged = true;
                 Back_Timer = urand(30000, 45000);
-            }
-            else Submerge_Timer -= diff;
+            } else Submerge_Timer -= diff;
 
             //ChangeTarget_Timer
             if (Submerged && ChangeTarget_Timer <= diff)
             {
-                Unit* target = nullptr;
+                Unit* target = NULL;
                 target = SelectTarget(SELECT_TARGET_RANDOM, 0);
 
                 if (target)
                     me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
 
                 ChangeTarget_Timer = urand(10000, 20000);
-            }
-            else ChangeTarget_Timer -= diff;
+            } else ChangeTarget_Timer -= diff;
 
             //Back_Timer
             if (Submerged && Back_Timer <= diff)
@@ -125,12 +121,12 @@ public:
 
                 Submerged = false;
                 Submerge_Timer = urand(60000, 120000);
-            }
-            else Back_Timer -= diff;
+            } else Back_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
+
 };
 
 void AddSC_boss_ouro()

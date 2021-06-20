@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -30,15 +30,15 @@ go_hive_pod
 go_veil_skith_cage
 EndContentData */
 
-#include "CellImpl.h"
-#include "GameObjectAI.h"
-#include "GridNotifiersImpl.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
+#include "GameObjectAI.h"
 #include "Spell.h"
+#include "Player.h"
 #include "WorldSession.h"
+#include "GridNotifiersImpl.h"
+#include "CellImpl.h"
 
 // Ours
 /*######
@@ -75,11 +75,11 @@ class go_mistwhisper_treasure : public GameObjectScript
 public:
     go_mistwhisper_treasure() : GameObjectScript("go_mistwhisper_treasure") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject* go) override
+    bool OnGossipHello(Player* pPlayer, GameObject *go) override
     {
         if (!go->FindNearestCreature(28105, 30.0f)) // Tartek
         {
-            if (Creature* cr = go->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+            if (Creature *cr = go->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
             {
                 cr->MonsterYell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL, 0);
                 cr->AI()->AttackStart(pPlayer);
@@ -91,37 +91,37 @@ public:
 
 class go_witherbark_totem_bundle : public GameObjectScript
 {
-public:
-    go_witherbark_totem_bundle() : GameObjectScript("go_witherbark_totem_bundle") { }
+    public:
+        go_witherbark_totem_bundle() : GameObjectScript("go_witherbark_totem_bundle") { }
 
-    struct go_witherbark_totem_bundleAI : public GameObjectAI
-    {
-        go_witherbark_totem_bundleAI(GameObject* gameObject) : GameObjectAI(gameObject)
+        struct go_witherbark_totem_bundleAI : public GameObjectAI
         {
-            _timer = 1;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_timer)
+            go_witherbark_totem_bundleAI(GameObject* gameObject) : GameObjectAI(gameObject)
             {
-                _timer += diff;
-                if (_timer > 5000)
+                _timer = 1;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (_timer)
                 {
-                    go->CastSpell(nullptr, 9056);
-                    go->DestroyForNearbyPlayers();
-                    _timer = 0;
+                    _timer += diff;
+                    if (_timer > 5000)
+                    {
+                        go->CastSpell(NULL, 9056);
+                        go->DestroyForNearbyPlayers();
+                        _timer = 0;
+                    }
                 }
             }
+
+            uint32 _timer;
+        };
+
+        GameObjectAI* GetAI(GameObject* go) const
+        {
+            return new go_witherbark_totem_bundleAI(go);
         }
-
-        uint32 _timer;
-    };
-
-    GameObjectAI* GetAI(GameObject* go) const override
-    {
-        return new go_witherbark_totem_bundleAI(go);
-    }
 };
 
 class go_arena_ready_marker : public GameObjectScript
@@ -129,7 +129,7 @@ class go_arena_ready_marker : public GameObjectScript
 public:
     go_arena_ready_marker() : GameObjectScript("go_arena_ready_marker") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    bool OnGossipHello(Player* player, GameObject * /*go*/) override
     {
         if (Battleground* bg = player->GetBattleground())
             bg->ReadyMarkerClicked(player);
@@ -168,7 +168,7 @@ public:
         int Random = rand() % (sizeof(NpcPrisonEntry) / sizeof(uint32));
 
         if (Creature* creature = player->SummonCreature(NpcPrisonEntry[Random], go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), go->GetAngle(player),
-                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+            TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
         {
             if (!creature->IsHostileTo(player))
             {
@@ -176,24 +176,12 @@ public:
 
                 switch (creature->GetEntry())
                 {
-                    case 22811:
-                        Spell = SPELL_REP_LC;
-                        break;
-                    case 22812:
-                        Spell = SPELL_REP_SHAT;
-                        break;
-                    case 22810:
-                        Spell = SPELL_REP_CE;
-                        break;
-                    case 22813:
-                        Spell = SPELL_REP_CON;
-                        break;
-                    case 22815:
-                        Spell = SPELL_REP_KT;
-                        break;
-                    case 22814:
-                        Spell = SPELL_REP_SPOR;
-                        break;
+                    case 22811: Spell = SPELL_REP_LC; break;
+                    case 22812: Spell = SPELL_REP_SHAT; break;
+                    case 22810: Spell = SPELL_REP_CE; break;
+                    case 22813: Spell = SPELL_REP_CON; break;
+                    case 22815: Spell = SPELL_REP_KT; break;
+                    case 22814: Spell = SPELL_REP_SPOR; break;
                 }
 
                 if (Spell)
@@ -224,7 +212,7 @@ public:
         int Random = rand() % (sizeof(NpcStasisEntry) / sizeof(uint32));
 
         player->SummonCreature(NpcStasisEntry[Random], go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), go->GetAngle(player),
-                               TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
 
         return false;
     }
@@ -246,7 +234,7 @@ public:
 
     bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
-        // xinef: prevent spawning hundreds of them
+         // xinef: prevent spawning hundreds of them
         if (go->GetGoType() == GAMEOBJECT_TYPE_GOOBER && !go->FindNearestCreature(NPC_GOGGEROC, 20.0f))
             go->SummonCreature(NPC_GOGGEROC, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
 
@@ -284,22 +272,22 @@ public:
             requireSummon = 0;
             int8 count = urand(1, 3);
             for (int8 i = 0; i < count; ++i)
-                go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionZ(), go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX()+cos(2*M_PI*i/3.0f)*0.60f, go->GetPositionY()+sin(2*M_PI*i/3.0f)*0.60f, go->GetPositionZ()+0.5f, go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
-        void OnStateChanged(uint32 state, Unit*  /*unit*/) override
+        void OnStateChanged(uint32 state, Unit*  /*unit*/)
         {
             if (requireSummon == 1 && state == GO_READY)
                 requireSummon = 2;
         }
 
-        void UpdateAI(uint32  /*diff*/) override
+        void UpdateAI(uint32  /*diff*/)
         {
             if (go->isSpawned() && requireSummon == 2)
                 SummonTadpoles();
         }
 
-        bool GossipHello(Player* player, bool  /*reportUse*/) override
+        bool GossipHello(Player* player, bool  /*reportUse*/)
         {
             if (requireSummon)
                 return false;
@@ -311,16 +299,16 @@ public:
                 GetCreatureListWithEntryInGrid(cList, go, NPC_WINTERFIN_TADPOLE, 5.0f);
                 for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
                 {
-                    player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE);
+                    player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE, 0);
                     (*itr)->DespawnOrUnsummon(urand(45000, 60000));
-                    (*itr)->GetMotionMaster()->MoveFollow(player, 1.0f, frand(0.0f, 2 * M_PI), MOTION_SLOT_CONTROLLED);
+                    (*itr)->GetMotionMaster()->MoveFollow(player, 1.0f, frand(0.0f, 2*M_PI), MOTION_SLOT_CONTROLLED);
                 }
             }
             return false;
         }
     };
 
-    GameObjectAI* GetAI(GameObject* go) const override
+    GameObjectAI* GetAI(GameObject* go) const
     {
         return new go_tadpole_cageAI(go);
     }
@@ -342,16 +330,16 @@ public:
             timer { 0 }
         { }
 
-        void UpdateAI(uint32  diff) override
+        void UpdateAI(uint32  diff)
         {
             timer += diff;
             if (timer > 3000)
             {
                 timer = 0;
                 std::list<Player*> players;
-                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                Cell::VisitWorldObjects(go, searcher, 0.3f);
+                acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
+                acore::PlayerListSearcher<acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
+                go->VisitNearbyWorldObject(0.3f, searcher);
 
                 if (players.size() > 0)
                 {
@@ -367,7 +355,7 @@ public:
         uint32 timer;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const override
+    GameObjectAI* GetAI(GameObject* go) const
     {
         return new go_flamesAI(go);
     }
@@ -389,16 +377,16 @@ public:
             timer { 0 }
         { }
 
-        void UpdateAI(uint32  diff) override
+        void UpdateAI(uint32  diff)
         {
             timer += diff;
             if (timer > 3000)
             {
                 timer = 0;
                 std::list<Player*> players;
-                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                Cell::VisitWorldObjects(go, searcher, 0.3f);
+                acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
+                acore::PlayerListSearcher<acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
+                go->VisitNearbyWorldObject(0.3f, searcher);
 
                 if (players.size() > 0)
                 {
@@ -414,373 +402,32 @@ public:
         uint32 timer;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const override
+    GameObjectAI* GetAI(GameObject* go) const
     {
         return new go_heatAI(go);
     }
 };
 
+
 // Theirs
-/*####
-## go_brewfest_music
-####*/
+/*######
+## go_cat_figurine
+######*/
 
-enum BrewfestMusic
+enum CatFigurine
 {
-    EVENT_BREWFESTDWARF01 = 11810, // 1.35 min
-    EVENT_BREWFESTDWARF02 = 11812, // 1.55 min
-    EVENT_BREWFESTDWARF03 = 11813, // 0.23 min
-    EVENT_BREWFESTGOBLIN01 = 11811, // 1.08 min
-    EVENT_BREWFESTGOBLIN02 = 11814, // 1.33 min
-    EVENT_BREWFESTGOBLIN03 = 11815 // 0.28 min
+    SPELL_SUMMON_GHOST_SABER    = 5968,
 };
 
-// These are in seconds
-enum BrewfestMusicTime
-{
-    EVENT_BREWFESTDWARF01_TIME = 95000,
-    EVENT_BREWFESTDWARF02_TIME = 155000,
-    EVENT_BREWFESTDWARF03_TIME = 23000,
-    EVENT_BREWFESTGOBLIN01_TIME = 68000,
-    EVENT_BREWFESTGOBLIN02_TIME = 93000,
-    EVENT_BREWFESTGOBLIN03_TIME = 28000
-};
-
-enum BrewfestMusicAreas
-{
-    SILVERMOON = 3430, // Horde
-    UNDERCITY = 1497,
-    ORGRIMMAR_1 = 1296,
-    ORGRIMMAR_2 = 14,
-    THUNDERBLUFF = 1638,
-    IRONFORGE_1 = 809, // Alliance
-    IRONFORGE_2 = 1,
-    STORMWIND = 12,
-    EXODAR = 3557,
-    DARNASSUS = 1657,
-    SHATTRATH = 3703 // General
-};
-
-enum BrewfestMusicEvents
-{
-    EVENT_BM_SELECT_MUSIC = 1,
-    EVENT_BM_START_MUSIC = 2
-};
-
-class go_brewfest_music : public GameObjectScript
+class go_cat_figurine : public GameObjectScript
 {
 public:
-    go_brewfest_music() : GameObjectScript("go_brewfest_music") { }
+    go_cat_figurine() : GameObjectScript("go_cat_figurine") { }
 
-    struct go_brewfest_musicAI : public GameObjectAI
+    bool OnGossipHello(Player* player, GameObject* /*go*/) override
     {
-        go_brewfest_musicAI(GameObject* go) : GameObjectAI(go)
-        {
-            _events.ScheduleEvent(EVENT_BM_SELECT_MUSIC, 1000);
-            _events.ScheduleEvent(EVENT_BM_START_MUSIC, 1500);
-            _currentMusicEvent = EVENT_BREWFESTGOBLIN01;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_BM_SELECT_MUSIC:
-                        {
-                            if (!IsHolidayActive(HOLIDAY_BREWFEST)) // Check if Brewfest is active
-                                break;
-                            // Select random music sample
-                            uint32 rnd = urand(0, 2);
-                            uint32 musicTime = 1000;
-                            //Restart the current selected music
-                            _currentMusicEvent = 0;
-                            //Check zone to play correct music
-                            if (go->GetAreaId() == SILVERMOON || go->GetAreaId() == UNDERCITY || go->GetAreaId() == ORGRIMMAR_1 || go->GetAreaId() == ORGRIMMAR_2 || go->GetAreaId() == THUNDERBLUFF)
-                            {
-                                switch (rnd)
-                                {
-                                    case 0:
-                                        _currentMusicEvent = EVENT_BREWFESTGOBLIN01;
-                                        musicTime = EVENT_BREWFESTGOBLIN01_TIME;
-                                        break;
-                                    case 1:
-                                        _currentMusicEvent = EVENT_BREWFESTGOBLIN02;
-                                        musicTime = EVENT_BREWFESTGOBLIN02_TIME;
-                                        break;
-                                    case 2:
-                                        _currentMusicEvent = EVENT_BREWFESTGOBLIN03;
-                                        musicTime = EVENT_BREWFESTGOBLIN03_TIME;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                            else if (go->GetAreaId() == IRONFORGE_1 || go->GetAreaId() == IRONFORGE_2 || go->GetAreaId() == STORMWIND || go->GetAreaId() == EXODAR || go->GetAreaId() == DARNASSUS)
-                            {
-                                switch (rnd)
-                                {
-                                    case 0:
-                                        _currentMusicEvent = EVENT_BREWFESTDWARF01;
-                                        musicTime = EVENT_BREWFESTDWARF01_TIME;
-                                        break;
-                                    case 1:
-                                        _currentMusicEvent = EVENT_BREWFESTDWARF02;
-                                        musicTime = EVENT_BREWFESTDWARF02_TIME;
-                                        break;
-                                    case 2:
-                                        _currentMusicEvent = EVENT_BREWFESTDWARF03;
-                                        musicTime = EVENT_BREWFESTDWARF03_TIME;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                            else if (go->GetAreaId() == SHATTRATH)
-                            {
-                                rnd = urand(0, 5);
-                                switch (rnd)
-                                {
-                                    case 0:
-                                        _currentMusicEvent = EVENT_BREWFESTGOBLIN01;
-                                        musicTime = EVENT_BREWFESTGOBLIN01_TIME;
-                                        break;
-                                    case 1:
-                                        _currentMusicEvent = EVENT_BREWFESTGOBLIN02;
-                                        musicTime = EVENT_BREWFESTGOBLIN02_TIME;
-                                        break;
-                                    case 2:
-                                        _currentMusicEvent = EVENT_BREWFESTGOBLIN03;
-                                        musicTime = EVENT_BREWFESTGOBLIN03_TIME;
-                                        break;
-                                    case 3:
-                                        _currentMusicEvent = EVENT_BREWFESTDWARF01;
-                                        musicTime = EVENT_BREWFESTDWARF01_TIME;
-                                        break;
-                                    case 4:
-                                        _currentMusicEvent = EVENT_BREWFESTDWARF02;
-                                        musicTime = EVENT_BREWFESTDWARF02_TIME;
-                                        break;
-                                    case 5:
-                                        _currentMusicEvent = EVENT_BREWFESTDWARF03;
-                                        musicTime = EVENT_BREWFESTDWARF03_TIME;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                            _events.ScheduleEvent(EVENT_BM_SELECT_MUSIC, musicTime); // Select new song music after play time is over
-                            break;
-                        }
-                    case EVENT_BM_START_MUSIC:
-                        if (!IsHolidayActive(HOLIDAY_BREWFEST)) // Check if Brewfest is active
-                            break;
-                        // Play selected music
-                        if (_currentMusicEvent != 0)
-                        {
-                            go->PlayDirectMusic(_currentMusicEvent);
-                        }
-                        _events.ScheduleEvent(EVENT_BM_START_MUSIC, 5000); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    private:
-        EventMap _events;
-        uint32 _currentMusicEvent;
-    };
-
-    GameObjectAI* GetAI(GameObject* go) const override
-    {
-        return new go_brewfest_musicAI(go);
-    }
-};
-
-/*####
-## go_pirate_day_music
-####*/
-
-enum PirateDayMusic
-{
-    MUSIC_PIRATE_DAY_MUSIC = 12845
-};
-
-enum PirateDayMusicEvents
-{
-    EVENT_PDM_START_MUSIC = 1
-};
-
-class go_pirate_day_music : public GameObjectScript
-{
-public:
-    go_pirate_day_music() : GameObjectScript("go_pirate_day_music") { }
-
-    struct go_pirate_day_musicAI : public GameObjectAI
-    {
-        uint32 rnd;
-
-        go_pirate_day_musicAI(GameObject* go) : GameObjectAI(go)
-        {
-            _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 1000);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_PDM_START_MUSIC:
-                        if (!IsHolidayActive(HOLIDAY_PIRATES_DAY))
-                            break;
-                        go->PlayDirectMusic(MUSIC_PIRATE_DAY_MUSIC);
-                        _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    private:
-        EventMap _events;
-    };
-
-    GameObjectAI* GetAI(GameObject* go) const override
-    {
-        return new go_pirate_day_musicAI(go);
-    }
-};
-
-/*####
-## go_darkmoon_faire_music
-####*/
-enum DarkmoonFaireMusic
-{
-    MUSIC_DARKMOON_FAIRE_MUSIC = 8440
-};
-
-enum DarkmoonFaireMusicEvents
-{
-    EVENT_DFM_START_MUSIC = 1
-};
-
-class go_darkmoon_faire_music : public GameObjectScript
-{
-public:
-    go_darkmoon_faire_music() : GameObjectScript("go_darkmoon_faire_music") { }
-
-    struct go_darkmoon_faire_musicAI : public GameObjectAI
-    {
-        uint32 rnd;
-
-        go_darkmoon_faire_musicAI(GameObject* go) : GameObjectAI(go)
-        {
-            _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 1000);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_DFM_START_MUSIC:
-                        if (!IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_ELWYNN) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_THUNDER) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_SHATTRATH))
-                            break;
-                        go->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
-                        _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    private:
-        EventMap _events;
-    };
-
-    GameObjectAI* GetAI(GameObject* go) const override
-    {
-        return new go_darkmoon_faire_musicAI(go);
-    }
-};
-
-/*####
-## go_midsummer_music
-####*/
-
-enum MidsummerMusic
-{
-    EVENTMIDSUMMERFIREFESTIVAL_A = 12319, // 1.08 min
-    EVENTMIDSUMMERFIREFESTIVAL_H = 12325, // 1.12 min
-};
-
-enum MidsummerMusicEvents
-{
-    EVENT_MM_START_MUSIC = 1
-};
-
-class go_midsummer_music : public GameObjectScript
-{
-public:
-    go_midsummer_music() : GameObjectScript("go_midsummer_music") { }
-
-    struct go_midsummer_musicAI : public GameObjectAI
-    {
-        go_midsummer_musicAI(GameObject* go) : GameObjectAI(go)
-        {
-            _events.ScheduleEvent(EVENT_MM_START_MUSIC, 1000);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_MM_START_MUSIC:
-                        {
-                            if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
-                                break;
-
-                            Map::PlayerList const& players = go->GetMap()->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            {
-                                if (Player* player = itr->GetSource())
-                                {
-                                    if (player->GetTeamId() == TEAM_HORDE)
-                                    {
-                                        go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_H, player);
-                                    }
-                                    else
-                                    {
-                                        go->PlayDirectMusic(EVENTMIDSUMMERFIREFESTIVAL_A, player);
-                                    }
-                                }
-                            }
-
-                            _events.ScheduleEvent(EVENT_MM_START_MUSIC, 5000); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
-                            break;
-                        }
-                    default:
-                        break;
-                }
-            }
-        }
-    private:
-        EventMap _events;
-    };
-
-    GameObjectAI* GetAI(GameObject* go) const override
-    {
-        return new go_midsummer_musicAI(go);
+        player->CastSpell(player, SPELL_SUMMON_GHOST_SABER, true);
+        return false;
     }
 };
 
@@ -1054,12 +701,12 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
                 player->CastSpell(player, SPELL_CREATE_1_FLASK_OF_BEAST, false);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 SendGossipMenuFor(player, GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
                 player->CastSpell(player, SPELL_CREATE_5_FLASK_OF_BEAST, false);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 SendGossipMenuFor(player, GOSSIP_FEL_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
@@ -1113,12 +760,12 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF:
                 player->CastSpell(player, SPELL_CREATE_1_FLASK_OF_SORCERER, false);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 SendGossipMenuFor(player, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
                 player->CastSpell(player, SPELL_CREATE_5_FLASK_OF_SORCERER, false);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 SendGossipMenuFor(player, GOSSIP_BASHIR_CRYSTALFORGE_ITEM_TEXT_RETURN, go->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
@@ -1226,7 +873,7 @@ public:
             return false;
 
         pPrisoner->DespawnOrUnsummon();
-        player->KilledMonsterCredit(NPC_EBON_BLADE_PRISONER_HUMAN);
+        player->KilledMonsterCredit(NPC_EBON_BLADE_PRISONER_HUMAN, 0);
         switch (pPrisoner->GetEntry())
         {
             case NPC_EBON_BLADE_PRISONER_HUMAN:
@@ -1281,27 +928,27 @@ enum InconspicuousLandmark
 
 class go_inconspicuous_landmark : public GameObjectScript
 {
-public:
-    go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
-    {
-        _lastUsedTime = time(nullptr);
-    }
+    public:
+        go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
+        {
+            _lastUsedTime = time(NULL);
+        }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
-    {
-        if (player->HasItemCount(ITEM_CUERGOS_KEY))
+        bool OnGossipHello(Player* player, GameObject* /*go*/) override
+        {
+            if (player->HasItemCount(ITEM_CUERGOS_KEY))
+                return true;
+
+            if (_lastUsedTime > time(NULL))
+                return true;
+
+            _lastUsedTime = time(NULL) + MINUTE;
+            player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
             return true;
+        }
 
-        if (_lastUsedTime > time(nullptr))
-            return true;
-
-        _lastUsedTime = time(nullptr) + MINUTE;
-        player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
-        return true;
-    }
-
-private:
-    uint32 _lastUsedTime;
+    private:
+        uint32 _lastUsedTime;
 };
 
 /*######
@@ -1327,98 +974,98 @@ enum SoulWellData
 
 class go_soulwell : public GameObjectScript
 {
-public:
-    go_soulwell() : GameObjectScript("go_soulwell") { }
+    public:
+        go_soulwell() : GameObjectScript("go_soulwell") { }
 
-    struct go_soulwellAI : public GameObjectAI
-    {
-        go_soulwellAI(GameObject* go) : GameObjectAI(go)
+        struct go_soulwellAI : public GameObjectAI
         {
-            _stoneSpell = 0;
-            _stoneId = 0;
-            switch (go->GetEntry())
+            go_soulwellAI(GameObject* go) : GameObjectAI(go)
             {
-                case GO_SOUL_WELL_R1:
-                    _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R0;
-                    if (Unit* owner = go->GetOwner())
-                    {
-                        if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
-                            _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R1;
-                        else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
-                            _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R2;
-                    }
-                    break;
-                case GO_SOUL_WELL_R2:
-                    _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R0;
-                    if (Unit* owner = go->GetOwner())
-                    {
-                        if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
-                            _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R1;
-                        else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
-                            _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R2;
-                    }
-                    break;
+                _stoneSpell = 0;
+                _stoneId = 0;
+                switch (go->GetEntry())
+                {
+                    case GO_SOUL_WELL_R1:
+                        _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R0;
+                        if (Unit* owner = go->GetOwner())
+                        {
+                            if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
+                                _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R1;
+                            else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
+                                _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R2;
+                        }
+                        break;
+                    case GO_SOUL_WELL_R2:
+                        _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R0;
+                        if (Unit* owner = go->GetOwner())
+                        {
+                            if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
+                                _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R1;
+                            else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
+                                _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R2;
+                        }
+                        break;
+                }
+                if (_stoneSpell == 0) // Should never happen
+                    return;
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_stoneSpell);
+                if (!spellInfo)
+                    return;
+
+                _stoneId = spellInfo->Effects[EFFECT_0].ItemType;
             }
-            if (_stoneSpell == 0) // Should never happen
-                return;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_stoneSpell);
-            if (!spellInfo)
-                return;
+            /// Due to the fact that this GameObject triggers CMSG_GAMEOBJECT_USE
+            /// _and_ CMSG_GAMEOBJECT_REPORT_USE, this GossipHello hook is called
+            /// twice. The script's handling is fine as it won't remove two charges
+            /// on the well. We have to find how to segregate REPORT_USE and USE.
+            bool GossipHello(Player* player, bool reportUse)
+            {
+                if (reportUse)
+                    return false;
 
-            _stoneId = spellInfo->Effects[EFFECT_0].ItemType;
-        }
+                Unit* owner = go->GetOwner();
+                if (_stoneSpell == 0 || _stoneId == 0)
+                {
+                    if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
+                        Spell::SendCastResult(player, spell, 0, SPELL_FAILED_ERROR);
+                    return true;
+                }
 
-        /// Due to the fact that this GameObject triggers CMSG_GAMEOBJECT_USE
-        /// _and_ CMSG_GAMEOBJECT_REPORT_USE, this GossipHello hook is called
-        /// twice. The script's handling is fine as it won't remove two charges
-        /// on the well. We have to find how to segregate REPORT_USE and USE.
-        bool GossipHello(Player* player, bool reportUse) override
+                if (!owner || owner->GetTypeId() != TYPEID_PLAYER || !player->IsInSameRaidWith(owner->ToPlayer()))
+                {
+                    if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
+                        Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TARGET_NOT_IN_RAID);
+                    return true;
+                }
+
+                // Don't try to add a stone if we already have one.
+                if (player->HasItemCount(_stoneId))
+                {
+                    if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
+                        Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TOO_MANY_OF_ITEM);
+                    return true;
+                }
+
+                player->CastSpell(player, _stoneSpell, false);
+
+                // Item has to actually be created to remove a charge on the well.
+                if (player->HasItemCount(_stoneId))
+                    go->AddUse();
+
+                return true;
+            }
+
+        private:
+            uint32 _stoneSpell;
+            uint32 _stoneId;
+        };
+
+        GameObjectAI* GetAI(GameObject* go) const
         {
-            if (reportUse)
-                return false;
-
-            Unit* owner = go->GetOwner();
-            if (_stoneSpell == 0 || _stoneId == 0)
-            {
-                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
-                    Spell::SendCastResult(player, spell, 0, SPELL_FAILED_ERROR);
-                return true;
-            }
-
-            if (!owner || owner->GetTypeId() != TYPEID_PLAYER || !player->IsInSameRaidWith(owner->ToPlayer()))
-            {
-                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
-                    Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TARGET_NOT_IN_RAID);
-                return true;
-            }
-
-            // Don't try to add a stone if we already have one.
-            if (player->HasItemCount(_stoneId))
-            {
-                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
-                    Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TOO_MANY_OF_ITEM);
-                return true;
-            }
-
-            player->CastSpell(player, _stoneSpell, false);
-
-            // Item has to actually be created to remove a charge on the well.
-            if (player->HasItemCount(_stoneId))
-                go->AddUse();
-
-            return true;
+            return new go_soulwellAI(go);
         }
-
-    private:
-        uint32 _stoneSpell;
-        uint32 _stoneId;
-    };
-
-    GameObjectAI* GetAI(GameObject* go) const override
-    {
-        return new go_soulwellAI(go);
-    }
 };
 
 /*######
@@ -1465,7 +1112,7 @@ public:
         if (qInfo)
         {
             /// @todo prisoner should help player for a short period of time
-            player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0]);
+            player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0], 0);
             pPrisoner->DisappearAndDie();
         }
         return true;
@@ -1513,7 +1160,7 @@ public:
     bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
+        if (action == GOSSIP_ACTION_INFO_DEF +1)
         {
             CloseGossipMenuFor(player);
             Creature* target = GetClosestCreatureWithEntry(player, NPC_OUTHOUSE_BUNNY, 3.0f);
@@ -1560,22 +1207,22 @@ public:
         if (go->FindNearestCreature(NPC_HIVE_AMBUSHER, 20.0f))
             return true;
 
-        go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX() + 1, go->GetPositionY(), go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
-        go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX(), go->GetPositionY() + 1, go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+        go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX()+1, go->GetPositionY(), go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+        go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX(), go->GetPositionY()+1, go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
         return true;
     }
 };
 
 class go_massive_seaforium_charge : public GameObjectScript
 {
-public:
-    go_massive_seaforium_charge() : GameObjectScript("go_massive_seaforium_charge") { }
+    public:
+        go_massive_seaforium_charge() : GameObjectScript("go_massive_seaforium_charge") { }
 
-    bool OnGossipHello(Player* /*player*/, GameObject* go) override
-    {
-        go->SetLootState(GO_JUST_DEACTIVATED);
-        return true;
-    }
+        bool OnGossipHello(Player* /*player*/, GameObject* go) override
+        {
+            go->SetLootState(GO_JUST_DEACTIVATED);
+            return true;
+        }
 };
 
 /*########
@@ -1584,9 +1231,9 @@ public:
 
 enum MissingFriends
 {
-    QUEST_MISSING_FRIENDS    = 10852,
-    NPC_CAPTIVE_CHILD        = 22314,
-    SAY_FREE_0               = 0,
+   QUEST_MISSING_FRIENDS    = 10852,
+   NPC_CAPTIVE_CHILD        = 22314,
+   SAY_FREE_0               = 0,
 };
 
 class go_veil_skith_cage : public GameObjectScript
@@ -1605,7 +1252,7 @@ public:
             {
                 player->KilledMonsterCredit(NPC_CAPTIVE_CHILD, (*itr)->GetGUID());
                 (*itr)->DespawnOrUnsummon(5000);
-                (*itr)->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 5, go->GetPositionY(), go->GetPositionZ());
+                (*itr)->GetMotionMaster()->MovePoint(1, go->GetPositionX()+5, go->GetPositionY(), go->GetPositionZ());
                 (*itr)->AI()->Talk(SAY_FREE_0);
                 (*itr)->GetMotionMaster()->Clear();
             }
@@ -1630,10 +1277,7 @@ void AddSC_go_scripts()
     new go_heat();
 
     // Theirs
-    new go_brewfest_music();
-    new go_pirate_day_music();
-    new go_darkmoon_faire_music();
-    new go_midsummer_music();
+    new go_cat_figurine();
     new go_gilded_brazier();
     //new go_shrine_of_the_birds();
     new go_southfury_moonstone();

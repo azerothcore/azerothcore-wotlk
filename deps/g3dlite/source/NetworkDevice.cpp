@@ -31,18 +31,19 @@ std::ostream& operator<<(std::ostream& os, const NetAddress& a) {
 static void logSocketInfo(const SOCKET& sock) {
     uint32 val;
     socklen_t sz = 4;
+    int ret;
 
-    getsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*)&val, (socklen_t*)&sz);
+    ret = getsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*)&val, (socklen_t*)&sz);
     logPrintf("SOL_SOCKET/SO_RCVBUF = %d\n", val);
 
-    getsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&val, (socklen_t*)&sz);
+    ret = getsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&val, (socklen_t*)&sz);
     logPrintf("SOL_SOCKET/SO_SNDBUF = %d\n", val);
 
     // Note: timeout = 0 means no timeout
-    getsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&val, (socklen_t*)&sz);
+    ret = getsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&val, (socklen_t*)&sz);
     logPrintf("SOL_SOCKET/SO_RCVTIMEO = %d\n", val);
 
-    getsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&val, (socklen_t*)&sz);
+    ret = getsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&val, (socklen_t*)&sz);
     logPrintf("SOL_SOCKET/SO_SNDTIMEO = %d\n", val);
 }
 
@@ -62,7 +63,7 @@ static int selectOneReadSocket(const SOCKET& sock) {
     FD_ZERO(&socketSet); 
     FD_SET(sock, &socketSet);
 
-    int ret = select((int)sock + 1, &socketSet, NULL, NULL, &timeout);
+    int ret = select(sock + 1, &socketSet, NULL, NULL, &timeout);
 
     return ret;
 }
@@ -101,7 +102,7 @@ static int selectOneWriteSocket(const SOCKET& sock) {
     FD_ZERO(&socketSet); 
     FD_SET(sock, &socketSet);
 
-    return select((int)sock + 1, NULL, &socketSet, NULL, &timeout);
+    return select(sock + 1, NULL, &socketSet, NULL, &timeout);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,7 +146,7 @@ std::string NetworkDevice::localHostName() const {
     return gethostbyname(ac)->h_name;
 }
 
-#ifndef G3D_WINDOWS
+#ifndef G3D_WIN32
 const char* errnoToString() {
     switch (errno) {
     case EBADF:
@@ -191,31 +192,31 @@ void NetworkDevice::EthernetAdapter::describe(TextOutput& t) const {
     t.writeNewline();
     
     t.writeSymbols("hostname", "=");
-    t.writeString(hostname + ";");
+    t.writeString(hostname);
     t.writeNewline();
 
     t.writeSymbols("name", "=");
-    t.writeString(name + ";");
+    t.writeString(name);
     t.writeNewline();    
 
     t.writeSymbols("ip", "=");
-    t.writeSymbol("\"" + formatIP(ip) + "\";");
+    t.writeSymbol(formatIP(ip));
     t.writeNewline();    
 
     t.writeSymbols("subnet", "=");
-    t.writeSymbol("\"" + formatIP(subnet) + "\";");
+    t.writeSymbol(formatIP(subnet));
     t.writeNewline();    
 
     t.writeSymbols("broadcast", "=");
-    t.writeSymbol("\"" + formatIP(broadcast) + "\";");
+    t.writeSymbol(formatIP(broadcast));
     t.writeNewline();    
 
     t.writeSymbols("mac", "=");
-    t.writeSymbol("\"" + formatMAC(mac) + "\";");
+    t.writeSymbol(formatMAC(mac));
     t.writeNewline();    
 
     t.popIndent();
-    t.writeSymbol("};");
+    t.writeSymbol("}");
     t.writeNewline();
 }
 
@@ -242,17 +243,15 @@ std::string NetworkDevice::formatMAC(const uint8 MAC[6]) {
 }
 
 
-#ifdef G3D_WINDOWS
+#ifdef G3D_WIN32
 
 bool NetworkDevice::init() {
     debugAssert(! initialized);
 
     logPrintf("Network Startup");
     logPrintf("Starting WinSock networking.\n");
-
-//    G3D now initializes winsock through ENet
-//    WSADATA wsda;            
-//    WSAStartup(MAKEWORD(G3D_WINSOCK_MAJOR_VERSION, G3D_WINSOCK_MINOR_VERSION), &wsda);
+    WSADATA wsda;		    
+    WSAStartup(MAKEWORD(G3D_WINSOCK_MAJOR_VERSION, G3D_WINSOCK_MINOR_VERSION), &wsda);
         
     std::string hostname = "localhost";
     {
@@ -281,9 +280,7 @@ bool NetworkDevice::init() {
     
     std::string machine = localHostName();
     std::string addr    = NetAddress(machine, 0).ipString();
-    /*
     logPrintf(
-
               "Network:\n"
               "  Status: %s\n"
               "  Loaded winsock specification version %d (%d is "
@@ -296,7 +293,6 @@ bool NetworkDevice::init() {
               wsda.wHighVersion,
               wsda.iMaxSockets,
               wsda.iMaxUdpDg);
-    */
     
     // TODO: WSAIoctl for subnet and broadcast addresses
     // http://msdn.microsoft.com/en-us/library/ms741621(VS.85).aspx
@@ -453,7 +449,7 @@ bool NetworkDevice::init() {
     }
 
     // Extract all interesting adapters from the table
-    for (AdapterTable::Iterator it = table.begin(); it.isValid(); ++it) {
+    for (AdapterTable::Iterator it = table.begin(); it.hasMore(); ++it) {
         const EthernetAdapter& adapter = it->value;
         
         // Only add adapters that have IP addresses
@@ -475,10 +471,11 @@ bool NetworkDevice::init() {
 void NetworkDevice::_cleanup() {
     debugAssert(initialized);
 
-#   ifdef G3D_WINDOWS
-    // Now handled through enet
-//        WSACleanup();
+    logPrintf("Network Cleanup");
+#   ifdef G3D_WIN32
+        WSACleanup();
 #   endif
+    logPrintf("Network cleaned up.");
 }
 
 bool NetworkDevice::bind(SOCKET sock, const NetAddress& addr) const {
@@ -500,7 +497,7 @@ bool NetworkDevice::bind(SOCKET sock, const NetAddress& addr) const {
 
 void NetworkDevice::closesocket(SOCKET& sock) const {
     if (sock != 0) {
-        #ifdef G3D_WINDOWS
+        #ifdef G3D_WIN32
             ::closesocket(sock);
         #else
             close(sock);
@@ -515,7 +512,7 @@ void NetworkDevice::closesocket(SOCKET& sock) const {
 void NetworkDevice::localHostAddresses(Array<NetAddress>& array) const {
     array.resize(0);
 
-    char ac[256];
+    char ac[128];
 
     if (gethostname(ac, sizeof(ac)) == SOCKET_ERROR) {
         Log::common()->printf("Error while getting local host name\n");
@@ -609,16 +606,13 @@ static void increaseBufferSize(SOCKET sock) {
 //////////////////////////////////////////////////////////////////////////////
 
 ReliableConduitRef ReliableConduit::create(const NetAddress& address) {
-    return ReliableConduitRef(new ReliableConduit(address));
+    return new ReliableConduit(address);
 }
 
 
-ReliableConduit::ReliableConduit
-   (const NetAddress&   _addr) : 
-    state(NO_MESSAGE), 
-    receiveBuffer(NULL),
-    receiveBufferTotalSize(0), 
-    receiveBufferUsedSize(0) {
+ReliableConduit::ReliableConduit(
+    const NetAddress&   _addr) : state(NO_MESSAGE), receiveBuffer(NULL),
+    receiveBufferTotalSize(0), receiveBufferUsedSize(0) {
 
     NetworkDevice* nd = NetworkDevice::instance();
     
@@ -835,7 +829,7 @@ uint32 ReliableConduit::waitingMessageType() {
 
 void ReliableConduit::sendBuffer(const BinaryOutput& b) {
     NetworkDevice* nd = NetworkDevice::instance();
-    int ret = ::send(sock, (const char*)b.getCArray(), (int)b.size(), 0);
+    int ret = ::send(sock, (const char*)b.getCArray(), b.size(), 0);
     
     if (ret == SOCKET_ERROR) {
         Log::common()->println("Error occured while sending message.");
@@ -944,11 +938,11 @@ void ReliableConduit::receiveIntoBuffer() {
 
     // Read the data itself
     int ret = 0;
-    uint32 left = messageSize - (uint32)receiveBufferUsedSize;
+    uint32 left = messageSize - receiveBufferUsedSize;
     int count = 0;
     while ((ret != SOCKET_ERROR) && (left > 0) && (count < 100)) {
 
-        ret = recv(sock, ((char*)receiveBuffer) + (uint32)receiveBufferUsedSize, left, 0);
+        ret = recv(sock, ((char*)receiveBuffer) + receiveBufferUsedSize, left, 0);
 
         if (ret > 0) {
             left -= ret;
@@ -991,12 +985,11 @@ LightweightConduitRef LightweightConduit::create(
     bool                        enableReceive,
     bool                        enableBroadcast) {
     
-    return LightweightConduitRef(new LightweightConduit(receivePort, enableReceive, enableBroadcast));
+    return new LightweightConduit(receivePort, enableReceive, enableBroadcast);
 }
 
-
-LightweightConduit::LightweightConduit
-   (uint16 port,
+LightweightConduit::LightweightConduit(
+    uint16 port,
     bool enableReceive, 
     bool enableBroadcast) {
     NetworkDevice* nd = NetworkDevice::instance();
@@ -1071,7 +1064,7 @@ bool LightweightConduit::receive(NetAddress& sender) {
 
 void LightweightConduit::sendBuffer(const NetAddress& a, BinaryOutput& b) {
     NetworkDevice* nd = NetworkDevice::instance();
-    if (sendto(sock, (const char*)b.getCArray(), (int)b.size(), 0,
+    if (sendto(sock, (const char*)b.getCArray(), b.size(), 0,
        (struct sockaddr *) &(a.addr), sizeof(a.addr)) == SOCKET_ERROR) {
         Log::common()->printf("Error occured while sending packet "
                              "to %s\n", inet_ntoa(a.addr.sin_addr));
@@ -1144,7 +1137,7 @@ uint32 LightweightConduit::waitingMessageType() {
 ///////////////////////////////////////////////////////////////////////////////
 
 NetListenerRef NetListener::create(const uint16 port) {
-    return NetListenerRef(new NetListener(port));
+    return new NetListener(port);
 }
 
 
@@ -1222,20 +1215,20 @@ ReliableConduitRef NetListener::waitForConnection() {
         Log::common()->println("Error in NetListener::acceptConnection.");
         Log::common()->println(socketErrorCode());
         nd->closesocket(sock);
-        return ReliableConduitRef();
+        return NULL;
     }
 
     Log::common()->printf("%s connected, transferred to socket %d.\n", 
                          inet_ntoa(remote_addr.sin_addr), sClient);
 
-    #ifndef G3D_WINDOWS
-    return ReliableConduitRef(new ReliableConduit(sClient, 
+    #ifndef G3D_WIN32
+        return new ReliableConduit(sClient, 
                      NetAddress(htonl(remote_addr.sin_addr.s_addr), 
-                                ntohs(remote_addr.sin_port))));
+                                ntohs(remote_addr.sin_port)));
     #else
-    return ReliableConduitRef(ReliableConduitRef(new ReliableConduit(sClient, 
+        return new ReliableConduit(sClient, 
                     NetAddress(ntohl(remote_addr.sin_addr.S_un.S_addr), 
-                               ntohs(remote_addr.sin_port)))));
+                               ntohs(remote_addr.sin_port)));
     #endif
 }
 
@@ -1254,17 +1247,17 @@ bool NetListener::clientWaiting() const {
 void NetworkDevice::describeSystem(
     TextOutput& t) {
 
-    t.writeSymbols("Network", "=", "{");
+    t.writeSymbols("Network", "{");
     t.writeNewline();
     t.pushIndent();
     
     for (int i = 0; i < m_adapterArray.size(); ++i) {
-        t.printf("Adapter%d =", i);
         m_adapterArray[i].describe(t);
     }
 
+
     t.popIndent();
-    t.writeSymbols("};");
+    t.writeSymbols("}");
     t.writeNewline();
     t.writeNewline();
 }

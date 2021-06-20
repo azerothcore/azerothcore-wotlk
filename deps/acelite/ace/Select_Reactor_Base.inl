@@ -6,21 +6,21 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 ACE_INLINE ACE_Select_Reactor_Handler_Repository::size_type
 ACE_Select_Reactor_Handler_Repository::size (void) const
 {
-#ifdef ACE_SELECT_REACTOR_BASE_USES_HASH_MAP
+#ifdef ACE_WIN32
   return this->event_handlers_.total_size ();
 #else
   return this->event_handlers_.size ();
-#endif  /* ACE_SELECT_REACTOR_BASE_USES_HASH_MAP */
+#endif  /* ACE_WIN32 */
 }
 
 ACE_INLINE ACE_Select_Reactor_Handler_Repository::max_handlep1_type
 ACE_Select_Reactor_Handler_Repository::max_handlep1 (void) const
 {
-#ifdef ACE_SELECT_REACTOR_BASE_USES_HASH_MAP
+#ifdef ACE_WIN32
   return this->event_handlers_.current_size ();
 #else
   return this->max_handlep1_;
-#endif  /* ACE_SELECT_REACTOR_BASE_USES_HASH_MAP */
+#endif  /* ACE_WIN32 */
 }
 
 ACE_INLINE int
@@ -50,11 +50,11 @@ ACE_Select_Reactor_Handler_Repository::find (ACE_HANDLE handle)
 
       if (pos != this->event_handlers_.end ())
         {
-#ifdef ACE_SELECT_REACTOR_BASE_USES_HASH_MAP
+#ifdef ACE_WIN32
           eh = (*pos).item ();
 #else
           eh = *pos;
-#endif  /* ACE_SELECT_REACTOR_BASE_USES_HASH_MAP */
+#endif  /* ACE_WIN32 */
         }
     }
   // Don't bother setting errno.  It isn't used in the select()-based
@@ -72,12 +72,12 @@ ACE_Select_Reactor_Handler_Repository::find (ACE_HANDLE handle)
 ACE_INLINE bool
 ACE_Select_Reactor_Handler_Repository_Iterator::done (void) const
 {
-#ifdef ACE_SELECT_REACTOR_BASE_USES_HASH_MAP
+#ifdef ACE_WIN32
   return this->current_ == this->rep_->event_handlers_.end ();
 #else
   return this->current_ == (this->rep_->event_handlers_.begin ()
                             + this->rep_->max_handlep1 ());
-#endif /* ACE_SELECT_REACTOR_BASE_USES_HASH_MAP */
+#endif /* ACE_WIN32 */
 }
 
 // ------------------------------------------------------------------
@@ -123,10 +123,9 @@ ACE_Select_Reactor_Impl::ACE_Select_Reactor_Impl (bool ms)
   , delete_signal_handler_ (false)
   , delete_notify_handler_ (false)
   , initialized_ (false)
-  , restart_ (false)
+  , restart_ (0)
   , requeue_position_ (-1) // Requeue at end of waiters by default.
-  , owner_ (ACE_OS::NULL_thread)
-  , state_changed_ (false)
+  , state_changed_ (0)
   , mask_signals_ (ms)
   , supress_renew_ (0)
 {
@@ -135,14 +134,14 @@ ACE_Select_Reactor_Impl::ACE_Select_Reactor_Impl (bool ms)
 #  pragma warning (pop)
 #endif
 
-ACE_INLINE bool
+ACE_INLINE int
 ACE_Select_Reactor_Impl::supress_notify_renew (void)
 {
   return this->supress_renew_;
 }
 
 ACE_INLINE void
-ACE_Select_Reactor_Impl::supress_notify_renew (bool sr)
+ACE_Select_Reactor_Impl::supress_notify_renew (int sr)
 {
   this->supress_renew_ = sr;
 }

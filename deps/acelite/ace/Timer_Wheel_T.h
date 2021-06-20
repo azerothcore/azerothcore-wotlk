@@ -169,6 +169,7 @@ public:
   virtual ACE_Timer_Node_T<TYPE>* get_first (void);
 
 protected:
+
   /// Schedules a timer.
   virtual long schedule_i (const TYPE& type,
                            const void* act,
@@ -199,6 +200,8 @@ private:
   u_int spoke_count_;
   /// Number of timer_id bits used for the spoke
   int spoke_bits_;
+  /// Maximum number of timers per spoke
+  u_int max_per_spoke_;
   /// Resolution (in microsoconds) of the timing wheel.
   int res_bits_;
   /// Index of the list with the earliest time

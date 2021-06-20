@@ -1,12 +1,8 @@
-/*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- */
-
-#include "GuildMgr.h"
-#include "ObjectAccessor.h"
-#include "Player.h"
 #include "WhoListCache.h"
 #include "World.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
+#include "GuildMgr.h"
 
 std::vector<WhoListPlayerInfo> WhoListCacheMgr::m_whoOpcodeList;
 
@@ -14,10 +10,10 @@ void WhoListCacheMgr::Update()
 {
     // clear current list
     m_whoOpcodeList.clear();
-    m_whoOpcodeList.reserve(sWorld->GetPlayerCount() + 1);
+    m_whoOpcodeList.reserve(sWorld->GetPlayerCount()+1);
 
-    std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
-    HashMapHolder<Player>::MapType const& m = ObjectAccessor::GetPlayers();
+    ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+    HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
         if (!itr->second->FindMap() || itr->second->GetSession()->PlayerLoading())

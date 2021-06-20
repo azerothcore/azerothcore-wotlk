@@ -2,78 +2,78 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "the_botanica.h"
 
 class instance_the_botanica : public InstanceMapScript
 {
-public:
-    instance_the_botanica() : InstanceMapScript("instance_the_botanica", 553) { }
+    public:
+        instance_the_botanica() : InstanceMapScript("instance_the_botanica", 553) { }
 
-    struct instance_the_botanica_InstanceMapScript : public InstanceScript
-    {
-        instance_the_botanica_InstanceMapScript(Map* map) : InstanceScript(map)
+        struct instance_the_botanica_InstanceMapScript : public InstanceScript
         {
-            SetBossNumber(MAX_ENCOUNTER);
-        }
-
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (!InstanceScript::SetBossState(type, state))
-                return false;
-
-            return true;
-        }
-
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "B O " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(char const* str) override
-        {
-            if (!str)
+            instance_the_botanica_InstanceMapScript(Map* map) : InstanceScript(map)
             {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
+                SetBossNumber(MAX_ENCOUNTER);
             }
 
-            OUT_LOAD_INST_DATA(str);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'B' && dataHead2 == 'O')
+            bool SetBossState(uint32 type, EncounterState state)
             {
-                for (uint32 i = 0; i < MAX_ENCOUNTER; ++i)
+                if (!InstanceScript::SetBossState(type, state))
+                    return false;
+
+                return true;
+            }
+
+            std::string GetSaveData()
+            {
+                OUT_SAVE_INST_DATA;
+
+                std::ostringstream saveStream;
+                saveStream << "B O " << GetBossSaveData();
+
+                OUT_SAVE_INST_DATA_COMPLETE;
+                return saveStream.str();
+            }
+
+            void Load(char const* str)
+            {
+                if (!str)
                 {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
+                    OUT_LOAD_INST_DATA_FAIL;
+                    return;
                 }
+
+                OUT_LOAD_INST_DATA(str);
+
+                char dataHead1, dataHead2;
+
+                std::istringstream loadStream(str);
+                loadStream >> dataHead1 >> dataHead2;
+
+                if (dataHead1 == 'B' && dataHead2 == 'O')
+                {
+                    for (uint32 i = 0; i < MAX_ENCOUNTER; ++i)
+                    {
+                        uint32 tmpState;
+                        loadStream >> tmpState;
+                        if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                            tmpState = NOT_STARTED;
+                        SetBossState(i, EncounterState(tmpState));
+                    }
+                }
+                else
+                    OUT_LOAD_INST_DATA_FAIL;
+
+                OUT_LOAD_INST_DATA_COMPLETE;
             }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
+        };
 
-            OUT_LOAD_INST_DATA_COMPLETE;
+        InstanceScript* GetInstanceScript(InstanceMap* map) const
+        {
+            return new instance_the_botanica_InstanceMapScript(map);
         }
-    };
-
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
-    {
-        return new instance_the_botanica_InstanceMapScript(map);
-    }
 };
 
 class spell_botanica_call_of_the_falcon : public SpellScriptLoader
@@ -85,12 +85,12 @@ public:
     {
         PrepareAuraScript(spell_botanica_call_of_the_falcon_AuraScript)
 
-        bool Load() override
+        bool Load()
         {
             _falconSet.clear();
             return true;
         }
-
+        
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             std::list<Creature*> creatureList;
@@ -105,25 +105,25 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (ObjectGuid const guid : _falconSet)
-                if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
+            for (std::set<uint64>::const_iterator itr = _falconSet.begin(); itr != _falconSet.end(); ++itr)
+                if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
                 {
                     falcon->TauntFadeOut(GetUnitOwner());
                     falcon->AddThreat(GetUnitOwner(), -10000000.0f);
                 }
         }
 
-        void Register() override
+        void Register()
         {
             OnEffectApply += AuraEffectApplyFn(spell_botanica_call_of_the_falcon_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_botanica_call_of_the_falcon_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
 
-    private:
-        GuidSet _falconSet;
+        private:
+            std::set<uint64> _falconSet;
     };
 
-    AuraScript* GetAuraScript() const override
+    AuraScript* GetAuraScript() const
     {
         return new spell_botanica_call_of_the_falcon_AuraScript();
     }
@@ -131,75 +131,67 @@ public:
 
 class spell_botanica_shift_form : public SpellScriptLoader
 {
-public:
-    spell_botanica_shift_form() : SpellScriptLoader("spell_botanica_shift_form") { }
+    public:
+        spell_botanica_shift_form() : SpellScriptLoader("spell_botanica_shift_form") { }
 
-    class spell_botanica_shift_form_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_botanica_shift_form_AuraScript);
-
-        bool Load() override
+        class spell_botanica_shift_form_AuraScript : public AuraScript
         {
-            _lastSchool = 0;
-            _lastForm = 0;
-            _swapTime = 0;
-            return true;
-        }
+            PrepareAuraScript(spell_botanica_shift_form_AuraScript);
 
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
+            bool Load()
             {
-                if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > time(nullptr))
-                    return false;
-
-                uint32 form = 0;
-                switch (GetFirstSchoolInMask(spellInfo->GetSchoolMask()))
-                {
-                    case SPELL_SCHOOL_FIRE:
-                        form = SPELL_FIRE_FORM;
-                        break;
-                    case SPELL_SCHOOL_FROST:
-                        form = SPELL_FROST_FORM;
-                        break;
-                    case SPELL_SCHOOL_ARCANE:
-                        form = SPELL_ARCANE_FORM;
-                        break;
-                    case SPELL_SCHOOL_SHADOW:
-                        form = SPELL_SHADOW_FORM;
-                        break;
-                    default:
-                        break;
-                }
-
-                if (form)
-                {
-                    _swapTime = time(nullptr) + 6;
-                    _lastSchool = spellInfo->GetSchoolMask();
-                    GetUnitOwner()->RemoveAurasDueToSpell(_lastForm);
-                    _lastForm = form;
-                    GetUnitOwner()->CastSpell(GetUnitOwner(), _lastForm, true);
-                }
+                _lastSchool = 0;
+                _lastForm = 0;
+                _swapTime = 0;
+                return true;
             }
 
-            return false;
-        }
+            bool CheckProc(ProcEventInfo& eventInfo)
+            {
+                if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
+                {
+                    if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > time(NULL))
+                        return false;
 
-        void Register() override
+                    uint32 form = 0;
+                    switch (GetFirstSchoolInMask(spellInfo->GetSchoolMask()))
+                    {
+                        case SPELL_SCHOOL_FIRE:     form = SPELL_FIRE_FORM;     break;
+                        case SPELL_SCHOOL_FROST:    form = SPELL_FROST_FORM;    break;
+                        case SPELL_SCHOOL_ARCANE:   form = SPELL_ARCANE_FORM;   break;
+                        case SPELL_SCHOOL_SHADOW:   form = SPELL_SHADOW_FORM;   break;
+                        default:
+                            break;
+                    }
+
+                    if (form)
+                    {
+                        _swapTime = time(NULL) + 6;
+                        _lastSchool = spellInfo->GetSchoolMask();
+                        GetUnitOwner()->RemoveAurasDueToSpell(_lastForm);
+                        _lastForm = form;
+                        GetUnitOwner()->CastSpell(GetUnitOwner(), _lastForm, true);
+                    }
+                }
+
+                return false;
+            }
+
+            void Register()
+            {
+                DoCheckProc += AuraCheckProcFn(spell_botanica_shift_form_AuraScript::CheckProc);
+            }
+
+            private:
+                uint32 _lastSchool;
+                uint32 _lastForm;
+                uint32 _swapTime;
+        };
+
+        AuraScript* GetAuraScript() const
         {
-            DoCheckProc += AuraCheckProcFn(spell_botanica_shift_form_AuraScript::CheckProc);
+            return new spell_botanica_shift_form_AuraScript();
         }
-
-    private:
-        uint32 _lastSchool;
-        uint32 _lastForm;
-        uint32 _swapTime;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_botanica_shift_form_AuraScript();
-    }
 };
 
 void AddSC_instance_the_botanica()

@@ -36,29 +36,34 @@ ACE_OS::inet_ntop (int family, const void *addrptr, char *strptr, size_t len)
 {
   ACE_OS_TRACE ("ACE_OS::inet_ntop");
 
-#if defined ACE_HAS_IPV6 && !defined ACE_LACKS_INET_NTOP
-#  if defined (ACE_HAS_NONCONST_INET_NTOP)
-  ACE_OSCALL_RETURN (::inet_ntop (family, const_cast<void *> (addrptr), strptr, len), const char *, 0);
-#  else
+#if defined (ACE_HAS_IPV6) && !defined (ACE_WIN32)
   ACE_OSCALL_RETURN (::inet_ntop (family, addrptr, strptr, len), const char *, 0);
-#  endif
 #else
+  const u_char *p = reinterpret_cast<const u_char *> (addrptr);
 
   if (family == AF_INET)
     {
-      const u_char *const p = reinterpret_cast<const u_char *> (addrptr);
-      if (ACE_OS::snprintf (strptr, len, "%d.%d.%d.%d", p[0], p[1], p[2], p[3])
-          > static_cast<int> (len))
+      char temp[INET_ADDRSTRLEN];
+
+      // Stevens uses snprintf() in his implementation but snprintf()
+      // doesn't appear to be very portable.  For now, hope that using
+      // sprintf() will not cause any string/memory overrun problems.
+      ACE_OS::sprintf (temp,
+                       "%d.%d.%d.%d",
+                       p[0], p[1], p[2], p[3]);
+
+      if (ACE_OS::strlen (temp) >= len)
         {
           errno = ENOSPC;
           return 0; // Failure
         }
+
+      ACE_OS::strcpy (strptr, temp);
       return strptr;
     }
 
-  errno = EAFNOSUPPORT;
-  return 0;
-#endif
+  ACE_NOTSUP_RETURN(0);
+#endif /* ACE_HAS_IPV6 */
 }
 
 ACE_INLINE int
@@ -66,21 +71,24 @@ ACE_OS::inet_pton (int family, const char *strptr, void *addrptr)
 {
   ACE_OS_TRACE ("ACE_OS::inet_pton");
 
-#if defined ACE_HAS_IPV6 && !defined ACE_LACKS_INET_PTON
+#if defined (ACE_HAS_IPV6) && !defined (ACE_WIN32)
   ACE_OSCALL_RETURN (::inet_pton (family, strptr, addrptr), int, -1);
 #else
-
   if (family == AF_INET)
     {
-      if (ACE_OS::inet_aton (strptr, static_cast<in_addr *> (addrptr)))
-        return 1; // Success
+      struct in_addr in_val;
+
+      if (ACE_OS::inet_aton (strptr, &in_val))
+        {
+          ACE_OS::memcpy (addrptr, &in_val, sizeof (struct in_addr));
+          return 1; // Success
+        }
 
       return 0; // Input is not a valid presentation format
     }
 
-  errno = EAFNOSUPPORT;
-  return 0;
-#endif
+  ACE_NOTSUP_RETURN(-1);
+#endif  /* ACE_HAS_IPV6 */
 }
 
 ACE_END_VERSIONED_NAMESPACE_DECL

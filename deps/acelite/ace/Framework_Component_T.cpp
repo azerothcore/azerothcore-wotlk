@@ -3,10 +3,6 @@
 
 #include "ace/Framework_Component_T.h"
 
-#if defined (ACE_HAS_ALLOC_HOOKS)
-# include "ace/Malloc_Base.h"
-#endif /* ACE_HAS_ALLOC_HOOKS */
-
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 template <class Concrete>
@@ -22,8 +18,6 @@ ACE_Framework_Component_T<Concrete>::~ACE_Framework_Component_T (void)
   ACE_TRACE ("ACE_Framework_Component_T<Concrete>::~ACE_Framework_Component_T");
   Concrete::close_singleton ();
 }
-
-ACE_ALLOC_HOOK_DEFINE_Tt(ACE_Framework_Component_T)
 
 template <class Concrete> void
 ACE_Framework_Component_T<Concrete>::close_singleton (void)

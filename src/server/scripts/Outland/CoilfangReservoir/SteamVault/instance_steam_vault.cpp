@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "InstanceScript.h"
 #include "steam_vault.h"
 
 class go_main_chambers_access_panel : public GameObjectScript
@@ -33,174 +33,177 @@ public:
 
         return true;
     }
+
 };
 
 class instance_steam_vault : public InstanceMapScript
 {
-public:
-    instance_steam_vault() : InstanceMapScript("instance_steam_vault", 545) { }
+    public:
+        instance_steam_vault() : InstanceMapScript("instance_steam_vault", 545) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
-    {
-        return new instance_steam_vault_InstanceMapScript(map);
-    }
-
-    struct instance_steam_vault_InstanceMapScript : public InstanceScript
-    {
-        instance_steam_vault_InstanceMapScript(Map* map) : InstanceScript(map) {}
-
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-
-        ObjectGuid MekgineerGUID;
-        ObjectGuid MainChambersDoor;
-        ObjectGuid AccessPanelHydro;
-        ObjectGuid AccessPanelMek;
-
-        void Initialize() override
+        InstanceScript* GetInstanceScript(InstanceMap* map) const
         {
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
+            return new instance_steam_vault_InstanceMapScript(map);
         }
 
-        bool IsEncounterInProgress() const override
+        struct instance_steam_vault_InstanceMapScript : public InstanceScript
         {
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                if (m_auiEncounter[i] == IN_PROGRESS)
-                    return true;
+            instance_steam_vault_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-            return false;
-        }
+            uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-        void OnCreatureCreate(Creature* creature) override
-        {
-            switch (creature->GetEntry())
+            uint64 MekgineerGUID;
+            uint64 MainChambersDoor;
+            uint64 AccessPanelHydro;
+            uint64 AccessPanelMek;
+
+            void Initialize()
             {
-                case NPC_MEKGINEER_STEAMRIGGER:
-                    MekgineerGUID = creature->GetGUID();
-                    break;
-            }
-        }
+                memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_MAIN_CHAMBERS_DOOR:
-                    MainChambersDoor = go->GetGUID();
-                    if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL && GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
-                case GO_ACCESS_PANEL_HYDRO:
-                    AccessPanelHydro = go->GetGUID();
-                    if (GetData(TYPE_HYDROMANCER_THESPIA) == DONE)
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                    else if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
-                case GO_ACCESS_PANEL_MEK:
-                    AccessPanelMek = go->GetGUID();
-                    if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == DONE)
-                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                    else if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
-                    break;
-            }
-        }
-
-        void SetData(uint32 type, uint32 data) override
-        {
-            switch (type)
-            {
-                case TYPE_HYDROMANCER_THESPIA:
-                    if (data == SPECIAL)
-                    {
-                        if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
-                            HandleGameObject(MainChambersDoor, true);
-                    }
-                    else if (data == DONE)
-                    {
-                        if (GameObject* panel = instance->GetGameObject(AccessPanelHydro))
-                            panel->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                    }
-
-                    m_auiEncounter[type] = data;
-                    break;
-                case TYPE_MEKGINEER_STEAMRIGGER:
-                    if (data == SPECIAL)
-                    {
-                        if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL)
-                            HandleGameObject(MainChambersDoor, true);
-                    }
-                    else if (data == DONE)
-                    {
-                        if (GameObject* panel = instance->GetGameObject(AccessPanelMek))
-                            panel->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                    }
-
-                    m_auiEncounter[type] = data;
-                    break;
-                case TYPE_WARLORD_KALITHRESH:
-                    m_auiEncounter[type] = data;
-                    break;
+                MekgineerGUID = 0;
+                MainChambersDoor = 0;
+                AccessPanelHydro = 0;
+                AccessPanelMek = 0;
             }
 
-            if (data == DONE || data == SPECIAL)
-                SaveToDB();
-        }
-
-        uint32 GetData(uint32 type) const override
-        {
-            switch (type)
+            bool IsEncounterInProgress() const
             {
-                case TYPE_HYDROMANCER_THESPIA:
-                case TYPE_MEKGINEER_STEAMRIGGER:
-                case TYPE_WARLORD_KALITHRESH:
-                    return m_auiEncounter[type];
-            }
-            return 0;
-        }
-
-        ObjectGuid GetGuidData(uint32 data) const override
-        {
-            if (data == TYPE_MEKGINEER_STEAMRIGGER)
-                return MekgineerGUID;
-
-            return ObjectGuid::Empty;
-        }
-
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream stream;
-            stream << "S V " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2];
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return stream.str();
-        }
-
-        void Load(const char* strIn) override
-        {
-            if (!strIn)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(strIn);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'S' && dataHead2 == 'V')
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                     if (m_auiEncounter[i] == IN_PROGRESS)
+                         return true;
+
+                return false;
+            }
+
+            void OnCreatureCreate(Creature* creature)
+            {
+                switch (creature->GetEntry())
                 {
-                    loadStream >> m_auiEncounter[i];
-                    if (m_auiEncounter[i] == IN_PROGRESS)
-                        m_auiEncounter[i] = NOT_STARTED;
+                    case NPC_MEKGINEER_STEAMRIGGER: MekgineerGUID = creature->GetGUID(); break;
+                }
+            }
+
+            void OnGameObjectCreate(GameObject* go)
+            {
+                switch (go->GetEntry())
+                {
+                    case GO_MAIN_CHAMBERS_DOOR:
+                        MainChambersDoor = go->GetGUID();
+                        if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL && GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
+                            HandleGameObject(0, true, go);
+                        break;
+                    case GO_ACCESS_PANEL_HYDRO:
+                        AccessPanelHydro = go->GetGUID();
+                        if (GetData(TYPE_HYDROMANCER_THESPIA) == DONE)
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        else if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL)
+                            HandleGameObject(0, true, go);
+                        break;
+                    case GO_ACCESS_PANEL_MEK:
+                        AccessPanelMek = go->GetGUID();
+                        if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == DONE)
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        else if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
+                            HandleGameObject(0, true, go);
+                        break;
+                }
+            }
+
+            void SetData(uint32 type, uint32 data)
+            {
+                switch (type)
+                {
+                    case TYPE_HYDROMANCER_THESPIA:
+                        if (data == SPECIAL)
+                        {
+                            if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
+                                HandleGameObject(MainChambersDoor, true);
+                        }
+                        else if (data == DONE)
+                        {
+                            if (GameObject* panel = instance->GetGameObject(AccessPanelHydro))
+                                panel->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        }
+
+                        m_auiEncounter[type] = data;
+                        break;
+                    case TYPE_MEKGINEER_STEAMRIGGER:
+                        if (data == SPECIAL)
+                        {
+                            if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL)
+                                HandleGameObject(MainChambersDoor, true);
+                        }
+                        else if (data == DONE)
+                        {
+                            if (GameObject* panel = instance->GetGameObject(AccessPanelMek))
+                                panel->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        }
+
+                        m_auiEncounter[type] = data;
+                        break;
+                    case TYPE_WARLORD_KALITHRESH:
+                        m_auiEncounter[type] = data;
+                        break;
                 }
 
-            OUT_LOAD_INST_DATA_COMPLETE;
-        }
-    };
+                if (data == DONE || data == SPECIAL)
+                    SaveToDB();
+            }
+
+            uint32 GetData(uint32 type) const
+            {
+                switch (type)
+                {
+                    case TYPE_HYDROMANCER_THESPIA:
+                    case TYPE_MEKGINEER_STEAMRIGGER:
+                    case TYPE_WARLORD_KALITHRESH:
+                        return m_auiEncounter[type];
+                }
+                return 0;
+            }
+
+            uint64 GetData64(uint32 data) const
+            {
+                if (data == TYPE_MEKGINEER_STEAMRIGGER)
+                    return MekgineerGUID;
+                return 0;
+            }
+
+            std::string GetSaveData()
+            {
+                OUT_SAVE_INST_DATA;
+
+                std::ostringstream stream;
+                stream << "S V " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2];
+
+                OUT_SAVE_INST_DATA_COMPLETE;
+                return stream.str();
+            }
+
+            void Load(const char* strIn)
+            {
+                if (!strIn)
+                {
+                    OUT_LOAD_INST_DATA_FAIL;
+                    return;
+                }
+
+                char dataHead1, dataHead2;
+                std::istringstream loadStream(strIn);
+                loadStream >> dataHead1 >> dataHead2;
+
+                if (dataHead1 == 'S' && dataHead2 == 'V')
+                    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                    {
+                        loadStream >> m_auiEncounter[i];
+                        if (m_auiEncounter[i] == IN_PROGRESS)
+                            m_auiEncounter[i] = NOT_STARTED;
+                    }
+
+                OUT_LOAD_INST_DATA_COMPLETE;
+            }
+        };
 };
 
 void AddSC_instance_steam_vault()

@@ -49,6 +49,7 @@ ACE_TLI::ACE_TLI (void)
     {
       delete [] this->so_opt_req.opt.buf;
       this->so_opt_req.opt.buf = 0;
+      return;
     }
 #endif /* ACE_HAS_SVR4_TLI */
 }

@@ -4,7 +4,7 @@
 /**
  *  @file    SOCK_IO.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //==========================================================================
 
@@ -47,6 +47,8 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_SOCK_IO : public ACE_SOCK
 {
 public:
+  // = Initialization and termination methods.
+
   /// Constructor.
   ACE_SOCK_IO (void);
 
@@ -80,11 +82,9 @@ public:
   ssize_t recvv (iovec *io_vec,
                  const ACE_Time_Value *timeout = 0) const;
 
-#ifndef ACE_LACKS_VA_FUNCTIONS
   /// Recv @a n varargs messages to the connected socket.
   ssize_t recv (size_t n,
                 ...) const;
-#endif
 
   /// Recv @a n bytes via Win32 @c ReadFile using overlapped I/O.
   ssize_t recv (void *buf,
@@ -107,11 +107,9 @@ public:
                  int n,
                  const ACE_Time_Value *timeout = 0) const;
 
-#ifndef ACE_LACKS_VA_FUNCTIONS
   /// Send @a n varargs messages to the connected socket.
   ssize_t send (size_t n,
                 ...) const;
-#endif
 
   /// Send @a n bytes via Win32 <WriteFile> using overlapped I/O.
   ssize_t send (const void *buf,

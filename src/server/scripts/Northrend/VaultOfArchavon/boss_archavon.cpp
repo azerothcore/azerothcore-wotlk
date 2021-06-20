@@ -2,26 +2,22 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "vault_of_archavon.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "vault_of_archavon.h"
 
 enum Archavon
 {
     SPELL_ROCK_SHARDS                   = 58678,
-    SPELL_ROCK_SHARDS_LEFT_HAND_VISUAL  = 58689,
-    SPELL_ROCK_SHARDS_RIGHT_HAND_VISUAL = 58692,
-    SPELL_ROCK_SHARDS_DAMAGE_10         = 58695,
-    SPELL_ROCK_SHARDS_DAMAGE_25         = 60883,
     SPELL_CRUSHING_LEAP_10              = 58960,
-    SPELL_CRUSHING_LEAP_25              = 60894, // Instant (10-80yr range) -- Leaps at an enemy, inflicting 8000 Physical damage, knocking all nearby enemies away, and creating a cloud of choking debris.
+    SPELL_CRUSHING_LEAP_25              = 60894, //Instant (10-80yr range) -- Leaps at an enemy, inflicting 8000 Physical damage, knocking all nearby enemies away, and creating a cloud of choking debris.
     SPELL_STOMP_10                      = 58663,
     SPELL_STOMP_25                      = 60880,
     SPELL_IMPALE_10                     = 58666,
-    SPELL_IMPALE_25                     = 60882, // Lifts an enemy off the ground with a spiked fist, inflicting 47125 to 52875 Physical damage and 9425 to 10575 additional damage each second for 8 sec.
-    SPELL_BERSERK                       = 47008
+    SPELL_IMPALE_25                     = 60882, //Lifts an enemy off the ground with a spiked fist, inflicting 47125 to 52875 Physical damage and 9425 to 10575 additional damage each second for 8 sec.
+    SPELL_BERSERK                       = 47008,
 };
 
 enum
@@ -36,10 +32,9 @@ enum Events
     EVENT_CHOKING_CLOUD     = 2,
     EVENT_STOMP             = 3,
     EVENT_IMPALE            = 4,
-    EVENT_BERSERK           = 5
+    EVENT_BERSERK           = 5,
 };
 
-// 31125 - Archavon the Stone Watcher
 class boss_archavon : public CreatureScript
 {
     public:
@@ -55,7 +50,7 @@ class boss_archavon : public CreatureScript
             InstanceScript* pInstance;
             EventMap events;
 
-            void Reset() override
+            void Reset()
             {
                 events.Reset();
                 if (pInstance)
@@ -68,72 +63,56 @@ class boss_archavon : public CreatureScript
                             aur->SetDuration(60 * MINUTE* IN_MILLISECONDS);
                         }
                     }
-
                     pInstance->SetData(EVENT_ARCHAVON, NOT_STARTED);
                 }
             }
 
-            void AttackStart(Unit* who) override
+            void AttackStart(Unit* who)
             {
                 if (me->HasAura(SPELL_STONED_AURA))
-                {
                     return;
-                }
 
                 ScriptedAI::AttackStart(who);
             }
 
-            void EnterCombat(Unit* /*who*/) override
+            void EnterCombat(Unit* /*who*/)
             {
                 events.ScheduleEvent(EVENT_ROCK_SHARDS, 15000);
                 events.ScheduleEvent(EVENT_CHOKING_CLOUD, 30000);
                 events.ScheduleEvent(EVENT_STOMP, 45000);
                 events.ScheduleEvent(EVENT_BERSERK, 300000);
-
                 if (pInstance)
-                {
                     pInstance->SetData(EVENT_ARCHAVON, IN_PROGRESS);
-                }
             }
 
-            void JustDied(Unit*) override
+            void JustDied(Unit* )
             {
                 if (pInstance)
-                {
                     pInstance->SetData(EVENT_ARCHAVON, DONE);
-                }
             }
 
-            void UpdateAI(uint32 diff) override
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
-                {
                     return;
-                }
 
                 events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
-                {
                     return;
-                }
 
-                switch (events.ExecuteEvent())
+                switch (events.GetEvent())
                 {
                     case EVENT_ROCK_SHARDS:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        {
-                            DoCast(target, SPELL_ROCK_SHARDS);
-                        }
-
+                            me->CastSpell(target, SPELL_ROCK_SHARDS, false);
+                        
                         events.RepeatEvent(15000);
                         break;
                     case EVENT_CHOKING_CLOUD:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-                        {
-                            DoCast(target, RAID_MODE(SPELL_CRUSHING_LEAP_10, SPELL_CRUSHING_LEAP_25), true); //10y ~ 80y, ignore range
-                        }
-
+                            me->CastSpell(target, RAID_MODE(SPELL_CRUSHING_LEAP_10, SPELL_CRUSHING_LEAP_25), true); //10y~80y, ignore range
+                        
                         events.RepeatEvent(30000);
                         break;
                     case EVENT_STOMP:
@@ -141,19 +120,19 @@ class boss_archavon : public CreatureScript
                         char buffer[100];
                         sprintf(buffer, "Archavon the Stone Watcher lunges for %s!", me->GetVictim()->GetName().c_str());
                         me->MonsterTextEmote(buffer, 0);
-
-                        DoCastVictim(RAID_MODE(SPELL_STOMP_10, SPELL_STOMP_25));
-
+                        me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_STOMP_10, SPELL_STOMP_25), false);
                         events.RepeatEvent(45000);
                         events.ScheduleEvent(EVENT_IMPALE, 3000);
                         break;
                     }
                     case EVENT_IMPALE:
-                        DoCastVictim(RAID_MODE(SPELL_IMPALE_10, SPELL_IMPALE_25));
+                        me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_IMPALE_10, SPELL_IMPALE_25), false);
+                        events.PopEvent();
                         break;
                     case EVENT_BERSERK:
-                        DoCast(me, SPELL_BERSERK, true);
+                        me->CastSpell(me, SPELL_BERSERK, true);
                         Talk(EMOTE_BERSERK);
+                        events.PopEvent();
                         break;
                     default:
                         break;
@@ -163,13 +142,12 @@ class boss_archavon : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const override
+        CreatureAI* GetAI(Creature* creature) const
         {
-            return GetVaultOfArchavonAI<boss_archavonAI>(creature);
+            return new boss_archavonAI(creature);
         }
 };
 
-// 58941 - Rock Shards
 class spell_archavon_rock_shards : public SpellScriptLoader
 {
     public:
@@ -182,39 +160,32 @@ class spell_archavon_rock_shards : public SpellScriptLoader
             void HandleScript(SpellEffIndex effIndex)
             {
                 PreventHitDefaultEffect(effIndex);
-
-                Unit* caster = GetCaster();
                 Unit* target = GetHitUnit();
-
-                if (!caster || !target)
+                Unit* caster = GetOriginalCaster();
+                if (target && caster && caster->GetMap())
                 {
-                    return;
+                    for (uint32 i = 0; i < 3; ++i)
+                    {
+                        caster->CastSpell(target, 58689, true);
+                        caster->CastSpell(target, 58692, true);
+                    }
+
+                    caster->CastSpell(target, caster->GetMap()->Is25ManRaid() ? 60883 : 58695, true); 
                 }
-
-                Map* map = caster->GetMap();
-                if (!map)
-                {
-                    return;
-                }
-
-                caster->CastSpell(target, SPELL_ROCK_SHARDS_LEFT_HAND_VISUAL, true);
-                caster->CastSpell(target, SPELL_ROCK_SHARDS_RIGHT_HAND_VISUAL, true);
-
-                uint32 spellId = map->Is25ManRaid() ? SPELL_ROCK_SHARDS_DAMAGE_25 : SPELL_ROCK_SHARDS_DAMAGE_10;
-                caster->CastSpell(target, spellId, true);
             }
 
-            void Register() override
+            void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_archavon_rock_shards_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const override
+        SpellScript* GetSpellScript() const
         {
             return new spell_archavon_rock_shards_SpellScript();
         }
 };
+
 
 void AddSC_boss_archavon()
 {

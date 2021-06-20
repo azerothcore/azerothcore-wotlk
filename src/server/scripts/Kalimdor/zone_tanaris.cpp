@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -20,12 +20,12 @@ npc_OOX17
 npc_tooga
 EndContentData */
 
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "WorldSession.h"
 
 /*######
@@ -45,7 +45,7 @@ class npc_aquementas : public CreatureScript
 public:
     npc_aquementas() : CreatureScript("npc_aquementas") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_aquementasAI(creature);
     }
@@ -61,7 +61,7 @@ public:
         uint32 FrostShockTimer;
         uint32 AquaJetTimer;
 
-        void Reset() override
+        void Reset()
         {
             SendItemTimer = 0;
             SwitchFactionTimer = 10000;
@@ -77,23 +77,23 @@ public:
             Player* player = receiver->ToPlayer();
 
             if (player && player->HasItemCount(11169, 1, false) &&
-                    player->HasItemCount(11172, 11, false) &&
-                    player->HasItemCount(11173, 1, false) &&
-                    !player->HasItemCount(11522, 1, true))
+                player->HasItemCount(11172, 11, false) &&
+                player->HasItemCount(11173, 1, false) &&
+                !player->HasItemCount(11522, 1, true))
             {
                 ItemPosCountVec dest;
-                uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 11522, 1, nullptr);
+                uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 11522, 1, NULL);
                 if (msg == EQUIP_ERR_OK)
                     player->StoreNewItem(dest, 11522, true);
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void EnterCombat(Unit* who)
         {
             Talk(AGGRO_YELL_AQUE, who);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (isFriendly)
             {
@@ -101,8 +101,7 @@ public:
                 {
                     me->setFaction(91);
                     isFriendly = false;
-                }
-                else SwitchFactionTimer -= diff;
+                } else SwitchFactionTimer -= diff;
             }
 
             if (!UpdateVictim())
@@ -115,27 +114,25 @@ public:
                     if (me->GetVictim()->GetTypeId() == TYPEID_PLAYER)
                         SendItem(me->GetVictim());
                     SendItemTimer = 5000;
-                }
-                else SendItemTimer -= diff;
+                } else SendItemTimer -= diff;
             }
 
             if (FrostShockTimer <= diff)
             {
                 DoCastVictim(SPELL_FROST_SHOCK);
                 FrostShockTimer = 15000;
-            }
-            else FrostShockTimer -= diff;
+            } else FrostShockTimer -= diff;
 
             if (AquaJetTimer <= diff)
             {
                 DoCast(me, SPELL_AQUA_JET);
                 AquaJetTimer = 15000;
-            }
-            else AquaJetTimer -= diff;
+            } else AquaJetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
+
 };
 
 /*######
@@ -165,7 +162,7 @@ class npc_custodian_of_time : public CreatureScript
 public:
     npc_custodian_of_time() : CreatureScript("npc_custodian_of_time") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_custodian_of_timeAI(creature);
     }
@@ -174,7 +171,7 @@ public:
     {
         npc_custodian_of_timeAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId) override
+        void WaypointReached(uint32 waypointId)
         {
             if (Player* player = GetPlayerForEscort())
             {
@@ -241,7 +238,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void MoveInLineOfSight(Unit* who)
 
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
@@ -260,14 +257,15 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
-        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) { }
+        void Reset() { }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             npc_escortAI::UpdateAI(diff);
         }
     };
+
 };
 
 /*######
@@ -313,6 +311,7 @@ public:
 
         return true;
     }
+
 };
 
 /*######
@@ -337,23 +336,23 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
                 SendGossipMenuFor(player, 1675, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 SendGossipMenuFor(player, 1676, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
                 SendGossipMenuFor(player, 1677, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
                 SendGossipMenuFor(player, 1678, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_NORGANNON_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
                 SendGossipMenuFor(player, 1679, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+5:
@@ -376,6 +375,7 @@ public:
 
         return true;
     }
+
 };
 
 /*######
@@ -401,7 +401,7 @@ class npc_OOX17 : public CreatureScript
 public:
     npc_OOX17() : CreatureScript("npc_OOX17") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == Q_OOX17)
         {
@@ -417,7 +417,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_OOX17AI(creature);
     }
@@ -426,7 +426,7 @@ public:
     {
         npc_OOX17AI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId) override
+        void WaypointReached(uint32 waypointId)
         {
             if (Player* player = GetPlayerForEscort())
             {
@@ -454,14 +454,14 @@ public:
             }
         }
 
-        void Reset() override { }
+        void Reset() { }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_OOX_AGGRO);
         }
 
-        void JustSummoned(Creature* summoned) override
+        void JustSummoned(Creature* summoned)
         {
             summoned->AI()->AttackStart(me);
         }
@@ -496,7 +496,7 @@ class npc_tooga : public CreatureScript
 public:
     npc_tooga() : CreatureScript("npc_tooga") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_TOOGA)
         {
@@ -507,7 +507,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_toogaAI(creature);
     }
@@ -520,18 +520,18 @@ public:
         uint32 PostEventTimer;
         uint32 PhasePostEvent;
 
-        ObjectGuid TortaGUID;
+        uint64 TortaGUID;
 
-        void Reset() override
+        void Reset()
         {
             CheckSpeechTimer = 2500;
             PostEventTimer = 1000;
             PhasePostEvent = 0;
 
-            TortaGUID.Clear();
+            TortaGUID = 0;
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void MoveInLineOfSight(Unit* who)
 
         {
             FollowerAI::MoveInLineOfSight(who);
@@ -550,7 +550,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 MotionType, uint32 PointId) override
+        void MovementInform(uint32 MotionType, uint32 PointId)
         {
             FollowerAI::MovementInform(MotionType, PointId);
 
@@ -561,7 +561,7 @@ public:
                 SetFollowComplete();
         }
 
-        void UpdateFollowerAI(uint32 Diff) override
+        void UpdateFollowerAI(uint32 Diff)
         {
             if (!UpdateVictim())
             {
@@ -628,6 +628,7 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
 };
 
 void AddSC_tanaris()

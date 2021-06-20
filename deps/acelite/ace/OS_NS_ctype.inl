@@ -31,11 +31,7 @@ ACE_OS::ace_isascii (ACE_TCHAR c)
 #if defined (ACE_USES_WCHAR)
 # if defined (ACE_LACKS_ISWASCII)
   if (c < 256)
-#  if defined (ACE_LACKS_ISASCII)
-  return (static_cast<unsigned char>(c) <= 0x7F);
-#  else
-  return isascii ((unsigned char) c);
-#  endif /* ACE_LACKS_ISASCII */
+    return isascii (static_cast<int> (c));
   else
     return c;
 # else

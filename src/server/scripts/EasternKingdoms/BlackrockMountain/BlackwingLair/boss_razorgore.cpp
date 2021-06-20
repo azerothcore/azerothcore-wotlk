@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "blackwing_lair.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
-#include "SpellScript.h"
 
 enum Say
 {
@@ -24,7 +24,7 @@ enum Spells
     SPELL_CHANNEL           = 45537,
     SPELL_EGG_DESTROY       = 19873,
 
-    SPELL_CLEAVE            = 19632,
+    SPELL_CLEAVE            = 22540,
     SPELL_WARSTOMP          = 24375,
     SPELL_FIREBALLVOLLEY    = 22425,
     SPELL_CONFLAGRATION     = 23023
@@ -56,9 +56,9 @@ public:
 
     struct boss_razorgoreAI : public BossAI
     {
-        boss_razorgoreAI(Creature* creature) : BossAI(creature, DATA_RAZORGORE_THE_UNTAMED) { }
+        boss_razorgoreAI(Creature* creature) : BossAI(creature, BOSS_RAZORGORE) { }
 
-        void Reset() override
+        void Reset()
         {
             _Reset();
 
@@ -66,7 +66,7 @@ public:
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             _JustDied();
             Talk(SAY_DEATH);
@@ -86,22 +86,19 @@ public:
             me->SetHealth(me->GetMaxHealth());
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 action)
         {
             if (action == ACTION_PHASE_TWO)
                 DoChangePhase();
-
-            if (action == TALK_EGG_BROKEN_RAND)
-                Talk(urand(SAY_EGGS_BROKEN1, SAY_EGGS_BROKEN3));
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
             if (!secondPhase)
                 damage = 0;
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -143,9 +140,9 @@ public:
         bool secondPhase;
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetBlackwingLairAI<boss_razorgoreAI>(creature);
+        return GetInstanceAI<boss_razorgoreAI>(creature);
     }
 };
 
@@ -158,7 +155,7 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
             if (instance->GetData(DATA_EGG_EVENT) != DONE)
-                if (Creature* razor = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
+                if (Creature* razor = ObjectAccessor::GetCreature(*go, instance->GetData64(DATA_RAZORGORE_THE_UNTAMED)))
                 {
                     razor->Attack(player, true);
                     player->CastSpell(razor, SPELL_MINDCONTROL);
@@ -169,40 +166,29 @@ public:
 
 class spell_egg_event : public SpellScriptLoader
 {
-public:
-    spell_egg_event() : SpellScriptLoader("spell_egg_event") { }
+    public:
+        spell_egg_event() : SpellScriptLoader("spell_egg_event") { }
 
-    class spell_egg_eventSpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_egg_eventSpellScript);
-
-        void HandleOnHit()
+        class spell_egg_eventSpellScript : public SpellScript
         {
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            PrepareSpellScript(spell_egg_eventSpellScript);
+
+            void HandleOnHit()
             {
-                instance->SetData(DATA_EGG_EVENT, SPECIAL);
+                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                    instance->SetData(DATA_EGG_EVENT, SPECIAL);
             }
-            if (GameObject* egg = GetCaster()->FindNearestGameObject(GO_EGG, 100))
-                {
-                    if (!egg)
-                        return;
 
-                    GetCaster()->GetAI()->DoAction(TALK_EGG_BROKEN_RAND);
-                    egg->SetLootState(GO_READY);
-                    egg->UseDoorOrButton(10000);
-                }
-        }
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_egg_eventSpellScript::HandleOnHit);
+            }
+        };
 
-        void Register() override
+        SpellScript* GetSpellScript() const
         {
-            OnHit += SpellHitFn(spell_egg_eventSpellScript::HandleOnHit);
+            return new spell_egg_eventSpellScript();
         }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_egg_eventSpellScript();
-    }
 };
 
 void AddSC_boss_razorgore()

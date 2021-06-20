@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -241,80 +241,85 @@ class OutdoorPvPNA;
 
 class OPvPCapturePointNA : public OPvPCapturePoint
 {
-public:
-    OPvPCapturePointNA(OutdoorPvP* pvp);
+    public:
 
-    bool Update(uint32 diff) override;
+        OPvPCapturePointNA(OutdoorPvP* pvp);
 
-    void ChangeState() override;
+        bool Update(uint32 diff);
 
-    void SendChangePhase() override;
+        void ChangeState();
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+        void SendChangePhase();
 
-    // used when player is activated/inactivated in the area
-    bool HandlePlayerEnter(Player* player) override;
-    void HandlePlayerLeave(Player* player) override;
+        void FillInitialWorldStates(WorldPacket & data);
 
-    bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go) override;
+        // used when player is activated/inactivated in the area
+        bool HandlePlayerEnter(Player* player);
+        void HandlePlayerLeave(Player* player);
 
-    int32 HandleOpenGo(Player* player, GameObject* go) override;
+        bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
 
-    uint32 GetAliveGuardsCount();
-    TeamId GetControllingFaction() const;
+        int32 HandleOpenGo(Player* player, uint64 guid);
 
-protected:
-    // called when a faction takes control
-    void FactionTakeOver(TeamId teamId);
+        uint32 GetAliveGuardsCount();
+        TeamId GetControllingFaction() const;
 
-    void DeSpawnNPCs();
-    void DeSpawnGOs();
+    protected:
 
-    void SpawnNPCsForTeam(TeamId teamId);
-    void SpawnGOsForTeam(TeamId teamId);
+        // called when a faction takes control
+        void FactionTakeOver(TeamId teamId);
 
-    void UpdateWyvernRoostWorldState(uint32 roost);
-    void UpdateHalaaWorldState();
+        void DeSpawnNPCs();
+        void DeSpawnGOs();
 
-private:
-    bool m_capturable;
+        void SpawnNPCsForTeam(TeamId teamId);
+        void SpawnGOsForTeam(TeamId teamId);
 
-    uint32 m_GuardsAlive;
+        void UpdateWyvernRoostWorldState(uint32 roost);
+        void UpdateHalaaWorldState();
 
-    TeamId m_ControllingFaction;
+    private:
 
-    uint32 m_WyvernStateNorth;
-    uint32 m_WyvernStateSouth;
-    uint32 m_WyvernStateEast;
-    uint32 m_WyvernStateWest;
+        bool m_capturable;
 
-    uint32 m_HalaaState;
+        uint32 m_GuardsAlive;
 
-    uint32 m_RespawnTimer;
+        TeamId m_ControllingFaction;
 
-    uint32 m_GuardCheckTimer;
+        uint32 m_WyvernStateNorth;
+        uint32 m_WyvernStateSouth;
+        uint32 m_WyvernStateEast;
+        uint32 m_WyvernStateWest;
+
+        uint32 m_HalaaState;
+
+        uint32 m_RespawnTimer;
+
+        uint32 m_GuardCheckTimer;
 };
 
 class OutdoorPvPNA : public OutdoorPvP
 {
-public:
-    OutdoorPvPNA();
+    public:
 
-    bool SetupOutdoorPvP() override;
+        OutdoorPvPNA();
 
-    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
-    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
+        bool SetupOutdoorPvP();
 
-    bool Update(uint32 diff) override;
+        void HandlePlayerEnterZone(Player* player, uint32 zone);
+        void HandlePlayerLeaveZone(Player* player, uint32 zone);
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+        bool Update(uint32 diff);
 
-    void SendRemoveWorldStates(Player* player) override;
+        void FillInitialWorldStates(WorldPacket &data);
 
-    void HandleKillImpl(Player* player, Unit* killed) override;
+        void SendRemoveWorldStates(Player* player);
 
-private:
-    OPvPCapturePointNA* m_obj;
+        void HandleKillImpl(Player* player, Unit* killed);
+
+    private:
+
+        OPvPCapturePointNA * m_obj;
 };
 
 #endif

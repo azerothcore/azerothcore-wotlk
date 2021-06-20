@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,13 +11,51 @@ SDComment: Quest support: 3520, 2767, Special vendor Gregan Brewspewer
 SDCategory: Feralas
 EndScriptData */
 
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "Player.h"
 #include "WorldSession.h"
+
+/*######
+## npc_gregan_brewspewer
+######*/
+
+#define GOSSIP_HELLO "Buy somethin', will ya?"
+
+class npc_gregan_brewspewer : public CreatureScript
+{
+public:
+    npc_gregan_brewspewer() : CreatureScript("npc_gregan_brewspewer") { }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        {
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            SendGossipMenuFor(player, 2434, creature->GetGUID());
+        }
+        if (action == GOSSIP_ACTION_TRADE)
+            player->GetSession()->SendListInventory(creature->GetGUID());
+        return true;
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        if (creature->IsQuestGiver())
+            player->PrepareQuestMenu(creature->GetGUID());
+
+        if (creature->IsVendor() && player->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+
+        SendGossipMenuFor(player, 2433, creature->GetGUID());
+        return true;
+    }
+
+};
 
 /*######
 ## npc_oox22fe
@@ -47,7 +85,7 @@ class npc_oox22fe : public CreatureScript
 public:
     npc_oox22fe() : CreatureScript("npc_oox22fe") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_RESCUE_OOX22FE)
         {
@@ -63,11 +101,12 @@ public:
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_oox22fe::npc_oox22feAI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
+
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_oox22feAI(creature);
     }
@@ -76,7 +115,7 @@ public:
     {
         npc_oox22feAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId) override
+        void WaypointReached(uint32 waypointId)
         {
             switch (waypointId)
             {
@@ -111,24 +150,25 @@ public:
             }
         }
 
-        void Reset() override
+        void Reset()
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             //For an small probability the npc says something when he get aggro
             if (urand(0, 9) > 7)
                 Talk(SAY_OOX_AGGRO);
         }
 
-        void JustSummoned(Creature* summoned) override
+        void JustSummoned(Creature* summoned)
         {
             summoned->AI()->AttackStart(me);
         }
     };
+
 };
 
 enum GordunniTrap
@@ -138,33 +178,33 @@ enum GordunniTrap
 
 class spell_gordunni_trap : public SpellScriptLoader
 {
-public:
-    spell_gordunni_trap() : SpellScriptLoader("spell_gordunni_trap") { }
+    public:
+        spell_gordunni_trap() : SpellScriptLoader("spell_gordunni_trap") { }
 
-    class spell_gordunni_trap_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_gordunni_trap_SpellScript);
-
-        void HandleDummy()
+        class spell_gordunni_trap_SpellScript : public SpellScript
         {
-            if (Unit* caster = GetCaster())
-                if (GameObject* chest = caster->SummonGameObject(GO_GORDUNNI_DIRT_MOUND, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
-                {
-                    chest->SetSpellId(GetSpellInfo()->Id);
-                    caster->RemoveGameObject(chest, false);
-                }
-        }
+            PrepareSpellScript(spell_gordunni_trap_SpellScript);
 
-        void Register() override
+            void HandleDummy()
+            {
+                if (Unit* caster = GetCaster())
+                    if (GameObject* chest = caster->SummonGameObject(GO_GORDUNNI_DIRT_MOUND, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                    {
+                        chest->SetSpellId(GetSpellInfo()->Id);
+                        caster->RemoveGameObject(chest, false);
+                    }
+            }
+
+            void Register()
+            {
+                OnCast += SpellCastFn(spell_gordunni_trap_SpellScript::HandleDummy);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            OnCast += SpellCastFn(spell_gordunni_trap_SpellScript::HandleDummy);
+            return new spell_gordunni_trap_SpellScript();
         }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_gordunni_trap_SpellScript();
-    }
 };
 
 /*######
@@ -173,6 +213,7 @@ public:
 
 void AddSC_feralas()
 {
+    new npc_gregan_brewspewer();
     new npc_oox22fe();
     new spell_gordunni_trap();
 }

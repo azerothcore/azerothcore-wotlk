@@ -44,8 +44,6 @@ public:
 
   /// Pointer to the next interface in the chain.
   ACE_Bcast_Node *next_;
-
-  ACE_ALLOC_HOOK_DECLARE;
 };
 
 /**
@@ -57,6 +55,7 @@ public:
 class ACE_Export ACE_SOCK_Dgram_Bcast : public ACE_SOCK_Dgram
 {
 public:
+  // = Initialization and termination methods.
   /// Default constructor.
   ACE_SOCK_Dgram_Bcast (void);
 

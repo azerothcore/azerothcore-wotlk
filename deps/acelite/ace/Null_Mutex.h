@@ -6,7 +6,7 @@
  *
  *   Moved from Synch.h.
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //==========================================================================
 
@@ -22,6 +22,7 @@
 
 #include "ace/Global_Macros.h"
 #include "ace/OS_Memory.h"
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -79,8 +80,6 @@ public:
   //ACE_ALLOC_HOOK_DECLARE;
 
   int lock_; // A dummy lock.
-
-  ACE_ALLOC_HOOK_DECLARE;
 };
 
 // FUZZ: disable check_for_ACE_Guard
@@ -99,6 +98,7 @@ template<>
 class ACE_Export ACE_Guard<ACE_Null_Mutex>
 {
 public:
+  // = Initialization and termination methods.
   ACE_Guard (ACE_Null_Mutex &) {}
   ACE_Guard (ACE_Null_Mutex &, int) {}
   ACE_Guard (ACE_Null_Mutex &, int, int) {}

@@ -19,8 +19,7 @@ options=(
     "client-data: (gd): download client data from github repository (beta)"   # 11
     "run-worldserver (rw): execute a simple restarter for worldserver" # 12
     "run-authserver (ra): execute a simple restarter for authserver" # 13
-    "docker (dr): Run docker tools" # 14
-    "quit: Exit from this menu"                     # 15
+    "quit: Exit from this menu"                     # 14
     )
 
 function _switch() {
@@ -67,11 +66,7 @@ function _switch() {
         ""|"ra"|"run-authserver"|"13")
             inst_simple_restarter authserver
             ;;
-        ""|"dr"|"docker"|"14")
-            DOCKER=1 denoRunFile "$AC_PATH_APPS/docker/docker-cmd.ts" "${@:2}"
-            exit
-            ;;
-        ""|"quit"|"15")
+        ""|"quit"|"14")
             echo "Goodbye!"
             exit
             ;;

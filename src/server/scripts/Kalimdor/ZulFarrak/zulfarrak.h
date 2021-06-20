@@ -5,8 +5,9 @@
 #ifndef DEF_ZULFARRACK_H
 #define DEF_ZULFARRACK_H
 
-#include "CellImpl.h"
 #include "SpellScript.h"
+#include "GridNotifiers.h"
+#include "CellImpl.h"
 
 enum ZulFarrakData
 {

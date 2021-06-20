@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "culling_of_stratholme.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "culling_of_stratholme.h"
 
 enum Spells
 {
@@ -32,9 +32,9 @@ class boss_infinite_corruptor : public CreatureScript
 public:
     boss_infinite_corruptor() : CreatureScript("boss_infinite_corruptor") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetCullingOfStratholmeAI<boss_infinite_corruptorAI>(creature);
+        return new boss_infinite_corruptorAI(creature);
     }
 
     struct boss_infinite_corruptorAI : public ScriptedAI
@@ -47,8 +47,8 @@ public:
         SummonList summons;
         uint32 beamTimer;
 
-        void Reset() override
-        {
+        void Reset() 
+        { 
             events.Reset();
             summons.DespawnAll();
             if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -60,9 +60,9 @@ public:
             beamTimer = 1;
         }
 
-        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) { summons.Summon(cr); }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             me->InterruptNonMeleeSpells(false);
             events.ScheduleEvent(EVENT_SPELL_VOID_STRIKE, 8000);
@@ -70,17 +70,14 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-            {
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
                 {
                     if (cr->GetEntry() == NPC_TIME_RIFT)
-                    {
                         cr->DespawnOrUnsummon(1000);
-                    }
                     else
                     {
                         cr->DespawnOrUnsummon(5000);
@@ -88,16 +85,12 @@ public:
                         cr->MonsterSay("You have my thanks for saving my existence in this timeline. Now i must report back to my superiors. They must know immediately of what i just experienced.", LANG_UNIVERSAL, 0);
                     }
                 }
-            }
 
             if (InstanceScript* pInstance = me->GetInstanceScript())
-            {
                 pInstance->SetData(DATA_SHOW_INFINITE_TIMER, 0);
-                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CORRUPTING_BLIGHT);
-            }
         }
 
-        void DoAction(int32 param) override
+        void DoAction(int32 param)
         {
             if (!me->IsAlive())
                 return;
@@ -110,7 +103,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (beamTimer)
             {
@@ -129,7 +122,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
+            switch (events.GetEvent())
             {
                 case EVENT_SPELL_VOID_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_VOID_STRIKE, false);
@@ -145,6 +138,7 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+
 };
 
 void AddSC_boss_infinite_corruptor()

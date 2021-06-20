@@ -4,7 +4,7 @@
 /**
  *  @file    Handle_Set.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -36,10 +36,6 @@
 #  define ACE_DEFAULT_SELECT_REACTOR_SIZE ACE_FD_SETSIZE
 #endif /* ACE_DEFAULT_SELECT_REACTOR_SIZE */
 
-#if defined (ACE_WIN32) || defined (ACE_MQX)
-# define ACE_HANDLE_SET_USES_FD_ARRAY
-#endif
-
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 /**
@@ -56,6 +52,8 @@ class ACE_Export ACE_Handle_Set
 {
 public:
   friend class ACE_Handle_Set_Iterator;
+
+  // = Initialization and termination.
 
   enum
   {
@@ -141,9 +139,9 @@ private:
   enum
   {
     WORDSIZE = NFDBITS,
-#if !defined (ACE_HANDLE_SET_USES_FD_ARRAY)
+#if !defined (ACE_WIN32)
     NUM_WORDS = howmany (MAXSIZE, NFDBITS),
-#endif /* ACE_HANDLE_SET_USES_FD_ARRAY */
+#endif /* ACE_WIN32 */
     NBITS = 256
   };
 
@@ -203,14 +201,14 @@ private:
   const ACE_Handle_Set &handles_;
 
   /// Index of the bit we're examining in the current word_num_() word.
-#if defined (ACE_HANDLE_SET_USES_FD_ARRAY)
+#if defined (ACE_WIN32)
   u_int handle_index_;
 #elif !defined (ACE_HAS_BIG_FD_SET)
   int handle_index_;
 #elif defined (ACE_HAS_BIG_FD_SET)
   int handle_index_;
   u_long oldlsb_;
-#endif /* ACE_HANDLE_SET_USES_FD_ARRAY */
+#endif /* ACE_WIN32 */
 
   /// Number of the word we're iterating over (typically between 0..7).
   int word_num_;
@@ -220,13 +218,13 @@ private:
   int word_max_;
 #endif /* ACE_HAS_BIG_FD_SET */
 
-#if !defined (ACE_HANDLE_SET_USES_FD_ARRAY) && !defined (ACE_HAS_BIG_FD_SET)
+#if !defined (ACE_WIN32) && !defined (ACE_HAS_BIG_FD_SET)
   /// Value of the bits in the word we're iterating on.
   fd_mask word_val_;
-#elif !defined (ACE_HANDLE_SET_USES_FD_ARRAY) && defined (ACE_HAS_BIG_FD_SET)
+#elif !defined (ACE_WIN32) && defined (ACE_HAS_BIG_FD_SET)
   /// Value of the bits in the word we're iterating on.
   u_long word_val_;
-#endif /* !ACE_HANDLE_SET_USES_FD_ARRAY && !ACE_HAS_BIG_FD_SET */
+#endif /* !ACE_WIN32 && !ACE_HAS_BIG_FD_SET */
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

@@ -1,4 +1,6 @@
 /* -*- C++ -*- */
+// $Id: ARGV.inl 80826 2008-03-04 14:51:23Z wotte $
+
 #include "ace/Global_Macros.h"
 
 // Open versioned namespace, if enabled by the user.

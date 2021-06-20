@@ -1,0 +1,9 @@
+//  -*- MPC -*- now wouldn't this be cool...
+project(ACE_XtReactor) : acedefaults, install, acelib, ace_output, ace_xt {
+  sharedname   = ACE_XtReactor
+  dynamicflags += ACE_XTREACTOR_BUILD_DLL
+
+  specific {
+    install_dir = ace/XtReactor
+  }
+}

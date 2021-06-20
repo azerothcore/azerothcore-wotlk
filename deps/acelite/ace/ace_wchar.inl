@@ -1,4 +1,7 @@
 // -*- C++ -*-
+//
+// $Id: ace_wchar.inl 80826 2008-03-04 14:51:23Z wotte $
+
 // These are always inlined
 // FUZZ: disable check_for_inline
 
@@ -44,7 +47,7 @@ ACE_Wide_To_Ascii::convert (const wchar_t *wstr)
   while ((*wtemp) != 0) // Hopefully the string is null terminated!
     ++wtemp;
 
-  size_t const len = wtemp - wstr + 1;
+  int const len = wtemp - wstr + 1;
 # else  /* ACE_WIN32 */
   size_t const len = ::wcslen (wstr) + 1;
 # endif /* ACE_WIN32 */

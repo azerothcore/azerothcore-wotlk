@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #ifndef TRINITYSERVER_MOVESPLINEFLAG_H
 #define TRINITYSERVER_MOVESPLINEFLAG_H
-
 #include "MovementTypedefs.h"
+
 #include <string>
 
 namespace Movement
@@ -24,7 +24,7 @@ namespace Movement
         enum eFlags
         {
             None                = 0x00000000,
-            // x00-xFF(first byte) used as animation Ids storage in pair with Animation flag
+                                                        // x00-xFF(first byte) used as animation Ids storage in pair with Animation flag
             Done                = 0x00000100,
             Falling             = 0x00000200,           // Affects elevation computation, can't be combined with Parabolic flag
             No_Spline           = 0x00000400,
@@ -59,34 +59,28 @@ namespace Movement
             // CatmullRom interpolation mode used
             Mask_CatmullRom     = Flying | Catmullrom,
             // Unused, not suported flags
-            Mask_Unused         = No_Spline | Enter_Cycle | Frozen | Unknown7 | Unknown8 | Unknown10 | Unknown11 | Unknown12 | Unknown13
+            Mask_Unused         = No_Spline|Enter_Cycle|Frozen|Unknown7|Unknown8|Unknown10|Unknown11|Unknown12|Unknown13
         };
 
-        inline uint32& raw() { return (uint32&) * this; }
-        [[nodiscard]] inline const uint32& raw() const { return (const uint32&) * this; }
+        inline uint32& raw() { return (uint32&)*this; }
+        inline const uint32& raw() const { return (const uint32&)*this; }
 
         MoveSplineFlag() { raw() = 0; }
         MoveSplineFlag(uint32 f) { raw() = f; }
         MoveSplineFlag(const MoveSplineFlag& f) { raw() = f.raw(); }
-        /* requried as of C++ 11 */
-#if __cplusplus >= 201103L
-        MoveSplineFlag(MoveSplineFlag&&) = default;
-        MoveSplineFlag& operator=(const MoveSplineFlag&) = default;
-        MoveSplineFlag& operator=(MoveSplineFlag&&) = default;
-#endif
 
         // Constant interface
 
-        [[nodiscard]] bool isSmooth() const { return raw() & Mask_CatmullRom; }
-        [[nodiscard]] bool isLinear() const { return !isSmooth(); }
-        [[nodiscard]] bool isFacing() const { return raw() & Mask_Final_Facing; }
+        bool isSmooth() const { return raw() & Mask_CatmullRom; }
+        bool isLinear() const { return !isSmooth(); }
+        bool isFacing() const { return raw() & Mask_Final_Facing; }
 
-        [[nodiscard]] uint8 getAnimationId() const { return animId; }
-        [[nodiscard]] bool hasAllFlags(uint32 f) const { return (raw() & f) == f; }
-        [[nodiscard]] bool hasFlag(uint32 f) const { return (raw() & f) != 0; }
+        uint8 getAnimationId() const { return animId; }
+        bool hasAllFlags(uint32 f) const { return (raw() & f) == f; }
+        bool hasFlag(uint32 f) const { return (raw() & f) != 0; }
         uint32 operator & (uint32 f) const { return (raw() & f); }
         uint32 operator | (uint32 f) const { return (raw() | f); }
-        [[nodiscard]] std::string ToString() const;
+        std::string ToString() const;
 
         // Not constant interface
 

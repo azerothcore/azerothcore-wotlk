@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "the_black_morass.h"
 
 enum Enums
@@ -41,7 +41,7 @@ public:
 
         EventMap events;
 
-        void Reset() override
+        void Reset()
         {
             events.Reset();
         }
@@ -52,13 +52,13 @@ public:
                 Talk(id);
         }
 
-        void InitializeAI() override
+        void InitializeAI()
         {
             OwnTalk(SAY_ENTER);
             ScriptedAI::InitializeAI();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/)
         {
             events.ScheduleEvent(EVENT_ARCANE_BLAST, 10000);
             events.ScheduleEvent(EVENT_TIME_LAPSE, 15000);
@@ -69,7 +69,7 @@ public:
             OwnTalk(SAY_AGGRO);
         }
 
-        void MoveInLineOfSight(Unit* who) override
+        void MoveInLineOfSight(Unit* who)
         {
             if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
             {
@@ -84,20 +84,20 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void KilledUnit(Unit* victim) override
+        void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 OwnTalk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* /*killer*/)
         {
             OwnTalk(SAY_DEATH);
             if (InstanceScript* instance = me->GetInstanceScript())
                 instance->SetData(TYPE_CHRONO_LORD_DEJA, DONE);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -130,9 +130,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return GetTheBlackMorassAI<boss_chrono_lord_dejaAI>(creature);
+        return new boss_chrono_lord_dejaAI(creature);
     }
 };
 

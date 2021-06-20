@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "Common.h"
-#include "DBCStores.h"
 #include "GroupMgr.h"
 #include "InstanceSaveMgr.h"
 #include "World.h"
+#include "DBCStores.h"
 
 GroupMgr::GroupMgr()
 {
@@ -35,7 +35,7 @@ void GroupMgr::InitGroupIds()
     if (result)
     {
         uint32 maxId = (*result)[0].GetUInt32();
-        _groupIds.resize(maxId + 1);
+        _groupIds.resize(maxId+1);
     }
 }
 
@@ -50,39 +50,39 @@ void GroupMgr::RegisterGroupId(uint32 groupId)
         ++_nextGroupId;
 }
 
-ObjectGuid::LowType GroupMgr::GenerateGroupId()
+uint32 GroupMgr::GenerateGroupId()
 {
-    ObjectGuid::LowType newGroupId = _nextGroupId;
+    uint32 newGroupId = _nextGroupId;
 
     // find the lowest available id starting from the current _nextGroupId
     while (_nextGroupId < 0xFFFFFFFF && ++_nextGroupId < _groupIds.size() && _groupIds[_nextGroupId]);
 
     if (_nextGroupId == 0xFFFFFFFF)
     {
-        LOG_ERROR("server", "Group ID overflow!! Can't continue, shutting down server.");
+        sLog->outError("Group ID overflow!! Can't continue, shutting down server.");
         World::StopNow(ERROR_EXIT_CODE);
     }
 
     return newGroupId;
 }
 
-Group* GroupMgr::GetGroupByGUID(ObjectGuid::LowType groupId) const
+Group* GroupMgr::GetGroupByGUID(uint32 groupId) const
 {
     GroupContainer::const_iterator itr = GroupStore.find(groupId);
     if (itr != GroupStore.end())
         return itr->second;
 
-    return nullptr;
+    return NULL;
 }
 
 void GroupMgr::AddGroup(Group* group)
 {
-    GroupStore[group->GetGUID().GetCounter()] = group;
+    GroupStore[group->GetLowGUID()] = group;
 }
 
 void GroupMgr::RemoveGroup(Group* group)
 {
-    GroupStore.erase(group->GetGUID().GetCounter());
+    GroupStore.erase(group->GetLowGUID());
 }
 
 void GroupMgr::LoadGroups()
@@ -92,11 +92,11 @@ void GroupMgr::LoadGroups()
 
         // Delete all groups whose leader does not exist
         CharacterDatabase.DirectExecute("DELETE FROM `groups` WHERE leaderGuid NOT IN (SELECT guid FROM characters)");
-
-        // Delete all groups with less than 2 members
-        CharacterDatabase.DirectExecute("DELETE FROM `groups` WHERE guid NOT IN (SELECT guid FROM group_member GROUP BY guid HAVING COUNT(guid) > 1)");
-
+        // Delete all groups with less than 2 members (or less than 1 for lfg groups)
+        // TODO: This query is not allowed in MySQL 8.0
+        CharacterDatabase.DirectExecute("DELETE groups FROM `groups` LEFT JOIN ((SELECT guid, count(*) as cnt FROM group_member GROUP BY guid) t) ON groups.guid = t.guid WHERE t.guid IS NULL OR (t.cnt<=1 AND groups.groupType <> 12)");
         // Delete invalid lfg_data
+        // TODO: This query is not allowed in MySQL 8.0
         CharacterDatabase.DirectExecute("DELETE lfg_data FROM lfg_data LEFT JOIN `groups` ON lfg_data.guid = groups.guid WHERE groups.guid IS NULL OR groups.groupType <> 12");
         // CharacterDatabase.DirectExecute("DELETE `groups` FROM `groups` LEFT JOIN lfg_data ON groups.guid = lfg_data.guid WHERE groups.groupType=12 AND lfg_data.guid IS NULL"); // group should be left so binds are cleared when disbanded
 
@@ -104,13 +104,13 @@ void GroupMgr::LoadGroups()
 
         //                                                        0              1           2             3                 4      5          6      7         8       9
         QueryResult result = CharacterDatabase.Query("SELECT g.leaderGuid, g.lootMethod, g.looterGuid, g.lootThreshold, g.icon1, g.icon2, g.icon3, g.icon4, g.icon5, g.icon6"
-                             //  10         11          12         13              14                  15            16        17          18
-                             ", g.icon7, g.icon8, g.groupType, g.difficulty, g.raidDifficulty, g.masterLooterGuid, g.guid, lfg.dungeon, lfg.state FROM `groups` g LEFT JOIN lfg_data lfg ON lfg.guid = g.guid ORDER BY g.guid ASC");
+            //  10         11          12         13              14                  15            16        17          18
+            ", g.icon7, g.icon8, g.groupType, g.difficulty, g.raidDifficulty, g.masterLooterGuid, g.guid, lfg.dungeon, lfg.state FROM `groups` g LEFT JOIN lfg_data lfg ON lfg.guid = g.guid ORDER BY g.guid ASC");
 
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 group definitions. DB table `groups` is empty!");
-            LOG_INFO("server", " ");
+            sLog->outString(">> Loaded 0 group definitions. DB table `groups` is empty!");
+            sLog->outString();
         }
         else
         {
@@ -126,17 +126,18 @@ void GroupMgr::LoadGroups()
                 }
                 AddGroup(group);
 
-                RegisterGroupId(group->GetGUID().GetCounter());
+                RegisterGroupId(group->GetLowGUID());
 
                 ++count;
-            } while (result->NextRow());
+            }
+            while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            sLog->outString(">> Loaded %u group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            sLog->outString();
         }
     }
 
-    LOG_INFO("server", "Loading Group members...");
+    sLog->outString("Loading Group members...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -149,8 +150,8 @@ void GroupMgr::LoadGroups()
         QueryResult result = CharacterDatabase.Query("SELECT guid, memberGuid, memberFlags, subgroup, roles FROM group_member ORDER BY guid");
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 group members. DB table `group_member` is empty!");
-            LOG_INFO("server", " ");
+            sLog->outString(">> Loaded 0 group members. DB table `group_member` is empty!");
+            sLog->outString();
         }
         else
         {
@@ -163,13 +164,14 @@ void GroupMgr::LoadGroups()
                 if (group)
                     group->LoadMemberFromDB(fields[1].GetUInt32(), fields[2].GetUInt8(), fields[3].GetUInt8(), fields[4].GetUInt8());
                 //else
-                //    LOG_ERROR("server", "GroupMgr::LoadGroups: Consistency failed, can't find group (storage id: %u)", fields[0].GetUInt32());
+                //    sLog->outError("GroupMgr::LoadGroups: Consistency failed, can't find group (storage id: %u)", fields[0].GetUInt32());
 
                 ++count;
-            } while (result->NextRow());
+            }
+            while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u group members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            sLog->outString(">> Loaded %u group members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            sLog->outString();
         }
     }
 }

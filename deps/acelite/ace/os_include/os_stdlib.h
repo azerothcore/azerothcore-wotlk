@@ -23,7 +23,6 @@
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
 #include "ace/os_include/os_stddef.h"
-#include "ace/os_include/os_stdint.h"
 #include "ace/os_include/sys/os_wait.h"
 
 #if defined (ACE_HAS_ALLOCA_H)

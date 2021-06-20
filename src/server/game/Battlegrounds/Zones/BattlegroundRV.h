@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -76,41 +76,41 @@ enum BattlegroundRVData
 
 class BattlegroundRV : public Battleground
 {
-public:
-    BattlegroundRV();
-    ~BattlegroundRV() override;
+    public:
+        BattlegroundRV();
+        ~BattlegroundRV();
 
-    /* inherited from BattlegroundClass */
-    void AddPlayer(Player* player) override;
-    void RemovePlayer(Player* player) override;
-    void StartingEventCloseDoors() override;
-    void StartingEventOpenDoors() override;
-    void Init() override;
-    void FillInitialWorldStates(WorldPacket& d) override;
-    void UpdateArenaWorldState() override;
-    void HandleAreaTrigger(Player* player, uint32 trigger) override;
-    bool SetupBattleground() override;
-    void HandleKillPlayer(Player* player, Player* killer) override;
-    bool HandlePlayerUnderMap(Player* player) override;
+        /* inherited from BattlegroundClass */
+        void AddPlayer(Player* player);
+        void RemovePlayer(Player* player);
+        void StartingEventCloseDoors();
+        void StartingEventOpenDoors();
+        void Init();
+        void FillInitialWorldStates(WorldPacket &d);
+        void UpdateArenaWorldState();
+        void HandleAreaTrigger(Player* player, uint32 trigger);
+        bool SetupBattleground();
+        void HandleKillPlayer(Player* player, Player* killer);
+        bool HandlePlayerUnderMap(Player* player);
 
-    GameObject* GetPillarAtPosition(Position* p);
+        GameObject* GetPillarAtPosition(Position* p);
 
-private:
-    uint32 Timer;
-    uint32 State;
-    uint16 CheckPlayersTimer;
+    private:
+        uint32 Timer;
+        uint32 State;
+        uint16 CheckPlayersTimer;
 
-    void PostUpdateImpl(uint32 diff) override;
+        void PostUpdateImpl(uint32 diff);
 
-protected:
-    uint32 getTimer() { return Timer; }
-    void setTimer(uint32 timer) { Timer = timer; }
-    uint32 getState() { return State; };
-    void setState(uint32 state) { State = state; }
+    protected:
+        uint32 getTimer() { return Timer; }
+        void setTimer(uint32 timer) { Timer = timer; }
+        uint32 getState() { return State; };
+        void setState(uint32 state) { State = state; }
 
-    void TeleportUnitToNewZ(Unit* unit, float newZ, bool casting);
-    void CheckPositionForUnit(Unit* unit);
-    void UpdatePillars();
-    uint32 GetPillarIdForPos(Position* p);
+        void TeleportUnitToNewZ(Unit* unit, float newZ, bool casting);
+        void CheckPositionForUnit(Unit* unit);
+        void UpdatePillars();
+        uint32 GetPillarIdForPos(Position* p);
 };
 #endif

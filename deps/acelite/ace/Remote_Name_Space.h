@@ -45,6 +45,7 @@ typedef ACE_Unbounded_Set<ACE_NS_WString> ACE_WSTRING_SET;
 class ACE_Export ACE_Remote_Name_Space : public ACE_Name_Space
 {
 public:
+  // = Initialization and termination methods.
   /// "Do-nothing" constructor.
   ACE_Remote_Name_Space (void);
 
@@ -131,8 +132,6 @@ public:
 
   /// Dump the state of the object.
   virtual void dump (void) const;
-
-  ACE_ALLOC_HOOK_DECLARE;
 
 private:
   /// Interface to Name server process for NET_LOCAL namespace.

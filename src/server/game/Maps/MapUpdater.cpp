@@ -1,62 +1,88 @@
-/*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2020 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
- */
-
-#include "AvgDiffTracker.h"
-#include "LFGMgr.h"
-#include "Map.h"
 #include "MapUpdater.h"
+#include "DelayExecutor.h"
+#include "Map.h"
+#include "DatabaseEnv.h"
+#include "LFGMgr.h"
+#include "AvgDiffTracker.h"
 
-class UpdateRequest
+#include <ace/Guard_T.h>
+#include <ace/Method_Request.h>
+
+class WDBThreadStartReq1 : public ACE_Method_Request
 {
-public:
-    UpdateRequest() = default;
-    virtual ~UpdateRequest() = default;
+    public:
 
-    virtual void call() = 0;
+        WDBThreadStartReq1()
+        {
+        }
+
+        virtual int call()
+        {
+            return 0;
+        }
 };
 
-class MapUpdateRequest : public UpdateRequest
+class WDBThreadEndReq1 : public ACE_Method_Request
 {
-public:
-    MapUpdateRequest(Map& m, MapUpdater& u, uint32 d, uint32 sd)
-        : m_map(m), m_updater(u), m_diff(d), s_diff(sd)
-    {
-    }
+    public:
 
-    void call() override
-    {
-        m_map.Update(m_diff, s_diff);
-        m_updater.update_finished();
-    }
-private:
-    Map& m_map;
-    MapUpdater& m_updater;
-    uint32 m_diff;
-    uint32 s_diff;
+        WDBThreadEndReq1()
+        {
+        }
+
+        virtual int call()
+        {
+            return 0;
+        }
 };
 
-class LFGUpdateRequest : public UpdateRequest
+class MapUpdateRequest : public ACE_Method_Request
 {
-public:
-    LFGUpdateRequest(MapUpdater& u, uint32 d) : m_updater(u), m_diff(d) {}
+    private:
 
-    void call() override
-    {
-        uint32 startTime = getMSTime();
-        sLFGMgr->Update(m_diff, 1);
-        uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
-        lfgDiffTracker.Update(totalTime);
-        m_updater.update_finished();
-    }
-private:
-    MapUpdater& m_updater;
-    uint32 m_diff;
+        Map& m_map;
+        MapUpdater& m_updater;
+        uint32 m_diff;
+        uint32 s_diff;
+
+    public:
+
+        MapUpdateRequest(Map& m, MapUpdater& u, uint32 d, uint32 sd)
+            : m_map(m), m_updater(u), m_diff(d), s_diff(sd)
+        {
+        }
+
+        virtual int call()
+        {
+            m_map.Update (m_diff, s_diff);
+            m_updater.update_finished();
+            return 0;
+        }
 };
 
-MapUpdater::MapUpdater(): pending_requests(0)
+class LFGUpdateRequest : public ACE_Method_Request
+{
+    private:
+
+        MapUpdater& m_updater;
+        uint32 m_diff;
+
+    public:
+        LFGUpdateRequest(MapUpdater& u, uint32 d) : m_updater(u), m_diff(d) {}
+
+        virtual int call()
+        {
+            uint32 startTime = getMSTime();
+            sLFGMgr->Update(m_diff, 1);
+            uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
+            lfgDiffTracker.Update(totalTime);
+            m_updater.update_finished();
+            return 0;
+        }
+};
+
+MapUpdater::MapUpdater():
+m_executor(), m_mutex(), m_condition(m_mutex), pending_requests(0)
 {
 }
 
@@ -65,82 +91,80 @@ MapUpdater::~MapUpdater()
     deactivate();
 }
 
-void MapUpdater::activate(size_t num_threads)
+int MapUpdater::activate(size_t num_threads)
 {
-    for (size_t i = 0; i < num_threads; ++i)
-    {
-        _workerThreads.push_back(std::thread(&MapUpdater::WorkerThread, this));
-    }
+    return m_executor.start((int)num_threads, new WDBThreadStartReq1, new WDBThreadEndReq1);
 }
 
-void MapUpdater::deactivate()
+int MapUpdater::deactivate()
 {
-    _cancelationToken = true;
-
     wait();
 
-    _queue.Cancel();
-
-    for (auto& thread : _workerThreads)
-    {
-        thread.join();
-    }
+    return m_executor.deactivate();
 }
 
-void MapUpdater::wait()
+int MapUpdater::wait()
 {
-    std::unique_lock<std::mutex> guard(_lock);
+    ACORE_GUARD(ACE_Thread_Mutex, m_mutex);
 
     while (pending_requests > 0)
-        _condition.wait(guard);
+        m_condition.wait();
 
-    guard.unlock();
+    return 0;
 }
 
-void MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
+int MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
-    std::lock_guard<std::mutex> guard(_lock);
+    ACORE_GUARD(ACE_Thread_Mutex, m_mutex);
 
     ++pending_requests;
 
-    _queue.Push(new MapUpdateRequest(map, *this, diff, s_diff));
+    if (m_executor.execute(new MapUpdateRequest(map, *this, diff, s_diff)) == -1)
+    {
+        ACE_DEBUG((LM_ERROR, ACE_TEXT("(%t) \n"), ACE_TEXT("Failed to schedule Map Update")));
+
+        --pending_requests;
+        return -1;
+    }
+
+    return 0;
 }
 
-void MapUpdater::schedule_lfg_update(uint32 diff)
+int MapUpdater::schedule_lfg_update(uint32 diff)
 {
-    std::lock_guard<std::mutex> guard(_lock);
+    ACORE_GUARD(ACE_Thread_Mutex, m_mutex);
 
     ++pending_requests;
 
-    _queue.Push(new LFGUpdateRequest(*this, diff));
+    if (m_executor.execute(new LFGUpdateRequest(*this, diff)) == -1)
+    {
+        ACE_DEBUG((LM_ERROR, ACE_TEXT("(%t) \n"), ACE_TEXT("Failed to schedule LFG Update")));
+
+        --pending_requests;
+        return -1;
+    }
+
+    return 0;
 }
 
 bool MapUpdater::activated()
 {
-    return _workerThreads.size() > 0;
+    return m_executor.activated();
 }
 
 void MapUpdater::update_finished()
 {
-    std::lock_guard<std::mutex> lock(_lock);
+    ACORE_GUARD(ACE_Thread_Mutex, m_mutex);
+
+    if (pending_requests == 0)
+    {
+        ACE_ERROR((LM_ERROR, ACE_TEXT("(%t)\n"), ACE_TEXT("MapUpdater::update_finished BUG, report to devs")));
+        sLog->outMisc("WOOT! pending_requests == 0 before decrement!");
+        m_condition.broadcast();
+        return;
+    }
 
     --pending_requests;
 
-    _condition.notify_all();
-}
-
-void MapUpdater::WorkerThread()
-{
-    while (1)
-    {
-        UpdateRequest* request = nullptr;
-
-        _queue.WaitAndPop(request);
-        if (_cancelationToken)
-            return;
-
-        request->call();
-
-        delete request;
-    }
+    m_condition.broadcast();
 }

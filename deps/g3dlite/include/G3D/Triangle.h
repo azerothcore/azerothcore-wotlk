@@ -1,19 +1,19 @@
 /**
- \file G3D/Triangle.h
+ @file Triangle.h
   
- \maintainer Morgan McGuire, http://graphics.cs.williams.edu
+ @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
- \created 2003-04-05
- \edited  2011-06-20
+ @created 2003-04-05
+ @edited  2008-10-06
 
- \cite Random point method by  Greg Turk, Generating random points in triangles.  In A. S. Glassner, ed., Graphics Gems, pp. 24-28. Academic Press, 1990
+ @cite Random point method by  Greg Turk, Generating random points in triangles.  In A. S. Glassner, ed., Graphics Gems, pp. 24-28. Academic Press, 1990
 
- Copyright 2000-2012, Morgan McGuire.
+ Copyright 2000-2009, Morgan McGuire.
  All rights reserved.
  */
 
-#ifndef G3D_Triangle_h
-#define G3D_Triangle_h
+#ifndef G3D_TRIANGLE_H
+#define G3D_TRIANGLE_H
 
 #include "G3D/platform.h"
 #include "G3D/g3dmath.h"
@@ -55,19 +55,19 @@ private:
     void init(const Vector3& v0, const Vector3& v1, const Vector3& v2);
 
 public:
-    
+	
     Triangle(class BinaryInput& b);
-    void serialize(class BinaryOutput& b);
-    void deserialize(class BinaryInput& b);
+	void serialize(class BinaryOutput& b);
+	void deserialize(class BinaryInput& b);
 
     Triangle();
     
-    Triangle(const Point3& v0, const Point3& v1, const Point3& v2);
+    Triangle(const Vector3& v0, const Vector3& v1, const Vector3& v2);
     
     ~Triangle();
 
     /** 0, 1, or 2 */
-    inline const Point3& vertex(int n) const {
+    inline const Vector3& vertex(int n) const {
         debugAssert((n >= 0) && (n < 3));
         return _vertex[n];
     }
@@ -91,15 +91,15 @@ public:
     const Vector3& normal() const;
 
     /** Barycenter */
-    Point3 center() const;
+    Vector3 center() const;
 
     const Plane& plane() const;
 
     /** Returns a random point in the triangle. */
-    Point3 randomPoint() const;
+    Vector3 randomPoint() const;
 
     inline void getRandomSurfacePoint
-    (Point3& P, 
+    (Vector3& P, 
      Vector3& N = Vector3::ignore()) const {
         P = randomPoint();
         N = normal();

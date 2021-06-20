@@ -20,6 +20,7 @@
 # pragma once
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
+#include "ace/Auto_Ptr.h"
 #include "ace/SString.h"
 #include "ace/Unbounded_Queue.h"
 #include "ace/Unbounded_Set.h"
@@ -263,9 +264,9 @@ public:
 #if (ACE_USES_CLASSIC_SVC_CONF == 1)
   /// Dynamically link the shared object file and retrieve a pointer to
   /// the designated shared object in this file. Also account for the
-  /// possibility to have static services registered when loading the DLL, by
-  /// ensuring that the dynamic service is registered before any of its
-  /// subordinate static services. Thus avoiding any finalization order
+  /// possiblity to have static services registered when loading the DLL, by
+  /// ensuring that the dynamic sevice is registered before any of its
+  /// subordibnate static services. Thus avoiding any finalization order
   /// problems.
   int initialize (const ACE_Service_Type_Factory *,
                   const ACE_TCHAR *parameters);
@@ -321,7 +322,6 @@ public:
     ~Processed_Static_Svc (void);
     ACE_TCHAR * name_;
     const ACE_Static_Svc_Descriptor *assd_;
-    ACE_ALLOC_HOOK_DECLARE;
   };
 
   /// Get the current ACE_Service_Repository held by this object.

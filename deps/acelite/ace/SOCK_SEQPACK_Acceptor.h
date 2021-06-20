@@ -7,7 +7,7 @@
  *  @author  Patrick J. Lardieri <plardier@atl.lmco.com>
  *  @author  Gaurav Naik, Lockheed Martin ATL
  *  @author  based on SOCK_STREAM_Acceptor
- *            by Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *            by Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -43,6 +43,7 @@ class ACE_Time_Value;
 class ACE_Export ACE_SOCK_SEQPACK_Acceptor : public ACE_SOCK
 {
 public:
+  // = Initialization and termination methods.
   /// Default constructor.
   ACE_SOCK_SEQPACK_Acceptor (void);
 

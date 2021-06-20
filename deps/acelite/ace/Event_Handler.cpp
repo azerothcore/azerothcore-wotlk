@@ -16,6 +16,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 // Implement conceptually abstract virtual functions in the base class
 // so derived classes don't have to implement unused ones.
+
 ACE_Event_Handler::ACE_Event_Handler (ACE_Reactor *r,
                                       int p)
   : reference_count_ (1),
@@ -32,6 +33,7 @@ ACE_Event_Handler::~ACE_Event_Handler (void)
 }
 
 // Gets the file descriptor associated with this I/O device.
+
 ACE_HANDLE
 ACE_Event_Handler::get_handle (void) const
 {
@@ -40,6 +42,7 @@ ACE_Event_Handler::get_handle (void) const
 }
 
 // Sets the file descriptor associated with this I/O device.
+
 void
 ACE_Event_Handler::set_handle (ACE_HANDLE)
 {
@@ -47,6 +50,7 @@ ACE_Event_Handler::set_handle (ACE_HANDLE)
 }
 
 // Gets the priority of this handler.
+
 int
 ACE_Event_Handler::priority (void) const
 {
@@ -55,6 +59,7 @@ ACE_Event_Handler::priority (void) const
 }
 
 // Sets the priority
+
 void
 ACE_Event_Handler::priority (int priority)
 {
@@ -64,6 +69,7 @@ ACE_Event_Handler::priority (int priority)
 
 // Called when the object is about to be removed from the Dispatcher
 // tables.
+
 int
 ACE_Event_Handler::handle_close (ACE_HANDLE, ACE_Reactor_Mask)
 {
@@ -72,6 +78,7 @@ ACE_Event_Handler::handle_close (ACE_HANDLE, ACE_Reactor_Mask)
 }
 
 // Called when input becomes available on fd.
+
 int
 ACE_Event_Handler::handle_input (ACE_HANDLE)
 {
@@ -80,6 +87,7 @@ ACE_Event_Handler::handle_input (ACE_HANDLE)
 }
 
 // Called when output is possible on fd.
+
 int
 ACE_Event_Handler::handle_output (ACE_HANDLE)
 {
@@ -88,6 +96,7 @@ ACE_Event_Handler::handle_output (ACE_HANDLE)
 }
 
 // Called when urgent data is available on fd.
+
 int
 ACE_Event_Handler::handle_exception (ACE_HANDLE)
 {
@@ -96,6 +105,7 @@ ACE_Event_Handler::handle_exception (ACE_HANDLE)
 }
 
 // Called when timer expires, TV stores the current time.
+
 int
 ACE_Event_Handler::handle_timeout (const ACE_Time_Value &, const void *)
 {
@@ -104,6 +114,7 @@ ACE_Event_Handler::handle_timeout (const ACE_Time_Value &, const void *)
 }
 
 // Called when a monitored Process exits
+
 int
 ACE_Event_Handler::handle_exit (ACE_Process *)
 {
@@ -112,6 +123,7 @@ ACE_Event_Handler::handle_exit (ACE_Process *)
 }
 
 // Called when a registered signal occurs.
+
 int
 ACE_Event_Handler::handle_signal (int, siginfo_t *, ucontext_t *)
 {
@@ -128,6 +140,7 @@ ACE_Event_Handler::resume_handler (void)
   // resuming the handler
   return ACE_Event_Handler::ACE_REACTOR_RESUMES_HANDLER;
 }
+
 
 int
 ACE_Event_Handler::handle_qos (ACE_HANDLE)

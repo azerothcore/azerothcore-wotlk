@@ -15,32 +15,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "mana_tombs.h"
 #include "Map.h"
-#include "ScriptMgr.h"
 
 class instance_mana_tombs : public InstanceMapScript
 {
-public:
-    instance_mana_tombs() : InstanceMapScript(MTScriptName, 557) { }
+    public:
+        instance_mana_tombs() : InstanceMapScript(MTScriptName, 557) { }
 
-    struct instance_mana_tombs_InstanceMapScript : public InstanceScript
-    {
-        instance_mana_tombs_InstanceMapScript(Map* map) : InstanceScript(map)
+        struct instance_mana_tombs_InstanceMapScript : public InstanceScript
         {
-            SetBossNumber(EncounterCount);
+            instance_mana_tombs_InstanceMapScript(Map* map) : InstanceScript(map)
+            {
+                SetBossNumber(EncounterCount);
+            }
+
+            void Load(char const* data) override { LoadBossState(data); }
+            
+            std::string GetSaveData() override { return DataHeader + GetBossSaveData(); }
+        };
+
+        InstanceScript* GetInstanceScript(InstanceMap* map) const override
+        {
+            return new instance_mana_tombs_InstanceMapScript(map);
         }
-
-        void Load(char const* data) override { LoadBossState(data); }
-
-        std::string GetSaveData() override { return DataHeader + GetBossSaveData(); }
-    };
-
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
-    {
-        return new instance_mana_tombs_InstanceMapScript(map);
-    }
 };
 
 void AddSC_instance_mana_tombs()

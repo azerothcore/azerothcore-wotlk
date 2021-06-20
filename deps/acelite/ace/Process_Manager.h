@@ -4,7 +4,7 @@
 /**
  *  @file    Process_Manager.h
  *
- *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
+ *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
 //=============================================================================
 
@@ -243,15 +243,6 @@ public:
    * @retval 0 on success; -1 on failure.
    */
   int wait (const ACE_Time_Value &timeout = ACE_Time_Value::max_time);
-#if defined (ACE_HAS_CPP11)
-  /// @sa wait
-  template< class Rep, class Period >
-  int wait (const std::chrono::duration<Rep, Period>& timeout)
-  {
-    ACE_Time_Value const tv (timeout);
-    return this->wait (tv);
-  }
-#endif
 
   /**
    * Wait up to @a timeout for a single specified process to terminate.
@@ -269,17 +260,6 @@ public:
   pid_t wait (pid_t pid,
               const ACE_Time_Value &timeout,
               ACE_exitcode *status = 0);
-#if defined (ACE_HAS_CPP11)
-  /// @sa wait
-  template< class Rep, class Period >
-  pid_t wait (pid_t pid,
-              const std::chrono::duration<Rep, Period>& timeout,
-              ACE_exitcode *status = 0)
-  {
-    ACE_Time_Value const tv (timeout);
-    return this->wait (pid, tv, status);
-  }
-#endif
 
   /**
    * Wait indefinitely for a single, specified process to terminate.
@@ -419,8 +399,6 @@ private:
 
     /// Dump the state of an object.
     void dump (void) const;
-
-    ACE_ALLOC_HOOK_DECLARE;
   };
 
   /// Resize the pool of Process_Descriptors.

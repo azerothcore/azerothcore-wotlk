@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,10 +15,10 @@ EndScriptData */
 npc_daphne_stilwell
 EndContentData */
 
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
+#include "Player.h"
 
 /*######
 ## npc_daphne_stilwell
@@ -51,7 +51,7 @@ class npc_daphne_stilwell : public CreatureScript
 public:
     npc_daphne_stilwell() : CreatureScript("npc_daphne_stilwell") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_TOME_VALOR)
         {
@@ -64,7 +64,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_daphne_stilwellAI(creature);
     }
@@ -76,13 +76,13 @@ public:
         SummonList summons;
         uint8 textCounter;
 
-        void Reset() override
+        void Reset()
         {
             summons.DespawnAll();
             textCounter = SAY_DS_DOWN_1;
         }
 
-        void WaypointReached(uint32 waypointId) override
+        void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
 
@@ -136,7 +136,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who) override
+        void AttackStart(Unit* who)
         {
             if (me->Attack(who, false))
             {
@@ -145,7 +145,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* creature) override
+        void JustSummoned(Creature* creature)
         {
             creature->SetHomePosition(me->GetHomePosition());
             creature->GetMotionMaster()->MoveChase(me);
@@ -155,7 +155,7 @@ public:
             summons.Summon(creature);
         }
 
-        void SummonedCreatureDies(Creature* creature, Unit*) override
+        void SummonedCreatureDies(Creature* creature, Unit*)
         {
             summons.Despawn(creature);
             if (summons.empty())
