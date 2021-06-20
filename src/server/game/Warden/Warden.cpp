@@ -17,7 +17,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <openssl/md5.h>
 #include <openssl/sha.h>
 
 Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
@@ -281,7 +280,7 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
 {
     static constexpr char WARDEN_TOKEN[] = "_TW\t";
     // if msg starts with WARDEN_TOKEN
-    if (!(msg.rfind(WARDEN_TOKEN, 0) == 0))
+    if (msg.rfind(WARDEN_TOKEN, 0) != 0)
     {
         return false;
     }
