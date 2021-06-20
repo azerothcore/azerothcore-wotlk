@@ -2952,6 +2952,15 @@ ItemDelete.ItemLevel = 80
 PlayerStart.AllReputation = 0
 
 #
+#    PlayerStart.CustomSpells
+#        Description: If enabled, players will ignore spells from playercreateinfo_spellstart at character
+#                     creation and will start with spells from the table playercreateinfo_spell_custom instead.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+PlayerStart.CustomSpells = 0
+
+#
 #    PlayerStart.MapsExplored
 #        Description: Characters start with all maps explored.
 #        Default:     0 - (Disabled)
