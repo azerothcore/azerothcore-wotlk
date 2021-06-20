@@ -113,7 +113,8 @@ public:
             { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "" },
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
             { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
-            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" }
+            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
+            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" }
         };
         return commandTable;
     }
@@ -3343,6 +3344,42 @@ public:
 
         handler->GetSession()->SendShowMailBox(player->GetGUID());
         return true;
+    }
+
+    static bool HandleStringCommand(ChatHandler *handler, char const *args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            return false;
+        }
+
+        uint32 id = atoi(strtok((char*)args, " "));
+        if (id == 0)
+        {
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            return false;
+        }
+
+        uint32 locale = 0;
+        char* localeString = strtok(nullptr, " ");
+        if (localeString != nullptr)
+        {
+            locale = atoi(localeString);
+        }
+
+        const char* str = sObjectMgr->GetAcoreString(id, static_cast<LocaleConstant>(locale));
+
+        if (strcmp(str, "<error>") == 0)
+        {
+            handler->PSendSysMessage(LANG_NO_ACORE_STRING_FOUND, id);
+            return true;
+        }
+        else
+        {
+            handler->SendSysMessage(str);
+            return true;
+        }
     }
 };
 

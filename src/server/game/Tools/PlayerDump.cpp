@@ -9,7 +9,6 @@
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
 #include "PlayerDump.h"
-#include "UpdateFields.h"
 #include "World.h"
 
 #define DUMP_TABLE_COUNT 27
