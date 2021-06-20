@@ -3572,7 +3572,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            LOG_ERROR("sql.sql", ">> Loaded 0 player create spells. DB table `playercreateinfo_spell_custom` is empty.");
+            LOG_INFO("server.loading", ">> Loaded 0 player create spells. DB table `playercreateinfo_spell_custom` is empty.");
         }
         else
         {
