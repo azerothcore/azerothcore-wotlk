@@ -1161,8 +1161,8 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     _CreateLogHolders();
 
     LOG_DEBUG("guild", "GUILD: creating guild [%s] for leader %s (%s)",
-                   name.c_str(), pLeader->GetName().c_str(), m_leaderGuid.ToString().c_str());
-#endif
+        name.c_str(), pLeader->GetName().c_str(), m_leaderGuid.ToString().c_str());
+
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_MEMBERS);
