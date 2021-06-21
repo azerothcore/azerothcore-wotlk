@@ -75,7 +75,7 @@ WorldObject::~WorldObject()
     {
         if (GetTypeId() == TYPEID_CORPSE)
         {
-            LOG_FATAL("server", "Object::~Object Corpse %s, type=%d deleted but still in map!!", GetGUID().ToString().c_str(), ((Corpse*)this)->GetType());
+            LOG_FATAL("entities.object", "Object::~Object Corpse %s, type=%d deleted but still in map!!", GetGUID().ToString().c_str(), ((Corpse*)this)->GetType());
             ABORT();
         }
         ResetMap();
@@ -88,15 +88,15 @@ Object::~Object()
 
     if (IsInWorld())
     {
-        LOG_FATAL("server", "Object::~Object - %s deleted but still in world!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in world!!", GetGUID().ToString().c_str());
         if (isType(TYPEMASK_ITEM))
-            LOG_FATAL("server", "Item slot %u", ((Item*)this)->GetSlot());
+            LOG_FATAL("entities.object", "Item slot %u", ((Item*)this)->GetSlot());
         ABORT();
     }
 
     if (m_objectUpdated)
     {
-        LOG_FATAL("server", "Object::~Object - %s deleted but still in update list!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in update list!!", GetGUID().ToString().c_str());
         ABORT();
     }
 
@@ -686,7 +686,7 @@ void Object::SetByteValue(uint16 index, uint8 offset, uint8 value)
 
     if (offset > 3)
     {
-        LOG_ERROR("server", "Object::SetByteValue: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteValue: wrong offset %u", offset);
         return;
     }
 
@@ -706,7 +706,7 @@ void Object::SetUInt16Value(uint16 index, uint8 offset, uint16 value)
 
     if (offset > 1)
     {
-        LOG_ERROR("server", "Object::SetUInt16Value: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetUInt16Value: wrong offset %u", offset);
         return;
     }
 
@@ -806,7 +806,7 @@ void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("server", "Object::SetByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -825,7 +825,7 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("server", "Object::RemoveByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::RemoveByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -840,7 +840,8 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
-    LOG_INFO("server", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u", (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
+    LOG_INFO("misc", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u",
+        (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
 
     // ASSERT must fail after function call
     return false;
@@ -912,32 +913,36 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
 
 void MovementInfo::OutDebug()
 {
-    LOG_INFO("server", "MOVEMENT INFO");
-    LOG_INFO("server", "guid %s", guid.ToString().c_str());
-    LOG_INFO("server", "flags %u", flags);
-    LOG_INFO("server", "flags2 %u", flags2);
-    LOG_INFO("server", "time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
-    LOG_INFO("server", "position: `%s`", pos.ToString().c_str());
+    LOG_INFO("movement", "MOVEMENT INFO");
+    LOG_INFO("movement", "guid %s", guid.ToString().c_str());
+    LOG_INFO("movement", "flags %u", flags);
+    LOG_INFO("movement", "flags2 %u", flags2);
+    LOG_INFO("movement", "time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
+    LOG_INFO("movement", "position: `%s`", pos.ToString().c_str());
+
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
-        LOG_INFO("server", "TRANSPORT:");
-        LOG_INFO("server", "guid: %s", transport.guid.ToString().c_str());
-        LOG_INFO("server", "position: `%s`", transport.pos.ToString().c_str());
-        LOG_INFO("server", "seat: %i", transport.seat);
-        LOG_INFO("server", "time: %u", transport.time);
+        LOG_INFO("movement", "TRANSPORT:");
+        LOG_INFO("movement", "guid: %s", transport.guid.ToString().c_str());
+        LOG_INFO("movement", "position: `%s`", transport.pos.ToString().c_str());
+        LOG_INFO("movement", "seat: %i", transport.seat);
+        LOG_INFO("movement", "time: %u", transport.time);
+
         if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
-            LOG_INFO("server", "time2: %u", transport.time2);
+        {
+            LOG_INFO("movement", "time2: %u", transport.time2);
+        }
     }
 
     if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        LOG_INFO("server", "pitch: %f", pitch);
+        LOG_INFO("movement", "pitch: %f", pitch);
 
-    LOG_INFO("server", "fallTime: %u", fallTime);
+    LOG_INFO("movement", "fallTime: %u", fallTime);
     if (flags & MOVEMENTFLAG_FALLING)
-        LOG_INFO("server", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
+        LOG_INFO("movement", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
 
     if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
-        LOG_INFO("server", "splineElevation: %f", splineElevation);
+        LOG_INFO("movement", "splineElevation: %f", splineElevation);
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
@@ -1920,7 +1925,7 @@ namespace Acore
                 ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, text, 0, "", loc_idx);
             }
             else
-                LOG_ERROR("server", "MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
+                LOG_ERROR("entities.object", "MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
         }
 
     private:
@@ -2092,7 +2097,7 @@ void WorldObject::SetMap(Map* map)
         return;
     if (m_currMap)
     {
-        LOG_FATAL("server", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
+        LOG_FATAL("entities.object", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
         ABORT();
     }
     m_currMap = map;
@@ -2140,7 +2145,7 @@ void WorldObject::AddObjectToRemoveList()
     Map* map = FindMap();
     if (!map)
     {
-        LOG_ERROR("server", "Object %s at attempt add to move list not have valid map (Id: %u).", GetGUID().ToString().c_str(), GetMapId());
+        LOG_ERROR("entities.object", "Object %s at attempt add to move list not have valid map (Id: %u).", GetGUID().ToString().c_str(), GetMapId());
         return;
     }
 
@@ -2693,7 +2698,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     // Prevent invalid coordinates here, position is unchanged
     if (!Acore::IsValidMapCoord(destx, desty))
     {
-        LOG_FATAL("server", "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
         return;
     }
 

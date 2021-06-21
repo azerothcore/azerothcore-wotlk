@@ -6,11 +6,11 @@ on:
   pull_request:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-modules:
     strategy:
       fail-fast: false
       matrix:
