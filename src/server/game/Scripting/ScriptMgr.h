@@ -247,7 +247,7 @@ public:
         _mapEntry = sMapStore.LookupEntry(_mapId);
 
         if (!_mapEntry)
-            LOG_ERROR("server", "Invalid MapScript for %u; no such map ID.", _mapId);
+            LOG_ERROR("maps.script", "Invalid MapScript for %u; no such map ID.", _mapId);
     }
 
     // Gets the MapEntry structure associated with this script. Can return nullptr.
@@ -288,7 +288,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsWorldMap())
-            LOG_ERROR("server", "WorldMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "WorldMapScript for map %u is invalid.", GetEntry()->MapID);
     }
 };
 
@@ -305,7 +305,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsDungeon())
-            LOG_ERROR("server", "InstanceMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "InstanceMapScript for map %u is invalid.", GetEntry()->MapID);
     }
 
     // Gets an InstanceScript object for this instance.
@@ -325,7 +325,7 @@ public:
         checkMap();
 
         if (GetEntry() && !GetEntry()->IsBattleground())
-            LOG_ERROR("server", "BattlegroundMapScript for map %u is invalid.", GetEntry()->MapID);
+            LOG_ERROR("maps.script", "BattlegroundMapScript for map %u is invalid.", GetEntry()->MapID);
     }
 };
 
@@ -1947,10 +1947,10 @@ public:
                 {
                     // Try to find an existing script.
                     bool existing = false;
-                    for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+                    for (auto iterator = ScriptPointerList.begin(); iterator != ScriptPointerList.end(); ++iterator)
                     {
                         // If the script names match...
-                        if (it->second->GetName() == script->GetName())
+                        if (iterator->second->GetName() == script->GetName())
                         {
                             // ... It exists.
                             existing = true;
@@ -1967,7 +1967,7 @@ public:
                     else
                     {
                         // If the script is already assigned -> delete it!
-                        LOG_ERROR("server", "Script named '%s' is already assigned (two or more scripts have the same name), so the script can't work, aborting...",
+                        LOG_ERROR("scripts", "Script named '%s' is already assigned (two or more scripts have the same name), so the script can't work, aborting...",
                                        script->GetName().c_str());
 
                         ABORT(); // Error that should be fixed ASAP.
@@ -2011,7 +2011,7 @@ private:
         {
             if (it->second == script)
             {
-                LOG_ERROR("server", "Script '%s' has same memory pointer as '%s'.",
+                LOG_ERROR("scripts", "Script '%s' has same memory pointer as '%s'.",
                                script->GetName().c_str(), it->second->GetName().c_str());
 
                 return false;
