@@ -90,7 +90,7 @@ ScriptMgr* ScriptMgr::instance()
 void ScriptMgr::Initialize()
 {
     AddScripts();
-    LOG_INFO("server", "Loading C++ scripts");
+    LOG_INFO("server.loading", "Loading C++ scripts");
 }
 
 void ScriptMgr::Unload()
@@ -168,8 +168,8 @@ void ScriptMgr::LoadDatabase()
 
     CheckIfScriptsInDatabaseExist();
 
-    LOG_INFO("server", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 struct TSpellSummary

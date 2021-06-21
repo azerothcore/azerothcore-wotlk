@@ -292,7 +292,7 @@ void TicketMgr::LoadTickets()
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
+        LOG_INFO("server.loading", ">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
 
         return;
     }
@@ -319,8 +319,8 @@ void TicketMgr::LoadTickets()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u GM tickets in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u GM tickets in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void TicketMgr::LoadSurveys()
@@ -332,8 +332,8 @@ void TicketMgr::LoadSurveys()
     if (QueryResult result = CharacterDatabase.Query("SELECT MAX(surveyId) FROM gm_survey"))
         _lastSurveyId = (*result)[0].GetUInt32();
 
-    LOG_INFO("server", ">> Loaded GM Survey count from database in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded GM Survey count from database in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void TicketMgr::AddTicket(GmTicket* ticket)

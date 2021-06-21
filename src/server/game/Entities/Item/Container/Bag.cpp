@@ -28,7 +28,7 @@ Bag::~Bag()
         {
             if (item->IsInWorld())
             {
-                LOG_FATAL("server", "Item %u (slot %u, bag slot %u) in bag %u (slot %u, bag slot %u, m_bagslot %u) is to be deleted but is still in world.",
+                LOG_FATAL("entities.item", "Item %u (slot %u, bag slot %u) in bag %u (slot %u, bag slot %u, m_bagslot %u) is to be deleted but is still in world.",
                                item->GetEntry(), (uint32)item->GetSlot(), (uint32)item->GetBagSlot(),
                                GetEntry(), (uint32)GetSlot(), (uint32)GetBagSlot(), (uint32)i);
                 item->RemoveFromWorld();

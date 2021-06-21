@@ -217,9 +217,7 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         do
         {
             ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].GetUInt32());
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "Loading char %s from account %u.", guid.ToString().c_str(), GetAccountId());
-#endif
+            LOG_DEBUG("network.opcode", "Loading char %s from account %u.", guid.ToString().c_str(), GetAccountId());
             if (Player::BuildEnumData(result, &data))
             {
                 _legitCharacters.insert(guid);
@@ -837,7 +835,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         }
         else
         {
-            LOG_ERROR("server", "Player %s (%s) marked as member of not existing guild (id: %u), removing guild membership for player.",
+            LOG_ERROR("network.opcode", "Player %s (%s) marked as member of not existing guild (id: %u), removing guild membership for player.",
                 pCurrChar->GetName().c_str(), pCurrChar->GetGUID().ToString().c_str(), guildId);
             pCurrChar->SetInGuild(0);
             pCurrChar->SetRank(0);
@@ -1113,9 +1111,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
             chH.PSendSysMessage("%s", GitRevision::GetFullVersion());
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "WORLD: Sent server info");
-#endif
+        LOG_DEBUG("network.opcode", "WORLD: Sent server info");
     }
 
     data.Initialize(SMSG_LEARNED_DANCE_MOVES, 4 + 4);
@@ -1214,9 +1210,7 @@ void WorldSession::HandlePlayerLoginToCharOutOfWorld(Player* /*pCurrChar*/)
 
 void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "WORLD: Received CMSG_SET_FACTION_ATWAR");
-#endif
+    LOG_DEBUG("network.opcode", "WORLD: Received CMSG_SET_FACTION_ATWAR");
 
     uint32 repListID;
     uint8  flag;
@@ -1230,7 +1224,7 @@ void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 //I think this function is never used :/ I dunno, but i guess this opcode not exists
 void WorldSession::HandleSetFactionCheat(WorldPacket& /*recvData*/)
 {
-    LOG_ERROR("server", "WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
+    LOG_ERROR("network.opcode", "WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
     GetPlayer()->GetReputationMgr().SendStates();
 }
 
@@ -1264,9 +1258,7 @@ void WorldSession::HandleTutorialReset(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "WORLD: Received CMSG_SET_WATCHED_FACTION");
-#endif
+    LOG_DEBUG("network.opcode", "WORLD: Received CMSG_SET_WATCHED_FACTION");
     uint32 fact;
     recvData >> fact;
     GetPlayer()->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fact);
@@ -1274,9 +1266,7 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "WORLD: Received CMSG_SET_FACTION_INACTIVE");
-#endif
+    LOG_DEBUG("network.opcode", "WORLD: Received CMSG_SET_FACTION_INACTIVE");
     uint32 replistid;
     uint8 inactive;
     recvData >> replistid >> inactive;
@@ -1286,18 +1276,14 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleShowingHelmOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "CMSG_SHOWING_HELM for %s", _player->GetName().c_str());
-#endif
+    LOG_DEBUG("network.opcode", "CMSG_SHOWING_HELM for %s", _player->GetName().c_str());
     recvData.read_skip<uint8>(); // unknown, bool?
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
 }
 
 void WorldSession::HandleShowingCloakOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "CMSG_SHOWING_CLOAK for %s", _player->GetName().c_str());
-#endif
+    LOG_DEBUG("network.opcode", "CMSG_SHOWING_CLOAK for %s", _player->GetName().c_str());
     recvData.read_skip<uint8>(); // unknown, bool?
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
 }
@@ -1476,9 +1462,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
 
 void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_ALTER_APPEARANCE");
-#endif
 
     uint32 Hair, Color, FacialHair, SkinColor;
     recvData >> Hair >> Color >> FacialHair >> SkinColor;
@@ -1555,9 +1539,7 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
 
     if (slot >= MAX_GLYPH_SLOT_INDEX)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
-#endif
         return;
     }
 
@@ -1714,9 +1696,7 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
 
 void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_SAVE");
-#endif
 
     uint64 setGuid;
     recvData.readPackGUID(setGuid);
@@ -1775,9 +1755,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
 
 void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_DELETE");
-#endif
 
     uint64 setGuid;
     recvData.readPackGUID(setGuid);
@@ -1787,9 +1765,7 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
 
 void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
-#endif
 
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
@@ -1799,9 +1775,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
         uint8 srcbag, srcslot;
         recvData >> srcbag >> srcslot;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("entities.player.items", "Item %s: srcbag %u, srcslot %u", itemGuid.ToString().c_str(), srcbag, srcslot);
-#endif
 
         // check if item slot is set to "ignored" (raw value == 1), must not be unequipped then
         if (itemGuid.GetRawValue() == 1)

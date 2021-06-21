@@ -76,7 +76,7 @@ void CalendarMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u calendar events", count);
+    LOG_INFO("server.loading", ">> Loaded %u calendar events", count);
     count = 0;
 
     //                                                       0   1      2        3       4       5            6      7
@@ -102,8 +102,8 @@ void CalendarMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u calendar invites", count);
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u calendar invites", count);
+    LOG_INFO("server.loading", " ");
 
     for (uint64 i = 1; i < _maxEventId; ++i)
         if (!GetEvent(i))
@@ -302,9 +302,7 @@ CalendarInvite* CalendarMgr::GetInvite(uint64 inviteId) const
             if ((*itr2)->GetInviteId() == inviteId)
                 return *itr2;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("entities.unit", "CalendarMgr::GetInvite: [" UI64FMTD "] not found!", inviteId);
-#endif
     return nullptr;
 }
 
