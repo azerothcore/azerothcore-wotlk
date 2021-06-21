@@ -906,13 +906,13 @@ public:
     void LoadQuests();
     void LoadQuestStartersAndEnders()
     {
-        LOG_INFO("server", "Loading GO Start Quest Data...");
+        LOG_INFO("server.loading", "Loading GO Start Quest Data...");
         LoadGameobjectQuestStarters();
-        LOG_INFO("server", "Loading GO End Quest Data...");
+        LOG_INFO("server.loading", "Loading GO End Quest Data...");
         LoadGameobjectQuestEnders();
-        LOG_INFO("server", "Loading Creature Start Quest Data...");
+        LOG_INFO("server.loading", "Loading Creature Start Quest Data...");
         LoadCreatureQuestStarters();
-        LOG_INFO("server", "Loading Creature End Quest Data...");
+        LOG_INFO("server.loading", "Loading Creature End Quest Data...");
         LoadCreatureQuestEnders();
     }
     void LoadGameobjectQuestStarters();
@@ -1255,6 +1255,7 @@ public:
     // reserved names
     void LoadReservedPlayersNames();
     [[nodiscard]] bool IsReservedName(std::string const& name) const;
+    void AddReservedPlayerName(std::string const& name);
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string const& name, bool create = false);

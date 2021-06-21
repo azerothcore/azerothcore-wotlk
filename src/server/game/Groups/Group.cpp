@@ -6,7 +6,6 @@
 
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
-#include "Common.h"
 #include "DatabaseEnv.h"
 #include "Group.h"
 #include "GroupMgr.h"
@@ -66,13 +65,20 @@ Group::~Group()
 
     if (m_bgGroup)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("bg.battleground", "Group::~Group: battleground group being deleted.");
-#endif
-        if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this) m_bgGroup->SetBgRaid(TEAM_ALLIANCE, nullptr);
-        else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this) m_bgGroup->SetBgRaid(TEAM_HORDE, nullptr);
-        else LOG_ERROR("server", "Group::~Group: battleground group is not linked to the correct battleground.");
+
+        if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this)
+        {
+            m_bgGroup->SetBgRaid(TEAM_ALLIANCE, nullptr);
+        }
+        else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this)
+        {
+            m_bgGroup->SetBgRaid(TEAM_HORDE, nullptr);
+        }
+        else
+            LOG_ERROR("bg.battleground", "Group::~Group: battleground group is not linked to the correct battleground.");
     }
+
     Rolls::iterator itr;
     while (!RollId.empty())
     {
@@ -460,26 +466,28 @@ bool Group::AddMember(Player* player)
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 if (itr->GetSource() == player) // pussywizard: no check same map, adding members is single threaded
-                    continue;
-
-                if (Player* member = itr->GetSource())
                 {
-                    if (player->HaveAtClient(member))
+                    continue;
+                }
+
+                if (Player* itrMember = itr->GetSource())
+                {
+                    if (player->HaveAtClient(itrMember))
                     {
-                        member->SetFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
-                        member->BuildValuesUpdateBlockForPlayer(&groupData, player);
-                        member->RemoveFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
+                        itrMember->SetFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
+                        itrMember->BuildValuesUpdateBlockForPlayer(&groupData, player);
+                        itrMember->RemoveFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
                     }
 
-                    if (member->HaveAtClient(player))
+                    if (itrMember->HaveAtClient(player))
                     {
                         UpdateData newData;
                         WorldPacket newDataPacket;
-                        player->BuildValuesUpdateBlockForPlayer(&newData, member);
+                        player->BuildValuesUpdateBlockForPlayer(&newData, itrMember);
                         if (newData.HasData())
                         {
                             newData.BuildPacket(&newDataPacket);
-                            member->SendDirectMessage(&newDataPacket);
+                            itrMember->SendDirectMessage(&newDataPacket);
                         }
                     }
                 }
@@ -1221,9 +1229,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
 
 void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Group::MasterLoot (SMSG_LOOT_MASTER_LIST, 330)");
-#endif
 
     for (std::vector<LootItem>::iterator i = loot->items.begin(); i != loot->items.end(); ++i)
     {
@@ -2045,9 +2051,7 @@ void Group::BroadcastGroupUpdate(void)
         {
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "-- Forced group value update for '%s'", pp->GetName().c_str());
-#endif
+            LOG_DEBUG("group", "-- Forced group value update for '%s'", pp->GetName().c_str());
         }
     }
 }
