@@ -216,13 +216,13 @@ public:
                                     return;
                                 }
                                 const char* name_races[RACE_DRAENEI] = {"human", "orc", "dwarf", "nightelf", "undead", "tauren", "gnome", "troll", "", "bloodelf", "draenei"};
-                                if( p->getRace() > 11 )
+                                if( p->GetRace() > 11 )
                                 {
                                     Reset();
                                     return;
                                 }
 
-                                std::string text = (OACHANOA_T_7_1 + std::string(name_races[p->getRace() - 1]));
+                                std::string text = (OACHANOA_T_7_1 + std::string(name_races[p->GetRace() - 1]));
                                 Say(text, true);
 
                                 p->AreaExploredOrEventHappens(12032);

@@ -118,7 +118,7 @@ public:
                         {
                             summon->CastSpell(summon, SPELL_STOLEN_SOUL_VISUAL, false);
                             summon->SetDisplayId(target->GetDisplayId());
-                            summon->AI()->DoAction(target->getClass());
+                            summon->AI()->DoAction(target->GetClass());
                             summon->AI()->AttackStart(target);
                         }
                     }

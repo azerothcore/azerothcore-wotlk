@@ -57,7 +57,7 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
                 CloseGossipMenuFor(player);
-                if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
+                if (player->GetClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
                     player->ActivateTaxiPathTo(TAXI_PATH_ID_HORDE);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
@@ -72,7 +72,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (player->getClass() != CLASS_DRUID)
+        if (player->GetClass() != CLASS_DRUID)
             SendGossipMenuFor(player, 4916, creature->GetGUID());
         else if (player->GetTeamId() != TEAM_HORDE)
         {
@@ -81,7 +81,7 @@ public:
 
             SendGossipMenuFor(player, 4917, creature->GetGUID());
         }
-        else if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
+        else if (player->GetClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
         {
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_THUNDER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
@@ -170,7 +170,7 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
                 CloseGossipMenuFor(player);
-                if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_ALLIANCE)
+                if (player->GetClass() == CLASS_DRUID && player->GetTeamId() == TEAM_ALLIANCE)
                     player->ActivateTaxiPathTo(TAXI_PATH_ID_ALLY);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
@@ -185,7 +185,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (player->getClass() != CLASS_DRUID)
+        if (player->GetClass() != CLASS_DRUID)
             SendGossipMenuFor(player, 4913, creature->GetGUID());
         else if (player->GetTeamId() != TEAM_ALLIANCE)
         {
@@ -194,7 +194,7 @@ public:
 
             SendGossipMenuFor(player, 4915, creature->GetGUID());
         }
-        else if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_ALLIANCE)
+        else if (player->GetClass() == CLASS_DRUID && player->GetTeamId() == TEAM_ALLIANCE)
         {
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_RUTHERAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 

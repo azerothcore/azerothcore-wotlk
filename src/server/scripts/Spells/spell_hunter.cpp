@@ -1140,7 +1140,7 @@ public:
 
             if (Creature* target = GetExplTargetUnit()->ToCreature())
             {
-                if (target->getLevel() > player->getLevel())
+                if (target->GetLevel() > player->GetLevel())
                 {
                     player->SendTameFailure(PET_TAME_TOO_HIGHLEVEL);
                     return SPELL_FAILED_DONT_REPORT;

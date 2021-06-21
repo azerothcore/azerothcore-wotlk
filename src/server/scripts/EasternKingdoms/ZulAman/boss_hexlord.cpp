@@ -436,7 +436,7 @@ public:
 
                     PlayerGUID = target->GetGUID();
                     PlayerAbility_Timer = urand(8000, 10000);
-                    PlayerClass = target->getClass() - 1;
+                    PlayerClass = target->GetClass() - 1;
 
                     if (PlayerClass == CLASS_DRUID - 1)
                         PlayerClass = CLASS_DRUID;

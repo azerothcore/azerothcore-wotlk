@@ -541,7 +541,7 @@ public:
         else
             return false;
 
-        Player* player = handler->getSelectedPlayer();
+        Player* player = handler->GetSelectedPlayer();
         if (!player)
             player = handler->GetSession()->GetPlayer();
 

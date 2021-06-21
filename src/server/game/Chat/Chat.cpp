@@ -702,7 +702,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
     return BuildChatPacket(data, chatType, language, senderGUID, receiverGUID, message, chatTag, senderName, receiverName, achievementId, gmMessage, channelName);
 }
 
-Player* ChatHandler::getSelectedPlayer()
+Player* ChatHandler::GetSelectedPlayer()
 {
     if (!m_session)
         return nullptr;
@@ -1124,7 +1124,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
     }
     else
     {
-        Player* pl = getSelectedPlayer();
+        Player* pl = GetSelectedPlayer();
         // if allowed player pointer
         if (player)
             *player = pl;
@@ -1284,8 +1284,8 @@ bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player*& player
     }
     else
     {
-        if (getSelectedPlayer())
-            player = getSelectedPlayer();
+        if (GetSelectedPlayer())
+            player = GetSelectedPlayer();
         else
             player = m_session->GetPlayer();
 

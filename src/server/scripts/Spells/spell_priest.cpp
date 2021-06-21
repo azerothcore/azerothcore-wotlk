@@ -205,7 +205,7 @@ public:
             if (AuraEffect const* aegis = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_PRIEST_DIVINE_AEGIS, EFFECT_0))
                 absorb += aegis->GetAmount();
 
-            absorb = std::min(absorb, eventInfo.GetProcTarget()->getLevel() * 125);
+            absorb = std::min(absorb, eventInfo.GetProcTarget()->GetLevel() * 125);
 
             GetTarget()->CastCustomSpell(SPELL_PRIEST_DIVINE_AEGIS, SPELLVALUE_BASE_POINT0, absorb, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }

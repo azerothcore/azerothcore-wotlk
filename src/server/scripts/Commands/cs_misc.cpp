@@ -312,7 +312,7 @@ public:
 
         BattlegroundTypeId bgTypeId = bg->GetBgTypeID();
 
-        TeamId teamId1 = Player::TeamIdForRace(players[0]->getRace());
+        TeamId teamId1 = Player::TeamIdForRace(players[0]->GetRace());
         TeamId teamId2 = (teamId1 == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
         for (uint8 i = 0; i < cnt; ++i)
         {
@@ -1025,7 +1025,7 @@ public:
 
     static bool HandleCooldownCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -1159,7 +1159,7 @@ public:
         // save GM account without delay and output message
         if (handler->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
         {
-            if (Player* target = handler->getSelectedPlayer())
+            if (Player* target = handler->GetSelectedPlayer())
             {
                 target->SaveToDB(false, false);
             }
@@ -1407,7 +1407,7 @@ public:
         if (!*args)
             return false;
 
-        Player* playerTarget = handler->getSelectedPlayer();
+        Player* playerTarget = handler->GetSelectedPlayer();
         if (!playerTarget)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1444,7 +1444,7 @@ public:
         if (!*args)
             return false;
 
-        Player* playerTarget = handler->getSelectedPlayer();
+        Player* playerTarget = handler->GetSelectedPlayer();
         if (!playerTarget)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1525,7 +1525,7 @@ public:
             count = 1;
 
         Player* player = handler->GetSession()->GetPlayer();
-        Player* playerTarget = handler->getSelectedPlayer();
+        Player* playerTarget = handler->GetSelectedPlayer();
         if (!playerTarget)
             playerTarget = player;
 
@@ -1623,7 +1623,7 @@ public:
         }
 
         Player* player = handler->GetSession()->GetPlayer();
-        Player* playerTarget = handler->getSelectedPlayer();
+        Player* playerTarget = handler->GetSelectedPlayer();
         if (!playerTarget)
             playerTarget = player;
 
@@ -1712,7 +1712,7 @@ public:
 
     static bool HandleMaxSkillCommand(ChatHandler* handler, char const* /*args*/)
     {
-        Player* SelectedPlayer = handler->getSelectedPlayer();
+        Player* SelectedPlayer = handler->GetSelectedPlayer();
         if (!SelectedPlayer)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1748,7 +1748,7 @@ public:
 
         int32 level = uint32(atol(levelStr));
 
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1861,10 +1861,10 @@ public:
             accId             = target->GetSession()->GetAccountId();
             money             = target->GetMoney();
             totalPlayerTime   = target->GetTotalPlayedTime();
-            level             = target->getLevel();
+            level             = target->GetLevel();
             latency           = target->GetSession()->GetLatency();
-            raceid            = target->getRace();
-            classid           = target->getClass();
+            raceid            = target->GetRace();
+            classid           = target->GetClass();
             muteTime          = target->GetSession()->m_muteTime;
             mapId             = target->GetMapId();
             areaId            = target->GetAreaId();
@@ -2911,7 +2911,7 @@ public:
         pet->SetGuidValue(UNIT_FIELD_CREATEDBY, player->GetGUID());
         pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, player->getFaction());
 
-        if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
+        if (!pet->InitStatsForLevel(creatureTarget->GetLevel()))
         {
             LOG_ERROR("misc", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
             handler->PSendSysMessage("Error 2");
@@ -2920,7 +2920,7 @@ public:
         }
 
         // prepare visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->getLevel() - 1);
+        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->GetLevel() - 1);
 
         pet->GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
         // this enables pet details window (Shift+P)
@@ -2930,7 +2930,7 @@ public:
         pet->GetMap()->AddToMap(pet->ToCreature());
 
         // visual effect for levelup
-        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->getLevel());
+        pet->SetUInt32Value(UNIT_FIELD_LEVEL, creatureTarget->GetLevel());
 
         player->SetMinion(pet, true);
         pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
@@ -3027,7 +3027,7 @@ public:
         char const* TargetName = strtok((char*)args, " "); // get entered name
         if (!TargetName) // if no name entered use target
         {
-            player = handler->getSelectedPlayer();
+            player = handler->GetSelectedPlayer();
             if (player) //prevent crash with creature as target
             {
                 name = player->GetName();
@@ -3077,7 +3077,7 @@ public:
         }
         else // If no name was entered - use target
         {
-            player = handler->getSelectedPlayer();
+            player = handler->GetSelectedPlayer();
             if (player)
                 name = player->GetName();
         }

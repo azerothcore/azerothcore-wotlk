@@ -181,7 +181,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     switch (pet->getPetType())
     {
         case SUMMON_PET:
-            petlevel = owner->getLevel();
+            petlevel = owner->GetLevel();
 
             if (pet->IsPetGhoul())
                 pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 0x400); // class = rogue

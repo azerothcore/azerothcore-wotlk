@@ -428,7 +428,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     // auto-selection buff level base at target level (in spellInfo)
     if (targets.GetUnitTarget())
     {
-        SpellInfo const* actualSpellInfo = spellInfo->GetAuraRankForLevel(targets.GetUnitTarget()->getLevel());
+        SpellInfo const* actualSpellInfo = spellInfo->GetAuraRankForLevel(targets.GetUnitTarget()->GetLevel());
 
         // if rank not found then function return nullptr but in explicit cast case original spell can be casted and later failed with appropriate error message
         if (actualSpellInfo)
@@ -627,9 +627,9 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
     WorldPacket data(SMSG_MIRRORIMAGE_DATA, 68);
     data << guid;
     data << uint32(creator->GetDisplayId());
-    data << uint8(creator->getRace());
+    data << uint8(creator->GetRace());
     data << uint8(creator->getGender());
-    data << uint8(creator->getClass());
+    data << uint8(creator->GetClass());
 
     if (creator->GetTypeId() == TYPEID_PLAYER)
     {

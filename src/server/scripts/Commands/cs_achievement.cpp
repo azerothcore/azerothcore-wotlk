@@ -49,7 +49,7 @@ public:
                 return false;
         }
 
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -65,7 +65,7 @@ public:
 
     static bool HandleAchievementCheckAllCommand(ChatHandler* handler, char const*  /*args*/)
     {
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);

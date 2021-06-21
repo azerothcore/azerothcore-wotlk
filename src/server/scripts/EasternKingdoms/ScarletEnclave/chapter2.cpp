@@ -729,7 +729,7 @@ public:
 
                     /// @todo simplify text's selection
 
-                    switch (player->getRace())
+                    switch (player->GetRace())
                     {
                         case RACE_HUMAN:
                             switch (ExecuteSpeech_Counter)

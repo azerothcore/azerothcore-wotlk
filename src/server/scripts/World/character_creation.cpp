@@ -23,7 +23,7 @@ public:
 
     void OnFirstLogin(Player* player) override
     {
-        switch (player->getClass())
+        switch (player->GetClass())
         {
             // Only two classes posses an aura on creation;
             case CLASS_WARRIOR:

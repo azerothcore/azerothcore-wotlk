@@ -55,7 +55,7 @@ public:
         if (!*args)
             return false;
 
-        Player* targetPlayer = handler->getSelectedPlayer();
+        Player* targetPlayer = handler->GetSelectedPlayer();
         if (!targetPlayer)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -93,7 +93,7 @@ public:
 
     static bool HandleDeserterRemove(ChatHandler* handler, char const* /*args*/, bool isInstance)
     {
-        Player* targetPlayer = handler->getSelectedPlayer();
+        Player* targetPlayer = handler->GetSelectedPlayer();
         if (!targetPlayer)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
