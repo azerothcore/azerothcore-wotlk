@@ -368,7 +368,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             // this is probably an error state, but we'll leave it
             // and hopefully recover on the next Update
             // we still need to copy our preffix
-            LOG_ERROR("server", "PathGenerator::BuildPolyPath: Path Build failed %s", _source->GetGUID().ToString().c_str());
+            LOG_ERROR("movement", "PathGenerator::BuildPolyPath: Path Build failed %s", _source->GetGUID().ToString().c_str());
         }
 
         // new path = prefix + suffix - overlap
@@ -469,7 +469,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         if (!_polyLength || dtStatusFailed(dtResult))
         {
             // only happens if we passed bad data to findPath(), or navmesh is messed up
-            LOG_ERROR("server", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
+            LOG_ERROR("movement", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
             BuildShortcut();
             _type = PATHFIND_NOPATH;
             return;
@@ -478,7 +478,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
     if (!_polyLength)
     {
-        LOG_ERROR("server", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
+        LOG_ERROR("movement", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -508,7 +508,7 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     if (_useRaycast)
     {
         // _straightLine uses raycast and it currently doesn't support building a point path, only a 2-point path with start and hitpoint/end is returned
-        LOG_ERROR("server", "PathGenerator::BuildPointPath() called with _useRaycast for unit %s", _source->GetGUID().ToString().c_str());
+        LOG_ERROR("movement", "PathGenerator::BuildPointPath() called with _useRaycast for unit %s", _source->GetGUID().ToString().c_str());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -1040,7 +1040,7 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
 {
     if (GetPathType() == PATHFIND_BLANK || _pathPoints.size() < 2)
     {
-        LOG_ERROR("server", "PathGenerator::ReducePathLengthByDist called before path was successfully built");
+        LOG_ERROR("movement", "PathGenerator::ReducePathLengthByDist called before path was successfully built");
         return;
     }
 
