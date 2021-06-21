@@ -1206,7 +1206,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     break;
 
                 instance->SetGuidData(e.action.setInstanceData64.field, targets->front()->GetGUID());
-                LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_SET_INST_DATA64: Field: %u, data: %lu",
+                LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_SET_INST_DATA64: Field: %u, data: %u",
                                e.action.setInstanceData64.field, targets->front()->GetGUID().GetRawValue());
                 delete targets;
                 break;
