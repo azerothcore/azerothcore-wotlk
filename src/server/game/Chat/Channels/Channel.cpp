@@ -96,9 +96,7 @@ void Channel::UpdateChannelInDB() const
         stmt->setUInt32(2, _channelDBId);
         CharacterDatabase.Execute(stmt);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("chat.system", "Channel(%s) updated in database", _name.c_str());
-#endif
     }
 }
 
@@ -696,9 +694,7 @@ void Channel::List(Player const* player)
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("chat.system", "SMSG_CHANNEL_LIST %s Channel: %s", player->GetSession()->GetPlayerInfo().c_str(), GetName().c_str());
-#endif
     WorldPacket data(SMSG_CHANNEL_LIST, 1 + (GetName().size() + 1) + 1 + 4 + playersStore.size() * (8 + 1));
     data << uint8(1);                                   // channel type?
     data << GetName();                                  // channel name
@@ -816,32 +812,6 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
         ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, _name);
 
     SendToAll(&data, pinfo.IsModerator() ? ObjectGuid::Empty : guid);
-}
-
-void Channel::EveryoneSayToSelf(const char* what)
-{
-    if (!what)
-        return;
-
-    uint32 messageLength = strlen(what) + 1;
-
-    WorldPacket data(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + _name.size() + 1 + 8 + 4 + messageLength + 1);
-    data << (uint8)CHAT_MSG_CHANNEL;
-    data << (uint32)LANG_UNIVERSAL;
-    data << uint64(0); // put player guid here
-    data << uint32(0);
-    data << _name;
-    data << uint64(0); // put player guid here
-    data << messageLength;
-    data << what;
-    data << uint8(0);
-
-    for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
-    {
-        data.put(5, i->first);
-        data.put(17 + _name.size() + 1, i->first);
-        i->second.plrPtr->GetSession()->SendPacket(&data);
-    }
 }
 
 void Channel::Invite(Player const* player, std::string const& newname)

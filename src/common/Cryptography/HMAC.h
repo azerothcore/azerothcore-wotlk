@@ -16,7 +16,7 @@
 
 class BigNumber;
 
-namespace acore::Impl
+namespace Acore::Impl
 {
     struct HMACImpl
     {
@@ -110,9 +110,9 @@ namespace acore::Impl
     };
 }
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
-    using HMAC_SHA1 = acore::Impl::GenericHMAC<EVP_sha1, Constants::SHA1_DIGEST_LENGTH_BYTES>;
-    using HMAC_SHA256 = acore::Impl::GenericHMAC<EVP_sha256, Constants::SHA256_DIGEST_LENGTH_BYTES>;
+    using HMAC_SHA1 = Acore::Impl::GenericHMAC<EVP_sha1, Constants::SHA1_DIGEST_LENGTH_BYTES>;
+    using HMAC_SHA256 = Acore::Impl::GenericHMAC<EVP_sha256, Constants::SHA256_DIGEST_LENGTH_BYTES>;
 }
 #endif

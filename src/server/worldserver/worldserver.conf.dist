@@ -9,8 +9,8 @@
 #    EXAMPLE CONFIG
 #    CONNECTIONS AND DIRECTORIES
 #    PERFORMANCE SETTINGS
-#    SERVER LOGGING
 #    SERVER SETTINGS
+#    CRYPTOGRAPHY
 #    WARDEN SETTINGS
 #    PLAYER INTERACTION
 #    CREATURE SETTINGS
@@ -27,6 +27,7 @@
 #    CHARACTER DELETE OPTIONS
 #    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
+#    LOGGING SYSTEM SETTINGS
 #    PACKET SPOOF PROTECTION SETTINGS
 #    DEBUG
 #
@@ -96,6 +97,18 @@ WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
 CharacterDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_characters"
 
 #
+#    Database.Reconnect.Seconds
+#    Database.Reconnect.Attempts
+#
+#        Description: How many seconds between every reconnection attempt
+#                     and how many attempts will be performed in total
+#        Default:     20 attempts every 15 seconds
+#
+
+Database.Reconnect.Seconds = 15
+Database.Reconnect.Attempts = 20
+
+#
 #    LoginDatabase.WorkerThreads
 #    WorldDatabase.WorkerThreads
 #    CharacterDatabase.WorkerThreads
@@ -143,6 +156,16 @@ WorldServerPort = 8085
 #        Default:     "0.0.0.0" - (Bind to all IPs on the system)
 
 BindIP = "0.0.0.0"
+
+#
+#    IPLocationFile
+#        Description: The path to your IP2Location database CSV file.
+#        Example:     "C:/acore/IP2LOCATION-LITE-DB1.CSV"
+#                     "/home/acore/IP2LOCATION-LITE-DB1.CSV"
+#        Default:     ""  - (Disabled)
+#
+
+IPLocationFile = ""
 
 #
 ###################################################################################################
@@ -443,19 +466,23 @@ SetAllCreaturesWithWaypointMovementActive = 0
 # SERVER LOGGING
 #
 #    PidFile
-#        Description: World daemon PID file
+#        Description: World daemon PID file.
 #        Example:     "./world.pid" - (Enabled)
 #        Default:     ""            - (Disabled)
 
 PidFile = ""
 
 #
-#    EnableLogDB
-#        Description: Write log messages to database (LogDatabaseInfo).
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#    PacketLogFile
+#        Description: Binary packet logging file for the world server.
+#                     Filename extension must be .pkt to be parsable with WowPacketParser.
+#        Example:     "World.pkt" - (Enabled)
+#        Default:     ""          - (Disabled)
 
-EnableLogDB = 0
+PacketLogFile = ""
+
+# Extended Logging system configuration moved to end of file (on purpose)
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -1204,6 +1231,25 @@ IsPreloadedContinentTransport.Enabled = 0
 ###################################################################################################
 
 ###################################################################################################
+# CRYPTOGRAPHY
+#
+#    TOTPMasterSecret
+#        Description: The key used by authserver to decrypt TOTP secrets from database storage.
+#                     You only need to set this here if you plan to use the in-game 2FA
+#                     management commands (.account 2fa), otherwise this can be left blank.
+#
+#                     The server will auto-detect if this does not match your authserver setting,
+#                     in which case any commands reliant on the secret will be disabled.
+#
+#        Default:     <blank>
+#
+
+TOTPMasterSecret =
+
+#
+###################################################################################################
+
+###################################################################################################
 # WARDEN SETTINGS
 #
 #    Warden.Enabled
@@ -1428,9 +1474,17 @@ CreatureFamilyAssistanceRadius = 10
 #
 #    CreatureFamilyAssistanceDelay
 #        Description: Time (in milliseconds) before creature assistance call.
-#        Default:     1500 - (1.5 Seconds)
+#        Default:     2000 - (2 Seconds)
 
-CreatureFamilyAssistanceDelay = 1500
+CreatureFamilyAssistanceDelay = 2000
+
+#
+#    CreatureFamilyAssistancePeriod
+#        Description: Time (in milliseconds) before next creature assistance call.
+#        Default:     3000 - (3 Seconds)
+#                     0    - (Disabled)
+
+CreatureFamilyAssistancePeriod = 3000
 
 #
 #    CreatureFamilyFleeDelay
@@ -1592,9 +1646,10 @@ NpcRegenHPTimeIfTargetIsUnreachable = 10
 # CHAT SETTINGS
 #
 #    ChatFakeMessagePreventing
-#        Description: Chat protection from creating fake messages using a lot spaces or other
-#                     invisible symbols. Not applied to the addon language, but may break old
-#                     addons that use normal languages for sending data to other clients.
+#        Description: Additional protection from creating fake chat messages using spaces.
+#                     Collapses multiple subsequent whitespaces into a single whitespace.
+#                     Not applied to the addon language, but may break old addons that use
+#                     "normal" chat messages for sending data to other clients.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -1803,14 +1858,6 @@ GM.InGMList.Level = 3
 #                     2 - (Only gamemasters)
 
 GM.InWhoList.Level = 3
-
-#
-#    GM.LogTrade
-#        Description: Include GM trade and trade slot enchanting operations in GM log.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-GM.LogTrade = 1
 
 #
 #    GM.StartLevel
@@ -2364,12 +2411,24 @@ Battleground.CastDeserter = 1
 Battleground.QueueAnnouncer.Enable = 0
 
 #
-#    Battleground.QueueAnnouncer.Limited.Enable
-#        Description: Show announce only if left players in queue = 1
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#    Battleground.QueueAnnouncer.Limit.MinLevel
+#        Description: Limit the QueueAnnouncer starting from a certain level.
+#                     When limited, it announces only if there are at least MinPlayers queued (see below)
+#                     At 80 it only limits RBG, at lower level only limits Warsong Gulch.
+#        Default:     0 - (Disabled, no limits)
+#                     10 - (Enabled for all, because BGs start at 10)
+#                     20 - (Enabled for 20 and higher)
+#                     80 - (Enabled only for 80)
 
-Battleground.QueueAnnouncer.Limited.Enable = 0
+Battleground.QueueAnnouncer.Limit.MinLevel = 0
+
+#
+#    Battleground.QueueAnnouncer.Limit.MinPlayers
+#        Description: When the Battleground.QueueAnnouncer.Limit.MinLevel limit is enabled (not 0)
+#                     only show when at least MinPlayers are queued.
+#        Default:     3 - (Show only when 3 or more players are queued)
+
+Battleground.QueueAnnouncer.Limit.MinPlayers = 3
 
 #
 #    Battleground.QueueAnnouncer.SpamProtection.Delay
@@ -2621,6 +2680,15 @@ Arena.GamesRequired = 10
 #                     1 - (Enabled)
 
 Arena.QueueAnnouncer.Enable = 0
+
+#
+#    Battleground.QueueAnnouncer.PlayerOnly
+#        Description: Battleground queue announcement type.
+#        Default:     0 - (System message, Anyone can see it)
+#                     1 - (Private, Only queued players can see it)
+#
+
+Arena.QueueAnnouncer.PlayerOnly = 0
 
 #
 #    Arena.ArenaSeason.ID
@@ -3207,17 +3275,19 @@ MoveMaps.Enable = 1
 Minigob.Manabonk.Enable = 1
 
 #
-
 #    Allow.IP.Based.Action.Logging
 #        Description: Logs actions, e.g. account login and logout to name a few, based on IP of current session.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
+#
 
 Allow.IP.Based.Action.Logging = 0
 
+#
 #     Calculate.Creature.Zone.Area.Data
 #        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
 #        Default:     0  - (Do not show)
+#
 
 Calculate.Creature.Zone.Area.Data = 0
 
@@ -3225,14 +3295,17 @@ Calculate.Creature.Zone.Area.Data = 0
 #     Calculate.Gameoject.Zone.Area.Data
 #        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table (WARNING: SLOW WORLD SERVER STARTUP)
 #        Default:     0  - (Do not show)
+#
 
 Calculate.Gameoject.Zone.Area.Data = 0
 
-#    LFG SETTINGS
+#
+#    LFG.Location.All
 #
 #     Includes satellite to search for work elsewhere LFG
 #        Default: 0 - Disable
 #                 1 - Enable
+#
 
 LFG.Location.All = 0
 
@@ -3388,6 +3461,7 @@ Appender.Console=1,4,0,"1 9 3 6 5 8"
 Appender.Server=2,5,0,Server.log,w
 Appender.GM=2,5,15,gm_%s.log
 Appender.DBErrors=2,5,0,DBErrors.log
+# Appender.DB=3,5,0
 
 #  Logger config values: Given a logger "name"
 #    Logger.name
@@ -3408,11 +3482,13 @@ Appender.DBErrors=2,5,0,DBErrors.log
 #
 
 Logger.root=2,Console Server
-Logger.server=4,Console Server
 Logger.commands.gm=4,Console GM
+Logger.diff=3,Console Server
+Logger.mmaps=4,Server
 Logger.scripts.hotswap=4,Console Server
+Logger.server=4,Console Server
 Logger.sql.sql=2,Console DBErrors
-Logger.sql.updates=4,Console Server
+Logger.sql=4,Console Server
 Logger.mmaps=4,Server
 
 #Logger.achievement=4,Console Server
@@ -3423,29 +3499,37 @@ Logger.mmaps=4,Server
 #Logger.bg.battlefield=4,Console Server
 #Logger.bg.battleground=4,Console Server
 #Logger.bg.reportpvpafk=4,Console Server
-#Logger.chat.log=4,Console Server
 #Logger.calendar=4,Console Server
+#Logger.chat.log=4,Console Server
 #Logger.chat.system=4,Console Server
 #Logger.cheat=4,Console Server
 #Logger.commands.ra=4,Console Server
 #Logger.condition=4,Console Server
+#Logger.dbc=4,Console Server
+#Logger.disable=4,Console Server
+#Logger.entities.dyobject=4,Console Server
 #Logger.entities.faction=4,Console Server
 #Logger.entities.gameobject=4,Console Server
+#Logger.entities.object=4,Console Server
 #Logger.entities.pet=4,Console Server
-#Logger.entities.player=4,Console Server
 #Logger.entities.player.character=4,Console Server
 #Logger.entities.player.dump=4,Console Server
 #Logger.entities.player.items=4,Console Server
 #Logger.entities.player.loading=4,Console Server
 #Logger.entities.player.skills=4,Console Server
+#Logger.entities.player=4,Console Server
 #Logger.entities.transport=4,Console Server
-#Logger.entities.unit=4,Console Server
 #Logger.entities.unit.ai=4,Console Server
+#Logger.entities.unit=4,Console Server
 #Logger.entities.vehicle=4,Console Server
 #Logger.gameevent=4,Console Server
+#Logger.group=4,Console Server
 #Logger.guild=4,Console Server
+#Logger.instance.save=4,Console Server
+#Logger.instance.script=4,Console Server
 #Logger.lfg=4,Console Server
 #Logger.loot=4,Console Server
+#Logger.mail=4,Console Server
 #Logger.maps.script=4,Console Server
 #Logger.maps=4,Console Server
 #Logger.misc=4,Console Server
@@ -3453,30 +3537,34 @@ Logger.mmaps=4,Server
 #Logger.movement.flightpath=4,Console Server
 #Logger.movement.motionmaster=4,Console Server
 #Logger.movement.splinechain=4,Console Server
-#Logger.network=4,Console Server
+#Logger.movement=4,Console Server
 #Logger.network.kick=4,Console Server
 #Logger.network.opcode=4,Console Server
 #Logger.network.soap=4,Console Server
+#Logger.network=4,Console Server
 #Logger.outdoorpvp=4,Console Server
 #Logger.pool=4,Console Server
 #Logger.rbac=4,Console Server
-#Logger.scripts=4,Console Server
-#Logger.scripts.ai=4,Console Server
+#Logger.reputation=4,Console Server
 #Logger.scripts.ai.escortai=4,Console Server
 #Logger.scripts.ai.followerai=4,Console Server
 #Logger.scripts.ai.petai=4,Console Server
 #Logger.scripts.ai.sai=4,Console Server
+#Logger.scripts.ai=4,Console Server
 #Logger.scripts.cos=4,Console Server
+#Logger.scripts=4,Console Server
 #Logger.server.authserver=4,Console Server
-#Logger.spells=4,Console Server
-#Logger.spells.aura.effect=4,Console Server
 #Logger.spells.aura.effect.nospell=4,Console Server
-#Logger.spells.effect=4,Console Server
+#Logger.spells.aura.effect=4,Console Server
 #Logger.spells.effect.nospell=4,Console Server
+#Logger.spells.effect=4,Console Server
+#Logger.spells.scripts=4,Console Server
+#Logger.spells=4,Console Server
 #Logger.sql.dev=4,Console Server
 #Logger.sql.driver=4,Console Server
-#Logger.warden=4,Console Server
 #Logger.vehicles=4,Console Server
+#Logger.warden=4,Console Server
+#Logger.weather=4,Console Server
 ###################################################################################################
 
 ###################################################################################################

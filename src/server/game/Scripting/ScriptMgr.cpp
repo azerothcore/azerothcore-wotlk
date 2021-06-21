@@ -90,7 +90,7 @@ ScriptMgr* ScriptMgr::instance()
 void ScriptMgr::Initialize()
 {
     AddScripts();
-    LOG_INFO("server", "Loading C++ scripts");
+    LOG_INFO("server.loading", "Loading C++ scripts");
 }
 
 void ScriptMgr::Unload()
@@ -168,8 +168,8 @@ void ScriptMgr::LoadDatabase()
 
     CheckIfScriptsInDatabaseExist();
 
-    LOG_INFO("server", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 struct TSpellSummary
@@ -1344,13 +1344,13 @@ void ScriptMgr::OnShutdown()
     FOREACH_SCRIPT(WorldScript)->OnShutdown();
 }
 
-bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
+bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id)
 {
     ASSERT(source);
     // target can be nullptr.
 
     GET_SCRIPT_RET(AchievementCriteriaScript, scriptId, tmpscript, false);
-    return tmpscript->OnCheck(source, target);
+    return tmpscript->OnCheck(source, target, criteria_id);
 }
 
 // Player
@@ -1549,6 +1549,11 @@ void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
     FOREACH_SCRIPT(PlayerScript)->OnBeforeUpdate(player, p_time);
 }
 
+void ScriptMgr::OnPlayerUpdate(Player* player, uint32 p_time)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnUpdate(player, p_time);
+}
+
 void ScriptMgr::OnPlayerLogin(Player* player)
 {
 #ifdef ELUNA
@@ -1645,9 +1650,31 @@ void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
     FOREACH_SCRIPT(PlayerScript)->OnRemoveFromBattleground(player, bg);
 }
 
+bool ScriptMgr::OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+    if (!itr->second->OnBeforeAchiComplete(player, achievement))
+        ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
 void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* achievement)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAchiComplete(player, achievement);
+}
+
+bool ScriptMgr::OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+    if (!itr->second->OnBeforeCriteriaProgress(player, criteria))
+        ret = false; // we change ret value only when scripts return false
+
+    return ret;
 }
 
 void ScriptMgr::OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
@@ -1976,9 +2003,25 @@ void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRa
     FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, canRate, lootMode, LootStoreItem, store);
 }
 
-void ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store)
+bool ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store)
 {
-    FOREACH_SCRIPT(GlobalScript)->OnItemRoll(player, LootStoreItem,  chance, loot, store);
+    bool ret = true; // return true by default
+
+    FOR_SCRIPTS_RET(GlobalScript, itr, end, ret)
+        if (!itr->second->OnItemRoll(player, LootStoreItem, chance, loot, store))
+            ret = false; // we change ret value only when a script returns false
+
+    return ret;
+}
+
+bool ScriptMgr::OnBeforeLootEqualChanced(Player const* player, LootStoreItemList EqualChanced, Loot& loot, LootStore const& store) {
+    bool ret = true; // return true by default
+
+    FOR_SCRIPTS_RET(GlobalScript, itr, end, ret)
+        if (!itr->second->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
+            ret = false; // we change ret value only when a script returns false
+
+    return ret;
 }
 
 void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData, lfg::LFGDungeonData const* dungeon)
@@ -2632,6 +2675,58 @@ void ScriptMgr::OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibi
     FOREACH_SCRIPT(PlayerScript)->OnSetServerSideVisibilityDetect(player, type, sec);
 }
 
+void ScriptMgr::AnticheatSetSkipOnePacketForASH(Player* player, bool apply)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetSkipOnePacketForASH(player, apply);
+}
+
+void ScriptMgr::AnticheatSetCanFlybyServer(Player* player, bool apply)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetCanFlybyServer(player, apply);
+}
+
+void ScriptMgr::AnticheatSetUnderACKmount(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetUnderACKmount(player);
+}
+
+void ScriptMgr::AnticheatSetRootACKUpd(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetRootACKUpd(player);
+}
+
+void ScriptMgr::AnticheatSetJumpingbyOpcode(Player* player, bool jump)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetJumpingbyOpcode(player, jump);
+}
+
+void ScriptMgr::AnticheatUpdateMovementInfo(Player* player, MovementInfo const& movementInfo)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatUpdateMovementInfo(player, movementInfo);
+}
+
+bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->AnticheatHandleDoubleJump(player, mover))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->AnticheatCheckMovementInfo(player, movementInfo, mover, jump))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
 bool ScriptMgr::CanGuildSendBankList(Guild const* guild, WorldSession* session, uint8 tabId, bool sendAllSlots)
 {
     bool ret = true;
@@ -2746,12 +2841,23 @@ bool ScriptMgr::CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, 
     return ret;
 }
 
-bool ScriptMgr::CanSendMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo, bool IsJoin)
+bool ScriptMgr::CanSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated)
 {
     bool ret = true;
 
     FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSendMessageArenaQueue(queue, ginfo, IsJoin))
+        if (!itr->second->CanSendJoinMessageArenaQueue(queue, leader, ginfo, bracketEntry, isRated))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanExitJoinMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanExitJoinMessageArenaQueue(queue, ginfo))
             ret = false; // we change ret value only when scripts return false
 
     return ret;

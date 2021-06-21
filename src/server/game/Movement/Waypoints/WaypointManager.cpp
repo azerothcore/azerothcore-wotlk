@@ -7,7 +7,6 @@
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "Log.h"
-#include "MapManager.h"
 #include "WaypointManager.h"
 
 WaypointMgr::WaypointMgr()
@@ -43,7 +42,7 @@ void WaypointMgr::Load()
     if (!result)
     {
         LOG_ERROR("sql.sql", ">> Loaded 0 waypoints. DB table `waypoint_data` is empty!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -62,8 +61,8 @@ void WaypointMgr::Load()
         float z = fields[4].GetFloat();
         float o = fields[5].GetFloat();
 
-        acore::NormalizeMapCoord(x);
-        acore::NormalizeMapCoord(y);
+        Acore::NormalizeMapCoord(x);
+        Acore::NormalizeMapCoord(y);
 
         wp->id = fields[1].GetUInt32();
         wp->x = x;
@@ -87,8 +86,8 @@ void WaypointMgr::Load()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u waypoints in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u waypoints in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void WaypointMgr::ReloadPath(uint32 id)
@@ -123,8 +122,8 @@ void WaypointMgr::ReloadPath(uint32 id)
         float z = fields[3].GetFloat();
         float o = fields[4].GetFloat();
 
-        acore::NormalizeMapCoord(x);
-        acore::NormalizeMapCoord(y);
+        Acore::NormalizeMapCoord(x);
+        Acore::NormalizeMapCoord(y);
 
         wp->id = fields[0].GetUInt32();
         wp->x = x;

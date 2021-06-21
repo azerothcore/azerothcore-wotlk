@@ -7,7 +7,6 @@
 #include "Common.h"
 #include "Corpse.h"
 #include "DatabaseEnv.h"
-#include "GossipDef.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -64,8 +63,8 @@ bool Corpse::Create(ObjectGuid::LowType guidlow, Player* owner)
 
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
-                       guidlow, owner->GetName().c_str(), owner->GetPositionX(), owner->GetPositionY());
+        LOG_ERROR("entities.player", "Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+            guidlow, owner->GetName().c_str(), owner->GetPositionX(), owner->GetPositionY());
         return false;
     }
 
@@ -74,7 +73,7 @@ bool Corpse::Create(ObjectGuid::LowType guidlow, Player* owner)
     SetObjectScale(1);
     SetGuidValue(CORPSE_FIELD_OWNER, owner->GetGUID());
 
-    _cellCoord = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    _cellCoord = Acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     return true;
 }
@@ -157,12 +156,12 @@ bool Corpse::LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields)
 
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Corpse ( %s, owner: %s) is not created, given coordinates are not valid (X: %f, Y: %f, Z: %f)",
-                       GetGUID().ToString().c_str(), GetOwnerGUID().ToString().c_str(), posX, posY, posZ);
+        LOG_ERROR("entities.player", "Corpse ( %s, owner: %s) is not created, given coordinates are not valid (X: %f, Y: %f, Z: %f)",
+            GetGUID().ToString().c_str(), GetOwnerGUID().ToString().c_str(), posX, posY, posZ);
         return false;
     }
 
-    _cellCoord = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    _cellCoord = Acore::ComputeCellCoord(GetPositionX(), GetPositionY());
     return true;
 }
 

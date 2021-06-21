@@ -16,6 +16,7 @@
 #include "GroupMgr.h"
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
+#include "IPLocation.h"
 #include "Language.h"
 #include "LFG.h"
 #include "MapManager.h"
@@ -24,6 +25,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
@@ -111,7 +113,8 @@ public:
             { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "" },
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
             { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
-            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" }
+            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
+            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" }
         };
         return commandTable;
     }
@@ -170,7 +173,7 @@ public:
             }
         }
         ASSERT(!allowedArenas.empty());
-        BattlegroundTypeId randomizedArenaBgTypeId = acore::Containers::SelectRandomContainerElement(allowedArenas);
+        BattlegroundTypeId randomizedArenaBgTypeId = Acore::Containers::SelectRandomContainerElement(allowedArenas);
 
         uint8 count = 0;
         if (i != tokens.end())
@@ -423,7 +426,7 @@ public:
             }
         }
 
-        CellCoord cellCoord = acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
+        CellCoord cellCoord = Acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
         Cell cell(cellCoord);
 
         uint32 zoneId, areaId;
@@ -442,7 +445,7 @@ public:
         float groundZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
 
-        GridCoord gridCoord = acore::ComputeGridCoord(object->GetPositionX(), object->GetPositionY());
+        GridCoord gridCoord = Acore::ComputeGridCoord(object->GetPositionX(), object->GetPositionY());
 
         // 63? WHY?
         int gridX = 63 - gridCoord.x_coord;
@@ -1526,9 +1529,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
-#endif
+        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
@@ -1541,15 +1542,19 @@ public:
         // Subtract
         if (count < 0)
         {
-            if (!playerTarget->HasItemCount(itemId, 0))
+            // Only have scam check on player accounts
+            if (playerTarget->GetSession()->GetSecurity() == SEC_PLAYER)
             {
-                // output that player don't have any items to destroy
-                handler->PSendSysMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget).c_str(), itemId);
-            }
-            else if (!playerTarget->HasItemCount(itemId, -count))
-            {
-                // output that player don't have as many items that you want to destroy
-                handler->PSendSysMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget).c_str(), itemId);
+                if (!playerTarget->HasItemCount(itemId, 0))
+                {
+                    // output that player don't have any items to destroy
+                    handler->PSendSysMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget).c_str(), itemId);
+                }
+                else if (!playerTarget->HasItemCount(itemId, -count))
+                {
+                    // output that player don't have as many items that you want to destroy
+                    handler->PSendSysMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget).c_str(), itemId);
+                }
             }
             else
             {
@@ -1560,14 +1565,6 @@ public:
 
             return true;
         }
-
-        /* [AC] Sunwell hack
-        if (handler->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
-               {
-                   handler->PSendSysMessage("You may only remove items. Adding items is available for higher GMLevel.");
-                   return false;
-               }
-               */
 
         // Adding items
         uint32 noSpaceForCount = 0;
@@ -1630,9 +1627,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
-#endif
+        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
 
         bool found = false;
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
@@ -1913,7 +1908,7 @@ public:
 
         // Query the prepared statement for login data
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
-        stmt->setInt32(0, int32(realmID));
+        stmt->setInt32(0, int32(realm.Id.Realm));
         stmt->setUInt32(1, accId);
         PreparedQueryResult accInfoResult = LoginDatabase.Query(stmt);
 
@@ -1931,28 +1926,10 @@ public:
                 lastIp    = fields[4].GetString();
                 lastLogin = fields[5].GetString();
 
-                /** if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
+                if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
                 {
                     lastIp.append(" (");
                     lastIp.append(location->CountryName);
-                    lastIp.append(")");
-                } **/
-
-                uint32 ip = inet_addr(lastIp.c_str());
-#if ACORE_ENDIAN == BIGENDIAN
-                EndianConvertReverse(ip);
-#endif
-                stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP2NATION_COUNTRY);
-
-                stmt->setUInt32(0, ip);
-
-                PreparedQueryResult result2 = LoginDatabase.Query(stmt);
-
-                if (result2)
-                {
-                    Field* fields2 = result2->Fetch();
-                    lastIp.append(" (");
-                    lastIp.append(fields2[0].GetString());
                     lastIp.append(")");
                 }
             }
@@ -2230,15 +2207,13 @@ public:
             return true;
         }
 
-        CellCoord p(acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
+        CellCoord p(Acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
         Cell cell(p);
         cell.SetNoCreate();
 
-        acore::RespawnDo u_do;
-        acore::WorldObjectWorker<acore::RespawnDo> worker(player, u_do);
-
-        TypeContainerVisitor<acore::WorldObjectWorker<acore::RespawnDo>, GridTypeMapContainer > obj_worker(worker);
-        cell.Visit(p, obj_worker, *player->GetMap(), *player, player->GetGridActivationRange());
+        Acore::RespawnDo u_do;
+        Acore::WorldObjectWorker<Acore::RespawnDo> worker(player, u_do);
+        Cell::VisitGridObjects(player, worker, player->GetGridActivationRange());
 
         return true;
     }
@@ -2938,7 +2913,7 @@ public:
 
         if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
         {
-            LOG_ERROR("server", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
+            LOG_ERROR("misc", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
             handler->PSendSysMessage("Error 2");
             delete pet;
             return false;
@@ -3365,6 +3340,42 @@ public:
 
         handler->GetSession()->SendShowMailBox(player->GetGUID());
         return true;
+    }
+
+    static bool HandleStringCommand(ChatHandler *handler, char const *args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            return false;
+        }
+
+        uint32 id = atoi(strtok((char*)args, " "));
+        if (id == 0)
+        {
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            return false;
+        }
+
+        uint32 locale = 0;
+        char* localeString = strtok(nullptr, " ");
+        if (localeString != nullptr)
+        {
+            locale = atoi(localeString);
+        }
+
+        const char* str = sObjectMgr->GetAcoreString(id, static_cast<LocaleConstant>(locale));
+
+        if (strcmp(str, "<error>") == 0)
+        {
+            handler->PSendSysMessage(LANG_NO_ACORE_STRING_FOUND, id);
+            return true;
+        }
+        else
+        {
+            handler->SendSysMessage(str);
+            return true;
+        }
     }
 };
 

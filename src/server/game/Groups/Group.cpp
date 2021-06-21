@@ -6,7 +6,6 @@
 
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
-#include "Common.h"
 #include "DatabaseEnv.h"
 #include "Group.h"
 #include "GroupMgr.h"
@@ -66,13 +65,20 @@ Group::~Group()
 
     if (m_bgGroup)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("bg.battleground", "Group::~Group: battleground group being deleted.");
-#endif
-        if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this) m_bgGroup->SetBgRaid(TEAM_ALLIANCE, nullptr);
-        else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this) m_bgGroup->SetBgRaid(TEAM_HORDE, nullptr);
-        else LOG_ERROR("server", "Group::~Group: battleground group is not linked to the correct battleground.");
+
+        if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this)
+        {
+            m_bgGroup->SetBgRaid(TEAM_ALLIANCE, nullptr);
+        }
+        else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this)
+        {
+            m_bgGroup->SetBgRaid(TEAM_HORDE, nullptr);
+        }
+        else
+            LOG_ERROR("bg.battleground", "Group::~Group: battleground group is not linked to the correct battleground.");
     }
+
     Rolls::iterator itr;
     while (!RollId.empty())
     {
@@ -460,26 +466,28 @@ bool Group::AddMember(Player* player)
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 if (itr->GetSource() == player) // pussywizard: no check same map, adding members is single threaded
-                    continue;
-
-                if (Player* member = itr->GetSource())
                 {
-                    if (player->HaveAtClient(member))
+                    continue;
+                }
+
+                if (Player* itrMember = itr->GetSource())
+                {
+                    if (player->HaveAtClient(itrMember))
                     {
-                        member->SetFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
-                        member->BuildValuesUpdateBlockForPlayer(&groupData, player);
-                        member->RemoveFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
+                        itrMember->SetFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
+                        itrMember->BuildValuesUpdateBlockForPlayer(&groupData, player);
+                        itrMember->RemoveFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
                     }
 
-                    if (member->HaveAtClient(player))
+                    if (itrMember->HaveAtClient(player))
                     {
                         UpdateData newData;
                         WorldPacket newDataPacket;
-                        player->BuildValuesUpdateBlockForPlayer(&newData, member);
+                        player->BuildValuesUpdateBlockForPlayer(&newData, itrMember);
                         if (newData.HasData())
                         {
                             newData.BuildPacket(&newDataPacket);
-                            member->SendDirectMessage(&newDataPacket);
+                            itrMember->SendDirectMessage(&newDataPacket);
                         }
                     }
                 }
@@ -557,10 +565,6 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             CharacterDatabase.Execute(stmt);
         }
 
-        // Reevaluate group enchanter if the leaving player had enchanting skill or the player is offline
-        if (!player || player->GetSkillValue(SKILL_ENCHANTING))
-            ResetMaxEnchantingLevel();
-
         // Remove player from loot rolls
         for (Rolls::iterator it = RollId.begin(); it != RollId.end();)
         {
@@ -600,6 +604,12 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             m_memberSlots.erase(slot);
             if (!isBGGroup() && !isBFGroup())
                 sWorld->UpdateGlobalPlayerGroup(guid.GetCounter(), 0);
+        }
+
+        // Reevaluate group enchanter if the leaving player had enchanting skill or the player is offline
+        if (!player || player->GetSkillValue(SKILL_ENCHANTING))
+        {
+            ResetMaxEnchantingLevel();
         }
 
         // Pick new leader if necessary
@@ -1219,9 +1229,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
 
 void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Group::MasterLoot (SMSG_LOOT_MASTER_LIST, 330)");
-#endif
 
     for (std::vector<LootItem>::iterator i = loot->items.begin(); i != loot->items.end(); ++i)
     {
@@ -1491,6 +1499,16 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
         LootItem* item = &(roll->itemSlot >= roll->getLoot()->items.size() ? roll->getLoot()->quest_items[roll->itemSlot - roll->getLoot()->items.size()] : roll->getLoot()->items[roll->itemSlot]);
         if (item)
             item->is_blocked = false;
+    }
+
+    if (Loot* loot = roll->getLoot(); loot && loot->isLooted() && loot->sourceGameObject)
+    {
+        const GameObjectTemplate* goInfo = loot->sourceGameObject->GetGOInfo();
+        if (goInfo && goInfo->type == GAMEOBJECT_TYPE_CHEST)
+        {
+            // Deactivate chest if the last item was rolled in group
+            loot->sourceGameObject->SetLootState(GO_JUST_DEACTIVATED);
+        }
     }
 
     RollId.erase(rollI);
@@ -2033,9 +2051,7 @@ void Group::BroadcastGroupUpdate(void)
         {
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "-- Forced group value update for '%s'", pp->GetName().c_str());
-#endif
+            LOG_DEBUG("group", "-- Forced group value update for '%s'", pp->GetName().c_str());
         }
     }
 }
@@ -2047,8 +2063,11 @@ void Group::ResetMaxEnchantingLevel()
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         pMember = ObjectAccessor::FindPlayer(citr->guid);
-        if (pMember && m_maxEnchantingLevel < pMember->GetSkillValue(SKILL_ENCHANTING))
+        if (pMember && pMember->GetSession() && !pMember->GetSession()->IsSocketClosed()
+            && m_maxEnchantingLevel < pMember->GetSkillValue(SKILL_ENCHANTING))
+        {
             m_maxEnchantingLevel = pMember->GetSkillValue(SKILL_ENCHANTING);
+        }
     }
 }
 

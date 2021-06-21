@@ -22,6 +22,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
+#include "PacketUtilities.h"
 #include "Pet.h"
 #include "Player.h"
 #include "SavingSystem.h"
@@ -42,49 +43,50 @@
 
 namespace
 {
-
     std::string const DefaultPlayerName = "<none>";
-
-} // namespace
+}
 
 bool MapSessionFilter::Process(WorldPacket* packet)
 {
-    if (packet->GetOpcode() >= NUM_MSG_TYPES)
+    ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
+
+    //let's check if our opcode can be really processed in Map::Update()
+    if (opHandle->ProcessingPlace == PROCESS_INPLACE)
         return true;
 
-    OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
-
-    if (opHandle.packetProcessing == PROCESS_INPLACE)
-        return true;
-
-    if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
+    //we do not process thread-unsafe packets
+    if (opHandle->ProcessingPlace == PROCESS_THREADUNSAFE)
         return false;
 
     Player* player = m_pSession->GetPlayer();
     if (!player)
         return false;
 
+    //in Map::Update() we do not process packets where player is not in world!
     return player->IsInWorld();
 }
 
+//we should process ALL packets when player is not in world/logged in
+//OR packet handler is not thread-safe!
 bool WorldSessionFilter::Process(WorldPacket* packet)
 {
-    if (packet->GetOpcode() >= NUM_MSG_TYPES)
+    ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
+
+    //check if packet handler is supposed to be safe
+    if (opHandle->ProcessingPlace == PROCESS_INPLACE)
         return true;
 
-    OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
-
-    if (opHandle.packetProcessing == PROCESS_INPLACE)
+    //thread-unsafe packets should be processed in World::UpdateSessions()
+    if (opHandle->ProcessingPlace == PROCESS_THREADUNSAFE)
         return true;
 
-    if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
-        return true;
-
+    //no player attached? -> our client! ^^
     Player* player = m_pSession->GetPlayer();
     if (!player)
         return true;
 
-    return (player->IsInWorld() == false);
+    //lets process all packets for non-in-the-world player
+    return !player->IsInWorld();
 }
 
 /// WorldSession constructor
@@ -182,9 +184,14 @@ std::string WorldSession::GetPlayerInfo() const
 {
     std::ostringstream ss;
 
-    ss << "[Player: " << GetPlayerName()
-       << " (Guid: " << (_player != nullptr ? _player->GetGUID() : 0)
-       << ", Account: " << GetAccountId() << ")]";
+    ss << "[Player: ";
+
+    if (!m_playerLoading && _player)
+    {
+        ss << _player->GetName() << ' ' << _player->GetGUID().ToString() << ", ";
+    }
+
+    ss << "Account: " << GetAccountId() << "]";
 
     return ss.str();
 }
@@ -198,10 +205,16 @@ ObjectGuid::LowType WorldSession::GetGuidLow() const
 /// Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
 {
+    if (packet->GetOpcode() == NULL_OPCODE)
+    {
+        LOG_ERROR("network.opcode", "%s send NULL_OPCODE", GetPlayerInfo().c_str());
+        return;
+    }
+
     if (!m_Socket)
         return;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(ACORE_DEBUG)
+#if defined(ACORE_DEBUG)
     // Code for network use statistic
     static uint64 sendPacketCount = 0;
     static uint64 sendPacketBytes = 0;
@@ -227,9 +240,9 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         uint64 minTime = uint64(cur_time - lastTime);
         uint64 fullTime = uint64(lastTime - firstTime);
 
-        LOG_DEBUG("server", "Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount) / fullTime, float(sendPacketBytes) / fullTime, uint32(fullTime));
+        LOG_DEBUG("network", "Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount) / fullTime, float(sendPacketBytes) / fullTime, uint32(fullTime));
 
-        LOG_DEBUG("server", "Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount) / minTime, float(sendLastPacketBytes) / minTime);
+        LOG_DEBUG("network", "Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount) / minTime, float(sendLastPacketBytes) / minTime);
 
         lastTime = cur_time;
         sendLastPacketCount = 1;
@@ -244,6 +257,8 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         return;
 #endif
 
+    LOG_TRACE("network.opcode", "S->C: %s %s", GetPlayerInfo().c_str(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet->GetOpcode())).c_str());
+
     if (m_Socket->SendPacket(*packet) == -1)
         m_Socket->CloseSocket("m_Socket->SendPacket(*packet) == -1");
 }
@@ -252,6 +267,25 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 void WorldSession::QueuePacket(WorldPacket* new_packet)
 {
     _recvQueue.add(new_packet);
+}
+
+/// Logging helper for unexpected opcodes
+void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, char const* status, const char* reason)
+{
+    LOG_ERROR("network.opcode", "Received unexpected opcode %s Status: %s Reason: %s from %s",
+        GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), status, reason, GetPlayerInfo().c_str());
+}
+
+/// Logging helper for unexpected opcodes
+void WorldSession::LogUnprocessedTail(WorldPacket* packet)
+{
+    if (!sLog->ShouldLog("network.opcode", LogLevel::LOG_LEVEL_TRACE) || packet->rpos() >= packet->wpos())
+        return;
+
+    LOG_TRACE("network.opcode", "Unprocessed tail data (read stop at %u from %u) Opcode %s from %s",
+        uint32(packet->rpos()), uint32(packet->wpos()), GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), GetPlayerInfo().c_str());
+
+    packet->print_storage();
 }
 
 /// Update the WorldSession (triggered by World update)
@@ -271,7 +305,6 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     uint32 _startMSTime = getMSTime();
     WorldPacket* packet = nullptr;
-    WorldPacket* movementPacket = nullptr;
     bool deletePacket = true;
     WorldPacket* firstDelayedPacket = nullptr;
     uint32 processedPackets = 0;
@@ -279,96 +312,92 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
     {
-        if (packet->GetOpcode() >= NUM_MSG_TYPES)
+        OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
+        ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
+
+        try
         {
-            LOG_ERROR("server", "WorldSession Packet filter: received non-existent opcode %s (0x%.4X)", LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
-        }
-        else
-        {
-            OpcodeHandler& opHandle = opcodeTable[packet->GetOpcode()];
-            try
+            switch (opHandle->Status)
             {
-                switch (opHandle.status)
+            case STATUS_LOGGEDIN:
+                if (!_player)
                 {
-                    case STATUS_LOGGEDIN:
-                        if (!_player)
-                        {
-                            // pussywizard: such packets were sent to do something for a character that has already logged out, skip them
-                        }
-                        else if (!_player->IsInWorld())
-                        {
-                            // pussywizard: such packets may do something important and the player is just being teleported, move to the end of the queue
-                            // pussywizard: previously such were skipped, so leave it as it is xD proper code below if we wish to change that
-
-                            // pussywizard: requeue only important packets not related to maps (PROCESS_THREADUNSAFE)
-                            /*if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
-                            {
-                                if (!firstDelayedPacket)
-                                    firstDelayedPacket = packet;
-                                deletePacket = false;
-                                QueuePacket(packet);
-                            }*/
-                        }
-                        else if (_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
-                        {
-                            if (movementPacket)
-                            {
-                                HandleMovementOpcodes(*movementPacket);
-                                delete movementPacket;
-                                movementPacket = nullptr;
-                            }
-                            sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                            if (!sEluna->OnPacketReceive(this, *packet))
-                                break;
-#endif
-                            (this->*opHandle.handler)(*packet);
-                        }
-                        break;
-                    case STATUS_TRANSFER:
-                        if (_player && !_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
-                        {
-                            if (movementPacket)
-                            {
-                                delete movementPacket;
-                                movementPacket = nullptr;
-                            }
-                            sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                            if (!sEluna->OnPacketReceive(this, *packet))
-                                break;
-#endif
-                            (this->*opHandle.handler)(*packet);
-                        }
-                        break;
-                    case STATUS_AUTHED:
-                        if (m_inQueue) // prevent cheating
-                            break;
-
-                        if (AntiDOS.EvaluateOpcode(*packet, currentTime))
-                        {
-                            sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                            if (!sEluna->OnPacketReceive(this, *packet))
-                                break;
-#endif
-                            (this->*opHandle.handler)(*packet);
-                        }
-                        break;
-                    case STATUS_NEVER:
-                        break;
-                    case STATUS_UNHANDLED:
-                        break;
+                    // pussywizard: such packets were sent to do something for a character that has already logged out, skip them
                 }
+                else if (!_player->IsInWorld())
+                {
+                    // pussywizard: such packets may do something important and the player is just being teleported, move to the end of the queue
+                    // pussywizard: previously such were skipped, so leave it as it is xD proper code below if we wish to change that
+
+                    // pussywizard: requeue only important packets not related to maps (PROCESS_THREADUNSAFE)
+                    /*if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
+                    {
+                        if (!firstDelayedPacket)
+                            firstDelayedPacket = packet;
+                        deletePacket = false;
+                        QueuePacket(packet);
+                    }*/
+                }
+                else if (_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
+                {
+                    sScriptMgr->OnPacketReceive(this, *packet);
+#ifdef ELUNA
+                    if (!sEluna->OnPacketReceive(this, *packet))
+                        break;
+#endif
+                    opHandle->Call(this, *packet);
+                    LogUnprocessedTail(packet);
+                }
+                break;
+            case STATUS_TRANSFER:
+                if (_player && !_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
+                {
+                    sScriptMgr->OnPacketReceive(this, *packet);
+#ifdef ELUNA
+                    if (!sEluna->OnPacketReceive(this, *packet))
+                        break;
+#endif
+                    opHandle->Call(this, *packet);
+                    LogUnprocessedTail(packet);
+                }
+                break;
+            case STATUS_AUTHED:
+                if (m_inQueue) // prevent cheating
+                    break;
+
+                if (AntiDOS.EvaluateOpcode(*packet, currentTime))
+                {
+                    sScriptMgr->OnPacketReceive(this, *packet);
+#ifdef ELUNA
+                    if (!sEluna->OnPacketReceive(this, *packet))
+                        break;
+#endif
+                    opHandle->Call(this, *packet);
+                    LogUnprocessedTail(packet);
+                }
+                break;
+            case STATUS_NEVER:
+                LOG_ERROR("network.opcode", "Received not allowed opcode %s from %s",
+                    GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), GetPlayerInfo().c_str());
+                break;
+            case STATUS_UNHANDLED:
+                LOG_DEBUG("network.opcode", "Received not handled opcode %s from %s",
+                    GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), GetPlayerInfo().c_str());
+                break;
             }
-            catch (ByteBufferException const&)
+        }
+        catch (WorldPackets::PacketArrayMaxCapacityException const& pamce)
+        {
+            LOG_ERROR("network", "PacketArrayMaxCapacityException: %s while parsing %s from %s.",
+                pamce.what(), GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), GetPlayerInfo().c_str());
+        }
+        catch (ByteBufferException const&)
+        {
+            LOG_ERROR("network", "WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
+            if (sLog->ShouldLog("network", LogLevel::LOG_LEVEL_DEBUG))
             {
-                LOG_ERROR("server", "WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
-                if (sLog->ShouldLog("network", LogLevel::LOG_LEVEL_DEBUG))
-                {
-                    LOG_DEBUG("network", "Dumping error causing packet:");
-                    packet->hexlike();
-                }
+                LOG_DEBUG("network", "Dumping error causing packet:");
+                packet->hexlike();
             }
         }
 
@@ -377,18 +406,16 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
         deletePacket = true;
 
-        if (++processedPackets >= 150) // limit (by count) packets processed in one update, prevent DDoS
+#define MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE 150
+        processedPackets++;
+
+        //process only a max amout of packets in 1 Update() call.
+        //Any leftover will be processed in next update
+        if (processedPackets > MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE)
             break;
 
         if (getMSTimeDiff(_startMSTime, getMSTime()) >= 3) // limit (by time) packets processed in one update, prevent DDoS
             break;
-    }
-
-    if (movementPacket)
-    {
-        if (_player && _player->IsInWorld())
-            HandleMovementOpcodes(*movementPacket);
-        delete movementPacket;
     }
 
     if (m_Socket && !m_Socket->IsClosed())
@@ -450,6 +477,10 @@ bool WorldSession::HandleSocketClosed()
     return false;
 }
 
+bool WorldSession::IsSocketClosed() const {
+    return !m_Socket || m_Socket->IsClosed();
+}
+
 void WorldSession::HandleTeleportTimeout(bool updateInSessions)
 {
     // pussywizard: handle teleport ack timeout
@@ -460,7 +491,7 @@ void WorldSession::HandleTeleportTimeout(bool updateInSessions)
         {
             if (GetPlayer()->IsBeingTeleportedFar() && GetPlayer()->GetSemaphoreTeleportFar() + sWorld->getIntConfig(CONFIG_TELEPORT_TIMEOUT_FAR) < currTime)
                 while (GetPlayer() && GetPlayer()->IsBeingTeleportedFar())
-                    HandleMoveWorldportAckOpcode();
+                    HandleMoveWorldportAck();
         }
         else // session update from Map::Update
         {
@@ -485,7 +516,7 @@ void WorldSession::LogoutPlayer(bool save)
 {
     // finish pending transfers before starting the logout
     while (_player && _player->IsBeingTeleportedFar())
-        HandleMoveWorldportAckOpcode();
+        HandleMoveWorldportAck();
 
     m_playerLogout = true;
     m_playerSave = save;
@@ -573,7 +604,7 @@ void WorldSession::LogoutPlayer(bool save)
         // Repop at GraveYard or other player far teleport will prevent saving player because of not present map
         // Teleport player immediately for correct player save
         while (_player && _player->IsBeingTeleportedFar())
-            HandleMoveWorldportAckOpcode();
+            HandleMoveWorldportAck();
 
         ///- empty buyback items and save the player in the database
         // some save parts only correctly work in case player present in map/player_lists (pets, etc)
@@ -634,9 +665,7 @@ void WorldSession::LogoutPlayer(bool save)
         //! Client will respond by sending 3x CMSG_CANCEL_TRADE, which we currently dont handle
         WorldPacket data(SMSG_LOGOUT_COMPLETE, 0);
         SendPacket(&data);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
-#endif
 
         //! Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
@@ -699,24 +728,28 @@ char const* WorldSession::GetAcoreString(uint32 entry) const
     return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
 }
 
-void WorldSession::Handle_NULL(WorldPacket& recvPacket)
+void WorldSession::Handle_NULL(WorldPacket& null)
 {
-    LOG_ERROR("server", "SESSION: received unhandled opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    LOG_ERROR("network.opcode", "Received unhandled opcode %s from %s",
+        GetOpcodeNameForLogging(static_cast<OpcodeClient>(null.GetOpcode())).c_str(), GetPlayerInfo().c_str());
 }
 
 void WorldSession::Handle_EarlyProccess(WorldPacket& recvPacket)
 {
-    LOG_ERROR("server", "SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    LOG_ERROR("network.opcode", "Received opcode %s that must be processed in WorldSocket::ReadDataHandler from %s",
+        GetOpcodeNameForLogging(static_cast<OpcodeClient>(recvPacket.GetOpcode())).c_str(), GetPlayerInfo().c_str());
 }
 
 void WorldSession::Handle_ServerSide(WorldPacket& recvPacket)
 {
-    LOG_ERROR("server", "SESSION: received server-side opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    LOG_ERROR("network.opcode", "Received server-side opcode %s from %s",
+        GetOpcodeNameForLogging(static_cast<OpcodeServer>(recvPacket.GetOpcode())).c_str(), GetPlayerInfo().c_str());
 }
 
 void WorldSession::Handle_Deprecated(WorldPacket& recvPacket)
 {
-    LOG_ERROR("server", "SESSION: received deprecated opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    LOG_ERROR("network.opcode", "Received deprecated opcode %s from %s",
+        GetOpcodeNameForLogging(static_cast<OpcodeClient>(recvPacket.GetOpcode())).c_str(), GetPlayerInfo().c_str());
 }
 
 void WorldSession::SendAuthWaitQue(uint32 position)
@@ -759,13 +792,13 @@ void WorldSession::LoadAccountData(PreparedQueryResult result, uint32 mask)
         uint32 type = fields[0].GetUInt8();
         if (type >= NUM_ACCOUNT_DATA_TYPES)
         {
-            LOG_ERROR("server", "Table `%s` have invalid account data type (%u), ignore.", mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+            LOG_ERROR("network", "Table `%s` have invalid account data type (%u), ignore.", mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
             continue;
         }
 
         if ((mask & (1 << type)) == 0)
         {
-            LOG_ERROR("server", "Table `%s` have non appropriate for table  account data type (%u), ignore.", mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+            LOG_ERROR("network", "Table `%s` have non appropriate for table  account data type (%u), ignore.", mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
             continue;
         }
 
@@ -1021,7 +1054,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket& data)
 
     if (size > 0xFFFFF)
     {
-        LOG_ERROR("server", "WorldSession::ReadAddonsInfo addon info too big, size %u", size);
+        LOG_ERROR("network", "WorldSession::ReadAddonsInfo addon info too big, size %u", size);
         return;
     }
 
@@ -1051,34 +1084,28 @@ void WorldSession::ReadAddonsInfo(WorldPacket& data)
 
             addonInfo >> enabled >> crc >> unk1;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
-#endif
+            LOG_DEBUG("network", "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
 
             AddonInfo addon(addonName, enabled, crc, 2, true);
 
             SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
             if (savedAddon)
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 bool match = true;
 
                 if (addon.CRC != savedAddon->CRC)
                     match = false;
 
                 if (!match)
-                    LOG_DEBUG("server", "ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
+                    LOG_DEBUG("network", "ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
                 else
-                    LOG_DEBUG("server", "ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
-#endif
+                    LOG_DEBUG("network", "ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
             }
             else
             {
                 AddonMgr::SaveAddon(addon);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("server", "ADDON: %s (0x%x) was not known, saving...", addon.Name.c_str(), addon.CRC);
-#endif
+                LOG_DEBUG("network", "ADDON: %s (0x%x) was not known, saving...", addon.Name.c_str(), addon.CRC);
             }
 
             // TODO: Find out when to not use CRC/pubkey, and other possible states.
@@ -1087,17 +1114,13 @@ void WorldSession::ReadAddonsInfo(WorldPacket& data)
 
         uint32 currentTime;
         addonInfo >> currentTime;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "ADDON: CurrentTime: %u", currentTime);
-#endif
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         if (addonInfo.rpos() != addonInfo.size())
             LOG_DEBUG("network", "packet under-read!");
-#endif
     }
     else
-        LOG_ERROR("server", "Addon packet uncompress error!");
+        LOG_ERROR("network", "Addon packet uncompress error!");
 }
 
 void WorldSession::SendAddonsInfo()
@@ -1136,9 +1159,7 @@ void WorldSession::SendAddonsInfo()
             data << uint8(usepk);
             if (usepk)                                      // if CRC is wrong, add public key (client need it)
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("server", "ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey", itr->CRC, itr->Name.c_str(), STANDARD_ADDON_CRC);
-#endif
+                LOG_DEBUG("network", "ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey", itr->CRC, itr->Name.c_str(), STANDARD_ADDON_CRC);
                 data.append(addonPublicKey, sizeof(addonPublicKey));
             }
 
@@ -1304,6 +1325,9 @@ void WorldSession::ProcessQueryCallbackPet()
         Player* player = GetPlayer();
         if (!player)
         {
+            SQLQueryHolder* param;
+            _loadPetFromDBSecondCallback.get(param);
+            delete param;
             _loadPetFromDBSecondCallback.cancel();
         }
         else if (!player->IsInWorld())
@@ -1385,9 +1409,9 @@ bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) co
     if (++packetCounter.amountCounter <= maxPacketCounterAllowed)
         return true;
 
-    LOG_INFO("server", "AntiDOS: Account %u, IP: %s, Ping: %u, Character %s, flooding packet (opc: %s (0x%X), count: %u)",
-                    Session->GetAccountId(), Session->GetRemoteAddress().c_str(), Session->GetLatency(),
-                    Session->GetPlayerName().c_str(), opcodeTable[p.GetOpcode()].name, p.GetOpcode(), packetCounter.amountCounter);
+    LOG_WARN("network", "AntiDOS: Account %u, IP: %s, Ping: %u, Character: %s, flooding packet (opc: %s (0x%X), count: %u)",
+        Session->GetAccountId(), Session->GetRemoteAddress().c_str(), Session->GetLatency(), Session->GetPlayerName().c_str(),
+        opcodeTable[static_cast<OpcodeClient>(p.GetOpcode())]->Name, p.GetOpcode(), packetCounter.amountCounter);
 
     switch (_policy)
     {
@@ -1395,7 +1419,7 @@ bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) co
             return true;
         case POLICY_KICK:
             {
-                LOG_INFO("server", "AntiDOS: Player %s kicked!", Session->GetPlayerName().c_str());
+                LOG_INFO("network", "AntiDOS: Player %s kicked!", Session->GetPlayerName().c_str());
                 Session->KickPlayer();
                 return false;
             }
@@ -1416,7 +1440,7 @@ bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) co
                         break;
                 }
 
-                LOG_INFO("server", "AntiDOS: Player automatically banned for %u seconds.", duration);
+                LOG_INFO("network", "AntiDOS: Player automatically banned for %u seconds.", duration);
                 return false;
             }
         default: // invalid policy

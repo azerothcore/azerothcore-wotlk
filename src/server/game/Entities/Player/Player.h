@@ -282,6 +282,14 @@ struct PlayerCreateInfoAction
 
 typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
 
+struct PlayerCreateInfoSkill
+{
+    uint16 SkillId;
+    uint16 Rank;
+};
+
+typedef std::list<PlayerCreateInfoSkill> PlayerCreateInfoSkills;
+
 struct PlayerInfo
 {
     // existence checked by displayId != 0
@@ -296,8 +304,9 @@ struct PlayerInfo
     uint16 displayId_m{0};
     uint16 displayId_f{0};
     PlayerCreateInfoItems item;
-    PlayerCreateInfoSpells spell;
+    PlayerCreateInfoSpells customSpells;
     PlayerCreateInfoActions action;
+    PlayerCreateInfoSkills skills;
 
     PlayerLevelInfo* levelInfo{nullptr};                             //[level-1] 0..MaxPlayerLevel-1
 };
@@ -1074,6 +1083,7 @@ private:
     float _groupRate;
     Player* _maxNotGrayMember;
     uint32 _count;
+    uint32 _aliveSumLevel;
     uint32 _sumLevel;
     uint32 _xp;
     bool _isFullXP;
@@ -1692,7 +1702,9 @@ public:
     void learnSpell(uint32 spellId);
     void removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporary);
     void resetSpells();
-    void learnDefaultSpells();
+    void LearnCustomSpells();
+    void LearnDefaultSkills();
+    void LearnDefaultSkill(uint32 skillId, uint16 rank);
     void learnQuestRewardedSpells();
     void learnQuestRewardedSpells(Quest const* quest);
     void learnSpellHighRank(uint32 spellid);
@@ -1802,7 +1814,7 @@ public:
     void _SaveSpellCooldowns(SQLTransaction& trans, bool logout);
     uint32 GetLastPotionId() { return m_lastPotionId; }
     void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
-    void UpdatePotionCooldown();
+    void UpdatePotionCooldown(Spell* spell = nullptr);
 
     void setResurrectRequestData(ObjectGuid guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
     {
@@ -2029,6 +2041,7 @@ public:
     [[nodiscard]] Corpse* GetCorpse() const;
     void SpawnCorpseBones(bool triggerSave = true);
     Corpse* CreateCorpse();
+    void RemoveCorpse();
     void KillPlayer();
     static void OfflineResurrect(ObjectGuid const guid, SQLTransaction& trans);
     bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
@@ -2066,7 +2079,7 @@ public:
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
-    void UpdateWeaponSkill (WeaponAttackType attType);
+    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType);
     void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence);
 
     void SetSkill(uint16 id, uint16 step, uint16 currVal, uint16 maxVal);

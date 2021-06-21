@@ -10,6 +10,7 @@
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
+#include <map>
 
 #define max_ge_check_delay DAY  // 1 day in seconds
 
@@ -84,7 +85,7 @@ class GameEventMgr
 {
 private:
     GameEventMgr();
-    ~GameEventMgr() = default;;
+    ~GameEventMgr() = default;
 
 public:
     static GameEventMgr* instance();

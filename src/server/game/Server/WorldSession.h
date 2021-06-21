@@ -19,10 +19,9 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GossipDef.h"
-#include "Opcodes.h"
+#include "Packet.h"
 #include "SharedDefines.h"
 #include "World.h"
-#include "WorldPacket.h"
 #include <utility>
 #include <map>
 
@@ -57,6 +56,10 @@ namespace lfg
     struct LfgPlayerRewardData;
     struct LfgRoleCheck;
     struct LfgUpdateData;
+}
+
+namespace WorldPackets
+{
 }
 
 enum AccountDataType
@@ -184,7 +187,7 @@ protected:
     uint8 CharCount;
 
 private:
-    virtual ~CharacterCreateInfo() = default;;
+    virtual ~CharacterCreateInfo() = default;
 };
 
 struct PacketCounter
@@ -392,7 +395,7 @@ public:
     void ResetTimeSync();
     void SendTimeSync();
 public:                                                 // opcodes handlers
-    void Handle_NULL(WorldPacket& recvPacket);          // not used
+    void Handle_NULL(WorldPacket& null);                // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
     void Handle_ServerSide(WorldPacket& recvPacket);    // sever side only, can't be accepted from client
     void Handle_Deprecated(WorldPacket& recvPacket);    // never used anymore by client
@@ -501,7 +504,7 @@ public:                                                 // opcodes handlers
     void HandleGameObjectQueryOpcode(WorldPacket& recvPacket);
 
     void HandleMoveWorldportAckOpcode(WorldPacket& recvPacket);
-    void HandleMoveWorldportAckOpcode();                // for server-side calls
+    void HandleMoveWorldportAck(); // for server-side calls
 
     void HandleMovementOpcodes(WorldPacket& recvPacket);
     void HandleSetActiveMoverOpcode(WorldPacket& recvData);
@@ -926,6 +929,7 @@ public:                                                 // opcodes handlers
     void SetKicked(bool val) { _kicked = val; }
     void SetShouldSetOfflineInDB(bool val) { _shouldSetOfflineInDB = val; }
     bool GetShouldSetOfflineInDB() const { return _shouldSetOfflineInDB; }
+    bool IsSocketClosed() const;
 
     /***
     CALLBACKS
@@ -996,6 +1000,10 @@ private:
     bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
 
     bool recoveryItem(Item* pItem);
+
+    // logging helper
+    void LogUnexpectedOpcode(WorldPacket* packet, char const* status, const char* reason);
+    void LogUnprocessedTail(WorldPacket* packet);
 
     // EnumData helpers
     bool IsLegitCharacterForAccount(ObjectGuid guid)
