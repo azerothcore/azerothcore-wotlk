@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "DBCStructure.h"
 #include "HostileRefManager.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"

@@ -15,7 +15,6 @@
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
-#include "DatabaseWorkerPool.h"
 #include "GitRevision.h"
 #include "IoContext.h"
 #include "Log.h"
@@ -77,7 +76,7 @@ public:
         if (!_delayTime)
             return;
 
-        LOG_INFO("server", "Starting up anti-freeze thread (%u seconds max stuck time)...", _delayTime / 1000);
+        LOG_INFO("server.worldserver", "Starting up anti-freeze thread (%u seconds max stuck time)...", _delayTime / 1000);
         while (!World::IsStopped())
         {
             uint32 curtime = getMSTime();
@@ -88,13 +87,13 @@ public:
             }
             else if (getMSTimeDiff(_lastChange, curtime) > _delayTime)
             {
-                LOG_INFO("server", "World Thread hangs, kicking out server!");
+                LOG_INFO("server.worldserver", "World Thread hangs, kicking out server!");
                 ABORT();
             }
 
             Acore::Thread::Sleep(1000);
         }
-        LOG_INFO("server", "Anti-freeze thread exiting without problems.");
+        LOG_INFO("server.worldserver", "Anti-freeze thread exiting without problems.");
     }
 };
 
@@ -121,10 +120,10 @@ int Master::Run()
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            LOG_ERROR("server", "Daemon PID: %u\n", pid); // outError for red color in console
+            LOG_ERROR("server.worldserver", "Daemon PID: %u\n", pid); // outError for red color in console
         else
         {
-            LOG_ERROR("server", "Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
+            LOG_ERROR("server.worldserver", "Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
             return 1;
         }
     }
@@ -211,7 +210,7 @@ int Master::Run()
     std::string bindIp = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
     if (sWorldSocketMgr->StartNetwork(worldPort, bindIp.c_str()) == -1)
     {
-        LOG_ERROR("server", "Failed to start network");
+        LOG_ERROR("server.worldserver", "Failed to start network");
         World::StopNow(ERROR_EXIT_CODE);
         // go down and shutdown the server
     }
@@ -219,7 +218,7 @@ int Master::Run()
     // set server online (allow connecting now)
     LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag & ~%u, population = 0 WHERE id = '%u'", REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
 
-    LOG_INFO("server", "%s (worldserver-daemon) ready...", GitRevision::GetFullVersion());
+    LOG_INFO("server.worldserver", "%s (worldserver-daemon) ready...", GitRevision::GetFullVersion());
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
@@ -240,7 +239,7 @@ int Master::Run()
 
     _StopDB();
 
-    LOG_INFO("server", "Halting process...");
+    LOG_INFO("server.worldserver", "Halting process...");
 
     if (cliThread)
     {
@@ -320,7 +319,7 @@ bool Master::_StartDB()
     realm.Id.Realm = sConfigMgr->GetOption<int32>("RealmID", 0);
     if (!realm.Id.Realm)
     {
-        LOG_ERROR("server", "Realm ID not defined in configuration file");
+        LOG_ERROR("server.worldserver", "Realm ID not defined in configuration file");
         return false;
     }
     else if (realm.Id.Realm > 255)
@@ -330,11 +329,11 @@ bool Master::_StartDB()
          * with a size of uint8 we can "only" store up to 255 realms
          * anything further the client will behave anormaly
         */
-        LOG_ERROR("server", "Realm ID must range from 1 to 255");
+        LOG_ERROR("server.worldserver", "Realm ID must range from 1 to 255");
         return false;
     }
 
-    LOG_INFO("server", "Realm running as realm ID %d", realm.Id.Realm);
+    LOG_INFO("server.worldserver", "Realm running as realm ID %d", realm.Id.Realm);
 
     ///- Clean the database before starting
     ClearOnlineAccounts();
@@ -345,7 +344,7 @@ bool Master::_StartDB()
     sWorld->LoadDBVersion();
     sWorld->LoadDBRevision();
 
-    LOG_INFO("server", "Using World DB: %s", sWorld->GetDBVersion());
+    LOG_INFO("server.worldserver", "Using World DB: %s", sWorld->GetDBVersion());
     return true;
 }
 

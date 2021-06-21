@@ -9,7 +9,6 @@
 *  \author Derex <derex101@gmail.com>
 */
 
-#include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
@@ -23,7 +22,6 @@
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_socket.h>
-#include <ace/os_include/sys/os_types.h>
 #include <ace/Reactor_Impl.h>
 #include <ace/Reactor.h>
 #include <ace/TP_Reactor.h>
@@ -137,9 +135,7 @@ protected:
 
     int svc() override
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "Network Thread Starting");
-#endif
+        LOG_DEBUG("network", "Network Thread Starting");
 
         ASSERT(m_Reactor);
 
@@ -176,9 +172,7 @@ protected:
             }
         }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "Network Thread exits");
-#endif
+        LOG_DEBUG("network", "Network Thread exits");
 
         return 0;
     }
@@ -228,7 +222,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     if (num_threads <= 0)
     {
-        LOG_ERROR("server", "Network.Threads is wrong in your config file");
+        LOG_ERROR("network", "Network.Threads is wrong in your config file");
         return -1;
     }
 
@@ -236,7 +230,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     m_NetThreads = new ReactorRunnable[m_NetThreadsCount];
 
-    LOG_INFO("server", "Max allowed socket connections %d", ACE::max_handles());
+    LOG_INFO("network", "Max allowed socket connections %d", ACE::max_handles());
 
     // -1 means use default
     m_SockOutKBuff = sConfigMgr->GetOption<int32> ("Network.OutKBuff", -1);
@@ -245,7 +239,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     if (m_SockOutUBuff <= 0)
     {
-        LOG_ERROR("server", "Network.OutUBuff is wrong in your config file");
+        LOG_ERROR("network", "Network.OutUBuff is wrong in your config file");
         return -1;
     }
 
@@ -255,7 +249,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     if (m_Acceptor->open(listen_addr, m_NetThreads[0].GetReactor(), ACE_NONBLOCK) == -1)
     {
-        LOG_ERROR("server", "Failed to open acceptor, check if the port is free");
+        LOG_ERROR("network", "Failed to open acceptor, check if the port is free");
         return -1;
     }
 
@@ -319,7 +313,7 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
                                      (void*) & m_SockOutKBuff,
                                      sizeof (int)) == -1 && errno != ENOTSUP)
         {
-            LOG_ERROR("server", "WorldSocketMgr::OnSocketOpen set_option SO_SNDBUF");
+            LOG_ERROR("network", "WorldSocketMgr::OnSocketOpen set_option SO_SNDBUF");
             return -1;
         }
     }
@@ -334,7 +328,7 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
                                      (void*)&ndoption,
                                      sizeof (int)) == -1)
         {
-            LOG_ERROR("server", "WorldSocketMgr::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror (errno));
+            LOG_ERROR("network", "WorldSocketMgr::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror (errno));
             return -1;
         }
     }
