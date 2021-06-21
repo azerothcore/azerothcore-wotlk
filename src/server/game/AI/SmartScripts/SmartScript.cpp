@@ -8,7 +8,6 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CreatureTextMgr.h"
-#include "DatabaseEnv.h"
 #include "GameEventMgr.h"
 #include "GossipDef.h"
 #include "GridDefines.h"
@@ -1206,7 +1205,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     break;
 
                 instance->SetGuidData(e.action.setInstanceData64.field, targets->front()->GetGUID());
-                LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_SET_INST_DATA64: Field: %u, data: %lu",
+                LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_SET_INST_DATA64: Field: %u, data: " SI64FMTD,
                                e.action.setInstanceData64.field, targets->front()->GetGUID().GetRawValue());
                 delete targets;
                 break;
