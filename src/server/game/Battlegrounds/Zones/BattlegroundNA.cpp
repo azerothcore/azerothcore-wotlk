@@ -69,7 +69,7 @@ void BattlegroundNA::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        LOG_ERROR("server", "BattlegroundNA: Killer player not found");
+        LOG_ERROR("bg.battleground", "BattlegroundNA: Killer player not found");
         return;
     }
 

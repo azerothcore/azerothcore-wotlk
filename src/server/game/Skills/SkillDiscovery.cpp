@@ -44,7 +44,7 @@ void LoadSkillDiscoveryTable()
     if (!result)
     {
         LOG_ERROR("sql.sql", ">> Loaded 0 skill discovery definitions. DB table `skill_discovery_template` is empty.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -140,8 +140,8 @@ void LoadSkillDiscoveryTable()
             LOG_ERROR("sql.sql", "Spell (ID: %u) is 100%% chance random discovery ability but not have data in `skill_discovery_template` table", spell_id);
     }
 
-    LOG_INFO("server", ">> Loaded %u skill discovery definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u skill discovery definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 uint32 GetExplicitDiscoverySpell(uint32 spellId, Player* player)
