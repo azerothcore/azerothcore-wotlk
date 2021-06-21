@@ -241,7 +241,7 @@ namespace VMAP
         return result;
     }
 
-    void WmoLiquid::getPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const
+    void WmoLiquid::GetPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const
     {
         tilesX = iTilesX;
         tilesY = iTilesY;
@@ -408,7 +408,7 @@ namespace VMAP
         return 0;
     }
 
-    void GroupModel::getMeshData(std::vector<G3D::Vector3>& outVertices, std::vector<MeshTriangle>& outTriangles, WmoLiquid*& liquid)
+    void GroupModel::GetMeshData(std::vector<G3D::Vector3>& outVertices, std::vector<MeshTriangle>& outTriangles, WmoLiquid*& liquid)
     {
         outVertices = vertices;
         outTriangles = triangles;
@@ -590,7 +590,7 @@ namespace VMAP
         return result;
     }
 
-    void WorldModel::getGroupModels(std::vector<GroupModel>& outGroupModels)
+    void WorldModel::GetGroupModels(std::vector<GroupModel>& outGroupModels)
     {
         outGroupModels = groupModels;
     }

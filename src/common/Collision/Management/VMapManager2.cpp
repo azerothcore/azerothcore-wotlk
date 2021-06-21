@@ -335,7 +335,7 @@ namespace VMAP
         return StaticMapTree::CanLoadMap(std::string(basePath), mapId, x, y);
     }
 
-    void VMapManager2::getInstanceMapTree(InstanceTreeMap& instanceMapTree)
+    void VMapManager2::GetInstanceMapTree(InstanceTreeMap& instanceMapTree)
     {
         instanceMapTree = iInstanceMapTrees;
     }

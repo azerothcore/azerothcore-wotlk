@@ -68,7 +68,7 @@ namespace VMAP
         void UnloadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
         [[nodiscard]] bool isTiled() const { return iIsTiled; }
         [[nodiscard]] uint32 numLoadedTiles() const { return iLoadedTiles.size(); }
-        void getModelInstances(ModelInstance*& models, uint32& count);
+        void GetModelInstances(ModelInstance*& models, uint32& count);
     };
 
     struct AreaInfo

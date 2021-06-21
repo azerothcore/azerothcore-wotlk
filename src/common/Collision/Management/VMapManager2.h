@@ -129,7 +129,7 @@ namespace VMAP
             return getMapFileName(mapId);
         }
         bool existsMap(const char* basePath, unsigned int mapId, int x, int y) override;
-        void getInstanceMapTree(InstanceTreeMap& instanceMapTree);
+        void GetInstanceMapTree(InstanceTreeMap& instanceMapTree);
 
         typedef uint32(*GetLiquidFlagsFn)(uint32 liquidType);
         GetLiquidFlagsFn GetLiquidFlagsPtr;
