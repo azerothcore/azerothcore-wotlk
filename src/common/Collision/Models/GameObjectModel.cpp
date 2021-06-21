@@ -81,8 +81,8 @@ void LoadGameObjectModelList(std::string const& dataPath)
 
     fclose(model_list_file);
 
-    LOG_INFO("server", ">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 GameObjectModel::~GameObjectModel()
@@ -101,7 +101,7 @@ bool GameObjectModel::initialize(std::unique_ptr<GameObjectModelOwnerBase> model
     // ignore models with no bounds
     if (mdl_box == G3D::AABox::zero())
     {
-        LOG_ERROR("server", "GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
+        LOG_ERROR("maps", "GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
         return false;
     }
 
