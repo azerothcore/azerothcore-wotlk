@@ -485,7 +485,7 @@ float ThreatManager::getThreatWithoutTemp(Unit* victim, bool alsoSearchOfflineLi
     if (!ref && alsoSearchOfflineList)
         ref = iThreatOfflineContainer.getReferenceByTarget(victim);
     if (ref)
-        threat = ref->getThreat() - ref->getTempThreatModifier();;
+        threat = ref->getThreat() - ref->getTempThreatModifier();
     return threat;
 }
 

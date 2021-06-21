@@ -45,6 +45,8 @@ public:
 
     void DisappearAndDie();
 
+    [[nodiscard]] bool isVendorWithIconSpeak() const;
+
     bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);

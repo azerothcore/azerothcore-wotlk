@@ -14,9 +14,6 @@
 #include "ScriptMgr.h"
 #include "World.h"
 
-constexpr uint32 MAX_ARENA_TEAM_ID = 0xFFF00000;
-constexpr uint32 MAX_TEMP_ARENA_TEAM_ID = 0xFFFFFFFE;
-
 ArenaTeamMgr::ArenaTeamMgr()
 {
     NextArenaTeamId = 1;
@@ -120,7 +117,7 @@ uint32 ArenaTeamMgr::GenerateArenaTeamId()
 {
     if (NextArenaTeamId >= MAX_ARENA_TEAM_ID)
     {
-        LOG_ERROR("server", "Arena team ids overflow!! Can't continue, shutting down server. ");
+        LOG_ERROR("bg.arena", "Arena team ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
 
@@ -149,8 +146,8 @@ void ArenaTeamMgr::LoadArenaTeams()
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 arena teams. DB table `arena_team` is empty!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 arena teams. DB table `arena_team` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -179,8 +176,8 @@ void ArenaTeamMgr::LoadArenaTeams()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void ArenaTeamMgr::DistributeArenaPoints()

@@ -16,6 +16,7 @@
 #include "GroupMgr.h"
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
+#include "IPLocation.h"
 #include "Language.h"
 #include "LFG.h"
 #include "MapManager.h"
@@ -112,7 +113,8 @@ public:
             { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "" },
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
             { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
-            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" }
+            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
+            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" }
         };
         return commandTable;
     }
@@ -1527,9 +1529,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
-#endif
+        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
@@ -1627,9 +1627,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
-#endif
+        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
 
         bool found = false;
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
@@ -1928,28 +1926,10 @@ public:
                 lastIp    = fields[4].GetString();
                 lastLogin = fields[5].GetString();
 
-                /** if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
+                if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
                 {
                     lastIp.append(" (");
                     lastIp.append(location->CountryName);
-                    lastIp.append(")");
-                } **/
-
-                uint32 ip = inet_addr(lastIp.c_str());
-#if ACORE_ENDIAN == BIGENDIAN
-                EndianConvertReverse(ip);
-#endif
-                stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP2NATION_COUNTRY);
-
-                stmt->setUInt32(0, ip);
-
-                PreparedQueryResult result2 = LoginDatabase.Query(stmt);
-
-                if (result2)
-                {
-                    Field* fields2 = result2->Fetch();
-                    lastIp.append(" (");
-                    lastIp.append(fields2[0].GetString());
                     lastIp.append(")");
                 }
             }
@@ -2933,7 +2913,7 @@ public:
 
         if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
         {
-            LOG_ERROR("server", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
+            LOG_ERROR("misc", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
             handler->PSendSysMessage("Error 2");
             delete pet;
             return false;
@@ -3360,6 +3340,42 @@ public:
 
         handler->GetSession()->SendShowMailBox(player->GetGUID());
         return true;
+    }
+
+    static bool HandleStringCommand(ChatHandler *handler, char const *args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            return false;
+        }
+
+        uint32 id = atoi(strtok((char*)args, " "));
+        if (id == 0)
+        {
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            return false;
+        }
+
+        uint32 locale = 0;
+        char* localeString = strtok(nullptr, " ");
+        if (localeString != nullptr)
+        {
+            locale = atoi(localeString);
+        }
+
+        const char* str = sObjectMgr->GetAcoreString(id, static_cast<LocaleConstant>(locale));
+
+        if (strcmp(str, "<error>") == 0)
+        {
+            handler->PSendSysMessage(LANG_NO_ACORE_STRING_FOUND, id);
+            return true;
+        }
+        else
+        {
+            handler->SendSysMessage(str);
+            return true;
+        }
     }
 };
 
