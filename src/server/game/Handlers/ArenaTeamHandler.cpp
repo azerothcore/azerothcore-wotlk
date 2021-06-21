@@ -17,15 +17,11 @@
 
 void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "MSG_INSPECT_ARENA_TEAMS");
-#endif
 
     ObjectGuid guid;
     recvData >> guid;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Inspect Arena stats (%s)", guid.ToString().c_str());
-#endif
 
     if (Player* player = ObjectAccessor::FindPlayer(guid))
     {
@@ -42,9 +38,7 @@ void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Received CMSG_ARENA_TEAM_QUERY");
-#endif
 
     uint32 arenaTeamId;
     recvData >> arenaTeamId;
@@ -58,9 +52,7 @@ void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Received CMSG_ARENA_TEAM_ROSTER");
-#endif
 
     uint32 arenaTeamId;                                     // arena team id
     recvData >> arenaTeamId;
@@ -71,9 +63,7 @@ void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_INVITE");
-#endif
 
     uint32 arenaTeamId;                                     // arena team id
     std::string invitedName;
@@ -143,9 +133,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("bg.battleground", "Player %s Invited %s to Join his ArenaTeam", GetPlayer()->GetName().c_str(), invitedName.c_str());
-#endif
 
     player->SetArenaTeamIdInvited(arenaTeam->GetId());
 
@@ -154,16 +142,12 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
     data << arenaTeam->GetName();
     player->GetSession()->SendPacket(&data);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_INVITE");
-#endif
 }
 
 void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket& /*recvData*/)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_ACCEPT");                // empty opcode
-#endif
 
     ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(_player->GetArenaTeamIdInvited());
     if (!arenaTeam)
@@ -196,9 +180,7 @@ void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleArenaTeamDeclineOpcode(WorldPacket& /*recvData*/)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_DECLINE");               // empty opcode
-#endif
 
     // Remove invite from player
     _player->SetArenaTeamIdInvited(0);
@@ -206,9 +188,7 @@ void WorldSession::HandleArenaTeamDeclineOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_LEAVE");
-#endif
 
     uint32 arenaTeamId;
     recvData >> arenaTeamId;
@@ -265,9 +245,7 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_DISBAND");
-#endif
 
     uint32 arenaTeamId;
     recvData >> arenaTeamId;
@@ -299,9 +277,7 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_REMOVE");
-#endif
 
     uint32 arenaTeamId;
     std::string name;
@@ -366,9 +342,7 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_LEADER");
-#endif
 
     uint32 arenaTeamId;
     std::string name;
