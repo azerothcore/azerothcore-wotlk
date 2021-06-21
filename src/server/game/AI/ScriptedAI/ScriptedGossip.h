@@ -89,21 +89,4 @@ void SendGossipMenuFor(Player* player, uint32 npcTextID, Creature const* creatur
 // Close menu
 void CloseGossipMenuFor(Player* player);
 
-/// Old macro. Need delete later
-// This fuction add's a menu item,
-// a - Icon Id
-// b - Text
-// c - Sender(this is to identify the current Menu with this item)
-// d - Action (identifys this Menu Item)
-// e - Text to be displayed in pop up box
-// f - Money value in pop up box
-#define ADD_GOSSIP_ITEM(a, b, c, d) PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, a, b, c, d, "", 0)
-#define ADD_GOSSIP_ITEM_EXTENDED(a, b, c, d, e, f, g)   PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, a, b, c, d, e, f, g)
-
-// This fuction Sends the current menu to show to client, a - NPCTEXTID(uint32), b - npc guid(ObjectGuid)
-#define SEND_GOSSIP_MENU(a, b)  PlayerTalkClass->SendGossipMenu(a, b)
-
-// Closes the Menu
-#define CLOSE_GOSSIP_MENU() PlayerTalkClass->SendCloseGossip()
-
 #endif
