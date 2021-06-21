@@ -65,13 +65,20 @@ Group::~Group()
 
     if (m_bgGroup)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("bg.battleground", "Group::~Group: battleground group being deleted.");
-#endif
-        if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this) m_bgGroup->SetBgRaid(TEAM_ALLIANCE, nullptr);
-        else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this) m_bgGroup->SetBgRaid(TEAM_HORDE, nullptr);
-        else LOG_ERROR("server", "Group::~Group: battleground group is not linked to the correct battleground.");
+
+        if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this)
+        {
+            m_bgGroup->SetBgRaid(TEAM_ALLIANCE, nullptr);
+        }
+        else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this)
+        {
+            m_bgGroup->SetBgRaid(TEAM_HORDE, nullptr);
+        }
+        else
+            LOG_ERROR("bg.battleground", "Group::~Group: battleground group is not linked to the correct battleground.");
     }
+
     Rolls::iterator itr;
     while (!RollId.empty())
     {
@@ -1222,9 +1229,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
 
 void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Group::MasterLoot (SMSG_LOOT_MASTER_LIST, 330)");
-#endif
 
     for (std::vector<LootItem>::iterator i = loot->items.begin(); i != loot->items.end(); ++i)
     {
@@ -2046,9 +2051,7 @@ void Group::BroadcastGroupUpdate(void)
         {
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "-- Forced group value update for '%s'", pp->GetName().c_str());
-#endif
+            LOG_DEBUG("group", "-- Forced group value update for '%s'", pp->GetName().c_str());
         }
     }
 }
