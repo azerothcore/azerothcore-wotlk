@@ -113,6 +113,7 @@ enum WorldBoolConfigs
     CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS,
     CONFIG_ARENA_SEASON_IN_PROGRESS,
     CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE,
+    CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY,
     CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN,
     CONFIG_VMAP_INDOOR_CHECK,
     CONFIG_PET_LOS,
@@ -581,7 +582,11 @@ public:
     virtual void UpdateRealmCharCount(uint32 accid) = 0;
     virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
+    virtual void LoadDBRevision() = 0;
     virtual char const* GetDBVersion() const = 0;
+    virtual char const* GetWorldDBRevision() const = 0;
+    virtual char const* GetCharacterDBRevision() const = 0;
+    virtual char const* GetAuthDBRevision() const = 0;
     virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     virtual uint32 GetCleaningFlags() const = 0;

@@ -9,11 +9,9 @@
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Chat.h"
-#include "Common.h"
 #include "Corpse.h"
 #include "GameGraveyard.h"
 #include "InstanceSaveMgr.h"
-#include "Language.h"
 #include "Log.h"
 #include "MathUtil.h"
 #include "MapManager.h"
@@ -69,7 +67,7 @@ void WorldSession::HandleMoveWorldportAck()
     }
 
     // reset instance validity, except if going to an instance inside an instance
-    if (GetPlayer()->m_InstanceValid == false && !mInstance)
+    if (!GetPlayer()->m_InstanceValid && !mInstance)
     {
         GetPlayer()->m_InstanceValid = true;
         // pussywizard: m_InstanceValid can be false only by leaving a group in an instance => so remove temp binds that could not be removed because player was still on the map!
@@ -120,7 +118,7 @@ void WorldSession::HandleMoveWorldportAck()
     if (!_player->getHostileRefManager().isEmpty())
         _player->getHostileRefManager().deleteReferences(); // pussywizard: multithreading crashfix
 
-    CellCoord pair(acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
+    CellCoord pair(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell(pair);
     if (!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid())
     {
@@ -168,7 +166,7 @@ void WorldSession::HandleMoveWorldportAck()
     }
 
     // xinef: do this again, player can be teleported inside bg->AddPlayer(_player)!!!!
-    CellCoord pair2(acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
+    CellCoord pair2(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell2(pair2);
     if (!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid())
     {
@@ -187,6 +185,16 @@ void WorldSession::HandleMoveWorldportAck()
         {
             GetPlayer()->ResurrectPlayer(0.5f, false);
             GetPlayer()->SpawnCorpseBones();
+        }
+    }
+
+    if (!corpse && mEntry->IsDungeon())
+    {
+        // resurrect character upon entering instance when the corpse is not available anymore
+        if (GetPlayer()->GetCorpseLocation().GetMapId() == mEntry->MapID)
+        {
+            GetPlayer()->ResurrectPlayer(0.5f, false);
+            GetPlayer()->RemoveCorpse();
         }
     }
 
@@ -397,7 +405,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             return;
         }
 
-        if (!acore::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
+        if (!Acore::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
                                     movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
         {
             if (plrMover)
@@ -594,7 +602,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     }
 
     // continue parse packet
-
     recvData >> unk1;                                      // counter or moveEvent
 
     MovementInfo movementInfo;
@@ -602,7 +609,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     ReadMovementInfo(recvData, &movementInfo);
 
     recvData >> newspeed;
-    /*----------------*/
 
     // client ACK send one packet for mounted/run case and need skip all except last from its
     // in other cases anti-cheat check can be fail in false case
@@ -883,16 +889,15 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     uint32 roundTripDuration = getMSTimeDiff(serverTimeAtSent, recvData.GetReceivedTime());
     uint32 lagDelay = roundTripDuration / 2;
 
-    /*
-    clockDelta = serverTime - clientTime
-    where
-    serverTime: time that was displayed on the clock of the SERVER at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
-    clientTime:  time that was displayed on the clock of the CLIENT at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
+    // clockDelta = serverTime - clientTime
+    // where
+    // serverTime: time that was displayed on the clock of the SERVER at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
+    // clientTime:  time that was displayed on the clock of the CLIENT at the moment when the client processed the SMSG_TIME_SYNC_REQUEST packet.
 
-    Once clockDelta has been computed, we can compute the time of an event on server clock when we know the time of that same event on the client clock,
-    using the following relation:
-    serverTime = clockDelta + clientTime
-    */
+    // Once clockDelta has been computed, we can compute the time of an event on server clock when we know the time of that same event on the client clock,
+    // using the following relation:
+    // serverTime = clockDelta + clientTime
+
     int64 clockDelta = (int64)serverTimeAtSent + (int64)lagDelay - (int64)clientTimestamp;
     _timeSyncClockDeltaQueue.put(std::pair<int64, uint32>(clockDelta, roundTripDuration));
     ComputeNewClockDelta();

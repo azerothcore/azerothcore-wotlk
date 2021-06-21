@@ -355,11 +355,11 @@ void MySQLConnection::CommitTransaction()
     Execute("COMMIT");
 }
 
-bool MySQLConnection::ExecuteTransaction(SQLTransaction& transaction)
+int MySQLConnection::ExecuteTransaction(SQLTransaction& transaction)
 {
     std::list<SQLElementData> const& queries = transaction->m_queries;
     if (queries.empty())
-        return false;
+        return -1;
 
     BeginTransaction();
 
@@ -376,8 +376,9 @@ bool MySQLConnection::ExecuteTransaction(SQLTransaction& transaction)
                 if (!Execute(stmt))
                 {
                     LOG_INFO("sql.driver", "[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    int errorCode = GetLastError();
                     RollbackTransaction();
-                    return false;
+                    return errorCode;
                 }
             }
             break;
@@ -388,8 +389,9 @@ bool MySQLConnection::ExecuteTransaction(SQLTransaction& transaction)
                 if (!Execute(sql))
                 {
                     LOG_INFO("sql.driver", "[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    int errorCode = GetLastError();
                     RollbackTransaction();
-                    return false;
+                    return errorCode;
                 }
             }
             break;
@@ -402,7 +404,7 @@ bool MySQLConnection::ExecuteTransaction(SQLTransaction& transaction)
     // and not while iterating over every element.
 
     CommitTransaction();
-    return true;
+    return 0;
 }
 
 MySQLPreparedStatement* MySQLConnection::GetPreparedStatement(uint32 index)

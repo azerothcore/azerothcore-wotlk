@@ -18,7 +18,7 @@
 #include <map>
 #include <unordered_map>
 
-namespace acore
+namespace Acore
 {
     // Helpers
     // Insert helpers

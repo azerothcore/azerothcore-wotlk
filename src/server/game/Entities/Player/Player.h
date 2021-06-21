@@ -1803,7 +1803,7 @@ public:
     void _SaveSpellCooldowns(SQLTransaction& trans, bool logout);
     uint32 GetLastPotionId() { return m_lastPotionId; }
     void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
-    void UpdatePotionCooldown();
+    void UpdatePotionCooldown(Spell* spell = nullptr);
 
     void setResurrectRequestData(ObjectGuid guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
     {
@@ -2030,6 +2030,7 @@ public:
     [[nodiscard]] Corpse* GetCorpse() const;
     void SpawnCorpseBones(bool triggerSave = true);
     Corpse* CreateCorpse();
+    void RemoveCorpse();
     void KillPlayer();
     static void OfflineResurrect(ObjectGuid const guid, SQLTransaction& trans);
     bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }

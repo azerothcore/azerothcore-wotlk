@@ -9,7 +9,7 @@
 #include "Define.h"
 #include <boost/asio/ip/address.hpp>
 
-namespace acore::Net
+namespace Acore::Net
 {
 #if BOOST_VERSION >= 106600
     using boost::asio::ip::make_address;

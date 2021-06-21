@@ -1998,7 +1998,7 @@ public:
             if (targets.size() < 2)
                 return;
 
-            targets.sort(acore::HealthPctOrderPred());
+            targets.sort(Acore::HealthPctOrderPred());
 
             WorldObject* target = targets.front();
             targets.clear();

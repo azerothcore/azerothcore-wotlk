@@ -741,7 +741,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_REACHED_HOME:
             case SMART_EVENT_RESET:
             case SMART_EVENT_QUEST_ACCEPTED:
-            case SMART_EVENT_QUEST_OBJ_COPLETETION:
+            case SMART_EVENT_QUEST_OBJ_COMPLETION:
             case SMART_EVENT_QUEST_COMPLETION:
             case SMART_EVENT_QUEST_REWARDED:
             case SMART_EVENT_QUEST_FAIL:
@@ -1120,7 +1120,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             }
         case SMART_ACTION_LOAD_GRID:
             {
-                if (!acore::IsValidMapCoord(e.target.x, e.target.y))
+                if (!Acore::IsValidMapCoord(e.target.x, e.target.y))
                 {
                     LOG_ERROR("server", "SmartScript: SMART_ACTION_LOAD_GRID uses invalid map coords: %u, skipped.", e.entryOrGuid);
                     return false;

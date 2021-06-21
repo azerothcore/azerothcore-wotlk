@@ -8,7 +8,6 @@
  * Interaction between core and LFGScripts
  */
 
-#include "Common.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "LFGScripts.h"
@@ -16,7 +15,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
-#include "WorldSession.h"
 
 namespace lfg
 {
@@ -179,8 +177,8 @@ namespace lfg
     void LFGGroupScript::OnRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, char const* reason)
     {
         // used only with EXTRA_LOGS
-        UNUSED(kicker);
-        UNUSED(reason);
+        (void)kicker;
+        (void)reason;
 
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
             return;
@@ -280,7 +278,7 @@ namespace lfg
     void LFGGroupScript::OnInviteMember(Group* group, ObjectGuid guid)
     {
         // used only with EXTRA_LOGS
-        UNUSED(guid);
+        (void)guid;
 
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
             return;

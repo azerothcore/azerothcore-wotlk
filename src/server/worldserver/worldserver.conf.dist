@@ -68,14 +68,6 @@ RealmID = 1
 DataDir = "."
 
 #
-#    PidFile
-#        Description: World daemon PID file
-#        Example:     "./world.pid" - (Enabled)
-#        Default:     ""            - (Disabled)
-
-PidFile = ""
-
-#
 #    LogsDir
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
@@ -164,6 +156,16 @@ WorldServerPort = 8085
 #        Default:     "0.0.0.0" - (Bind to all IPs on the system)
 
 BindIP = "0.0.0.0"
+
+#
+#    IPLocationFile
+#        Description: The path to your IP2Location database CSV file.
+#        Example:     "C:/acore/IP2LOCATION-LITE-DB1.CSV"
+#                     "/home/acore/IP2LOCATION-LITE-DB1.CSV"
+#        Default:     ""  - (Disabled)
+#
+
+IPLocationFile = ""
 
 #
 ###################################################################################################
@@ -457,6 +459,29 @@ PreloadAllNonInstancedMapGrids = 0
 
 SetAllCreaturesWithWaypointMovementActive = 0
 
+#
+###################################################################################################
+
+###################################################################################################
+# SERVER LOGGING
+#
+#    PidFile
+#        Description: World daemon PID file.
+#        Example:     "./world.pid" - (Enabled)
+#        Default:     ""            - (Disabled)
+
+PidFile = ""
+
+#
+#    PacketLogFile
+#        Description: Binary packet logging file for the world server.
+#                     Filename extension must be .pkt to be parsable with WowPacketParser.
+#        Example:     "World.pkt" - (Enabled)
+#        Default:     ""          - (Disabled)
+
+PacketLogFile = ""
+
+# Extended Logging system configuration moved to end of file (on purpose)
 #
 ###################################################################################################
 
@@ -1457,7 +1482,7 @@ CreatureFamilyAssistanceDelay = 2000
 #    CreatureFamilyAssistancePeriod
 #        Description: Time (in milliseconds) before next creature assistance call.
 #        Default:     3000 - (3 Seconds)
-                      0    - (Disabled)
+#                     0    - (Disabled)
 
 CreatureFamilyAssistancePeriod = 3000
 
@@ -2655,6 +2680,15 @@ Arena.GamesRequired = 10
 #                     1 - (Enabled)
 
 Arena.QueueAnnouncer.Enable = 0
+
+#
+#    Battleground.QueueAnnouncer.PlayerOnly
+#        Description: Battleground queue announcement type.
+#        Default:     0 - (System message, Anyone can see it)
+#                     1 - (Private, Only queued players can see it)
+#
+
+Arena.QueueAnnouncer.PlayerOnly = 0
 
 #
 #    Arena.ArenaSeason.ID

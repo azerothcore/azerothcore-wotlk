@@ -76,7 +76,7 @@ private:
     RealmSocket& socket_;
     RealmSocket& socket() { return socket_; }
 
-    std::optional<acore::Crypto::SRP6> _srp6;
+    std::optional<Acore::Crypto::SRP6> _srp6;
     SessionKey _sessionKey = {};
     std::array<uint8, 16> _reconnectProof = {};
 
@@ -89,6 +89,7 @@ private:
     // between enUS and enGB, which is important for the patch system
     std::string _localizationName;
     std::string _os;
+    std::string _ipCountry;
     uint16 _build;
     uint8 _expversion;
 };

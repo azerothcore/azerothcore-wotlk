@@ -9,17 +9,18 @@
 */
 
 #include "ACSoap.h"
+#include "AsyncAcceptor.h"
 #include "BigNumber.h"
 #include "CliRunnable.h"
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
-#include "DatabaseWorkerPool.h"
 #include "GitRevision.h"
+#include "IoContext.h"
 #include "Log.h"
 #include "Master.h"
 #include "OpenSSLCrypto.h"
-#include "RARunnable.h"
+#include "RASession.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SignalHandler.h"
@@ -32,17 +33,12 @@
 #include "DatabaseLoader.h"
 #include "Optional.h"
 #include "SecretMgr.h"
+#include "ProcessPriority.h"
 #include <ace/Sig_Handler.h>
 
 #ifdef _WIN32
 #include "ServiceWin32.h"
 extern int m_ServiceStatus;
-#endif
-
-#ifdef __linux__
-#include <sched.h>
-#include <sys/resource.h>
-#define PROCESS_HIGH_PRIORITY -15 // [-20, 19], default is 0
 #endif
 
 /// Handle worldservers's termination signals
@@ -65,7 +61,7 @@ void HandleSignal(int sigNum)
     }
 }
 
-class FreezeDetectorRunnable : public acore::Runnable
+class FreezeDetectorRunnable : public Acore::Runnable
 {
 private:
     uint32 _loops;
@@ -95,13 +91,14 @@ public:
                 ABORT();
             }
 
-            acore::Thread::Sleep(1000);
+            Acore::Thread::Sleep(1000);
         }
         LOG_INFO("server", "Anti-freeze thread exiting without problems.");
     }
 };
 
 bool LoadRealmInfo();
+AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext);
 
 Master* Master::instance()
 {
@@ -112,6 +109,8 @@ Master* Master::instance()
 /// Main function
 int Master::Run()
 {
+    std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
+
     OpenSSLCrypto::threadsSetup();
     BigNumber seed1;
     seed1.SetRand(16 * 8);
@@ -129,6 +128,9 @@ int Master::Run()
         }
     }
 
+    // Set process priority according to configuration settings
+    SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
+
     ///- Start the databases
     if (!_StartDB())
         return 1;
@@ -139,7 +141,7 @@ int Master::Run()
     LoadRealmInfo();
 
     // Loading modules configs
-    sConfigMgr->LoadModulesConfigs();
+    sConfigMgr->PrintLoadedModulesConfigs();
 
     ///- Initialize the World
     sSecretMgr->Initialize();
@@ -148,7 +150,7 @@ int Master::Run()
     sScriptMgr->OnStartup();
 
     ///- Initialize the signal handlers
-    acore::SignalHandler signalHandler;
+    Acore::SignalHandler signalHandler;
 
     signalHandler.handle_signal(SIGINT, &HandleSignal);
     signalHandler.handle_signal(SIGTERM, &HandleSignal);
@@ -158,10 +160,10 @@ int Master::Run()
 #endif
 
     ///- Launch WorldRunnable thread
-    acore::Thread worldThread(new WorldRunnable);
-    worldThread.setPriority(acore::Priority_Highest);
+    Acore::Thread worldThread(new WorldRunnable);
+    worldThread.setPriority(Acore::Priority_Highest);
 
-    acore::Thread* cliThread = nullptr;
+    Acore::Thread* cliThread = nullptr;
 
 #ifdef _WIN32
     if (sConfigMgr->GetOption<bool>("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -170,99 +172,37 @@ int Master::Run()
 #endif
     {
         ///- Launch CliRunnable thread
-        cliThread = new acore::Thread(new CliRunnable);
+        cliThread = new Acore::Thread(new CliRunnable);
     }
-
-    acore::Thread rarThread(new RARunnable);
 
     // pussywizard:
-    acore::Thread auctionLising_thread(new AuctionListingRunnable);
-    auctionLising_thread.setPriority(acore::Priority_High);
+    Acore::Thread auctionLising_thread(new AuctionListingRunnable);
+    auctionLising_thread.setPriority(Acore::Priority_High);
 
-#if defined(_WIN32) || defined(__linux__)
+    // Start the Remote Access port (acceptor) if enabled
+    std::unique_ptr<AsyncAcceptor> raAcceptor;
+    if (sConfigMgr->GetOption<bool>("Ra.Enable", false))
+        raAcceptor.reset(StartRaSocketAcceptor(*ioContext));
 
-    ///- Handle affinity for multiple processors and process priority
-    uint32 affinity = sConfigMgr->GetOption<int32>("UseProcessors", 0);
-    bool highPriority = sConfigMgr->GetOption<bool>("ProcessPriority", false);
-
-#ifdef _WIN32 // Windows
-
-    HANDLE hProcess = GetCurrentProcess();
-
-    if (affinity > 0)
-    {
-        ULONG_PTR appAff;
-        ULONG_PTR sysAff;
-
-        if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
-        {
-            ULONG_PTR currentAffinity = affinity & appAff;            // remove non accessible processors
-
-            if (!currentAffinity)
-                LOG_ERROR("server", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the worldserver. Accessible processors bitmask (hex): %x", affinity, appAff);
-            else if (SetProcessAffinityMask(hProcess, currentAffinity))
-                LOG_INFO("server", "Using processors (bitmask, hex): %x", currentAffinity);
-            else
-                LOG_ERROR("server", "Can't set used processors (hex): %x", currentAffinity);
-        }
-    }
-
-    if (highPriority)
-    {
-        if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
-            LOG_INFO("server", "worldserver process priority class set to HIGH");
-        else
-            LOG_ERROR("server", "Can't set worldserver process priority class.");
-    }
-
-#else // Linux
-
-    if (affinity > 0)
-    {
-        cpu_set_t mask;
-        CPU_ZERO(&mask);
-
-        for (unsigned int i = 0; i < sizeof(affinity) * 8; ++i)
-            if (affinity & (1 << i))
-                CPU_SET(i, &mask);
-
-        if (sched_setaffinity(0, sizeof(mask), &mask))
-            LOG_ERROR("server", "Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
-        else
-        {
-            CPU_ZERO(&mask);
-            sched_getaffinity(0, sizeof(mask), &mask);
-            LOG_INFO("server", "Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
-        }
-    }
-
-    if (highPriority)
-    {
-        if (setpriority(PRIO_PROCESS, 0, PROCESS_HIGH_PRIORITY))
-            LOG_ERROR("server", "Can't set worldserver process priority class, error: %s", strerror(errno));
-        else
-            LOG_INFO("server", "worldserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
-    }
-
-#endif
-#endif
-
-    // Start soap serving thread
-    acore::Thread* soapThread = nullptr;
+    // Start soap serving thread if enabled
+    std::shared_ptr<std::thread> soapThread;
     if (sConfigMgr->GetOption<bool>("SOAP.Enabled", false))
     {
-        ACSoapRunnable* runnable = new ACSoapRunnable();
-        runnable->SetListenArguments(sConfigMgr->GetOption<std::string>("SOAP.IP", "127.0.0.1"), uint16(sConfigMgr->GetOption<int32>("SOAP.Port", 7878)));
-        soapThread = new acore::Thread(runnable);
+        soapThread.reset(new std::thread(ACSoapThread, sConfigMgr->GetOption<std::string>("SOAP.IP", "127.0.0.1"), sConfigMgr->GetOption<uint16>("SOAP.Port", 7878)),
+            [](std::thread* thr)
+        {
+            thr->join();
+            delete thr;
+        });
     }
 
     // Start up freeze catcher thread
-    acore::Thread* freezeThread = nullptr;
+    Acore::Thread* freezeThread = nullptr;
     if (uint32 freezeDelay = sConfigMgr->GetOption<int32>("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable* runnable = new FreezeDetectorRunnable(freezeDelay * 1000);
-        freezeThread = new acore::Thread(runnable);
-        freezeThread->setPriority(acore::Priority_Highest);
+        freezeThread = new Acore::Thread(runnable);
+        freezeThread->setPriority(Acore::Priority_Highest);
     }
 
     ///- Launch the world listener socket
@@ -283,15 +223,7 @@ int Master::Run()
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
     worldThread.wait();
-    rarThread.wait();
     auctionLising_thread.wait();
-
-    if (soapThread)
-    {
-        soapThread->wait();
-        soapThread->destroy();
-        delete soapThread;
-    }
 
     if (freezeThread)
     {
@@ -410,6 +342,7 @@ bool Master::_StartDB()
     WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_revision = '%s'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
 
     sWorld->LoadDBVersion();
+    sWorld->LoadDBRevision();
 
     LOG_INFO("server", "Using World DB: %s", sWorld->GetDBVersion());
     return true;
@@ -480,4 +413,21 @@ bool LoadRealmInfo()
     realm.PopulationLevel = fields[10].GetFloat();
     realm.Build = fields[11].GetUInt32();
     return true;
+}
+
+AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext)
+{
+    uint16 raPort = uint16(sConfigMgr->GetOption<int32>("Ra.Port", 3443));
+    std::string raListener = sConfigMgr->GetOption<std::string>("Ra.IP", "0.0.0.0");
+
+    AsyncAcceptor* acceptor = new AsyncAcceptor(ioContext, raListener, raPort);
+    if (!acceptor->Bind())
+    {
+        LOG_ERROR("server.worldserver", "Failed to bind RA socket acceptor");
+        delete acceptor;
+        return nullptr;
+    }
+
+    acceptor->AsyncAccept<RASession>();
+    return acceptor;
 }
