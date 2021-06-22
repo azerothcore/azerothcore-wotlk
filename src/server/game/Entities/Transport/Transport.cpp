@@ -37,7 +37,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
 
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        LOG_ERROR("entities.transport", "Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
                        guidlow, x, y);
         return false;
     }
@@ -48,7 +48,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
 
     if (!goinfo)
     {
-        LOG_ERROR("server", "Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
+        LOG_ERROR("entities.transport", "Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
         return false;
     }
 
@@ -57,7 +57,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     TransportTemplate const* tInfo = sTransportMgr->GetTransportTemplate(entry);
     if (!tInfo)
     {
-        LOG_ERROR("server", "Transport %u (name: %s) will not be created, missing `transport_template` entry.", entry, goinfo->name.c_str());
+        LOG_ERROR("entities.transport", "Transport %u (name: %s) will not be created, missing `transport_template` entry.", entry, goinfo->name.c_str());
         return false;
     }
 
@@ -128,7 +128,7 @@ void MotionTransport::Update(uint32 diff)
     if (AI())
         AI()->UpdateAI(diff);
     else if (!AIM_Initialize())
-        LOG_ERROR("server", "Could not initialize GameObjectAI for Transport");
+        LOG_ERROR("entities.transport", "Could not initialize GameObjectAI for Transport");
 
     if (GetKeyFrames().size() <= 1)
         return;
@@ -332,7 +332,7 @@ Creature* MotionTransport::CreateNPCPassenger(ObjectGuid::LowType guid, Creature
 
     if (!creature->IsPositionValid())
     {
-        LOG_ERROR("server", "Creature (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
+        LOG_ERROR("entities.transport", "Creature (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
             creature->GetGUID().ToString().c_str(), creature->GetPositionX(), creature->GetPositionY());
         delete creature;
         return nullptr;
@@ -374,7 +374,7 @@ GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObj
 
     if (!go->IsPositionValid())
     {
-        LOG_ERROR("server", "GameObject (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
+        LOG_ERROR("entities.transport", "GameObject (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
             go->GetGUID().ToString().c_str(), go->GetPositionX(), go->GetPositionY());
         delete go;
         return nullptr;
@@ -670,7 +670,7 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     m_stationaryPosition.Relocate(x, y, z, ang);
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
+        LOG_ERROR("entities.transport", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
         return false;
     }
 
