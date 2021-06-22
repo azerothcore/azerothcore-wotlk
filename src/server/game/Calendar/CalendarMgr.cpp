@@ -11,6 +11,7 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "QueryResult.h"
+#include <unordered_map>
 
 CalendarInvite::~CalendarInvite()
 {
