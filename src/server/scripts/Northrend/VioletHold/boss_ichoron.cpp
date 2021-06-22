@@ -193,8 +193,8 @@ public:
                             p1.m_positionY += 2.5f * sin(angle);
                             p2.m_positionX -= 2.5f * cos(angle);
                             p2.m_positionY -= 2.5f * sin(angle);
-                            DoSummon(NPC_ICHOR_GLOBULE, p1, 60s, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
-                            DoSummon(NPC_ICHOR_GLOBULE, p2, 60s, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
+                            DoSummon(NPC_ICHOR_GLOBULE, p1, 1min, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
+                            DoSummon(NPC_ICHOR_GLOBULE, p2, 1min, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN);
                         }
                     }
                 }
