@@ -23894,7 +23894,7 @@ void Player::LearnCustomSpells()
         else                                               // but send in normal spell in game learn case
         {
             learnSpell(tspell);
-        }                                         
+        }
     }
 }
 
