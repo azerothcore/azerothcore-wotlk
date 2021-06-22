@@ -129,7 +129,7 @@ public:
                     break;
                 case EVENT_SUMMON_TOTEMS:
                     for (uint8 i = 0; i < 3; ++i)
-                        DoSummon(NPC_TOTEM, TotemPos[i], 10 * 60 * 1000, TEMPSUMMON_TIMED_DESPAWN);
+                        DoSummon(NPC_TOTEM, TotemPos[i], 10min, TEMPSUMMON_TIMED_DESPAWN);
                     break;
                 case EVENT_INVOKER_SAY_1:
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, InvokerGUID))
@@ -172,7 +172,7 @@ public:
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, true);
                     me->CastSpell(me, SPELL_SELF_STUN, true);
-                    if (Creature* c = DoSummon(NPC_FROZEN_CORE, *me, 24000, TEMPSUMMON_TIMED_DESPAWN))
+                    if (Creature* c = DoSummon(NPC_FROZEN_CORE, *me, 24s, TEMPSUMMON_TIMED_DESPAWN))
                     {
                         c->SetHealth(me->GetHealth());
                     }
