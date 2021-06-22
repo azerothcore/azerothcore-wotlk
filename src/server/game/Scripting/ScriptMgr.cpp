@@ -90,7 +90,7 @@ ScriptMgr* ScriptMgr::instance()
 void ScriptMgr::Initialize()
 {
     AddScripts();
-    LOG_INFO("server", "Loading C++ scripts");
+    LOG_INFO("server.loading", "Loading C++ scripts");
 }
 
 void ScriptMgr::Unload()
@@ -168,8 +168,8 @@ void ScriptMgr::LoadDatabase()
 
     CheckIfScriptsInDatabaseExist();
 
-    LOG_INFO("server", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 struct TSpellSummary
@@ -1682,12 +1682,12 @@ void ScriptMgr::OnCriteriaProgress(Player* player, AchievementCriteriaEntry cons
     FOREACH_SCRIPT(PlayerScript)->OnCriteriaProgress(player, criteria);
 }
 
-void ScriptMgr::OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData)
+void ScriptMgr::OnAchievementSave(CharacterDatabaseTransaction trans, Player* player, uint16 achiId, CompletedAchievementData achiData)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAchiSave(trans, player, achiId, achiData);
 }
 
-void ScriptMgr::OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData)
+void ScriptMgr::OnCriteriaSave(CharacterDatabaseTransaction trans, Player* player, uint16 critId, CriteriaProgress criteriaData)
 {
     FOREACH_SCRIPT(PlayerScript)->OnCriteriaSave(trans, player, critId, criteriaData);
 }
@@ -1975,7 +1975,7 @@ void ScriptMgr::OnGroupDisband(Group* group)
 }
 
 // Global
-void ScriptMgr::OnGlobalItemDelFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid)
+void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
 {
     ASSERT(trans);
     ASSERT(itemGuid);
@@ -2364,7 +2364,7 @@ bool ScriptMgr::CanGiveMailRewardAtGiveLevel(Player* player, uint8 level)
     return ret;
 }
 
-void ScriptMgr::OnDeleteFromDB(SQLTransaction& trans, uint32 guid)
+void ScriptMgr::OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid)
 {
     FOREACH_SCRIPT(PlayerScript)->OnDeleteFromDB(trans, guid);
 }

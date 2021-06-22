@@ -417,7 +417,7 @@ public:
             }
             else
             {
-                LOG_ERROR("server", "Sending opcode that has unknown type '%s'", type.c_str());
+                LOG_ERROR("network.opcode", "Sending opcode that has unknown type '%s'", type.c_str());
                 break;
             }
         }
