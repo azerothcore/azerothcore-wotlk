@@ -24,6 +24,7 @@
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SignalHandler.h"
+#include "ScriptLoader.h"
 #include "Timer.h"
 #include "Util.h"
 #include "World.h"
@@ -32,6 +33,7 @@
 #include "WorldSocketMgr.h"
 #include "DatabaseLoader.h"
 #include "Optional.h"
+#include "MySQLThreading.h"
 #include "SecretMgr.h"
 #include "ProcessPriority.h"
 #include <ace/Sig_Handler.h>
@@ -145,6 +147,7 @@ int Master::Run()
 
     ///- Initialize the World
     sSecretMgr->Initialize();
+    sScriptMgr->SetScriptLoader(AddScripts);
     sWorld->SetInitialWorldSettings();
 
     sScriptMgr->OnStartup();
@@ -306,7 +309,7 @@ bool Master::_StartDB()
     MySQL::Library_Init();
 
     // Load databases
-    DatabaseLoader loader;
+    DatabaseLoader loader("server.worldserver");
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")

@@ -7,6 +7,7 @@
 #include "Common.h"
 #include "DBCStores.h"
 #include "GroupMgr.h"
+#include "Log.h"
 #include "InstanceSaveMgr.h"
 #include "World.h"
 
