@@ -7121,6 +7121,29 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100yd
     });
 
+    // ///////////////////////////////////////////
+    // ///////////OPERATION GNOMERGAN/////////////
+    // ///////////////////////////////////////////
+    ApplySpellFix({ 51590 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+    });
+
+    ApplySpellFix({ 51590 }, [](SpellEntry* spellInfo)
+    {
+        for (int8 i = 0; i < 3; ++i)
+            spellInfo->EffectImplicitTargetB[i] = TARGET_UNIT_TARGET_ANY;
+    });
+
+    ApplySpellFix({
+        75536, // Explosion (prevent error message in console)
+        71607, // Explosion (prevent error message in console)
+        71610  // Emergency Recall [Camera trigger]
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_TARGET_ANY;
+    });
+
     // Frigid Frostling, Infrigidate
     ApplySpellFix({ 74960 }, [](SpellEntry* spellInfo)
     {
