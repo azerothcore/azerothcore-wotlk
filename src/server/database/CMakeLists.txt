@@ -6,6 +6,7 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE_SOURCES
   # Exclude
+  ${CMAKE_CURRENT_SOURCE_DIR}/Updater
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
 if(USE_COREPCH)
@@ -42,10 +43,9 @@ target_include_directories(database
 target_link_libraries(database
   PRIVATE
     acore-core-interface
-    # mysql
+    mysql
   PUBLIC
-    common
-    mysql)
+    common)
 
 set_target_properties(database
   PROPERTIES

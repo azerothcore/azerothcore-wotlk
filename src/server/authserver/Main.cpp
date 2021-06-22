@@ -23,6 +23,8 @@
 #include "Log.h"
 #include "RealmAcceptor.h"
 #include "RealmList.h"
+#include "DatabaseLoader.h"
+#include "MySQLThreading.h"
 #include "SecretMgr.h"
 #include "SharedDefines.h"
 #include "SignalHandler.h"
@@ -211,7 +213,7 @@ bool StartDB()
     // Load databases
     // NOTE: While authserver is singlethreaded you should keep synch_threads == 1.
     // Increasing it is just silly since only 1 will be used ever.
-    DatabaseLoader loader;
+    DatabaseLoader loader("server.authserver");
     loader
         .AddDatabase(LoginDatabase, "Login");
 

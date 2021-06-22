@@ -839,10 +839,10 @@ public:
     virtual bool OnBeforeCriteriaProgress(Player* /*player*/, AchievementCriteriaEntry const* /*criteria*/) { return true; }
 
     // Called when an Achievement is saved to DB
-    virtual void OnAchiSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CompletedAchievementData /*achiData*/) { }
+    virtual void OnAchiSave(CharacterDatabaseTransaction /*trans*/, Player* /*player*/, uint16 /*achId*/, CompletedAchievementData /*achiData*/) { }
 
     // Called when an Criteria is saved to DB
-    virtual void OnCriteriaSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CriteriaProgress /*criteriaData*/) { }
+    virtual void OnCriteriaSave(CharacterDatabaseTransaction /*trans*/, Player* /*player*/, uint16 /*achId*/, CriteriaProgress /*criteriaData*/) { }
 
     // Called when a player selects an option in a player gossip window
     virtual void OnGossipSelect(Player* /*player*/, uint32 /*menu_id*/, uint32 /*sender*/, uint32 /*action*/) { }
@@ -947,7 +947,7 @@ public:
 
     [[nodiscard]] virtual bool CanGiveMailRewardAtGiveLevel(Player* /*player*/, uint8 /*level*/) { return true; }
 
-    virtual void OnDeleteFromDB(SQLTransaction& /*trans*/, uint32 /*guid*/) { }
+    virtual void OnDeleteFromDB(CharacterDatabaseTransaction /*trans*/, uint32 /*guid*/) { }
 
     [[nodiscard]] virtual bool CanRepopAtGraveyard(Player* /*player*/) { return true; }
 
@@ -1139,7 +1139,7 @@ protected:
 
 public:
     // items
-    virtual void OnItemDelFromDB(SQLTransaction& /*trans*/, ObjectGuid::LowType /*itemGuid*/) { }
+    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, ObjectGuid::LowType /*itemGuid*/) { }
     virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
 
     // loot
@@ -1615,8 +1615,8 @@ public: /* PlayerScript */
     bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
     void OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
     bool OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
-    void OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
-    void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
+    void OnAchievementSave(CharacterDatabaseTransaction trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
+    void OnCriteriaSave(CharacterDatabaseTransaction trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
     void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
     void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
     void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
@@ -1660,7 +1660,7 @@ public: /* PlayerScript */
     void PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
     void OnRewardKillRewarder(Player* player, bool isDungeon, float& rate);
     bool CanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
-    void OnDeleteFromDB(SQLTransaction& trans, uint32 guid);
+    void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
     bool CanRepopAtGraveyard(Player* player);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
     bool CanAreaExploreAndOutdoor(Player* player);
@@ -1740,7 +1740,7 @@ public: /* GroupScript */
     void OnCreate(Group* group, Player* leader);
 
 public: /* GlobalScript */
-    void OnGlobalItemDelFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
+    void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     void OnGlobalMirrorImageDisplayItem(const Item* item, uint32& display);
     void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap);
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);
