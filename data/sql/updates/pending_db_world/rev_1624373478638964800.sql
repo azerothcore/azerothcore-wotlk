@@ -2486,7 +2486,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (3683, 8460, 0, 'Bruiseweed - Ashenvale - subzone 3'),
 (3613, 8460, 0, 'Bruiseweed - Ashenvale - subzone 3'),
 (3576, 8460, 0, 'Bruiseweed - Ashenvale - subzone 3'),
-(3535, 8460, 0, 'Bruiseweed - Ashenvale - subzone 3'),
 (3534, 8460, 0, 'Bruiseweed - Ashenvale - subzone 3'),
 (3533, 8460, 0, 'Bruiseweed - Ashenvale - subzone 3'),
 (3530, 8460, 0, 'Bruiseweed - Ashenvale - subzone 3'),
@@ -3607,3 +3606,33 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (86277, 8777, 0, 'Bruiseweed - Stonetalon Mountains - subzone 6'),
 (86278, 8777, 0, 'Bruiseweed - Stonetalon Mountains - subzone 6'),
 (87254, 8777, 0, 'Bruiseweed - Stonetalon Mountains - subzone 6');
+
+-- Cleaning up the remaining database problems
+DELETE FROM `pool_gameobject` WHERE `guid`=3535
+OR `guid`=86931
+OR `guid`=2134983
+OR `guid`=2134991
+OR `guid`=2135047
+OR `guid`=2135097
+OR `guid`=2135105
+OR `guid`=2135119
+OR `guid`=2135145
+OR `guid`=2135154
+OR `guid`=2135155
+OR `guid`=2135169
+OR `guid`=2135172
+OR `guid`=2135173
+OR `guid`=2135181
+OR `guid`=2135199
+OR `guid`=2135212
+OR `guid`=2135213
+OR `guid`=2135218
+OR `guid`=2135232
+OR `guid`=2135237
+OR `guid`=2135241
+OR `guid`=2135253
+OR `guid`=3069
+OR `guid`=3307
+OR `guid`=3251;
+
+DELETE FROM `pool_gameobject` WHERE `description` LIKE '%bruiseweed%';
