@@ -512,7 +512,7 @@ void Vehicle::Dismiss()
 
     LOG_DEBUG("vehicles", "Vehicle::Dismiss %s", _me->GetGUID().ToString().c_str());
     Uninstall();
-    GetBase()->ToCreature()->DespawnOrUnsummon();
+    GetBase()->ToCreature()->DespawnOrUnsummon(0s);
 }
 
 bool Vehicle::IsVehicleInUse()

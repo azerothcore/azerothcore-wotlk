@@ -333,7 +333,7 @@ public:
 
                         for (uint8 i = 0; i < 2; ++i)
                             if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GUARD_1_GUID + i)))
-                                c->DespawnOrUnsummon();
+                                c->DespawnOrUnsummon(0s);
                     }
 
                     events.RescheduleEvent(2, 7000);

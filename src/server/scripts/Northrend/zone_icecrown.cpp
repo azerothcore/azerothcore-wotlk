@@ -1755,7 +1755,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Summons.DespawnAll();
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1968,7 +1968,7 @@ public:
                 case EVENT_ENDED:
                     {
                         Summons.DespawnAll();
-                        me->DespawnOrUnsummon();
+                        me->DespawnOrUnsummon(0s);
                     }
                     break;
             }

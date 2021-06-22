@@ -358,7 +358,7 @@ public:
         {
             if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ROTFACE)))
                 rotface->AI()->SummonedCreatureDespawn(me);
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -434,7 +434,7 @@ public:
         {
             if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ROTFACE)))
                 rotface->AI()->SummonedCreatureDespawn(me);
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void DoAction(int32 action) override
@@ -591,9 +591,9 @@ public:
             GetCaster()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
             GetHitCreature()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
             GetHitCreature()->CastSpell(GetCaster(), SPELL_OOZE_MERGE, true);
-            GetHitCreature()->DespawnOrUnsummon();
+            GetHitCreature()->DespawnOrUnsummon(0s);
             if (GetCaster()->ToCreature())
-                GetCaster()->ToCreature()->DespawnOrUnsummon();
+                GetCaster()->ToCreature()->DespawnOrUnsummon(0s);
         }
 
         void Register() override
@@ -671,7 +671,7 @@ public:
 
             GetHitCreature()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_BUFF_COMBINE);
             GetHitCreature()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_COMBINE);
-            GetHitCreature()->DespawnOrUnsummon();
+            GetHitCreature()->DespawnOrUnsummon(0s);
         }
 
         void Register() override
@@ -734,7 +734,7 @@ public:
             }
 
             GetHitCreature()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
-            GetHitCreature()->DespawnOrUnsummon();
+            GetHitCreature()->DespawnOrUnsummon(0s);
         }
 
         void Register() override
@@ -842,7 +842,7 @@ public:
 
             target->SetVisible(false);
             target->RemoveAllAuras();
-            //target->ToCreature()->DespawnOrUnsummon();
+            //target->ToCreature()->DespawnOrUnsummon(0s);
             target->ToCreature()->DespawnOrUnsummon(60000);
         }
 

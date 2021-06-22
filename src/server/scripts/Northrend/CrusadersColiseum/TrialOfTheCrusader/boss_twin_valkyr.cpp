@@ -696,7 +696,7 @@ public:
                 return;
 
             if( urand(0, 2) )
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
         }
 
         void MoveToNextPoint()

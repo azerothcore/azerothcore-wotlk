@@ -269,7 +269,7 @@ public:
                     if (Creature* pPortal = ObjectAccessor::GetCreature(*me, PortalGUID[i]))
                     {
                         CAST_AI(npc_fiendish_portal::npc_fiendish_portalAI, pPortal->AI())->DespawnAllImp();
-                        pPortal->DespawnOrUnsummon();
+                        pPortal->DespawnOrUnsummon(0s);
                     }
 
                     PortalGUID[i].Clear();
@@ -335,7 +335,7 @@ public:
                 if (PortalGUID[i])
                 {
                     if (Creature* pPortal = ObjectAccessor::GetCreature((*me), PortalGUID[i]))
-                        pPortal->DespawnOrUnsummon();
+                        pPortal->DespawnOrUnsummon(0s);
 
                     PortalGUID[i].Clear();
                 }

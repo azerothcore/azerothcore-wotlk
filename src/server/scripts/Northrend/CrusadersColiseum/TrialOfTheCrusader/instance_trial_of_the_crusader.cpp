@@ -843,10 +843,10 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
                             c->SetFacingTo(M_PI / 2);
                         if( Creature* c = instance->GetCreature(NPC_PurpleGroundGUID) )
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         NPC_PurpleGroundGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_PortalGUID) )
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         NPC_PortalGUID.Clear();
 
                         events.RescheduleEvent(EVENT_SCENE_106, 10000);
@@ -1309,7 +1309,7 @@ public:
                             c->SetVisible(false);
                             c->SetDisplayId(11686);
                             if( Creature* t = c->FindNearestCreature(NPC_WORLD_TRIGGER, 500.0f, true) )
-                                t->DespawnOrUnsummon();
+                                t->DespawnOrUnsummon(0s);
 
                             InstanceProgress = INSTANCE_PROGRESS_ANUB_ARAK;
                             SpawnAnubArak();
@@ -1324,7 +1324,7 @@ public:
                         {
                             c->SetVisible(true);
                             c->AI()->Talk(SAY_STAGE_4_05);
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         }
 
                         break;
@@ -1445,17 +1445,17 @@ public:
                     if( Creature* c = instance->GetCreature(NPC_GormokGUID) )
                     {
                         c->AI()->DoAction(-1); // despawn summons
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     }
                     NPC_GormokGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_AcidmawGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     NPC_AcidmawGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_DreadscaleGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     NPC_DreadscaleGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_IcehowlGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     NPC_IcehowlGUID.Clear();
                     northrendBeastsMask = 0;
                     break;
@@ -1463,21 +1463,21 @@ public:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                         c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     if( Creature* c = instance->GetCreature(NPC_FizzlebangGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     NPC_FizzlebangGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     NPC_JaraxxusGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_PurpleGroundGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     NPC_PurpleGroundGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_PortalGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     NPC_PortalGUID.Clear();
                     break;
                 case INSTANCE_PROGRESS_JARAXXUS_INTRO_DONE:
                     if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                     {
                         c->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -1495,7 +1495,7 @@ public:
                         c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     for (ObjectGuid guid : NPC_ChampionGUIDs)
                         if (Creature* c = instance->GetCreature(guid))
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                     NPC_ChampionGUIDs.clear();
                     break;
                 case INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD:
@@ -1504,13 +1504,13 @@ public:
                     if( Creature* c = instance->GetCreature(NPC_DarkbaneGUID) )
                     {
                         c->AI()->DoAction(-1);
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     }
                     NPC_DarkbaneGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_LightbaneGUID) )
                     {
                         c->AI()->DoAction(-1);
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     }
                     NPC_LightbaneGUID.Clear();
                     break;
@@ -1532,16 +1532,16 @@ public:
                             c->SetFacingTo(c->GetOrientation());
                         }
                         if (Creature* t = c->FindNearestCreature(NPC_WORLD_TRIGGER, 500.0f, true))
-                            t->DespawnOrUnsummon();
+                            t->DespawnOrUnsummon(0s);
                     }
                     if( Creature* c = instance->GetCreature(NPC_LichKingGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     NPC_LichKingGUID.Clear();
 
                     if( Creature* c = instance->GetCreature(NPC_AnubarakGUID) )
                     {
                         c->AI()->DoAction(-1);
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     }
                     NPC_AnubarakGUID.Clear();
 

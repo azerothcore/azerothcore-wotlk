@@ -357,7 +357,7 @@ public:
                                     Player* player = GetPlayerForEscort();
                                     if (!player || me->GetDistance(player) > 60.0f)
                                     {
-                                        me->DespawnOrUnsummon();
+                                        me->DespawnOrUnsummon(0s);
                                         return;
                                     }
 

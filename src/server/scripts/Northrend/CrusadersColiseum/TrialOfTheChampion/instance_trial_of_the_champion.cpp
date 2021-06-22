@@ -159,12 +159,12 @@ public:
                 case VEHICLE_ARGENT_BATTLEWORG:
                     if( InstanceProgress < INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED && m_auiEncounter[0] == NOT_STARTED )
                     {
-                        creature->DespawnOrUnsummon();
+                        creature->DespawnOrUnsummon(0s);
                         creature->SetRespawnTime(3);
                         VehicleList.push_back(creature->GetGUID());
                     }
                     else
-                        creature->DespawnOrUnsummon();
+                        creature->DespawnOrUnsummon(0s);
                     break;
             }
             if (creature->GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID))
@@ -282,7 +282,7 @@ public:
                         for (ObjectGuid const guid : VehicleList)
                             if (Creature* veh = instance->GetCreature(guid))
                             {
-                                veh->DespawnOrUnsummon();
+                                veh->DespawnOrUnsummon(0s);
                                 veh->SetRespawnTime(3);
                             }
                         for( uint8 i = 0; i < 3; ++i )
@@ -290,16 +290,16 @@ public:
                             for( uint8 j = 0; j < 3; ++j )
                             {
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[i][j]) )
-                                    c->DespawnOrUnsummon();
+                                    c->DespawnOrUnsummon(0s);
                                 NPC_GrandChampionMinionsGUID[i][j].Clear();
                             }
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
-                                c->DespawnOrUnsummon();
+                                c->DespawnOrUnsummon(0s);
                             NPC_GrandChampionGUID[i].Clear();
                         }
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                             c->SetHomePosition(748.309f, 619.488f, 411.172f, 4.71239f);
                             c->SetPosition(748.309f, 619.488f, 411.172f, 4.71239f);
                             c->SetRespawnTime(3);
@@ -312,7 +312,7 @@ public:
                     {
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
-                            announcer->DespawnOrUnsummon();
+                            announcer->DespawnOrUnsummon(0s);
                             announcer->SetHomePosition(735.81f, 661.92f, 412.39f, 4.714f);
                             announcer->SetPosition(735.81f, 661.92f, 412.39f, 4.714f);
                             announcer->SetRespawnTime(3);
@@ -322,7 +322,7 @@ public:
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                                 {
                                     uint32 entry = c->GetEntry();
-                                    c->DespawnOrUnsummon();
+                                    c->DespawnOrUnsummon(0s);
                                     switch( i )
                                     {
                                         case 0:
@@ -359,18 +359,18 @@ public:
                             for( uint8 j = 0; j < 3; ++j )
                             {
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
-                                    c->DespawnOrUnsummon();
+                                    c->DespawnOrUnsummon(0s);
                                 NPC_ArgentSoldierGUID[i][j].Clear();
                             }
                         if( Creature* c = instance->GetCreature(NPC_ArgentChampionGUID) )
                         {
                             c->AI()->DoAction(-1); // paletress despawn memory
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         }
                         NPC_ArgentChampionGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                             c->SetHomePosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetPosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetRespawnTime(3);
@@ -384,17 +384,17 @@ public:
                     // revert to INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED
                     {
                         if( Creature* c = instance->GetCreature(NPC_BlackKnightVehicleGUID) )
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         NPC_BlackKnightVehicleGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
                             c->AI()->DoAction(-1);
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         }
                         NPC_BlackKnightGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                             c->SetHomePosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetPosition(743.14f, 628.77f, 411.2f, 4.71239f);
                             c->SetRespawnTime(3);
@@ -405,7 +405,7 @@ public:
                     break;
                 case INSTANCE_PROGRESS_FINISHED:
                     if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                     break;
             }
 
@@ -569,7 +569,7 @@ public:
                                 InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED;
                                 for (ObjectGuid const guid : VehicleList)
                                     if (Creature* veh = instance->GetCreature(guid))
-                                        veh->DespawnOrUnsummon();
+                                        veh->DespawnOrUnsummon(0s);
                                 events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOVE_SIDE, 0);
                             }
                             break;

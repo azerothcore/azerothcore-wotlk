@@ -708,7 +708,7 @@ public:
                     fire->SetOwnerGUID(ObjectGuid::Empty);
                     fire->Delete();
                 }
-                me->DespawnOrUnsummon(); // this will remove DynObjects
+                me->DespawnOrUnsummon(0s); // this will remove DynObjects
             }
         }
 
@@ -1339,7 +1339,7 @@ public:
                 {
                     if (Unit* caster = aur->GetCaster())
                         if (caster->GetTypeId() == TYPEID_UNIT)
-                            caster->ToCreature()->DespawnOrUnsummon();
+                            caster->ToCreature()->DespawnOrUnsummon(0s);
                     target->CastSpell(target, SPELL_FLASH_FREEZE_INSTAKILL, true);
                     return;
                 }

@@ -81,7 +81,7 @@ void SmartAI::UpdateDespawn(const uint32 diff)
             mDespawnState++;
         }
         else
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
     }
     else
         mDespawnTime -= diff;

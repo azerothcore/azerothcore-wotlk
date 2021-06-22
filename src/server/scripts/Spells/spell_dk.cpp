@@ -261,7 +261,7 @@ public:
         {
             if (Unit* charm = GetUnitOwner()->GetCharm())
                 if (GetSpellInfo()->Effects[EFFECT_0].MiscValue >= 0 && charm->GetEntry() == uint32(GetSpellInfo()->Effects[EFFECT_0].MiscValue))
-                    charm->ToCreature()->DespawnOrUnsummon();
+                    charm->ToCreature()->DespawnOrUnsummon(0s);
         }
 
         void Register() override

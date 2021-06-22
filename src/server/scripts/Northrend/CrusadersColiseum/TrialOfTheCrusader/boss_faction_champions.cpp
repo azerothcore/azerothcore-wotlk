@@ -2357,7 +2357,7 @@ public:
 
         void EnterEvadeMode() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
     };
 };
@@ -2424,7 +2424,7 @@ public:
 
         void EnterEvadeMode() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
     };
 };

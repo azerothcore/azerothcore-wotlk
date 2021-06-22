@@ -275,7 +275,7 @@ public:
                     if (TalkCount > 3)
                     {
                         if (Creature* pSpotlight = ObjectAccessor::GetCreature(*me, m_uiSpotlightGUID))
-                            pSpotlight->DespawnOrUnsummon();
+                            pSpotlight->DespawnOrUnsummon(0s);
 
                         SetEscortPaused(false);
                         return;
@@ -455,7 +455,7 @@ public:
                 Creature* Arcanagos = me->SummonCreature(NPC_ARCANAGOS, ArcanagosPos[0], ArcanagosPos[1], ArcanagosPos[2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 if (!Arcanagos)
                 {
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                     return;
                 }
 
@@ -469,7 +469,7 @@ public:
                 Arcanagos->SetCanFly(true);
             }
             else
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
         }
 
         void EnterCombat(Unit* /*who*/) override {}

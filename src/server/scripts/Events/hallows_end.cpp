@@ -1233,7 +1233,7 @@ public:
                 if (Unit* owner = GetOwner())
                     owner->ToCreature()->AI()->DoAction(me->GetHealth());
 
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             }
         }
 
@@ -1288,7 +1288,7 @@ public:
                     Unit::Kill(me, owner);
                 }
                 damage = 0;
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
                 return;
             }
 
@@ -1374,7 +1374,7 @@ public:
                 if (Creature* cr = me->SummonCreature(NPC_PUMPKIN_FIEND, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
                     cr->SetInCombatWithZone();
 
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             }
         }
 

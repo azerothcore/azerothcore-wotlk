@@ -55,14 +55,14 @@ public:
             instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = instance->GetCreature(_medivhGUID))
             {
-                medivh->DespawnOrUnsummon();
+                medivh->DespawnOrUnsummon(0s);
                 medivh->SetRespawnTime(3);
             }
 
             GuidSet eCopy = encounterNPCs;
             for (ObjectGuid const guid : eCopy)
                 if (Creature* creature = instance->GetCreature(guid))
-                    creature->DespawnOrUnsummon();
+                    creature->DespawnOrUnsummon(0s);
         }
 
         bool IsEncounterInProgress() const override
@@ -186,7 +186,7 @@ public:
                                 GuidSet eCopy = encounterNPCs;
                                 for (ObjectGuid guid : eCopy)
                                     if (Creature* creature = instance->GetCreature(guid))
-                                        creature->DespawnOrUnsummon();
+                                        creature->DespawnOrUnsummon(0s);
                             }
                     break;
             }

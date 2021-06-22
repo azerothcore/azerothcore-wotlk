@@ -357,7 +357,7 @@ public:
                             if (instance)
                                 instance->SetData(DATA_RIFT_KILLED, 1);
 
-                            me->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon(0s);
                             break;
                         }
                         else

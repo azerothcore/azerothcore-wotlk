@@ -758,7 +758,7 @@ public:
                 {
                     // Remove object
                     JustDied(me);
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                     return;
                 }
                 _existenceCheckTimer = 1000;

@@ -182,11 +182,11 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_DalronnGhostGUID) )
                         {
                             c->AI()->DoAction(-1);
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         }
                         NPC_DalronnGhostGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         NPC_SkarvaldGhostGUID.Clear();
                     }
                     if (data == DONE)
@@ -194,11 +194,11 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_DalronnGhostGUID) )
                         {
                             c->AI()->DoAction(-1);
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         }
                         NPC_DalronnGhostGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         NPC_SkarvaldGhostGUID.Clear();
                     }
 

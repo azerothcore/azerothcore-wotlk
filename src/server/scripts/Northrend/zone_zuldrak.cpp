@@ -674,7 +674,7 @@ public:
                     {
                         UnlockRageclaw(caster, rageclaw);
                         caster->ToPlayer()->KilledMonster(rageclaw->GetCreatureTemplate(), _rageclawGUID);
-                        me->DespawnOrUnsummon();
+                        me->DespawnOrUnsummon(0s);
                     }
                     else
                         me->setDeathState(JUST_DIED);
@@ -766,7 +766,7 @@ public:
         {
             if (Type != POINT_MOTION_TYPE)
                 return;
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
     };
 
@@ -883,7 +883,7 @@ public:
             {
                 player->KilledMonsterCredit(gymerDummy->GetEntry(), gymerDummy->GetGUID());
                 gymerDummy->CastSpell(gymerDummy, SPELL_GYMER_LOCK_EXPLOSION, true);
-                gymerDummy->DespawnOrUnsummon();
+                gymerDummy->DespawnOrUnsummon(0s);
             }
         }
         return true;

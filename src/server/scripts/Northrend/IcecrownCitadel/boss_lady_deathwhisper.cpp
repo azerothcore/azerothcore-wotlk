@@ -235,7 +235,7 @@ public:
         void Reset() override
         {
             if (Creature* darnavan = ObjectAccessor::GetCreature(*me, _darnavanGUID))
-                darnavan->DespawnOrUnsummon();
+                darnavan->DespawnOrUnsummon(0s);
             _darnavanGUID.Clear();
             _waveCounter = 0;
             _Reset();
@@ -1025,7 +1025,7 @@ public:
             if (type != POINT_MOTION_TYPE || id != POINT_DESPAWN)
                 return;
 
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void EnterCombat(Unit* /*victim*/) override

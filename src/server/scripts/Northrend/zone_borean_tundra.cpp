@@ -240,7 +240,7 @@ public:
                     if (owner->GetTypeId() == TYPEID_PLAYER)
                     {
                         owner->CastSpell(owner, SPELL_MAMMOTH_CALF_ESCORT_CREDIT, true);
-                        who->ToCreature()->DespawnOrUnsummon();
+                        who->ToCreature()->DespawnOrUnsummon(0s);
                     }
                 }
             }
@@ -502,7 +502,7 @@ public:
                             break;
 
                         case 7:
-                            me->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon(0s);
                             IntroPhase = 0;
                             IntroTimer = 0;
                             break;

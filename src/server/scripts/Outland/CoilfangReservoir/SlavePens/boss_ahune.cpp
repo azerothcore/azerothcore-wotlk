@@ -359,7 +359,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
     };
 };

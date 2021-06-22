@@ -375,7 +375,7 @@ public:
                     if (_summonGUID.GetEntry() != newEntry)
                     {
                         if (Creature* image = ObjectAccessor::GetCreature(*me, _summonGUID))
-                            image->DespawnOrUnsummon();
+                            image->DespawnOrUnsummon(0s);
 
                         float z = 653.622f;
                         if (newEntry == NPC_MALYGOS_IMAGE || newEntry == NPC_RAZORSCALE_IMAGE || newEntry == NPC_SARTHARION_IMAGE)
@@ -587,7 +587,7 @@ public:
                         DoCast(me, SPELL_TELEPORT_VISUAL);
                         break;
                     case EVENT_DESPAWN:
-                        me->DespawnOrUnsummon();
+                        me->DespawnOrUnsummon(0s);
                         break;
                     default:
                         break;

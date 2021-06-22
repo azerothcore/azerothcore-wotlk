@@ -204,7 +204,7 @@ public:
                         if (Creature* c = instance->GetCreature(NPC_MartinOrGorkunGUID))
                         {
                             c->AI()->DoAction(1); // despawn summons
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                         }
                     if (teamIdInInstance == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_MARTIN_VICTUS_2);
@@ -218,7 +218,7 @@ public:
                 case NPC_TYRANNUS:
                     if (NPC_TyrannusGUID)
                         if (Creature* c = instance->GetCreature(NPC_TyrannusGUID))
-                            c->DespawnOrUnsummon();
+                            c->DespawnOrUnsummon(0s);
                     NPC_TyrannusGUID = creature->GetGUID();
 
                     if (m_auiEncounter[2] == DONE)

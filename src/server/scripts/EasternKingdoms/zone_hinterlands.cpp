@@ -292,7 +292,7 @@ public:
                         }
                         else
                         {
-                            me->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon(0s);
                             return;
                         }
                     }

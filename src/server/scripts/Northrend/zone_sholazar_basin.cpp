@@ -1119,7 +1119,7 @@ public:
             player->CastSpell(player, spellId, true);
 
         creature->AI()->Talk(SAY_DWARF_HELP);
-        creature->DespawnOrUnsummon();
+        creature->DespawnOrUnsummon(0s);
         return true;
     }
 };
@@ -1309,7 +1309,7 @@ public:
                         wilhelm->AI()->Talk(SAY_WILHELM_HIT);
                         if (Player* player = shooter->ToPlayer())
                             player->KilledMonsterCredit(NPC_APPLE);
-                        //apple->DespawnOrUnsummon(); zomg!
+                        //apple->DespawnOrUnsummon(0s); zomg!
 
                         break;
                     }
@@ -1431,7 +1431,7 @@ public:
                 if (passenger && passenger->GetTypeId() == TYPEID_PLAYER)
                     passenger->CastSpell(passenger, SPELL_CREDIT, true);
 
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             }
         }
     };

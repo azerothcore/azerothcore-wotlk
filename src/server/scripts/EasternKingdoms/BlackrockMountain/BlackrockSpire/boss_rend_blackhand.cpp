@@ -201,7 +201,7 @@ public:
             if (summon->GetEntry() == NPC_GYTH)
             {
                 summon->AI()->SetData(1, 1);
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
                 return;
             }
 

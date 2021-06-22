@@ -86,7 +86,7 @@ public:
             // we mustn't remove the Creature in the same round in which we cast the summon spell, otherwise there will be no summons
             if (spellhit && morphtimer >= 5000)
             {
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
                 return;
             }
             // walk 5 seconds before summoning
@@ -259,7 +259,7 @@ public:
 
             if (id == 57)
             {
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
                 return;
             }
 
@@ -273,7 +273,7 @@ public:
             {
                 if (MustDieTimer <= diff)
                 {
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                     return;
                 }
                 else MustDieTimer -= diff;
@@ -337,7 +337,7 @@ public:
                 Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
                 if (!player)
                 {
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                     return;
                 }
 
@@ -433,7 +433,7 @@ public:
             if (WeMustDie)
             {
                 if (WeMustDieTimer <= diff)
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                 else
                     WeMustDieTimer -= diff;
             }

@@ -3442,7 +3442,7 @@ public:
                 if (target->isDead() && !target->IsPet())
                 {
                     GetCaster()->SummonGameObject(OBJECT_IMPRISONED_DOOMGUARD, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0, 0, 0, 0, uint32(target->GetRespawnTime() - time(nullptr)));
-                    target->DespawnOrUnsummon();
+                    target->DespawnOrUnsummon(0s);
                 }
         }
 
@@ -3745,7 +3745,7 @@ public:
             Unit* caster = GetCaster();
             if (GetHitCreature())
             {
-                GetHitCreature()->DespawnOrUnsummon();
+                GetHitCreature()->DespawnOrUnsummon(0s);
 
                 //cast spell Raptor Capture Credit
                 caster->CastSpell(caster, SPELL_RAPTOR_CAPTURE_CREDIT, true, nullptr);
@@ -4207,7 +4207,7 @@ public:
         {
             if (Creature* target = GetHitCreature())
                 if (target->isDead())
-                    target->DespawnOrUnsummon();
+                    target->DespawnOrUnsummon(0s);
         }
 
         void Register() override

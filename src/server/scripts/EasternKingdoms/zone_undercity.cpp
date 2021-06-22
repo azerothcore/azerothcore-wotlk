@@ -1040,31 +1040,31 @@ public:
 
                 if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
                 {
-                    putress->DespawnOrUnsummon();
+                    putress->DespawnOrUnsummon(0s);
                     putressGUID.Clear();
                 }
 
                 if (Creature* blightWorm = ObjectAccessor::GetCreature(*me, blightWormGUID))
                 {
-                    blightWorm->DespawnOrUnsummon();
+                    blightWorm->DespawnOrUnsummon(0s);
                     blightWormGUID.Clear();
                 }
 
                 if (Creature* khanok = ObjectAccessor::GetCreature(*me, khanokGUID))
                 {
-                    khanok->DespawnOrUnsummon();
+                    khanok->DespawnOrUnsummon(0s);
                     khanokGUID.Clear();
                 }
 
                 if (Creature* thrall = ObjectAccessor::GetCreature(*me, thrallGUID))
                 {
-                    thrall->DespawnOrUnsummon();
+                    thrall->DespawnOrUnsummon(0s);
                     thrallGUID.Clear();
                 }
 
                 if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasGUID))
                 {
-                    sylvanas->DespawnOrUnsummon();
+                    sylvanas->DespawnOrUnsummon(0s);
                     sylvanasGUID.Clear();
                 }
 
@@ -1073,7 +1073,7 @@ public:
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, generatorGUID[i]))
                     {
                         generatorGUID[i].Clear();
-                        temp->DespawnOrUnsummon();
+                        temp->DespawnOrUnsummon(0s);
                     }
                 }
 
@@ -1082,13 +1082,13 @@ public:
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, allianceForcesGUID[i]))
                     {
                         allianceForcesGUID[i].Clear();
-                        temp->DespawnOrUnsummon();
+                        temp->DespawnOrUnsummon(0s);
                     }
                 }
 
                 for (ObjectGuid const guid : allianceGuardsGUID)
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
-                        temp->DespawnOrUnsummon();
+                        temp->DespawnOrUnsummon(0s);
 
                 allianceGuardsGUID.clear();
 
@@ -1097,7 +1097,7 @@ public:
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, hordeForcesGUID[i]))
                     {
                         hordeForcesGUID[i].Clear();
-                        temp->DespawnOrUnsummon();
+                        temp->DespawnOrUnsummon(0s);
                     }
                 }
             }
@@ -1995,7 +1995,7 @@ public:
                             me->GetCreatureListWithEntryInGrid(HelperList, NPC_THRALL, 100.0f);
                             if (!HelperList.empty())
                                 for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                    (*itr)->DespawnOrUnsummon();
+                                    (*itr)->DespawnOrUnsummon(0s);
                             if (Map* map = me->GetMap())
                             {
                                 Map::PlayerList const& PlayerList = map->GetPlayers();
@@ -2019,7 +2019,7 @@ public:
                             UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 0);
                             UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_DONE_A, 0);
                             UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_DONE_A, 0);
-                            me->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon(0s);
                             break;
                     }
                 }
@@ -2387,37 +2387,37 @@ public:
 
                 if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
                 {
-                    valimathras->DespawnOrUnsummon();
+                    valimathras->DespawnOrUnsummon(0s);
                     ValimathrasGUID.Clear();
                 }
 
                 if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
                 {
-                    valimathrasportal->DespawnOrUnsummon();
+                    valimathrasportal->DespawnOrUnsummon(0s);
                     ValimathrasPortalGUID.Clear();
                 }
 
                 if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
                 {
-                    wrynn->DespawnOrUnsummon();
+                    wrynn->DespawnOrUnsummon(0s);
                     WrynnGUID.Clear();
                 }
 
                 if (Creature* jaina = ObjectAccessor::GetCreature(*me, JainaGUID))
                 {
-                    jaina->DespawnOrUnsummon();
+                    jaina->DespawnOrUnsummon(0s);
                     JainaGUID.Clear();
                 }
 
                 if (Creature* saurfang = ObjectAccessor::GetCreature(*me, SaurfangGUID))
                 {
-                    saurfang->DespawnOrUnsummon();
+                    saurfang->DespawnOrUnsummon(0s);
                     SaurfangGUID.Clear();
                 }
 
                 for (ObjectGuid const guid : hordeGuardsGUID)
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
-                        temp->DespawnOrUnsummon();
+                        temp->DespawnOrUnsummon(0s);
 
                 hordeGuardsGUID.clear();
             }
@@ -2501,7 +2501,7 @@ public:
                         me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DOOMGUARD_PILLARGER, 1000.0f);
                         if (!SanktumList.empty())
                             for (std::list<Creature*>::iterator itr = SanktumList.begin(); itr != SanktumList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon();
+                                (*itr)->DespawnOrUnsummon(0s);
                         break;
                     }
                 case NPC_VARIMATHRAS:
@@ -2515,7 +2515,7 @@ public:
                         me->GetCreatureListWithEntryInGrid(ThroneList, NPC_VARIMATHRAS_PORTAL, 1000.0f);
                         if (!ThroneList.empty())
                             for (std::list<Creature*>::iterator itr = ThroneList.begin(); itr != ThroneList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon();
+                                (*itr)->DespawnOrUnsummon(0s);
                         SetEscortPaused(false);
                         SetRun(false);
                         break;
@@ -2567,7 +2567,7 @@ public:
             if (Creature* portal = me->FindNearestCreature(NPC_VARIMATHRAS_PORTAL, 500.0f))
             {
                 portal->SummonCreature(NPC_LEGION_OVERLORD, ThrallSpawn[81].x + rand32() % 5, ThrallSpawn[81].y + rand32() % 5, ThrallSpawn[81].z, TEMPSUMMON_DEAD_DESPAWN);
-                portal->DespawnOrUnsummon();
+                portal->DespawnOrUnsummon(0s);
             }
         }
 
@@ -3041,7 +3041,7 @@ public:
                                 me->GetCreatureListWithEntryInGrid(PlagueList, NPC_PLAGUE_TRIGGER, 50.0f);
                                 if (!PlagueList.empty())
                                     for (std::list<Creature*>::iterator itr = PlagueList.begin(); itr != PlagueList.end(); itr++)
-                                        (*itr)->DespawnOrUnsummon();
+                                        (*itr)->DespawnOrUnsummon(0s);
                                 SetEscortPaused(false);
                                 SetRun(false);
                                 if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
@@ -3106,7 +3106,7 @@ public:
                                 me->GetCreatureListWithEntryInGrid(HelperList, NPC_SLINGER_TRIGGER, 1000.0f);
                                 if (!HelperList.empty())
                                     for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                        (*itr)->DespawnOrUnsummon();
+                                        (*itr)->DespawnOrUnsummon(0s);
                                 JumpToNextStep(5 * IN_MILLISECONDS);
                                 break;
                             }
@@ -3216,7 +3216,7 @@ public:
                                 me->GetCreatureListWithEntryInGrid(HostileList, NPC_BLIGHT_SLINGER, 1000.0f);
                                 if (!HostileList.empty())
                                     for (std::list<Creature*>::iterator itr = HostileList.begin(); itr != HostileList.end(); itr++)
-                                        (*itr)->DespawnOrUnsummon();
+                                        (*itr)->DespawnOrUnsummon(0s);
                                 for (uint8 i = 0; i < 7; ++i)
                                     me->SummonGameObject(GO_HORDE_BANNER, ThrallSpawn[i + 37].x, ThrallSpawn[i + 37].y, ThrallSpawn[i + 37].z, ThrallSpawn[i + 37].o, 0.0f, 0.0f, 0.0f, 0.0f, 120 * IN_MILLISECONDS);
                                 SpawnWave(6);
@@ -3827,7 +3827,7 @@ public:
                                 me->GetCreatureListWithEntryInGrid(HelperList, NPC_WRYNN, 100.0f);
                                 if (!HelperList.empty())
                                     for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                        (*itr)->DespawnOrUnsummon();
+                                        (*itr)->DespawnOrUnsummon(0s);
                                 JumpToNextStep(8 * IN_MILLISECONDS);
                                 break;
                             }

@@ -71,7 +71,7 @@ public:
                 if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
                 {
                     c->AI()->DoAction(1);
-                    c->DespawnOrUnsummon();
+                    c->DespawnOrUnsummon(0s);
                     pInstance->SetGuidData(DATA_MARTIN_OR_GORKUN_GUID, ObjectGuid::Empty);
                 }
                 if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))

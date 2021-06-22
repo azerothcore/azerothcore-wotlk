@@ -102,7 +102,7 @@ public:
         void DespawnOachanoa()
         {
             if (Creature* c = ObjectAccessor::GetCreature(*me, oachanoaGUID))
-                c->DespawnOrUnsummon();
+                c->DespawnOrUnsummon(0s);
         }
 
         void UpdateAI(uint32 diff) override

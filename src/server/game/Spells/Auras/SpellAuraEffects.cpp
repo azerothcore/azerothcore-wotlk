@@ -5941,7 +5941,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
 
                                     player->AutoStoreLoot(creature->GetCreatureTemplate()->SkinLootId, LootTemplates_Skinning, true);
 
-                                    creature->DespawnOrUnsummon();
+                                    creature->DespawnOrUnsummon(0s);
                                 }
                                 return;
                             }
@@ -5979,7 +5979,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
 
                                 Creature* creatureTarget = target->ToCreature();
 
-                                creatureTarget->DespawnOrUnsummon();
+                                creatureTarget->DespawnOrUnsummon(0s);
                                 return;
                             }
                         // Tear of Azzinoth Summon Channel - it's not really supposed to do anything, and this only prevents the console spam

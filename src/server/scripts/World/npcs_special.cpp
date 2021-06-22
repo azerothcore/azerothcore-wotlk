@@ -126,7 +126,7 @@ public:
                             // no one won - despawn
                             if (!finished)
                             {
-                                me->DespawnOrUnsummon();
+                                me->DespawnOrUnsummon(0s);
                                 break;
                             }
                         }
@@ -264,7 +264,7 @@ public:
                             // no one won - despawn
                             if (!finished)
                             {
-                                me->DespawnOrUnsummon();
+                                me->DespawnOrUnsummon(0s);
                                 break;
                             }
                         }

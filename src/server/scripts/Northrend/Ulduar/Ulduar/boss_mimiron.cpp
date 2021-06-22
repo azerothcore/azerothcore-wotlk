@@ -811,7 +811,7 @@ public:
                     if( pInstance )
                         pInstance->SetData(TYPE_MIMIRON, DONE);
                     summons.DespawnAll();
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                     break;
             }
         }
@@ -831,12 +831,12 @@ public:
             if (Creature* c = GetVX001())
             {
                 c->AI()->EnterEvadeMode();
-                c->DespawnOrUnsummon();
+                c->DespawnOrUnsummon(0s);
             }
             if (Creature* c = GetACU())
             {
                 c->AI()->EnterEvadeMode();
-                c->DespawnOrUnsummon();
+                c->DespawnOrUnsummon(0s);
             }
 
             summons.DoAction(1337); // despawn summons of summons
@@ -2323,9 +2323,9 @@ public:
         {
             for (ObjectGuid guid : FlameList)
                 if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
-                    c->DespawnOrUnsummon();
+                    c->DespawnOrUnsummon(0s);
             FlameList.clear();
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -2347,7 +2347,7 @@ public:
                     {
                         if( FlameList.empty() )
                         {
-                            me->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon(0s);
                             return;
                         }
 

@@ -571,7 +571,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                         }
                         else
                         {
-                            creature->DespawnOrUnsummon();
+                            creature->DespawnOrUnsummon(0s);
                             return;
                         }
                     }
@@ -586,7 +586,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                         }
                         else
                         {
-                            creature->DespawnOrUnsummon();
+                            creature->DespawnOrUnsummon(0s);
                             return;
                         }
                     }

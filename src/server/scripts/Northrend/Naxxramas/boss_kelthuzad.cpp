@@ -614,7 +614,7 @@ public:
         {
             if (me->GetEntry() == NPC_GUARDIAN_OF_ICECROWN)
             {
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             }
         }
 

@@ -640,8 +640,8 @@ public:
                         break;
                     case POINT_FINAL:
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
-                            deathbringer->DespawnOrUnsummon();
-                        me->DespawnOrUnsummon();
+                            deathbringer->DespawnOrUnsummon(0s);
+                        me->DespawnOrUnsummon(0s);
                         break;*/
                     default:
                         break;

@@ -231,12 +231,12 @@ public:
             case NPC_MANA_VOID:
             case NPC_COLUMN_OF_FROST:
             case NPC_ROT_WORM:
-                creature->DespawnOrUnsummon();
+                creature->DespawnOrUnsummon(0s);
                 return;
             case NPC_RISEN_ARCHMAGE:
                 if (!creature->GetSpawnId())
                 {
-                    creature->DespawnOrUnsummon();
+                    creature->DespawnOrUnsummon(0s);
                     return;
                 }
                 break;
@@ -257,7 +257,7 @@ public:
             creature->SetRespawnTime(11);
         }
         else
-            creature->DespawnOrUnsummon();
+            creature->DespawnOrUnsummon(0s);
 
         creature->SetCorpseDelay(corpseDelay);
         creature->SetRespawnDelay(respawnDelay);
@@ -798,7 +798,7 @@ public:
                 return;
 
             _used = true;
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         uint32 GetData(uint32 type) const override

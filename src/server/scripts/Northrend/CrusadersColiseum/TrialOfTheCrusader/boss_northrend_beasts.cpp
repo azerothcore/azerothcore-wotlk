@@ -207,7 +207,7 @@ public:
         void DoAction(int32 param) override
         {
             if( param == 1 && !TargetGUID )
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
         }
     };
 };
@@ -355,7 +355,7 @@ public:
                                             break;
                                         }
                                     if( needDespawn )
-                                        snobold->ToCreature()->DespawnOrUnsummon();
+                                        snobold->ToCreature()->DespawnOrUnsummon(0s);
                                 }
                         }
                         PlayerGUID.Clear();

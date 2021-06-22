@@ -81,7 +81,7 @@ public:
                     {
                         for (ObjectGuid guid : minions)
                             if (Creature* c = instance->GetCreature(guid))
-                                c->DespawnOrUnsummon();
+                                c->DespawnOrUnsummon(0s);
                         minions.clear();
                     }
                     break;

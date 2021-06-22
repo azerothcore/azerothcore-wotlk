@@ -344,7 +344,7 @@ public:
                     return 0;
                 default:
                     if(mograine)
-                        mograine->DespawnOrUnsummon();
+                        mograine->DespawnOrUnsummon(0s);
                     return 0;
             }
         }

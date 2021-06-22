@@ -467,7 +467,7 @@ public:
                 std::list<Creature*> constructList;
                 me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
                 for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
-                    (*itr)->DespawnOrUnsummon();
+                    (*itr)->DespawnOrUnsummon(0s);
             }
             else
             {

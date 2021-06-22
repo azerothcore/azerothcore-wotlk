@@ -1719,7 +1719,7 @@ public:
                         else
                             me->AddAura(SPELL_BUBBLE_BUILD_UP, me);
 
-                        target->ToCreature()->DespawnOrUnsummon();
+                        target->ToCreature()->DespawnOrUnsummon(0s);
                         DoAction(0);
                     }
                     else if (Aura* aura = target->GetAura(SPELL_BUBBLE_BUILD_UP))
@@ -1727,7 +1727,7 @@ public:
                         aura->ModStackAmount(stacksMe);
 
                         target->ToCreature()->AI()->DoAction(0);
-                        me->DespawnOrUnsummon();
+                        me->DespawnOrUnsummon(0s);
                     }
                 }
         }
@@ -1738,7 +1738,7 @@ public:
             if (timer >= 25000)
             {
                 timer = 0;
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             }
         }
     };

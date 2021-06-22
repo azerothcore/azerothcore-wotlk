@@ -328,7 +328,7 @@ public:
                         {
                             if (pIchoron->AI())
                                 pIchoron->AI()->DoAction(ACTION_WATER_ELEMENT_HIT);
-                            me->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon(0s);
                         }
                 uiRangeCheck_Timer = 1000;
             }

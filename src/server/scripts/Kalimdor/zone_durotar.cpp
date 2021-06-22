@@ -175,7 +175,7 @@ public:
                 vehSummoner->RemoveAurasDueToSpell(SPELL_SPIRIT_OF_THE_TIGER_RIDER);
                 vehSummoner->RemoveAurasDueToSpell(SPELL_SUMMON_ZENTABRA_TRIGGER);
             }
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -198,7 +198,7 @@ public:
                     vehSummoner->RemoveAurasDueToSpell(SPELL_SUMMON_ZENTABRA_TRIGGER);
                 }
 
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             }
         }
 
@@ -316,7 +316,7 @@ public:
             if (type != POINT_MOTION_TYPE)
                 return;
             if (id == POINT_URUZIN)
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override

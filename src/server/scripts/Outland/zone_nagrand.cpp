@@ -344,7 +344,7 @@ public:
             {
                 if (Say_Timer <= diff)
                 {
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                     ReleasedFromCage = false;
                 }
                 else
