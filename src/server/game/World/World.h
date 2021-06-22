@@ -11,8 +11,6 @@
 #ifndef __WORLD_H
 #define __WORLD_H
 
-#include "Callback.h"
-#include "Common.h"
 #include "IWorld.h"
 #include "LockedQueue.h"
 #include "ObjectGuid.h"
@@ -337,14 +335,7 @@ public:
     static float GetMaxVisibleDistanceInBGArenas()      { return m_MaxVisibleDistanceInBGArenas;   }
 
     // our: needed for arena spectator subscriptions
-    uint32 GetNextWhoListUpdateDelaySecs()
-    {
-        if (m_timers[WUPDATE_5_SECS].Passed())
-            return 1;
-        uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
-        t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
-        return uint32(ceil(t / 1000.0f));
-    }
+    uint32 GetNextWhoListUpdateDelaySecs();
 
     // xinef: Global Player Data Storage system
     void LoadGlobalPlayerDataStore();
@@ -493,7 +484,7 @@ private:
     AutobroadcastsWeightMap m_AutobroadcastsWeights;
 
     void ProcessQueryCallbacks();
-    ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
+    QueryCallbackProcessor _queryProcessor;
 };
 
 std::unique_ptr<IWorld>& getWorldInstance();
