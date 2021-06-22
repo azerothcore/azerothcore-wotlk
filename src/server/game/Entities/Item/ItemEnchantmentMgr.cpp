@@ -58,13 +58,13 @@ void LoadRandomEnchantmentsTable()
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server", ">> Loaded %u Item Enchantment definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded %u Item Enchantment definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", " ");
     }
     else
     {
         LOG_ERROR("sql.sql", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", " ");
     }
 }
 
