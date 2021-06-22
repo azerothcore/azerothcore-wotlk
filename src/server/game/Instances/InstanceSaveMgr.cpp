@@ -117,7 +117,7 @@ bool InstanceSaveManager::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool sk
 
         // delete save from db:
         // character_instance is deleted when unbinding a certain player
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
         stmt->setUInt32(0, save->GetInstanceId());
         CharacterDatabase.Execute(stmt);
 
@@ -163,7 +163,7 @@ void InstanceSave::InsertToDB()
         }
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_INSTANCE_SAVE);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_INSTANCE_SAVE);
     stmt->setUInt32(0, m_instanceid);
     stmt->setUInt16(1, GetMapId());
     stmt->setUInt32(2, uint32(GetResetTimeForDB()));
@@ -377,7 +377,7 @@ void InstanceSaveManager::LoadCharacterBinds()
                 {
                     if (bind.perm) // already loaded perm -> delete currently checked one from db
                     {
-                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+                        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
                         stmt->setUInt32(0, guid.GetCounter());
                         stmt->setUInt32(1, instanceId);
                         CharacterDatabase.Execute(stmt);
@@ -385,7 +385,7 @@ void InstanceSaveManager::LoadCharacterBinds()
                     }
                     else // override temp bind by newest one
                     {
-                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+                        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
                         stmt->setUInt32(0, guid.GetCounter());
                         stmt->setUInt32(1, bind.save->GetInstanceId());
                         CharacterDatabase.Execute(stmt);
@@ -470,7 +470,7 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator& itr)
     if (pList.empty())
     {
         // delete character_instance per id, delete instance per id
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE);
         stmt->setUInt32(0, itr->second->GetInstanceId());
         CharacterDatabase.Execute(stmt);
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
@@ -487,8 +487,8 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator& itr)
     else
     {
         // delete character_instance per id where extended = 0, transtaction with set extended = 0, transaction is used to avoid mysql thread races
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_NOT_EXTENDED);
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_NOT_EXTENDED);
         stmt->setUInt32(0, itr->second->GetInstanceId());
         trans->Append(stmt);
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_SET_NOT_EXTENDED);
@@ -535,7 +535,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         ScheduleReset(time_t(next_reset - 3600), InstResetEvent(1, mapid, difficulty));
 
         // update it in the DB
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
         stmt->setUInt32(0, next_reset);
         stmt->setUInt16(1, uint16(mapid));
         stmt->setUInt8(2, uint8(difficulty));
@@ -591,7 +591,7 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(ObjectGuid guid, I
         {
             bind.extended = false;
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE);
             stmt->setUInt32(0, save->GetInstanceId());
             stmt->setBool(1, permanent);
             stmt->setUInt32(2, guid.GetCounter());
@@ -605,9 +605,9 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(ObjectGuid guid, I
         // pussywizard: CHANGED MY MIND! DON'T SLOW DOWN THIS QUERY! HANDLE ONLY DURING LOADING FROM DB!
         // example: enter instance -> bind -> update old id to new id -> exit -> delete new id
         // if delete by new id is executed before update, then we end up with shit in db
-        /*SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        /*CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         // ensure any shit for that map+difficulty is deleted!
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_GUID_MAP_DIFF); // DELETE ci FROM character_instance ci JOIN instance i ON ci.instance = i.id WHERE ci.guid = ? AND i.map = ? AND i.difficulty = ?
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_GUID_MAP_DIFF); // DELETE ci FROM character_instance ci JOIN instance i ON ci.instance = i.id WHERE ci.guid = ? AND i.map = ? AND i.difficulty = ?
         stmt->setUInt32(0, guidLow);
         stmt->setUInt16(1, uint16(save->GetMapId()));
         stmt->setUInt8(2, uint8(save->GetDifficulty()));
@@ -619,7 +619,7 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(ObjectGuid guid, I
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);*/
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
         stmt->setUInt32(0, guid.GetCounter());
         stmt->setUInt32(1, save->GetInstanceId());
         stmt->setBool(2, permanent);
@@ -657,7 +657,7 @@ void InstanceSaveManager::PlayerUnbindInstance(ObjectGuid guid, uint32 mapid, Di
     {
         if (deleteFromDB)
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
             stmt->setUInt32(0, guid.GetCounter());
             stmt->setUInt32(1, itr->second.save->GetInstanceId());
             CharacterDatabase.Execute(stmt);

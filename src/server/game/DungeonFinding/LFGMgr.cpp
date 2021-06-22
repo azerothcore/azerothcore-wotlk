@@ -85,7 +85,7 @@ namespace lfg
         if (!guid.IsGroup())
             return;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_LFG_DATA);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_LFG_DATA);
         stmt->setUInt32(0, guid.GetCounter());
         stmt->setUInt32(1, GetDungeon(guid));
         stmt->setUInt32(2, GetState(guid));

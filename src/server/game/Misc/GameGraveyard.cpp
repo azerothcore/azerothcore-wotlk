@@ -231,7 +231,7 @@ bool Graveyard::AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool p
     // add link to DB
     if (persist)
     {
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GRAVEYARD_ZONE);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GRAVEYARD_ZONE);
 
         stmt->setUInt32(0, id);
         stmt->setUInt32(1, zoneId);
@@ -282,7 +282,7 @@ void Graveyard::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
     // remove link from DB
     if (persist)
     {
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GRAVEYARD_ZONE);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GRAVEYARD_ZONE);
 
         stmt->setUInt32(0, id);
         stmt->setUInt32(1, zoneId);
