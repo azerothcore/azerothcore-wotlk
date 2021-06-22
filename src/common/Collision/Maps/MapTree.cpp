@@ -5,15 +5,15 @@
  */
 
 #include "MapTree.h"
-#include "ModelInstance.h"
-#include "VMapManager2.h"
-#include "VMapDefinitions.h"
-#include "Log.h"
 #include "Errors.h"
-#include <string>
-#include <sstream>
+#include "Log.h"
+#include "ModelInstance.h"
+#include "VMapDefinitions.h"
+#include "VMapManager2.h"
 #include <iomanip>
 #include <limits>
+#include <sstream>
+#include <string>
 
 using G3D::Vector3;
 
