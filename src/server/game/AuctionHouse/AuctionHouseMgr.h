@@ -79,8 +79,8 @@ struct AuctionEntry
     [[nodiscard]] uint32 GetAuctionCut() const;
     [[nodiscard]] uint32 GetAuctionOutBid() const;
     bool BuildAuctionInfo(WorldPacket& data) const;
-    void DeleteFromDB(SQLTransaction& trans) const;
-    void SaveToDB(SQLTransaction& trans) const;
+    void DeleteFromDB(CharacterDatabaseTransaction trans) const;
+    void SaveToDB(CharacterDatabaseTransaction trans) const;
     bool LoadFromDB(Field* fields);
     [[nodiscard]] std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
     static std::string BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
@@ -102,8 +102,9 @@ public:
 
     [[nodiscard]] uint32 Getcount() const { return AuctionsMap.size(); }
 
-    AuctionEntryMap::iterator GetAuctionsBegin() {return AuctionsMap.begin();}
-    AuctionEntryMap::iterator GetAuctionsEnd() {return AuctionsMap.end();}
+    AuctionEntryMap::iterator GetAuctionsBegin() { return AuctionsMap.begin(); }
+    AuctionEntryMap::iterator GetAuctionsEnd() { return AuctionsMap.end(); }
+    AuctionEntryMap const& GetAuctions() { return AuctionsMap; }
 
     [[nodiscard]] AuctionEntry* GetAuction(uint32 id) const
     {
@@ -156,12 +157,12 @@ public:
     }
 
     //auction messages
-    void SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification = true, bool updateAchievementCriteria = true, bool sendMail = true);
-    void SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail = true);
-    void SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification = true, bool updateAchievementCriteria = true, bool sendMail = true);
-    void SendAuctionExpiredMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification = true, bool sendMail = true);
-    void SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans, bool sendNotification = true, bool sendMail = true);
-    void SendAuctionCancelledToBidderMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail = true);
+    void SendAuctionWonMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification = true, bool updateAchievementCriteria = true, bool sendMail = true);
+    void SendAuctionSalePendingMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail = true);
+    void SendAuctionSuccessfulMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification = true, bool updateAchievementCriteria = true, bool sendMail = true);
+    void SendAuctionExpiredMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification = true, bool sendMail = true);
+    void SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, CharacterDatabaseTransaction trans, bool sendNotification = true, bool sendMail = true);
+    void SendAuctionCancelledToBidderMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail = true);
 
     static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count);
     static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
@@ -173,7 +174,7 @@ public:
     void LoadAuctions();
 
     void AddAItem(Item* it);
-    bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false, SQLTransaction* trans = nullptr);
+    bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false, CharacterDatabaseTransaction* trans = nullptr);
 
     void Update();
 

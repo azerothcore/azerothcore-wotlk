@@ -441,7 +441,7 @@ void DeleteSpellFromAllPlayers(uint32 spellId)
     CharacterDatabaseStatements stmts[2] = {CHAR_DEL_INVALID_SPELL_SPELLS, CHAR_DEL_INVALID_SPELL_TALENTS};
     for (uint8 i = 0; i < 2; i++)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(stmts[i]);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(stmts[i]);
         stmt->setUInt32(0, spellId);
         CharacterDatabase.Execute(stmt);
     }
