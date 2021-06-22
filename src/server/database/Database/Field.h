@@ -1,437 +1,135 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
-#ifndef AZEROTHCORE_FIELD_H
-#define AZEROTHCORE_FIELD_H
+#ifndef _FIELD_H
+#define _FIELD_H
 
-#include "Common.h"
-#include "Log.h"
+#include "DatabaseEnvFwd.h"
+#include "Define.h"
 #include <array>
-#include <mysql.h>
+#include <string>
+#include <string_view>
+#include <vector>
 
-class Field
+enum class DatabaseFieldTypes : uint8
 {
-    friend class ResultSet;
-    friend class PreparedResultSet;
+    Null,
+    Int8,
+    Int16,
+    Int32,
+    Int64,
+    Float,
+    Double,
+    Decimal,
+    Date,
+    Binary
+};
+
+struct QueryResultFieldMetadata
+{
+    char const* TableName = nullptr;
+    char const* TableAlias = nullptr;
+    char const* Name = nullptr;
+    char const* Alias = nullptr;
+    char const* TypeName = nullptr;
+    uint32 Index = 0;
+    DatabaseFieldTypes Type = DatabaseFieldTypes::Null;
+};
+
+/**
+    @class Field
+
+    @brief Class used to access individual fields of database query result
+
+    Guideline on field type matching:
+
+    |   MySQL type           |  method to use                         |
+    |------------------------|----------------------------------------|
+    | TINYINT                | GetBool, GetInt8, GetUInt8             |
+    | SMALLINT               | GetInt16, GetUInt16                    |
+    | MEDIUMINT, INT         | GetInt32, GetUInt32                    |
+    | BIGINT                 | GetInt64, GetUInt64                    |
+    | FLOAT                  | GetFloat                               |
+    | DOUBLE, DECIMAL        | GetDouble                              |
+    | CHAR, VARCHAR,         | GetCString, GetString                  |
+    | TINYTEXT, MEDIUMTEXT,  | GetCString, GetString                  |
+    | TEXT, LONGTEXT         | GetCString, GetString                  |
+    | TINYBLOB, MEDIUMBLOB,  | GetBinary, GetString                   |
+    | BLOB, LONGBLOB         | GetBinary, GetString                   |
+    | BINARY, VARBINARY      | GetBinary                              |
+
+    Return types of aggregate functions:
+
+    | Function |       Type        |
+    |----------|-------------------|
+    | MIN, MAX | Same as the field |
+    | SUM, AVG | DECIMAL           |
+    | COUNT    | BIGINT            |
+*/
+class AC_DATABASE_API Field
+{
+friend class ResultSet;
+friend class PreparedResultSet;
 
 public:
-    [[nodiscard]] bool GetBool() const // Wrapper, actually gets integer
+    Field();
+    ~Field();
+
+    bool GetBool() const // Wrapper, actually gets integer
     {
-        return (GetUInt8() == 1);
+        return GetUInt8() == 1 ? true : false;
     }
 
-    [[nodiscard]] uint8 GetUInt8() const
-    {
-        if (!data.value)
-            return 0;
+    uint8 GetUInt8() const;
+    int8 GetInt8() const;
+    uint16 GetUInt16() const;
+    int16 GetInt16() const;
+    uint32 GetUInt32() const;
+    int32 GetInt32() const;
+    uint64 GetUInt64() const;
+    int64 GetInt64() const;
+    float GetFloat() const;
+    double GetDouble() const;
+    char const* GetCString() const;
+    std::string GetString() const;
+    std::string_view GetStringView() const;
+    std::vector<uint8> GetBinary() const;
 
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_TINY))
-        {
-            LOG_INFO("sql.driver", "Warning: GetUInt8() on non-tinyint field. Using type: %s.", FieldTypeToString(data.type));
-            return 0;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<uint8*>(data.value);
-        return static_cast<uint8>(atol((char*)data.value));
-    }
-
-    [[nodiscard]] int8 GetInt8() const
-    {
-        if (!data.value)
-            return 0;
-
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_TINY))
-        {
-            LOG_INFO("sql.driver", "Warning: GetInt8() on non-tinyint field. Using type: %s.", FieldTypeToString(data.type));
-            return 0;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<int8*>(data.value);
-        return static_cast<int8>(atol((char*)data.value));
-    }
-
-#ifdef ELUNA
-    enum_field_types GetType() const
-    {
-        return data.type;
-    }
-#endif
-
-    [[nodiscard]] uint16 GetUInt16() const
-    {
-        if (!data.value)
-            return 0;
-
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_SHORT) && !IsType(MYSQL_TYPE_YEAR))
-        {
-            LOG_INFO("sql.driver", "Warning: GetUInt16() on non-smallint field. Using type: %s.", FieldTypeToString(data.type));
-            return 0;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<uint16*>(data.value);
-        return static_cast<uint16>(atol((char*)data.value));
-    }
-
-    [[nodiscard]] int16 GetInt16() const
-    {
-        if (!data.value)
-            return 0;
-
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_SHORT) && !IsType(MYSQL_TYPE_YEAR))
-        {
-            LOG_INFO("sql.driver", "Warning: GetInt16() on non-smallint field. Using type: %s.", FieldTypeToString(data.type));
-            return 0;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<int16*>(data.value);
-        return static_cast<int16>(atol((char*)data.value));
-    }
-
-    [[nodiscard]] uint32 GetUInt32() const
-    {
-        if (!data.value)
-            return 0;
-
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_INT24) && !IsType(MYSQL_TYPE_LONG))
-        {
-            LOG_INFO("sql.driver", "Warning: GetUInt32() on non-(medium)int field. Using type: %s.", FieldTypeToString(data.type));
-            return 0;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<uint32*>(data.value);
-        return static_cast<uint32>(atol((char*)data.value));
-    }
-
-    [[nodiscard]] int32 GetInt32() const
-    {
-        if (!data.value)
-            return 0;
-
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_INT24) && !IsType(MYSQL_TYPE_LONG))
-        {
-            LOG_INFO("sql.driver", "Warning: GetInt32() on non-(medium)int field. Using type: %s.", FieldTypeToString(data.type));
-            return 0;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<int32*>(data.value);
-        return static_cast<int32>(atol((char*)data.value));
-    }
-
-    [[nodiscard]] uint64 GetUInt64() const
-    {
-        if (!data.value)
-            return 0;
-
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_LONGLONG) && !IsType(MYSQL_TYPE_BIT))
-        {
-            LOG_INFO("sql.driver", "Warning: GetUInt64() on non-bigint field. Using type: %s.", FieldTypeToString(data.type));
-            return 0;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<uint64*>(data.value);
-        return static_cast<uint64>(atol((char*)data.value));
-    }
-
-    [[nodiscard]] int64 GetInt64() const
-    {
-        if (!data.value)
-            return 0;
-
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_LONGLONG) && !IsType(MYSQL_TYPE_BIT))
-        {
-            LOG_INFO("sql.driver", "Warning: GetInt64() on non-bigint field. Using type: %s.", FieldTypeToString(data.type));
-            return 0;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<int64*>(data.value);
-        return static_cast<int64>(strtol((char*)data.value, nullptr, 10));
-    }
-
-    [[nodiscard]] float GetFloat() const
-    {
-        if (!data.value)
-            return 0.0f;
-
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_FLOAT))
-        {
-            LOG_INFO("sql.driver", "Warning: GetFloat() on non-float field. Using type: %s.", FieldTypeToString(data.type));
-            return 0.0f;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<float*>(data.value);
-        return static_cast<float>(atof((char*)data.value));
-    }
-
-    [[nodiscard]] double GetDouble() const
-    {
-        if (!data.value)
-            return 0.0f;
-
-#ifdef ACORE_DEBUG
-        if (!IsType(MYSQL_TYPE_DOUBLE))
-        {
-            LOG_INFO("sql.driver", "Warning: GetDouble() on non-double field. Using type: %s.", FieldTypeToString(data.type));
-            return 0.0f;
-        }
-#endif
-
-        if (data.raw)
-            return *reinterpret_cast<double*>(data.value);
-        return static_cast<double>(atof((char*)data.value));
-    }
-
-    [[nodiscard]] char const* GetCString() const
-    {
-        if (!data.value)
-            return nullptr;
-
-#ifdef ACORE_DEBUG
-        if (IsNumeric())
-        {
-            LOG_INFO("sql.driver", "Error: GetCString() on numeric field. Using type: %s.", FieldTypeToString(data.type));
-            return nullptr;
-        }
-#endif
-        return static_cast<char const*>(data.value);
-    }
-
-    [[nodiscard]] std::string GetString() const
-    {
-        if (!data.value)
-            return "";
-
-        if (data.raw)
-        {
-            char const* string = GetCString();
-            if (!string)
-                string = "";
-            return std::string(string, data.length);
-        }
-        return std::string((char*)data.value);
-    }
-
-    [[nodiscard]] bool IsNull() const
-    {
-        if (IsBinary() && data.length == 0)
-        {
-            return true;
-        }
-        return data.value == nullptr;
-    }
-
-    [[nodiscard]] std::vector<uint8> GetBinary() const;
-    template<size_t S>
-    [[nodiscard]] std::array<uint8, S> GetBinary() const
+    template <size_t S>
+    std::array<uint8, S> GetBinary() const
     {
         std::array<uint8, S> buf;
         GetBinarySizeChecked(buf.data(), S);
         return buf;
     }
 
-protected:
-    Field();
-    ~Field();
+    bool IsNull() const
+    {
+        return data.value == nullptr;
+    }
 
-#if defined(__GNUC__)
-#pragma pack(1)
-#else
-#pragma pack(push, 1)
-#endif
+    DatabaseFieldTypes GetType() { return meta->Type; }
+
+protected:
     struct
     {
-        uint32 length;          // Length (prepared strings only)
-        void* value;            // Actual data in memory
-        enum_field_types type;  // Field type
+        char const* value;      // Actual data in memory
+        uint32 length;          // Length
         bool raw;               // Raw bytes? (Prepared statement or ad hoc)
     } data;
-#if defined(__GNUC__)
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
 
-    void SetByteValue(void const* newValue, size_t const newSize, enum_field_types newType, uint32 length);
-    void SetStructuredValue(char* newValue, enum_field_types newType, uint32 length);
-
-    void CleanUp()
-    {
-        delete[] ((char*)data.value);
-        data.value = nullptr;
-    }
-
-    static size_t SizeForType(MYSQL_FIELD* field)
-    {
-        switch (field->type)
-        {
-            case MYSQL_TYPE_NULL:
-                return 0;
-            case MYSQL_TYPE_TINY:
-                return 1;
-            case MYSQL_TYPE_YEAR:
-            case MYSQL_TYPE_SHORT:
-                return 2;
-            case MYSQL_TYPE_INT24:
-            case MYSQL_TYPE_LONG:
-            case MYSQL_TYPE_FLOAT:
-                return 4;
-            case MYSQL_TYPE_DOUBLE:
-            case MYSQL_TYPE_LONGLONG:
-            case MYSQL_TYPE_BIT:
-                return 8;
-
-            case MYSQL_TYPE_TIMESTAMP:
-            case MYSQL_TYPE_DATE:
-            case MYSQL_TYPE_TIME:
-            case MYSQL_TYPE_DATETIME:
-                return sizeof(MYSQL_TIME);
-
-            case MYSQL_TYPE_TINY_BLOB:
-            case MYSQL_TYPE_MEDIUM_BLOB:
-            case MYSQL_TYPE_LONG_BLOB:
-            case MYSQL_TYPE_BLOB:
-            case MYSQL_TYPE_STRING:
-            case MYSQL_TYPE_VAR_STRING:
-                return field->max_length + 1;
-
-            case MYSQL_TYPE_DECIMAL:
-            case MYSQL_TYPE_NEWDECIMAL:
-                return 64;
-
-            case MYSQL_TYPE_GEOMETRY:
-            /*
-            Following types are not sent over the wire:
-            MYSQL_TYPE_ENUM:
-            MYSQL_TYPE_SET:
-            */
-            default:
-                LOG_INFO("sql.driver", "SQL::SizeForType(): invalid field type %u", uint32(field->type));
-                return 0;
-        }
-    }
-
-    [[nodiscard]] bool IsType(enum_field_types type) const
-    {
-        return data.type == type;
-    }
-
-    [[nodiscard]] bool IsNumeric() const
-    {
-        return (data.type == MYSQL_TYPE_TINY ||
-                data.type == MYSQL_TYPE_SHORT ||
-                data.type == MYSQL_TYPE_INT24 ||
-                data.type == MYSQL_TYPE_LONG ||
-                data.type == MYSQL_TYPE_FLOAT ||
-                data.type == MYSQL_TYPE_DOUBLE ||
-                data.type == MYSQL_TYPE_LONGLONG );
-    }
-
-    [[nodiscard]] bool IsBinary() const
-    {
-        return (
-            data.type == MYSQL_TYPE_TINY_BLOB ||
-            data.type == MYSQL_TYPE_MEDIUM_BLOB ||
-            data.type == MYSQL_TYPE_LONG_BLOB ||
-            data.type == MYSQL_TYPE_BLOB ||
-            data.type == MYSQL_TYPE_VAR_STRING ||
-            data.type == MYSQL_TYPE_STRING
-        );
-    }
-
-    void GetBinarySizeChecked(uint8* buf, size_t size) const;
+    void SetByteValue(char const* newValue, uint32 length);
+    void SetStructuredValue(char const* newValue, uint32 length);
+    bool IsType(DatabaseFieldTypes type) const;
+    bool IsNumeric() const;
 
 private:
-#ifdef ACORE_DEBUG
-    static char const* FieldTypeToString(enum_field_types type)
-    {
-        switch (type)
-        {
-            case MYSQL_TYPE_BIT:
-                return "BIT";
-            case MYSQL_TYPE_BLOB:
-                return "BLOB";
-            case MYSQL_TYPE_DATE:
-                return "DATE";
-            case MYSQL_TYPE_DATETIME:
-                return "DATETIME";
-            case MYSQL_TYPE_NEWDECIMAL:
-                return "NEWDECIMAL";
-            case MYSQL_TYPE_DECIMAL:
-                return "DECIMAL";
-            case MYSQL_TYPE_DOUBLE:
-                return "DOUBLE";
-            case MYSQL_TYPE_ENUM:
-                return "ENUM";
-            case MYSQL_TYPE_FLOAT:
-                return "FLOAT";
-            case MYSQL_TYPE_GEOMETRY:
-                return "GEOMETRY";
-            case MYSQL_TYPE_INT24:
-                return "INT24";
-            case MYSQL_TYPE_LONG:
-                return "LONG";
-            case MYSQL_TYPE_LONGLONG:
-                return "LONGLONG";
-            case MYSQL_TYPE_LONG_BLOB:
-                return "LONG_BLOB";
-            case MYSQL_TYPE_MEDIUM_BLOB:
-                return "MEDIUM_BLOB";
-            case MYSQL_TYPE_NEWDATE:
-                return "NEWDATE";
-            case MYSQL_TYPE_NULL:
-                return "nullptr";
-            case MYSQL_TYPE_SET:
-                return "SET";
-            case MYSQL_TYPE_SHORT:
-                return "SHORT";
-            case MYSQL_TYPE_STRING:
-                return "STRING";
-            case MYSQL_TYPE_TIME:
-                return "TIME";
-            case MYSQL_TYPE_TIMESTAMP:
-                return "TIMESTAMP";
-            case MYSQL_TYPE_TINY:
-                return "TINY";
-            case MYSQL_TYPE_TINY_BLOB:
-                return "TINY_BLOB";
-            case MYSQL_TYPE_VAR_STRING:
-                return "VAR_STRING";
-            case MYSQL_TYPE_YEAR:
-                return "YEAR";
-            default:
-                return "-Unknown-";
-        }
-    }
-#endif
+    QueryResultFieldMetadata const* meta;
+    void LogWrongType(char const* getter) const;
+    void SetMetadata(QueryResultFieldMetadata const* fieldMeta);
+    void GetBinarySizeChecked(uint8* buf, size_t size) const;
 };
 
 #endif

@@ -89,12 +89,10 @@ uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32
     uint32 timeHr = (((time / 60) / 60) / 12);
     uint32 deposit = uint32(((multiplier * MSV * count / 3) * timeHr * 3) * sWorld->getRate(RATE_AUCTION_DEPOSIT));
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("auctionHouse", "MSV:        %u", MSV);
     LOG_DEBUG("auctionHouse", "Items:      %u", count);
     LOG_DEBUG("auctionHouse", "Multiplier: %f", multiplier);
     LOG_DEBUG("auctionHouse", "Deposit:    %u", deposit);
-#endif
 
     if (deposit < AH_MINIMUM_DEPOSIT * sWorld->getRate(RATE_AUCTION_DEPOSIT))
         return AH_MINIMUM_DEPOSIT * sWorld->getRate(RATE_AUCTION_DEPOSIT);
@@ -103,7 +101,7 @@ uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32
 }
 
 //does not clear ram
-void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification, bool updateAchievementCriteria, bool sendMail)
+void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification, bool updateAchievementCriteria, bool sendMail)
 {
     Item* pItem = GetAItem(auction->item_guid);
     if (!pItem)
@@ -122,7 +120,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
         sScriptMgr->OnBeforeAuctionHouseMgrSendAuctionWonMail(this, auction, bidder, bidder_accId, sendNotification, updateAchievementCriteria, sendMail);
         // set owner to bidder (to prevent delete item with sender char deleting)
         // owner in `data` will set at mail receive and item extracting
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
         stmt->setUInt32(0, auction->bidder.GetCounter());
         stmt->setUInt32(1, pItem->GetGUID().GetCounter());
         trans->Append(stmt);
@@ -145,7 +143,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
         sAuctionMgr->RemoveAItem(auction->item_guid, true, &trans);
 }
 
-void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail)
+void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail)
 {
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
     uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
@@ -160,7 +158,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTrans
 }
 
 //call this method to send mail to auction owner, when auction is successful, it does not clear ram
-void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification, bool updateAchievementCriteria, bool sendMail)
+void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification, bool updateAchievementCriteria, bool sendMail)
 {
     Player* owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
     uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter());
@@ -205,7 +203,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransa
 }
 
 //does not clear ram
-void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification, bool sendMail)
+void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendNotification, bool sendMail)
 {
     //return an item in auction to its owner by mail
     Item* pItem = GetAItem(auction->item_guid);
@@ -233,7 +231,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
 }
 
 //this function sends mail to old bidder
-void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans, bool sendNotification, bool sendMail)
+void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, CharacterDatabaseTransaction trans, bool sendNotification, bool sendMail)
 {
     Player* oldBidder = ObjectAccessor::FindConnectedPlayer(auction->bidder);
 
@@ -257,7 +255,7 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
 }
 
 //this function sends mail, when auction is cancelled to old bidder
-void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail)
+void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail)
 {
     Player* bidder = ObjectAccessor::FindConnectedPlayer(auction->bidder);
 
@@ -290,13 +288,13 @@ void AuctionHouseMgr::LoadAuctionItems()
     }
 
     // data needs to be at first place for Item::LoadFromDB
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_AUCTION_ITEMS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_AUCTION_ITEMS);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 auction items. DB table `auctionhouse` or `item_instance` is empty!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 auction items. DB table `auctionhouse` or `item_instance` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -312,7 +310,7 @@ void AuctionHouseMgr::LoadAuctionItems()
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item_template);
         if (!proto)
         {
-            LOG_ERROR("server", "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid, item_template);
+            LOG_ERROR("auctionHouse", "AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid, item_template);
             continue;
         }
 
@@ -327,27 +325,27 @@ void AuctionHouseMgr::LoadAuctionItems()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u auction items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u auction items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void AuctionHouseMgr::LoadAuctions()
 {
     uint32 oldMSTime = getMSTime();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_AUCTIONS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_AUCTIONS);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 auctions. DB table `auctionhouse` is empty.");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
     uint32 count = 0;
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     do
     {
         Field* fields = result->Fetch();
@@ -366,8 +364,8 @@ void AuctionHouseMgr::LoadAuctions()
 
     CharacterDatabase.CommitTransaction(trans);
 
-    LOG_INFO("server", ">> Loaded %u auctions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u auctions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void AuctionHouseMgr::AddAItem(Item* it)
@@ -377,7 +375,7 @@ void AuctionHouseMgr::AddAItem(Item* it)
     mAitems[it->GetGUID()] = it;
 }
 
-bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB, SQLTransaction* trans /*= nullptr*/)
+bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB, CharacterDatabaseTransaction* trans /*= nullptr*/)
 {
     ItemMap::iterator i = mAitems.find(itemGuid);
     if (i == mAitems.end())
@@ -460,7 +458,7 @@ void AuctionHouseObject::Update()
     if (AuctionsMap.empty())
         return;
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     for (AuctionEntryMap::iterator itr, iter = AuctionsMap.begin(); iter != AuctionsMap.end(); )
     {
@@ -675,7 +673,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     Item* item = sAuctionMgr->GetAItem(item_guid);
     if (!item)
     {
-        LOG_ERROR("server", "AuctionEntry::BuildAuctionInfo: Auction %u has a non-existent item: %s", Id, item_guid.ToString().c_str());
+        LOG_ERROR("auctionHouse", "AuctionEntry::BuildAuctionInfo: Auction %u has a non-existent item: %s", Id, item_guid.ToString().c_str());
         return false;
     }
     data << uint32(Id);
@@ -717,16 +715,16 @@ uint32 AuctionEntry::GetAuctionOutBid() const
     return outbid ? outbid : 1;
 }
 
-void AuctionEntry::DeleteFromDB(SQLTransaction& trans) const
+void AuctionEntry::DeleteFromDB(CharacterDatabaseTransaction trans) const
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_AUCTION);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_AUCTION);
     stmt->setUInt32(0, Id);
     trans->Append(stmt);
 }
 
-void AuctionEntry::SaveToDB(SQLTransaction& trans) const
+void AuctionEntry::SaveToDB(CharacterDatabaseTransaction trans) const
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AUCTION);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AUCTION);
     stmt->setUInt32(0, Id);
     stmt->setUInt8(1, houseId);
     stmt->setUInt32(2, item_guid.GetCounter());
@@ -758,7 +756,7 @@ bool AuctionEntry::LoadFromDB(Field* fields)
     auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntryFromHouse(houseId);
     if (!auctionHouseEntry)
     {
-        LOG_ERROR("server", "Auction %u has invalid house id %u", Id, houseId);
+        LOG_ERROR("auctionHouse", "Auction %u has invalid house id %u", Id, houseId);
         return false;
     }
 
@@ -766,7 +764,7 @@ bool AuctionEntry::LoadFromDB(Field* fields)
     // and item_template in fact (GetAItem will fail if problematic in result check in AuctionHouseMgr::LoadAuctionItems)
     if (!sAuctionMgr->GetAItem(item_guid))
     {
-        LOG_ERROR("server", "Auction %u has not a existing item : %s", Id, item_guid.ToString().c_str());
+        LOG_ERROR("auctionHouse", "Auction %u has not a existing item : %s", Id, item_guid.ToString().c_str());
         return false;
     }
     return true;

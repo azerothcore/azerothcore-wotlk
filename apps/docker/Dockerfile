@@ -190,6 +190,7 @@ ENV CCACHE_CPP2=true
 ENV CSCRIPTPCH=OFF
 ENV CCOREPCH=OFF
 ENV CTOOLS=ON
+ENV CSCRIPTS=static
 RUN bash apps/docker/docker-build-prod.sh
 
 #================================================================

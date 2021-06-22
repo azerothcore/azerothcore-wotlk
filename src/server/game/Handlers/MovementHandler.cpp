@@ -31,9 +31,7 @@
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
-#endif
     HandleMoveWorldportAck();
 }
 
@@ -62,7 +60,7 @@ void WorldSession::HandleMoveWorldportAck()
     Map* oldMap = GetPlayer()->GetMap();
     if (GetPlayer()->IsInWorld())
     {
-        LOG_ERROR("server", "Player (Name %s) is still in world when teleported from map %u to new map %u", GetPlayer()->GetName().c_str(), oldMap->GetId(), loc.GetMapId());
+        LOG_ERROR("network.opcode", "Player (Name %s) is still in world when teleported from map %u to new map %u", GetPlayer()->GetName().c_str(), oldMap->GetId(), loc.GetMapId());
         oldMap->RemovePlayerFromMap(GetPlayer(), false);
     }
 
@@ -81,7 +79,7 @@ void WorldSession::HandleMoveWorldportAck()
     // while the player is in transit, for example the map may get full
     if (!newMap || !newMap->CanEnter(GetPlayer(), false))
     {
-        LOG_ERROR("server", "Map %d could not be created for player %s, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUID().ToString().c_str());
+        LOG_ERROR("network.opcode", "Map %d could not be created for player %s, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUID().ToString().c_str());
         GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
         return;
     }
@@ -95,7 +93,7 @@ void WorldSession::HandleMoveWorldportAck()
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     if (!GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer()))
     {
-        LOG_ERROR("server", "WORLD: failed to teleport player %s (%s) to map %d because of unknown reason!",
+        LOG_ERROR("network.opcode", "WORLD: failed to teleport player %s (%s) to map %d because of unknown reason!",
             GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str(), loc.GetMapId());
         GetPlayer()->ResetMap();
         GetPlayer()->SetMap(oldMap);
@@ -238,21 +236,15 @@ void WorldSession::HandleMoveWorldportAck()
 
 void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "MSG_MOVE_TELEPORT_ACK");
-#endif
 
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
 
     uint32 flags, time;
     recvData >> flags >> time; // unused
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "Guid %s", guid.ToString().c_str());
-#endif
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "Flags %u, time %u", flags, time / IN_MILLISECONDS);
-#endif
+    LOG_DEBUG("network.opcode", "Guid %s", guid.ToString().c_str());
+    LOG_DEBUG("network.opcode", "Flags %u, time %u", flags, time / IN_MILLISECONDS);
 
     Player* plMover = _player->m_mover->ToPlayer();
 
@@ -583,9 +575,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 {
     uint32 opcode = recvData.GetOpcode();
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recvd %s (%u, 0x%X) opcode", GetOpcodeNameForLogging(static_cast<OpcodeClient>(opcode)).c_str(), opcode, opcode);
-#endif
 
     /* extract packet */
     ObjectGuid guid;
@@ -656,7 +646,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
             force_move_type = MOVE_PITCH_RATE;
             break;
         default:
-            LOG_ERROR("server", "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", opcode);
+            LOG_ERROR("network.opcode", "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", opcode);
             return;
     }
 
@@ -675,13 +665,13 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     {
         if (_player->GetSpeed(move_type) > newspeed)         // must be greater - just correct
         {
-            LOG_ERROR("server", "%sSpeedChange player %s is NOT correct (must be %f instead %f), force set to correct value",
+            LOG_ERROR("network.opcode", "%sSpeedChange player %s is NOT correct (must be %f instead %f), force set to correct value",
                            move_type_name[move_type], _player->GetName().c_str(), _player->GetSpeed(move_type), newspeed);
             _player->SetSpeed(move_type, _player->GetSpeedRate(move_type), true);
         }
         else                                                // must be lesser - cheating
         {
-            LOG_INFO("server", "Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
+            LOG_INFO("network.opcode", "Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
                            _player->GetName().c_str(), GetAccountId(), _player->GetSpeed(move_type), newspeed);
             KickPlayer("Incorrect speed");
         }
@@ -690,9 +680,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
-#endif
 
     ObjectGuid guid;
     recvData >> guid;
@@ -700,16 +688,14 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
     if (GetPlayer()->IsInWorld() && _player->m_mover && _player->m_mover->IsInWorld())
     {
         if (_player->m_mover->GetGUID() != guid)
-            LOG_ERROR("server", "HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
+            LOG_ERROR("network.opcode", "HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
                 guid.ToString().c_str(), _player->m_mover->GetGUID().ToString().c_str());
     }
 }
 
 void WorldSession::HandleMoveNotActiveMover(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
-#endif
 
     ObjectGuid old_mover_guid;
     recvData >> old_mover_guid.ReadAsPacked();
@@ -738,9 +724,7 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_MOVE_KNOCK_BACK_ACK");
-#endif
 
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
@@ -775,9 +759,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 
 void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_MOVE_HOVER_ACK");
-#endif
 
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
@@ -793,9 +775,7 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
 
 void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_MOVE_WATER_WALK_ACK");
-#endif
 
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
@@ -835,9 +815,7 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
-#endif
 
     ObjectGuid guid;
     uint32 timeSkipped;
@@ -848,14 +826,14 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 
     if (!mover)
     {
-        LOG_ERROR("server", "WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [%s]", GetPlayer()->GetGUID().ToString().c_str());
+        LOG_ERROR("network.opcode", "WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [%s]", GetPlayer()->GetGUID().ToString().c_str());
         return;
     }
 
     // prevent tampered movement data
     if (guid != mover->GetGUID())
     {
-        LOG_ERROR("server", "WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [%s]", GetPlayer()->GetGUID().ToString().c_str());
+        LOG_ERROR("network.opcode", "WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [%s]", GetPlayer()->GetGUID().ToString().c_str());
         return;
     }
 
@@ -869,9 +847,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_TIME_SYNC_RESP");
-#endif
 
     uint32 counter, clientTimestamp;
     recvData >> counter >> clientTimestamp;
