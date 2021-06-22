@@ -19,10 +19,9 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GossipDef.h"
-#include "Opcodes.h"
+#include "Packet.h"
 #include "SharedDefines.h"
 #include "World.h"
-#include "WorldPacket.h"
 #include <utility>
 #include <map>
 
@@ -57,6 +56,10 @@ namespace lfg
     struct LfgPlayerRewardData;
     struct LfgRoleCheck;
     struct LfgUpdateData;
+}
+
+namespace WorldPackets
+{
 }
 
 enum AccountDataType
@@ -107,6 +110,12 @@ enum ChatRestrictionType
     ERR_CHAT_THROTTLED  = 1,
     ERR_USER_SQUELCHED  = 2,
     ERR_YELL_RESTRICTED = 3
+};
+
+enum DeclinedNameResult
+{
+    DECLINED_NAMES_RESULT_SUCCESS = 0,
+    DECLINED_NAMES_RESULT_ERROR = 1
 };
 
 enum CharterTypes
@@ -162,29 +171,53 @@ class CharacterCreateInfo
     friend class Player;
 
 protected:
-    CharacterCreateInfo(std::string  name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
-                        WorldPacket& data) : Name(std::move(name)), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
-        OutfitId(outfitId), Data(data), CharCount(0)
-    {}
-
     /// User specified variables
     std::string Name;
-    uint8 Race;
-    uint8 Class;
-    uint8 Gender;
-    uint8 Skin;
-    uint8 Face;
-    uint8 HairStyle;
-    uint8 HairColor;
-    uint8 FacialHair;
-    uint8 OutfitId;
-    WorldPacket Data;
+    uint8 Race = 0;
+    uint8 Class = 0;
+    uint8 Gender = GENDER_NONE;
+    uint8 Skin = 0;
+    uint8 Face = 0;
+    uint8 HairStyle = 0;
+    uint8 HairColor = 0;
+    uint8 FacialHair = 0;
+    uint8 OutfitId = 0;
 
     /// Server side data
-    uint8 CharCount;
+    uint8 CharCount = 0;
+};
 
-private:
-    virtual ~CharacterCreateInfo() = default;;
+struct CharacterRenameInfo
+{
+    friend class WorldSession;
+
+protected:
+    ObjectGuid Guid;
+    std::string Name;
+};
+
+struct CharacterCustomizeInfo : public CharacterRenameInfo
+{
+    friend class Player;
+    friend class WorldSession;
+
+protected:
+    uint8 Gender = GENDER_NONE;
+    uint8 Skin = 0;
+    uint8 Face = 0;
+    uint8 HairStyle = 0;
+    uint8 HairColor = 0;
+    uint8 FacialHair = 0;
+};
+
+struct CharacterFactionChangeInfo : public CharacterCustomizeInfo
+{
+    friend class Player;
+    friend class WorldSession;
+
+protected:
+    uint8 Race = 0;
+    bool FactionChange = false;
 };
 
 struct PacketCounter
@@ -300,7 +333,7 @@ public:
     // Pet
     void SendPetNameQuery(ObjectGuid guid, uint32 petnumber);
     void SendStablePet(ObjectGuid guid);
-    void SendStablePetCallback(PreparedQueryResult result, ObjectGuid guid);
+    void SendStablePetCallback(ObjectGuid guid, PreparedQueryResult result);
     void SendStableResult(uint8 guid);
     bool CheckStableMaster(ObjectGuid guid);
 
@@ -313,7 +346,7 @@ public:
 
     void LoadTutorialsData();
     void SendTutorialsData();
-    void SaveTutorialsData(SQLTransaction& trans);
+    void SaveTutorialsData(CharacterDatabaseTransaction trans);
     uint32 GetTutorialInt(uint8 index) const { return m_Tutorials[index]; }
     void SetTutorialInt(uint8 index, uint32 value)
     {
@@ -392,7 +425,7 @@ public:
     void ResetTimeSync();
     void SendTimeSync();
 public:                                                 // opcodes handlers
-    void Handle_NULL(WorldPacket& recvPacket);          // not used
+    void Handle_NULL(WorldPacket& null);                // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
     void Handle_ServerSide(WorldPacket& recvPacket);    // sever side only, can't be accepted from client
     void Handle_Deprecated(WorldPacket& recvPacket);    // never used anymore by client
@@ -400,13 +433,20 @@ public:                                                 // opcodes handlers
     void HandleCharEnumOpcode(WorldPacket& recvPacket);
     void HandleCharDeleteOpcode(WorldPacket& recvPacket);
     void HandleCharCreateOpcode(WorldPacket& recvPacket);
-    void HandleCharCreateCallback(PreparedQueryResult result, CharacterCreateInfo* createInfo);
     void HandlePlayerLoginOpcode(WorldPacket& recvPacket);
     void HandleCharEnum(PreparedQueryResult result);
-    void HandlePlayerLoginFromDB(LoginQueryHolder* holder);
+    void HandlePlayerLoginFromDB(LoginQueryHolder const& holder);
     void HandlePlayerLoginToCharInWorld(Player* pCurrChar);
     void HandlePlayerLoginToCharOutOfWorld(Player* pCurrChar);
     void HandleCharFactionOrRaceChange(WorldPacket& recvData);
+    void HandleCharFactionOrRaceChangeCallback(std::shared_ptr<CharacterFactionChangeInfo> factionChangeInfo, PreparedQueryResult result);
+
+    void SendCharCreate(ResponseCodes result);
+    void SendCharDelete(ResponseCodes result);
+    void SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo);
+    void SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo);
+    void SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo);
+    void SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid);
 
     // played time
     void HandlePlayedTime(WorldPacket& recvPacket);
@@ -501,7 +541,7 @@ public:                                                 // opcodes handlers
     void HandleGameObjectQueryOpcode(WorldPacket& recvPacket);
 
     void HandleMoveWorldportAckOpcode(WorldPacket& recvPacket);
-    void HandleMoveWorldportAckOpcode();                // for server-side calls
+    void HandleMoveWorldportAck(); // for server-side calls
 
     void HandleMovementOpcodes(WorldPacket& recvPacket);
     void HandleSetActiveMoverOpcode(WorldPacket& recvData);
@@ -589,16 +629,16 @@ public:                                                 // opcodes handlers
     void HandleStablePet(WorldPacket& recvPacket);
     void HandleStablePetCallback(PreparedQueryResult result);
     void HandleUnstablePet(WorldPacket& recvPacket);
-    void HandleUnstablePetCallback(PreparedQueryResult result, uint32 petId);
+    void HandleUnstablePetCallback(uint32 petId, PreparedQueryResult result);
     void HandleBuyStableSlot(WorldPacket& recvPacket);
     void HandleStableRevivePet(WorldPacket& recvPacket);
     void HandleStableSwapPet(WorldPacket& recvPacket);
-    void HandleStableSwapPetCallback(PreparedQueryResult result, uint32 petId);
-    void HandleOpenWrappedItemCallback(PreparedQueryResult result, uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID);
+    void HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult result);
+    void HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result);
     void HandleLoadActionsSwitchSpec(PreparedQueryResult result);
     void HandleCharacterAuraFrozen(PreparedQueryResult result);
     uint8 HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType);
-    void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder* holder);
+    void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder);
 
     void HandleDuelAcceptedOpcode(WorldPacket& recvPacket);
     void HandleDuelCancelledOpcode(WorldPacket& recvPacket);
@@ -750,7 +790,7 @@ public:                                                 // opcodes handlers
     void HandleSetActionBarToggles(WorldPacket& recvData);
 
     void HandleCharRenameOpcode(WorldPacket& recvData);
-    void HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult result, std::string const& newName);
+    void HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameInfo, PreparedQueryResult result);
     void HandleSetPlayerDeclinedNames(WorldPacket& recvData);
 
     void HandleTotemDestroyed(WorldPacket& recvData);
@@ -900,6 +940,7 @@ public:                                                 // opcodes handlers
     void HandleAlterAppearance(WorldPacket& recvData);
     void HandleRemoveGlyph(WorldPacket& recvData);
     void HandleCharCustomize(WorldPacket& recvData);
+    void HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomizeInfo> customizeInfo, PreparedQueryResult result);
     void HandleQueryInspectAchievements(WorldPacket& recvData);
     void HandleEquipmentSetSave(WorldPacket& recvData);
     void HandleEquipmentSetDelete(WorldPacket& recvData);
@@ -911,9 +952,6 @@ public:                                                 // opcodes handlers
     void HandleEjectPassenger(WorldPacket& data);
     void HandleEnterPlayerVehicle(WorldPacket& data);
     void HandleUpdateProjectilePosition(WorldPacket& recvPacket);
-
-    // _loadPetFromDBFirstCallback helpers
-    //QueryCallback<PreparedQueryResult, uint64> GetLoadPetFromDBFirstCallback() { return _loadPetFromDBFirstCallback; }
 
     uint32 _lastAuctionListItemsMSTime;
     uint32 _lastAuctionListOwnerItemsMSTime;
@@ -928,28 +966,20 @@ public:                                                 // opcodes handlers
     bool GetShouldSetOfflineInDB() const { return _shouldSetOfflineInDB; }
     bool IsSocketClosed() const;
 
-    /***
-    CALLBACKS
-    ***/
+    /*
+     * CALLBACKS
+     */
+
+    QueryCallbackProcessor& GetQueryProcessor() { return _queryProcessor; }
+    TransactionCallback& AddTransactionCallback(TransactionCallback&& callback);
+    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback);
+
 private:
-    void InitializeQueryCallbackParameters();
     void ProcessQueryCallbacks();
-    void ProcessQueryCallbackPlayer();
-    void ProcessQueryCallbackPet();
-    void ProcessQueryCallbackLogin();
 
-    PreparedQueryResultFuture _charEnumCallback;
-    PreparedQueryResultFuture _stablePetCallback;
-    QueryCallback<PreparedQueryResult, std::string> _charRenameCallback;
-    QueryCallback<PreparedQueryResult, uint32> _unstablePetCallback;
-    QueryCallback<PreparedQueryResult, uint32> _stableSwapCallback;
-    QueryCallback<PreparedQueryResult, ObjectGuid> _sendStabledPetCallback;
-    QueryCallback<PreparedQueryResult, CharacterCreateInfo*, true> _charCreateCallback;
-
-    QueryResultHolderFuture _charLoginCallback;
-
-    QueryResultHolderFuture _loadPetFromDBSecondCallback;
-    QueryCallback_3<PreparedQueryResult, uint8, uint8, uint32> _openWrappedItemCallback;
+    QueryCallbackProcessor _queryProcessor;
+    AsyncCallbackProcessor<TransactionCallback> _transactionCallbacks;
+    AsyncCallbackProcessor<SQLQueryHolderCallback> _queryHolderProcessor;
 
     friend class World;
 protected:
@@ -981,15 +1011,6 @@ protected:
         DosProtection& operator=(DosProtection const& right) = delete;
     } AntiDOS;
 
-public:
-    // xinef: those must be public, requires calls out of worldsession :(
-    QueryCallback_2<PreparedQueryResult, uint32, AsynchPetSummon*> _loadPetFromDBFirstCallback;
-    PreparedQueryResultFuture _loadActionsSwitchSpecCallback;
-    PreparedQueryResultFuture _CharacterAuraFrozenCallback;
-
-    /***
-    END OF CALLBACKS
-    ***/
 private:
     // private trade methods
     void moveItems(Item* myItems[], Item* hisItems[]);
@@ -997,6 +1018,10 @@ private:
     bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
 
     bool recoveryItem(Item* pItem);
+
+    // logging helper
+    void LogUnexpectedOpcode(WorldPacket* packet, char const* status, const char* reason);
+    void LogUnprocessedTail(WorldPacket* packet);
 
     // EnumData helpers
     bool IsLegitCharacterForAccount(ObjectGuid guid)

@@ -27,7 +27,7 @@ bool WorldSession::CanOpenMailBox(ObjectGuid guid)
     {
         if (_player->GetSession()->GetSecurity() < SEC_MODERATOR)
         {
-            LOG_ERROR("server", "%s attempt open mailbox in cheating way.", _player->GetName().c_str());
+            LOG_ERROR("network.opcode", "%s attempt open mailbox in cheating way.", _player->GetName().c_str());
             return false;
         }
     }
@@ -115,18 +115,14 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     if (!rc)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "Player %s is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
+        LOG_DEBUG("network.opcode", "Player %s is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
             player->GetGUID().ToString().c_str(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
-#endif
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "Player %s is sending mail to %s (%s) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
+    LOG_DEBUG("network.opcode", "Player %s is sending mail to %s (%s) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
         player->GetGUID().ToString().c_str(), receiver.c_str(), rc.ToString().c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
-#endif
 
     if (player->GetGUID() == rc)
     {
@@ -136,7 +132,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     if (money && COD) // cannot send money in a COD mail
     {
-        LOG_ERROR("server", "%s attempt to dupe money!!!.", receiver.c_str());
+        LOG_ERROR("network.opcode", "%s attempt to dupe money!!!.", receiver.c_str());
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
@@ -272,7 +268,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     MailDraft draft(subject, body);
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     if (items_count > 0 || money > 0)
     {
@@ -397,9 +393,9 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
     }
     //we can return mail now
     //so firstly delete the old one
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
     stmt->setUInt32(0, mailId);
     trans->Append(stmt);
 
@@ -488,7 +484,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
     uint8 msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, it, false);
     if (msg == EQUIP_ERR_OK)
     {
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         m->RemoveItem(itemLowGuid);
         m->removedItems.push_back(itemLowGuid);
 
@@ -574,7 +570,7 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recvData)
     player->SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_OK);
 
     // save money and mail to prevent cheating
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     player->SaveGoldToDB(trans);
     player->_SaveMail(trans);
     CharacterDatabase.CommitTransaction(trans);
@@ -750,9 +746,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
     bodyItem->SetUInt32Value(ITEM_FIELD_CREATOR, m->sender);
     bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_MAIL_TEXT_MASK);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "HandleMailCreateTextItem mailid=%u", mailId);
-#endif
+    LOG_DEBUG("network.opcode", "HandleMailCreateTextItem mailid=%u", mailId);
 
     ItemPosCountVec dest;
     uint8 msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, bodyItem, false);

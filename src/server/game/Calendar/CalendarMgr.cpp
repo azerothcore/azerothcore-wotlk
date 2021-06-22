@@ -76,7 +76,7 @@ void CalendarMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u calendar events", count);
+    LOG_INFO("server.loading", ">> Loaded %u calendar events", count);
     count = 0;
 
     //                                                       0   1      2        3       4       5            6      7
@@ -102,8 +102,8 @@ void CalendarMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u calendar invites", count);
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u calendar invites", count);
+    LOG_INFO("server.loading", " ");
 
     for (uint64 i = 1; i < _maxEventId; ++i)
         if (!GetEvent(i))
@@ -121,13 +121,7 @@ void CalendarMgr::AddEvent(CalendarEvent* calendarEvent, CalendarSendEventType s
     SendCalendarEvent(calendarEvent->GetCreatorGUID(), *calendarEvent, sendType);
 }
 
-void CalendarMgr::AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite)
-{
-    SQLTransaction dummy;
-    AddInvite(calendarEvent, invite, dummy);
-}
-
-void CalendarMgr::AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite, SQLTransaction& trans)
+void CalendarMgr::AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite, CharacterDatabaseTransaction trans)
 {
     if (!calendarEvent->IsGuildAnnouncement())
         SendCalendarEventInvite(*invite);
@@ -165,8 +159,8 @@ void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover)
 
     SendCalendarEventRemovedAlert(*calendarEvent);
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt;
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabasePreparedStatement* stmt;
     MailDraft mail(calendarEvent->BuildCalendarMailSubject(remover), calendarEvent->BuildCalendarMailBody());
 
     CalendarInviteStore& eventInvites = _invites[calendarEvent->GetEventId()];
@@ -212,8 +206,8 @@ void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, ObjectGuid /*rem
     if (itr == _invites[eventId].end())
         return;
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CALENDAR_INVITE);
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CALENDAR_INVITE);
     stmt->setUInt64(0, (*itr)->GetInviteId());
     trans->Append(stmt);
     CharacterDatabase.CommitTransaction(trans);
@@ -234,7 +228,7 @@ void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, ObjectGuid /*rem
 
 void CalendarMgr::UpdateEvent(CalendarEvent* calendarEvent)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CALENDAR_EVENT);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CALENDAR_EVENT);
     stmt->setUInt64(0, calendarEvent->GetEventId());
     stmt->setUInt32(1, calendarEvent->GetCreatorGUID().GetCounter());
     stmt->setString(2, calendarEvent->GetTitle());
@@ -247,15 +241,9 @@ void CalendarMgr::UpdateEvent(CalendarEvent* calendarEvent)
     CharacterDatabase.Execute(stmt);
 }
 
-void CalendarMgr::UpdateInvite(CalendarInvite* invite)
+void CalendarMgr::UpdateInvite(CalendarInvite* invite, CharacterDatabaseTransaction trans)
 {
-    SQLTransaction dummy;
-    UpdateInvite(invite, dummy);
-}
-
-void CalendarMgr::UpdateInvite(CalendarInvite* invite, SQLTransaction& trans)
-{
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CALENDAR_INVITE);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CALENDAR_INVITE);
     stmt->setUInt64(0, invite->GetInviteId());
     stmt->setUInt64(1, invite->GetEventId());
     stmt->setUInt32(2, invite->GetInviteeGUID().GetCounter());
@@ -314,9 +302,7 @@ CalendarInvite* CalendarMgr::GetInvite(uint64 inviteId) const
             if ((*itr2)->GetInviteId() == inviteId)
                 return *itr2;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("entities.unit", "CalendarMgr::GetInvite: [" UI64FMTD "] not found!", inviteId);
-#endif
     return nullptr;
 }
 

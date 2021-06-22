@@ -49,8 +49,8 @@ public:
     void SaveToDB();
     bool LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields);
 
-    void DeleteFromDB(SQLTransaction& trans);
-    static void DeleteFromDB(ObjectGuid const ownerGuid, SQLTransaction& trans);
+    void DeleteFromDB(CharacterDatabaseTransaction trans);
+    static void DeleteFromDB(ObjectGuid const ownerGuid, CharacterDatabaseTransaction trans);
 
     [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(CORPSE_FIELD_OWNER); }
 

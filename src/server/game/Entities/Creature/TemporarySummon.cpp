@@ -7,7 +7,6 @@
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
-#include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -139,7 +138,7 @@ void TempSummon::Update(uint32 diff)
             }
         default:
             UnSummon();
-            LOG_ERROR("server", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
+            LOG_ERROR("entities.unit", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
             break;
     }
 }
@@ -263,7 +262,7 @@ void TempSummon::RemoveFromWorld()
                     owner->m_SummonSlot[slot].Clear();
 
     //if (GetOwnerGUID())
-    //    LOG_ERROR("server", "Unit %u has owner guid when removed from world", GetEntry());
+    //    LOG_ERROR("entities.unit", "Unit %u has owner guid when removed from world", GetEntry());
 
     Creature::RemoveFromWorld();
 }
@@ -282,11 +281,11 @@ void Minion::InitStats(uint32 duration)
 
     SetReactState(REACT_PASSIVE);
 
-    Unit* m_owner = GetOwner();
-    SetCreatorGUID(m_owner->GetGUID());
-    setFaction(m_owner->getFaction());
+    Unit* owner = GetOwner();
+    SetCreatorGUID(owner->GetGUID());
+    setFaction(owner->getFaction());
 
-    m_owner->SetMinion(this, true);
+    owner->SetMinion(this, true);
 }
 
 void Minion::RemoveFromWorld()

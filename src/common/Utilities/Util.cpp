@@ -6,66 +6,19 @@
 
 #include "Util.h"
 #include "Common.h"
-#include "utf8.h"
-#include "Log.h"
-#include "Errors.h"
-#include "TypeList.h"
-#include <ace/Task.h>
-#include "SFMT.h"
-#include "Errors.h" // for ASSERT
-#include <ace/TSS_T.h>
-#include <array>
-#include <cwchar>
+#include "Containers.h"
+// #include "IpAddress.h"
+#include "StringConvert.h"
+#include "StringFormat.h"
+#include <utf8.h>
+#include <algorithm>
+#include <iomanip>
+#include <sstream>
 #include <string>
-#include <random>
-
-typedef ACE_TSS<SFMTRand> SFMTRandTSS;
-static SFMTRandTSS sfmtRand;
-static SFMTEngine engine;
-
-int32 irand(int32 min, int32 max)
-{
-    ASSERT(max >= min);
-    return int32(sfmtRand->IRandom(min, max));
-}
-
-uint32 urand(uint32 min, uint32 max)
-{
-    ASSERT(max >= min);
-    return sfmtRand->URandom(min, max);
-}
-
-float frand(float min, float max)
-{
-    ASSERT(max >= min);
-    return float(sfmtRand->Random() * (max - min) + min);
-}
-
-uint32 rand32()
-{
-    return int32(sfmtRand->BRandom());
-}
-
-double rand_norm()
-{
-    return sfmtRand->Random();
-}
-
-double rand_chance()
-{
-    return sfmtRand->Random() * 100.0;
-}
-
-uint32 urandweighted(size_t count, double const* chances)
-{
-    std::discrete_distribution<uint32> dd(chances, chances + count);
-    return dd(SFMTEngine::Instance());
-}
-
-SFMTEngine& SFMTEngine::Instance()
-{
-    return engine;
-}
+#include <cctype>
+#include <cstdarg>
+#include <ctime>
+#include <ace/Default_Constants.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
 {
@@ -390,7 +343,7 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
 {
     try
     {
-        acore::CheckedBufferOutputIterator<wchar_t> out(wstr, wsize);
+        Acore::CheckedBufferOutputIterator<wchar_t> out(wstr, wsize);
         out = utf8::utf8to16(utf8str, utf8str + csize, out);
         wsize -= out.remaining(); // remaining unused space
         wstr[wsize] = L'\0';
@@ -632,7 +585,7 @@ bool Utf8ToUpperOnlyLatin(std::string& utf8String)
     return WStrToUtf8(wstr, utf8String);
 }
 
-std::string acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, bool reverse /* = false */)
+std::string Acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, bool reverse /* = false */)
 {
     int32 init = 0;
     int32 end = arrayLen;
@@ -656,7 +609,7 @@ std::string acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, 
     return ss.str();
 }
 
-void acore::Impl::HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse /*= false*/)
+void Acore::Impl::HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse /*= false*/)
 {
     ASSERT(str.size() == (2 * outlen));
 

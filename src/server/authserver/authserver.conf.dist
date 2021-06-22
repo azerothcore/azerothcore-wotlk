@@ -135,6 +135,15 @@ WrongPass.BanType = 0
 WrongPass.Logging = 0
 
 #
+#    IPLocationFile
+#        Description: The path to your IP2Location database CSV file.
+#        Example:     "C:/acore/IP2LOCATION-LITE-DB1.CSV"
+#                     "/home/acore/IP2LOCATION-LITE-DB1.CSV"
+#        Default:     ""  - (Disabled)
+
+IPLocationFile = ""
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -185,7 +194,16 @@ LoginDatabase.SynchThreads = 1
 
 ###################################################################################################
 # CRYPTOGRAPHY
+
 #
+#    EnableTOTP
+#        Description: Check if a TOTP token is needed on account login
+#
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+EnableTOTP = 0
+
 #    TOTPMasterSecret
 #        Description: The master key used to encrypt TOTP secrets for database storage.
 #                     If you want to change this, uncomment TOTPOldMasterSecret, then copy

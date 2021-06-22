@@ -13,6 +13,7 @@ option(ENABLE_EXTRAS       "Set to 0 to disable extra features optimizing perfor
 option(ENABLE_VMAP_CHECKS  "Enable Checks relative to DisableMgr system on vmap"         1)
 option(ENABLE_EXTRA_LOGS   "Enable extra log functions that can be CPU intensive"        0)
 option(WITH_DYNAMIC_LINKING "Enable dynamic library linking."                            0)
+option(WITH_STRICT_DATABASE_TYPE_CHECKS "Enable strict checking of database field value accessors" 0)
 
 IsDynamicLinkingRequired(WITH_DYNAMIC_LINKING_FORCED)
 

@@ -320,7 +320,7 @@ public:
     void HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
 };
 
-namespace acore
+namespace Acore
 {
     // Binary predicate for sorting the priority of absorption aura effects
     class AbsorbAuraOrderPred
