@@ -26,16 +26,8 @@
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  define ACORE_PATH_MAX MAX_PATH
 #  define _USE_MATH_DEFINES
-#  ifndef DECLSPEC_NORETURN
-#    define DECLSPEC_NORETURN __declspec(noreturn)
-#  endif //DECLSPEC_NORETURN
-#  ifndef DECLSPEC_DEPRECATED
-#    define DECLSPEC_DEPRECATED __declspec(deprecated)
-#  endif //DECLSPEC_DEPRECATED
 #else //AC_PLATFORM != AC_PLATFORM_WINDOWS
 #  define ACORE_PATH_MAX PATH_MAX
-#  define DECLSPEC_NORETURN
-#  define DECLSPEC_DEPRECATED
 #endif //AC_PLATFORM
 
 #if !defined(COREDEBUG)
@@ -48,13 +40,9 @@
 #endif //!COREDEBUG
 
 #if AC_COMPILER == AC_COMPILER_GNU
-#  define ATTR_NORETURN __attribute__((noreturn))
 #  define ATTR_PRINTF(F, V) __attribute__ ((format (printf, F, V)))
-#  define ATTR_DEPRECATED __attribute__((deprecated))
 #else //AC_COMPILER != AC_COMPILER_GNU
-#  define ATTR_NORETURN
 #  define ATTR_PRINTF(F, V)
-#  define ATTR_DEPRECATED
 #endif //AC_COMPILER == AC_COMPILER_GNU
 
 #ifdef ACORE_API_USE_DYNAMIC_LINKING
