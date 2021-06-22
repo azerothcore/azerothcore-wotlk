@@ -601,7 +601,7 @@ public:
                 case 13:
                     me->setActive(false);
                     if (Creature* c = me->FindNearestCreature(NPC_SUNWELL_VISUAL_BUNNY, 60.0f, true))
-                        c->DespawnOrUnsummon(1);
+                        c->DespawnOrUnsummon(1ms);
                     if (GameObject* go = me->FindNearestGameObject(GO_QUEL_DELAR, 60.0f))
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     me->SetWalk(true);

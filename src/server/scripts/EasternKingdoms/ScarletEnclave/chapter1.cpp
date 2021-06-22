@@ -482,7 +482,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE && point == 1)
             {
-                me->DespawnOrUnsummon(1500);
+                me->DespawnOrUnsummon(1500ms);
                 me->CastSpell(me, SPELL_GHOUL_SUBMERGE, true);
             }
         }

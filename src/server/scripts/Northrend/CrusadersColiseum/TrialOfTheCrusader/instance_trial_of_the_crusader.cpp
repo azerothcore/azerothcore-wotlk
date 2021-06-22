@@ -1324,7 +1324,7 @@ public:
                         {
                             c->SetVisible(true);
                             c->AI()->Talk(SAY_STAGE_4_05);
-                            c->DespawnOrUnsummon(0);
+                            c->DespawnOrUnsummon();
                         }
 
                         break;

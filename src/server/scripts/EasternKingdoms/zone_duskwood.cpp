@@ -58,7 +58,7 @@ public:
                 for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
                     if ((*itr)->IsAlive() && me->GetGUID() != (*itr)->GetGUID())
                     {
-                        me->DespawnOrUnsummon(1);
+                        me->DespawnOrUnsummon(1ms);
                         break;
                     }
 

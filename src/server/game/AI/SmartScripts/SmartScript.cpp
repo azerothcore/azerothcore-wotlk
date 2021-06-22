@@ -1299,7 +1299,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 {
                     if (IsCreature(*itr))
-                        (*itr)->ToCreature()->DespawnOrUnsummon(e.action.forceDespawn.delay + 1);
+                        (*itr)->ToCreature()->DespawnOrUnsummon(Milliseconds(e.action.forceDespawn.delay) + 1ms);
                     else if (IsGameObject(*itr))
                         (*itr)->ToGameObject()->Delete();
                 }

@@ -1880,12 +1880,12 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn)
     RemoveCorpse(true);
 }
 
-void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
+void Creature::DespawnOrUnsummon(Milliseconds timeToDespawn /*= 0s*/)
 {
     if (TempSummon* summon = this->ToTempSummon())
-        summon->UnSummon(msTimeToDespawn);
+        summon->UnSummon(timeToDespawn.count());
     else
-        ForcedDespawn(msTimeToDespawn);
+        ForcedDespawn(timeToDespawn.count());
 }
 
 void Creature::InitializeReactState()

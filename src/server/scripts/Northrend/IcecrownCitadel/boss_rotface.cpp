@@ -358,7 +358,7 @@ public:
         {
             if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ROTFACE)))
                 rotface->AI()->SummonedCreatureDespawn(me);
-            me->DespawnOrUnsummon(0);
+            me->DespawnOrUnsummon();
         }
 
         void UpdateAI(uint32 diff) override

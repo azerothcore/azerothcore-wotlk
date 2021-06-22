@@ -3092,10 +3092,10 @@ public:
                             if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
                             {
                                 valimathras->GetMotionMaster()->MovePoint(0, 1804.559f, 235.504f, 62.753f);
-                                valimathras->DespawnOrUnsummon(3 * IN_MILLISECONDS);
+                                valimathras->DespawnOrUnsummon(3s);
                             }
                             if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
-                                valimathrasportal->DespawnOrUnsummon(6 * IN_MILLISECONDS);
+                                valimathrasportal->DespawnOrUnsummon(6s);
                             JumpToNextStep(1 * IN_MILLISECONDS);
                             break;
                         case 26:
@@ -3372,10 +3372,10 @@ public:
                             if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
                             {
                                 valimathras->GetMotionMaster()->MovePoint(0, 1596.642f, 429.811f, -46.3429f);
-                                valimathras->DespawnOrUnsummon(3 * IN_MILLISECONDS);
+                                valimathras->DespawnOrUnsummon(3s);
                             }
                             if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
-                                valimathrasportal->DespawnOrUnsummon(3 * IN_MILLISECONDS);
+                                valimathrasportal->DespawnOrUnsummon(3s);
                             JumpToNextStep(2 * IN_MILLISECONDS);
                             break;
                         // KHANOK - Trashspawn
@@ -3906,8 +3906,8 @@ public:
                             me->GetCreatureListWithEntryInGrid(HelperList, NPC_OVERLORD_SAURFANG, 100.0f);
                             if (!HelperList.empty())
                                 for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                    (*itr)->DespawnOrUnsummon(120 * IN_MILLISECONDS);
-                            me->DespawnOrUnsummon(120 * IN_MILLISECONDS);
+                                    (*itr)->DespawnOrUnsummon(120s);
+                            me->DespawnOrUnsummon(120s);
                             bStepping = false;
                             JumpToNextStep(0 * IN_MILLISECONDS);
                             break;

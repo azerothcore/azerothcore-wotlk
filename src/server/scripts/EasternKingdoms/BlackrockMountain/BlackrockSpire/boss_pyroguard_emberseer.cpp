@@ -330,7 +330,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(10000);
+            me->DespawnOrUnsummon(10s);
         }
 
         void SetData(uint32 data, uint32 value) override

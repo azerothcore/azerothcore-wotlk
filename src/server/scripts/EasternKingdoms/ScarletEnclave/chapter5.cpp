@@ -680,7 +680,7 @@ public:
                             orbaz->SetReactState(REACT_PASSIVE);
                             orbaz->AI()->Talk(EMOTE_LIGHT_OF_DAWN04);
                             orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], true, true);
-                            orbaz->DespawnOrUnsummon(7000);
+                            orbaz->DespawnOrUnsummon(7s);
                         }
 
                         for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -826,7 +826,7 @@ public:
                         alex->AI()->Talk(SAY_LIGHT_OF_DAWN41);
 
                     if (Creature* darion = GetEntryFromSummons(NPC_DARION_MOGRAINE))
-                        darion->DespawnOrUnsummon(3000);
+                        darion->DespawnOrUnsummon(3s);
                     break;
                 case EVENT_OUTRO_SCENE_19:
                     if (Creature* alex = GetEntryFromSummons(NPC_HIGHLORD_ALEXANDROS_MOGRAINE))
@@ -873,7 +873,7 @@ public:
                 case EVENT_OUTRO_SCENE_23:
                     if (Creature* alex = GetEntryFromSummons(NPC_HIGHLORD_ALEXANDROS_MOGRAINE))
                     {
-                        alex->DespawnOrUnsummon(5000);
+                        alex->DespawnOrUnsummon(5s);
                         alex->SetVisible(false);
                     }
                     break;
@@ -1036,7 +1036,7 @@ public:
                     if (Creature* lk = GetEntryFromSummons(NPC_THE_LICH_KING))
                     {
                         lk->CastSpell(lk, SPELL_EXIT_TELEPORT_VISUAL, true);
-                        lk->DespawnOrUnsummon(1500);
+                        lk->DespawnOrUnsummon(1500ms);
                     }
 
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
@@ -1126,7 +1126,7 @@ public:
                     }
                 case EVENT_OUTRO_SCENE_61:
                     summons.DespawnAll();
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     events.Reset();
                     return;
             }

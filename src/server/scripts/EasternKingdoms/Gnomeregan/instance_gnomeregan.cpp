@@ -78,7 +78,7 @@ public:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
                         player->GroupEventHappens(QUEST_A_FINE_MESS, me);
-                    me->DespawnOrUnsummon(1000);
+                    me->DespawnOrUnsummon(1s);
                 }
             }
         }

@@ -339,12 +339,12 @@ public:
                     return 0.5 * IN_MILLISECONDS;
                 case 13:
                     mograine->AI()->Talk(2);
-                    mograine->DespawnOrUnsummon(3 * IN_MILLISECONDS);
+                    mograine->DespawnOrUnsummon(3s);
                     mograine->Kill(me, me, true);
                     return 0;
                 default:
                     if(mograine)
-                        mograine->DespawnOrUnsummon(0);
+                        mograine->DespawnOrUnsummon();
                     return 0;
             }
         }

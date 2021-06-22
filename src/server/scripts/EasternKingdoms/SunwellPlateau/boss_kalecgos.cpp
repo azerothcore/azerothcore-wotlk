@@ -428,7 +428,7 @@ public:
                     break;
                 case EVENT_KALEC_SCENE_3:
                     me->GetMotionMaster()->MovePoint(0, 1400.0f, 630.0f, 90.0f, false, true);
-                    me->DespawnOrUnsummon(6000);
+                    me->DespawnOrUnsummon(6s);
                     break;
             }
 

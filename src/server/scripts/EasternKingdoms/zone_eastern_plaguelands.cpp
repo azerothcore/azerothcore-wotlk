@@ -268,7 +268,7 @@ public:
                 if (Unit* creature = summon->GetSummoner())
                     creature->GetAI()->DoAction(1);
 
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void JustDied(Unit*) override

@@ -114,7 +114,7 @@ public:
         void SummonedCreatureDies(Creature* summon, Unit* killer) override
         {
             summons.Despawn(summon);
-            summon->DespawnOrUnsummon(1);
+            summon->DespawnOrUnsummon(1ms);
             if (killer)
                 killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
         }

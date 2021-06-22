@@ -376,7 +376,7 @@ public:
                     }
                     break;
                 case EVENT_SPAWN_FELMYST:
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     if (Creature* felmyst = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_FELMYST)))
                         felmyst->AI()->DoAction(ACTION_START_EVENT);
                     break;
