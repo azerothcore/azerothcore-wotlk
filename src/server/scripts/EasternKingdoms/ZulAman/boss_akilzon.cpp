@@ -172,7 +172,7 @@ public:
                 {
                     x = 343.0f + rand() % 60;
                     y = 1380.0f + rand() % 60;
-                    if (Unit* trigger = me->SummonTrigger(x, y, z, 0, 2000))
+                    if (Unit* trigger = me->SummonTrigger(x, y, z, 0, 2s))
                     {
                         trigger->setFaction(35);
                         trigger->SetMaxHealth(100000);
@@ -262,7 +262,7 @@ public:
                             }
                             */
 
-                            Unit* Cloud = me->SummonTrigger(x, y, me->GetPositionZ() + 16, 0, 15000);
+                            Unit* Cloud = me->SummonTrigger(x, y, me->GetPositionZ() + 16, 0, 15s);
                             if (Cloud)
                             {
                                 CloudGUID = Cloud->GetGUID();

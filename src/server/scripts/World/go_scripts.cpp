@@ -357,7 +357,7 @@ public:
                 {
                     std::list<Player*>::iterator itr = players.begin();
                     std::advance(itr, urand(0, players.size() - 1));
-                    if (Creature* trigger = go->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
+                    if (Creature* trigger = go->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2s, true))
                         trigger->CastSpell(trigger, SPELL_FLAMES);
                 }
             }
@@ -404,7 +404,7 @@ public:
                 {
                     std::list<Player*>::iterator itr = players.begin();
                     std::advance(itr, urand(0, players.size() - 1));
-                    if (Creature* trigger = go->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2000, true))
+                    if (Creature* trigger = go->SummonTrigger((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), 0, 2s, true))
                         trigger->CastSpell(trigger, SPELL_HEAT);
                 }
             }

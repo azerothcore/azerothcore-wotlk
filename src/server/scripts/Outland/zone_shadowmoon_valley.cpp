@@ -61,7 +61,7 @@ public:
                 GameObject* go = *itr;
                 if (!go->isSpawned())
                     continue;
-                Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
+                Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 10ms);
                 if (cr2)
                 {
                     cr2->setFaction(14);

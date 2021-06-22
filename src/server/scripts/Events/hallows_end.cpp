@@ -1114,7 +1114,7 @@ public:
                                 break;
                             case 2:
                                 player->MonsterSay("Your time is nigh...", LANG_UNIVERSAL, 0);
-                                if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15 * IN_MILLISECONDS))
+                                if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15s))
                                     trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
                                 break;
                             case 3:
