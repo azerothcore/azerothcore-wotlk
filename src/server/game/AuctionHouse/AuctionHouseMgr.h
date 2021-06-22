@@ -13,6 +13,7 @@
 #include "EventProcessor.h"
 #include "ObjectGuid.h"
 #include "WorldPacket.h"
+#include <unordered_map>
 
 class Item;
 class Player;
