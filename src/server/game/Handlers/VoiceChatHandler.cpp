@@ -4,6 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Log.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"

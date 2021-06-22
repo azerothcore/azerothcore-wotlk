@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #include "LoginDatabase.h"
+#include "MySQLPreparedStatement.h"
 
 void LoginDatabaseConnection::DoPrepareStatements()
 {
@@ -109,4 +109,16 @@ void LoginDatabaseConnection::DoPrepareStatements()
 
     PrepareStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET, "SELECT totp_secret FROM account WHERE id = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET, "UPDATE account SET totp_secret = ? WHERE id = ?", CONNECTION_ASYNC);
+}
+
+LoginDatabaseConnection::LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
+{
+}
+
+LoginDatabaseConnection::LoginDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo)
+{
+}
+
+LoginDatabaseConnection::~LoginDatabaseConnection()
+{
 }
