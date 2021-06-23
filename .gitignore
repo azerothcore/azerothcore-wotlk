@@ -92,3 +92,34 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
+/.vs/CMake Overview
+/.vs/ProjectSettings.json
+/.vs/VSWorkspaceState.json
+/.vs/azerothcore-wotlk/v16/.suo
+/.vs/azerothcore-wotlk/v16/Browse.VC.db
+/.vs/azerothcore-wotlk/v16/ipch/AutoPCH/6471c316927369aa/REFORGER.ipch
+/.vs/cmake.db
+/.vs/slnx.sqlite
+/CMakeSettings.json
+/out/build/x64-Debug/.cmake/api/v1/query/client-MicrosoftVS/query.json
+/out/build/x64-Debug/CMakeCache.txt
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CMakeCCompiler.cmake
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CMakeCXXCompiler.cmake
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CMakeDetermineCompilerABI_C.bin
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CMakeDetermineCompilerABI_CXX.bin
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CMakeRCCompiler.cmake
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CMakeSystem.cmake
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CompilerIdC/CMakeCCompilerId.c
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CompilerIdC/CMakeCCompilerId.exe
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CompilerIdC/CMakeCCompilerId.obj
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.cpp
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.exe
+/out/build/x64-Debug/CMakeFiles/3.20.21032501-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.obj
+/out/build/x64-Debug/CMakeFiles/CMakeError.log
+/out/build/x64-Debug/CMakeFiles/CMakeOutput.log
+/out/build/x64-Debug/CMakeFiles/ShowIncludes/foo.h
+/out/build/x64-Debug/CMakeFiles/ShowIncludes/main.c
+/out/build/x64-Debug/CMakeFiles/ShowIncludes/main.obj
+/out/build/x64-Debug/CMakeFiles/cmake.check_cache
+/out/build/x64-Debug/VSInheritEnvironments.txt
+/out/build/x64-Debug/revision.h
