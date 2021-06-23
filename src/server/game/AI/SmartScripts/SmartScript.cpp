@@ -1385,9 +1385,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 {
                     if (IsCreature(*itr))
+                    {
                         (*itr)->ToCreature()->AI()->SetData(e.action.setData.field, e.action.setData.data);
+                        (*itr)->ToCreature()->m_data.SetData(e.action.setData.field, e.action.setData.data);
+                    }
                     else if (IsGameObject(*itr))
+                    {
                         (*itr)->ToGameObject()->AI()->SetData(e.action.setData.field, e.action.setData.data);
+                    }
                 }
 
                 delete targets;

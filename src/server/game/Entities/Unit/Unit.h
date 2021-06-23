@@ -1382,6 +1382,22 @@ private:
     Unit* defaultValue;
 };
 
+/* This Class is the abstraction meant to represent a "State".
+ * SmartAI usually sends "Data" which are a couple of values sent to
+ * other event functions in order to proc certain events. Here we store
+ * the Unit's data object in order to use them in, for example, Conditions.
+*/
+class UnitData
+{
+public:
+    UnitData(uint32 field, uint32 data) : _field(field), _data(data) {}
+    void SetData(uint32 field, uint32 data) { _field = field; _data = data; }
+    uint32 GetData(uint32 field) { return _data; }
+private:
+    uint32 _field;
+    uint32 _data;
+};
+
 class Unit : public WorldObject
 {
 public:
@@ -2497,6 +2513,7 @@ public:
     [[nodiscard]] float GetCollisionWidth() const override;
     [[nodiscard]] float GetCollisionRadius() const override;
 
+    UnitData m_data;
 protected:
     explicit Unit (bool isWorldObject);
 
@@ -2578,7 +2595,6 @@ protected:
     bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
     bool _instantCast;
-
 private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
     bool HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
