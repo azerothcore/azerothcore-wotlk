@@ -217,7 +217,9 @@ UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 2806); -- It wa
 UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 2817); -- It was 1.05
 UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 2830); -- It was 1.05
 UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 2850); -- It was 1.6
+UPDATE `creature_template` SET `speed_run` = 1.42857 WHERE (`entry` = 2850); -- It was 1.14286
 UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 2852); -- It was 0.96
+UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 2853); -- It was 0.96
 UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 2860); -- It was 1.05
 UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 2888); -- It was 1.05
 UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 2892); -- It was 1.05
