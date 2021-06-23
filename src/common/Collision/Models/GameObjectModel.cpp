@@ -5,12 +5,12 @@
  */
 
 #include "GameObjectModel.h"
-#include "VMapFactory.h"
-#include "VMapManager2.h"
-#include "VMapDefinitions.h"
-#include "WorldModel.h"
 #include "Log.h"
 #include "Timer.h"
+#include "VMapDefinitions.h"
+#include "VMapFactory.h"
+#include "VMapManager2.h"
+#include "WorldModel.h"
 
 using G3D::Vector3;
 using G3D::Ray;

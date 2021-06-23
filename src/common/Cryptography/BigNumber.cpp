@@ -5,10 +5,10 @@
 
 #include "Cryptography/BigNumber.h"
 #include "Errors.h"
-#include <openssl/bn.h>
-#include <cstring>
 #include <algorithm>
+#include <cstring>
 #include <memory>
+#include <openssl/bn.h>
 
 BigNumber::BigNumber()
     : _bn(BN_new())

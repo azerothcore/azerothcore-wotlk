@@ -6,10 +6,10 @@
 #include "AppenderConsole.h"
 #include "LogMessage.h"
 #include "SmartEnum.h"
-#include "StringFormat.h"
 #include "StringConvert.h"
-#include "Util.h"
+#include "StringFormat.h"
 #include "Tokenize.h"
+#include "Util.h"
 #include <sstream>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS

@@ -7,8 +7,8 @@
 #ifndef THREADING_H
 #define THREADING_H
 
-#include <thread>
 #include <atomic>
+#include <thread>
 
 namespace Acore
 {

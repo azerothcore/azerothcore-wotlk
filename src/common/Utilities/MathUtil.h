@@ -5,10 +5,10 @@
 #ifndef _MATH_UTIL_H
 #define _MATH_UTIL_H
 
-#include <vector>
-#include <iterator>
 #include <algorithm>
+#include <iterator>
 #include <numeric>
+#include <vector>
 
 // based on https://stackoverflow.com/questions/7616511/calculate-mean-and-standard-deviation-from-a-vector-of-samples-in-c-using-boos/12405793#comment32490316_12405793
 template <typename Container, typename T = typename std::decay<decltype(*std::begin(std::declval<Container>()))>::type>

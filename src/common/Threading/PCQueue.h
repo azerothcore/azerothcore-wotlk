@@ -7,10 +7,10 @@
 #ifndef _PCQ_H
 #define _PCQ_H
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
-#include <atomic>
 #include <type_traits>
 
 template <typename T>

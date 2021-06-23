@@ -9,12 +9,12 @@
 #include "Common.h"
 #include "Config.h"
 #include "Errors.h"
-#include "Logger.h"
 #include "LogMessage.h"
 #include "LogOperation.h"
+#include "Logger.h"
 #include "StringConvert.h"
-#include "Util.h"
 #include "Tokenize.h"
+#include "Util.h"
 #include <chrono>
 #include <sstream>
 

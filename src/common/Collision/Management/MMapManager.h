@@ -9,10 +9,10 @@
 
 #include "Common.h"
 #include "DetourAlloc.h"
-#include "DetourNavMesh.h"
 #include "DetourExtended.h"
-#include <unordered_map>
+#include "DetourNavMesh.h"
 #include <shared_mutex>
+#include <unordered_map>
 #include <vector>
 
 //  memory management

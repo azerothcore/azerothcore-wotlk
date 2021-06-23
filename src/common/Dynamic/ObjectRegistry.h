@@ -8,10 +8,10 @@
 #define ACORE_OBJECTREGISTRY_H
 
 #include "Define.h"
-#include <string>
-#include <vector>
 #include <map>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 /** ObjectRegistry holds all registry item of the same type
  */
