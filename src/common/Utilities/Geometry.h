@@ -11,11 +11,10 @@
 #ifndef _ACORE_GEOMETRY_H
 #define _ACORE_GEOMETRY_H
 
-#include <cmath>
-#include <iostream>
+#include "Define.h"
 #include <cstdlib>
-
-using namespace std;
+#include <iostream>
+#include <math.h>
 
 [[nodiscard]] inline float getAngle(float startX, float startY, float destX, float destY)
 {

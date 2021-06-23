@@ -103,7 +103,13 @@ public:
                 if (procSpell->IsAffectingArea())
                     targets = 1;
 
-            eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, eventInfo.GetActionTarget(), false, nullptr, aurEff);
+            if (Unit* target = eventInfo.GetActionTarget())
+            {
+                if (target->IsAlive())
+                {
+                    eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, target, false, nullptr, aurEff);
+                }
+            }
         }
 
         void Register() override
@@ -652,7 +658,7 @@ public:
 
         void CountTargets(std::list<WorldObject*>& targetList)
         {
-            acore::Containers::RandomResize(targetList, GetSpellValue()->MaxAffectedTargets);
+            Acore::Containers::RandomResize(targetList, GetSpellValue()->MaxAffectedTargets);
             _targetCount = targetList.size();
         }
 
@@ -767,7 +773,7 @@ public:
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::HealthPctOrderPred());
+                targets.sort(Acore::HealthPctOrderPred());
                 targets.resize(maxTargets);
             }
         }

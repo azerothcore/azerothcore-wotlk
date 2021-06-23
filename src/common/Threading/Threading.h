@@ -7,10 +7,10 @@
 #ifndef THREADING_H
 #define THREADING_H
 
-#include <thread>
 #include <atomic>
+#include <thread>
 
-namespace acore
+namespace Acore
 {
     class Runnable
     {

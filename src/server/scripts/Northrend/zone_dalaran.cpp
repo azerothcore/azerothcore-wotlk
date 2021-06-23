@@ -540,12 +540,12 @@ public:
 
             if (PlayerInDalaranList.empty())
                 return nullptr;
-            return acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
+            return Acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
         }
 
         void SendMailToPlayer(Player* player)
         {
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             int16 deliverDelay = irand(MAIL_DELIVER_DELAY_MIN, MAIL_DELIVER_DELAY_MAX);
             MailDraft(MAIL_MINIGOB_ENTRY, true).SendMailTo(trans, MailReceiver(player), MailSender(MAIL_CREATURE, me->GetEntry()), MAIL_CHECK_MASK_NONE, deliverDelay);
             CharacterDatabase.CommitTransaction(trans);

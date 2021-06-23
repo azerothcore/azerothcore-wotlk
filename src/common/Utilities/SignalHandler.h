@@ -8,10 +8,10 @@
 #define _SIGNAL_HANDLER_H_
 
 #include <csignal>
-#include <unordered_set>
 #include <mutex>
+#include <unordered_set>
 
-namespace acore
+namespace Acore
 {
     /// Handle termination signals
     class SignalHandler

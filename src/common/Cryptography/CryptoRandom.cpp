@@ -7,7 +7,7 @@
 #include "Errors.h"
 #include <openssl/rand.h>
 
-void acore::Crypto::GetRandomBytes(uint8* buf, size_t len)
+void Acore::Crypto::GetRandomBytes(uint8* buf, size_t len)
 {
     int result = RAND_bytes(buf, len);
     ASSERT(result == 1);

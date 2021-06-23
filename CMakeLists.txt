@@ -40,6 +40,7 @@ list(APPEND CMAKE_MODULE_PATH
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 include(ConfigureScripts)
+include(ConfigureModules)
 
 # some utils for cmake
 include(deps/acore/cmake-utils/utils.cmake)
@@ -70,7 +71,6 @@ FOREACH(subdir ${sub_DIRS})
 
     STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
     if(EXISTS "${subdir}/CMakeLists.txt")
-        message("Loading module: ${subdir_rel}")
         add_subdirectory("${subdir_rel}")
     endif()
 ENDFOREACH()

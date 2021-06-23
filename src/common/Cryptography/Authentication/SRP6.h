@@ -8,13 +8,13 @@
 
 #include "AuthDefines.h"
 #include "BigNumber.h"
-#include "Define.h"
 #include "Common.h"
 #include "CryptoHash.h"
+#include "Define.h"
 #include <array>
 #include <optional>
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     class SRP6
     {

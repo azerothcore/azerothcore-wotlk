@@ -5,7 +5,7 @@
 #ifndef AZEROTHCORE_IWORLD_H
 #define AZEROTHCORE_IWORLD_H
 
-#include "Callback.h"
+#include "AsyncCallbackProcessor.h"
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
@@ -15,6 +15,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 class WorldPacket;
 class WorldSession;
@@ -113,6 +114,7 @@ enum WorldBoolConfigs
     CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS,
     CONFIG_ARENA_SEASON_IN_PROGRESS,
     CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE,
+    CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY,
     CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN,
     CONFIG_VMAP_INDOOR_CHECK,
     CONFIG_PET_LOS,
@@ -251,6 +253,7 @@ enum WorldIntConfigs
     CONFIG_CHATFLOOD_MUTE_TIME,
     CONFIG_EVENT_ANNOUNCE,
     CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY,
+    CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD,
     CONFIG_CREATURE_FAMILY_FLEE_DELAY,
     CONFIG_WORLD_BOSS_LEVEL_DIFF,
     CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF,
@@ -580,7 +583,11 @@ public:
     virtual void UpdateRealmCharCount(uint32 accid) = 0;
     virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
+    virtual void LoadDBRevision() = 0;
     virtual char const* GetDBVersion() const = 0;
+    virtual char const* GetWorldDBRevision() const = 0;
+    virtual char const* GetCharacterDBRevision() const = 0;
+    virtual char const* GetAuthDBRevision() const = 0;
     virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     virtual uint32 GetCleaningFlags() const = 0;
