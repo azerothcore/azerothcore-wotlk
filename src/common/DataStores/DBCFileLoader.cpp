@@ -4,11 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "DBCFileLoader.h"
+#include "Errors.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "DBCFileLoader.h"
-#include "Errors.h"
 
 DBCFileLoader::DBCFileLoader() : recordSize(0), recordCount(0), fieldCount(0), stringSize(0), fieldsOffset(nullptr), data(nullptr), stringTable(nullptr) { }
 
