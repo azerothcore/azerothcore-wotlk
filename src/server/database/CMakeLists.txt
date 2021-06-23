@@ -42,7 +42,7 @@ target_include_directories(database
 
 target_link_libraries(database
   PRIVATE
-    # acore-core-interface
+    acore-core-interface
     mysql
   PUBLIC
     common)
