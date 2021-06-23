@@ -16,18 +16,18 @@
  */
 
 #include "VMapManager2.h"
+#include "Errors.h"
+#include "Log.h"
+#include "MapDefines.h"
 #include "MapTree.h"
 #include "ModelInstance.h"
-#include "WorldModel.h"
-#include "MapDefines.h"
-#include "Log.h"
 #include "VMapDefinitions.h"
-#include "Errors.h"
+#include "WorldModel.h"
 #include <G3D/Vector3.h>
-#include <iostream>
 #include <iomanip>
-#include <string>
+#include <iostream>
 #include <sstream>
+#include <string>
 
 using G3D::Vector3;
 
