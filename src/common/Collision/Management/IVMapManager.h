@@ -7,8 +7,8 @@
 #ifndef _IVMAPMANAGER_H
 #define _IVMAPMANAGER_H
 
-#include <string>
 #include "Define.h"
+#include <string>
 
 //===========================================================
 
