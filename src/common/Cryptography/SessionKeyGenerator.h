@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
  */
 
-#include <cstring>
 #include "CryptoHash.h"
+#include <cstring>
 
 #ifndef AZEROTHCORE_SESSIONKEYGENERATOR_HPP
 #define AZEROTHCORE_SESSIONKEYGENERATOR_HPP
