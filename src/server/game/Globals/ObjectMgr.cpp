@@ -5681,14 +5681,14 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
     time_t curTime = time(nullptr);
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_EXPIRED_MAIL);
-    stmt->setUInt32(0, curTime);
+    stmt->setUInt32(0, uint32(curTime));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
         return;
 
     std::map<uint32 /*messageId*/, MailItemInfoVec> itemsCache;
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_EXPIRED_MAIL_ITEMS);
-    stmt->setUInt32(0, curTime);
+    stmt->setUInt32(0, uint32(curTime));
     if (PreparedQueryResult items = CharacterDatabase.Query(stmt))
     {
         MailItemInfo item;
@@ -5714,10 +5714,11 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         m->receiver       = fields[3].GetUInt32();
         bool has_items    = fields[4].GetBool();
         m->expire_time    = time_t(fields[5].GetUInt32());
-        m->deliver_time   = 0;
+        m->deliver_time   = time_t(0);
         m->COD            = fields[6].GetUInt32();
         m->checked        = fields[7].GetUInt8();
         m->mailTemplateId = fields[8].GetInt16();
+        m->auctionId      = fields[9].GetInt32();
 
         Player* player = nullptr;
         if (serverUp)
@@ -5755,8 +5756,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_RETURNED);
                 stmt->setUInt32(0, m->receiver);
                 stmt->setUInt32(1, m->sender);
-                stmt->setUInt32(2, curTime + 30 * DAY);
-                stmt->setUInt32(3, curTime);
+                stmt->setUInt32(2, uint32(curTime + 30 * DAY));
+                stmt->setUInt32(3, uint32(curTime));
                 stmt->setUInt8 (4, uint8(MAIL_CHECK_MASK_RETURNED));
                 stmt->setUInt32(5, m->messageID);
                 CharacterDatabase.Execute(stmt);
