@@ -695,7 +695,7 @@ CharacterCreating.Disabled.RaceMask = 0
 #                     2    - (Disabled, Paladin)
 #                     4    - (Disabled, Hunter)
 #                     8    - (Disabled, Rogue)
-#                     16   - (Disabled, Undead)
+#                     16   - (Disabled, Priest)
 #                     32   - (Disabled, Death Knight)
 #                     64   - (Disabled, Shaman)
 #                     128  - (Disabled, Mage)
@@ -2952,13 +2952,15 @@ ItemDelete.ItemLevel = 80
 PlayerStart.AllReputation = 0
 
 #
-#    PlayerStart.CustomSpells
-#        Description: If enabled, players will ignore spells from playercreateinfo_spellstart at character
-#                     creation and will start with spells from the table playercreateinfo_spell_custom instead.
+#    PlayerStart.AllSpells
+#        Description: If enabled, players will start with all their class spells (not talents).
+#                     You must populate playercreateinfo_spell_custom table with the spells you
+#                     want, or this will not work! The table has data for all classes / races up
+#                     to TBC expansion.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-PlayerStart.CustomSpells = 0
+PlayerStart.AllSpells = 0
 
 #
 #    PlayerStart.MapsExplored
