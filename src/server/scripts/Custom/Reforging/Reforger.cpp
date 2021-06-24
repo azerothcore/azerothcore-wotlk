@@ -309,7 +309,7 @@ public:
             return true;
         }
 
-        bool OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId)
         {
             uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
             uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
