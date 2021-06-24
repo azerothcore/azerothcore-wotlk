@@ -30,7 +30,7 @@ void AuthCrypt::Init(SessionKey const& K)
 
 void AuthCrypt::DecryptRecv(uint8* data, size_t len)
 {
-     ASSERT(_initialized);
+    ASSERT(_initialized);
     _clientDecrypt.UpdateData(data, len);
 }
 

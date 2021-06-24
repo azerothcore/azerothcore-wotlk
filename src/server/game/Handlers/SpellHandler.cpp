@@ -227,20 +227,18 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 
     if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))// wrapped?
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_GIFT_BY_ITEM);
-
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_GIFT_BY_ITEM);
         stmt->setUInt32(0, item->GetGUID().GetCounter());
-
-        _openWrappedItemCallback.SetFirstParam(bagIndex);
-        _openWrappedItemCallback.SetSecondParam(slot);
-        _openWrappedItemCallback.SetThirdParam(item->GetGUID().GetCounter());
-        _openWrappedItemCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
+        _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt)
+            .WithPreparedCallback(std::bind(&WorldSession::HandleOpenWrappedItemCallback, this, bagIndex, slot, item->GetGUID().GetCounter(), std::placeholders::_1)));
     }
     else
+    {
         pUser->SendLoot(item->GetGUID(), LOOT_CORPSE);
+    }
 }
 
-void WorldSession::HandleOpenWrappedItemCallback(PreparedQueryResult result, uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID)
+void WorldSession::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result)
 {
     if (!GetPlayer())
         return;
@@ -254,12 +252,12 @@ void WorldSession::HandleOpenWrappedItemCallback(PreparedQueryResult result, uin
 
     if (!result)
     {
-        LOG_ERROR("network.opcode", "Wrapped item %s don't have record in character_gifts table and will deleted", item->GetGUID().ToString().c_str());
+        LOG_ERROR("network", "Wrapped item %s don't have record in character_gifts table and will deleted", item->GetGUID().ToString().c_str());
         GetPlayer()->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
         return;
     }
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     Field* fields = result->Fetch();
     uint32 entry = fields[0].GetUInt32();
@@ -273,7 +271,7 @@ void WorldSession::HandleOpenWrappedItemCallback(PreparedQueryResult result, uin
     item->SetState(ITEM_CHANGED, GetPlayer());
     GetPlayer()->SaveInventoryAndGoldToDB(trans);
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
     stmt->setUInt32(0, item->GetGUID().GetCounter());
     trans->Append(stmt);
 

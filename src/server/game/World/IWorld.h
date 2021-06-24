@@ -5,7 +5,7 @@
 #ifndef AZEROTHCORE_IWORLD_H
 #define AZEROTHCORE_IWORLD_H
 
-#include "Callback.h"
+#include "AsyncCallbackProcessor.h"
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
@@ -15,6 +15,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 class WorldPacket;
 class WorldSession;
