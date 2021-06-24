@@ -491,7 +491,7 @@ struct AcoreStringLocale
 {
     uint32 entry;
     std::string locale;
-    std::string content;
+    std::vector<std::string> content;
 };
 
 typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;

@@ -7829,9 +7829,9 @@ void ObjectMgr::LoadAcoreStringsLocales()
 
         uint32 entry = fields[0].GetUInt32();
 
-        AcoreStringLocaleContainer::iterator asl = _acoreStringStore.find(entry);
+        AcoreStringLocaleContainer::iterator asl = _acoreStringLocaleStore.find(entry);
 
-        if (asl == _acoreStringStore.end())
+        if (asl == _acoreStringLocaleStore.end())
         {
             LOG_ERROR("sql.sql", "AcoreStringLocale (Id: %u) in table `acore_string_locale` does not exist. Skipped!", entry);
             continue;
@@ -7853,7 +7853,7 @@ char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 
     if (AcoreStringLocale const* asl = GetAcoreStringLocale(entry))
     {
-        return asl->content.c_str();
+        return asl->content[locale].c_str();
     }
     else
     {
