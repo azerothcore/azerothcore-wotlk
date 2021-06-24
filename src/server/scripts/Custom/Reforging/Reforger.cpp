@@ -21,25 +21,6 @@
 #include "WorldSession.h"
 #include "DatabaseEnv.h"
 
-/*
-Reforging by Rochet2
-http://rochet2.github.io/
-
-Rules of thumb:
-Item can be reforged once.
-Item reforge wont show to anyone but you in tooltips. Stats will be there nevertheless.
-You will see the increased stats on all tooltips of the same item you reforged.
-You can disable the stat changes to tooltips by setting send_cache_packets to false in Reforging.cpp.
-Reforges are stripped when you mail, ah, guildbank the item etc. Only YOU can have the reforge.
-Only item base stats are reforgable. Enchants and random stats are not.
-
-This script is made blizzlike. This means that the reforgable stats etc are from CATACLYSM!
-I have been informed that some stats were removed etc that would be important to be reforgable.
-However I do not know what those stats are currently. Do look through the statTypes to add whatever you want.
-Edit IsReforgable is you want to tweak requirements
-
-*/
-
 // Remember to add to GetStatName too
 static const ItemModType statTypes[] = { ITEM_MOD_SPIRIT, ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_HIT_RATING, ITEM_MOD_CRIT_RATING, ITEM_MOD_HASTE_RATING, ITEM_MOD_EXPERTISE_RATING };
 static const uint8 stat_type_max = sizeof(statTypes) / sizeof(*statTypes);
@@ -253,13 +234,6 @@ class REFORGER_NPC : public CreatureScript
 public:
     REFORGER_NPC() : CreatureScript("REFORGER_NPC") { }
 
-    class ReforgeAI : public ScriptedAI
-    {
-    public:
-        ReforgeAI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
-
         bool OnGossipHello(Player* player, Creature* creature)
         {
             ClearGossipMenuFor(player);
@@ -436,12 +410,6 @@ public:
             RESTORE,
             REFORGE,
         };
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new ReforgeAI(creature);
-    }
 };
 
 void AddSC_REFORGER_NPC()
