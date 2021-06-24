@@ -288,7 +288,7 @@ public:
             bool triggered;
         };
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        static bool OnGossipHello(Player* player, Creature* creature)
         {
 
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Select slot of the item to reforge:", 0, Melt(MAIN_MENU, 0));
