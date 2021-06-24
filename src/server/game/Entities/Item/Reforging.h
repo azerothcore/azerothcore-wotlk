@@ -14,3 +14,5 @@ void SendReforgePacket(Player * player, uint32 entry, uint32 lowguid = 0, const 
 void SendReforgePackets(Player * player);
 void RemoveReforge(Player * player, uint32 itemguid, bool update);
 std::vector<Item*> GetItemList(const Player * player);
+
+#endif
