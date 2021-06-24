@@ -7811,7 +7811,7 @@ bool ObjectMgr::LoadAcoreStrings()
     return true;
 }
 
-void LoadAcoreStringsLocales()
+void ObjectMgr::LoadAcoreStringsLocales()
 {
     uint32 oldMSTime = getMSTime();
 
@@ -7833,16 +7833,14 @@ void LoadAcoreStringsLocales()
 
         if (asl == _acoreStringStore.end())
         {
-            LOG_ERROR("sql.sql", "BroadcastText (Id: %u) in table `broadcast_text_locale` does not exist. Skipped!", entry);
+            LOG_ERROR("sql.sql", "AcoreStringLocale (Id: %u) in table `acore_string_locale` does not exist. Skipped!", entry);
             continue;
         }
 
         LocaleConstant locale = GetLocaleByName(fields[1].GetString());
 
         if (locale == LOCALE_enUS)
-        {
             continue;
-        }
 
         AddLocaleString(fields[2].GetString(), locale, asl->second.content);
 
