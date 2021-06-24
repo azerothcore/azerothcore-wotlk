@@ -123,3 +123,6 @@ local.properties
 /out/build/x64-Debug/CMakeFiles/cmake.check_cache
 /out/build/x64-Debug/VSInheritEnvironments.txt
 /out/build/x64-Debug/revision.h
+/.vs/azerothcore-wotlk/v16/Browse.VC.db-shm
+/.vs/azerothcore-wotlk/v16/Browse.VC.db-wal
+/.vs/azerothcore-wotlk/v16/Browse.VC.opendb
