@@ -288,13 +288,9 @@ public:
             bool triggered;
         };
 
-        bool OnGossipHello(Player* player)
+        bool OnGossipHello(Player* player, Creature* creature)
         {
-            return OnGossipHello(player, me);
-        }
 
-        static bool OnGossipHello(Player* player, Creature* creature)
-        {
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Select slot of the item to reforge:", 0, Melt(MAIN_MENU, 0));
             for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
             {
@@ -309,14 +305,7 @@ public:
             return true;
         }
 
-        bool OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId)
-        {
-            uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
-            uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
-            return OnGossipSelect(player, me, sender, action);
-        }
-
-        static bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 melt)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 melt)
         {
             ClearGossipMenuFor(player);
 
