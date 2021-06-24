@@ -1480,6 +1480,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server", "Loading acore strings...");
     if (!sObjectMgr->LoadAcoreStrings())
         exit(1);                                            // Error message displayed in function already
+    LOG_INFO("server", "Loading acore strings locale...");
+    sObjectMgr->LoadAcoreStringsLocales();
 
     ///- Update the realm entry in the database with the realm type from the config file
     //No SQL injection as values are treated as integers
