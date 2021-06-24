@@ -238,14 +238,13 @@ public:
         {
             ClearGossipMenuFor(player);
 
-            ChatHandler(player->GetSession()).PSendSysMessage("Entrei no Hello");
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Select slot of the item to reforge:", 0, Melt(MAIN_MENU, 0));
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Selecione um Item para Reforjar:", 0, Melt(MAIN_MENU, 0));
             for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
             {
                 if (Item* invItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
                     if (IsReforgable(invItem, player))
                         if (const char* slotname = GetSlotName(slot, player->GetSession()))
-                            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, slotname, 0, Melt(SELECT_STAT_REDUCE, slot));
+                            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, invItem->GetTemplate()->Name1, 0, Melt(SELECT_STAT_REDUCE, slot));
             }
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Remove reforges", 0, Melt(SELECT_RESTORE, 0));
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Update menu", 0, Melt(MAIN_MENU, 0));
@@ -394,7 +393,7 @@ public:
                     }
                 }
                 // OnGossipHello(player, creature);
-                //new Timed(player, creature);
+                CloseGossipMenuFor(player);
             }
             }
             return true;
