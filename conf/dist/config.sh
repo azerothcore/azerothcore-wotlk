@@ -60,7 +60,7 @@ CDEBUG=OFF
 # * MinSizeRel: same as Release but optimizing for size rather than speed.
 CTYPE=${CTYPE:-Release}
 # compile scripts
-CSCRIPTS=${CSCRIPTS:-ON}
+CSCRIPTS=${CSCRIPTS:-static}
 # compile unit tests
 CBUILD_TESTING=OFF
 # compile server

@@ -8,8 +8,8 @@
 #include "StringConvert.h"
 #include "StringFormat.h"
 #include "Util.h"
-#include <mutex>
 #include <fstream>
+#include <mutex>
 #include <unordered_map>
 
 namespace
@@ -60,7 +60,7 @@ namespace
         {
             if (!replace)
             {
-                LOG_ERROR("server", "> Config: Option '%s' is exist! Option key - '%s'", optionName.c_str(), itr->second.c_str());
+                LOG_ERROR("server.loading", "> Config: Option '%s' is exist! Option key - '%s'", optionName.c_str(), itr->second.c_str());
                 return;
             }
 
@@ -153,7 +153,9 @@ namespace
 
         // No lines read
         if (!count)
+        {
             throw ConfigException(Acore::StringFormat("Config::LoadFile: Empty file '%s'", file.c_str()));
+        }
 
         // Add correct keys if file load without errors
         for (auto const& [entry, key] : fileConfigs)
@@ -200,7 +202,9 @@ ConfigMgr* ConfigMgr::instance()
 bool ConfigMgr::Reload()
 {
     if (!LoadAppConfigs())
+    {
         return false;
+    }
 
     return LoadModulesConfigs();
 }
@@ -213,7 +217,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            LOG_ERROR("server", "> Config: Missing name %s in config, add \"%s = %s\"",
+            LOG_ERROR("server.loading", "> Config: Missing name %s in config, add \"%s = %s\"",
                 name.c_str(), name.c_str(), Acore::ToString(def).c_str());
         }
 
@@ -225,7 +229,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            LOG_ERROR("server", "> Config: Bad value defined for name '%s', going to use '%s' instead",
+            LOG_ERROR("server.loading", "> Config: Bad value defined for name '%s', going to use '%s' instead",
                 name.c_str(), Acore::ToString(def).c_str());
         }
 
@@ -243,7 +247,7 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            LOG_ERROR("server", "> Config: Missing name %s in config, add \"%s = %s\"",
+            LOG_ERROR("server.loading", "> Config: Missing name %s in config, add \"%s = %s\"",
                 name.c_str(), name.c_str(), def.c_str());
         }
 
@@ -269,7 +273,7 @@ bool ConfigMgr::GetOption<bool>(std::string const& name, bool const& def, bool s
     {
         if (showLogs)
         {
-            LOG_ERROR("server", "> Config: Bad value defined for name '%s', going to use '%s' instead",
+            LOG_ERROR("server.loading", "> Config: Bad value defined for name '%s', going to use '%s' instead",
                 name.c_str(), def ? "true" : "false");
         }
 
@@ -287,7 +291,9 @@ std::vector<std::string> ConfigMgr::GetKeysByString(std::string const& name)
 
     for (auto const& [optionName, key] : _configOptions)
         if (!optionName.compare(0, name.length(), name))
+        {
             keys.emplace_back(optionName);
+        }
 
     return keys;
 }
@@ -324,7 +330,9 @@ void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::stri
     {
         Tokenizer configFileList(modulesConfigList, ',');
         for (auto const& itr : configFileList)
+        {
             _additonalFiles.emplace_back(std::string(itr));
+        }
     }
 }
 
@@ -332,11 +340,15 @@ bool ConfigMgr::LoadAppConfigs()
 {
     // #1 - Load init config file .conf.dist
     if (!LoadInitial(_filename + ".dist"))
+    {
         return false;
+    }
 
     // #2 - Load .conf file
     if (!LoadAdditionalFile(_filename))
+    {
         return false;
+    }
 
     return true;
 }
@@ -344,7 +356,9 @@ bool ConfigMgr::LoadAppConfigs()
 bool ConfigMgr::LoadModulesConfigs()
 {
     if (_additonalFiles.empty())
+    {
         return true;
+    }
 
     // Start loading module configs
     std::string const& moduleConfigPath = GetConfigPath() + "modules/";
@@ -356,20 +370,30 @@ bool ConfigMgr::LoadModulesConfigs()
         std::string defaultFileName = distFileName;
 
         if (!defaultFileName.empty())
+        {
             defaultFileName.erase(defaultFileName.end() - 5, defaultFileName.end());
+        }
 
         // Load .conf.dist config
         if (!LoadAdditionalFile(moduleConfigPath + distFileName))
+        {
             isExistDistConfig = false;
+        }
 
         // Load .conf config
         if (!LoadAdditionalFile(moduleConfigPath + defaultFileName))
+        {
             isExistDefaultConfig = false;
+        }
 
         if (isExistDefaultConfig && isExistDistConfig)
+        {
             _moduleConfigFiles.emplace_back(defaultFileName);
+        }
         else if (!isExistDefaultConfig && isExistDistConfig)
+        {
             _moduleConfigFiles.emplace_back(distFileName);
+        }
     }
 
     // If module configs not exist - no load
@@ -379,13 +403,15 @@ bool ConfigMgr::LoadModulesConfigs()
 void ConfigMgr::PrintLoadedModulesConfigs()
 {
     // Print modules configurations
-    LOG_INFO("server", " ");
-    LOG_INFO("server", "Using modules configuration:");
+    LOG_INFO("server.loading", " ");
+    LOG_INFO("server.loading", "Using modules configuration:");
 
     for (auto const& itr : _moduleConfigFiles)
-        LOG_INFO("server", "> %s", itr.c_str());
+    {
+        LOG_INFO("server.loading", "> %s", itr.c_str());
+    }
 
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", " ");
 }
 
 /*

@@ -6,9 +6,9 @@
 #include "SFMTRand.h"
 #include <algorithm>
 #include <array>
+#include <ctime>
 #include <functional>
 #include <random>
-#include <ctime>
 
 #if defined(__aarch64__)
 #if defined(__clang__)
