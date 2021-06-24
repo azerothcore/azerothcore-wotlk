@@ -288,7 +288,7 @@ public:
             bool triggered;
         };
 
-        bool OnGossipHello(Player* player) override
+        bool OnGossipHello(Player* player)
         {
             return OnGossipHello(player, me);
         }
