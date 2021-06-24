@@ -483,7 +483,15 @@ typedef std::unordered_map<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap
 
 struct AcoreString
 {
-    std::vector<std::string> Content;
+    uint32 entry;
+    std::string content;
+};
+
+struct AcoreStringLocale
+{
+    uint32 entry;
+    std::string locale;
+    std::string content;
 };
 
 typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
@@ -500,6 +508,7 @@ typedef std::unordered_map<uint32, QuestRequestItemsLocale> QuestRequestItemsLoc
 typedef std::unordered_map<uint32, NpcTextLocale> NpcTextLocaleContainer;
 typedef std::unordered_map<uint32, PageTextLocale> PageTextLocaleContainer;
 typedef std::unordered_map<int32, AcoreString> AcoreStringContainer;
+typedef std::unordered_map<int32, AcoreStringLocale> AcoreStringLocaleContainer;
 typedef std::unordered_map<uint32, GossipMenuItemsLocale> GossipMenuItemsLocaleContainer;
 typedef std::unordered_map<uint32, PointOfInterestLocale> PointOfInterestLocaleContainer;
 
@@ -969,6 +978,7 @@ public:
     void InitializeSpellInfoPrecomputedData();
 
     bool LoadAcoreStrings();
+    void LoadAcoreStringsLocales();
     void LoadBroadcastTexts();
     void LoadBroadcastTextLocales();
     void LoadCreatureClassLevelStats();
@@ -1239,6 +1249,16 @@ public:
 
         return &itr->second;
     }
+
+    AcoreStringLocale const* GetAcoreStringLocale(uint32 entry) const
+    {
+        AcoreStringLocaleContainer::const_iterator itr = _acoreStringLocaleStore.find(entry);
+        if (itr == _acoreStringLocaleStore.end())
+            return nullptr;
+
+        return &itr->second;
+    }
+
     [[nodiscard]] char const* GetAcoreString(uint32 entry, LocaleConstant locale) const;
     [[nodiscard]] char const* GetAcoreStringForDBCLocale(uint32 entry) const { return GetAcoreString(entry, DBCLocaleIndex); }
     [[nodiscard]] LocaleConstant GetDBCLocaleIndex() const { return DBCLocaleIndex; }
@@ -1493,6 +1513,7 @@ private:
     NpcTextLocaleContainer _npcTextLocaleStore;
     PageTextLocaleContainer _pageTextLocaleStore;
     AcoreStringContainer _acoreStringStore;
+    AcoreStringLocaleContainer _acoreStringLocaleStore;
     GossipMenuItemsLocaleContainer _gossipMenuItemsLocaleStore;
     PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
 

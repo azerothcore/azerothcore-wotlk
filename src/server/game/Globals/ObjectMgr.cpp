@@ -7781,12 +7781,46 @@ bool ObjectMgr::LoadAcoreStrings()
     uint32 oldMSTime = getMSTime();
 
     _acoreStringStore.clear(); // for reload case
-    QueryResult result = WorldDatabase.PQuery("SELECT entry, content_default, locale_koKR, locale_frFR, locale_deDE, locale_zhCN, locale_zhTW, locale_esES, locale_esMX, locale_ruRU FROM acore_string");
+
+    QueryResult result = WorldDatabase.PQuery("SELECT entry, content FROM acore_string");
+
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
         LOG_INFO("server", " ");
         return false;
+    }
+
+    _acoreStringStore.rehash(result->GetRowCount());
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        AcoreString as;
+
+        as.entry = fields[0].GetUInt32();
+        as.content = fields[1].GetString();
+
+        _acoreStringStore[as.entry] = as;
+
+    } while (result->NextRow());
+
+    LOG_INFO("server", ">> Loaded %u acore strings in %u ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", " ");
+    return true;
+}
+
+void LoadAcoreStringsLocales()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.PQuery("SELECT Entry, Locale, Content FROM acore_string_locale");
+
+    if (!result)
+    {
+        LOG_INFO("server", ">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
+        LOG_INFO("server", " ");
     }
 
     do
@@ -7795,31 +7829,40 @@ bool ObjectMgr::LoadAcoreStrings()
 
         uint32 entry = fields[0].GetUInt32();
 
-        AcoreString& data = _acoreStringStore[entry];
+        AcoreStringLocaleContainer::iterator asl = _acoreStringStore.find(entry);
 
-        data.Content.resize(DEFAULT_LOCALE + 1);
+        if (asl == _acoreStringStore.end())
+        {
+            LOG_ERROR("sql.sql", "BroadcastText (Id: %u) in table `broadcast_text_locale` does not exist. Skipped!", entry);
+            continue;
+        }
 
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
-            AddLocaleString(fields[i + 1].GetString(), LocaleConstant(i), data.Content);
+        LocaleConstant locale = GetLocaleByName(fields[1].GetString());
+
+        if (locale == LOCALE_enUS)
+        {
+            continue;
+        }
+
+        AddLocaleString(fields[2].GetString(), locale, asl->second.content);
+
     } while (result->NextRow());
-
-    LOG_INFO("server", ">> Loaded %u acore strings in %u ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
-
-    return true;
 }
 
 char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 {
-    if (AcoreString const* ts = GetAcoreString(entry))
-    {
-        if (ts->Content.size() > size_t(locale) && !ts->Content[locale].empty())
-            return ts->Content[locale].c_str();
+    AcoreString const* as = GetAcoreString(entry);
 
-        return ts->Content[DEFAULT_LOCALE].c_str();
+    if (AcoreStringLocale const* asl = GetAcoreStringLocale(entry))
+    {
+        return asl->content.c_str();
+    }
+    else
+    {
+        return as->content.c_str();
     }
 
-    LOG_ERROR("sql.sql", "Acore string entry %u not found in DB.", entry);
+    LOG_ERROR("sql.sql", "Acore string locale entry %u not found in DB.", entry);
 
     return "<error>";
 }
