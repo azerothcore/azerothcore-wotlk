@@ -16,18 +16,18 @@
  */
 
 #include "VMapManager2.h"
+#include "Errors.h"
+#include "Log.h"
+#include "MapDefines.h"
 #include "MapTree.h"
 #include "ModelInstance.h"
-#include "WorldModel.h"
-#include "MapDefines.h"
-#include "Log.h"
 #include "VMapDefinitions.h"
-#include "Errors.h"
+#include "WorldModel.h"
 #include <G3D/Vector3.h>
-#include <iostream>
 #include <iomanip>
-#include <string>
+#include <iostream>
 #include <sstream>
+#include <string>
 
 using G3D::Vector3;
 
@@ -299,7 +299,7 @@ namespace VMAP
             WorldModel* worldmodel = new WorldModel();
             if (!worldmodel->readFile(basepath + filename + ".vmo"))
             {
-                LOG_ERROR("server", "VMapManager2: could not load '%s%s.vmo'", basepath.c_str(), filename.c_str());
+                LOG_ERROR("maps", "VMapManager2: could not load '%s%s.vmo'", basepath.c_str(), filename.c_str());
                 delete worldmodel;
                 return nullptr;
             }
@@ -319,7 +319,7 @@ namespace VMAP
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
         if (model == iLoadedModelFiles.end())
         {
-            LOG_ERROR("server", "VMapManager2: trying to unload non-loaded file '%s'", filename.c_str());
+            LOG_ERROR("maps", "VMapManager2: trying to unload non-loaded file '%s'", filename.c_str());
             return;
         }
         if (model->second.decRefCount() == 0)

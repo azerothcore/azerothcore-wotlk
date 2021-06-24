@@ -117,7 +117,7 @@ uint32 ArenaTeamMgr::GenerateArenaTeamId()
 {
     if (NextArenaTeamId >= MAX_ARENA_TEAM_ID)
     {
-        LOG_ERROR("server", "Arena team ids overflow!! Can't continue, shutting down server. ");
+        LOG_ERROR("bg.arena", "Arena team ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
 
@@ -146,8 +146,8 @@ void ArenaTeamMgr::LoadArenaTeams()
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 arena teams. DB table `arena_team` is empty!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 arena teams. DB table `arena_team` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -176,8 +176,8 @@ void ArenaTeamMgr::LoadArenaTeams()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void ArenaTeamMgr::DistributeArenaPoints()
@@ -198,16 +198,16 @@ void ArenaTeamMgr::DistributeArenaPoints()
             sScriptMgr->OnBeforeUpdateArenaPoints(at, PlayerPoints);
         }
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt;
+    CharacterDatabasePreparedStatement* stmt;
 
     // Cycle that gives points to all players
     for (std::map<ObjectGuid, uint32>::iterator playerItr = PlayerPoints.begin(); playerItr != PlayerPoints.end(); ++playerItr)
     {
         // Add points to player if online
         if (Player* player = ObjectAccessor::FindPlayer(playerItr->first))
-            player->ModifyArenaPoints(playerItr->second, &trans);
+            player->ModifyArenaPoints(playerItr->second, trans);
         else    // Update database
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_ARENA_POINTS);

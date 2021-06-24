@@ -6,11 +6,11 @@
 
 #include "DynamicTree.h"
 #include "BoundingIntervalHierarchyWrapper.h"
+#include "GameObjectModel.h"
 #include "Log.h"
+#include "ModelInstance.h"
 #include "RegularGrid.h"
 #include "Timer.h"
-#include "GameObjectModel.h"
-#include "ModelInstance.h"
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
 #include <G3D/Vector3.h>
