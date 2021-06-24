@@ -262,6 +262,8 @@ public:
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
+            ClearGossipMenuFor(player);
+
             ChatHandler(player->GetSession()).PSendSysMessage("Entrei no Hello");
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Select slot of the item to reforge:", 0, Melt(MAIN_MENU, 0));
             for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
