@@ -260,37 +260,9 @@ public:
         {
         }
 
-        struct Timed : public BasicEvent
+        bool OnGossipHello(Player* player, Creature* creature)
         {
-            // This timed event tries to fix modify money breaking gossip
-            // This event closes the gossip menu and on the second player update tries to open the next menu
-            Timed(Player* player, Creature* creature) : guid(creature->GetGUID()), player(player), triggered(false)
-            {
-                CloseGossipMenuFor(player);
-                player->m_Events.AddEvent(this, player->m_Events.CalculateTime(1));
-            }
-
-            bool Execute(uint64, uint32) override
-            {
-                if (!triggered)
-                {
-                    triggered = true;
-                    player->m_Events.AddEvent(this, player->m_Events.CalculateTime(1));
-                    return false;
-                }
-                if (Creature* creature = player->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_GOSSIP))
-                    OnGossipHello(player, creature);
-                return true;
-            }
-
-            ObjectGuid guid;
-            Player* player;
-            bool triggered;
-        };
-
-        static bool OnGossipHello(Player* player, Creature* creature)
-        {
-
+            ChatHandler(player->GetSession()).PSendSysMessage("Entrei no Hello");
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Select slot of the item to reforge:", 0, Melt(MAIN_MENU, 0));
             for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
             {
@@ -446,7 +418,7 @@ public:
                     }
                 }
                 // OnGossipHello(player, creature);
-                new Timed(player, creature);
+                //new Timed(player, creature);
             }
             }
             return true;
