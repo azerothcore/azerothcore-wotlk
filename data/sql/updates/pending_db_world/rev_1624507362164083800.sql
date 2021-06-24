@@ -105,7 +105,7 @@ UPDATE `acore_string` SET `locale_esES`=@LOCALE, `locale_esMX`=@LOCALE WHERE `en
 SET @LOCALE:="El tipo de movimiento de la criatura se ha establecido en '%s', los waypoints se han eliminado (si los hay).";
 UPDATE `acore_string` SET `locale_esES`=@LOCALE, `locale_esMX`=@LOCALE WHERE `entry`=257;
 
-SET @LOCALE:="El tipo de movimiento de la criatura es "%s", los puntos de ruta no se han eliminado.";
+SET @LOCALE:="El tipo de movimiento de la criatura es '%s', los puntos de ruta no se han eliminado.";
 UPDATE `acore_string` SET `locale_esES`=@LOCALE, `locale_esMX`=@LOCALE WHERE `entry`=258;
 
 SET @LOCALE:="Valor incorrecto, usa on o off";
