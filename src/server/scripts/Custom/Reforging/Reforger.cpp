@@ -175,7 +175,7 @@ public:
     public:
         SendRefPackLogin(Player* _player) : player(_player)
         {
-            _player->m_Events.AddEvent(this, _player->m_Events.CalculateTime(Milliseconds(1000)));
+            _player->m_Events.AddEvent(this, _player->m_Events.CalculateTime(1000));
         }
 
         bool Execute(uint64, uint32) override
@@ -186,7 +186,7 @@ public:
         Player* player;
     };
 
-    void OnLogin(Player* player)
+    void OnLogin(Player* player) override
     {
         uint32 playerGUID = player->GetGUID().GetCounter();
         QueryResult result = CharacterDatabase.PQuery("SELECT `GUID`, `increase`, `decrease`, `stat_value` FROM `custom_reforging` WHERE `Owner` = %u", playerGUID);
