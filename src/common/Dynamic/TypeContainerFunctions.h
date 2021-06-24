@@ -63,9 +63,13 @@ namespace Acore
     {
         auto i = elements._element.find(handle);
         if (i == elements._element.end())
+        {
             return nullptr;
+        }
         else
+        {
             return i->second;
+        }
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE>
