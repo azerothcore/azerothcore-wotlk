@@ -7815,6 +7815,8 @@ void ObjectMgr::LoadAcoreStringsLocales()
 {
     uint32 oldMSTime = getMSTime();
 
+    _acoreStringLocaleStore.clear(); // for reload case
+
     QueryResult result = WorldDatabase.PQuery("SELECT Entry, Locale, Content FROM acore_string_locale");
 
     if (!result)
@@ -7829,22 +7831,19 @@ void ObjectMgr::LoadAcoreStringsLocales()
 
         uint32 entry = fields[0].GetUInt32();
 
-        AcoreStringLocaleContainer::iterator asl = _acoreStringLocaleStore.find(entry);
-
-        if (asl == _acoreStringLocaleStore.end())
-        {
-            LOG_ERROR("sql.sql", "AcoreStringLocale (Id: %u) in table `acore_string_locale` does not exist. Skipped!", entry);
-            continue;
-        }
+        AcoreStringLocale &asl = _acoreStringLocaleStore[entry];
 
         LocaleConstant locale = GetLocaleByName(fields[1].GetString());
 
         if (locale == LOCALE_enUS)
             continue;
 
-        AddLocaleString(fields[2].GetString(), locale, asl->second.content);
+        AddLocaleString(fields[2].GetString(), locale, asl.content);
 
     } while (result->NextRow());
+
+    LOG_INFO("server", ">> Loaded %u acore strings locale in %u ms", (uint32)_acoreStringLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", " ");
 }
 
 char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
