@@ -116,7 +116,7 @@ public:
 
         bool Load() override
         {
-            _procTargetGUID = 0;
+            _procTargetGUID.Clear();
             return true;
         }
 
@@ -154,7 +154,7 @@ public:
         }
 
     private:
-        uint64 _procTargetGUID;
+        ObjectGuid _procTargetGUID;
     };
 
     AuraScript* GetAuraScript() const override
@@ -282,7 +282,8 @@ public:
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(enchant->spellid[s]);
                         if (!spellInfo)
                         {
-                            sLog->outError("Player::CastItemCombatSpell Enchant %i, player (Name: %s, GUID: %u) cast unknown spell %i", enchant->ID, player->GetName().c_str(), player->GetGUIDLow(), enchant->spellid[s]);
+                            LOG_ERROR("misc", "Player::CastItemCombatSpell Enchant %i, player (Name: %s, %s) cast unknown spell %i",
+                                enchant->ID, player->GetName().c_str(), player->GetGUID().ToString().c_str(), enchant->spellid[s]);
                             continue;
                         }
 
@@ -394,7 +395,7 @@ public:
         {
             while (!_targets.empty())
             {
-                uint64 guid = acore::Containers::SelectRandomContainerElement(_targets);
+                ObjectGuid guid = Acore::Containers::SelectRandomContainerElement(_targets);
                 if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                 {
                     // xinef: target may be no longer valid
@@ -437,7 +438,7 @@ public:
         }
 
     private:
-        std::list<uint64> _targets;
+        GuidList _targets;
     };
 
     AuraScript* GetAuraScript() const override
@@ -519,7 +520,7 @@ public:
             PlayerSpellMap const& spellMap = caster->GetSpellMap();
             for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
                 if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
                 {
                     if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep

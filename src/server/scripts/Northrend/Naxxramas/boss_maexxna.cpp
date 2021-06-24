@@ -88,7 +88,7 @@ public:
             summons.DespawnAll();
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_MAEXXNA_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_MAEXXNA_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -107,7 +107,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_SPIDERLINGS, 30000);
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_MAEXXNA_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_MAEXXNA_GATE)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }
@@ -219,12 +219,14 @@ public:
 
     struct boss_maexxna_webwrapAI : public NullCreatureAI
     {
-        explicit boss_maexxna_webwrapAI(Creature* c) : NullCreatureAI(c), victimGUID(0) {}
+        explicit boss_maexxna_webwrapAI(Creature* c) : NullCreatureAI(c) {}
 
-        uint64 victimGUID;
-        void SetGUID(uint64 guid, int32  /*param*/) override
+        ObjectGuid victimGUID;
+
+        void SetGUID(ObjectGuid guid, int32  /*param*/) override
         {
             victimGUID = guid;
+
             if (me->m_spells[0] && victimGUID)
             {
                 if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))

@@ -44,9 +44,6 @@ public:
             _barrelCount = 0;
             _attemptsCount = 0;
 
-            _thrallGUID = 0;
-            _tarethaGUID = 0;
-
             _initalFlamesSet.clear();
             _finalFlamesSet.clear();
             _prisonersSet.clear();
@@ -166,13 +163,14 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             if (data == DATA_THRALL_GUID)
                 return _thrallGUID;
             else if (data == DATA_TARETHA_GUID)
                 return _tarethaGUID;
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void Update(uint32 diff) override
@@ -185,8 +183,8 @@ public:
                         instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
                         instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
 
-                        for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
-                            if (Creature* orc = instance->GetCreature(*itr))
+                        for (ObjectGuid const guid : _prisonersSet)
+                            if (Creature* orc = instance->GetCreature(guid))
                             {
                                 uint8 index = orc->GetDistance(instancePositions[0]) < 80.0f ? 0 : 1;
                                 Position pos(instancePositions[index]);
@@ -195,8 +193,8 @@ public:
                                 orc->SetStandState(UNIT_STAND_STATE_STAND);
                             }
 
-                        for (std::set<uint64>::const_iterator itr = _initalFlamesSet.begin(); itr != _initalFlamesSet.end(); ++itr)
-                            if (GameObject* gobject = instance->GetGameObject(*itr))
+                        for (ObjectGuid const guid : _initalFlamesSet)
+                            if (GameObject* gobject = instance->GetGameObject(guid))
                             {
                                 gobject->SetRespawnTime(0);
                                 gobject->UpdateObjectVisibility(true);
@@ -214,18 +212,18 @@ public:
                             if (!players.isEmpty())
                                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                     if (Player* player = itr->GetSource())
-                                        player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER, 0);
+                                        player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER);
                         }
 
-                        for (std::set<uint64>::const_iterator itr = _finalFlamesSet.begin(); itr != _finalFlamesSet.end(); ++itr)
-                            if (GameObject* gobject = instance->GetGameObject(*itr))
+                        for (ObjectGuid const guid : _finalFlamesSet)
+                            if (GameObject* gobject = instance->GetGameObject(guid))
                             {
                                 gobject->SetRespawnTime(0);
                                 gobject->UpdateObjectVisibility(true);
                             }
 
-                        for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
-                            if (Creature* orc = instance->GetCreature(*itr))
+                        for (ObjectGuid const guid : _prisonersSet)
+                            if (Creature* orc = instance->GetCreature(guid))
                                 if (roll_chance_i(25))
                                     orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
 
@@ -330,11 +328,11 @@ public:
         uint32 _barrelCount;
         uint32 _attemptsCount;
 
-        uint64 _thrallGUID;
-        uint64 _tarethaGUID;
-        std::set<uint64> _initalFlamesSet;
-        std::set<uint64> _finalFlamesSet;
-        std::set<uint64> _prisonersSet;
+        ObjectGuid _thrallGUID;
+        ObjectGuid _tarethaGUID;
+        GuidSet _initalFlamesSet;
+        GuidSet _finalFlamesSet;
+        GuidSet _prisonersSet;
 
         EventMap _events;
     };

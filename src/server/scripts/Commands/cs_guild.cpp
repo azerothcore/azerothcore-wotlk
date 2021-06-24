@@ -131,7 +131,7 @@ public:
             return false;
 
         // if not guild name only (in "") then player name
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         if (!handler->extractPlayerTarget(*args != '"' ? (char*)args : nullptr, nullptr, &targetGuid))
             return false;
 
@@ -155,11 +155,11 @@ public:
     static bool HandleGuildUninviteCommand(ChatHandler* handler, char const* args)
     {
         Player* target;
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
             return false;
 
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(GUID_LOPART(targetGuid));
+        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid.GetCounter());
         if (!guildId)
             return false;
 
@@ -180,12 +180,12 @@ public:
             return false;
 
         Player* target;
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         std::string target_name;
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &target_name))
             return false;
 
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(GUID_LOPART(targetGuid));
+        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid.GetCounter());
         if (!guildId)
             return false;
 
@@ -217,8 +217,8 @@ public:
         // Display Guild Information
         handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
         std::string guildMasterName;
-        if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID(), guildMasterName))
-            handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), GUID_LOPART(guild->GetLeaderGUID())); // Guild Master
+        if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID().GetCounter(), guildMasterName))
+            handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), guild->GetLeaderGUID().GetCounter()); // Guild Master
 
         // Format creation date
         char createdDateStr[20];

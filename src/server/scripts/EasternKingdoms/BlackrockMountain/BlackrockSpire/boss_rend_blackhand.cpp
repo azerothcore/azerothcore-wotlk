@@ -171,15 +171,15 @@ public:
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PREPARATION);
             gythEvent = false;
-            victorGUID = 0;
-            waveDoorGUID = 0;
+            victorGUID.Clear();
+            waveDoorGUID.Clear();
 
             summons.DespawnAll();
 
             if (Creature* victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 5.0f, true))
                 victor->Respawn(true);
 
-            if (GameObject* exitDoor = me->GetMap()->GetGameObject(instance->GetData64(GO_GYTH_ENTRY_DOOR)))
+            if (GameObject* exitDoor = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GYTH_ENTRY_DOOR)))
                 exitDoor->SetGoState(GO_STATE_ACTIVE);
 
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, NOT_STARTED);
@@ -225,7 +225,7 @@ public:
             if (Creature* victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 75.0f, true))
                 victor->AI()->SetData(1, 2);
 
-            if (GameObject* exitDoor = me->GetMap()->GetGameObject(instance->GetData64(GO_GYTH_ENTRY_DOOR)))
+            if (GameObject* exitDoor = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GYTH_ENTRY_DOOR)))
                 exitDoor->SetGoState(GO_STATE_ACTIVE);
 
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, DONE);
@@ -287,7 +287,7 @@ public:
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_0);
 
-                            if (GameObject* door2 = me->GetMap()->GetGameObject(instance->GetData64(GO_GYTH_ENTRY_DOOR)))
+                            if (GameObject* door2 = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GYTH_ENTRY_DOOR)))
                                 door2->SetGoState(GO_STATE_READY);
 
                             events.ScheduleEvent(EVENT_START_2, 4000);
@@ -465,8 +465,8 @@ public:
 
     private:
         bool   gythEvent;
-        uint64 victorGUID;
-        uint64 waveDoorGUID;
+        ObjectGuid victorGUID;
+        ObjectGuid waveDoorGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

@@ -215,7 +215,6 @@ public:
                             {
                                 pa->SetCanFly(true);
                                 pa->SetDisableGravity(true);
-                                pa->SetHover(true);
                                 pa->SendMovementFlagUpdate();
                                 pa->CastSpell(pa, SPELL_PLANAR_AURA_VISUAL, true);
                                 pa->CastSpell(pa, SPELL_PLANAR_AURA_DAMAGE, true);

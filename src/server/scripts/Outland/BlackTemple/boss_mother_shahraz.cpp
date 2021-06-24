@@ -258,15 +258,15 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_SABER_LASH_IMMUNITY));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SABER_LASH_IMMUNITY));
             if (targets.size() <= 1)
                 FinishCast(SPELL_FAILED_DONT_REPORT);
         }
 
         void SetDest(SpellDestination& dest)
         {
-            std::list<Spell::TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-            for (std::list<Spell::TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+            std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+            for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
                 if (Unit* target = ObjectAccessor::GetUnit(*GetCaster(), ihit->targetGUID))
                 {
                     dest.Relocate(*target);

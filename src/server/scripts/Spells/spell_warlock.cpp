@@ -152,7 +152,7 @@ public:
                     if (owner->GetAuraEffectDummy(56250))
                     {
                         Unit* target = GetTarget();
-                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
+                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, target->GetAura(32409)); // SW:D shall not be removed.
                         target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                         target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
                     }
@@ -275,7 +275,7 @@ public:
         void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             // Remove Fel Armor and Demon Armor
-            GetTarget()->RemoveAurasWithFamily(SPELLFAMILY_WARLOCK, 0, 0x20000020, 0, 0);
+            GetTarget()->RemoveAurasWithFamily(SPELLFAMILY_WARLOCK, 0, 0x20000020, 0, ObjectGuid::Empty);
         }
 
         void Register() override
@@ -629,7 +629,7 @@ public:
                             break;
                         case CREATURE_FAMILY_VOIDWALKER:
                             {
-                                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_EMPOWERMENT_VOIDWALKER);
+                                SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_WARLOCK_DEMONIC_EMPOWERMENT_VOIDWALKER);
                                 int32 hp = int32(targetCreature->CountPctFromMaxHealth(GetCaster()->CalculateSpellDamage(targetCreature, spellInfo, 0)));
                                 targetCreature->CastCustomSpell(targetCreature, SPELL_WARLOCK_DEMONIC_EMPOWERMENT_VOIDWALKER, &hp, nullptr, nullptr, true);
                                 //unitTarget->CastSpell(unitTarget, 54441, true);
@@ -708,7 +708,7 @@ public:
                             rank = 2;
                             break;
                         default:
-                            sLog->outError("Unknown rank of Improved Healthstone id: %d", aurEff->GetId());
+                            LOG_ERROR("spells", "Unknown rank of Improved Healthstone id: %d", aurEff->GetId());
                             break;
                     }
                 }
@@ -1013,7 +1013,7 @@ public:
                 // WARLOCK_DEMONIC_CIRCLE_ALLOW_CAST; allowing him to cast the WARLOCK_DEMONIC_CIRCLE_TELEPORT.
                 // If not in range remove the WARLOCK_DEMONIC_CIRCLE_ALLOW_CAST.
 
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_CIRCLE_TELEPORT);
+                SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_WARLOCK_DEMONIC_CIRCLE_TELEPORT);
 
                 if (GetTarget()->IsWithinDist(circle, spellInfo->GetMaxRange(true)))
                 {

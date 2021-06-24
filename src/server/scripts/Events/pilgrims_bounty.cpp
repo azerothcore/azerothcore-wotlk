@@ -96,7 +96,7 @@ public:
     {
         npc_pilgrims_bounty_chairAI(Creature* creature) : VehicleAI(creature)
         {
-            plateGUID = 0;
+            plateGUID.Clear();
             timerSpawnPlate = 1;
             timerRotateChair = 0;
             me->SetReactState(REACT_PASSIVE);
@@ -111,7 +111,7 @@ public:
                 who->ToPlayer()->SetClientControl(me, 0, true);
         }
 
-        uint64 plateGUID;
+        ObjectGuid plateGUID;
         uint32 timerSpawnPlate;
         uint32 timerRotateChair;
 
@@ -671,7 +671,7 @@ class achievement_pb_pilgrims_peril : public AchievementCriteriaScript
 public:
     achievement_pb_pilgrims_peril() : AchievementCriteriaScript("achievement_pb_pilgrims_peril") { }
 
-    bool OnCheck(Player* source, Unit* /*target*/) override
+    bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         if (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_DRESS, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ROBE, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ATTIRE, 1))
             return true;
@@ -685,7 +685,7 @@ class achievement_pb_terokkar_turkey_time : public AchievementCriteriaScript
 public:
     achievement_pb_terokkar_turkey_time() : AchievementCriteriaScript("achievement_pb_terokkar_turkey_time") { }
 
-    bool OnCheck(Player* source, Unit* /*target*/) override
+    bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         if (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_HAT, 1) && (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_DRESS, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ROBE, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ATTIRE, 1)))
             return true;

@@ -126,7 +126,7 @@ public:
 
         InstanceScript* instance;
 
-        uint64 m_uiSpotlightGUID;
+        ObjectGuid m_uiSpotlightGUID;
 
         uint32 TalkCount;
         uint32 TalkTimer;
@@ -138,7 +138,7 @@ public:
 
         void Reset() override
         {
-            m_uiSpotlightGUID = 0;
+            m_uiSpotlightGUID.Clear();
 
             TalkCount = 0;
             TalkTimer = 2000;
@@ -168,7 +168,7 @@ public:
             {
                 case 0:
                     DoCast(me, SPELL_TUXEDO, false);
-                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_STAGEDOORLEFT));
+                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
                     break;
                 case 4:
                     TalkCount = 0;
@@ -184,12 +184,12 @@ public:
                     }
                     break;
                 case 8:
-                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_STAGEDOORLEFT));
+                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
                     PerformanceReady = true;
                     break;
                 case 9:
                     PrepareEncounter();
-                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_CURTAINS));
+                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_CURTAINS));
                     break;
             }
         }
@@ -228,9 +228,7 @@ public:
 
         void PrepareEncounter()
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
-#endif
+            LOG_DEBUG("scripts.ai", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
             uint8 index = 0;
             uint8 count = 0;
 
@@ -437,7 +435,7 @@ public:
 
         InstanceScript* instance;
 
-        uint64 ArcanagosGUID;
+        ObjectGuid ArcanagosGUID;
 
         uint32 YellTimer;
         uint8 Step;
@@ -448,11 +446,11 @@ public:
 
         void Reset() override
         {
-            ArcanagosGUID = 0;
+            ArcanagosGUID.Clear();
             MTimer = 0;
             ATimer = 0;
 
-            if (instance && instance->GetData64(DATA_IMAGE_OF_MEDIVH) == 0)
+            if (instance && !instance->GetGuidData(DATA_IMAGE_OF_MEDIVH))
             {
                 Creature* Arcanagos = me->SummonCreature(NPC_ARCANAGOS, ArcanagosPos[0], ArcanagosPos[1], ArcanagosPos[2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 if (!Arcanagos)
@@ -461,7 +459,7 @@ public:
                     return;
                 }
 
-                instance->SetData64(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
+                instance->SetGuidData(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
                 EventStarted = true;
                 ArcanagosGUID = Arcanagos->GetGUID();
 

@@ -5,6 +5,7 @@
  */
 
 #include "GameGraveyard.h"
+#include "MapManager.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
@@ -24,7 +25,7 @@ void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 {
     if (killed->GetTypeId() == TYPEID_PLAYER && player->GetTeamId() != killed->ToPlayer()->GetTeamId())
     {
-        player->KilledMonsterCredit(NA_CREDIT_MARKER, 0); // 0 guid, btw it isn't even used in killedmonster function :S
+        player->KilledMonsterCredit(NA_CREDIT_MARKER);
         player->CastSpell(player, player->GetTeamId() == TEAM_ALLIANCE ? NA_KILL_TOKEN_ALLIANCE : NA_KILL_TOKEN_HORDE, true);
     }
 }
@@ -32,7 +33,7 @@ void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 uint32 OPvPCapturePointNA::GetAliveGuardsCount()
 {
     uint32 cnt = 0;
-    for (std::map<uint32, uint64>::iterator itr = m_Creatures.begin(); itr != m_Creatures.end(); ++itr)
+    for (std::map<uint32, ObjectGuid::LowType>::iterator itr = m_Creatures.begin(); itr != m_Creatures.end(); ++itr)
     {
         switch (itr->first)
         {
@@ -51,10 +52,13 @@ uint32 OPvPCapturePointNA::GetAliveGuardsCount()
             case NA_NPC_GUARD_13:
             case NA_NPC_GUARD_14:
             case NA_NPC_GUARD_15:
-                if (Creature const* const cr = HashMapHolder<Creature>::Find(itr->second))
-                    if (cr->IsAlive())
+            {
+                auto bounds = m_PvP->GetMap()->GetCreatureBySpawnIdStore().equal_range(itr->second);
+                for (auto itr2 = bounds.first; itr2 != bounds.second; ++itr2)
+                    if (itr2->second->IsAlive())
                         ++cnt;
                 break;
+            }
             default:
                 break;
         }
@@ -199,6 +203,7 @@ bool OutdoorPvPNA::SetupOutdoorPvP()
     //    m_TypeId = OUTDOOR_PVP_NA; _MUST_ be set in ctor, because of spawns cleanup
     // add the zones affected by the pvp buff
     RegisterZone(NA_BUFF_ZONE);
+    SetMapFromZone(NA_BUFF_ZONE);
 
     // halaa
     m_obj = new OPvPCapturePointNA(this);
@@ -393,9 +398,9 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
     return false;
 }
 
-int32 OPvPCapturePointNA::HandleOpenGo(Player* player, uint64 guid)
+int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
 {
-    int32 retval = OPvPCapturePoint::HandleOpenGo(player, guid);
+    int32 retval = OPvPCapturePoint::HandleOpenGo(player, go);
     if (retval >= 0)
     {
         const go_type* gos = nullptr;
@@ -588,11 +593,9 @@ void OPvPCapturePointNA::ChangeState()
             break;
     }
 
-    GameObject* flag = HashMapHolder<GameObject>::Find(m_capturePointGUID);
-    if (flag)
-    {
-        flag->SetGoArtKit(artkit);
-    }
+    auto bounds = sMapMgr->FindMap(530, 0)->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
+    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+        itr->second->SetGoArtKit(artkit);
 
     UpdateHalaaWorldState();
 }

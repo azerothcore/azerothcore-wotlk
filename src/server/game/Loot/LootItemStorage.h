@@ -13,18 +13,27 @@ Xinef
 
 struct StoredLootItem
 {
-    StoredLootItem(uint32 i, uint32 c, int32 ri, uint32 rs) :
-        itemid(i), count(c), randomPropertyId(ri), randomSuffix(rs) { }
+    StoredLootItem(uint32 i, uint32 c, int32 ri, uint32 rs, bool follow_loot_rules, bool freeforall,
+        bool is_blocked, bool is_counted, bool is_underthreshold, bool needs_quest, uint32 conditionLootId) :
+        itemid(i), count(c), randomPropertyId(ri), randomSuffix(rs), follow_loot_rules(follow_loot_rules), freeforall(freeforall), is_blocked(is_blocked),
+        is_counted(is_counted), is_underthreshold(is_underthreshold), needs_quest(needs_quest), conditionLootId(conditionLootId) { }
 
     // If itemid == 0 - money amount is stored in count value
     uint32 itemid;
     uint32 count;
     int32 randomPropertyId;
     uint32 randomSuffix;
+    bool follow_loot_rules;
+    bool freeforall;
+    bool is_blocked;
+    bool is_counted;
+    bool is_underthreshold;
+    bool needs_quest;
+    uint32 conditionLootId;
 };
 
 typedef std::list<StoredLootItem> StoredLootItemList;
-typedef std::unordered_map<uint32, StoredLootItemList> LootItemContainer;
+typedef std::unordered_map<ObjectGuid, StoredLootItemList> LootItemContainer;
 
 class LootItemStorage
 {
@@ -36,14 +45,14 @@ public:
     static LootItemStorage* instance();
 
     void LoadStorageFromDB();
-    void RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count);
+    void RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count);
 
     void AddNewStoredLoot(Loot* loot, Player* player);
-    bool LoadStoredLoot(Item* item);
+    bool LoadStoredLoot(Item* item, Player* player);
 
-    void RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot* loot);
-    void RemoveStoredLootMoney(uint32 containerId, Loot* loot);
-    void RemoveStoredLoot(uint32 containerId);
+    void RemoveStoredLootItem(ObjectGuid containerGUID, uint32 itemid, uint32 count, Loot* loot);
+    void RemoveStoredLootMoney(ObjectGuid containerGUID, Loot* loot);
+    void RemoveStoredLoot(ObjectGuid containerGUID);
 
 private:
     LootItemContainer lootItemStore;

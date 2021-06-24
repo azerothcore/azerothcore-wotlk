@@ -9,7 +9,6 @@
 *  \author Derex <derex101@gmail.com>
 */
 
-#include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
@@ -23,7 +22,6 @@
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_socket.h>
-#include <ace/os_include/sys/os_types.h>
 #include <ace/Reactor_Impl.h>
 #include <ace/Reactor.h>
 #include <ace/TP_Reactor.h>
@@ -92,7 +90,7 @@ public:
 
     int AddSocket (WorldSocket* sock)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+        std::lock_guard<std::mutex> guard(m_NewSockets_Lock);
 
         ++m_Connections;
         sock->AddReference();
@@ -112,7 +110,7 @@ public:
 protected:
     void AddNewSockets()
     {
-        ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+        std::lock_guard<std::mutex> guard(m_NewSockets_Lock);
 
         if (m_NewSockets.empty())
             return;
@@ -137,9 +135,7 @@ protected:
 
     int svc() override
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug ("Network Thread Starting");
-#endif
+        LOG_DEBUG("network", "Network Thread Starting");
 
         ASSERT(m_Reactor);
 
@@ -176,9 +172,7 @@ protected:
             }
         }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug ("Network Thread exits");
-#endif
+        LOG_DEBUG("network", "Network Thread exits");
 
         return 0;
     }
@@ -194,7 +188,7 @@ private:
     SocketSet m_Sockets;
 
     SocketSet m_NewSockets;
-    ACE_Thread_Mutex m_NewSockets_Lock;
+    std::mutex m_NewSockets_Lock;
 };
 
 WorldSocketMgr::WorldSocketMgr() :
@@ -228,7 +222,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     if (num_threads <= 0)
     {
-        sLog->outError("Network.Threads is wrong in your config file");
+        LOG_ERROR("network", "Network.Threads is wrong in your config file");
         return -1;
     }
 
@@ -236,7 +230,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     m_NetThreads = new ReactorRunnable[m_NetThreadsCount];
 
-    sLog->outBasic ("Max allowed socket connections %d", ACE::max_handles());
+    LOG_INFO("network", "Max allowed socket connections %d", ACE::max_handles());
 
     // -1 means use default
     m_SockOutKBuff = sConfigMgr->GetOption<int32> ("Network.OutKBuff", -1);
@@ -245,7 +239,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     if (m_SockOutUBuff <= 0)
     {
-        sLog->outError("Network.OutUBuff is wrong in your config file");
+        LOG_ERROR("network", "Network.OutUBuff is wrong in your config file");
         return -1;
     }
 
@@ -255,7 +249,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     if (m_Acceptor->open(listen_addr, m_NetThreads[0].GetReactor(), ACE_NONBLOCK) == -1)
     {
-        sLog->outError("Failed to open acceptor, check if the port is free");
+        LOG_ERROR("network", "Failed to open acceptor, check if the port is free");
         return -1;
     }
 
@@ -268,8 +262,8 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 int
 WorldSocketMgr::StartNetwork (uint16 port, const char* address)
 {
-    if (!sLog->IsOutDebug())
-        ACE_Log_Msg::instance()->priority_mask (LM_ERROR, ACE_Log_Msg::PROCESS);
+    if (!sLog->ShouldLog("network", LogLevel::LOG_LEVEL_DEBUG))
+        ACE_Log_Msg::instance()->priority_mask(LM_ERROR, ACE_Log_Msg::PROCESS);
 
     if (StartReactiveIO(port, address) == -1)
         return -1;
@@ -319,7 +313,7 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
                                      (void*) & m_SockOutKBuff,
                                      sizeof (int)) == -1 && errno != ENOTSUP)
         {
-            sLog->outError("WorldSocketMgr::OnSocketOpen set_option SO_SNDBUF");
+            LOG_ERROR("network", "WorldSocketMgr::OnSocketOpen set_option SO_SNDBUF");
             return -1;
         }
     }
@@ -334,7 +328,7 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
                                      (void*)&ndoption,
                                      sizeof (int)) == -1)
         {
-            sLog->outError("WorldSocketMgr::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror (errno));
+            LOG_ERROR("network", "WorldSocketMgr::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror (errno));
             return -1;
         }
     }

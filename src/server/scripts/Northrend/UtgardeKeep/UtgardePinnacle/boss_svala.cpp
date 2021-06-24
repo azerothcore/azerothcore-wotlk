@@ -101,10 +101,10 @@ public:
         {
             instance = creature->GetInstanceScript();
             Started = false;
-            ArthasGUID = 0;
+            ArthasGUID.Clear();
         }
 
-        uint64 ArthasGUID;
+        ObjectGuid ArthasGUID;
         bool Started;
         InstanceScript* instance;
         EventMap events;
@@ -152,7 +152,7 @@ public:
             if (instance)
             {
                 instance->SetData(DATA_SVALA_SORROWGRAVE, IN_PROGRESS);
-                if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_SVALA_MIRROR)))
+                if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_SVALA_MIRROR)))
                     mirror->SetGoState(GO_STATE_READY);
             }
         }
@@ -227,7 +227,7 @@ public:
                 case 30:
                     {
                         WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
-                        data.append(me->GetPackGUID());
+                        data << me->GetPackGUID();
                         me->SendMessageToSet(&data, false);
                         break;
                     }
@@ -263,7 +263,7 @@ public:
                 case EVENT_SVALA_TALK7:
                     me->SetFacingTo(M_PI / 2.0f);
                     Talk(TALK_INTRO_S3);
-                    if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_SVALA_MIRROR)))
+                    if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_SVALA_MIRROR)))
                         mirror->SetGoState(GO_STATE_ACTIVE);
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13000);
                     break;

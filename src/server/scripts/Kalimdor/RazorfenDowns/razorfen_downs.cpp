@@ -79,7 +79,7 @@ public:
                 channeling = false;
                 eventProgress = 0;
                 spawnerCount  = 0;
-                me->SetFlag(UNIT_NPC_FLAGS, GOSSIP_OPTION_QUESTGIVER);
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
         }
@@ -108,7 +108,7 @@ public:
             {
                 eventInProgress = true;
                 Talk(SAY_QUEST_ACCEPTED);
-                me->RemoveFlag(UNIT_NPC_FLAGS, GOSSIP_OPTION_QUESTGIVER);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 me->setFaction(FACTION_ESCORT);
                 me->GetMotionMaster()->MovePath(PATH_ESCORT, false);
             }
@@ -180,9 +180,9 @@ public:
                             DoCast(me, SPELL_IDOM_ROOM_CAMERA_SHAKE);
                             me->SummonGameObject(GO_BELNISTRASZS_BRAZIER, 2577.196f, 947.0781f, 53.16757f, 2.356195f, 0, 0, 0.9238796f, 0.3826832f, 3600);
                             std::list<WorldObject*> ClusterList;
-                            acore::AllWorldObjectsInRange objects(me, 50.0f);
-                            acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
-                            me->VisitNearbyObject(50.0f, searcher);
+                            Acore::AllWorldObjectsInRange objects(me, 50.0f);
+                            Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
+                            Cell::VisitAllObjects(me, searcher, 50.0f);
                             for (std::list<WorldObject*>::const_iterator itr = ClusterList.begin(); itr != ClusterList.end(); ++itr)
                             {
                                 if (Player* player = (*itr)->ToPlayer())

@@ -15,14 +15,15 @@
 #include "AuthDefines.h"
 #include "AddonMgr.h"
 #include "BanManager.h"
+#include "CircularBuffer.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GossipDef.h"
-#include "Opcodes.h"
+#include "Packet.h"
 #include "SharedDefines.h"
 #include "World.h"
-#include "WorldPacket.h"
 #include <utility>
+#include <map>
 
 class Creature;
 class GameObject;
@@ -55,6 +56,10 @@ namespace lfg
     struct LfgPlayerRewardData;
     struct LfgRoleCheck;
     struct LfgUpdateData;
+}
+
+namespace WorldPackets
+{
 }
 
 enum AccountDataType
@@ -107,6 +112,12 @@ enum ChatRestrictionType
     ERR_YELL_RESTRICTED = 3
 };
 
+enum DeclinedNameResult
+{
+    DECLINED_NAMES_RESULT_SUCCESS = 0,
+    DECLINED_NAMES_RESULT_ERROR = 1
+};
+
 enum CharterTypes
 {
     GUILD_CHARTER_TYPE                            = 9,
@@ -124,7 +135,7 @@ public:
     virtual ~PacketFilter() = default;
 
     virtual bool Process(WorldPacket* /*packet*/) { return true; }
-    [[nodiscard]] virtual bool ProcessLogout() const { return true; }
+    [[nodiscard]] virtual bool ProcessUnsafe() const { return true; }
 
 protected:
     WorldSession* const m_pSession;
@@ -138,7 +149,7 @@ public:
 
     bool Process(WorldPacket* packet) override;
     //in Map::Update() we do not process player logout!
-    [[nodiscard]] bool ProcessLogout() const override { return false; }
+    [[nodiscard]] bool ProcessUnsafe() const override { return false; }
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -160,29 +171,53 @@ class CharacterCreateInfo
     friend class Player;
 
 protected:
-    CharacterCreateInfo(std::string  name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
-                        WorldPacket& data) : Name(std::move(name)), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
-        OutfitId(outfitId), Data(data), CharCount(0)
-    {}
-
     /// User specified variables
     std::string Name;
-    uint8 Race;
-    uint8 Class;
-    uint8 Gender;
-    uint8 Skin;
-    uint8 Face;
-    uint8 HairStyle;
-    uint8 HairColor;
-    uint8 FacialHair;
-    uint8 OutfitId;
-    WorldPacket Data;
+    uint8 Race = 0;
+    uint8 Class = 0;
+    uint8 Gender = GENDER_NONE;
+    uint8 Skin = 0;
+    uint8 Face = 0;
+    uint8 HairStyle = 0;
+    uint8 HairColor = 0;
+    uint8 FacialHair = 0;
+    uint8 OutfitId = 0;
 
     /// Server side data
-    uint8 CharCount;
+    uint8 CharCount = 0;
+};
 
-private:
-    virtual ~CharacterCreateInfo() = default;;
+struct CharacterRenameInfo
+{
+    friend class WorldSession;
+
+protected:
+    ObjectGuid Guid;
+    std::string Name;
+};
+
+struct CharacterCustomizeInfo : public CharacterRenameInfo
+{
+    friend class Player;
+    friend class WorldSession;
+
+protected:
+    uint8 Gender = GENDER_NONE;
+    uint8 Skin = 0;
+    uint8 Face = 0;
+    uint8 HairStyle = 0;
+    uint8 HairColor = 0;
+    uint8 FacialHair = 0;
+};
+
+struct CharacterFactionChangeInfo : public CharacterCustomizeInfo
+{
+    friend class Player;
+    friend class WorldSession;
+
+protected:
+    uint8 Race = 0;
+    bool FactionChange = false;
 };
 
 struct PacketCounter
@@ -230,7 +265,7 @@ public:
     uint32 GetCurrentVendor() const { return m_currentVendorEntry; }
     void SetCurrentVendor(uint32 vendorEntry) { m_currentVendorEntry = vendorEntry; }
 
-    uint32 GetGuidLow() const;
+    ObjectGuid::LowType GetGuidLow() const;
     void SetSecurity(AccountTypes security) { _security = security; }
     std::string const& GetRemoteAddress() { return m_Address; }
     void SetPlayer(Player* player);
@@ -269,38 +304,38 @@ public:
     /// Handle the authentication waiting queue (to be completed)
     void SendAuthWaitQue(uint32 position);
 
-    //void SendTestCreatureQueryOpcode(uint32 entry, uint64 guid, uint32 testvalue);
-    void SendNameQueryOpcode(uint64 guid);
+    //void SendTestCreatureQueryOpcode(uint32 entry, ObjectGuid guid, uint32 testvalue);
+    void SendNameQueryOpcode(ObjectGuid guid);
 
-    void SendTrainerList(uint64 guid);
-    void SendTrainerList(uint64 guid, std::string const& strTitle);
-    void SendListInventory(uint64 guid, uint32 vendorEntry = 0);
-    void SendShowBank(uint64 guid);
-    bool CanOpenMailBox(uint64 guid);
-    void SendShowMailBox(uint64 guid);
-    void SendTabardVendorActivate(uint64 guid);
+    void SendTrainerList(ObjectGuid guid);
+    void SendTrainerList(ObjectGuid guid, std::string const& strTitle);
+    void SendListInventory(ObjectGuid guid, uint32 vendorEntry = 0);
+    void SendShowBank(ObjectGuid guid);
+    bool CanOpenMailBox(ObjectGuid guid);
+    void SendShowMailBox(ObjectGuid guid);
+    void SendTabardVendorActivate(ObjectGuid guid);
     void SendSpiritResurrect();
     void SendBindPoint(Creature* npc);
 
     void SendAttackStop(Unit const* enemy);
 
-    void SendBattleGroundList(uint64 guid, BattlegroundTypeId bgTypeId = BATTLEGROUND_RB);
+    void SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId = BATTLEGROUND_RB);
 
     void SendTradeStatus(TradeStatus status);
     void SendUpdateTrade(bool trader_data = true);
     void SendCancelTrade();
 
-    void SendPetitionQueryOpcode(uint64 petitionguid);
+    void SendPetitionQueryOpcode(ObjectGuid petitionguid);
 
     // Spell
     void HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets& targets);
 
     // Pet
-    void SendPetNameQuery(uint64 guid, uint32 petnumber);
-    void SendStablePet(uint64 guid);
-    void SendStablePetCallback(PreparedQueryResult result, uint64 guid);
+    void SendPetNameQuery(ObjectGuid guid, uint32 petnumber);
+    void SendStablePet(ObjectGuid guid);
+    void SendStablePetCallback(ObjectGuid guid, PreparedQueryResult result);
     void SendStableResult(uint8 guid);
-    bool CheckStableMaster(uint64 guid);
+    bool CheckStableMaster(ObjectGuid guid);
 
     // Account Data
     AccountData* GetAccountData(AccountDataType type) { return &m_accountData[type]; }
@@ -311,7 +346,7 @@ public:
 
     void LoadTutorialsData();
     void SendTutorialsData();
-    void SaveTutorialsData(SQLTransaction& trans);
+    void SaveTutorialsData(CharacterDatabaseTransaction trans);
     uint32 GetTutorialInt(uint8 index) const { return m_Tutorials[index]; }
     void SetTutorialInt(uint8 index, uint32 value)
     {
@@ -322,17 +357,17 @@ public:
         }
     }
     //auction
-    void SendAuctionHello(uint64 guid, Creature* unit);
+    void SendAuctionHello(ObjectGuid guid, Creature* unit);
     void SendAuctionCommandResult(uint32 auctionId, uint32 Action, uint32 ErrorCode, uint32 bidError = 0);
-    void SendAuctionBidderNotification(uint32 location, uint32 auctionId, uint64 bidder, uint32 bidSum, uint32 diff, uint32 item_template);
+    void SendAuctionBidderNotification(uint32 location, uint32 auctionId, ObjectGuid bidder, uint32 bidSum, uint32 diff, uint32 item_template);
     void SendAuctionOwnerNotification(AuctionEntry* auction);
 
     //Item Enchantment
-    void SendEnchantmentLog(uint64 target, uint64 caster, uint32 itemId, uint32 enchantId);
-    void SendItemEnchantTimeUpdate(uint64 Playerguid, uint64 Itemguid, uint32 slot, uint32 Duration);
+    void SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint32 itemId, uint32 enchantId);
+    void SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid Itemguid, uint32 slot, uint32 Duration);
 
     //Taxi
-    void SendTaxiStatus(uint64 guid);
+    void SendTaxiStatus(ObjectGuid guid);
     void SendTaxiMenu(Creature* unit);
     void SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathNode = 0);
     bool SendLearnNewTaxiNode(Creature* unit);
@@ -341,11 +376,11 @@ public:
     // Guild/Arena Team
     void SendArenaTeamCommandResult(uint32 team_action, std::string const& team, std::string const& player, uint32 error_id = 0);
     void SendNotInArenaTeamPacket(uint8 type);
-    void SendPetitionShowList(uint64 guid);
+    void SendPetitionShowList(ObjectGuid guid);
 
     void BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data);
 
-    void DoLootRelease(uint64 lguid);
+    void DoLootRelease(ObjectGuid lguid);
 
     // Account mute time
     time_t m_muteTime;
@@ -357,7 +392,6 @@ public:
 
     uint32 GetLatency() const { return m_latency; }
     void SetLatency(uint32 latency) { m_latency = latency; }
-    void ResetClientTimeDelay() { m_clientTimeDelay = 0; }
 
     std::atomic<time_t> m_timeOutTime;
     void UpdateTimeOutTime(uint32 diff)
@@ -387,8 +421,11 @@ public:
     time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
     void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
 
+    // Time Synchronisation
+    void ResetTimeSync();
+    void SendTimeSync();
 public:                                                 // opcodes handlers
-    void Handle_NULL(WorldPacket& recvPacket);          // not used
+    void Handle_NULL(WorldPacket& null);                // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
     void Handle_ServerSide(WorldPacket& recvPacket);    // sever side only, can't be accepted from client
     void Handle_Deprecated(WorldPacket& recvPacket);    // never used anymore by client
@@ -396,13 +433,20 @@ public:                                                 // opcodes handlers
     void HandleCharEnumOpcode(WorldPacket& recvPacket);
     void HandleCharDeleteOpcode(WorldPacket& recvPacket);
     void HandleCharCreateOpcode(WorldPacket& recvPacket);
-    void HandleCharCreateCallback(PreparedQueryResult result, CharacterCreateInfo* createInfo);
     void HandlePlayerLoginOpcode(WorldPacket& recvPacket);
     void HandleCharEnum(PreparedQueryResult result);
-    void HandlePlayerLoginFromDB(LoginQueryHolder* holder);
+    void HandlePlayerLoginFromDB(LoginQueryHolder const& holder);
     void HandlePlayerLoginToCharInWorld(Player* pCurrChar);
     void HandlePlayerLoginToCharOutOfWorld(Player* pCurrChar);
     void HandleCharFactionOrRaceChange(WorldPacket& recvData);
+    void HandleCharFactionOrRaceChangeCallback(std::shared_ptr<CharacterFactionChangeInfo> factionChangeInfo, PreparedQueryResult result);
+
+    void SendCharCreate(ResponseCodes result);
+    void SendCharDelete(ResponseCodes result);
+    void SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo);
+    void SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo);
+    void SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo);
+    void SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid);
 
     // played time
     void HandlePlayedTime(WorldPacket& recvPacket);
@@ -497,7 +541,7 @@ public:                                                 // opcodes handlers
     void HandleGameObjectQueryOpcode(WorldPacket& recvPacket);
 
     void HandleMoveWorldportAckOpcode(WorldPacket& recvPacket);
-    void HandleMoveWorldportAckOpcode();                // for server-side calls
+    void HandleMoveWorldportAck(); // for server-side calls
 
     void HandleMovementOpcodes(WorldPacket& recvPacket);
     void HandleSetActiveMoverOpcode(WorldPacket& recvData);
@@ -585,16 +629,16 @@ public:                                                 // opcodes handlers
     void HandleStablePet(WorldPacket& recvPacket);
     void HandleStablePetCallback(PreparedQueryResult result);
     void HandleUnstablePet(WorldPacket& recvPacket);
-    void HandleUnstablePetCallback(PreparedQueryResult result, uint32 petId);
+    void HandleUnstablePetCallback(uint32 petId, PreparedQueryResult result);
     void HandleBuyStableSlot(WorldPacket& recvPacket);
     void HandleStableRevivePet(WorldPacket& recvPacket);
     void HandleStableSwapPet(WorldPacket& recvPacket);
-    void HandleStableSwapPetCallback(PreparedQueryResult result, uint32 petId);
-    void HandleOpenWrappedItemCallback(PreparedQueryResult result, uint8 bagIndex, uint8 slot, uint32 itemLowGUID);
+    void HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult result);
+    void HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result);
     void HandleLoadActionsSwitchSpec(PreparedQueryResult result);
     void HandleCharacterAuraFrozen(PreparedQueryResult result);
     uint8 HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType);
-    void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder* holder);
+    void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder const& holder);
 
     void HandleDuelAcceptedOpcode(WorldPacket& recvPacket);
     void HandleDuelCancelledOpcode(WorldPacket& recvPacket);
@@ -616,7 +660,7 @@ public:                                                 // opcodes handlers
     void HandleAuctionSellItem(WorldPacket& recvData);
     void HandleAuctionRemoveItem(WorldPacket& recvData);
     void HandleAuctionListOwnerItems(WorldPacket& recvData);
-    void HandleAuctionListOwnerItemsEvent(uint64 creatureGuid);
+    void HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid);
     void HandleAuctionPlaceBid(WorldPacket& recvData);
     void HandleAuctionListPendingSales(WorldPacket& recvData);
 
@@ -732,7 +776,7 @@ public:                                                 // opcodes handlers
     //Pet
     void HandlePetAction(WorldPacket& recvData);
     void HandlePetStopAttack(WorldPacket& recvData);
-    void HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid, uint16 flag, uint64 guid2);
+    void HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spellid, uint16 flag, ObjectGuid guid2);
     void HandlePetNameQuery(WorldPacket& recvData);
     void HandlePetSetAction(WorldPacket& recvData);
     void HandlePetAbandon(WorldPacket& recvData);
@@ -746,7 +790,7 @@ public:                                                 // opcodes handlers
     void HandleSetActionBarToggles(WorldPacket& recvData);
 
     void HandleCharRenameOpcode(WorldPacket& recvData);
-    void HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult result, std::string const& newName);
+    void HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameInfo, PreparedQueryResult result);
     void HandleSetPlayerDeclinedNames(WorldPacket& recvData);
 
     void HandleTotemDestroyed(WorldPacket& recvData);
@@ -806,7 +850,7 @@ public:                                                 // opcodes handlers
 
     void SendLfgUpdatePlayer(lfg::LfgUpdateData const& updateData);
     void SendLfgUpdateParty(lfg::LfgUpdateData const& updateData);
-    void SendLfgRoleChosen(uint64 guid, uint8 roles);
+    void SendLfgRoleChosen(ObjectGuid guid, uint8 roles);
     void SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& pRoleCheck);
     void SendLfgLfrList(bool update);
     void SendLfgJoinResult(lfg::LfgJoinResultData const& joinData);
@@ -896,6 +940,7 @@ public:                                                 // opcodes handlers
     void HandleAlterAppearance(WorldPacket& recvData);
     void HandleRemoveGlyph(WorldPacket& recvData);
     void HandleCharCustomize(WorldPacket& recvData);
+    void HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomizeInfo> customizeInfo, PreparedQueryResult result);
     void HandleQueryInspectAchievements(WorldPacket& recvData);
     void HandleEquipmentSetSave(WorldPacket& recvData);
     void HandleEquipmentSetDelete(WorldPacket& recvData);
@@ -908,9 +953,6 @@ public:                                                 // opcodes handlers
     void HandleEnterPlayerVehicle(WorldPacket& data);
     void HandleUpdateProjectilePosition(WorldPacket& recvPacket);
 
-    // _loadPetFromDBFirstCallback helpers
-    //QueryCallback<PreparedQueryResult, uint64> GetLoadPetFromDBFirstCallback() { return _loadPetFromDBFirstCallback; }
-
     uint32 _lastAuctionListItemsMSTime;
     uint32 _lastAuctionListOwnerItemsMSTime;
 
@@ -922,29 +964,22 @@ public:                                                 // opcodes handlers
     void SetKicked(bool val) { _kicked = val; }
     void SetShouldSetOfflineInDB(bool val) { _shouldSetOfflineInDB = val; }
     bool GetShouldSetOfflineInDB() const { return _shouldSetOfflineInDB; }
+    bool IsSocketClosed() const;
 
-    /***
-    CALLBACKS
-    ***/
+    /*
+     * CALLBACKS
+     */
+
+    QueryCallbackProcessor& GetQueryProcessor() { return _queryProcessor; }
+    TransactionCallback& AddTransactionCallback(TransactionCallback&& callback);
+    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback);
+
 private:
-    void InitializeQueryCallbackParameters();
     void ProcessQueryCallbacks();
-    void ProcessQueryCallbackPlayer();
-    void ProcessQueryCallbackPet();
-    void ProcessQueryCallbackLogin();
 
-    PreparedQueryResultFuture _charEnumCallback;
-    PreparedQueryResultFuture _stablePetCallback;
-    QueryCallback<PreparedQueryResult, std::string> _charRenameCallback;
-    QueryCallback<PreparedQueryResult, uint32> _unstablePetCallback;
-    QueryCallback<PreparedQueryResult, uint32> _stableSwapCallback;
-    QueryCallback<PreparedQueryResult, uint64> _sendStabledPetCallback;
-    QueryCallback<PreparedQueryResult, CharacterCreateInfo*, true> _charCreateCallback;
-
-    QueryResultHolderFuture _charLoginCallback;
-
-    QueryResultHolderFuture _loadPetFromDBSecondCallback;
-    QueryCallback_3<PreparedQueryResult, uint8, uint8, uint32> _openWrappedItemCallback;
+    QueryCallbackProcessor _queryProcessor;
+    AsyncCallbackProcessor<TransactionCallback> _transactionCallbacks;
+    AsyncCallbackProcessor<SQLQueryHolderCallback> _queryHolderProcessor;
 
     friend class World;
 protected:
@@ -976,34 +1011,29 @@ protected:
         DosProtection& operator=(DosProtection const& right) = delete;
     } AntiDOS;
 
-public:
-    // xinef: those must be public, requires calls out of worldsession :(
-    QueryCallback_2<PreparedQueryResult, uint32, AsynchPetSummon*> _loadPetFromDBFirstCallback;
-    PreparedQueryResultFuture _loadActionsSwitchSpecCallback;
-    PreparedQueryResultFuture _CharacterAuraFrozenCallback;
-
-    /***
-    END OF CALLBACKS
-    ***/
 private:
     // private trade methods
     void moveItems(Item* myItems[], Item* hisItems[]);
 
-    bool CanUseBank(uint64 bankerGUID = 0) const;
+    bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
 
     bool recoveryItem(Item* pItem);
 
+    // logging helper
+    void LogUnexpectedOpcode(WorldPacket* packet, char const* status, const char* reason);
+    void LogUnprocessedTail(WorldPacket* packet);
+
     // EnumData helpers
-    bool IsLegitCharacterForAccount(uint32 lowGUID)
+    bool IsLegitCharacterForAccount(ObjectGuid guid)
     {
-        return _legitCharacters.find(lowGUID) != _legitCharacters.end();
+        return _legitCharacters.find(guid) != _legitCharacters.end();
     }
 
     // this stores the GUIDs of the characters who can login
     // characters who failed on Player::BuildEnumData shouldn't login
-    std::set<uint32> _legitCharacters;
+    GuidSet _legitCharacters;
 
-    uint32 m_GUIDLow;
+    ObjectGuid::LowType m_GUIDLow;
     Player* _player;
     WorldSocket* m_Socket;
     std::string m_Address;
@@ -1028,22 +1058,29 @@ private:
     LocaleConstant m_sessionDbcLocale;
     LocaleConstant m_sessionDbLocaleIndex;
     uint32 m_latency;
-    uint32 m_clientTimeDelay;
     AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
     uint32 m_Tutorials[MAX_ACCOUNT_TUTORIAL_VALUES];
     bool   m_TutorialsChanged;
     AddonsList m_addonsList;
     uint32 recruiterId;
     bool isRecruiter;
-    ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
+    LockedQueue<WorldPacket*> _recvQueue;
     uint32 m_currentVendorEntry;
-    uint64 m_currentBankerGUID;
+    ObjectGuid m_currentBankerGUID;
     time_t timeWhoCommandAllowed;
     uint32 _offlineTime;
     bool _kicked;
     bool _shouldSetOfflineInDB;
     // Packets cooldown
     time_t _calendarEventCreationCooldown;
+
+    CircularBuffer<std::pair<int64, uint32>> _timeSyncClockDeltaQueue; // first member: clockDelta. Second member: latency of the packet exchange that was used to compute that clockDelta.
+    int64 _timeSyncClockDelta;
+    void ComputeNewClockDelta();
+
+    std::map<uint32, uint32> _pendingTimeSyncRequests; // key: counter. value: server time when packet with that counter was sent.
+    uint32 _timeSyncNextCounter;
+    uint32 _timeSyncTimer;
 };
 #endif
 /// @}
