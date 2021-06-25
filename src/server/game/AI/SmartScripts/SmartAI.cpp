@@ -105,7 +105,7 @@ WayPoint* SmartAI::GetNextWayPoint()
     return nullptr;
 }
 
-void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
+void SmartAI::GenerateWayPointArray(Movement::PointsArray* points, uint32 group)
 {
     if (!mWayPoints || mWayPoints->empty())
         return;
@@ -120,8 +120,11 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
         WPPath::const_iterator itr;
         while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end())
         {
-            WayPoint* wp = (*itr).second;
-            points->push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+            if ((*itr).second->wp_group == group)
+            {
+                WayPoint* wp = (*itr).second;
+                points->push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+            }
         }
     }
     else
@@ -138,8 +141,11 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
             WPPath::const_iterator itr;
             while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end() && cnt++ <= length)
             {
-                WayPoint* wp = (*itr).second;
-                pVector.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                if ((*itr).second->wp_group == group)
+                {
+                    WayPoint* wp = (*itr).second;
+                    pVector.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                }
             }
 
             if (pVector.size() > 2) // more than source + dest
@@ -165,6 +171,38 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
             *points = pVector;
             break;
         }
+    }
+}
+
+void SmartAI::RandomWaypointGroup(uint32 firstGroup, uint32 lastGroup, Unit* invoker)
+{
+    if (me->IsInCombat())// no wp movement in combat
+    {
+        LOG_ERROR("scripts.ai.sai", "SmartAI::StartPath: Creature entry %u wanted to start waypoint movement while in combat, ignoring.", me->GetEntry());
+        return;
+    }
+
+    if (HasEscortState(SMART_ESCORT_ESCORTING))
+        StopPath();
+
+    if (!mWayPoints || mWayPoints->empty())
+        return;
+
+    if (WayPoint* wp = GetNextWayPoint())
+    {
+        AddEscortState(SMART_ESCORT_ESCORTING);
+
+        if (invoker && invoker->GetTypeId() == TYPEID_PLAYER)
+        {
+            mEscortNPCFlags = me->GetUInt32Value(UNIT_NPC_FLAGS);
+            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+        }
+
+        Movement::PointsArray pathPoints;
+        GenerateWayPointArray(&pathPoints, uint32(urand(firstGroup, lastGroup)));
+
+        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+        GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_START, nullptr, wp->id, GetScript()->GetPathId());
     }
 }
 

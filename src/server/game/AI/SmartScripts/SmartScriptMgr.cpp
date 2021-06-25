@@ -53,16 +53,16 @@ void SmartWaypointMgr::LoadFromDB()
     uint32 total = 0;
     uint32 last_entry = 0;
     uint32 last_id = 1;
-
+    uint32 last_group = 0;
     do
     {
         Field* fields = result->Fetch();
         uint32 entry = fields[0].GetUInt32();
         uint32 id = fields[1].GetUInt32();
-        float x, y, z;
-        x = fields[2].GetFloat();
-        y = fields[3].GetFloat();
-        z = fields[4].GetFloat();
+        uint32 wp_group = fields[2].GetUInt32();
+        float x = fields[3].GetFloat();
+        float y = fields[4].GetFloat();
+        float z = fields[5].GetFloat();
 
         if (last_entry != entry)
         {
@@ -71,13 +71,14 @@ void SmartWaypointMgr::LoadFromDB()
             count++;
         }
 
-        if (last_id != id)
-            LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry %u, unexpected point id %u, expected %u.", entry, id, last_id);
+        if (last_id != id && last_group == wp_group)
+            LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry %u, unexpected point id %u, expected %u in group %u", entry, id, last_id, last_group);
 
         last_id++;
-        (*waypoint_map[entry])[id] = new WayPoint(id, x, y, z);
+        (*waypoint_map[entry])[id] = new WayPoint(wp_group, id, x, y, z);
 
         last_entry = entry;
+        last_group = wp_group;
         total++;
     } while (result->NextRow());
 
