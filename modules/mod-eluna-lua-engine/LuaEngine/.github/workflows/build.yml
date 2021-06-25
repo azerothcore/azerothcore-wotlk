@@ -1,0 +1,131 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  TC-Eluna:
+    strategy:
+      fail-fast: false
+      matrix:
+        eluna: [ON]
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: false
+        repository: ElunaLuaEngine/ElunaTrinityWotlk
+    - uses: actions/checkout@v2
+      with:
+        path: src/server/game/LuaEngine
+    - name: Dependencies
+      run: |
+        sudo apt-get update && sudo apt-get install -yq libboost-all-dev
+    - name: Setup
+      env:
+        ELUNA: ${{ matrix.eluna }}
+      run: |
+        mkdir bin
+        cd bin
+        cmake ../ -DELUNA=$ELUNA -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=1 -DSCRIPTS=dynamic -DSERVERS=1 -DNOJEM=0 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_C_FLAGS_DEBUG="-DNDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="-DNDEBUG" -DCMAKE_INSTALL_PREFIX=check_install -DBUILD_TESTING=1
+        cd ..
+    - name: Build
+      run: |
+        cd bin
+        make -j 4 -k && make install
+    - name: Unit tests
+      run: |
+        cd bin
+        make test
+    - name: Check executables
+      run: |
+        cd bin/check_install/bin
+        ./authserver --version
+        ./worldserver --version
+
+  AC-Eluna:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          repository: azerothcore/azerothcore-wotlk
+          ref: 'master'
+      - uses: actions/checkout@v2
+        with:
+          submodules: false
+          repository: azerothcore/mod-eluna-lua-engine
+          path: modules/mod-eluna-lua-engine
+      - uses: actions/checkout@v2
+        with:
+          path: modules/mod-eluna-lua-engine/LuaEngine
+      - name: Configure OS
+        run: |
+          # Copy paste of https://github.com/azerothcore/azerothcore-wotlk/blob/master/apps/ci/ci-install.sh
+
+          cat >>conf/config.sh <<CONFIG_SH
+          MTHREADS=4
+          CWARNINGS=ON
+          CDEBUG=OFF
+          CTYPE=Release
+          CSCRIPTS=ON
+          CUNIT_TESTS=ON
+          CSERVERS=ON
+          CTOOLS=ON
+          CSCRIPTPCH=ON
+          CCOREPCH=ON
+          CCUSTOMOPTIONS='-DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror"'
+          DB_CHARACTERS_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
+          DB_AUTH_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
+          DB_WORLD_CONF="MYSQL_USER='root'; MYSQL_PASS='root'; MYSQL_HOST='localhost';"
+          CONFIG_SH
+
+          time sudo apt-get update -y
+          # time sudo apt-get upgrade -y
+          time sudo apt-get install -y git lsb-release sudo ccache
+          time ./acore.sh install-deps
+
+          time sudo apt-get install -y clang-10
+          echo "CCOMPILERC=\"clang-10\"" >> ./conf/config.sh
+          echo "CCOMPILERCXX=\"clang++-10\"" >> ./conf/config.sh
+      - name: Import db
+        run: source ./apps/ci/ci-import-db.sh
+      - name: Build
+        run: source ./apps/ci/ci-compile.sh
+      - name: Dry run
+        run: source ./apps/ci/ci-worldserver-dry-run.sh
+      - name: Check startup errors
+        run: source ./apps/ci/ci-error-check.sh
+
+  mangos-Eluna:
+    strategy:
+      fail-fast: false
+      matrix:
+        eluna: [ON, OFF]
+        patch: [zero, one, two]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          repository: mangos${{ matrix.patch }}/server
+          ref: master
+      - uses: actions/checkout@v2
+        with:
+          path: src/modules/Eluna
+      - name: Configure
+        env:
+          ELUNA: ${{ matrix.eluna }}
+        run: |
+          mkdir bin
+          cd bin
+          cmake .. -DELUNA=$ELUNA -DCMAKE_INSTALL_PREFIX=install -DSOAP=1 -DPLAYERBOTS=0 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/
+          cd ..
+      - name: Build
+        run: |
+          cd bin
+          make -j4
+          make install
