@@ -45,6 +45,12 @@
 #include "ScriptMgrMacros.h"
 #include "Group.h"
 
+ABScriptMgr* ABScriptMgr::instance()
+{
+    static ABScriptMgr instance;
+    return &instance;
+}
+
 bool ABScriptMgr::OnBeforeModifyAttributes(Creature *creature, uint32 & instancePlayerCount) {
     bool ret=true;
     FOR_SCRIPTS_RET(ABModuleScript, itr, end, ret) // return true by default if not scripts
