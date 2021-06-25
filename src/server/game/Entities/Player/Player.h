@@ -1653,8 +1653,7 @@ public:
     uint32 GetMailCacheSize() { return m_mailCache.size();}
     Mail* GetMail(uint32 id);
 
-    PlayerMails::iterator GetMailBegin() { return m_mailCache.begin();}
-    PlayerMails::iterator GetMailEnd() { return m_mailCache.end();}
+    PlayerMails const& GetMails() const { return m_mailCache; }
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/

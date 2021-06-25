@@ -3200,6 +3200,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 delete targets;
                 break;
             }
+        case SMART_ACTION_RANDOM_WP_GROUP:
+        {
+            ObjectList* targets = GetTargets(e, unit);
+            if (!targets)
+                break;
+
+            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+            {
+                CAST_AI(SmartAI, me->AI())->RandomWaypointGroup(
+                    e.action.randomWpGroup.wpMinRandom,
+                    e.action.randomWpGroup.wpMaxRandom, (*itr)->ToUnit());
+            }
+
+            delete targets;
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry %d SourceType %u, Event %u, Unhandled Action type %u", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
