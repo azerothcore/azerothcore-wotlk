@@ -3,7 +3,6 @@
  * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
-
 #include "BuiltInConfig.h"
 #include "Config.h"
 #include "GitRevision.h"

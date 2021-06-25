@@ -3,7 +3,6 @@
  * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
-
 #ifndef BUILT_IN_CONFIG_H
 #define BUILT_IN_CONFIG_H
 
