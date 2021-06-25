@@ -7904,8 +7904,8 @@ void ObjectMgr::LoadAcoreStringsLocales()
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
+        LOG_INFO("server.loading", " ");
     }
 
     do
