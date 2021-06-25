@@ -52,6 +52,6 @@ namespace Acore
     /// and returns a non-empty string when it was found.
     AC_COMMON_API std::string SearchExecutableInPath(std::string const& filename);
 
-} // namespace Warhead
+} // namespace Acore
 
 #endif // __PROCESS_H__
