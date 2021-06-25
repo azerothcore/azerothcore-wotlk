@@ -7,9 +7,9 @@
 // Manages registration, loading, and execution of scripts.
 class ABScriptMgr
 {
-    friend class ACE_Singleton<ABScriptMgr, ACE_Null_Mutex>;
     public: /* Initialization */
 
+        static ABScriptMgr* instance();
         // called at the start of ModifyCreatureAttributes method
         // it can be used to add some condition to skip autobalancing system for example
         bool OnBeforeModifyAttributes(Creature* creature, uint32 & instancePlayerCount);
@@ -20,7 +20,7 @@ class ABScriptMgr
         bool OnBeforeUpdateStats(Creature* creature, uint32 &scaledHealth, uint32 &scaledMana, float &damageMultiplier, uint32 &newBaseArmor);
 };
 
-#define sABScriptMgr ACE_Singleton<ABScriptMgr, ACE_Null_Mutex>::instance()
+#define sABScriptMgr ABScriptMgr::instance()
 
 /*
 * Dedicated hooks for Autobalance Module
