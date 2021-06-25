@@ -1,0 +1,46 @@
+[worldserver]
+
+#
+#    DuelReset.Cooldowns
+#        Description: Reset all cooldowns before duel starts and restore them when duel ends.
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+
+DuelReset.Cooldowns = 1
+
+#    DuelReset.HealthMana
+#        Description: Reset health and mana before duel starts and restore them when duel ends.
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+
+DuelReset.HealthMana = 1
+
+#    DuelReset.CooldownAge
+#        Description: Required time of a cooldown passed for it to be reset. Measured in seconds since the cooldown started.
+#        Default:     30  - (Enabled)
+#                     0  - (Disabled)
+
+DuelReset.CooldownAge = 30
+
+#    DuelReset.Zones
+#        Description: Whitelist of ZoneIDs seperated by Semicolons (;) where the reset for cooldowns and health/mana is enabled.
+#                     If Zones is set to any, the set Areas do not matter. The reset will always be applied.
+#                     If Zones is set to none, only the set Areas matter.
+#
+#        Examples:    "876;3817" - (GM Island;Testing)
+#                     "0" - (none)
+#                     ""  - (any)
+#        Default:     "0" - (none)
+
+DuelReset.Zones = "0"
+
+#    DuelReset.Areas
+#        Description: Whitelist of AreaIDs seperated by Semicolons (;) where the reset for cooldowns and health/mana is enabled.
+#                     If Areas is set to any or none, only the set Zones matter.
+#
+#        Examples:    "85;1" - (Tirisfal Glades;Dun Morogh)
+#                     "0" - (none)
+#                     ""  - (any)
+#        Default:     "12;14;809" - (Elwynn Forest;Durotar;Gates of Ironforge)
+
+DuelReset.Areas = "12;14;809"
