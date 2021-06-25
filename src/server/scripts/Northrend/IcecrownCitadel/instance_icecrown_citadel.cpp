@@ -1541,7 +1541,7 @@ public:
                     if (stalkers.empty())
                         return;
 
-                    stalkers.sort(acore::ObjectDistanceOrderPred(teleporter));
+                    stalkers.sort(Acore::ObjectDistanceOrderPred(teleporter));
                     stalkers.front()->CastSpell((Unit*)nullptr, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
                     stalkers.pop_front();
                     for (std::list<Creature*>::iterator itr = stalkers.begin(); itr != stalkers.end(); ++itr)
@@ -1774,7 +1774,7 @@ public:
                         GetCreatureListWithEntryInGrid(triggers, terenas, NPC_WORLD_TRIGGER_INFINITE_AOI, 100.0f);
                         if (!triggers.empty())
                         {
-                            triggers.sort(acore::ObjectDistanceOrderPred(terenas, false));
+                            triggers.sort(Acore::ObjectDistanceOrderPred(terenas, false));
                             Unit* visual = triggers.front();
                             visual->CastSpell(visual, SPELL_FROSTMOURNE_TELEPORT_VISUAL, true);
                         }
@@ -1845,7 +1845,7 @@ public:
                     return;
             }
 
-            go->Relocate(acore::Containers::SelectRandomContainerElement(trapPositions));
+            go->Relocate(Acore::Containers::SelectRandomContainerElement(trapPositions));
         }
 
     protected:

@@ -8,10 +8,10 @@
 #define _GAMEOBJECT_MODEL_H
 
 #include "Define.h"
-#include <G3D/Matrix3.h>
-#include <G3D/Vector3.h>
 #include <G3D/AABox.h>
+#include <G3D/Matrix3.h>
 #include <G3D/Ray.h>
+#include <G3D/Vector3.h>
 
 namespace VMAP
 {

@@ -1,32 +1,22 @@
 /*
- * This file is part of the WarheadCore Project. See AUTHORS file for Copyright information
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #include "RASession.h"
 #include "AccountMgr.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
+#include "Duration.h"
 #include "Log.h"
-#include "ServerMotd.h"
 #include "SRP6.h"
+#include "ServerMotd.h"
 #include "Util.h"
 #include "World.h"
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/read_until.hpp>
 #include <memory>
+#include <thread>
 
 using boost::asio::ip::tcp;
 
@@ -34,7 +24,7 @@ void RASession::Start()
 {
     // wait 1 second for active connections to send negotiation request
     for (int counter = 0; counter < 10 && _socket.available() == 0; counter++)
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(100ms);
 
     // Check if there are bytes available, if they are, then the client is requesting the negotiation
     if (_socket.available() > 0)
@@ -79,7 +69,7 @@ void RASession::Start()
     // Read commands
     for (;;)
     {
-        Send("TC>");
+        Send("AC>");
         std::string command = ReadString();
 
         if (ProcessCommand(command))
@@ -124,10 +114,10 @@ bool RASession::CheckAccessLevel(const std::string& user)
 
     Utf8ToUpperOnlyLatin(safeUser);
 
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS);
+    auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS);
     stmt->setString(0, safeUser);
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
 
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (!result)
     {
         LOG_INFO("commands.ra", "User %s does not exist in database", user.c_str());
@@ -160,7 +150,7 @@ bool RASession::CheckPassword(const std::string& user, const std::string& pass)
     Utf8ToUpperOnlyLatin(safe_pass);
     std::transform(safe_pass.begin(), safe_pass.end(), safe_pass.begin(), ::toupper);
 
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD_BY_NAME);
+    auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD_BY_NAME);
 
     stmt->setString(0, safe_user);
 
@@ -207,7 +197,9 @@ bool RASession::ProcessCommand(std::string& command)
 void RASession::CommandPrint(void* callbackArg, const char* text)
 {
     if (!text || !*text)
+    {
         return;
+    }
 
     RASession* session = static_cast<RASession*>(callbackArg);
     session->Send(text);

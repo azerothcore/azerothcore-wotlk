@@ -13,7 +13,7 @@
 #include <boost/asio/bind_executor.hpp>
 #endif
 
-namespace acore::Asio
+namespace Acore::Asio
 {
     /**
         Hack to make it possible to forward declare strand (which is a inner class)

@@ -16,6 +16,8 @@ CollectSourceFiles(
 add_executable(MeshExtractor ${PRIVATE_SOURCES})
 
 target_link_libraries(MeshExtractor
+  PRIVATE
+    acore-core-interface
   PUBLIC
     common
     Recast

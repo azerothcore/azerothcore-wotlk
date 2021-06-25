@@ -1430,7 +1430,7 @@ void OpcodeTable::Initialize()
 
 #undef DEFINE_HANDLER
 #undef DEFINE_SERVER_OPCODE_HANDLER
-};
+}
 
 template<typename T>
 inline std::string GetOpcodeNameForLoggingImpl(T id)

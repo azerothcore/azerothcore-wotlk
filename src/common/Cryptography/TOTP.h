@@ -10,7 +10,7 @@
 #include <ctime>
 #include <vector>
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     struct AC_COMMON_API TOTP
     {

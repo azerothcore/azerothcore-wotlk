@@ -23,7 +23,7 @@
 class Player;
 //class Map;
 
-namespace acore
+namespace Acore
 {
     struct VisibleNotifier
     {

@@ -11,7 +11,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <string>
 
-namespace acore::Asio
+namespace Acore::Asio
 {
     /**
      Hack to make it possible to forward declare resolver (one of its template arguments is a typedef to something super long and using nested classes)

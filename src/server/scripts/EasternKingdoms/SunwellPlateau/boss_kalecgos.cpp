@@ -626,7 +626,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(SpectralBlastCheck(GetCaster()->GetVictim()));
-            acore::Containers::RandomResize(targets, 1);
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void HandleDummy(SpellEffIndex effIndex)

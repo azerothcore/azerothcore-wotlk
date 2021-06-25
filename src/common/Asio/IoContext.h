@@ -19,7 +19,7 @@
 #define IoContextBase io_service
 #endif
 
-namespace acore::Asio
+namespace Acore::Asio
 {
     class IoContext
     {

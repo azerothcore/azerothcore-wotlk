@@ -48,8 +48,10 @@ public:
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
-                if (m_auiEncounter[i] == IN_PROGRESS)
+                if (m_auiEncounter[i] == IN_PROGRESS && i != TYPE_LOKEN_INTRO)
+                {
                     return true;
+                }
             }
             return false;
         }

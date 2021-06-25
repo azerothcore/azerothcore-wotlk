@@ -112,7 +112,11 @@ public:
     MOCK_METHOD(void, UpdateRealmCharCount, (uint32 accid), ());
     MOCK_METHOD(LocaleConstant, GetAvailableDbcLocale, (LocaleConstant locale), (const));
     MOCK_METHOD(void, LoadDBVersion, ());
+    MOCK_METHOD(void, LoadDBRevision, ());
     MOCK_METHOD(char const *, GetDBVersion, (), (const));
+    MOCK_METHOD(char const *, GetWorldDBRevision, (), (const));
+    MOCK_METHOD(char const *, GetCharacterDBRevision, (), (const));
+    MOCK_METHOD(char const *, GetAuthDBRevision, (), (const));
     MOCK_METHOD(void, LoadAutobroadcasts, ());
     MOCK_METHOD(void, UpdateAreaDependentAuras, ());
     MOCK_METHOD(uint32, GetCleaningFlags, (), (const));

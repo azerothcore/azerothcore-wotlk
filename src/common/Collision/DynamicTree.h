@@ -27,7 +27,7 @@ public:
     ~DynamicMapTree();
 
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2,
-                         float z2, uint32 phasemask) const;
+                                       float z2, uint32 phasemask) const;
 
     bool getIntersectionTime(uint32 phasemask, const G3D::Ray& ray,
                              const G3D::Vector3& endPos, float& maxDist) const;

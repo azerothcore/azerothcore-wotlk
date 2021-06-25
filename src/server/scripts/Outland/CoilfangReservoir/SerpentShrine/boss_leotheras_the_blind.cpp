@@ -401,7 +401,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
             if (Unit* victim = GetCaster()->GetVictim())
-                unitList.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+                unitList.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
         void Register() override

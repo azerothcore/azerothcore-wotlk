@@ -9,10 +9,10 @@
 
 #include "Common.h"
 #include "DetourAlloc.h"
-#include "DetourNavMesh.h"
 #include "DetourExtended.h"
-#include <unordered_map>
+#include "DetourNavMesh.h"
 #include <shared_mutex>
+#include <unordered_map>
 #include <vector>
 
 //  memory management
@@ -40,10 +40,14 @@ namespace MMAP
         ~MMapData()
         {
             for (NavMeshQuerySet::iterator i = navMeshQueries.begin(); i != navMeshQueries.end(); ++i)
+            {
                 dtFreeNavMeshQuery(i->second);
+            }
 
             if (navMesh)
+            {
                 dtFreeNavMesh(navMesh);
+            }
         }
 
         // we have to use single dtNavMeshQuery for every instance, since those are not thread safe

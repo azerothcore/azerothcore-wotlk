@@ -5,12 +5,12 @@
  */
 
 #include "GameObjectModel.h"
-#include "VMapFactory.h"
-#include "VMapManager2.h"
-#include "VMapDefinitions.h"
-#include "WorldModel.h"
 #include "Log.h"
 #include "Timer.h"
+#include "VMapDefinitions.h"
+#include "VMapFactory.h"
+#include "VMapManager2.h"
+#include "WorldModel.h"
 
 using G3D::Vector3;
 using G3D::Ray;
@@ -55,14 +55,16 @@ void LoadGameObjectModelList(std::string const& dataPath)
         Vector3 v1, v2;
         if (fread(&displayId, sizeof(uint32), 1, model_list_file) != 1)
             if (feof(model_list_file))  // EOF flag is only set after failed reading attempt
+            {
                 break;
+            }
 
         if (fread(&isWmo, sizeof(uint8), 1, model_list_file) != 1
-            || fread(&name_length, sizeof(uint32), 1, model_list_file) != 1
-            || name_length >= sizeof(buff)
-            || fread(&buff, sizeof(char), name_length, model_list_file) != name_length
-            || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
-            || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
+                || fread(&name_length, sizeof(uint32), 1, model_list_file) != 1
+                || name_length >= sizeof(buff)
+                || fread(&buff, sizeof(char), name_length, model_list_file) != name_length
+                || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
+                || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
         {
             LOG_ERROR("maps", "File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
             fclose(model_list_file);
@@ -72,7 +74,7 @@ void LoadGameObjectModelList(std::string const& dataPath)
         if (v1.isNaN() || v2.isNaN())
         {
             LOG_ERROR("maps", "File '%s' Model '%s' has invalid v1%s v2%s values!",
-                VMAP::GAMEOBJECT_MODELS, std::string(buff, name_length).c_str(), v1.toString().c_str(), v2.toString().c_str());
+                      VMAP::GAMEOBJECT_MODELS, std::string(buff, name_length).c_str(), v1.toString().c_str(), v2.toString().c_str());
             continue;
         }
 
@@ -81,34 +83,40 @@ void LoadGameObjectModelList(std::string const& dataPath)
 
     fclose(model_list_file);
 
-    LOG_INFO("server", ">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 GameObjectModel::~GameObjectModel()
 {
     if (iModel)
+    {
         VMAP::VMapFactory::createOrGetVMapManager()->releaseModelInstance(name);
+    }
 }
 
 bool GameObjectModel::initialize(std::unique_ptr<GameObjectModelOwnerBase> modelOwner, std::string const& dataPath)
 {
     ModelList::const_iterator it = model_list.find(modelOwner->GetDisplayId());
     if (it == model_list.end())
+    {
         return false;
+    }
 
     G3D::AABox mdl_box(it->second.bound);
     // ignore models with no bounds
     if (mdl_box == G3D::AABox::zero())
     {
-        LOG_ERROR("server", "GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
+        LOG_ERROR("maps", "GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
         return false;
     }
 
     iModel = VMAP::VMapFactory::createOrGetVMapManager()->acquireModelInstance(dataPath + "vmaps/", it->second.name);
 
     if (!iModel)
+    {
         return false;
+    }
 
     name = it->second.name;
     iPos = modelOwner->GetPosition();
@@ -122,7 +130,9 @@ bool GameObjectModel::initialize(std::unique_ptr<GameObjectModelOwnerBase> model
     mdl_box = AABox(mdl_box.low() * iScale, mdl_box.high() * iScale);
     AABox rotated_bounds;
     for (int i = 0; i < 8; ++i)
+    {
         rotated_bounds.merge(iRotation * mdl_box.corner(i));
+    }
 
     iBound = rotated_bounds + iPos;
 
@@ -154,11 +164,15 @@ GameObjectModel* GameObjectModel::Create(std::unique_ptr<GameObjectModelOwnerBas
 bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask) const
 {
     if (!(phasemask & ph_mask) || !owner->IsSpawned())
+    {
         return false;
+    }
 
     float time = ray.intersectionTime(iBound);
     if (time == G3D::inf())
+    {
         return false;
+    }
 
     // child bounds are defined in object space:
     Vector3 p = iInvRot * (ray.origin() - iPos) * iInvScale;
@@ -176,11 +190,15 @@ bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool Sto
 bool GameObjectModel::UpdatePosition()
 {
     if (!iModel)
+    {
         return false;
+    }
 
     ModelList::const_iterator it = model_list.find(owner->GetDisplayId());
     if (it == model_list.end())
+    {
         return false;
+    }
 
     G3D::AABox mdl_box(it->second.bound);
 
@@ -200,7 +218,9 @@ bool GameObjectModel::UpdatePosition()
     AABox rotated_bounds;
 
     for (int i = 0; i < 8; ++i)
+    {
         rotated_bounds.merge(iRotation * mdl_box.corner(i));
+    }
 
     iBound = rotated_bounds + iPos;
 #ifdef SPAWN_CORNERS

@@ -11,7 +11,7 @@
 #include <array>
 #include <openssl/evp.h>
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     class ARC4
     {

@@ -23,8 +23,8 @@ public:
     bool IsInitialized() const { return _initialized; }
 
 private:
-    acore::Crypto::ARC4 _clientDecrypt;
-    acore::Crypto::ARC4 _serverEncrypt;
+    Acore::Crypto::ARC4 _clientDecrypt;
+    Acore::Crypto::ARC4 _serverEncrypt;
     bool _initialized;
 };
 #endif

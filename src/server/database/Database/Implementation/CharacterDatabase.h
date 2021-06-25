@@ -1,29 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #ifndef _CHARACTERDATABASE_H
 #define _CHARACTERDATABASE_H
 
-#include "DatabaseWorkerPool.h"
 #include "MySQLConnection.h"
 
-class CharacterDatabaseConnection : public MySQLConnection
-{
-public:
-    //- Constructors for sync and async connections
-    CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-    CharacterDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
-
-    //- Loads database type specific prepared statements
-    void DoPrepareStatements() override;
-};
-
-typedef DatabaseWorkerPool<CharacterDatabaseConnection> CharacterDatabaseWorkerPool;
-
-enum CharacterDatabaseStatements
+enum CharacterDatabaseStatements : uint32
 {
     /*  Naming standard for defines:
         {DB}_{SEL/INS/UPD/DEL/REP}_{Summary of data changed}
@@ -137,7 +122,6 @@ enum CharacterDatabaseStatements
     CHAR_INS_ACCOUNT_INSTANCE_LOCK_TIMES,
     CHAR_SEL_MATCH_MAKER_RATING,
     CHAR_SEL_CHARACTER_COUNT,
-    CHAR_UPD_NAME,
     CHAR_DEL_DECLINED_NAME,
 
     CHAR_INS_GUILD,
@@ -342,6 +326,8 @@ enum CharacterDatabaseStatements
     CHAR_SEL_POOL_QUEST_SAVE,
     CHAR_SEL_CHARACTER_AT_LOGIN,
     CHAR_SEL_CHAR_CLASS_LVL_AT_LOGIN,
+    CHAR_SEL_CHAR_CUSTOMIZE_INFO,
+    CHAR_SEL_CHAR_RACE_OR_FACTION_CHANGE_INFOS,
     CHAR_SEL_CHAR_AT_LOGIN_TITLES_MONEY,
     CHAR_SEL_CHAR_COD_ITEM_MAIL,
     CHAR_SEL_CHAR_SOCIAL,
@@ -378,7 +364,7 @@ enum CharacterDatabaseStatements
     CHAR_DEL_PETITION_SIGNATURE_BY_GUID,
     CHAR_DEL_CHAR_DECLINED_NAME,
     CHAR_INS_CHAR_DECLINED_NAME,
-    CHAR_UPD_FACTION_OR_RACE,
+    CHAR_UPD_CHAR_RACE,
     CHAR_DEL_CHAR_SKILL_LANGUAGES,
     CHAR_INS_CHAR_SKILL_LANGUAGE,
     CHAR_UPD_CHAR_TAXI_PATH,
@@ -466,6 +452,7 @@ enum CharacterDatabaseStatements
     CHAR_DEL_CHAR_PET_BY_OWNER,
     CHAR_DEL_CHAR_PET_DECLINEDNAME_BY_OWNER,
     CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT,
+    CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT_SYNS,
     CHAR_SEL_PET_SLOTS,
     CHAR_SEL_PET_SLOTS_DETAIL,
     CHAR_SEL_PET_ENTRY,
@@ -507,7 +494,23 @@ enum CharacterDatabaseStatements
     CHAR_INS_RECOVERY_ITEM,
     CHAR_DEL_RECOVERY_ITEM,
 
+    CHAR_INS_RESERVED_PLAYER_NAME,
+
     MAX_CHARACTERDATABASE_STATEMENTS
+};
+
+class AC_DATABASE_API CharacterDatabaseConnection : public MySQLConnection
+{
+public:
+    typedef CharacterDatabaseStatements Statements;
+
+    //- Constructors for sync and async connections
+    CharacterDatabaseConnection(MySQLConnectionInfo& connInfo);
+    CharacterDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
+    ~CharacterDatabaseConnection();
+
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements() override;
 };
 
 #endif

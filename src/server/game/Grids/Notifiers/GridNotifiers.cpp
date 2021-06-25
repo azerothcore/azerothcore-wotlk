@@ -4,19 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Item.h"
 #include "Map.h"
 #include "ObjectAccessor.h"
 #include "SpellInfo.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
-using namespace acore;
+using namespace Acore;
 
 void VisibleNotifier::Visit(GameObjectMapType& m)
 {

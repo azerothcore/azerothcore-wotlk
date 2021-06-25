@@ -21,26 +21,23 @@
 #include "DeadlineTimer.h"
 #include "IoContext.h"
 #include "Config.h"
-#include "Log.h"
+#include "DatabaseEnv.h"
+#include "DatabaseLoader.h"
 #include "GitRevision.h"
 #include "Util.h"
 #include "SignalHandler.h"
 #include "RealmList.h"
 #include "DatabaseLoader.h"
+#include "MySQLThreading.h"
 #include "SecretMgr.h"
 #include "SharedDefines.h"
+#include "SignalHandler.h"
 #include "Util.h"
 #include <boost/version.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include <csignal>
-
-#ifdef __linux__
-#include <sched.h>
-#include <sys/resource.h>
-#define PROCESS_HIGH_PRIORITY -15 // [-20, 19], default is 0
-#endif
 
 #ifndef _ACORE_REALM_CONFIG
 #define _ACORE_REALM_CONFIG "authserver.conf"
@@ -67,6 +64,7 @@ int main(int argc, char** argv)
 {
     acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
     signal(SIGABRT, &acore::AbortHandler);
+
     // Command line parsing to get the configuration file name
     std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
     int count = 1;
@@ -96,7 +94,7 @@ int main(int argc, char** argv)
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
-    acore::Banner::Show("authserver",
+    Acore::Banner::Show("authserver",
         [](char const* text)
         {
             LOG_INFO("server.authserver", "%s", text);
@@ -137,6 +135,9 @@ int main(int argc, char** argv)
     std::shared_ptr<void> dbHandle(nullptr, [](void*) { StopDB(); });
 
     std::shared_ptr<acore::Asio::IoContext> ioContext = std::make_shared<acore::Asio::IoContext>();
+
+    // Load IP Location Database
+    sIPLocation->Load();
 
     // Get the list of realms for the server
     sRealmList->Initialize(*ioContext, sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
@@ -209,7 +210,7 @@ bool StartDB()
     // Load databases
     // NOTE: While authserver is singlethreaded you should keep synch_threads == 1.
     // Increasing it is just silly since only 1 will be used ever.
-    DatabaseLoader loader;
+    DatabaseLoader loader("server.authserver");
     loader
         .AddDatabase(LoginDatabase, "Login");
 

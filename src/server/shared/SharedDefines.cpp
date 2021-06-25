@@ -5,4 +5,4 @@
 
 #include "SharedDefines.h"
 
-ServerProcessTypes acore::Impl::CurrentServerProcessHolder::_type = NUM_SERVER_PROCESS_TYPES;
+ServerProcessTypes Acore::Impl::CurrentServerProcessHolder::_type = NUM_SERVER_PROCESS_TYPES;

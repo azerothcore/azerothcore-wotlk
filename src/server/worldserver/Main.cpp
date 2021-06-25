@@ -188,12 +188,16 @@ int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
+    // Loading modules configs
+    sConfigMgr->LoadModulesConfigs();
+
     std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 
     // Init all logs
+    sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
-    Acore::Logo::Show("authserver",
+    Acore::Banner::Show("worldserver-daemon",
         [](char const* text)
         {
             LOG_INFO("server.worldserver", "%s", text);

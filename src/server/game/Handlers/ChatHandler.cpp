@@ -9,7 +9,6 @@
 #include "ChannelMgr.h"
 #include "Chat.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Guild.h"
@@ -58,7 +57,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
-        LOG_ERROR("server", "CHAT: Wrong message type received: %u", type);
+        LOG_ERROR("network.opcode", "CHAT: Wrong message type received: %u", type);
         recvData.rfinish();
         return;
     }
@@ -299,7 +298,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         {
             if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
             {
-                //LOG_ERROR("server", "Player %s (%s) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
+                //LOG_ERROR("network.opcode", "Player %s (%s) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
                 //    GetPlayer()->GetGUID().ToString().c_str(), msg.c_str());
 
                 if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
@@ -669,7 +668,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 break;
             }
         default:
-            LOG_ERROR("server", "CHAT: unknown message type %u, lang: %u", type, lang);
+            LOG_ERROR("network.opcode", "CHAT: unknown message type %u, lang: %u", type, lang);
             break;
     }
 }
@@ -693,7 +692,7 @@ void WorldSession::HandleEmoteOpcode(WorldPacket& recvData)
     GetPlayer()->HandleEmoteCommand(emote);
 }
 
-namespace acore
+namespace Acore
 {
     class EmoteChatBuilder
     {
@@ -723,7 +722,7 @@ namespace acore
         uint32        i_emote_num;
         Unit const*   i_target;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 {
@@ -774,15 +773,15 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 
     Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
 
-    CellCoord p = acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
+    CellCoord p = Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    acore::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
-    acore::LocalizedPacketDo<acore::EmoteChatBuilder > emote_do(emote_builder);
-    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), emote_do);
-    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::EmoteChatBuilder> >, WorldTypeMapContainer> message(emote_worker);
+    Acore::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
+    Acore::LocalizedPacketDo<Acore::EmoteChatBuilder > emote_do(emote_builder);
+    Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::EmoteChatBuilder > > emote_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), emote_do);
+    TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::EmoteChatBuilder> >, WorldTypeMapContainer> message(emote_worker);
     cell.Visit(p, message, *GetPlayer()->GetMap(), *GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 
     GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE, text_emote, 0, unit);
@@ -812,11 +811,9 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 void WorldSession::HandleChannelDeclineInvite(WorldPacket& recvPacket)
 {
     // used only with EXTRA_LOGS
-    UNUSED(recvPacket);
+    (void)recvPacket;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Opcode %u", recvPacket.GetOpcode());
-#endif
 }
 
 void WorldSession::SendPlayerNotFoundNotice(std::string const& name)

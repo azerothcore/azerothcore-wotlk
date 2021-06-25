@@ -7,7 +7,7 @@
 
 #include "Define.h"
 
-namespace acore
+namespace Acore
 {
     namespace Banner
     {

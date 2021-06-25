@@ -54,7 +54,7 @@ class Weather
 {
 public:
     Weather(uint32 zone, WeatherData const* weatherChances);
-    ~Weather() = default;;
+    ~Weather() = default;
 
     bool Update(uint32 diff);
     bool ReGenerate();

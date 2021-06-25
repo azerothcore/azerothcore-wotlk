@@ -9,7 +9,7 @@
 #include "Define.h"
 #include <utility>
 
-namespace acore
+namespace Acore
 {
     /**
      * @class IteratorPair
@@ -41,6 +41,6 @@ namespace acore
     }
     //! namespace Containers
 }
-//! namespace acore
+//! namespace Acore
 
 #endif // IteratorPair_h__

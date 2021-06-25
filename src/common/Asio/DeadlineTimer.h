@@ -18,7 +18,7 @@
 
 #define DeadlineTimerBase boost::asio::basic_deadline_timer<boost::posix_time::ptime, boost::asio::time_traits<boost::posix_time::ptime> BasicDeadlineTimerThirdTemplateArg>
 
-namespace acore::Asio
+namespace Acore::Asio
 {
     class DeadlineTimer : public DeadlineTimerBase
     {

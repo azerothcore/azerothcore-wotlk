@@ -21,7 +21,6 @@ class AuraEffect;
 class Aura;
 class DynamicObject;
 class AuraScript;
-class ProcInfo;
 
 class AuraApplication
 {

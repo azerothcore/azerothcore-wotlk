@@ -510,12 +510,12 @@ public:
         {
             // remove targets with this aura already
             // tank is not on this list
-            targets.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+            targets.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
             targets.remove(GetCaster()->GetVictim());
             if (targets.empty())
                 return;
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
             _target = target;

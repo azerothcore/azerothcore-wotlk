@@ -679,7 +679,7 @@ public:
                                             if( Unit* c = v->GetBase() )
                                                 if( c->GetTypeId() == TYPEID_UNIT && c->ToCreature()->GetEntry() == (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_BATTLEWORG : VEHICLE_ARGENT_WARHORSE) )
                                                 {
-                                                    me->GetMotionMaster()->MovementExpired();;
+                                                    me->GetMotionMaster()->MovementExpired();
                                                     me->GetMotionMaster()->MoveIdle();
                                                     me->StopMoving();
                                                     me->CastSpell(me, SPELL_TRAMPLE_STUN, false);

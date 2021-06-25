@@ -13,6 +13,8 @@ namespace GitRevision
     char const* GetHash();
     char const* GetDate();
     char const* GetBranch();
+    char const* GetCMakeVersion();
+    char const* GetHostOSVersion();
     char const* GetFullVersion();
     char const* GetCompanyNameStr();
     char const* GetLegalCopyrightStr();

@@ -22,13 +22,13 @@
 #    endif // !defined(BOOST_ASIO_HAS_MOVE)
 #  endif // if WARHEAD_COMPILER == WARHEAD_COMPILER_INTEL
 #else
-#include <sys/types.h>
+#include <cstdlib>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
+#include <sys/types.h>
 #include <unistd.h>
-#include <netdb.h>
-#include <cstdlib>
 #endif
 
 #if AC_COMPILER == AC_COMPILER_MICROSOFT
@@ -98,7 +98,7 @@ AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 
 #define MAX_QUERY_LEN 32*1024
 
-namespace acore
+namespace Acore
 {
     template<class ArgumentType, class ResultType>
     struct unary_function

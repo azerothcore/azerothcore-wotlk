@@ -30,9 +30,13 @@ inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
 {
     // getMSTime() have limited data range and this is case when it overflow in this tick
     if (oldMSTime > newMSTime)
+    {
         return (0xFFFFFFFF - oldMSTime) + newMSTime;
+    }
     else
+    {
         return newMSTime - oldMSTime;
+    }
 }
 
 inline uint32 getMSTimeDiff(uint32 oldMSTime, TimePoint newTime)
@@ -60,7 +64,9 @@ public:
     {
         _current += diff;
         if (_current < 0)
+        {
             _current = 0;
+        }
     }
 
     bool Passed()
@@ -71,7 +77,9 @@ public:
     void Reset()
     {
         if (_current >= _interval)
+        {
             _current %= _interval;
+        }
     }
 
     void SetCurrent(time_t current)
@@ -174,7 +182,9 @@ public:
     bool Update(const uint32 diff)
     {
         if ((i_expireTime -= diff) > 0)
+        {
             return false;
+        }
 
         i_expireTime += i_period > int32(diff) ? i_period : diff;
         return true;

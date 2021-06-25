@@ -169,7 +169,7 @@ bool BattlegroundSA::ResetObjs()
 
         if (!sg)
         {
-            LOG_ERROR("server", "SOTA: Can't find GY entry %u", BG_SA_GYEntries[i]);
+            LOG_ERROR("bg.battleground", "SOTA: Can't find GY entry %u", BG_SA_GYEntries[i]);
             return false;
         }
 
@@ -182,7 +182,7 @@ bool BattlegroundSA::ResetObjs()
         {
             GraveyardStatus[i] = GetOtherTeamId(Attackers);
             if (!AddSpiritGuide(i + BG_SA_MAXNPC, sg->x, sg->y, sg->z, BG_SA_GYOrientation[i], GetOtherTeamId(Attackers)))
-                LOG_ERROR("server", "SOTA: couldn't spawn GY: %u", i);
+                LOG_ERROR("bg.battleground", "SOTA: couldn't spawn GY: %u", i);
         }
     }
 
@@ -624,21 +624,28 @@ void BattlegroundSA::EventPlayerDamagedGO(Player* /*player*/, GameObject* go, ui
             case BG_SA_BLUE_GATE:
             case BG_SA_GREEN_GATE:
                 {
-                    GameObject* go = nullptr;
-                    if ((go = GetBGObject(BG_SA_RED_GATE)))
-                        go->SetDestructibleBuildingModifyState(true);
-                    if ((go = GetBGObject(BG_SA_PURPLE_GATE)))
-                        go->SetDestructibleBuildingModifyState(true);
+                    if (auto redGate = GetBGObject(BG_SA_RED_GATE))
+                    {
+                        redGate->SetDestructibleBuildingModifyState(true);
+                    }
+                    if (auto purpleGate = GetBGObject(BG_SA_PURPLE_GATE))
+                    {
+                        purpleGate->SetDestructibleBuildingModifyState(true);
+                    }
                     break;
                 }
             case BG_SA_RED_GATE:
             case BG_SA_PURPLE_GATE:
-                if (GameObject*  go = GetBGObject(BG_SA_YELLOW_GATE))
-                    go->SetDestructibleBuildingModifyState(true);
+                if (auto yellowGate = GetBGObject(BG_SA_YELLOW_GATE))
+                {
+                    yellowGate->SetDestructibleBuildingModifyState(true);
+                }
                 break;
             case BG_SA_YELLOW_GATE:
-                if (GameObject*  go = GetBGObject(BG_SA_ANCIENT_GATE))
-                    go->SetDestructibleBuildingModifyState(true);
+                if (auto ancientGate = GetBGObject(BG_SA_ANCIENT_GATE))
+                {
+                    ancientGate->SetDestructibleBuildingModifyState(true);
+                }
                 break;
         }
     }
@@ -876,7 +883,7 @@ void BattlegroundSA::EventPlayerClickedOnFlag(Player* Source, GameObject* gameOb
             break;
         default:
             return;
-    };
+    }
 }
 
 void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
@@ -912,7 +919,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
     GraveyardStruct const* sg = sGraveyard->GetGraveyard(BG_SA_GYEntries[i]);
     if (!sg)
     {
-        LOG_ERROR("server", "BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);
+        LOG_ERROR("bg.battleground", "BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);
         return;
     }
 
@@ -996,7 +1003,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
         default:
             ABORT();
             break;
-    };
+    }
 }
 
 void BattlegroundSA::EventPlayerUsedGO(Player* Source, GameObject* object)

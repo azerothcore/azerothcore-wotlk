@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-namespace acore::Encoding
+namespace Acore::Encoding
 {
     struct AC_COMMON_API Base32
     {

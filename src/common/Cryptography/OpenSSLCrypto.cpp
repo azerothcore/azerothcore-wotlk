@@ -15,9 +15,13 @@ std::vector<std::mutex*> cryptoLocks;
 static void lockingCallback(int mode, int type, char const* /*file*/, int /*line*/)
 {
     if (mode & CRYPTO_LOCK)
+    {
         cryptoLocks[type]->lock();
+    }
     else
+    {
         cryptoLocks[type]->unlock();
+    }
 }
 static void threadIdCallback(CRYPTO_THREADID* id)
 {

@@ -22,7 +22,7 @@ struct MmapTileHeader
     uint32 mmapVersion{MMAP_VERSION};
     uint32 size{0};
     char usesLiquids{true};
-    char padding[3]{};
+    char padding[3] {};
 
     MmapTileHeader() : dtVersion(DT_NAVMESH_VERSION) { }
 };

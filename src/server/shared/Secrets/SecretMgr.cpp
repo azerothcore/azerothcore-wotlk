@@ -13,7 +13,6 @@
 #include "Log.h"
 #include "SharedDefines.h"
 #include <functional>
-#include <unordered_map>
 
 #define SECRET_FLAG_FOR(key, val, server) server ## _ ## key = (val ## ull << (16*SERVER_PROCESS_ ## server))
 #define SECRET_FLAG(key, val) SECRET_FLAG_ ## key = val, SECRET_FLAG_FOR(key, val, AUTHSERVER), SECRET_FLAG_FOR(key, val, WORLDSERVER)
@@ -111,7 +110,7 @@ void SecretMgr::AttemptLoad(Secrets i, LogLevel errorLevel, std::unique_lock<std
     // verify digest
     if (
         ((!oldDigest) != (!currentValue)) || // there is an old digest, but no current secret (or vice versa)
-        (oldDigest && !acore::Crypto::Argon2::Verify(currentValue->AsHexStr(), *oldDigest)) // there is an old digest, and the current secret does not match it
+        (oldDigest && !Acore::Crypto::Argon2::Verify(currentValue->AsHexStr(), *oldDigest)) // there is an old digest, and the current secret does not match it
         )
     {
         if (info.owner != THIS_SERVER_PROCESS)
@@ -128,7 +127,7 @@ void SecretMgr::AttemptLoad(Secrets i, LogLevel errorLevel, std::unique_lock<std
         if (oldDigest && info.oldKey) // there is an old digest, so there might be an old secret (if possible)
         {
             oldSecret = GetHexFromConfig(info.oldKey, info.bits);
-            if (oldSecret && !acore::Crypto::Argon2::Verify(oldSecret->AsHexStr(), *oldDigest))
+            if (oldSecret && !Acore::Crypto::Argon2::Verify(oldSecret->AsHexStr(), *oldDigest))
             {
                 LOG_MESSAGE_BODY("server.loading", errorLevel, "Invalid value for '%s' specified - this is not actually the secret previously used in your auth DB.", info.oldKey);
                 _secrets[i].state = Secret::LOAD_FAILED;
@@ -137,7 +136,7 @@ void SecretMgr::AttemptLoad(Secrets i, LogLevel errorLevel, std::unique_lock<std
         }
 
         // attempt to transition us to the new key, if possible
-        Optional<std::string> error = AttemptTransition(Secrets(i), currentValue, oldSecret, !!oldDigest);
+        Optional<std::string> error = AttemptTransition(Secrets(i), currentValue, oldSecret, static_cast<bool>(oldDigest));
         if (error)
         {
             LOG_MESSAGE_BODY("server.loading", errorLevel, "Your value of '%s' changed, but we cannot transition your database to the new value:\n%s", info.configKey, error->c_str());
@@ -178,15 +177,15 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
                 if (hadOldSecret)
                 {
                     if (!oldSecret)
-                        return acore::StringFormat("Cannot decrypt old TOTP tokens - add config key '%s' to authserver.conf!", secret_info[i].oldKey);
+                        return Acore::StringFormat("Cannot decrypt old TOTP tokens - add config key '%s' to authserver.conf!", secret_info[i].oldKey);
 
-                    bool success = acore::Crypto::AEDecrypt<acore::Crypto::AES>(totpSecret, oldSecret->ToByteArray<acore::Crypto::AES::KEY_SIZE_BYTES>());
+                    bool success = Acore::Crypto::AEDecrypt<Acore::Crypto::AES>(totpSecret, oldSecret->ToByteArray<Acore::Crypto::AES::KEY_SIZE_BYTES>());
                     if (!success)
-                        return acore::StringFormat("Cannot decrypt old TOTP tokens - value of '%s' is incorrect for some users!", secret_info[i].oldKey);
+                        return Acore::StringFormat("Cannot decrypt old TOTP tokens - value of '%s' is incorrect for some users!", secret_info[i].oldKey);
                 }
 
                 if (newSecret)
-                    acore::Crypto::AEEncryptWithRandomIV<acore::Crypto::AES>(totpSecret, newSecret->ToByteArray<acore::Crypto::AES::KEY_SIZE_BYTES>());
+                    Acore::Crypto::AEEncryptWithRandomIV<Acore::Crypto::AES>(totpSecret, newSecret->ToByteArray<Acore::Crypto::AES::KEY_SIZE_BYTES>());
 
                 auto* updateStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
                 updateStmt->setBinary(0, totpSecret);
@@ -211,7 +210,7 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
     {
         BigNumber salt;
         salt.SetRand(128);
-        Optional<std::string> hash = acore::Crypto::Argon2::Hash(newSecret->AsHexStr(), salt);
+        Optional<std::string> hash = Acore::Crypto::Argon2::Hash(newSecret->AsHexStr(), salt);
         if (!hash)
             return std::string("Failed to hash new secret");
 

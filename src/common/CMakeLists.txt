@@ -49,8 +49,10 @@ target_include_directories(common
     ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(common
-  PUBLIC
+  PRIVATE
     acore-core-interface
+  PUBLIC
+    ace
     boost
     argon2
     g3dlib

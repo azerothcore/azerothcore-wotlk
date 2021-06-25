@@ -8,8 +8,8 @@
 
 #include "Define.h"
 #include "LogCommon.h"
-#include <string>
 #include <ctime>
+#include <string>
 
 struct LogMessage
 {

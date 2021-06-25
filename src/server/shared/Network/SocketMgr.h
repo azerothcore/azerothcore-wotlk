@@ -23,7 +23,7 @@ public:
         ASSERT(!_threads && !_acceptor && !_threadCount, "StopNetwork must be called prior to SocketMgr destruction");
     }
 
-    virtual bool StartNetwork(acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int threadCount)
+    virtual bool StartNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int threadCount)
     {
         ASSERT(threadCount > 0);
 

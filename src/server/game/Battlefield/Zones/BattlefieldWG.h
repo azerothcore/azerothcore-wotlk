@@ -9,6 +9,7 @@
 
 #include "Battlefield.h"
 #include "ObjectAccessor.h"
+#include "Log.h"
 #include "World.h"
 #include "WorldPacket.h"
 
@@ -1194,7 +1195,7 @@ struct BfWGGameObjectBuilding
                 if (GameObject* go = m_WG->GetRelic())
                     go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 else
-                    LOG_ERROR("server", "BattlefieldWG: Relic not found.");
+                    LOG_ERROR("bg.battlefield", "BattlefieldWG: Relic not found.");
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
             case BATTLEFIELD_WG_OBJECTTYPE_WALL:

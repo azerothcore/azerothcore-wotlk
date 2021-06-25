@@ -1171,7 +1171,7 @@ public:
 
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
         {
-            SpellInfo const* talentSpell = sSpellMgr->GetSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
+            SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
             amount = talentSpell->Effects[EFFECT_0].CalcValue(GetCaster());
             if (Unit* totem = GetCaster())
                 if (Unit* owner = totem->ToTotem()->GetSummoner())
@@ -1359,7 +1359,7 @@ public:
                     FinishCast(SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
                     return;
                 }
-                target = acore::Containers::SelectRandomContainerElement(targets);
+                target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 targets.push_back(target);
             }
@@ -2240,7 +2240,7 @@ public:
                 return;
             }
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
             _corpse = true;
@@ -2563,7 +2563,7 @@ public:
         {
             // min pct of hp is stored in effect 0 of talent spell
             uint8 rank = GetSpellInfo()->GetRank();
-            SpellInfo const* talentProto = sSpellMgr->GetSpellInfo(sSpellMgr->GetSpellWithRank(SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1, rank));
+            SpellInfo const* talentProto = sSpellMgr->AssertSpellInfo(sSpellMgr->GetSpellWithRank(SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1, rank));
 
             int32 remainingHp = int32(GetTarget()->GetHealth() - dmgInfo.GetDamage());
             int32 minHp = int32(GetTarget()->CountPctFromMaxHealth(talentProto->Effects[EFFECT_0].CalcValue(GetCaster())));

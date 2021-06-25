@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-namespace acore
+namespace Acore
 {
     std::vector<std::string_view> Tokenize(std::string_view str, char sep, bool keepEmpty);
 

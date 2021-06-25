@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-namespace acore
+namespace Acore
 {
     template<class T>
     constexpr inline T* AddressOrSelf(T* ptr)
@@ -55,22 +55,26 @@ namespace acore
         void check() const
         {
             if (!(_buf < _end))
+            {
                 throw std::out_of_range("index");
+            }
         }
     };
 }
 
-namespace acore::Containers
+namespace Acore::Containers
 {
     // resizes <container> to have at most <requestedSize> elements
     // if it has more than <requestedSize> elements, the elements to keep are selected randomly
     template<class C>
     void RandomResize(C& container, std::size_t requestedSize)
     {
-        static_assert(std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<typename C::iterator>::iterator_category>::value, "Invalid container passed to acore::Containers::RandomResize");
+        static_assert(std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<typename C::iterator>::iterator_category>::value, "Invalid container passed to Acore::Containers::RandomResize");
 
         if (std::size(container) <= requestedSize)
+        {
             return;
+        }
 
         auto keepIt = std::begin(container), curIt = std::begin(container);
         uint32 elementsToKeep = requestedSize, elementsToProcess = std::size(container);
@@ -81,7 +85,9 @@ namespace acore::Containers
             if (urand(1, elementsToProcess) <= elementsToKeep)
             {
                 if (keepIt != curIt)
+                {
                     *keepIt = std::move(*curIt);
+                }
 
                 ++keepIt;
                 --elementsToKeep;
@@ -102,7 +108,9 @@ namespace acore::Containers
         std::copy_if(std::begin(container), std::end(container), std::inserter(containerCopy, std::end(containerCopy)), predicate);
 
         if (requestedSize)
+        {
             RandomResize(containerCopy, requestedSize);
+        }
 
         container = std::move(containerCopy);
     }
@@ -160,13 +168,25 @@ namespace acore::Containers
         }
 
         if (weightSum <= 0.0)
+        {
             weights.assign(std::size(container), 1.0);
+        }
 
         return SelectRandomWeightedContainerElement(container, weights);
     }
 
+    /**
+     * Returns a pointer to mapped value (or the value itself if map stores pointers)
+     */
+    template<class M>
+    inline auto MapGetValuePtr(M& map, typename M::key_type const& key) -> decltype(AddressOrSelf(map.find(key)->second))
+    {
+        auto itr = map.find(key);
+        return itr != map.end() ? AddressOrSelf(itr->second) : nullptr;
+    }
+
     /*
-     * @fn void acore::Containers::RandomShuffle(C& container)
+     * @fn void Acore::Containers::RandomShuffle(C& container)
      *
      * @brief Reorder the elements of the container randomly.
      *
@@ -185,9 +205,13 @@ namespace acore::Containers
         for (auto itr = range.first; itr != range.second;)
         {
             if (itr->second == value)
+            {
                 itr = multimap.erase(itr);
+            }
             else
+            {
                 ++itr;
+            }
         }
     }
 

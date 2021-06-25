@@ -16,7 +16,9 @@ namespace VMAP
     VMapManager2* VMapFactory::createOrGetVMapManager()
     {
         if (!gVMapManager)
+        {
             gVMapManager = new VMapManager2();
+        }
 
         return gVMapManager;
     }

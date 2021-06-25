@@ -2955,7 +2955,7 @@ class achievement_yogg_saron_drive_me_crazy : public AchievementCriteriaScript
 public:
     achievement_yogg_saron_drive_me_crazy() : AchievementCriteriaScript("achievement_yogg_saron_drive_me_crazy") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetAI()->GetData(DATA_GET_DRIVE_ME_CRAZY); // target = Yogg-Saron
     }
@@ -2969,7 +2969,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_SARA)))
@@ -2990,7 +2990,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_BRAIN_OF_YOGG_SARON)))
@@ -3008,7 +3008,7 @@ class achievement_yogg_saron_kiss_and_make_up : public AchievementCriteriaScript
 public:
     achievement_yogg_saron_kiss_and_make_up() : AchievementCriteriaScript("achievement_yogg_saron_kiss_and_make_up") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Sara*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Sara*/, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_SARA && target->GetAI() && target->GetAI()->GetData(DATA_GET_SARA_PHASE);
     }

@@ -23,6 +23,8 @@ target_include_directories(mapextractor
     ${CMAKE_CURRENT_SOURCE_DIR}/loadlib)
 
 target_link_libraries(mapextractor
+  PRIVATE
+    acore-core-interface
   PUBLIC
     common
     mpq)

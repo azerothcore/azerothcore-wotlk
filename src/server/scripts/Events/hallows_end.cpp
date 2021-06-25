@@ -810,9 +810,9 @@ public:
         {
             float radius = 100.0f;
             std::list<Player*> players;
-            acore::AnyPlayerInObjectRangeCheck checker(me, radius);
-            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
-            me->VisitNearbyWorldObject(radius, searcher);
+            Acore::AnyPlayerInObjectRangeCheck checker(me, radius);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Cell::VisitWorldObjects(me, searcher, radius);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {

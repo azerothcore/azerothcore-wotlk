@@ -275,7 +275,6 @@ struct CreatureData
     bool overwrittenZ{false};
 };
 
-
 struct CreatureModelInfo
 {
     float bounding_radius;

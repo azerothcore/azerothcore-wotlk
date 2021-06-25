@@ -8,10 +8,10 @@
 #define ACORE_OBJECTREGISTRY_H
 
 #include "Define.h"
-#include <string>
-#include <vector>
 #include <map>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 /** ObjectRegistry holds all registry item of the same type
  */
@@ -41,7 +41,9 @@ public:
         if ( iter != i_registeredObjects.end() )
         {
             if ( !override )
+            {
                 return false;
+            }
             delete iter->second;
             i_registeredObjects.erase(iter);
         }
@@ -57,7 +59,9 @@ public:
         if ( iter != i_registeredObjects.end() )
         {
             if ( delete_object )
+            {
                 delete iter->second;
+            }
             i_registeredObjects.erase(iter);
         }
     }
@@ -74,7 +78,9 @@ public:
         unsigned int sz = l.size();
         l.resize(sz + i_registeredObjects.size());
         for (typename RegistryMapType::const_iterator iter = i_registeredObjects.begin(); iter != i_registeredObjects.end(); ++iter)
+        {
             l[sz++] = iter->first;
+        }
         return i_registeredObjects.size();
     }
 
@@ -88,7 +94,9 @@ public:
     ~ObjectRegistry()
     {
         for (typename RegistryMapType::iterator iter = i_registeredObjects.begin(); iter != i_registeredObjects.end(); ++iter)
+        {
             delete iter->second;
+        }
         i_registeredObjects.clear();
     }
 private:

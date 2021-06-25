@@ -249,9 +249,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("scripts.ai", "TSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
-#endif
 
             switch (type)
             {

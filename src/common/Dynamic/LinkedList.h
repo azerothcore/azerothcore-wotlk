@@ -115,7 +115,9 @@ public:
             return result;
         }
         else
+        {
             return iSize;
+        }
     }
 
     void incSize() { ++iSize; }

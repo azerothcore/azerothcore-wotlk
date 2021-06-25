@@ -24,6 +24,8 @@ class AC_GAME_API PacketLog
 private:
     PacketLog();
     ~PacketLog();
+    std::mutex _logPacketLock;
+    std::once_flag _initializeFlag;
 
 public:
     static PacketLog* instance();

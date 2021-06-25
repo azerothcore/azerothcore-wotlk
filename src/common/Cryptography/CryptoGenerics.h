@@ -13,7 +13,7 @@
 #include <iterator>
 #include <vector>
 
-namespace acore::Impl
+namespace Acore::Impl
 {
     struct CryptoGenericsImpl
     {
@@ -21,7 +21,7 @@ namespace acore::Impl
         static typename Cipher::IV GenerateRandomIV()
         {
             typename Cipher::IV iv;
-            acore::Crypto::GetRandomBytes(iv);
+            Acore::Crypto::GetRandomBytes(iv);
             return iv;
         }
 
@@ -44,7 +44,7 @@ namespace acore::Impl
     };
 }
 
-namespace acore::Crypto
+namespace Acore::Crypto
 {
     template <typename Cipher>
     void AEEncryptWithRandomIV(std::vector<uint8>& data, typename Cipher::Key const& key)
@@ -52,7 +52,7 @@ namespace acore::Crypto
         using IV = typename Cipher::IV;
         using Tag = typename Cipher::Tag;
         // select random IV
-        IV iv = acore::Impl::CryptoGenericsImpl::GenerateRandomIV<Cipher>();
+        IV iv = Acore::Impl::CryptoGenericsImpl::GenerateRandomIV<Cipher>();
         Tag tag;
 
         // encrypt data
@@ -62,8 +62,8 @@ namespace acore::Crypto
         ASSERT(success);
 
         // append trailing IV and tag
-        acore::Impl::CryptoGenericsImpl::AppendToBack(data, iv);
-        acore::Impl::CryptoGenericsImpl::AppendToBack(data, tag);
+        Acore::Impl::CryptoGenericsImpl::AppendToBack(data, iv);
+        Acore::Impl::CryptoGenericsImpl::AppendToBack(data, tag);
     }
 
     template <typename Cipher>
@@ -80,8 +80,8 @@ namespace acore::Crypto
         // extract trailing IV and tag
         IV iv;
         Tag tag;
-        acore::Impl::CryptoGenericsImpl::SplitFromBack(data, tag);
-        acore::Impl::CryptoGenericsImpl::SplitFromBack(data, iv);
+        Acore::Impl::CryptoGenericsImpl::SplitFromBack(data, tag);
+        Acore::Impl::CryptoGenericsImpl::SplitFromBack(data, iv);
 
         // decrypt data
         Cipher cipher(false);

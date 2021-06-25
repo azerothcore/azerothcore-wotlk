@@ -4,7 +4,6 @@
 
 #include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
-#include "Creature.h"
 #include "GameGraveyard.h"
 #include "GameObject.h"
 #include "Language.h"

@@ -3575,7 +3575,7 @@ enum ServerProcessTypes
     NUM_SERVER_PROCESS_TYPES
 };
 
-namespace acore::Impl
+namespace Acore::Impl
 {
     struct AC_SHARED_API CurrentServerProcessHolder
     {
@@ -3584,6 +3584,6 @@ namespace acore::Impl
     };
 }
 
-#define THIS_SERVER_PROCESS (acore::Impl::CurrentServerProcessHolder::type())
+#define THIS_SERVER_PROCESS (Acore::Impl::CurrentServerProcessHolder::type())
 
 #endif

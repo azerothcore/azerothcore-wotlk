@@ -138,7 +138,7 @@ WorldSocket::WorldSocket(void): WorldHandler(),
     m_RecvWPct(0), m_RecvPct(), m_Header(sizeof (ClientPktHeader)),
     m_OutBuffer(0), m_OutBufferSize(65536), m_OutActive(false)
 {
-    acore::Crypto::GetRandomBytes(m_Seed);
+    Acore::Crypto::GetRandomBytes(m_Seed);
 
     reference_counting_policy().value (ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 
@@ -374,7 +374,7 @@ struct AccountInfo
 
     if ((header.size < 4) || (header.size > 10240) || (header.cmd > 10240))
     {
-        LOG_ERROR("server", "WorldSocket::handle_input_header(): client (%s) sent malformed packet (size: %hd, cmd: %d)",
+        LOG_ERROR("network", "WorldSocket::handle_input_header(): client (%s) sent malformed packet (size: %hd, cmd: %d)",
             GetRemoteAddress().c_str(), header.size, header.cmd);
 
         uint32 world_expansion = sWorld->getIntConfig(CONFIG_EXPANSION);
@@ -495,7 +495,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
     }
     else
     {
-        LOG_ERROR("server", "WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%u. Disconnected client.",
+        LOG_ERROR("network", "WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%u. Disconnected client.",
             aptr->GetOpcode(), GetRemoteAddress().c_str(), m_Session ? m_Session->GetAccountId() : 0);
 
         if (sLog->ShouldLog("network", LogLevel::LOG_LEVEL_DEBUG))
@@ -533,7 +533,7 @@ void WorldSocket::SendPacketAndLogOpcode(WorldPacket const& packet)
     if (sPacketLog->CanLogPacket())
         sPacketLog->LogPacket(packet, SERVER_TO_CLIENT, GetRemoteIpAddress(), GetRemotePort());
 
-    LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", aptr->GetOpcode());
+    LOG_ERROR("network", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", aptr->GetOpcode());
     return -1;
 }
 
@@ -546,7 +546,7 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     std::string accountName;
     WorldPacket packet, SendAddonPacked;
     std::array<uint8, 4> clientSeed;
-    acore::Crypto::SHA1::Digest digest;
+    Acore::Crypto::SHA1::Digest digest;
 
     if (sWorld->IsClosed())
     {
@@ -554,7 +554,7 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         packet << uint8(AUTH_REJECT);
         SendPacket(packet);
 
-        LOG_ERROR("server", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", GetRemoteAddress().c_str());
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", GetRemoteAddress().c_str());
         return -1;
     }
 
@@ -570,10 +570,9 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> DosResponse;
     recvPacket.read(digest);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "WorldSocket::HandleAuthSession: client %u, loginServerID %u, accountName %s, loginServerType %u",
+    LOG_DEBUG("network", "WorldSocket::HandleAuthSession: client %u, loginServerID %u, accountName %s, loginServerType %u",
         BuiltNumberClient, loginServerID, accountName.c_str(), loginServerType);
-#endif
+
     // Get the account information from the realmd database
     //         0           1        2       3        4            5         6       7          8      9      10
     // SELECT id, sessionkey, last_ip, locked, lock_country, expansion, mutetime, locale, recruiter, os, totaltime FROM account WHERE username = ?
@@ -592,7 +591,7 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        LOG_ERROR("server", "WorldSocket::HandleAuthSession: Sent Auth Response (unknown account).");
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Sent Auth Response (unknown account).");
         return -1;
     }
 
@@ -618,7 +617,7 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         packet << uint8(AUTH_REJECT);
         SendPacket(packet);
 
-        LOG_ERROR("server", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", address.c_str());
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", address.c_str());
         sScriptMgr->OnFailedAccountLogin(account.Id);
         return -1;
     }
@@ -662,7 +661,7 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     // Check that Key and account name are the same on client and server
     uint8 t[4] = { 0x00, 0x00, 0x00, 0x00 };
 
-    acore::Crypto::SHA1 sha;
+    Acore::Crypto::SHA1 sha;
     sha.UpdateData(accountName);
     sha.UpdateData(t);
     sha.UpdateData(clientSeed);
@@ -674,15 +673,13 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     {
         packet.Initialize(SMSG_AUTH_RESPONSE, 1);
         packet << uint8(AUTH_FAILED);
-
         SendPacket(packet);
-
-        LOG_ERROR("server", "WorldSocket::HandleAuthSession: Authentication failed for account: %u ('%s') address: %s", account.Id, accountName.c_str(), address.c_str());
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Authentication failed for account: %u ('%s') address: %s", account.Id, accountName.c_str(), address.c_str());
         return -1;
     }
 
-    /*if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(address))
-        _ipCountry = location->CountryCode;*/
+    if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(address))
+        _ipCountry = location->CountryCode;
 
     ///- Re-check ip locking (same check as in auth).
     if (account.IsLockedToIP)
@@ -698,18 +695,18 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
             return -1;
         }
     }
-    //else if (!account.LockCountry.empty() && account.LockCountry != "00" && !_ipCountry.empty())
-    //{
-    //    if (account.LockCountry != _ipCountry)
-    //    {
-    //        packet.Initialize(SMSG_AUTH_RESPONSE, 1);
-    //        packet << uint8(AUTH_REJECT);
-    //        LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account country differs. Original country: %s, new country: %s).", account.LockCountry.c_str(), _ipCountry.c_str());
-    //        // We could log on hook only instead of an additional db log, however action logger is config based. Better keep DB logging as well
-    //        sScriptMgr->OnFailedAccountLogin(account.Id);
-    //        return -1;
-    //    }
-    //}
+    else if (!account.LockCountry.empty() && account.LockCountry != "00" && !_ipCountry.empty())
+    {
+        if (account.LockCountry != _ipCountry)
+        {
+            packet.Initialize(SMSG_AUTH_RESPONSE, 1);
+            packet << uint8(AUTH_REJECT);
+            LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account country differs. Original country: %s, new country: %s).", account.LockCountry.c_str(), _ipCountry.c_str());
+            // We could log on hook only instead of an additional db log, however action logger is config based. Better keep DB logging as well
+            sScriptMgr->OnFailedAccountLogin(account.Id);
+            return -1;
+        }
+    }
 
     if (account.IsBanned)
     {

@@ -35,7 +35,9 @@ public:
     {
         ASSERT(fromObj);                                // fromObj MUST not be nullptr
         if (isValid())
+        {
             unlink();
+        }
         if (toObj != nullptr)
         {
             iRefTo = toObj;

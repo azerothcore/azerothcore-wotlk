@@ -56,7 +56,7 @@ public:                                                 // constructors and glob
         _visibleFactionCount(0), _honoredFactionCount(0), _reveredFactionCount(0), _exaltedFactionCount(0), _sendFactionIncreased(false) {}
     ~ReputationMgr() {}
 
-    void SaveToDB(SQLTransaction& trans);
+    void SaveToDB(CharacterDatabaseTransaction trans);
     void LoadFromDB(PreparedQueryResult result);
 public:                                                 // statics
     static const int32 PointsInRank[MAX_REPUTATION_RANK];
