@@ -9,7 +9,7 @@
 #include <sstream>
 
 Appender::Appender(uint8 _id, std::string const& _name, LogLevel _level /* = LOG_LEVEL_DISABLED */, AppenderFlags _flags /* = APPENDER_FLAGS_NONE */):
-id(_id), name(_name), level(_level), flags(_flags) { }
+    id(_id), name(_name), level(_level), flags(_flags) { }
 
 Appender::~Appender() { }
 
@@ -41,18 +41,26 @@ void Appender::setLogLevel(LogLevel _level)
 void Appender::write(LogMessage* message)
 {
     if (!level || level < message->level)
+    {
         return;
+    }
 
     std::ostringstream ss;
 
     if (flags & APPENDER_FLAGS_PREFIX_TIMESTAMP)
+    {
         ss << message->getTimeStr() << ' ';
+    }
 
     if (flags & APPENDER_FLAGS_PREFIX_LOGLEVEL)
+    {
         ss << Acore::StringFormat("%-5s ", Appender::getLogLevelString(message->level));
+    }
 
     if (flags & APPENDER_FLAGS_PREFIX_LOGFILTERTYPE)
+    {
         ss << '[' << message->type << "] ";
+    }
 
     message->prefix = ss.str();
     _write(message);
