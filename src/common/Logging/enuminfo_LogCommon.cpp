@@ -4,8 +4,8 @@
  * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
  */
 
-#include "LogCommon.h"
 #include "Define.h"
+#include "LogCommon.h"
 #include "SmartEnum.h"
 #include <stdexcept>
 

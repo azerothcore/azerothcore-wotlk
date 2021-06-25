@@ -927,7 +927,7 @@ public:
         }
         else
         {
-            SQLTransaction trans(nullptr);
+            CharacterDatabaseTransaction trans(nullptr);
             Player::OfflineResurrect(targetGuid, trans);
         }
 
@@ -1491,7 +1491,7 @@ public:
             {
                 std::string itemName = itemNameStr + 1;
 
-                PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ITEM_TEMPLATE_BY_NAME);
+                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ITEM_TEMPLATE_BY_NAME);
                 stmt->setString(0, itemName);
                 PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -1529,9 +1529,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
-#endif
+        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
@@ -1629,9 +1627,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
-#endif
+        LOG_DEBUG("misc", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
 
         bool found = false;
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
@@ -1791,7 +1787,8 @@ public:
         Player* target;
         ObjectGuid targetGuid;
         std::string targetName;
-        PreparedStatement* stmt = nullptr;
+        CharacterDatabasePreparedStatement* stmt = nullptr;
+        LoginDatabasePreparedStatement* loginStmt = nullptr;
 
         ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
 
@@ -1911,11 +1908,11 @@ public:
         }
 
         // Query the prepared statement for login data
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
-        stmt->setInt32(0, int32(realm.Id.Realm));
-        stmt->setUInt32(1, accId);
-        PreparedQueryResult accInfoResult = LoginDatabase.Query(stmt);
+        loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
+        loginStmt->setInt32(0, int32(realm.Id.Realm));
+        loginStmt->setUInt32(1, accId);
 
+        PreparedQueryResult accInfoResult = LoginDatabase.Query(loginStmt);
         if (accInfoResult)
         {
             Field* fields = accInfoResult->Fetch();
@@ -1956,8 +1953,9 @@ public:
         std::string nameLink = handler->playerLink(targetName);
 
         // Returns banType, banTime, bannedBy, banreason
-        PreparedStatement* banQuery = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
+        LoginDatabasePreparedStatement* banQuery = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
         banQuery->setUInt32(0, accId);
+
         PreparedQueryResult accBannedResult = LoginDatabase.Query(banQuery);
         if (!accBannedResult)
         {
@@ -1976,10 +1974,10 @@ public:
         }
 
         // Can be used to query data from World database
-        PreparedStatement* xpQuery = WorldDatabase.GetPreparedStatement(WORLD_SEL_REQ_XP);
+        WorldDatabasePreparedStatement* xpQuery = WorldDatabase.GetPreparedStatement(WORLD_SEL_REQ_XP);
         xpQuery->setUInt8(0, level);
-        PreparedQueryResult xpResult = WorldDatabase.Query(xpQuery);
 
+        PreparedQueryResult xpResult = WorldDatabase.Query(xpQuery);
         if (xpResult)
         {
             Field* fields = xpResult->Fetch();
@@ -1987,10 +1985,10 @@ public:
         }
 
         // Can be used to query data from Characters database
-        PreparedStatement* charXpQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_XP);
+        CharacterDatabasePreparedStatement* charXpQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_XP);
         charXpQuery->setUInt32(0, lowguid);
-        PreparedQueryResult charXpResult = CharacterDatabase.Query(charXpQuery);
 
+        PreparedQueryResult charXpResult = CharacterDatabase.Query(charXpQuery);
         if (charXpResult)
         {
             Field* fields = charXpResult->Fetch();
@@ -1999,8 +1997,9 @@ public:
 
             if (gguid != 0)
             {
-                PreparedStatement* guildQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_EXTENDED);
+                CharacterDatabasePreparedStatement* guildQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_EXTENDED);
                 guildQuery->setUInt32(0, lowguid);
+
                 PreparedQueryResult guildInfoResult = CharacterDatabase.Query(guildQuery);
                 if (guildInfoResult)
                 {
@@ -2174,8 +2173,9 @@ public:
 
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
-        PreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
+        CharacterDatabasePreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
         mailQuery->setUInt32(0, lowguid);
+
         PreparedQueryResult mailInfoResult = CharacterDatabase.Query(mailQuery);
         if (mailInfoResult)
         {
@@ -2254,7 +2254,7 @@ public:
         if (handler->HasLowerSecurity (target, targetGuid, true))
             return false;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         std::string muteBy = "";
         if (handler->GetSession())
             muteBy = handler->GetSession()->GetPlayerName();
@@ -2340,7 +2340,7 @@ public:
             target->GetSession()->m_muteTime = 0;
         }
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         stmt->setInt64(0, 0);
         stmt->setString(1, "");
         stmt->setString(2, "");
@@ -2388,7 +2388,7 @@ public:
     // helper for mutehistory
     static bool HandleMuteInfoHelper(uint32 accountId, char const* accountName, ChatHandler* handler)
     {
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
         stmt->setUInt16(0, accountId);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -2675,7 +2675,7 @@ public:
         MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
 
         //- TODO: Fix poor design
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         MailDraft(subject, text)
         .SendMailTo(trans, MailReceiver(target, targetGuid.GetCounter()), sender);
 
@@ -2775,7 +2775,7 @@ public:
         // fill mail
         MailDraft draft(subject, text);
 
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
         for (ItemPairs::const_iterator itr = items.begin(); itr != items.end(); ++itr)
         {
@@ -2832,7 +2832,7 @@ public:
         // from console show not existed sender
         MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
 
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
         MailDraft(subject, text)
         .AddMoney(money)
@@ -2917,7 +2917,7 @@ public:
 
         if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
         {
-            LOG_ERROR("server", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
+            LOG_ERROR("misc", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
             handler->PSendSysMessage("Error 2");
             delete pet;
             return false;
@@ -3096,7 +3096,7 @@ public:
         {
             if (ObjectGuid playerGUID = sWorld->GetGlobalPlayerGUID(name))
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
                 stmt->setUInt32(0, playerGUID.GetCounter());
                 CharacterDatabase.Execute(stmt);
                 handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());

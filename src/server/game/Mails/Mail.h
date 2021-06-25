@@ -126,12 +126,12 @@ public:                                                 // modifiers
     MailDraft& AddCOD(uint32 COD) { m_COD = COD; return *this; }
 
 public:                                                 // finishers
-    void SendReturnToSender(uint32 sender_acc, ObjectGuid::LowType sender_guid, ObjectGuid::LowType receiver_guid, SQLTransaction& trans);
-    void SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0, bool deleteMailItemsFromDB = false, bool sendMail = true);
+    void SendReturnToSender(uint32 sender_acc, ObjectGuid::LowType sender_guid, ObjectGuid::LowType receiver_guid, CharacterDatabaseTransaction trans);
+    void SendMailTo(CharacterDatabaseTransaction trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0, bool deleteMailItemsFromDB = false, bool sendMail = true, int32 auctionId = 0);
 
 private:
-    void deleteIncludedItems(SQLTransaction& trans, bool inDB = false);
-    void prepareItems(Player* receiver, SQLTransaction& trans);                // called from SendMailTo for generate mailTemplateBase items
+    void deleteIncludedItems(CharacterDatabaseTransaction trans, bool inDB = false);
+    void prepareItems(Player* receiver, CharacterDatabaseTransaction trans);                // called from SendMailTo for generate mailTemplateBase items
 
     uint16      m_mailTemplateId;
     bool        m_mailTemplateItemsNeed;
@@ -169,6 +169,10 @@ struct Mail
     uint32 COD;
     uint32 checked;
     MailState state;
+
+    // < 0 Pending
+    // > 0 Delivery
+    int32 auctionId;
 
     void AddItem(ObjectGuid::LowType itemGuidLow, uint32 item_template)
     {
