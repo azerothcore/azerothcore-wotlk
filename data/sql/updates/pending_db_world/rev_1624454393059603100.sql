@@ -47,7 +47,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (7604, 0, 17, 0, 60, 0, 100, 0, 2000, 4000, 4000, 4500, 0, 223, 1, 2, 0, 0, 0, 0, 19, 8877, 200, 0, 0, 0, 0, 0, 0, 'Sergeant Bly - On Update - Start Waypoint');
 
 -- SERGEANT BLY SMART-EVENT CONDITIONS
--- DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 14) AND (`SourceEntry` = @SERGEANT_BLY_ENTRY) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 2) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 2) AND (`ConditionValue2` = 2) AND (`ConditionValue3` = 0);
+-- DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` = @SERGEANT_BLY_ENTRY) AND (`ConditionTypeOrReference` = 103);
 -- INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 -- (22, 14, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 13'),
 -- (22, 15, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 14'),
