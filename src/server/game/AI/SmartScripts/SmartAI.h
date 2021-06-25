@@ -38,7 +38,7 @@ public:
 
     // Start moving to the desired MovePoint
     void StartPath(bool run = false, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
-    bool LoadPath(uint32 entry);
+    bool LoadPath(uint32 entry, uint32 group = 0);
     void PausePath(uint32 delay, bool forced = false);
     void StopPath(uint32 DespawnTime = 0, uint32 quest = 0, bool fail = false);
     void EndPath(bool fail = false);
@@ -202,15 +202,16 @@ private:
     void ReturnToLastOOCPos();
     void UpdatePath(const uint32 diff);
     SmartScript mScript;
-    WPPath* mWayPoints;
+    std::vector<WPPath*> mWayPoints;
     uint32 mEscortState;
     uint32 mCurrentWPID;
+    uint32 mCurrentWPGroupID;
     bool mWPReached;
     bool mOOCReached;
     uint32 mWPPauseTimer;
     WayPoint* mLastWP;
     uint32 mEscortNPCFlags;
-    uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
+    uint32 GetWPCount() { return !mWayPoints.empty() ? mWayPoints.size() : 0; }
     bool mCanRepeatPath;
     bool mRun;
     bool mCanAutoAttack;

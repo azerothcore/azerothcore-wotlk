@@ -23,10 +23,9 @@
 SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 {
     // copy script to local (protection for table reload)
-
-    mWayPoints = nullptr;
     mEscortState = SMART_ESCORT_NONE;
     mCurrentWPID = 0;//first wp id is 1 !!
+    mCurrentWPGroupID = 0;
     mWPReached = false;
     mOOCReached = false;
     mWPPauseTimer = 0;
@@ -89,6 +88,8 @@ void SmartAI::UpdateDespawn(const uint32 diff)
 
 WayPoint* SmartAI::GetNextWayPoint()
 {
+    // TODO:
+    // Get Next Waypoint from current group
     if (!mWayPoints || mWayPoints->empty())
         return nullptr;
 
@@ -185,6 +186,11 @@ void SmartAI::RandomWaypointGroup(uint32 firstGroup, uint32 lastGroup, Unit* inv
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         StopPath();
 
+    uint32 group = urand(firstGroup, lastGroup);
+
+    if (!LoadPath(invoker->GetEntry(), group))
+        return;
+
     if (!mWayPoints || mWayPoints->empty())
         return;
 
@@ -199,7 +205,7 @@ void SmartAI::RandomWaypointGroup(uint32 firstGroup, uint32 lastGroup, Unit* inv
         }
 
         Movement::PointsArray pathPoints;
-        GenerateWayPointArray(&pathPoints, uint32(urand(firstGroup, lastGroup)));
+        GenerateWayPointArray(&pathPoints, uint32());
 
         me->GetMotionMaster()->MoveSplinePath(&pathPoints);
         GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_START, nullptr, wp->id, GetScript()->GetPathId());
@@ -246,12 +252,12 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
     }
 }
 
-bool SmartAI::LoadPath(uint32 entry)
+bool SmartAI::LoadPath(uint32 entry, uint32 group)
 {
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         return false;
 
-    mWayPoints = sSmartWaypointMgr->GetPath(entry);
+    mWayPoints = sSmartWaypointMgr->GetPath(entry, group);
     if (!mWayPoints)
     {
         GetScript()->SetPathId(0);

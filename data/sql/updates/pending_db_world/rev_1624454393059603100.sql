@@ -44,17 +44,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (7604, 0, 14, 0, 60, 0, 100, 0, 2000, 4000, 4000, 4500, 0, 223, 1, 2, 0, 0, 0, 0, 19, 7787, 200, 0, 0, 0, 0, 0, 0, 'Sergeant Bly - On Update - Start Waypoint'),
 (7604, 0, 15, 0, 60, 0, 100, 0, 2000, 4000, 4000, 4500, 0, 223, 1, 2, 0, 0, 0, 0, 19, 8876, 200, 0, 0, 0, 0, 0, 0, 'Sergeant Bly - On Update - Start Waypoint'),
 (7604, 0, 16, 0, 60, 0, 100, 0, 2000, 4000, 4000, 4500, 0, 223, 1, 2, 0, 0, 0, 0, 19, 7788, 200, 0, 0, 0, 0, 0, 0, 'Sergeant Bly - On Update - Start Waypoint'),
-(7604, 0, 17, 0, 60, 0, 100, 0, 2000, 4000, 4000, 4500, 0, 223, 1, 2, 0, 0, 0, 0, 19, 8877, 200, 0, 0, 0, 0, 0, 0, 'Sergeant Bly - On Update - Start Waypoint'),
-(7604, 0, 18, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Bly - On Reached Point 1 - Set Data 2 2 (No Repeat) Used as condition to Start creature waypoint');
+(7604, 0, 17, 0, 60, 0, 100, 0, 2000, 4000, 4000, 4500, 0, 223, 1, 2, 0, 0, 0, 0, 19, 8877, 200, 0, 0, 0, 0, 0, 0, 'Sergeant Bly - On Update - Start Waypoint');
 
 -- SERGEANT BLY SMART-EVENT CONDITIONS
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 14) AND (`SourceEntry` = @SERGEANT_BLY_ENTRY) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 2) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 2) AND (`ConditionValue2` = 2) AND (`ConditionValue3` = 0);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 14, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 13'),
-(22, 15, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 14'),
-(22, 16, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 15'),
-(22, 17, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 16'),
-(22, 18, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 17');
+-- DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 14) AND (`SourceEntry` = @SERGEANT_BLY_ENTRY) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 2) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 2) AND (`ConditionValue2` = 2) AND (`ConditionValue3` = 0);
+-- INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- (22, 14, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 13'),
+-- (22, 15, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 14'),
+-- (22, 16, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 15'),
+-- (22, 17, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 16'),
+-- (22, 18, @SERGEANT_BLY_ENTRY, 0, 0, @CONDITION_UNIT_DATA, 0, 2, 2, 0, 0, 0, 0, '', 'Sergeant Bly has to have data 2 2 to activate SAI id 17');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = @SERGEANT_BLY_ALIST+1) AND (`source_type` = 9) AND (`id` IN (3, 4));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -87,12 +86,13 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 8877) AND (`source_type` = 0)
 -- This part of the script is experimental
 -- Altering Waypoints table to group them and a new SmartAI Action for Random Waypoint Group:
 -- allows for several pathing options for mobs, like for example Zul'farrak's mobs on Pyramid event
-ALTER TABLE `waypoints`	ADD COLUMN `wp_group` MEDIUMINT(7) UNSIGNED NOT NULL DEFAULT '0' AFTER `pointid`;
-ALTER TABLE `waypoints`
-	DROP PRIMARY KEY,
-	ADD PRIMARY KEY (`entry`, `pointid`, `wp_group`) USING BTREE;
+-- ALTER TABLE `waypoints`	ADD COLUMN `wp_group` MEDIUMINT(7) UNSIGNED NOT NULL DEFAULT '0' AFTER `pointid`;
+-- ALTER TABLE `waypoints`
+--	DROP PRIMARY KEY,
+--	ADD PRIMARY KEY (`entry`, `pointid`, `wp_group`) USING BTREE;
+--
 
-
+DELETE FROM `waypoints` WHERE `entry`= 7789 OR `entry`= 7787 OR `entry`= 8876 OR `entry`= 7788 OR `entry`=8877;
 INSERT INTO `waypoints` (`entry`, `pointid`, `wp_group`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (7789, 0, 1, 1900.05, 1228.05, 9.22243, NULL);
 INSERT INTO `waypoints` (`entry`, `pointid`, `wp_group`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (7789, 1, 1, 1897.53, 1241.17, 20.4998, NULL);
 INSERT INTO `waypoints` (`entry`, `pointid`, `wp_group`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (7789, 2, 1, 1892.34, 1259.13, 38.3703, NULL);

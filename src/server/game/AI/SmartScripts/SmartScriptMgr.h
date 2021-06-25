@@ -1709,6 +1709,11 @@ public:
     bool enableTimed;
 };
 
+/*Redundancy of information:
+    We are storing pointId on both the WPPath first and inside WayPoint pointer.
+    Since we need to group them based on group ids, the first member of WPPath will
+    be the group which the waypoint belongs too.
+*/
 typedef std::unordered_map<uint32, WayPoint*> WPPath;
 
 typedef std::list<WorldObject*> ObjectList;
@@ -1776,11 +1781,22 @@ public:
 
     void LoadFromDB();
 
-    WPPath* GetPath(uint32 id)
+    WPPath* GetPath(uint32 id, uint32 group = 0)
     {
-        if (waypoint_map.find(id) != waypoint_map.end())
-            return waypoint_map[id];
-        else return 0;
+        for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
+        {
+            if (itr->first == id)
+            {
+                for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
+                {
+                    if (pathItr->first == group)
+                    {
+                        return itr->second;
+                    }
+                }
+            }
+        }
+        return nullptr;
     }
 
 private:
