@@ -20,6 +20,7 @@
 #include "SecretMgr.h"
 #include "TOTP.h"
 #include "Threading.h"
+#include "Util.h"
 #include <algorithm>
 #include <openssl/crypto.h>
 #include <openssl/md5.h>
@@ -577,7 +578,7 @@ bool AuthSocket::_HandleLogonProof()
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
         stmt->setBinary(0, _sessionKey);
         stmt->setString(1, socket().getRemoteAddress().c_str());
         stmt->setUInt32(2, GetLocaleByName(_localizationName));
@@ -625,7 +626,7 @@ bool AuthSocket::_HandleLogonProof()
         // We can not include the failed account login hook. However, this is a workaround to still log this.
         if (sConfigMgr->GetOption<bool>("WrongPass.Logging", false))
         {
-            PreparedStatement* logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
+            LoginDatabasePreparedStatement* logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
             logstmt->setString(0, _accountInfo.Login);
             logstmt->setString(1, socket().getRemoteAddress());
             logstmt->setString(2, "Logged on failed AccountLogin due wrong password");
@@ -636,7 +637,7 @@ bool AuthSocket::_HandleLogonProof()
         if (MaxWrongPassCount > 0)
         {
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
             stmt->setString(0, _accountInfo.Login);
             LoginDatabase.Execute(stmt);
 
@@ -720,7 +721,6 @@ bool AuthSocket::_HandleReconnectChallenge()
 
     auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_RECONNECTCHALLENGE);
     stmt->setString(0, login);
-
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
     // Stop if the account is not found
@@ -835,7 +835,7 @@ bool AuthSocket::_HandleRealmList()
 
     // Get the user id (else close the connection)
     // No SQL injection (prepared statement)
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
     stmt->setString(0, _accountInfo.Login);
 
     PreparedQueryResult result = LoginDatabase.Query(stmt);
