@@ -45,7 +45,9 @@ public:
         std::lock_guard<std::mutex> lock(_queueLock);
 
         if (_queue.empty() || _shutdown)
+        {
             return false;
+        }
 
         value = _queue.front();
 
@@ -61,10 +63,14 @@ public:
         // we could be using .wait(lock, predicate) overload here but it is broken
         // https://connect.microsoft.com/VisualStudio/feedback/details/1098841
         while (_queue.empty() && !_shutdown)
+        {
             _condition.wait(lock);
+        }
 
         if (_queue.empty() || _shutdown)
+        {
             return;
+        }
 
         value = _queue.front();
 
