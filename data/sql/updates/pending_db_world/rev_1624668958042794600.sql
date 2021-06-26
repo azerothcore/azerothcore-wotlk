@@ -5,7 +5,7 @@ INSERT INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `Option
 (10189,0,'esES','Lady Valiente, estoy listo para ir a Orgrimmar. Abre el portal.',''),
 (10189,0,'esMX','Lady Valiente, estoy listo para ir a Orgrimmar. Abre el portal.','');
 
-DELETE FROM `creature_text_locale` WHERE `CreatureID` = 32346 AND GroupID IN (0, 1, 2, 3 ,4) AND `Locale` IN ('esES','esMX');
+DELETE FROM `creature_text_locale` WHERE `CreatureID` = 32346 AND `GroupID` IN (0, 1, 2, 3 ,4) AND `Locale` IN ('esES','esMX');
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
 (32364,0,0,'esES','Thrall, ¿qué ha ocurrido? El Rey se prepara para la guerra...'),
 (32364,1,0,'esES','Haré llegar esta información al Rey Wrynn, Thrall, pero...'),
