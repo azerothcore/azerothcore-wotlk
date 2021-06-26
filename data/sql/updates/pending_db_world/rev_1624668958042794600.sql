@@ -1,10 +1,11 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1624668958042794600');
+
 DELETE FROM `gossip_menu_option_locale` WHERE `MenuID` = 10189 AND OptionID = 0 AND `Locale` IN ('esES','esMX');
 INSERT INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`, `BoxText`) VALUES
 (10189,0,'esES','Lady Valiente, estoy listo para ir a Orgrimmar. Abre el portal.',''),
 (10189,0,'esMX','Lady Valiente, estoy listo para ir a Orgrimmar. Abre el portal.','');
 
-DELETE FROM `creature_text_locale` WHERE `CreatureID` IN (32364, 32346) AND GroupID IN (0, 1, 2, 3 ,4) AND `Locale` IN ('esES','esMX');
+DELETE FROM `creature_text_locale` WHERE `CreatureID` = 32346 AND GroupID IN (0, 1, 2, 3 ,4) AND `Locale` IN ('esES','esMX');
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
 (32364,0,0,'esES','Thrall, ¿qué ha ocurrido? El Rey se prepara para la guerra...'),
 (32364,1,0,'esES','Haré llegar esta información al Rey Wrynn, Thrall, pero...'),
@@ -26,10 +27,10 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (13347, 13242) AND `locale` IN ('esES','esMX');
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
-(13347,'esES','<El rey Wrynn se seca una lágrima>.$B$B<El Rey asiente.>$B$BEsto es culpa mía.',18019),
 (13242,'esES','<La cara de Colmillosaurio se desfigura.>$B$BMi corazón... mi fuerza...',18019),
-(13347,'esMX','<El rey Wrynn se seca una lágrima>.$B$B<El Rey asiente.>$B$BEsto es culpa mía.',18019),
-(13242,'esMX','<La cara de Colmillosaurio se desfigura.>$B$BMi corazón... mi fuerza...',18019);
+(13242,'esMX','<La cara de Colmillosaurio se desfigura.>$B$BMi corazón... mi fuerza...',18019),
+(13347,'esES','<El rey Wrynn se seca una lágrima>.$B$B<El Rey asiente.>$B$BEsto es culpa mía.',18019),
+(13347,'esMX','<El rey Wrynn se seca una lágrima>.$B$B<El Rey asiente.>$B$BEsto es culpa mía.',18019);
 
 DELETE FROM `quest_offer_reward_locale` WHERE `ID` IN (13347, 13369, 13370, 13371, 13377, 13242, 13257, 13266, 13267) AND `locale` IN ('esES','esMX');
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
