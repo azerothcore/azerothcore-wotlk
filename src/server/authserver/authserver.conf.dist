@@ -144,6 +144,23 @@ WrongPass.Logging = 0
 IPLocationFile = ""
 
 #
+#    BanExpiryCheckInterval
+#        Description: Time (in seconds) between checks for expired bans
+#        Default:     60
+#
+
+BanExpiryCheckInterval = 60
+
+#
+#    StrictVersionCheck
+#        Description: Prevent modified clients from connecting
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+
+StrictVersionCheck = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################

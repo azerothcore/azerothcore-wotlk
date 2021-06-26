@@ -14,7 +14,7 @@
 #include "MySQLPreparedStatement.h"
 #include "MySQLWorkaround.h"
 #include "PreparedStatement.h"
-#include "ProducerConsumerQueue.h"
+#include "PCQueue.h"
 #include "QueryCallback.h"
 #include "QueryHolder.h"
 #include "QueryResult.h"
