@@ -19,9 +19,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recvd CMSG_ATTACKSWING: %s", guid.ToString().c_str());
-#endif
 
     Unit* pEnemy = ObjectAccessor::GetUnit(*_player, guid);
 
@@ -68,7 +66,7 @@ void WorldSession::HandleSetSheathedOpcode(WorldPacket& recvData)
 
     if (sheathed >= MAX_SHEATH_STATE)
     {
-        LOG_ERROR("server", "Unknown sheath state %u ??", sheathed);
+        LOG_ERROR("network.opcode", "Unknown sheath state %u ??", sheathed);
         return;
     }
 

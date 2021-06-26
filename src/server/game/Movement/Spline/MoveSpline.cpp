@@ -137,7 +137,6 @@ namespace Movement
         // TODO: what to do in such cases? problem is in input data (all points are at same coords)
         if (spline.length() < minimal_duration)
         {
-            //LOG_ERROR("server", "MoveSpline::init_spline: zero length spline, wrong input data?"); // ZOMG! temp comment to avoid console spam from transports
             spline.set_length(spline.last(), spline.isCyclic() ? 1000 : 1);
         }
         point_Idx = spline.first();
@@ -222,7 +221,7 @@ namespace Movement
                 offset = path[i] - middle;
                 if (fabs(offset.x) >= MAX_OFFSET || fabs(offset.y) >= MAX_OFFSET || fabs(offset.z) >= MAX_OFFSET)
                 {
-                    LOG_ERROR("server", "MoveSplineInitArgs::_checkPathBounds check failed");
+                    LOG_ERROR("movement", "MoveSplineInitArgs::_checkPathBounds check failed");
                     return false;
                 }
             }

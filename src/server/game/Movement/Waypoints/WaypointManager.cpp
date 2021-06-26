@@ -42,7 +42,7 @@ void WaypointMgr::Load()
     if (!result)
     {
         LOG_ERROR("sql.sql", ">> Loaded 0 waypoints. DB table `waypoint_data` is empty!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -86,8 +86,8 @@ void WaypointMgr::Load()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u waypoints in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u waypoints in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void WaypointMgr::ReloadPath(uint32 id)
@@ -101,7 +101,7 @@ void WaypointMgr::ReloadPath(uint32 id)
         _waypointStore.erase(itr);
     }
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_ID);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_ID);
 
     stmt->setUInt32(0, id);
 

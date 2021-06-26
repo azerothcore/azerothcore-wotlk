@@ -73,7 +73,7 @@ CREATE TEMPORARY TABLE `_temp_totp_conversion`
     `totp_secret` varbinary(128) default null,
     primary key(`original_key`),
     index (`remaining_key`)
-);
+)DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `_temp_totp_conversion` (`original_key`) SELECT DISTINCT `token_key` FROM `account`;
 UPDATE `_temp_totp_conversion` SET `remaining_key`=TRIM(TRAILING '=' FROM `original_key`),`totp_secret`='' WHERE `original_key`!='';
