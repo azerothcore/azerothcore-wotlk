@@ -48,13 +48,13 @@ using SRP6 = Acore::Crypto::SRP6;
 
     // find position of first nonzero byte
     size_t p = 0;
-    while (p < EPHEMERAL_KEY_LENGTH && !S[p]) ++p;
-    if (p & 1) ++p; // skip one extra byte if p is odd
+    while (p < EPHEMERAL_KEY_LENGTH && !S[p]) { ++p; }
+    if (p & 1) { ++p; } // skip one extra byte if p is odd
     p /= 2; // offset into buffers
 
     // hash each of the halves, starting at the first nonzero byte
-    SHA1::Digest const hash0 = SHA1::GetDigestOf(buf0.data() + p, EPHEMERAL_KEY_LENGTH/2 - p);
-    SHA1::Digest const hash1 = SHA1::GetDigestOf(buf1.data() + p, EPHEMERAL_KEY_LENGTH/2 - p);
+    SHA1::Digest const hash0 = SHA1::GetDigestOf(buf0.data() + p, EPHEMERAL_KEY_LENGTH / 2 - p);
+    SHA1::Digest const hash1 = SHA1::GetDigestOf(buf1.data() + p, EPHEMERAL_KEY_LENGTH / 2 - p);
 
     // stick the two hashes back together
     SessionKey K;
@@ -76,7 +76,9 @@ std::optional<SessionKey> SRP6::VerifyChallengeResponse(EphemeralKey const& A, S
 
     BigNumber const _A(A);
     if ((_A % _N).IsZero())
+    {
         return std::nullopt;
+    }
 
     BigNumber const u(SHA1::GetDigestOf(A, B));
     EphemeralKey const S = (_A * (_v.ModExp(u, _N))).ModExp(_b, N).ToByteArray<32>();
@@ -91,7 +93,11 @@ std::optional<SessionKey> SRP6::VerifyChallengeResponse(EphemeralKey const& A, S
 
     SHA1::Digest const ourM = SHA1::GetDigestOf(NgHash, _I, s, A, B, K);
     if (ourM == clientM)
+    {
         return K;
+    }
     else
+    {
         return std::nullopt;
+    }
 }
