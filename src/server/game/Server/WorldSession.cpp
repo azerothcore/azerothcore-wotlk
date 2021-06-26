@@ -16,6 +16,7 @@
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "Hyperlinks.h"
 #include "Log.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"

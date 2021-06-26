@@ -20,7 +20,6 @@
 #include "Common.h"
 #include "DBCStores.h"
 #include "Errors.h"
-#include "GameLocale.h"
 #include "ObjectMgr.h"
 #include "SharedDefines.h"
 #include "SpellInfo.h"
@@ -136,7 +135,7 @@ struct LinkValidator<LinkTags::item>
 {
     static bool IsTextValid(ItemLinkData const& data, std::string_view text)
     {
-        ItemLocale const* locale = sGameLocale->GetItemLocale(data.Item->ItemId);
+        ItemLocale const* locale = sObjectMgr->GetItemLocale(data.Item->ItemId);
 
         std::array<char const*, 16> const* randomSuffixes = nullptr;
 
@@ -153,7 +152,7 @@ struct LinkValidator<LinkTags::item>
             if (!locale && i != DEFAULT_LOCALE)
                 continue;
 
-            std::string_view name = (i == DEFAULT_LOCALE) ? data.Item->Name1 : sGameLocale->GetLocaleString(locale->Name, i);
+            std::string_view name = (i == DEFAULT_LOCALE) ? data.Item->Name1 : ObjectMgr::GetLocaleString(locale->Name, i);
             if (name.empty())
                 continue;
 
@@ -190,7 +189,7 @@ struct LinkValidator<LinkTags::quest>
         if (text == data.Quest->GetTitle())
             return true;
 
-        QuestLocale const* locale = sGameLocale->GetQuestLocale(data.Quest->GetQuestId());
+        QuestLocale const* locale = sObjectMgr->GetQuestLocale(data.Quest->GetQuestId());
         if (!locale)
             return false;
 
@@ -199,7 +198,7 @@ struct LinkValidator<LinkTags::quest>
             if (i == DEFAULT_LOCALE)
                 continue;
 
-            std::string_view name = sGameLocale->GetLocaleString(locale->Title, i);
+            std::string_view name = ObjectMgr::GetLocaleString(locale->Title, i);
             if (!name.empty() && (text == name))
                 return true;
         }
@@ -248,7 +247,7 @@ struct LinkValidator<LinkTags::enchant>
 
         for (auto pair = bounds.first; pair != bounds.second; ++pair)
         {
-            SkillLineEntry const* skill = sSkillLineStore.LookupEntry(pair->second->skillId);
+            SkillLineEntry const* skill = sSkillLineStore.LookupEntry(pair->second->SkillLine);
             if (!skill)
                 return false;
 

@@ -5,7 +5,6 @@
  */
 
 #include "AccountMgr.h"
-#include "ace/INET_Addr.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
@@ -979,7 +978,7 @@ public:
         return true;
     }
 
-    static bool HandleHelpCommand(ChatHandler* handler, char const* args)
+    static bool HandleHelpCommand(ChatHandler* handler, Tail cmd)
     {
         Acore::ChatCommands::SendCommandHelpFor(*handler, cmd);
 

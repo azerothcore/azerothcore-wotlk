@@ -1328,6 +1328,13 @@ public:
     }
 
     static void AddLocaleString(std::string&& s, LocaleConstant locale, std::vector<std::string>& data);
+    static std::string_view GetLocaleString(std::vector<std::string> const& data, size_t locale)
+    {
+        if (locale < data.size())
+            return data[locale];
+        else
+            return {};
+    }
     static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
     {
         if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
