@@ -1,10 +1,8 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1624636115436386300');
 
-DELETE FROM `gossip_menu_option_locale` WHERE `MenuID` = 10189 AND `Locale` IN ('esES','esMX');
+DELETE FROM `gossip_menu_option_locale` WHERE `MenuID` = 10189, OptionID = 0 AND `Locale` IN ('esES','esMX');
 INSERT INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`, `BoxText`) VALUES
 (10189,0,'esES','Lady Valiente, estoy listo para ir a Orgrimmar. Abre el portal.','');
-
-INSERT INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`, `BoxText`) VALUES
 (10189,0,'esMX','Lady Valiente, estoy listo para ir a Orgrimmar. Abre el portal.','');
 
 
@@ -17,8 +15,6 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 (32364,4,0,'esES','Adiós, Jefe de Guerra. Rezo para que la próxima vez que nos encontremos sea como aliados.'),
 (32346,0,0,'esES','No hagas nada que pueda provocar a la horda. $N. El Jefe de Guerra confía en nuestra buena fe.'),
 (32346,1,0,'esES','Vamos.');
-
-INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
 (32364,0,0,'esMX','Thrall, ¿qué ha ocurrido? El Rey se prepara para la guerra...'),
 (32364,1,0,'esMX','Haré llegar esta información al Rey Wrynn, Thrall, pero...'),
 (32364,2,0,'esMX','Bolvar era como un hermano para él. En ausencia del Rey, Bolvar mantenía unida a la Alianza. Proporcionó fuerza a nuestro pueblo en los momentos más oscuros. Cuidó de Anduin, como si fuera su propio hijo.'),
@@ -31,8 +27,6 @@ DELETE FROM `quest_request_items_locale` WHERE `ID` IN (13347, 13242) AND `local
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (13347,'esES','<El rey Wrynn se seca una lágrima>.$B$B<El Rey asiente.>$B$BEsto es culpa mía.',18019),
 (13242,'esES','<La cara de Colmillosaurio se desfigura.>$B$BMi corazón... mi fuerza...',18019);
-
-INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (13347,'esMX','<El rey Wrynn se seca una lágrima>.$B$B<El Rey asiente.>$B$BEsto es culpa mía.',18019),
 (13242,'esMX','<La cara de Colmillosaurio se desfigura.>$B$BMi corazón... mi fuerza...',18019);
 
@@ -47,8 +41,6 @@ INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verified
 (13257,'esES','El señor demoníaco, Varimathras, y el boticario jefe renegado, Putress, son los responsables de esta traición.$B$B<Thrall asiente.>$B$BSí, el mismo Putress que ha descubierto la cura para el reciente brote de Plaga.$B$BAquellos que no se aliaron con su régimen han sido ejecutados o desterrados. Sylvanas casi murió en el golpe.$B$BLa horda ha perdido entrañas. Orgrimmar acogerá a los refugiados Renegados hasta que se resuelva la crisis. Por ahora, estamos bajo ley marcial.',18019),
 (13266,'esES','Te pondré al día rápidamente, $N.$B$BEntrañas está en guerra. Los boticarios de Putress y los demonios de Varimathras han asediado la ciudad. Han tomado una posición defensiva en el interior y usan el maldito añublo contra nuestras tropas.',18019),
 (13267,'esES','El mañana está lleno de incertidumbre. Los días en los que la Alianza y Horda luchaban juntos contra un enemigo común se han ido. Una nueva batalla amanece, $N, una batalla en la que no habrá ganador.$B$BPero debemos seguir avanzando hacia Corona de Hielo. No tenemos elección. Nuestra salvación está en manos de héroes como tú, $N. El futuro de la Horda, y del mundo, depende de tí.$B$BVolvamos a Orgrimmar, Debes volver a Rasganorte de inmediato.',18019);
-
-INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
 (13347,'esMX','La Reina de Dragones tiene razón $N. No todo está perdido. Habrá una fuerza que renazca de las cenizas y yo purgaré el mal de la Horda de este mundo. Las muertes de nuestros hermanos y hermanas no habrán sido en vano.',18019),
 (13369,'esMX','La Horda no quiere guerra $R. Escúchame bien...',18019),
 (13370,'esMX','¿Han perdido Entrañas? Entonces el momento de golpearles es ahora. Nos encargaremos de Putress nosotros mismos y retomaremos las Ruinas de Lordaeron para la Alianza!',18019),
