@@ -13,10 +13,10 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-desertion
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-duel-reset.git modules/mod-duel-reset
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-eluna-lua-engine.git modules/mod-eluna-lua-engine
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ip-tracker.git modules/mod-ip-tracker
-git clone --depth=1 --branch=master https://github.com/azerothcore/mod-low-level-arena.git modules/mod-low-level-arena
+git clone --depth=1 --branch=main    https://github.com/azerothcore/mod-low-level-arena.git modules/mod-low-level-arena
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-multi-client-check.git modules/mod-multi-client-check
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pvp-titles.git modules/mod-pvp-titles
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pvpstats-announcer.git modules/mod-pvpstats-announcer
-git clone --depth=1 --branch=master https://github.com/azerothcore/mod-queue-list-cache.git modules/mod-queue-list-cache
+git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-queue-list-cache.git modules/mod-queue-list-cache
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-server-auto-shutdown.git modules/mod-server-auto-shutdown
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-transmog.git modules/mod-transmog
