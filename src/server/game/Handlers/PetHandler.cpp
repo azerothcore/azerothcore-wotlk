@@ -479,7 +479,7 @@ void WorldSession::HandlePetStopAttack(WorldPacket& recvData)
     pet->ClearInPetCombat();
 }
 
-void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spellid, uint16 flag, ObjectGuid guid2)
+void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellid, uint16 flag, ObjectGuid guid2)
 {
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
