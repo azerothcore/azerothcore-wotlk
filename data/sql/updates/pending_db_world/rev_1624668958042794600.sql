@@ -17,7 +17,7 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 (32364,3,0,'esMX','Temo que la ira lo consuma, Thrall. Espero que la razón prevalezca, pero debemos prepararnos para lo peor... para la guerra.'),
 (32364,4,0,'esMX','Adiós, Jefe de Guerra. Rezo para que la próxima vez que nos encontremos sea como aliados.');
 
-DELETE FROM `creature_text_locale` WHERE `CreatureID` IN (32364, 32346) AND GroupID IN (0, 1) AND `Locale` IN ('esES','esMX');
+DELETE FROM `creature_text_locale` WHERE `CreatureID` = 32346 AND GroupID IN (0, 1) AND `Locale` IN ('esES','esMX');
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
 (32346,0,0,'esES','No hagas nada que pueda provocar a la horda. $N. El Jefe de Guerra confía en nuestra buena fe.'),
 (32346,1,0,'esES','Vamos.'),
