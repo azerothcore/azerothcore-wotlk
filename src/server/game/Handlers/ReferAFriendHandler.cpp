@@ -11,9 +11,7 @@
 
 void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: CMSG_GRANT_LEVEL");
-#endif
 
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();
@@ -56,9 +54,7 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 
 void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
-#endif
 
     ObjectGuid guid;
     recvData >> guid.ReadAsPacked();

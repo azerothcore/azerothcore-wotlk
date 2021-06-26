@@ -10,6 +10,7 @@
 // For static or at-server-startup loaded spell data
 
 #include "Common.h"
+#include "Log.h"
 #include "SharedDefines.h"
 #include "Unit.h"
 
@@ -690,6 +691,22 @@ public:
         ASSERT(spellId < GetSpellInfoStoreSize());
         SpellInfo const* spellInfo = mSpellInfoMap[spellId];
         ASSERT(spellInfo);
+        return spellInfo;
+    }
+    // use this instead of AssertSpellInfo to have the problem logged instead of crashing the server
+    SpellInfo const* CheckSpellInfo(uint32 spellId) const
+    {
+        if (spellId >= GetSpellInfoStoreSize())
+        {
+            LOG_ERROR("server", "spellId %u is not lower than GetSpellInfoStoreSize() (%u)", spellId, GetSpellInfoStoreSize());
+            return nullptr;
+        }
+        SpellInfo const* spellInfo = mSpellInfoMap[spellId];
+        if (!spellInfo)
+        {
+            LOG_ERROR("server", "spellId %u has invalid spellInfo", spellId);
+            return nullptr;
+        }
         return spellInfo;
     }
     [[nodiscard]] uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
