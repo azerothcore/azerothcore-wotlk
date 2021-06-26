@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1624714294954952856');
 
-DELETE FROM `creature_queststarter` WHERE `quest` IN (8154, 8155, 8156, 8080, 8297. 8162, 8161, 8160, 8123, 8299);
-DELETE FROM `creature_questender` WHERE `quest` IN (8154, 8155, 8156, 8080, 8297. 8162, 8161, 8160, 8123, 8299);
+DELETE FROM `creature_queststarter` WHERE `quest` IN (8154, 8155, 8156, 8080, 8297, 8162, 8161, 8160, 8123, 8299);
+DELETE FROM `creature_questender` WHERE `quest` IN (8154, 8155, 8156, 8080, 8297, 8162, 8161, 8160, 8123, 8299);
 
 DELETE FROM `disables` WHERE `entry` IN (8154, 8155, 8156, 8080, 8297, 8162, 8161, 8160, 8123, 8299);
 INSERT INTO `disables` (sourceType, entry, flags, comment) VALUES 
