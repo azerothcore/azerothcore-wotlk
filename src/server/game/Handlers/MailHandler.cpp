@@ -588,54 +588,59 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
     Player* player = _player;
     player->_LoadMail();
 
-    uint32 mailsCount = 0;                                 // real send to client mails amount                               // real mails amount
+    uint8 mailsCount = 0;
+    uint32 realCount = 0;
 
     WorldPacket data(SMSG_MAIL_LIST_RESULT, (200));         // guess size
     data << uint32(0);                                      // real mail's count
     data << uint8(0);                                       // mail's count
     time_t cur_time = time(nullptr);
 
-    for (PlayerMails::iterator itr = player->GetMailBegin(); itr != player->GetMailEnd(); ++itr)
+    for (Mail const* mail : player->GetMails())
     {
         // prevent client storage overflow
         if (mailsCount >= MAX_INBOX_CLIENT_CAPACITY)
         {
-            break;
+            ++realCount;
+            continue;
         }
 
         // skip deleted or not delivered (deliver delay not expired) mails
-        if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
-            continue;
-
-        uint8 item_count = uint8((*itr)->items.size());            // max count is MAX_MAIL_ITEMS (12)
-
-        size_t next_mail_size = 2 + 4 + 1 + ((*itr)->messageType == MAIL_NORMAL ? 8 : 4) + 4 * 8 + ((*itr)->subject.size() + 1) + ((*itr)->body.size() + 1) + 1 + item_count * (1 + 4 + 4 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3 * 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1);
-
-        if (data.wpos() + next_mail_size > MAX_NETCLIENT_PACKET_SIZE)
+        if (mail->state == MAIL_STATE_DELETED || cur_time < mail->deliver_time)
         {
             continue;
         }
 
-        data << uint16(next_mail_size);                    // Message size
-        data << uint32((*itr)->messageID);                 // Message ID
-        data << uint8((*itr)->messageType);                // Message Type
+        uint8 item_count = uint8(mail->items.size());            // max count is MAX_MAIL_ITEMS (12)
 
-        switch ((*itr)->messageType)
+        size_t next_mail_size = 2 + 4 + 1 + (mail->messageType == MAIL_NORMAL ? 8 : 4) + 4 * 8 + (mail->subject.size() + 1) + (mail->body.size() + 1) + 1 + item_count * (1 + 4 + 4 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3 * 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1);
+
+        if (data.wpos() + next_mail_size > MAX_NETCLIENT_PACKET_SIZE)
+        {
+            ++realCount;
+            continue;
+        }
+
+        data << uint16(next_mail_size);                 // Message size
+        data << uint32(mail->messageID);                // Message ID
+        data << uint8(mail->messageType);               // Message Type
+
+        switch (mail->messageType)
         {
             case MAIL_NORMAL:                               // sender guid
-                data << ObjectGuid::Create<HighGuid::Player>((*itr)->sender);
+                data << ObjectGuid::Create<HighGuid::Player>(mail->sender);
                 break;
             case MAIL_CREATURE:
             case MAIL_GAMEOBJECT:
             case MAIL_AUCTION:
             case MAIL_CALENDAR:
-                data << uint32((*itr)->sender);            // creature/gameobject entry, auction id, calendar event id?
+                data << uint32(mail->sender);            // creature/gameobject entry, auction id, calendar event id?
                 break;
         }
 
         // prevent client crash
-        std::string subject = (*itr)->subject;
-        std::string body = (*itr)->body;
+        std::string subject = mail->subject;
+        std::string body = mail->body;
 
         if (subject.find("| |") != std::string::npos)
         {
@@ -646,20 +651,20 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
             body = "";
         }
 
-        data << uint32((*itr)->COD);                         // COD
-        data << uint32(0);                                   // probably changed in 3.3.3
-        data << uint32((*itr)->stationery);                  // stationery (Stationery.dbc)
-        data << uint32((*itr)->money);                       // Gold
-        data << uint32((*itr)->checked);                     // flags
-        data << float(float((*itr)->expire_time - time(nullptr)) / DAY); // Time
-        data << uint32((*itr)->mailTemplateId);              // mail template (MailTemplate.dbc)
-        data << subject;                                     // Subject string - once 00, when mail type = 3, max 256
-        data << body;                                        // message? max 8000
-        data << uint8(item_count);                           // client limit is 0x10
+        data << uint32(mail->COD);                                      // COD
+        data << uint32(0);                                              // probably changed in 3.3.3
+        data << uint32(mail->stationery);                               // stationery (Stationery.dbc)
+        data << uint32(mail->money);                                    // Gold
+        data << uint32(mail->checked);                                  // flags
+        data << float(float(mail->expire_time - time(nullptr)) / DAY);  // Time
+        data << uint32(mail->mailTemplateId);                           // mail template (MailTemplate.dbc)
+        data << subject;                                                // Subject string - once 00, when mail type = 3, max 256
+        data << body;                                                   // message? max 8000
+        data << uint8(item_count);                                      // client limit is 0x10
 
         for (uint8 i = 0; i < item_count; ++i)
         {
-            Item* item = player->GetMItem((*itr)->items[i].item_guid);
+            Item* item = player->GetMItem(mail->items[i].item_guid);
             // item index (0-6?)
             data << uint8(i);
             // item guid low?
@@ -688,11 +693,12 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
             data << uint8(0);
         }
 
+        ++realCount;
         ++mailsCount;
     }
 
-    data.put<uint32>(0, player->totalMailCount);            // this will display warning about undelivered mail to player if realCount > mailsCount
-    data.put<uint8>(4, uint8(mailsCount));                  // set real send mails to client
+    data.put<uint32>(0, realCount);     //  this will display warning about undelivered mail to player if realCount > mailsCount
+    data.put<uint8>(4, mailsCount);     // set real send mails to client
     SendPacket(&data);
 
     // recalculate m_nextMailDelivereTime and unReadMails
@@ -781,28 +787,27 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket& /*recvData*/)
         uint32 count = 0;
         time_t now = time(nullptr);
         std::set<uint32> sentSenders;
-        for (PlayerMails::iterator itr = _player->GetMailBegin(); itr != _player->GetMailEnd(); ++itr)
+        for (Mail const* mail : _player->GetMails())
         {
-            Mail* m = (*itr);
             // must be not checked yet
-            if (m->checked & MAIL_CHECK_MASK_READ)
+            if (mail->checked & MAIL_CHECK_MASK_READ)
                 continue;
 
             // and already delivered
-            if (now < m->deliver_time)
+            if (now < mail->deliver_time)
                 continue;
 
             // only send each mail sender once
-            if (sentSenders.count(m->sender))
+            if (sentSenders.count(mail->sender))
                 continue;
 
-            data << (m->messageType == MAIL_NORMAL ? ObjectGuid::Create<HighGuid::Player>(m->sender) : ObjectGuid::Empty);  // player guid
-            data << uint32(m->messageType != MAIL_NORMAL ? m->sender : 0);  // non-player entries
-            data << uint32(m->messageType);
-            data << uint32(m->stationery);
-            data << float(m->deliver_time - now);
+            data << (mail->messageType == MAIL_NORMAL ? ObjectGuid::Create<HighGuid::Player>(mail->sender) : ObjectGuid::Empty);  // player guid
+            data << uint32(mail->messageType != MAIL_NORMAL ? mail->sender : 0);  // non-player entries
+            data << uint32(mail->messageType);
+            data << uint32(mail->stationery);
+            data << float(mail->deliver_time - now);
 
-            sentSenders.insert(m->sender);
+            sentSenders.insert(mail->sender);
             ++count;
             if (count == 2)                                  // do not display more than 2 mails
                 break;
