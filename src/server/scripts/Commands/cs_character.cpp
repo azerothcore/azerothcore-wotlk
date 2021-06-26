@@ -100,7 +100,7 @@ public:
     static bool GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::string searchString)
     {
         PreparedQueryResult result;
-        PreparedStatement* stmt;
+        CharacterDatabasePreparedStatement* stmt = nullptr;
         if (!searchString.empty())
         {
             // search by GUID
@@ -309,10 +309,20 @@ public:
     //rename characters
     static bool HandleCharacterRenameCommand(ChatHandler* handler, char const* args)
     {
+        char* nameStr = strtok((char*)args, " ");
+        char* reserveNameStr = strtok(nullptr, " ");
+
+        if (!reserveNameStr && nameStr && atoi(nameStr) == 1)
+        {
+            reserveNameStr = nameStr;
+            nameStr = nullptr;
+        }
+        bool reserveName = reserveNameStr != nullptr && atoi(reserveNameStr) == 1;
+
         Player* target;
         ObjectGuid targetGuid;
         std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+        if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
             return false;
 
         if (target)
@@ -337,6 +347,11 @@ public:
             stmt->setUInt16(0, uint16(AT_LOGIN_RENAME));
             stmt->setUInt32(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
+        }
+
+        if (reserveName)
+        {
+            sObjectMgr->AddReservedPlayerName(targetName);
         }
 
         return true;

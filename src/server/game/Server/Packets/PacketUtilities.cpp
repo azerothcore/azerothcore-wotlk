@@ -8,7 +8,6 @@
 #include "Errors.h"
 #include <utf8.h>
 #include <sstream>
-#include <array>
 
 WorldPackets::InvalidStringValueException::InvalidStringValueException(std::string const& value) :
     ByteBufferInvalidValueException("string", value.c_str()) { }

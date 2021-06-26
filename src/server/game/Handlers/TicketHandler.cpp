@@ -5,9 +5,7 @@
  */
 
 #include "Chat.h"
-#include "Common.h"
 #include "Language.h"
-#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "TicketMgr.h"
@@ -84,7 +82,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
             }
             else
             {
-                LOG_ERROR("server", "CMSG_GMTICKET_CREATE possibly corrupt. Uncompression failed.");
+                LOG_ERROR("network.opcode", "CMSG_GMTICKET_CREATE possibly corrupt. Uncompression failed.");
                 recvData.rfinish();
                 return;
             }
@@ -131,7 +129,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
     GMTicketResponse response = GMTICKET_RESPONSE_UPDATE_ERROR;
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
-        SQLTransaction trans = SQLTransaction(nullptr);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetMessage(message);
         ticket->SaveToDB(trans);
 
@@ -192,7 +190,7 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
     recv_data >> mainSurvey;
 
     std::unordered_set<uint32> surveyIds;
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     // sub_survey1, r1, comment1, sub_survey2, r2, comment2, sub_survey3, r3, comment3, sub_survey4, r4, comment4, sub_survey5, r5, comment5, sub_survey6, r6, comment6, sub_survey7, r7, comment7, sub_survey8, r8, comment8, sub_survey9, r9, comment9, sub_survey10, r10, comment10,
     for (uint8 i = 0; i < 10; i++)
@@ -216,7 +214,7 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
         if (!surveyIds.insert(subSurveyId).second)
             continue;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SUBSURVEY);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SUBSURVEY);
         stmt->setUInt32(0, nextSurveyID);
         stmt->setUInt32(1, subSurveyId);
         stmt->setUInt32(2, rank);
@@ -232,7 +230,7 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
         return;
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SURVEY);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SURVEY);
     stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
     stmt->setUInt32(1, nextSurveyID);
     stmt->setUInt32(2, mainSurvey);
@@ -255,7 +253,7 @@ void WorldSession::HandleReportLag(WorldPacket& recv_data)
     recv_data >> y;
     recv_data >> z;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_LAG_REPORT);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_LAG_REPORT);
     stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
     stmt->setUInt8 (1, lagType);
     stmt->setUInt16(2, mapId);

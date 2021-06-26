@@ -16,6 +16,7 @@ EndScriptData */
 #include "Base32.h"
 #include "Chat.h"
 #include "CryptoGenerics.h"
+#include "IPLocation.h"
 #include "Language.h"
 #include "Player.h"
 #include "Realm.h"
@@ -23,8 +24,8 @@ EndScriptData */
 #include "SecretMgr.h"
 #include "StringConvert.h"
 #include "TOTP.h"
-#include <unordered_map>
 #include <openssl/rand.h>
+#include <unordered_map>
 
 #if AC_COMPILER == AC_COMPILER_GNU
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -41,35 +42,41 @@ public:
     {
         static ChatCommandTable accountSetCommandTable =
         {
-            { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,      "" },
-            { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,    "" },
-            { "password",   SEC_CONSOLE,        true,   &HandleAccountSetPasswordCommand,   "" },
-            { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,        "" }
+            { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,          "" },
+            { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,        "" },
+            { "password",   SEC_CONSOLE,        true,   &HandleAccountSetPasswordCommand,       "" },
+            { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,            "" }
         };
 
         static ChatCommandTable accountLockCommandTable
         {
-            { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,   "" },
-            { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,        "" }
+            { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,       "" },
+            { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,            "" }
         };
 
         static ChatCommandTable account2faCommandTable
         {
-            { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,      "" },
-            { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,     "" },
+            { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,          "" },
+            { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,         "" },
+        };
+
+        static std::vector<ChatCommand> accountRemoveCommandTable
+        {
+            { "country",    SEC_ADMINISTRATOR,  true,  &HandleAccountRemoveLockCountryCommand,  "" }
         };
 
         static ChatCommandTable accountCommandTable =
         {
-            { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable    },
-            { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,         "" },
-            { "create",     SEC_CONSOLE,        true,   &HandleAccountCreateCommand,        "" },
-            { "delete",     SEC_CONSOLE,        true,   &HandleAccountDeleteCommand,        "" },
-            { "onlinelist", SEC_CONSOLE,        true,   &HandleAccountOnlineListCommand,    "" },
-            { "lock",       SEC_PLAYER,         false,  nullptr, "", accountLockCommandTable   },
-            { "set",        SEC_ADMINISTRATOR,  true,   nullptr, "", accountSetCommandTable    },
-            { "password",   SEC_PLAYER,         false,  &HandleAccountPasswordCommand,      "" },
-            { "",           SEC_PLAYER,         false,  &HandleAccountCommand,              "" }
+            { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable        },
+            { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,             "" },
+            { "create",     SEC_CONSOLE,        true,   &HandleAccountCreateCommand,            "" },
+            { "delete",     SEC_CONSOLE,        true,   &HandleAccountDeleteCommand,            "" },
+            { "onlinelist", SEC_CONSOLE,        true,   &HandleAccountOnlineListCommand,        "" },
+            { "lock",       SEC_PLAYER,         false,  nullptr, "", accountLockCommandTable       },
+            { "set",        SEC_ADMINISTRATOR,  true,   nullptr, "", accountSetCommandTable        },
+            { "password",   SEC_PLAYER,         false,  &HandleAccountPasswordCommand,          "" },
+            { "remove",     SEC_ADMINISTRATOR,  true,   nullptr, "", accountRemoveCommandTable     },
+            { "",           SEC_PLAYER,         false,  &HandleAccountCommand,                  "" }
         };
 
         static ChatCommandTable commandTable =
@@ -253,7 +260,7 @@ public:
             return false;
         }
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
         stmt->setUInt8(0, uint8(expansion));
         stmt->setUInt32(1, accountId);
@@ -374,7 +381,7 @@ public:
     static bool HandleAccountOnlineListCommand(ChatHandler* handler, char const* /*args*/)
     {
         ///- Get the list of accounts ID logged to the realm
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ONLINE);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ONLINE);
 
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -398,9 +405,9 @@ public:
 
             ///- Get the username, last IP and GM level of each account
             // No SQL injection. account is uint32.
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO);
-            stmt->setUInt32(0, account);
-            PreparedQueryResult resultLogin = LoginDatabase.Query(stmt);
+            LoginDatabasePreparedStatement* loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO);
+            loginStmt->setUInt32(0, account);
+            PreparedQueryResult resultLogin = LoginDatabase.Query(loginStmt);
 
             if (resultLogin)
             {
@@ -415,6 +422,45 @@ public:
         } while (result->NextRow());
 
         handler->SendSysMessage(LANG_ACCOUNT_LIST_BAR);
+        return true;
+    }
+
+    static bool HandleAccountRemoveLockCountryCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        ///- %Parse the command line arguments
+        char* _accountName = strtok((char*)args, " ");
+        if (!_accountName)
+            return false;
+
+        std::string accountName = _accountName;
+        if (!Utf8ToUpperOnlyLatin(accountName))
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 accountId = AccountMgr::GetId(accountName);
+        if (!accountId)
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+        stmt->setString(0, "00");
+        stmt->setUInt32(1, accountId);
+        LoginDatabase.Execute(stmt);
+        handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
+
         return true;
     }
 
@@ -433,30 +479,24 @@ public:
         {
             if (param == "on")
             {
-                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGON_COUNTRY);
-                uint32 ip = inet_addr(handler->GetSession()->GetRemoteAddress().c_str());
-                EndianConvertReverse(ip);
-                stmt->setUInt32(0, ip);
-                PreparedQueryResult result = LoginDatabase.Query(stmt);
-                if (result)
+                if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(handler->GetSession()->GetRemoteAddress()))
                 {
-                    Field* fields = result->Fetch();
-                    std::string country = fields[0].GetString();
-                    stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_CONTRY);
-                    stmt->setString(0, country);
+                    auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+                    stmt->setString(0, location->CountryCode);
                     stmt->setUInt32(1, handler->GetSession()->GetAccountId());
                     LoginDatabase.Execute(stmt);
                     handler->PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
                 }
                 else
                 {
-                    handler->PSendSysMessage("[IP2NATION] Table empty");
-                    ;//LOG_DEBUG("network", "[IP2NATION] Table empty");
+                    handler->PSendSysMessage("No IP2Location information - account not locked");
+                    handler->SetSentErrorMessage(true);
+                    return false;
                 }
             }
             else if (param == "off")
             {
-                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_CONTRY);
+                auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
                 stmt->setString(0, "00");
                 stmt->setUInt32(1, handler->GetSession()->GetAccountId());
                 LoginDatabase.Execute(stmt);
@@ -483,7 +523,7 @@ public:
 
         if (!param.empty())
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK);
 
             if (param == "on")
             {
@@ -709,7 +749,7 @@ public:
         if (expansion < 0 || uint8(expansion) > sWorld->getIntConfig(CONFIG_EXPANSION))
             return false;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
 
         stmt->setUInt8(0, expansion);
         stmt->setUInt32(1, accountId);
@@ -788,7 +828,7 @@ public:
         // Check and abort if the target gm has a higher rank on one of the realms and the new realm is -1
         if (gmRealmID == -1 && !AccountMgr::IsConsoleAccount(playerSecurity))
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS_GMLEVEL_TEST);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS_GMLEVEL_TEST);
 
             stmt->setUInt32(0, targetAccountId);
             stmt->setUInt8(1, uint8(gm));
@@ -812,18 +852,16 @@ public:
         }
 
         // If gmRealmID is -1, delete all values for the account id, else, insert values for the specific realm.Id.Realm
-        PreparedStatement* stmt;
+        LoginDatabasePreparedStatement* stmt;
 
         if (gmRealmID == -1)
         {
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS);
-
             stmt->setUInt32(0, targetAccountId);
         }
         else
         {
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
-
             stmt->setUInt32(0, targetAccountId);
             stmt->setUInt32(1, realm.Id.Realm);
         }

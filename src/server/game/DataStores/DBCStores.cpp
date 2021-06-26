@@ -123,6 +123,9 @@ DBCStorage <ScalingStatValuesEntry> sScalingStatValuesStore(ScalingStatValuesfmt
 
 DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
 DBCStorage <SkillLineAbilityEntry> sSkillLineAbilityStore(SkillLineAbilityfmt);
+DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
+SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
+DBCStorage <SkillTiersEntry> sSkillTiersStore(SkillTiersfmt);
 
 DBCStorage <SoundEntriesEntry> sSoundEntriesStore(SoundEntriesfmt);
 
@@ -183,7 +186,7 @@ uint32 DBCFileCount = 0;
 
 static bool LoadDBC_assert_print(uint32 fsize, uint32 rsize, const std::string& filename)
 {
-    LOG_ERROR("server", "Size of '%s' set by format string (%u) not equal size of C++ structure (%u).", filename.c_str(), fsize, rsize);
+    LOG_ERROR("dbc", "Size of '%s' set by format string (%u) not equal size of C++ structure (%u).", filename.c_str(), fsize, rsize);
 
     // ASSERT must fail after function call
     return false;
@@ -324,6 +327,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sScalingStatValuesStore,               "ScalingStatValues.dbc",                "scalingstatvalues_dbc");
     LOAD_DBC(sSkillLineStore,                       "SkillLine.dbc",                        "skillline_dbc");
     LOAD_DBC(sSkillLineAbilityStore,                "SkillLineAbility.dbc",                 "skilllineability_dbc");
+    LOAD_DBC(sSkillRaceClassInfoStore,              "SkillRaceClassInfo.dbc",               "skillraceclassinfo_dbc");
     LOAD_DBC(sSoundEntriesStore,                    "SoundEntries.dbc",                     "soundentries_dbc");
     LOAD_DBC(sSpellStore,                           "Spell.dbc",                            "spell_dbc");
     LOAD_DBC(sSpellCastTimesStore,                  "SpellCastTimes.dbc",                   "spellcasttimes_dbc");
@@ -392,21 +396,35 @@ void LoadDBCStores(const std::string& dataPath)
         if (i->Category)
             sSpellsByCategoryStore[i->Category].insert(i->Id);
 
+    for (SkillRaceClassInfoEntry const* entry : sSkillRaceClassInfoStore)
+    {
+        if (sSkillLineStore.LookupEntry(entry->SkillID))
+        {
+            SkillRaceClassInfoBySkill.emplace(entry->SkillID, entry);
+        }
+    }
+
     for (SkillLineAbilityEntry const* skillLine : sSkillLineAbilityStore)
     {
-        SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->spellId);
+        SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->Spell);
         if (spellInfo && spellInfo->Attributes & SPELL_ATTR0_PASSIVE)
         {
             for (CreatureFamilyEntry const* cFamily : sCreatureFamilyStore)
             {
-                if (skillLine->skillId != cFamily->skillLine[0] && skillLine->skillId != cFamily->skillLine[1])
+                if (skillLine->SkillLine != cFamily->skillLine[0] && skillLine->SkillLine != cFamily->skillLine[1])
+                {
                     continue;
+                }
 
                 if (spellInfo->SpellLevel)
+                {
                     continue;
+                }
 
-                if (skillLine->learnOnGetSkill != ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL)
+                if (skillLine->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+                {
                     continue;
+                }
 
                 sPetFamilySpellsStore[cFamily->ID].insert(spellInfo->Id);
             }
@@ -565,7 +583,7 @@ void LoadDBCStores(const std::string& dataPath)
     // error checks
     if (bad_dbc_files.size() >= DBCFileCount)
     {
-        LOG_ERROR("server", "Incorrect DataDir value in worldserver.conf or ALL required *.dbc files (%d) not found by path: %sdbc", DBCFileCount, dataPath.c_str());
+        LOG_ERROR("dbc", "Incorrect DataDir value in worldserver.conf or ALL required *.dbc files (%d) not found by path: %sdbc", DBCFileCount, dataPath.c_str());
         exit(1);
     }
     else if (!bad_dbc_files.empty())
@@ -574,7 +592,7 @@ void LoadDBCStores(const std::string& dataPath)
         for (StoreProblemList::iterator i = bad_dbc_files.begin(); i != bad_dbc_files.end(); ++i)
             str += *i + "\n";
 
-        LOG_ERROR("server", "Some required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFileCount, str.c_str());
+        LOG_ERROR("dbc", "Some required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFileCount, str.c_str());
         exit(1);
     }
 
@@ -586,14 +604,14 @@ void LoadDBCStores(const std::string& dataPath)
             !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
             !sSpellStore.LookupEntry(80864)            )        // last client known item added in 3.3.5a
     {
-        LOG_ERROR("server", "You have _outdated_ DBC data. Please extract correct versions from current using client.");
+        LOG_ERROR("dbc", "You have _outdated_ DBC data. Please extract correct versions from current using client.");
         exit(1);
     }
 
     LoadM2Cameras(dataPath);
 
-    LOG_INFO("server", ">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 // Convert the geomoetry from a spline value, to an actual WoW XYZ
@@ -775,7 +793,7 @@ bool readCamera(M2Camera const* cam, uint32 buffSize, M2Header const* header, Ci
 void LoadM2Cameras(const std::string& dataPath)
 {
     sFlyByCameraStore.clear();
-    LOG_INFO("server", ">> Loading Cinematic Camera files");
+    LOG_INFO("server.loading", ">> Loading Cinematic Camera files");
 
     uint32 oldMSTime = getMSTime();
     for (uint32 i = 0; i < sCinematicCameraStore.GetNumRows(); ++i)
@@ -813,7 +831,7 @@ void LoadM2Cameras(const std::string& dataPath)
             // Reject if not at least the size of the header
             if (static_cast<uint32>(fileSize) < sizeof(M2Header))
             {
-                LOG_ERROR("server", "Camera file %s is damaged. File is smaller than header size", filename.c_str());
+                LOG_ERROR("dbc", "Camera file %s is damaged. File is smaller than header size", filename.c_str());
                 m2file.close();
                 continue;
             }
@@ -827,7 +845,7 @@ void LoadM2Cameras(const std::string& dataPath)
             // Check file has correct magic (MD20)
             if (strcmp(fileCheck, "MD20"))
             {
-                LOG_ERROR("server", "Camera file %s is damaged. File identifier not found", filename.c_str());
+                LOG_ERROR("dbc", "Camera file %s is damaged. File identifier not found", filename.c_str());
                 m2file.close();
                 continue;
             }
@@ -847,7 +865,7 @@ void LoadM2Cameras(const std::string& dataPath)
 
             if (header->ofsCameras + sizeof(M2Camera) > static_cast<uint32>(fileSize))
             {
-                LOG_ERROR("server", "Camera file %s is damaged. Camera references position beyond file end", filename.c_str());
+                LOG_ERROR("dbc", "Camera file %s is damaged. Camera references position beyond file end", filename.c_str());
                 continue;
             }
 
@@ -855,11 +873,11 @@ void LoadM2Cameras(const std::string& dataPath)
             M2Camera const* cam = reinterpret_cast<M2Camera const*>(buffer.data() + header->ofsCameras);
             if (!readCamera(cam, fileSize, header, dbcentry))
             {
-                LOG_ERROR("server", "Camera file %s is damaged. Camera references position beyond file end", filename.c_str());
+                LOG_ERROR("dbc", "Camera file %s is damaged. Camera references position beyond file end", filename.c_str());
             }
         }
     }
-    LOG_INFO("server", ">> Loaded %u cinematic waypoint sets in %u ms", (uint32)sFlyByCameraStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded %u cinematic waypoint sets in %u ms", (uint32)sFlyByCameraStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 SimpleFactionsList const* GetFactionTeamList(uint32 faction)
@@ -1080,4 +1098,25 @@ uint32 GetDefaultMapLight(uint32 mapId)
     }
 
     return 0;
+}
+
+SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_)
+{
+    SkillRaceClassInfoBounds bounds = SkillRaceClassInfoBySkill.equal_range(skill);
+    for (SkillRaceClassInfoMap::iterator itr = bounds.first; itr != bounds.second; ++itr)
+    {
+        if (itr->second->RaceMask && !(itr->second->RaceMask & (1 << (race - 1))))
+        {
+            continue;
+        }
+
+        if (itr->second->ClassMask && !(itr->second->ClassMask & (1 << (class_ - 1))))
+        {
+            continue;
+        }
+
+        return itr->second;
+    }
+
+    return nullptr;
 }

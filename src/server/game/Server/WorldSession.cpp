@@ -35,6 +35,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "QueryHolder.h"
 #include "zlib.h"
 
 #ifdef ELUNA
@@ -86,7 +87,7 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
         return true;
 
     //lets process all packets for non-in-the-world player
-    return (player->IsInWorld() == false);
+    return !player->IsInWorld();
 }
 
 /// WorldSession constructor
@@ -139,8 +140,6 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
         ResetTimeOutTime(false);
         LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = %u;", GetAccountId());
     }
-
-    InitializeQueryCallbackParameters();
 }
 
 /// WorldSession destructor
@@ -214,7 +213,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (!m_Socket)
         return;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(ACORE_DEBUG)
+#if defined(ACORE_DEBUG)
     // Code for network use statistic
     static uint64 sendPacketCount = 0;
     static uint64 sendPacketBytes = 0;
@@ -240,9 +239,9 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         uint64 minTime = uint64(cur_time - lastTime);
         uint64 fullTime = uint64(lastTime - firstTime);
 
-        LOG_DEBUG("server", "Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount) / fullTime, float(sendPacketBytes) / fullTime, uint32(fullTime));
+        LOG_DEBUG("network", "Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount) / fullTime, float(sendPacketBytes) / fullTime, uint32(fullTime));
 
-        LOG_DEBUG("server", "Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount) / minTime, float(sendLastPacketBytes) / minTime);
+        LOG_DEBUG("network", "Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount) / minTime, float(sendLastPacketBytes) / minTime);
 
         lastTime = cur_time;
         sendLastPacketCount = 1;
@@ -393,7 +392,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         }
         catch (ByteBufferException const&)
         {
-            LOG_ERROR("server", "WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
+            LOG_ERROR("network", "WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
             if (sLog->ShouldLog("network", LogLevel::LOG_LEVEL_DEBUG))
             {
                 LOG_DEBUG("network", "Dumping error causing packet:");
@@ -569,7 +568,7 @@ void WorldSession::LogoutPlayer(bool save)
                 {
                     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
                     {
-                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
+                        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
                         stmt->setUInt32(0, _player->GetGUID().GetCounter());
                         stmt->setUInt8(1, BG_DESERTION_TYPE_INVITE_LOGOUT);
                         CharacterDatabase.Execute(stmt);
@@ -665,12 +664,10 @@ void WorldSession::LogoutPlayer(bool save)
         //! Client will respond by sending 3x CMSG_CANCEL_TRADE, which we currently dont handle
         WorldPacket data(SMSG_LOGOUT_COMPLETE, 0);
         SendPacket(&data);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
-#endif
 
         //! Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
         stmt->setUInt32(0, GetAccountId());
         CharacterDatabase.Execute(stmt);
     }
@@ -802,7 +799,7 @@ void WorldSession::SendAuthWaitQue(uint32 position)
 
 void WorldSession::LoadGlobalAccountData()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_DATA);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_DATA);
     stmt->setUInt32(0, GetAccountId());
     LoadAccountData(CharacterDatabase.Query(stmt), GLOBAL_CACHE_MASK);
 }
@@ -822,13 +819,13 @@ void WorldSession::LoadAccountData(PreparedQueryResult result, uint32 mask)
         uint32 type = fields[0].GetUInt8();
         if (type >= NUM_ACCOUNT_DATA_TYPES)
         {
-            LOG_ERROR("server", "Table `%s` have invalid account data type (%u), ignore.", mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+            LOG_ERROR("network", "Table `%s` have invalid account data type (%u), ignore.", mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
             continue;
         }
 
         if ((mask & (1 << type)) == 0)
         {
-            LOG_ERROR("server", "Table `%s` have non appropriate for table  account data type (%u), ignore.", mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
+            LOG_ERROR("network", "Table `%s` have non appropriate for table  account data type (%u), ignore.", mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
             continue;
         }
 
@@ -840,7 +837,7 @@ void WorldSession::LoadAccountData(PreparedQueryResult result, uint32 mask)
 void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string const& data)
 {
     uint32 id = 0;
-    uint32 index = 0;
+    CharacterDatabaseStatements index;
     if ((1 << type) & GLOBAL_CACHE_MASK)
     {
         id = GetAccountId();
@@ -856,7 +853,7 @@ void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string c
         index = CHAR_REP_PLAYER_ACCOUNT_DATA;
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(index);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(index);
     stmt->setUInt32(0, id);
     stmt->setUInt8(1, type);
     stmt->setUInt32(2, uint32(tm));
@@ -883,7 +880,7 @@ void WorldSession::LoadTutorialsData()
 {
     memset(m_Tutorials, 0, sizeof(uint32) * MAX_ACCOUNT_TUTORIAL_VALUES);
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_TUTORIALS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_TUTORIALS);
     stmt->setUInt32(0, GetAccountId());
     if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
         for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
@@ -900,12 +897,12 @@ void WorldSession::SendTutorialsData()
     SendPacket(&data);
 }
 
-void WorldSession::SaveTutorialsData(SQLTransaction& trans)
+void WorldSession::SaveTutorialsData(CharacterDatabaseTransaction trans)
 {
     if (!m_TutorialsChanged)
         return;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HAS_TUTORIALS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HAS_TUTORIALS);
     stmt->setUInt32(0, GetAccountId());
     bool hasTutorials = bool(CharacterDatabase.Query(stmt));
 
@@ -1084,7 +1081,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket& data)
 
     if (size > 0xFFFFF)
     {
-        LOG_ERROR("server", "WorldSession::ReadAddonsInfo addon info too big, size %u", size);
+        LOG_ERROR("network", "WorldSession::ReadAddonsInfo addon info too big, size %u", size);
         return;
     }
 
@@ -1114,34 +1111,28 @@ void WorldSession::ReadAddonsInfo(WorldPacket& data)
 
             addonInfo >> enabled >> crc >> unk1;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
-#endif
+            LOG_DEBUG("network", "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
 
             AddonInfo addon(addonName, enabled, crc, 2, true);
 
             SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
             if (savedAddon)
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 bool match = true;
 
                 if (addon.CRC != savedAddon->CRC)
                     match = false;
 
                 if (!match)
-                    LOG_DEBUG("server", "ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
+                    LOG_DEBUG("network", "ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
                 else
-                    LOG_DEBUG("server", "ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
-#endif
+                    LOG_DEBUG("network", "ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
             }
             else
             {
                 AddonMgr::SaveAddon(addon);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("server", "ADDON: %s (0x%x) was not known, saving...", addon.Name.c_str(), addon.CRC);
-#endif
+                LOG_DEBUG("network", "ADDON: %s (0x%x) was not known, saving...", addon.Name.c_str(), addon.CRC);
             }
 
             // TODO: Find out when to not use CRC/pubkey, and other possible states.
@@ -1150,17 +1141,13 @@ void WorldSession::ReadAddonsInfo(WorldPacket& data)
 
         uint32 currentTime;
         addonInfo >> currentTime;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "ADDON: CurrentTime: %u", currentTime);
-#endif
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         if (addonInfo.rpos() != addonInfo.size())
             LOG_DEBUG("network", "packet under-read!");
-#endif
     }
     else
-        LOG_ERROR("server", "Addon packet uncompress error!");
+        LOG_ERROR("network", "Addon packet uncompress error!");
 }
 
 void WorldSession::SendAddonsInfo()
@@ -1199,9 +1186,7 @@ void WorldSession::SendAddonsInfo()
             data << uint8(usepk);
             if (usepk)                                      // if CRC is wrong, add public key (client need it)
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("server", "ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey", itr->CRC, itr->Name.c_str(), STANDARD_ADDON_CRC);
-#endif
+                LOG_DEBUG("network", "ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey", itr->CRC, itr->Name.c_str(), STANDARD_ADDON_CRC);
                 data.append(addonPublicKey, sizeof(addonPublicKey));
             }
 
@@ -1240,181 +1225,21 @@ void WorldSession::SetPlayer(Player* player)
         m_GUIDLow = _player->GetGUID().GetCounter();
 }
 
-void WorldSession::InitializeQueryCallbackParameters()
-{
-    // Callback parameters that have pointers in them should be properly
-    // initialized to nullptr here.
-    _charCreateCallback.SetParam(nullptr);
-    _loadPetFromDBFirstCallback.SetFirstParam(0);
-    _loadPetFromDBFirstCallback.SetSecondParam(nullptr);
-}
-
 void WorldSession::ProcessQueryCallbacks()
 {
-    ProcessQueryCallbackPlayer();
-    ProcessQueryCallbackPet();
-    ProcessQueryCallbackLogin();
+    _queryProcessor.ProcessReadyCallbacks();
+    _transactionCallbacks.ProcessReadyCallbacks();
+    _queryHolderProcessor.ProcessReadyCallbacks();
 }
 
-void WorldSession::ProcessQueryCallbackPlayer()
+TransactionCallback& WorldSession::AddTransactionCallback(TransactionCallback&& callback)
 {
-    PreparedQueryResult result;
-
-    //- HandleCharRenameOpcode
-    if (_charRenameCallback.IsReady())
-    {
-        std::string param = _charRenameCallback.GetParam();
-        _charRenameCallback.GetResult(result);
-        HandleChangePlayerNameOpcodeCallBack(result, param);
-        _charRenameCallback.FreeResult();
-    }
-
-    //- HandleOpenItemOpcode
-    if (_openWrappedItemCallback.IsReady())
-    {
-        uint8 bagIndex = _openWrappedItemCallback.GetFirstParam();
-        uint8 slot = _openWrappedItemCallback.GetSecondParam();
-        ObjectGuid::LowType itemLowGUID = _openWrappedItemCallback.GetThirdParam();
-        _openWrappedItemCallback.GetResult(result);
-        HandleOpenWrappedItemCallback(result, bagIndex, slot, itemLowGUID);
-        _openWrappedItemCallback.FreeResult();
-    }
-
-    //- Player - ActivateSpec
-    if (_loadActionsSwitchSpecCallback.ready())
-    {
-        _loadActionsSwitchSpecCallback.get(result);
-        HandleLoadActionsSwitchSpec(result);
-        _loadActionsSwitchSpecCallback.cancel();
-    }
+    return _transactionCallbacks.AddCallback(std::move(callback));
 }
 
-void WorldSession::ProcessQueryCallbackPet()
+SQLQueryHolderCallback& WorldSession::AddQueryHolderCallback(SQLQueryHolderCallback&& callback)
 {
-    PreparedQueryResult result;
-
-    //- SendStabledPet
-    if (_sendStabledPetCallback.IsReady())
-    {
-        ObjectGuid param = _sendStabledPetCallback.GetParam();
-        _sendStabledPetCallback.GetResult(result);
-        SendStablePetCallback(result, param);
-        _sendStabledPetCallback.FreeResult();
-        return;
-    }
-
-    //- HandleStablePet
-    if (_stablePetCallback.ready())
-    {
-        _stablePetCallback.get(result);
-        HandleStablePetCallback(result);
-        _stablePetCallback.cancel();
-        return;
-    }
-
-    //- HandleUnstablePet
-    if (_unstablePetCallback.IsReady())
-    {
-        uint32 param = _unstablePetCallback.GetParam();
-        _unstablePetCallback.GetResult(result);
-        HandleUnstablePetCallback(result, param);
-        _unstablePetCallback.FreeResult();
-        return;
-    }
-
-    //- HandleStableSwapPet
-    if (_stableSwapCallback.IsReady())
-    {
-        uint32 param = _stableSwapCallback.GetParam();
-        _stableSwapCallback.GetResult(result);
-        HandleStableSwapPetCallback(result, param);
-        _stableSwapCallback.FreeResult();
-        return;
-    }
-
-    //- LoadPetFromDB first part
-    if (_loadPetFromDBFirstCallback.IsReady())
-    {
-        Player* player = GetPlayer();
-        if (!player)
-        {
-            if (AsynchPetSummon* info = _loadPetFromDBFirstCallback.GetSecondParam())
-                delete info;
-            _loadPetFromDBFirstCallback.Reset();
-            return;
-        }
-        // process only if player is in world (teleport crashes?)
-        // otherwise wait with result till he logs in
-        if (player->IsInWorld())
-        {
-            uint8 asynchLoadType = _loadPetFromDBFirstCallback.GetFirstParam();
-            _loadPetFromDBFirstCallback.GetResult(result);
-
-            uint8 loadResult = HandleLoadPetFromDBFirstCallback(result, asynchLoadType);
-            if (loadResult != PET_LOAD_OK)
-                Pet::HandleAsynchLoadFailed(_loadPetFromDBFirstCallback.GetSecondParam(), player, asynchLoadType, loadResult);
-
-            if (AsynchPetSummon* info = _loadPetFromDBFirstCallback.GetSecondParam())
-                delete info;
-            _loadPetFromDBFirstCallback.Reset();
-        }
-        return;
-    }
-
-    //- LoadPetFromDB second part
-    if (_loadPetFromDBSecondCallback.ready())
-    {
-        Player* player = GetPlayer();
-        if (!player)
-        {
-            SQLQueryHolder* param;
-            _loadPetFromDBSecondCallback.get(param);
-            delete param;
-            _loadPetFromDBSecondCallback.cancel();
-        }
-        else if (!player->IsInWorld())
-        {
-            // wait
-        }
-        else
-        {
-            SQLQueryHolder* param;
-            _loadPetFromDBSecondCallback.get(param);
-            HandleLoadPetFromDBSecondCallback((LoadPetFromDBQueryHolder*)param);
-            delete param;
-            _loadPetFromDBSecondCallback.cancel();
-        }
-        return;
-    }
-}
-
-void WorldSession::ProcessQueryCallbackLogin()
-{
-    PreparedQueryResult result;
-
-    //! HandleCharEnumOpcode
-    if (_charEnumCallback.ready())
-    {
-        _charEnumCallback.get(result);
-        HandleCharEnum(result);
-        _charEnumCallback.cancel();
-    }
-
-    if (_charCreateCallback.IsReady())
-    {
-        _charCreateCallback.GetResult(result);
-        HandleCharCreateCallback(result, _charCreateCallback.GetParam());
-        // Don't call FreeResult() here, the callback handler will do that depending on the events in the callback chain
-    }
-
-    //! HandlePlayerLoginOpcode
-    if (_charLoginCallback.ready())
-    {
-        SQLQueryHolder* param;
-        _charLoginCallback.get(param);
-        HandlePlayerLoginFromDB((LoginQueryHolder*)param);
-        _charLoginCallback.cancel();
-    }
+    return _queryHolderProcessor.AddCallback(std::move(callback));
 }
 
 void WorldSession::InitWarden(SessionKey const& k, std::string const& os)

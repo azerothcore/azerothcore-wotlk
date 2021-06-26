@@ -69,5 +69,6 @@
         "xstring": "cpp"
     },
     "deno.enable": true,
-    "deno.path" : "deps/deno/bin/deno"
+    "deno.path": "deps/deno/bin/deno",
+    "deno.lint": true
 }

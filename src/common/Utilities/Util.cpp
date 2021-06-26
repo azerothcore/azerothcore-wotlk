@@ -7,19 +7,21 @@
 #include "Util.h"
 #include "Common.h"
 #include "Containers.h"
-// #include "IpAddress.h"
 #include "StringConvert.h"
 #include "StringFormat.h"
-#include <utf8.h>
+#include <ace/Default_Constants.h>
 #include <algorithm>
+#include <cctype>
+#include <cstdarg>
+#include <ctime>
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <cctype>
 #include <cstdarg>
 #include <ctime>
-#include <ace/Default_Constants.h>
 #include <boost/core/demangle.hpp>
+#include <utf8.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
 {
@@ -27,7 +29,9 @@ Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserv
     memcpy(m_str, src.c_str(), src.length() + 1);
 
     if (vectorReserve)
+    {
         m_storage.reserve(vectorReserve);
+    }
 
     char* posold = m_str;
     char* posnew = m_str;
@@ -46,7 +50,9 @@ Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserv
             // Hack like, but the old code accepted these kind of broken strings,
             // so changing it would break other things
             if (posold != posnew)
+            {
                 m_storage.push_back(posold);
+            }
 
             break;
         }
@@ -89,7 +95,9 @@ time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime)
     time_t hourLocal = midnightLocal + hour * HOUR;
 
     if (onlyAfterTime && hourLocal <= time)
+    {
         hourLocal += DAY;
+    }
 
     return hourLocal;
 }
@@ -114,17 +122,25 @@ void stripLineInvisibleChars(std::string& str)
         else
         {
             if (wpos != pos)
+            {
                 str[wpos++] = str[pos];
+            }
             else
+            {
                 ++wpos;
+            }
             space = false;
         }
     }
 
     if (wpos < str.size())
+    {
         str.erase(wpos, str.size());
+    }
     if (str.find("|TInterface") != std::string::npos)
+    {
         str.clear();
+    }
 }
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText)
@@ -136,18 +152,28 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText)
 
     std::ostringstream ss;
     if (days)
+    {
         ss << days << (shortText ? "d" : " day(s) ");
+    }
     if (hours)
+    {
         ss << hours << (shortText ? "h" : " hour(s) ");
+    }
     if (minutes)
+    {
         ss << minutes << (shortText ? "m" : " minute(s) ");
+    }
     if (secs || (!days && !hours && !minutes) )
+    {
         ss << secs << (shortText ? "s" : " second(s) ");
+    }
 
     std::string str = ss.str();
 
     if (!shortText && !str.empty() && str[str.size() - 1] == ' ')
+    {
         str.resize(str.size() - 1);
+    }
 
     return str;
 }
@@ -159,7 +185,9 @@ int32 MoneyStringToMoney(const std::string& moneyString)
     if (!(std::count(moneyString.begin(), moneyString.end(), 'g') == 1 ||
             std::count(moneyString.begin(), moneyString.end(), 's') == 1 ||
             std::count(moneyString.begin(), moneyString.end(), 'c') == 1))
-        return 0; // Bad format
+    {
+        return 0;    // Bad format
+    }
 
     Tokenizer tokens(moneyString, ' ');
     for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
@@ -169,15 +197,23 @@ int32 MoneyStringToMoney(const std::string& moneyString)
         size_t sCount = std::count(tokenString.begin(), tokenString.end(), 's');
         size_t cCount = std::count(tokenString.begin(), tokenString.end(), 'c');
         if (gCount + sCount + cCount != 1)
+        {
             return 0;
+        }
 
         uint32 amount = atoi(*itr);
         if (gCount == 1)
+        {
             money += amount * 100 * 100;
+        }
         else if (sCount == 1)
+        {
             money += amount * 100;
+        }
         else if (cCount == 1)
+        {
             money += amount;
+        }
     }
 
     return money;
@@ -258,7 +294,9 @@ std::string TimeToHumanReadable(time_t t)
 bool IsIPAddress(char const* ipaddress)
 {
     if (!ipaddress)
+    {
         return false;
+    }
 
     // Let the big boys do it.
     // Drawback: all valid ip address formats are recognized e.g.: 12.23, 121234, 0xABCD)
@@ -276,7 +314,9 @@ bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_
 {
     uint32 mask = subnetMask.get_ip_address();
     if ((net.get_ip_address() & mask) == (addr.get_ip_address() & mask))
+    {
         return true;
+    }
     return false;
 }
 
@@ -285,7 +325,9 @@ uint32 CreatePIDFile(std::string const& filename)
 {
     FILE* pid_file = fopen(filename.c_str(), "w");
     if (pid_file == nullptr)
+    {
         return 0;
+    }
 
     uint32 pid = GetPID();
 
@@ -325,7 +367,9 @@ void utf8truncate(std::string& utf8str, size_t len)
     {
         size_t wlen = utf8::distance(utf8str.c_str(), utf8str.c_str() + utf8str.size());
         if (wlen <= len)
+        {
             return;
+        }
 
         std::wstring wstr;
         wstr.resize(wlen);
@@ -366,7 +410,9 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
             wsize = 0;
         }
         else
+        {
             wsize = 0;
+        }
 
         return false;
     }
@@ -447,7 +493,9 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
 {
     // supported only Cyrillic cases
     if (wname.empty() || !isCyrillicCharacter(wname[0]) || declension > 5)
+    {
         return wname;
+    }
 
     // Important: end length must be <= MAX_INTERNAL_PLAYER_NAME-MAX_PLAYER_NAME (3 currently)
     static std::wstring const a_End    = { wchar_t(0x0430), wchar_t(0x0000) };
@@ -484,10 +532,14 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
         std::wstring const& ending = **itr;
         std::size_t const endLen = ending.length();
         if (!(endLen <= thisLen))
+        {
             continue;
+        }
 
         if (wname.substr(thisLen - endLen, thisLen) == ending)
+        {
             return wname.substr(0, thisLen - endLen);
+        }
     }
 
     return wname;
@@ -498,7 +550,9 @@ bool utf8ToConsole(std::string_view utf8str, std::string& conStr)
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     std::wstring wstr;
     if (!Utf8toWStr(utf8str, wstr))
+    {
         return false;
+    }
 
     conStr.resize(wstr.size());
     CharToOemBuffW(&wstr[0], &conStr[0], wstr.size());
@@ -530,13 +584,17 @@ bool Utf8FitTo(std::string_view str, std::wstring_view search)
     std::wstring temp;
 
     if (!Utf8toWStr(str, temp))
+    {
         return false;
+    }
 
     // converting to lower case
     wstrToLower(temp);
 
     if (temp.find(search) == std::wstring::npos)
+    {
         return false;
+    }
 
     return true;
 }
@@ -558,7 +616,9 @@ void vutf8printf(FILE* out, const char* str, va_list* ap)
     size_t temp_len = vsnprintf(temp_buf, 32 * 1024, str, *ap);
     //vsnprintf returns -1 if the buffer is too small
     if (temp_len == size_t(-1))
+    {
         temp_len = 32 * 1024 - 1;
+    }
 
     size_t wtemp_len = 32 * 1024 - 1;
     Utf8toWStr(temp_buf, temp_len, wtemp_buf, wtemp_len);
@@ -574,7 +634,9 @@ bool Utf8ToUpperOnlyLatin(std::string& utf8String)
 {
     std::wstring wstr;
     if (!Utf8toWStr(utf8String, wstr))
+    {
         return false;
+    }
 
     std::transform(wstr.begin(), wstr.end(), wstr.begin(), wcharToUpperOnlyLatin);
 

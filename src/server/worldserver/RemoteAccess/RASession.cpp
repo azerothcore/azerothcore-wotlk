@@ -116,8 +116,8 @@ bool RASession::CheckAccessLevel(const std::string& user)
 
     auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS);
     stmt->setString(0, safeUser);
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
 
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (!result)
     {
         LOG_INFO("commands.ra", "User %s does not exist in database", user.c_str());

@@ -5,7 +5,7 @@
 #ifndef AZEROTHCORE_IWORLD_H
 #define AZEROTHCORE_IWORLD_H
 
-#include "Callback.h"
+#include "AsyncCallbackProcessor.h"
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
@@ -15,6 +15,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 class WorldPacket;
 class WorldSession;
@@ -107,6 +108,7 @@ enum WorldBoolConfigs
     CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS,
     CONFIG_ARENA_SEASON_IN_PROGRESS,
     CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE,
+    CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY,
     CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN,
     CONFIG_VMAP_INDOOR_CHECK,
     CONFIG_PET_LOS,
