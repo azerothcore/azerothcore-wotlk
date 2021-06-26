@@ -59,7 +59,9 @@ public:
     void outCommand(uint32 account, Format&& fmt, Args&&... args)
     {
         if (!ShouldLog("commands.gm", LOG_LEVEL_INFO))
+        {
             return;
+        }
 
         outCommand(Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...), std::to_string(account));
     }
@@ -99,7 +101,9 @@ public:
     void outErrorDb(Format&& fmt, Args&& ... args)
     {
         if (!ShouldLog("sql.sql", LOG_LEVEL_ERROR))
+        {
             return;
+        }
 
         outMessage("sql.sql", LOG_LEVEL_ERROR, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
@@ -120,7 +124,9 @@ public:
     void outSQLDev(Format&& fmt, Args&& ... args)
     {
         if (!ShouldLog("sql.dev", LOG_LEVEL_INFO))
+        {
             return;
+        }
 
         outMessage("sql.dev", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
@@ -129,7 +135,9 @@ public:
     void outSQLDriver(Format&& fmt, Args&& ... args)
     {
         if (!ShouldLog("sql.driver", LOG_LEVEL_INFO))
+        {
             return;
+        }
 
         outMessage("sql.driver", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
@@ -144,10 +152,14 @@ public:
     void outDebug(DebugLogFilters filter, Format&& fmt, Args&& ... args)
     {
         if (!(_debugLogMask & filter))
+        {
             return;
+        }
 
         if (!ShouldLog("server", LOG_LEVEL_DEBUG))
+        {
             return;
+        }
 
         outMessage("server", LOG_LEVEL_DEBUG, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
