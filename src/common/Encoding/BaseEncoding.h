@@ -29,7 +29,9 @@ namespace Acore::Impl
         {
             size *= 8; // bits in input
             if (size % PAD_TO) // pad to boundary
+            {
                 size += (PAD_TO - (size % PAD_TO));
+            }
             return (size / BITS_PER_CHAR);
         }
 
@@ -37,7 +39,9 @@ namespace Acore::Impl
         {
             size *= BITS_PER_CHAR; // bits in input
             if (size % PAD_TO) // pad to boundary
+            {
                 size += (PAD_TO - (size % PAD_TO));
+            }
             return (size / 8);
         }
 
@@ -45,7 +49,9 @@ namespace Acore::Impl
         {
             auto it = data.begin(), end = data.end();
             if (it == end)
+            {
                 return "";
+            }
 
             std::string s;
             s.reserve(EncodedSize(data.size()));
@@ -57,7 +63,7 @@ namespace Acore::Impl
                 if (bitsLeft >= BITS_PER_CHAR)
                 {
                     bitsLeft -= BITS_PER_CHAR;
-                    thisC = ((*it >> bitsLeft) & ((1 << BITS_PER_CHAR)-1));
+                    thisC = ((*it >> bitsLeft) & ((1 << BITS_PER_CHAR) - 1));
                     if (!bitsLeft)
                     {
                         ++it;
@@ -69,7 +75,9 @@ namespace Acore::Impl
                     thisC = (*it & ((1 << bitsLeft) - 1)) << (BITS_PER_CHAR - bitsLeft);
                     bitsLeft += (8 - BITS_PER_CHAR);
                     if ((++it) != end)
+                    {
                         thisC |= (*it >> bitsLeft);
+                    }
                 }
                 s.append(1, Encoding::Encode(thisC));
             } while (it != end);
@@ -77,9 +85,13 @@ namespace Acore::Impl
             while (bitsLeft != 8)
             {
                 if (bitsLeft > BITS_PER_CHAR)
+                {
                     bitsLeft -= BITS_PER_CHAR;
+                }
                 else
+                {
                     bitsLeft += (8 - BITS_PER_CHAR);
+                }
                 s.append(1, PADDING);
             }
 
@@ -90,7 +102,9 @@ namespace Acore::Impl
         {
             auto it = data.begin(), end = data.end();
             if (it == end)
+            {
                 return std::vector<uint8>();
+            }
 
             std::vector<uint8> v;
             v.reserve(DecodedSize(data.size()));
@@ -126,15 +140,21 @@ namespace Acore::Impl
             while ((it != end) && (*it == PADDING) && (bitsLeft != 8))
             {
                 if (bitsLeft > BITS_PER_CHAR)
+                {
                     bitsLeft -= BITS_PER_CHAR;
+                }
                 else
+                {
                     bitsLeft += (8 - BITS_PER_CHAR);
+                }
                 ++it;
             }
 
             // ok, all padding should be consumed, and we should be at end of string
             if (it == end)
+            {
                 return v;
+            }
 
             // anything else is an error
             return {};
