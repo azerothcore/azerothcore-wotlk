@@ -619,7 +619,7 @@ void Creature::Update(uint32 diff)
                 }
 
                 Unit* owner = GetCharmerOrOwner();
-                if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()))
+                if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange(), true, false))
                 {
                     RemoveCharmAuras();
                 }
@@ -1712,7 +1712,7 @@ bool Creature::CanStartAttack(Unit const* who) const
                 assist = true;
 
     if (!assist)
-        if (IsNeutralToAll() || !IsWithinDistInMap(who, GetAggroRange(who) + m_CombatDistance)) // pussywizard: +m_combatDistance for turrets and similar
+        if (IsNeutralToAll() || !IsWithinDistInMap(who, GetAggroRange(who) + m_CombatDistance, true, false)) // pussywizard: +m_combatDistance for turrets and similar
             return false;
 
     if (!CanCreatureAttack(who))
