@@ -280,7 +280,7 @@ void ThreatContainer::modifyThreatPercent(Unit* victim, int32 percent)
 void ThreatContainer::update()
 {
     if (iDirty && iThreatList.size() > 1)
-        iThreatList.sort(acore::ThreatOrderPred());
+        iThreatList.sort(Acore::ThreatOrderPred());
 
     iDirty = false;
 }
@@ -485,7 +485,7 @@ float ThreatManager::getThreatWithoutTemp(Unit* victim, bool alsoSearchOfflineLi
     if (!ref && alsoSearchOfflineList)
         ref = iThreatOfflineContainer.getReferenceByTarget(victim);
     if (ref)
-        threat = ref->getThreat() - ref->getTempThreatModifier();;
+        threat = ref->getThreat() - ref->getTempThreatModifier();
     return threat;
 }
 

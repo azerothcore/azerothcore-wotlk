@@ -429,8 +429,8 @@ struct BroadcastText
 
     uint32 Id{0};
     uint32 Language{0};
-    StringVector MaleText;
-    StringVector FemaleText;
+    std::vector<std::string> MaleText;
+    std::vector<std::string> FemaleText;
     uint32 EmoteId0{0};
     uint32 EmoteId1{0};
     uint32 EmoteId2{0};
@@ -483,7 +483,7 @@ typedef std::unordered_map<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap
 
 struct AcoreString
 {
-    StringVector Content;
+    std::vector<std::string> Content;
 };
 
 typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
@@ -645,7 +645,7 @@ enum SkillRangeType
     SKILL_RANGE_NONE,                                       // 0..0 always
 };
 
-SkillRangeType GetSkillRangeType(SkillLineEntry const* pSkill, bool racial);
+SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 
 #define MAX_PLAYER_NAME          12                         // max allowed by client name length
 #define MAX_INTERNAL_PLAYER_NAME 15                         // max server internal player name length (> MAX_PLAYER_NAME for support declined names)
@@ -906,13 +906,13 @@ public:
     void LoadQuests();
     void LoadQuestStartersAndEnders()
     {
-        LOG_INFO("server", "Loading GO Start Quest Data...");
+        LOG_INFO("server.loading", "Loading GO Start Quest Data...");
         LoadGameobjectQuestStarters();
-        LOG_INFO("server", "Loading GO End Quest Data...");
+        LOG_INFO("server.loading", "Loading GO End Quest Data...");
         LoadGameobjectQuestEnders();
-        LOG_INFO("server", "Loading Creature Start Quest Data...");
+        LOG_INFO("server.loading", "Loading Creature Start Quest Data...");
         LoadCreatureQuestStarters();
-        LOG_INFO("server", "Loading Creature End Quest Data...");
+        LOG_INFO("server.loading", "Loading Creature End Quest Data...");
         LoadCreatureQuestEnders();
     }
     void LoadGameobjectQuestStarters();
@@ -1255,6 +1255,7 @@ public:
     // reserved names
     void LoadReservedPlayersNames();
     [[nodiscard]] bool IsReservedName(std::string const& name) const;
+    void AddReservedPlayerName(std::string const& name);
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string const& name, bool create = false);
@@ -1326,8 +1327,8 @@ public:
         return _gossipMenuItemsStore.equal_range(uiMenuId);
     }
 
-    static void AddLocaleString(std::string&& s, LocaleConstant locale, StringVector& data);
-    static inline void GetLocaleString(const StringVector& data, int loc_idx, std::string& value)
+    static void AddLocaleString(std::string&& s, LocaleConstant locale, std::vector<std::string>& data);
+    static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
     {
         if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
             value = data[loc_idx];
@@ -1346,6 +1347,8 @@ public:
     void LoadFactionChangeReputations();
     void LoadFactionChangeSpells();
     void LoadFactionChangeTitles();
+
+    [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
 
 private:
     // first free id for selected id type
@@ -1451,7 +1454,7 @@ private:
     typedef std::map<uint32, int32> FishingBaseSkillContainer; // [areaId][base skill level]
     FishingBaseSkillContainer _fishingBaseForAreaStore;
 
-    typedef std::map<uint32, StringVector> HalfNameContainer;
+    typedef std::map<uint32, std::vector<std::string>> HalfNameContainer;
     HalfNameContainer _petHalfName0;
     HalfNameContainer _petHalfName1;
 

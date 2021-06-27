@@ -31,6 +31,11 @@ class ACE_Message_Block;
 class WorldPacket;
 class WorldSession;
 
+namespace WorldPackets
+{
+    class ServerPacket;
+}
+
 /// Handler that can communicate over stream sockets.
 typedef ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH> WorldHandler;
 
@@ -186,6 +191,8 @@ private:
     bool m_OutActive;
 
     std::array<uint8, 4> m_Seed;
+
+    std::string _ipCountry;
 };
 
 #endif  /* _WORLDSOCKET_H */
