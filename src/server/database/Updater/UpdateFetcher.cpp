@@ -63,7 +63,7 @@ void UpdateFetcher::FillFileListRecursively(Path const& path, LocaleFileStorage&
         }
         else if (itr->path().extension() == ".sql")
         {
-            LOG_TRACE("sql.updates", "Added locale file \"%s\".", itr->path().filename().generic_string().c_str());
+            LOG_TRACE("sql.updates", "Added locale file \"%s\" state '%s'.", itr->path().filename().generic_string().c_str(), AppliedFileEntry::StateConvert(state).c_str());
 
             LocaleFileEntry const entry = { itr->path(), state };
 
@@ -95,6 +95,7 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
         Field* fields = result->Fetch();
 
         std::string path = fields[0].GetString();
+        std::string state = fields[1].GetString();
         if (path.substr(0, 1) == "$")
             path = _sourceDirectory->generic_string() + path.substr(1);
 
@@ -106,28 +107,29 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
             continue;
         }
 
-        DirectoryEntry const entry = { p, AppliedFileEntry::StateConvert(fields[1].GetString()) };
+        DirectoryEntry const entry = { p, AppliedFileEntry::StateConvert(state) };
         directories.push_back(entry);
 
-        LOG_TRACE("sql.updates", "Added applied file \"%s\" from remote.", p.filename().generic_string().c_str());
+        LOG_TRACE("sql.updates", "Added applied file \"%s\" '%s' state from remote.", p.filename().generic_string().c_str(), state.c_str());
 
     } while (result->NextRow());
 
     std::vector<std::string> moduleList;
 
-    auto const& _modulesTokens = Warhead::Tokenize(WH_MODULES_LIST, ',', true);
+    auto const& _modulesTokens = Acore::Tokenize(AC_MODULES_LIST, ',', true);
     for (auto const& itr : _modulesTokens)
-        moduleList.push_back(std::string(itr));
+        moduleList.emplace_back(itr);
 
+    // data/sql
     for (auto const& itr : moduleList)
     {
-        std::string path = _sourceDirectory->generic_string() + "/modules/" + itr + "/sql/" + _dbModuleName; // module/mod-name/sql/db_world
+        std::string path = _sourceDirectory->generic_string() + "/modules/" + itr + "/data/sql/" + _dbModuleName; // modules/mod-name/data/sql/db-world
 
         Path const p(path);
         if (!is_directory(p))
             continue;
 
-        DirectoryEntry const entry = { p, AppliedFileEntry::StateConvert("RELEASED") };
+        DirectoryEntry const entry = { p, AppliedFileEntry::StateConvert("CUSTOM") };
         directories.push_back(entry);
 
         LOG_TRACE("sql.updates", "Added applied modules file \"%s\" from remote.", p.filename().generic_string().c_str());
@@ -148,11 +150,12 @@ UpdateFetcher::AppliedFileStorage UpdateFetcher::ReceiveAppliedFiles() const
     {
         Field* fields = result->Fetch();
 
-        AppliedFileEntry const entry = { fields[0].GetString(), fields[1].GetString(),
-                                         AppliedFileEntry::StateConvert(fields[2].GetString()), fields[3].GetUInt64()
-                                       };
+        AppliedFileEntry const entry =
+        {
+            fields[0].GetString(), fields[1].GetString(), AppliedFileEntry::StateConvert(fields[2].GetString()), fields[3].GetUInt64()
+        };
 
-        map.insert(std::make_pair(entry.name, entry));
+        map.emplace(entry.name, entry);
     } while (result->NextRow());
 
     return map;
@@ -207,11 +210,14 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
 
     size_t importedUpdates = 0;
 
-    for (auto const& availableQuery : available)
+    auto ApplyUpdateFile = [&](LocaleFileEntry const& sqlFile)
     {
-        LOG_DEBUG("sql.updates", "Checking update \"%s\"...", availableQuery.first.filename().generic_string().c_str());
+        auto filePath = sqlFile.first;
+        auto fileState = sqlFile.second;
 
-        AppliedFileStorage::const_iterator iter = applied.find(availableQuery.first.filename().string());
+        LOG_DEBUG("sql.updates", "Checking update \"%s\"...", filePath.filename().generic_string().c_str());
+
+        AppliedFileStorage::const_iterator iter = applied.find(filePath.filename().string());
         if (iter != applied.end())
         {
             // If redundancy is disabled, skip it, because the update is already applied.
@@ -219,19 +225,19 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
             {
                 LOG_DEBUG("sql.updates", ">> Update is already applied, skipping redundancy checks.");
                 applied.erase(iter);
-                continue;
+                return;
             }
 
             // If the update is in an archived directory and is marked as archived in our database, skip redundancy checks (archived updates never change).
-            if (!archivedRedundancy && (iter->second.state == ARCHIVED) && (availableQuery.second == ARCHIVED))
+            if (!archivedRedundancy && (iter->second.state == ARCHIVED) && (sqlFile.second == ARCHIVED))
             {
                 LOG_DEBUG("sql.updates", ">> Update is archived and marked as archived in database, skipping redundancy checks.");
                 applied.erase(iter);
-                continue;
+                return;
             }
         }
 
-        std::string const hash = ByteArrayToHexStr(Warhead::Crypto::SHA1::GetDigestOf(ReadSQLUpdate(availableQuery.first)));
+        std::string const hash = ByteArrayToHexStr(Acore::Crypto::SHA1::GetDigestOf(ReadSQLUpdate(filePath)));
 
         UpdateMode mode = MODE_APPLY;
 
@@ -244,6 +250,7 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
             {
                 // Check if the original file was removed. If not, we've got a problem.
                 LocaleFileStorage::const_iterator localeIter;
+
                 // Push localeIter forward
                 for (localeIter = available.begin(); (localeIter != available.end()) &&
                         (localeIter->first.filename().string() != hashIter->second); ++localeIter);
@@ -253,25 +260,24 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
                 {
                     LOG_WARN("sql.updates", ">> It seems like the update \"%s\" \'%s\' was renamed, but the old file is still there! " \
                              "Treating it as a new file! (It is probably an unmodified copy of the file \"%s\")",
-                             availableQuery.first.filename().string().c_str(), hash.substr(0, 7).c_str(),
+                             filePath.filename().string().c_str(), hash.substr(0, 7).c_str(),
                              localeIter->first.filename().string().c_str());
                 }
-                // It is safe to treat the file as renamed here
-                else
+                else // It is safe to treat the file as renamed here
                 {
                     LOG_INFO("sql.updates", ">> Renaming update \"%s\" to \"%s\" \'%s\'.",
-                             hashIter->second.c_str(), availableQuery.first.filename().string().c_str(), hash.substr(0, 7).c_str());
+                             hashIter->second.c_str(), filePath.filename().string().c_str(), hash.substr(0, 7).c_str());
 
-                    RenameEntry(hashIter->second, availableQuery.first.filename().string());
+                    RenameEntry(hashIter->second, filePath.filename().string());
                     applied.erase(hashIter->second);
-                    continue;
+                    return;
                 }
             }
             // Apply the update if it was never seen before.
             else
             {
                 LOG_INFO("sql.updates", ">> Applying update \"%s\" \'%s\'...",
-                         availableQuery.first.filename().string().c_str(), hash.substr(0, 7).c_str());
+                    filePath.filename().string().c_str(), hash.substr(0, 7).c_str());
             }
         }
         // Rehash the update entry if it exists in our database with an empty hash.
@@ -279,42 +285,42 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
         {
             mode = MODE_REHASH;
 
-            LOG_INFO("sql.updates", ">> Re-hashing update \"%s\" \'%s\'...", availableQuery.first.filename().string().c_str(),
-                     hash.substr(0, 7).c_str());
+            LOG_INFO("sql.updates", ">> Re-hashing update \"%s\" \'%s\'...", filePath.filename().string().c_str(),
+                hash.substr(0, 7).c_str());
         }
         else
         {
             // If the hash of the files differs from the one stored in our database, reapply the update (because it changed).
             if (iter->second.hash != hash)
             {
-                LOG_INFO("sql.updates", ">> Reapplying update \"%s\" \'%s\' -> \'%s\' (it changed)...", availableQuery.first.filename().string().c_str(),
-                         iter->second.hash.substr(0, 7).c_str(), hash.substr(0, 7).c_str());
+                LOG_INFO("sql.updates", ">> Reapplying update \"%s\" \'%s\' -> \'%s\' (it changed)...", filePath.filename().string().c_str(),
+                    iter->second.hash.substr(0, 7).c_str(), hash.substr(0, 7).c_str());
             }
             else
             {
                 // If the file wasn't changed and just moved, update its state (if necessary).
-                if (iter->second.state != availableQuery.second)
+                if (iter->second.state != fileState)
                 {
                     LOG_DEBUG("sql.updates", ">> Updating the state of \"%s\" to \'%s\'...",
-                              availableQuery.first.filename().string().c_str(), AppliedFileEntry::StateConvert(availableQuery.second).c_str());
+                              filePath.filename().string().c_str(), AppliedFileEntry::StateConvert(fileState).c_str());
 
-                    UpdateState(availableQuery.first.filename().string(), availableQuery.second);
+                    UpdateState(filePath.filename().string(), fileState);
                 }
 
                 LOG_DEBUG("sql.updates", ">> Update is already applied and matches the hash \'%s\'.", hash.substr(0, 7).c_str());
 
                 applied.erase(iter);
-                continue;
+                return;
             }
         }
 
         uint32 speed = 0;
-        AppliedFileEntry const file = { availableQuery.first.filename().string(), hash, availableQuery.second, 0 };
+        AppliedFileEntry const file = { filePath.filename().string(), hash, fileState, 0 };
 
         switch (mode)
         {
             case MODE_APPLY:
-                speed = Apply(availableQuery.first);
+                speed = Apply(filePath);
             /* fallthrough */
             case MODE_REHASH:
                 UpdateEntry(file, speed);
@@ -326,6 +332,20 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
 
         if (mode == MODE_APPLY)
             ++importedUpdates;
+    };
+
+    // Apply default updates
+    for (auto const& availableQuery : available)
+    {
+        if (availableQuery.second != CUSTOM)
+            ApplyUpdateFile(availableQuery);
+    }
+
+    // Apply only custom updates
+    for (auto const& availableQuery : available)
+    {
+        if (availableQuery.second == CUSTOM)
+            ApplyUpdateFile(availableQuery);
     }
 
     // Cleanup up orphaned entries (if enabled)
