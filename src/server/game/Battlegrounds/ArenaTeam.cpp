@@ -56,7 +56,7 @@ bool ArenaTeam::Create(ObjectGuid captainGuid, uint8 type, std::string const& te
     BorderColor = borderColor;
 
     // Save arena team to db
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM);
     stmt->setUInt32(0, TeamId);
     stmt->setString(1, TeamName);
     stmt->setUInt32(2, captainGuid.GetCounter());
@@ -106,7 +106,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     // Check if player is already in a similar arena team
     if ((player && player->GetArenaTeamId(GetSlot())) || Player::GetArenaTeamIdFromStorage(playerGuid.GetCounter(), GetSlot()) != 0)
     {
-        LOG_ERROR("server", "Arena: Player %s (%s) already has an arena team of type %u", playerName.c_str(), playerGuid.ToString().c_str(), GetType());
+        LOG_ERROR("bg.arena", "Arena: Player %s (%s) already has an arena team of type %u", playerName.c_str(), playerGuid.ToString().c_str(), GetType());
         return false;
     }
 
@@ -120,7 +120,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
 
     // xinef: zomg! sync query
     // Try to get player's match maker rating from db and fall back to config setting if not found
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MATCH_MAKER_RATING);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MATCH_MAKER_RATING);
     stmt->setUInt32(0, playerGuid.GetCounter());
     stmt->setUInt8(1, GetSlot());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
@@ -258,9 +258,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
     if (Empty() || !captainPresentInTeam)
     {
         // Arena team is empty or captain is not in team, delete from db
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("bg.battleground", "ArenaTeam %u does not have any members or its captain is not in team, disbanding it...", TeamId);
-#endif
         return false;
     }
 
@@ -273,7 +271,7 @@ bool ArenaTeam::SetName(std::string const& name)
         return false;
 
     TeamName = name;
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_NAME);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_NAME);
     stmt->setString(0, TeamName);
     stmt->setUInt32(1, GetId());
     CharacterDatabase.Execute(stmt);
@@ -291,7 +289,7 @@ void ArenaTeam::SetCaptain(ObjectGuid guid)
     CaptainGuid = guid;
 
     // Update database
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_CAPTAIN);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_CAPTAIN);
     stmt->setUInt32(0, guid.GetCounter());
     stmt->setUInt32(1, GetId());
     CharacterDatabase.Execute(stmt);
@@ -361,7 +359,7 @@ void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
     // Only used for single member deletion, for arena team disband we use a single query for more efficiency
     if (cleanDb)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ARENA_TEAM_MEMBER);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ARENA_TEAM_MEMBER);
         stmt->setUInt32(0, GetId());
         stmt->setUInt32(1, guid.GetCounter());
         CharacterDatabase.Execute(stmt);
@@ -381,9 +379,9 @@ void ArenaTeam::Disband(WorldSession* session)
     }
 
     // Update database
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ARENA_TEAM);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ARENA_TEAM);
     stmt->setUInt32(0, TeamId);
     trans->Append(stmt);
 
@@ -404,9 +402,9 @@ void ArenaTeam::Disband()
         DelMember(Members.front().Guid, false);
 
     // Update database
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ARENA_TEAM);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ARENA_TEAM);
     stmt->setUInt32(0, TeamId);
     trans->Append(stmt);
 
@@ -458,9 +456,7 @@ void ArenaTeam::Roster(WorldSession* session)
     }
 
     session->SendPacket(&data);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_ROSTER");
-#endif
 }
 
 void ArenaTeam::Query(WorldSession* session)
@@ -475,9 +471,7 @@ void ArenaTeam::Query(WorldSession* session)
     data << uint32(BorderStyle);                            // border style
     data << uint32(BorderColor);                            // border color
     session->SendPacket(&data);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_QUERY_RESPONSE");
-#endif
 }
 
 void ArenaTeam::SendStats(WorldSession* session)
@@ -578,7 +572,7 @@ void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 str
             data << str1 << str2 << str3;
             break;
         default:
-            LOG_ERROR("server", "Unhandled strCount %u in ArenaTeam::BroadcastEvent", strCount);
+            LOG_ERROR("bg.arena", "Unhandled strCount %u in ArenaTeam::BroadcastEvent", strCount);
             return;
     }
 
@@ -587,9 +581,7 @@ void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 str
 
     BroadcastPacket(&data);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_EVENT");
-#endif
 }
 
 void ArenaTeam::MassInviteToEvent(WorldSession* session)
@@ -630,7 +622,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
         return slot;
     }
 
-    LOG_ERROR("server", "FATAL: Unknown arena team type %u for some arena team", type);
+    LOG_ERROR("bg.arena", "FATAL: Unknown arena team type %u for some arena team", type);
     return 0xFF;
 }
 
@@ -929,9 +921,9 @@ void ArenaTeam::SaveToDB()
     // Save team and member stats to db
     // Called after a match has ended or when calculating arena_points
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_STATS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_STATS);
     stmt->setUInt16(0, Stats.Rating);
     stmt->setUInt16(1, Stats.WeekGames);
     stmt->setUInt16(2, Stats.WeekWins);
