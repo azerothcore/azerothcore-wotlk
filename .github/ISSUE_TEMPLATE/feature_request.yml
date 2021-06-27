@@ -11,7 +11,7 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: Describe your feature request in detail
+      label: Describe your feature request or suggestion in detail
       description: |
         A clear and concise description of what you want to happen.
     validations:
@@ -19,7 +19,7 @@ body:
   - type: textarea
     id: solution
     attributes:
-      label: Describe a possible solution to your Feature or Suggestion in detail
+      label: Describe a possible solution to your feature or suggestion in detail
       description: |
         A clear and concise description of any alternative solutions or features you've considered.
     validations:
