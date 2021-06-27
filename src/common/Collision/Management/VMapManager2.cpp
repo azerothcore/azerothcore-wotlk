@@ -200,7 +200,7 @@ namespace VMAP
     get the hit position and return true if we hit something
     otherwise the result pos will be the dest pos
     */
-    bool VMapManager2::getObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist)
+    bool VMapManager2::GetObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist)
     {
 #if defined(ENABLE_VMAP_CHECKS)
         if (isLineOfSightCalcEnabled() && !IsVMAPDisabledForPtr(mapId, VMAP_DISABLE_LOS))
@@ -212,7 +212,7 @@ namespace VMAP
                 Vector3 pos1 = convertPositionToInternalRep(x1, y1, z1);
                 Vector3 pos2 = convertPositionToInternalRep(x2, y2, z2);
                 Vector3 resultPos;
-                bool result = instanceTree->second->getObjectHitPos(pos1, pos2, resultPos, modifyDist);
+                bool result = instanceTree->second->GetObjectHitPos(pos1, pos2, resultPos, modifyDist);
                 resultPos = convertPositionToInternalRep(resultPos.x, resultPos.y, resultPos.z);
                 rx = resultPos.x;
                 ry = resultPos.y;
@@ -255,7 +255,7 @@ namespace VMAP
         return VMAP_INVALID_HEIGHT_VALUE;
     }
 
-    bool VMapManager2::getAreaInfo(unsigned int mapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
+    bool VMapManager2::GetAreaInfo(unsigned int mapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
     {
 #if defined(ENABLE_VMAP_CHECKS)
         if (!IsVMAPDisabledForPtr(mapId, VMAP_DISABLE_AREAFLAG))
@@ -265,7 +265,7 @@ namespace VMAP
             if (instanceTree != iInstanceMapTrees.end())
             {
                 Vector3 pos = convertPositionToInternalRep(x, y, z);
-                bool result = instanceTree->second->getAreaInfo(pos, flags, adtId, rootId, groupId);
+                bool result = instanceTree->second->GetAreaInfo(pos, flags, adtId, rootId, groupId);
                 // z is not touched by convertPositionToInternalRep(), so just copy
                 z = pos.z;
                 return result;
@@ -353,7 +353,7 @@ namespace VMAP
         return StaticMapTree::CanLoadMap(std::string(basePath), mapId, x, y);
     }
 
-    void VMapManager2::getInstanceMapTree(InstanceTreeMap& instanceMapTree)
+    void VMapManager2::GetInstanceMapTree(InstanceTreeMap& instanceMapTree)
     {
         instanceMapTree = iInstanceMapTrees;
     }
