@@ -565,7 +565,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                 {
                     LOG_INFO("entities.player.character", "Account: %u (IP: %s) Create Character: %s %s", GetAccountId(), GetRemoteAddress().c_str(), newChar->GetName().c_str(), newChar->GetGUID().ToString().c_str());
                     sScriptMgr->OnPlayerCreate(newChar.get());
-                    sWorld->AddGlobalPlayerData(newChar->GetGUID().GetCounter(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->GetRace(), newChar->GetClass(), newChar->getLevel(), 0, 0);
+                    sWorld->AddGlobalPlayerData(newChar->GetGUID().GetCounter(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->GetRace(), newChar->GetClass(), newChar->GetLevel(), 0, 0);
 
                     SendCharCreate(CHAR_CREATE_SUCCESS);
                 }
