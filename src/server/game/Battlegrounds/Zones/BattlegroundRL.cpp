@@ -67,7 +67,7 @@ void BattlegroundRL::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        LOG_ERROR("server", "Killer player not found");
+        LOG_ERROR("bg.battleground", "Killer player not found");
         return;
     }
 
