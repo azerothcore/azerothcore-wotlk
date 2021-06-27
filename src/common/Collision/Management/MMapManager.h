@@ -40,10 +40,14 @@ namespace MMAP
         ~MMapData()
         {
             for (NavMeshQuerySet::iterator i = navMeshQueries.begin(); i != navMeshQueries.end(); ++i)
+            {
                 dtFreeNavMeshQuery(i->second);
+            }
 
             if (navMesh)
+            {
                 dtFreeNavMesh(navMesh);
+            }
         }
 
         // we have to use single dtNavMeshQuery for every instance, since those are not thread safe

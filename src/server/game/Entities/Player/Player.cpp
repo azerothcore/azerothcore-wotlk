@@ -24146,7 +24146,7 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
         // need learn
         else if (!IsInWorld())
         {
-            addSpell(pAbility->Spell, true, true, true, false);
+            addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true, false);
         }
         else
         {
