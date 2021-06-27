@@ -22,7 +22,9 @@ public:
                 return;
             }
             else if (_nodes[i] == n)
+            {
                 return;
+            }
     }
     Node* _nodes[9];
 };
@@ -64,7 +66,9 @@ public:
     {
         for (int x = 0; x < CELL_NUMBER; ++x)
             for (int y = 0; y < CELL_NUMBER; ++y)
+            {
                 delete nodes[x][y];
+            }
     }
 
     void insert(const T& value)
@@ -85,7 +89,9 @@ public:
         {
             Cell c = Cell::ComputeCell(pos[i].x, pos[i].y);
             if (!c.isValid())
+            {
                 continue;
+            }
             Node& node = getGridFor(pos[i].x, pos[i].y);
             na.AddNode(&node);
         }
@@ -93,9 +99,13 @@ public:
         for (uint8 i = 0; i < 9; ++i)
         {
             if (na._nodes[i])
+            {
                 na._nodes[i]->insert(value);
+            }
             else
+            {
                 break;
+            }
         }
 
         memberTable.set(&value, na);
@@ -107,9 +117,13 @@ public:
         for (uint8 i = 0; i < 9; ++i)
         {
             if (na._nodes[i])
+            {
                 na._nodes[i]->remove(value);
+            }
             else
+            {
                 break;
+            }
         }
 
         // Remove the member
@@ -121,7 +135,9 @@ public:
         for (int x = 0; x < CELL_NUMBER; ++x)
             for (int y = 0; y < CELL_NUMBER; ++y)
                 if (Node* n = nodes[x][y])
+                {
                     n->balance();
+                }
     }
 
     bool contains(const T& value) const { return memberTable.containsKey(&value); }
@@ -151,7 +167,9 @@ public:
     {
         ASSERT(x < CELL_NUMBER && y < CELL_NUMBER);
         if (!nodes[x][y])
+        {
             nodes[x][y] = NodeCreatorFunc::makeNode(x, y);
+        }
         return *nodes[x][y];
     }
 
@@ -166,14 +184,18 @@ public:
     {
         Cell cell = Cell::ComputeCell(ray.origin().x, ray.origin().y);
         if (!cell.isValid())
+        {
             return;
+        }
 
         Cell last_cell = Cell::ComputeCell(end.x, end.y);
 
         if (cell == last_cell)
         {
             if (Node* node = nodes[cell.x][cell.y])
+            {
                 node->intersectRay(ray, intersectCallback, max_dist, stopAtFirstHit);
+            }
             return;
         }
 
@@ -222,7 +244,9 @@ public:
                 node->intersectRay(ray, intersectCallback, max_dist, stopAtFirstHit);
             }
             if (cell == last_cell)
+            {
                 break;
+            }
             if (tMaxX < tMaxY)
             {
                 tMaxX += tDeltaX;
@@ -242,9 +266,13 @@ public:
     {
         Cell cell = Cell::ComputeCell(point.x, point.y);
         if (!cell.isValid())
+        {
             return;
+        }
         if (Node* node = nodes[cell.x][cell.y])
+        {
             node->intersectPoint(point, intersectCallback);
+        }
     }
 
     // Optimized verson of intersectRay function for rays with vertical directions
@@ -253,9 +281,13 @@ public:
     {
         Cell cell = Cell::ComputeCell(ray.origin().x, ray.origin().y);
         if (!cell.isValid())
+        {
             return;
+        }
         if (Node* node = nodes[cell.x][cell.y])
+        {
             node->intersectRay(ray, intersectCallback, max_dist, false);
+        }
     }
 };
 
