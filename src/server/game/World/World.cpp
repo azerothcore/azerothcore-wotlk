@@ -77,6 +77,8 @@
 #include "WhoListCache.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <boost/asio/ip/address.hpp>
+#include <cmath>
 
 #ifdef ELUNA
 #include "LuaEngine.h"
