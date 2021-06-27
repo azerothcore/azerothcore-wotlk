@@ -2820,12 +2820,12 @@ bool ScriptMgr::OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Play
     return ret;
 }
 
-bool ScriptMgr::CanSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo)
+bool ScriptMgr::OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo)
 {
     bool ret = true;
 
     FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->CanSendExitMessageArenaQueue(queue, ginfo))
+        if (!itr->second->OnBeforeSendExitMessageArenaQueue(queue, ginfo))
             ret = false; // we change ret value only when scripts return false
 
     return ret;

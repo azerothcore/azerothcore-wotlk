@@ -1820,7 +1820,7 @@ public: /* BGScript */
     void OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers);
     bool CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
     bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
-    bool CanSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
+    bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);

@@ -1080,7 +1080,7 @@ void BattlegroundQueue::SendExitMessageArenaQueue(GroupQueueInfo* ginfo)
     if (!sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE))
         return;
 
-    if (!sScriptMgr->CanSendExitMessageArenaQueue(this, ginfo))
+    if (!sScriptMgr->OnBeforeSendExitMessageArenaQueue(this, ginfo))
         return;
 
     ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(ginfo->ArenaTeamId);
