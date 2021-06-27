@@ -15,7 +15,9 @@ static RandomEngine engine;
 static SFMTRand* GetRng()
 {
     if (!sfmtRand)
+    {
         sfmtRand = std::make_unique<SFMTRand>();
+    }
 
     return sfmtRand.get();
 }
@@ -51,7 +53,7 @@ Milliseconds randtime(Milliseconds min, Milliseconds max)
 {
     long long diff = max.count() - min.count();
     ASSERT(diff >= 0);
-    ASSERT(diff <= (uint32)-1);
+    ASSERT(diff <= (uint32) - 1);
     return min + Milliseconds(urand(0, diff));
 }
 

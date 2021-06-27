@@ -18,36 +18,50 @@ AppenderFile::AppenderFile(uint8 id, std::string const& name, LogLevel level, Ap
     _fileSize(0)
 {
     if (args.size() < 4)
+    {
         throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Missing file name for appender %s", name.c_str()));
+    }
 
     _fileName.assign(args[3]);
 
     std::string mode = "a";
     if (4 < args.size())
+    {
         mode.assign(args[4]);
+    }
 
     if (flags & APPENDER_FLAGS_USE_TIMESTAMP)
     {
         size_t dot_pos = _fileName.find_last_of('.');
         if (dot_pos != std::string::npos)
+        {
             _fileName.insert(dot_pos, sLog->GetLogsTimestamp());
+        }
         else
+        {
             _fileName += sLog->GetLogsTimestamp();
+        }
     }
 
     if (5 < args.size())
     {
         if (Optional<uint32> size = Acore::StringTo<uint32>(args[5]))
+        {
             _maxFileSize = *size;
+        }
         else
+        {
             throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Invalid size '%s' for appender %s", std::string(args[5]).c_str(), name.c_str()));
+        }
     }
 
     _dynamicName = std::string::npos != _fileName.find("%s");
     _backup = (flags & APPENDER_FLAGS_MAKE_FILE_BACKUP) != 0;
 
     if (!_dynamicName)
+    {
         logfile = OpenFile(_fileName, mode, (mode == "w") && _backup);
+    }
 }
 
 AppenderFile::~AppenderFile()
@@ -67,7 +81,9 @@ void AppenderFile::_write(LogMessage const* message)
         // always use "a" with dynamic name otherwise it could delete the log we wrote in last _write() call
         FILE* file = OpenFile(namebuf, "a", _backup || exceedMaxSize);
         if (!file)
+        {
             return;
+        }
 
         fprintf(file, "%s%s\n", message->prefix.c_str(), message->text.c_str());
         fflush(file);
@@ -77,10 +93,14 @@ void AppenderFile::_write(LogMessage const* message)
         return;
     }
     else if (exceedMaxSize)
+    {
         logfile = OpenFile(_fileName, "w", true);
+    }
 
     if (!logfile)
+    {
         return;
+    }
 
     fprintf(logfile, "%s%s\n", message->prefix.c_str(), message->text.c_str());
     fflush(logfile);

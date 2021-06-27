@@ -90,7 +90,7 @@ namespace AddonMgr
     {
         std::string name = addon.Name;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ADDON);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ADDON);
 
         stmt->setString(0, name);
         stmt->setUInt32(1, addon.CRC);
