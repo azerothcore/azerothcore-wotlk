@@ -137,9 +137,9 @@ WrongPass.Logging = 0
 
 #
 #    SourceDirectory
-#        Description: The path to your WarheadCore source directory.
+#        Description: The path to your AzerothCore source directory.
 #                     If the path is left empty, the built-in CMAKE_SOURCE_DIR is used.
-#        Example:     "../WarheadCore"
+#        Example:     "../AzerothCore"
 #        Default:     ""
 #
 
