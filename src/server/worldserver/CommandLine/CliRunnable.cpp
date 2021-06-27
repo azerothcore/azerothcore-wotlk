@@ -112,7 +112,7 @@ void CliRunnable::run()
     ::rl_event_hook = &Acore::Impl::Readline::cli_hook_func;
 #endif
 
-    if (sConfigMgr->GetBoolDefault("BeepAtStart", true))
+    if (sConfigMgr->GetOption<bool>("BeepAtStart", true))
         printf("\a"); // \a = Alert
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
@@ -122,7 +122,7 @@ void CliRunnable::run()
 
         std::string command;
 
-#if WARHEAD_PLATFORM == WARHEAD_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
         wchar_t commandbuf[256];
         if (fgetws(commandbuf, sizeof(commandbuf), stdin))
         {
