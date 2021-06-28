@@ -126,11 +126,15 @@ std::unordered_map<uint8, AuthHandler> const Handlers = AuthSession::InitHandler
 
 void AccountInfo::LoadResult(Field* fields)
 {
-    //          0           1         2               3          4                5                                                             6
-    //SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate,
-    //                               7                 8
-    //       ab.unbandate = ab.bandate, aa.gmlevel (, more query-specific fields)
-    //FROM account a LEFT JOIN account_access aa ON a.id = aa.id LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 WHERE a.username = ?
+    //          0        1          2           3             4             5
+    // SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins,
+    //                                 6                                        7
+    // ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate,
+    //                                 8                                             9
+    // ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate,
+    //      10
+    // aa.gmlevel (, more query-specific fields)
+    // FROM account a LEFT JOIN account_access aa ON a.id = aa.id LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 LEFT JOIN ip_banned ipb ON ipb.ip = ? WHERE a.username = ?
 
     Id = fields[0].GetUInt32();
     Login = fields[1].GetString();
@@ -138,9 +142,9 @@ void AccountInfo::LoadResult(Field* fields)
     LockCountry = fields[3].GetString();
     LastIP = fields[4].GetString();
     FailedLogins = fields[5].GetUInt32();
-    IsBanned = fields[6].GetUInt64() != 0;
-    IsPermanenetlyBanned = fields[7].GetUInt64() != 0;
-    SecurityLevel = AccountTypes(fields[8].GetUInt8());
+    IsBanned = fields[6].GetBool() || fields[8].GetBool();
+    IsPermanentlyBanned = fields[7].GetBool() || fields[9].GetBool();
+    SecurityLevel = static_cast<AccountTypes>(fields[10].GetUInt8()) > SEC_CONSOLE ? SEC_CONSOLE : static_cast<AccountTypes>(fields[10].GetUInt8());
 
     // Use our own uppercasing of the account name instead of using UPPER() in mysql query
     // This is how the account was created in the first place and changing it now would result in breaking
@@ -292,7 +296,8 @@ bool AuthSession::HandleLogonChallenge()
 
     // Get the account details from the account table
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
-    stmt->setString(0, login);
+    stmt->setString(0, GetRemoteIpAddress().to_string());
+    stmt->setString(1, login);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::LogonChallengeCallback, this, std::placeholders::_1)));
     return true;
@@ -352,7 +357,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     // If the account is banned, reject the logon attempt
     if (_accountInfo.IsBanned)
     {
-        if (_accountInfo.IsPermanenetlyBanned)
+        if (_accountInfo.IsPermanentlyBanned)
         {
             pkt << uint8(WOW_FAIL_BANNED);
             SendPacket(pkt);
@@ -369,11 +374,13 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     }
 
     uint8 securityFlags = 0;
+
     // Check if a TOTP token is needed
-    if (!fields[9].IsNull())
+    if (!fields[11].IsNull())
     {
         securityFlags = 4;
-        _totpSecret = fields[9].GetBinary();
+        _totpSecret = fields[11].GetBinary();
+
         if (auto const& secret = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY))
         {
             bool success = Acore::Crypto::AEDecrypt<Acore::Crypto::AES>(*_totpSecret, *secret);
@@ -389,9 +396,8 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
 
     _srp6.emplace(
         _accountInfo.Login,
-        fields[10].GetBinary<Acore::Crypto::SRP6::SALT_LENGTH>(),
-        fields[11].GetBinary<Acore::Crypto::SRP6::VERIFIER_LENGTH>()
-    );
+        fields[12].GetBinary<Acore::Crypto::SRP6::SALT_LENGTH>(),
+        fields[13].GetBinary<Acore::Crypto::SRP6::VERIFIER_LENGTH>());
 
     // Fill the response packet with the result
     if (AuthHelper::IsAcceptedClientBuild(_build))
@@ -454,7 +460,7 @@ bool AuthSession::HandleLogonProof()
     }
 
     // Check if SRP6 results match (password is correct), else send an error
-    if (std::optional<SessionKey> K = _srp6->VerifyChallengeResponse(logonProof->A, logonProof->clientM))
+    if (Optional<SessionKey> K = _srp6->VerifyChallengeResponse(logonProof->A, logonProof->clientM))
     {
         _sessionKey = *K;
         // Check auth token
@@ -628,7 +634,8 @@ bool AuthSession::HandleReconnectChallenge()
 
     // Get the account details from the account table
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_RECONNECTCHALLENGE);
-    stmt->setString(0, login);
+    stmt->setString(0, GetRemoteIpAddress().to_string());
+    stmt->setString(1, login);
 
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::ReconnectChallengeCallback, this, std::placeholders::_1)));
     return true;
@@ -649,7 +656,7 @@ void AuthSession::ReconnectChallengeCallback(PreparedQueryResult result)
     Field* fields = result->Fetch();
 
     _accountInfo.LoadResult(fields);
-    _sessionKey = fields[9].GetBinary<SESSION_KEY_LENGTH>();
+    _sessionKey = fields[11].GetBinary<SESSION_KEY_LENGTH>();
     Acore::Crypto::GetRandomBytes(_reconnectProof);
     _status = STATUS_RECONNECT_PROOF;
 
