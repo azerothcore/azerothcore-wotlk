@@ -13,7 +13,7 @@
 #include "Log.h"
 #include "Util.h"
 
-#if ACORE_PLATFORM != ACORE_PLATFORM_WINDOWS
+#if AC_PLATFORM != AC_PLATFORM_WINDOWS
 #include "Chat.h"
 #include "ChatCommand.h"
 #include <cstring>
@@ -28,7 +28,7 @@ static inline void PrintCliPrefix()
     printf("%s", CLI_PREFIX);
 }
 
-#if ACORE_PLATFORM != ACORE_PLATFORM_WINDOWS
+#if AC_PLATFORM != AC_PLATFORM_WINDOWS
 namespace Acore::Impl::Readline
 {
     static std::vector<std::string> vec;
@@ -61,7 +61,7 @@ namespace Acore::Impl::Readline
 
 void utf8print(void* /*arg*/, std::string_view str)
 {
-#if ACORE_PLATFORM == ACORE_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     std::wstring wbuf;
     if (!Utf8toWStr(str, wbuf))
         return;
@@ -99,7 +99,7 @@ int kb_hit_return()
 /// %Thread start
 void CliRunnable::run()
 {
-#if ACORE_PLATFORM == ACORE_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     // print this here the first time
     // later it will be printed after command queue updates
     PrintCliPrefix();
@@ -149,7 +149,7 @@ void CliRunnable::run()
             {
                 if (nextLineIndex == 0)
                 {
-#if ACORE_PLATFORM == ACORE_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
                     PrintCliPrefix();
 #endif
                     continue;
@@ -160,7 +160,7 @@ void CliRunnable::run()
 
             fflush(stdout);
             sWorld->QueueCliCommand(new CliCommandHolder(nullptr, command.c_str(), &utf8print, &commandFinished));
-#if ACORE_PLATFORM != ACORE_PLATFORM_WINDOWS
+#if AC_PLATFORM != AC_PLATFORM_WINDOWS
             add_history(command.c_str());
 #endif
         }
