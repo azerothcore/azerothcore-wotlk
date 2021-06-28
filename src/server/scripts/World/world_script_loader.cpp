@@ -18,6 +18,7 @@ void AddSC_achievement_scripts();
 void AddSC_chat_log(); // location: scripts\World\chat_log.cpp
 void AddSC_character_creation();
 void AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
+void AddSC_player_scripts();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -37,4 +38,5 @@ void AddWorldScripts()
     AddSC_chat_log(); // location: scripts\World\chat_log.cpp
     AddSC_character_creation();
     AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
+    AddSC_player_scripts();
 }
