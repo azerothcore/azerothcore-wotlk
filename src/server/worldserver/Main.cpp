@@ -115,7 +115,7 @@ void usage(const char* prog)
 #endif
 }
 
-/// Launch the Warhead server
+/// Launch the Azeroth server
 int main(int argc, char** argv)
 {
     Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_WORLDSERVER;
