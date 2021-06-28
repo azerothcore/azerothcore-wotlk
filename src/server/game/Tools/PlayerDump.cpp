@@ -99,7 +99,7 @@ bool findnth(std::string& str, int n, std::string::size_type& s, std::string::si
 std::string gettablename(std::string& str)
 {
     std::string::size_type s = 13;
-    std::string::size_type e = str.find(_TABLE_SIM_, s);
+    std::string::size_type e = str.find("`", s);
     if (e == std::string::npos)
         return "";
 
@@ -187,7 +187,7 @@ std::string CreateDumpString(char const* tableName, QueryResult result)
 {
     if (!tableName || !result) return "";
     std::ostringstream ss;
-    ss << "INSERT INTO " << _TABLE_SIM_ << tableName << _TABLE_SIM_ << " VALUES (";
+    ss << "INSERT INTO `" << tableName << "` VALUES (";
     Field* fields = result->Fetch();
     for (uint32 i = 0; i < result->GetFieldCount(); ++i)
     {
@@ -416,7 +416,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     bool incHighest = true;
     if (guid != 0 && guid < sObjectMgr->GetGenerator<HighGuid::Player>().GetNextAfterMaxUsed())
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_GUID);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_GUID);
         stmt->setUInt32(0, guid);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -434,7 +434,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
     if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
         stmt->setString(0, name);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -464,7 +464,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     uint8 playerClass = 0;
     uint8 level = 1;
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     while (!feof(fin))
     {
         if (!fgets(buf, 32000, fin))
@@ -544,7 +544,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                         // check if the original name already exists
                         name = getnth(line, 3);
 
-                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+                        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
                         stmt->setString(0, name);
                         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 

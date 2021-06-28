@@ -198,16 +198,16 @@ void ArenaTeamMgr::DistributeArenaPoints()
             sScriptMgr->OnBeforeUpdateArenaPoints(at, PlayerPoints);
         }
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt;
+    CharacterDatabasePreparedStatement* stmt;
 
     // Cycle that gives points to all players
     for (std::map<ObjectGuid, uint32>::iterator playerItr = PlayerPoints.begin(); playerItr != PlayerPoints.end(); ++playerItr)
     {
         // Add points to player if online
         if (Player* player = ObjectAccessor::FindPlayer(playerItr->first))
-            player->ModifyArenaPoints(playerItr->second, &trans);
+            player->ModifyArenaPoints(playerItr->second, trans);
         else    // Update database
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_ARENA_POINTS);

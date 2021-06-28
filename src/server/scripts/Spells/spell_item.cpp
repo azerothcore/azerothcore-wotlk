@@ -288,7 +288,7 @@ public:
             return true;
         }
 
-        uint16 getMountSpellId()
+        uint32 getMountSpellId()
         {
             switch (m_scriptSpellId)
             {
@@ -308,7 +308,7 @@ public:
             Unit* target = GetTarget();
             if (target->getLevel() <= 70)
             {
-                if (uint16 spellId = getMountSpellId())
+                if (auto spellId = getMountSpellId())
                 {
                     target->CastSpell(target, spellId, aurEff);
                 }
@@ -318,7 +318,7 @@ public:
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            if (uint16 spellId = getMountSpellId())
+            if (auto spellId = getMountSpellId())
             {
                 target->RemoveAurasDueToSpell(spellId);
             }
