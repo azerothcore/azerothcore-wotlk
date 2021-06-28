@@ -4107,7 +4107,9 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
                 continue;
             }
 
-            if (_spell_idx->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && !HasSkill(pSkill->id))
+            // @todo confirm if rogues start wth lockpicking skill at level 1 but only recieve the spell to use it at level 16
+            // Added for runeforging, it is confirmed via sniff that this happens when death knights learn the spell, not on character creation.
+            if ((_spell_idx->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && !HasSkill(pSkill->id)) || ((pSkill->id == SKILL_LOCKPICKING || pSkill->id == SKILL_RUNEFORGING) && _spell_idx->second->TrivialSkillLineRankHigh == 0))
             {
                 LearnDefaultSkill(pSkill->id, 0);
             }
