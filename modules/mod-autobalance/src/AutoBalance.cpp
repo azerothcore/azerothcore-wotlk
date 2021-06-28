@@ -45,6 +45,8 @@
 #include "ScriptMgrMacros.h"
 #include "Group.h"
 
+uint mplus = 0;
+
 ABScriptMgr* ABScriptMgr::instance()
 {
     static ABScriptMgr instance;
@@ -1055,6 +1057,38 @@ public:
     }
 };
 
+class npc_mythic : public CreatureScript
+{
+public:
+    npc_mythic() : CreatureScript("npc_mythic") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        player->PlayerTalkClass->ClearMenus();
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/Icons/trade_engineering:30:30:-18:0|tMythic +10", 10, 0);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/Icons/trade_engineering:30:30:-18:0|tMythic +15", 15, 0);
+        player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    {
+        switch (sender)
+        {
+        case 10:
+        {
+            mplus = 10;
+            ChatHandler(player->GetSession()).PSendSysMessage("Dificuldade definida para +10");
+        }break;
+
+        case 15:
+        {
+            mplus = 15;
+            ChatHandler(player->GetSession()).PSendSysMessage("Dificuldade definida para +15");
+        }break;
+    }
+
+
 
 
 void AddAutoBalanceScripts()
@@ -1066,4 +1100,5 @@ void AddAutoBalanceScripts()
     new AutoBalance_AllMapScript;
     new AutoBalance_CommandScript;
     new AutoBalance_GlobalScript;
+    new npc_mythic;
 }
