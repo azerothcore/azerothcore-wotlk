@@ -453,7 +453,7 @@ bool StartDB()
     sWorld->LoadDBVersion();
 
     LOG_INFO("server.loading", "> Version DB world:     %s", sWorld->GetDBVersion());
-    LOG_INFO("server.loading", "");
+    LOG_INFO("server.loading", " ");
 
     return true;
 }
