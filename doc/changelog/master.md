@@ -1,3 +1,18 @@
+## 4.0.0-dev.4 | Commit: [fbad1f3d6c27a5d3eea22483913c67a827ab01be
+](https://github.com/azerothcore/azerothcore-wotlk/commit/fbad1f3d6c27a5d3eea22483913c67a827ab01be
+
+
+### Added
+- new hook `OnBeforeSendJoinMessageArenaQueue` and `OnBeforeSendExitMessageArenaQueue`
+
+### Changed
+- Rename `CanExitJoinMessageArenaQueue` to `OnBeforeSendExitMessageArenaQueue`
+- Rename `CanSendJoinMessageArenaQueue` to `OnBeforeSendJoinMessageArenaQueue`
+
+### How to upgrade
+- Just rename all hooks from `CanExitJoinMessageArenaQueue` and `CanSendMessageArenaQueue`, to `OnBeforeSendExitMessageArenaQueue`
+- Just rename all hooks from `CanSendJoinMessageArenaQueue` and `OnBeforeSendJoinMessageArenaQueue`
+
 ## 4.0.0-dev.3 | Commit: [c35dde6fae732269357b78fb796fba21956b83fc
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/c35dde6fae732269357b78fb796fba21956b83fc
 
