@@ -42,11 +42,11 @@ class GameObjectModel
 public:
     std::string name;
 
-    [[nodiscard]] const G3D::AABox& getBounds() const { return iBound; }
+    [[nodiscard]] const G3D::AABox& GetBounds() const { return iBound; }
 
     ~GameObjectModel();
 
-    [[nodiscard]] const G3D::Vector3& getPosition() const { return iPos; }
+    [[nodiscard]] const G3D::Vector3& GetPosition() const { return iPos; }
 
     /** Enables\disables collision. */
     void disable() { phasemask = 0; }

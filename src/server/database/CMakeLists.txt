@@ -6,7 +6,6 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE_SOURCES
   # Exclude
-  ${CMAKE_CURRENT_SOURCE_DIR}/Updater
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
 if(USE_COREPCH)
@@ -46,6 +45,9 @@ target_link_libraries(database
     mysql
   PUBLIC
     common)
+
+# Add support auto update db for modules
+GetModuleList()
 
 set_target_properties(database
   PROPERTIES
