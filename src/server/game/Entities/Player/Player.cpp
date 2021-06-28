@@ -9273,9 +9273,9 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 loot->generateMoneyLoot(addon->mingold, addon->maxgold);
 
             if (loot_type == LOOT_FISHING)
-                go->getFishLoot(loot, this);
+                go->GetFishLoot(loot, this);
             else if (loot_type == LOOT_FISHING_JUNK)
-                go->getFishLootJunk(loot, this);
+                go->GetFishLootJunk(loot, this);
 
             if (go->GetGOInfo()->type == GAMEOBJECT_TYPE_CHEST && go->GetGOInfo()->chest.groupLootRules)
             {
