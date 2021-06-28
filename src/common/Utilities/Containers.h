@@ -55,7 +55,9 @@ namespace Acore
         void check() const
         {
             if (!(_buf < _end))
+            {
                 throw std::out_of_range("index");
+            }
         }
     };
 }
@@ -70,7 +72,9 @@ namespace Acore::Containers
         static_assert(std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<typename C::iterator>::iterator_category>::value, "Invalid container passed to Acore::Containers::RandomResize");
 
         if (std::size(container) <= requestedSize)
+        {
             return;
+        }
 
         auto keepIt = std::begin(container), curIt = std::begin(container);
         uint32 elementsToKeep = requestedSize, elementsToProcess = std::size(container);
@@ -81,7 +85,9 @@ namespace Acore::Containers
             if (urand(1, elementsToProcess) <= elementsToKeep)
             {
                 if (keepIt != curIt)
+                {
                     *keepIt = std::move(*curIt);
+                }
 
                 ++keepIt;
                 --elementsToKeep;
@@ -102,7 +108,9 @@ namespace Acore::Containers
         std::copy_if(std::begin(container), std::end(container), std::inserter(containerCopy, std::end(containerCopy)), predicate);
 
         if (requestedSize)
+        {
             RandomResize(containerCopy, requestedSize);
+        }
 
         container = std::move(containerCopy);
     }
@@ -160,7 +168,9 @@ namespace Acore::Containers
         }
 
         if (weightSum <= 0.0)
+        {
             weights.assign(std::size(container), 1.0);
+        }
 
         return SelectRandomWeightedContainerElement(container, weights);
     }
@@ -195,9 +205,13 @@ namespace Acore::Containers
         for (auto itr = range.first; itr != range.second;)
         {
             if (itr->second == value)
+            {
                 itr = multimap.erase(itr);
+            }
             else
+            {
                 ++itr;
+            }
         }
     }
 

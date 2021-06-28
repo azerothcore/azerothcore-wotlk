@@ -20,11 +20,15 @@ inline T standard_deviation(Container&& c)
     auto mean = sum / size;
 
     if (size == 1)
+    {
         return (T) 0;
+    }
 
     T accum = T();
     for (const auto d : c)
+    {
         accum += (d - mean) * (d - mean);
+    }
     return std::sqrt(accum / (size - 1));
 }
 
@@ -43,7 +47,8 @@ inline T median(std::vector<T> a)
 {
     size_t n = a.size();
     // If size of the arr[] is even
-    if (n % 2 == 0) {
+    if (n % 2 == 0)
+    {
 
         // Applying nth_element
         // on n/2th index
@@ -65,7 +70,8 @@ inline T median(std::vector<T> a)
     }
 
     // If size of the arr[] is odd
-    else {
+    else
+    {
 
         // Applying nth_element
         // on n/2
