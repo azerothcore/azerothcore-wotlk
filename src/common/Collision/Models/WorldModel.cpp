@@ -14,7 +14,7 @@ using G3D::Ray;
 
 template<> struct BoundsTrait<VMAP::GroupModel>
 {
-    static void getBounds(const VMAP::GroupModel& obj, G3D::AABox& out) { out = obj.GetBound(); }
+    static void GetBounds(const VMAP::GroupModel& obj, G3D::AABox& out) { out = obj.GetBound(); }
 };
 
 namespace VMAP
@@ -257,7 +257,7 @@ namespace VMAP
         return result;
     }
 
-    void WmoLiquid::getPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const
+    void WmoLiquid::GetPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const
     {
         tilesX = iTilesX;
         tilesY = iTilesY;
@@ -442,7 +442,7 @@ namespace VMAP
         return 0;
     }
 
-    void GroupModel::getMeshData(std::vector<G3D::Vector3>& outVertices, std::vector<MeshTriangle>& outTriangles, WmoLiquid*& liquid)
+    void GroupModel::GetMeshData(std::vector<G3D::Vector3>& outVertices, std::vector<MeshTriangle>& outTriangles, WmoLiquid*& liquid)
     {
         outVertices = vertices;
         outTriangles = triangles;
@@ -454,7 +454,7 @@ namespace VMAP
     void WorldModel::setGroupModels(std::vector<GroupModel>& models)
     {
         groupModels.swap(models);
-        groupTree.build(groupModels, BoundsTrait<GroupModel>::getBounds, 1);
+        groupTree.build(groupModels, BoundsTrait<GroupModel>::GetBounds, 1);
     }
 
     struct WModelRayCallBack
@@ -638,7 +638,7 @@ namespace VMAP
         return result;
     }
 
-    void WorldModel::getGroupModels(std::vector<GroupModel>& outGroupModels)
+    void WorldModel::GetGroupModels(std::vector<GroupModel>& outGroupModels)
     {
         outGroupModels = groupModels;
     }

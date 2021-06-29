@@ -646,14 +646,14 @@ namespace MMAP
                 break;
 
             InstanceTreeMap instanceTrees;
-            ((VMapManager2*)vmapManager)->getInstanceMapTree(instanceTrees);
+            ((VMapManager2*)vmapManager)->GetInstanceMapTree(instanceTrees);
 
             if (!instanceTrees[mapID])
                 break;
 
             ModelInstance* models = nullptr;
             uint32 count = 0;
-            instanceTrees[mapID]->getModelInstances(models, count);
+            instanceTrees[mapID]->GetModelInstances(models, count);
 
             if (!models)
                 break;
@@ -671,7 +671,7 @@ namespace MMAP
                 retval = true;
 
                 std::vector<GroupModel> groupModels;
-                worldModel->getGroupModels(groupModels);
+                worldModel->GetGroupModels(groupModels);
 
                 // all M2s need to have triangle indices reversed
                 bool isM2 = instance.name.find(".m2") != std::string::npos || instance.name.find(".M2") != std::string::npos;
@@ -690,7 +690,7 @@ namespace MMAP
                     std::vector<MeshTriangle> tempTriangles;
                     WmoLiquid* liquid = nullptr;
 
-                    groupModel.getMeshData(tempVertices, tempTriangles, liquid);
+                    groupModel.GetMeshData(tempVertices, tempTriangles, liquid);
 
                     // first handle collision mesh
                     transform(tempVertices, transformedVertices, scale, rotation, position);
@@ -707,7 +707,7 @@ namespace MMAP
                         std::vector<int> liqTris;
                         uint32 tilesX, tilesY, vertsX, vertsY;
                         G3D::Vector3 corner;
-                        liquid->getPosInfo(tilesX, tilesY, corner);
+                        liquid->GetPosInfo(tilesX, tilesY, corner);
                         vertsX = tilesX + 1;
                         vertsY = tilesY + 1;
                         uint8* flags = liquid->GetFlagsStorage();

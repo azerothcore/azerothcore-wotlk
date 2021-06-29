@@ -29,13 +29,13 @@ template<> struct HashTrait< GameObjectModel>
 
 template<> struct PositionTrait< GameObjectModel>
 {
-    static void getPosition(const GameObjectModel& g, G3D::Vector3& p) { p = g.getPosition(); }
+    static void GetPosition(const GameObjectModel& g, G3D::Vector3& p) { p = g.GetPosition(); }
 };
 
 template<> struct BoundsTrait< GameObjectModel>
 {
-    static void getBounds(const GameObjectModel& g, G3D::AABox& out) { out = g.getBounds();}
-    static void getBounds2(const GameObjectModel* g, G3D::AABox& out) { out = g->getBounds();}
+    static void GetBounds(const GameObjectModel& g, G3D::AABox& out) { out = g.GetBounds();}
+    static void GetBounds2(const GameObjectModel* g, G3D::AABox& out) { out = g->GetBounds();}
 };
 
 typedef RegularGrid2D<GameObjectModel, BIHWrap<GameObjectModel>> ParentTree;
@@ -145,7 +145,7 @@ struct DynamicTreeIntersectionCallback
     bool didHit() const { return did_hit;}
 };
 
-bool DynamicMapTree::getIntersectionTime(const uint32 phasemask, const G3D::Ray& ray,
+bool DynamicMapTree::GetIntersectionTime(const uint32 phasemask, const G3D::Ray& ray,
         const G3D::Vector3& endPos, float& maxDist) const
 {
     float distance = maxDist;
@@ -158,7 +158,7 @@ bool DynamicMapTree::getIntersectionTime(const uint32 phasemask, const G3D::Ray&
     return callback.didHit();
 }
 
-bool DynamicMapTree::getObjectHitPos(const uint32 phasemask, const G3D::Vector3& startPos,
+bool DynamicMapTree::GetObjectHitPos(const uint32 phasemask, const G3D::Vector3& startPos,
                                      const G3D::Vector3& endPos, G3D::Vector3& resultHit,
                                      float modifyDist) const
 {
@@ -175,7 +175,7 @@ bool DynamicMapTree::getObjectHitPos(const uint32 phasemask, const G3D::Vector3&
     G3D::Vector3 dir = (endPos - startPos) / maxDist;            // direction with length of 1
     G3D::Ray ray(startPos, dir);
     float dist = maxDist;
-    if (getIntersectionTime(phasemask, ray, endPos, dist))
+    if (GetIntersectionTime(phasemask, ray, endPos, dist))
     {
         resultHit = startPos + dir * dist;
         if (modifyDist < 0)
