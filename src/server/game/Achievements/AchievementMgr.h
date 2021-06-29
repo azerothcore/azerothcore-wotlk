@@ -233,8 +233,8 @@ typedef std::map<uint32, AchievementReward> AchievementRewards;
 
 struct AchievementRewardLocale
 {
-    StringVector Subject;
-    StringVector Text;
+    std::vector<std::string> Subject;
+    std::vector<std::string> Text;
 };
 
 typedef std::map<uint32, AchievementRewardLocale> AchievementRewardLocales;
@@ -261,7 +261,7 @@ public:
     void Reset();
     static void DeleteFromDB(ObjectGuid::LowType lowguid);
     void LoadFromDB(PreparedQueryResult achievementResult, PreparedQueryResult criteriaResult);
-    void SaveToDB(SQLTransaction& trans);
+    void SaveToDB(CharacterDatabaseTransaction trans);
     void ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
     void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
     void CompletedAchievement(AchievementEntry const* entry);
@@ -368,6 +368,9 @@ public:
     void LoadCompletedAchievements();
     void LoadRewards();
     void LoadRewardLocales();
+
+    [[nodiscard]] AchievementEntry const* GetAchievement(uint32 achievementId) const;
+
 private:
     AchievementCriteriaDataMap m_criteriaDataMap;
 

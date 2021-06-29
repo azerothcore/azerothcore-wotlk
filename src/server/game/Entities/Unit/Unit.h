@@ -1633,7 +1633,7 @@ public:
     void HandleEmoteCommand(uint32 anim_id);
     void AttackerStateUpdate (Unit* victim, WeaponAttackType attType = BASE_ATTACK, bool extra = false);
 
-    void CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK);
+    void CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK, const bool sittingVictim = false);
     void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
     void HandleProcExtraAttackFor(Unit* victim);
 
@@ -2177,7 +2177,7 @@ public:
     bool isInBackInMap(Unit const* target, float distance, float arc = M_PI) const;
 
     // Visibility system
-    [[nodiscard]] bool IsVisible() const { return (m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM) > SEC_PLAYER) ? false : true; }
+    [[nodiscard]] bool IsVisible() const { return m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM) <= SEC_PLAYER; }
     void SetVisible(bool x);
     void SetModelVisible(bool on);
 
@@ -2627,7 +2627,7 @@ private:
     float processDummyAuras(float TakenTotalMod) const;
 };
 
-namespace acore
+namespace Acore
 {
     // Binary predicate for sorting Units based on percent value of a power
     class PowerPctOrderPred
