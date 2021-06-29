@@ -58,6 +58,7 @@ public:
             { "anim",           SEC_ADMINISTRATOR,  false, &HandleDebugAnimCommand,            "" },
             { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "" },
             { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "" },
+            { "lfg",            SEC_ADMINISTRATOR,  false, &HandleDebugDungeonFinderCommand,   "" },
             { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "" },
             { "lootrecipient",  SEC_ADMINISTRATOR,  false, &HandleDebugGetLootRecipientCommand, "" },
             { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "" },
@@ -802,6 +803,12 @@ public:
                 handler->SendSysMessage("All OK!");
         }
 
+        return true;
+    }
+
+    static bool HandleDebugDungeonFinderCommand(ChatHandler* /*handler*/, char const* /*args*/)
+    {
+        sLFGMgr->ToggleTesting();
         return true;
     }
 

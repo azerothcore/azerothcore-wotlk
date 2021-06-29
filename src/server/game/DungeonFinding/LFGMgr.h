@@ -550,6 +550,10 @@ namespace lfg
         static bool HasIgnore(ObjectGuid guid1, ObjectGuid guid2);
         /// Sends queue status to player
         static void SendLfgQueueStatus(ObjectGuid guid, LfgQueueStatusData const& data);
+        // debug lfg command
+        void ToggleTesting();
+        /// For 1 player queue testing
+        bool isTesting() const { return m_Testing; }
 
     private:
         TeamId GetTeam(ObjectGuid guid);
@@ -602,6 +606,7 @@ namespace lfg
         LfgPlayerBootContainer BootsStore;                 ///< Current player kicks
         LfgPlayerDataContainer PlayersStore;               ///< Player data
         LfgGroupDataContainer GroupsStore;                 ///< Group data
+        bool m_Testing;
     };
 
 } // namespace lfg
