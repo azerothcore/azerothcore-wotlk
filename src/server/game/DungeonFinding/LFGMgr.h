@@ -553,7 +553,7 @@ namespace lfg
         // debug lfg command
         void ToggleTesting();
         /// For 1 player queue testing
-        bool isTesting() const { return m_Testing; }
+        [[nodiscard]] bool isTesting() const { return m_Testing; }
 
     private:
         TeamId GetTeam(ObjectGuid guid);
