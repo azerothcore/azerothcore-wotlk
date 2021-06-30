@@ -66,7 +66,7 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (3678, 0, 2, 5763, 149.14, 252.73, -102.62, 3.5, 4, 60000),
 (3678, 0, 2, 5763, 143.57, 218.98, -102.9, 2.37, 4, 60000),
 (3678, 0, 2, 5763, 137.94, 262.89, -102.85, 3.99, 4, 60000),
-(3678, 2, 5763, 143.57, 218.98, -102.9, 2.37, 4, 60000);
+(3678, 0, 2, 5763, 143.57, 218.98, -102.9, 2.37, 4, 60000);
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5762;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 5762) AND (`source_type` = 0) AND (`id` IN (0, 1));
