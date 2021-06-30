@@ -3881,6 +3881,7 @@ OR `entry`= 4992;
 -- Re-insert the TBC Copper veins in the Database
 -- No need to delete these since we deleted gameobject with gameobject_template 1731
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
+(74958, 1731, 530, 0, 0, 1, 1, 8133.32, -6785.23, 71.3577, -1.88496, 0, 0, 0.809017, -0.587785, 900, 255, 1),
 (74957, 1731, 530, 0, 0, 1, 1, 8620.07, -5806.49, 37.7047, 2.47837, 0, 0, 0, 1, 60, 255, 1),
 (74956, 1731, 530, 0, 0, 1, 1, 8924, -7719.83, 198.6, -2.00713, 0, 0, 0, 1, 60, 255, 1),
 (74955, 1731, 530, 0, 0, 1, 1, 8707.96, -5766.97, 10.0575, 0.052359, 0, 0, 0, 1, 60, 255, 1),
