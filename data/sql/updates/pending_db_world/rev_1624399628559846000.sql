@@ -40,6 +40,15 @@ UPDATE creature_template SET AIName="SmartAI" WHERE entry= @ENTRY;
 INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
 (@ENTRY, 0, 0, 0, 37, 0, 85, 0, 0, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "On AI initialize - Self: Despawn in 0.5 s");
 
+DELETE FROM pool_creature WHERE guid=45763;
+INSERT INTO pool_creature (guid, pool_entry, chance, description) VALUES (45763, 9718, 85, 'Ghok Bashguud add');
+
+DELETE FROM pool_creature WHERE guid=300742;
+INSERT INTO pool_creature (guid, pool_entry, chance, description) VALUES (300742, 9718, 15, 'Ghok Bashguud');
+
+DELETE FROM pool_template WHERE entry=9718;
+INSERT INTO pool_template (entry, max_limit, description) VALUES (9718, 1, 'Ghok Bashguud - LBRS');
+
 
 -- Script Zekkis, add him 2 abilities
 SET @ENTRY := 5400;
