@@ -45,7 +45,7 @@
 #include "ScriptMgrMacros.h"
 #include "Group.h"
 
-uint mplus = 0;
+uint32 mplus = 0;
 
 ABScriptMgr* ABScriptMgr::instance()
 {
@@ -248,22 +248,6 @@ class AutoBalance_WorldScript : public WorldScript
     }
 };
 
-class AutoBalance_PlayerScript : public PlayerScript
-{
-    public:
-        AutoBalance_PlayerScript()
-            : PlayerScript("AutoBalance_PlayerScript")
-        {
-        }
-        
-        void OnLogin(Player *Player) override
-        {
-            if (sConfigMgr->GetBoolDefault("AutoBalanceAnnounce.enable", true)) {
-                ChatHandler(Player->GetSession()).SendSysMessage("This server is running the |cff4CFF00AutoBalance |rmodule.");
-            }
-        }
-};
-
 class AutoBalance_UnitScript : public UnitScript
 {
     public:
@@ -299,20 +283,12 @@ class AutoBalance_UnitScript : public UnitScript
 
     uint32 _Modifer_DealDamage(Unit* target, Unit* attacker, uint32 damage)
     {
-        if (!enabled)
-            return damage;
-
         if (!attacker || attacker->GetTypeId() == TYPEID_PLAYER || !attacker->IsInWorld())
             return damage;
 
         float damageMultiplier = attacker->CustomData.GetDefault<AutoBalanceCreatureInfo>("AutoBalanceCreatureInfo")->DamageMultiplier;
 
-        if (damageMultiplier == 1)
-            return damage;
-
-        if (!(!DungeonsOnly
-                || (target->GetMap()->IsDungeon() && attacker->GetMap()->IsDungeon()) || (attacker->GetMap()->IsBattleground()
-                     && target->GetMap()->IsBattleground())))
+        if (!(!DungeonsOnly || (target->GetMap()->IsDungeon() && attacker->GetMap()->IsDungeon()) || (attacker->GetMap()->IsBattleground() && target->GetMap()->IsBattleground())))
             return damage;
 
 
@@ -334,9 +310,6 @@ class AutoBalance_AllMapScript : public AllMapScript
 
         void OnPlayerEnterAll(Map* map, Player* player)
         {
-            if (!enabled)
-                return;
-
             if (player->IsGameMaster())
                 return;
 
@@ -363,7 +336,7 @@ class AutoBalance_AllMapScript : public AllMapScript
             }
 
             //mapABInfo->playerCount++; //(maybe we've to found a safe solution to avoid player recount each time)
-            mapABInfo->playerCount = map->GetPlayersCountExceptGMs();
+            mapABInfo->playerCount = mplus;
 
             if (PlayerChangeNotify)
             {
@@ -387,9 +360,6 @@ class AutoBalance_AllMapScript : public AllMapScript
 
         void OnPlayerLeaveAll(Map* map, Player* player)
         {
-            if (!enabled)
-                return;
-
             if (player->IsGameMaster())
                 return;
 
@@ -425,7 +395,7 @@ class AutoBalance_AllMapScript : public AllMapScript
                 else
                 {
                     //mapABInfo->playerCount--;
-                    mapABInfo->playerCount = map->GetPlayersCountExceptGMs() - 1;
+                    mapABInfo->playerCount = mplus;
                 }
             }
 
@@ -565,7 +535,7 @@ public:
         if (originalLevel <= 1 && areaMinLvl >= 5)
             skipLevel = true;
 
-        if (LevelScaling && creature->GetMap()->IsDungeon() && !skipLevel && !checkLevelOffset(level, originalLevel)) {  // change level only whithin the offsets and when in dungeon/raid
+        if (LevelScaling && creature->GetMap()->IsDungeon() && !skipLevel) {  // change level only whithin the offsets and when in dungeon/raid
             if (level != creatureABInfo->selectedLevel || creatureABInfo->selectedLevel != creature->getLevel()) {
                 // keep bosses +3 level
                 creatureABInfo->selectedLevel = level + bonusLevel;
@@ -1064,7 +1034,6 @@ public:
 void AddAutoBalanceScripts()
 {
     new AutoBalance_WorldScript;
-    new AutoBalance_PlayerScript;
     new AutoBalance_UnitScript;
     new AutoBalance_AllCreatureScript;
     new AutoBalance_AllMapScript;
