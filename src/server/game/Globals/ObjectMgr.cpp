@@ -8041,6 +8041,11 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry)
             return SKILL_RANGE_MONO;
         case SKILL_CATEGORY_LANGUAGES:
             return SKILL_RANGE_LANGUAGE;
+        case SKILL_CATEGORY_SECONDARY:
+        case SKILL_CATEGORY_PROFESSION:
+            // not set skills for professions and racial abilities
+            if (IsProfessionOrRidingSkill(rcEntry->SkillID))
+                return SKILL_RANGE_RANK;
     }
 
     return SKILL_RANGE_LEVEL;
