@@ -34,6 +34,7 @@ enum HunterSpells
     SPELL_HUNTER_CHIMERA_SHOT_VIPER                 = 53358,
     SPELL_HUNTER_CHIMERA_SHOT_SCORPID               = 53359,
     SPELL_HUNTER_GLYPH_OF_ASPECT_OF_THE_VIPER       = 56851,
+    SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT               = 61389,
     SPELL_HUNTER_IMPROVED_MEND_PET                  = 24406,
     SPELL_HUNTER_INVIGORATION_TRIGGERED             = 53398,
     SPELL_HUNTER_MASTERS_CALL_TRIGGERED             = 62305,
@@ -893,6 +894,65 @@ public:
     }
 };
 
+// 56841 - Glyph of Arcane Shot
+class spell_hun_glyph_of_arcane_shot : public SpellScriptLoader
+{
+public:
+    spell_hun_glyph_of_arcane_shot() : SpellScriptLoader("spell_hun_glyph_of_arcane_shot") { }
+
+    class spell_hun_glyph_of_arcane_shot_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_glyph_of_arcane_shot_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT))
+                return false;
+            return true;
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            if (Unit* procTarget = eventInfo.GetProcTarget())
+            {
+                Unit::AuraApplicationMap& auras = procTarget->GetAppliedAuras();
+                for (Unit::AuraApplicationMap::const_iterator i = auras.begin(); i != auras.end(); ++i)
+                {
+                    SpellInfo const* spellInfo = i->second->GetBase()->GetSpellInfo();
+                    // Search only Serpent Sting, Viper Sting, Scorpid Sting, Wyvern Sting
+                    if (spellInfo->SpellFamilyFlags.HasFlag(0xC000, 0x1080) && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER)
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            if (!procSpell)
+                return;
+
+            int32 mana = procSpell->CalcPowerCost(GetTarget(), procSpell->GetSchoolMask());
+            ApplyPct(mana, aurEff->GetAmount());
+
+            GetTarget()->CastCustomSpell(SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT, SPELLVALUE_BASE_POINT0, mana, GetTarget());
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_hun_glyph_of_arcane_shot_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_hun_glyph_of_arcane_shot_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_glyph_of_arcane_shot_AuraScript();
+    }
+};
+
 // 55709 - Pet Heart of the Phoenix
 class spell_hun_pet_heart_of_the_phoenix : public SpellScriptLoader
 {
@@ -1234,6 +1294,7 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_animal_handler();
     new spell_hun_generic_scaling();
     new spell_hun_taming_the_beast();
+    new spell_hun_glyph_of_arcane_shot();
 
     // Theirs
     new spell_hun_aspect_of_the_beast();
