@@ -1,0 +1,64 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ master ]
+ # schedule:
+ #   - cron: '35 16 * * 0'
+
+jobs:
+  analyze:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04]
+        compiler: [clang]
+        modules: [without]
+        language: [cpp]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
+    env:
+      COMPILER: ${{ matrix.compiler }}
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
+      - name: Checkout modules
+        run: ./apps/ci/ci-install-modules.sh
+        if: matrix.modules == 'with'
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/.ccache
+          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
+      - name: Run Core Build Action
+        id: build-action
+        uses: azerothcore/acore-core-build-action@main
+        continue-on-error: true
+      - name: Configure OS
+        run: echo "${{ steps.build-action.outputs.configure-os }}"
+      - name: Create conf/config.sh
+        run: echo "${{ steps.build-action.outputs.config-sh }}"
+      - name: Import DB
+        run: echo "${{ steps.build-action.outputs.import-db }}"
+      - name: Build
+        run: echo "${{ steps.build-action.outputs.build }}"
+      - name: Dry Run
+        run: echo "${{ steps.build-action.outputs.dry-run }}"
+      - name: Check Startup Errors
+        run: echo "${{ steps.build-action.outputs.startup-errors }}"
+      - name: Run Unit Tests
+        run: echo "${{ steps.build-action.outputs.unit-tests }}"
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
