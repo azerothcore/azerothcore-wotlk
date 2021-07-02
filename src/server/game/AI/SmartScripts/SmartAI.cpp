@@ -506,13 +506,7 @@ void SmartAI::UpdateAI(uint32 diff)
         return;
 
     if (mCanAutoAttack)
-    {
         DoMeleeAttackIfReady();
-        if (!me->HasUnitState(UNIT_STATE_CASTING))
-        {
-            me->GetAI()->AttackStart(me->GetVictim());
-        }
-    }
 }
 
 bool SmartAI::IsEscortInvokerInRange()
