@@ -4562,10 +4562,16 @@ public:
                 target->RemoveAurasByType(SPELL_AURA_MOUNTED, ObjectGuid::Empty, GetHitAura());
 
                 // Triggered spell id dependent on riding skill and zone
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_mount150);
-                uint32 zoneid, areaid;
-                target->GetZoneAndAreaId(zoneid, areaid);
-                bool const canFly = spellInfo && (spellInfo->CheckLocation(target->GetMapId(), zoneid, areaid, target) == SPELL_CAST_OK);
+                bool canFly = false;
+                uint32 map = GetVirtualMapForMapAndZone(target->GetMapId(), target->GetZoneId());
+                if (map == 530 || (map == 571 && target->HasSpell(SPELL_COLD_WEATHER_FLYING)))
+                    canFly = true;
+
+                AreaTableEntry const* area = sAreaTableStore.LookupEntry(target->GetAreaId());
+                // Xinef: add battlefield check
+                Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
+                if (!area || (canFly && ((area->flags & AREA_FLAG_NO_FLY_ZONE) || (Bf && !Bf->CanFlyIn()))))
+                    canFly = false;
 
                 uint32 mount = 0;
                 switch (target->GetBaseSkillValue(SKILL_RIDING))
