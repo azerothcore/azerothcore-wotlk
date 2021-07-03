@@ -1,3 +1,19 @@
+-- DB update 2021_07_02_04 -> 2021_07_03_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_07_02_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_07_02_04 2021_07_03_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1624668958042794600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1624668958042794600');
 
 DELETE FROM `gossip_menu_option_locale` WHERE `MenuID` = 10189 AND OptionID = 0 AND `Locale` IN ('esES','esMX');
@@ -52,3 +68,13 @@ INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verified
 (13257,'esMX','El señor demoníaco, Varimathras, y el boticario jefe renegado, Putress, son los responsables de esta traición.$B$B<Thrall asiente.>$B$BSí, el mismo Putress que ha descubierto la cura para el reciente brote de Plaga.$B$BAquellos que no se aliaron con su régimen han sido ejecutados o desterrados. Sylvanas casi murió en el golpe.$B$BLa horda ha perdido entrañas. Orgrimmar acogerá a los refugiados Renegados hasta que se resuelva la crisis. Por ahora, estamos bajo ley marcial.',18019),
 (13266,'esMX','Te pondré al día rápidamente, $N.$B$BEntrañas está en guerra. Los boticarios de Putress y los demonios de Varimathras han asediado la ciudad. Han tomado una posición defensiva en el interior y usan el maldito añublo contra nuestras tropas.',18019),
 (13267,'esMX','El mañana está lleno de incertidumbre. Los días en los que la Alianza y Horda luchaban juntos contra un enemigo común se han ido. Una nueva batalla amanece, $N, una batalla en la que no habrá ganador.$B$BPero debemos seguir avanzando hacia Corona de Hielo. No tenemos elección. Nuestra salvación está en manos de héroes como tú, $N. El futuro de la Horda, y del mundo, depende de tí.$B$BVolvamos a Orgrimmar, Debes volver a Rasganorte de inmediato.',18019);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_07_03_00' WHERE sql_rev = '1624668958042794600';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
