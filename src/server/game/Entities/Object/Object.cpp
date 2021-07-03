@@ -1071,7 +1071,7 @@ float WorldObject::GetDistanceZ(const WorldObject* obj) const
 
 bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius) const
 {
-    float sizefactor = useBoundingRadius ? GetObjectSize() + obj->GetObjectSize() : 0.0f; //GetObjectSize() + obj->GetObjectSize();
+    float sizefactor = useBoundingRadius ? GetObjectSize() + obj->GetObjectSize() : 0.0f;
     float maxdist = dist2compare + sizefactor;
 
     if (m_transport && obj->GetTransport() &&  obj->GetTransport()->GetGUID() == m_transport->GetGUID())
