@@ -803,7 +803,7 @@ void GameObject::Delete()
         AddObjectToRemoveList();
 }
 
-void GameObject::getFishLoot(Loot* fishloot, Player* loot_owner)
+void GameObject::GetFishLoot(Loot* fishloot, Player* loot_owner)
 {
     fishloot->clear();
 
@@ -823,7 +823,7 @@ void GameObject::getFishLoot(Loot* fishloot, Player* loot_owner)
     }
 }
 
-void GameObject::getFishLootJunk(Loot* fishloot, Player* loot_owner)
+void GameObject::GetFishLootJunk(Loot* fishloot, Player* loot_owner)
 {
     fishloot->clear();
 
