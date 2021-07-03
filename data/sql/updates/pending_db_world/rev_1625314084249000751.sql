@@ -10,7 +10,7 @@ DELETE FROM `creature` WHERE `id` = 5345 AND `guid` = 51843;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (51843, 5345, 1, 0, 0, 1, 1, 0, 0, -4748.69, 2897.92, -39.7154, 1.49365, 9900, 15, 0, 2218, 0, 1, 0, 0, 0, '', 0);
 
---Lady Szallah 
+-- Lady Szallah 
 UPDATE `creature_template` SET `MovementType` = 1 WHERE `entry` = 5343;
 DELETE FROM `creature` WHERE `id` = 5343 AND `guid` = 51679;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
