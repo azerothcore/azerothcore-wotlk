@@ -1,3 +1,19 @@
+-- DB update 2021_07_04_00 -> 2021_07_04_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_07_04_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_07_04_00 2021_07_04_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1624891276964449853'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1624891276964449853');
 
 -- Accursed Slitherblade 14229, GUID 51846 - MovementType to 1, wander dist to 20
@@ -21,3 +37,13 @@ DELETE FROM `creature` WHERE `id` = 18241 AND `guid` = 27825;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (27825, 18241, 1, 0, 0, 1, 1, 17625, 0, -100.613, 2832.51, -40.6645, 3.98299, 21600, 20, 0, 955, 0, 1, 0, 0, 0, '', 0);
 
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_07_04_01' WHERE sql_rev = '1624891276964449853';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
