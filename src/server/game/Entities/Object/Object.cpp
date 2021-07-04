@@ -13,8 +13,6 @@
 #include "DynamicTree.h"
 #include "DynamicVisibility.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "Group.h"
 #include "Log.h"
 #include "MapManager.h"
 #include "MovementPacketBuilder.h"
@@ -37,10 +35,13 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "VMapFactory.h"
-#include "WaypointMovementGenerator.h"
 #include "World.h"
 #include "WorldPacket.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+#include "GridNotifiersImpl.h"
 
 #ifdef ELUNA
 #include "ElunaEventMgr.h"
@@ -74,7 +75,7 @@ WorldObject::~WorldObject()
     {
         if (GetTypeId() == TYPEID_CORPSE)
         {
-            LOG_FATAL("server", "Object::~Object Corpse %s, type=%d deleted but still in map!!", GetGUID().ToString().c_str(), ((Corpse*)this)->GetType());
+            LOG_FATAL("entities.object", "Object::~Object Corpse %s, type=%d deleted but still in map!!", GetGUID().ToString().c_str(), ((Corpse*)this)->GetType());
             ABORT();
         }
         ResetMap();
@@ -87,15 +88,15 @@ Object::~Object()
 
     if (IsInWorld())
     {
-        LOG_FATAL("server", "Object::~Object - %s deleted but still in world!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in world!!", GetGUID().ToString().c_str());
         if (isType(TYPEMASK_ITEM))
-            LOG_FATAL("server", "Item slot %u", ((Item*)this)->GetSlot());
+            LOG_FATAL("entities.object", "Item slot %u", ((Item*)this)->GetSlot());
         ABORT();
     }
 
     if (m_objectUpdated)
     {
-        LOG_FATAL("server", "Object::~Object - %s deleted but still in update list!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in update list!!", GetGUID().ToString().c_str());
         ABORT();
     }
 
@@ -685,7 +686,7 @@ void Object::SetByteValue(uint16 index, uint8 offset, uint8 value)
 
     if (offset > 3)
     {
-        LOG_ERROR("server", "Object::SetByteValue: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteValue: wrong offset %u", offset);
         return;
     }
 
@@ -705,7 +706,7 @@ void Object::SetUInt16Value(uint16 index, uint8 offset, uint16 value)
 
     if (offset > 1)
     {
-        LOG_ERROR("server", "Object::SetUInt16Value: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetUInt16Value: wrong offset %u", offset);
         return;
     }
 
@@ -805,7 +806,7 @@ void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("server", "Object::SetByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -824,7 +825,7 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("server", "Object::RemoveByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::RemoveByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -839,7 +840,8 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
-    LOG_INFO("server", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u", (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
+    LOG_INFO("misc", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u",
+        (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
 
     // ASSERT must fail after function call
     return false;
@@ -911,32 +913,36 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
 
 void MovementInfo::OutDebug()
 {
-    LOG_INFO("server", "MOVEMENT INFO");
-    LOG_INFO("server", "guid %s", guid.ToString().c_str());
-    LOG_INFO("server", "flags %u", flags);
-    LOG_INFO("server", "flags2 %u", flags2);
-    LOG_INFO("server", "time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
-    LOG_INFO("server", "position: `%s`", pos.ToString().c_str());
+    LOG_INFO("movement", "MOVEMENT INFO");
+    LOG_INFO("movement", "guid %s", guid.ToString().c_str());
+    LOG_INFO("movement", "flags %u", flags);
+    LOG_INFO("movement", "flags2 %u", flags2);
+    LOG_INFO("movement", "time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
+    LOG_INFO("movement", "position: `%s`", pos.ToString().c_str());
+
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
-        LOG_INFO("server", "TRANSPORT:");
-        LOG_INFO("server", "guid: %s", transport.guid.ToString().c_str());
-        LOG_INFO("server", "position: `%s`", transport.pos.ToString().c_str());
-        LOG_INFO("server", "seat: %i", transport.seat);
-        LOG_INFO("server", "time: %u", transport.time);
+        LOG_INFO("movement", "TRANSPORT:");
+        LOG_INFO("movement", "guid: %s", transport.guid.ToString().c_str());
+        LOG_INFO("movement", "position: `%s`", transport.pos.ToString().c_str());
+        LOG_INFO("movement", "seat: %i", transport.seat);
+        LOG_INFO("movement", "time: %u", transport.time);
+
         if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
-            LOG_INFO("server", "time2: %u", transport.time2);
+        {
+            LOG_INFO("movement", "time2: %u", transport.time2);
+        }
     }
 
     if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        LOG_INFO("server", "pitch: %f", pitch);
+        LOG_INFO("movement", "pitch: %f", pitch);
 
-    LOG_INFO("server", "fallTime: %u", fallTime);
+    LOG_INFO("movement", "fallTime: %u", fallTime);
     if (flags & MOVEMENTFLAG_FALLING)
-        LOG_INFO("server", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
+        LOG_INFO("movement", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
 
     if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
-        LOG_INFO("server", "splineElevation: %f", splineElevation);
+        LOG_INFO("movement", "splineElevation: %f", splineElevation);
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
@@ -1410,8 +1416,8 @@ void WorldObject::GetRandomPoint(const Position& pos, float distance, float& ran
     rand_y = pos.m_positionY + new_dist * sin(angle);
     rand_z = pos.m_positionZ;
 
-    acore::NormalizeMapCoord(rand_x);
-    acore::NormalizeMapCoord(rand_y);
+    Acore::NormalizeMapCoord(rand_x);
+    Acore::NormalizeMapCoord(rand_y);
     UpdateGroundPositionZ(rand_x, rand_y, rand_z);            // update to LOS height if available
 }
 
@@ -1510,7 +1516,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
 bool Position::IsPositionValid() const
 {
-    return acore::IsValidMapCoord(m_positionX, m_positionY, m_positionZ, m_orientation);
+    return Acore::IsValidMapCoord(m_positionX, m_positionY, m_positionZ, m_orientation);
 }
 
 float WorldObject::GetGridActivationRange() const
@@ -1900,7 +1906,7 @@ void Object::ForceValuesUpdateAtIndex(uint32 i)
     AddToObjectUpdateIfNeeded();
 }
 
-namespace acore
+namespace Acore
 {
     class MonsterChatBuilder
     {
@@ -1919,7 +1925,7 @@ namespace acore
                 ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, text, 0, "", loc_idx);
             }
             else
-                LOG_ERROR("server", "MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
+                LOG_ERROR("entities.object", "MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
         }
 
     private:
@@ -1948,61 +1954,61 @@ namespace acore
         Language i_language;
         WorldObject const* i_target;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 
 void WorldObject::MonsterSay(const char* text, uint32 language, WorldObject const* target)
 {
-    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = Acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    acore::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, text, language, target);
-    acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> say_do(say_build);
-    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    Acore::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, text, language, target);
+    Acore::LocalizedPacketDo<Acore::MonsterCustomChatBuilder> say_do(say_build);
+    Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
+    TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
 void WorldObject::MonsterSay(int32 textId, uint32 language, WorldObject const* target)
 {
-    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = Acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    acore::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, textId, language, target);
-    acore::LocalizedPacketDo<acore::MonsterChatBuilder> say_do(say_build);
-    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    Acore::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, textId, language, target);
+    Acore::LocalizedPacketDo<Acore::MonsterChatBuilder> say_do(say_build);
+    Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
+    TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
 void WorldObject::MonsterYell(const char* text, uint32 language, WorldObject const* target)
 {
-    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = Acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    acore::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, text, language, target);
-    acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> say_do(say_build);
-    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
-    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    Acore::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, text, language, target);
+    Acore::LocalizedPacketDo<Acore::MonsterCustomChatBuilder> say_do(say_build);
+    Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
+    TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
 void WorldObject::MonsterYell(int32 textId, uint32 language, WorldObject const* target)
 {
-    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = Acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    acore::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, textId, language, target);
-    acore::LocalizedPacketDo<acore::MonsterChatBuilder> say_do(say_build);
-    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
-    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    Acore::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, textId, language, target);
+    Acore::LocalizedPacketDo<Acore::MonsterChatBuilder> say_do(say_build);
+    Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
+    TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
@@ -2016,15 +2022,15 @@ void WorldObject::MonsterTextEmote(const char* text, WorldObject const* target, 
 
 void WorldObject::MonsterTextEmote(int32 textId, WorldObject const* target, bool IsBossEmote)
 {
-    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
+    CellCoord p = Acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    acore::MonsterChatBuilder say_build(this, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, textId, LANG_UNIVERSAL, target);
-    acore::LocalizedPacketDo<acore::MonsterChatBuilder> say_do(say_build);
-    acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> > say_worker(this, (IsBossEmote ? 200.0f : sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE)), say_do);
-    TypeContainerVisitor<acore::PlayerDistWorker<acore::LocalizedPacketDo<acore::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+    Acore::MonsterChatBuilder say_build(this, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, textId, LANG_UNIVERSAL, target);
+    Acore::LocalizedPacketDo<Acore::MonsterChatBuilder> say_do(say_build);
+    Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterChatBuilder> > say_worker(this, (IsBossEmote ? 200.0f : sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE)), say_do);
+    TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, (IsBossEmote ? 200.0f : sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE)));
 }
 
@@ -2072,8 +2078,8 @@ void WorldObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*
     dist += GetObjectSize();
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
-    acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
-    VisitNearbyWorldObject(dist, notifier);
+    Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
@@ -2091,7 +2097,7 @@ void WorldObject::SetMap(Map* map)
         return;
     if (m_currMap)
     {
-        LOG_FATAL("server", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
+        LOG_FATAL("entities.object", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
         ABORT();
     }
     m_currMap = map;
@@ -2139,7 +2145,7 @@ void WorldObject::AddObjectToRemoveList()
     Map* map = FindMap();
     if (!map)
     {
-        LOG_ERROR("server", "Object %s at attempt add to move list not have valid map (Id: %u).", GetGUID().ToString().c_str(), GetMapId());
+        LOG_ERROR("entities.object", "Object %s at attempt add to move list not have valid map (Id: %u).", GetGUID().ToString().c_str(), GetMapId());
         return;
     }
 
@@ -2404,27 +2410,27 @@ void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list 
 Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive) const
 {
     Creature* creature = nullptr;
-    acore::NearestCreatureEntryWithLiveStateInObjectRangeCheck checker(*this, entry, alive, range);
-    acore::CreatureLastSearcher<acore::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(this, creature, checker);
-    VisitNearbyObject(range, searcher);
+    Acore::NearestCreatureEntryWithLiveStateInObjectRangeCheck checker(*this, entry, alive, range);
+    Acore::CreatureLastSearcher<Acore::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(this, creature, checker);
+    Cell::VisitAllObjects(this, searcher, range);
     return creature;
 }
 
 GameObject* WorldObject::FindNearestGameObject(uint32 entry, float range) const
 {
     GameObject* go = nullptr;
-    acore::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range);
-    acore::GameObjectLastSearcher<acore::NearestGameObjectEntryInObjectRangeCheck> searcher(this, go, checker);
-    VisitNearbyGridObject(range, searcher);
+    Acore::NearestGameObjectEntryInObjectRangeCheck checker(*this, entry, range);
+    Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck> searcher(this, go, checker);
+    Cell::VisitGridObjects(this, searcher, range);
     return go;
 }
 
 GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float range) const
 {
     GameObject* go = nullptr;
-    acore::NearestGameObjectTypeInObjectRangeCheck checker(*this, type, range);
-    acore::GameObjectLastSearcher<acore::NearestGameObjectTypeInObjectRangeCheck> searcher(this, go, checker);
-    VisitNearbyGridObject(range, searcher);
+    Acore::NearestGameObjectTypeInObjectRangeCheck checker(*this, type, range);
+    Acore::GameObjectLastSearcher<Acore::NearestGameObjectTypeInObjectRangeCheck> searcher(this, go, checker);
+    Cell::VisitGridObjects(this, searcher, range);
     return go;
 }
 
@@ -2432,41 +2438,29 @@ Player* WorldObject::SelectNearestPlayer(float distance) const
 {
     Player* target = nullptr;
 
-    acore::NearestPlayerInObjectRangeCheck checker(this, distance);
-    acore::PlayerLastSearcher<acore::NearestPlayerInObjectRangeCheck> searcher(this, target, checker);
-    VisitNearbyObject(distance, searcher);
+    Acore::NearestPlayerInObjectRangeCheck checker(this, distance);
+    Acore::PlayerLastSearcher<Acore::NearestPlayerInObjectRangeCheck> searcher(this, target, checker);
+    Cell::VisitWorldObjects(this, searcher, distance);
 
     return target;
 }
 
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, uint32 entry, float maxSearchRange) const
 {
-    CellCoord pair(acore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
-    Cell cell(pair);
-    cell.SetNoCreate();
-
-    acore::AllGameObjectsWithEntryInRange check(this, entry, maxSearchRange);
-    acore::GameObjectListSearcher<acore::AllGameObjectsWithEntryInRange> searcher(this, gameobjectList, check);
-    TypeContainerVisitor<acore::GameObjectListSearcher<acore::AllGameObjectsWithEntryInRange>, GridTypeMapContainer> visitor(searcher);
-
-    cell.Visit(pair, visitor, *(this->GetMap()), *this, maxSearchRange);
+    Acore::AllGameObjectsWithEntryInRange check(this, entry, maxSearchRange);
+    Acore::GameObjectListSearcher<Acore::AllGameObjectsWithEntryInRange> searcher(this, gameobjectList, check);
+    Cell::VisitGridObjects(this, searcher, maxSearchRange);
 }
 
 void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, uint32 entry, float maxSearchRange) const
 {
-    CellCoord pair(acore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
-    Cell cell(pair);
-    cell.SetNoCreate();
-
-    acore::AllCreaturesOfEntryInRange check(this, entry, maxSearchRange);
-    acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
-    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> visitor(searcher);
-
-    cell.Visit(pair, visitor, *(this->GetMap()), *this, maxSearchRange);
+    Acore::AllCreaturesOfEntryInRange check(this, entry, maxSearchRange);
+    Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
+    Cell::VisitGridObjects(this, searcher, maxSearchRange);
 }
 
 /*
-namespace acore
+namespace Acore
 {
     class NearUsedPosDo
     {
@@ -2535,7 +2529,7 @@ namespace acore
             float              i_angle;
             ObjectPosSelector& i_selector;
     };
-}                                                           // namespace acore
+}                                                           // namespace Acore
 */
 
 //===================================================================================================
@@ -2565,8 +2559,8 @@ void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y
     x = GetPositionX() + (effectiveReach + distance2d) * std::cos(absAngle);
     y = GetPositionY() + (effectiveReach + distance2d) * std::sin(absAngle);
 
-    acore::NormalizeMapCoord(x);
-    acore::NormalizeMapCoord(y);
+    Acore::NormalizeMapCoord(x);
+    Acore::NormalizeMapCoord(y);
 }
 
 void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle) const
@@ -2702,9 +2696,9 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     desty = pos.m_positionY + dist * sin(angle);
 
     // Prevent invalid coordinates here, position is unchanged
-    if (!acore::IsValidMapCoord(destx, desty))
+    if (!Acore::IsValidMapCoord(destx, desty))
     {
-        LOG_FATAL("server", "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
         return;
     }
 
@@ -2733,8 +2727,8 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
         }
     }
 
-    acore::NormalizeMapCoord(pos.m_positionX);
-    acore::NormalizeMapCoord(pos.m_positionY);
+    Acore::NormalizeMapCoord(pos.m_positionX);
+    Acore::NormalizeMapCoord(pos.m_positionY);
     UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
     pos.m_orientation = m_orientation;
 }
@@ -2752,7 +2746,7 @@ Position WorldObject::GetFirstCollisionPosition(float startX, float startY, floa
 
     MovePositionToFirstCollision(pos, distance, ang);
     return pos;
-};
+}
 
 Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float destZ)
 {
@@ -2767,7 +2761,7 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
 
     MovePositionToFirstCollision(pos, distance, ang);
     return pos;
-};
+}
 
 Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
 {
@@ -2841,9 +2835,9 @@ void WorldObject::DestroyForNearbyPlayers()
         return;
 
     std::list<Player*> targets;
-    acore::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange() + VISIBILITY_COMPENSATION, false);
-    acore::PlayerListSearcherWithSharedVision<acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
-    VisitNearbyWorldObject(GetVisibilityRange() + VISIBILITY_COMPENSATION, searcher);
+    Acore::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange() + VISIBILITY_COMPENSATION, false);
+    Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, GetVisibilityRange());
     for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
         Player* player = (*iter);
@@ -2865,8 +2859,8 @@ void WorldObject::DestroyForNearbyPlayers()
 void WorldObject::UpdateObjectVisibility(bool /*forced*/, bool /*fromUpdate*/)
 {
     //updates object's visibility for nearby players
-    acore::VisibleChangesNotifier notifier(*this);
-    VisitNearbyWorldObject(GetVisibilityRange() + VISIBILITY_COMPENSATION, notifier);
+    Acore::VisibleChangesNotifier notifier(*this);
+    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
 }
 
 void WorldObject::AddToNotify(uint16 f)
@@ -2970,31 +2964,26 @@ struct WorldObjectChangeAccumulator
 
 void WorldObject::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set)
 {
-    CellCoord p = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
-    Cell cell(p);
-    cell.SetNoCreate();
     WorldObjectChangeAccumulator notifier(*this, data_map, player_set);
-    TypeContainerVisitor<WorldObjectChangeAccumulator, WorldTypeMapContainer > player_notifier(notifier);
-    Map& map = *GetMap();
     //we must build packets for all visible players
-    cell.Visit(p, player_notifier, map, *this, GetVisibilityRange() + VISIBILITY_COMPENSATION);
+    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
 
     ClearUpdateMask(false);
 }
 
 void WorldObject::GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry)
 {
-    CellCoord pair(acore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
+    CellCoord pair(Acore::ComputeCellCoord(this->GetPositionX(), this->GetPositionY()));
     Cell cell(pair);
     cell.SetNoCreate();
 
-    acore::AllCreaturesOfEntryInRange check(this, entry, radius);
-    acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
+    Acore::AllCreaturesOfEntryInRange check(this, entry, radius);
+    Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
 
-    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, WorldTypeMapContainer> world_visitor(searcher);
+    TypeContainerVisitor<Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange>, WorldTypeMapContainer> world_visitor(searcher);
     cell.Visit(pair, world_visitor, *(this->GetMap()), *this, radius);
 
-    TypeContainerVisitor<acore::CreatureListSearcher<acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> grid_visitor(searcher);
+    TypeContainerVisitor<Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange>, GridTypeMapContainer> grid_visitor(searcher);
     cell.Visit(pair, grid_visitor, *(this->GetMap()), *this, radius);
 }
 
@@ -3019,7 +3008,7 @@ ObjectGuid WorldObject::GetTransGUID() const
 float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/, float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/) const
 {
     if (z != MAX_HEIGHT)
-        z += Z_OFFSET_FIND_HEIGHT;
+        z += std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT);
 
     return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
 }
@@ -3028,7 +3017,7 @@ float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* gr
 {
     return GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, ground,
         isType(TYPEMASK_UNIT) ? !static_cast<Unit const*>(this)->HasAuraType(SPELL_AURA_WATER_WALK) : false,
-        GetCollisionHeight());
+        std::max(GetCollisionHeight(),  Z_OFFSET_FIND_HEIGHT));
 }
 
 float WorldObject::GetFloorZ() const
@@ -3036,5 +3025,5 @@ float WorldObject::GetFloorZ() const
     if (!IsInWorld())
         return m_staticFloorZ;
 
-    return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + Z_OFFSET_FIND_HEIGHT));
+    return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT)));
 }

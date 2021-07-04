@@ -1,7 +1,13 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
+
 #ifndef __SAVINGSYSTEM_H
 #define __SAVINGSYSTEM_H
 
 #include "Common.h"
+#include <list>
+#include <mutex>
 
 // to evenly distribute saving players to db
 

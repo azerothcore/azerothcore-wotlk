@@ -95,13 +95,17 @@ function comp_compile() {
 
   cd $CWD
 
-  if [ $DOCKER = 1 ]; then
+  if [[ $DOCKER = 1 ]]; then
     echo "Generating confs..."
     cp -n "env/dist/etc/worldserver.conf.dockerdist" "env/dist/etc/worldserver.conf"
     cp -n "env/dist/etc/authserver.conf.dockerdist" "env/dist/etc/authserver.conf"
   fi
 
   runHooks "ON_AFTER_BUILD"
+
+  # set worldserver SUID bit
+  sudo chown root:root "$AC_BINPATH_FULL/worldserver"
+  sudo chmod u+s "$AC_BINPATH_FULL/worldserver"
 }
 
 function comp_build() {
