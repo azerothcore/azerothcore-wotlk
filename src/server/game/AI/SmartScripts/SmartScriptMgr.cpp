@@ -49,36 +49,57 @@ void SmartWaypointMgr::LoadFromDB()
         return;
     }
 
-    uint32 count = 0;
-    uint32 total = 0;
-    uint32 last_entry = 0;
-    uint32 last_id = 1;
-
+    uint32 count        = 0;
+    uint32 total        = 0;
+    uint32 last_entry   = 0;
+    uint32 last_id      = 1;
+    uint32 last_group   = 0;
     do
     {
-        Field* fields = result->Fetch();
-        uint32 entry = fields[0].GetUInt32();
-        uint32 id = fields[1].GetUInt32();
-        float x, y, z;
-        x = fields[2].GetFloat();
-        y = fields[3].GetFloat();
-        z = fields[4].GetFloat();
+        Field* fields   = result->Fetch();
+        uint32 entry    = fields[0].GetUInt32();
+        uint32 id       = fields[1].GetUInt32();
+        uint32 wp_group = fields[2].GetUInt32();
+        float x         = fields[3].GetFloat();
+        float y         = fields[4].GetFloat();
+        float z         = fields[5].GetFloat();
 
-        if (last_entry != entry)
+        /* Groups are how Waypoints are organized into.
+         * Keep in mind that you can jump from group 0
+         * to another entry's group 0. So It's important to check
+         * for both the Entry aswell the group.
+        */
+        if (last_group != wp_group || last_entry != entry)
         {
+            // Insert a new WPPath object into our waypoint_map
+            // which stores all entries waypoints in groups.
             waypoint_map[entry] = new WPPath();
             last_id = 1;
-            count++;
         }
 
-        if (last_id != id)
-            LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry %u, unexpected point id %u, expected %u.", entry, id, last_id);
+        if (last_id != id && last_group == wp_group)
+            LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry %u, unexpected point id %u, expected %u in group %u", entry, id, last_id, last_group);
 
-        last_id++;
-        (*waypoint_map[entry])[id] = new WayPoint(id, x, y, z);
+        /* Reading from Right to left:
+         * Insert a new WayPoint object inside Waypoint Map
+         *      for the current entry, in the respective group of waypoints.
+         */
+        (*waypoint_map[entry])[wp_group] = new WayPoint(wp_group, id, x, y, z);
 
-        last_entry = entry;
+        // When a new entry is found, count it for the display message
+        if (last_entry != entry) { count++; }
+
+        // A new waypoint was loaded, so we count it for the display message
         total++;
+
+        // This is the PointID. It's used to check for strange jumps of points from 1 to 3
+        last_id++;
+
+        // To find a new entry we remember the last one
+        last_entry = entry;
+
+        last_group = wp_group;
+
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded %u SmartAI waypoint paths (total %u waypoints) in %u ms", count, total, GetMSTimeDiffToNow(oldMSTime));
@@ -1231,6 +1252,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_VORTEX_SUMMON:
         case SMART_ACTION_PLAYER_TALK:
         case SMART_ACTION_CU_ENCOUNTER_START:
+        case SMART_ACTION_RANDOM_WP_GROUP:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type(%u), event_type(%u), Entry %d SourceType %u Event %u, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

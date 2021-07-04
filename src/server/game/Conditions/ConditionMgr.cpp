@@ -407,6 +407,24 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                     condMeets = unit->HasAuraType(AuraType(ConditionValue1));
                 break;
             }
+        /* This condition can be used when using SmartAI to set data with Actions.
+         * A good example for this is giving Non playable Characters gossip options
+         * when that creature has a specific combination of field + data.
+         * ConditionValue1 = Field
+         * ConditionValue2 = Data
+        */
+        case CONDITION_UNIT_DATA:
+        {
+            if (Creature* creature = object->ToCreature())
+            {
+                uint32 data = creature->m_data.GetData(ConditionValue1);
+                if (data == ConditionValue2)
+                {
+                    condMeets = true;
+                }
+            }
+            break;
+        }
         default:
             condMeets = false;
             break;

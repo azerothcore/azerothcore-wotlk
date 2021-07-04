@@ -23,10 +23,9 @@
 SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 {
     // copy script to local (protection for table reload)
-
-    mWayPoints = nullptr;
     mEscortState = SMART_ESCORT_NONE;
     mCurrentWPID = 0;//first wp id is 1 !!
+    mCurrentWPGroupID = 0;
     mWPReached = false;
     mOOCReached = false;
     mWPPauseTimer = 0;
@@ -89,6 +88,8 @@ void SmartAI::UpdateDespawn(const uint32 diff)
 
 WayPoint* SmartAI::GetNextWayPoint()
 {
+    // TODO:
+    // Get Next Waypoint from current group
     if (!mWayPoints || mWayPoints->empty())
         return nullptr;
 
@@ -105,7 +106,7 @@ WayPoint* SmartAI::GetNextWayPoint()
     return nullptr;
 }
 
-void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
+void SmartAI::GenerateWayPointArray(Movement::PointsArray* points, uint32 group)
 {
     if (!mWayPoints || mWayPoints->empty())
         return;
@@ -120,8 +121,11 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
         WPPath::const_iterator itr;
         while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end())
         {
-            WayPoint* wp = (*itr).second;
-            points->push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+            if ((*itr).second->wp_group == group)
+            {
+                WayPoint* wp = (*itr).second;
+                points->push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+            }
         }
     }
     else
@@ -138,8 +142,11 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
             WPPath::const_iterator itr;
             while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end() && cnt++ <= length)
             {
-                WayPoint* wp = (*itr).second;
-                pVector.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                if ((*itr).second->wp_group == group)
+                {
+                    WayPoint* wp = (*itr).second;
+                    pVector.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                }
             }
 
             if (pVector.size() > 2) // more than source + dest
@@ -165,6 +172,43 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
             *points = pVector;
             break;
         }
+    }
+}
+
+void SmartAI::RandomWaypointGroup(uint32 firstGroup, uint32 lastGroup, Unit* invoker)
+{
+    if (me->IsInCombat())// no wp movement in combat
+    {
+        LOG_ERROR("scripts.ai.sai", "SmartAI::StartPath: Creature entry %u wanted to start waypoint movement while in combat, ignoring.", me->GetEntry());
+        return;
+    }
+
+    if (HasEscortState(SMART_ESCORT_ESCORTING))
+        StopPath();
+
+    uint32 group = urand(firstGroup, lastGroup);
+
+    if (!LoadPath(invoker->GetEntry(), group))
+        return;
+
+    if (!mWayPoints || mWayPoints->empty())
+        return;
+
+    if (WayPoint* wp = GetNextWayPoint())
+    {
+        AddEscortState(SMART_ESCORT_ESCORTING);
+
+        if (invoker && invoker->GetTypeId() == TYPEID_PLAYER)
+        {
+            mEscortNPCFlags = me->GetUInt32Value(UNIT_NPC_FLAGS);
+            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+        }
+
+        Movement::PointsArray pathPoints;
+        GenerateWayPointArray(&pathPoints, uint32());
+
+        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+        GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_START, nullptr, wp->id, GetScript()->GetPathId());
     }
 }
 
@@ -208,12 +252,12 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
     }
 }
 
-bool SmartAI::LoadPath(uint32 entry)
+bool SmartAI::LoadPath(uint32 entry, uint32 group)
 {
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         return false;
 
-    mWayPoints = sSmartWaypointMgr->GetPath(entry);
+    mWayPoints = sSmartWaypointMgr->GetPath(entry, group);
     if (!mWayPoints)
     {
         GetScript()->SetPathId(0);

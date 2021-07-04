@@ -17,14 +17,16 @@
 
 struct WayPoint
 {
-    WayPoint(uint32 _id, float _x, float _y, float _z)
+    WayPoint(uint32 _wp_group, uint32 _id, float _x, float _y, float _z)
     {
+        wp_group = _wp_group;
         id = _id;
         x = _x;
         y = _y;
         z = _z;
     }
 
+    uint32 wp_group;
     uint32 id;
     float x;
     float y;
@@ -619,7 +621,8 @@ enum SMART_ACTION
     SMART_ACTION_VORTEX_SUMMON                      = 221,    // entry, duration (0 = perm), spiral scaling, spiral appearance, range max, phi_delta     <-- yes confusing math, try it ingame and see, my lovely AC boys!
     SMART_ACTION_CU_ENCOUNTER_START                 = 222,    // Resets cooldowns on all targets and removes Heroism debuff(s)
 
-    SMART_ACTION_AC_END                             = 223,    // placeholder
+    SMART_ACTION_RANDOM_WP_GROUP                    = 223,
+    SMART_ACTION_AC_END                             = 224,    // placeholder
 };
 
 struct SmartAction
@@ -1250,6 +1253,12 @@ struct SmartAction
             uint32 phi_delta;
         } summonVortex;
 
+        struct
+        {
+            uint32 wpMinRandom; // The first group to pick
+            uint32 wpMaxRandom; // The last group to pick
+        }randomWpGroup;
+
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1700,6 +1709,11 @@ public:
     bool enableTimed;
 };
 
+/*Redundancy of information:
+    We are storing pointId on both the WPPath first and inside WayPoint pointer.
+    Since we need to group them based on group ids, the first member of WPPath will
+    be the group which the waypoint belongs too.
+*/
 typedef std::unordered_map<uint32, WayPoint*> WPPath;
 
 typedef std::list<WorldObject*> ObjectList;
@@ -1767,11 +1781,22 @@ public:
 
     void LoadFromDB();
 
-    WPPath* GetPath(uint32 id)
+    WPPath* GetPath(uint32 id, uint32 group = 0)
     {
-        if (waypoint_map.find(id) != waypoint_map.end())
-            return waypoint_map[id];
-        else return 0;
+        for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
+        {
+            if (itr->first == id)
+            {
+                for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
+                {
+                    if (pathItr->first == group)
+                    {
+                        return itr->second;
+                    }
+                }
+            }
+        }
+        return nullptr;
     }
 
 private:

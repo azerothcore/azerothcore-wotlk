@@ -175,7 +175,8 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE),
     m_HostileRefManager(this),
-    m_comboTarget(nullptr)
+    m_comboTarget(nullptr),
+    m_data(0, 0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
