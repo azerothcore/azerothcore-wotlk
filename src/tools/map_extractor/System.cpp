@@ -980,7 +980,7 @@ void ExtractMapsFromMpq(uint32 build)
     {
         printf("Extract %s (%d/%u)                  \n", map_ids[z].name, z + 1, map_count);
         // Loadup map grid data
-        mpqMapName = acore::StringFormat(R"(World\Maps\%s\%s.wdt)", map_ids[z].name, map_ids[z].name);
+        mpqMapName = Acore::StringFormat(R"(World\Maps\%s\%s.wdt)", map_ids[z].name, map_ids[z].name);
         WDT_file wdt;
         if (!wdt.loadFile(mpqMapName, false))
         {
@@ -994,8 +994,8 @@ void ExtractMapsFromMpq(uint32 build)
             {
                 if (!wdt.main->adt_list[y][x].exist)
                     continue;
-                mpqFileName = acore::StringFormat(R"(World\Maps\%s\%s_%u_%u.adt)", map_ids[z].name, map_ids[z].name, x, y);
-                outputFileName = acore::StringFormat("%s/maps/%03u%02u%02u.map", output_path, map_ids[z].id, y, x);
+                mpqFileName = Acore::StringFormat(R"(World\Maps\%s\%s_%u_%u.adt)", map_ids[z].name, map_ids[z].name, x, y);
+                outputFileName = Acore::StringFormat("%s/maps/%03u%02u%02u.map", output_path, map_ids[z].id, y, x);
                 ConvertADT(mpqFileName, outputFileName, y, x, build);
             }
             // draw progress bar

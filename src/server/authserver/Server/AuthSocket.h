@@ -9,10 +9,13 @@
 
 #include "Common.h"
 #include "CryptoHash.h"
+#include "Optional.h"
 #include "RealmSocket.h"
 #include "SRP6.h"
+#include <mutex>
 
 class ACE_INET_Addr;
+class Field;
 struct Realm;
 
 enum eStatus
@@ -23,6 +26,21 @@ enum eStatus
     STATUS_PATCH,      // unused
     STATUS_AUTHED,
     STATUS_CLOSED
+};
+
+struct AccountInfo
+{
+    void LoadResult(Field* fields);
+
+    uint32 Id = 0;
+    std::string Login;
+    bool IsLockedToIP = false;
+    std::string LockCountry;
+    std::string LastIP;
+    uint32 FailedLogins = 0;
+    bool IsBanned = false;
+    bool IsPermanentlyBanned = false;
+    AccountTypes SecurityLevel = SEC_PLAYER;
 };
 
 // Handle login commands
@@ -58,22 +76,22 @@ private:
     RealmSocket& socket_;
     RealmSocket& socket() { return socket_; }
 
-    std::optional<acore::Crypto::SRP6> _srp6;
+    std::optional<Acore::Crypto::SRP6> _srp6;
     SessionKey _sessionKey = {};
     std::array<uint8, 16> _reconnectProof = {};
 
     eStatus _status;
 
-    std::string _login;
-    std::string _tokenKey;
+    AccountInfo _accountInfo;
+    Optional<std::vector<uint8>> _totpSecret;
 
     // Since GetLocaleByName() is _NOT_ bijective, we have to store the locale as a string. Otherwise we can't differ
     // between enUS and enGB, which is important for the patch system
     std::string _localizationName;
     std::string _os;
+    std::string _ipCountry;
     uint16 _build;
     uint8 _expversion;
-    AccountTypes _accountSecurityLevel;
 };
 
 #endif

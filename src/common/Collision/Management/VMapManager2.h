@@ -18,10 +18,11 @@
 #ifndef _VMAPMANAGER2_H
 #define _VMAPMANAGER2_H
 
+#include "Common.h"
 #include "IVMapManager.h"
-#include "Define.h"
 #include <mutex>
 #include <unordered_map>
+#include <vector>
 
 //===========================================================
 
@@ -65,12 +66,22 @@ namespace VMAP
     typedef std::unordered_map<uint32, StaticMapTree*> InstanceTreeMap;
     typedef std::unordered_map<std::string, ManagedModel> ModelFileMap;
 
+    enum DisableTypes
+    {
+        VMAP_DISABLE_AREAFLAG       = 0x1,
+        VMAP_DISABLE_HEIGHT         = 0x2,
+        VMAP_DISABLE_LOS            = 0x4,
+        VMAP_DISABLE_LIQUIDSTATUS   = 0x8
+    };
+
     class VMapManager2 : public IVMapManager
     {
     protected:
         // Tree to check collision
         ModelFileMap iLoadedModelFiles;
         InstanceTreeMap iInstanceMapTrees;
+        bool thread_safe_environment;
+
         // Mutex for iLoadedModelFiles
         std::mutex LoadedModelFilesLock;
 
@@ -78,6 +89,9 @@ namespace VMAP
         /* void _unloadMap(uint32 pMapId, uint32 x, uint32 y); */
 
         static uint32 GetLiquidFlagsDummy(uint32) { return 0; }
+        static bool IsVMAPDisabledForDummy(uint32 /*entry*/, uint8 /*flags*/) { return false; }
+
+        InstanceTreeMap::const_iterator GetMapTree(uint32 mapId) const;
 
     public:
         // public for debug
@@ -86,6 +100,8 @@ namespace VMAP
 
         VMapManager2();
         ~VMapManager2() override;
+
+        void InitializeThreadUnsafe(const std::vector<uint32>& mapIds);
 
         int loadMap(const char* pBasePath, unsigned int mapId, int x, int y) override;
 
@@ -96,12 +112,12 @@ namespace VMAP
         /**
         fill the hit pos and return true, if an object was hit
         */
-        bool getObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist) override;
+        bool GetObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist) override;
         float getHeight(unsigned int mapId, float x, float y, float z, float maxSearchDist) override;
 
         bool processCommand(char* /*command*/) override { return false; } // for debug and extensions
 
-        bool getAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
+        bool GetAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
         bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 reqLiquidType, float& level, float& floor, uint32& type) const override;
 
         WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename);
@@ -113,11 +129,13 @@ namespace VMAP
             return getMapFileName(mapId);
         }
         bool existsMap(const char* basePath, unsigned int mapId, int x, int y) override;
-    public:
-        void getInstanceMapTree(InstanceTreeMap& instanceMapTree);
+        void GetInstanceMapTree(InstanceTreeMap& instanceMapTree);
 
         typedef uint32(*GetLiquidFlagsFn)(uint32 liquidType);
         GetLiquidFlagsFn GetLiquidFlagsPtr;
+
+        typedef bool(*IsVMAPDisabledForFn)(uint32 entry, uint8 flags);
+        IsVMAPDisabledForFn IsVMAPDisabledForPtr;
     };
 }
 

@@ -50,10 +50,11 @@ target_include_directories(common
 
 target_link_libraries(common
   PRIVATE
-    game-interface
-  PUBLIC
     acore-core-interface
+  PUBLIC
     ace
+    boost
+    argon2
     g3dlib
     Detour
     sfmt

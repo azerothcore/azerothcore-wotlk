@@ -662,8 +662,8 @@ union GameObjectValue
 
 struct GameObjectLocale
 {
-    StringVector Name;
-    StringVector CastBarCaption;
+    std::vector<std::string> Name;
+    std::vector<std::string> CastBarCaption;
 };
 
 // `gameobject_addon` table
@@ -812,8 +812,8 @@ public:
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
     void Refresh();
     void Delete();
-    void getFishLoot(Loot* loot, Player* loot_owner);
-    void getFishLootJunk(Loot* loot, Player* loot_owner);
+    void GetFishLoot(Loot* loot, Player* loot_owner);
+    void GetFishLootJunk(Loot* loot, Player* loot_owner);
     [[nodiscard]] GameobjectTypes GetGoType() const { return GameobjectTypes(GetByteValue(GAMEOBJECT_BYTES_1, 1)); }
     void SetGoType(GameobjectTypes type) { SetByteValue(GAMEOBJECT_BYTES_1, 1, type); }
     [[nodiscard]] GOState GetGoState() const { return GOState(GetByteValue(GAMEOBJECT_BYTES_1, 0)); }
@@ -953,6 +953,7 @@ public:
 
 protected:
     bool AIM_Initialize();
+    GameObjectModel* CreateModel();
     void UpdateModel();                                 // updates model in case displayId were changed
     uint32      m_spellId;
     time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
