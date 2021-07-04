@@ -1392,7 +1392,7 @@ class UnitData
 public:
     UnitData(uint32 field, uint32 data) : _field(field), _data(data) {}
     void SetData(uint32 field, uint32 data) { _field = field; _data = data; }
-    uint32 GetData(uint32 field) { return _data; }
+    uint32 GetData(uint32 field) { return (field == _field ? _data : 0); }
 private:
     uint32 _field;
     uint32 _data;

@@ -1785,6 +1785,9 @@ public:
 
     std::vector<WayPoint*> GetPath(uint32 id /*waypoint.entry*/, uint32 group)
     {
+        if (id == 7604)
+            LOG_DEBUG("sql.sql","Found Sergeant's Bly path");
+
         std::vector<WayPoint*> returned_path;
         for (auto wp : waypoint_map)
         {

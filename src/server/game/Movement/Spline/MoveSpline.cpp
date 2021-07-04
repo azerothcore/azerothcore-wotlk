@@ -196,7 +196,7 @@ namespace Movement
                 LOG_ERROR("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: expression '%s' failed for cyclic spline continuation", #exp); \
             return false;\
         }
-        CHECK(path.size() > 1);
+        CHECK(path.size() >= 1);
         CHECK(velocity > 0.01f);
         CHECK(time_perc >= 0.f && time_perc <= 1.f);
         //CHECK(_checkPathBounds());
