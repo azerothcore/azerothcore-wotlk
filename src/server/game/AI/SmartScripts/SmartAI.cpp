@@ -90,25 +90,25 @@ WayPoint* SmartAI::GetNextWayPoint()
 {
     // TODO:
     // Get Next Waypoint from current group
-    if (!mWayPoints || mWayPoints->empty())
+    if (mWayPoints.empty())
         return nullptr;
 
     mCurrentWPID++;
-    WPPath::const_iterator itr = mWayPoints->find(mCurrentWPID);
-    if (itr != mWayPoints->end())
+    for (auto wp : mWayPoints)
     {
-        mLastWP = (*itr).second;
-        if (mLastWP->id != mCurrentWPID)
-            LOG_ERROR("scripts.ai.sai", "SmartAI::GetNextWayPoint: Got not expected waypoint id %u, expected %u", mLastWP->id, mCurrentWPID);
-
-        return (*itr).second;
+        if (wp->id == mCurrentWPID && wp->wp_group == mCurrentWPGroupID)
+        {
+            return wp;
+        }
     }
+
+    LOG_ERROR("scripts.ai.sai", "SmartAI::GetNextWayPoint: Got not expected waypoint id %u", mCurrentWPID);
     return nullptr;
 }
 
 void SmartAI::GenerateWayPointArray(Movement::PointsArray* points, uint32 group)
 {
-    if (!mWayPoints || mWayPoints->empty())
+    if (mWayPoints.empty())
         return;
 
     // Flying unit, just fill array
@@ -117,13 +117,11 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points, uint32 group)
         // xinef: first point in vector is unit real position
         points->clear();
         points->push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-        uint32 wpCounter = mCurrentWPID;
-        WPPath::const_iterator itr;
-        while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end())
+        uint32 entry = me->GetEntry();
+        for (auto wp : mWayPoints)
         {
-            if ((*itr).second->wp_group == group)
+            if (wp->entry == entry && wp->wp_group == group)
             {
-                WayPoint* wp = (*itr).second;
                 points->push_back(G3D::Vector3(wp->x, wp->y, wp->z));
             }
         }
@@ -135,17 +133,12 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points, uint32 group)
             std::vector<G3D::Vector3> pVector;
             // xinef: first point in vector is unit real position
             pVector.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            uint32 length = (mWayPoints->size() - mCurrentWPID) * size;
-
-            uint32 cnt = 0;
-            uint32 wpCounter = mCurrentWPID;
-            WPPath::const_iterator itr;
-            while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end() && cnt++ <= length)
+            uint32 entry = me->GetEntry();
+            for (auto wp : mWayPoints)
             {
-                if ((*itr).second->wp_group == group)
+                if (wp->entry == entry && wp->wp_group == group)
                 {
-                    WayPoint* wp = (*itr).second;
-                    pVector.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                    points->push_back(G3D::Vector3(wp->x, wp->y, wp->z));
                 }
             }
 
@@ -191,7 +184,7 @@ void SmartAI::RandomWaypointGroup(uint32 firstGroup, uint32 lastGroup, Unit* inv
     if (!LoadPath(invoker->GetEntry(), group))
         return;
 
-    if (!mWayPoints || mWayPoints->empty())
+    if (mWayPoints.empty())
         return;
 
     if (WayPoint* wp = GetNextWayPoint())
@@ -229,7 +222,7 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
             return;
     }
 
-    if (!mWayPoints || mWayPoints->empty())
+    if (mWayPoints.empty())
         return;
 
     if (WayPoint* wp = GetNextWayPoint())
@@ -257,8 +250,9 @@ bool SmartAI::LoadPath(uint32 entry, uint32 group)
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         return false;
 
+    mCurrentWPGroupID = group;
     mWayPoints = sSmartWaypointMgr->GetPath(entry, group);
-    if (!mWayPoints)
+    if (mWayPoints.empty())
     {
         GetScript()->SetPathId(0);
         return false;
@@ -316,7 +310,7 @@ void SmartAI::StopPath(uint32 DespawnTime, uint32 quest, bool fail)
 void SmartAI::EndPath(bool fail)
 {
     RemoveEscortState(SMART_ESCORT_ESCORTING | SMART_ESCORT_PAUSED | SMART_ESCORT_RETURNING);
-    mWayPoints = nullptr;
+    mWayPoints.clear();
     mLastWP = nullptr;
     mWPPauseTimer = 0;
 

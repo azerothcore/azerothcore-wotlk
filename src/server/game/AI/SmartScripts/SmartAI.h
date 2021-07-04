@@ -202,7 +202,7 @@ private:
     void ReturnToLastOOCPos();
     void UpdatePath(const uint32 diff);
     SmartScript mScript;
-    std::vector<WPPath*> mWayPoints;
+    std::vector<WayPoint*> mWayPoints;
     uint32 mEscortState;
     uint32 mCurrentWPID;
     uint32 mCurrentWPGroupID;

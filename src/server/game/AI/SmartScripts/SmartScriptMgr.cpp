@@ -29,14 +29,6 @@ void SmartWaypointMgr::LoadFromDB()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
-    {
-        for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
-            delete pathItr->second;
-
-        delete itr->second;
-    }
-
     waypoint_map.clear();
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_SMARTAI_WP);
@@ -71,20 +63,16 @@ void SmartWaypointMgr::LoadFromDB()
         */
         if (last_group != wp_group || last_entry != entry)
         {
-            // Insert a new WPPath object into our waypoint_map
-            // which stores all entries waypoints in groups.
-            waypoint_map[entry] = new WPPath();
+            // Reset the ID of the pointer we are inserting
             last_id = 1;
         }
 
         if (last_id != id && last_group == wp_group)
             LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry %u, unexpected point id %u, expected %u in group %u", entry, id, last_id, last_group);
 
-        /* Reading from Right to left:
-         * Insert a new WayPoint object inside Waypoint Map
-         *      for the current entry, in the respective group of waypoints.
-         */
-        (*waypoint_map[entry])[wp_group] = new WayPoint(wp_group, id, x, y, z);
+        // Insert a new WayPoint pointer into our waypoint_map
+        // A vector that stores all waypoints in the game
+        waypoint_map.push_back(new WayPoint(entry, wp_group, id, x, y, z));
 
         // When a new entry is found, count it for the display message
         if (last_entry != entry) { count++; }
@@ -97,7 +85,6 @@ void SmartWaypointMgr::LoadFromDB()
 
         // To find a new entry we remember the last one
         last_entry = entry;
-
         last_group = wp_group;
 
     } while (result->NextRow());
@@ -108,13 +95,7 @@ void SmartWaypointMgr::LoadFromDB()
 
 SmartWaypointMgr::~SmartWaypointMgr()
 {
-    for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
-    {
-        for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
-            delete pathItr->second;
-
-        delete itr->second;
-    }
+    waypoint_map.clear();
 }
 
 SmartAIMgr* SmartAIMgr::instance()
@@ -1045,7 +1026,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             break;
         case SMART_ACTION_WP_START:
             {
-                if (!sSmartWaypointMgr->GetPath(e.action.wpStart.pathID))
+                // Before waypoint groups we got "Path" which as a pointer that held
+                // the WayPoint pointers that simulated a path. To keep that working,
+                // we start the paths from group 0, since it's the default on table.
+                if (sSmartWaypointMgr->GetPath(e.action.wpStart.pathID, 0).empty())
                 {
                     LOG_ERROR("sql.sql", "SmartAIMgr: Creature %d Event %u Action %u uses non-existent WaypointPath id %u, skipped.", e.entryOrGuid, e.event_id, e.GetActionType(), e.action.wpStart.pathID);
                     return false;

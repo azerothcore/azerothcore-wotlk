@@ -2751,19 +2751,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                                     if (!waypoints[i])
                                         continue;
 
-                                    WPPath* path = sSmartWaypointMgr->GetPath(waypoints[i]);
+                                    std::vector<WayPoint*> path = sSmartWaypointMgr->GetPath(waypoints[i], 0);
 
-                                    if (!path || path->empty())
+                                    if (path.empty())
                                         continue;
 
-                                    WPPath::const_iterator itrWp = path->find(0);
-
-                                    if (itrWp != path->end())
+                                    for (auto wp : path)
                                     {
-                                        if (WayPoint* wp = itrWp->second)
+                                        if (wp->id == waypoints[i])
                                         {
                                             float distToThisPath = target->GetDistance(wp->x, wp->y, wp->z);
-
                                             if (distToThisPath < distanceToClosest)
                                             {
                                                 distanceToClosest = distToThisPath;

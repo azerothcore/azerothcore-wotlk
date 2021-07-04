@@ -17,8 +17,9 @@
 
 struct WayPoint
 {
-    WayPoint(uint32 _wp_group, uint32 _id, float _x, float _y, float _z)
+    WayPoint(uint32 _entry, uint32 _wp_group, uint32 _id, float _x, float _y, float _z)
     {
+        entry = _entry;
         wp_group = _wp_group;
         id = _id;
         x = _x;
@@ -26,6 +27,7 @@ struct WayPoint
         z = _z;
     }
 
+    uint32 entry;
     uint32 wp_group;
     uint32 id;
     float x;
@@ -1781,26 +1783,21 @@ public:
 
     void LoadFromDB();
 
-    WPPath* GetPath(uint32 id, uint32 group = 0)
+    std::vector<WayPoint*> GetPath(uint32 id /*waypoint.entry*/, uint32 group)
     {
-        for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
+        std::vector<WayPoint*> returned_path;
+        for (auto wp : waypoint_map)
         {
-            if (itr->first == id)
+            if (wp->entry == id && wp->wp_group == group)
             {
-                for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
-                {
-                    if (pathItr->first == group)
-                    {
-                        return itr->second;
-                    }
-                }
+                returned_path.push_back(wp);
             }
         }
-        return nullptr;
+        return returned_path;
     }
 
 private:
-    std::unordered_map<uint32, WPPath*> waypoint_map;
+    std::vector<WayPoint*> waypoint_map;
 };
 
 // all events for a single entry

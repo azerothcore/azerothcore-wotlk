@@ -45,21 +45,19 @@ public:
 
         void InitializeAI() override
         {
-            WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
-            if (!path || path->empty())
+            Movement::PointsArray pathPoints;
+
+            std::vector<WayPoint*> path = sSmartWaypointMgr->GetPath(me->GetEntry(), 0);
+            if (path.empty())
             {
                 me->DespawnOrUnsummon(1);
                 return;
             }
 
-            Movement::PointsArray pathPoints;
             pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
 
-            uint32 wpCounter = 1;
-            WPPath::const_iterator itr;
-            while ((itr = path->find(wpCounter++)) != path->end())
+            for (auto wp : path)
             {
-                WayPoint* wp = itr->second;
                 pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
             }
 
