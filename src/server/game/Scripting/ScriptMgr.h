@@ -839,10 +839,10 @@ public:
     virtual bool OnBeforeCriteriaProgress(Player* /*player*/, AchievementCriteriaEntry const* /*criteria*/) { return true; }
 
     // Called when an Achievement is saved to DB
-    virtual void OnAchiSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CompletedAchievementData /*achiData*/) { }
+    virtual void OnAchiSave(CharacterDatabaseTransaction /*trans*/, Player* /*player*/, uint16 /*achId*/, CompletedAchievementData /*achiData*/) { }
 
     // Called when an Criteria is saved to DB
-    virtual void OnCriteriaSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CriteriaProgress /*criteriaData*/) { }
+    virtual void OnCriteriaSave(CharacterDatabaseTransaction /*trans*/, Player* /*player*/, uint16 /*achId*/, CriteriaProgress /*criteriaData*/) { }
 
     // Called when a player selects an option in a player gossip window
     virtual void OnGossipSelect(Player* /*player*/, uint32 /*menu_id*/, uint32 /*sender*/, uint32 /*action*/) { }
@@ -947,7 +947,7 @@ public:
 
     [[nodiscard]] virtual bool CanGiveMailRewardAtGiveLevel(Player* /*player*/, uint8 /*level*/) { return true; }
 
-    virtual void OnDeleteFromDB(SQLTransaction& /*trans*/, uint32 /*guid*/) { }
+    virtual void OnDeleteFromDB(CharacterDatabaseTransaction /*trans*/, uint32 /*guid*/) { }
 
     [[nodiscard]] virtual bool CanRepopAtGraveyard(Player* /*player*/) { return true; }
 
@@ -1139,7 +1139,7 @@ protected:
 
 public:
     // items
-    virtual void OnItemDelFromDB(SQLTransaction& /*trans*/, ObjectGuid::LowType /*itemGuid*/) { }
+    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, ObjectGuid::LowType /*itemGuid*/) { }
     virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
 
     // loot
@@ -1199,9 +1199,26 @@ public:
 
     [[nodiscard]] virtual bool CanSendMessageBGQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
 
-    [[nodiscard]] bool CanSendJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, GroupQueueInfo* /*ginfo*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isRated*/) { return true; }
+    /**
+     * @brief This hook runs before sending the join message during the arena queue, allowing you to run extra operations or disabling the join message
+     *
+     * @param queue Contains information about the Arena queue
+     * @param leader Contains information about the player leader
+     * @param ginfo Contains information about the group of the queue
+     * @param bracketEntry Contains information about the bracket
+     * @param isRated Contains information about rated arena or skirmish
+     * @return True if you want to continue sending the message, false if you want to disable the message
+     */
+    [[nodiscard]] virtual bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, GroupQueueInfo* /*ginfo*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isRated*/) { return true; }
 
-    [[nodiscard]] bool CanExitJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/) { return true; }
+    /**
+     * @brief This hook runs before sending the exit message during the arena queue, allowing you to run extra operations or disabling the exit message
+     *
+     * @param queue Contains information about the Arena queue
+     * @param ginfo Contains information about the group of the queue
+     * @return True if you want to continue sending the message, false if you want to disable the message
+     */
+    [[nodiscard]] virtual bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/) { return true; }
 };
 
 class ArenaTeamScript : public ScriptObject
@@ -1414,10 +1431,19 @@ public: /* Initialization */
     void FillSpellSummary();
     void CheckIfScriptsInDatabaseExist();
 
-    const char* ScriptsVersion() const { return "Integrated Trinity Scripts"; }
+    const char* ScriptsVersion() const { return "Integrated Azeroth Scripts"; }
 
     void IncrementScriptCount() { ++_scriptCount; }
     uint32 GetScriptCount() const { return _scriptCount; }
+
+    typedef void(*ScriptLoaderCallbackType)();
+
+    /// Sets the script loader callback which is invoked to load scripts
+    /// (Workaround for circular dependency game <-> scripts)
+    void SetScriptLoader(ScriptLoaderCallbackType script_loader_callback)
+    {
+        _script_loader_callback = script_loader_callback;
+    }
 
 public: /* Unloading */
     void Unload();
@@ -1606,8 +1632,8 @@ public: /* PlayerScript */
     bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
     void OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
     bool OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
-    void OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
-    void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
+    void OnAchievementSave(CharacterDatabaseTransaction trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
+    void OnCriteriaSave(CharacterDatabaseTransaction trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
     void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
     void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
     void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
@@ -1651,7 +1677,7 @@ public: /* PlayerScript */
     void PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
     void OnRewardKillRewarder(Player* player, bool isDungeon, float& rate);
     bool CanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
-    void OnDeleteFromDB(SQLTransaction& trans, uint32 guid);
+    void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
     bool CanRepopAtGraveyard(Player* player);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
     bool CanAreaExploreAndOutdoor(Player* player);
@@ -1731,7 +1757,7 @@ public: /* GroupScript */
     void OnCreate(Group* group, Player* leader);
 
 public: /* GlobalScript */
-    void OnGlobalItemDelFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
+    void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     void OnGlobalMirrorImageDisplayItem(const Item* item, uint32& display);
     void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap);
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);
@@ -1793,8 +1819,8 @@ public: /* BGScript */
                                         BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
     void OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers);
     bool CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
-    bool CanSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
-    bool CanExitJoinMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
+    bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
+    bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);
@@ -1873,6 +1899,8 @@ private:
 
     //atomic op counter for active scripts amount
     std::atomic<long> _scheduledScripts;
+
+    ScriptLoaderCallbackType _script_loader_callback;
 };
 
 #define sScriptMgr ScriptMgr::instance()

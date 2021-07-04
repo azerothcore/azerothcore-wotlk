@@ -25,7 +25,9 @@ Thread::Thread(Runnable* instance) : m_task(instance), m_ThreadImp(&Thread::Thre
 
     // register reference to m_task to prevent it deeltion until destructor
     if (m_task)
+    {
         m_task->incReference();
+    }
 }
 
 Thread::~Thread()
@@ -34,13 +36,17 @@ Thread::~Thread()
 
     // deleted runnable object (if no other references)
     if (m_task)
+    {
         m_task->decReference();
+    }
 }
 
 bool Thread::wait()
 {
     if (m_iThreadId == std::thread::id() || !m_task)
+    {
         return false;
+    }
 
     bool res = true;
 
@@ -61,7 +67,9 @@ bool Thread::wait()
 void Thread::destroy()
 {
     if (m_iThreadId == std::thread::id() || !m_task)
+    {
         return;
+    }
 
     // FIXME: We need to make sure that all threads can be trusted to
     // halt execution on their own as this is not an interrupt

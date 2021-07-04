@@ -1,22 +1,36 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #include "LoginDatabase.h"
+#include "MySQLPreparedStatement.h"
 
 void LoginDatabaseConnection::DoPrepareStatements()
 {
     if (!m_reconnecting)
         m_stmts.resize(MAX_LOGINDATABASE_STATEMENTS);
 
-    PrepareStatement(LOGIN_SEL_LOGONCHALLENGE, "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, "
-        "ab.unbandate = ab.bandate, aa.gmlevel, a.totp_secret, a.salt, a.verifier "
-        "FROM account a LEFT JOIN account_access aa ON a.id = aa.id LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 WHERE a.username = ?", CONNECTION_SYNCH);
-    PrepareStatement(LOGIN_SEL_RECONNECTCHALLENGE, "SELECT a.id, UPPER(a.username), a.locked, a.lock_country, a.last_ip, a.failed_logins, ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, "
-        "ab.unbandate = ab.bandate, aa.gmlevel, a.session_key "
-        "FROM account a LEFT JOIN account_access aa ON a.id = aa.id LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 WHERE a.username = ? AND a.session_key IS NOT NULL", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_LOGONCHALLENGE,
+        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, "
+        "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate, "
+        "ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate, "
+        "aa.gmlevel, a.totp_secret, a.salt, a.verifier "
+        "FROM account a "
+        "LEFT JOIN account_access aa ON a.id = aa.id "
+        "LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 "
+        "LEFT JOIN ip_banned ipb ON ipb.ip = ? "
+        "WHERE a.username = ?", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_RECONNECTCHALLENGE,
+        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, "
+        "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate, "
+        "ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate, "
+        "aa.gmlevel, a.session_key "
+        "FROM account a "
+        "LEFT JOIN account_access aa ON a.id = aa.id "
+        "LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 "
+        "LEFT JOIN ip_banned ipb ON ipb.ip = ? "
+        "WHERE a.username = ? AND a.session_key IS NOT NULL", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_ACCOUNT_INFO_BY_NAME, "SELECT a.id, a.session_key, a.last_ip, a.locked, a.lock_country, a.expansion, a.mutetime, a.locale, a.recruiter, a.os, a.totaltime, "
         "aa.gmlevel, ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, r.id FROM account a LEFT JOIN account_access aa ON a.id = aa.id AND aa.RealmID IN (-1, ?) "
         "LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 LEFT JOIN account r ON a.id = r.recruiter WHERE a.username = ? "
@@ -109,4 +123,16 @@ void LoginDatabaseConnection::DoPrepareStatements()
 
     PrepareStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET, "SELECT totp_secret FROM account WHERE id = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET, "UPDATE account SET totp_secret = ? WHERE id = ?", CONNECTION_ASYNC);
+}
+
+LoginDatabaseConnection::LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
+{
+}
+
+LoginDatabaseConnection::LoginDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo)
+{
+}
+
+LoginDatabaseConnection::~LoginDatabaseConnection()
+{
 }
