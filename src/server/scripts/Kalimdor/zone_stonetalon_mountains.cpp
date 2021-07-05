@@ -26,11 +26,15 @@ EndContentData */
 ## npc_braug_dimspirit
 ######*/
 
-#define GOSSIP_HBD1 "Ysera"
-#define GOSSIP_HBD2 "Neltharion"
-#define GOSSIP_HBD3 "Nozdormu"
-#define GOSSIP_HBD4 "Alexstrasza"
-#define GOSSIP_HBD5 "Malygos"
+enum BraugDimspirit
+{
+    // Gossips for Quest 'Test of Lore'
+    GOSSIP_TOL_MENU             = 4763,
+    GOSSIP_TOL_YSERA            = 0,
+    GOSSIP_TOL_NELTHARION       = 1,
+    GOSSIP_TOL_ALEXSTRASZA      = 2,
+    GOSSIP_TOL_MALYGOS          = 3
+};
 
 class npc_braug_dimspirit : public CreatureScript
 {
@@ -56,20 +60,23 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
+        {
             player->PrepareQuestMenu(creature->GetGUID());
+        }
 
         if (player->GetQuestStatus(6627) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HBD5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_TOL_MENU, GOSSIP_TOL_YSERA,GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_TOL_MENU, GOSSIP_TOL_NELTHARION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, GOSSIP_TOL_MENU, GOSSIP_TOL_ALEXSTRASZA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_TOL_MENU, GOSSIP_TOL_MALYGOS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             SendGossipMenuFor(player, 5820, creature->GetGUID());
         }
         else
+        {
             SendGossipMenuFor(player, 5819, creature->GetGUID());
+        }
 
         return true;
     }
