@@ -734,14 +734,14 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     if (!m_goValue.Transport.AnimationInfo)
     {
         LOG_ERROR("vehicle", "StaticTransport::Create: No AnimationInfo was found for transport entry (%u)", goinfo->entry);
-        return;
+        return false;
     }
     //ASSERT(m_goValue.Transport.AnimationInfo->TotalTime > 0);
     if (m_goValue.Transport.AnimationInfo->TotalTime < 0)
     {
         LOG_ERROR("vehicle", "StaticTransport::Create: TotalTime is > 0 (%u) for AnimationInfo (%u) for transport entry (%u)",
             m_goValue.Transport.AnimationInfo->TotalTime, m_goValue.Transport.AnimationInfo, goinfo->entry);
-        return;
+        return false;
     }
     SetPauseTime(goinfo->transport.pauseAtTime);
     if (goinfo->transport.startOpen && goinfo->transport.pauseAtTime)
