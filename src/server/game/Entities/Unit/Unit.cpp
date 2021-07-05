@@ -19950,9 +19950,9 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
     for (uint16 index = 0; index < m_valuesCount; ++index)
     {
         if (_fieldNotifyFlags & flags[index] ||
-                ((flags[index] & visibleFlag) & UF_FLAG_SPECIAL_INFO) ||
-                ((updateType == UPDATETYPE_VALUES ? _changesMask.GetBit(index) : m_uint32Values[index]) && (flags[index] & visibleFlag)) ||
-                (index == UNIT_FIELD_AURASTATE && HasFlag(UNIT_FIELD_AURASTATE, PER_CASTER_AURA_STATE_MASK)))
+            ((flags[index] & visibleFlag) & UF_FLAG_SPECIAL_INFO) ||
+            ((updateType == UPDATETYPE_VALUES ? _changesMask.GetBit(index) : m_uint32Values[index]) && (flags[index] & visibleFlag)) ||
+            (index == UNIT_FIELD_AURASTATE && HasFlag(UNIT_FIELD_AURASTATE, PER_CASTER_AURA_STATE_MASK)))
         {
             updateMask.SetBit(index);
 
@@ -19970,138 +19970,139 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                     if (!target->CanSeeSpellClickOn(creature))
                     {
                         appendValue &= ~UNIT_NPC_FLAG_SPELLCLICK;
+                    }
+
+                    fieldBuffer << uint32(appendValue);
                 }
-
-                fieldBuffer << uint32(appendValue);
-            }
-            else if (index == UNIT_FIELD_AURASTATE)
-            {
-                // Check per caster aura states to not enable using a spell in client if specified aura is not by target
-                fieldBuffer << BuildAuraStateUpdateForTarget(target);
-            }
-            // FIXME: Some values at server stored in float format but must be sent to client in uint32 format
-            else if (index >= UNIT_FIELD_BASEATTACKTIME && index <= UNIT_FIELD_RANGEDATTACKTIME)
-            {
-                // convert from float to uint32 and send
-                fieldBuffer << uint32(m_floatValues[index] < 0 ? 0 : m_floatValues[index]);
-            }
-            // there are some float values which may be negative or can't get negative due to other checks
-            else if ((index >= UNIT_FIELD_NEGSTAT0   && index <= UNIT_FIELD_NEGSTAT4) ||
-                     (index >= UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE  && index <= (UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE + 6)) ||
-                     (index >= UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE  && index <= (UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE + 6)) ||
-                     (index >= UNIT_FIELD_POSSTAT0   && index <= UNIT_FIELD_POSSTAT4))
-            {
-                fieldBuffer << uint32(m_floatValues[index]);
-            }
-            // Gamemasters should be always able to select units - remove not selectable flag
-            else if (index == UNIT_FIELD_FLAGS)
-            {
-                uint32 appendValue = m_uint32Values[UNIT_FIELD_FLAGS];
-                if (target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity()))
-                    appendValue &= ~UNIT_FLAG_NOT_SELECTABLE;
-
-                fieldBuffer << uint32(appendValue);
-            }
-            // use modelid_a if not gm, _h if gm for CREATURE_FLAG_EXTRA_TRIGGER creatures
-            else if (index == UNIT_FIELD_DISPLAYID)
-            {
-                uint32 displayId = m_uint32Values[UNIT_FIELD_DISPLAYID];
-                if (creature)
+                else if (index == UNIT_FIELD_AURASTATE)
                 {
-                    CreatureTemplate const* cinfo = creature->GetCreatureTemplate();
+                    // Check per caster aura states to not enable using a spell in client if specified aura is not by target
+                    fieldBuffer << BuildAuraStateUpdateForTarget(target);
+                }
+                // FIXME: Some values at server stored in float format but must be sent to client in uint32 format
+                else if (index >= UNIT_FIELD_BASEATTACKTIME && index <= UNIT_FIELD_RANGEDATTACKTIME)
+                {
+                    // convert from float to uint32 and send
+                    fieldBuffer << uint32(m_floatValues[index] < 0 ? 0 : m_floatValues[index]);
+                }
+                // there are some float values which may be negative or can't get negative due to other checks
+                else if ((index >= UNIT_FIELD_NEGSTAT0 && index <= UNIT_FIELD_NEGSTAT4) ||
+                    (index >= UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE && index <= (UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE + 6)) ||
+                    (index >= UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE && index <= (UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE + 6)) ||
+                    (index >= UNIT_FIELD_POSSTAT0 && index <= UNIT_FIELD_POSSTAT4))
+                {
+                    fieldBuffer << uint32(m_floatValues[index]);
+                }
+                // Gamemasters should be always able to select units - remove not selectable flag
+                else if (index == UNIT_FIELD_FLAGS)
+                {
+                    uint32 appendValue = m_uint32Values[UNIT_FIELD_FLAGS];
+                    if (target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity()))
+                        appendValue &= ~UNIT_FLAG_NOT_SELECTABLE;
 
-                    // this also applies for transform auras
-                    if (SpellInfo const* transform = sSpellMgr->GetSpellInfo(getTransForm()))
-                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                            if (transform->Effects[i].IsAura(SPELL_AURA_TRANSFORM))
-                                if (CreatureTemplate const* transformInfo = sObjectMgr->GetCreatureTemplate(transform->Effects[i].MiscValue))
-                                {
-                                    cinfo = transformInfo;
-                                    break;
-                                }
-
-                    if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER)
+                    fieldBuffer << uint32(appendValue);
+                }
+                // use modelid_a if not gm, _h if gm for CREATURE_FLAG_EXTRA_TRIGGER creatures
+                else if (index == UNIT_FIELD_DISPLAYID)
+                {
+                    uint32 displayId = m_uint32Values[UNIT_FIELD_DISPLAYID];
+                    if (creature)
                     {
-                        if (target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity()))
+                        CreatureTemplate const* cinfo = creature->GetCreatureTemplate();
+
+                        // this also applies for transform auras
+                        if (SpellInfo const* transform = sSpellMgr->GetSpellInfo(getTransForm()))
+                            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                if (transform->Effects[i].IsAura(SPELL_AURA_TRANSFORM))
+                                    if (CreatureTemplate const* transformInfo = sObjectMgr->GetCreatureTemplate(transform->Effects[i].MiscValue))
+                                    {
+                                        cinfo = transformInfo;
+                                        break;
+                                    }
+
+                        if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER)
                         {
-                            if (cinfo->Modelid1)
-                                displayId = cinfo->Modelid1;    // Modelid1 is a visible model for gms
+                            if (target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity()))
+                            {
+                                if (cinfo->Modelid1)
+                                    displayId = cinfo->Modelid1;    // Modelid1 is a visible model for gms
+                                else
+                                    displayId = 17519;              // world visible trigger's model
+                            }
                             else
-                                displayId = 17519;              // world visible trigger's model
+                            {
+                                if (cinfo->Modelid2)
+                                    displayId = cinfo->Modelid2;    // Modelid2 is an invisible model for players
+                                else
+                                    displayId = 11686;              // world invisible trigger's model
+                            }
+                        }
+                    }
+
+                    fieldBuffer << uint32(displayId);
+                }
+                // hide lootable animation for unallowed players
+                else if (index == UNIT_DYNAMIC_FLAGS)
+                {
+                    uint32 dynamicFlags = m_uint32Values[UNIT_DYNAMIC_FLAGS] & ~(UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
+
+                    if (creature)
+                    {
+                        if (creature->hasLootRecipient())
+                        {
+                            dynamicFlags |= UNIT_DYNFLAG_TAPPED;
+                            if (creature->isTappedBy(target))
+                                dynamicFlags |= UNIT_DYNFLAG_TAPPED_BY_PLAYER;
+                        }
+
+                        if (!target->isAllowedToLoot(creature))
+                            dynamicFlags &= ~UNIT_DYNFLAG_LOOTABLE;
+                    }
+
+                    // unit UNIT_DYNFLAG_TRACK_UNIT should only be sent to caster of SPELL_AURA_MOD_STALKED auras
+                    if (dynamicFlags & UNIT_DYNFLAG_TRACK_UNIT)
+                        if (!HasAuraTypeWithCaster(SPELL_AURA_MOD_STALKED, target->GetGUID()))
+                            dynamicFlags &= ~UNIT_DYNFLAG_TRACK_UNIT;
+
+                    fieldBuffer << dynamicFlags;
+                }
+                // FG: pretend that OTHER players in own group are friendly ("blue")
+                else if (index == UNIT_FIELD_BYTES_2 || index == UNIT_FIELD_FACTIONTEMPLATE)
+                {
+                    if (IsControlledByPlayer() && target != this && sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && IsInRaidWith(target))
+                    {
+                        FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
+                        FactionTemplateEntry const* ft2 = target->GetFactionTemplateEntry();
+                        if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2))
+                        {
+                            if (index == UNIT_FIELD_BYTES_2)
+                                // Allow targetting opposite faction in party when enabled in config
+                                fieldBuffer << (m_uint32Values[UNIT_FIELD_BYTES_2] & ((UNIT_BYTE2_FLAG_SANCTUARY /*| UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5*/) << 8)); // this flag is at uint8 offset 1 !!
+                            else
+                                // pretend that all other HOSTILE players have own faction, to allow follow, heal, rezz (trade wont work)
+                                fieldBuffer << uint32(target->getFaction());
                         }
                         else
-                        {
-                            if (cinfo->Modelid2)
-                                displayId = cinfo->Modelid2;    // Modelid2 is an invisible model for players
-                            else
-                                displayId = 11686;              // world invisible trigger's model
-                        }
-                    }
-                }
-
-                fieldBuffer << uint32(displayId);
-            }
-            // hide lootable animation for unallowed players
-            else if (index == UNIT_DYNAMIC_FLAGS)
-            {
-                uint32 dynamicFlags = m_uint32Values[UNIT_DYNAMIC_FLAGS] & ~(UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
-
-                if (creature)
-                {
-                    if (creature->hasLootRecipient())
-                    {
-                        dynamicFlags |= UNIT_DYNFLAG_TAPPED;
-                        if (creature->isTappedBy(target))
-                            dynamicFlags |= UNIT_DYNFLAG_TAPPED_BY_PLAYER;
-                    }
-
-                    if (!target->isAllowedToLoot(creature))
-                        dynamicFlags &= ~UNIT_DYNFLAG_LOOTABLE;
-                }
-
-                // unit UNIT_DYNFLAG_TRACK_UNIT should only be sent to caster of SPELL_AURA_MOD_STALKED auras
-                if (dynamicFlags & UNIT_DYNFLAG_TRACK_UNIT)
-                    if (!HasAuraTypeWithCaster(SPELL_AURA_MOD_STALKED, target->GetGUID()))
-                        dynamicFlags &= ~UNIT_DYNFLAG_TRACK_UNIT;
-
-                fieldBuffer << dynamicFlags;
-            }
-            // FG: pretend that OTHER players in own group are friendly ("blue")
-            else if (index == UNIT_FIELD_BYTES_2 || index == UNIT_FIELD_FACTIONTEMPLATE)
-            {
-                if (IsControlledByPlayer() && target != this && sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && IsInRaidWith(target))
-                {
-                    FactionTemplateEntry const* ft1 = GetFactionTemplateEntry();
-                    FactionTemplateEntry const* ft2 = target->GetFactionTemplateEntry();
-                    if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2))
+                            fieldBuffer << m_uint32Values[index];
+                    }// pussywizard / Callmephil
+                    else if (target->IsSpectator() && target->FindMap() && target->FindMap()->IsBattleArena() &&
+                        (this->GetTypeId() == TYPEID_PLAYER || this->GetTypeId() == TYPEID_UNIT || this->GetTypeId() == TYPEID_DYNAMICOBJECT))
                     {
                         if (index == UNIT_FIELD_BYTES_2)
-                            // Allow targetting opposite faction in party when enabled in config
-                            fieldBuffer << (m_uint32Values[UNIT_FIELD_BYTES_2] & ((UNIT_BYTE2_FLAG_SANCTUARY /*| UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5*/) << 8)); // this flag is at uint8 offset 1 !!
+                            fieldBuffer << (m_uint32Values[index] & 0xFFFFF2FF); // clear UNIT_BYTE2_FLAG_PVP, UNIT_BYTE2_FLAG_FFA_PVP, UNIT_BYTE2_FLAG_SANCTUARY
                         else
-                            // pretend that all other HOSTILE players have own faction, to allow follow, heal, rezz (trade wont work)
-                            fieldBuffer << uint32(target->getFaction());
+                            fieldBuffer << (uint32)target->getFaction();
                     }
                     else
-                        fieldBuffer << m_uint32Values[index];
-                }// pussywizard / Callmephil
-                else if (target->IsSpectator() && target->FindMap() && target->FindMap()->IsBattleArena() &&
-                         (this->GetTypeId() == TYPEID_PLAYER || this->GetTypeId() == TYPEID_UNIT || this->GetTypeId() == TYPEID_DYNAMICOBJECT))
-                {
-                    if (index == UNIT_FIELD_BYTES_2)
-                        fieldBuffer << (m_uint32Values[index] & 0xFFFFF2FF); // clear UNIT_BYTE2_FLAG_PVP, UNIT_BYTE2_FLAG_FFA_PVP, UNIT_BYTE2_FLAG_SANCTUARY
-                    else
-                        fieldBuffer << (uint32)target->getFaction();
+                        if (!sScriptMgr->IsCustomBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
+                        {
+                            fieldBuffer << m_uint32Values[index];
+                        }
                 }
                 else
-                    if (!sScriptMgr->IsCustomBuildValuesUpdate(this, updateType, fieldBuffer, target, index))
-                    {
-                        fieldBuffer << m_uint32Values[index];
-                    }
+                    // send in current format (float as float, uint32 as uint32)
+                    fieldBuffer << m_uint32Values[index];
             }
-            else
-                // send in current format (float as float, uint32 as uint32)
-                fieldBuffer << m_uint32Values[index];
         }
     }
 

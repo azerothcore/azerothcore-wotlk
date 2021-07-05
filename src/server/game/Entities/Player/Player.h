@@ -2227,7 +2227,7 @@ public:
 
     void SendInitWorldStates(uint32 zone, uint32 area);
     void SendUpdateWorldState(uint32 Field, uint32 Value);
-    void SendDirectMessage(WorldPacket* data);
+    void SendDirectMessage(WorldPacket const* data);
     void SendBGWeekendWorldStates();
     void SendBattlefieldWorldStates();
 
