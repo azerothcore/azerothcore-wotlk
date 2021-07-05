@@ -39,6 +39,7 @@ public:
     // Start moving to the desired MovePoint
     void StartPath(bool run = false, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
     bool LoadPath(uint32 entry, uint32 group = 0);
+    void StartMoving(uint32 group);
     void PausePath(uint32 delay, bool forced = false);
     void StopPath(uint32 DespawnTime = 0, uint32 quest = 0, bool fail = false);
     void EndPath(bool fail = false);
@@ -185,10 +186,11 @@ public:
 
     void OnSpellClick(Unit* clicker, bool& result) override;
 
-    // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
     void SetForcedCombatMove(float dist);
 
+    bool GetWaypointGroupMovement() { return mOnWaypointGroupMovement; }
+    void SetWaypointGroupMovement(bool state) { mOnWaypointGroupMovement = state; }
 private:
     uint32 mFollowCreditType;
     uint32 mFollowArrivedTimer;
@@ -219,6 +221,8 @@ private:
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
 
+    // For RandomWaypointGroup validation
+    bool mOnWaypointGroupMovement;
     bool AssistPlayerInCombat(Unit* who);
 
     uint32 mDespawnTime;
