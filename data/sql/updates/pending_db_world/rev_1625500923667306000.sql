@@ -5,12 +5,8 @@ INSERT INTO `npc_text`(`ID`,`text0_0`,`text0_1`,`BroadcastTextID0`,
 `lang0`,`Probability0`)
 VALUES
 (50031,
-"Alas $N, I am much too busy to talk. As I mentioned, I need time to think on the situation at hand.
-
-I wish you luck in your travels. Good day.",
-"Alas $N, I am much too busy to talk. As I mentioned, I need time to think on the situation at hand.
-
-I wish you luck in your travels. Good day.",0,0,0);
+"Alas $N, I am much too busy to talk. As I mentioned, I need time to think on the situation at hand.$B$BI wish you luck in your travels. Good day.",
+"Alas $N, I am much too busy to talk. As I mentioned, I need time to think on the situation at hand.$B$BI wish you luck in your travels. Good day.",0,0,0);
 
 /* Create new gossip menuID */
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 61023) AND (`TextID` IN (15296, 50031));
