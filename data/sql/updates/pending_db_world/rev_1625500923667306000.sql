@@ -19,4 +19,5 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14, 61023, 50031, 0, 0, 8, 0, 8336, 0, 0, 0, 0, 0, '', '');
 
+/* Link creature_template with new gossip menuID */
 UPDATE `creature_template` SET `gossip_menu_id` = 61023 WHERE (`entry` = 15296);
