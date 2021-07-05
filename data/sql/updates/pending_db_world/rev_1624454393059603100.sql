@@ -78,7 +78,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (760401, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 69, 2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1887.92, 1228.18, 9.98, 0, 'Sergeant Bly - Script9 - Move Point'),
 (760401, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 1, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 1883.68, 1227.95, 9.543, 0, 'Sergeant Bly - Script9 - Move Point'),
 (760401, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 1, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 1897.23, 1228.34, 9.43, 0, 'Sergeant Bly - Script9 - Move Point'),
-(760401, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 1, 0, 0, 0, 0, 0, 12, 3, 0, 0, 0, 1878.02, 1227.65, 9.485, 0, 'Sergeant Bly - Script9 - Move Point'),
+(760401, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 6, 0, 0, 0, 0, 0, 12, 3, 0, 0, 0, 1878.02, 1227.65, 9.485, 0, 'Sergeant Bly - Script9 - Move Point'),
 (760401, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 1, 0, 0, 0, 0, 0, 12, 4, 0, 0, 0, 1891.57, 1228.68, 9.69, 0, 'Sergeant Bly - Script9 - Move Point'),
 (760401, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Bly - Script9 - Say Line 2'),
 (760401, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1887.92, 1228.18, 9.98, 4.68, 'Sergeant Bly - Script9 - Set Home Pos'),
@@ -94,7 +94,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (760402, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 69, 3, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1883.82, 1200.83, 8.87, 0, 'Sergeant Bly - Script9 - Move Point'),
 (760402, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 1, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 1874.11, 1206.17, 8.87, 0, 'Sergeant Bly - Script9 - Move Point'),
 (760402, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 1, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 1894.5, 1204.4, 8.87, 0, 'Sergeant Bly - Script9 - Move Point'),
-(760402, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 1, 0, 0, 0, 0, 0, 12, 3, 0, 0, 0, 1877.52, 1199.63, 8.87, 0, 'Sergeant Bly - Script9 - Move Point'),
+(760402, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 6, 0, 0, 0, 0, 0, 12, 3, 0, 0, 0, 1877.52, 1199.63, 8.87, 0, 'Sergeant Bly - Script9 - Move Point'),
 (760402, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 201, 1, 0, 0, 0, 0, 0, 12, 4, 0, 0, 0, 1891.83, 1201.45, 8.87, 0, 'Sergeant Bly - Script9 - Move Point'),
 (760402, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1883.82, 1200.83, 8.87, 4.68, 'Sergeant Bly - Script9 - Set Home Pos'),
 (760402, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 2, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Bly - Script9 - Set Data'),
@@ -237,7 +237,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (7607, 0, 0, 0, 0, 0, 100, 0, 6000, 11000, 13000, 25000, 0, 11, 8858, 0, 0, 0, 0, 0, 5, 30, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - In Combat - Cast \'Bomb\''),
 (7607, 0, 1, 0, 0, 0, 100, 0, 0, 1000, 2000, 2000, 0, 11, 6660, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - In Combat - Cast \'Shoot\''),
 (7607, 0, 2, 0, 0, 0, 100, 0, 6000, 20000, 23000, 45000, 0, 11, 21688, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - In Combat - Cast \'Goblin Land Mine\''),
-(7607, 0, 3, 0, 34, 0, 100, 1, 8, 1, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Reached Point 1 - Set Home Position (No Repeat)'),
+(7607, 0, 3, 0, 34, 0, 100, 1, 8, 6, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Reached Point 6 - Set Home Position (No Repeat)'),
 (7607, 0, 4, 5, 62, 0, 100, 257, 940, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Gossip Option 0 Selected - Set Npc Flag  (No Repeat)'),
 (7607, 0, 5, 7, 61, 0, 100, 257, 940, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Gossip Option 0 Selected - Say Line 1 (No Repeat)'),
 (7607, 0, 6, 7, 38, 0, 100, 257, 1, 2, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Data Set 1 2 - Set Npc Flag  (No Repeat)'),
@@ -249,12 +249,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (7607, 0, 12, 0, 61, 0, 100, 0, 1, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Timed Event 1 Triggered - Say Line 2 (No Repeat)'),
 (7607, 0, 13, 0, 38, 0, 100, 0, 1, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1878.02, 1227.65, 9.485, 4.68, 'Weegli Blastfuse - On Data Set 1 0 - Set Home Position'),
 (7607, 0, 14, 0, 38, 0, 100, 0, 2, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1877.52, 1199.63, 8.87, 4.68, 'Weegli Blastfuse - On Data Set 2 0 - Set Home Position'),
-(7607, 0, 15, 16, 34, 0, 100, 0, 8, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Reached Point 1 - Say Line 0'),
-(7607, 0, 16, 0, 61, 0, 100, 0, 8, 1, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Reached Point 1 - Set Event Phase 1'),
+(7607, 0, 15, 16, 34, 0, 100, 0, 8, 1, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Reached Point 1 - Set Event Phase 1'),
+(7607, 0, 16, 0, 61, 1, 100, 0, 8, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Reached Point 1 - Say Line 0'),
 (7607, 0, 17, 18, 60, 1, 100, 0, 3000, 3000, 0, 0, 0, 69, 4, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1890.6, 1270.56, 41.5341, 4.7211, 'Weegli Blastfuse - On Update - Move To Position (Phase 1)'),
 (7607, 0, 18, 0, 61, 1, 100, 0, 3000, 3000, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Update - Set Event Phase 0 (Phase 1)'),
 (7607, 0, 19, 0, 61, 0, 100, 0, 940, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Gossip Option 0 Selected - Set Reactstate Passive (No Repeat)'),
-(7607, 0, 20, 0, 34, 1, 100, 0, 8, 4, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1891.25, 1264.55, 41.4012, 4.725, 'Weegli Blastfuse - On Reached Point 4 - Set Orientation 4.725 (Phase 1)');
+(7607, 0, 20, 0, 34, 1, 100, 0, 8, 4, 0, 0, 0, 69, 5, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1890.37, 1269.84, 41.5157, 4.78393, 'Weegli Blastfuse - On Reached Point 4 - Move To Position (Phase 1)'),
+(7607, 0, 21, 22, 34, 1, 100, 0, 8, 5, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Reached Point 5 - Set Home Position (Phase 1)'),
+(7607, 0, 22, 0, 61, 1, 100, 0, 8, 5, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Weegli Blastfuse - On Reached Point 5 - Set Run Off (Phase 1)');
 
 -- Using a helper to spawn the creatures and make them climb up.
 DELETE FROM `creature_template` WHERE (`entry` = 9000000);
