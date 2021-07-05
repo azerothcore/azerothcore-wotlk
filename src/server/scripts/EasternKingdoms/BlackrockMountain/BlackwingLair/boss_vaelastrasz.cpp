@@ -173,7 +173,7 @@ public:
                         case EVENT_SPEECH_7:
                             me->setFaction(103);
                             if (PlayerGUID && ObjectAccessor::GetUnit(*me, PlayerGUID))
-                                AttackStart(ObjectAccessor::GetUnit(*me, PlayerGUID));;
+                                AttackStart(ObjectAccessor::GetUnit(*me, PlayerGUID));
                             break;
                     }
                 }
@@ -254,7 +254,7 @@ public:
         {
             if (sender == GOSSIP_ID && action == 0)
             {
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 BeginSpeech(player);
             }
         }

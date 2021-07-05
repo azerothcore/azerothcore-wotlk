@@ -48,7 +48,7 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 class PathGenerator;
-namespace acore
+namespace Acore
 {
     struct ObjectUpdater;
     struct LargeObjectUpdater;
@@ -293,14 +293,14 @@ public:
     template<class T> bool AddToMap(T*, bool checkTransport = false);
     template<class T> void RemoveFromMap(T*, bool);
 
-    void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                            TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
-    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                                  TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                                  TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                                  TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
 
     virtual void Update(const uint32, const uint32, bool thread = true);
 
@@ -318,13 +318,13 @@ public:
 
     [[nodiscard]] bool IsRemovalGrid(float x, float y) const
     {
-        GridCoord p = acore::ComputeGridCoord(x, y);
+        GridCoord p = Acore::ComputeGridCoord(x, y);
         return !getNGrid(p.x_coord, p.y_coord);
     }
 
     [[nodiscard]] bool IsGridLoaded(float x, float y) const
     {
-        return IsGridLoaded(acore::ComputeGridCoord(x, y));
+        return IsGridLoaded(Acore::ComputeGridCoord(x, y));
     }
 
     void LoadGrid(float x, float y);
@@ -406,9 +406,6 @@ public:
     void AddObjectToSwitchList(WorldObject* obj, bool on);
     virtual void DelayedUpdate(const uint32 diff);
 
-    void UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair);
-    void UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair);
-
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
@@ -440,10 +437,6 @@ public:
     void RemoveFromActive(T* obj);
 
     template<class T> void SwitchGridContainers(T* obj, bool on);
-    template<class NOTIFIER> void VisitAll(const float& x, const float& y, float radius, NOTIFIER& notifier);
-    template<class NOTIFIER> void VisitFirstFound(const float& x, const float& y, float radius, NOTIFIER& notifier);
-    template<class NOTIFIER> void VisitWorld(const float& x, const float& y, float radius, NOTIFIER& notifier);
-    template<class NOTIFIER> void VisitGrid(const float& x, const float& y, float radius, NOTIFIER& notifier);
     CreatureGroupHolderType CreatureGroupHolder;
 
     void UpdateIteratorBack(Player* player);
@@ -506,7 +499,7 @@ public:
     void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
     [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _dynamicTree.contains(model);}
     [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
-    bool getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
+    bool GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
     [[nodiscard]] float GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const
     {
         return _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
@@ -812,55 +805,4 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
     }
 }
 
-template<class NOTIFIER>
-inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, WorldTypeMapContainer> world_object_notifier(notifier);
-    cell.Visit(p, world_object_notifier, *this, radius, x, y);
-    TypeContainerVisitor<NOTIFIER, GridTypeMapContainer >  grid_object_notifier(notifier);
-    cell.Visit(p, grid_object_notifier, *this, radius, x, y);
-}
-
-// should be used with Searcher notifiers, tries to search world if nothing found in grid
-template<class NOTIFIER>
-inline void Map::VisitFirstFound(const float& x, const float& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, WorldTypeMapContainer> world_object_notifier(notifier);
-    cell.Visit(p, world_object_notifier, *this, radius, x, y);
-    if (!notifier.i_object)
-    {
-        TypeContainerVisitor<NOTIFIER, GridTypeMapContainer >  grid_object_notifier(notifier);
-        cell.Visit(p, grid_object_notifier, *this, radius, x, y);
-    }
-}
-
-template<class NOTIFIER>
-inline void Map::VisitWorld(const float& x, const float& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, WorldTypeMapContainer> world_object_notifier(notifier);
-    cell.Visit(p, world_object_notifier, *this, radius, x, y);
-}
-
-template<class NOTIFIER>
-inline void Map::VisitGrid(const float& x, const float& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, GridTypeMapContainer >  grid_object_notifier(notifier);
-    cell.Visit(p, grid_object_notifier, *this, radius, x, y);
-}
 #endif

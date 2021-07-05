@@ -7,6 +7,7 @@
 #include "blackrock_depths.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include <vector>
 
 enum Spells
 {
@@ -38,7 +39,7 @@ const Position SummonPositions[7] =
     {1012.252747f, -206.696487f, -61.980618f, 3.617599f},
 };
 
-vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 };
+std::vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 };
 
 class boss_ambassador_flamelash : public CreatureScript
 {
@@ -60,7 +61,7 @@ public:
         SummonList summons;
 
         // This will allow to find a valid position to spawn them
-        vector<int> validPosition;
+        std::vector<int> validPosition;
         bool foundValidPosition = false;
 
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }

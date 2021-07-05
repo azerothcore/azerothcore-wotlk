@@ -8,7 +8,6 @@
 #include "RealmSocket.h"
 #include <ace/INET_Addr.h>
 #include <ace/OS_NS_string.h>
-#include <ace/SString.h>
 
 RealmSocket::Session::Session() = default;
 
@@ -43,7 +42,7 @@ int RealmSocket::open(void* arg)
 
     if (peer().get_remote_addr(addr) == -1)
     {
-        LOG_ERROR("server", "Error %s while opening realm socket!", ACE_OS::strerror(errno));
+        LOG_ERROR("network", "Error %s while opening realm socket!", ACE_OS::strerror(errno));
         return -1;
     }
 
