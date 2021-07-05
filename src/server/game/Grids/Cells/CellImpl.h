@@ -60,12 +60,14 @@ inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, 
     if (!standing_cell.IsCoordValid())
         return;
 
-    //no jokes here... Actually placing ASSERT() here was good idea, but
-    //we had some problems with DynamicObjects, which pass radius = 0.0f (DB issue?)
-    //maybe it is better to just return when radius <= 0.0f?
+    // no jokes here... Actually placing ASSERT() here was good idea, but
+    // we had some problems with DynamicObjects, which pass radius = 0.0f (DB issue?)
+    // maybe it is better to just return when radius <= 0.0f?
+    // Added LOG_ERROR to try and catch errors.
     if (radius <= 0.0f)
     {
         map.Visit(*this, visitor);
+        LOG_ERROR("maps", "Cell::Visit: radius is <= 0.0f (%f), visitor (%u) map (%u) x_off (%f) y_off (%f)", radius, static_cast<uint32>(visitor), map, x_off, y_off);
         return;
     }
     //lets limit the upper value for search radius

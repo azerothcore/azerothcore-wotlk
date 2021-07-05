@@ -17761,12 +17761,17 @@ void Player::_LoadArenaTeamInfo()
         if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUID().GetCounter(), itr.second))
         {
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
-            if (!arenaTeam) // some shit, should be assert, but just ignore
+            if (!arenaTeam)
+            {
+                LOG_ERROR("bg.arena", "Player::_LoadArenaTeamInfo: No arena team was found.");
                 continue;
+            }
             ArenaTeamMember const* member = arenaTeam->GetMember(GetGUID());
-            if (!member) // some shit, should be assert, but just ignore
+            if (!member)
+            {
+                LOG_ERROR("bg.arena", "Player::_LoadArenaTeamInfo: No members in the arena team (%u) was found.", arenaTeamId);
                 continue;
-
+            }
             uint8 slot = itr.second;
 
             SetArenaTeamInfoField(slot, ARENA_TEAM_ID, arenaTeamId);
