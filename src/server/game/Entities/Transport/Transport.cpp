@@ -733,7 +733,7 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     //ASSERT(m_goValue.Transport.AnimationInfo);
     if (!m_goValue.Transport.AnimationInfo)
     {
-        LOG_ERROR("vehicle", "StaticTransport::Create: No AnimInfo was found for transport entry (%u)", goinfo->entry);
+        LOG_ERROR("vehicle", "StaticTransport::Create: No AnimationInfo was found for transport entry (%u)", goinfo->entry);
         return;
     }
     //ASSERT(m_goValue.Transport.AnimationInfo->TotalTime > 0);
