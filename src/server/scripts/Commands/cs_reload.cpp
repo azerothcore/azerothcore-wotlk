@@ -30,6 +30,8 @@ EndScriptData */
 #include "TicketMgr.h"
 #include "WardenCheckMgr.h"
 #include "WaypointManager.h"
+#include "StringConvert.h"
+#include "Tokenize.h"
 
 class reload_commandscript : public CommandScript
 {
@@ -410,13 +412,11 @@ public:
         if (!*args)
             return false;
 
-        Tokenizer entries(std::string(args), ' ');
-
-        for (Tokenizer::const_iterator itr = entries.begin(); itr != entries.end(); ++itr)
+        for (std::string_view entryStr : Acore::Tokenize(args, ' ', false))
         {
-            uint32 entry = uint32(atoi(*itr));
+            uint32 entry = Acore::StringTo<uint32>(entryStr).value_or(0);
 
-            PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEMPLATE);
+            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEMPLATE);
             stmt->setUInt32(0, entry);
             PreparedQueryResult result = WorldDatabase.Query(stmt);
 

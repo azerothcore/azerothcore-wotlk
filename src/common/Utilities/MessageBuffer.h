@@ -7,8 +7,8 @@
 #define __MESSAGEBUFFER_H_
 
 #include "Define.h"
-#include <vector>
 #include <cstring>
+#include <vector>
 
 class MessageBuffer
 {

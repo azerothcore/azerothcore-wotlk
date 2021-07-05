@@ -9,7 +9,6 @@
 #include "BattlegroundIC.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
-#include "CreatureAI.h"
 #include "DBCStores.h"
 #include "GameGraveyard.h"
 #include "InstanceScript.h"
@@ -441,7 +440,7 @@ void DeleteSpellFromAllPlayers(uint32 spellId)
     CharacterDatabaseStatements stmts[2] = {CHAR_DEL_INVALID_SPELL_SPELLS, CHAR_DEL_INVALID_SPELL_TALENTS};
     for (uint8 i = 0; i < 2; i++)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(stmts[i]);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(stmts[i]);
         stmt->setUInt32(0, spellId);
         CharacterDatabase.Execute(stmt);
     }
@@ -3280,8 +3279,6 @@ void SpellMgr::LoadSpellCustomAttr()
         if (overrideAttr && allNonBinary)
             spellInfo->AttributesCu &= ~SPELL_ATTR0_CU_BINARY_SPELL;
     }
-
-    CreatureAI::FillAISpellInfo();
 
     LOG_INFO("server.loading", ">> Loaded spell custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");

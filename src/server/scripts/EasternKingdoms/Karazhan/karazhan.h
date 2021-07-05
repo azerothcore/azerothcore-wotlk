@@ -16,8 +16,6 @@
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "CreatureAIImpl.h"
-
 #ifndef DEF_KARAZHAN_H
 #define DEF_KARAZHAN_H
 
