@@ -1255,10 +1255,13 @@ struct SmartAction
             uint32 phi_delta;
         } summonVortex;
 
+        /* wpMinRandom: The first waypoint group to pick
+         * wpMaxRandom: The last waypoint group to pick
+         */
         struct
         {
-            uint32 wpMinRandom; // The first group to pick
-            uint32 wpMaxRandom; // The last group to pick
+            uint32 wpMinRandom;
+            uint32 wpMaxRandom;
         }randomWpGroup;
 
         //! Note for any new future actions
