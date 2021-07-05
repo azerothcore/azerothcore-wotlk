@@ -43,27 +43,6 @@
 #define NPC_SCORCHED_GROUND             33123
 #define NPC_WATER_TRIGGER               22515
 
-#define TEXT_AGGRO                      "Insolent whelps! Your blood will temper the weapons used to reclaim this world!"
-#define TEXT_ACTIVATE_CONSTRUCT         "Arise, soldiers of the Iron Crucible! The Makers' will be done!"
-#define TEXT_SCORCH_1                   "Let the inferno consume you!"
-#define TEXT_SCORCH_2                   "BURN! Burn in the makers fire!"
-#define TEXT_SLAG_POT                   "I will burn away your impurities!"
-#define TEXT_SLAY_1                     "More scraps for the scrapheap!"
-#define TEXT_SLAY_2                     "Your bones will serve as kindling!"
-#define TEXT_BERSERK                    "Let it be finished!"
-#define TEXT_DEATH                      "I. Have. Failed."
-#define TEXT_FLAME_JETS                 "Ignis The Furnace Master begins to cast Flame Jets!"
-
-#define SOUND_AGGRO                     15564
-#define SOUND_ACTIVATE_CONSTRUCT        15565
-#define SOUND_SLAG_POT                  15566
-#define SOUND_SCORCH_1                  15567
-#define SOUND_SCORCH_2                  15568
-#define SOUND_SLAY_1                    15569
-#define SOUND_SLAY_2                    15570
-#define SOUND_BERSERK                   15571
-#define SOUND_DEATH                     15572
-
 #define ACHIEV_STOKIN_THE_FURNACE_EVENT 20951
 
 enum eEvents
@@ -74,6 +53,20 @@ enum eEvents
     EVENT_ENABLE_ROTATE,
     EVENT_SPELL_FLAME_JETS,
     EVENT_GRAB,
+};
+
+enum BossIgnis
+{
+    // Texts
+    TEXT_AGGRO                      = 0,
+    TEXT_ACTIVATE_CONSTRUCT         = 1,
+    TEXT_SLAG_POT                   = 2,
+    TEXT_SCORCH                     = 3,
+    TEXT_SLAY                       = 4,
+    TEXT_BERSERK                    = 5,
+    TEXT_DEATH                      = 6,
+    TEXT_FLAME_JETS                 = 7
+
 };
 
 class npc_ulduar_iron_construct : public CreatureScript
@@ -246,8 +239,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32000);
             events.ScheduleEvent(EVENT_GRAB, 25000);
 
-            me->MonsterYell(TEXT_AGGRO, LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(SOUND_AGGRO);
+            Talk(TEXT_AGGRO);
             DoZoneInCombat();
 
             if( InstanceScript* m_pInstance = me->GetInstanceScript() )
@@ -284,22 +276,12 @@ public:
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if( rand() % 2 )
-            {
-                me->MonsterYell(TEXT_SLAY_1, LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_SLAY_1);
-            }
-            else
-            {
-                me->MonsterYell(TEXT_SLAY_2, LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_SLAY_2);
-            }
+            Talk(TEXT_SLAY);
         }
 
         void JustDied(Unit* /*victim*/) override
         {
-            me->MonsterYell(TEXT_DEATH, LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(SOUND_DEATH);
+            Talk(TEXT_DEATH);
 
             if( me->GetInstanceScript() )
                 me->GetInstanceScript()->SetData(TYPE_IGNIS, DONE);
@@ -346,24 +328,14 @@ public:
                     me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     if (++counter >= 20)
                     {
-                        me->MonsterYell(TEXT_BERSERK, LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_BERSERK);
+                        Talk(TEXT_BERSERK);
                         me->CastSpell(me, SPELL_BERSERK, true);
                         break;
                     }
                     events.RepeatEvent(RAID_MODE(40000, 30000));
                     break;
                 case EVENT_SPELL_SCORCH:
-                    if( rand() % 2 )
-                    {
-                        me->MonsterYell(TEXT_SCORCH_1, LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_SCORCH_1);
-                    }
-                    else
-                    {
-                        me->MonsterYell(TEXT_SCORCH_2, LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_SCORCH_2);
-                    }
+                    Talk(TEXT_SCORCH);
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->DisableRotate(true);
                     me->SendMovementFlagUpdate();
@@ -376,7 +348,7 @@ public:
                     me->DisableRotate(false);
                     break;
                 case EVENT_SPELL_FLAME_JETS:
-                    me->MonsterTextEmote(TEXT_FLAME_JETS, 0, true);
+                    Talk(TEXT_FLAME_JETS);
                     me->CastSpell(me->GetVictim(), S_FLAME_JETS, false);
                     events.RepeatEvent(25000);
                     break;
@@ -413,8 +385,7 @@ public:
                             int8 pos = urand(0, playerGUIDs.size() - 1);
                             if( Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)) )
                             {
-                                me->MonsterYell(TEXT_SLAG_POT, LANG_UNIVERSAL, 0);
-                                me->PlayDirectSound(SOUND_SLAG_POT);
+                                Talk(TEXT_SLAG_POT);
                                 me->CastSpell(pTarget, SPELL_GRAB, false);
                             }
                         }
