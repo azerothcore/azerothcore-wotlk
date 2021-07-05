@@ -95,7 +95,7 @@ namespace Acore
         {
             if (own_team_only)
                 if (Player const* player = src->ToPlayer())
-                    team = player->GetTeamId();            
+                    team = player->GetTeamId();
         }
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);

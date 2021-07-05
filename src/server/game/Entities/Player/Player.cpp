@@ -6975,6 +6975,7 @@ void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcv
 {
     if (skipped_rcvr != this)
         SendDirectMessage(data);
+
     // we use World::GetMaxVisibleDistance() because i cannot see why not use a distance
     // update: replaced by GetMap()->GetVisibilityDistance()
     Acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
@@ -6982,7 +6983,7 @@ void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcv
 }
 
 
-void Player::SendDirectMessage(WorldPacket const* data)
+void Player::SendDirectMessage(WorldPacket const* data) const
 {
     m_session->SendPacket(data);
 }
