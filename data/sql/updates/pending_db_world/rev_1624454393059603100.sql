@@ -66,10 +66,10 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 8877) AND (`source_type` = 0)
 -- This part of the script is experimental
 -- Altering Waypoints table to group them and a new SmartAI Action for Random Waypoint Group:
 -- allows for several pathing options for mobs, like for example Zul'farrak's mobs on Pyramid event
--- ALTER TABLE `waypoints`	ADD COLUMN `wp_group` MEDIUMINT(7) UNSIGNED NOT NULL DEFAULT '0' AFTER `pointid`;
--- ALTER TABLE `waypoints`
--- DROP PRIMARY KEY,
--- ADD PRIMARY KEY (`entry`, `pointid`, `wp_group`) USING BTREE;
+ALTER TABLE `waypoints`	ADD COLUMN `wp_group` MEDIUMINT(7) UNSIGNED NOT NULL DEFAULT '0' AFTER `pointid`;
+ALTER TABLE `waypoints`
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`entry`, `pointid`, `wp_group`) USING BTREE;
 
 DELETE FROM `waypoints` WHERE `entry` IN (7789, 7787, 8876, 7788, 8877);
 INSERT INTO `waypoints` (`entry`, `pointid`, `wp_group`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES 
