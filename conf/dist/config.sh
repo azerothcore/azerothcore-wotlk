@@ -228,20 +228,20 @@ DB_MYSQL_EXEC="mysql"
 DB_MYSQL_DUMP_EXEC="mysqldump"
 
 
-DB_AUTH_CONF=${DB_AUTH_CONF:-"MYSQL_USER='acore'; \
-                    MYSQL_PASS='acore'; \
+DB_AUTH_CONF=${DB_AUTH_CONF:-"MYSQL_USER='root'; \
+                    MYSQL_PASS='sasser12'; \
                     MYSQL_HOST='localhost';\
                     MYSQL_PORT='3306';\
                     "}
 
-DB_CHARACTERS_CONF=${DB_CHARACTERS_CONF:-"MYSQL_USER='acore'; \
-                    MYSQL_PASS='acore'; \
+DB_CHARACTERS_CONF=${DB_CHARACTERS_CONF:-"MYSQL_USER='root'; \
+                    MYSQL_PASS='sasser12'; \
                     MYSQL_HOST='localhost';\
                     MYSQL_PORT='3306';\
                     "}
 
-DB_WORLD_CONF=${DB_WORLD_CONF:-"MYSQL_USER='acore'; \
-                    MYSQL_PASS='acore'; \
+DB_WORLD_CONF=${DB_WORLD_CONF:-"MYSQL_USER='root'; \
+                    MYSQL_PASS='sasser12'; \
                     MYSQL_HOST='localhost';\
                     MYSQL_PORT='3306';\
                     "}
