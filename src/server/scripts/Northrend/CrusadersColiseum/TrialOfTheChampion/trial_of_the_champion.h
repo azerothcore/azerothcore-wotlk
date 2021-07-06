@@ -204,6 +204,7 @@ enum eTexts
     TEXT_BK_LICH                                    = 35,
     TEXT_BK_TASK                                    = 36,
 
+    TEXT_EADRIC_RADIATE                             = 2,
     TEXT_EADRIC_AGGRO                               = 42,
     TEXT_EADRIC_HAMMER                              = 43,
     TEXT_EADRIC_SLAIN_1                             = 44,

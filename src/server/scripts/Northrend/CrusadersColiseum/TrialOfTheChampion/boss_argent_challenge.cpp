@@ -72,7 +72,7 @@ enum PaletressEvents
     EVENT_SPELL_WAKING_NIGHTMARE,
 };
 
-#define TEXT_RADIATE                    "Eadric the Pure begins to radiate light. Shield your eyes!"
+
 
 class boss_eadric : public CreatureScript
 {
@@ -168,7 +168,7 @@ public:
                     break;
                 case EVENT_SPELL_RADIANCE:
                     me->CastSpell((Unit*)nullptr, SPELL_RADIANCE, false);
-                    me->MonsterTextEmote(TEXT_RADIATE, 0, true);
+                    Talk(TEXT_EADRIC_RADIATE);
                     events.RepeatEvent(16000);
                     break;
                 case EVENT_SPELL_HAMMER_RIGHTEOUS:
