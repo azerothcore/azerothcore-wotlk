@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1625603525661258200');
 
---- Witch Doctor Unbagwa
+-- Witch Doctor Unbagwa
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1449;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 1449);
@@ -13,7 +13,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1449, 0, 5, 6, 61, 1, 100, 0, 1, 1, 0, 0, 0, 4, 2859, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Witch Doctor Unbagwa - On Data Set 1 1 - Play Sound 2859'),
 (1449, 0, 6, 0, 61, 1, 100, 0, 1, 1, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Witch Doctor Unbagwa - On Data Set 1 1 - Set Event Phase 0');
 
---- Witch Doctor Unbagwa actionlist
+-- Witch Doctor Unbagwa actionlist
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 144900);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (144900, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Witch Doctor Unbagwa - Actionlist - Say Line 0'),
@@ -23,7 +23,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (144900, 9, 5, 0, 0, 0, 100, 0, 20000, 20000, 0, 0, 0, 12, 1516, 3, 300000, 1, 0, 0, 8, 0, 0, 0, 0, -13813.5, 8.70047, 27.3387, 6.0634, 'Witch Doctor Unbagwa - Actionlist - Summon Creature \'Konda\''),
 (144900, 9, 6, 0, 0, 0, 100, 0, 20000, 20000, 0, 0, 0, 12, 1514, 3, 300000, 1, 0, 0, 8, 0, 0, 0, 0, -13813.5, 8.70047, 27.3387, 6.0634, 'Witch Doctor Unbagwa - Actionlist - Summon Creature \'Mokk the Savage\'');
 
---- Mokk
+-- Mokk
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1514;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 1514);
