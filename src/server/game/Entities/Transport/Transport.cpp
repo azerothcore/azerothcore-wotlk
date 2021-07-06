@@ -737,10 +737,10 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
         return false;
     }
     //ASSERT(m_goValue.Transport.AnimationInfo->TotalTime > 0);
-    if (m_goValue.Transport.AnimationInfo->TotalTime < 0)
+    if (m_goValue.Transport.AnimationInfo->TotalTime == 0)
     {
-        LOG_ERROR("vehicle", "StaticTransport::Create: TotalTime is > 0 (%u) for AnimationInfo (%u) for transport entry (%u)",
-            m_goValue.Transport.AnimationInfo->TotalTime, m_goValue.Transport.AnimationInfo, goinfo->entry);
+        LOG_ERROR("vehicle", "StaticTransport::Create: TotalTime is 0 for AnimationInfo (%u) for transport entry (%u)",
+            m_goValue.Transport.AnimationInfo, goinfo->entry);
         return false;
     }
     SetPauseTime(goinfo->transport.pauseAtTime);
