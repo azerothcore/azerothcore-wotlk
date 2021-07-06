@@ -72,8 +72,6 @@ enum PaletressEvents
     EVENT_SPELL_WAKING_NIGHTMARE,
 };
 
-
-
 class boss_eadric : public CreatureScript
 {
 public:
