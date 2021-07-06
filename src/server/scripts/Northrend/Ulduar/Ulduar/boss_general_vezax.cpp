@@ -60,17 +60,6 @@ enum VezaxGOs
     // GO_VEZAX_DOOR                            = 194750,
 };
 
-enum VezaxSounds
-{
-    SOUND_VEZAX_AGGRO                           = 15542,
-    SOUND_VEZAX_SLAIN_1                         = 15543,
-    SOUND_VEZAX_SLAIN_2                         = 15544,
-    SOUND_VEZAX_SURGE                           = 15545,
-    SOUND_VEZAX_DEATH                           = 15546,
-    SOUND_VEZAX_BERSERK                         = 15547,
-    SOUND_VEZAX_HARDMODE                        = 15548,
-};
-
 enum VezaxEvents
 {
     EVENT_SPELL_VEZAX_SHADOW_CRASH              = 1,
@@ -86,13 +75,24 @@ enum VezaxEvents
     EVENT_RESTORE_TARGET                        = 11,
 };
 
-#define TEXT_VEZAX_AGGRO                            "Your destruction will herald a new age of suffering!"
-#define TEXT_VEZAX_SLAIN_1                          "You thought to stand before the legions of death... and survive?"
-#define TEXT_VEZAX_SLAIN_2                          "Defiance... a flaw of mortality."
-#define TEXT_VEZAX_SURGE                            "The black blood of Yogg-Saron courses through me! I. AM. UNSTOPPABLE!"
-#define TEXT_VEZAX_BERSERK                          "Your defeat was inevitable!"
-#define TEXT_VEZAX_DEATH                            "Oh, what horrors await...."
-#define TEXT_VEZAX_HARDMODE                         "Behold, now! Terror, absolute!"
+enum VezaxTexts
+{
+    TEXT_VEZAX_AGGRO                            = 0,
+    TEXT_VEZAX_SLAIN                            = 1,
+    TEXT_VEZAX_SURGE                            = 2,
+    TEXT_VEZAX_DEATH                            = 3,
+    TEXT_VEZAX_BERSERK                          = 4,
+    TEXT_VEZAX_HARDMODE                         = 5,
+    EMOTE_SARONITE_VAPORS_SWIRL                 = 6,
+    EMOTE_VEZAX_SUMMON_SARONITE_ANIMUS          = 7,
+    EMOTE_VEZAX_DARK_SURGE                      = 8
+};
+
+enum SaroniteVaporsTexts
+{
+    EMOTE_SARONITE_VAPORS_SPAWN                 = 0
+};
+
 
 class boss_vezax : public CreatureScript
 {
@@ -152,8 +152,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_SUMMON_SARONITE_VAPORS, 30000);
             events.RescheduleEvent(EVENT_BERSERK, 600000);
 
-            me->MonsterYell(TEXT_VEZAX_AGGRO, LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(SOUND_VEZAX_AGGRO, 0);
+            Talk(TEXT_VEZAX_AGGRO);
 
             if (pInstance)
                 pInstance->SetData(TYPE_VEZAX, IN_PROGRESS);
@@ -213,8 +212,7 @@ public:
                 case EVENT_BERSERK:
                     berserk = true;
                     me->CastSpell(me, SPELL_VEZAX_BERSERK, true);
-                    me->MonsterYell(TEXT_VEZAX_BERSERK, LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_VEZAX_BERSERK, 0);
+                    Talk(TEXT_VEZAX_BERSERK);
                     break;
                 case EVENT_SPELL_VEZAX_SHADOW_CRASH:
                     {
@@ -248,8 +246,8 @@ public:
                     events.RepeatEvent( me->GetMap()->Is25ManRaid() ? 8000 : 15000 );
                     break;
                 case EVENT_SPELL_SURGE_OF_DARKNESS:
-                    me->MonsterYell(TEXT_VEZAX_SURGE, LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_VEZAX_SURGE, 0);
+                    Talk(EMOTE_VEZAX_DARK_SURGE);
+                    Talk(TEXT_VEZAX_SURGE);
                     me->CastSpell(me, SPELL_SURGE_OF_DARKNESS, false);
                     events.RepeatEvent(63000);
                     events.DelayEvents(10000, 1);
@@ -285,7 +283,6 @@ public:
                     {
                         vaporsCount++;
                         me->CastSpell(me, SPELL_SUMMON_SARONITE_VAPORS, false);
-                        me->MonsterTextEmote("A cloud of saronite vapors coalesces nearby!", 0, true);
 
                         if( vaporsCount < 6 || !hardmodeAvailable )
                             events.RepeatEvent(30000);
@@ -308,7 +305,7 @@ public:
                 case EVENT_SARONITE_VAPORS_SWIRL:
                     if (summons.size())
                     {
-                        me->MonsterTextEmote("The saronite vapors mass and swirl violently, merging into a monstrous form!", 0, true);
+                        Talk(EMOTE_SARONITE_VAPORS_SWIRL);
                         if( Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())) )
                             sv->CastSpell(sv, SPELL_SARONITE_ANIMUS_FORMATION_VISUAL, true);
 
@@ -319,9 +316,8 @@ public:
                 case EVENT_SPELL_SUMMON_SARONITE_ANIMUS:
                     if (summons.size())
                     {
-                        me->MonsterTextEmote("A saronite barrier appears around General Vezax!", 0, true);
-                        me->MonsterYell(TEXT_VEZAX_HARDMODE, LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_VEZAX_HARDMODE, 0);
+                        Talk(EMOTE_VEZAX_SUMMON_SARONITE_ANIMUS);
+                        Talk(TEXT_VEZAX_HARDMODE);
 
                         me->CastSpell(me, SPELL_SARONITE_BARRIER, true);
                         if( Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())) )
@@ -345,8 +341,7 @@ public:
             if (pInstance)
                 pInstance->SetData(TYPE_VEZAX, DONE);
 
-            me->MonsterYell(TEXT_VEZAX_DEATH, LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(SOUND_VEZAX_DEATH, 0);
+            Talk(TEXT_VEZAX_DEATH);
 
             if( GameObject* door = me->FindNearestGameObject(GO_VEZAX_DOOR, 500.0f) )
                 if( door->GetGoState() != GO_STATE_ACTIVE )
@@ -360,16 +355,7 @@ public:
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
             {
-                if( urand(0, 1) )
-                {
-                    me->MonsterYell(TEXT_VEZAX_SLAIN_1, LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_VEZAX_SLAIN_1, 0);
-                }
-                else
-                {
-                    me->MonsterYell(TEXT_VEZAX_SLAIN_2, LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_VEZAX_SLAIN_2, 0);
-                }
+                Talk(TEXT_VEZAX_SLAIN);
             }
         }
 
@@ -415,6 +401,11 @@ public:
             if( pInstance )
                 if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)) )
                     vezax->AI()->DoAction(1);
+        }
+
+        void IsSummonedBy(Unit*) override
+        {
+            Talk(EMOTE_SARONITE_VAPORS_SPAWN);
         }
     };
 };
