@@ -32,10 +32,12 @@ EndContentData */
 enum LadyJaina
 {
     QUEST_JAINAS_AUTOGRAPH = 558,
-    SPELL_JAINAS_AUTOGRAPH = 23122
-};
+    SPELL_JAINAS_AUTOGRAPH = 23122,
 
-#define GOSSIP_ITEM_JAINA "I know this is rather silly but i have a young ward who is a bit shy and would like your autograph."
+    // Texts
+    GOSSIP_MENU_JAINA       = 2465,
+    GOSSIP_OPTION_AUTOGRAPH = 0
+};
 
 class npc_lady_jaina_proudmoore : public CreatureScript
 {
@@ -59,7 +61,9 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_JAINAS_AUTOGRAPH) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_JAINA, GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_JAINA, GOSSIP_OPTION_AUTOGRAPH, GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
+        }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
