@@ -17,7 +17,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <openssl/md5.h>
 #include <openssl/sha.h>
 
 Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
@@ -38,9 +37,7 @@ Warden::~Warden()
 
 void Warden::SendModuleToClient()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Send module to client");
-#endif
 
     // Create packet structure
     WardenModuleTransfer packet;
@@ -66,9 +63,7 @@ void Warden::SendModuleToClient()
 
 void Warden::RequestModule()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Request module");
-#endif
 
     // Create packet structure
     WardenModuleUse request;
@@ -139,16 +134,12 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
 
     if (checksum != newChecksum)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "CHECKSUM IS NOT VALID");
-#endif
         return false;
     }
     else
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "CHECKSUM IS VALID");
-#endif
         return true;
     }
 }
@@ -281,7 +272,7 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
 {
     static constexpr char WARDEN_TOKEN[] = "_TW\t";
     // if msg starts with WARDEN_TOKEN
-    if (!(msg.rfind(WARDEN_TOKEN, 0) == 0))
+    if (msg.rfind(WARDEN_TOKEN, 0) != 0)
     {
         return false;
     }
@@ -321,9 +312,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
     _warden->DecryptData(recvData.contents(), recvData.size());
     uint8 opcode;
     recvData >> opcode;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
-#endif
     recvData.hexlike();
 
     switch (opcode)
@@ -338,23 +327,17 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             _warden->HandleData(recvData);
             break;
         case WARDEN_CMSG_MEM_CHECKS_RESULT:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("warden", "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
-#endif
             break;
         case WARDEN_CMSG_HASH_RESULT:
             _warden->HandleHashResult(recvData);
             _warden->InitializeModule();
             break;
         case WARDEN_CMSG_MODULE_FAILED:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("warden", "NYI WARDEN_CMSG_MODULE_FAILED received!");
-#endif
             break;
         default:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("warden", "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
-#endif
             break;
     }
 }

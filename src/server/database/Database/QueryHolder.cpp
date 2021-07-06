@@ -1,109 +1,37 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
-#include "MySQLConnection.h"
 #include "QueryHolder.h"
-#include "PreparedStatement.h"
+#include "Errors.h"
 #include "Log.h"
+#include "MySQLConnection.h"
+#include "PreparedStatement.h"
+#include "QueryResult.h"
 
-bool SQLQueryHolder::SetQuery(size_t index, const char* sql)
+bool SQLQueryHolderBase::SetPreparedQueryImpl(size_t index, PreparedStatementBase* stmt)
 {
     if (m_queries.size() <= index)
     {
-        LOG_ERROR("server", "Query index (%u) out of range (size: %u) for query: %s", uint32(index), (uint32)m_queries.size(), sql);
+        LOG_ERROR("sql.sql", "Query index (%u) out of range (size: %u) for prepared statement", uint32(index), (uint32)m_queries.size());
         return false;
     }
 
-    /// not executed yet, just stored (it's not called a holder for nothing)
-    SQLElementData element;
-    element.type = SQL_ELEMENT_RAW;
-    element.element.query = strdup(sql);
-
-    SQLResultSetUnion result;
-    result.qresult = nullptr;
-
-    m_queries[index] = SQLResultPair(element, result);
+    m_queries[index].first = stmt;
     return true;
 }
 
-bool SQLQueryHolder::SetPQuery(size_t index, const char* format, ...)
-{
-    if (!format)
-    {
-        LOG_ERROR("server", "Query (index: %u) is empty.", uint32(index));
-        return false;
-    }
-
-    va_list ap;
-    char szQuery [MAX_QUERY_LEN];
-    va_start(ap, format);
-    int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
-    va_end(ap);
-
-    if (res == -1)
-    {
-        LOG_ERROR("server", "SQL Query truncated (and not execute) for format: %s", format);
-        return false;
-    }
-
-    return SetQuery(index, szQuery);
-}
-
-bool SQLQueryHolder::SetPreparedQuery(size_t index, PreparedStatement* stmt)
-{
-    if (m_queries.size() <= index)
-    {
-        LOG_ERROR("server", "Query index (%u) out of range (size: %u) for prepared statement", uint32(index), (uint32)m_queries.size());
-        return false;
-    }
-
-    /// not executed yet, just stored (it's not called a holder for nothing)
-    SQLElementData element;
-    element.type = SQL_ELEMENT_PREPARED;
-    element.element.stmt = stmt;
-
-    SQLResultSetUnion result;
-    result.presult = nullptr;
-
-    m_queries[index] = SQLResultPair(element, result);
-    return true;
-}
-
-QueryResult SQLQueryHolder::GetResult(size_t index)
-{
-    // Don't call to this function if the index is of an ad-hoc statement
-    if (index < m_queries.size())
-    {
-        ResultSet* result = m_queries[index].second.qresult;
-        if (!result || !result->GetRowCount())
-            return QueryResult(nullptr);
-
-        result->NextRow();
-        return QueryResult(result);
-    }
-    else
-        return QueryResult(nullptr);
-}
-
-PreparedQueryResult SQLQueryHolder::GetPreparedResult(size_t index)
+PreparedQueryResult SQLQueryHolderBase::GetPreparedResult(size_t index) const
 {
     // Don't call to this function if the index is of a prepared statement
-    if (index < m_queries.size())
-    {
-        PreparedResultSet* result = m_queries[index].second.presult;
-        if (!result || !result->GetRowCount())
-            return PreparedQueryResult(nullptr);
+    ASSERT(index < m_queries.size(), "Query holder result index out of range, tried to access index " SZFMTD " but there are only " SZFMTD " results",
+        index, m_queries.size());
 
-        return PreparedQueryResult(result);
-    }
-    else
-        return PreparedQueryResult(nullptr);
+    return m_queries[index].second;
 }
 
-void SQLQueryHolder::SetResult(size_t index, ResultSet* result)
+void SQLQueryHolderBase::SetPreparedResult(size_t index, PreparedResultSet* result)
 {
     if (result && !result->GetRowCount())
     {
@@ -113,85 +41,45 @@ void SQLQueryHolder::SetResult(size_t index, ResultSet* result)
 
     /// store the result in the holder
     if (index < m_queries.size())
-        m_queries[index].second.qresult = result;
+        m_queries[index].second = PreparedQueryResult(result);
 }
 
-void SQLQueryHolder::SetPreparedResult(size_t index, PreparedResultSet* result)
+SQLQueryHolderBase::~SQLQueryHolderBase()
 {
-    if (result && !result->GetRowCount())
-    {
-        delete result;
-        result = nullptr;
-    }
-
-    /// store the result in the holder
-    if (index < m_queries.size())
-        m_queries[index].second.presult = result;
-}
-
-SQLQueryHolder::~SQLQueryHolder()
-{
-    for (size_t i = 0; i < m_queries.size(); i++)
+    for (std::pair<PreparedStatementBase*, PreparedQueryResult>& query : m_queries)
     {
         /// if the result was never used, free the resources
         /// results used already (getresult called) are expected to be deleted
-        if (SQLElementData* data = &m_queries[i].first)
-        {
-            switch (data->type)
-            {
-                case SQL_ELEMENT_RAW:
-                    free((void*)(const_cast<char*>(data->element.query)));
-                    break;
-                case SQL_ELEMENT_PREPARED:
-                    delete data->element.stmt;
-                    break;
-            }
-        }
+        delete query.first;
     }
 }
 
-void SQLQueryHolder::SetSize(size_t size)
+void SQLQueryHolderBase::SetSize(size_t size)
 {
     /// to optimize push_back, reserve the number of queries about to be executed
     m_queries.resize(size);
 }
 
+SQLQueryHolderTask::~SQLQueryHolderTask() = default;
+
 bool SQLQueryHolderTask::Execute()
 {
-    //the result can't be ready as we are processing it right now
-    ASSERT(!m_result.ready());
+    /// execute all queries in the holder and pass the results
+    for (size_t i = 0; i < m_holder->m_queries.size(); ++i)
+        if (PreparedStatementBase* stmt = m_holder->m_queries[i].first)
+            m_holder->SetPreparedResult(i, m_conn->Query(stmt));
 
-    if (!m_holder)
-        return false;
+    m_result.set_value();
+    return true;
+}
 
-    /// we can do this, we are friends
-    std::vector<SQLQueryHolder::SQLResultPair>& queries = m_holder->m_queries;
-
-    for (size_t i = 0; i < queries.size(); i++)
+bool SQLQueryHolderCallback::InvokeIfReady()
+{
+    if (m_future.valid() && m_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
     {
-        /// execute all queries in the holder and pass the results
-        if (SQLElementData* data = &queries[i].first)
-        {
-            switch (data->type)
-            {
-                case SQL_ELEMENT_RAW:
-                {
-                    char const* sql = data->element.query;
-                    if (sql)
-                        m_holder->SetResult(i, m_conn->Query(sql));
-                    break;
-                }
-                case SQL_ELEMENT_PREPARED:
-                {
-                    PreparedStatement* stmt = data->element.stmt;
-                    if (stmt)
-                        m_holder->SetPreparedResult(i, m_conn->Query(stmt));
-                    break;
-                }
-            }
-        }
+        m_callback(*m_holder);
+        return true;
     }
 
-    m_result.set(m_holder);
-    return true;
+    return false;
 }

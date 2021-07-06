@@ -429,9 +429,7 @@ void PoolGroup<Quest>::Spawn1Object(PoolObject* obj)
     PooledQuestRelationBoundsNC qr = sPoolMgr->mQuestCreatureRelation.equal_range(obj->guid);
     for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("pool", "PoolGroup<Quest>: Adding quest %u to creature %u", itr->first, itr->second);
-#endif
         questMap->insert(QuestRelations::value_type(itr->second, itr->first));
     }
 
@@ -440,9 +438,7 @@ void PoolGroup<Quest>::Spawn1Object(PoolObject* obj)
     qr = sPoolMgr->mQuestGORelation.equal_range(obj->guid);
     for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("pool", "PoolGroup<Quest>: Adding quest %u to GO %u", itr->first, itr->second);
-#endif
         questMap->insert(QuestRelations::value_type(itr->second, itr->first));
     }
 }
@@ -450,13 +446,11 @@ void PoolGroup<Quest>::Spawn1Object(PoolObject* obj)
 template <>
 void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 triggerFrom)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("pool", "PoolGroup<Quest>: Spawning pool %u", poolId);
-#endif
     // load state from db
     if (!triggerFrom)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_POOL_QUEST_SAVE);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_POOL_QUEST_SAVE);
 
         stmt->setUInt32(0, poolId);
 
@@ -576,8 +570,8 @@ void PoolMgr::LoadFromDB()
         if (!result)
         {
             mPoolTemplate.clear();
-            LOG_INFO("server", ">> Loaded 0 object pools. DB table `pool_template` is empty.");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 object pools. DB table `pool_template` is empty.");
+            LOG_INFO("server.loading", " ");
             return;
         }
 
@@ -594,13 +588,13 @@ void PoolMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server", ">> Loaded %u objects pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded %u objects pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", " ");
     }
 
     // Creatures
 
-    LOG_INFO("server", "Loading Creatures Pooling Data...");
+    LOG_INFO("server.loading", "Loading Creatures Pooling Data...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -609,8 +603,8 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 creatures in  pools. DB table `pool_creature` is empty.");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 creatures in  pools. DB table `pool_creature` is empty.");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -651,14 +645,14 @@ void PoolMgr::LoadFromDB()
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u creatures in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u creatures in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
     // Gameobjects
 
-    LOG_INFO("server", "Loading Gameobject Pooling Data...");
+    LOG_INFO("server.loading", "Loading Gameobject Pooling Data...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -667,8 +661,8 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 gameobjects in  pools. DB table `pool_gameobject` is empty.");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 gameobjects in  pools. DB table `pool_gameobject` is empty.");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -721,14 +715,14 @@ void PoolMgr::LoadFromDB()
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u gameobject in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u gameobject in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
     // Pool of pools
 
-    LOG_INFO("server", "Loading Mother Pooling Data...");
+    LOG_INFO("server.loading", "Loading Mother Pooling Data...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -737,8 +731,8 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 pools in pools");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 pools in pools");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -813,22 +807,22 @@ void PoolMgr::LoadFromDB()
                 }
             }
 
-            LOG_INFO("server", ">> Loaded %u pools in mother pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u pools in mother pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
-    LOG_INFO("server", "Loading Quest Pooling Data...");
+    LOG_INFO("server.loading", "Loading Quest Pooling Data...");
     {
         uint32 oldMSTime = getMSTime();
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_QUEST_POOLS);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_QUEST_POOLS);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
 
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 quests in pools");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 quests in pools");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -903,13 +897,13 @@ void PoolMgr::LoadFromDB()
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u quests in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u quests in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
     // The initialize method will spawn all pools not in an event and not in another pool, this is why there is 2 left joins with 2 null checks
-    LOG_INFO("server", "Starting objects pooling system...");
+    LOG_INFO("server.loading", "Starting objects pooling system...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -919,8 +913,8 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server", ">> Pool handling system initialized, 0 pools spawned.");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Pool handling system initialized, 0 pools spawned.");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -950,8 +944,8 @@ void PoolMgr::LoadFromDB()
                 }
             } while (result->NextRow());
 
-            LOG_INFO("server", "Pool handling system initialized, %u pools spawned in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("pool", "Pool handling system initialized, %u pools spawned in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 }
@@ -962,7 +956,7 @@ void PoolMgr::LoadQuestPools()
 
 void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
 {
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     // pussywizard: mysql thread races, change only what is meant to be changed
     std::set<uint32> deletedPools;
@@ -979,7 +973,7 @@ void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
             if (!other && !quest->IsDaily() && !quest->IsWeekly())
                 continue;
         }
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_POOL_SAVE);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_POOL_SAVE);
         stmt->setUInt32(0, itr->second.GetPoolId());
         trans->Append(stmt);
         deletedPools.insert(itr->second.GetPoolId());
@@ -989,7 +983,7 @@ void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
         if (deletedPools.find(itr->second) != deletedPools.end())
             if (IsSpawnedObject<Quest>(itr->first))
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_POOL_SAVE);
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_POOL_SAVE);
                 stmt->setUInt32(0, itr->second);
                 stmt->setUInt32(1, itr->first);
                 trans->Append(stmt);

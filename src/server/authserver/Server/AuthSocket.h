@@ -39,7 +39,7 @@ struct AccountInfo
     std::string LastIP;
     uint32 FailedLogins = 0;
     bool IsBanned = false;
-    bool IsPermanenetlyBanned = false;
+    bool IsPermanentlyBanned = false;
     AccountTypes SecurityLevel = SEC_PLAYER;
 };
 
@@ -89,6 +89,7 @@ private:
     // between enUS and enGB, which is important for the patch system
     std::string _localizationName;
     std::string _os;
+    std::string _ipCountry;
     uint16 _build;
     uint8 _expversion;
 };

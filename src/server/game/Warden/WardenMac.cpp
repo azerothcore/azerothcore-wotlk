@@ -5,15 +5,12 @@
  */
 
 #include "ByteBuffer.h"
-#include "Common.h"
-#include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SessionKeyGenerator.h"
 #include "Util.h"
 #include "WardenMac.h"
 #include "WardenModuleMac.h"
-#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include <openssl/md5.h>
@@ -47,20 +44,16 @@ void WardenMac::Init(WorldSession* pClient, SessionKey const& K)
     _inputCrypto.Init(_inputKey);
     _outputCrypto.Init(_outputKey);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Server side warden for client %u initializing...", pClient->GetAccountId());
     LOG_DEBUG("warden", "C->S Key: %s", Acore::Impl::ByteArrayToHexStr(_inputKey, 16).c_str());
     LOG_DEBUG("warden", "S->C Key: %s", Acore::Impl::ByteArrayToHexStr(_outputKey, 16 ).c_str());
     LOG_DEBUG("warden", "  Seed: %s", Acore::Impl::ByteArrayToHexStr(_seed, 16).c_str());
     LOG_DEBUG("warden", "Loading Module...");
-#endif
 
     _module = GetModuleForClient();
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Module Key: %s", Acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
     LOG_DEBUG("warden", "Module ID: %s", Acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
-#endif
     RequestModule();
 }
 
@@ -87,16 +80,12 @@ ClientWardenModule* WardenMac::GetModuleForClient()
 
 void WardenMac::InitializeModule()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Initialize module");
-#endif
 }
 
 void WardenMac::RequestHash()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Request hash");
-#endif
 
     // Create packet structure
     WardenHashRequest Request;
@@ -164,16 +153,12 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
     // Verify key
     if (memcmp(buff.contents() + 1, sha1.GetDigest().data(), 20) != 0)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "Request hash reply: failed");
-#endif
         ApplyPenalty(0, "Request hash reply: failed");
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Request hash reply: succeed");
-#endif
 
     // client 7F96EEFDA5B63D20A4DF8E00CBF48304
     //const uint8 client_key[16] = { 0x7F, 0x96, 0xEE, 0xFD, 0xA5, 0xB6, 0x3D, 0x20, 0xA4, 0xDF, 0x8E, 0x00, 0xCB, 0xF4, 0x83, 0x04 };
@@ -193,9 +178,7 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
 
 void WardenMac::RequestChecks()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Request data");
-#endif
 
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
@@ -219,9 +202,7 @@ void WardenMac::RequestChecks()
 
 void WardenMac::HandleData(ByteBuffer& buff)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Handle data");
-#endif
 
     _dataSent = false;
     _clientResponseTimer = 0;
@@ -254,9 +235,7 @@ void WardenMac::HandleData(ByteBuffer& buff)
 
     if (sha1Hash != sha1.GetDigest())
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "Handle data failed: SHA1 hash is wrong!");
-#endif
         //found = true;
     }
 
@@ -271,9 +250,7 @@ void WardenMac::HandleData(ByteBuffer& buff)
 
     if (memcmp(ourMD5Hash, theirsMD5Hash, 16))
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "Handle data failed: MD5 hash is wrong!");
-#endif
         //found = true;
     }
 
