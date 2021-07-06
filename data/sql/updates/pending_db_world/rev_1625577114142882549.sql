@@ -8,5 +8,5 @@ UPDATE `item_loot_template` SET `Chance` = 100 WHERE `Entry` = 11568 AND `Item` 
 -- Delete Threshadon Meat/Preserved Pheromone from Hoard of the Black Dragonflight
 DELETE FROM `item_loot_template` WHERE `Entry` = 10569 AND `Item` IN (11569, 11570);
 
--- Delete Threshadon Meat/Preserved Pheromone from A Small Pouch
+-- Delete Threshadon Meat/Preserved Pheromone from A Small Pack
 DELETE FROM `item_loot_template` WHERE `Entry` = 11107 AND `Item` IN (11569, 11570);
