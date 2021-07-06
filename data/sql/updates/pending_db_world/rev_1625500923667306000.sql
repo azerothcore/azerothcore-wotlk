@@ -15,7 +15,14 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (61023, 50031);
 
 /* Add condition for the second gossip */
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` = 61023) AND (`SourceEntry` = 50031) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 28) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 8336) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+/*
+	SourceTypeOrReferenceId = CONDITION_SOURCE_TYPE_GOSSIP_MENU = 14
+	ConditionTypeOrReference = CONDITION_QUESTREWARDED = 8
+    ConditionValue1(quest_template id) = 8336
+    ConditionValue2 - always 0
+    ConditionValue3 - always 0
+*/
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` = 61023) AND (`SourceEntry` = 50031) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 8) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 8336) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14, 61023, 50031, 0, 0, 8, 0, 8336, 0, 0, 0, 0, 0, '', '');
 
