@@ -93,7 +93,6 @@ enum SaroniteVaporsTexts
     EMOTE_SARONITE_VAPORS_SPAWN                 = 0
 };
 
-
 class boss_vezax : public CreatureScript
 {
 public:
@@ -331,7 +330,6 @@ public:
                     summons.DespawnEntry(NPC_SARONITE_VAPORS);
                     break;
             }
-
             DoMeleeAttackIfReady();
         }
 
