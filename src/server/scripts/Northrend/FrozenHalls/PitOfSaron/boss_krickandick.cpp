@@ -13,9 +13,8 @@
 #include "Vehicle.h"
 #include "WorldSession.h"
 
-enum Texts
+enum Yells
 {
-    EMOTE_ICK_CHASING                   = 1,
     SAY_AGGRO                           = 24,
     SAY_SLAY_1                          = 25,
     SAY_SLAY_2                          = 26,
@@ -28,7 +27,7 @@ enum Texts
     EMOTE_ICK_POISON                    = 33,
 };
 
-
+#define EMOTE_ICK_CHASING               "%s is chasing you!"
 
 enum Spells
 {
@@ -109,7 +108,7 @@ public:
             {
                 WorldPacket data;
 
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, "TODO");
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_ICK_CHASING);
                 target->ToPlayer()->GetSession()->SendPacket(&data);
 
                 AttackStart(target);
