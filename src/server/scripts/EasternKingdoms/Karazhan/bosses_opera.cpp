@@ -793,9 +793,11 @@ enum RedRidingHood
     SPELL_WIDE_SWIPE                = 30761,
 
     CREATURE_BIG_BAD_WOLF           = 17521,
-};
 
-#define GOSSIP_GRANDMA          "What phat lewtz you have grandmother?"
+    // Texts
+    GOSSIP_MENU_GRANDMOTHER         = 7441,
+    GOSSIP_OPTION_GRANDMOTHER       = 0
+};
 
 class npc_grandmother : public CreatureScript
 {
@@ -818,7 +820,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_GRANDMA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        AddGossipItemFor(player, GOSSIP_MENU_GRANDMOTHER, GOSSIP_OPTION_GRANDMOTHER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         SendGossipMenuFor(player, 8990, creature->GetGUID());
 
         return true;
