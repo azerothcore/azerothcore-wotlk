@@ -4,7 +4,6 @@
  */
 
 #include "UpdateFetcher.h"
-#include "Common.h"
 #include "CryptoHash.h"
 #include "DBUpdater.h"
 #include "Field.h"
@@ -13,24 +12,23 @@
 #include "Tokenize.h"
 #include "Util.h"
 #include <filesystem>
-#include <fstream>
 #include <sstream>
 
 using namespace std::filesystem;
 
 struct UpdateFetcher::DirectoryEntry
 {
-    DirectoryEntry(Path const& path_, State state_) : path(path_), state(state_) { }
+    DirectoryEntry(std::filesystem::path const& path_, State state_) : path(path_), state(state_) { }
 
-    Path const path;
+    std::filesystem::path const path;
     State const state;
 };
 
-UpdateFetcher::UpdateFetcher(Path const& sourceDirectory,
+UpdateFetcher::UpdateFetcher(std::filesystem::path const& sourceDirectory,
                              std::function<void(std::string const&)> const& apply,
-                             std::function<void(Path const& path)> const& applyFile,
+                             std::function<void(std::filesystem::path const& path)> const& applyFile,
                              std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName_) :
-    _sourceDirectory(std::make_unique<Path>(sourceDirectory)), _apply(apply), _applyFile(applyFile),
+    _sourceDirectory(std::make_unique<std::filesystem::path>(sourceDirectory)), _apply(apply), _applyFile(applyFile),
     _retrieve(retrieve), _dbModuleName(dbModuleName_)
 {
 }
@@ -49,7 +47,7 @@ UpdateFetcher::LocaleFileStorage UpdateFetcher::GetFileList() const
     return files;
 }
 
-void UpdateFetcher::FillFileListRecursively(Path const& path, LocaleFileStorage& storage, State const state, uint32 const depth) const
+void UpdateFetcher::FillFileListRecursively(std::filesystem::path const& path, LocaleFileStorage& storage, State const state, uint32 const depth) const
 {
     static uint32 const MAX_DEPTH = 10;
     static directory_iterator const end;
@@ -99,7 +97,7 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
         if (path.substr(0, 1) == "$")
             path = _sourceDirectory->generic_string() + path.substr(1);
 
-        Path const p(path);
+        std::filesystem::path const p(path);
 
         if (!is_directory(p))
         {
@@ -125,7 +123,7 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
     {
         std::string path = _sourceDirectory->generic_string() + "/modules/" + itr + "/data/sql/" + _dbModuleName; // modules/mod-name/data/sql/db-world
 
-        Path const p(path);
+        std::filesystem::path const p(path);
         if (!is_directory(p))
             continue;
 
@@ -161,7 +159,7 @@ UpdateFetcher::AppliedFileStorage UpdateFetcher::ReceiveAppliedFiles() const
     return map;
 }
 
-std::string UpdateFetcher::ReadSQLUpdate(Path const& file) const
+std::string UpdateFetcher::ReadSQLUpdate(std::filesystem::path const& file) const
 {
     std::ifstream in(file.c_str());
     if (!in.is_open())
@@ -374,7 +372,7 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
     return UpdateResult(importedUpdates, countRecentUpdates, countArchivedUpdates);
 }
 
-uint32 UpdateFetcher::Apply(Path const& path) const
+uint32 UpdateFetcher::Apply(std::filesystem::path const& path) const
 {
     using Time = std::chrono::high_resolution_clock;
 
