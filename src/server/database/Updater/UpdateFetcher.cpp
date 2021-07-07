@@ -16,7 +16,7 @@
 #include <fstream>
 #include <sstream>
 
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 struct UpdateFetcher::DirectoryEntry
 {

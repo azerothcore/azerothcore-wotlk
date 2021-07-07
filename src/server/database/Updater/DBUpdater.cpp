@@ -27,7 +27,7 @@ std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 
 bool DBUpdaterUtil::CheckExecutable()
 {
-    boost::filesystem::path exe(GetCorrectedMySQLExecutable());
+    std::filesystem::path exe(GetCorrectedMySQLExecutable());
     if (!is_regular_file(exe))
     {
         exe = Acore::SearchExecutableInPath("mysql");
@@ -191,13 +191,13 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     catch (UpdateException&)
     {
         LOG_FATAL("sql.updates", "Failed to create database %s! Does the user (named in *.conf) have `CREATE`, `ALTER`, `DROP`, `INSERT` and `DELETE` privileges on the MySQL server?", pool.GetConnectionInfo()->database.c_str());
-        boost::filesystem::remove(temp);
+        std::filesystem::remove(temp);
         return false;
     }
 
     LOG_INFO("sql.updates", "Done.");
     LOG_INFO("sql.updates", " ");
-    boost::filesystem::remove(temp);
+    std::filesystem::remove(temp);
     return true;
 }
 
@@ -294,7 +294,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
     std::string const DirPathStr = DBUpdater<T>::GetBaseFilesDirectory();
 
     Path const DirPath(DirPathStr);
-    if (!boost::filesystem::is_directory(DirPath))
+    if (!std::filesystem::is_directory(DirPath))
     {
         LOG_ERROR("sql.updates", ">> Directory \"%s\" not exist", DirPath.generic_string().c_str());
         return false;
@@ -306,10 +306,10 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    boost::filesystem::directory_iterator const DirItr;
+    std::filesystem::directory_iterator const DirItr;
     uint32 FilesCount = 0;
 
-    for (boost::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
+    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
     {
         if (itr->path().extension() == ".sql")
             FilesCount++;
@@ -321,7 +321,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    for (boost::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
+    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
     {
         if (itr->path().extension() != ".sql")
             continue;

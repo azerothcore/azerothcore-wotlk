@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace boost::filesystem
+namespace std::filesystem
 {
     class path;
 }
@@ -33,7 +33,7 @@ struct AC_DATABASE_API UpdateResult
 
 class AC_DATABASE_API UpdateFetcher
 {
-    typedef boost::filesystem::path Path;
+    typedef std::filesystem::path Path;
 
 public:
     UpdateFetcher(Path const& updateDirectory,

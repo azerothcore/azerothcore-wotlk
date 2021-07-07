@@ -82,7 +82,7 @@ namespace Acore
             {
                 // With binding stdin
                 return child{
-                    exe = boost::filesystem::absolute(executable).string(),
+                    exe = std::filesystem::absolute(executable).string(),
                     args = argsVector,
                     env = environment(boost::this_process::environment()),
                     std_in = inputFile.get(),
@@ -94,7 +94,7 @@ namespace Acore
             {
                 // Without binding stdin
                 return child{
-                    exe = boost::filesystem::absolute(executable).string(),
+                    exe = std::filesystem::absolute(executable).string(),
                     args = argsVector,
                     env = environment(boost::this_process::environment()),
                     std_in = boost::process::close,
