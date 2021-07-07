@@ -1,6 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1625500923667306000');
 
 /* Add new gossip */
+DELETE FROM `npc_text` WHERE (`ID` = 50031);
 INSERT INTO `npc_text`(`ID`,`text0_0`,`text0_1`,`BroadcastTextID0`,
 `lang0`,`Probability0`)
 VALUES
