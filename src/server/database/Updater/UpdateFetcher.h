@@ -12,11 +12,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-namespace std::filesystem
-{
-    class path;
-}
+#include <filesystem>
 
 struct AC_DATABASE_API UpdateResult
 {

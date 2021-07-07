@@ -4,7 +4,6 @@
  */
 
 #include "UpdateFetcher.h"
-#include "Common.h"
 #include "CryptoHash.h"
 #include "DBUpdater.h"
 #include "Field.h"
@@ -12,8 +11,6 @@
 #include "QueryResult.h"
 #include "Tokenize.h"
 #include "Util.h"
-#include <filesystem>
-#include <fstream>
 #include <sstream>
 
 using namespace std::filesystem;
