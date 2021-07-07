@@ -33,11 +33,12 @@ struct AC_DATABASE_API UpdateResult
 
 class AC_DATABASE_API UpdateFetcher
 {
+    typedef std::filesystem::path Path;
 
 public:
-    UpdateFetcher(std::filesystem::path const& updateDirectory,
+    UpdateFetcher(Path const& updateDirectory,
                   std::function<void(std::string const&)> const& apply,
-                  std::function<void(std::filesystem::path const& path)> const& applyFile,
+                  std::function<void(Path const& path)> const& applyFile,
                   std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName);
     ~UpdateFetcher();
 
@@ -101,7 +102,7 @@ private:
 
     struct DirectoryEntry;
 
-    typedef std::pair<std::filesystem::path, State> LocaleFileEntry;
+    typedef std::pair<Path, State> LocaleFileEntry;
 
     struct PathCompare
     {
@@ -114,15 +115,15 @@ private:
     typedef std::vector<UpdateFetcher::DirectoryEntry> DirectoryStorage;
 
     LocaleFileStorage GetFileList() const;
-    void FillFileListRecursively(std::filesystem::path const& path, LocaleFileStorage& storage,
+    void FillFileListRecursively(Path const& path, LocaleFileStorage& storage,
                                  State const state, uint32 const depth) const;
 
     DirectoryStorage ReceiveIncludedDirectories() const;
     AppliedFileStorage ReceiveAppliedFiles() const;
 
-    std::string ReadSQLUpdate(std::filesystem::path const& file) const;
+    std::string ReadSQLUpdate(Path const& file) const;
 
-    uint32 Apply(std::filesystem::path const& path) const;
+    uint32 Apply(Path const& path) const;
 
     void UpdateEntry(AppliedFileEntry const& entry, uint32 const speed = 0) const;
     void RenameEntry(std::string const& from, std::string const& to) const;
@@ -130,10 +131,10 @@ private:
 
     void UpdateState(std::string const& name, State const state) const;
 
-    std::unique_ptr<std::filesystem::path> const _sourceDirectory;
+    std::unique_ptr<Path> const _sourceDirectory;
 
     std::function<void(std::string const&)> const _apply;
-    std::function<void(std::filesystem::path const& path)> const _applyFile;
+    std::function<void(Path const& path)> const _applyFile;
     std::function<QueryResult(std::string const&)> const _retrieve;
 
     // modules
