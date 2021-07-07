@@ -1,0 +1,3 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1625085335146756200');
+
+UPDATE `creature_template` SET `InhabitType` = 1 WHERE `entry` IN (37955,38434,38435,38436,37501,38197,37502,38198,37232,38362);
