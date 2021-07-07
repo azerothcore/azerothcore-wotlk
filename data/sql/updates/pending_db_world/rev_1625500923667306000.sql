@@ -24,7 +24,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 */
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` = 61023) AND (`SourceEntry` = 50031) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 8) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 8336) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(14, 61023, 50031, 0, 0, 8, 0, 8336, 0, 0, 0, 0, 0, '', '');
+(14, 61023, 50031, 0, 0, 8, 0, 8336, 0, 0, 0, 0, 0, '', 'Show gossip only if quest 8336 is rewarded');
 
 /* Link creature_template with new gossip menuID */
 UPDATE `creature_template` SET `gossip_menu_id` = 61023 WHERE (`entry` = 15296);
