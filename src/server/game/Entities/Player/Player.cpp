@@ -14992,7 +14992,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                             GetName().c_str(), GetGUID().GetCounter(), menu->GetGossipMenu().GetMenuId(), creature->GetName().c_str(), creature->GetEntry());
                         canTalk = false;
                     }
-                    // no break;
+                    [[fallthrough]];
                 }
                 case GOSSIP_OPTION_GOSSIP:
                     if (creature->isVendorWithIconSpeak())
