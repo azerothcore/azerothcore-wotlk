@@ -737,7 +737,7 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
         return false;
     }
     //ASSERT(m_goValue.Transport.AnimationInfo->TotalTime > 0);
-    if (m_goValue.Transport.AnimationInfo->TotalTime == 0)
+    if (!m_goValue.Transport.AnimationInfo->TotalTime)
     {
         LOG_ERROR("vehicle", "StaticTransport::Create: AnimationInfo->TotalTime is 0 for GameObject entry (%u)", goinfo->entry);
         return false;
