@@ -6,4 +6,6 @@
 #ifndef AllPackets_h__
 #define AllPackets_h__
 
+#include "NPCPackets.h"
+
 #endif // AllPackets_h__

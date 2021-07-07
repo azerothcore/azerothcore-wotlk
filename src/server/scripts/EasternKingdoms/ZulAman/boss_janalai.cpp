@@ -227,7 +227,7 @@ public:
             Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
             Cell::VisitGridObjects(me, searcher, me->GetGridActivationRange());
 
-            //TC_LOG_ERROR("scripts", "Eggs %d at middle", templist.size());
+            //LOG_ERROR("scripts", "Eggs %d at middle", templist.size());
             if (templist.empty())
                 return false;
 
@@ -504,7 +504,7 @@ public:
             Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, templist, check);
             Cell::VisitGridObjects(me, searcher, me->GetGridActivationRange());
 
-            //TC_LOG_ERROR("scripts", "Eggs %d at %d", templist.size(), side);
+            //LOG_ERROR("scripts", "Eggs %d at %d", templist.size(), side);
 
             for (std::list<Creature*>::const_iterator i = templist.begin(); i != templist.end() && num > 0; ++i)
                 if ((*i)->GetDisplayId() != 11686)
