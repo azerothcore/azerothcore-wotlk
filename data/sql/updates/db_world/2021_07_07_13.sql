@@ -1,3 +1,19 @@
+-- DB update 2021_07_07_12 -> 2021_07_07_13
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_07_07_12';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_07_07_12 2021_07_07_13 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1625434614739025100'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1625434614739025100');
 
@@ -66,3 +82,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (8480, 8, 0, 'The legion of Blackrock comes, dwarflings! We shall scorch the earth and set fire to the heavens. None shall survive...', 14, 0, 100, 0, 0, 0, 4465, 0, 'Kalaran the Deceiver');
 
 
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_07_07_13' WHERE sql_rev = '1625434614739025100';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
