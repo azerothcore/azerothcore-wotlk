@@ -12,6 +12,7 @@
 #include "Tokenize.h"
 #include "Util.h"
 #include <sstream>
+#include <fstream>
 
 using namespace std::filesystem;
 
