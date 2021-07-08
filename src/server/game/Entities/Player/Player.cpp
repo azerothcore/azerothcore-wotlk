@@ -17761,12 +17761,17 @@ void Player::_LoadArenaTeamInfo()
         if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUID().GetCounter(), itr.second))
         {
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
-            if (!arenaTeam) // some shit, should be assert, but just ignore
+            if (!arenaTeam)
+            {
+                LOG_ERROR("bg.arena", "Player::_LoadArenaTeamInfo: No arena team was found.");
                 continue;
+            }
             ArenaTeamMember const* member = arenaTeam->GetMember(GetGUID());
-            if (!member) // some shit, should be assert, but just ignore
+            if (!member)
+            {
+                LOG_ERROR("bg.arena", "Player::_LoadArenaTeamInfo: No members in the arena team (%u) was found.", arenaTeamId);
                 continue;
-
+            }
             uint8 slot = itr.second;
 
             SetArenaTeamInfoField(slot, ARENA_TEAM_ID, arenaTeamId);
@@ -23544,9 +23549,16 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 
 void Player::UpdateVisibilityForPlayer(bool mapChange)
 {
+    // After added to map seer must be a player - there is no possibility to still have different seer (all charm auras must be already removed)
+    if (mapChange && m_seer != this)
+    {
+        m_seer = this;
+    }
+
     Acore::VisibleNotifier notifierNoLarge(*this, mapChange, false); // visit only objects which are not large; default distance
     Cell::VisitAllObjects(m_seer, notifierNoLarge, GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
     notifierNoLarge.SendToSelf();
+
     Acore::VisibleNotifier notifierLarge(*this, mapChange, true);    // visit only large objects; maximum distance
     Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
     notifierLarge.SendToSelf();
@@ -24146,13 +24158,34 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
             removeSpell(pAbility->Spell, GetActiveSpec(), true);
         }
         // need learn
-        else if (!IsInWorld())
-        {
-            addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true, false);
-        }
         else
         {
-            learnSpell(pAbility->Spell);
+            //used to avoid double Seal of Righteousness on paladins, it's the only player spell which has both spell and forward spell in auto learn
+            if (pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && pAbility->SupercededBySpell)
+            {
+                bool skipCurrent = false;
+                auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(pAbility->SupercededBySpell);
+                for (auto itr = bounds.first; itr != bounds.second; ++itr)
+                {
+                    if (itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skill_value >= itr->second->MinSkillLineRank)
+                    {
+                        skipCurrent = true;
+                        break;
+                    }
+                }
+                if (skipCurrent)
+                {
+                    continue;
+                }
+            }
+            if (!IsInWorld())
+            {
+                addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true, false);
+            }
+            else
+            {
+                learnSpell(pAbility->Spell);
+            }
         }
     }
 }
