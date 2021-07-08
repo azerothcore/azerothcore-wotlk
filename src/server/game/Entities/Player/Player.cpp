@@ -17761,12 +17761,17 @@ void Player::_LoadArenaTeamInfo()
         if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUID().GetCounter(), itr.second))
         {
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
-            if (!arenaTeam) // some shit, should be assert, but just ignore
+            if (!arenaTeam)
+            {
+                LOG_ERROR("bg.arena", "Player::_LoadArenaTeamInfo: No arena team was found.");
                 continue;
+            }
             ArenaTeamMember const* member = arenaTeam->GetMember(GetGUID());
-            if (!member) // some shit, should be assert, but just ignore
+            if (!member)
+            {
+                LOG_ERROR("bg.arena", "Player::_LoadArenaTeamInfo: No members in the arena team (%u) was found.", arenaTeamId);
                 continue;
-
+            }
             uint8 slot = itr.second;
 
             SetArenaTeamInfoField(slot, ARENA_TEAM_ID, arenaTeamId);
@@ -23544,9 +23549,16 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 
 void Player::UpdateVisibilityForPlayer(bool mapChange)
 {
+    // After added to map seer must be a player - there is no possibility to still have different seer (all charm auras must be already removed)
+    if (mapChange && m_seer != this)
+    {
+        m_seer = this;
+    }
+
     Acore::VisibleNotifier notifierNoLarge(*this, mapChange, false); // visit only objects which are not large; default distance
     Cell::VisitAllObjects(m_seer, notifierNoLarge, GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
     notifierNoLarge.SendToSelf();
+
     Acore::VisibleNotifier notifierLarge(*this, mapChange, true);    // visit only large objects; maximum distance
     Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
     notifierLarge.SendToSelf();
@@ -26008,6 +26020,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
     // SetPQuery(PLAYER_LOGIN_QUERY_LOADSKILLS,          "SELECT skill, value, max FROM character_skills WHERE guid = '%u'", m_guid.GetCounter());
 
     uint32 count = 0;
+    std::unordered_map<uint32, uint32> loadedSkillValues;
     if (result)
     {
         do
@@ -26073,7 +26086,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
 
             mSkillStatus.insert(SkillStatusMap::value_type(skill, SkillStatusData(count, SKILL_UNCHANGED)));
 
-            learnSkillRewardedSpells(skill, value);
+            loadedSkillValues[skill] = value;
 
             ++count;
 
@@ -26083,6 +26096,12 @@ void Player::_LoadSkills(PreparedQueryResult result)
                 break;
             }
         } while (result->NextRow());
+    }
+
+    // Learn skill rewarded spells after all skills have been loaded to prevent learning a skill from them before its loaded with proper value from DB
+    for (auto& skill : loadedSkillValues)
+    {
+        learnSkillRewardedSpells(skill.first, skill.second);
     }
 
     for (; count < PLAYER_MAX_SKILLS; ++count)
