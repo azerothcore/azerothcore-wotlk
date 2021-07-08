@@ -24158,13 +24158,34 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
             removeSpell(pAbility->Spell, GetActiveSpec(), true);
         }
         // need learn
-        else if (!IsInWorld())
-        {
-            addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true, false);
-        }
         else
         {
-            learnSpell(pAbility->Spell);
+            //used to avoid double Seal of Righteousness on paladins, it's the only player spell which has both spell and forward spell in auto learn
+            if (pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && pAbility->SupercededBySpell)
+            {
+                bool skipCurrent = false;
+                auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(pAbility->SupercededBySpell);
+                for (auto itr = bounds.first; itr != bounds.second; ++itr)
+                {
+                    if (itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skill_value >= itr->second->MinSkillLineRank)
+                    {
+                        skipCurrent = true;
+                        break;
+                    }
+                }
+                if (skipCurrent)
+                {
+                    continue;
+                }
+            }
+            if (!IsInWorld())
+            {
+                addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true, false);
+            }
+            else
+            {
+                learnSpell(pAbility->Spell);
+            }
         }
     }
 }
