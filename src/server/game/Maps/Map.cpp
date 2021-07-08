@@ -53,6 +53,7 @@ Map::~Map()
     {
         WorldObject* obj = *i_worldObjects.begin();
         ASSERT(obj->IsWorldObject());
+        LOG_ERROR("maps", "Map::~Map: WorldObject TypeId is not a corpse! (%u)", static_cast<uint8>(obj->GetTypeId()));
         //ASSERT(obj->GetTypeId() == TYPEID_CORPSE);
         obj->RemoveFromWorld();
         obj->ResetMap();
@@ -540,7 +541,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     ASSERT(cellCoord.IsCoordValid());
     if (!cellCoord.IsCoordValid())
     {
-        LOG_ERROR("maps", "Map::Add: Object %s has invalid coordinates X:%f Y:%f grid cell [%u:%u]",
+        LOG_ERROR("maps", "Map::AddToMap: Object %s has invalid coordinates X:%f Y:%f grid cell [%u:%u]",
             obj->GetGUID().ToString().c_str(), obj->GetPositionX(), obj->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
         return false; //Should delete object
     }
