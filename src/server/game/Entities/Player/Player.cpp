@@ -23549,9 +23549,16 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 
 void Player::UpdateVisibilityForPlayer(bool mapChange)
 {
+    // After added to map seer must be a player - there is no possibility to still have different seer (all charm auras must be already removed)
+    if (mapChange && m_seer != this)
+    {
+        m_seer = this;
+    }
+
     Acore::VisibleNotifier notifierNoLarge(*this, mapChange, false); // visit only objects which are not large; default distance
     Cell::VisitAllObjects(m_seer, notifierNoLarge, GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
     notifierNoLarge.SendToSelf();
+
     Acore::VisibleNotifier notifierLarge(*this, mapChange, true);    // visit only large objects; maximum distance
     Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
     notifierLarge.SendToSelf();
