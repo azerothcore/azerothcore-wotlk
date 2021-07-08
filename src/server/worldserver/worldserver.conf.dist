@@ -2105,6 +2105,7 @@ Rate.Skill.Discovery = 1
 #    Rate.Drop.Item.Artifact
 #    Rate.Drop.Item.Referenced
 #    Rate.Drop.Money
+#    Rate.Drop.QuestMoney
 #        Description: Drop rates for money and items based on quality.
 #        Default:     1 - (Rate.Drop.Item.Poor)
 #                     1 - (Rate.Drop.Item.Normal)
@@ -2115,6 +2116,7 @@ Rate.Skill.Discovery = 1
 #                     1 - (Rate.Drop.Item.Artifact)
 #                     1 - (Rate.Drop.Item.Referenced)
 #                     1 - (Rate.Drop.Money)
+#                     1 - (Rate.Drop.QuestMoney)
 
 Rate.Drop.Item.Poor             = 1
 Rate.Drop.Item.Normal           = 1
@@ -2125,6 +2127,7 @@ Rate.Drop.Item.Legendary        = 1
 Rate.Drop.Item.Artifact         = 1
 Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
+Rate.Drop.QuestMoney            = 1
 
 #    RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player

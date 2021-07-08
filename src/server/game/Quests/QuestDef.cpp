@@ -208,7 +208,7 @@ int32 Quest::GetRewOrReqMoney() const
     if (RewardMoney <= 0)
         return RewardMoney;
 
-    return static_cast<int32>(RewardMoney * sWorld->getRate(RATE_DROP_MONEY));
+    return static_cast<int32>(RewardMoney * sWorld->getRate(RATE_DROP_QUESTMONEY));
 }
 
 uint32 Quest::GetRewMoneyMaxLevel() const
