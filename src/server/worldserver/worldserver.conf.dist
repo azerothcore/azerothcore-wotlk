@@ -2672,11 +2672,25 @@ Battleground.RewardLoserHonorLast   = 5
 Battleground.PlayerRespawn = 30
 
 #
-#    Battleground.BuffRespawn
-#        Description: Battleground buff respawn time (in seconds).
-#        Default:     180 (Recommended 10+)
+#    Battleground.RestorationBuffRespawn
+#        Description: Battleground restoration buff respawn time (in seconds).
+#        Default:     20 (Recommended 10+)
 
-Battleground.BuffRespawn = 180
+Battleground.RestorationBuffRespawn = 20
+
+#
+#    Battleground.BerserkingBuffRespawn
+#        Description: Battleground berserking buff respawn time (in seconds).
+#        Default:     120 (Recommended 10+)
+
+Battleground.BerserkingBuffRespawn = 120
+
+#
+#    Battleground.SpeedBuffRespawn
+#        Description: Battleground speed buff respawn time (in seconds).
+#        Default:     150 (Recommended 10+)
+
+Battleground.SpeedBuffRespawn = 150
 
 #
 ###################################################################################################
