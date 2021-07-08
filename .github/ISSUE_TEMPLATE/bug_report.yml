@@ -4,7 +4,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking your time to fill out a bug report. Remember to fill out all fields including the title above. 
+        Thank you for taking the time to fill out a bug report. Remember to fill out all fields including the title above. 
         An issue that is not properly filled out will be closed. 
         You can read more about the standards for a bug report [here](https://www.azerothcore.org/wiki/issue-tracker-standards).
   - type: textarea
@@ -50,7 +50,7 @@ body:
     attributes:
       label: Extra Notes
       description: |
-        Do you have any extra notes that can help solve the issue that does not fit any other field.
+        Do you have any extra notes that can help solve the issue that does not fit any other field?
       placeholder: |
         None
     validations:
@@ -60,10 +60,10 @@ body:
     attributes:
       label: AC rev. hash/commit
       description: |
-        Copy the result of `.server debug` command (if you need to run it from client get prat addon)
+        Copy the result of the `.server debug` command (if you need to run it from the client get a prat addon)
     validations:
       required: true
-  - type: textarea
+  - type: input
     id: os
     attributes:
       label: Operating system
