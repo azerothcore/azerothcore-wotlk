@@ -60,9 +60,9 @@ inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, 
     if (!standing_cell.IsCoordValid())
         return;
 
-    //no jokes here... Actually placing ASSERT() here was good idea, but
-    //we had some problems with DynamicObjects, which pass radius = 0.0f (DB issue?)
-    //maybe it is better to just return when radius <= 0.0f?
+    // no jokes here... Actually placing ASSERT() here was good idea, but
+    // we had some problems with DynamicObjects, which pass radius = 0.0f (DB issue?)
+    // maybe it is better to just return when radius <= 0.0f?
     if (radius <= 0.0f)
     {
         map.Visit(*this, visitor);
