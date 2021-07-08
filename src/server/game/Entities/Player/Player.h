@@ -14,7 +14,7 @@
 #include "GroupReference.h"
 #include "InstanceSaveMgr.h"
 #include "Item.h"
-#include "KillerRewarder.h"
+#include "KillRewarder.h"
 #include "MapReference.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
