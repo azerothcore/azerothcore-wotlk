@@ -30,6 +30,7 @@ public:
     {
         static std::vector<ChatCommand> learnAllMyCommandTable =
         {
+            { "lvl",            SEC_GAMEMASTER,  false, &HandleLearnAllMyLvlCommand,         "" },
             { "class",          SEC_GAMEMASTER,  false, &HandleLearnAllMyClassCommand,       "" },
             { "pettalents",     SEC_GAMEMASTER,  false, &HandleLearnAllMyPetTalentsCommand,  "" },
             { "spells",         SEC_GAMEMASTER,  false, &HandleLearnAllMySpellsCommand,      "" },
@@ -102,6 +103,70 @@ public:
     {
         HandleLearnAllMySpellsCommand(handler, "");
         HandleLearnAllMyTalentsCommand(handler, "");
+        return true;
+    }
+
+    static bool HandleLearnAllMyLvlCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        auto LearnPlayerSpell = [](Player* player, uint32 trainerEntry)
+        {
+            auto tsd = sObjectMgr->GetNpcTrainerSpells(trainerEntry);
+            auto tsMap = tsd->spellList;
+            bool hadNew = false;
+
+            do
+            {
+                hadNew = false;
+
+                for (auto const& [spellID, trainerSpell] : tsMap)
+                {
+                    TrainerSpellState tsState = player->GetTrainerSpellState(&trainerSpell);
+
+                    // Skip non green state
+                    if (tsState != TrainerSpellState::TRAINER_SPELL_GREEN)
+                    {
+                        continue;
+                    }
+
+                    hadNew = true;
+
+                    auto spellInfo = sSpellMgr->GetSpellInfo(trainerSpell.spell);
+                    if (!spellInfo)
+                    {
+                        continue;
+                    }
+
+                    if (spellInfo->Effects[0].Effect == SpellEffects::SPELL_EFFECT_LEARN_SPELL)
+                    {
+                        player->CastSpell(player, spellInfo);
+                    }
+                    else
+                    {
+                        player->learnSpell(trainerSpell.spell);
+                    }
+                }
+            } while (hadNew);
+        };
+
+        for (auto itr = sObjectMgr->GetCreatureTemplates()->begin(); itr != sObjectMgr->GetCreatureTemplates()->end(); ++itr)
+        {
+            auto creatureInfo = itr->second;
+
+            // Skip for non player class
+            if (creatureInfo.trainer_class != player->getClass())
+                continue;
+
+            if (creatureInfo.trainer_type == TrainerType::TRAINER_TYPE_CLASS || creatureInfo.trainer_type == TrainerType::TRAINER_TYPE_TRADESKILLS)
+            {
+                LearnPlayerSpell(player, creatureInfo.Entry);
+            }
+        }
+
+        handler->PSendSysMessage("You have learned all the available skills at a this level");
         return true;
     }
 
