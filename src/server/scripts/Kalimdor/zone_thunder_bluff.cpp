@@ -22,14 +22,18 @@ EndScriptData */
 
 enum CairneBloodhoof
 {
-    SPELL_BERSERKER_CHARGE  = 16636,
-    SPELL_CLEAVE            = 16044,
-    SPELL_MORTAL_STRIKE     = 16856,
-    SPELL_THUNDERCLAP       = 23931,
-    SPELL_UPPERCUT          = 22916
+    // Spells
+    SPELL_BERSERKER_CHARGE      = 16636,
+    SPELL_CLEAVE                = 16044,
+    SPELL_MORTAL_STRIKE         = 16856,
+    SPELL_THUNDERCLAP           = 23931,
+    SPELL_UPPERCUT              = 22916,
+
+    // Gossip
+    GOSSIP_MENU_ID_ON_QUEST     = 5851,
+    GOSSIP_MENU_OPTION_ON_QUEST = 0
 };
 
-#define GOSSIP_HCB "I know this is rather silly but a young ward who is a bit shy would like your hoofprint."
 /// @todo verify abilities/timers
 class npc_cairne_bloodhoof : public CreatureScript
 {
@@ -53,7 +57,9 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(925) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HCB, GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_ID_ON_QUEST, GOSSIP_MENU_OPTION_ON_QUEST, GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
+        }
 
         SendGossipMenuFor(player, 7013, creature->GetGUID());
 

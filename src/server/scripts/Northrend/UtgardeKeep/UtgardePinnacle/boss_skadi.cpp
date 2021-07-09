@@ -20,6 +20,10 @@ enum Misc
     SAY_DRAKE_DEATH                     = 5,
     SAY_DRAKE_BREATH                    = 6,
 
+    // Grauf TEXTS
+    EMOTE_GRAUF_BREATH                  = 0,
+    EMOTE_GRAUF_RANGE                   = 1,
+
     // SPELLS
     SPELL_CRUSH_N                       = 50234,
     SPELL_CRUSH_H                       = 59330,
@@ -81,8 +85,6 @@ static Position SkadiPosition[] =
     {490.096f, -510.86f, 123.368f, 0.0f},
     {490.76f, -517.389f, 123.368f, 0.0f}
 };
-
-#define EMOTE_IN_RANGE   "Skadi the Ruthless is within range of the harpoon launchers"
 
 enum phase
 {
@@ -352,7 +354,7 @@ public:
                     if (m_pInstance)
                         m_pInstance->SetData(SKADI_IN_RANGE, 1);
 
-                    me->MonsterTextEmote(EMOTE_IN_RANGE, 0, true);
+                    Talk(EMOTE_GRAUF_RANGE);
                     me->SetFacingTo(M_PI);
                     break;
             }

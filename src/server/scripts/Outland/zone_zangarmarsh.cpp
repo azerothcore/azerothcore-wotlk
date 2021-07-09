@@ -116,10 +116,6 @@ public:
 /*######
 ## npcs_ashyen_and_keleth
 ######*/
-
-#define GOSSIP_ITEM_BLESS_ASH     "Grant me your mark, wise ancient."
-#define GOSSIP_ITEM_BLESS_KEL     "Grant me your mark, mighty ancient."
-
 enum AshyenAndKeleth
 {
     GOSSIP_REWARD_BLESS         = 0,
@@ -135,7 +131,13 @@ enum AshyenAndKeleth
     SPELL_BLESS_KEL_EXA         = 31814,
     SPELL_BLESS_KEL_REV         = 31813,
     SPELL_BLESS_KEL_HON         = 31812,
-    SPELL_BLESS_KEL_FRI         = 31807
+    SPELL_BLESS_KEL_FRI         = 31807,
+
+    // Gossip
+    GOSSIP_MENU_KEL             = 7560,
+    GOSSIP_MENU_ASH             = 7559,
+    GOSSIP_ITEM_BLESS_ASH       = 0,
+    GOSSIP_ITEM_BLESS_KEL       = 0
 };
 
 class npcs_ashyen_and_keleth : public CreatureScript
@@ -148,10 +150,15 @@ public:
         if (player->GetReputationRank(942) > REP_NEUTRAL)
         {
             if (creature->GetEntry() == NPC_ASHYEN)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BLESS_ASH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            {
+                AddGossipItemFor(player, GOSSIP_MENU_ASH, GOSSIP_ITEM_BLESS_ASH, GOSSIP_SENDER_MAIN,
+                                 GOSSIP_ACTION_INFO_DEF + 1);
+            }
 
             if (creature->GetEntry() == NPC_KELETH)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BLESS_KEL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            {
+                AddGossipItemFor(player, GOSSIP_MENU_KEL, GOSSIP_ITEM_BLESS_KEL, GOSSIP_SENDER_MAIN,GOSSIP_ACTION_INFO_DEF + 1);
+            }
         }
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -234,13 +241,15 @@ public:
 ## npc_cooshcoosh
 ######*/
 
-#define GOSSIP_COOSH            "You owe Sim'salabim money. Hand them over or die!"
-
 enum Cooshhooosh
 {
     SPELL_LIGHTNING_BOLT    = 9532,
     QUEST_CRACK_SKULLS      = 10009,
-    FACTION_HOSTILE_CO      = 45
+    FACTION_HOSTILE_CO      = 45,
+
+    // Gossip
+    GOSSIP_MENU_COOSH       = 7730,
+    GOSSIP_OPTION_COOSH     = 0
 };
 
 class npc_cooshcoosh : public CreatureScript
@@ -291,7 +300,10 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_CRACK_SKULLS) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_COOSH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_COOSH, GOSSIP_OPTION_COOSH, GOSSIP_SENDER_MAIN,
+                             GOSSIP_ACTION_INFO_DEF);
+        }
 
         SendGossipMenuFor(player, 9441, creature->GetGUID());
         return true;
@@ -314,9 +326,13 @@ public:
 ## npc_elder_kuruti
 ######*/
 
-#define GOSSIP_ITEM_KUR1 "Greetings, elder. It is time for your people to end their hostility towards the draenei and their allies."
-#define GOSSIP_ITEM_KUR2 "I did not mean to deceive you, elder. The draenei of Telredor thought to approach you in a way that would seem familiar to you."
-#define GOSSIP_ITEM_KUR3 "I will tell them. Farewell, elder."
+enum ElderKuruti
+{
+    GOSSIP_MENU_ID_KUR              = 7582,
+    GOSSIP_ITEM_KUR1                = 0,
+    GOSSIP_ITEM_KUR2                = 1,
+    GOSSIP_ITEM_KUR3                = 2
+};
 
 class npc_elder_kuruti : public CreatureScript
 {
@@ -326,7 +342,9 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(9803) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KUR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_ID_KUR, GOSSIP_ITEM_KUR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        }
 
         SendGossipMenuFor(player, 9226, creature->GetGUID());
 
@@ -339,11 +357,11 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KUR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_MENU_ID_KUR, GOSSIP_ITEM_KUR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 9227, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KUR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_MENU_ID_KUR, GOSSIP_ITEM_KUR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, 9229, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
@@ -477,12 +495,12 @@ public:
 ## npc_timothy_daniels
 ######*/
 
-#define GOSSIP_TIMOTHY_DANIELS_ITEM1    "Specialist, eh? Just what kind of specialist are you, anyway?"
-#define GOSSIP_TEXT_BROWSE_POISONS      "Let me browse your reagents and poison supplies."
-
 enum Timothy
 {
-    GOSSIP_TEXTID_TIMOTHY_DANIELS1      = 9239
+    GOSSIP_TEXTID_TIMOTHY_DANIELS1      = 9239,
+    GOSSIP_MENU_TIMOTHY_DANIELS         = 7590,
+    GOSSIP_TEXT_BROWSE_POISONS          = 0,
+    GOSSIP_TIMOTHY_DANIELS_ITEM1        = 1
 };
 
 class npc_timothy_daniels : public CreatureScript
@@ -496,9 +514,11 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor())
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_POISONS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_TIMOTHY_DANIELS, GOSSIP_TEXT_BROWSE_POISONS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        }
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_TIMOTHY_DANIELS_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, GOSSIP_MENU_TIMOTHY_DANIELS, GOSSIP_TIMOTHY_DANIELS_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
