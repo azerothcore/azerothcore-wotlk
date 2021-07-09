@@ -843,7 +843,7 @@ public:
     void AddToSkillupList(ObjectGuid playerGuid) { m_SkillupList.push_back(playerGuid); }
     [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const
     {
-        for (ObjectGuid const guid : m_SkillupList)
+        for (ObjectGuid const& guid : m_SkillupList)
             if (guid == playerGuid)
                 return true;
 
