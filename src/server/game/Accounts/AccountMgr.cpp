@@ -339,7 +339,8 @@ void AccountMgr::LoadRBAC()
         if (permissionId != newId)
         {
             permissionId = newId;
-            permission = _permissions[newId];
+            permission = new rbac::RBACPermission(newId, field[1].GetString());
+            // permission = _permissions[newId];
         }
 
         uint32 linkedPermissionId = field[1].GetUInt32();
