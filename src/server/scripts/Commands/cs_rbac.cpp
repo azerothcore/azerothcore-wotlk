@@ -47,22 +47,22 @@ public:
     std::vector<ChatCommand> GetCommands() const override
     {
         static std::vector<ChatCommand> rbacAccountCommandTable =
-        {
-            {        "list", rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_LIST,   true, &HandleRBACPermListCommand,    "" },
-            {       "grant", rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_GRANT,  true, &HandleRBACPermGrantCommand,   "" },
-            {        "deny", rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_DENY,   true, &HandleRBACPermDenyCommand,    "" },
-            {      "revoke", rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_REVOKE, true, &HandleRBACPermRevokeCommand,  "" },
+        { 
+            { "list",   rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_LIST,   true, &HandleRBACPermListCommand,    "" },
+            { "grant",  rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_GRANT,  true, &HandleRBACPermGrantCommand,   "" },
+            { "deny",   rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_DENY,   true, &HandleRBACPermDenyCommand,    "" },
+            { "revoke", rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_REVOKE, true, &HandleRBACPermRevokeCommand,  "" },
         };
 
         static std::vector<ChatCommand> rbacCommandTable =
         {
-            {    "account", rbac::RBAC_PERM_COMMAND_RBAC_ACC,  true, nullptr, "", rbacAccountCommandTable },
-            {       "list", rbac::RBAC_PERM_COMMAND_RBAC_LIST, true, &HandleRBACListPermissionsCommand, "" },
+            { "account", rbac::RBAC_PERM_COMMAND_RBAC_ACC,  true, nullptr, "", rbacAccountCommandTable  },
+            { "list",    rbac::RBAC_PERM_COMMAND_RBAC_LIST, true, &HandleRBACListPermissionsCommand, "" },
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            {       "rbac", rbac::RBAC_PERM_COMMAND_RBAC, true, nullptr, "", rbacCommandTable },
+            { "rbac", rbac::RBAC_PERM_COMMAND_RBAC, true, nullptr, "", rbacCommandTable },
         };
 
         return commandTable;
