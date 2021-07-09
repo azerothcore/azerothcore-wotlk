@@ -62,6 +62,9 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_RELOAD_RBAC                            = 680,
 
     // custom permissions 1000+
+
+    RBAC_DUMMY                                              = 1000, //Remove when 197,198,199 has other perms assigned, this is used to prevent crash.
+
     RBAC_PERM_MAX
 };
 

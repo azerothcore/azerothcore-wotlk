@@ -59,13 +59,17 @@ CREATE TABLE IF NOT EXISTS `rbac_linked_permissions` (
 DELETE FROM `rbac_linked_permissions`;
 /*!40000 ALTER TABLE `rbac_linked_permissions` DISABLE KEYS */;
 INSERT INTO `rbac_linked_permissions` (`id`, `linkedId`) VALUES
+(192, 193),
 (192, 196),
+(193, 194),
 (193, 197),
+(194, 195),
 (194, 198),
 (195, 199),
 (196, 200),
 (196, 201),
-(196, 680);
+(196, 680),
+(199, 1000);
 /*!40000 ALTER TABLE `rbac_linked_permissions` ENABLE KEYS */;
 
 -- Dumpar struktur för tabell acore_auth.rbac_permissions
@@ -79,13 +83,19 @@ CREATE TABLE IF NOT EXISTS `rbac_permissions` (
 DELETE FROM `rbac_permissions`;
 /*!40000 ALTER TABLE `rbac_permissions` DISABLE KEYS */;
 INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
+(196, 'Role: Administrator Commands'),
+(197, 'Role: Gamemaster Commands'),
+(198, 'Role: Moderator Commands'),
+(199, 'Role: Player Commands'),
 (200, 'Command: rbac'),
 (201, 'Command: rbac account'),
 (202, 'Command: rbac account list'),
 (203, 'Command: rbac account grant'),
 (204, 'Command: rbac account deny'),
 (205, 'Command: rbac account revoke'),
-(206, 'Command: rbac list');
+(206, 'Command: rbac list'),
+(680, 'Command: reload rbac'),
+(1000, 'RBAC_DUMMY');
 /*!40000 ALTER TABLE `rbac_permissions` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
