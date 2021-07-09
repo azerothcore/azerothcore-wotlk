@@ -1361,6 +1361,7 @@ bool SpellInfo::IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const
         case SPELL_SPECIFIC_SCROLL:
         case SPELL_SPECIFIC_MAGE_ARCANE_BRILLANCE:
         case SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT:
+        case SPELL_SPECIFIC_WARRIOR_ENRAGE:
             return spellSpec1 == spellSpec2;
         case SPELL_SPECIFIC_FOOD:
             return spellSpec2 == SPELL_SPECIFIC_FOOD
@@ -2117,7 +2118,6 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
                     else if (drink)
                         return SPELL_SPECIFIC_DRINK;
                 }
-                // scrolls effects
                 else
                 {
                     SpellInfo const* firstRankSpellInfo = GetFirstRankSpell();
@@ -2130,6 +2130,10 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
                         case 8115: // Agility
                         case 8091: // Armor
                             return SPELL_SPECIFIC_SCROLL;
+                        case 12880: // Enrage (Enrage)
+                        case 57518: // Enrage (Wrecking Crew)
+                        case 57514: // Enrage (Imp. Defensive Stance)
+                            return SPELL_SPECIFIC_WARRIOR_ENRAGE;
                     }
                 }
                 break;
@@ -2147,6 +2151,12 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
                 if ((SpellFamilyFlags[0] & 0x1000000) && Effects[0].ApplyAuraName == SPELL_AURA_MOD_CONFUSE)
                     return SPELL_SPECIFIC_MAGE_POLYMORPH;
 
+                break;
+            }
+        case SPELLFAMILY_WARRIOR:
+            {
+                if (Id == 12292) // Death Wish
+                    return SPELL_SPECIFIC_WARRIOR_ENRAGE;
                 break;
             }
         case SPELLFAMILY_WARLOCK:
