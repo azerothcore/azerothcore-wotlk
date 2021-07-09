@@ -108,7 +108,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (448402, 9, 2, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 10, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - Actionlist - Start Attacking');
 
 
-DELETE FROM waypoints WHERE entry = 4484;
+DELETE FROM `waypoints` WHERE entry = 4484;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
 (4484, 1, 3175.93, 193.541, 3.48354, 'Feero Ironhand'),
 (4484, 2, 3187.92, 197.118, 4.6993, 'Feero Ironhand'),
