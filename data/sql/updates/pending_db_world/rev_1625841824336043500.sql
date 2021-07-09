@@ -26,5 +26,4 @@ INSERT IGNORE INTO `spell_dbc` VALUES
 -- Radius 5 Yards
 -- I tested it with Knock Back (350), which is a very far distance. Therefore, I reduced it to 200
 -- https://www.wowhead.com/spell=54469/plague-strike
-UPDATE `spell_dbc` SET `EffectRadiusIndex_1`='8', `EffectRadiusIndex_2`='8', `EffectRadiusIndex_3`='8' WHERE  `ID`=54469;
-UPDATE `spell_dbc` SET `EffectMiscValue_3` = 200 WHERE (`ID` = 54469);
+UPDATE `spell_dbc` SET `EffectRadiusIndex_1`=8, `EffectRadiusIndex_2`=8, `EffectRadiusIndex_3`=8, `EffectMiscValue_3` = 200 WHERE  `ID`=54469;
