@@ -59,6 +59,8 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_RBAC_ACC_PERM_REVOKE                   = 205,
     RBAC_PERM_COMMAND_RBAC_LIST                              = 206,
 
+    RBAC_PERM_COMMAND_RELOAD_RBAC                            = 680,
+
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

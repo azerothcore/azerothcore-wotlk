@@ -339,9 +339,8 @@ void AccountMgr::LoadRBAC()
         if (permissionId != newId)
         {
             permissionId = newId;
-            permission = _permissions[newId];
+            permission = new rbac::RBACPermission(newId, field[1].GetString());
         }
-
 
         uint32 linkedPermissionId = field[1].GetUInt32();
         if (linkedPermissionId == permissionId)
@@ -349,6 +348,7 @@ void AccountMgr::LoadRBAC()
             LOG_ERROR("sql.sql", "RBAC Permission %u has itself as linked permission. Ignored", permissionId);
             continue;
         }
+
         permission->AddLinkedPermission(linkedPermissionId);
         ++count2;
     } while (result->NextRow());

@@ -64,7 +64,8 @@ INSERT INTO `rbac_linked_permissions` (`id`, `linkedId`) VALUES
 (194, 198),
 (195, 199),
 (196, 200),
-(196, 201);
+(196, 201),
+(196, 680);
 /*!40000 ALTER TABLE `rbac_linked_permissions` ENABLE KEYS */;
 
 -- Dumpar struktur för tabell acore_auth.rbac_permissions
