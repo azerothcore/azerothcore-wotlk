@@ -197,7 +197,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
                     {
                         Player* member = groupRef->GetSource();
 
-                        if (member && me->IsWithinDistInMap(member, MAX_PLAYER_DISTANCE))
+                        if (member && me->IsWithinDistInMap(member, MAX_PLAYER_DISTANCE, true, false))
                         {
                             bIsMaxRangeExceeded = false;
                             break;
@@ -206,7 +206,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
                 }
                 else
                 {
-                    if (me->IsWithinDistInMap(player, MAX_PLAYER_DISTANCE))
+                    if (me->IsWithinDistInMap(player, MAX_PLAYER_DISTANCE, true, false))
                         bIsMaxRangeExceeded = false;
                 }
             }
