@@ -8,6 +8,7 @@
 #include "DisableMgr.h"
 #include "GameObjectAI.h"
 #include "Group.h"
+#include "MapManager.h"
 #include "Player.h"
 #include "PoolMgr.h"
 #include "ReputationMgr.h"
