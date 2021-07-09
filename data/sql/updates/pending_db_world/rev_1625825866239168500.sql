@@ -3,19 +3,20 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1625825866239168500');
 DELETE FROM `creature_summon_groups` WHERE summonerId = 4484;
 -- First wave
 -- https://youtu.be/NZaDRm3E9T4?t=245 starting out of combat here, 2 minutes after they despawn
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 0, 3879, 3490.648193, 204.498672, 11.509378, 3.3, 4, 120000);
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 0, 3879, 3499.849854, 191.872589, 9.913058, 1.305067, 4, 120000);
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 0, 3879, 3512.693848, 230.043503, 12.579866, 3.03, 4.390900, 120000);
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 0, 3879, 3489.394775, 233.419022, 13.957080, 5.502226, 4, 120000);
+INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES
+(4484, 0, 0, 3879, 3490.648193, 204.498672, 11.509378, 3.3, 4, 120000);
+(4484, 0, 0, 3879, 3499.849854, 191.872589, 9.913058, 1.305067, 4, 120000),
+(4484, 0, 0, 3879, 3512.693848, 230.043503, 12.579866, 3.03, 4.390900, 120000),
+(4484, 0, 0, 3879, 3489.394775, 233.419022, 13.957080, 5.502226, 4, 120000),
 -- Second wave
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 1, 3893, 3768.341064, 167.625793, 8.215360, 4.300611, 4, 60000);
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 1, 3893, 3761.626465, 176.662735, 8.166564, 4.390155, 4, 60000);
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 1, 3893, 3738.870605, 185.198700, 8.003495, 4.987058, 4, 60000);
+(4484, 0, 1, 3893, 3768.341064, 167.625793, 8.215360, 4.300611, 4, 60000),
+(4484, 0, 1, 3893, 3761.626465, 176.662735, 8.166564, 4.390155, 4, 60000),
+(4484, 0, 1, 3893, 3738.870605, 185.198700, 8.003495, 4.987058, 4, 60000),
 -- Third wave
 -- https://youtu.be/NZaDRm3E9T4?t=756 starting out of combat, 1 minute after they despawn
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 2, 3898, 4217.048828, 95.637215, 34.785011, 3.82938, 4, 60000);
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 2, 3899, 4223.432129, 94.937691, 35.046329, 3.907077, 4, 60000);
-INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES (4484, 0, 2, 3900, 4217.989258, 101.213264, 35.168644, 3.856026, 4, 60000);
+(4484, 0, 2, 3898, 4217.048828, 95.637215, 34.785011, 3.82938, 4, 60000),
+(4484, 0, 2, 3899, 4223.432129, 94.937691, 35.046329, 3.907077, 4, 60000),
+(4484, 0, 2, 3900, 4217.989258, 101.213264, 35.168644, 3.856026, 4, 60000);
 
 
 -- Delete Smart AI for melee creatures without spells
@@ -108,51 +109,50 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 
 DELETE FROM waypoints WHERE entry = 4484;
-
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 1, 3175.93, 193.541, 3.48354, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 2, 3187.92, 197.118, 4.6993, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 3, 3203.48, 192.349, 5.90847, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 4, 3219.12, 182.236, 6.58841, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 5, 3229.85, 191.23, 7.49455, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 6, 3225.04, 199.439, 7.09672, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 7, 3227.65, 210.76, 8.62933, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 8, 3232.94, 223.725, 10.0522, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 9, 3263.07, 225.985, 10.6459, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 10, 3284.76, 220.414, 10.9505, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 11, 3315.65, 210.198, 11.9677, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 12, 3341.02, 214.29, 13.3204, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 13, 3367.13, 224.588, 11.8671, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 14, 3409.07, 226.385, 9.21523, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 15, 3432.29, 225.396, 10.0283, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 16, 3454.87, 219.339, 12.5932, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 17, 3470.46, 214.818, 13.2644, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 18, 3481.42, 212.557, 12.3546, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 19, 3500.32, 210.936, 10.2261, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 20, 3515.19, 212.546, 9.62118, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 21, 3522.900146, 213.576904, 9.203624, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 22, 3601.65, 217.771, 1.29901, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 23, 3638.61, 212.526, 1.43314, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 24, 3680.76, 200.308, 3.38501, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 25, 3725.67, 180.396, 6.31401, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 26, 3762.35, 159.686, 7.38862, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 27, 3774.54, 151.17, 7.79964, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 28, 3789.7, 140.397, 9.06224, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 29, 3821.42, 111.61, 10.2586, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 30, 3850.38, 84.7109, 13.942, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 31, 3875.35, 60.3884, 14.9889, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 32, 3908.24, 35.2092, 15.332, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 33, 3942.2, 14.8882, 16.9694, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 34, 3976.43, -0.073566, 16.9687, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 35, 4008.34, -6.62891, 16.4641, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 36, 4029.48, -6.64076, 16.5497, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 37, 4050.06, 1.48816, 15.7462, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 38, 4083.41, 14.0858, 15.8512, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 39, 4098.46, 20.0329, 17.2525, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 40, 4125.749023, 32.694153, 20.618135, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 41, 4149.13, 46.8332, 24.661, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 42, 4164.44, 55.9354, 26.7934, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 43, 4200.283203, 82.396561, 32.021034, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 44, 4202.202148, 83.824730, 32.288143, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 45, 4256.208984, 126.819801, 40.609882, 'Feero Ironhand');
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES (4484, 46, 4338.702148, 176.241531, 46.838947, 'Feero Ironhand');
-
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
+(4484, 1, 3175.93, 193.541, 3.48354, 'Feero Ironhand'),
+(4484, 2, 3187.92, 197.118, 4.6993, 'Feero Ironhand'),
+(4484, 3, 3203.48, 192.349, 5.90847, 'Feero Ironhand'),
+(4484, 4, 3219.12, 182.236, 6.58841, 'Feero Ironhand'),
+(4484, 5, 3229.85, 191.23, 7.49455, 'Feero Ironhand'),
+(4484, 6, 3225.04, 199.439, 7.09672, 'Feero Ironhand'),
+(4484, 7, 3227.65, 210.76, 8.62933, 'Feero Ironhand'),
+(4484, 8, 3232.94, 223.725, 10.0522, 'Feero Ironhand'),
+(4484, 9, 3263.07, 225.985, 10.6459, 'Feero Ironhand'),
+(4484, 10, 3284.76, 220.414, 10.9505, 'Feero Ironhand'),
+(4484, 11, 3315.65, 210.198, 11.9677, 'Feero Ironhand'),
+(4484, 12, 3341.02, 214.29, 13.3204, 'Feero Ironhand'),
+(4484, 13, 3367.13, 224.588, 11.8671, 'Feero Ironhand'),
+(4484, 14, 3409.07, 226.385, 9.21523, 'Feero Ironhand'),
+(4484, 15, 3432.29, 225.396, 10.0283, 'Feero Ironhand'),
+(4484, 16, 3454.87, 219.339, 12.5932, 'Feero Ironhand'),
+(4484, 17, 3470.46, 214.818, 13.2644, 'Feero Ironhand'),
+(4484, 18, 3481.42, 212.557, 12.3546, 'Feero Ironhand'),
+(4484, 19, 3500.32, 210.936, 10.2261, 'Feero Ironhand'),
+(4484, 20, 3515.19, 212.546, 9.62118, 'Feero Ironhand'),
+(4484, 21, 3522.900146, 213.576904, 9.203624, 'Feero Ironhand'),
+(4484, 22, 3601.65, 217.771, 1.29901, 'Feero Ironhand'),
+(4484, 23, 3638.61, 212.526, 1.43314, 'Feero Ironhand'),
+(4484, 24, 3680.76, 200.308, 3.38501, 'Feero Ironhand'),
+(4484, 25, 3725.67, 180.396, 6.31401, 'Feero Ironhand'),
+(4484, 26, 3762.35, 159.686, 7.38862, 'Feero Ironhand'),
+(4484, 27, 3774.54, 151.17, 7.79964, 'Feero Ironhand'),
+(4484, 28, 3789.7, 140.397, 9.06224, 'Feero Ironhand'),
+(4484, 29, 3821.42, 111.61, 10.2586, 'Feero Ironhand'),
+(4484, 30, 3850.38, 84.7109, 13.942, 'Feero Ironhand'),
+(4484, 31, 3875.35, 60.3884, 14.9889, 'Feero Ironhand'),
+(4484, 32, 3908.24, 35.2092, 15.332, 'Feero Ironhand'),
+(4484, 33, 3942.2, 14.8882, 16.9694, 'Feero Ironhand'),
+(4484, 34, 3976.43, -0.073566, 16.9687, 'Feero Ironhand'),
+(4484, 35, 4008.34, -6.62891, 16.4641, 'Feero Ironhand'),
+(4484, 36, 4029.48, -6.64076, 16.5497, 'Feero Ironhand'),
+(4484, 37, 4050.06, 1.48816, 15.7462, 'Feero Ironhand'),
+(4484, 38, 4083.41, 14.0858, 15.8512, 'Feero Ironhand'),
+(4484, 39, 4098.46, 20.0329, 17.2525, 'Feero Ironhand'),
+(4484, 40, 4125.749023, 32.694153, 20.618135, 'Feero Ironhand'),
+(4484, 41, 4149.13, 46.8332, 24.661, 'Feero Ironhand'),
+(4484, 42, 4164.44, 55.9354, 26.7934, 'Feero Ironhand'),
+(4484, 43, 4200.283203, 82.396561, 32.021034, 'Feero Ironhand'),
+(4484, 44, 4202.202148, 83.824730, 32.288143, 'Feero Ironhand'),
+(4484, 45, 4256.208984, 126.819801, 40.609882, 'Feero Ironhand'),
+(4484, 46, 4338.702148, 176.241531, 46.838947, 'Feero Ironhand');
