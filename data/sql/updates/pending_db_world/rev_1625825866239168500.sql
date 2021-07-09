@@ -4,7 +4,7 @@ DELETE FROM `creature_summon_groups` WHERE summonerId = 4484;
 -- First wave
 -- https://youtu.be/NZaDRm3E9T4?t=245 starting out of combat here, 2 minutes after they despawn
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES
-(4484, 0, 0, 3879, 3490.648193, 204.498672, 11.509378, 3.3, 4, 120000);
+(4484, 0, 0, 3879, 3490.648193, 204.498672, 11.509378, 3.3, 4, 120000),
 (4484, 0, 0, 3879, 3499.849854, 191.872589, 9.913058, 1.305067, 4, 120000),
 (4484, 0, 0, 3879, 3512.693848, 230.043503, 12.579866, 3.03, 4.390900, 120000),
 (4484, 0, 0, 3879, 3489.394775, 233.419022, 13.957080, 5.502226, 4, 120000),
@@ -21,9 +21,9 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 
 -- Delete Smart AI for melee creatures without spells
 UPDATE `creature_template` SET `AIName` = '' WHERE (`entry` = 3893);
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3893) AND (`source_type` = 0)
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3893) AND (`source_type` = 0);
 UPDATE `creature_template` SET `AIName` = '' WHERE (`entry` = 3879);
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3879) AND (`source_type` = 0)
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3879) AND (`source_type` = 0);
 
 
 -- Aligar the Tormentor
