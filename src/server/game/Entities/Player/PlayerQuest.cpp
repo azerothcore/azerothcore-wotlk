@@ -16,6 +16,10 @@
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 /*********************************************************/
 /***                    QUEST SYSTEM                   ***/
 /*********************************************************/
