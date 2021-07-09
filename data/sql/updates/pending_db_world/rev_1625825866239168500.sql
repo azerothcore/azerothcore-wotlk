@@ -19,11 +19,19 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (4484, 0, 2, 3900, 4217.989258, 101.213264, 35.168644, 3.856026, 4, 60000);
 
 
--- Delete Smart AI for melee creatures without spells
-UPDATE `creature_template` SET `AIName` = '' WHERE (`entry` = 3893);
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3893) AND (`source_type` = 0);
-UPDATE `creature_template` SET `AIName` = '' WHERE (`entry` = 3879);
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3879) AND (`source_type` = 0);
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 3893;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 3893);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(3893, 0, 0, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 63, 2, 1, 0, 0, 0, 0, 10, 32783, 4484, 0, 0, 0, 0, 0, 0, 'Forsaken Scout - On Just Died - On Set Counter');
+
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 3879;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 3879);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(3879, 0, 0, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 10, 32783, 4484, 0, 0, 0, 0, 0, 0, 'Dark Strand Assassin - On Just Died - On Set Counter');
+
 
 
 -- Aligar the Tormentor
@@ -69,12 +77,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (4484, 0, 1, 2, 61, 0, 100, 1, 976, 0, 0, 0, 0, 19, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Quest \'Supplies to Auberdine\' Taken - Remove Flags Immune To NPC\'s (No Repeat)'),
 (4484, 0, 2, 0, 61, 0, 100, 1, 976, 0, 0, 0, 0, 1, 7, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Quest \'Supplies to Auberdine\' Taken - Say Line 7 (No Repeat)'),
 (4484, 0, 3, 0, 7, 0, 100, 1, 0, 0, 0, 0, 0, 19, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Evade - Remove Flags Immune To NPC\'s (No Repeat)'),
-(4484, 0, 4, 5, 40, 0, 100, 1, 20, 4484, 0, 0, 0, 54, 10000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 20 Reached - Pause Waypoint (No Repeat)'),
+(4484, 0, 4, 5, 40, 0, 100, 1, 20, 4484, 0, 0, 0, 54, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 20 Reached - Pause Waypoint (No Repeat)'),
 (4484, 0, 5, 0, 61, 0, 100, 1, 20, 4484, 0, 0, 0, 80, 448400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 20 Reached - Run Script (No Repeat)'),
-(4484, 0, 6, 0, 40, 0, 100, 1, 21, 4484, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 21 Reached - Say Line 1 (No Repeat)'),
-(4484, 0, 7, 8, 40, 0, 100, 1, 27, 4484, 0, 0, 0, 54, 10000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 27 Reached - Pause Waypoint (No Repeat)'),
+(4484, 0, 6, 0, 77, 0, 100, 0, 1, 4, 0, 0, 0, 80, 448403, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Counter Set - Run Script'),
+(4484, 0, 7, 8, 40, 0, 100, 1, 27, 4484, 0, 0, 0, 54, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 27 Reached - Pause Waypoint (No Repeat)'),
 (4484, 0, 8, 0, 61, 0, 100, 0, 27, 4484, 0, 0, 0, 80, 448401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 27 Reached - Run Script (No Repeat)'),
-(4484, 0, 9, 0, 40, 0, 100, 1, 28, 4484, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 28 Reached - Say Line 3 (No Repeat)'),
+(4484, 0, 9, 0, 77, 0, 100, 1, 2, 3, 0, 0, 0, 80, 448404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Counter Set - Run Script (No Repeat)'),
 (4484, 0, 10, 11, 40, 0, 100, 1, 43, 4484, 0, 0, 0, 54, 10000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 43 Reached - Pause Waypoint (No Repeat)'),
 (4484, 0, 11, 0, 61, 0, 100, 0, 43, 4484, 0, 0, 0, 80, 448402, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 43 Reached - Run Script (No Repeat)'),
 (4484, 0, 12, 13, 40, 0, 100, 1, 44, 4484, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - On Waypoint 44 Reached - Say Line 6 (No Repeat)'),
@@ -107,7 +115,19 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (448402, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 107, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - Actionlist - Summon Creature Group 2'),
 (448402, 9, 2, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 10, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - Actionlist - Start Attacking');
 
+-- Actionlist 3
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 448403);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(448403, 9, 0, 0, 0, 0, 100, 1, 500, 500, 0, 0, 0, 54, 11000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - Actionlist - Pause Waypoint (No Repeat)'),
+(448403, 9, 1, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - Actionlist - Say Line 1 (No Repeat)');
 
+-- Actionlist 5
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 448404);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(448404, 9, 0, 0, 0, 0, 100, 1, 500, 500, 0, 0, 0, 54, 8000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - Actionlist - Pause Waypoint (No Repeat)'),
+(448404, 9, 1, 0, 0, 0, 100, 1, 1000, 1000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Feero Ironhand - Actionlist - Say Line 3 (No Repeat)');
+
+-- Waypoints
 DELETE FROM `waypoints` WHERE `entry` = 4484;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
 (4484, 1, 3175.93, 193.541, 3.48354, 'Feero Ironhand'),
