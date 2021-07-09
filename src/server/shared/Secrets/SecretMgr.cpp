@@ -13,7 +13,6 @@
 #include "Log.h"
 #include "SharedDefines.h"
 #include <functional>
-#include <unordered_map>
 
 #define SECRET_FLAG_FOR(key, val, server) server ## _ ## key = (val ## ull << (16*SERVER_PROCESS_ ## server))
 #define SECRET_FLAG(key, val) SECRET_FLAG_ ## key = val, SECRET_FLAG_FOR(key, val, AUTHSERVER), SECRET_FLAG_FOR(key, val, WORLDSERVER)
@@ -137,7 +136,7 @@ void SecretMgr::AttemptLoad(Secrets i, LogLevel errorLevel, std::unique_lock<std
         }
 
         // attempt to transition us to the new key, if possible
-        Optional<std::string> error = AttemptTransition(Secrets(i), currentValue, oldSecret, !!oldDigest);
+        Optional<std::string> error = AttemptTransition(Secrets(i), currentValue, oldSecret, static_cast<bool>(oldDigest));
         if (error)
         {
             LOG_MESSAGE_BODY("server.loading", errorLevel, "Your value of '%s' changed, but we cannot transition your database to the new value:\n%s", info.configKey, error->c_str());

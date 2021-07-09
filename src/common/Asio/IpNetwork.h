@@ -31,11 +31,17 @@ namespace Acore::Net
     inline boost::asio::ip::address_v4 GetDefaultNetmaskV4(boost::asio::ip::address_v4 const& networkAddress)
     {
         if ((address_to_uint(networkAddress) & 0x80000000) == 0)
+        {
             return boost::asio::ip::address_v4(0xFF000000);
+        }
         if ((address_to_uint(networkAddress) & 0xC0000000) == 0x80000000)
+        {
             return boost::asio::ip::address_v4(0xFFFF0000);
+        }
         if ((address_to_uint(networkAddress) & 0xE0000000) == 0xC0000000)
+        {
             return boost::asio::ip::address_v4(0xFFFFFF00);
+        }
         return boost::asio::ip::address_v4(0xFFFFFFFF);
     }
 

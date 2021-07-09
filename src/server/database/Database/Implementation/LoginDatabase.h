@@ -1,29 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #ifndef _LOGINDATABASE_H
 #define _LOGINDATABASE_H
 
-#include "DatabaseWorkerPool.h"
 #include "MySQLConnection.h"
 
-class LoginDatabaseConnection : public MySQLConnection
-{
-public:
-    //- Constructors for sync and async connections
-    LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) { }
-    LoginDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
-
-    //- Loads database type specific prepared statements
-    void DoPrepareStatements() override;
-};
-
-typedef DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabaseWorkerPool;
-
-enum LoginDatabaseStatements
+enum LoginDatabaseStatements : uint32
 {
     /*  Naming standard for defines:
         {DB}_{SEL/INS/UPD/DEL/REP}_{Summary of data changed}
@@ -119,6 +104,20 @@ enum LoginDatabaseStatements
     LOGIN_UPD_ACCOUNT_TOTP_SECRET,
 
     MAX_LOGINDATABASE_STATEMENTS
+};
+
+class AC_DATABASE_API LoginDatabaseConnection : public MySQLConnection
+{
+public:
+    typedef LoginDatabaseStatements Statements;
+
+    //- Constructors for sync and async connections
+    LoginDatabaseConnection(MySQLConnectionInfo& connInfo);
+    LoginDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo);
+    ~LoginDatabaseConnection();
+
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements() override;
 };
 
 #endif

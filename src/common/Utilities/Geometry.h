@@ -12,8 +12,8 @@
 #define _ACORE_GEOMETRY_H
 
 #include "Define.h"
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 #include <math.h>
 
 [[nodiscard]] inline float getAngle(float startX, float startY, float destX, float destY)
@@ -28,7 +28,7 @@
 
 [[nodiscard]] inline float getSlopeAngle(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
-    float floorDist = sqrt(pow(startY - destY, 2.0f) + pow(startX - destX,2.0f));
+    float floorDist = sqrt(pow(startY - destY, 2.0f) + pow(startX - destX, 2.0f));
     return atan(abs(destZ - startZ) / abs(floorDist));
 }
 

@@ -39,7 +39,7 @@ struct AccountInfo
     std::string LastIP;
     uint32 FailedLogins = 0;
     bool IsBanned = false;
-    bool IsPermanenetlyBanned = false;
+    bool IsPermanentlyBanned = false;
     AccountTypes SecurityLevel = SEC_PLAYER;
 };
 

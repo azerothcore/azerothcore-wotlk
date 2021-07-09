@@ -5,7 +5,7 @@
 #ifndef AZEROTHCORE_IWORLD_H
 #define AZEROTHCORE_IWORLD_H
 
-#include "Callback.h"
+#include "AsyncCallbackProcessor.h"
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
@@ -15,6 +15,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 class WorldPacket;
 class WorldSession;
@@ -283,7 +284,9 @@ enum WorldIntConfigs
     CONFIG_BATTLEGROUND_REPORT_AFK,
     CONFIG_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_BATTLEGROUND_PLAYER_RESPAWN,
-    CONFIG_BATTLEGROUND_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,

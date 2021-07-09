@@ -7,14 +7,16 @@ on:
     types: ['labeled']
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
   cancel-in-progress: true
 
 jobs:
   docker-build-n-deploy:
     strategy:
       fail-fast: true
-    runs-on: ubuntu-20.04
+      matrix:
+        os: [ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ github.event.label.name == 'run-build' }}
     env:
       COMPOSE_DOCKER_CLI_BUILD: 1
@@ -45,7 +47,7 @@ jobs:
     #       compose_file: docker-compose.yml
 
       - name: Login to Docker Hub
-        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ steps.extract_branch.outputs.branch == 'master' }}
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -68,7 +70,7 @@ jobs:
       - name: Deploy Dev
         #env:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ steps.extract_branch.outputs.branch == 'master' }}
         run: |
           docker-compose --profile dev --profile local push
 
@@ -76,10 +78,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: var/docker/ccache
-          key: ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}:${{ github.sha }}
+          key: ccache:${{ matrix.os }}:clang:without-modules:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
-            ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}
-            ccache:ubuntu-20.04:clang:without-modules
+            ccache:${{ matrix.os }}:clang:without-modules:${{ github.ref }}
+            ccache:${{ matrix.os }}:clang:without-modules
 
       - name: Build Production images
         env:
