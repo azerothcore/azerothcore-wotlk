@@ -14,7 +14,9 @@
 #define _WORLDSOCKET_H
 
 #include "AuthCrypt.h"
+#include "AsyncCallbackProcessor.h"
 #include "Common.h"
+#include "DatabaseEnvFwd.h"
 #include "Duration.h"
 #include <ace/Message_Block.h>
 #include <ace/SOCK_Stream.h>
@@ -145,6 +147,8 @@ private:
     /// Called by ProcessIncoming() on CMSG_AUTH_SESSION.
     int HandleAuthSession (WorldPacket& recvPacket);
 
+    void LoadSessionPermissionsCallback(PreparedQueryResult result);
+
     /// Called by ProcessIncoming() on CMSG_PING.
     int HandlePing (WorldPacket& recvPacket);
 
@@ -192,6 +196,7 @@ private:
 
     std::array<uint8, 4> m_Seed;
 
+    QueryCallbackProcessor _queryProcessor;
     std::string _ipCountry;
 };
 

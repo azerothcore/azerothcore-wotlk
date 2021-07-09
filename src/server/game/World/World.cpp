@@ -54,6 +54,7 @@
 #include "PetitionMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "RBAC.h"
 #include "Realm.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
@@ -1557,6 +1558,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
     LOG_INFO("server.loading", ">> Localization strings loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+
+    LOG_INFO("server.loading", "Loading Account Roles and Permissions...");
+    sAccountMgr->LoadRBAC();
 
     LOG_INFO("server.loading", "Loading Page Texts...");
     sObjectMgr->LoadPageTexts();
@@ -3446,6 +3450,15 @@ ObjectGuid World::GetGlobalPlayerGUID(std::string const& name) const
 
     // Player not found
     return ObjectGuid::Empty;
+}
+
+void World::ReloadRBAC()
+{
+    // Passive reload, we mark the data as invalidated and next time a permission is checked it will be reloaded
+    LOG_INFO("rbac", "World::ReloadRBAC()");
+    for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+        if (WorldSession* session = itr->second)
+            session->InvalidateRBACData();
 }
 
 void World::RemoveOldCorpses()

@@ -20,6 +20,7 @@
 #include "DatabaseEnv.h"
 #include "GossipDef.h"
 #include "Packet.h"
+#include "RBAC.h"
 #include "SharedDefines.h"
 #include "World.h"
 #include <utility>
@@ -56,6 +57,11 @@ namespace lfg
     struct LfgPlayerRewardData;
     struct LfgRoleCheck;
     struct LfgUpdateData;
+}
+
+namespace rbac
+{
+class RBACData;
 }
 
 namespace WorldPackets
@@ -230,7 +236,7 @@ struct PacketCounter
 class WorldSession
 {
 public:
-    WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    WorldSession(uint32 id, std::string&& name, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
     bool PlayerLoading() const { return m_playerLoading; }
@@ -254,6 +260,12 @@ public:
 
     void SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos = 0);
     void SendClientCacheVersion(uint32 version);
+
+    rbac::RBACData* GetRBACData();
+    bool HasPermission(uint32 permissionId);
+    void LoadPermissions();
+    QueryCallback LoadPermissionsAsync();
+    void InvalidateRBACData(); // Used to force LoadPermissions at next HasPermission check
 
     AccountTypes GetSecurity() const { return _security; }
     bool CanSkipQueue() const { return _skipQueue; }
@@ -1042,6 +1054,7 @@ private:
     AccountTypes _security;
     bool _skipQueue;
     uint32 _accountId;
+    std::string _accountName;
     uint8 m_expansion;
     uint32 m_total_time;
 
@@ -1065,6 +1078,7 @@ private:
     uint32 recruiterId;
     bool isRecruiter;
     LockedQueue<WorldPacket*> _recvQueue;
+    rbac::RBACData* _RBACData;
     uint32 m_currentVendorEntry;
     ObjectGuid m_currentBankerGUID;
     time_t timeWhoCommandAllowed;
