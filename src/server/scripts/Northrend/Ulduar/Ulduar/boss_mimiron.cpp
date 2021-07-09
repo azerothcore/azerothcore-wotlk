@@ -1160,7 +1160,9 @@ public:
                     break;
                 case EVENT_PROXIMITY_MINES_1:
                     for (uint8 i = 0; i < 10; ++i)
-                    me->CastSpell(me, SPELL_SUMMON_PROXIMITY_MINE, true);
+                    {
+                        me->CastSpell(me, SPELL_SUMMON_PROXIMITY_MINE, true);
+                    }
                     break;
                 case EVENT_FLAME_SUPPRESSION_50000:
                     me->CastSpell(me, SPELL_FLAME_SUPPRESSANT_50000yd, false);
