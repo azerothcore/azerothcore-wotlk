@@ -27,7 +27,7 @@
 namespace lfg
 {
 
-    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK))
+    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false)
     {
         new LFGPlayerScript();
         new LFGGroupScript();
@@ -758,6 +758,12 @@ namespace lfg
               << ". Dungeons (" << uint32(dungeons.size()) << "): " << ConcatenateDungeons(dungeons);
             LOG_DEBUG("lfg", "%s", o.str().c_str());
         }*/
+    }
+
+    void LFGMgr::ToggleTesting()
+    {
+        m_Testing = !m_Testing;
+        sWorld->SendWorldText(m_Testing ? LANG_DEBUG_LFG_ON : LANG_DEBUG_LFG_OFF);
     }
 
     /**
@@ -1615,7 +1621,10 @@ namespace lfg
                 if ((randomDungeon || selectedRandomLfgDungeon(player->GetGUID())) && !player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN))
                 {
                     randomDungeon = true;
-                    player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
+                    // if player is debugging, don't add dungeon cooldown
+                    if (!m_Testing) {
+                        player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
+                    }
                 }
                 TeleportPlayer(player, false);
             }
@@ -1673,7 +1682,7 @@ namespace lfg
             if (itPlayers->second.accept != LFG_ANSWER_AGREE)   // No answer (-1) or not accepted (0)
                 allAnswered = false;
 
-        if (!allAnswered)
+        if (!m_Testing && !allAnswered)
         {
             for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
                 SendLfgUpdateProposal(it->first, proposal);
