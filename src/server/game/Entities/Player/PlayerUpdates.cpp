@@ -17,6 +17,9 @@
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
 #include "WeatherMgr.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 
 // Zone Interval should be 1 second
 #define ZONE_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
@@ -1412,6 +1415,41 @@ void Player::UpdateCinematicLocation(uint32 /*diff*/) {
   }
 }
 
+template void Player::UpdateVisibilityOf(Player *target, UpdateData &data,
+                                         std::vector<Unit *> &visibleNow);
+template void Player::UpdateVisibilityOf(Creature *target, UpdateData &data,
+                                         std::vector<Unit *> &visibleNow);
+template void Player::UpdateVisibilityOf(Corpse *target, UpdateData &data,
+                                         std::vector<Unit *> &visibleNow);
+template void Player::UpdateVisibilityOf(GameObject *target, UpdateData &data,
+                                         std::vector<Unit *> &visibleNow);
+template void Player::UpdateVisibilityOf(DynamicObject *target,
+                                         UpdateData &data,
+                                         std::vector<Unit *> &visibleNow);
+
+void Player::UpdateVisibilityForPlayer(bool mapChange) {
+  // After added to map seer must be a player - there is no possibility to still
+  // have different seer (all charm auras must be already removed)
+  if (mapChange && m_seer != this) {
+    m_seer = this;
+  }
+
+  Acore::VisibleNotifier notifierNoLarge(
+      *this, mapChange,
+      false); // visit only objects which are not large; default distance
+  Cell::VisitAllObjects(m_seer, notifierNoLarge,
+                        GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
+  notifierNoLarge.SendToSelf();
+
+  Acore::VisibleNotifier notifierLarge(
+      *this, mapChange, true); // visit only large objects; maximum distance
+  Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
+  notifierLarge.SendToSelf();
+
+  if (mapChange)
+    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+}
+
 void Player::UpdateObjectVisibility(bool forced, bool fromUpdate) {
   if (!forced)
     AddToNotify(NOTIFY_VISIBILITY_CHANGED);
@@ -1480,41 +1518,6 @@ void Player::UpdateVisibilityOf(T *target, UpdateData &data,
       UpdateVisibilityOf_helper(m_clientGUIDs, target, visibleNow);
     }
   }
-}
-
-template void Player::UpdateVisibilityOf(Player *target, UpdateData &data,
-                                         std::vector<Unit *> &visibleNow);
-template void Player::UpdateVisibilityOf(Creature *target, UpdateData &data,
-                                         std::vector<Unit *> &visibleNow);
-template void Player::UpdateVisibilityOf(Corpse *target, UpdateData &data,
-                                         std::vector<Unit *> &visibleNow);
-template void Player::UpdateVisibilityOf(GameObject *target, UpdateData &data,
-                                         std::vector<Unit *> &visibleNow);
-template void Player::UpdateVisibilityOf(DynamicObject *target,
-                                         UpdateData &data,
-                                         std::vector<Unit *> &visibleNow);
-
-void Player::UpdateVisibilityForPlayer(bool mapChange) {
-  // After added to map seer must be a player - there is no possibility to still
-  // have different seer (all charm auras must be already removed)
-  if (mapChange && m_seer != this) {
-    m_seer = this;
-  }
-
-  Acore::VisibleNotifier notifierNoLarge(
-      *this, mapChange,
-      false); // visit only objects which are not large; default distance
-  Cell::VisitAllObjects(m_seer, notifierNoLarge,
-                        GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
-  notifierNoLarge.SendToSelf();
-
-  Acore::VisibleNotifier notifierLarge(
-      *this, mapChange, true); // visit only large objects; maximum distance
-  Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
-  notifierLarge.SendToSelf();
-
-  if (mapChange)
-    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
 }
 
 void Player::GetInitialVisiblePackets(Unit *target) {
@@ -2044,4 +2047,12 @@ void Player::UpdateSpecCount(uint8 count) {
   SetSpecsCount(count);
 
   SendTalentsInfoData(false);
+}
+
+void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
+{
+    WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
+    data << Field;
+    data << Value;
+    GetSession()->SendPacket(&data);
 }
