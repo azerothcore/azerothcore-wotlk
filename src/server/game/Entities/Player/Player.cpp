@@ -85,12 +85,6 @@
 #include "LuaEngine.h"
 #endif
 
-// Zone Interval should be 1 second
-#define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
-
-#define CINEMATIC_LOOKAHEAD (2 * IN_MILLISECONDS)
-#define CINEMATIC_UPDATEDIFF 500
-
 enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
