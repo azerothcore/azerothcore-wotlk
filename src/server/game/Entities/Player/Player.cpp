@@ -90,19 +90,7 @@
 // Zone Interval should be 1 second
 #define ZONE_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 
-#define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
-#define PLAYER_SKILL_VALUE_INDEX(x) (PLAYER_SKILL_INDEX(x) + 1)
-#define PLAYER_SKILL_BONUS_INDEX(x) (PLAYER_SKILL_INDEX(x) + 2)
-
-#define SKILL_VALUE(x)         PAIR32_LOPART(x)
-#define SKILL_MAX(x)           PAIR32_HIPART(x)
-#define MAKE_SKILL_VALUE(v, m) MAKE_PAIR32(v, m)
-
-#define SKILL_TEMP_BONUS(x)    int16(PAIR32_LOPART(x))
-#define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
-#define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
-
-#define CINEMATIC_LOOKAHEAD  (2 * IN_MILLISECONDS)
+#define CINEMATIC_LOOKAHEAD (2 * IN_MILLISECONDS)
 #define CINEMATIC_UPDATEDIFF 500
 
 enum CharacterFlags {
@@ -148,11 +136,7 @@ enum CharacterCustomizeFlags {
   CHAR_CUSTOMIZE_FLAG_RACE      = 0x00100000  // name, gender, race, etc...
 };
 
-// corpse reclaim times
-#define DEATH_EXPIRE_STEP (5 * MINUTE)
-#define MAX_DEATH_COUNT   3
-
-static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = {30, 60, 120};
+static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 
 // we can disable this warning for this since it only
 // causes undefined behavior when passed to the base class constructor
@@ -12348,8 +12332,12 @@ Item *Player::GetItemByEntry(uint32 entry) const
   // in inventory
   for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
     if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-      if (pItem->GetEntry() == entry)
-        return pItem;
+      if (pItem->GetEntry() == entry)// Zone Interval should be 1 second
+#define ZONE_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
+
+#define CINEMATIC_UPDATEDIFF 500
+#define CINEMATIC_LOOKAHEAD (2 * IN_MILLISECONDS)
+
 
   for (uint8 i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
     if (Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -12405,8 +12393,12 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
   Item *pSrcItem = GetItemByPos(srcbag, srcslot);
   if (!pSrcItem) {
     SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pSrcItem, nullptr);
-    return;
-  }
+    return;// Zone Interval should be 1 second
+#define ZONE_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
+
+#define CINEMATIC_UPDATEDIFF 500
+#define CINEMATIC_LOOKAHEAD (2 * IN_MILLISECONDS)
+
 
   if (pSrcItem->m_lootGenerated) // prevent split looting item (item
   {
