@@ -2,7 +2,16 @@
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-class KillRewarder
+#ifndef __KILL_REWARDER_H__
+#define __KILL_REWARDER_H__
+
+#include "Define.h"
+
+class Group;
+class Player;
+class Unit;
+
+class AC_GAME_API KillRewarder
 {
 public:
     KillRewarder(Player* killer, Unit* victim, bool isBattleGround);
@@ -34,3 +43,7 @@ private:
     bool _isBattleGround;
     bool _isPvP;
 };
+
+std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
+
+#endif
