@@ -33,7 +33,8 @@
 #define CINEMATIC_UPDATEDIFF 500
 #define CINEMATIC_LOOKAHEAD (2 * IN_MILLISECONDS)
 
-void Player::Update(uint32 p_time) {
+void Player::Update(uint32 p_time) 
+{
   if (!IsInWorld())
     return;
 
@@ -383,13 +384,15 @@ void Player::Update(uint32 p_time) {
   }
 }
 
-void Player::UpdateMirrorTimers() {
+void Player::UpdateMirrorTimers() 
+{
   // Desync flags for update on next HandleDrowning
   if (m_MirrorTimerFlags)
     m_MirrorTimerFlagsLast = ~m_MirrorTimerFlags;
 }
 
-void Player::UpdateNextMailTimeAndUnreads() {
+void Player::UpdateNextMailTimeAndUnreads() 
+{
   // Update the next delivery time and unread mails
   time_t cTime = time(nullptr);
   // Get the next delivery time
@@ -418,7 +421,8 @@ void Player::UpdateNextMailTimeAndUnreads() {
   }
 }
 
-void Player::UpdateLocalChannels(uint32 newZone) {
+void Player::UpdateLocalChannels(uint32 newZone) 
+{
   // pussywizard: mutex needed (tc changed opcode to THREAD UNSAFE)
   static std::mutex channelsLock;
   std::lock_guard<std::mutex> guard(channelsLock);
@@ -504,13 +508,15 @@ void Player::UpdateLocalChannels(uint32 newZone) {
   }
 }
 
-void Player::UpdateDefense() {
+void Player::UpdateDefense() 
+{
   if (UpdateSkill(SKILL_DEFENSE,
                   sWorld->getIntConfig(CONFIG_SKILL_GAIN_DEFENSE)))
     UpdateDefenseBonusesMod(); // update dependent from defense skill part
 }
 
-void Player::UpdateRating(CombatRating cr) {
+void Player::UpdateRating(CombatRating cr) 
+{
   int32 amount = m_baseRatingValue[cr];
   // Apply bonus from SPELL_AURA_MOD_RATING_FROM_STAT
   // stat used stored in miscValueB for this aura
@@ -597,13 +603,15 @@ void Player::UpdateRating(CombatRating cr) {
   }
 }
 
-void Player::UpdateAllRatings() {
+void Player::UpdateAllRatings() 
+{
   for (int cr = 0; cr < MAX_COMBAT_RATING; ++cr)
     UpdateRating(CombatRating(cr));
 }
 
 // skill+step, checking for max value
-bool Player::UpdateSkill(uint32 skill_id, uint32 step) {
+bool Player::UpdateSkill(uint32 skill_id, uint32 step) 
+{
   if (!skill_id)
     return false;
 
@@ -639,7 +647,8 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step) {
 
 // iraizo: turn this into a switch statement
 inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel,
-                           uint32 GreenLevel, uint32 YellowLevel) {
+                           uint32 GreenLevel, uint32 YellowLevel) 
+                           {
   if (SkillValue >= GrayLevel)
     return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_GREY) * 10;
   if (SkillValue >= GreenLevel)
@@ -650,7 +659,8 @@ inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel,
 }
 
 bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
-                               uint32 RedLevel, uint32 Multiplicator) {
+                               uint32 RedLevel, uint32 Multiplicator) 
+                               {
   LOG_DEBUG("entities.player.skills",
             "UpdateGatherSkill(SkillId %d SkillLevel %d RedLevel %d)", SkillId,
             SkillValue, RedLevel);
@@ -706,7 +716,8 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
   return false;
 }
 
-bool Player::UpdateCraftSkill(uint32 spellid) {
+bool Player::UpdateCraftSkill(uint32 spellid) 
+{
   LOG_DEBUG("entities.player.skills", "UpdateCraftSkill spellid %d", spellid);
 
   SkillLineAbilityMapBounds bounds =
@@ -742,7 +753,8 @@ bool Player::UpdateCraftSkill(uint32 spellid) {
   return false;
 }
 
-float getProbabilityOfLevelUp(uint32 SkillValue) {
+float getProbabilityOfLevelUp(uint32 SkillValue) 
+{
   /* According to El's Extreme Angling page, from 1 to 115 the probability of a
    * skill level up is 100% since 100/1 = 100. From 115 - 135 should average 2
    * catches per skill up so that means 100/2 = 50%. This returns the
@@ -760,7 +772,8 @@ float getProbabilityOfLevelUp(uint32 SkillValue) {
   return 100 / dens[std::distance(std::begin(bounds), it)];
 }
 
-bool Player::UpdateFishingSkill() {
+bool Player::UpdateFishingSkill() 
+{
   LOG_DEBUG("entities.player.skills", "UpdateFishingSkill");
 
   uint32 SkillValue = GetPureSkillValue(SKILL_FISHING);
@@ -785,7 +798,8 @@ static uint32 bonusSkillLevels[] = {75, 150, 225, 300, 375, 450};
 static const size_t bonusSkillLevelsSize =
     sizeof(bonusSkillLevels) / sizeof(uint32);
 
-bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step) {
+bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step) 
+{
   LOG_DEBUG("entities.player.skills",
             "UpdateSkillPro(SkillId %d, Chance %3.1f%%)", SkillId,
             Chance / 10.0f);
@@ -843,7 +857,8 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step) {
   return false;
 }
 
-void Player::UpdateWeaponSkill(Unit *victim, WeaponAttackType attType) {
+void Player::UpdateWeaponSkill(Unit *victim, WeaponAttackType attType) 
+{
   if (IsInFeralForm())
     return; // always maximized SKILL_FERAL_COMBAT in fact
 
@@ -880,7 +895,8 @@ void Player::UpdateWeaponSkill(Unit *victim, WeaponAttackType attType) {
 }
 
 void Player::UpdateCombatSkills(Unit *victim, WeaponAttackType attType,
-                                bool defence) {
+                                bool defence) 
+{
   uint8 plevel = getLevel(); // if defense than victim == attacker
   uint8 greylevel = Acore::XP::GetGrayLevel(plevel);
   uint8 moblevel = victim->getLevelForTarget(this);
@@ -916,7 +932,8 @@ void Player::UpdateCombatSkills(Unit *victim, WeaponAttackType attType,
     return;
 }
 
-void Player::UpdateSkillsForLevel() {
+void Player::UpdateSkillsForLevel() 
+{
   uint16 maxconfskill = sWorld->GetConfigMaxSkillValue();
   uint32 maxSkill = GetMaxSkillValueForLevel();
 
@@ -960,7 +977,8 @@ void Player::UpdateSkillsForLevel() {
   }
 }
 
-void Player::UpdateSkillsToMaxSkillsForLevel() {
+void Player::UpdateSkillsToMaxSkillsForLevel() 
+{
   for (SkillStatusMap::iterator itr = mSkillStatus.begin();
        itr != mSkillStatus.end(); ++itr) {
     if (itr->second.uState == SKILL_DELETED)
@@ -984,7 +1002,8 @@ void Player::UpdateSkillsToMaxSkillsForLevel() {
 }
 
 bool Player::UpdatePosition(float x, float y, float z, float orientation,
-                            bool teleport) {
+                            bool teleport) 
+{
   if (!Unit::UpdatePosition(x, y, z, orientation, teleport))
     return false;
 
@@ -999,7 +1018,8 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
   return true;
 }
 
-void Player::UpdateHonorFields() {
+void Player::UpdateHonorFields() 
+{
   /// called when rewarding honor and at each save
   time_t now = time_t(time(nullptr));
   time_t today = time_t(time(nullptr) / DAY) * DAY;
@@ -1027,7 +1047,8 @@ void Player::UpdateHonorFields() {
   m_lastHonorUpdateTime = now;
 }
 
-void Player::UpdateArea(uint32 newArea) {
+void Player::UpdateArea(uint32 newArea) 
+{
   // pussywizard: inform instance, needed for Icecrown Citadel
   if (InstanceScript *instance = GetInstanceScript())
     instance->OnPlayerAreaUpdate(this, m_areaUpdateId, newArea);
@@ -1061,7 +1082,8 @@ void Player::UpdateArea(uint32 newArea) {
     RemoveRestFlag(REST_FLAG_IN_FACTION_AREA);
 }
 
-void Player::UpdateZone(uint32 newZone, uint32 newArea) {
+void Player::UpdateZone(uint32 newZone, uint32 newArea) 
+{
   if (m_zoneUpdateId != newZone) {
     sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
     sOutdoorPvPMgr->HandlePlayerEnterZone(this, newZone);
@@ -1153,7 +1175,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea) {
   UpdateZoneDependentAuras(newZone);
 }
 
-void Player::UpdateEquipSpellsAtFormChange() {
+void Player::UpdateEquipSpellsAtFormChange() 
+{
   for (uint8 i = 0; i < INVENTORY_SLOT_BAG_END; ++i) {
     if (m_items[i] && !m_items[i]->IsBroken() &&
         CanUseAttackType(GetAttackBySlot(i))) {
@@ -1185,7 +1208,8 @@ void Player::UpdateEquipSpellsAtFormChange() {
   }
 }
 
-void Player::UpdateHomebindTime(uint32 time) {
+void Player::UpdateHomebindTime(uint32 time) 
+{
   // GMs never get homebind timer online
   if (m_InstanceValid || IsGameMaster()) {
     if (m_HomebindTimer) // instance valid, but timer not reset
@@ -1219,7 +1243,8 @@ void Player::UpdateHomebindTime(uint32 time) {
   }
 }
 
-void Player::UpdatePvPState() {
+void Player::UpdatePvPState() 
+{
   UpdateFFAPvPState();
 
   if (pvpInfo.IsHostile) // in hostile area
@@ -1234,7 +1259,8 @@ void Player::UpdatePvPState() {
   }
 }
 
-void Player::UpdateFFAPvPState(bool reset /*= true*/) {
+void Player::UpdateFFAPvPState(bool reset /*= true*/) 
+{
   // TODO: should we always synchronize UNIT_FIELD_BYTES_2, 1 of controller and
   // controlled? no, we shouldn't, those are checked for affecting player by
   // client
@@ -1290,7 +1316,8 @@ void Player::UpdateFFAPvPState(bool reset /*= true*/) {
   }
 }
 
-void Player::UpdatePvP(bool state, bool _override) {
+void Player::UpdatePvP(bool state, bool _override) 
+{
   if (!state || _override) {
     SetPvP(state);
     pvpInfo.EndTimer = 0;
@@ -1302,7 +1329,8 @@ void Player::UpdatePvP(bool state, bool _override) {
   RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
 }
 
-void Player::UpdatePotionCooldown(Spell *spell) {
+void Player::UpdatePotionCooldown(Spell *spell) 
+{
   // no potion used i combat or still in combat
   if (!GetLastPotionId() || IsInCombat())
     return;
@@ -1332,7 +1360,8 @@ void Player::UpdatePotionCooldown(Spell *spell) {
   SetLastPotionId(0);
 }
 
-void Player::UpdateCinematicLocation(uint32 /*diff*/) {
+void Player::UpdateCinematicLocation(uint32 /*diff*/) 
+{
   Position lastPosition;
   uint32 lastTimestamp = 0;
   Position nextPosition;
@@ -1433,7 +1462,8 @@ template void Player::UpdateVisibilityOf(DynamicObject *target,
                                          UpdateData &data,
                                          std::vector<Unit *> &visibleNow);
 
-void Player::UpdateVisibilityForPlayer(bool mapChange) {
+void Player::UpdateVisibilityForPlayer(bool mapChange) 
+{
   // After added to map seer must be a player - there is no possibility to still
   // have different seer (all charm auras must be already removed)
   if (mapChange && m_seer != this) {
@@ -1456,7 +1486,8 @@ void Player::UpdateVisibilityForPlayer(bool mapChange) {
     m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
 }
 
-void Player::UpdateObjectVisibility(bool forced, bool fromUpdate) {
+void Player::UpdateObjectVisibility(bool forced, bool fromUpdate) 
+{
   if (!forced)
     AddToNotify(NOTIFY_VISIBILITY_CHANGED);
   else if (!isBeingLoaded()) {
@@ -1472,13 +1503,15 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate) {
 
 template <class T>
 inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, T *target,
-                                      std::vector<Unit *> & /*v*/) {
+                                      std::vector<Unit *> & /*v*/) 
+{                 
   s64.insert(target->GetGUID());
 }
 
 template <>
 inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, GameObject *target,
-                                      std::vector<Unit *> & /*v*/) {
+                                      std::vector<Unit *> & /*v*/) 
+{
   // @HACK: This is to prevent objects like deeprun tram from disappearing when
   // player moves far from its spawn point while riding it
   if ((target->GetGOInfo()->type != GAMEOBJECT_TYPE_TRANSPORT))
@@ -1487,30 +1520,37 @@ inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, GameObject *target,
 
 template <>
 inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, Creature *target,
-                                      std::vector<Unit *> &v) {
+                                      std::vector<Unit *> &v) 
+{
   s64.insert(target->GetGUID());
   v.push_back(target);
 }
 
 template <>
 inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, Player *target,
-                                      std::vector<Unit *> &v) {
+                                      std::vector<Unit *> &v) 
+{
   s64.insert(target->GetGUID());
   v.push_back(target);
 }
 
 template <class T>
-inline void BeforeVisibilityDestroy(T * /*t*/, Player * /*p*/) {}
+inline void BeforeVisibilityDestroy(T * /*t*/, Player * /*p*/) 
+{
+
+}
 
 template <>
-inline void BeforeVisibilityDestroy<Creature>(Creature *t, Player *p) {
+inline void BeforeVisibilityDestroy<Creature>(Creature *t, Player *p)
+{
   if (p->GetPetGUID() == t->GetGUID() && t->IsPet())
     ((Pet *)t)->Remove(PET_SAVE_NOT_IN_SLOT, true);
 }
 
 template <class T>
 void Player::UpdateVisibilityOf(T *target, UpdateData &data,
-                                std::vector<Unit *> &visibleNow) {
+                                std::vector<Unit *> &visibleNow)
+{
   if (HaveAtClient(target)) {
     if (!CanSeeOrDetect(target, false, true)) {
       BeforeVisibilityDestroy<T>(target, this);
@@ -1526,7 +1566,8 @@ void Player::UpdateVisibilityOf(T *target, UpdateData &data,
   }
 }
 
-void Player::GetInitialVisiblePackets(Unit *target) {
+void Player::GetInitialVisiblePackets(Unit *target) 
+{
   GetAurasForTarget(target);
   if (target->IsAlive()) {
     if (target->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && target->GetVictim())
@@ -1534,7 +1575,8 @@ void Player::GetInitialVisiblePackets(Unit *target) {
   }
 }
 
-void Player::UpdateVisibilityOf(WorldObject *target) {
+void Player::UpdateVisibilityOf(WorldObject *target) 
+{
   if (HaveAtClient(target)) {
     if (!CanSeeOrDetect(target, false, true)) {
       if (target->GetTypeId() == TYPEID_UNIT)
@@ -1556,7 +1598,8 @@ void Player::UpdateVisibilityOf(WorldObject *target) {
   }
 }
 
-void Player::UpdateTriggerVisibility() {
+void Player::UpdateTriggerVisibility() 
+{
   if (m_clientGUIDs.empty())
     return;
 
@@ -1598,7 +1641,8 @@ void Player::UpdateTriggerVisibility() {
   GetSession()->SendPacket(&packet);
 }
 
-void Player::UpdateForQuestWorldObjects() {
+void Player::UpdateForQuestWorldObjects() 
+{
   if (m_clientGUIDs.empty())
     return;
 
@@ -1645,7 +1689,8 @@ void Player::UpdateForQuestWorldObjects() {
   GetSession()->SendPacket(&packet);
 }
 
-void Player::UpdateTitansGrip() {
+void Player::UpdateTitansGrip() 
+{
   // 10% damage reduce if 2x2h weapons are used
   if (!CanTitanGrip())
     RemoveAurasDueToSpell(49152);
@@ -1653,7 +1698,8 @@ void Player::UpdateTitansGrip() {
     aur->RecalculateAmountOfEffects();
 }
 
-void Player::UpdateZoneDependentAuras(uint32 newZone) {
+void Player::UpdateZoneDependentAuras(uint32 newZone) 
+{
   // Some spells applied at enter into zone (with subzones), aura removed in
   // UpdateAreaDependentAuras that called always at zone->area update
   SpellAreaForAreaMapBounds saBounds =
@@ -1666,7 +1712,8 @@ void Player::UpdateZoneDependentAuras(uint32 newZone) {
         CastSpell(this, itr->second->spellId, true);
 }
 
-void Player::UpdateAreaDependentAuras(uint32 newArea) {
+void Player::UpdateAreaDependentAuras(uint32 newArea) 
+{
   // remove auras from spells with area limitations
   for (AuraMap::iterator iter = m_ownedAuras.begin();
        iter != m_ownedAuras.end();) {
@@ -1721,7 +1768,8 @@ void Player::UpdateAreaDependentAuras(uint32 newArea) {
   }
 }
 
-void Player::UpdateCorpseReclaimDelay() {
+void Player::UpdateCorpseReclaimDelay() 
+{
   bool pvp = m_ExtraFlags & PLAYER_EXTRA_PVP_DEATH;
 
   if ((pvp && !sWorld->getBoolConfig(CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVP)) ||
@@ -1742,7 +1790,8 @@ void Player::UpdateCorpseReclaimDelay() {
     m_deathExpireTime = now + DEATH_EXPIRE_STEP;
 }
 
-void Player::UpdateUnderwaterState(Map *m, float x, float y, float z) {
+void Player::UpdateUnderwaterState(Map *m, float x, float y, float z) 
+{
   // pussywizard: optimization
   if (GetExactDistSq(&m_last_underwaterstate_position) < 3.0f * 3.0f)
     return;
@@ -1821,7 +1870,8 @@ void Player::UpdateUnderwaterState(Map *m, float x, float y, float z) {
   }
 }
 
-void Player::UpdateCharmedAI() {
+void Player::UpdateCharmedAI() 
+{
   // Xinef: maybe passed as argument?
   Unit *charmer = GetCharmer();
   CharmInfo *charmInfo = GetCharmInfo();
@@ -1860,7 +1910,8 @@ void Player::UpdateCharmedAI() {
                         1 << (CLASS_PRIEST - 1));
 
   // Xinef: charmer type specific actions
-  if (charmer->GetTypeId() == TYPEID_PLAYER) {
+  if (charmer->GetTypeId() == TYPEID_PLAYER) 
+  {
     bool follow = false;
     if (!target) {
       if (charmInfo->GetPlayerReactState() == REACT_PASSIVE)
@@ -1883,7 +1934,8 @@ void Player::UpdateCharmedAI() {
       GetMotionMaster()->MoveChase(target, Mages ? 15 : 4);
   }
 
-  if (!target || !IsValidAttackTarget(target)) {
+  if (!target || !IsValidAttackTarget(target)) 
+  {
     target = SelectNearbyTarget(nullptr, 30);
     if (!target) {
       if (!HasUnitState(UNIT_STATE_FOLLOW))
@@ -1986,7 +2038,8 @@ void Player::UpdateCharmedAI() {
   }
 }
 
-void Player::UpdateLootAchievements(LootItem *item, Loot *loot) {
+void Player::UpdateLootAchievements(LootItem *item, Loot *loot) 
+{
   UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemid,
                             item->count);
   UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE,
@@ -2010,7 +2063,8 @@ void Player::UpdateFallInformationIfNeed(MovementInfo const &minfo,
     SetFallInformation(minfo.fallTime, minfo.pos.GetPositionZ());
 }
 
-void Player::UpdateSpecCount(uint8 count) {
+void Player::UpdateSpecCount(uint8 count) 
+{
   uint32 curCount = GetSpecsCount();
   if (curCount == count)
     return;
