@@ -42,16 +42,14 @@
 
 #define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
 
-enum TimeConstants
-{
-    MINUTE          = 60,
-    HOUR            = MINUTE * 60,
-    DAY             = HOUR * 24,
-    WEEK            = DAY * 7,
-    MONTH           = DAY * 30,
-    YEAR            = MONTH * 12,
-    IN_MILLISECONDS = 1000
-};
+// TimeConstants
+#define MINUTE 60
+#define HOUR MINUTE * 60
+#define DAY HOUR * 24
+#define WEEK DAY * 7
+#define MONTH DAY * 30
+#define YEAR MONTH * 12
+#define IN_MILLISECONDS 1000
 
 enum AccountTypes
 {
