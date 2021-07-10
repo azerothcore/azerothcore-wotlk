@@ -212,7 +212,7 @@ void GameObject::ClearRitualList()
     if (!animSpell || m_unique_users.empty())
         return;
 
-    for (ObjectGuid const guid : m_unique_users)
+    for (ObjectGuid const& guid : m_unique_users)
     {
         if (Player* channeler = ObjectAccessor::GetPlayer(*this, guid))
             if (Spell* spell = channeler->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
