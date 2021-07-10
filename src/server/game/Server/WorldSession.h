@@ -300,10 +300,10 @@ public:
 
     // Returns true if all contained hyperlinks are valid
     // May kick player on false depending on world config (handler should abort)
-    bool ValidateHyperlinksAndMaybeKick(std::string const& str);
+    bool ValidateHyperlinksAndMaybeKick(std::string_view str);
     // Returns true if the message contains no hyperlinks
     // May kick player on false depending on world config (handler should abort)
-    bool DisallowHyperlinksAndMaybeKick(std::string const& str);
+    bool DisallowHyperlinksAndMaybeKick(std::string_view str);
 
     void QueuePacket(WorldPacket* new_packet);
     bool Update(uint32 diff, PacketFilter& updater);
