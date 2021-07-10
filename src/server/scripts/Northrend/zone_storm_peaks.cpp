@@ -775,7 +775,7 @@ public:
                 return;
 
             if (!me->GetVehicle())
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
         }
 
         void SpellHit(Unit* caster, const SpellInfo* spell) override

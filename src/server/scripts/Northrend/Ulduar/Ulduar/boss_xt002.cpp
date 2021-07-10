@@ -176,7 +176,7 @@ public:
             {
                 accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
                 if (!me->HandleSpellClick(accessory, 0))
-                    accessory->DespawnOrUnsummon();
+                    accessory->DespawnOrUnsummon(0s);
             }
         }
 
@@ -839,7 +839,7 @@ public:
             if (Unit* target = SelectTargetFromPlayerList(200))
                 AttackStart(target);
             else
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
         }
 
         void UpdateAI(uint32  /*diff*/) override

@@ -1476,7 +1476,7 @@ public:
                 }
                 caster->CastSpell(caster, spellId, true, castItem);
                 caster->CastSpell(caster, SPELL_ROBOT_KILL_CREDIT, true);
-                target->DespawnOrUnsummon();
+                target->DespawnOrUnsummon(0s);
             }
         }
 
@@ -1739,7 +1739,7 @@ public:
             {
                 caster->CastSpell(caster, SPELL_TRIGGER_AID_OF_THE_EARTHEN, true, nullptr);
                 caster->KilledMonsterCredit(NPC_FALLEN_EARTHEN_DEFENDER);
-                target->DespawnOrUnsummon();
+                target->DespawnOrUnsummon(0s);
             }
         }
 
@@ -1871,7 +1871,7 @@ public:
             Player* caster = GetCaster()->ToPlayer();
             if (Creature* target = GetHitCreature())
             {
-                target->DespawnOrUnsummon();
+                target->DespawnOrUnsummon(0s);
                 caster->KilledMonsterCredit(NPC_SCALPS_KC_BUNNY);
             }
         }

@@ -878,7 +878,7 @@ public:
         void HandleScript(SpellEffIndex /*effIndex*/)
         {
             if (GetCaster()->ToCreature()->GetEntry() == NPC_BROKEN_DOWN_SHREDDER)
-                GetCaster()->ToCreature()->DespawnOrUnsummon();
+                GetCaster()->ToCreature()->DespawnOrUnsummon(0s);
         }
 
         void Register() override

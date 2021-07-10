@@ -230,7 +230,7 @@ public:
                 Creature* Vorpil = ObjectAccessor::GetCreature(*me, VorpilGUID);
                 if (!Vorpil)
                 {
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                     return;
                 }
                 me->GetMotionMaster()->MoveFollow(Vorpil, 0.0f, 0.0f);

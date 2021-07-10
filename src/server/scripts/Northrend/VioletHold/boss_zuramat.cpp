@@ -202,7 +202,7 @@ public:
         {
             if (a == -1337)
                 if (Creature* c = pInstance->instance->GetCreature(SummonedGUID))
-                    c->DespawnOrUnsummon();
+                    c->DespawnOrUnsummon(0s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -211,7 +211,7 @@ public:
             {
                 pInstance->SetData(DATA_ACHIEV, 0);
                 if (Creature* c = pInstance->instance->GetCreature(SummonedGUID))
-                    c->DespawnOrUnsummon();
+                    c->DespawnOrUnsummon(0s);
             }
             me->DespawnOrUnsummon(5000);
         }

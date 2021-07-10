@@ -551,7 +551,7 @@ public:
                     if (Creature* mount = me->FindNearestCreature(NPC_SKARLOC_MOUNT, 10.0f))
                     {
                         me->SetFacingTo(mount->GetOrientation());
-                        mount->DespawnOrUnsummon();
+                        mount->DespawnOrUnsummon(0s);
                     }
                     break;
                 case EVENT_TALK_START_RIDE:

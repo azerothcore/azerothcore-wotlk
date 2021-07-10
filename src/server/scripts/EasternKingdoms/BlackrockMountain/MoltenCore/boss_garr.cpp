@@ -113,7 +113,7 @@ public:
             {
                 damage = 0;
                 DoCastVictim(SPELL_ERUPTION);
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             }
         }
 

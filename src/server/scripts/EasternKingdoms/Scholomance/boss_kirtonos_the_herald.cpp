@@ -100,7 +100,7 @@ public:
             }
 
             instance->SetData(DATA_KIRTONOS_THE_HERALD, NOT_STARTED);
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void IsSummonedBy(Unit* /*summoner*/) override

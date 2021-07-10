@@ -174,7 +174,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
             if (HasFollowState(STATE_FOLLOW_COMPLETE) && !HasFollowState(STATE_FOLLOW_POSTEVENT))
             {
                 LOG_DEBUG("scripts.ai", "TSCR: FollowerAI is set completed, despawns.");
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
                 return;
             }
 
@@ -214,7 +214,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
             if (bIsMaxRangeExceeded)
             {
                 LOG_DEBUG("scripts.ai", "TSCR: FollowerAI failed because player/group was to far away or not found");
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
                 return;
             }
 
@@ -248,7 +248,7 @@ void FollowerAI::MovementInform(uint32 motionType, uint32 pointId)
                 AddFollowState(STATE_FOLLOW_RETURNING);
         }
         else
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
     }
 }
 

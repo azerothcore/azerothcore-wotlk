@@ -46,7 +46,7 @@ void SummonList::DespawnEntry(uint32 entry)
         else if (summon->GetEntry() == entry)
         {
             i = storage_.erase(i);
-            summon->DespawnOrUnsummon();
+            summon->DespawnOrUnsummon(0s);
         }
         else
             ++i;
@@ -60,7 +60,7 @@ void SummonList::DespawnAll()
         Creature* summon = ObjectAccessor::GetCreature(*me, storage_.front());
         storage_.pop_front();
         if (summon)
-            summon->DespawnOrUnsummon();
+            summon->DespawnOrUnsummon(0s);
     }
 }
 

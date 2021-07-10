@@ -331,7 +331,7 @@ public:
 
         if (CreatureData const* data = creature->GetCreatureData())
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
-        creature->DespawnOrUnsummon();
+        creature->DespawnOrUnsummon(0s);
 
         creature->SetRespawnTime(5);
     }

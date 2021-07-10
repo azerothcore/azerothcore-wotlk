@@ -162,7 +162,7 @@ public:
                     if (Creature* attumen = summons.GetCreatureWithEntry(NPC_ATTUMEN_THE_HUNTSMAN))
                     {
                         _healthPct = std::max<float>(me->GetHealthPct(), attumen->GetHealthPct());
-                        attumen->DespawnOrUnsummon();
+                        attumen->DespawnOrUnsummon(0s);
                     }
 
                     me->CastSpell(me, SPELL_SUMMON_ATTUMEN_MOUNTED, true);

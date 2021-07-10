@@ -212,7 +212,7 @@ public:
                     break;
                 case 23:
                     player->GroupEventHappens(QUEST_TRAIL_OF_FIRE, me);
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                     break;
                 case 5:
                     if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
@@ -292,7 +292,7 @@ public:
             if (waypointId != 26)
                 return;
 
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
     };
 

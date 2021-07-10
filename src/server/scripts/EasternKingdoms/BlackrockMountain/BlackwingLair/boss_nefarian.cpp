@@ -277,7 +277,7 @@ public:
                             break;
                         case EVENT_SUCCESS_2:
                             DoCast(me, SPELL_VAELASTRASZZ_SPAWN);
-                            me->DespawnOrUnsummon(1000);
+                            me->DespawnOrUnsummon(1s);
                             break;
                         case EVENT_PATH_3:
                             me->GetMotionMaster()->MovePath(NEFARIUS_PATH_3, false);
@@ -467,7 +467,7 @@ public:
                 std::list<Creature*> constructList;
                 me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
                 for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
-                    (*itr)->DespawnOrUnsummon();
+                    (*itr)->DespawnOrUnsummon(0s);
             }
             else
             {

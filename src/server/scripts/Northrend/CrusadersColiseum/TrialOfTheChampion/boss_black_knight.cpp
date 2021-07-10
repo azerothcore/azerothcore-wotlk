@@ -163,7 +163,7 @@ public:
                 Talk(TEXT_BK_AGGRO);
                 me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
                 if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)) )
-                    announcer->DespawnOrUnsummon();
+                    announcer->DespawnOrUnsummon(0s);
 
                 events.Reset();
                 events.ScheduleEvent(EVENT_ANNOUNCER_SAY_ZOMBIE, 2500);

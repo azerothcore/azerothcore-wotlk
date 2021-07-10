@@ -219,7 +219,7 @@ public:
             instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
             if (Creature*  Axe = me->FindNearestCreature(MALCHEZARS_AXE, 100.0f))
             {
-                Axe->DespawnOrUnsummon();
+                Axe->DespawnOrUnsummon(0s);
             }
         }
 

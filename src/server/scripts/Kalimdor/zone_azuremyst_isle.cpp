@@ -134,7 +134,7 @@ public:
             if (RunAwayTimer)
             {
                 if (RunAwayTimer <= diff)
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
                 else
                     RunAwayTimer -= diff;
 
@@ -477,7 +477,7 @@ public:
             _events.Update(diff);
 
             if (_events.ExecuteEvent() == EVENT_DESPAWN)
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
         }
 
     private:

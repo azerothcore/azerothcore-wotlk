@@ -81,7 +81,7 @@ void SmartAI::UpdateDespawn(const uint32 diff)
             mDespawnState++;
         }
         else
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
     }
     else
         mDespawnTime -= diff;
@@ -382,7 +382,7 @@ void SmartAI::UpdatePath(const uint32 diff)
 
             // Xinef: allow to properly hook out of range despawn action, which in most cases should perform the same operation as dying
             GetScript()->ProcessEventsFor(SMART_EVENT_DEATH, me);
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
             return;
         }
         mEscortInvokerCheckTimer = 1000;

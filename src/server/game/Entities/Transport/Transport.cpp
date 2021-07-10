@@ -545,7 +545,7 @@ void MotionTransport::DelayedTeleportTransport()
             case TYPEID_UNIT:
                 _passengers.erase(obj);
                 if (!obj->ToCreature()->IsPet())
-                    obj->ToCreature()->DespawnOrUnsummon();
+                    obj->ToCreature()->DespawnOrUnsummon(0s);
                 break;
             case TYPEID_GAMEOBJECT:
                 _passengers.erase(obj);

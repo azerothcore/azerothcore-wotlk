@@ -3103,7 +3103,7 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
         return;
 
     // "kill" original creature
-    creatureTarget->DespawnOrUnsummon();
+    creatureTarget->DespawnOrUnsummon(0s);
 
     uint8 level = (creatureTarget->getLevel() < (m_caster->getLevel() - 5)) ? (m_caster->getLevel() - 5) : creatureTarget->getLevel();
 
@@ -4053,7 +4053,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT || m_caster->GetTypeId() != TYPEID_PLAYER)
                                 return;
 
-                            unitTarget->ToCreature()->DespawnOrUnsummon();
+                            unitTarget->ToCreature()->DespawnOrUnsummon(0s);
 
                             return;
                         }

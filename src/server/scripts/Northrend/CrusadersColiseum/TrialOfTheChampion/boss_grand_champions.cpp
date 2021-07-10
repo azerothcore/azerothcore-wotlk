@@ -603,7 +603,7 @@ public:
                     if( NewMountGUID )
                         if( Creature* mount = ObjectAccessor::GetCreature(*me, NewMountGUID) )
                         {
-                            mount->DespawnOrUnsummon();
+                            mount->DespawnOrUnsummon(0s);
                             me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, mount->GetDisplayId());
                             me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             me->SetHealth(50000);
@@ -625,7 +625,7 @@ public:
                         }
                 }
                 else if( id == 9 )
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
             }
         }
 

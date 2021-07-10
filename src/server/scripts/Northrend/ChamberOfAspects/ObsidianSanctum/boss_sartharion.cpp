@@ -671,7 +671,7 @@ public:
                         continue;
                     }
 
-                    dragon->DespawnOrUnsummon();
+                    dragon->DespawnOrUnsummon(0s);
                     dragon->SetRespawnTime(5);
                 }
             }

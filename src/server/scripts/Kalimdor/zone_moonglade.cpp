@@ -675,9 +675,9 @@ public:
                     trap->RemoveFromWorld();
 
                 if (Creature* omen = me->FindNearestCreature(NPC_OMEN, 5.0f, false))
-                    omen->DespawnOrUnsummon();
+                    omen->DespawnOrUnsummon(0s);
 
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             }
         }
     };

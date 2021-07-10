@@ -1225,7 +1225,7 @@ public:
         if (!pPrisoner || !pPrisoner->IsAlive())
             return false;
 
-        pPrisoner->DespawnOrUnsummon();
+        pPrisoner->DespawnOrUnsummon(0s);
         player->KilledMonsterCredit(NPC_EBON_BLADE_PRISONER_HUMAN);
         switch (pPrisoner->GetEntry())
         {

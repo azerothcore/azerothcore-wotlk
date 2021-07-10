@@ -280,7 +280,7 @@ public:
                 case EVENT_START_PHASE_2:
                     if( Creature* c = ObjectAccessor::GetCreature(*me, ValkyrGUID) )
                     {
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                         summons.DespawnAll();
                     }
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -364,7 +364,7 @@ public:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, ThrowGUID))
                     {
                         c->DestroyForNearbyPlayers();
-                        c->DespawnOrUnsummon();
+                        c->DespawnOrUnsummon(0s);
                         summons.DespawnAll();
                     }
                     ThrowGUID.Clear();

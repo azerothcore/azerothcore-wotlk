@@ -912,7 +912,7 @@ public:
                 me->StopMovingOnCurrentPos();
                 if (Vehicle* vehicle = me->GetVehicleKit())
                     vehicle->RemoveAllPassengers();
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
                 return;
             }
             else
@@ -1028,7 +1028,7 @@ public:
                         if (me->IsWithinDist3d(c, 12.0f))
                         {
                             me->CastSpell(c, SPELL_POWER_SPARK_MALYGOS_BUFF, true);
-                            me->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon(0s);
                             return;
                         }
                 CheckTimer = 1000;

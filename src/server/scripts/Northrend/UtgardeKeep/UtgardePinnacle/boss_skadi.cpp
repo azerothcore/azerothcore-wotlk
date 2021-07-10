@@ -473,7 +473,7 @@ public:
                 case EVENT_GRAUF_REMOVE_SKADI:
                     {
                         RemoveSkadi(false);
-                        me->DespawnOrUnsummon();
+                        me->DespawnOrUnsummon(0s);
                         break;
                     }
             }

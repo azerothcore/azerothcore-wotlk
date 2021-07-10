@@ -107,9 +107,9 @@ public:
 
             // checked for safety
             while( Creature* c = me->FindNearestCreature(NPC_INFERNAL_VOLCANO, 500.0f, true) )
-                c->DespawnOrUnsummon();
+                c->DespawnOrUnsummon(0s);
             while( Creature* c = me->FindNearestCreature(NPC_NETHER_PORTAL, 500.0f, true) )
-                c->DespawnOrUnsummon();
+                c->DespawnOrUnsummon(0s);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -344,7 +344,7 @@ public:
 
         void EnterEvadeMode() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
     };
 };
@@ -425,7 +425,7 @@ public:
 
         void EnterEvadeMode() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
     };
 };

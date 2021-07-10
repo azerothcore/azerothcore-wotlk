@@ -343,7 +343,7 @@ public:
         {
             if (m_pInstance->GetBossState(DATA_EREGOS) == IN_PROGRESS)
                 if (Creature* eregos = me->FindNearestCreature(NPC_EREGOS, 450.0f, true))
-                    eregos->DespawnOrUnsummon(); // On retail this kills abusive call of drake during engaged Eregos
+                    eregos->DespawnOrUnsummon(0s); // On retail this kills abusive call of drake during engaged Eregos
 
             me->SetFacingToObject(summoner);
 

@@ -241,9 +241,9 @@ public:
         void DespawnHeads()
         {
             Creature* cr;
-            if ((cr = GetAbedneum())) cr->DespawnOrUnsummon();
-            if ((cr = GetMarnak())) cr->DespawnOrUnsummon();
-            if ((cr = GetKaddrak())) cr->DespawnOrUnsummon();
+            if ((cr = GetAbedneum())) cr->DespawnOrUnsummon(0s);
+            if ((cr = GetMarnak())) cr->DespawnOrUnsummon(0s);
+            if ((cr = GetKaddrak())) cr->DespawnOrUnsummon(0s);
             SwitchHeadVisaul(0x7, false);
         }
 

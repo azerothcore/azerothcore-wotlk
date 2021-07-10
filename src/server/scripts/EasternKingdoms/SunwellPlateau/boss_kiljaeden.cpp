@@ -989,7 +989,7 @@ public:
                     if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                     {
                         velen->GetMotionMaster()->MovePoint(0, 1739.38f, 643.79f, 28.06f);
-                        velen->DespawnOrUnsummon(5000);
+                        velen->DespawnOrUnsummon(5s);
                     }
                     events.ScheduleEvent(eventId + 1, 3000);
                     break;
@@ -999,7 +999,7 @@ public:
                             if (summon->GetEntry() == NPC_SHATTERED_SUN_SOLDIER)
                             {
                                 summon->GetMotionMaster()->MovePoint(0, 1739.38f, 643.79f, 28.06f);
-                                summon->DespawnOrUnsummon(summon->GetExactDist2d(1734.96f, 642.43f) * 100);
+                                summon->DespawnOrUnsummon(Milliseconds(summon->GetExactDist2d(1734.96f, 642.43f)) * 100ms);
                             }
                     events.ScheduleEvent(eventId + 1, 7000);
                     break;

@@ -197,7 +197,7 @@ public:
                                 }
                             }
                             instance->SetData(GO_BELNISTRASZS_BRAZIER, DONE);
-                            me->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon(0s);
                             break;
                         }
                     case EVENT_FIREBALL:

@@ -252,7 +252,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
                         me->Respawn();
                     }
                     else
-                        me->DespawnOrUnsummon();
+                        me->DespawnOrUnsummon(0s);
                 }
 
                 // xinef: remove escort state, escort was finished (lack of this line resulted in skipping UpdateEscortAI calls after finished escort)
@@ -292,7 +292,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
                     me->Respawn();
                 }
                 else
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
 
                 return;
             }

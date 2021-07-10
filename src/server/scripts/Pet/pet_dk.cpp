@@ -194,7 +194,7 @@ public:
                 if (_despawnTimer > diff)
                     _despawnTimer -= diff;
                 else
-                    me->DespawnOrUnsummon();
+                    me->DespawnOrUnsummon(0s);
             }
         }
 

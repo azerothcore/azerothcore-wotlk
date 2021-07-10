@@ -121,7 +121,7 @@ public:
             // Do not want to unsummon Ohgan
             for (int i = 0; i < CHAINED_SPIRT_COUNT; ++i)
                 if (Creature* unsummon = ObjectAccessor::GetCreature(*me, chainedSpirtGUIDs[i]))
-                    unsummon->DespawnOrUnsummon();
+                    unsummon->DespawnOrUnsummon(0s);
             instance->SetBossState(DATA_MANDOKIR, DONE);
             instance->SaveToDB();
         }

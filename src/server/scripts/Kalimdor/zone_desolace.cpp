@@ -172,7 +172,7 @@ public:
             for (uint8 i = 0; i < MAX_CARAVAN_SUMMONS; ++i)
             {
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, summons[i]))
-                    summon->DespawnOrUnsummon();
+                    summon->DespawnOrUnsummon(0s);
 
                 summons[i].Clear();
             }

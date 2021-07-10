@@ -724,7 +724,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     Unit* owner = GetOwner();
     if (!owner) // just to be sure, asynchronous now
     {
-        DespawnOrUnsummon(1000);
+        DespawnOrUnsummon(1s);
         return false;
     }
 

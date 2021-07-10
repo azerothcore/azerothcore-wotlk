@@ -18902,7 +18902,7 @@ bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
     Position pos = _self;
     _self.MovePositionToFirstCollision(pos, 20.0f, M_PI);
     _self.GetMotionMaster()->MovePoint(0, pos);
-    _self.ToCreature()->DespawnOrUnsummon(_duration);
+    _self.ToCreature()->DespawnOrUnsummon(Milliseconds(_duration));
     return true;
 }
 

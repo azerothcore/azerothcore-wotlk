@@ -219,7 +219,7 @@ public:
             if( MemoryGUID )
             {
                 if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
-                    memory->DespawnOrUnsummon();
+                    memory->DespawnOrUnsummon(0s);
                 MemoryGUID.Clear();
             }
             me->SetReactState(REACT_PASSIVE);
@@ -268,7 +268,7 @@ public:
                 if( MemoryGUID )
                     if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     {
-                        memory->DespawnOrUnsummon();
+                        memory->DespawnOrUnsummon(0s);
                         MemoryGUID.Clear();
                     }
             }

@@ -155,7 +155,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void SummonTito();
@@ -354,7 +354,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* Spell) override
@@ -462,7 +462,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void AttackStart(Unit* who) override
@@ -593,7 +593,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -684,7 +684,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -810,7 +810,7 @@ public:
             if (Creature* pBigBadWolf = creature->SummonCreature(CREATURE_BIG_BAD_WOLF, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
                 pBigBadWolf->AI()->AttackStart(player);
 
-            creature->DespawnOrUnsummon();
+            creature->DespawnOrUnsummon(0s);
         }
 
         return true;
@@ -878,7 +878,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1114,7 +1114,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* Spell) override
@@ -1196,7 +1196,7 @@ public:
 
         void JustReachedHome() override
         {
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

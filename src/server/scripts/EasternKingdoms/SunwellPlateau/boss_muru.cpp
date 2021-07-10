@@ -170,7 +170,7 @@ public:
                     if (!muru->IsInEvadeMode())
                         muru->AI()->EnterEvadeMode();
 
-            me->DespawnOrUnsummon();
+            me->DespawnOrUnsummon(0s);
         }
 
         void EnterCombat(Unit* /*who*/) override

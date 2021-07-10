@@ -53,7 +53,7 @@ public:
             {
                 instance->SetBossState(DATA_GYTH, NOT_STARTED);
                 summons.DespawnAll();
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             }
         }
 

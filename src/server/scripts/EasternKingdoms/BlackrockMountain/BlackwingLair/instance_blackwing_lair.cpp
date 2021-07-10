@@ -180,7 +180,7 @@ public:
                     {
                         case NOT_STARTED:
                             if (Creature* nefarian = instance->GetCreature(GetGuidData(DATA_NEFARIAN)))
-                                nefarian->DespawnOrUnsummon();
+                                nefarian->DespawnOrUnsummon(0s);
                             break;
                         case FAIL:
                             _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15 * 60 * IN_MILLISECONDS); //15min

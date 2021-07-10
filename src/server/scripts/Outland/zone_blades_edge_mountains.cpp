@@ -1080,7 +1080,7 @@ public:
         void Reset() override
         {
             if (GetClosestCreatureWithEntry(me, NPC_OSCILLATING_FREQUENCY_SCANNER_TOP_BUNNY, 25.0f))
-                me->DespawnOrUnsummon();
+                me->DespawnOrUnsummon(0s);
             else
             {
                 // Spell 37392 does not exist in dbc, manually spawning

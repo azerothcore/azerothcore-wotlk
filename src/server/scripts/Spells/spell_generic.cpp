@@ -1447,7 +1447,7 @@ public:
         {
             if (Unit* caster = GetCaster())
                 if (Creature* haunt = caster->FindNearestCreature(NPC_SCOURGE_HAUNT, 5.0f, true))
-                    haunt->DespawnOrUnsummon();
+                    haunt->DespawnOrUnsummon(0s);
         }
 
         void Register() override
