@@ -38,13 +38,15 @@ public:
 
     // Start moving to the desired MovePoint
     void StartPath(bool run = false, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
-    bool LoadPath(uint32 entry);
+    bool LoadPath(uint32 entry, uint32 group = 0);
+    void StartMoving(uint32 group);
     void PausePath(uint32 delay, bool forced = false);
     void StopPath(uint32 DespawnTime = 0, uint32 quest = 0, bool fail = false);
     void EndPath(bool fail = false);
     void ResumePath();
+    void RandomWaypointGroup(uint32 firstGroup, uint32 lastGroup, Unit* invoker);
     WayPoint* GetNextWayPoint();
-    void GenerateWayPointArray(Movement::PointsArray* points);
+    void GenerateWayPointArray(Movement::PointsArray* points, uint32 group = 0);
     bool HasEscortState(uint32 uiEscortState) { return (mEscortState & uiEscortState); }
     void AddEscortState(uint32 uiEscortState) { mEscortState |= uiEscortState; }
     bool IsEscorted() override { return (mEscortState & SMART_ESCORT_ESCORTING); }
@@ -184,10 +186,11 @@ public:
 
     void OnSpellClick(Unit* clicker, bool& result) override;
 
-    // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
     void SetForcedCombatMove(float dist);
 
+    bool GetWaypointGroupMovement() { return mOnWaypointGroupMovement; }
+    void SetWaypointGroupMovement(bool state) { mOnWaypointGroupMovement = state; }
 private:
     uint32 mFollowCreditType;
     uint32 mFollowArrivedTimer;
@@ -201,15 +204,16 @@ private:
     void ReturnToLastOOCPos();
     void UpdatePath(const uint32 diff);
     SmartScript mScript;
-    WPPath* mWayPoints;
+    std::vector<WayPoint*> mWayPoints;
     uint32 mEscortState;
     uint32 mCurrentWPID;
+    uint32 mCurrentWPGroupID;
     bool mWPReached;
     bool mOOCReached;
     uint32 mWPPauseTimer;
     WayPoint* mLastWP;
     uint32 mEscortNPCFlags;
-    uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
+    uint32 GetWPCount() { return !mWayPoints.empty() ? mWayPoints.size() : 0; }
     bool mCanRepeatPath;
     bool mRun;
     bool mCanAutoAttack;
@@ -217,6 +221,8 @@ private:
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
 
+    // For RandomWaypointGroup validation
+    bool mOnWaypointGroupMovement;
     bool AssistPlayerInCombat(Unit* who);
 
     uint32 mDespawnTime;

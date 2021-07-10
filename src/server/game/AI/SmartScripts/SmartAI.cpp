@@ -23,10 +23,9 @@
 SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 {
     // copy script to local (protection for table reload)
-
-    mWayPoints = nullptr;
     mEscortState = SMART_ESCORT_NONE;
     mCurrentWPID = 0;//first wp id is 1 !!
+    mCurrentWPGroupID = 0;
     mWPReached = false;
     mOOCReached = false;
     mWPPauseTimer = 0;
@@ -61,6 +60,8 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     mJustReset = false;
 
+    mOnWaypointGroupMovement = false;
+
     // Xinef: Vehicle conditions
     m_ConditionsTimer = 0;
     if (me->GetVehicleKit())
@@ -89,25 +90,27 @@ void SmartAI::UpdateDespawn(const uint32 diff)
 
 WayPoint* SmartAI::GetNextWayPoint()
 {
-    if (!mWayPoints || mWayPoints->empty())
+    // TODO:
+    // Get Next Waypoint from current group
+    if (mWayPoints.empty())
         return nullptr;
 
     mCurrentWPID++;
-    WPPath::const_iterator itr = mWayPoints->find(mCurrentWPID);
-    if (itr != mWayPoints->end())
+    for (auto wp : mWayPoints)
     {
-        mLastWP = (*itr).second;
-        if (mLastWP->id != mCurrentWPID)
-            LOG_ERROR("scripts.ai.sai", "SmartAI::GetNextWayPoint: Got not expected waypoint id %u, expected %u", mLastWP->id, mCurrentWPID);
-
-        return (*itr).second;
+        if (wp->id == mCurrentWPID && wp->wp_group == mCurrentWPGroupID)
+        {
+            return wp;
+        }
     }
+
+    LOG_ERROR("scripts.ai.sai", "SmartAI::GetNextWayPoint: Got not expected waypoint id %u", mCurrentWPID);
     return nullptr;
 }
 
-void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
+void SmartAI::GenerateWayPointArray(Movement::PointsArray* points, uint32 group)
 {
-    if (!mWayPoints || mWayPoints->empty())
+    if (mWayPoints.empty())
         return;
 
     // Flying unit, just fill array
@@ -116,12 +119,12 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
         // xinef: first point in vector is unit real position
         points->clear();
         points->push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-        uint32 wpCounter = mCurrentWPID;
-        WPPath::const_iterator itr;
-        while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end())
+        for (auto wp : mWayPoints)
         {
-            WayPoint* wp = (*itr).second;
-            points->push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+            if (wp->wp_group == group)
+            {
+                points->push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+            }
         }
     }
     else
@@ -131,15 +134,12 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
             std::vector<G3D::Vector3> pVector;
             // xinef: first point in vector is unit real position
             pVector.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            uint32 length = (mWayPoints->size() - mCurrentWPID) * size;
-
-            uint32 cnt = 0;
-            uint32 wpCounter = mCurrentWPID;
-            WPPath::const_iterator itr;
-            while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end() && cnt++ <= length)
+            for (auto wp : mWayPoints)
             {
-                WayPoint* wp = (*itr).second;
-                pVector.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                if (wp->wp_group == group)
+                {
+                    pVector.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                }
             }
 
             if (pVector.size() > 2) // more than source + dest
@@ -168,6 +168,42 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
     }
 }
 
+/*
+    This function is only called by SmartScript.cpp SMART_ACTION_RANDOM_WP_GROUP.
+    Since we are passing the target, we can force any target to start their
+    respective Waypoints, as long as they are loaded on server start.
+*/
+void SmartAI::RandomWaypointGroup(uint32 firstGroup, uint32 lastGroup, Unit* target)
+{
+    if (target->IsInCombat()) { return; }
+
+    uint32 group = urand(firstGroup, lastGroup);
+
+    // Make each creature load their own paths
+    CAST_AI(SmartAI, target->ToCreature()->AI())->LoadPath(target->GetEntry(), group);
+
+    // Make them move after their paths are loaded
+    CAST_AI(SmartAI, target->ToCreature()->AI())->StartMoving(group);
+}
+
+/*
+    This is also only called by SmartAI::RandomWaypointGroup(...)
+    to make the target "me" move, being "me" the target that we passed
+    to the function SmartAI::RandomWaypointGroup(...) when scripting a
+    creature with SMART_ACTION_RANDOM_WP_GROUP.
+*/
+void SmartAI::StartMoving(uint32 group)
+{
+    // If creature is currently on Waypoint Group Movement
+    if (GetWaypointGroupMovement()) { return; }
+
+    // Start a new Waypoint movement
+    Movement::PointsArray pathPoints;
+    GenerateWayPointArray(&pathPoints, group);
+    me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+    SetWaypointGroupMovement(true);
+}
+
 void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
 {
     if (me->IsInCombat())// no wp movement in combat
@@ -176,16 +212,13 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
         return;
     }
 
-    if (HasEscortState(SMART_ESCORT_ESCORTING))
-        StopPath();
-
     if (path)
     {
         if (!LoadPath(path))
             return;
     }
 
-    if (!mWayPoints || mWayPoints->empty())
+    if (mWayPoints.empty())
         return;
 
     if (WayPoint* wp = GetNextWayPoint())
@@ -208,13 +241,16 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
     }
 }
 
-bool SmartAI::LoadPath(uint32 entry)
+bool SmartAI::LoadPath(uint32 entry, uint32 group)
 {
+    if (!mWayPoints.empty()) { return false; }
+
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         return false;
 
-    mWayPoints = sSmartWaypointMgr->GetPath(entry);
-    if (!mWayPoints)
+    mCurrentWPGroupID = group;
+    mWayPoints = sSmartWaypointMgr->GetPath(entry, group);
+    if (mWayPoints.empty())
     {
         GetScript()->SetPathId(0);
         return false;
@@ -272,7 +308,7 @@ void SmartAI::StopPath(uint32 DespawnTime, uint32 quest, bool fail)
 void SmartAI::EndPath(bool fail)
 {
     RemoveEscortState(SMART_ESCORT_ESCORTING | SMART_ESCORT_PAUSED | SMART_ESCORT_RETURNING);
-    mWayPoints = nullptr;
+    mWayPoints.clear();
     mLastWP = nullptr;
     mWPPauseTimer = 0;
 
@@ -326,7 +362,6 @@ void SmartAI::EndPath(bool fail)
         }
     }
 
-    // Xinef: if the escort failed - DO NOT PROCESS ANYTHING, ITS RETARDED
     // Xinef: End Path events should be only processed if it was SUCCESSFUL stop or stop called by SMART_ACTION_WAYPOINT_STOP
     if (fail)
     {
@@ -438,7 +473,14 @@ void SmartAI::UpdatePath(const uint32 diff)
 
         mWPReached = false;
         if (mCurrentWPID == GetWPCount())
+        {
             EndPath();
+            if (GetWaypointGroupMovement())
+            {
+                SetWaypointGroupMovement(false);
+            }
+        }
+
         else if (GetNextWayPoint())
         {
             SetRun(mRun);

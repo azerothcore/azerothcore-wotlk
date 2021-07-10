@@ -45,17 +45,14 @@ public:
         boss_lieutenant_drakeAI(Creature* creature) : ScriptedAI(creature)
         {
             pathPoints.clear();
-            WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
-            if (!path || path->empty())
+            std::vector<WayPoint*> path = sSmartWaypointMgr->GetPath(me->GetEntry(), 0);
+            if (path.empty())
                 return;
 
             pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
 
-            uint32 wpCounter = 1;
-            WPPath::const_iterator itr;
-            while ((itr = path->find(wpCounter++)) != path->end())
+            for (auto wp : path)
             {
-                WayPoint* wp = itr->second;
                 pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
             }
         }

@@ -17,14 +17,18 @@
 
 struct WayPoint
 {
-    WayPoint(uint32 _id, float _x, float _y, float _z)
+    WayPoint(uint32 _entry, uint32 _wp_group, uint32 _id, float _x, float _y, float _z)
     {
+        entry = _entry;
+        wp_group = _wp_group;
         id = _id;
         x = _x;
         y = _y;
         z = _z;
     }
 
+    uint32 entry;
+    uint32 wp_group;
     uint32 id;
     float x;
     float y;
@@ -619,7 +623,8 @@ enum SMART_ACTION
     SMART_ACTION_VORTEX_SUMMON                      = 221,    // entry, duration (0 = perm), spiral scaling, spiral appearance, range max, phi_delta     <-- yes confusing math, try it ingame and see, my lovely AC boys!
     SMART_ACTION_CU_ENCOUNTER_START                 = 222,    // Resets cooldowns on all targets and removes Heroism debuff(s)
 
-    SMART_ACTION_AC_END                             = 223,    // placeholder
+    SMART_ACTION_RANDOM_WP_GROUP                    = 223,
+    SMART_ACTION_AC_END                             = 224,    // placeholder
 };
 
 struct SmartAction
@@ -1250,6 +1255,15 @@ struct SmartAction
             uint32 phi_delta;
         } summonVortex;
 
+        /* wpMinRandom: The first waypoint group to pick
+         * wpMaxRandom: The last waypoint group to pick
+         */
+        struct
+        {
+            uint32 wpMinRandom;
+            uint32 wpMaxRandom;
+        }randomWpGroup;
+
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1700,6 +1714,11 @@ public:
     bool enableTimed;
 };
 
+/*Redundancy of information:
+    We are storing pointId on both the WPPath first and inside WayPoint pointer.
+    Since we need to group them based on group ids, the first member of WPPath will
+    be the group which the waypoint belongs too.
+*/
 typedef std::unordered_map<uint32, WayPoint*> WPPath;
 
 typedef std::list<WorldObject*> ObjectList;
@@ -1767,15 +1786,24 @@ public:
 
     void LoadFromDB();
 
-    WPPath* GetPath(uint32 id)
+    std::vector<WayPoint*> GetPath(uint32 id /*waypoint.entry*/, uint32 group)
     {
-        if (waypoint_map.find(id) != waypoint_map.end())
-            return waypoint_map[id];
-        else return 0;
+        if (id == 7604)
+            LOG_DEBUG("sql.sql","Found Sergeant's Bly path");
+
+        std::vector<WayPoint*> returned_path;
+        for (auto wp : waypoint_map)
+        {
+            if (wp->entry == id && wp->wp_group == group)
+            {
+                returned_path.push_back(wp);
+            }
+        }
+        return returned_path;
     }
 
 private:
-    std::unordered_map<uint32, WPPath*> waypoint_map;
+    std::vector<WayPoint*> waypoint_map;
 };
 
 // all events for a single entry

@@ -153,7 +153,8 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
+Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject)
+    m_data(0, 0),
     m_movedByPlayer(nullptr),
     m_lastSanctuaryTime(0),
     IsAIEnabled(false),
