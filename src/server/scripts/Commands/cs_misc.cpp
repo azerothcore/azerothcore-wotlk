@@ -378,7 +378,8 @@ public:
 
             switch (guidHigh)
             {
-                case HighGuid::Player:
+                using enum HighGuid;
+                case Player:
                 {
                     object = ObjectAccessor::FindPlayerByLowGUID(guidLow);
                     if (!object)
@@ -388,7 +389,7 @@ public:
                     }
                     break;
                 }
-                case HighGuid::Unit:
+                case Unit:
                 {
                     object = handler->GetCreatureFromPlayerMapByDbGuid(guidLow);
                     if (!object)
@@ -398,7 +399,7 @@ public:
                     }
                     break;
                 }
-                case HighGuid::GameObject:
+                case GameObject:
                 {
                     object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
                     if (!object)
@@ -1072,7 +1073,8 @@ public:
 
             switch (guidHigh)
             {
-                case HighGuid::Player:
+                using enum HighGuid;
+                case Player:
                 {
                     obj = ObjectAccessor::FindPlayerByLowGUID(guidLow);
                     if (!obj)
@@ -1082,7 +1084,7 @@ public:
                     }
                     break;
                 }
-                case HighGuid::Unit:
+                case Unit:
                 {
                     obj = handler->GetCreatureFromPlayerMapByDbGuid(guidLow);
                     if (!obj)
@@ -1092,7 +1094,7 @@ public:
                     }
                     break;
                 }
-                case HighGuid::GameObject:
+                case GameObject:
                 {
                     obj = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
                     if (!obj)

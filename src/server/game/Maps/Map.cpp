@@ -3337,9 +3337,10 @@ time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
     ObjectGuid linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
     switch (linkedGuid.GetHigh())
     {
-        case HighGuid::Unit:
+        using enum HighGuid;
+        case Unit:
             return GetCreatureRespawnTime(linkedGuid.GetCounter());
-        case HighGuid::GameObject:
+        case GameObject:
             return GetGORespawnTime(linkedGuid.GetCounter());
         default:
             break;

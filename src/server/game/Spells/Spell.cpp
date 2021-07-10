@@ -208,10 +208,11 @@ ObjectGuid SpellCastTargets::GetUnitTargetGUID() const
 {
     switch (m_objectTargetGUID.GetHigh())
     {
-        case HighGuid::Player:
-        case HighGuid::Vehicle:
-        case HighGuid::Unit:
-        case HighGuid::Pet:
+        using enum HighGuid;
+        case Player:
+        case Vehicle:
+        case Unit:
+        case Pet:
             return m_objectTargetGUID;
         default:
             break;
@@ -241,9 +242,10 @@ ObjectGuid SpellCastTargets::GetGOTargetGUID() const
 {
     switch (m_objectTargetGUID.GetHigh())
     {
-        case HighGuid::Transport:
-        case HighGuid::Mo_Transport:
-        case HighGuid::GameObject:
+        using enum HighGuid;
+        case Transport:
+        case Mo_Transport:
+        case GameObject:
             return m_objectTargetGUID;
         default:
             break;

@@ -105,20 +105,21 @@ WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, ObjectGuid con
 {
     switch (guid.GetHigh())
     {
-        case HighGuid::Player:
+        using enum HighGuid;
+        case Player:
             return GetPlayer(p, guid);
-        case HighGuid::Transport:
-        case HighGuid::Mo_Transport:
-        case HighGuid::GameObject:
+        case Transport:
+        case Mo_Transport:
+        case GameObject:
             return GetGameObject(p, guid);
-        case HighGuid::Vehicle:
-        case HighGuid::Unit:
+        case Vehicle:
+        case Unit:
             return GetCreature(p, guid);
-        case HighGuid::Pet:
+        case Pet:
             return GetPet(p, guid);
-        case HighGuid::DynamicObject:
+        case DynamicObject:
             return GetDynamicObject(p, guid);
-        case HighGuid::Corpse:
+        case Corpse:
             return GetCorpse(p, guid);
         default:
             return nullptr;
@@ -131,30 +132,31 @@ Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, ObjectGuid con
 {
     switch (guid.GetHigh())
     {
-        case HighGuid::Item:
+        using enum HighGuid;
+        case Item:
             if (typemask & TYPEMASK_ITEM && p.GetTypeId() == TYPEID_PLAYER)
                 return ((Player const&)p).GetItemByGuid(guid);
             break;
-        case HighGuid::Player:
+        case Player:
             if (typemask & TYPEMASK_PLAYER)
                 return GetPlayer(p, guid);
             break;
-        case HighGuid::Transport:
-        case HighGuid::Mo_Transport:
-        case HighGuid::GameObject:
+        case Transport:
+        case Mo_Transport:
+        case GameObject:
             if (typemask & TYPEMASK_GAMEOBJECT)
                 return GetGameObject(p, guid);
             break;
-        case HighGuid::Unit:
-        case HighGuid::Vehicle:
+        case Unit:
+        case Vehicle:
             if (typemask & TYPEMASK_UNIT)
                 return GetCreature(p, guid);
             break;
-        case HighGuid::Pet:
+        case Pet:
             if (typemask & TYPEMASK_UNIT)
                 return GetPet(p, guid);
             break;
-        case HighGuid::DynamicObject:
+        case DynamicObject:
             if (typemask & TYPEMASK_DYNAMICOBJECT)
                 return GetDynamicObject(p, guid);
             break;

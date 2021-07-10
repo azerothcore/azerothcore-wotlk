@@ -282,28 +282,29 @@ void Map::ScriptsProcess()
         {
             switch (step.sourceGUID.GetHigh())
             {
-                case HighGuid::Item: // as well as HIGHGUID_CONTAINER
+                using enum HighGuid;
+                case Item: // as well as HIGHGUID_CONTAINER
                     if (Player* player = ObjectAccessor::GetPlayer(this, step.ownerGUID))
                         source = player->GetItemByGuid(step.sourceGUID);
                     break;
-                case HighGuid::Unit:
-                case HighGuid::Vehicle:
+                case Unit:
+                case Vehicle:
                     source = GetCreature(step.sourceGUID);
                     break;
-                case HighGuid::Pet:
+                case Pet:
                     source = GetPet(step.sourceGUID);
                     break;
-                case HighGuid::Player:
+                case Player:
                     source = HashMapHolder<Player>::Find(step.sourceGUID);
                     break;
-                case HighGuid::Transport:
-                case HighGuid::GameObject:
+                case Transport:
+                case GameObject:
                     source = GetGameObject(step.sourceGUID);
                     break;
-                case HighGuid::Corpse:
+                case Corpse:
                     source = GetCorpse(step.sourceGUID);
                     break;
-                case HighGuid::Mo_Transport:
+                case Mo_Transport:
                     source = GetTransport(step.sourceGUID);
                     break;
                 default:
@@ -318,24 +319,25 @@ void Map::ScriptsProcess()
         {
             switch (step.targetGUID.GetHigh())
             {
-                case HighGuid::Unit:
-                case HighGuid::Vehicle:
+                using enum HighGuid;
+                case Unit:
+                case Vehicle:
                     target = GetCreature(step.targetGUID);
                     break;
-                case HighGuid::Pet:
+                case Pet:
                     target = GetPet(step.targetGUID);
                     break;
-                case HighGuid::Player:                       // empty GUID case also
+                case Player:                       // empty GUID case also
                     target = HashMapHolder<Player>::Find(step.targetGUID);
                     break;
-                case HighGuid::Transport:
-                case HighGuid::GameObject:
+                case Transport:
+                case GameObject:
                     target = GetGameObject(step.targetGUID);
                     break;
-                case HighGuid::Corpse:
+                case Corpse:
                     target = GetCorpse(step.targetGUID);
                     break;
-                case HighGuid::Mo_Transport:
+                case Mo_Transport:
                     target = GetTransport(step.targetGUID);
                     break;
                 default:
