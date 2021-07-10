@@ -328,7 +328,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
             for (std::map<ObjectGuid, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
             {
                 Creature* sh = nullptr;
-                for (ObjectGuid const guid : itr->second)
+                for (ObjectGuid const& guid : itr->second)
                 {
                     Player* player = ObjectAccessor::FindPlayer(guid);
                     if (!player)
@@ -360,7 +360,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
     }
     else if (m_LastResurrectTime > 500)    // Resurrect players only half a second later, to see spirit heal effect on NPC
     {
-        for (ObjectGuid const guid : m_ResurrectQueue)
+        for (ObjectGuid const& guid : m_ResurrectQueue)
         {
             Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)
@@ -1479,7 +1479,7 @@ void Battleground::RelocateDeadPlayers(ObjectGuid queueIndex)
     if (!ghostList.empty())
     {
         GraveyardStruct const* closestGrave = nullptr;
-        for (ObjectGuid const guid : ghostList)
+        for (ObjectGuid const& guid : ghostList)
         {
             Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)

@@ -104,7 +104,7 @@ bool UpdateData::BuildPacket(WorldPacket* packet)
         buf << (uint8) UPDATETYPE_OUT_OF_RANGE_OBJECTS;
         buf << (uint32) m_outOfRangeGUIDs.size();
 
-        for (ObjectGuid const guid : m_outOfRangeGUIDs)
+        for (ObjectGuid const& guid : m_outOfRangeGUIDs)
         {
             buf << guid.WriteAsPacked();
         }
