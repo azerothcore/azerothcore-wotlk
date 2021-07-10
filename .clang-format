@@ -14,9 +14,10 @@ AllowShortLoopsOnASingleLine: 'true'
 BinPackArguments: 'true'
 BinPackParameters: 'true'
 BreakBeforeBraces: Allman
+IndentWidth: '4'
 SpaceAfterCStyleCast: 'true'
 SpaceBeforeCpp11BracedList: 'true'
-SpaceBeforeParens: Never
+SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: 'true'
 SpaceInEmptyParentheses: 'false'
 SpacesInAngles: 'false'
@@ -24,6 +25,8 @@ SpacesInCStyleCastParentheses: 'false'
 SpacesInContainerLiterals: 'false'
 SpacesInParentheses: 'false'
 Standard: Cpp11
+TabWidth: '0'
 UseTab: Never
+PointerAlignment: Left
 
 ...
