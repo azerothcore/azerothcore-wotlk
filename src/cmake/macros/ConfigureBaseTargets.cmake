@@ -10,7 +10,7 @@ add_library(acore-compile-option-interface INTERFACE)
 set(CXX_EXTENSIONS OFF)
 
 # Enable support С++17
-set(CMAKE_CXX_STANDARD 20) # TODO: revert this before merging this PR
+set(CMAKE_CXX_STANDARD 17)
 message(STATUS "Enabled С++17 support")
 
 # An interface library to make the target features available to other targets
