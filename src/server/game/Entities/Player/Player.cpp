@@ -12075,6 +12075,7 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     // After added to map seer must be a player - there is no possibility to still have different seer (all charm auras must be already removed)
     if (mapChange && m_seer != this)
     {
+        LOG_ERROR("entities.player", "Something wrong in Player::UpdateVisibilityForPlayer - after added to map seer must be a player - there is no possibility to still have different seer (all charm auras must be already removed)");
         m_seer = this;
     }
 
