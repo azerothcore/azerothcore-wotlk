@@ -13,7 +13,7 @@ AllowShortLambdasOnASingleLine: Inline
 AllowShortLoopsOnASingleLine: 'true'
 BinPackArguments: 'true'
 BinPackParameters: 'true'
-BreakBeforeBraces: GNU
+BreakBeforeBraces: Allman
 SpaceAfterCStyleCast: 'true'
 SpaceBeforeCpp11BracedList: 'true'
 SpaceBeforeParens: Never
@@ -24,7 +24,6 @@ SpacesInCStyleCastParentheses: 'false'
 SpacesInContainerLiterals: 'false'
 SpacesInParentheses: 'false'
 Standard: Cpp11
-TabWidth: '4'
-UseTab: ForIndentation
+UseTab: Never
 
 ...
