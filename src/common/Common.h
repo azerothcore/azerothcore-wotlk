@@ -43,13 +43,13 @@
 #define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
 
 // TimeConstants
-#define MINUTE 60
-#define HOUR MINUTE * 60
-#define DAY HOUR * 24
-#define WEEK DAY * 7
-#define MONTH DAY * 30
-#define YEAR MONTH * 12
-#define IN_MILLISECONDS 1000
+constexpr auto MINUTE = 60;
+constexpr auto HOUR = MINUTE * 60;
+constexpr auto DAY = HOUR * 24;
+constexpr auto WEEK = DAY * 7;
+constexpr auto MONTH = DAY * 30;
+constexpr auto YEAR = MONTH * 12;
+constexpr auto IN_MILLISECONDS = 1000;
 
 enum AccountTypes
 {
