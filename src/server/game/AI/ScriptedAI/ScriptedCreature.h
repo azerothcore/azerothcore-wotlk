@@ -224,7 +224,7 @@ struct ScriptedAI : public CreatureAI
 
         switch (axis)
         {
-            using enum Axis
+            using enum Axis;
             case AXIS_X:
                 if ((!above && me->GetPositionX() < pos->GetPositionX()) || me->GetPositionX() > pos->GetPositionX())
                 {
