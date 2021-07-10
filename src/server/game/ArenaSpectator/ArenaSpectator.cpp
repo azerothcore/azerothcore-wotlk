@@ -201,7 +201,7 @@ namespace ArenaSpectator
                     return true;
             }
 
-        if (player->GetUInt64Value(PLAYER_FARSIGHT) || player->m_seer != player) // pussywizard: below this point we must not have a viewpoint!
+        if (player->GetGuidValue(PLAYER_FARSIGHT) || player->m_seer != player) // pussywizard: below this point we must not have a viewpoint!
             return true;
 
         if (player->HaveAtClient(spectate))
