@@ -234,8 +234,8 @@ public:
                 }
                 handler->SetSentErrorMessage(true);
                 return false;
-            case BAN_EXISTS:
-                handler->PSendSysMessage(LANG_BAN_EXISTS, nameOrIP.c_str());
+            case BAN_LONGER_EXISTS:
+                handler->PSendSysMessage("Unsuccessful! A longer ban is already present on this account!");
                 break;
             default:
                 break;
