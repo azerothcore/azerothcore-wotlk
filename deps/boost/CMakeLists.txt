@@ -28,8 +28,8 @@ endif()
 
 include (CheckCXXSourceCompiles)
 
-# C++20 requires Boost 1.75 to build
-set(BOOST_REQUIRED_VERSION 1.75)
+# C++20 requires Boost 1.74 to build
+set(BOOST_REQUIRED_VERSION 1.74)
 
 find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system filesystem program_options iostreams regex)
 
