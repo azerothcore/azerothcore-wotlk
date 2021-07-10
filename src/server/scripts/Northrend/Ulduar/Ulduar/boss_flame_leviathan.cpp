@@ -408,7 +408,7 @@ public:
                     return;
                 case EVENT_SUMMON:
                     if(summons.size() < 20)
-                        if (Creature* lift = DoSummonFlyer(NPC_MECHANOLIFT, me, 30.0f, 50.0f, 0))
+                        if (Creature* lift = DoSummonFlyer(NPC_MECHANOLIFT, me, 30.0f, 50.0f, 0s))
                             lift->GetMotionMaster()->MoveRandom(100);
 
                     events.RepeatEvent(4000);

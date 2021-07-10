@@ -1095,7 +1095,7 @@ public:
             _events.SetPhase(1);
             _events.ScheduleEvent(EVENT_INTRO_1, 14000);
             // summon a visual trigger
-            if (Creature* summon = DoSummon(NPC_FLOATING_TRIGGER, triggerPos, 15000, TEMPSUMMON_TIMED_DESPAWN))
+            if (Creature* summon = DoSummon(NPC_FLOATING_TRIGGER, triggerPos, 15s, TEMPSUMMON_TIMED_DESPAWN))
             {
                 summon->SetDisplayId(11686); // it's a general npc, and the template has 2 models (first is an infernal)
                 summon->CastSpell(summon, SPELL_OOC_INVOCATION_VISUAL, true);
