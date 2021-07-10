@@ -1,7 +1,9 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU
+ * AGPL v3 license:
+ * https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
- 
+
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Channel.h"
@@ -28,12 +30,14 @@
 constexpr auto ZONE_UPDATE_INTERVAL = 1000;
 
 constexpr auto CINEMATIC_UPDATEDIFF = 500;
-constexpr auto CINEMATIC_LOOKAHEAD = 2000;
+constexpr auto CINEMATIC_LOOKAHEAD  = 2000;
 
 void Player::Update(uint32 p_time)
 {
     if (!IsInWorld())
+    {
         return;
+    }
 
     sScriptMgr->OnBeforePlayerUpdate(this, p_time);
 
@@ -84,7 +88,7 @@ void Player::Update(uint32 p_time)
         if (m_charmUpdateTimer >= 1000)
         {
             m_charmUpdateTimer = 0;
-            if (Unit *charmer = GetCharmer())
+            if (Unit* charmer = GetCharmer())
                 if (charmer->IsAlive())
                     UpdateCharmedAI();
         }
@@ -110,7 +114,7 @@ void Player::Update(uint32 p_time)
     if (GetSession()->m_muteTime && GetSession()->m_muteTime < now)
     {
         GetSession()->m_muteTime = 0;
-        LoginDatabasePreparedStatement *stmt =
+        LoginDatabasePreparedStatement* stmt =
             LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
         stmt->setInt64(0, 0); // Set the mute time to 0
         stmt->setString(1, "");
@@ -124,7 +128,7 @@ void Player::Update(uint32 p_time)
         QuestSet::iterator iter = m_timedquests.begin();
         while (iter != m_timedquests.end())
         {
-            QuestStatusData &q_status = m_QuestStatus[*iter];
+            QuestStatusData& q_status = m_QuestStatus[*iter];
             if (q_status.Timer <= p_time)
             {
                 uint32 quest_id = *iter;
@@ -145,7 +149,7 @@ void Player::Update(uint32 p_time)
     if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) &&
         !HasUnitState(UNIT_STATE_CASTING))
     {
-        if (Unit *victim = GetVictim())
+        if (Unit* victim = GetVictim())
         {
             // default combat reach 10
             // TODO add weapon, skill check
@@ -269,7 +273,7 @@ void Player::Update(uint32 p_time)
             // supposed to be in one
             if (HasRestFlag(REST_FLAG_IN_TAVERN))
             {
-                AreaTrigger const *atEntry =
+                AreaTrigger const* atEntry =
                     sObjectMgr->GetAreaTrigger(GetInnTriggerId());
                 if (!atEntry || !IsInAreaTriggerRadius(atEntry))
                     RemoveRestFlag(REST_FLAG_IN_TAVERN);
@@ -395,7 +399,7 @@ void Player::Update(uint32 p_time)
     // group update
     SendUpdateToOutOfRangeGroupMembers();
 
-    Pet *pet = GetPet();
+    Pet* pet = GetPet();
     if (pet && !pet->IsWithinDistInMap(this, GetMap()->GetVisibilityRange()) &&
         !pet->isPossessed())
         // if (pet && !pet->IsWithinDistInMap(this,
@@ -446,7 +450,7 @@ void Player::UpdateNextMailTimeAndUnreads()
     // Update the next delivery time and unread mails
     time_t cTime = time(nullptr);
     // Get the next delivery time
-    CharacterDatabasePreparedStatement *stmtNextDeliveryTime =
+    CharacterDatabasePreparedStatement* stmtNextDeliveryTime =
         CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
     stmtNextDeliveryTime->setUInt32(0, GetGUID().GetCounter());
     stmtNextDeliveryTime->setUInt32(1, uint32(cTime));
@@ -454,12 +458,12 @@ void Player::UpdateNextMailTimeAndUnreads()
         CharacterDatabase.Query(stmtNextDeliveryTime);
     if (resultNextDeliveryTime)
     {
-        Field *fields          = resultNextDeliveryTime->Fetch();
+        Field* fields          = resultNextDeliveryTime->Fetch();
         m_nextMailDelivereTime = time_t(fields[0].GetUInt32());
     }
 
     // Get unread mails count
-    CharacterDatabasePreparedStatement *stmtUnreadAmount =
+    CharacterDatabasePreparedStatement* stmtUnreadAmount =
         CharacterDatabase.GetPreparedStatement(
             CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
     stmtUnreadAmount->setUInt32(0, GetGUID().GetCounter());
@@ -468,7 +472,7 @@ void Player::UpdateNextMailTimeAndUnreads()
         CharacterDatabase.Query(stmtUnreadAmount);
     if (resultUnreadAmount)
     {
-        Field *fields = resultUnreadAmount->Fetch();
+        Field* fields = resultUnreadAmount->Fetch();
         unReadMails   = uint8(fields[0].GetUInt64());
     }
 }
@@ -483,11 +487,11 @@ void Player::UpdateLocalChannels(uint32 newZone)
         return; // The client handles it automatically after loading, but not
                 // after teleporting
 
-    AreaTableEntry const *current_zone = sAreaTableStore.LookupEntry(newZone);
+    AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(newZone);
     if (!current_zone)
         return;
 
-    ChannelMgr *cMgr = ChannelMgr::forTeam(GetTeamId());
+    ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeamId());
     if (!cMgr)
         return;
 
@@ -496,10 +500,10 @@ void Player::UpdateLocalChannels(uint32 newZone)
 
     for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
     {
-        if (ChatChannelsEntry const *channel =
+        if (ChatChannelsEntry const* channel =
                 sChatChannelsStore.LookupEntry(i))
         {
-            Channel *usedChannel = nullptr;
+            Channel* usedChannel = nullptr;
 
             for (JoinedChannelsList::iterator itr = m_channels.begin();
                  itr != m_channels.end(); ++itr)
@@ -511,8 +515,8 @@ void Player::UpdateLocalChannels(uint32 newZone)
                 }
             }
 
-            Channel *removeChannel = nullptr;
-            Channel *joinChannel   = nullptr;
+            Channel* removeChannel = nullptr;
+            Channel* joinChannel   = nullptr;
             bool     sendRemove    = true;
 
             if (CanJoinConstantChannelInZone(channel, current_zone))
@@ -525,7 +529,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
                                   // names are not changing
 
                     char        new_channel_name_buf[100];
-                    char const *currentNameExt;
+                    char const* currentNameExt;
 
                     if (channel->flags & CHANNEL_DBC_FLAG_CITY_ONLY)
                         currentNameExt = sObjectMgr->GetAcoreStringForDBCLocale(
@@ -588,7 +592,7 @@ void Player::UpdateRating(CombatRating cr)
     int32 amount = m_baseRatingValue[cr];
     // Apply bonus from SPELL_AURA_MOD_RATING_FROM_STAT
     // stat used stored in miscValueB for this aura
-    AuraEffectList const &modRatingFromStat =
+    AuraEffectList const& modRatingFromStat =
         GetAuraEffectsByType(SPELL_AURA_MOD_RATING_FROM_STAT);
     for (AuraEffectList::const_iterator i = modRatingFromStat.begin();
          i != modRatingFromStat.end(); ++i)
@@ -808,7 +812,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
                 GetPureSkillValue(_spell_idx->second->SkillLine);
 
             // Alchemy Discoveries here
-            SpellInfo const *spellEntry = sSpellMgr->GetSpellInfo(spellid);
+            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spellid);
             if (spellEntry && spellEntry->Mechanic == MECHANIC_DISCOVERY)
             {
                 if (uint32 discoveredSpell = GetSkillDiscoverySpell(
@@ -945,7 +949,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(Unit *victim, WeaponAttackType attType)
+void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
 {
     if (IsInFeralForm())
         return; // always maximized SKILL_FERAL_COMBAT in fact
@@ -960,7 +964,7 @@ void Player::UpdateWeaponSkill(Unit *victim, WeaponAttackType attType)
 
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
 
-    Item *tmpitem = GetWeaponForAttack(attType, true);
+    Item* tmpitem = GetWeaponForAttack(attType, true);
     if (!tmpitem && attType == BASE_ATTACK)
     {
         // Keep unarmed & fist weapon skills in sync
@@ -986,7 +990,7 @@ void Player::UpdateWeaponSkill(Unit *victim, WeaponAttackType attType)
     UpdateAllCritPercentages();
 }
 
-void Player::UpdateCombatSkills(Unit *victim, WeaponAttackType attType,
+void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType,
                                 bool defence)
 {
     uint8 plevel    = getLevel(); // if defense than victim == attacker
@@ -1041,7 +1045,7 @@ void Player::UpdateSkillsForLevel()
             continue;
 
         uint32                         pskill = itr->first;
-        SkillRaceClassInfoEntry const *rcEntry =
+        SkillRaceClassInfoEntry const* rcEntry =
             GetSkillRaceClassInfo(pskill, getRace(), getClass());
         if (!rcEntry)
             continue;
@@ -1156,7 +1160,7 @@ void Player::UpdateHonorFields()
 void Player::UpdateArea(uint32 newArea)
 {
     // pussywizard: inform instance, needed for Icecrown Citadel
-    if (InstanceScript *instance = GetInstanceScript())
+    if (InstanceScript* instance = GetInstanceScript())
         instance->OnPlayerAreaUpdate(this, m_areaUpdateId, newArea);
 
     sScriptMgr->OnPlayerUpdateArea(this, m_areaUpdateId, newArea);
@@ -1165,7 +1169,7 @@ void Player::UpdateArea(uint32 newArea)
     // so apply them accordingly
     m_areaUpdateId = newArea;
 
-    AreaTableEntry const *area = sAreaTableStore.LookupEntry(newArea);
+    AreaTableEntry const* area = sAreaTableStore.LookupEntry(newArea);
     pvpInfo.IsInFFAPvPArea     = area && (area->flags & AREA_FLAG_ARENA);
     UpdateFFAPvPState(false);
 
@@ -1201,7 +1205,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         SendInitWorldStates(newZone,
                             newArea); // only if really enters to new zone, not
                                       // just area change, works strange...
-        if (Guild *guild = GetGuild())
+        if (Guild* guild = GetGuild())
             guild->UpdateMemberData(this, GUILD_MEMBER_DATA_ZONEID, newZone);
     }
 
@@ -1215,13 +1219,13 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     // zone changed, so area changed as well, update it
     UpdateArea(newArea);
 
-    AreaTableEntry const *zone = sAreaTableStore.LookupEntry(newZone);
+    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(newZone);
     if (!zone)
         return;
 
     if (sWorld->getBoolConfig(CONFIG_WEATHER))
     {
-        if (Weather *weather = WeatherMgr::FindWeather(zone->ID))
+        if (Weather* weather = WeatherMgr::FindWeather(zone->ID))
             weather->SendWeatherUpdateToPlayer(this);
         else if (!WeatherMgr::AddWeather(zone->ID))
             // send fine weather packet to remove old zone's weather
@@ -1305,13 +1309,13 @@ void Player::UpdateEquipSpellsAtFormChange()
     // item set bonuses not dependent from item broken state
     for (size_t setindex = 0; setindex < ItemSetEff.size(); ++setindex)
     {
-        ItemSetEffect *eff = ItemSetEff[setindex];
+        ItemSetEffect* eff = ItemSetEff[setindex];
         if (!eff)
             continue;
 
         for (uint32 y = 0; y < MAX_ITEM_SET_SPELLS; ++y)
         {
-            SpellInfo const *spellInfo = eff->spells[y];
+            SpellInfo const* spellInfo = eff->spells[y];
             if (!spellInfo)
                 continue;
 
@@ -1422,7 +1426,7 @@ void Player::UpdateFFAPvPState(bool reset /*= true*/)
 
             // xinef: iterate attackers
             AttackerSet        toRemove;
-            AttackerSet const &attackers = getAttackers();
+            AttackerSet const& attackers = getAttackers();
             for (AttackerSet::const_iterator itr = attackers.begin();
                  itr != attackers.end(); ++itr)
                 if (!(*itr)->IsValidAttackTarget(this))
@@ -1433,7 +1437,7 @@ void Player::UpdateFFAPvPState(bool reset /*= true*/)
                 (*itr)->AttackStop();
 
             // xinef: remove our own victim
-            if (Unit *victim = GetVictim())
+            if (Unit* victim = GetVictim())
                 if (!IsValidAttackTarget(victim))
                     AttackStop();
         }
@@ -1470,7 +1474,7 @@ void Player::UpdatePvP(bool state, bool _override)
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
 }
 
-void Player::UpdatePotionCooldown(Spell *spell)
+void Player::UpdatePotionCooldown(Spell* spell)
 {
     // no potion used i combat or still in combat
     if (!GetLastPotionId() || IsInCombat())
@@ -1482,12 +1486,12 @@ void Player::UpdatePotionCooldown(Spell *spell)
     {
         // spell/item pair let set proper cooldown (except not existed charged
         // spell cooldown spellmods for potions)
-        if (ItemTemplate const *proto =
+        if (ItemTemplate const* proto =
                 sObjectMgr->GetItemTemplate(GetLastPotionId()))
             for (uint8 idx = 0; idx < MAX_ITEM_SPELLS; ++idx)
                 if (proto->Spells[idx].SpellId &&
                     proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
-                    if (SpellInfo const *spellInfo =
+                    if (SpellInfo const* spellInfo =
                             sSpellMgr->GetSpellInfo(proto->Spells[idx].SpellId))
                         SendCooldownEvent(spellInfo, GetLastPotionId());
     }
@@ -1604,17 +1608,17 @@ void Player::UpdateCinematicLocation(uint32 /*diff*/)
     }
 }
 
-template void Player::UpdateVisibilityOf(Player *target, UpdateData &data,
-                                         std::vector<Unit *> &visibleNow);
-template void Player::UpdateVisibilityOf(Creature *target, UpdateData &data,
-                                         std::vector<Unit *> &visibleNow);
-template void Player::UpdateVisibilityOf(Corpse *target, UpdateData &data,
-                                         std::vector<Unit *> &visibleNow);
-template void Player::UpdateVisibilityOf(GameObject *target, UpdateData &data,
-                                         std::vector<Unit *> &visibleNow);
-template void Player::UpdateVisibilityOf(DynamicObject *      target,
-                                         UpdateData &         data,
-                                         std::vector<Unit *> &visibleNow);
+template void Player::UpdateVisibilityOf(Player* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Creature* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Corpse* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(GameObject* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(DynamicObject*      target,
+                                         UpdateData&         data,
+                                         std::vector<Unit*>& visibleNow);
 
 void Player::UpdateVisibilityForPlayer(bool mapChange)
 {
@@ -1658,15 +1662,15 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 }
 
 template <class T>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, T *target,
-                                      std::vector<Unit *> & /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, T* target,
+                                      std::vector<Unit*>& /*v*/)
 {
     s64.insert(target->GetGUID());
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, GameObject *target,
-                                      std::vector<Unit *> & /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target,
+                                      std::vector<Unit*>& /*v*/)
 {
     // @HACK: This is to prevent objects like deeprun tram from disappearing
     // when player moves far from its spawn point while riding it
@@ -1675,36 +1679,35 @@ inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, GameObject *target,
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, Creature *target,
-                                      std::vector<Unit *> &v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Creature* target,
+                                      std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
     v.push_back(target);
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet &s64, Player *target,
-                                      std::vector<Unit *> &v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Player* target,
+                                      std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
     v.push_back(target);
 }
 
-template <class T>
-inline void BeforeVisibilityDestroy(T * /*t*/, Player * /*p*/)
+template <class T> inline void BeforeVisibilityDestroy(T* /*t*/, Player* /*p*/)
 {
 }
 
 template <>
-inline void BeforeVisibilityDestroy<Creature>(Creature *t, Player *p)
+inline void BeforeVisibilityDestroy<Creature>(Creature* t, Player* p)
 {
     if (p->GetPetGUID() == t->GetGUID() && t->IsPet())
-        ((Pet *) t)->Remove(PET_SAVE_NOT_IN_SLOT, true);
+        ((Pet*) t)->Remove(PET_SAVE_NOT_IN_SLOT, true);
 }
 
 template <class T>
-void Player::UpdateVisibilityOf(T *target, UpdateData &data,
-                                std::vector<Unit *> &visibleNow)
+void Player::UpdateVisibilityOf(T* target, UpdateData& data,
+                                std::vector<Unit*>& visibleNow)
 {
     if (HaveAtClient(target))
     {
@@ -1726,7 +1729,7 @@ void Player::UpdateVisibilityOf(T *target, UpdateData &data,
     }
 }
 
-void Player::GetInitialVisiblePackets(Unit *target)
+void Player::GetInitialVisiblePackets(Unit* target)
 {
     GetAurasForTarget(target);
     if (target->IsAlive())
@@ -1737,7 +1740,7 @@ void Player::GetInitialVisiblePackets(Unit *target)
     }
 }
 
-void Player::UpdateVisibilityOf(WorldObject *target)
+void Player::UpdateVisibilityOf(WorldObject* target)
 {
     if (HaveAtClient(target))
     {
@@ -1761,7 +1764,7 @@ void Player::UpdateVisibilityOf(WorldObject *target)
             // caster client send data at target visibility change (adding to
             // client)
             if (target->isType(TYPEMASK_UNIT))
-                GetInitialVisiblePackets((Unit *) target);
+                GetInitialVisiblePackets((Unit*) target);
         }
     }
 }
@@ -1781,7 +1784,7 @@ void Player::UpdateTriggerVisibility()
     {
         if ((*itr).IsCreatureOrVehicle())
         {
-            Creature *creature = GetMap()->GetCreature(*itr);
+            Creature* creature = GetMap()->GetCreature(*itr);
             // Update fields of triggers, transformed units or unselectable
             // units (values dependent on GM state)
             if (!creature || (!creature->IsTrigger() &&
@@ -1796,7 +1799,7 @@ void Player::UpdateTriggerVisibility()
         }
         else if ((*itr).IsGameObject())
         {
-            GameObject *go = GetMap()->GetGameObject(*itr);
+            GameObject* go = GetMap()->GetGameObject(*itr);
             if (!go)
                 continue;
 
@@ -1825,12 +1828,12 @@ void Player::UpdateForQuestWorldObjects()
     {
         if ((*itr).IsGameObject())
         {
-            if (GameObject *obj = ObjectAccessor::GetGameObject(*this, *itr))
+            if (GameObject* obj = ObjectAccessor::GetGameObject(*this, *itr))
                 obj->BuildValuesUpdateBlockForPlayer(&udata, this);
         }
         else if ((*itr).IsCreatureOrVehicle())
         {
-            Creature *obj =
+            Creature* obj =
                 ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
             if (!obj)
                 continue;
@@ -1875,7 +1878,7 @@ void Player::UpdateTitansGrip()
     // 10% damage reduce if 2x2h weapons are used
     if (!CanTitanGrip())
         RemoveAurasDueToSpell(49152);
-    else if (Aura *aur = GetAura(49152))
+    else if (Aura* aur = GetAura(49152))
         aur->RecalculateAmountOfEffects();
 }
 
@@ -1914,11 +1917,11 @@ void Player::UpdateAreaDependentAuras(uint32 newArea)
         for (ControlSet::iterator itr = m_Controlled.begin();
              itr != m_Controlled.end();)
         {
-            Unit *controlled = *itr;
+            Unit* controlled = *itr;
             ++itr;
             if (controlled && !controlled->IsPet())
             {
-                Unit::AuraMap &tAuras = controlled->GetOwnedAuras();
+                Unit::AuraMap& tAuras = controlled->GetOwnedAuras();
                 for (Unit::AuraMap::iterator auraIter = tAuras.begin();
                      auraIter != tAuras.end();)
                 {
@@ -1980,7 +1983,7 @@ void Player::UpdateCorpseReclaimDelay()
         m_deathExpireTime = now + DEATH_EXPIRE_STEP;
 }
 
-void Player::UpdateUnderwaterState(Map *m, float x, float y, float z)
+void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
 {
     // pussywizard: optimization
     if (GetExactDistSq(&m_last_underwaterstate_position) < 3.0f * 3.0f)
@@ -2009,7 +2012,7 @@ void Player::UpdateUnderwaterState(Map *m, float x, float y, float z)
 
     if (uint32 liqEntry = liquid_status.entry)
     {
-        LiquidTypeEntry const *liquid = sLiquidTypeStore.LookupEntry(liqEntry);
+        LiquidTypeEntry const* liquid = sLiquidTypeStore.LookupEntry(liqEntry);
         if (_lastLiquid && _lastLiquid->SpellId && _lastLiquid->Id != liqEntry)
             RemoveAurasDueToSpell(_lastLiquid->SpellId);
 
@@ -2073,8 +2076,8 @@ void Player::UpdateUnderwaterState(Map *m, float x, float y, float z)
 void Player::UpdateCharmedAI()
 {
     // Xinef: maybe passed as argument?
-    Unit *     charmer   = GetCharmer();
-    CharmInfo *charmInfo = GetCharmInfo();
+    Unit*      charmer   = GetCharmer();
+    CharmInfo* charmInfo = GetCharmInfo();
 
     // Xinef: needs more thinking, maybe kill player?
     if (!charmer || !charmInfo)
@@ -2085,7 +2088,7 @@ void Player::UpdateCharmedAI()
     if (charmer->GetTypeId() == TYPEID_UNIT &&
         charmer->ToCreature()->IsInEvadeMode())
     {
-        AuraEffectList const &auras =
+        AuraEffectList const& auras =
             GetAuraEffectsByType(SPELL_AURA_MOD_CHARM);
         for (AuraEffectList::const_iterator iter = auras.begin();
              iter != auras.end(); ++iter)
@@ -2099,7 +2102,7 @@ void Player::UpdateCharmedAI()
             }
     }
 
-    Unit *target = GetVictim();
+    Unit* target = GetVictim();
     if (target)
     {
         SetInFront(target);
@@ -2283,7 +2286,7 @@ void Player::UpdateCharmedAI()
     }
 }
 
-void Player::UpdateLootAchievements(LootItem *item, Loot *loot)
+void Player::UpdateLootAchievements(LootItem* item, Loot* loot)
 {
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemid,
                               item->count);
@@ -2296,13 +2299,13 @@ void Player::UpdateLootAchievements(LootItem *item, Loot *loot)
 void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type,
                                        uint32 miscValue1 /*= 0*/,
                                        uint32 miscValue2 /*= 0*/,
-                                       Unit * unit /*= nullptr*/)
+                                       Unit*  unit /*= nullptr*/)
 {
     m_achievementMgr->UpdateAchievementCriteria(type, miscValue1, miscValue2,
                                                 unit);
 }
 
-void Player::UpdateFallInformationIfNeed(MovementInfo const &minfo,
+void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo,
                                          uint16              opcode)
 {
     if (m_lastFallTime >= minfo.fallTime ||
@@ -2320,7 +2323,7 @@ void Player::UpdateSpecCount(uint8 count)
         ActivateSpec(0);
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-    CharacterDatabasePreparedStatement *stmt = nullptr;
+    CharacterDatabasePreparedStatement* stmt = nullptr;
 
     // Copy spec data
     if (count > curCount)
