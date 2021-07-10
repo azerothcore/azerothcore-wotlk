@@ -28,12 +28,8 @@ endif()
 
 include (CheckCXXSourceCompiles)
 
-if (WIN32)
-  # On windows the requirements are higher according to the wiki.
-  set(BOOST_REQUIRED_VERSION 1.70)
-else()
-  set(BOOST_REQUIRED_VERSION 1.67)
-endif()
+# C++20 requires Boost 1.75 to build
+set(BOOST_REQUIRED_VERSION 1.75)
 
 find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system filesystem program_options iostreams regex)
 
