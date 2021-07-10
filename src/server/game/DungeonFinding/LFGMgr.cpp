@@ -1129,7 +1129,7 @@ namespace lfg
 
                 if (!deletedGroupsToErase.empty())
                 {
-                    for (ObjectGuid const toErase : deletedGroupsToErase)
+                    for (ObjectGuid const& toErase : deletedGroupsToErase)
                     {
                         deletedGroups.erase(toErase);
                     }
@@ -1137,7 +1137,7 @@ namespace lfg
 
                 if (!deletedGroups.empty())
                 {
-                    for (ObjectGuid const deletedGroup : deletedGroups)
+                    for (ObjectGuid const& deletedGroup : deletedGroups)
                     {
                         ++deletedCounter;
                         buffer_deleted << deletedGroup;
