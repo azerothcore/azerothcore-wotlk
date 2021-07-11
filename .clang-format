@@ -24,7 +24,7 @@ SpacesInAngles: 'false'
 SpacesInCStyleCastParentheses: 'false'
 SpacesInContainerLiterals: 'false'
 SpacesInParentheses: 'false'
-Standard: Cpp11
+Standard: Latest
 TabWidth: '0'
 UseTab: Never
 PointerAlignment: Left
