@@ -151,8 +151,11 @@ namespace ArenaSpectator
         if (!errors.empty())
         {
             handler->PSendSysMessage("To spectate, please fix the following:");
-            for (std::list<std::string>::const_iterator itr = errors.begin(); itr != errors.end(); ++itr)
-                handler->PSendSysMessage("- {}", (*itr));
+
+            for (auto const& itr : errors)
+            {
+                handler->SendSysMessage(fmt::format(itr));
+            }
 
             return true;
         }

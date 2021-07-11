@@ -44,6 +44,4 @@ private:
     bool _isPvP;
 };
 
-std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
-
 #endif

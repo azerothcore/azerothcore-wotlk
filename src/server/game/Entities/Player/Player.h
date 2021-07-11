@@ -13,7 +13,7 @@
 #include "MapReference.h"
 #include "GroupReference.h"
 #include "Pet.h"
-#include "DbcStores.h"
+#include "DBCStores.h"
 
 enum ArenaTeamInfoType : uint8;
 
