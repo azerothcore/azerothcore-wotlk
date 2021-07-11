@@ -2321,7 +2321,7 @@ public:
 
         void RemoveAll()
         {
-            for (ObjectGuid guid : FlameList)
+            for (ObjectGuid const& guid : FlameList)
                 if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                     c->DespawnOrUnsummon();
             FlameList.clear();

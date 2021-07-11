@@ -70,6 +70,7 @@
 #define FMT_RETRY(result, expression) FMT_RETRY_VAL(result, expression, -1)
 
 FMT_BEGIN_NAMESPACE
+FMT_MODULE_EXPORT_BEGIN
 
 /**
   \rst
@@ -128,7 +129,8 @@ template <typename Char> struct formatter<std::error_code, Char> {
   FMT_CONSTEXPR auto format(const std::error_code& ec, FormatContext& ctx) const
       -> decltype(ctx.out()) {
     auto out = ctx.out();
-    out = detail::write<Char>(out, to_string_view(ec.category().name()));
+    out = detail::write_bytes(out, ec.category().name(),
+                              basic_format_specs<Char>());
     out = detail::write<Char>(out, Char(':'));
     out = detail::write<Char>(out, ec.value());
     return out;
@@ -138,7 +140,7 @@ template <typename Char> struct formatter<std::error_code, Char> {
 #ifdef _WIN32
 FMT_API const std::error_category& system_category() FMT_NOEXCEPT;
 
-namespace detail {
+FMT_BEGIN_DETAIL_NAMESPACE
 // A converter from UTF-16 to UTF-8.
 // It is only provided for Windows since other systems support UTF-8 natively.
 class utf16_to_utf8 {
@@ -147,7 +149,7 @@ class utf16_to_utf8 {
 
  public:
   utf16_to_utf8() {}
-  FMT_API explicit utf16_to_utf8(wstring_view s);
+  FMT_API explicit utf16_to_utf8(basic_string_view<wchar_t> s);
   operator string_view() const { return string_view(&buffer_[0], size()); }
   size_t size() const { return buffer_.size() - 1; }
   const char* c_str() const { return &buffer_[0]; }
@@ -156,12 +158,12 @@ class utf16_to_utf8 {
   // Performs conversion returning a system error code instead of
   // throwing exception on conversion error. This method may still throw
   // in case of memory allocation error.
-  FMT_API int convert(wstring_view s);
+  FMT_API int convert(basic_string_view<wchar_t> s);
 };
 
 FMT_API void format_windows_error(buffer<char>& out, int error_code,
                                   const char* message) FMT_NOEXCEPT;
-}  // namespace detail
+FMT_END_DETAIL_NAMESPACE
 
 FMT_API std::system_error vwindows_error(int error_code, string_view format_str,
                                          format_args args);
@@ -197,7 +199,7 @@ FMT_API std::system_error vwindows_error(int error_code, string_view format_str,
 template <typename... Args>
 std::system_error windows_error(int error_code, string_view message,
                                 const Args&... args) {
-  return vwindows_error(error_code, message, make_format_args(args...));
+  return vwindows_error(error_code, message, fmt::make_format_args(args...));
 }
 
 // Reports a Windows error without throwing an exception.
@@ -268,7 +270,7 @@ class buffered_file {
 
   template <typename... Args>
   inline void print(string_view format_str, const Args&... args) {
-    vprint(format_str, make_format_args(args...));
+    vprint(format_str, fmt::make_format_args(args...));
   }
 };
 
@@ -360,7 +362,7 @@ class file {
 // Returns the memory page size.
 long getpagesize();
 
-namespace detail {
+FMT_BEGIN_DETAIL_NAMESPACE
 
 struct buffer_size {
   buffer_size() = default;
@@ -389,12 +391,13 @@ struct ostream_params {
     this->buffer_size = bs.value;
   }
 };
-}  // namespace detail
 
-static constexpr detail::buffer_size buffer_size;
+FMT_END_DETAIL_NAMESPACE
+
+constexpr detail::buffer_size buffer_size;
 
 /** A fast output stream which is not thread-safe. */
-class ostream final : private detail::buffer<char> {
+class FMT_API ostream final : private detail::buffer<char> {
  private:
   file file_;
 
@@ -404,7 +407,7 @@ class ostream final : private detail::buffer<char> {
     clear();
   }
 
-  FMT_API void grow(size_t) override final;
+  void grow(size_t) override;
 
   ostream(cstring_view path, const detail::ostream_params& params)
       : file_(path, params.oflag) {
@@ -432,13 +435,12 @@ class ostream final : private detail::buffer<char> {
   }
 
   /**
-    Formats ``args`` according to specifications in ``format_str`` and writes
-    the output to the file.
+    Formats ``args`` according to specifications in ``fmt`` and writes the
+    output to the file.
    */
-  template <typename S, typename... Args>
-  void print(const S& format_str, Args&&... args) {
-    format_to(detail::buffer_appender<char>(*this), format_str,
-              std::forward<Args>(args)...);
+  template <typename... T> void print(format_string<T...> fmt, T&&... args) {
+    vformat_to(detail::buffer_appender<char>(*this), fmt,
+               fmt::make_format_args(args...));
   }
 };
 
@@ -507,6 +509,7 @@ class locale {
 };
 using Locale FMT_DEPRECATED_ALIAS = locale;
 #endif  // FMT_LOCALE
+FMT_MODULE_EXPORT_END
 FMT_END_NAMESPACE
 
 #endif  // FMT_OS_H_

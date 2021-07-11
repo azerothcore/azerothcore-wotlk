@@ -10,16 +10,20 @@
 
 namespace GitRevision
 {
-    char const* GetHash();
-    char const* GetDate();
-    char const* GetBranch();
-    char const* GetCMakeVersion();
-    char const* GetHostOSVersion();
-    char const* GetFullVersion();
-    char const* GetCompanyNameStr();
-    char const* GetLegalCopyrightStr();
-    char const* GetFileVersionStr();
-    char const* GetProductVersionStr();
+    AC_COMMON_API char const* GetHash();
+    AC_COMMON_API char const* GetDate();
+    AC_COMMON_API char const* GetBranch();
+    AC_COMMON_API char const* GetCMakeCommand();
+    AC_COMMON_API char const* GetCMakeVersion();
+    AC_COMMON_API char const* GetHostOSVersion();
+    AC_COMMON_API char const* GetBuildDirectory();
+    AC_COMMON_API char const* GetSourceDirectory();
+    AC_COMMON_API char const* GetMySQLExecutable();
+    AC_COMMON_API char const* GetFullVersion();
+    AC_COMMON_API char const* GetCompanyNameStr();
+    AC_COMMON_API char const* GetLegalCopyrightStr();
+    AC_COMMON_API char const* GetFileVersionStr();
+    AC_COMMON_API char const* GetProductVersionStr();
 }
 
 #endif

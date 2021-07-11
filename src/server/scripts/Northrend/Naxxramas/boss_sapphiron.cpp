@@ -191,7 +191,7 @@ public:
 
         bool IsValidExplosionTarget(WorldObject* target)
         {
-            for (ObjectGuid const guid : blockList)
+            for (ObjectGuid const& guid : blockList)
             {
                 if (target->GetGUID() == guid)
                     return false;

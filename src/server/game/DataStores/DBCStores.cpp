@@ -328,6 +328,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sSkillLineStore,                       "SkillLine.dbc",                        "skillline_dbc");
     LOAD_DBC(sSkillLineAbilityStore,                "SkillLineAbility.dbc",                 "skilllineability_dbc");
     LOAD_DBC(sSkillRaceClassInfoStore,              "SkillRaceClassInfo.dbc",               "skillraceclassinfo_dbc");
+    LOAD_DBC(sSkillTiersStore,                      "SkillTiers.dbc",                       nullptr); // TODO: add the SQL table!
     LOAD_DBC(sSoundEntriesStore,                    "SoundEntries.dbc",                     "soundentries_dbc");
     LOAD_DBC(sSpellStore,                           "Spell.dbc",                            "spell_dbc");
     LOAD_DBC(sSpellCastTimesStore,                  "SpellCastTimes.dbc",                   "spellcasttimes_dbc");

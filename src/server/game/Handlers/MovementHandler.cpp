@@ -566,8 +566,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                         plrMover->Relocate(grave->x, grave->y, grave->z, plrMover->GetOrientation());
                     }
                 }
-
-                plrMover->StopMovingOnCurrentPos(); // pussywizard: moving corpse can't release spirit
             }
     }
 }

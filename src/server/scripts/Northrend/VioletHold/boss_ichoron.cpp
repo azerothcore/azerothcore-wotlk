@@ -209,7 +209,7 @@ public:
                         bool bIsWaterElementsAlive = false;
                         if (!globules.empty())
                         {
-                            for (ObjectGuid const guid : globules)
+                            for (ObjectGuid const& guid : globules)
                                 if (Creature* pTemp = ObjectAccessor::GetCreature(*me, guid))
                                     if (pTemp->IsAlive())
                                     {

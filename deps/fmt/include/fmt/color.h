@@ -507,7 +507,7 @@ void vformat_to(buffer<Char>& buf, const text_style& ts,
     auto background = detail::make_background_color<Char>(ts.get_background());
     buf.append(background.begin(), background.end());
   }
-  detail::vformat_to(buf, format_str, args);
+  detail::vformat_to(buf, format_str, args, {});
   if (has_style) detail::reset_color<Char>(buf);
 }
 
@@ -582,8 +582,8 @@ inline std::basic_string<Char> vformat(
 template <typename S, typename... Args, typename Char = char_t<S>>
 inline std::basic_string<Char> format(const text_style& ts, const S& format_str,
                                       const Args&... args) {
-  return vformat(ts, to_string_view(format_str),
-                 fmt::make_args_checked<Args...>(format_str, args...));
+  return fmt::vformat(ts, to_string_view(format_str),
+                      fmt::make_args_checked<Args...>(format_str, args...));
 }
 
 /**
@@ -594,7 +594,7 @@ template <typename OutputIt, typename Char,
 OutputIt vformat_to(
     OutputIt out, const text_style& ts, basic_string_view<Char> format_str,
     basic_format_args<buffer_context<type_identity_t<Char>>> args) {
-  decltype(detail::get_buffer<Char>(out)) buf(detail::get_buffer_init(out));
+  auto&& buf = detail::get_buffer<Char>(out);
   detail::vformat_to(buf, ts, format_str, args);
   return detail::get_iterator(buf);
 }

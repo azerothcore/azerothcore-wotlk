@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cerrno>  // errno
 #include <climits>
 #include <cmath>
 #include <cstdarg>
@@ -102,23 +103,21 @@ template <typename Locale> Locale locale_ref::get() const {
   return locale_ ? *static_cast<const std::locale*>(locale_) : std::locale();
 }
 
-template <typename Char> FMT_FUNC std::string grouping_impl(locale_ref loc) {
-  return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>()).grouping();
-}
-template <typename Char> FMT_FUNC Char thousands_sep_impl(locale_ref loc) {
-  return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>())
-      .thousands_sep();
+template <typename Char>
+FMT_FUNC auto thousands_sep_impl(locale_ref loc) -> thousands_sep_result<Char> {
+  auto& facet = std::use_facet<std::numpunct<Char>>(loc.get<std::locale>());
+  auto grouping = facet.grouping();
+  auto thousands_sep = grouping.empty() ? Char() : facet.thousands_sep();
+  return {std::move(grouping), thousands_sep};
 }
 template <typename Char> FMT_FUNC Char decimal_point_impl(locale_ref loc) {
   return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>())
       .decimal_point();
 }
 #else
-template <typename Char> FMT_FUNC std::string grouping_impl(locale_ref) {
-  return "\03";
-}
-template <typename Char> FMT_FUNC Char thousands_sep_impl(locale_ref) {
-  return FMT_STATIC_THOUSANDS_SEPARATOR;
+template <typename Char>
+FMT_FUNC auto thousands_sep_impl(locale_ref) -> thousands_sep_result<Char> {
+  return {"\03", FMT_STATIC_THOUSANDS_SEPARATOR};
 }
 template <typename Char> FMT_FUNC Char decimal_point_impl(locale_ref) {
   return '.';
@@ -147,8 +146,7 @@ template <> FMT_FUNC int count_digits<4>(detail::fallback_uintptr n) {
 }
 
 #if __cplusplus < 201703L
-template <typename T>
-constexpr const typename basic_data<T>::digit_pair basic_data<T>::digits[];
+template <typename T> constexpr const char basic_data<T>::digits[][2];
 template <typename T> constexpr const char basic_data<T>::hex_digits[];
 template <typename T> constexpr const char basic_data<T>::signs[];
 template <typename T> constexpr const unsigned basic_data<T>::prefixes[];
@@ -565,7 +563,6 @@ class bigint {
       (*this)[bigit_index] = static_cast<bigit>(sum);
       sum >>= bits<bigit>::value;
     }
-    --num_result_bigits;
     remove_leading_zeros();
     exp_ *= 2;
   }
@@ -640,8 +637,8 @@ inline uint64_t power_of_10_64(int exp) {
 // error: the size of the region (lower, upper) outside of which numbers
 // definitely do not round to value (Delta in Grisu3).
 template <typename Handler>
-FMT_ALWAYS_INLINE digits::result grisu_gen_digits(fp value, uint64_t error,
-                                                  int& exp, Handler& handler) {
+FMT_INLINE digits::result grisu_gen_digits(fp value, uint64_t error, int& exp,
+                                           Handler& handler) {
   const fp one(1ULL << -value.e, value.e);
   // The integral part of scaled value (p1 in Grisu) = value / one. It cannot be
   // zero because it contains a product of two 64-bit numbers with MSB set (due
@@ -1919,7 +1916,7 @@ bool is_center_integer(typename float_info<T>::carrier_uint two_f, int exponent,
 }
 
 // Remove trailing zeros from n and return the number of zeros removed (float)
-FMT_ALWAYS_INLINE int remove_trailing_zeros(uint32_t& n) FMT_NOEXCEPT {
+FMT_INLINE int remove_trailing_zeros(uint32_t& n) FMT_NOEXCEPT {
 #ifdef FMT_BUILTIN_CTZ
   int t = FMT_BUILTIN_CTZ(n);
 #else
@@ -1947,7 +1944,7 @@ FMT_ALWAYS_INLINE int remove_trailing_zeros(uint32_t& n) FMT_NOEXCEPT {
 }
 
 // Removes trailing zeros and returns the number of zeros removed (double)
-FMT_ALWAYS_INLINE int remove_trailing_zeros(uint64_t& n) FMT_NOEXCEPT {
+FMT_INLINE int remove_trailing_zeros(uint64_t& n) FMT_NOEXCEPT {
 #ifdef FMT_BUILTIN_CTZLL
   int t = FMT_BUILTIN_CTZLL(n);
 #else
@@ -2033,8 +2030,7 @@ FMT_ALWAYS_INLINE int remove_trailing_zeros(uint64_t& n) FMT_NOEXCEPT {
 
 // The main algorithm for shorter interval case
 template <class T>
-FMT_ALWAYS_INLINE decimal_fp<T> shorter_interval_case(int exponent)
-    FMT_NOEXCEPT {
+FMT_INLINE decimal_fp<T> shorter_interval_case(int exponent) FMT_NOEXCEPT {
   decimal_fp<T> ret_value;
   // Compute k and beta
   const int minus_k = floor_log10_pow2_minus_log10_4_over_3(exponent);
@@ -2500,19 +2496,6 @@ int snprintf_float(T value, int precision, float_specs specs,
     return exp - fraction_size;
   }
 }
-
-struct stringifier {
-  template <typename T> FMT_INLINE std::string operator()(T value) const {
-    return to_string(value);
-  }
-  std::string operator()(basic_format_arg<format_context>::handle h) const {
-    memory_buffer buf;
-    format_parse_context parse_ctx({});
-    format_context format_ctx(buffer_appender<char>(buf), {}, {});
-    h.format(parse_ctx, format_ctx);
-    return to_string(buf);
-  }
-};
 }  // namespace detail
 
 template <> struct formatter<detail::bigint> {
@@ -2575,14 +2558,11 @@ FMT_FUNC void report_system_error(int error_code,
   report_error(format_system_error, error_code, message);
 }
 
-FMT_FUNC std::string detail::vformat(string_view format_str, format_args args) {
-  if (format_str.size() == 2 && equal2(format_str.data(), "{}")) {
-    auto arg = args.get(0);
-    if (!arg) error_handler().on_error("argument not found");
-    return visit_format_arg(stringifier(), arg);
-  }
-  memory_buffer buffer;
-  detail::vformat_to(buffer, format_str, args);
+FMT_FUNC std::string vformat(string_view fmt, format_args args) {
+  // Don't optimize the "{}" case to keep the binary size small and because it
+  // can be better optimized in fmt::format anyway.
+  auto buffer = memory_buffer();
+  detail::vformat_to(buffer, fmt, args);
   return to_string(buffer);
 }
 
@@ -2594,13 +2574,12 @@ extern "C" __declspec(dllimport) int __stdcall WriteConsoleW(  //
 }  // namespace detail
 #endif
 
-FMT_FUNC void vprint(std::FILE* f, string_view format_str, format_args args) {
-  memory_buffer buffer;
-  detail::vformat_to(buffer, format_str, args);
+namespace detail {
+FMT_FUNC void print(std::FILE* f, string_view text) {
 #ifdef _WIN32
   auto fd = _fileno(f);
   if (_isatty(fd)) {
-    detail::utf8_to_utf16 u16(string_view(buffer.data(), buffer.size()));
+    detail::utf8_to_utf16 u16(string_view(text.data(), text.size()));
     auto written = detail::dword();
     if (detail::WriteConsoleW(reinterpret_cast<void*>(_get_osfhandle(fd)),
                               u16.c_str(), static_cast<uint32_t>(u16.size()),
@@ -2611,7 +2590,14 @@ FMT_FUNC void vprint(std::FILE* f, string_view format_str, format_args args) {
     // redirected to NUL.
   }
 #endif
-  detail::fwrite_fully(buffer.data(), 1, buffer.size(), f);
+  detail::fwrite_fully(text.data(), 1, text.size(), f);
+}
+}  // namespace detail
+
+FMT_FUNC void vprint(std::FILE* f, string_view format_str, format_args args) {
+  memory_buffer buffer;
+  detail::vformat_to(buffer, format_str, args);
+  detail::print(f, {buffer.data(), buffer.size()});
 }
 
 #ifdef _WIN32

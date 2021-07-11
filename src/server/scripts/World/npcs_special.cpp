@@ -983,7 +983,7 @@ public:
                     {
                         if (!Patients.empty())
                         {
-                            for (ObjectGuid const guid : Patients)
+                            for (ObjectGuid const& guid : Patients)
                             {
                                 if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
                                     patient->setDeathState(JUST_DIED);

@@ -169,7 +169,7 @@ public:
                 case DATA_RAZORGORE_THE_UNTAMED:
                     if (state == DONE)
                     {
-                        for (ObjectGuid const guid : EggList)
+                        for (ObjectGuid const& guid : EggList)
                             if (GameObject* egg = instance->GetGameObject(guid))
                                 egg->SetPhaseMask(2, true);
                     }

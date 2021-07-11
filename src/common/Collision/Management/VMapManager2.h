@@ -112,12 +112,12 @@ namespace VMAP
         /**
         fill the hit pos and return true, if an object was hit
         */
-        bool getObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist) override;
+        bool GetObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist) override;
         float getHeight(unsigned int mapId, float x, float y, float z, float maxSearchDist) override;
 
         bool processCommand(char* /*command*/) override { return false; } // for debug and extensions
 
-        bool getAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
+        bool GetAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
         bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 reqLiquidType, float& level, float& floor, uint32& type) const override;
 
         WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename);
@@ -129,7 +129,7 @@ namespace VMAP
             return getMapFileName(mapId);
         }
         bool existsMap(const char* basePath, unsigned int mapId, int x, int y) override;
-        void getInstanceMapTree(InstanceTreeMap& instanceMapTree);
+        void GetInstanceMapTree(InstanceTreeMap& instanceMapTree);
 
         typedef uint32(*GetLiquidFlagsFn)(uint32 liquidType);
         GetLiquidFlagsFn GetLiquidFlagsPtr;

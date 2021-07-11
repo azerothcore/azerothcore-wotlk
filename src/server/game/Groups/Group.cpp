@@ -1864,7 +1864,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
             return ERR_BATTLEGROUND_JOIN_FAILED;
 
         // don't allow cross-faction groups to join queue
-        if (member->GetTeamId() != teamId)
+        if (member->GetTeamId() != teamId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
             return ERR_BATTLEGROUND_JOIN_TIMED_OUT;
 
         // don't let join rated matches if the arena team id doesn't match

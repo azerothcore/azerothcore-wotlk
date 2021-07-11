@@ -200,7 +200,7 @@ public:
             if( !IsHeroic() )
                 events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4000);
 
-            for (ObjectGuid guid : summons)
+            for (ObjectGuid const& guid : summons)
                 if (pInstance)
                     if (Creature* c = pInstance->instance->GetCreature(guid))
                     {

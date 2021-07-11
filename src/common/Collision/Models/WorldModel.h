@@ -45,7 +45,7 @@ namespace VMAP
         uint32 GetFileSize();
         bool writeToFile(FILE* wf);
         static bool readFromFile(FILE* rf, WmoLiquid*& liquid);
-        void getPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const;
+        void GetPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const;
     private:
         WmoLiquid() { }
         uint32 iTilesX{0};       //!< number of tiles in x direction, each
@@ -78,7 +78,7 @@ namespace VMAP
         [[nodiscard]] const G3D::AABox& GetBound() const { return iBound; }
         [[nodiscard]] uint32 GetMogpFlags() const { return iMogpFlags; }
         [[nodiscard]] uint32 GetWmoID() const { return iGroupWMOID; }
-        void getMeshData(std::vector<G3D::Vector3>& outVertices, std::vector<MeshTriangle>& outTriangles, WmoLiquid*& liquid);
+        void GetMeshData(std::vector<G3D::Vector3>& outVertices, std::vector<MeshTriangle>& outTriangles, WmoLiquid*& liquid);
     protected:
         G3D::AABox iBound;
         uint32 iMogpFlags{0};// 0x8 outdor; 0x2000 indoor
@@ -102,7 +102,7 @@ namespace VMAP
         bool GetLocationInfo(const G3D::Vector3& p, const G3D::Vector3& down, float& dist, LocationInfo& info) const;
         bool writeFile(const std::string& filename);
         bool readFile(const std::string& filename);
-        void getGroupModels(std::vector<GroupModel>& outGroupModels);
+        void GetGroupModels(std::vector<GroupModel>& outGroupModels);
     protected:
         uint32 RootWMOID{0};
         std::vector<GroupModel> groupModels;

@@ -187,7 +187,7 @@ public:
                         events.ScheduleEvent(EVENT_PARALYZE, 15000);
                         break;
                     case EVENT_SWARMER_ATTACK:
-                        for (ObjectGuid guid : _swarmers)
+                        for (ObjectGuid const& guid : _swarmers)
                             if (Creature* swarmer = me->GetMap()->GetCreature(guid))
                                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                                     swarmer->AI()->AttackStart(target);

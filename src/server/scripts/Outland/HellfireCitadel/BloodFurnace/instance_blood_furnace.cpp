@@ -218,7 +218,7 @@ public:
 
         void ResetPrisoners(GuidSet prisoners)
         {
-            for (ObjectGuid guid : prisoners)
+            for (ObjectGuid const& guid : prisoners)
                 if (Creature* prisoner = instance->GetCreature(guid))
                     ResetPrisoner(prisoner);
         }
@@ -300,7 +300,7 @@ public:
 
         void ActivatePrisoners(GuidSet prisoners)
         {
-            for (ObjectGuid guid : prisoners)
+            for (ObjectGuid const& guid : prisoners)
                 if (Creature* prisoner = instance->GetCreature(guid))
                 {
                     prisoner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);

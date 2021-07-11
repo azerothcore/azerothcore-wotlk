@@ -731,7 +731,17 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     SetGoAnimProgress(animprogress);
     m_goValue.Transport.AnimationInfo = sTransportMgr->GetTransportAnimInfo(goinfo->entry);
     //ASSERT(m_goValue.Transport.AnimationInfo);
+    if (!m_goValue.Transport.AnimationInfo)
+    {
+        LOG_ERROR("vehicle", "StaticTransport::Create: No AnimationInfo was found for GameObject entry (%u)", goinfo->entry);
+        return false;
+    }
     //ASSERT(m_goValue.Transport.AnimationInfo->TotalTime > 0);
+    if (!m_goValue.Transport.AnimationInfo->TotalTime)
+    {
+        LOG_ERROR("vehicle", "StaticTransport::Create: AnimationInfo->TotalTime is 0 for GameObject entry (%u)", goinfo->entry);
+        return false;
+    }
     SetPauseTime(goinfo->transport.pauseAtTime);
     if (goinfo->transport.startOpen && goinfo->transport.pauseAtTime)
     {

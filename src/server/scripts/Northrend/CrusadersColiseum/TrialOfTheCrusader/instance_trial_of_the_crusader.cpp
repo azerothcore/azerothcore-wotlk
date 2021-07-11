@@ -73,7 +73,7 @@ public:
 
                 // move corpses
                 const ObjectGuid npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
-                for (const ObjectGuid i : npcs)
+                for (ObjectGuid const& i : npcs)
                 {
                     if (Creature* c = instance->GetCreature(i))
                     {
@@ -402,7 +402,7 @@ public:
                             InstanceProgress = INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD;
                             events.RescheduleEvent(EVENT_SCENE_FACTION_CHAMPIONS_DEAD, 2500);
 
-                            for (ObjectGuid guid : NPC_ChampionGUIDs)
+                            for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                                 if (Creature* c = instance->GetCreature(guid))
                                     c->DespawnOrUnsummon(15000);
                             NPC_ChampionGUIDs.clear();
@@ -455,7 +455,7 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         AchievementTimer = 0;
-                        for (ObjectGuid guid : NPC_ChampionGUIDs)
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                             if (Creature* c = instance->GetCreature(guid))
                                 if (!c->IsInCombat())
                                     if (Unit* target = c->SelectNearestTarget(200.0f))
@@ -1093,7 +1093,7 @@ public:
                     }
                 case EVENT_CHAMPIONS_ATTACK:
                     {
-                        for (ObjectGuid guid : NPC_ChampionGUIDs)
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                             if (Creature* c = instance->GetCreature(guid))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -1493,7 +1493,7 @@ public:
                 case INSTANCE_PROGRESS_JARAXXUS_DEAD:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                         c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    for (ObjectGuid guid : NPC_ChampionGUIDs)
+                    for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                         if (Creature* c = instance->GetCreature(guid))
                             c->DespawnOrUnsummon();
                     NPC_ChampionGUIDs.clear();

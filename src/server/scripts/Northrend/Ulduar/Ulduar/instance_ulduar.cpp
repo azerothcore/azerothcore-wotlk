@@ -1219,7 +1219,7 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounter
 {
     if (!_leviathanVehicles.empty())
     {
-        for (ObjectGuid guid : _leviathanVehicles)
+        for (ObjectGuid const& guid : _leviathanVehicles)
             if (Creature* cr = instance->GetCreature(guid))
                 if (Vehicle* veh = cr->GetVehicleKit())
                     veh->Dismiss();

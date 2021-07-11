@@ -29,10 +29,10 @@ public:
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2,
                                        float z2, uint32 phasemask) const;
 
-    bool getIntersectionTime(uint32 phasemask, const G3D::Ray& ray,
+    bool GetIntersectionTime(uint32 phasemask, const G3D::Ray& ray,
                              const G3D::Vector3& endPos, float& maxDist) const;
 
-    bool getObjectHitPos(uint32 phasemask, const G3D::Vector3& pPos1,
+    bool GetObjectHitPos(uint32 phasemask, const G3D::Vector3& pPos1,
                          const G3D::Vector3& pPos2, G3D::Vector3& pResultHitPos,
                          float pModifyDist) const;
 

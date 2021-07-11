@@ -5,22 +5,26 @@
 
 #include "DatabaseLoader.h"
 #include "Config.h"
-// #include "DBUpdater.h" not implement
+#include "DBUpdater.h"
 #include "DatabaseEnv.h"
 #include "Duration.h"
 #include "Log.h"
-#include "Duration.h"
 #include <errmsg.h>
 #include <mysqld_error.h>
 #include <thread>
 
-DatabaseLoader::DatabaseLoader(std::string const& logger)
-    : _logger(logger) { }
+DatabaseLoader::DatabaseLoader(std::string const& logger, uint32 const defaultUpdateMask)
+    : _logger(logger), _autoSetup(sConfigMgr->GetOption<bool>("Updates.AutoSetup", true)),
+    _updateFlags(sConfigMgr->GetOption<uint32>("Updates.EnableDatabases", defaultUpdateMask))
+{
+}
 
 template <class T>
 DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::string const& name)
 {
-    _open.push([this, name, &pool]() -> bool
+    bool const updatesEnabledForThis = DBUpdater<T>::IsEnabled(_updateFlags);
+
+    _open.push([this, name, updatesEnabledForThis, &pool]() -> bool
     {
         std::string const dbString = sConfigMgr->GetOption<std::string>(name + "DatabaseInfo", "");
         if (dbString.empty())
@@ -67,6 +71,16 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
                 }
             }
 
+            // Database does not exist
+            if ((error == ER_BAD_DB_ERROR) && updatesEnabledForThis && _autoSetup && !sConfigMgr->isDryRun())
+            {
+                // Try to create the database and connect again if auto setup is enabled
+                if (DBUpdater<T>::Create(pool) && (!pool.Open()))
+                {
+                    error = 0;
+                }
+            }
+
             // If the error wasn't handled quit
             if (error)
             {
@@ -85,6 +99,32 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
         return true;
     });
 
+    // Populate and update only if updates are enabled for this pool
+    if (updatesEnabledForThis && !sConfigMgr->isDryRun())
+    {
+        _populate.push([this, name, &pool]() -> bool
+        {
+            if (!DBUpdater<T>::Populate(pool))
+            {
+                LOG_ERROR(_logger, "Could not populate the %s database, see log for details.", name.c_str());
+                return false;
+            }
+
+            return true;
+        });
+
+        _update.push([this, name, &pool]() -> bool
+        {
+            if (!DBUpdater<T>::Update(pool))
+            {
+                LOG_ERROR(_logger, "Could not update the %s database, see log for details.", name.c_str());
+                return false;
+            }
+
+            return true;
+        });
+    }
+
     _prepare.push([this, name, &pool]() -> bool
     {
         if (!pool.PrepareStatements())
@@ -101,12 +141,22 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
 bool DatabaseLoader::Load()
 {
-    return OpenDatabases() && PrepareStatements();
+    return OpenDatabases() && PopulateDatabases() && UpdateDatabases() && PrepareStatements();
 }
 
 bool DatabaseLoader::OpenDatabases()
 {
     return Process(_open);
+}
+
+bool DatabaseLoader::PopulateDatabases()
+{
+    return Process(_populate);
+}
+
+bool DatabaseLoader::UpdateDatabases()
+{
+    return Process(_update);
 }
 
 bool DatabaseLoader::PrepareStatements()

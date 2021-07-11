@@ -555,10 +555,11 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!attacker && !IsOnSameSide(attacker))
+            if (!attacker || !IsOnSameSide(attacker))
             {
                 damage = 0;
             }
+
             if (!me->IsInCombat())
             {
                 me->CallForHelp(25.0f);

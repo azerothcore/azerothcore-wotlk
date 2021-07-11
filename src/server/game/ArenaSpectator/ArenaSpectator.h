@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
 
 #ifndef AZEROTHCORE_ARENASPECTATOR_H
 #define AZEROTHCORE_ARENASPECTATOR_H

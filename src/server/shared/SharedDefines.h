@@ -194,7 +194,7 @@ enum SpellSchools
     SPELL_SCHOOL_ARCANE                 = 6
 };
 
-#define MAX_SPELL_SCHOOL                  7
+constexpr auto MAX_SPELL_SCHOOL = 7;
 
 enum SpellSchoolMask
 {
