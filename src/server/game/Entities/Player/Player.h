@@ -21,7 +21,7 @@ struct CharacterCustomizeInfo;
 
 class AreaTrigger;
 
-class Player : public Unit, public GridObject<Player>
+class AC_GAME_API Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
     friend void Item::AddToUpdateQueueOf(Player* player);
