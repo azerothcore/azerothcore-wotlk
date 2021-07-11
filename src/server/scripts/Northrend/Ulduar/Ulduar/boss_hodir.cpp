@@ -239,11 +239,11 @@ public:
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
             }
 
-            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 900.0f))
             {
                 go->SetGoState(GO_STATE_ACTIVE);
             }
-
+            
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
             {
                 pInstance->SetData(TYPE_SPAWN_HODIR_CACHE, 0);
@@ -252,6 +252,7 @@ public:
             // Reset helpers
             if (!summons.size())
                 SpawnHelpers();
+            
         }
 
         void EnterCombat(Unit*  /*pWho*/) override
@@ -375,8 +376,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoom(&ENTRANCE_DOOR, Axis::AXIS_Y, false) || !IsInRoom(&EXIT_DOOR, Axis::AXIS_Y, true))
+            if (me->GetPositionY() <= ENTRANCE_DOOR.GetPositionY() || me->GetPositionY() >= EXIT_DOOR.GetPositionY())
             {
+                boss_hodirAI::EnterEvadeMode();
                 return;
             }
 
