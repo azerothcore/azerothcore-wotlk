@@ -29,5 +29,5 @@ void Acore::Banner::Show(std::string_view applicationName, void(*log)(std::strin
         logExtraInfo();
     }
 
-    log("");
+    log(" ");
 }
