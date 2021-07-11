@@ -16,6 +16,7 @@
 #include "DBCStores.h"
 
 enum ArenaTeamInfoType : uint8;
+enum QuestGiverStatus : uint32;
 enum QuestStatus : uint8;
 
 struct CharacterCustomizeInfo;

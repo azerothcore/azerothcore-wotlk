@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "PlayerCommand.h"
 #include "ScriptMgr.h"
+#include "SpellMgr.h"
 
 bool PlayerCommand::Learn(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all)
 {
