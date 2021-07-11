@@ -19,6 +19,8 @@ enum ArenaTeamInfoType : uint8;
 
 struct CharacterCustomizeInfo;
 
+class AreaTrigger;
+
 class Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
