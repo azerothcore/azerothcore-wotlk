@@ -200,7 +200,7 @@ public:
             }
 
             uint16 phase = 1;
-            for (ObjectGuid guid : summons)
+            for (ObjectGuid const& guid : summons)
             {
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                     phase |= summon->GetPhaseMask();
