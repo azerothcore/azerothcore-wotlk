@@ -346,7 +346,7 @@ public:
 
    /** Resizes this to match the size of \a other and then copies the data from other using memcpy.  This is only safe for POD types */
    void copyPOD(const Array<T>& other) {
-       static_assert(std::is_pod<T>::value, "copyPOD called on non-POD type");
+       static_assert(std::is_standard_layout<T>::value, "copyPOD called on non-POD type");
        if (numAllocated < other.num) {
            m_memoryManager->free(data);
            data = NULL;
