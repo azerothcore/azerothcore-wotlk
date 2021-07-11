@@ -724,7 +724,7 @@ void WorldSession::SendNotification(uint32 string_id, ...)
 
 char const* WorldSession::GetAcoreString(uint32 entry) const
 {
-    return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
+    return sGameLocale->GetAcoreString(entry, GetSessionDbLocaleIndex());
 }
 
 void WorldSession::Handle_NULL(WorldPacket& null)

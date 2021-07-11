@@ -6620,7 +6620,7 @@ void Player::PrettyPrintRequirementsQuestList(const std::vector<const Progressio
         std::string questTitle = questTemplate->GetTitle();
         if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(questTemplate->GetQuestId()))
         {
-            ObjectMgr::GetLocaleString(questLocale->Title, loc_idx, questTitle);
+            GameLocale::GetLocaleString(questLocale->Title, loc_idx, questTitle);
         }
 
         std::stringstream stream;
@@ -6638,7 +6638,7 @@ void Player::PrettyPrintRequirementsQuestList(const std::vector<const Progressio
         }
         else
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sGameLocale->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
         }
     }
 }
@@ -6671,7 +6671,7 @@ void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const Pro
         }
         else
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sGameLocale->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
         }
     }
 }
@@ -6689,9 +6689,9 @@ void Player::PrettyPrintRequirementsItemsList(const std::vector<const Progressio
 
         //Get the localised name
         std::string name = itemTemplate->Name1;
-        if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemTemplate->ItemId))
+        if (ItemLocale const* il = sGameLocale->GetItemLocale(itemTemplate->ItemId))
         {
-            ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+            GameLocale::GetLocaleString(il->Name, loc_idx, name);
         }
 
         std::stringstream stream;
@@ -6709,7 +6709,7 @@ void Player::PrettyPrintRequirementsItemsList(const std::vector<const Progressio
         }
         else
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sGameLocale->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
         }
     }
 }

@@ -1538,27 +1538,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading instances...");
     sInstanceSaveMgr->LoadInstances();
 
-    LOG_INFO("server.loading", "Loading Broadcast texts...");
-    sObjectMgr->LoadBroadcastTexts();
-    sObjectMgr->LoadBroadcastTextLocales();
-
-    LOG_INFO("server.loading", "Loading Localization strings...");
-    uint32 oldMSTime = getMSTime();
-    sObjectMgr->LoadCreatureLocales();
-    sObjectMgr->LoadGameObjectLocales();
-    sObjectMgr->LoadItemLocales();
-    sObjectMgr->LoadItemSetNameLocales();
-    sObjectMgr->LoadQuestLocales();
-    sObjectMgr->LoadQuestOfferRewardLocale();
-    sObjectMgr->LoadQuestRequestItemsLocale();
-    sObjectMgr->LoadNpcTextLocales();
-    sObjectMgr->LoadPageTextLocales();
-    sObjectMgr->LoadGossipMenuItemsLocales();
-    sObjectMgr->LoadPointOfInterestLocales();
-
-    sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
-    LOG_INFO("server.loading", ">> Localization strings loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
+    LOG_INFO("server.loading", "Loading Game locale texts...");
+    sGameLocale->LoadAllLocales();
 
     LOG_INFO("server.loading", "Loading Page Texts...");
     sObjectMgr->LoadPageTexts();
@@ -1787,14 +1768,16 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Achievements...");
     sAchievementMgr->LoadAchievementReferenceList();
+
     LOG_INFO("server.loading", "Loading Achievement Criteria Lists...");
     sAchievementMgr->LoadAchievementCriteriaList();
+
     LOG_INFO("server.loading", "Loading Achievement Criteria Data...");
     sAchievementMgr->LoadAchievementCriteriaData();
+
     LOG_INFO("server.loading", "Loading Achievement Rewards...");
     sAchievementMgr->LoadRewards();
-    LOG_INFO("server.loading", "Loading Achievement Reward Locales...");
-    sAchievementMgr->LoadRewardLocales();
+
     LOG_INFO("server.loading", "Loading Completed Achievements...");
     sAchievementMgr->LoadCompletedAchievements();
 
@@ -2407,7 +2390,7 @@ namespace Acore
         explicit WorldWorldTextBuilder(uint32 textId, va_list* args = nullptr) : i_textId(textId), i_args(args) {}
         void operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
+            char const* text = sGameLocale->GetAcoreString(i_textId, loc_idx);
 
             if (i_args)
             {

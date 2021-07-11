@@ -618,8 +618,8 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 
             // local name
             if (loc_idx >= 0)
-                if (ItemLocale const* il = sObjectMgr->GetItemLocale(proto->ItemId))
-                    ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+                if (ItemLocale const* il = sGameLocale->GetItemLocale(proto->ItemId))
+                    GameLocale::GetLocaleString(il->Name, loc_idx, name);
 
             // DO NOT use GetItemEnchantMod(proto->RandomProperty) as it may return a result
             //  that matches the search but it may not equal item->GetItemRandomPropertyId()

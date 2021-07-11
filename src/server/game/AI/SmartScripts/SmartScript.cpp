@@ -36,7 +36,7 @@ public:
 
     size_t operator()(WorldPacket* data, LocaleConstant locale) const
     {
-        std::string text = sObjectMgr->GetAcoreString(_textId, locale);
+        std::string text = sGameLocale->GetAcoreString(_textId, locale);
         return ChatHandler::BuildChatPacket(*data, _msgType, Language(_language), _source, _target, text, 0, "", locale);
     }
 
@@ -3026,7 +3026,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         case SMART_ACTION_PLAYER_TALK:
             {
                 ObjectList* targets = GetTargets(e, unit);
-                char const* text = sObjectMgr->GetAcoreString(e.action.playerTalk.textId, DEFAULT_LOCALE);
+                char const* text = sGameLocale->GetAcoreString(e.action.playerTalk.textId, DEFAULT_LOCALE);
 
                 if (targets)
                     for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)

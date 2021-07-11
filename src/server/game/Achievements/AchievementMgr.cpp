@@ -42,7 +42,7 @@ namespace Acore
 
         void operator()(WorldPacket& data, LocaleConstant loc_idx)
         {
-            std::string text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
+            std::string text = sGameLocale->GetAcoreString(i_textId, loc_idx);
             ChatHandler::BuildChatPacket(data, i_msgtype, LANG_UNIVERSAL, &i_player, &i_player, text, i_achievementId);
         }
 
@@ -2256,8 +2256,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
             {
                 if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
                 {
-                    ObjectMgr::GetLocaleString(loc->Subject, localeConstant, subject);
-                    ObjectMgr::GetLocaleString(loc->Text, localeConstant, text);
+                    GameLocale::GetLocaleString(loc->Subject, localeConstant, subject);
+                    GameLocale::GetLocaleString(loc->Text, localeConstant, text);
                 }
             }
 
@@ -2921,46 +2921,6 @@ void AchievementGlobalMgr::LoadRewards()
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded %u achievement rewards in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
-}
-
-void AchievementGlobalMgr::LoadRewardLocales()
-{
-    uint32 oldMSTime = getMSTime();
-
-    m_achievementRewardLocales.clear();                       // need for reload case
-
-    //                                               0   1       2        3
-    QueryResult result = WorldDatabase.Query("SELECT ID, Locale, Subject, Text FROM achievement_reward_locale");
-
-    if (!result)
-    {
-        LOG_INFO("server.loading", ">> Loaded 0 achievement reward locale strings.  DB table `achievement_reward_locale` is empty");
-        LOG_INFO("server.loading", " ");
-        return;
-    }
-
-    do
-    {
-        Field* fields = result->Fetch();
-
-        uint32 ID = fields[0].GetUInt32();
-        if (m_achievementRewards.find(ID) == m_achievementRewards.end())
-        {
-            LOG_ERROR("sql.sql", "Table `achievement_reward_locale` (Entry: %u) has locale strings for non-existing achievement reward.", ID);
-            continue;
-        }
-
-        LocaleConstant locale = GetLocaleByName(fields[1].GetString());
-        if (locale == LOCALE_enUS)
-            continue;
-
-        AchievementRewardLocale& data = m_achievementRewardLocales[ID];
-        ObjectMgr::AddLocaleString(fields[2].GetString(), locale, data.Subject);
-        ObjectMgr::AddLocaleString(fields[3].GetString(), locale, data.Text);
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Loaded %lu Achievement Reward Locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 

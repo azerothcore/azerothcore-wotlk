@@ -153,7 +153,7 @@ void Player::SendPreparedQuest(ObjectGuid guid)
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                         if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(nl->Text_0[0], loc_idx, title);
+                            GameLocale::GetLocaleString(nl->Text_0[0], loc_idx, title);
                 }
                 else
                 {
@@ -162,7 +162,7 @@ void Player::SendPreparedQuest(ObjectGuid guid)
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                         if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
-                            ObjectMgr::GetLocaleString(nl->Text_1[0], loc_idx, title);
+                            GameLocale::GetLocaleString(nl->Text_1[0], loc_idx, title);
                 }
             }
         }
@@ -2289,7 +2289,7 @@ void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
         int loc_idx = pReceiver->GetSession()->GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
             if (const QuestLocale* pLocale = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
-                ObjectMgr::GetLocaleString(pLocale->Title, loc_idx, strTitle);
+                GameLocale::GetLocaleString(pLocale->Title, loc_idx, strTitle);
 
         WorldPacket data(SMSG_QUEST_CONFIRM_ACCEPT, (4 + quest->GetTitle().size() + 8));
         data << uint32(quest->GetQuestId());

@@ -134,7 +134,7 @@ void CreatureTextMgr::LoadCreatureTexts()
         }
         if (temp.BroadcastTextId)
         {
-            if (!sObjectMgr->GetBroadcastText(temp.BroadcastTextId))
+            if (!sGameLocale->GetBroadcastText(temp.BroadcastTextId))
             {
                 LOG_ERROR("sql.sql", "CreatureTextMgr: Entry %u, Group %u, Id %u in table `creature_text` has non-existing or incompatible BroadcastTextId %u.", temp.entry, temp.group, temp.id, temp.BroadcastTextId);
                 temp.BroadcastTextId = 0;
@@ -477,7 +477,7 @@ std::string CreatureTextMgr::GetLocalizedChatString(uint32 entry, uint8 gender, 
 
     std::string baseText = "";
 
-    BroadcastText const* bct = sObjectMgr->GetBroadcastText(groupItr->BroadcastTextId);
+    BroadcastText const* bct = sGameLocale->GetBroadcastText(groupItr->BroadcastTextId);
     if (bct)
         baseText = bct->GetText(locale, gender);
     else
@@ -487,7 +487,7 @@ std::string CreatureTextMgr::GetLocalizedChatString(uint32 entry, uint8 gender, 
     {
         LocaleCreatureTextMap::const_iterator locItr = mLocaleTextMap.find(CreatureTextId(entry, uint32(textGroup), id));
         if (locItr != mLocaleTextMap.end())
-            ObjectMgr::GetLocaleString(locItr->second.Text, locale, baseText);
+            GameLocale::GetLocaleString(locItr->second.Text, locale, baseText);
     }
 
     return baseText;

@@ -1228,7 +1228,7 @@ std::string ChatHandler::GetNameLink(Player* chr) const
 
 char const* CliHandler::GetAcoreString(uint32 entry) const
 {
-    return sObjectMgr->GetAcoreStringForDBCLocale(entry);
+    return sGameLocale->GetAcoreStringForDBCLocale(entry);
 }
 
 bool CliHandler::isAvailable(ChatCommand const& cmd) const
