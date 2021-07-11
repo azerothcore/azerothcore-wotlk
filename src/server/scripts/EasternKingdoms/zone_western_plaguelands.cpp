@@ -29,13 +29,6 @@ EndContentData */
 ## npcs_dithers_and_arbington
 ######*/
 
-#define GOSSIP_HDA1 "What does the Felstone Field Cauldron need?"
-#define GOSSIP_HDA2 "What does the Dalson's Tears Cauldron need?"
-#define GOSSIP_HDA3 "What does the Writhing Haunt Cauldron need?"
-#define GOSSIP_HDA4 "What does the Gahrron's Withering Cauldron need?"
-
-#define GOSSIP_SDA1 "Thanks, i need a Vitreous Focuser"
-
 class npcs_dithers_and_arbington : public CreatureScript
 {
 public:
@@ -50,19 +43,19 @@ public:
                 player->GetSession()->SendListInventory(creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SDA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, 3224, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 3980, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SDA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, 3225, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 3981, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SDA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, 3226, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 3982, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SDA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, 3227, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 SendGossipMenuFor(player, 3983, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+5:
@@ -83,10 +76,10 @@ public:
 
         if (player->GetQuestRewardStatus(5237) || player->GetQuestRewardStatus(5238))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HDA1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HDA2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HDA3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HDA4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+            AddGossipItemFor(player, 3228, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, 3228, 2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, 3228, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            AddGossipItemFor(player, 3228, 4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
             SendGossipMenuFor(player, 3985, creature->GetGUID());
         }
         else
