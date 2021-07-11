@@ -71,7 +71,7 @@ struct MechanicImmune
     char const* text;
 };
 
-#define MAX_MECHANIC    32
+constexpr auto MAX_MECHANIC = 32;
 
 MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
 {
@@ -107,6 +107,23 @@ MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
     { MECHANIC_IMMUNE_SHIELD, "MECHANIC_IMMUNE_SHIELD"      },
     { MECHANIC_SAPPED, "MECHANIC_SAPPED"             },
     { MECHANIC_ENRAGED, "MECHANIC_ENRAGED"            },
+};
+
+struct SpellSchoolImmune
+{
+    uint32 flag;
+    char const* text;
+};
+
+SpellSchoolImmune const spellSchoolImmunes[MAX_SPELL_SCHOOL] =
+{
+    { SPELL_SCHOOL_NORMAL, "SPELL_SCHOOL_NORMAL" },
+    { SPELL_SCHOOL_HOLY,   "SPELL_SCHOOL_HOLY"   },
+    { SPELL_SCHOOL_FIRE,   "SPELL_SCHOOL_FIRE"   },
+    { SPELL_SCHOOL_NATURE, "SPELL_SCHOOL_NATURE" },
+    { SPELL_SCHOOL_FROST,  "SPELL_SCHOOL_FROST"  },
+    { SPELL_SCHOOL_SHADOW, "SPELL_SCHOOL_SHADOW" },
+    { SPELL_SCHOOL_ARCANE, "SPELL_SCHOOL_ARCANE" },
 };
 
 class npc_commandscript : public CommandScript
@@ -722,6 +739,7 @@ public:
         uint32 faction = target->getFaction();
         uint32 npcflags = target->GetUInt32Value(UNIT_NPC_FLAGS);
         uint32 mechanicImmuneMask = cInfo->MechanicImmuneMask;
+        uint32 spellSchoolImmuneMask = cInfo->SpellSchoolImmuneMask;
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
@@ -746,13 +764,30 @@ public:
         handler->PSendSysMessage(LANG_NPCINFO_AIINFO, target->GetAIName().c_str(), target->GetScriptName().c_str());
 
         for (uint8 i = 0; i < NPCFLAG_COUNT; i++)
+        {
             if (npcflags & npcFlagTexts[i].flag)
+            {
                 handler->PSendSysMessage(npcFlagTexts[i].text, npcFlagTexts[i].flag);
+            }
+        }
 
         handler->PSendSysMessage(LANG_NPCINFO_MECHANIC_IMMUNE, mechanicImmuneMask);
         for (uint8 i = 1; i < MAX_MECHANIC; ++i)
+        {
             if (mechanicImmuneMask & (1 << (mechanicImmunes[i].flag - 1)))
+            {
                 handler->PSendSysMessage(mechanicImmunes[i].text, mechanicImmunes[i].flag);
+            }
+        }
+
+        handler->PSendSysMessage(LANG_NPCINFO_SPELL_SCHOOL_IMMUNE, spellSchoolImmuneMask);
+        for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+        {
+            if (spellSchoolImmuneMask & (1 << spellSchoolImmunes[i].flag))
+            {
+                handler->PSendSysMessage(spellSchoolImmunes[i].text, spellSchoolImmunes[i].flag);
+            }
+        }
 
         return true;
     }
