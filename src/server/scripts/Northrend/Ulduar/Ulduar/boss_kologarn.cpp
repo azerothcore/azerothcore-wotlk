@@ -635,7 +635,7 @@ public:
 };
 
 // predicate function to select non main tank target
-class StoneGripTargetSelector : public Acore::unary_function<Unit*, bool>
+class StoneGripTargetSelector
 {
 public:
     StoneGripTargetSelector(Creature* me, Unit const* victim) : _me(me), _victim(victim) {}
@@ -651,6 +651,7 @@ public:
         return false;
     }
 
+private:
     Creature* _me;
     Unit const* _victim;
 };

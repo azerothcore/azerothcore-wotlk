@@ -2,11 +2,20 @@
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-class PlayerTaxi
+#ifndef __PLAYER_TAXI_H__
+#define __PLAYER_TAXI_H__
+
+#include "DBCStructure.h"
+#include <vector>
+
+class ByteBuffer;
+
+class AC_GAME_API PlayerTaxi
 {
 public:
     PlayerTaxi();
     ~PlayerTaxi() = default;
+
     // Nodes
     void InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level);
     void LoadTaxiMask(std::string const& data);
@@ -17,6 +26,7 @@ public:
         uint32 submask = 1 << ((nodeidx - 1) % 32);
         return (m_taximask[field] & submask) == submask;
     }
+
     bool SetTaximaskNode(uint32 nodeidx)
     {
         uint8  field   = uint8((nodeidx - 1) / 32);
@@ -29,6 +39,7 @@ public:
         else
             return false;
     }
+
     void AppendTaximaskTo(ByteBuffer& data, bool all);
 
     // Destinations
@@ -59,3 +70,7 @@ private:
     std::vector<uint32> m_TaxiDestinations;
     uint32 _taxiSegment;
 };
+
+std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
+
+#endif

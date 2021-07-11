@@ -225,7 +225,7 @@ private:
     ObjectGuid _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public Acore::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector
 {
 public:
     LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }

@@ -160,15 +160,18 @@ const Position PosPlatform         = {2640.5f, -3360.6f, 285.26f, 0.0f};
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
 
 // Predicate function to check that the r   efzr unit is NOT on the same side as the source.
-struct NotOnSameSide : public Acore::unary_function<Unit*, bool>
+struct NotOnSameSide
 {
-    bool m_inLiveSide;
-    explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) {}
+public:
+    explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) { }
 
     bool operator() (const Unit* pTarget)
     {
         return (m_inLiveSide != IN_LIVE_SIDE(pTarget));
     }
+
+private:
+    bool m_inLiveSide;
 };
 
 class boss_gothik : public CreatureScript
