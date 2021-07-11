@@ -11,8 +11,8 @@ AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: Inline
 AllowShortLoopsOnASingleLine: 'true'
-BinPackArguments: 'true'
-BinPackParameters: 'true'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
 BreakBeforeBraces: Allman
 IndentWidth: '4'
 SpaceAfterCStyleCast: 'true'
@@ -28,5 +28,7 @@ Standard: Cpp11
 TabWidth: '0'
 UseTab: Never
 PointerAlignment: Left
+ColumnLimit: 0
+
 
 ...
