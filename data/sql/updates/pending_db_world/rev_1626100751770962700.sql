@@ -7,4 +7,3 @@ UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 5 WHERE `id` = 155
 UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 5 WHERE `id` = 1551 AND `guid` = 981;
 UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 5 WHERE `id` = 1551 AND `guid` = 1062;
 
-
