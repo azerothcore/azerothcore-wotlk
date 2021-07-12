@@ -365,7 +365,7 @@ public:
    /** Resizes this to just barely match the size of \a other + itself and then copies the data to the end of the array from other using memcpy.  
         This is only safe for POD types */
    void appendPOD(const Array<T>& other) {
-       static_assert(std::is_pod<T>::value, "appendPOD called on non-POD type");
+       static_assert(std::is_standard_layout<T>::value, "appendPOD called on non-POD type");
        const size_t oldSize = num;
        num += other.num;
        if (numAllocated < num) {
