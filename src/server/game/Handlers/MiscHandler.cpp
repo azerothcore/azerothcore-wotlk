@@ -21,7 +21,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "LootMgr.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"

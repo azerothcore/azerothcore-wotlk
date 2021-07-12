@@ -2435,13 +2435,13 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
             // Xinef: replaced with CombatStop(false)
             target->AttackStop();
             target->RemoveAllAttackers();
-            target->getHostileRefManager().addThreatPercent(-100);
+            target->getHostileRefMgr().addThreatPercent(-100);
             target->ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
         }
         else
         {
             target->CombatStop();
-            target->getHostileRefManager().deleteReferences();
+            target->getHostileRefMgr().deleteReferences();
         }
 
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
@@ -2999,7 +2999,7 @@ void AuraEffect::HandleAuraModTotalThreat(AuraApplication const* aurApp, uint8 m
 
     Unit* caster = GetCaster();
     if (caster && caster->IsAlive())
-        target->getHostileRefManager().addTempThreat((float)GetAmount(), apply);
+        target->getHostileRefMgr().addTempThreat((float)GetAmount(), apply);
 }
 
 void AuraEffect::HandleModTaunt(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -6408,7 +6408,7 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     heal = uint32(caster->SpellHealingBonusTaken(caster, GetSpellInfo(), heal, DOT, GetBase()->GetStackAmount()));
 
     int32 gain = caster->HealBySpell(caster, GetSpellInfo(), heal);
-    caster->getHostileRefManager().threatAssist(caster, gain * 0.5f, GetSpellInfo());
+    caster->getHostileRefMgr().threatAssist(caster, gain * 0.5f, GetSpellInfo());
 }
 
 void AuraEffect::HandlePeriodicHealthFunnelAuraTick(Unit* target, Unit* caster) const
@@ -6546,7 +6546,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     target->SendPeriodicAuraLog(&pInfo);
 
     if (caster)
-        target->getHostileRefManager().threatAssist(caster, float(gain) * 0.5f, GetSpellInfo());
+        target->getHostileRefMgr().threatAssist(caster, float(gain) * 0.5f, GetSpellInfo());
 
     bool haveCastItem = GetBase()->GetCastItemGUID();
 
@@ -6684,7 +6684,7 @@ void AuraEffect::HandleObsModPowerAuraTick(Unit* target, Unit* caster) const
     int32 gain = target->ModifyPower(PowerType, amount);
 
     if (caster)
-        target->getHostileRefManager().threatAssist(caster, float(gain) * 0.5f, GetSpellInfo());
+        target->getHostileRefMgr().threatAssist(caster, float(gain) * 0.5f, GetSpellInfo());
 }
 
 void AuraEffect::HandlePeriodicEnergizeAuraTick(Unit* target, Unit* caster) const
@@ -6718,7 +6718,7 @@ void AuraEffect::HandlePeriodicEnergizeAuraTick(Unit* target, Unit* caster) cons
     int32 gain = target->ModifyPower(PowerType, amount);
 
     if (caster)
-        target->getHostileRefManager().threatAssist(caster, float(gain) * 0.5f, GetSpellInfo());
+        target->getHostileRefMgr().threatAssist(caster, float(gain) * 0.5f, GetSpellInfo());
 }
 
 void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) const

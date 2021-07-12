@@ -9,7 +9,7 @@
 #include "Timer.h"
 #include "VMapDefinitions.h"
 #include "VMapFactory.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 #include "WorldModel.h"
 
 using G3D::Vector3;
@@ -91,7 +91,7 @@ GameObjectModel::~GameObjectModel()
 {
     if (iModel)
     {
-        VMAP::VMapFactory::createOrGetVMapManager()->releaseModelInstance(name);
+        VMAP::VMapFactory::createOrGetVMapMgr()->releaseModelInstance(name);
     }
 }
 
@@ -111,7 +111,7 @@ bool GameObjectModel::initialize(std::unique_ptr<GameObjectModelOwnerBase> model
         return false;
     }
 
-    iModel = VMAP::VMapFactory::createOrGetVMapManager()->acquireModelInstance(dataPath + "vmaps/", it->second.name);
+    iModel = VMAP::VMapFactory::createOrGetVMapMgr()->acquireModelInstance(dataPath + "vmaps/", it->second.name);
 
     if (!iModel)
     {

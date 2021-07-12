@@ -14,7 +14,7 @@
 #include "InstanceSaveMgr.h"
 #include "Log.h"
 #include "MathUtil.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
@@ -47,9 +47,9 @@ void WorldSession::HandleMoveWorldportAck()
     WorldLocation const& loc = GetPlayer()->GetTeleportDest();
 
     // possible errors in the coordinate validity check
-    if (!MapManager::IsValidMapCoord(loc))
+    if (!MapMgr::IsValidMapCoord(loc))
     {
-        KickPlayer("!MapManager::IsValidMapCoord(loc)");
+        KickPlayer("!MapMgr::IsValidMapCoord(loc)");
         return;
     }
 
@@ -113,8 +113,8 @@ void WorldSession::HandleMoveWorldportAck()
             _player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
 
-    if (!_player->getHostileRefManager().isEmpty())
-        _player->getHostileRefManager().deleteReferences(); // pussywizard: multithreading crashfix
+    if (!_player->getHostileRefMgr().isEmpty())
+        _player->getHostileRefMgr().deleteReferences(); // pussywizard: multithreading crashfix
 
     CellCoord pair(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell(pair);

@@ -9,7 +9,7 @@
 #include "GameObject.h"
 #include "GossipDef.h"
 #include "Language.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPEP.h"

@@ -5123,7 +5123,7 @@ public:
 
             if (instant_exit)
             {
-                caster->getHostileRefManager().deleteReferences();
+                caster->getHostileRefMgr().deleteReferences();
             }
             caster->CombatStop();
         }

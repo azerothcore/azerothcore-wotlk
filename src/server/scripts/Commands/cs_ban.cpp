@@ -12,7 +12,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "AccountMgr.h"
-#include "BanManager.h"
+#include "BanMgr.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectAccessor.h"

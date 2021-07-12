@@ -16,10 +16,10 @@ enum BanReturn
     BAN_LONGER_EXISTS
 };
 
-class BanManager
+class BanMgr
 {
 public:
-    static BanManager* instance();
+    static BanMgr* instance();
 
     BanReturn BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author);
     BanReturn BanAccountByPlayerName(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author);
@@ -32,6 +32,6 @@ public:
     bool RemoveBanCharacter(std::string const& CharacterName);
 };
 
-#define sBan BanManager::instance()
+#define sBan BanMgr::instance()
 
 #endif // _BAN_MANAGER_H

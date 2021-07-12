@@ -858,7 +858,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
             target = handler->GetSession()->GetPlayer();
-        HostileReference* ref = target->getHostileRefManager().getFirst();
+        HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
         handler->PSendSysMessage("Hostil reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
         while (ref)

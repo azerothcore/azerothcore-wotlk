@@ -8,7 +8,7 @@
 
 #include "Common.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"

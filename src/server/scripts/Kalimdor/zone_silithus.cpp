@@ -17,7 +17,7 @@ quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
 #include "AccountMgr.h"
-#include "BanManager.h"
+#include "BanMgr.h"
 #include "Group.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

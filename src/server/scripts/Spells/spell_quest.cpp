@@ -13,7 +13,7 @@
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
 #include "GridNotifiers.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"

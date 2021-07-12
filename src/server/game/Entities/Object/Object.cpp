@@ -14,7 +14,7 @@
 #include "DynamicVisibility.h"
 #include "GridNotifiers.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MovementPacketBuilder.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
@@ -2959,7 +2959,7 @@ struct WorldObjectChangeAccumulator
         }
     }
 
-    template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
+    template<class SKIP> void Visit(GridRefMgr<SKIP>&) {}
 };
 
 void WorldObject::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set)
