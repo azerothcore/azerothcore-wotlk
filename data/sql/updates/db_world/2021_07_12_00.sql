@@ -1,3 +1,19 @@
+-- DB update 2021_07_11_00 -> 2021_07_12_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_07_11_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_07_11_00 2021_07_12_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1625841824336043500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1625841824336043500');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29414;
@@ -27,3 +43,13 @@ INSERT IGNORE INTO `spell_dbc` VALUES
 -- I tested it with Knock Back (350), which is a very far distance. Therefore, I reduced it to 200
 -- https://www.wowhead.com/spell=54469/plague-strike
 UPDATE `spell_dbc` SET `EffectRadiusIndex_1`=8, `EffectRadiusIndex_2`=8, `EffectRadiusIndex_3`=8, `EffectMiscValue_3` = 200 WHERE  `ID`=54469;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_07_12_00' WHERE sql_rev = '1625841824336043500';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
