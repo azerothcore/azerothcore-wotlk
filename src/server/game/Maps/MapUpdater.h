@@ -13,8 +13,8 @@ class UpdateRequest;
 class MapUpdater
 {
 public:
-    MapUpdater();
-    virtual ~MapUpdater();
+    MapUpdater() : _cancelationToken(false), pending_requests(0) {}
+    ~MapUpdater() {}
 
     void schedule_update(Map& map, uint32 diff, uint32 s_diff);
     void schedule_lfg_update(uint32 diff);

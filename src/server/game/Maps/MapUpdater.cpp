@@ -56,15 +56,6 @@ private:
     uint32 m_diff;
 };
 
-MapUpdater::MapUpdater(): pending_requests(0)
-{
-}
-
-MapUpdater::~MapUpdater()
-{
-    deactivate();
-}
-
 void MapUpdater::activate(size_t num_threads)
 {
     for (size_t i = 0; i < num_threads; ++i)
