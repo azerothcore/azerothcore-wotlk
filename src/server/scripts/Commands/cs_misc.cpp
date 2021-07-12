@@ -5,7 +5,6 @@
  */
 
 #include "AccountMgr.h"
-#include "ace/INET_Addr.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"

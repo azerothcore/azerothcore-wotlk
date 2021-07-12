@@ -168,6 +168,14 @@ MySQLExecutable = ""
 IPLocationFile = ""
 
 #
+#    BanExpiryCheckInterval
+#        Description: Time (in seconds) between checks for expired bans
+#        Default:     60
+#
+
+BanExpiryCheckInterval = 60
+
+#
 ###################################################################################################
 
 ###################################################################################################
