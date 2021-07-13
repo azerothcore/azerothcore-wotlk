@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU
- * AGPL v3 license:
- * https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
 #include "BattlefieldMgr.h"
@@ -35,9 +33,7 @@ constexpr auto CINEMATIC_LOOKAHEAD  = 2000;
 void Player::Update(uint32 p_time)
 {
     if (!IsInWorld())
-    {
         return;
-    }
 
     sScriptMgr->OnBeforePlayerUpdate(this, p_time);
 
@@ -258,11 +254,8 @@ void Player::Update(uint32 p_time)
             "misc",
             "Player::Update - invalid position (%.1f, %.1f, %.1f)! Map: %u, "
             "MapId: %u, %s",
-            GetPositionX(),
-            GetPositionY(),
-            GetPositionZ(),
-            (FindMap() ? FindMap()->GetId() : 0),
-            GetMapId(),
+            GetPositionX(), GetPositionY(), GetPositionZ(),
+            (FindMap() ? FindMap()->GetId() : 0), GetMapId(),
             GetGUID().ToString().c_str());
         GetSession()->KickPlayer("Invalid position");
         return;
@@ -509,8 +502,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
             Channel* usedChannel = nullptr;
 
             for (JoinedChannelsList::iterator itr = m_channels.begin();
-                 itr != m_channels.end();
-                 ++itr)
+                 itr != m_channels.end(); ++itr)
             {
                 if ((*itr)->GetChannelId() == i)
                 {
@@ -541,7 +533,9 @@ void Player::UpdateLocalChannels(uint32 newZone)
                     else
                         currentNameExt = current_zone_name.c_str();
 
-                    snprintf(new_channel_name_buf, 100, channel->pattern[m_session->GetSessionDbcLocale()], currentNameExt);
+                    snprintf(new_channel_name_buf, 100,
+                             channel->pattern[m_session->GetSessionDbcLocale()],
+                             currentNameExt);
 
                     joinChannel = cMgr->GetJoinChannel(new_channel_name_buf,
                                                        channel->ChannelID);
@@ -597,8 +591,7 @@ void Player::UpdateRating(CombatRating cr)
     AuraEffectList const& modRatingFromStat =
         GetAuraEffectsByType(SPELL_AURA_MOD_RATING_FROM_STAT);
     for (AuraEffectList::const_iterator i = modRatingFromStat.begin();
-         i != modRatingFromStat.end();
-         ++i)
+         i != modRatingFromStat.end(); ++i)
         if ((*i)->GetMiscValue() & (1 << cr))
             amount += int32(CalculatePct(GetStat(Stats((*i)->GetMiscValueB())),
                                          (*i)->GetAmount()));
@@ -726,7 +719,8 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
 }
 
 // iraizo: turn this into a switch statement
-inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLevel, uint32 YellowLevel)
+inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel,
+                           uint32 GreenLevel, uint32 YellowLevel)
 {
     if (SkillValue >= GrayLevel)
         return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_GREY) * 10;
@@ -737,13 +731,12 @@ inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLeve
     return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_ORANGE) * 10;
 }
 
-bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLevel, uint32 Multiplicator)
+bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
+                               uint32 RedLevel, uint32 Multiplicator)
 {
     LOG_DEBUG("entities.player.skills",
               "UpdateGatherSkill(SkillId %d SkillLevel %d RedLevel %d)",
-              SkillId,
-              SkillValue,
-              RedLevel);
+              SkillId, SkillValue, RedLevel);
 
     uint32 gathering_skill_gain =
         sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
@@ -757,19 +750,23 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
     case SKILL_JEWELCRAFTING:
     case SKILL_INSCRIPTION:
         return UpdateSkillPro(SkillId,
-                              SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50, RedLevel + 25) *
+                              SkillGainChance(SkillValue, RedLevel + 100,
+                                              RedLevel + 50, RedLevel + 25) *
                                   Multiplicator,
                               gathering_skill_gain);
     case SKILL_SKINNING:
         if (sWorld->getIntConfig(CONFIG_SKILL_CHANCE_SKINNING_STEPS) == 0)
             return UpdateSkillPro(SkillId,
-                                  SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50, RedLevel + 25) *
+                                  SkillGainChance(SkillValue, RedLevel + 100,
+                                                  RedLevel + 50,
+                                                  RedLevel + 25) *
                                       Multiplicator,
                                   gathering_skill_gain);
         else
             return UpdateSkillPro(
                 SkillId,
-                (SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50, RedLevel + 25) *
+                (SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50,
+                                 RedLevel + 25) *
                  Multiplicator) >>
                     (SkillValue /
                      sWorld->getIntConfig(CONFIG_SKILL_CHANCE_SKINNING_STEPS)),
@@ -777,13 +774,16 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
     case SKILL_MINING:
         if (sWorld->getIntConfig(CONFIG_SKILL_CHANCE_MINING_STEPS) == 0)
             return UpdateSkillPro(SkillId,
-                                  SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50, RedLevel + 25) *
+                                  SkillGainChance(SkillValue, RedLevel + 100,
+                                                  RedLevel + 50,
+                                                  RedLevel + 25) *
                                       Multiplicator,
                                   gathering_skill_gain);
         else
             return UpdateSkillPro(
                 SkillId,
-                (SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50, RedLevel + 25) *
+                (SkillGainChance(SkillValue, RedLevel + 100, RedLevel + 50,
+                                 RedLevel + 25) *
                  Multiplicator) >>
                     (SkillValue /
                      sWorld->getIntConfig(CONFIG_SKILL_CHANCE_MINING_STEPS)),
@@ -800,8 +800,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
         sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first;
-         _spell_idx != bounds.second;
-         ++_spell_idx)
+         _spell_idx != bounds.second; ++_spell_idx)
     {
         if (_spell_idx->second->SkillLine)
         {
@@ -846,8 +845,10 @@ float getProbabilityOfLevelUp(uint32 SkillValue)
         return 0.0f;
     }
 
-    std::array<uint32, 10> bounds {115, 135, 160, 190, 215, 295, 315, 355, 425, 450};
-    std::array<float, 11>  dens {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 9.0f, 10.0f, 11.0f, 12.0f, 1.0f};
+    std::array<uint32, 10> bounds {115, 135, 160, 190, 215,
+                                   295, 315, 355, 425, 450};
+    std::array<float, 11>  dens {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f,
+                                9.0f, 10.0f, 11.0f, 12.0f, 1.0f};
     auto                   it =
         std::lower_bound(std::begin(bounds), std::end(bounds), SkillValue);
     return 100 / dens[std::distance(std::begin(bounds), it)];
@@ -883,8 +884,7 @@ static const size_t bonusSkillLevelsSize =
 bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
 {
     LOG_DEBUG("entities.player.skills",
-              "UpdateSkillPro(SkillId %d, Chance %3.1f%%)",
-              SkillId,
+              "UpdateSkillPro(SkillId %d, Chance %3.1f%%)", SkillId,
               Chance / 10.0f);
     if (!SkillId)
         return false;
@@ -941,8 +941,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     }
 
     LOG_DEBUG("entities.player.skills",
-              "Player::UpdateSkillPro Chance=%3.1f%% missed",
-              Chance / 10.0f);
+              "Player::UpdateSkillPro Chance=%3.1f%% missed", Chance / 10.0f);
     return false;
 }
 
@@ -987,7 +986,8 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
     UpdateAllCritPercentages();
 }
 
-void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence)
+void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType,
+                                bool defence)
 {
     uint8 plevel    = getLevel(); // if defense than victim == attacker
     uint8 greylevel = Acore::XP::GetGrayLevel(plevel);
@@ -1036,8 +1036,7 @@ void Player::UpdateSkillsForLevel()
         sWorld->getBoolConfig(CONFIG_ALWAYS_MAX_SKILL_FOR_LEVEL);
 
     for (SkillStatusMap::iterator itr = mSkillStatus.begin();
-         itr != mSkillStatus.end();
-         ++itr)
+         itr != mSkillStatus.end(); ++itr)
     {
         if (itr->second.uState == SKILL_DELETED)
             continue;
@@ -1082,8 +1081,7 @@ void Player::UpdateSkillsForLevel()
 void Player::UpdateSkillsToMaxSkillsForLevel()
 {
     for (SkillStatusMap::iterator itr = mSkillStatus.begin();
-         itr != mSkillStatus.end();
-         ++itr)
+         itr != mSkillStatus.end(); ++itr)
     {
         if (itr->second.uState == SKILL_DELETED)
             continue;
@@ -1106,7 +1104,8 @@ void Player::UpdateSkillsToMaxSkillsForLevel()
     }
 }
 
-bool Player::UpdatePosition(float x, float y, float z, float orientation, bool teleport)
+bool Player::UpdatePosition(float x, float y, float z, float orientation,
+                            bool teleport)
 {
     if (!Unit::UpdatePosition(x, y, z, orientation, teleport))
         return false;
@@ -1366,8 +1365,7 @@ void Player::UpdateHomebindTime(uint32 time)
             "maps",
             "PLAYER: Player '%s' (%s) will be teleported to homebind in 60 "
             "seconds",
-            GetName().c_str(),
-            GetGUID().ToString().c_str());
+            GetName().c_str(), GetGUID().ToString().c_str());
     }
 }
 
@@ -1400,9 +1398,9 @@ void Player::UpdateFFAPvPState(bool reset /*= true*/)
         {
             SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
             for (ControlSet::iterator itr = m_Controlled.begin();
-                 itr != m_Controlled.end();
-                 ++itr)
-                (*itr)->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+                 itr != m_Controlled.end(); ++itr)
+                (*itr)->SetByteValue(UNIT_FIELD_BYTES_2, 1,
+                                     UNIT_BYTE2_FLAG_FFA_PVP);
         }
 
         if (pvpInfo.IsInFFAPvPArea)
@@ -1419,22 +1417,20 @@ void Player::UpdateFFAPvPState(bool reset /*= true*/)
 
             RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
             for (ControlSet::iterator itr = m_Controlled.begin();
-                 itr != m_Controlled.end();
-                 ++itr)
-                (*itr)->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+                 itr != m_Controlled.end(); ++itr)
+                (*itr)->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1,
+                                       UNIT_BYTE2_FLAG_FFA_PVP);
 
             // xinef: iterate attackers
             AttackerSet        toRemove;
             AttackerSet const& attackers = getAttackers();
             for (AttackerSet::const_iterator itr = attackers.begin();
-                 itr != attackers.end();
-                 ++itr)
+                 itr != attackers.end(); ++itr)
                 if (!(*itr)->IsValidAttackTarget(this))
                     toRemove.insert(*itr);
 
             for (AttackerSet::const_iterator itr = toRemove.begin();
-                 itr != toRemove.end();
-                 ++itr)
+                 itr != toRemove.end(); ++itr)
                 (*itr)->AttackStop();
 
             // xinef: remove our own victim
@@ -1525,11 +1521,13 @@ void Player::UpdateCinematicLocation(uint32 /*diff*/)
     {
         if (cam.timeStamp > m_cinematicDiff)
         {
-            nextPosition  = Position(cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w);
+            nextPosition  = Position(cam.locations.x, cam.locations.y,
+                                    cam.locations.z, cam.locations.w);
             nextTimestamp = cam.timeStamp;
             break;
         }
-        lastPosition  = Position(cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w);
+        lastPosition  = Position(cam.locations.x, cam.locations.y,
+                                cam.locations.z, cam.locations.w);
         lastTimestamp = cam.timeStamp;
     }
     float angle = lastPosition.GetAngle(&nextPosition);
@@ -1567,11 +1565,13 @@ void Player::UpdateCinematicLocation(uint32 /*diff*/)
     {
         if (static_cast<int32>(cam.timeStamp) >= workDiff)
         {
-            nextPosition  = Position(cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w);
+            nextPosition  = Position(cam.locations.x, cam.locations.y,
+                                    cam.locations.z, cam.locations.w);
             nextTimestamp = cam.timeStamp;
             break;
         }
-        lastPosition  = Position(cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w);
+        lastPosition  = Position(cam.locations.x, cam.locations.y,
+                                cam.locations.z, cam.locations.w);
         lastTimestamp = cam.timeStamp;
     }
 
@@ -1600,14 +1600,19 @@ void Player::UpdateCinematicLocation(uint32 /*diff*/)
     if (m_CinematicObject && interPosition.IsPositionValid())
     {
         m_CinematicObject->MonsterMoveWithSpeed(
-            interPosition.m_positionX, interPosition.m_positionY, interPosition.m_positionZ, 200.0f);
+            interPosition.m_positionX, interPosition.m_positionY,
+            interPosition.m_positionZ, 200.0f);
     }
 }
 
-template void Player::UpdateVisibilityOf(Player* target, UpdateData& data, std::vector<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(Creature* target, UpdateData& data, std::vector<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(Corpse* target, UpdateData& data, std::vector<Unit*>& visibleNow);
-template void Player::UpdateVisibilityOf(GameObject* target, UpdateData& data, std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Player* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Creature* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(Corpse* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(GameObject* target, UpdateData& data,
+                                         std::vector<Unit*>& visibleNow);
 template void Player::UpdateVisibilityOf(DynamicObject*      target,
                                          UpdateData&         data,
                                          std::vector<Unit*>& visibleNow);
@@ -1624,7 +1629,8 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     Acore::VisibleNotifier notifierNoLarge(
         *this, mapChange,
         false); // visit only objects which are not large; default distance
-    Cell::VisitAllObjects(m_seer, notifierNoLarge, GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
+    Cell::VisitAllObjects(m_seer, notifierNoLarge,
+                          GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
     notifierNoLarge.SendToSelf();
 
     Acore::VisibleNotifier notifierLarge(
@@ -1653,13 +1659,15 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 }
 
 template <class T>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, T* target, std::vector<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, T* target,
+                                      std::vector<Unit*>& /*v*/)
 {
     s64.insert(target->GetGUID());
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target, std::vector<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target,
+                                      std::vector<Unit*>& /*v*/)
 {
     // @HACK: This is to prevent objects like deeprun tram from disappearing
     // when player moves far from its spawn point while riding it
@@ -1668,14 +1676,16 @@ inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target,
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Creature* target, std::vector<Unit*>& v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Creature* target,
+                                      std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
     v.push_back(target);
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Player* target, std::vector<Unit*>& v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Player* target,
+                                      std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
     v.push_back(target);
@@ -1694,7 +1704,8 @@ inline void BeforeVisibilityDestroy<Creature>(Creature* t, Player* p)
 }
 
 template <class T>
-void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::vector<Unit*>& visibleNow)
+void Player::UpdateVisibilityOf(T* target, UpdateData& data,
+                                std::vector<Unit*>& visibleNow)
 {
     if (HaveAtClient(target))
     {
@@ -1767,8 +1778,7 @@ void Player::UpdateTriggerVisibility()
     UpdateData  udata;
     WorldPacket packet;
     for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin();
-         itr != m_clientGUIDs.end();
-         ++itr)
+         itr != m_clientGUIDs.end(); ++itr)
     {
         if ((*itr).IsCreatureOrVehicle())
         {
@@ -1812,8 +1822,7 @@ void Player::UpdateForQuestWorldObjects()
     UpdateData  udata;
     WorldPacket packet;
     for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin();
-         itr != m_clientGUIDs.end();
-         ++itr)
+         itr != m_clientGUIDs.end(); ++itr)
     {
         if ((*itr).IsGameObject())
         {
@@ -1834,8 +1843,7 @@ void Player::UpdateForQuestWorldObjects()
             SpellClickInfoMapBounds clickPair =
                 sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
             for (SpellClickInfoContainer::const_iterator _itr = clickPair.first;
-                 _itr != clickPair.second;
-                 ++_itr)
+                 _itr != clickPair.second; ++_itr)
             {
                 //! This code doesn't look right, but it was logically converted
                 //! to condition system to do the exact same thing it did
@@ -1846,8 +1854,7 @@ void Player::UpdateForQuestWorldObjects()
                         obj->GetEntry(), _itr->second.spellId);
                 bool buildUpdateBlock = false;
                 for (ConditionList::const_iterator jtr = conds.begin();
-                     jtr != conds.end() && !buildUpdateBlock;
-                     ++jtr)
+                     jtr != conds.end() && !buildUpdateBlock; ++jtr)
                     if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED ||
                         (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
                         buildUpdateBlock = true;
@@ -1880,8 +1887,7 @@ void Player::UpdateZoneDependentAuras(uint32 newZone)
     SpellAreaForAreaMapBounds saBounds =
         sSpellMgr->GetSpellAreaForAreaMapBounds(newZone);
     for (SpellAreaForAreaMap::const_iterator itr = saBounds.first;
-         itr != saBounds.second;
-         ++itr)
+         itr != saBounds.second; ++itr)
         if (itr->second->autocast &&
             itr->second->IsFitToRequirements(this, newZone, 0))
             if (!HasAura(itr->second->spellId))
@@ -1931,8 +1937,7 @@ void Player::UpdateAreaDependentAuras(uint32 newArea)
     SpellAreaForAreaMapBounds saBounds =
         sSpellMgr->GetSpellAreaForAreaMapBounds(newArea);
     for (SpellAreaForAreaMap::const_iterator itr = saBounds.first;
-         itr != saBounds.second;
-         ++itr)
+         itr != saBounds.second; ++itr)
         if (itr->second->autocast &&
             itr->second->IsFitToRequirements(this, m_zoneUpdateId, newArea))
             if (!HasAura(itr->second->spellId))
@@ -1982,7 +1987,8 @@ void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
     if (GetExactDistSq(&m_last_underwaterstate_position) < 3.0f * 3.0f)
         return;
 
-    m_last_underwaterstate_position.Relocate(m_positionX, m_positionY, m_positionZ);
+    m_last_underwaterstate_position.Relocate(m_positionX, m_positionY,
+                                             m_positionZ);
 
     if (!IsPositionValid()) // pussywizard: crashfix if calculated grid coords
                             // would be out of range 0-64
@@ -2083,12 +2089,13 @@ void Player::UpdateCharmedAI()
         AuraEffectList const& auras =
             GetAuraEffectsByType(SPELL_AURA_MOD_CHARM);
         for (AuraEffectList::const_iterator iter = auras.begin();
-             iter != auras.end();
-             ++iter)
+             iter != auras.end(); ++iter)
             if ((*iter)->GetCasterGUID() == charmer->GetGUID() &&
                 (*iter)->GetBase()->IsPermanent())
             {
-                Unit::DealDamage(charmer, this, GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                Unit::DealDamage(charmer, this, GetHealth(), nullptr,
+                                 DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL,
+                                 nullptr, false);
                 return;
             }
     }
@@ -2127,7 +2134,8 @@ void Player::UpdateCharmedAI()
             if (follow)
             {
                 if (!HasUnitState(UNIT_STATE_FOLLOW))
-                    GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                    GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST,
+                                                  PET_FOLLOW_ANGLE);
                 return;
             }
         }
@@ -2143,7 +2151,8 @@ void Player::UpdateCharmedAI()
         if (!target)
         {
             if (!HasUnitState(UNIT_STATE_FOLLOW))
-                GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST,
+                                              PET_FOLLOW_ANGLE);
 
             return;
         }
@@ -2174,7 +2183,8 @@ void Player::UpdateCharmedAI()
                     else if (m_charmAISpells[SPELL_ROOT_OR_FEAR] &&
                              !HasSpellCooldown(
                                  m_charmAISpells[SPELL_ROOT_OR_FEAR]))
-                        CastSpell(target, m_charmAISpells[SPELL_ROOT_OR_FEAR], false);
+                        CastSpell(target, m_charmAISpells[SPELL_ROOT_OR_FEAR],
+                                  false);
                     else if (m_charmAISpells[SPELL_IMMUNITY] &&
                              !HasSpellCooldown(m_charmAISpells[SPELL_IMMUNITY]))
                         CastSpell(this, m_charmAISpells[SPELL_IMMUNITY], true);
@@ -2196,7 +2206,8 @@ void Player::UpdateCharmedAI()
                         if (m_charmAISpells[SPELL_DOT_DAMAGE] &&
                             !HasSpellCooldown(
                                 m_charmAISpells[SPELL_DOT_DAMAGE]))
-                            CastSpell(target, m_charmAISpells[SPELL_DOT_DAMAGE], false);
+                            CastSpell(target, m_charmAISpells[SPELL_DOT_DAMAGE],
+                                      false);
                         break;
                     }
                 }
@@ -2224,7 +2235,8 @@ void Player::UpdateCharmedAI()
                 case 2:
                     if (m_charmAISpells[SPELL_DOT_DAMAGE] &&
                         !HasSpellCooldown(m_charmAISpells[SPELL_DOT_DAMAGE]))
-                        CastSpell(target, m_charmAISpells[SPELL_DOT_DAMAGE], false);
+                        CastSpell(target, m_charmAISpells[SPELL_DOT_DAMAGE],
+                                  false);
                     break;
                 }
             }
@@ -2259,7 +2271,8 @@ void Player::UpdateCharmedAI()
                 if (m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd] &&
                     !HasSpellCooldown(
                         m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd]))
-                    CastSpell(target, m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd], false);
+                    CastSpell(target, m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd],
+                              false);
                 break;
             case 2:
                 if (m_charmAISpells[SPELL_DOT_DAMAGE] &&
@@ -2273,13 +2286,12 @@ void Player::UpdateCharmedAI()
 
 void Player::UpdateLootAchievements(LootItem* item, Loot* loot)
 {
-    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemid, item->count);
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemid,
+                              item->count);
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE,
-                              loot->loot_type,
-                              item->count);
+                              loot->loot_type, item->count);
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM,
-                              item->itemid,
-                              item->count);
+                              item->itemid, item->count);
 }
 
 void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type,
@@ -2287,7 +2299,8 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type,
                                        uint32                   miscValue2 /*= 0*/,
                                        Unit*                    unit /*= nullptr*/)
 {
-    m_achievementMgr->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
+    m_achievementMgr->UpdateAchievementCriteria(type, miscValue1, miscValue2,
+                                                unit);
 }
 
 void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo,
@@ -2315,8 +2328,7 @@ void Player::UpdateSpecCount(uint8 count)
     {
         _SaveActions(trans); // make sure the button list is cleaned up
         for (ActionButtonList::iterator itr = m_actionButtons.begin();
-             itr != m_actionButtons.end();
-             ++itr)
+             itr != m_actionButtons.end(); ++itr)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACTION);
             stmt->setUInt32(0, GetGUID().GetCounter());
