@@ -31,6 +31,8 @@ endif()
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
+find_package(Filesystem REQUIRED)
+
 add_library(common
   ${PRIVATE_SOURCES})
 
@@ -62,6 +64,7 @@ target_link_libraries(common
     openssl
     threads
     jemalloc
+    std::filesystem
     fmt)
 
 set_target_properties(common
