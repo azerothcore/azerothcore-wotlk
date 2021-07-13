@@ -40,7 +40,6 @@ provided, first looks for ``Final``, and falls back to ``Experimental`` in case
 of failure. If ``Final`` is found, :imp-target:`std::filesystem` and all
 :ref:`variables <fs.variables>` will refer to the ``Final`` version.
 
-
 Imported Targets
 ****************
 
@@ -58,7 +57,6 @@ Imported Targets
         :ref:`compile language standard feature <req-lang-standards>`. Linking
         to this target will automatically enable C++17 if no later standard
         version is already required on the linking target.
-
 
 .. _fs.variables:
 
@@ -86,7 +84,6 @@ Variables
     depending on whether :find-component:`fs.Final` or
     :find-component:`fs.Experimental` was found.
 
-
 Examples
 ********
 
@@ -99,9 +96,7 @@ Using `find_package(Filesystem)` with no component arguments:
     add_executable(my-program main.cpp)
     target_link_libraries(my-program PRIVATE std::filesystem)
 
-
 #]=======================================================================]
-
 
 if(TARGET std::filesystem)
     # This module has already been processed. Don't do it again.
