@@ -11,8 +11,8 @@ AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: Inline
 AllowShortLoopsOnASingleLine: 'true'
-BinPackArguments: 'false'
-BinPackParameters: 'false'
+BinPackArguments: 'true'
+BinPackParameters: 'true'
 BreakBeforeBraces: Allman
 IndentWidth: '4'
 SpaceAfterCStyleCast: 'true'
