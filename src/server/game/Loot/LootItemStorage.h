@@ -45,12 +45,12 @@ public:
     static LootItemStorage* instance();
 
     void LoadStorageFromDB();
-    void RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count);
+    void RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count, uint32 itemIndex);
 
     void AddNewStoredLoot(Loot* loot, Player* player);
     bool LoadStoredLoot(Item* item, Player* player);
 
-    void RemoveStoredLootItem(ObjectGuid containerGUID, uint32 itemid, uint32 count, Loot* loot);
+    void RemoveStoredLootItem(ObjectGuid containerGUID, uint32 itemid, uint32 count, Loot* loot, uint32 itemIndex);
     void RemoveStoredLootMoney(ObjectGuid containerGUID, Loot* loot);
     void RemoveStoredLoot(ObjectGuid containerGUID);
 

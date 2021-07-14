@@ -51,7 +51,7 @@ void LootItemStorage::LoadStorageFromDB()
     LOG_INFO("server.loading", " ");
 }
 
-void LootItemStorage::RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count)
+void LootItemStorage::RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count, uint32 itemIndex)
 {
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -59,6 +59,7 @@ void LootItemStorage::RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid,
     stmt->setUInt32(0, containerGUID.GetCounter());
     stmt->setUInt32(1, itemid);
     stmt->setUInt32(2, count);
+    stmt->setUInt32(3, itemIndex);
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
@@ -212,7 +213,7 @@ bool LootItemStorage::LoadStoredLoot(Item* item, Player* player)
     return true;
 }
 
-void LootItemStorage::RemoveStoredLootItem(ObjectGuid containerGUID, uint32 itemid, uint32 count, Loot* loot)
+void LootItemStorage::RemoveStoredLootItem(ObjectGuid containerGUID, uint32 itemid, uint32 count, Loot* loot, uint32 itemIndex)
 {
     LootItemContainer::iterator itr = lootItemStore.find(containerGUID);
     if (itr == lootItemStore.end())
@@ -222,7 +223,7 @@ void LootItemStorage::RemoveStoredLootItem(ObjectGuid containerGUID, uint32 item
     for (StoredLootItemList::iterator it2 = itemList.begin(); it2 != itemList.end(); ++it2)
         if (it2->itemid == itemid && it2->count == count)
         {
-            RemoveEntryFromDB(containerGUID, itemid, count);
+            RemoveEntryFromDB(containerGUID, itemid, count, itemIndex);
             itemList.erase(it2);
             break;
         }
@@ -243,7 +244,7 @@ void LootItemStorage::RemoveStoredLootMoney(ObjectGuid containerGUID, Loot* loot
     for (StoredLootItemList::iterator it2 = itemList.begin(); it2 != itemList.end(); ++it2)
         if (it2->itemid == 0)
         {
-            RemoveEntryFromDB(containerGUID, 0, it2->count);
+            RemoveEntryFromDB(containerGUID, 0, it2->count, 0);
             itemList.erase(it2);
             break;
         }
