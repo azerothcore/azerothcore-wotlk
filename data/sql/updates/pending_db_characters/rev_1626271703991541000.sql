@@ -1,2 +1,3 @@
+INSERT INTO `version_db_characters` (`sql_rev`) VALUES ('1626271703991541000');
 ALTER TABLE `item_loot_storage` 
 ADD COLUMN `item_index` int(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `item_count`;
