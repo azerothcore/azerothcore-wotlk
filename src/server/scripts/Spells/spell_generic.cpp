@@ -30,6 +30,11 @@
 #include "Vehicle.h"
 #include <array>
 
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+#include "GridNotifiersImpl.h"
+
 // Ours
 class spell_gen_model_visible : public SpellScriptLoader
 {
