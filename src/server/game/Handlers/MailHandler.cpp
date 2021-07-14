@@ -508,7 +508,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
                 {
                     std::string senderName;
                     if (!sObjectMgr->GetPlayerNameByGUID(m->sender, senderName))
-                        senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
+                        senderName = sGameLocale->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);
                     CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<COD> %s\", NOW())",

@@ -46,7 +46,7 @@ namespace Acore
 
         void operator()(WorldPacket& data, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
+            char const* text = sGameLocale->GetAcoreString(_textId, loc_idx);
             if (_args)
             {
                 // we need copy va_list before use or original va_list will corrupted
@@ -83,9 +83,9 @@ namespace Acore
 
         void operator()(WorldPacket& data, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
-            char const* arg1str = _arg1 ? sObjectMgr->GetAcoreString(_arg1, loc_idx) : "";
-            char const* arg2str = _arg2 ? sObjectMgr->GetAcoreString(_arg2, loc_idx) : "";
+            char const* text = sGameLocale->GetAcoreString(_textId, loc_idx);
+            char const* arg1str = _arg1 ? sGameLocale->GetAcoreString(_arg1, loc_idx) : "";
+            char const* arg2str = _arg2 ? sGameLocale->GetAcoreString(_arg2, loc_idx) : "";
 
             char str[2048];
             snprintf(str, 2048, text, arg1str, arg2str);
@@ -1774,7 +1774,7 @@ void Battleground::SendWarningToAll(uint32 entry, ...)
     {
         if (localizedPackets.find(itr->second->GetSession()->GetSessionDbLocaleIndex()) == localizedPackets.end())
         {
-            char const* format = sObjectMgr->GetAcoreString(entry, itr->second->GetSession()->GetSessionDbLocaleIndex());
+            char const* format = sGameLocale->GetAcoreString(entry, itr->second->GetSession()->GetSessionDbLocaleIndex());
 
             char str[1024];
             va_list ap;
@@ -1806,7 +1806,7 @@ void Battleground::EndNow()
 char const* Battleground::GetAcoreString(int32 entry)
 {
     // FIXME: now we have different DBC locales and need localized message for each target client
-    return sObjectMgr->GetAcoreStringForDBCLocale(entry);
+    return sGameLocale->GetAcoreStringForDBCLocale(entry);
 }
 
 void Battleground::HandleTriggerBuff(GameObject* gameObject)
