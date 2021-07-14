@@ -118,25 +118,11 @@ endif()
 
 # Performance optimization options:
 
-if( ENABLE_EXTRAS )
-  message("* Enable extra features           : Yes (default)")
-  add_definitions(-DENABLE_EXTRAS)
-else()
-  message("* Enable extra features           : No")
-endif()
-
 if( ENABLE_VMAP_CHECKS )
   message("* Enable vmap DisableMgr checks   : Yes (default)")
   add_definitions(-DENABLE_VMAP_CHECKS)
 else()
   message("* Enable vmap DisableMgr checks   : No")
-endif()
-
-if( ENABLE_EXTRA_LOGS )
-  message("* Enable extra logging functions  : Yes")
-  add_definitions(-DENABLE_EXTRA_LOGS)
-else()
-  message("* Enable extra logging functions  : No (default)")
 endif()
 
 if(WIN32)
