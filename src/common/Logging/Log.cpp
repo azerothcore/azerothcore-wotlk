@@ -222,6 +222,11 @@ void Log::outMessage(std::string const& filter, LogLevel level, std::string&& me
     write(std::make_unique<LogMessage>(level, filter, std::move(message)));
 }
 
+void Log::_outMessageFmt(std::string const& filter, LogLevel level, std::string&& message)
+{
+    write(std::make_unique<LogMessage>(level, filter, std::move(message)));
+}
+
 void Log::outCommand(std::string&& message, std::string&& param1)
 {
     write(std::make_unique<LogMessage>(LOG_LEVEL_INFO, "commands.gm", std::move(message), std::move(param1)));

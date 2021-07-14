@@ -128,18 +128,17 @@ extern int main(int argc, char** argv)
     sLog->Initialize();
 
     Acore::Banner::Show("worldserver-daemon",
-        [](char const* text)
+        [](std::string_view text)
         {
-            LOG_INFO("server.worldserver", "%s", text);
+            FMT_LOG_INFO("server.worldserver", text);
         },
         []()
         {
-            LOG_INFO("server.worldserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
-            LOG_INFO("server.worldserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            LOG_INFO("server.worldserver", "> Using Boost version:           %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
-            LOG_INFO("server.worldserver", "> Using ACE version:             %s\n", ACE_VERSION);
-        }
-    );
+            FMT_LOG_INFO("server.worldserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
+            FMT_LOG_INFO("server.worldserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            FMT_LOG_INFO("server.worldserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+            FMT_LOG_INFO("server.worldserver", "> Using ACE version:             {}", ACE_VERSION);
+        });
 
     ///- and run the 'Master'
     /// @todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

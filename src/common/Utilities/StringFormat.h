@@ -8,6 +8,7 @@
 #ifndef _STRING_FORMAT_H_
 #define _STRING_FORMAT_H_
 
+#include <fmt/core.h>
 #include <fmt/printf.h>
 
 namespace Acore
@@ -27,6 +28,20 @@ namespace Acore
         }
     }
 
+    // Default string format function.
+    template<typename... Args>
+    inline std::string StringFormatFmt(std::string_view fmt, Args&&... args)
+    {
+        try
+        {
+            return fmt::format(fmt, std::forward<Args>(args)...);
+        }
+        catch (const fmt::format_error& formatError)
+        {
+            return fmt::format("An error occurred formatting string \"{}\": {}", fmt, formatError.what());
+        }
+    }
+
     /// Returns true if the given char pointer is null.
     inline bool IsFormatEmptyOrNull(char const* fmt)
     {
@@ -34,7 +49,7 @@ namespace Acore
     }
 
     /// Returns true if the given std::string is empty.
-    inline bool IsFormatEmptyOrNull(std::string const& fmt)
+    inline bool IsFormatEmptyOrNull(std::string_view fmt)
     {
         return fmt.empty();
     }
