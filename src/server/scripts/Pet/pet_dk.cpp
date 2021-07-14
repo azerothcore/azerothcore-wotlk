@@ -62,8 +62,12 @@ public:
             // Xinef: Night of the Dead avoidance
             if (Aura* aur = me->GetAura(SPELL_DK_NIGHT_OF_THE_DEAD))
                 if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2718, 0))
+                {
                     if (aur->GetEffect(0))
+                    {
                         aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                    }
+                }
 
             me->SetCanFly(true);
             me->SetDisableGravity(true);
