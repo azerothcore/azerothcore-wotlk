@@ -1,2 +1,2 @@
-ALTER TABLE `item_loot_items` 
+ALTER TABLE `item_loot_storage` 
 ADD COLUMN `item_index` int(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `item_count`;
