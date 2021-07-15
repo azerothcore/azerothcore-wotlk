@@ -435,7 +435,7 @@ public:
                     }
                     break;
                 case EVENT_WARN_DEEP_BREATH:
-                    me->MonsterTextEmote(TEXT_DEEP_BREATH, 0, true);
+                    me->TextEmote(TEXT_DEEP_BREATH, nullptr, true);
                     me->RemoveAura(62794);
                     events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500);
                     break;
@@ -740,7 +740,7 @@ public:
                             if( GameObject* wh = me->SummonGameObject(GetHarpoonGunIdForThisHFS(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3 * M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 0) )
                             {
                                 me->RemoveGameObject(wh, false);
-                                me->MonsterTextEmote(TEXT_TURRET_READY, 0, true);
+                                me->TextEmote(TEXT_TURRET_READY, nullptr, true);
                             }
                         }
                     }

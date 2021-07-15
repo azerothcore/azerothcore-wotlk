@@ -1174,7 +1174,7 @@ public:
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_YS_DEAFENING_ROAR:
-                    me->MonsterTextEmote("Yogg-Saron opens his mouth wide!", 0, true);
+                    me->TextEmote("Yogg-Saron opens his mouth wide!", nullptr, true);
                     me->Yell("Eternal suffering awaits!", LANG_UNIVERSAL);
                     me->PlayDirectSound(YS_P3_DEAFENING_ROAR);
                     me->CastSpell(me, SPELL_DEAFENING_ROAR, false);
@@ -2261,7 +2261,7 @@ public:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
                         {
                             me->PlayDirectSound(15760, player);
-                            me->MonsterWhisper("Destroy them minion, your master commands it!", player, false);
+                            me->Whisper("Destroy them minion, your master commands it!", player);
                         }
                         break;
                     }
@@ -2659,7 +2659,7 @@ public:
 
             Unit* caster = GetCaster();
             caster->PlayDirectSound(VOYS_INSANE1, target);
-            caster->MonsterWhisper("Your will is no longer you own...", target, false);
+            caster->Whisper("Your will is no longer you own...", target);
             caster->CastSpell(target, SPELL_INSANE1, true);
             target->CastSpell(target, SPELL_INSANE2, true);
         }

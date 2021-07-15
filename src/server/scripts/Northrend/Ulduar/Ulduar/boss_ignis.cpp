@@ -376,7 +376,7 @@ public:
                     me->DisableRotate(false);
                     break;
                 case EVENT_SPELL_FLAME_JETS:
-                    me->MonsterTextEmote(TEXT_FLAME_JETS, 0, true);
+                    me->TextEmote(TEXT_FLAME_JETS, nullptr, true);
                     me->CastSpell(me->GetVictim(), S_FLAME_JETS, false);
                     events.RepeatEvent(25000);
                     break;

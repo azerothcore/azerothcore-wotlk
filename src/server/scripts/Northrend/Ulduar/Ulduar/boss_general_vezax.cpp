@@ -285,7 +285,7 @@ public:
                     {
                         vaporsCount++;
                         me->CastSpell(me, SPELL_SUMMON_SARONITE_VAPORS, false);
-                        me->MonsterTextEmote("A cloud of saronite vapors coalesces nearby!", 0, true);
+                        me->TextEmote("A cloud of saronite vapors coalesces nearby!", nullptr, true);
 
                         if( vaporsCount < 6 || !hardmodeAvailable )
                             events.RepeatEvent(30000);
@@ -308,7 +308,7 @@ public:
                 case EVENT_SARONITE_VAPORS_SWIRL:
                     if (summons.size())
                     {
-                        me->MonsterTextEmote("The saronite vapors mass and swirl violently, merging into a monstrous form!", 0, true);
+                        me->TextEmote("The saronite vapors mass and swirl violently, merging into a monstrous form!", nullptr, true);
                         if( Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())) )
                             sv->CastSpell(sv, SPELL_SARONITE_ANIMUS_FORMATION_VISUAL, true);
 
@@ -319,7 +319,7 @@ public:
                 case EVENT_SPELL_SUMMON_SARONITE_ANIMUS:
                     if (summons.size())
                     {
-                        me->MonsterTextEmote("A saronite barrier appears around General Vezax!", 0, true);
+                        me->TextEmote("A saronite barrier appears around General Vezax!", nullptr, true);
                         me->Yell(TEXT_VEZAX_HARDMODE, LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_VEZAX_HARDMODE, 0);
 

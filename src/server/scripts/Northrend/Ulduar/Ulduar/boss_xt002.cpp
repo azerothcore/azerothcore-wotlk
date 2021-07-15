@@ -266,7 +266,7 @@ public:
 
                 me->CastSpell(me, SPELL_HEARTBREAK, true);
 
-                me->MonsterTextEmote("XT-002 Deconstructor's heart is severed from his body.", 0, true);
+                me->TextEmote("XT-002 Deconstructor's heart is severed from his body.", nullptr, true);
                 events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4000);
                 return;
             }
@@ -342,7 +342,7 @@ public:
                     events.ScheduleEvent(EVENT_GRAVITY_BOMB, 10000, 1);
                     break;
                 case EVENT_TYMPANIC_TANTARUM:
-                    me->MonsterTextEmote("XT-002 Deconstructor begins to cause the earth to quake.", 0, true);
+                    me->TextEmote("XT-002 Deconstructor begins to cause the earth to quake.", nullptr, true);
                     me->Yell("NO! NO! NO! NO! NO!", LANG_UNIVERSAL);
                     me->PlayDirectSound(XT_SOUND_TANTARUM);
                     me->CastSpell(me, SPELL_TYMPANIC_TANTARUM, true);
@@ -356,7 +356,7 @@ public:
 
                 // Animation events
                 case EVENT_START_SECOND_PHASE:
-                    me->MonsterTextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", 0, true);
+                    me->TextEmote("XT-002 Deconstructor's heart is exposed and leaking energy.", nullptr, true);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
@@ -606,7 +606,7 @@ public:
                     }
 
                     if (!urand(0, 2))
-                        me->MonsterTextEmote("XT-002 Deconstructor consumes scrap bot to repair himself.", 0, true);
+                        me->TextEmote("XT-002 Deconstructor consumes scrap bot to repair himself.", nullptr, true);
 
                     me->DespawnOrUnsummon(1);
                 }
