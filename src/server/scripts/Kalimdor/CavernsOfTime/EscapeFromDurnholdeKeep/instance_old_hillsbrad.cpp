@@ -183,7 +183,7 @@ public:
                         instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
                         instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
 
-                        for (ObjectGuid const guid : _prisonersSet)
+                        for (ObjectGuid const& guid : _prisonersSet)
                             if (Creature* orc = instance->GetCreature(guid))
                             {
                                 uint8 index = orc->GetDistance(instancePositions[0]) < 80.0f ? 0 : 1;
@@ -193,7 +193,7 @@ public:
                                 orc->SetStandState(UNIT_STAND_STATE_STAND);
                             }
 
-                        for (ObjectGuid const guid : _initalFlamesSet)
+                        for (ObjectGuid const& guid : _initalFlamesSet)
                             if (GameObject* gobject = instance->GetGameObject(guid))
                             {
                                 gobject->SetRespawnTime(0);
@@ -215,14 +215,14 @@ public:
                                         player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER);
                         }
 
-                        for (ObjectGuid const guid : _finalFlamesSet)
+                        for (ObjectGuid const& guid : _finalFlamesSet)
                             if (GameObject* gobject = instance->GetGameObject(guid))
                             {
                                 gobject->SetRespawnTime(0);
                                 gobject->UpdateObjectVisibility(true);
                             }
 
-                        for (ObjectGuid const guid : _prisonersSet)
+                        for (ObjectGuid const& guid : _prisonersSet)
                             if (Creature* orc = instance->GetCreature(guid))
                                 if (roll_chance_i(25))
                                     orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
