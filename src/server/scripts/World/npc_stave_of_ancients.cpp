@@ -248,13 +248,14 @@ public:
         {
             uint32 serpentStings[12] = { 1978, 13549, 13550, 13551, 13552, 13553, 13554, 13555, 25295, 27016, 49000, 49001 };
 
-            if (me->GetEntry() == ARTORIUS_EVIL_ENTRY)
+            if (!InNormalForm())
             {
                 bool applyAura = std::find(std::begin(serpentStings), std::end(serpentStings), Spell->Id) != std::end(serpentStings);
 
                 if (applyAura)
                 {
                     me->AddAura(ARTORIUS_SPELL_STINGING_TRAUMA, me);
+                    me->MonsterTextEmote(ARTORIUS_WEAKNESS_EMOTE, 0);
                 }
             }
         }

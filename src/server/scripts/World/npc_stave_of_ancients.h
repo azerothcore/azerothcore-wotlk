@@ -28,6 +28,7 @@ enum NPCArtorius
     ARTORIUS_EVENT_DEMONIC_DOOM               = 5,
     ARTORIUS_GOSSIP_TEXT                      = 7045,   // npc_text.ID               "How wonderful to see another person in..."
     ARTORIUS_GOSSIP_OPTION_TEXT               = 14531,  // creature_text.CreatureID  "I know you as Artorius the Doombringer..."
+    ARTORIUS_WEAKNESS_EMOTE                   = 9786,   // broadcast_text.ID         "%s is stricken by a virulent poison."
     ARTORIUS_SAY                              = 9787,   // broadcast_text.ID         "Your soul is mine, weakling."
 
     ARTORIUS_NORMAL_ENTRY                     = 14531,  // creature_template.entry
