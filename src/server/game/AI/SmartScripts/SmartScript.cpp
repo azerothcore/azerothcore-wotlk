@@ -270,7 +270,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsUnit(*itr))
                     {
                         uint32 sound = temp[urand(0, count - 1)];
-                        (*itr)->SendPlaySound(sound, e.action.randomSound.onlySelf > 0);
+                        (*itr)->PlayDirectSound(sound, e.action.randomSound.onlySelf ? (*itr)->ToPlayer() : nullptr);
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_SOUND: target: %s (%s), sound: %u, onlyself: %u",
                                        (*itr)->GetName().c_str(), (*itr)->GetGUID().ToString().c_str(), sound, e.action.randomSound.onlySelf);
                     }
@@ -318,7 +318,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (IsUnit(*itr))
                         {
-                            (*itr)->SendPlayMusic(e.action.music.sound, e.action.music.onlySelf > 0);
+                            (*itr)->PlayDirectSound(e.action.music.sound, e.action.music.onlySelf ? (*itr)->ToPlayer() : nullptr);
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_MUSIC: target: %s (%s), sound: %u, onlySelf: %u, type: %u",
                                            (*itr)->GetName().c_str(), (*itr)->GetGUID().ToString().c_str(), e.action.music.sound, e.action.music.onlySelf, e.action.music.type);
                         }
@@ -391,7 +391,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsUnit(*itr))
                     {
                         uint32 sound = temp[urand(0, count - 1)];
-                        (*itr)->SendPlayMusic(sound, e.action.randomMusic.onlySelf > 0);
+                        (*itr)->PlayDirectSound(sound, e.action.randomMusic.onlySelf ? (*itr)->ToPlayer() : nullptr);
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_MUSIC: target: %s (%s), sound: %u, onlyself: %u, type: %u",
                                        (*itr)->GetName().c_str(), (*itr)->GetGUID().ToString().c_str(), sound, e.action.randomMusic.onlySelf, e.action.randomMusic.type);
                     }
@@ -960,7 +960,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 me->DoFleeToGetAssistance();
                 if (e.action.flee.withEmote)
                 {
-                    Acore::StringTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, LANG_FLEE, LANG_UNIVERSAL, nullptr);
+                    Acore::BroadcastTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, LANG_FLEE, me->getGender());
                     sCreatureTextMgr->SendChatPacket(me, builder, CHAT_MSG_MONSTER_EMOTE);
                 }
                 LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_FLEE_FOR_ASSIST: Creature %s DoFleeToGetAssistance", me->GetGUID().ToString().c_str());
@@ -1251,7 +1251,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range);
                         if (e.action.callHelp.withEmote)
                         {
-                            Acore::StringTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, LANG_CALL_FOR_HELP, LANG_UNIVERSAL, nullptr);
+                            Acore::BroadcastTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, LANG_CALL_FOR_HELP, LANG_UNIVERSAL, nullptr);
                             sCreatureTextMgr->SendChatPacket(*itr, builder, CHAT_MSG_MONSTER_EMOTE);
                         }
                     }

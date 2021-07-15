@@ -237,7 +237,7 @@ void ScriptedAI::DoPlayMusic(uint32 soundId, bool zone)
     {
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
         {
-            (*itr)->SendPlayMusic(soundId, true);
+            (*itr)->PlayDirectSound(soundId);
         }
 
         delete targets;

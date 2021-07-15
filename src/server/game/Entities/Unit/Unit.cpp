@@ -10,6 +10,7 @@
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "Chat.h"
 #include "ChatTextBuilder.h"
 #include "Common.h"
 #include "ConditionMgr.h"
@@ -20293,7 +20294,7 @@ void Unit::Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject con
         return;
     }
 
-    Acore::BroadcastTextBuilder builder(this, msgType, textId, GetGender(), target);
+    Acore::BroadcastTextBuilder builder(this, msgType, textId, getGender(), target);
     Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> localizer(builder);
     Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> > worker(this, textRange, localizer);
     Cell::VisitWorldObjects(this, worker, textRange);
@@ -20328,6 +20329,6 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
 
     LocaleConstant locale = target->GetSession()->GetSessionDbLocaleIndex();
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, GetGender()), 0, "", locale);
+    ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
 }

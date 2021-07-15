@@ -1529,7 +1529,7 @@ public:
             if (!vehicle)
                 return;
 
-            Player* driver = vehicle->GetPassenger(0) ? vehicle->GetPassenger(0)->ToPlayer() : nullptr;
+            Unit* driver = vehicle->GetPassenger(0);
             if (!driver)
                 return;
 

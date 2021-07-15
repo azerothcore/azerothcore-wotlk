@@ -383,11 +383,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
 
                 if (type == CHAT_MSG_SAY)
-                    sender->Say(msg, Languague(lang));
+                    sender->Say(msg, Language(lang));
                 else if (type == CHAT_MSG_EMOTE)
                     sender->TextEmote(msg);
                 else if (type == CHAT_MSG_YELL)
-                    sender->Yell(msg, Languague(lang));
+                    sender->Yell(msg, Language(lang));
             }
             break;
         case CHAT_MSG_WHISPER:
@@ -431,7 +431,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
                     sender->AddWhisperWhiteList(receiver->GetGUID());
 
-                GetPlayer()->Whisper(msg, Languague(lang), receiver);
+                GetPlayer()->Whisper(msg, Language(lang), receiver);
             }
             break;
         case CHAT_MSG_PARTY:

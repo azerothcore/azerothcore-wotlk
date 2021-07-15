@@ -830,9 +830,10 @@ public:
 ## npc_jungle_punch_target
 #####*/
 
+#define SAY_OFFER "Care to try Grimbooze Thunderbrew's new jungle punch?"
+
 enum JunglePunch
 {
-    SAY_OFFER                           = 28558,
     ITEM_TANKARD                        = 2705,
 
     NPC_HEMET                           = 27986,
@@ -1014,7 +1015,7 @@ public:
                     continue;
 
                 player->KilledMonsterCredit(me->GetEntry());
-                player->Say(SAY_OFFER, LANG_UNIVERSAL, me);
+                player->Say(SAY_OFFER, LANG_UNIVERSAL);
                 sayStep = 1;
                 break;
             }
@@ -1465,15 +1466,15 @@ public:
 
         void HandleScript(SpellEffIndex /*effIndex*/)
         {
-            if (Player* player = GetHitUnit()->ToPlayer())
+            if (Unit* target = GetHitUnit())
             {
                 switch (GetSpellInfo()->Id)
                 {
                     case SPELL_CORRECT_TRACKS:
-                        player->Say(sObjectMgr->GetAcoreStringForDBCLocale(SAY_CORRECT_TRACKS), LANG_UNIVERSAL, player);
+                        target->Say(SAY_CORRECT_TRACKS, target);
                         break;
                     case SPELL_INCORRECT_TRACKS:
-                        player->Say(sObjectMgr->GetAcoreStringForDBCLocale(SAY_INCORRECT_TRACKS), LANG_UNIVERSAL, player);
+                        target->Say(SAY_INCORRECT_TRACKS, target);
                         break;
                     default:
                         break;

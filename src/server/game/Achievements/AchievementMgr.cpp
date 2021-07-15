@@ -11,6 +11,7 @@
 #include "Battleground.h"
 #include "BattlegroundAB.h"
 #include "CellImpl.h"
+#include "Chat.h"
 #include "ChatTextBuilder.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -644,9 +645,9 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId());
     if (guild)
     {
-        Acore::StringTextBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, GetPlayer(), achievement->ID);
-        Acore::LocalizedPacketDo<Acore::StringTextBuilder> say_do(say_builder);
-        guild->BroadcastWorker(say_do, GetPlayer());
+        Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, GetPlayer()->getGender(), GetPlayer(), achievement->ID);
+        Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
+        guild->BroadcastWorker(_localizer, GetPlayer());
     }
 
     if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_KILL | ACHIEVEMENT_FLAG_REALM_FIRST_REACH))
@@ -687,11 +688,11 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
         Cell cell(p);
         cell.SetNoCreate();
 
-        Acore::StringTextBuilder say_builder(*GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, GetPlayer(), achievement->ID);
-        Acore::LocalizedPacketDo<Acore::StringTextBuilder> say_do(say_builder);
-        Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::StringTextBuilder> > say_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-        TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::StringTextBuilder> >, WorldTypeMapContainer > message(say_worker);
-        Cell::VisitWorldObjects(GetPlayer(), say_worker, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
+        Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, GetPlayer()->getGender(), GetPlayer(), achievement->ID);
+        Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
+        Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder>>                                              _worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), _localizer);
+        TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> >, WorldTypeMapContainer > message(_worker);
+        Cell::VisitWorldObjects(GetPlayer(), _worker, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
     }
 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8 + 4 + 8);

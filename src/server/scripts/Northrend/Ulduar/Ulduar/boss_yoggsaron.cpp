@@ -2261,7 +2261,7 @@ public:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
                         {
                             me->PlayDirectSound(15760, player);
-                            me->Whisper("Destroy them minion, your master commands it!", player);
+                            me->Whisper("Destroy them minion, your master commands it!", LANG_UNIVERSAL, player);
                         }
                         break;
                     }
@@ -2659,7 +2659,7 @@ public:
 
             Unit* caster = GetCaster();
             caster->PlayDirectSound(VOYS_INSANE1, target);
-            caster->Whisper("Your will is no longer you own...", target);
+            caster->Whisper("Your will is no longer you own...", LANG_UNIVERSAL, target);
             caster->CastSpell(target, SPELL_INSANE1, true);
             target->CastSpell(target, SPELL_INSANE2, true);
         }

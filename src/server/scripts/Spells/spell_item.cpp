@@ -795,7 +795,7 @@ public:
                         break;
                     case SPELL_FISH_FEAST:
                         if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(FISH_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                            player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player,);
+                            player->TextEmote(bct->GetText(loc_idx, player->getGender()).c_str(), player);
                         break;
                     case SPELL_SMALL_FEAST:
                         if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE))
