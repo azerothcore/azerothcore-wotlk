@@ -1,3 +1,19 @@
+-- DB update 2021_07_15_00 -> 2021_07_15_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_07_15_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_07_15_00 2021_07_15_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1626104814208190800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1626104814208190800');
 
 -- Make Emerald Ooze wander 
@@ -47,3 +63,13 @@ UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 5 WHERE `id` = 446
 -- Make Vilebranch Soothsayer wander
 UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 10 WHERE `id` = 4467 AND `guid` = 93408;
 UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 3 WHERE `id` = 4467 AND `guid` IN (93633, 93637, 93660, 93661, 93668, 93671);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_07_15_01' WHERE sql_rev = '1626104814208190800';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
