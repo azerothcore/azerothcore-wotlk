@@ -27,14 +27,20 @@ EndScriptData */
 #include <openssl/rand.h>
 #include <unordered_map>
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class account_commandscript : public CommandScript
 {
 public:
     account_commandscript() : CommandScript("account_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> accountSetCommandTable =
+        static ChatCommandTable accountSetCommandTable =
         {
             { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,          "" },
             { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,        "" },
@@ -42,13 +48,13 @@ public:
             { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,            "" }
         };
 
-        static std::vector<ChatCommand> accountLockCommandTable
+        static ChatCommandTable accountLockCommandTable
         {
             { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,       "" },
             { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,            "" }
         };
 
-        static std::vector<ChatCommand> account2faCommandTable
+        static ChatCommandTable account2faCommandTable
         {
             { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,          "" },
             { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,         "" },
@@ -59,7 +65,7 @@ public:
             { "country",    SEC_ADMINISTRATOR,  true,  &HandleAccountRemoveLockCountryCommand,  "" }
         };
 
-        static std::vector<ChatCommand> accountCommandTable =
+        static ChatCommandTable accountCommandTable =
         {
             { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable        },
             { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,             "" },
@@ -73,7 +79,7 @@ public:
             { "",           SEC_PLAYER,         false,  &HandleAccountCommand,                  "" }
         };
 
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "account", SEC_PLAYER, true, nullptr, "", accountCommandTable }
         };

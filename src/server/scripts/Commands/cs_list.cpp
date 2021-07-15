@@ -19,14 +19,20 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
+#if AC_COMPILER == AC_COMPILER_GNU
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+using namespace Acore::ChatCommands;
+
 class list_commandscript : public CommandScript
 {
 public:
     list_commandscript() : CommandScript("list_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> listCommandTable =
+        static ChatCommandTable listCommandTable =
         {
             { "creature",       SEC_MODERATOR,  true,  &HandleListCreatureCommand,          "" },
             { "item",           SEC_MODERATOR,  true,  &HandleListItemCommand,              "" },
@@ -34,7 +40,7 @@ public:
             { "gobject",        SEC_MODERATOR,  true,  &HandleListObjectCommand,            "" },
             { "auras",          SEC_MODERATOR,  false, &HandleListAurasCommand,             "" }
         };
-        static std::vector<ChatCommand> commandTable =
+        static ChatCommandTable commandTable =
         {
             { "list",          SEC_MODERATOR,   true, nullptr,                                 "", listCommandTable }
         };

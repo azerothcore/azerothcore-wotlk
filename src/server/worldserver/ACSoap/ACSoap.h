@@ -22,7 +22,7 @@ public:
 
     ~SOAPCommand() { }
 
-    void appendToPrintBuffer(char const* msg)
+    void appendToPrintBuffer(std::string_view msg)
     {
         m_printBuffer += msg;
     }
@@ -38,7 +38,7 @@ public:
         return m_success;
     }
 
-    static void print(void* callbackArg, char const* msg)
+    static void print(void* callbackArg, std::string_view msg)
     {
         ((SOAPCommand*)callbackArg)->appendToPrintBuffer(msg);
     }
