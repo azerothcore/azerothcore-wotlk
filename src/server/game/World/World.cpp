@@ -1491,8 +1491,10 @@ void World::SetInitialWorldSettings()
     sIPLocation->Load();
 
     std::vector<uint32> mapIds;
-    for (auto const& map : sMapStore)
+    for (auto const map : sMapStore)
+    {
         mapIds.emplace_back(map->MapID);
+    }
 
     vmmgr2->InitializeThreadUnsafe(mapIds);
 
