@@ -76,9 +76,9 @@ enum BWLMisc
     ACTION_PHASE_TWO            = 1,
     DATA_EGG_EVENT              = 2,
     TALK_EGG_BROKEN_RAND        = 3,
-
-    SAY_NEFARIAN_VAEL_INTRO     = 100003, // latest id in broadcast_text atm
 };
+
+#define SAY_NEFARIAN_VAEL_INTRO "Ah...the heroes. You are persistent, aren't you? Your ally here attempted to match his power against mine - and paid the price. Now he shall serve me...by slaughtering you. Get up, little red wyrm...and destroy them !"
 
 template <class AI, class T>
 inline AI* GetBlackwingLairAI(T* obj)

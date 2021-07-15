@@ -202,7 +202,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         Creature* pOtherBoss = GetOtherBoss();
         if (pOtherBoss)
         {
-            //me->MonsterYell("Teleporting ...", LANG_UNIVERSAL, 0);
+            //me->Yell("Teleporting ...", LANG_UNIVERSAL);
             Position thisPos;
             thisPos.Relocate(me);
             Position otherPos;
@@ -246,7 +246,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 me->ClearUnitState(UNIT_STATE_STUNNED);
                 if (Unit* nearu = me->SelectNearestTarget(100))
                 {
-                    //DoYell(nearu->GetName(), LANG_UNIVERSAL, 0);
+                    //DoYell(nearu->GetName(), LANG_UNIVERSAL);
                     AttackStart(nearu);
                     me->AddThreat(nearu, 10000);
                 }

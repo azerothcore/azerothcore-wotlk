@@ -74,10 +74,10 @@ public:
             switch (waypointId)
             {
                 case 0:
-                    me->MonsterTextEmote("You've been seen! Use the net and Freezing elixir to keep the dwarves away!", 0, true);
+                    me->TextEmote("You've been seen! Use the net and Freezing elixir to keep the dwarves away!", nullptr, true);
                     break;
                 case 19:
-                    me->MonsterTextEmote("The frosthound has located the thief's hiding place. Confront him!", 0, true);
+                    me->TextEmote("The frosthound has located the thief's hiding place. Confront him!", nullptr, true);
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         summoner->ToPlayer()->KilledMonsterCredit(29677);
                     break;
