@@ -95,6 +95,7 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
         stmt->setBool(index++, false);
         stmt->setBool(index++, false);
         stmt->setBool(index++, false);
+        stmt->setUInt32(index++, 0);
         trans->Append(stmt);
     }
 
