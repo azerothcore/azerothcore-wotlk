@@ -9,7 +9,6 @@
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Item.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
