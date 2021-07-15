@@ -65,7 +65,7 @@ public:
         if (!*args)
             return false;
 
-        Player* targetPlayer = handler->getSelectedPlayer();
+        Player* targetPlayer = handler->GetSelectedPlayer();
 
         if (!targetPlayer)
         {
@@ -107,7 +107,7 @@ public:
 
     static bool HandleLearnAllMySpellsCommand(ChatHandler* handler, char const* /*args*/)
     {
-        ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass());
+        ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->GetClass());
         if (!classEntry)
             return true;
         uint32 family = classEntry->spellfamily;
@@ -322,7 +322,7 @@ public:
         //  Learns all recipes of specified profession and sets skill to max
         //  Example: .learn all_recipes enchanting
 
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -433,7 +433,7 @@ public:
         if (!*args)
             return false;
 
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);

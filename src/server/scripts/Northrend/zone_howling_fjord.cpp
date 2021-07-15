@@ -118,7 +118,7 @@ public:
                     return;
                 case 4:
                     me->MonsterWhisper("NOOOOOOOoooooooooo!", summoner->ToPlayer());
-                    me->SetLevel(summoner->getLevel());
+                    me->SetLevel(summoner->GetLevel());
                     me->setFaction(14);
                     if (me->GetExactDist(summoner) < 50.0f)
                     {

@@ -348,7 +348,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
             if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(badname))
                 if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid.GetCounter()))
                 {
-                    if (Player::TeamIdForRace(gpd->race) == Player::TeamIdForRace(player->getRace()))
+                    if (Player::TeamIdForRace(gpd->race) == Player::TeamIdForRace(player->GetRace()))
                     {
                         banOffline = true;
                         victim = guid;

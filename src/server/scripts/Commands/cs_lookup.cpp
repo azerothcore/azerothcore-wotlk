@@ -282,7 +282,7 @@ public:
             return false;
 
         // Can be nullptr at console call
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
 
         std::string namePart = args;
         std::wstring wNamePart;
@@ -614,7 +614,7 @@ public:
             return false;
 
         // can be nullptr at console call
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
 
         std::string namePart = args;
         std::wstring wNamePart;
@@ -743,7 +743,7 @@ public:
             return false;
 
         // can be nullptr in console call
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
 
         std::string namePart = args;
         std::wstring wNamePart;
@@ -831,7 +831,7 @@ public:
             return false;
 
         // can be nullptr at console call
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
 
         std::string namePart = args;
         std::wstring wNamePart;
@@ -943,7 +943,7 @@ public:
             return false;
 
         // can be nullptr at console call
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
 
         uint32 id = atoi((char*)args);
 
@@ -1163,7 +1163,7 @@ public:
             return false;
 
         // can be nullptr in console call
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
 
         // title name have single string arg for player name
         char const* targetName = target ? target->GetName().c_str() : "NAME";
@@ -1316,7 +1316,7 @@ public:
         int32 limit;
         char* limitStr;
 
-        Player* target = handler->getSelectedPlayer();
+        Player* target = handler->GetSelectedPlayer();
         if (!*args)
         {
             // nullptr only if used from console

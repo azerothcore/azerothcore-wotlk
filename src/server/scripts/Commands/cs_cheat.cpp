@@ -130,7 +130,7 @@ public:
         if (!*args)
             return false;
 
-        Player* player = handler->getSelectedPlayer();
+        Player* player = handler->GetSelectedPlayer();
         if (!player)
         {
             handler->PSendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -186,7 +186,7 @@ public:
     {
         std::string argStr = (char*)args;
 
-        Player* chr = handler->getSelectedPlayer();
+        Player* chr = handler->GetSelectedPlayer();
 
         if (!chr)
             chr = handler->GetSession()->GetPlayer();

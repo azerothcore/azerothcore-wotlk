@@ -87,7 +87,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     Player* player = ObjectAccessor::FindConnectedPlayer(playerGuid);
     if (player)
     {
-        playerClass = player->getClass();
+        playerClass = player->GetClass();
         playerName = player->GetName();
     }
     else
@@ -441,7 +441,7 @@ void ArenaTeam::Roster(WorldSession* session)
         sObjectMgr->GetPlayerNameByGUID(itr->Guid.GetCounter(), tempName);
         data << tempName;                                  // member name
         data << uint32((itr->Guid == GetCaptain() ? 0 : 1));// captain flag 0 captain 1 member
-        data << uint8((player ? player->getLevel() : 0));           // unknown, level?
+        data << uint8((player ? player->GetLevel() : 0));           // unknown, level?
         data << uint8(itr->Class);                         // class
         data << uint32(itr->WeekGames);                    // played this week
         data << uint32(itr->WeekWins);                     // wins this week

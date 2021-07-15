@@ -39,7 +39,7 @@ public:
                 uint32 hp = uint32(owner->GetMaxHealth() * 0.3f);
                 me->SetMaxHealth(hp);
                 me->SetHealth(hp);
-                me->SetLevel(owner->getLevel());
+                me->SetLevel(owner->GetLevel());
             }
 
             me->CastSpell(me, SPELL_PRIEST_LIGHTWELL_CHARGES, false); // Spell for Lightwell Charges

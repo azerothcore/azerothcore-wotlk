@@ -2854,7 +2854,7 @@ public:
                 {
                     c->AI()->AttackStart(target);
                     DoZoneInCombat(c);
-                    uint8 Class = target->getClass();
+                    uint8 Class = target->GetClass();
                     if (Class != CLASS_DRUID)
                         if (Player* p = target->ToPlayer())
                         {

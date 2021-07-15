@@ -265,10 +265,10 @@ public:
         void RecalculateDamage()
         {
             if (Unit* target = GetHitUnit())
-                if (target->getLevel() > 60)
+                if (target->GetLevel() > 60)
                 {
                     int32 damage = GetHitDamage();
-                    AddPct(damage, -4 * int8(std::min(target->getLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
+                    AddPct(damage, -4 * int8(std::min(target->GetLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
                     SetHitDamage(damage);
                 }
         }
@@ -291,8 +291,8 @@ public:
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool&   /*canBeRecalculated*/)
         {
             if (Unit* owner = GetUnitOwner())
-                if (owner->getLevel() > 60)
-                    AddPct(amount, -4 * int8(std::min(owner->getLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
+                if (owner->GetLevel() > 60)
+                    AddPct(amount, -4 * int8(std::min(owner->GetLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
         }
 
         void Register() override
@@ -450,7 +450,7 @@ public:
         SpellCastResult CheckRequirement()
         {
             if (Unit* target = GetExplTargetUnit())
-                if (target->getLevel() >= _level)
+                if (target->GetLevel() >= _level)
                     return SPELL_FAILED_DONT_REPORT;
 
             return SPELL_CAST_OK;
@@ -492,7 +492,7 @@ public:
         {
             if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
             {
-                if (modOwner->getClass() == CLASS_HUNTER)
+                if (modOwner->GetClass() == CLASS_HUNTER)
                     amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 8.0f);
                 else if (modOwner->getPowerType() == POWER_MANA)
                     amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 8.0f);
@@ -505,7 +505,7 @@ public:
         {
             if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
             {
-                if (modOwner->getClass() == CLASS_HUNTER)
+                if (modOwner->GetClass() == CLASS_HUNTER)
                     amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 17.0f);
                 else if (modOwner->getPowerType() == POWER_MANA)
                     amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 17.0f);
@@ -518,7 +518,7 @@ public:
         {
             if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
             {
-                if (modOwner->getClass() == CLASS_HUNTER)
+                if (modOwner->GetClass() == CLASS_HUNTER)
                     amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 26.0f);
                 else if (modOwner->getPowerType() == POWER_MANA)
                     amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 26.0f);
@@ -671,8 +671,8 @@ public:
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool&   /*canBeRecalculated*/)
         {
             Unit* target = GetUnitOwner();
-            if (target->getLevel() <= 63)
-                amount = amount * target->getLevel() / 60;
+            if (target->GetLevel() <= 63)
+                amount = amount * target->GetLevel() / 60;
             else
                 SetDuration(1);
         }
@@ -802,7 +802,7 @@ public:
 
         SpellCastResult CheckRequirement()
         {
-            if (GetCaster()->getLevel() < GetSpellInfo()->BaseLevel)
+            if (GetCaster()->GetLevel() < GetSpellInfo()->BaseLevel)
                 return SPELL_FAILED_LEVEL_REQUIREMENT;
             return SPELL_CAST_OK;
         }
@@ -1088,7 +1088,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetActor() && eventInfo.GetActor()->getLevel() >= 75;
+            return eventInfo.GetActor() && eventInfo.GetActor()->GetLevel() >= 75;
         }
 
         void Register() override
@@ -1198,8 +1198,8 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             // Xinef: mostly its 33.(3)% reduce by 70 and 66.(6)% by 80
-            if (eventInfo.GetActor() && eventInfo.GetActor()->getLevel() > 60)
-                if (roll_chance_f((eventInfo.GetActor()->getLevel() - 60) * 3.33f))
+            if (eventInfo.GetActor() && eventInfo.GetActor()->GetLevel() > 60)
+                if (roll_chance_f((eventInfo.GetActor()->GetLevel() - 60) * 3.33f))
                     return false;
 
             return true;
@@ -2853,7 +2853,7 @@ public:
                 target->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
                 uint32 spellId = SPELL_MAGIC_ROOSTER_NORMAL;
-                switch (target->getRace())
+                switch (target->GetRace())
                 {
                     case RACE_DRAENEI:
                         if (target->getGender() == GENDER_MALE)
@@ -4048,11 +4048,11 @@ public:
                 case NPC_ARGENT_WARHORSE:
                     {
                         if (player->HasAchieved(ACHIEVEMENT_CHAMPION_ALLIANCE) || player->HasAchieved(ACHIEVEMENT_CHAMPION_HORDE))
-                            return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_CHAMPION : SPELL_PENNANT_ARGENT_CRUSADE_CHAMPION;
+                            return player->GetClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_CHAMPION : SPELL_PENNANT_ARGENT_CRUSADE_CHAMPION;
                         else if (player->HasAchieved(ACHIEVEMENT_ARGENT_VALOR))
-                            return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_VALIANT : SPELL_PENNANT_ARGENT_CRUSADE_VALIANT;
+                            return player->GetClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_VALIANT : SPELL_PENNANT_ARGENT_CRUSADE_VALIANT;
                         else
-                            return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_ASPIRANT : SPELL_PENNANT_ARGENT_CRUSADE_ASPIRANT;
+                            return player->GetClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_ASPIRANT : SPELL_PENNANT_ARGENT_CRUSADE_ASPIRANT;
                     }
                 default:
                     return 0;

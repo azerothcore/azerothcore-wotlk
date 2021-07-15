@@ -76,10 +76,10 @@ public:
 
     static bool HandleResetStatsOrLevelHelper(Player* player)
     {
-        ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(player->getClass());
+        ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(player->GetClass());
         if (!classEntry)
         {
-            LOG_ERROR("dbc", "Class %u not found in DBC (Wrong DBC files?)", player->getClass());
+            LOG_ERROR("dbc", "Class %u not found in DBC (Wrong DBC files?)", player->GetClass());
             return false;
         }
 
@@ -89,9 +89,9 @@ public:
         if (!player->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
             player->SetShapeshiftForm(FORM_NONE);
 
-        player->setFactionForRace(player->getRace());
+        player->setFactionForRace(player->GetRace());
 
-        player->SetUInt32Value(UNIT_FIELD_BYTES_0, ((player->getRace()) | (player->getClass() << 8) | (player->getGender() << 16) | (powerType << 24)));
+        player->SetUInt32Value(UNIT_FIELD_BYTES_0, ((player->GetRace()) | (player->GetClass() << 8) | (player->getGender() << 16) | (powerType << 24)));
 
         // reset only if player not in some form;
         if (player->GetShapeshiftForm() == FORM_NONE)
@@ -115,10 +115,10 @@ public:
         if (!HandleResetStatsOrLevelHelper(target))
             return false;
 
-        uint8 oldLevel = target->getLevel();
+        uint8 oldLevel = target->GetLevel();
 
         // set starting level
-        uint32 startLevel = target->getClass() != CLASS_DEATH_KNIGHT
+        uint32 startLevel = target->GetClass() != CLASS_DEATH_KNIGHT
                             ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
                             : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 

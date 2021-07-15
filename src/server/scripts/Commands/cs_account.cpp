@@ -705,7 +705,7 @@ public:
 
         if (!exp)
         {
-            Player* player = handler->getSelectedPlayer();
+            Player* player = handler->GetSelectedPlayer();
             if (!player)
                 return false;
 
@@ -770,7 +770,7 @@ public:
 
         if (arg1 && !arg3)
         {
-            if (!handler->getSelectedPlayer())
+            if (!handler->GetSelectedPlayer())
                 return false;
             isAccountNameGiven = false;
         }
@@ -801,7 +801,7 @@ public:
         }
 
         // handler->getSession() == nullptr only for console
-        targetAccountId = (isAccountNameGiven) ? AccountMgr::GetId(targetAccountName) : handler->getSelectedPlayer()->GetSession()->GetAccountId();
+        targetAccountId = (isAccountNameGiven) ? AccountMgr::GetId(targetAccountName) : handler->GetSelectedPlayer()->GetSession()->GetAccountId();
         int32 gmRealmID = (isAccountNameGiven) ? atoi(arg3) : atoi(arg2);
         uint32 playerSecurity;
         if (handler->GetSession())

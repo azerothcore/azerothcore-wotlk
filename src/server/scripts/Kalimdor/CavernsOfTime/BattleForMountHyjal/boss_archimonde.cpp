@@ -362,7 +362,7 @@ public:
 
         void GainSoulCharge(Player* victim)
         {
-            switch (victim->getClass())
+            switch (victim->GetClass())
             {
                 case CLASS_PRIEST:
                 case CLASS_PALADIN:

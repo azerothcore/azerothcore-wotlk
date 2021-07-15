@@ -54,7 +54,7 @@ public:
 
             EnsureGridLoaded();
 
-            if (plr->getRace() != RACE_HUMAN && plr->getRace() != RACE_DWARF && plr->getRace() != RACE_GNOME)
+            if (plr->GetRace() != RACE_HUMAN && plr->GetRace() != RACE_DWARF && plr->GetRace() != RACE_GNOME)
                 plr->CastSpell(plr, ((plr->getGender() == GENDER_MALE) ? SPELL_HUMAN_MALE : SPELL_HUMAN_FEMALE), true);
         }
 

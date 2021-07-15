@@ -155,7 +155,7 @@ public:
                 if (Unit* ghoul = unitTarget->GetCharm())
                 {
                     //health, mana, armor and resistance
-                    PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(ghoul->GetEntry(), ghoul->getLevel());
+                    PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(ghoul->GetEntry(), ghoul->GetLevel());
                     if (pInfo)                                      // exist in DB
                     {
                         ghoul->SetCreateHealth(pInfo->health);
@@ -165,8 +165,8 @@ public:
                             ghoul->SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
                     }
 
-                    ghoul->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(ghoul->getLevel() - (ghoul->getLevel() / 4)));
-                    ghoul->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(ghoul->getLevel() + (ghoul->getLevel() / 4)));
+                    ghoul->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(ghoul->GetLevel() - (ghoul->GetLevel() / 4)));
+                    ghoul->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(ghoul->GetLevel() + (ghoul->GetLevel() / 4)));
 
                     // Avoidance, Night of the Dead
                     if (Aura* aur = ghoul->AddAura(62137, ghoul))
@@ -1215,7 +1215,7 @@ public:
         bool Load() override
         {
             _executed = false;
-            return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCaster()->getClass() == CLASS_DEATH_KNIGHT;
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCaster()->GetClass() == CLASS_DEATH_KNIGHT;
         }
 
         void HandleAfterHit()
@@ -1495,7 +1495,7 @@ public:
 
         SpellCastResult CheckClass()
         {
-            if (GetCaster()->getClass() != CLASS_DEATH_KNIGHT)
+            if (GetCaster()->GetClass() != CLASS_DEATH_KNIGHT)
             {
                 SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_MUST_BE_DEATH_KNIGHT);
                 return SPELL_FAILED_CUSTOM_ERROR;

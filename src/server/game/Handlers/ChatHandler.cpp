@@ -221,7 +221,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         specialMessageLimit = 15;
                         break;
                     case CHAT_MSG_WHISPER:
-                        if (sender->getLevel() >= 80)
+                        if (sender->GetLevel() >= 80)
                             specialMessageLimit = 15;
                         break;
                 }
@@ -376,7 +376,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!sender->IsAlive())
                     return;
 
-                if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ))
+                if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ))
                 {
                     SendNotification(GetAcoreString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
                     return;
@@ -392,7 +392,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             break;
         case CHAT_MSG_WHISPER:
             {
-                if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ))
+                if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ))
                 {
                     SendNotification(GetAcoreString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
                     return;
@@ -590,7 +590,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             {
                 if (AccountMgr::IsPlayerAccount(GetSecurity()))
                 {
-                    if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
+                    if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
                     {
                         SendNotification(GetAcoreString(LANG_CHANNEL_REQ), sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ));
                         return;

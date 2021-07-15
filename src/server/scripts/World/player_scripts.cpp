@@ -21,7 +21,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_APPRENTICE_ANGLER)
         {
-            uint32 level = player->getLevel();
+            uint32 level = player->GetLevel();
             int32 moneyRew = 0;
             if (level <= 10)
                 moneyRew = 85;

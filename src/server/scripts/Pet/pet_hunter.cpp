@@ -96,8 +96,8 @@ public:
                 _init = true;
 
                 CreatureTemplate const* Info = me->GetCreatureTemplate();
-                CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(me->getLevel(), Info->unit_class);
-                uint32 health = uint32(107 * (me->getLevel() - 40) * 0.025f);
+                CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(me->GetLevel(), Info->unit_class);
+                uint32 health = uint32(107 * (me->GetLevel() - 40) * 0.025f);
                 me->SetCreateHealth(health);
 
                 for (uint8 stat = 0; stat < MAX_STATS; ++stat)
