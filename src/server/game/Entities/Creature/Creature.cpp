@@ -3213,7 +3213,16 @@ void Creature::SetLastDamagedTimePtr(std::shared_ptr<time_t> const& val)
 
 bool Creature::CanPeriodicallyCallForAssistance() const
 {
-    if (!IsInCombat())
+    if (!IsAlive() || !IsInCombat() || IsInEvadeMode())
+        return false;
+
+    if (!GetMap() || GetMap()->IsDungeon())
+        return false;
+
+    if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+        return false;
+
+    if (GetReactState() == REACT_PASSIVE)
         return false;
 
     // Unable to call for assistance
