@@ -13,7 +13,6 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 void AddScripts() {}
-bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args) { return false; }
 
 class WorldMock: public IWorld {
 public:

@@ -11,8 +11,8 @@
 #include "Realm.h"
 #include <array>
 #include <map>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 struct RealmBuildInfo
 {
@@ -25,19 +25,21 @@ struct RealmBuildInfo
     std::array<uint8, 20> MacHash;
 };
 
+namespace boost::system
+{
+    class error_code;
+}
+
 /// Storage object for the list of realms on the server
 class AC_SHARED_API RealmList
 {
 public:
     typedef std::map<RealmHandle, Realm> RealmMap;
 
-    RealmList();
-    ~RealmList() = default;
+    static RealmList* Instance();
 
-    static RealmList* instance();
-
-    void Initialize(uint32 updateInterval);
-    void UpdateIfNeed();
+    void Initialize(Acore::Asio::IoContext& ioContext, uint32 updateInterval);
+    void Close();
 
     RealmMap const& GetRealms() const { return _realms; }
     Realm const* GetRealm(RealmHandle const& id) const;
@@ -45,18 +47,22 @@ public:
     RealmBuildInfo const* GetBuildInfo(uint32 build) const;
 
 private:
+    RealmList();
+    ~RealmList() = default;
+
     void LoadBuildInfo();
-    void UpdateRealms();
+    void UpdateRealms(boost::system::error_code const& error);
     void UpdateRealm(RealmHandle const& id, uint32 build, std::string const& name,
-        ACE_INET_Addr&& address, ACE_INET_Addr&& localAddr, ACE_INET_Addr&& localSubmask,
+        boost::asio::ip::address&& address, boost::asio::ip::address&& localAddr, boost::asio::ip::address&& localSubmask,
         uint16 port, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel, float population);
 
     std::vector<RealmBuildInfo> _builds;
     RealmMap _realms;
     uint32 _updateInterval;
-    time_t _nextUpdateTime;
+    std::unique_ptr<Acore::Asio::DeadlineTimer> _updateTimer;
+    std::unique_ptr<Acore::Asio::Resolver> _resolver;
 };
 
-#define sRealmList RealmList::instance()
+#define sRealmList RealmList::Instance()
 
 #endif

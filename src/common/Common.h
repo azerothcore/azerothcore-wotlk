@@ -14,13 +14,12 @@
 #include <utility>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#include <ace/config-all.h>
 #include <ws2tcpip.h>
 #if AC_COMPILER == AC_COMPILER_INTEL
 #    if !defined(BOOST_ASIO_HAS_MOVE)
 #      define BOOST_ASIO_HAS_MOVE
 #    endif // !defined(BOOST_ASIO_HAS_MOVE)
-#  endif // if WARHEAD_COMPILER == WARHEAD_COMPILER_INTEL
+#  endif // if AC_COMPILER == AC_COMPILER_INTEL
 #else
 #include <cstdlib>
 #include <netdb.h>
