@@ -15,6 +15,7 @@
 #include "Opcodes.h"
 #include "PacketLog.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
@@ -785,6 +786,14 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     return -1;
 }
 
+void WorldSocket::LoadSessionPermissionsCallback(PreparedQueryResult result)
+{
+    // RBAC must be loaded before adding session to check for skip queue permission
+    m_Session->GetRBACData()->LoadFromDBCallback(result);
+
+    sWorld->AddSession(m_Session);
+}
+
 int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 {
     // NOTE: ATM the socket is singlethread, have this in mind ...
@@ -983,7 +992,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // NOTE ATM the socket is single-threaded, have this in mind ...
     ACE_NEW_RETURN(m_Session,
-        WorldSession(account.Id, this, AccountTypes(account.Security), account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, skipQueue, account.TotalTime), -1);
+        WorldSession(account.Id, std::move(accountName), this, AccountTypes(account.Security), account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, skipQueue, account.TotalTime), -1);
 
     m_Session->LoadGlobalAccountData();
     m_Session->LoadTutorialsData();
@@ -1001,6 +1010,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     std::this_thread::sleep_for(Microseconds(sleepTime));
 
     sWorld->AddSession(m_Session);
+
+    _queryProcessor.AddCallback(m_Session->LoadPermissionsAsync().WithPreparedCallback(std::bind(&WorldSocket::LoadSessionPermissionsCallback, this, std::placeholders::_1)));
 
     return 0;
 }
