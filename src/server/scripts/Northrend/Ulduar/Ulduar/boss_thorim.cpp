@@ -492,12 +492,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->Yell("Can't you at least put up a fight!?", LANG_UNIVERSAL, 0);
+                me->Yell("Can't you at least put up a fight!?", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY1);
             }
             else
             {
-                me->Yell("Pathetic!", LANG_UNIVERSAL, 0);
+                me->Yell("Pathetic!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY2);
             }
         }
@@ -531,7 +531,7 @@ public:
                 me->GetMotionMaster()->MoveJump(Middle.GetPositionX(), Middle.GetPositionY(), Middle.GetPositionZ(), 20, 20);
                 me->RemoveAura(SPELL_SHEATH_OF_LIGHTNING);
 
-                me->Yell("Impertinent whelps! You dare challenge me atop my pedestal! I will crush you myself!", LANG_UNIVERSAL, 0);
+                me->Yell("Impertinent whelps! You dare challenge me atop my pedestal! I will crush you myself!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_JUMPDOWN);
 
                 // Hard Mode
@@ -564,7 +564,7 @@ public:
                     events.Reset();
                     DisableThorim(true);
 
-                    me->Yell("Stay your arms! I yield!", LANG_UNIVERSAL, 0);
+                    me->Yell("Stay your arms! I yield!", LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_DEFEATED);
 
                     events.SetPhase(EVENT_PHASE_OUTRO);
@@ -634,15 +634,15 @@ public:
             switch (urand(0, 2))
             {
                 case 0:
-                    me->Yell("Behold the power of the storms and despair!", LANG_UNIVERSAL, 0);
+                    me->Yell("Behold the power of the storms and despair!", LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_SPECIAL1);
                     break;
                 case 1:
-                    me->Yell("Do not hold back! Destroy them!", LANG_UNIVERSAL, 0);
+                    me->Yell("Do not hold back! Destroy them!", LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_SPECIAL2);
                     break;
                 case 2:
-                    me->Yell("Have you begun to regret your intrusion? ", LANG_UNIVERSAL, 0);
+                    me->Yell("Have you begun to regret your intrusion? ", LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_SPECIAL3);
                     break;
             }
@@ -670,7 +670,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_THORIM_AGGRO:
-                    me->Yell("Interlopers! You mortals who dare to interfere with my sport will pay... Wait--you...", LANG_UNIVERSAL, 0);
+                    me->Yell("Interlopers! You mortals who dare to interfere with my sport will pay... Wait--you...", LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_AGGRO1);
                     events.ScheduleEvent(EVENT_THORIM_AGGRO2, 9000);
 
@@ -680,7 +680,7 @@ public:
                     break;
                 case EVENT_THORIM_AGGRO2:
                     {
-                        me->Yell("I remember you... In the mountains... But you... what is this? Where am--", LANG_UNIVERSAL, 0);
+                        me->Yell("I remember you... In the mountains... But you... what is this? Where am--", LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_AGGRO2);
 
                         EntryCheckPredicate pred(NPC_SIF);
@@ -719,7 +719,7 @@ public:
                         }
 
                         // No players found
-                        me->Yell("Failures! Weaklings!", LANG_UNIVERSAL, 0);
+                        me->Yell("Failures! Weaklings!", LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_AWIPE);
                         me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 
@@ -752,13 +752,13 @@ public:
                     break;
                 case EVENT_THORIM_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    me->Yell("My patience has reached its limit!", LANG_UNIVERSAL, 0);
+                    me->Yell("My patience has reached its limit!", LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_BERSERK);
                     break;
                 case EVENT_THORIM_OUTRO1:
                     if (_hardMode)
                     {
-                        me->Yell("You! Fiend! You are not my beloved! Be gone!", LANG_UNIVERSAL, 0);
+                        me->Yell("You! Fiend! You are not my beloved! Be gone!", LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_HARD1);
                         events.ScheduleEvent(EVENT_THORIM_OUTRO2, 5000, 0, 3);
                         EntryCheckPredicate pred(NPC_SIF);
@@ -766,7 +766,7 @@ public:
                     }
                     else
                     {
-                        me->Yell("I feel as though I am awakening from a nightmare, but the shadows in this place yet linger.", LANG_UNIVERSAL, 0);
+                        me->Yell("I feel as though I am awakening from a nightmare, but the shadows in this place yet linger.", LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_NORM1);
                         events.ScheduleEvent(EVENT_THORIM_OUTRO2, 9000, 0, 3);
                     }
@@ -774,13 +774,13 @@ public:
                 case EVENT_THORIM_OUTRO2:
                     if (_hardMode)
                     {
-                        me->Yell("Behold the hand behind all the evil that has befallen Ulduar! Left my kingdom in ruins, corrupted my brother and slain my wife!", LANG_UNIVERSAL, 0);
+                        me->Yell("Behold the hand behind all the evil that has befallen Ulduar! Left my kingdom in ruins, corrupted my brother and slain my wife!", LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_HARD2);
                         events.ScheduleEvent(EVENT_THORIM_OUTRO3, 12000, 0, 3);
                     }
                     else
                     {
-                        me->Yell("Sif... was Sif here? Impossible--she died by my brother's hand. A dark nightmare indeed....", LANG_UNIVERSAL, 0);
+                        me->Yell("Sif... was Sif here? Impossible--she died by my brother's hand. A dark nightmare indeed....", LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_NORM2);
                         events.ScheduleEvent(EVENT_THORIM_OUTRO3, 10000, 0, 3);
                     }
@@ -788,12 +788,12 @@ public:
                 case EVENT_THORIM_OUTRO3:
                     if (_hardMode)
                     {
-                        me->Yell("And now it falls to you, champions, to avenge us all! The task before you is great, but I will lend you my aid as I am able. You must prevail!", LANG_UNIVERSAL, 0);
+                        me->Yell("And now it falls to you, champions, to avenge us all! The task before you is great, but I will lend you my aid as I am able. You must prevail!", LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_HARD3);
                     }
                     else
                     {
-                        me->Yell("I need time to reflect.... I will aid your cause if you should require it. I owe you at least that much. Farewell.", LANG_UNIVERSAL, 0);
+                        me->Yell("I need time to reflect.... I will aid your cause if you should require it. I owe you at least that much. Farewell.", LANG_UNIVERSAL);
                         me->PlayDirectSound(SOUND_NORM3);
                     }
 
@@ -876,16 +876,16 @@ public:
             {
                 case EVENT_SIF_FINISH_DOMINION:
                     me->PlayDirectSound(SOUND_SIF_DESPAWN);
-                    me->Yell("This pathetic morons are harmless. Relive my station, dispose of them!", LANG_UNIVERSAL, 0);
+                    me->Yell("This pathetic morons are harmless. Relive my station, dispose of them!", LANG_UNIVERSAL);
                     me->DespawnOrUnsummon(5000);
                     break;
                 case EVENT_SIF_START_TALK:
-                    me->Yell("Thorim, my lord, why else would these invaders have come into your sanctum but to slay you? They must be stopped!", LANG_UNIVERSAL, 0);
+                    me->Yell("Thorim, my lord, why else would these invaders have come into your sanctum but to slay you? They must be stopped!", LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_SIF_START);
                     break;
                 case EVENT_SIF_JOIN_TALK:
                     me->PlayDirectSound(SOUND_SIF_EVENT);
-                    me->Yell("Impossible! Lord Thorim, I will bring your foes a frigid death!", LANG_UNIVERSAL, 0);
+                    me->Yell("Impossible! Lord Thorim, I will bring your foes a frigid death!", LANG_UNIVERSAL);
                     events.ScheduleEvent(EVENT_SIF_FROST_NOVA_START, 1000);
                     events.ScheduleEvent(EVENT_SIF_FROSTBOLT_VALLEY, 11000);
                     events.ScheduleEvent(EVENT_SIF_BLIZZARD, 15000);

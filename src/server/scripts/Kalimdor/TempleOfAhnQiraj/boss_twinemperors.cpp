@@ -246,7 +246,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 me->ClearUnitState(UNIT_STATE_STUNNED);
                 if (Unit* nearu = me->SelectNearestTarget(100))
                 {
-                    //DoYell(nearu->GetName(), LANG_UNIVERSAL, 0);
+                    //DoYell(nearu->GetName(), LANG_UNIVERSAL);
                     AttackStart(nearu);
                     me->AddThreat(nearu, 10000);
                 }
