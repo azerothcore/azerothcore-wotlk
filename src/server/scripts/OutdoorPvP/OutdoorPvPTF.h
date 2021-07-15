@@ -67,23 +67,23 @@ const tf_tower_world_state TFTowerWorldStates[TF_TOWER_NUM] =
     {0xa85, 0xa84, 0xa83}
 };
 
-const uint32 TFTowerPlayerEnterEvents[TF_TOWER_NUM] =
-{
-    12226,
-    12497,
-    12486,
-    12499,
-    12501
-};
+//const uint32 TFTowerPlayerEnterEvents[TF_TOWER_NUM] =
+//{
+//    12226,
+//    12497,
+//    12486,
+//    12499,
+//    12501
+//};
 
-const uint32 TFTowerPlayerLeaveEvents[TF_TOWER_NUM] =
-{
-    12225,
-    12496,
-    12487,
-    12498,
-    12500
-};
+//const uint32 TFTowerPlayerLeaveEvents[TF_TOWER_NUM] =
+//{
+//    12225,
+//    12496,
+//    12487,
+//    12498,
+//    12500
+//};
 
 enum TFWorldStates
 {

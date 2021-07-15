@@ -31,9 +31,9 @@ enum OutdoorPvPHPTowerType
 
 const uint32 HP_CREDITMARKER[HP_TOWER_NUM] = {19032, 19028, 19029};
 
-const uint32 HP_CapturePointEvent_Enter[HP_TOWER_NUM] = {11404, 11396, 11388};
+//const uint32 HP_CapturePointEvent_Enter[HP_TOWER_NUM] = {11404, 11396, 11388};
 
-const uint32 HP_CapturePointEvent_Leave[HP_TOWER_NUM] = {11403, 11395, 11387};
+//const uint32 HP_CapturePointEvent_Leave[HP_TOWER_NUM] = {11403, 11395, 11387};
 
 enum OutdoorPvPHPWorldStates
 {
