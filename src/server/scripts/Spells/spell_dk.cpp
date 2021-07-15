@@ -221,7 +221,7 @@ public:
                     ghoul->SetModifierValue(UNIT_MOD_HEALTH, TOTAL_VALUE, (ghoul->GetStat(STAT_STAMINA) - ghoul->GetCreateStat(STAT_STAMINA)) * 10.0f);
 
                     // Power Energy
-                    ghoul->SetModifierValue(UnitMods(UNIT_MOD_POWER_START + POWER_ENERGY), BASE_VALUE, ghoul->GetCreatePowers(POWER_ENERGY));
+                    ghoul->SetModifierValue(UnitMods(UNIT_MOD_POWER_START + static_cast<uint8>(POWER_ENERGY)), BASE_VALUE, ghoul->GetCreatePowers(POWER_ENERGY));
                     ghoul->UpdateAllStats();
                     ghoul->SetFullHealth();
 
