@@ -11,12 +11,12 @@
 #include "Dynamic/LinkedList.h"
 #include "Dynamic/LinkedReference/Reference.h"
 
-template <class TO, class FROM> class RefManager : public LinkedListHead
+template <class TO, class FROM> class RefMgr : public LinkedListHead
 {
 public:
     typedef LinkedListHead::Iterator< Reference<TO, FROM>> iterator;
-    RefManager() = default;
-    virtual ~RefManager() { clearReferences(); }
+    RefMgr() = default;
+    virtual ~RefMgr() { clearReferences(); }
 
     Reference<TO, FROM>* getFirst() { return ((Reference<TO, FROM>*) LinkedListHead::getFirst()); }
     [[nodiscard]] Reference<TO, FROM> const* getFirst() const { return ((Reference<TO, FROM> const*) LinkedListHead::getFirst()); }

@@ -21,10 +21,10 @@ class StaticTransport;
 class MotionTransport;
 struct TransportCreatureProto;
 
-class MapManager
+class MapMgr
 {
 public:
-    static MapManager* instance();
+    static MapMgr* instance();
 
     Map* CreateBaseMap(uint32 mapId);
     Map* FindBaseNonInstanceMap(uint32 mapId) const;
@@ -39,7 +39,7 @@ public:
 
     [[nodiscard]] uint32 GetAreaId(uint32 mapid, float x, float y, float z) const
     {
-        Map const* m = const_cast<MapManager*>(this)->CreateBaseMap(mapid);
+        Map const* m = const_cast<MapMgr*>(this)->CreateBaseMap(mapid);
         return m->GetAreaId(x, y, z);
     }
     [[nodiscard]] uint32 GetAreaId(uint32 mapid, Position const& pos) const { return GetAreaId(mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()); }
@@ -47,7 +47,7 @@ public:
 
     [[nodiscard]] uint32 GetZoneId(uint32 mapid, float x, float y, float z) const
     {
-        Map const* m = const_cast<MapManager*>(this)->CreateBaseMap(mapid);
+        Map const* m = const_cast<MapMgr*>(this)->CreateBaseMap(mapid);
         return m->GetZoneId(x, y, z);
     }
     [[nodiscard]] uint32 GetZoneId(uint32 mapid, Position const& pos) const { return GetZoneId(mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()); }
@@ -55,7 +55,7 @@ public:
 
     void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, uint32 mapid, float x, float y, float z)
     {
-        Map const* m = const_cast<MapManager*>(this)->CreateBaseMap(mapid);
+        Map const* m = const_cast<MapMgr*>(this)->CreateBaseMap(mapid);
         m->GetZoneAndAreaId(zoneid, areaid, x, y, z);
     }
 
@@ -143,11 +143,11 @@ private:
     typedef std::unordered_map<uint32, Map*> MapMapType;
     typedef std::vector<bool> InstanceIds;
 
-    MapManager();
-    ~MapManager();
+    MapMgr();
+    ~MapMgr();
 
-    MapManager(const MapManager&);
-    MapManager& operator=(const MapManager&);
+    MapMgr(const MapMgr&);
+    MapMgr& operator=(const MapMgr&);
 
     std::mutex Lock;
     MapMapType i_maps;
@@ -160,7 +160,7 @@ private:
 };
 
 template<typename Worker>
-void MapManager::DoForAllMaps(Worker&& worker)
+void MapMgr::DoForAllMaps(Worker&& worker)
 {
     std::lock_guard<std::mutex> guard(Lock);
 
@@ -179,7 +179,7 @@ void MapManager::DoForAllMaps(Worker&& worker)
 }
 
 template<typename Worker>
-inline void MapManager::DoForAllMapsWithMapId(uint32 mapId, Worker&& worker)
+inline void MapMgr::DoForAllMapsWithMapId(uint32 mapId, Worker&& worker)
 {
     std::lock_guard<std::mutex> guard(Lock);
 
@@ -198,6 +198,6 @@ inline void MapManager::DoForAllMapsWithMapId(uint32 mapId, Worker&& worker)
     }
 }
 
-#define sMapMgr MapManager::instance()
+#define sMapMgr MapMgr::instance()
 
 #endif

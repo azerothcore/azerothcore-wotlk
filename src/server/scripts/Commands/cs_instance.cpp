@@ -16,7 +16,7 @@ EndScriptData */
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Language.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 

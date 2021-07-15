@@ -13,7 +13,7 @@
 #include "BattlegroundMgr.h"
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "OutdoorPvPMgr.h"
 #include "ScriptMgr.h"

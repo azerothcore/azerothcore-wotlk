@@ -24,7 +24,7 @@
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
@@ -174,7 +174,7 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_vehicle(nullptr),
     m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE),
-    m_HostileRefManager(this),
+    m_HostileRefMgr(this),
     m_comboTarget(nullptr)
 {
 #ifdef _MSC_VER
@@ -408,7 +408,7 @@ void Unit::Update(uint32 p_time)
         // Check UNIT_STATE_MELEE_ATTACKING or UNIT_STATE_CHASE (without UNIT_STATE_FOLLOW in this case) so pets can reach far away
         // targets without stopping half way there and running off.
         // These flags are reset after target dies or another command is given.
-        if (m_HostileRefManager.isEmpty())
+        if (m_HostileRefMgr.isEmpty())
         {
             // m_CombatTimer set at aura start and it will be freeze until aura removing
             if (m_CombatTimer <= p_time)
@@ -10715,7 +10715,7 @@ void Unit::EnergizeBySpell(Unit* victim, uint32 spellID, uint32 damage, Powers p
     victim->ModifyPower(powerType, damage);
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
-    victim->getHostileRefManager().threatAssist(this, float(damage) * 0.5f, spellInfo);
+    victim->getHostileRefMgr().threatAssist(this, float(damage) * 0.5f, spellInfo);
 }
 
 float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype)
@@ -13760,7 +13760,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
     {
         CombatStop();
         DeleteThreatList();
-        getHostileRefManager().deleteReferences();
+        getHostileRefMgr().deleteReferences();
         ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
         if (IsNonMeleeSpellCast(false))
@@ -14923,7 +14923,7 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
     CombatStop();
     ClearComboPointHolders();
     DeleteThreatList();
-    getHostileRefManager().deleteReferences();
+    getHostileRefMgr().deleteReferences();
     GetMotionMaster()->Clear(false);                    // remove different non-standard movement generators.
 }
 
@@ -17062,7 +17062,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
 
                 // Stop attacks
                 victim->CombatStop();
-                victim->getHostileRefManager().deleteReferences();
+                victim->getHostileRefMgr().deleteReferences();
 
                 // restore for use at real death
                 victim->SetUInt32Value(PLAYER_SELF_RES_SPELL, ressSpellId);
@@ -17768,7 +17768,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     CastStop();
 
     CombatStop();
-    getHostileRefManager().deleteReferences();
+    getHostileRefMgr().deleteReferences();
     DeleteThreatList();
 
     // xinef: update speed after charming
@@ -18240,7 +18240,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
         // modify hostile references for new phasemask, some special cases deal with hostile references themselves
         if (GetTypeId() == TYPEID_UNIT || (!ToPlayer()->IsGameMaster() && !ToPlayer()->GetSession()->PlayerLogout()))
         {
-            HostileRefManager& refManager = getHostileRefManager();
+            HostileRefMgr& refManager = getHostileRefMgr();
             HostileReference* ref = refManager.getFirst();
 
             while (ref)
@@ -18265,7 +18265,7 @@ void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
 
                 for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                     if (Unit* unit = (*itr)->getTarget())
-                        unit->getHostileRefManager().setOnlineOfflineState(ToCreature(), unit->InSamePhase(newPhaseMask));
+                        unit->getHostileRefMgr().setOnlineOfflineState(ToCreature(), unit->InSamePhase(newPhaseMask));
             }
         }
     }
@@ -19310,7 +19310,7 @@ void Unit::StopAttackFaction(uint32 faction_id)
             ++itr;
     }
 
-    getHostileRefManager().deleteReferencesForFaction(faction_id);
+    getHostileRefMgr().deleteReferencesForFaction(faction_id);
 
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
         (*itr)->StopAttackFaction(faction_id);

@@ -16,7 +16,7 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 
 class wp_commandscript : public CommandScript
 {

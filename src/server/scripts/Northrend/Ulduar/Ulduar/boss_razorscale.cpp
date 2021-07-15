@@ -11,7 +11,7 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "ulduar.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 
 #define SPELL_FLAMEBUFFET_10                64016
 #define SPELL_FLAMEBUFFET_25                64023

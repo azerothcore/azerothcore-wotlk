@@ -14,7 +14,7 @@ EndScriptData */
 #include "Chat.h"
 #include "Group.h"
 #include "Language.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"

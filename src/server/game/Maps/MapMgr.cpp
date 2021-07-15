@@ -15,7 +15,7 @@
 #include "LFGMgr.h"
 #include "Log.h"
 #include "MapInstanced.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -29,24 +29,24 @@
 #include "LuaEngine.h"
 #endif
 
-MapManager::MapManager()
+MapMgr::MapMgr()
 {
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
     mapUpdateStep = 0;
     _nextInstanceId = 0;
 }
 
-MapManager::~MapManager()
+MapMgr::~MapMgr()
 {
 }
 
-MapManager* MapManager::instance()
+MapMgr* MapMgr::instance()
 {
-    static MapManager instance;
+    static MapMgr instance;
     return &instance;
 }
 
-void MapManager::Initialize()
+void MapMgr::Initialize()
 {
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
 
@@ -55,13 +55,13 @@ void MapManager::Initialize()
         m_updater.activate(num_threads);
 }
 
-void MapManager::InitializeVisibilityDistanceInfo()
+void MapMgr::InitializeVisibilityDistanceInfo()
 {
     for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         (*iter).second->InitVisibilityDistance();
 }
 
-Map* MapManager::CreateBaseMap(uint32 id)
+Map* MapMgr::CreateBaseMap(uint32 id)
 {
     Map* map = FindBaseMap(id);
 
@@ -92,7 +92,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
     return map;
 }
 
-Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
+Map* MapMgr::FindBaseNonInstanceMap(uint32 mapId) const
 {
     Map* map = FindBaseMap(mapId);
     if (map && map->Instanceable())
@@ -100,7 +100,7 @@ Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
     return map;
 }
 
-Map* MapManager::CreateMap(uint32 id, Player* player)
+Map* MapMgr::CreateMap(uint32 id, Player* player)
 {
     Map* m = CreateBaseMap(id);
 
@@ -110,7 +110,7 @@ Map* MapManager::CreateMap(uint32 id, Player* player)
     return m;
 }
 
-Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
+Map* MapMgr::FindMap(uint32 mapid, uint32 instanceId) const
 {
     Map* map = FindBaseMap(mapid);
     if (!map)
@@ -122,7 +122,7 @@ Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
     return ((MapInstanced*)map)->FindInstanceMap(instanceId);
 }
 
-bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
+bool MapMgr::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
 {
     MapEntry const* entry = sMapStore.LookupEntry(mapid);
     if (!entry)
@@ -236,7 +236,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     return player->Satisfy(sObjectMgr->GetAccessRequirement(mapid, targetDifficulty), mapid, true);
 }
 
-void MapManager::Update(uint32 diff)
+void MapMgr::Update(uint32 diff)
 {
     for (uint8 i = 0; i < 4; ++i)
         i_timer[i].Update(diff);
@@ -288,11 +288,11 @@ void MapManager::Update(uint32 diff)
     }
 }
 
-void MapManager::DoDelayedMovesAndRemoves()
+void MapMgr::DoDelayedMovesAndRemoves()
 {
 }
 
-bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
+bool MapMgr::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
     GridCoord p = Acore::ComputeGridCoord(x, y);
 
@@ -302,7 +302,7 @@ bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
     return Map::ExistMap(mapid, gx, gy) && Map::ExistVMap(mapid, gx, gy);
 }
 
-bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
+bool MapMgr::IsValidMAP(uint32 mapid, bool startUp)
 {
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 
@@ -318,7 +318,7 @@ bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
     // TODO: add check for battleground template
 }
 
-void MapManager::UnloadAll()
+void MapMgr::UnloadAll()
 {
     for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end();)
     {
@@ -331,7 +331,7 @@ void MapManager::UnloadAll()
         m_updater.deactivate();
 }
 
-void MapManager::GetNumInstances(uint32& dungeons, uint32& battlegrounds, uint32& arenas)
+void MapMgr::GetNumInstances(uint32& dungeons, uint32& battlegrounds, uint32& arenas)
 {
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
@@ -348,7 +348,7 @@ void MapManager::GetNumInstances(uint32& dungeons, uint32& battlegrounds, uint32
     }
 }
 
-void MapManager::GetNumPlayersInInstances(uint32& dungeons, uint32& battlegrounds, uint32& arenas, uint32& spectators)
+void MapMgr::GetNumPlayersInInstances(uint32& dungeons, uint32& battlegrounds, uint32& arenas, uint32& spectators)
 {
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
@@ -374,7 +374,7 @@ void MapManager::GetNumPlayersInInstances(uint32& dungeons, uint32& battleground
     }
 }
 
-void MapManager::InitInstanceIds()
+void MapMgr::InitInstanceIds()
 {
     _nextInstanceId = 1;
 
@@ -386,7 +386,7 @@ void MapManager::InitInstanceIds()
     }
 }
 
-void MapManager::RegisterInstanceId(uint32 instanceId)
+void MapMgr::RegisterInstanceId(uint32 instanceId)
 {
     // Allocation was done in InitInstanceIds()
     _instanceIds[instanceId] = true;
@@ -397,7 +397,7 @@ void MapManager::RegisterInstanceId(uint32 instanceId)
         ++_nextInstanceId;
 }
 
-uint32 MapManager::GenerateInstanceId()
+uint32 MapMgr::GenerateInstanceId()
 {
     uint32 newInstanceId = _nextInstanceId;
 

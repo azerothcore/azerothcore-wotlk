@@ -20,14 +20,14 @@ namespace MMAP
         MMAP_LOAD_RESULT_IGNORED,
     };
 
-    class IMMapManager
+    class IMMapMgr
     {
     private:
         bool iEnablePathFinding;
 
     public:
-        IMMapManager() : iEnablePathFinding(true) {}
-        virtual ~IMMapManager(void) {}
+        IMMapMgr() : iEnablePathFinding(true) {}
+        virtual ~IMMapMgr(void) {}
 
         //Enabled/Disabled Pathfinding
         void setEnablePathFinding(bool value) { iEnablePathFinding = value; }

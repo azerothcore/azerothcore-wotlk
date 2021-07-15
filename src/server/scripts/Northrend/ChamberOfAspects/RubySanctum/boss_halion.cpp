@@ -3,7 +3,7 @@
 */
 
 #include "GameObjectAI.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Player.h"
 #include "ruby_sanctum.h"
 #include "ScriptedCreature.h"

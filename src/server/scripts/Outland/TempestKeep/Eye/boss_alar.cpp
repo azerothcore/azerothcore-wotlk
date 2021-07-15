@@ -6,7 +6,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "the_eye.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 
 enum Spells
 {

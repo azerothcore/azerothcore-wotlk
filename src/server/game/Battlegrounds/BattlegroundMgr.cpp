@@ -27,7 +27,7 @@
 #include "GameGraveyard.h"
 #include "Map.h"
 #include "MapInstanced.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"

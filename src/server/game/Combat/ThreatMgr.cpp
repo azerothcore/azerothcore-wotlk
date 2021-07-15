@@ -12,7 +12,7 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "ThreatManager.h"
+#include "ThreatMgr.h"
 #include "Unit.h"
 #include "UnitEvents.h"
 

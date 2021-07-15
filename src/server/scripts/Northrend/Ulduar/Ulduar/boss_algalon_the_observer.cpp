@@ -3,7 +3,7 @@
 */
 
 #include "GameObjectAI.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"

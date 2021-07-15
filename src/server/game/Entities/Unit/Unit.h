@@ -9,12 +9,12 @@
 
 #include "EventProcessor.h"
 #include "FollowerReference.h"
-#include "FollowerRefManager.h"
-#include "HostileRefManager.h"
+#include "FollowerRefMgr.h"
+#include "HostileRefMgr.h"
 #include "MotionMaster.h"
 #include "Object.h"
 #include "SpellAuraDefines.h"
-#include "ThreatManager.h"
+#include "ThreatMgr.h"
 #include <functional>
 
 #define WORLD_TRIGGER   12999
@@ -2197,9 +2197,9 @@ public:
     void TauntApply(Unit* victim);
     void TauntFadeOut(Unit* taunter);
     ThreatManager& getThreatManager() { return m_ThreatManager; }
-    void addHatedBy(HostileReference* pHostileReference) { m_HostileRefManager.insertFirst(pHostileReference); };
+    void addHatedBy(HostileReference* pHostileReference) { m_HostileRefMgr.insertFirst(pHostileReference); };
     void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
-    HostileRefManager& getHostileRefManager() { return m_HostileRefManager; }
+    HostileRefMgr& getHostileRefMgr() { return m_HostileRefMgr; }
 
     VisibleAuraMap const* GetVisibleAuras() { return &m_visibleAuras; }
     AuraApplication* GetVisibleAura(uint8 slot)
@@ -2305,7 +2305,7 @@ public:
     void  ModSpellCastTime(SpellInfo const* spellProto, int32& castTime, Spell* spell = nullptr);
     float CalculateLevelPenalty(SpellInfo const* spellProto) const;
 
-    void addFollower(FollowerReference* pRef) { m_FollowingRefManager.insertFirst(pRef); }
+    void addFollower(FollowerReference* pRef) { m_FollowingRefMgr.insertFirst(pRef); }
     void removeFollower(FollowerReference* /*pRef*/) { /* nothing to do yet */ }
 
     MotionMaster* GetMotionMaster() { return i_motionMaster; }
@@ -2609,9 +2609,9 @@ private:
 
     Diminishing m_Diminishing;
     // Manage all Units that are threatened by us
-    HostileRefManager m_HostileRefManager;
+    HostileRefMgr m_HostileRefMgr;
 
-    FollowerRefManager m_FollowingRefManager;
+    FollowerRefMgr m_FollowingRefMgr;
     Unit* m_comboTarget;
 
     ComboPointHolderSet m_ComboPointHolders;

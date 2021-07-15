@@ -19,7 +19,7 @@
 #define _VMAPMANAGER2_H
 
 #include "Common.h"
-#include "IVMapManager.h"
+#include "IVMapMgr.h"
 #include <mutex>
 #include <unordered_map>
 #include <vector>
@@ -74,7 +74,7 @@ namespace VMAP
         VMAP_DISABLE_LIQUIDSTATUS   = 0x8
     };
 
-    class VMapManager2 : public IVMapManager
+    class VMapMgr2 : public IVMapMgr
     {
     protected:
         // Tree to check collision
@@ -98,8 +98,8 @@ namespace VMAP
         [[nodiscard]] G3D::Vector3 convertPositionToInternalRep(float x, float y, float z) const;
         static std::string getMapFileName(unsigned int mapId);
 
-        VMapManager2();
-        ~VMapManager2() override;
+        VMapMgr2();
+        ~VMapMgr2() override;
 
         void InitializeThreadUnsafe(const std::vector<uint32>& mapIds);
 

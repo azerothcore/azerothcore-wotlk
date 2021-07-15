@@ -29,16 +29,16 @@ namespace VMAP
 #define VMAP_INVALID_HEIGHT_VALUE -200000.0f            // real assigned value in unknown height case
 
     //===========================================================
-    class IVMapManager
+    class IVMapMgr
     {
     private:
         bool iEnableLineOfSightCalc{true};
         bool iEnableHeightCalc{true};
 
     public:
-        IVMapManager()  { }
+        IVMapMgr()  { }
 
-        virtual ~IVMapManager() = default;
+        virtual ~IVMapMgr() = default;
 
         virtual int loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
 

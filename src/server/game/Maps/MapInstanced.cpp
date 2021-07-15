@@ -8,7 +8,7 @@
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "MapInstanced.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MMapFactory.h"
 #include "ObjectMgr.h"
 #include "Player.h"

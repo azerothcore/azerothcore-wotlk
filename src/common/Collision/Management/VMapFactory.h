@@ -7,17 +7,17 @@
 #ifndef _VMAPFACTORY_H
 #define _VMAPFACTORY_H
 
-#include "IVMapManager.h"
+#include "IVMapMgr.h"
 
-// This is the access point to the VMapManager.
+// This is the access point to the VMapMgr.
 namespace VMAP
 {
-    class VMapManager2;
+    class VMapMgr2;
 
     class VMapFactory
     {
     public:
-        static VMapManager2* createOrGetVMapManager();
+        static VMapMgr2* createOrGetVMapMgr();
         static void clear();
     };
 }

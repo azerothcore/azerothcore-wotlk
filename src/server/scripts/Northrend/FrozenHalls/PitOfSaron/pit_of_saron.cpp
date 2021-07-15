@@ -3,7 +3,7 @@
 */
 
 #include "CreatureGroups.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "PassiveAI.h"
 #include "pit_of_saron.h"
 #include "Player.h"

@@ -5,29 +5,29 @@
  */
 
 #include "VMapFactory.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 
 namespace VMAP
 {
-    VMapManager2* gVMapManager = nullptr;
+    VMapMgr2* gVMapMgr = nullptr;
 
     //===============================================
     // just return the instance
-    VMapManager2* VMapFactory::createOrGetVMapManager()
+    VMapMgr2* VMapFactory::createOrGetVMapMgr()
     {
-        if (!gVMapManager)
+        if (!gVMapMgr)
         {
-            gVMapManager = new VMapManager2();
+            gVMapMgr = new VMapMgr2();
         }
 
-        return gVMapManager;
+        return gVMapMgr;
     }
 
     //===============================================
     // delete all internal data structures
     void VMapFactory::clear()
     {
-        delete gVMapManager;
-        gVMapManager = nullptr;
+        delete gVMapMgr;
+        gVMapMgr = nullptr;
     }
 }
