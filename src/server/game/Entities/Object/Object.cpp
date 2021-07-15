@@ -1880,6 +1880,16 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj, bool checkAlert) co
     return true;
 }
 
+void WorldObject::SendPlayMusic(uint32 Music, bool OnlySelf)
+{
+    WorldPacket data(SMSG_PLAY_MUSIC, 4);
+    data << Music;
+    if (OnlySelf && GetTypeId() == TYPEID_PLAYER)
+        this->ToPlayer()->GetSession()->SendPacket(&data);
+    else
+        SendMessageToSet(&data, true); // ToSelf ignored in this case
+}
+
 void Object::ForceValuesUpdateAtIndex(uint32 i)
 {
     _changesMask.SetBit(i);

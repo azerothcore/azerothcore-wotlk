@@ -923,6 +923,9 @@ public:
     FlaggedValuesArray32<int32, uint32, ServerSideVisibilityType, TOTAL_SERVERSIDE_VISIBILITY_TYPES> m_serverSideVisibility;
     FlaggedValuesArray32<int32, uint32, ServerSideVisibilityType, TOTAL_SERVERSIDE_VISIBILITY_TYPES> m_serverSideVisibilityDetect;
 
+    // Low Level Packets
+    void SendPlayMusic(uint32 Music, bool OnlySelf);
+
     virtual void SetMap(Map* map);
     virtual void ResetMap();
     [[nodiscard]] Map* GetMap() const { ASSERT(m_currMap); return m_currMap; }
