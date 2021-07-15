@@ -173,19 +173,20 @@ class ObjectGuid
         {
             switch (high)
             {
-                case HighGuid::Item:         return TYPEID_ITEM;
-                //case HighGuid::Container:    return TYPEID_CONTAINER; HighGuid::Container == HighGuid::Item currently
-                case HighGuid::Unit:         return TYPEID_UNIT;
-                case HighGuid::Pet:          return TYPEID_UNIT;
-                case HighGuid::Player:       return TYPEID_PLAYER;
-                case HighGuid::GameObject:   return TYPEID_GAMEOBJECT;
-                case HighGuid::DynamicObject: return TYPEID_DYNAMICOBJECT;
-                case HighGuid::Corpse:       return TYPEID_CORPSE;
-                case HighGuid::Mo_Transport: return TYPEID_GAMEOBJECT;
-                case HighGuid::Vehicle:      return TYPEID_UNIT;
+                using enum HighGuid;
+                case Item:         return TYPEID_ITEM;
+                //case Container:    return TYPEID_CONTAINER; HighGuid::Container == HighGuid::Item currently
+                case Unit:         return TYPEID_UNIT;
+                case Pet:          return TYPEID_UNIT;
+                case Player:       return TYPEID_PLAYER;
+                case GameObject:   return TYPEID_GAMEOBJECT;
+                case DynamicObject: return TYPEID_DYNAMICOBJECT;
+                case Corpse:       return TYPEID_CORPSE;
+                case Mo_Transport: return TYPEID_GAMEOBJECT;
+                case Vehicle:      return TYPEID_UNIT;
                 // unknown
-                case HighGuid::Instance:
-                case HighGuid::Group:
+                case Instance:
+                case Group:
                 default:                    return TYPEID_OBJECT;
             }
         }
@@ -208,19 +209,20 @@ class ObjectGuid
         {
             switch (high)
             {
-                case HighGuid::Item:
-                case HighGuid::Player:
-                case HighGuid::DynamicObject:
-                case HighGuid::Corpse:
-                case HighGuid::Mo_Transport:
-                case HighGuid::Instance:
-                case HighGuid::Group:
+                using enum HighGuid;
+                case Item:
+                case Player:
+                case DynamicObject:
+                case Corpse:
+                case Mo_Transport:
+                case Instance:
+                case Group:
                     return false;
-                case HighGuid::GameObject:
-                case HighGuid::Transport:
-                case HighGuid::Unit:
-                case HighGuid::Pet:
-                case HighGuid::Vehicle:
+                case GameObject:
+                case Transport:
+                case Unit:
+                case Pet:
+                case Vehicle:
                 default:
                     return true;
             }
