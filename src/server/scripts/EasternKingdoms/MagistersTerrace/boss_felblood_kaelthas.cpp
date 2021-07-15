@@ -6,7 +6,6 @@
 #include "Opcodes.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
-#include "WorldPacket.h"
 
 enum Says
 {

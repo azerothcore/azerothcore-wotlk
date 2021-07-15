@@ -62,8 +62,8 @@ enum Talks
     SAY_KILL_ONE,
     SAY_KILL_TWO,
     SAY_DEATH,
-    SAY_NALORAKK_EVENT1, // Unimplemented
-    SAY_NALORAKK_EVENT2 // Unimplemented
+    SAY_NALORAKK_EVENT1, // Not implemented
+    SAY_NALORAKK_EVENT2 // Not implemented
 };
 
 class boss_nalorakk : public CreatureScript

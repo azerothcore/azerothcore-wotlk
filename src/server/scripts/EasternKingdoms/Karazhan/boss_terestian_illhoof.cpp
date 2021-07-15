@@ -86,10 +86,10 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            ObjectGuid TerestianGUID = instance->GetGuidData(DATA_TERESTIAN);
-            if (TerestianGUID)
+            ObjectGuid TerestianGuid = instance->GetGuidData(DATA_TERESTIAN);
+            if (TerestianGuid)
             {
-                Unit* Terestian = ObjectAccessor::GetUnit(*me, TerestianGUID);
+                Unit* Terestian = ObjectAccessor::GetUnit(*me, TerestianGuid);
                 if (Terestian && Terestian->IsAlive())
                     DoCast(Terestian, SPELL_BROKEN_PACT, true);
             }

@@ -5,7 +5,6 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "sunwell_plateau.h"

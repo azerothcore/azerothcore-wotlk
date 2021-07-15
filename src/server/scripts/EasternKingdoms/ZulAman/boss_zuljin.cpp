@@ -252,10 +252,9 @@ public:
 
         void SpawnAdds()
         {
-            Creature* creature = nullptr;
             for (uint8 i = 0; i < 4; ++i)
             {
-                creature = me->SummonCreature(SpiritInfo[i].entry, SpiritInfo[i].x, SpiritInfo[i].y, SpiritInfo[i].z, SpiritInfo[i].orient, TEMPSUMMON_DEAD_DESPAWN, 0);
+                Creature* creature = me->SummonCreature(SpiritInfo[i].entry, SpiritInfo[i].x, SpiritInfo[i].y, SpiritInfo[i].z, SpiritInfo[i].orient, TEMPSUMMON_DEAD_DESPAWN, 0);
                 if (creature)
                 {
                     creature->CastSpell(creature, SPELL_SPIRIT_AURA, true);

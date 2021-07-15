@@ -8,7 +8,6 @@
 #include "CreatureTextMgr.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
-#include "PetAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
@@ -672,14 +671,14 @@ uint32 acherus_soul_prison[12] =
     191590
 };
 
-uint32 acherus_unworthy_initiate[5] =
-{
-    29519,
-    29520,
-    29565,
-    29566,
-    29567
-};
+//uint32 acherus_unworthy_initiate[5] =
+//{
+//    29519,
+//    29520,
+//    29565,
+//    29566,
+//    29567
+//};
 
 class npc_unworthy_initiate : public CreatureScript
 {
@@ -782,7 +781,7 @@ public:
                         {
                             if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 100))
                             {
-                                if (temp_prison && me->IsWithinDist(temp_prison, dist, false))
+                                if (me->IsWithinDist(temp_prison, dist, false))
                                 {
                                     dist = me->GetDistance2d(temp_prison);
                                     prison = temp_prison;

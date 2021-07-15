@@ -576,9 +576,14 @@ public:
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(10))
                     {
-                        if (InstanceScript* instance = me->GetInstanceScript())
-                            if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
+                        if (InstanceScript* instanceScript = me->GetInstanceScript())
+                        {
+                            if (Creature *kalecgos = ObjectAccessor::GetCreature(*me, instanceScript->GetGuidData(
+                                    NPC_KALECGOS)))
+                            {
                                 kalecgos->AI()->DoAction(ACTION_ENRAGE_OTHER);
+                            }
+                        }
                         DoAction(ACTION_ENRAGE);
                         break;
                     }

@@ -956,12 +956,12 @@ public:
     {
         boss_apokoAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        uint32 Totem_Timer;
+//        uint32 Totem_Timer;
         uint8  Totem_Amount;
         uint32 War_Stomp_Timer;
-        uint32 Purge_Timer;
+//        uint32 Purge_Timer;
         uint32 Healing_Wave_Timer;
-        uint32 Frost_Shock_Timer;
+//        uint32 Frost_Shock_Timer;
 
         void EnterCombat(Unit* who) override
         {

@@ -474,9 +474,9 @@ public:
 
         void EnterCombat(Unit* /*who*/) override {}
 
-        uint32 NextStep(uint32 Step)
+        uint32 NextStep(uint32 nextStep)
         {
-            switch(Step)
+            switch(nextStep)
             {
                 case 1:
                     me->MonsterYell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL, 0);

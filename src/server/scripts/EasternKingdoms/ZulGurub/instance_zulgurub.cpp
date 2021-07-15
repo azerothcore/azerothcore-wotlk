@@ -102,22 +102,16 @@ public:
             {
                 case DATA_LORKHAN:
                     return _zealotLorkhanGUID;
-                    break;
                 case DATA_ZATH:
                     return _zealotZathGUID;
-                    break;
                 case DATA_THEKAL:
                     return _highPriestTekalGUID;
-                    break;
                 case DATA_JINDO:
                     return _jindoTheHexxerGUID;
-                    break;
                 case NPC_ARLOKK:
                     return _arlokkGUID;
-                    break;
                 case GO_GONG_OF_BETHEKK:
                     return _goGongOfBethekkGUID;
-                    break;
             }
 
             return ObjectGuid::Empty;

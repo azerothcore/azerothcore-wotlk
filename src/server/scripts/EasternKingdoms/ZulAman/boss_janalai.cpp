@@ -182,22 +182,20 @@ public:
 
         void FireWall()
         {
-            uint8 WallNum;
-            Creature* wall = nullptr;
             for (uint8 i = 0; i < 4; ++i)
             {
-                if (i == 0 || i == 2)
-                    WallNum = 3;
-                else
-                    WallNum = 2;
+                uint8 WallNum = i == 0 || i == 2 ? 3 : 2;
 
                 for (uint8 j = 0; j < WallNum; j++)
                 {
-                    if (WallNum == 3)
-                        wall = me->SummonCreature(NPC_FIRE_BOMB, FireWallCoords[i][0], FireWallCoords[i][1] + 5 * (j - 1), FireWallCoords[i][2], FireWallCoords[i][3], TEMPSUMMON_TIMED_DESPAWN, 15000);
-                    else
-                        wall = me->SummonCreature(NPC_FIRE_BOMB, FireWallCoords[i][0] - 2 + 4 * j, FireWallCoords[i][1], FireWallCoords[i][2], FireWallCoords[i][3], TEMPSUMMON_TIMED_DESPAWN, 15000);
-                    if (wall) wall->CastSpell(wall, SPELL_FIRE_WALL, true);
+                    Creature* wall = WallNum == 3
+                            ? me->SummonCreature(NPC_FIRE_BOMB, FireWallCoords[i][0], FireWallCoords[i][1] + 5 * (j - 1), FireWallCoords[i][2], FireWallCoords[i][3], TEMPSUMMON_TIMED_DESPAWN, 15000)
+                            : me->SummonCreature(NPC_FIRE_BOMB, FireWallCoords[i][0] - 2 + 4 * j, FireWallCoords[i][1], FireWallCoords[i][2], FireWallCoords[i][3], TEMPSUMMON_TIMED_DESPAWN, 15000);
+
+                    if (wall)
+                    {
+                        wall->CastSpell(wall, SPELL_FIRE_WALL, true);
+                    }
                 }
             }
         }
@@ -534,7 +532,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!instance || !(instance->GetData(DATA_JANALAIEVENT) == IN_PROGRESS))
+            if (!instance || instance->GetData(DATA_JANALAIEVENT) != IN_PROGRESS)
             {
                 me->DisappearAndDie();
                 return;
@@ -614,7 +612,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!instance || !(instance->GetData(DATA_JANALAIEVENT) == IN_PROGRESS))
+            if (!instance || instance->GetData(DATA_JANALAIEVENT) != IN_PROGRESS)
             {
                 me->DisappearAndDie();
                 return;
