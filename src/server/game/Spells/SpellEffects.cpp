@@ -3938,7 +3938,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             if (m_caster->getGender() > 0)
                                 gender = "her";
                             sprintf(buf, "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName().c_str(), gender, gender, urand(1, 10), urand(1, 10));
-                            m_caster->MonsterTextEmote(buf, nullptr);
+                            m_caster->TextEmote(buf);
                             break;
                         }
                     // Roll 'dem Bones - Worn Troll Dice
@@ -3949,7 +3949,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             if (m_caster->getGender() > 0)
                                 gender = "her";
                             sprintf(buf, "%s causually tosses %s [Worn Troll Dice]. One %u and one %u.", m_caster->GetName().c_str(), gender, urand(1, 6), urand(1, 6));
-                            m_caster->MonsterTextEmote(buf, nullptr);
+                            m_caster->TextEmote(buf);
                             break;
                         }
                     // Death Knight Initiate Visual
@@ -6223,14 +6223,17 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+    if (!unitTarget)
         return;
+
+    Player* player = unitTarget->ToPlayer();
+    if (!player)
 
     switch (m_spellInfo->Id)
     {
         case 58730: // Restricted Flight Area
         case 58600: // Restricted Flight Area
-            unitTarget->ToPlayer()->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
+            player->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
             break;
         default:
             break;
@@ -6244,9 +6247,7 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
         return;
     }
 
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(soundId);
-    unitTarget->ToPlayer()->GetSession()->SendPacket(&data);
+    player->PlayDirectSound(soundId, player);
 }
 
 void Spell::EffectRemoveAura(SpellEffIndex effIndex)

@@ -102,7 +102,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
                 creature->AI()->DoAction(ACTION_START_FIGHT);
-                creature->MonsterSay("You'll pay for this insult, $C.", LANG_UNIVERSAL, player);
+                creature->Say("You'll pay for this insult, $C.", LANG_UNIVERSAL);
                 break;
         }
         return true;
@@ -149,7 +149,7 @@ public:
                     if ((cr = me->SummonCreature(NPC_ANTAGONIST, me->GetPositionX() + 3 * cos(o), me->GetPositionY() + 3 * sin(o), me->GetPositionZ(), me->GetOrientation())))
                     {
                         if (i == 0)
-                            cr->MonsterSay("Time to die.", LANG_UNIVERSAL, 0);
+                            cr->Say("Time to die.", LANG_UNIVERSAL);
 
                         summons.Summon(cr);
                         cr->SetInCombatWithZone();
@@ -540,7 +540,7 @@ public:
                     if (q_status.CreatureOrGOCount[me->GetEntry() - 24202] == 0)
                     {
                         player->KilledMonsterCredit(me->GetEntry());
-                        player->MonsterSay(GetTextFor(me->GetEntry(), quest).c_str(), LANG_UNIVERSAL, player);
+                        player->Say(GetTextFor(me->GetEntry(), quest).c_str(), LANG_UNIVERSAL, player);
                     }
                 }
             }
@@ -758,16 +758,16 @@ public:
                         if (thrown == 3)
                         {
                             thrown = 0;
-                            sayer->MonsterSay("SOMEONE TRY THIS SUPER BREW!", LANG_UNIVERSAL, 0);
+                            sayer->Say("SOMEONE TRY THIS SUPER BREW!", LANG_UNIVERSAL);
                             //sayer->CastSpell(sayer, SPELL_CREATE_SUPER_BREW, true);
                             sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX() + 15 * cos(sayer->GetOrientation()), sayer->GetPositionY() + 15 * sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
                         }
                         else
                         {
                             if (urand(0, 1))
-                                sayer->MonsterSay("Chug and chuck! Chug and chuck!", LANG_UNIVERSAL, 0);
+                                sayer->Say("Chug and chuck! Chug and chuck!", LANG_UNIVERSAL);
                             else
-                                sayer->MonsterSay("Down the free brew and pelt the Guzzlers with your mug!", LANG_UNIVERSAL, 0);
+                                sayer->Say("Down the free brew and pelt the Guzzlers with your mug!", LANG_UNIVERSAL);
                         }
 
                         break;
@@ -781,7 +781,7 @@ public:
             {
                 char amount[500];
                 sprintf(amount, "We did it boys! Now back to the Grim Guzzler and we'll drink to the %u that were injured!", guzzlerCounter);
-                herald->MonsterYell(amount, LANG_UNIVERSAL, 0);
+                herald->Yell(amount, LANG_UNIVERSAL);
             }
 
             Reset();
@@ -794,7 +794,7 @@ public:
             {
                 char amount[500];
                 sprintf(amount, "RETREAT!! We've already lost %u and we can't afford to lose any more!!", guzzlerCounter);
-                herald->MonsterYell(amount, LANG_UNIVERSAL, 0);
+                herald->Yell(amount, LANG_UNIVERSAL);
             }
 
             me->CastSpell(me, (me->GetMapId() == 1 ? SPELL_SUMMON_PLANS_H : SPELL_SUMMON_PLANS_A), true);
@@ -1019,19 +1019,19 @@ public:
                 switch (urand(0, 4))
                 {
                     case 0:
-                        me->MonsterSay("Drink it all boys!", LANG_UNIVERSAL, 0);
+                        me->Say("Drink it all boys!", LANG_UNIVERSAL);
                         break;
                     case 1:
-                        me->MonsterSay("DRINK! BRAWL! DRINK! BRAWL!", LANG_UNIVERSAL, 0);
+                        me->Say("DRINK! BRAWL! DRINK! BRAWL!", LANG_UNIVERSAL);
                         break;
                     case 2:
-                        me->MonsterSay("Did someone say, \"Free Brew\"?", LANG_UNIVERSAL, 0);
+                        me->Say("Did someone say, \"Free Brew\"?", LANG_UNIVERSAL);
                         break;
                     case 3:
-                        me->MonsterSay("No one expects the Dark Iron dwarves!", LANG_UNIVERSAL, 0);
+                        me->Say("No one expects the Dark Iron dwarves!", LANG_UNIVERSAL);
                         break;
                     case 4:
-                        me->MonsterSay("It's not a party without some crashers!", LANG_UNIVERSAL, 0);
+                        me->Say("It's not a party without some crashers!", LANG_UNIVERSAL);
                         break;
                 }
             }

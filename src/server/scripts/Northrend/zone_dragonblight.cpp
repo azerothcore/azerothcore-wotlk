@@ -94,9 +94,9 @@ public:
             }
 
             if (yell)
-                c->MonsterYell(text.c_str(), LANG_UNIVERSAL, player);
+                c->Yell(text.c_str(), LANG_UNIVERSAL, player);
             else
-                c->MonsterWhisper(text.c_str(), player, false);
+                c->Whisper(text.c_str(), player);
         }
 
         void DespawnOachanoa()
@@ -349,12 +349,12 @@ public:
             {
                 case EVENT_START_EVENT:
                     if (Creature* cr = getFuture())
-                        cr->MonsterWhisper(IsFuture() ? "Hey there, $N, don't be alarmed. It's me... you... from the future. I'm here to help." : "Whoa! You're me, but from the future! Hey, my equipment got an upgrade! Cool!", getSummoner());
+                        cr->Whisper(IsFuture() ? "Hey there, $N, don't be alarmed. It's me... you... from the future. I'm here to help." : "Whoa! You're me, but from the future! Hey, my equipment got an upgrade! Cool!", getSummoner());
                     events.ScheduleEvent(EVENT_FIGHT_1, 7000);
                     break;
                 case EVENT_FIGHT_1:
                     if (Creature* cr = getFuture())
-                        cr->MonsterWhisper(IsFuture() ? "Heads up... here they come. I'll help as much as I can. Let's just keep them off the hourglass!" : "Here come the Infinites! I've got to keep the hourglass safe. Can you help?", getSummoner());
+                        cr->Whisper(IsFuture() ? "Heads up... here they come. I'll help as much as I can. Let's just keep them off the hourglass!" : "Here come the Infinites! I've got to keep the hourglass safe. Can you help?", getSummoner());
                     events.ScheduleEvent(EVENT_FIGHT_2, 6000);
                     break;
                 case EVENT_FIGHT_2:
@@ -405,13 +405,13 @@ public:
                         if (Player* player = getSummoner())
                             player->GroupEventHappens(IsFuture() ? QUEST_MYSTERY_OF_THE_INFINITE : QUEST_MYSTERY_OF_THE_INFINITE_REDUX, me);
 
-                        me->MonsterWhisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", getSummoner());
+                        me->Whisper(IsFuture() ? "Look, $N, the hourglass has revealed Nozdormu!" : "What the heck? Nozdormu is up there!", getSummoner());
                         events.ScheduleEvent(EVENT_FINISH_EVENT, 6000);
                         break;
                     }
                 case EVENT_FINISH_EVENT:
                     {
-                        me->MonsterWhisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", getSummoner());
+                        me->Whisper(IsFuture() ? "Farewell, $N. Keep us alive and get some better equipment!" : "I feel like I'm being pulled away through time. Thanks for the help....", getSummoner());
                         me->DespawnOrUnsummon(500);
                         if (getFuture())
                             getFuture()->DespawnOrUnsummon(500);
@@ -452,7 +452,7 @@ public:
             }
 
             if (Creature* cr = getFuture())
-                cr->MonsterWhisper(text.c_str(), getSummoner());
+                cr->Whisper(text.c_str(), getSummoner());
         }
     };
 };

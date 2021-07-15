@@ -181,7 +181,7 @@ public:
                     break;
                 ExpeditionEngineerGUIDs[i] = (*itr)->GetGUID();
                 if (!i)
-                    (*itr)->MonsterYell(TEXT_EE_AGGRO, LANG_UNIVERSAL, 0);
+                    (*itr)->Yell(TEXT_EE_AGGRO, LANG_UNIVERSAL, 0);
                 ++i;
             }
             if (Creature* c = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 300.0f, true))
@@ -341,7 +341,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_MOVE_OUT, LANG_UNIVERSAL, 0);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;
@@ -510,7 +510,7 @@ public:
                         if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
                         {
                             if (!i)
-                                c->MonsterYell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL, 0);
+                                c->Yell(TEXT_EE_FIRES_OUT, LANG_UNIVERSAL, 0);
                             c->AI()->SetData(1, 0); // start repairing
                         }
                     break;

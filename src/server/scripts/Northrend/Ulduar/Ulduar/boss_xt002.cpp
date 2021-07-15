@@ -190,7 +190,7 @@ public:
             RescheduleEvents(); // Other events are scheduled here
 
             me->setActive(true);
-            me->MonsterYell("New toys? For me? I promise I won't break them this time!", LANG_UNIVERSAL, 0);
+            me->Yell("New toys? For me? I promise I won't break them this time!", LANG_UNIVERSAL, 0);
             me->PlayDirectSound(XT_SOUND_AGGRO);
 
             if (m_pInstance)
@@ -212,12 +212,12 @@ public:
             {
                 if (urand(0, 1))
                 {
-                    me->MonsterYell("I... I think I broke it.", LANG_UNIVERSAL, 0);
+                    me->Yell("I... I think I broke it.", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(XT_SOUND_SLAY1);
                 }
                 else
                 {
-                    me->MonsterYell("I guess it doesn't bend that way.", LANG_UNIVERSAL, 0);
+                    me->Yell("I guess it doesn't bend that way.", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(XT_SOUND_SLAY2);
                 }
             }
@@ -225,7 +225,7 @@ public:
 
         void JustDied(Unit* /*victim*/) override
         {
-            me->MonsterYell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL, 0);
+            me->Yell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL, 0);
             me->PlayDirectSound(XT_SOUND_DEATH);
 
             if (m_pInstance)
@@ -316,7 +316,7 @@ public:
                         me->SetControlled(true, UNIT_STATE_STUNNED);
                         me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
 
-                        me->MonsterYell("So tired. I will rest for just a moment!", LANG_UNIVERSAL, 0);
+                        me->Yell("So tired. I will rest for just a moment!", LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(XT_SOUND_HEART_OPEN);
 
                         events.CancelEventGroup(1);
@@ -343,13 +343,13 @@ public:
                     break;
                 case EVENT_TYMPANIC_TANTARUM:
                     me->MonsterTextEmote("XT-002 Deconstructor begins to cause the earth to quake.", 0, true);
-                    me->MonsterYell("NO! NO! NO! NO! NO!", LANG_UNIVERSAL, 0);
+                    me->Yell("NO! NO! NO! NO! NO!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(XT_SOUND_TANTARUM);
                     me->CastSpell(me, SPELL_TYMPANIC_TANTARUM, true);
                     events.RepeatEvent(60000);
                     return;
                 case EVENT_ENRAGE:
-                    me->MonsterYell("I'm tired of these toys. I don't want to play anymore!", LANG_UNIVERSAL, 0);
+                    me->Yell("I'm tired of these toys. I don't want to play anymore!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(XT_SOUND_ENRAGE);
                     me->CastSpell(me, SPELL_XT002_ENRAGE, true);
                     break;
@@ -370,7 +370,7 @@ public:
                         return;
                     }
 
-                    me->MonsterYell("I'm ready to play!", LANG_UNIVERSAL, 0);
+                    me->Yell("I'm ready to play!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(XT_SOUND_HEART_CLOSED);
 
                     me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge

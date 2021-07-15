@@ -202,7 +202,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         Creature* pOtherBoss = GetOtherBoss();
         if (pOtherBoss)
         {
-            //me->MonsterYell("Teleporting ...", LANG_UNIVERSAL, 0);
+            //me->Yell("Teleporting ...", LANG_UNIVERSAL);
             Position thisPos;
             thisPos.Relocate(me);
             Position otherPos;

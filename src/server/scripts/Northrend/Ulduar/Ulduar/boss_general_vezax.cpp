@@ -152,7 +152,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_SUMMON_SARONITE_VAPORS, 30000);
             events.RescheduleEvent(EVENT_BERSERK, 600000);
 
-            me->MonsterYell(TEXT_VEZAX_AGGRO, LANG_UNIVERSAL, 0);
+            me->Yell(TEXT_VEZAX_AGGRO, LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_VEZAX_AGGRO, 0);
 
             if (pInstance)
@@ -213,7 +213,7 @@ public:
                 case EVENT_BERSERK:
                     berserk = true;
                     me->CastSpell(me, SPELL_VEZAX_BERSERK, true);
-                    me->MonsterYell(TEXT_VEZAX_BERSERK, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_VEZAX_BERSERK, LANG_UNIVERSAL);
                     me->PlayDirectSound(SOUND_VEZAX_BERSERK, 0);
                     break;
                 case EVENT_SPELL_VEZAX_SHADOW_CRASH:
@@ -248,7 +248,7 @@ public:
                     events.RepeatEvent( me->GetMap()->Is25ManRaid() ? 8000 : 15000 );
                     break;
                 case EVENT_SPELL_SURGE_OF_DARKNESS:
-                    me->MonsterYell(TEXT_VEZAX_SURGE, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_VEZAX_SURGE, LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_VEZAX_SURGE, 0);
                     me->CastSpell(me, SPELL_SURGE_OF_DARKNESS, false);
                     events.RepeatEvent(63000);
@@ -320,7 +320,7 @@ public:
                     if (summons.size())
                     {
                         me->MonsterTextEmote("A saronite barrier appears around General Vezax!", 0, true);
-                        me->MonsterYell(TEXT_VEZAX_HARDMODE, LANG_UNIVERSAL, 0);
+                        me->Yell(TEXT_VEZAX_HARDMODE, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_VEZAX_HARDMODE, 0);
 
                         me->CastSpell(me, SPELL_SARONITE_BARRIER, true);
@@ -345,7 +345,7 @@ public:
             if (pInstance)
                 pInstance->SetData(TYPE_VEZAX, DONE);
 
-            me->MonsterYell(TEXT_VEZAX_DEATH, LANG_UNIVERSAL, 0);
+            me->Yell(TEXT_VEZAX_DEATH, LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_VEZAX_DEATH, 0);
 
             if( GameObject* door = me->FindNearestGameObject(GO_VEZAX_DOOR, 500.0f) )
@@ -362,12 +362,12 @@ public:
             {
                 if( urand(0, 1) )
                 {
-                    me->MonsterYell(TEXT_VEZAX_SLAIN_1, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_VEZAX_SLAIN_1, LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_VEZAX_SLAIN_1, 0);
                 }
                 else
                 {
-                    me->MonsterYell(TEXT_VEZAX_SLAIN_2, LANG_UNIVERSAL, 0);
+                    me->Yell(TEXT_VEZAX_SLAIN_2, LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_VEZAX_SLAIN_2, 0);
                 }
             }

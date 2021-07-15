@@ -246,7 +246,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32000);
             events.ScheduleEvent(EVENT_GRAB, 25000);
 
-            me->MonsterYell(TEXT_AGGRO, LANG_UNIVERSAL, 0);
+            me->Yell(TEXT_AGGRO, LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_AGGRO);
             DoZoneInCombat();
 
@@ -286,19 +286,19 @@ public:
         {
             if( rand() % 2 )
             {
-                me->MonsterYell(TEXT_SLAY_1, LANG_UNIVERSAL, 0);
+                me->Yell(TEXT_SLAY_1, LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_SLAY_1);
             }
             else
             {
-                me->MonsterYell(TEXT_SLAY_2, LANG_UNIVERSAL, 0);
+                me->Yell(TEXT_SLAY_2, LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_SLAY_2);
             }
         }
 
         void JustDied(Unit* /*victim*/) override
         {
-            me->MonsterYell(TEXT_DEATH, LANG_UNIVERSAL, 0);
+            me->Yell(TEXT_DEATH, LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_DEATH);
 
             if( me->GetInstanceScript() )
@@ -346,7 +346,7 @@ public:
                     me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     if (++counter >= 20)
                     {
-                        me->MonsterYell(TEXT_BERSERK, LANG_UNIVERSAL, 0);
+                        me->Yell(TEXT_BERSERK, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_BERSERK);
                         me->CastSpell(me, SPELL_BERSERK, true);
                         break;
@@ -356,12 +356,12 @@ public:
                 case EVENT_SPELL_SCORCH:
                     if( rand() % 2 )
                     {
-                        me->MonsterYell(TEXT_SCORCH_1, LANG_UNIVERSAL, 0);
+                        me->Yell(TEXT_SCORCH_1, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_SCORCH_1);
                     }
                     else
                     {
-                        me->MonsterYell(TEXT_SCORCH_2, LANG_UNIVERSAL, 0);
+                        me->Yell(TEXT_SCORCH_2, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_SCORCH_2);
                     }
                     me->SetControlled(true, UNIT_STATE_ROOT);
@@ -413,7 +413,7 @@ public:
                             int8 pos = urand(0, playerGUIDs.size() - 1);
                             if( Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)) )
                             {
-                                me->MonsterYell(TEXT_SLAG_POT, LANG_UNIVERSAL, 0);
+                                me->Yell(TEXT_SLAG_POT, LANG_UNIVERSAL, 0);
                                 me->PlayDirectSound(SOUND_SLAG_POT);
                                 me->CastSpell(pTarget, SPELL_GRAB, false);
                             }

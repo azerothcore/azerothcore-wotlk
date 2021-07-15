@@ -11,7 +11,7 @@
 #include "Battleground.h"
 #include "BattlegroundAB.h"
 #include "CellImpl.h"
-#include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "DBCEnums.h"
@@ -31,28 +31,6 @@
 #include "SpellMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
-
-namespace Acore
-{
-    class AchievementChatBuilder
-    {
-    public:
-        AchievementChatBuilder(Player const& player, ChatMsg msgtype, int32 textId, uint32 ach_id)
-            : i_player(player), i_msgtype(msgtype), i_textId(textId), i_achievementId(ach_id) {}
-
-        void operator()(WorldPacket& data, LocaleConstant loc_idx)
-        {
-            std::string text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
-            ChatHandler::BuildChatPacket(data, i_msgtype, LANG_UNIVERSAL, &i_player, &i_player, text, i_achievementId);
-        }
-
-    private:
-        Player const& i_player;
-        ChatMsg i_msgtype;
-        int32 i_textId;
-        uint32 i_achievementId;
-    };
-}                                                           // namespace Acore
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
@@ -666,8 +644,8 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId());
     if (guild)
     {
-        Acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
-        Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> say_do(say_builder);
+        Acore::StringTextBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, GetPlayer(), achievement->ID);
+        Acore::LocalizedPacketDo<Acore::StringTextBuilder> say_do(say_builder);
         guild->BroadcastWorker(say_do, GetPlayer());
     }
 
@@ -709,10 +687,10 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
         Cell cell(p);
         cell.SetNoCreate();
 
-        Acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
-        Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> say_do(say_builder);
-        Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> > say_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-        TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+        Acore::StringTextBuilder say_builder(*GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, GetPlayer(), achievement->ID);
+        Acore::LocalizedPacketDo<Acore::StringTextBuilder> say_do(say_builder);
+        Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::StringTextBuilder> > say_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
+        TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::StringTextBuilder> >, WorldTypeMapContainer > message(say_worker);
         Cell::VisitWorldObjects(GetPlayer(), say_worker, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
     }
 

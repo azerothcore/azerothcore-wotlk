@@ -145,7 +145,7 @@ public:
 
         void EnterCombat(Unit*  /*who*/) override
         {
-            me->MonsterYell("Ah, the heroes. Your little friends said you would come. This certainly saves me the trouble of hunting you down myself.", LANG_UNIVERSAL, 0);
+            me->Yell("Ah, the heroes. Your little friends said you would come. This certainly saves me the trouble of hunting you down myself.", LANG_UNIVERSAL);
             me->CastSpell(me, SPELL_ARTRUIS_ICY_VEINS, true);
             events.RescheduleEvent(EVENT_CAST_FROST_BOLT, 4000);
             events.RescheduleEvent(EVENT_CAST_FROST_NOVA, 15000);
@@ -189,7 +189,7 @@ public:
                         }
                         else if (action == ACTION_MAKE_FRIENDLY && me->GetVictim())
                         {
-                            minion->MonsterSay("Now you not catch us with back turned! Now we hurt you bad undead. BAD!", LANG_UNIVERSAL, 0);
+                            minion->Say("Now you not catch us with back turned! Now we hurt you bad undead. BAD!", LANG_UNIVERSAL);
                             minion->RemoveAurasDueToSpell(SPELL_ARTRUIS_BINDING);
                             minion->setFaction(me->GetVictim()->getFaction());
                             minion->AddThreat(me, 100000.0f);
@@ -217,21 +217,21 @@ public:
                     if (me->GetHealthPct() <= 30)
                     {
                         me->SetControlled(true, UNIT_STATE_STUNNED);
-                        me->MonsterTextEmote("Artruis is shielded. You must choose your side quickly to break his spell.", 0, true);
+                        me->TextEmote("Artruis is shielded. You must choose your side quickly to break his spell.", nullptr, true);
                         SummonsAction(ACTION_BIND_MINIONS);
                         break;
                     }
                     events.RepeatEvent(1000);
                     break;
                 case EVENT_ARTRUIS_TALK1:
-                    me->MonsterYell("I have weathered a hundred years of war and suffering. Do you truly think it wise to pit your mortal bodies against a being that cannot die? I'd venture you have more to lose.", LANG_UNIVERSAL, 0);
+                    me->Yell("I have weathered a hundred years of war and suffering. Do you truly think it wise to pit your mortal bodies against a being that cannot die? I'd venture you have more to lose.", LANG_UNIVERSAL);
                     events.RescheduleEvent(EVENT_ARTRUIS_TALK2, 10000);
                     break;
                 case EVENT_ARTRUIS_TALK2:
-                    me->MonsterYell("Even shattered into countless pieces, the crystals all around weaken me... perhaps i should not have underestimated the titans so...", LANG_UNIVERSAL, 0);
+                    me->Yell("Even shattered into countless pieces, the crystals all around weaken me... perhaps i should not have underestimated the titans so...", LANG_UNIVERSAL);
                     break;
                 case EVENT_ARTRUIS_TALK3:
-                    me->MonsterYell("Arthas once mustered strength... of the very same sort... perhaps he is the path that you will follow.", LANG_UNIVERSAL, 0);
+                    me->Yell("Arthas once mustered strength... of the very same sort... perhaps he is the path that you will follow.", LANG_UNIVERSAL);
                     break;
                 case EVENT_CAST_FROST_BOLT:
                     me->CastSpell(me->GetVictim(), SPELL_ARTRUIS_FROSTBOLT, false);
@@ -329,7 +329,7 @@ public:
         void Say(const char* text)
         {
             if (Creature* th = ObjectAccessor::GetCreature(*me, thunderbrewGUID))
-                th->MonsterSay(text, LANG_UNIVERSAL, 0);
+                th->Say(text, LANG_UNIVERSAL);
             else
                 Reset();
         }
@@ -1014,7 +1014,7 @@ public:
                     continue;
 
                 player->KilledMonsterCredit(me->GetEntry());
-                player->MonsterSay(SAY_OFFER, LANG_UNIVERSAL, me);
+                player->Say(SAY_OFFER, LANG_UNIVERSAL, me);
                 sayStep = 1;
                 break;
             }
@@ -1470,10 +1470,10 @@ public:
                 switch (GetSpellInfo()->Id)
                 {
                     case SPELL_CORRECT_TRACKS:
-                        player->MonsterSay(sObjectMgr->GetAcoreStringForDBCLocale(SAY_CORRECT_TRACKS), LANG_UNIVERSAL, player);
+                        player->Say(sObjectMgr->GetAcoreStringForDBCLocale(SAY_CORRECT_TRACKS), LANG_UNIVERSAL, player);
                         break;
                     case SPELL_INCORRECT_TRACKS:
-                        player->MonsterSay(sObjectMgr->GetAcoreStringForDBCLocale(SAY_INCORRECT_TRACKS), LANG_UNIVERSAL, player);
+                        player->Say(sObjectMgr->GetAcoreStringForDBCLocale(SAY_INCORRECT_TRACKS), LANG_UNIVERSAL, player);
                         break;
                     default:
                         break;
