@@ -761,7 +761,7 @@ public:
     void GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance, float absAngle) const;
     void GetNearPoint2D(float& x, float& y, float distance, float absAngle) const;
     void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0) const;
-    void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
+    void GetTheClosestPoint(float& x, float& y, float& z, float rangecheck, float startedZ, float controlZ = 0) const;
     bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, const WorldObject* forWho = nullptr, bool force = false) const;
     void MovePosition(Position& pos, float dist, float angle);
     void GetNearPosition(Position& pos, float dist, float angle)
