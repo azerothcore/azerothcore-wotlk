@@ -1,4 +1,6 @@
-// Scripted by Xinef
+/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
 #include "CellImpl.h"
 #include "GameEventMgr.h"
@@ -1206,8 +1208,10 @@ public:
                         break;
                     }
                     // just walking, fatiuge handling
-                    if (Aura* aur = caster->GetAura(SPELL_RAM_FATIGUE))
-                        aur->ModStackAmount(-4);
+                    if (Aura* fatigueAura = caster->GetAura(SPELL_RAM_FATIGUE))
+                    {
+                        fatigueAura->ModStackAmount(-4);
+                    }
                     break;
                 case 1:
                     // One click to maintain speed, more to increase

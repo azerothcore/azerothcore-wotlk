@@ -1,4 +1,6 @@
-// Scripted by Xinef
+/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
 #include "GameEventMgr.h"
 #include "Player.h"
@@ -83,11 +85,9 @@ public:
                 if (target->HasAuraType(SPELL_AURA_TRANSFORM))
                     return;
 
-                uint32 spellId = 0;
-                if (target->getGender() == GENDER_MALE)
-                    spellId = RAND(SPELL_WINTER_WONDERVOLT_RED_MAN, SPELL_WINTER_WONDERVOLT_GREEN_MAN);
-                else
-                    spellId = RAND(SPELL_WINTER_WONDERVOLT_RED_WOMEN, SPELL_WINTER_WONDERVOLT_GREEN_WOMEN);
+                uint32 spellId = target->getGender() == GENDER_MALE
+                        ? RAND(SPELL_WINTER_WONDERVOLT_RED_MAN, SPELL_WINTER_WONDERVOLT_GREEN_MAN)
+                        : RAND(SPELL_WINTER_WONDERVOLT_RED_WOMEN, SPELL_WINTER_WONDERVOLT_GREEN_WOMEN);
 
                 // cast
                 target->CastSpell(target, spellId, true);
