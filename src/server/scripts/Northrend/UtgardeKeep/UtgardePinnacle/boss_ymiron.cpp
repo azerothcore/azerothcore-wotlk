@@ -215,7 +215,7 @@ public:
 
                             // Spawn flames in previous boat if any
                             if (BoatNum) // different than 0
-                                if (Creature* cr = me->SummonTrigger(BoatStructure[BoatOrder[BoatNum - 1]].SpawnX, BoatStructure[BoatOrder[BoatNum - 1]].SpawnY, BoatStructure[BoatOrder[BoatNum - 1]].SpawnZ, 0, 1800000))
+                                if (Creature* cr = me->SummonTrigger(BoatStructure[BoatOrder[BoatNum - 1]].SpawnX, BoatStructure[BoatOrder[BoatNum - 1]].SpawnY, BoatStructure[BoatOrder[BoatNum - 1]].SpawnZ, 0, 30min))
                                 {
                                     cr->AddAura(SPELL_FLAMES, cr);
                                     summons2.Summon(cr);

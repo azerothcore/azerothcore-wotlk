@@ -629,7 +629,7 @@ void Map::ScriptsProcess()
                             float o = step.script->TempSummonCreature.Orientation;
 
                             if (step.script->TempSummonCreature.CheckIfExists)
-                                if (Unit* trigger = pSummoner->SummonTrigger(x, y, z, o, 1))
+                                if (Unit* trigger = pSummoner->SummonTrigger(x, y, z, o, 1ms))
                                     if (trigger->FindNearestCreature(entry, 60.0f))
                                         break;
 

@@ -765,7 +765,7 @@ public:
                 if (Vehicle* vehicle = cVeh->GetVehicleKit())
                     if (Unit* passenger = vehicle->GetPassenger(0))
                         if (IsFriendly(passenger))
-                            if (Creature* teleportTrigger = passenger->SummonTrigger(go->GetPositionX() - 60.0f, go->GetPositionY(), go->GetPositionZ() + 1.0f, cVeh->GetOrientation(), 1000))
+                            if (Creature* teleportTrigger = passenger->SummonTrigger(go->GetPositionX() - 60.0f, go->GetPositionY(), go->GetPositionZ() + 1.0f, cVeh->GetOrientation(), 1s))
                                 return teleportTrigger;
 
             return nullptr;

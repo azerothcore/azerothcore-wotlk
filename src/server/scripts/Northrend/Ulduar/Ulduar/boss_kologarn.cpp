@@ -555,7 +555,7 @@ public:
                 z = 448.888f;
             }
 
-            if (Creature* cr = me->SummonTrigger(x, y, z, 0, 5000))
+            if (Creature* cr = me->SummonTrigger(x, y, z, 0, 5s))
             {
                 cr->CastSpell(cr, SPELL_RUBBLE_FALL, true);
 
