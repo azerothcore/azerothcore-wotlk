@@ -143,6 +143,7 @@ typedef GuidSet AllowedLooterSet;
 struct LootItem
 {
     uint32  itemid;
+    uint32  itemIndex;
     uint32  randomSuffix;
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition

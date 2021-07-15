@@ -368,7 +368,8 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
 // Constructor, copies most fields from LootStoreItem and generates random count
 LootItem::LootItem(LootStoreItem const& li)
 {
-    itemid      = li.itemid;
+    itemid       = li.itemid;
+    itemIndex    = 0;
     conditions   = li.conditions;
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
@@ -466,6 +467,7 @@ void Loot::AddItem(LootStoreItem const& item)
     {
         LootItem generatedLoot(item);
         generatedLoot.count = std::min(count, proto->GetMaxStackSize());
+        generatedLoot.itemIndex = lootItems.size();
         lootItems.push_back(generatedLoot);
         count -= proto->GetMaxStackSize();
 
