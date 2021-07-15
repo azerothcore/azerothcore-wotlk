@@ -26,9 +26,9 @@
 **{fmt}** is an open-source formatting library providing a fast and safe
 alternative to C stdio and C++ iostreams.
 
-If you like this project, please consider donating to BY_Help,
-an initiative to help victims of political repressions in Belarus:
-https://www.facebook.com/donate/199475051809330/.
+If you like this project, please consider donating to the BYSOL
+Foundation that helps victims of political repressions in Belarus:
+https://bysol.org/en/bs/general/.
 
 `Documentation <https://fmt.dev>`__
 
@@ -340,6 +340,10 @@ Projects using this library
   logging library with latency in nanoseconds
 
 * `Folly <https://github.com/facebook/folly>`_: Facebook open-source library
+
+* `Grand Mountain Adventure
+  <https://store.steampowered.com/app/1247360/Grand_Mountain_Adventure/>`_:
+  A beautiful open-world ski & snowboarding game
 
 * `HarpyWar/pvpgn <https://github.com/pvpgn/pvpgn-server>`_:
   Player vs Player Gaming Network with tweaks

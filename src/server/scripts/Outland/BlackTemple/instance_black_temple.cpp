@@ -187,7 +187,7 @@ public:
 
             if (type == DATA_SHADE_OF_AKAMA && state == DONE)
             {
-                for (ObjectGuid const guid : ashtongueGUIDs)
+                for (ObjectGuid const& guid : ashtongueGUIDs)
                     if (Creature* ashtongue = instance->GetCreature(guid))
                         ashtongue->setFaction(FACTION_ASHTONGUE);
             }
@@ -293,7 +293,7 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (ObjectGuid const guid : _turtleSet)
+            for (ObjectGuid const& guid : _turtleSet)
                 if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
                     turtle->TauntFadeOut(GetUnitOwner());
