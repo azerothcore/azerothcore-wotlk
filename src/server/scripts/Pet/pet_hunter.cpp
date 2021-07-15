@@ -21,11 +21,6 @@ enum HunterSpells
     SPELL_HUNTER_PET_SCALING            = 62915
 };
 
-enum HunterCreatures
-{
-    NPC_HUNTER_VIPER                    = 19921
-};
-
 class npc_pet_hunter_snake_trap : public CreatureScript
 {
 public:
