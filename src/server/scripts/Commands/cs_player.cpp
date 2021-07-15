@@ -34,15 +34,20 @@ public:
             return false;
 
         char* playerName = strtok((char*)args, " ");
-        char* spellid = strtok(nullptr, " ");
+        char* spellId = strtok(nullptr, " ");
         char const* all = strtok(nullptr, " ");
         Player* targetPlayer = FindPlayer(handler, playerName);
-        if (!spellid || !targetPlayer)
+        if (!spellId || !targetPlayer)
+        {
             return false;
+        }
 
-        uint32 spell = handler->extractSpellIdFromLink(spellid);
+        uint32 spell = handler->extractSpellIdFromLink(spellId);
+
         if (!spell)
+        {
             return false;
+        }
 
         return Learn(handler, targetPlayer, spell, all);
     }
@@ -53,15 +58,21 @@ public:
             return false;
 
         char* playerName = strtok((char*)args, " ");
-        char* spellid = strtok(nullptr, " ");
+        char* spellId = strtok(nullptr, " ");
         char const* all = strtok(nullptr, " ");
         Player* targetPlayer = FindPlayer(handler, playerName);
-        if (!spellid || !targetPlayer)
-            return false;
 
-        uint32 spell = handler->extractSpellIdFromLink(spellid);
-        if (!spell)
+        if (!spellId || !targetPlayer)
+        {
             return false;
+        }
+
+        uint32 spell = handler->extractSpellIdFromLink(spellId);
+
+        if (!spell)
+        {
+            return false;
+        }
 
         return UnLearn(handler, targetPlayer, spell, all);
     }

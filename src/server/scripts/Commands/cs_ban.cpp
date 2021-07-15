@@ -389,14 +389,14 @@ public:
 
         if (filter.empty())
         {
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_ALL);
-            result = LoginDatabase.Query(stmt);
+            LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_ALL);
+            result = LoginDatabase.Query(stmt2);
         }
         else
         {
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_BY_USERNAME);
-            stmt->setString(0, filter);
-            result = LoginDatabase.Query(stmt);
+            LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_BY_USERNAME);
+            stmt2->setString(0, filter);
+            result = LoginDatabase.Query(stmt2);
         }
 
         if (!result)
@@ -586,14 +586,14 @@ public:
 
         if (filter.empty())
         {
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED_ALL);
-            result = LoginDatabase.Query(stmt);
+            LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED_ALL);
+            result = LoginDatabase.Query(stmt2);
         }
         else
         {
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED_BY_IP);
-            stmt->setString(0, filter);
-            result = LoginDatabase.Query(stmt);
+            LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED_BY_IP);
+            stmt2->setString(0, filter);
+            result = LoginDatabase.Query(stmt2);
         }
 
         if (!result)

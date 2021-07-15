@@ -5,7 +5,6 @@
  */
 
 #include "AccountMgr.h"
-#include "ace/INET_Addr.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
@@ -132,10 +131,10 @@ public:
             return false;
         }
 
-        Tokenizer::const_iterator i = tokens.begin();
+        Tokenizer::const_iterator tokensItr = tokens.begin();
 
         std::set<BattlegroundTypeId> allowedArenas;
-        std::string arenasStr = *(i++);
+        std::string arenasStr = *(tokensItr++);
         std::string tmpStr;
         Tokenizer arenaTokens(arenasStr, ',');
         for (Tokenizer::const_iterator itr = arenaTokens.begin(); itr != arenaTokens.end(); ++itr)
@@ -176,9 +175,9 @@ public:
         BattlegroundTypeId randomizedArenaBgTypeId = Acore::Containers::SelectRandomContainerElement(allowedArenas);
 
         uint8 count = 0;
-        if (i != tokens.end())
+        if (tokensItr != tokens.end())
         {
-            std::string mode = *(i++);
+            std::string mode = *(tokensItr++);
             if (mode == "1v1") count = 2;
             else if (mode == "2v2") count = 4;
             else if (mode == "3v3") count = 6;
@@ -205,9 +204,9 @@ public:
         Player* plr = nullptr;
         Player* players[10] = {nullptr};
         uint8 cnt = 0;
-        for (; i != tokens.end(); ++i)
+        for (; tokensItr != tokens.end(); ++tokensItr)
         {
-            last_name = std::string(*i);
+            last_name = std::string(*tokensItr);
             plr = ObjectAccessor::FindPlayerByName(last_name, false);
             if (!plr) { error = 1; break; }
             if (!plr->IsInWorld() || !plr->FindMap() || plr->IsBeingTeleported()) { error = 2; break; }
@@ -235,13 +234,17 @@ public:
         }
 
         for (uint8 i = 0; i < cnt && !error; ++i)
+        {
             for (uint8 j = i + 1; j < cnt; ++j)
+            {
                 if (players[i]->GetGUID() == players[j]->GetGUID())
                 {
                     last_name = players[i]->GetName();
                     error = 13;
                     break;
                 }
+            }
+        }
 
         switch (error)
         {
@@ -831,7 +834,7 @@ public:
 
             std::string plNameLink = handler->GetNameLink(player);
 
-            if (player->IsBeingTeleported() == true)
+            if (player->IsBeingTeleported())
             {
                 handler->PSendSysMessage(LANG_IS_TELEPORTED, plNameLink.c_str());
                 handler->SetSentErrorMessage(true);
@@ -2003,12 +2006,12 @@ public:
                 PreparedQueryResult guildInfoResult = CharacterDatabase.Query(guildQuery);
                 if (guildInfoResult)
                 {
-                    Field* fields  = guildInfoResult->Fetch();
-                    guildId        = fields[0].GetUInt32();
-                    guildName      = fields[1].GetString();
-                    guildRank      = fields[2].GetString();
-                    note           = fields[3].GetString();
-                    officeNote     = fields[4].GetString();
+                    Field* guildInfoFields  = guildInfoResult->Fetch();
+                    guildId        = guildInfoFields[0].GetUInt32();
+                    guildName      = guildInfoFields[1].GetString();
+                    guildRank      = guildInfoFields[2].GetString();
+                    note           = guildInfoFields[3].GetString();
+                    officeNote     = guildInfoFields[4].GetString();
                 }
             }
         }
