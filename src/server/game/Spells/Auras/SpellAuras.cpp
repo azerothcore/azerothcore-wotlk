@@ -464,6 +464,12 @@ Unit* Aura::GetCaster() const
 
 AuraObjectType Aura::GetType() const
 {
+    if (!m_owner)
+    {
+        LOG_ERROR("spells", "Aura::GetType m_owner is null!");
+        return UNIT_AURA_TYPE;
+    }
+
     return (m_owner->GetTypeId() == TYPEID_DYNAMICOBJECT) ? DYNOBJ_AURA_TYPE : UNIT_AURA_TYPE;
 }
 
