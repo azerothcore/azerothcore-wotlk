@@ -6223,17 +6223,14 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!unitTarget)
-        return;
-
-    Player* player = unitTarget->ToPlayer();
-    if (!player)
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return
 
     switch (m_spellInfo->Id)
     {
         case 58730: // Restricted Flight Area
         case 58600: // Restricted Flight Area
-            player->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
+            unitTarget->ToPlayer()->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
             break;
         default:
             break;
