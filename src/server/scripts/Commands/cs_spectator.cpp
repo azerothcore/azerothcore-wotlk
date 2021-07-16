@@ -27,8 +27,8 @@ public:
         {
             { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,                  "" },
             { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,                    "" },
-            { "spectate",       SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorSpectateCommand, "" },
-            { "watch",          SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorWatchCommand,    "" },
+            { "spectate",       SEC_CONSOLE,        false, &HandleSpectatorSpectateCommand,                 "" },
+            { "watch",          SEC_CONSOLE,        false, &HandleSpectatorWatchCommand,                    "" },
             { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,                    "" },
             { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,                         "" }
         };
@@ -75,6 +75,22 @@ public:
 
         //player->SetIsSpectator(false);
         player->TeleportToEntryPoint();
+        return true;
+    }
+
+    static bool HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args)
+    {
+        if (!ArenaSpectator::HandleSpectatorSpectateCommand(handler, args))
+            return false;
+
+        return true;
+    }
+
+    static bool HandleSpectatorWatchCommand(ChatHandler* handler, char const* args)
+    {
+        if (!ArenaSpectator::HandleSpectatorWatchCommand(handler, args))
+            return false;
+
         return true;
     }
 };

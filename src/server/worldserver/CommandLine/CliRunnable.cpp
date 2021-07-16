@@ -97,7 +97,7 @@ int kb_hit_return()
 #endif
 
 /// %Thread start
-void CliRunnable::run()
+void CliThread()
 {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     // print this here the first time
