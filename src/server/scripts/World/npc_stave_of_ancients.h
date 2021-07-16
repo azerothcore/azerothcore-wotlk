@@ -26,6 +26,7 @@ enum CommonEvents
 enum NPCArtorius
 {
     ARTORIUS_EVENT_DEMONIC_DOOM               = 5,
+
     ARTORIUS_GOSSIP_TEXT                      = 7045,   // npc_text.ID               "How wonderful to see another person in..."
     ARTORIUS_GOSSIP_OPTION_TEXT               = 14531,  // creature_text.CreatureID  "I know you as Artorius the Doombringer..."
     ARTORIUS_WEAKNESS_EMOTE                   = 9786,   // broadcast_text.ID         "%s is stricken by a virulent poison."
@@ -44,9 +45,9 @@ struct NPCStaveQuestAI : public ScriptedAI
 {
     NPCStaveQuestAI(Creature *creature) : ScriptedAI(creature) { }
 
-    ObjectGuid pGUID;
+    ObjectGuid playerGUID;
     bool encounterStarted;
-    ThreatContainer::StorageType threatList;
+    ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
 
     std::map<int, int> entryKeys = {
         { ARTORIUS_NORMAL_ENTRY, 1 },
@@ -65,7 +66,6 @@ struct NPCStaveQuestAI : public ScriptedAI
     bool InNormalForm();
     void RevealForm();
     void StorePlayerGUID();
-    void InitMembers();
     bool IsAllowedEntry(uint32 /*entry*/);
     bool IsFairFight();
     bool ValidThreatlist();

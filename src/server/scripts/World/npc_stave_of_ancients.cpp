@@ -1,3 +1,9 @@
+/* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ *
+ *
+ * This program is free software licensed under GPL version 2
+ * Please see the included DOCS/LICENSE.TXT for more information */
+
 #include "CreatureTextMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -27,7 +33,7 @@ void NPCStaveQuestAI::RevealForm()
 
 void NPCStaveQuestAI::StorePlayerGUID()
 {
-    if (!pGUID.IsEmpty())
+    if (!playerGUID.IsEmpty())
     {
         return;
     }
@@ -36,15 +42,9 @@ void NPCStaveQuestAI::StorePlayerGUID()
     {
         if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER)
         {
-            pGUID = (*itr)->getUnitGuid();
+            playerGUID = (*itr)->getUnitGuid();
         }
     }
-}
-
-void NPCStaveQuestAI::InitMembers()
-{
-    threatList = me->getThreatManager().getThreatList();
-    StorePlayerGUID();
 }
 
 bool NPCStaveQuestAI::IsAllowedEntry(uint32 entry)
@@ -70,7 +70,7 @@ bool NPCStaveQuestAI::IsFairFight()
 
         if (unit->IsPlayer())
         {
-            if (pGUID != unit->GetGUID())
+            if (playerGUID != unit->GetGUID())
             {
                 // if there is another player in the threatlist its unfair
                 return false;
@@ -78,7 +78,7 @@ bool NPCStaveQuestAI::IsFairFight()
         }
         else
         {
-            if (!pGUID.IsEmpty() && unit->GetOwnerGUID() != pGUID)
+            if (!playerGUID.IsEmpty() && unit->GetOwnerGUID() != playerGUID)
             {
                 // if a creature attacking isn't owned by the player its unfair
                 return false;
@@ -147,7 +147,7 @@ public:
         void Reset() override
         {
             encounterStarted = false;
-            pGUID.Clear();
+            playerGUID.Clear();
             events.Reset();
 
             if (me->HasAura(ARTORIUS_SPELL_STINGING_TRAUMA))
@@ -158,17 +158,24 @@ public:
 
         void AttackStart(Unit* target) override
         {
+            if (playerGUID.IsEmpty() && !InNormalForm())
+            {
+                StorePlayerGUID();
+            }
+
+            ScriptedAI::AttackStart(target);
+        }
+
+        void EnterCombat(Unit* /*victim*/) override
+        {
             RevealForm();
 
             if (!InNormalForm())
             {
-                InitMembers();
                 events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_DOOM, urand(3000, 5000));
                 events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
                 events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
             }
-
-            ScriptedAI::AttackStart(target);
         }
 
         void UpdateAI(uint32 diff) override
@@ -192,9 +199,9 @@ public:
             if (UpdateVictim())
             {
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
-                if (!pGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, pGUID)->HasAura(5384))
+                if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
                 {
-                    pGUID.Clear();
+                    playerGUID.Clear();
                     EnterEvadeMode();
                     return;
                 }
