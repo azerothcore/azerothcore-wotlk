@@ -384,7 +384,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             LOG_ERROR("network", "%s sent %s with an invalid link:\n%s", GetPlayerInfo().c_str(),
                 GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), ihe.GetInvalidValue().c_str());
 
-            if (sWorld->getBoolConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
             {
                 KickPlayer("WorldSession::Update Invalid chat link");
             }
@@ -394,7 +394,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
             LOG_ERROR("network", "%s sent %s which illegally contained a hyperlink:\n%s", GetPlayerInfo().c_str(),
                 GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str(), ihe.GetInvalidValue().c_str());
 
-            if (sWorld->getBoolConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
             {
                 KickPlayer("WorldSession::Update Illegal chat link");
             }
