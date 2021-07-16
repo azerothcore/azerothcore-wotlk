@@ -47,6 +47,11 @@ void NPCStaveQuestAI::StorePlayerGUID()
     }
 }
 
+Player* NPCStaveQuestAI::GetGossipPlayer()
+{
+    return ObjectAccessor::GetPlayer(*me, gossipPlayerGUID);
+}
+
 bool NPCStaveQuestAI::IsAllowedEntry(uint32 entry)
 {
     uint32 allowedEntries[4] = { 0, 12999, 19833, 19921 }; //player, World Invisible Trigger(traps) and snake trap snakes
@@ -385,12 +390,48 @@ public:
         npc_simoneAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+            uint32 eventId = events.ExecuteEvent();
+
+            // Out of combat events
+            switch (eventId)
+            {
+                case EVENT_ENCOUNTER_START:
+                    me->MonsterTextEmote(SIMONE_EMOTE, GetGossipPlayer());
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    events.ScheduleEvent(SIMONE_EVENT_TALK, 4000);
+                    break;
+                case SIMONE_EVENT_TALK:
+                    me->MonsterSay(SIMONE_SAY, LANG_UNIVERSAL, GetGossipPlayer());
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    break;
+                case EVENT_REVEAL:
+                    RevealForm();
+                    break;
+            }
+        }
+
+        void ScheduleEncounterStart(ObjectGuid playerGUID)
+        {
+            PrepareForEncounter();
+            gossipPlayerGUID = playerGUID;
+            events.ScheduleEvent(EVENT_ENCOUNTER_START, 1000);
+        }
     };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
     {
         CloseGossipMenuFor(player);
-        creature->AI()->DoAction(EVENT_ENCOUNTER_START);
+        if (creature->AI() && CAST_AI(npc_simone::npc_simoneAI, creature->AI()))
+        {
+            CAST_AI(npc_simone::npc_simoneAI, creature->AI())->ScheduleEncounterStart(player->GetGUID());
+        }
 
         return true;
     }
