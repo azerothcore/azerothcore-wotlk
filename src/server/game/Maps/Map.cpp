@@ -53,6 +53,7 @@ Map::~Map()
     {
         WorldObject* obj = *i_worldObjects.begin();
         ASSERT(obj->IsWorldObject());
+        LOG_ERROR("maps", "Map::~Map: WorldObject TypeId is not a corpse! (%u)", static_cast<uint8>(obj->GetTypeId()));
         //ASSERT(obj->GetTypeId() == TYPEID_CORPSE);
         obj->RemoveFromWorld();
         obj->ResetMap();
@@ -540,7 +541,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     ASSERT(cellCoord.IsCoordValid());
     if (!cellCoord.IsCoordValid())
     {
-        LOG_ERROR("maps", "Map::Add: Object %s has invalid coordinates X:%f Y:%f grid cell [%u:%u]",
+        LOG_ERROR("maps", "Map::AddToMap: Object %s has invalid coordinates X:%f Y:%f grid cell [%u:%u]",
             obj->GetGUID().ToString().c_str(), obj->GetPositionX(), obj->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
         return false; //Should delete object
     }
@@ -2076,7 +2077,7 @@ bool Map::GetAreaInfo(float x, float y, float z, uint32& flags, int32& adtId, in
 {
     float vmap_z = z;
     VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
-    if (vmgr->getAreaInfo(GetId(), x, y, vmap_z, flags, adtId, rootId, groupId))
+    if (vmgr->GetAreaInfo(GetId(), x, y, vmap_z, flags, adtId, rootId, groupId))
     {
         // check if there's terrain between player height and object height
         if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
@@ -2265,13 +2266,13 @@ bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, floa
     return true;
 }
 
-bool Map::getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist)
+bool Map::GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist)
 {
     G3D::Vector3 startPos(x1, y1, z1);
     G3D::Vector3 dstPos(x2, y2, z2);
 
     G3D::Vector3 resultPos;
-    bool result = _dynamicTree.getObjectHitPos(phasemask, startPos, dstPos, resultPos, modifyDist);
+    bool result = _dynamicTree.GetObjectHitPos(phasemask, startPos, dstPos, resultPos, modifyDist);
 
     rx = resultPos.x;
     ry = resultPos.y;
@@ -3701,7 +3702,7 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     // Unit is not on the ground, check for potential collision via vmaps
     if (notOnGround)
     {
-        bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
+        bool col = VMAP::VMapFactory::createOrGetVMapManager()->GetObjectHitPos(source->GetMapId(),
             startX, startY, startZ + halfHeight,
             destX, destY, destZ + halfHeight,
             destX, destY, destZ, -CONTACT_DISTANCE);
@@ -3716,7 +3717,7 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     }
 
     // check dynamic collision
-    bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
+    bool col = source->GetMap()->GetObjectHitPos(source->GetPhaseMask(),
         startX, startY, startZ + halfHeight,
         destX, destY, destZ + halfHeight,
         destX, destY, destZ, -CONTACT_DISTANCE);

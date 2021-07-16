@@ -446,8 +446,9 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
             }
         }
 
-        for (std::vector<Unit*>::iterator itr = controlled.begin(); itr != controlled.end(); ++itr)
-            HandlePetActionHelper(*itr, guid1, spellid, flag, guid2);
+        for (Unit* pet : controlled)
+            if (pet && pet->IsInWorld() && pet->GetMap() == _player->GetMap())
+                HandlePetActionHelper(pet, guid1, spellid, flag, guid2);
     }
 }
 
@@ -479,7 +480,7 @@ void WorldSession::HandlePetStopAttack(WorldPacket& recvData)
     pet->ClearInPetCombat();
 }
 
-void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spellid, uint16 flag, ObjectGuid guid2)
+void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellid, uint16 flag, ObjectGuid guid2)
 {
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)

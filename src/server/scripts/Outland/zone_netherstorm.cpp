@@ -1097,7 +1097,7 @@ public:
         {
             if (!summons.empty())
             {
-                for (ObjectGuid guid : summons)
+                for (ObjectGuid const& guid : summons)
                     if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     {
                         float x, y, z, o;

@@ -210,10 +210,7 @@ namespace Movement
     {
         if (!(flags & MoveSplineFlag::Mask_CatmullRom) && path.size() > 2)
         {
-            enum
-            {
-                MAX_OFFSET = (1 << 11) / 2
-            };
+            constexpr auto MAX_OFFSET = (1 << 11) / 2;
             Vector3 middle = (path.front() + path.back()) / 2;
             Vector3 offset;
             for (uint32 i = 1; i < path.size() - 1; ++i)

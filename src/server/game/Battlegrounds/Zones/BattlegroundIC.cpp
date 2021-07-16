@@ -590,13 +590,13 @@ void BattlegroundIC::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
                 nodePoint[i].timer = BANNER_STATE_CHANGE_TIME; // 1 minute for last change (real faction banner)
                 nodePoint[i].needChange = true;
 
-                RelocateDeadPlayers(BgCreatures[BG_IC_NPC_SPIRIT_GUIDE_1 + nodePoint[i].nodeType - 2]);
+                RelocateDeadPlayers(BgCreatures[static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + nodePoint[i].nodeType - 2]);
 
                 // if we are here means that the point has been lost, or it is the first capture
 
                 if (nodePoint[i].nodeType != NODE_TYPE_REFINERY && nodePoint[i].nodeType != NODE_TYPE_QUARRY)
-                    if (BgCreatures[BG_IC_NPC_SPIRIT_GUIDE_1 + (nodePoint[i].nodeType) - 2])
-                        DelCreature(BG_IC_NPC_SPIRIT_GUIDE_1 + (nodePoint[i].nodeType) - 2);
+                    if (BgCreatures[static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + (nodePoint[i].nodeType) - 2])
+                        DelCreature(static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + (nodePoint[i].nodeType) - 2);
 
                 UpdatePlayerScore(player, SCORE_BASES_ASSAULTED, 1);
 
@@ -724,7 +724,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture)
 {
     if (nodePoint->nodeType != NODE_TYPE_REFINERY && nodePoint->nodeType != NODE_TYPE_QUARRY)
     {
-        if (!AddSpiritGuide(BG_IC_NPC_SPIRIT_GUIDE_1 + nodePoint->nodeType - 2,
+        if (!AddSpiritGuide(static_cast<uint16>(BG_IC_NPC_SPIRIT_GUIDE_1) + nodePoint->nodeType - 2,
                             BG_IC_SpiritGuidePos[nodePoint->nodeType][0], BG_IC_SpiritGuidePos[nodePoint->nodeType][1],
                             BG_IC_SpiritGuidePos[nodePoint->nodeType][2], BG_IC_SpiritGuidePos[nodePoint->nodeType][3],
                             nodePoint->faction))
@@ -983,7 +983,7 @@ GraveyardStruct const* BattlegroundIC::GetClosestGraveyard(Player* player)
     }
     // If not, place ghost on starting location
     if (!good_entry)
-        good_entry = sGraveyard->GetGraveyard(BG_IC_GraveyardIds[player->GetTeamId() + MAX_NODE_TYPES]);
+        good_entry = sGraveyard->GetGraveyard(BG_IC_GraveyardIds[player->GetTeamId() + static_cast<uint16>(MAX_NODE_TYPES)]);
 
     return good_entry;
 }

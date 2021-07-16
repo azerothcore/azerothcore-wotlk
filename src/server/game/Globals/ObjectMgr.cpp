@@ -465,15 +465,15 @@ void ObjectMgr::LoadCreatureTemplates()
 
 //                                                   0      1                   2                   3                   4            5            6         7         8
     QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, modelid1, modelid2, modelid3, "
-//                        9         10    11       12        13              14        15        16   17       18       19          20
-                         "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, "
-//                        21      22     23         24              25              26               27            28             29          30          31
+//                        9         10    11       12        13              14        15        16   17       18       19          20          21
+                         "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, detection_range, "
+//                        22      23     24         25              26              27               28            29             30          31          32
                          "scale, `rank`, dmgschool, DamageModifier, BaseAttackTime, RangeAttackTime, BaseVariance, RangeVariance, unit_class, unit_flags, unit_flags2, "
-//                        32            33      34            35             36             37            38
+//                        33            34      35            36             37             38            39
                          "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, type, "
-//                        39          40      41              42        43              44         45       46       47      48
+//                        40          41      42              43        44              45         46       47       48      49
                          "type_flags, lootid, pickpocketloot, skinloot, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-//                        49           50           51              52            53             54            55          56           57                    58                        59           60
+//                        50           51           52              53            54             55            56          57           58                    59                        60           61
                          "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
                          "FROM creature_template;");
 
@@ -555,28 +555,29 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.npcflag           = fields[18].GetUInt32();
     creatureTemplate.speed_walk        = fields[19].GetFloat();
     creatureTemplate.speed_run         = fields[20].GetFloat();
-    creatureTemplate.scale             = fields[21].GetFloat();
-    creatureTemplate.rank              = uint32(fields[22].GetUInt8());
-    creatureTemplate.dmgschool         = uint32(fields[23].GetInt8());
-    creatureTemplate.DamageModifier    = fields[24].GetFloat();
-    creatureTemplate.BaseAttackTime    = fields[25].GetUInt32();
-    creatureTemplate.RangeAttackTime   = fields[26].GetUInt32();
-    creatureTemplate.BaseVariance      = fields[27].GetFloat();
-    creatureTemplate.RangeVariance     = fields[28].GetFloat();
-    creatureTemplate.unit_class        = uint32(fields[29].GetUInt8());
-    creatureTemplate.unit_flags        = fields[30].GetUInt32();
-    creatureTemplate.unit_flags2       = fields[31].GetUInt32();
-    creatureTemplate.dynamicflags      = fields[32].GetUInt32();
-    creatureTemplate.family            = uint32(fields[33].GetUInt8());
-    creatureTemplate.trainer_type      = uint32(fields[34].GetUInt8());
-    creatureTemplate.trainer_spell     = fields[35].GetUInt32();
-    creatureTemplate.trainer_class     = uint32(fields[36].GetUInt8());
-    creatureTemplate.trainer_race      = uint32(fields[37].GetUInt8());
-    creatureTemplate.type              = uint32(fields[38].GetUInt8());
-    creatureTemplate.type_flags        = fields[39].GetUInt32();
-    creatureTemplate.lootid            = fields[40].GetUInt32();
-    creatureTemplate.pickpocketLootId  = fields[41].GetUInt32();
-    creatureTemplate.SkinLootId        = fields[42].GetUInt32();
+    creatureTemplate.detection_range   = fields[21].GetFloat();
+    creatureTemplate.scale             = fields[22].GetFloat();
+    creatureTemplate.rank              = uint32(fields[23].GetUInt8());
+    creatureTemplate.dmgschool         = uint32(fields[24].GetInt8());
+    creatureTemplate.DamageModifier    = fields[25].GetFloat();
+    creatureTemplate.BaseAttackTime    = fields[26].GetUInt32();
+    creatureTemplate.RangeAttackTime   = fields[27].GetUInt32();
+    creatureTemplate.BaseVariance      = fields[28].GetFloat();
+    creatureTemplate.RangeVariance     = fields[29].GetFloat();
+    creatureTemplate.unit_class        = uint32(fields[30].GetUInt8());
+    creatureTemplate.unit_flags        = fields[31].GetUInt32();
+    creatureTemplate.unit_flags2       = fields[32].GetUInt32();
+    creatureTemplate.dynamicflags      = fields[33].GetUInt32();
+    creatureTemplate.family            = uint32(fields[34].GetUInt8());
+    creatureTemplate.trainer_type      = uint32(fields[35].GetUInt8());
+    creatureTemplate.trainer_spell     = fields[36].GetUInt32();
+    creatureTemplate.trainer_class     = uint32(fields[37].GetUInt8());
+    creatureTemplate.trainer_race      = uint32(fields[38].GetUInt8());
+    creatureTemplate.type              = uint32(fields[39].GetUInt8());
+    creatureTemplate.type_flags        = fields[40].GetUInt32();
+    creatureTemplate.lootid            = fields[41].GetUInt32();
+    creatureTemplate.pickpocketLootId  = fields[42].GetUInt32();
+    creatureTemplate.SkinLootId        = fields[43].GetUInt32();
 
     for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
     {
@@ -588,24 +589,24 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
         creatureTemplate.spells[i] = 0;
     }
 
-    creatureTemplate.PetSpellDataId        = fields[43].GetUInt32();
-    creatureTemplate.VehicleId             = fields[44].GetUInt32();
-    creatureTemplate.mingold               = fields[45].GetUInt32();
-    creatureTemplate.maxgold               = fields[46].GetUInt32();
-    creatureTemplate.AIName                = fields[47].GetString();
-    creatureTemplate.MovementType          = uint32(fields[48].GetUInt8());
-    creatureTemplate.InhabitType           = uint32(fields[49].GetUInt8());
-    creatureTemplate.HoverHeight           = fields[50].GetFloat();
-    creatureTemplate.ModHealth             = fields[51].GetFloat();
-    creatureTemplate.ModMana               = fields[52].GetFloat();
-    creatureTemplate.ModArmor              = fields[53].GetFloat();
-    creatureTemplate.RacialLeader          = fields[54].GetBool();
-    creatureTemplate.movementId            = fields[55].GetUInt32();
-    creatureTemplate.RegenHealth           = fields[56].GetBool();
-    creatureTemplate.MechanicImmuneMask    = fields[57].GetUInt32();
-    creatureTemplate.SpellSchoolImmuneMask = fields[58].GetUInt8();
-    creatureTemplate.flags_extra           = fields[59].GetUInt32();
-    creatureTemplate.ScriptID              = GetScriptId(fields[60].GetCString());
+    creatureTemplate.PetSpellDataId        = fields[44].GetUInt32();
+    creatureTemplate.VehicleId             = fields[45].GetUInt32();
+    creatureTemplate.mingold               = fields[46].GetUInt32();
+    creatureTemplate.maxgold               = fields[47].GetUInt32();
+    creatureTemplate.AIName                = fields[48].GetString();
+    creatureTemplate.MovementType          = uint32(fields[49].GetUInt8());
+    creatureTemplate.InhabitType           = uint32(fields[50].GetUInt8());
+    creatureTemplate.HoverHeight           = fields[51].GetFloat();
+    creatureTemplate.ModHealth             = fields[52].GetFloat();
+    creatureTemplate.ModMana               = fields[53].GetFloat();
+    creatureTemplate.ModArmor              = fields[54].GetFloat();
+    creatureTemplate.RacialLeader          = fields[55].GetBool();
+    creatureTemplate.movementId            = fields[56].GetUInt32();
+    creatureTemplate.RegenHealth           = fields[57].GetBool();
+    creatureTemplate.MechanicImmuneMask    = fields[58].GetUInt32();
+    creatureTemplate.SpellSchoolImmuneMask = fields[59].GetUInt8();
+    creatureTemplate.flags_extra           = fields[60].GetUInt32();
+    creatureTemplate.ScriptID              = GetScriptId(fields[61].GetCString());
 }
 
 void ObjectMgr::LoadCreatureTemplateResistances()
@@ -5681,14 +5682,14 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
     time_t curTime = time(nullptr);
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_EXPIRED_MAIL);
-    stmt->setUInt32(0, curTime);
+    stmt->setUInt32(0, uint32(curTime));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
         return;
 
     std::map<uint32 /*messageId*/, MailItemInfoVec> itemsCache;
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_EXPIRED_MAIL_ITEMS);
-    stmt->setUInt32(0, curTime);
+    stmt->setUInt32(0, uint32(curTime));
     if (PreparedQueryResult items = CharacterDatabase.Query(stmt))
     {
         MailItemInfo item;
@@ -5714,10 +5715,11 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         m->receiver       = fields[3].GetUInt32();
         bool has_items    = fields[4].GetBool();
         m->expire_time    = time_t(fields[5].GetUInt32());
-        m->deliver_time   = 0;
+        m->deliver_time   = time_t(0);
         m->COD            = fields[6].GetUInt32();
         m->checked        = fields[7].GetUInt8();
         m->mailTemplateId = fields[8].GetInt16();
+        m->auctionId      = fields[9].GetInt32();
 
         Player* player = nullptr;
         if (serverUp)
@@ -5755,8 +5757,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_RETURNED);
                 stmt->setUInt32(0, m->receiver);
                 stmt->setUInt32(1, m->sender);
-                stmt->setUInt32(2, curTime + 30 * DAY);
-                stmt->setUInt32(3, curTime);
+                stmt->setUInt32(2, uint32(curTime + 30 * DAY));
+                stmt->setUInt32(3, uint32(curTime));
                 stmt->setUInt8 (4, uint8(MAIL_CHECK_MASK_RETURNED));
                 stmt->setUInt32(5, m->messageID);
                 CharacterDatabase.Execute(stmt);
