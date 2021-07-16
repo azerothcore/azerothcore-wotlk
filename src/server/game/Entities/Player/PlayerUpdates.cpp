@@ -245,8 +245,7 @@ void Player::Update(uint32 p_time)
             m_weaponChangeTimer -= p_time;
     }
 
-    if (!IsPositionValid()) // pussywizard: will crash below at eg.
-                            // GetZoneAndAreaId
+    if (!IsPositionValid()) // pussywizard: will crash below at eg. GetZoneAndAreaId
     {
         LOG_INFO(
             "misc",
