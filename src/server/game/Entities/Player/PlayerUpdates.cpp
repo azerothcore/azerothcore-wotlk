@@ -307,8 +307,7 @@ void Player::Update(uint32 p_time)
     {
         if (m_additionalSaveTimer <= p_time)
         {
-            CharacterDatabaseTransaction trans =
-                CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
             if (m_additionalSaveMask & ADDITIONAL_SAVING_INVENTORY_AND_GOLD)
                 SaveInventoryAndGoldToDB(trans);
