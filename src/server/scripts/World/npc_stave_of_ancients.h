@@ -43,6 +43,14 @@ enum NPCArtorius
     ARTORIUS_SPELL_STINGING_TRAUMA            = 23299
 };
 
+enum NPCSimone
+{
+  SIMONE_HEAD                                 = 18952,
+
+  SIMONE_GOSSIP_TEXT                          = 7041,
+  SIMONE_GOSSIP_OPTION_TEXT                   = 14527,
+};
+
 struct NPCStaveQuestAI : public ScriptedAI
 {
     NPCStaveQuestAI(Creature *creature) : ScriptedAI(creature) { }
