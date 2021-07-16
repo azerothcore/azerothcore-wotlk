@@ -55,10 +55,9 @@ INSERT INTO `pool_template` (`entry`,`max_limit`,`description`) VALUES
 DELETE FROM `pool_gameobject` WHERE `guid` IN (SELECT `guid` FROM TEMP_POOL_ENTRIES);
 
 -- Add to new pool
-Insert INTO `pool_gameobject`
+INSERT INTO `pool_gameobject`
 (`guid`, `pool_entry`, `chance`, `description`) 
-select `guid`, `pool_entry`, @CHANCE, `description`
-FROM TEMP_POOL_ENTRIES;
+SELECT `guid`, `pool_entry`, @CHANCE, `description` FROM TEMP_POOL_ENTRIES;
 
 -- Set spawn time
 UPDATE `gameobject` SET `spawntimesecs` = @RESPAWN WHERE `guid` IN (SELECT `guid` FROM TEMP_POOL_ENTRIES);
