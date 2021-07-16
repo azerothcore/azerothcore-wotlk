@@ -280,7 +280,7 @@ void check_args(std::string const&, ...);
         } \
         catch (const std::exception& e) \
         { \
-            sLog->outMessage("server", LogLevel::LOG_LEVEL_ERROR, "Wrong format occurred ({}) at '{}:{}'", \
+            sLog->outMessageFmt("server", LogLevel::LOG_LEVEL_ERROR, "Wrong format occurred ({}) at '{}:{}'", \
                 e.what(), __FILE__, __LINE__); \
         } \
     }
