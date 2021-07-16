@@ -14,13 +14,12 @@
 #include <utility>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#include <ace/config-all.h>
 #include <ws2tcpip.h>
 #if AC_COMPILER == AC_COMPILER_INTEL
 #    if !defined(BOOST_ASIO_HAS_MOVE)
 #      define BOOST_ASIO_HAS_MOVE
 #    endif // !defined(BOOST_ASIO_HAS_MOVE)
-#  endif // if WARHEAD_COMPILER == WARHEAD_COMPILER_INTEL
+#  endif // if AC_COMPILER == AC_COMPILER_INTEL
 #else
 #include <cstdlib>
 #include <netdb.h>
@@ -42,16 +41,14 @@
 
 #define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
 
-enum TimeConstants
-{
-    MINUTE          = 60,
-    HOUR            = MINUTE * 60,
-    DAY             = HOUR * 24,
-    WEEK            = DAY * 7,
-    MONTH           = DAY * 30,
-    YEAR            = MONTH * 12,
-    IN_MILLISECONDS = 1000
-};
+// TimeConstants
+constexpr auto MINUTE = 60;
+constexpr auto HOUR = MINUTE * 60;
+constexpr auto DAY = HOUR * 24;
+constexpr auto WEEK = DAY * 7;
+constexpr auto MONTH = DAY * 30;
+constexpr auto YEAR = MONTH * 12;
+constexpr auto IN_MILLISECONDS = 1000;
 
 enum AccountTypes
 {
