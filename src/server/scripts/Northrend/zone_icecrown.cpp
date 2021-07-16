@@ -1412,6 +1412,36 @@ public:
     }
 };
 
+class spell_onslaught_or_call_bone_gryphon : public SpellScriptLoader
+{
+public:
+    spell_onslaught_or_call_bone_gryphon() : SpellScriptLoader("spell_onslaught_or_call_bone_gryphon") { }
+
+    class spell_onslaught_or_call_bone_gryphon_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_onslaught_or_call_bone_gryphon_SpellScript);
+
+        void ChangeSummonPos(SpellEffIndex /*effIndex*/)
+        {
+            WorldLocation summonPos = *GetExplTargetDest();
+            Position offset = { 0.0f, 0.0f, 3.0f, 0.0f };
+            summonPos.RelocateOffset(offset);
+            SetExplTargetDest(summonPos);
+            GetHitDest()->RelocateOffset(offset);
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_onslaught_or_call_bone_gryphon_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_onslaught_or_call_bone_gryphon_SpellScript();
+    }
+};
+
 // Theirs
 /*######
 ## npc_guardian_pavilion
@@ -2098,6 +2128,7 @@ void AddSC_icecrown()
     new spell_fight_fire_bomber();
     new spell_anti_air_rocket_bomber();
     new npc_infra_green_bomber_generic();
+    new spell_onslaught_or_call_bone_gryphon();
 
     // Theirs
     new npc_guardian_pavilion();

@@ -28,4 +28,6 @@ void Acore::Banner::Show(char const* applicationName, void(*log)(char const* tex
     {
         logExtraInfo();
     }
+
+    log(" ");
 }
