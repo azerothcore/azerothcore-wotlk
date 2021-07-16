@@ -165,8 +165,7 @@ void Player::Update(uint32 p_time)
                 else if (!HasInArc(2 * M_PI / 3, victim))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
-                    if (m_swingErrorMsg !=
-                        2) // send single time (client auto repeat)
+                    if (m_swingErrorMsg != 2) // send single time (client auto repeat)
                     {
                         SendAttackSwingBadFacingAttack();
                         m_swingErrorMsg = 2;
