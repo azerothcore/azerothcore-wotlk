@@ -21,7 +21,7 @@
 #include "DeadlineTimer.h"
 #include "GitRevision.h"
 #include "IoContext.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MySQLThreading.h"
 #include "ObjectAccessor.h"
 #include "OpenSSLCrypto.h"
@@ -293,7 +293,7 @@ int main(int argc, char** argv)
         // unload battleground templates before different singletons destroyed
         sBattlegroundMgr->DeleteAllBattlegrounds();
 
-        sOutdoorPvPMgr->Die();                     // unload it before MapManager
+        sOutdoorPvPMgr->Die();                     // unload it before MapMgr
         sMapMgr->UnloadAll();                      // unload all grids (including locked in memory)
 
 #ifdef ELUNA
