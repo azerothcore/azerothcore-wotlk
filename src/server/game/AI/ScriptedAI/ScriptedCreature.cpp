@@ -202,7 +202,7 @@ void ScriptedAI::DoPlaySoundToSet(WorldObject* source, uint32 soundId)
         return;
     }
 
-    source->SendPlayMusic(soundId, true);
+    source->PlayDirectSound(soundId);
 }
 
 void ScriptedAI::DoPlayMusic(uint32 soundId, bool zone)
@@ -237,7 +237,7 @@ void ScriptedAI::DoPlayMusic(uint32 soundId, bool zone)
     {
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
         {
-            (*itr)->PlayDirectSound(soundId);
+            (*itr)->SendPlayMusic(soundId, true);
         }
 
         delete targets;
