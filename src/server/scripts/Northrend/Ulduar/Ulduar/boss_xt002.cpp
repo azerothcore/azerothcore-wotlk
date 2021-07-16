@@ -586,7 +586,7 @@ public:
                 }
         }
 
-        // tc use updateAI, while we have movementinform :)
+        // tc idiots, they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -786,7 +786,7 @@ public:
             }
         }
 
-        // tc they use updateAI, while we have movementinform :)
+        // tc idiots, they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)

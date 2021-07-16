@@ -4359,7 +4359,7 @@ void AuraEffect::HandleAuraModIncreaseHealthPercent(AuraApplication const* aurAp
     float percent = target->GetHealthPct();
     target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(GetAmount()), apply);
 
-    // Xinef: pct was rounded down and could "kill" creature by setting its health to 0 making npc zombie
+    // Xinef: idiots, pct was rounded down and could "kill" creature by setting its health to 0 making npc zombie
     if (target->IsAlive())
         if (uint32 healthAmount = CalculatePct(target->GetMaxHealth(), percent))
             target->SetHealth(healthAmount);

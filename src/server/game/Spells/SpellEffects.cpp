@@ -3919,7 +3919,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         }
                         break;
                     }*/
-                    /* disabled for now, was being abused
+                    /* disabled for now, was being abused by idiots
                     // 5,000 Gold
                     case 46642:
                     {

@@ -2712,7 +2712,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         {
             if (unit->IsImmunedToSpellEffect(m_spellInfo, effectNumber))
                 effectMask &= ~(1 << effectNumber);
-            // Xinef: Buggs out polymorph
+            // Xinef: What retarded added this shit? Buggs out polymorph
             // Xinef: And this is checked in MagicSpellHitResult, why we check resistance twice?
             // Xinef: And why we check every spell effect basing on rand and generic dispel info? some effects will be appliend and some wont? WTF?
             /*else if (m_spellInfo->Effects[effectNumber].IsAura() && !m_spellInfo->IsPositiveEffect(effectNumber))
@@ -3355,13 +3355,13 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
                     ((m_targets.GetObjectTarget() && m_caster != m_targets.GetObjectTarget()) || m_spellInfo->IsPositive()))
             {
                 // Xinef: Creature should focus to cast target if there is explicit target or self if casting positive spell
-                // Xinef: Creature should not rotate when casting spell... based on halion behavior
+                // Xinef: Creature should not rotate like a retard when casting spell... based on halion behavior
                 m_caster->ToCreature()->FocusTarget(this, m_targets.GetObjectTarget() != nullptr ? m_targets.GetObjectTarget() : m_caster);
             }
         }
 
         //item: first cast may destroy item and second cast causes crash
-        // xinef: removed !m_spellInfo->StartRecoveryTime
+        // xinef: removed !m_spellInfo->StartRecoveryTime because of TC retardiness
         // second los check failed in events
         // xinef: removed itemguid check, currently there is no such item in database
         if (!m_casttime && /*!m_castItemGUID &&*/ GetCurrentContainer() == CURRENT_GENERIC_SPELL)
@@ -3640,9 +3640,9 @@ void Spell::_cast(bool skipCheck)
         if (modOwner)
             modOwner->RemoveSpellMods(this);
 
-        // Xinef: why do we keep focus after spell is sent to air?
+        // Xinef: Fucking retarded idiots, why do we keep focus after spell is sent to air?
         // Xinef: Because of this, in the middle of some animation after setting targetguid to 0 etc
-        // Xinef: we get focused to it out of nowhere...
+        // Xinef: we get focused to it out of nowhere, idiots...
         if (Creature* creatureCaster = m_caster->ToCreature())
             creatureCaster->ReleaseFocus(this);
     }
@@ -7032,7 +7032,7 @@ SpellCastResult Spell::CheckItems()
     }
 
     // check weapon presence in slots for main/offhand weapons
-    if (/*never skip those checks !(_triggeredCastFlags & TRIGGERED_IGNORE_EQUIPPED_ITEM_REQUIREMENT) &&*/ m_spellInfo->EquippedItemClass >= 0)
+    if (/*Moar retardnes! never skip those checks !(_triggeredCastFlags & TRIGGERED_IGNORE_EQUIPPED_ITEM_REQUIREMENT) &&*/ m_spellInfo->EquippedItemClass >= 0)
     {
         // main hand weapon required
         if (m_spellInfo->HasAttribute(SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON))

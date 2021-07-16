@@ -227,7 +227,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         if (!IsEventValid(temp))
             continue;
 
-        // xinef: specific check for timed events, fix db makers
+        // xinef: specific check for timed events, fix db makers retardness
         switch (temp.event.type)
         {
             case SMART_EVENT_UPDATE:
