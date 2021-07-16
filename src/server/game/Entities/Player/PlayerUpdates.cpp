@@ -155,8 +155,7 @@ void Player::Update(uint32 p_time)
                 if (!IsWithinMeleeRange(victim))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
-                    if (m_swingErrorMsg !=
-                        1) // send single time (client auto repeat)
+                    if (m_swingErrorMsg != 1) // send single time (client auto repeat)
                     {
                         SendAttackSwingNotInRange();
                         m_swingErrorMsg = 1;
