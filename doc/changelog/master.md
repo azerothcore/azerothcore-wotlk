@@ -1,3 +1,11 @@
+## 4.0.0-dev.10 | Commit: [0897705a6814fc19007e5f88fbcb98b3689880c9
+](https://github.com/azerothcore/azerothcore-wotlk/commit/0897705a6814fc19007e5f88fbcb98b3689880c9
+
+
+### How to upgrade
+
+Upgrade your Boost version to 1.74 or higher.
+
 ## 4.0.0-dev.9 | Commit: [edfc2a8db48a17bf3e9ace0b36edc819aa0e5e23
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/edfc2a8db48a17bf3e9ace0b36edc819aa0e5e23
 

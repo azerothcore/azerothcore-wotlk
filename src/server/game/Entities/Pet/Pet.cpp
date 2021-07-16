@@ -4,6 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Pet.h"
 #include "ArenaSpectator.h"
 #include "Battleground.h"
 #include "Common.h"
@@ -13,7 +14,7 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectMgr.h"
-#include "Pet.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"

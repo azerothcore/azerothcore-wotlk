@@ -8,6 +8,7 @@
     \ingroup world
 */
 
+#include "World.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
@@ -28,8 +29,8 @@
 #include "CreatureAIRegistry.h"
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
 #include "GameEventMgr.h"
@@ -38,16 +39,16 @@
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
+#include "IPLocation.h"
 #include "InstanceSaveMgr.h"
 #include "ItemEnchantmentMgr.h"
-#include "IPLocation.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
-#include "MapMgr.h"
 #include "MMapFactory.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
@@ -66,17 +67,18 @@
 #include "Transport.h"
 #include "TransportMgr.h"
 #include "Util.h"
-#include "Vehicle.h"
 #include "VMapFactory.h"
+#include "VMapMgr2.h"
+#include "Vehicle.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
 #include "WeatherMgr.h"
 #include "WhoListCache.h"
-#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <VMapMgr2.h>
+#include <boost/asio/ip/address.hpp>
+#include <cmath>
 
 #ifdef ELUNA
 #include "LuaEngine.h"
