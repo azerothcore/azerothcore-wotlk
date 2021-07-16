@@ -10,7 +10,6 @@
 #include "Containers.h"
 #include "Define.h"
 #include "Errors.h"
-#include <ace/INET_Addr.h>
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -18,6 +17,9 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <list>
+#include <map>
+#include <array>
 
 // Searcher for map of structs
 template<typename T, class S> struct Finder
@@ -382,12 +384,6 @@ void vutf8printf(FILE* out, const char* str, va_list* ap);
 bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 bool IsIPAddress(char const* ipaddress);
-
-/// Checks if address belongs to the a network with specified submask
-bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_INET_Addr const& subnetMask);
-
-/// Transforms ACE_INET_Addr address into string format "dotted_ip:port"
-std::string GetAddressString(ACE_INET_Addr const& addr);
 
 uint32 CreatePIDFile(const std::string& filename);
 uint32 GetPID();
