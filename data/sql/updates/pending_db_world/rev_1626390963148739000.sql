@@ -13,8 +13,8 @@ DELETE from `gameobject_template_locale` where `entry` = 2848 AND `locale` = 'zh
 INSERT INTO `gameobject_template_locale` (`entry`, `locale`, `name`, `castBarCaption`, `VerifiedBuild`) VALUES ('2848', 'zhCN', '玛瑙石柱', '', '18019');
 
 -- add `Pillar of Amethyst`(id 2858) Chinese translation
-DELETE from `gameobject_template_locale` where `entry` = 2848 AND `locale` = 'zhCN';
-INSERT INTO `gameobject_template_locale` (`entry`, `locale`, `name`, `castBarCaption`, `VerifiedBuild`) VALUES ('2858', 'zhCN', '紫水晶石柱', '', '18019');
+DELETE from `gameobject_template_locale` where `entry` = 2858 AND `locale` = 'zhCN';
+INSERT INTO `gameobject_template_locale` (`entry`, `locale`, `name`, `castBarCaption`, `VerifiedBuild`) VALUES ('2858', 'zhCN', '紫水晶石柱', '', '18019'); 
 
 -- fixed name error
 UPDATE `creature_template_locale` SET `Title` = '勇气纹章军需官' WHERE `entry` = '31581' AND `locale` = 'zhCN';
