@@ -493,7 +493,7 @@ bool WorldSession::HandleSocketClosed()
 
 bool WorldSession::IsSocketClosed() const
 {
-    return !m_Socket || m_Socket->IsClosed();
+    return !m_Socket || !m_Socket->IsOpen();
 }
 
 void WorldSession::HandleTeleportTimeout(bool updateInSessions)
