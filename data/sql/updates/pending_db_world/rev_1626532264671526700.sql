@@ -8,3 +8,4 @@ INSERT INTO `gossip_menu` (`menuid`, `textid` ) VALUES (61025 ,10041);
 
 -- We update the character to use the new gossip id.
 UPDATE `creature_template` SET `gossip_menu_id` = 61025, `faction` = 1604 WHERE (`entry` = 20406);
+
