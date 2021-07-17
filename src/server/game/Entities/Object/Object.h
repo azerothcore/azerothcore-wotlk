@@ -806,11 +806,11 @@ public:
     bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
     [[nodiscard]] bool InSamePhase(uint32 phasemask) const { return m_useCombinedPhases ? GetPhaseMask() & phasemask : GetPhaseMask() == phasemask; }
 
-    [[nodiscard]] uint32 GetZoneId() const { return _zoneId; }
-    [[nodiscard]] uint32 GetAreaId() const { return _areaId; }
-    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const { zoneid = _zoneId, areaid = _areaId; }
-    [[nodiscard]] bool IsOutdoors() const { return _outdoors; }
-    LiquidData const& GetLiquidData() const { return _liquidData; }
+    [[nodiscard]] uint32 GetZoneId() const;
+    [[nodiscard]] uint32 GetAreaId() const;
+    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const;
+    [[nodiscard]] bool IsOutdoors() const;
+    LiquidData const& GetLiquidData() const;
 
     InstanceScript* GetInstanceScript();
 

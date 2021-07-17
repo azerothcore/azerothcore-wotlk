@@ -1005,7 +1005,7 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
     creature->Relocate(x, y, z, o);
     if (creature->IsVehicle())
         creature->GetVehicleKit()->RelocatePassengers();
-    creature->SetPositionDataUpdate();
+    creature->UpdatePositionData();
     creature->UpdateObjectVisibility(false);
 }
 
