@@ -397,6 +397,11 @@ public:
             playerGUID.Clear();
             events.Reset();
 
+            if (InNormalForm())
+            {
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+
             if (me->HasAura(SIMONE_SPELL_SILENCE))
             {
                 me->RemoveAura(SIMONE_SPELL_SILENCE);
@@ -416,6 +421,7 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             RevealForm();
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
             if (!InNormalForm())
             {
@@ -466,7 +472,7 @@ public:
                 return;
             }
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+            if (me->HasUnitState(UNIT_STATE_CASTING) && eventId != EVENT_RANGE_CHECK && eventId != EVENT_UNFAIR_FIGHT)
             {
                 events.RepeatEvent(1000);
                 return;
@@ -503,10 +509,21 @@ public:
                     me->CastSpell(me->GetVictim(), SIMONE_SPELL_TEMPTRESS_KISS, false);
                     events.RepeatEvent(45000);
                     break;
-                // case EVENT_CHECK_FOR_VIPER_STING
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        {
+            if (!InNormalForm())
+            {
+                if (Spell->Id == SIMONE_SPELL_WEAKNESS_VIPER_STING)
+                {
+                    me->AddAura(SIMONE_SPELL_SILENCE, me);
+                    me->MonsterTextEmote(SIMONE_WEAKNESS_EMOTE, 0);
+                }
+            }
         }
 
         void ScheduleEncounterStart(ObjectGuid playerGUID)

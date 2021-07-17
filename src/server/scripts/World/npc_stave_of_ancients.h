@@ -53,15 +53,18 @@ enum NPCSimone
     SIMONE_GOSSIP_OPTION_TEXT                 = 14527,  // creature_text.CreatureID  "I am not fooled by your disguise, tempt..."
     SIMONE_EMOTE                              = 9759,   // broadcast_text.ID         "%s laughs at your foolish request."
     SIMONE_SAY                                = 9760,   // broadcast_text.ID         "As you wish, $c."
+    SIMONE_WEAKNESS_EMOTE                     = 9762,   // broadcast_text.ID         "%s is silenced by the venomous sting."
 
     SIMONE_NORMAL_ENTRY                       = 14527,  // creature_template.entry
     SIMONE_EVIL_ENTRY                         = 14533,  // creature_template.entry
 
     SIMONE_HEAD                               = 18952,  // item_template.entry
 
-    SIMONE_SPELL_SILENCE                      = 15487,  // its actually the priest silence spell but couldn't find better match
+    SIMONE_SPELL_WEAKNESS_VIPER_STING         = 3034,
+    SIMONE_SPELL_TEMPTRESS_KISS               = 23205,
     SIMONE_SPELL_CHAIN_LIGHTNING              = 23206,
-    SIMONE_SPELL_TEMPTRESS_KISS               = 23205
+    // Found 23207 using spell editor it matches the duration, it doesn't have animation and the id is close to the other simone spells
+    SIMONE_SPELL_SILENCE                      = 23207
 };
 
 struct NPCStaveQuestAI : public ScriptedAI
