@@ -13,7 +13,6 @@
 #include <G3D/Quat.h>
 #include <algorithm>
 #include <cstdio>
-#include <cstdint>
 #include <limits>
 
 Model::Model(std::string& filename) : filename(filename), header(), vertices(nullptr), indices(nullptr)

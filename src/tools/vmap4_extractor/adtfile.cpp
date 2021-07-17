@@ -8,7 +8,6 @@
 #include "adtfile.h"
 #include <algorithm>
 #include <cstdio>
-#include <cstdint>
 
 #ifdef WIN32
 #define snprintf _snprintf
