@@ -91,6 +91,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
     m_model = CreateModel();
+
     return true;
 }
 
@@ -675,6 +676,8 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     }
 
     SetPhaseMask(phaseMask, false);
+
+    UpdatePositionData();
 
     SetZoneScript();
     if (m_zoneScript)
