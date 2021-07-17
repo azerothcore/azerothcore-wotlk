@@ -166,7 +166,6 @@ struct PositionFullTerrainStatus
     LiquidData liquidInfo;
 };
 
-
 enum LineOfSightChecks
 {
     LINEOFSIGHT_CHECK_VMAP      = 0x1, // check static floor layout data
