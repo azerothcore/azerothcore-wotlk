@@ -62,7 +62,7 @@ bool WorldSocketMgr::StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::s
     if (!BaseSocketMgr::StartNetwork(ioContext, bindIp, port, threadCount))
         return false;
 
-    _acceptor->AsyncAcceptWithCallback<&OnSocketAccept>();
+    _acceptor->AsyncAcceptWithCallback<OnSocketAccept>();
 
     sScriptMgr->OnNetworkStart();
     return true;
