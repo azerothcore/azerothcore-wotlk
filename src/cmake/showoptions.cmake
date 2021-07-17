@@ -158,4 +158,10 @@ if(BUILD_SHARED_LIBS)
   WarnAboutSpacesInBuildPath()
 endif()
 
+if (USE_CPP_20)
+  message("")
+  message(" *** Enabled c++20 standart")
+  message(" *** Please note that this is an experimental feature!")
+endif()
+
 message("")
