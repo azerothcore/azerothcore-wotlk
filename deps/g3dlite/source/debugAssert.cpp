@@ -103,7 +103,7 @@ static void createErrorMessage(
         if (NULL != formatMsg) {
             realLastErr = formatMsg;
         } else {
-            realLastErr = LPTSTR(_T("Last error code does not exist."));
+            realLastErr = _T("Last error code does not exist.");
         }
 
         if (lastErr != 0) {
