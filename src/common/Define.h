@@ -30,11 +30,6 @@
 #  define ACORE_PATH_MAX PATH_MAX
 #endif //AC_PLATFORM
 
-#if _MSC_VER
-#  define INT32_MAX    2147483647i32
-#  define PTRDIFF_MAX  INT32_MAX 
-#endif //_MSC_VER
-
 #if !defined(COREDEBUG)
 #  define ACORE_INLINE inline
 #else //COREDEBUG

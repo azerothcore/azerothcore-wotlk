@@ -7,10 +7,10 @@
 #include "model.h"
 #include "dbcfile.h"
 #include "adtfile.h"
-#include "Define.h"
 #include "vmapexport.h"
 #include <algorithm>
 #include <cstdio>
+#include <cstdint>
 
 bool ExtractSingleModel(std::string& fname)
 {
