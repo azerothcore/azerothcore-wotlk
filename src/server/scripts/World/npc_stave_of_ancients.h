@@ -46,6 +46,8 @@ enum NPCArtorius
 enum NPCSimone
 {
     SIMONE_EVENT_TALK                         = 5,
+    SIMONE_EVENT_CHAIN_LIGHTNING              = 6,
+    SIMONE_EVENT_TEMPTRESS_KISS               = 7,
 
     SIMONE_GOSSIP_TEXT                        = 7041,   // npc_text.ID               "What a wonderful day to be alive! Look ..."
     SIMONE_GOSSIP_OPTION_TEXT                 = 14527,  // creature_text.CreatureID  "I am not fooled by your disguise, tempt..."
@@ -56,6 +58,10 @@ enum NPCSimone
     SIMONE_EVIL_ENTRY                         = 14533,  // creature_template.entry
 
     SIMONE_HEAD                               = 18952,  // item_template.entry
+
+    SIMONE_SPELL_SILENCE                      = 15487,  // its actually the priest silence spell but couldn't find better match
+    SIMONE_SPELL_CHAIN_LIGHTNING              = 23206,
+    SIMONE_SPELL_TEMPTRESS_KISS               = 23205
 };
 
 struct NPCStaveQuestAI : public ScriptedAI
