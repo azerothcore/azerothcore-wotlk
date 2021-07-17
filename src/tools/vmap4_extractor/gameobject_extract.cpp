@@ -10,6 +10,7 @@
 #include "vmapexport.h"
 #include <algorithm>
 #include <cstdio>
+#include <cstdint>
 
 bool ExtractSingleModel(std::string& fname)
 {
