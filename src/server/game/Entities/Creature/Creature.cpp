@@ -3032,10 +3032,7 @@ void Creature::UpdateMovementFlags()
     if (info->flags_extra & CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE)
         return;
 
-    float x = GetPositionX();
-    float y = GetPositionY();
     float z = GetPositionZ();
-
     float ground = GetFloorZ();
 
     bool IsInAir = false;
