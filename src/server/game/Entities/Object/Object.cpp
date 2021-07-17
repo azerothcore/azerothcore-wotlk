@@ -950,8 +950,8 @@ WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
     elunaEvents(nullptr),
 #endif
     LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
-    _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), m_transport(nullptr), m_currMap(nullptr), m_InstanceId(0),
-    m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
+    _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
+    m_currMap(nullptr), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -1040,8 +1040,19 @@ void WorldObject::_Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32
     SetPhaseMask(phaseMask, false);
 }
 
+void WorldObject::SetPositionDataUpdate()
+{
+    _updatePositionData = true;
+
+    // Calls immediately for charmed units
+    if (GetTypeId() == TYPEID_UNIT && ToUnit()->isCharmedOwnedByPlayerOrPlayer())
+        UpdatePositionData();
+}
+
 void WorldObject::UpdatePositionData()
 {
+    _updatePositionData = false;
+
     PositionFullTerrainStatus data;
     GetMap()->GetFullTerrainStatusForPosition(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ(), GetCollisionHeight(), data);
     ProcessPositionDataChanged(data);
@@ -3037,8 +3048,52 @@ float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* gr
 
 float WorldObject::GetFloorZ() const
 {
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
     if (!IsInWorld())
         return _floorZ;
 
     return std::max<float>(_floorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT)));
+}
+
+uint32 WorldObject::GetZoneId() const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    return _zoneId;
+}
+
+uint32 WorldObject::GetAreaId() const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    return _areaId;
+}
+
+void WorldObject::GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    zoneid = _zoneId;
+    areaid = _areaId;
+}
+
+bool WorldObject::IsOutdoors() const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    return _outdoors;
+}
+
+LiquidData const& WorldObject::GetLiquidData() const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    return _liquidData;
 }

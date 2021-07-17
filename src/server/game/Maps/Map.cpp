@@ -1005,7 +1005,7 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
     creature->Relocate(x, y, z, o);
     if (creature->IsVehicle())
         creature->GetVehicleKit()->RelocatePassengers();
-    creature->UpdatePositionData();
+    creature->SetPositionDataUpdate();
     creature->UpdateObjectVisibility(false);
 }
 
@@ -1026,7 +1026,7 @@ void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float 
 
     go->Relocate(x, y, z, o);
     go->UpdateModelPosition();
-    go->UpdatePositionData();
+    go->SetPositionDataUpdate();
     go->UpdateObjectVisibility(false);
 }
 
@@ -1046,7 +1046,7 @@ void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float
         RemoveDynamicObjectFromMoveList(dynObj);
 
     dynObj->Relocate(x, y, z, o);
-    dynObj->UpdatePositionData();
+    dynObj->SetPositionDataUpdate();
     dynObj->UpdateObjectVisibility(false);
 }
 

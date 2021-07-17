@@ -972,6 +972,7 @@ public:
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
 
+    void SetPositionDataUpdate();
     void UpdatePositionData();
 
     void AddToObjectUpdate() override;
@@ -1050,6 +1051,7 @@ protected:
     float _floorZ;
     bool _outdoors;
     LiquidData _liquidData;
+    bool _updatePositionData;
 
     // transports
     Transport* m_transport;
