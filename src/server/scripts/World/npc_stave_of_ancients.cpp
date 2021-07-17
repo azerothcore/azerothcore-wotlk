@@ -423,7 +423,11 @@ public:
             RevealForm();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-            if (!InNormalForm())
+            if (InNormalForm())
+            {
+                events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
+            }
+            else
             {
                 events.ScheduleEvent(SIMONE_EVENT_CHAIN_LIGHTNING, 3000);
                 events.ScheduleEvent(SIMONE_EVENT_TEMPTRESS_KISS, 1000);
@@ -481,6 +485,10 @@ public:
             // In combat events
             switch (eventId)
             {
+                case EVENT_FOOLS_PLIGHT:
+                    me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
+                    events.RepeatEvent(urand(6000, 9000));
+                    break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
                     {

@@ -20,7 +20,8 @@ enum CommonEvents
     EVENT_ENCOUNTER_START                     = 1,
     EVENT_REVEAL                              = 2,
     EVENT_RANGE_CHECK                         = 3,
-    EVENT_UNFAIR_FIGHT                        = 4
+    EVENT_UNFAIR_FIGHT                        = 4,
+    EVENT_FOOLS_PLIGHT                        = 5
 };
 
 enum NPCArtorius
@@ -45,9 +46,9 @@ enum NPCArtorius
 
 enum NPCSimone
 {
-    SIMONE_EVENT_TALK                         = 5,
-    SIMONE_EVENT_CHAIN_LIGHTNING              = 6,
-    SIMONE_EVENT_TEMPTRESS_KISS               = 7,
+    SIMONE_EVENT_TALK                         = 6,
+    SIMONE_EVENT_CHAIN_LIGHTNING              = 7,
+    SIMONE_EVENT_TEMPTRESS_KISS               = 8,
 
     SIMONE_GOSSIP_TEXT                        = 7041,   // npc_text.ID               "What a wonderful day to be alive! Look ..."
     SIMONE_GOSSIP_OPTION_TEXT                 = 14527,  // creature_text.CreatureID  "I am not fooled by your disguise, tempt..."
@@ -64,7 +65,8 @@ enum NPCSimone
     SIMONE_SPELL_TEMPTRESS_KISS               = 23205,
     SIMONE_SPELL_CHAIN_LIGHTNING              = 23206,
     // Found 23207 using spell editor it matches the duration, it doesn't have animation and the id is close to the other simone spells
-    SIMONE_SPELL_SILENCE                      = 23207
+    SIMONE_SPELL_SILENCE                      = 23207,
+    SPELL_FOOLS_PLIGHT                        = 23504
 };
 
 struct NPCStaveQuestAI : public ScriptedAI
