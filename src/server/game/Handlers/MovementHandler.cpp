@@ -90,6 +90,8 @@ void WorldSession::HandleMoveWorldportAck()
     GetPlayer()->ResetMap();
     GetPlayer()->SetMap(newMap);
 
+    GetPlayer()->UpdatePositionData();
+
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     if (!GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer()))
     {
