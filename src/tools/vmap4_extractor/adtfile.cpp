@@ -6,9 +6,9 @@
 
 #include "vmapexport.h"
 #include "adtfile.h"
+#include "Define.h"
 #include <algorithm>
 #include <cstdio>
-#include <cstdint>
 
 #ifdef WIN32
 #define snprintf _snprintf
