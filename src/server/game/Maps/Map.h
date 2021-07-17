@@ -378,7 +378,7 @@ public:
     [[nodiscard]] bool GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
     [[nodiscard]] uint32 GetAreaId(uint32 phaseMask, float x, float y, float z) const;
     [[nodiscard]] uint32 GetZoneId(uint32 phaseMask, float x, float y, float z) const;
-    [[nodiscard]] void   GetZoneAndAreaId(uint32 phaseMask, uint32& zoneid, uint32& areaid, float x, float y, float z) const;
+    void GetZoneAndAreaId(uint32 phaseMask, uint32& zoneid, uint32& areaid, float x, float y, float z) const;
 
     [[nodiscard]] float GetWaterLevel(float x, float y) const;
     bool IsInWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
