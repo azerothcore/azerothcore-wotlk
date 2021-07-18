@@ -6147,6 +6147,7 @@ uint32 Player::GetLevelFromStorage(ObjectGuid::LowType guid)
     return 0;
 }
 
+
 //If players are too far away from the duel flag... they lose the duel
 void Player::CheckDuelDistance(time_t currTime)
 {
