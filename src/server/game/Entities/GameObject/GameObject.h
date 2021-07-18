@@ -843,7 +843,7 @@ public:
     void AddToSkillupList(ObjectGuid playerGuid) { m_SkillupList.push_back(playerGuid); }
     [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const
     {
-        for (ObjectGuid const guid : m_SkillupList)
+        for (ObjectGuid const& guid : m_SkillupList)
             if (guid == playerGuid)
                 return true;
 
@@ -993,7 +993,7 @@ private:
     void UpdatePackedRotation();
 
     //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
-    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const override
+    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/, bool /*useBoundingRadius = true*/) const override
     {
         //! Following check does check 3d distance
         dist2compare += obj->GetObjectSize();

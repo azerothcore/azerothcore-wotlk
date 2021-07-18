@@ -25,7 +25,7 @@ EndScriptData */
 #include "StringConvert.h"
 #include "VMapFactory.h"
 #include "VMapManager2.h"
-#include <boost/filesystem/operations.hpp>
+#include <filesystem>
 #include <boost/version.hpp>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
@@ -117,7 +117,6 @@ public:
 
         handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
         handler->PSendSysMessage("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-        handler->PSendSysMessage("Using ACE version: %s", ACE_VERSION);
         handler->PSendSysMessage("Using Boost version: %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         handler->PSendSysMessage("Using MySQL version: %u", MySQL::GetLibraryVersion());
         handler->PSendSysMessage("Using CMake version: %s", GitRevision::GetCMakeVersion());
@@ -154,20 +153,20 @@ public:
 
         for (std::string const& subDir : subDirs)
         {
-            boost::filesystem::path mapPath(dataDir);
+            std::filesystem::path mapPath(dataDir);
             mapPath /= subDir;
 
-            if (!boost::filesystem::exists(mapPath))
+            if (!std::filesystem::exists(mapPath))
             {
                 handler->PSendSysMessage("%s directory doesn't exist!. Using path: %s", subDir.c_str(), mapPath.generic_string().c_str());
                 continue;
             }
 
-            auto end = boost::filesystem::directory_iterator();
-            std::size_t folderSize = std::accumulate(boost::filesystem::directory_iterator(mapPath), end, std::size_t(0), [](std::size_t val, boost::filesystem::path const& mapFile)
+            auto end = std::filesystem::directory_iterator();
+            std::size_t folderSize = std::accumulate(std::filesystem::directory_iterator(mapPath), end, std::size_t(0), [](std::size_t val, std::filesystem::path const& mapFile)
             {
-                if (boost::filesystem::is_regular_file(mapFile))
-                    val += boost::filesystem::file_size(mapFile);
+                if (std::filesystem::is_regular_file(mapFile))
+                    val += std::filesystem::file_size(mapFile);
                 return val;
             });
 

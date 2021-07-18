@@ -52,7 +52,6 @@ target_link_libraries(common
   PRIVATE
     acore-core-interface
   PUBLIC
-    ace
     boost
     argon2
     g3dlib
@@ -62,6 +61,7 @@ target_link_libraries(common
     openssl
     threads
     jemalloc
+    stdfs
     fmt)
 
 set_target_properties(common

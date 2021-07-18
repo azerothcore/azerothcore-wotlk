@@ -279,7 +279,7 @@ public:
                 case INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_3:
                     // revert to INSTANCE_PROGRESS_INITIAL
                     {
-                        for (ObjectGuid const guid : VehicleList)
+                        for (ObjectGuid const& guid : VehicleList)
                             if (Creature* veh = instance->GetCreature(guid))
                             {
                                 veh->DespawnOrUnsummon();
@@ -567,7 +567,7 @@ public:
                             {
                                 Counter = 0;
                                 InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED;
-                                for (ObjectGuid const guid : VehicleList)
+                                for (ObjectGuid const& guid : VehicleList)
                                     if (Creature* veh = instance->GetCreature(guid))
                                         veh->DespawnOrUnsummon();
                                 events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOVE_SIDE, 0);
