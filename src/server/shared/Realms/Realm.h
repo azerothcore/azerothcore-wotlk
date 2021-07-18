@@ -6,9 +6,8 @@
 #ifndef Realm_h__
 #define Realm_h__
 
+#include "AsioHacksFwd.h"
 #include "Common.h"
-// #include "AsioHacksFwd.h"
-#include <ace/INET_Addr.h>
 
 enum RealmFlags
 {
@@ -56,9 +55,9 @@ struct AC_SHARED_API Realm
 {
     RealmHandle Id;
     uint32 Build;
-    std::unique_ptr<ACE_INET_Addr> ExternalAddress;
-    std::unique_ptr<ACE_INET_Addr> LocalAddress;
-    std::unique_ptr<ACE_INET_Addr> LocalSubnetMask;
+    std::unique_ptr<boost::asio::ip::address> ExternalAddress;
+    std::unique_ptr<boost::asio::ip::address> LocalAddress;
+    std::unique_ptr<boost::asio::ip::address> LocalSubnetMask;
     uint16 Port;
     std::string Name;
     uint8 Type;
@@ -67,7 +66,7 @@ struct AC_SHARED_API Realm
     AccountTypes AllowedSecurityLevel;
     float PopulationLevel;
 
-    // boost::asio::ip::tcp_endpoint GetAddressForClient(boost::asio::ip::address const& clientAddr) const;
+    boost::asio::ip::tcp_endpoint GetAddressForClient(boost::asio::ip::address const& clientAddr) const;
 };
 
 #endif // Realm_h__
