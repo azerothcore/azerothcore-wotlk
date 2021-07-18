@@ -1941,7 +1941,7 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
         }
     }
 
-    return std::move(liquidData);
+    return liquidData;
 }
 
 GridMap* Map::GetGrid(float x, float y)
@@ -2251,7 +2251,7 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
         }
     }
 
-   return std::move(liquidData);
+   return liquidData;
 }
 
 void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType)
