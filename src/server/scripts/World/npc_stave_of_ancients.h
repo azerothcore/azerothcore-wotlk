@@ -55,6 +55,7 @@ enum NPCSimone
     SIMONE_EMOTE                              = 9759,   // broadcast_text.ID         "%s laughs at your foolish request."
     SIMONE_SAY                                = 9760,   // broadcast_text.ID         "As you wish, $c."
     SIMONE_WEAKNESS_EMOTE                     = 9762,   // broadcast_text.ID         "%s is silenced by the venomous sting."
+    PRECIOUS_GOSSIP_TEXT                      = 7042,   // npc_text.ID               "*GRRRR* *RUFF* *RUFF*"
 
     SIMONE_NORMAL_ENTRY                       = 14527,  // creature_template.entry
     SIMONE_EVIL_ENTRY                         = 14533,  // creature_template.entry

@@ -375,6 +375,31 @@ public:
     }
 };
 
+class npc_precious : public CreatureScript
+{
+public:
+    npc_precious() : CreatureScript("npc_precious") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_preciousAI(creature);
+    }
+
+    struct npc_preciousAI : public NPCStaveQuestAI
+    {
+        npc_preciousAI(Creature *creature) : NPCStaveQuestAI(creature) { }
+
+        EventMap events;
+    };
+
+    bool OnGossipHello(Player *player, Creature * creature) override
+    {
+        SendGossipMenuFor(player, PRECIOUS_GOSSIP_TEXT, creature->GetGUID());
+
+        return true;
+    }
+};
+
 class npc_simone : public CreatureScript
 {
 public:
@@ -570,5 +595,6 @@ public:
 void AddSC_npc_stave_of_ancients()
 {
     new npc_artorius();
+    new npc_precious();
     new npc_simone();
 }
