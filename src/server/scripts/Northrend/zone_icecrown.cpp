@@ -135,27 +135,27 @@ public:
             switch(currentQuest)
             {
                 case QUEST_BFV_FALLEN_HEROES:
-                    me->SummonCreature(NPC_ELDRETH, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_GENESS, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_JHADRAS, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_MASUD, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_RITH, 8213.5f, 3478.5f, 626.79f, 1.56f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_TALLA, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_ELDRETH, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_GENESS, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_JHADRAS, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_MASUD, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_RITH, 8213.5f, 3478.5f, 626.79f, 1.56f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_TALLA, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_DARK_MASTER:
-                    me->SummonCreature(NPC_DARK_MASTER, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_DARK_MASTER, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_SIGRID:
-                    me->SummonCreature(NPC_SIGRID, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_SIGRID, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_CARNAGE:
-                    me->SummonCreature(NPC_CARNAGE, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_CARNAGE, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_THANE:
-                    me->SummonCreature(NPC_THANE, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_THANE, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_FINAL:
-                    me->SummonCreature(NPC_PRINCE, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_PRINCE, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
             }
         }
@@ -180,7 +180,7 @@ public:
             {
                 uint32 quest = currentQuest;
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                {
+                {                  
                     switch (quest)
                     {
                         case QUEST_BFV_FALLEN_HEROES:
@@ -202,13 +202,24 @@ public:
                             me->MonsterYell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                     }
-
                     player->GroupEventHappens(quest, player);
                 }
                 playerGUID2 = playerGUID;
                 EnterEvadeMode();
                 if (quest == QUEST_BFV_FINAL)
                     events.ScheduleEvent(EVENT_VALHALAS_THIRD, 7000);
+            }
+            else
+            {
+                uint32 quest = currentQuest;
+                if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                {
+                    if (!player->HasQuest(quest))
+                    {
+                        Reset();
+                        return;
+                    }
+                }
             }
         }
 
@@ -310,8 +321,11 @@ public:
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
+        npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI());
+        vAI->Reset();
+
         creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-        if (npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI()))
+        if (vAI)
             vAI->StartBattle(player->GetGUID(), quest->GetQuestId());
 
         switch (quest->GetQuestId())

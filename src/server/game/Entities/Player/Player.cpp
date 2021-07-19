@@ -12982,6 +12982,18 @@ bool Player::HasQuestForGO(int32 GOId) const
     return false;
 }
 
+bool Player::HasQuest(uint32 questId) const
+{
+    for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (questid == questId)
+            return true;
+    }
+
+    return false;
+}
+
 void Player::UpdateForQuestWorldObjects()
 {
     if (m_clientGUIDs.empty())

@@ -1400,6 +1400,7 @@ public:
     void ReputationChanged2(FactionEntry const* factionEntry);
     [[nodiscard]] bool HasQuestForItem(uint32 itemId, uint32 excludeQuestId = 0, bool turnIn = false) const;
     [[nodiscard]] bool HasQuestForGO(int32 GOId) const;
+    [[nodiscard]] bool HasQuest(uint32 questId) const;
     void UpdateForQuestWorldObjects();
     [[nodiscard]] bool CanShareQuest(uint32 quest_id) const;
 
