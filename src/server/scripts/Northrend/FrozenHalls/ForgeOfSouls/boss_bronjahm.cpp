@@ -194,7 +194,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_bronjahmAI(creature);
+        return GetForgeOfSoulsAI<boss_bronjahmAI>(creature);
     }
 };
 
@@ -221,7 +221,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (pInstance)
-                if (Creature* b = pInstance->instance->GetCreature(pInstance->GetData64(DATA_BRONJAHM)))
+                if (Creature* b = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_BRONJAHM)))
                 {
                     if (me->GetExactDist2d(b) <= 2.0f)
                     {
@@ -245,7 +245,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_fos_corrupted_soul_fragmentAI(creature);
+        return GetForgeOfSoulsAI<npc_fos_corrupted_soul_fragmentAI>(creature);
     }
 };
 
@@ -367,7 +367,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f, false));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f, false));
         }
 
         void Register() override

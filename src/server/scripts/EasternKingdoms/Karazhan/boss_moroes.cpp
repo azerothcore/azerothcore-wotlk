@@ -165,7 +165,7 @@ public:
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
                     guestList.push_back(summon);
 
-            return acore::Containers::SelectRandomContainerElement(guestList);
+            return Acore::Containers::SelectRandomContainerElement(guestList);
         }
 
         void UpdateAI(uint32 diff) override
@@ -241,7 +241,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_moroesAI>(creature);
+        return GetKarazhanAI<boss_moroesAI>(creature);
     }
 };
 

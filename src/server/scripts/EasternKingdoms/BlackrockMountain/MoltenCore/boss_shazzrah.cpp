@@ -101,7 +101,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_shazzrahAI(creature);
+        return GetMoltenCoreAI<boss_shazzrahAI>(creature);
     }
 };
 
@@ -125,7 +125,7 @@ public:
             if (targets.empty())
                 return;
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }

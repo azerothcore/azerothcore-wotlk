@@ -11,10 +11,9 @@ SDComment:
 SDCategory: Molten Core
 EndScriptData */
 
-#include "molten_core.h"
-#include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "molten_core.h"
 
 enum Spells
 {
@@ -41,42 +40,50 @@ public:
         {
         }
 
-        void EnterCombat(Unit* victim) override
+        void EnterCombat(Unit* /*victim*/) override
         {
-            BossAI::EnterCombat(victim);
-            events.ScheduleEvent(EVENT_IMPENDING_DOOM, 10000);
-            events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 20000);
-            events.ScheduleEvent(EVENT_SHADOW_SHOCK, 6000);
+            _EnterCombat();
+            events.ScheduleEvent(EVENT_IMPENDING_DOOM, urand(6000, 11000));
+            events.ScheduleEvent(EVENT_LUCIFRON_CURSE, urand(11000, 14000));
+            events.ScheduleEvent(EVENT_SHADOW_SHOCK, 5000);
         }
 
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
-            while (uint32 eventId = events.ExecuteEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
                     case EVENT_IMPENDING_DOOM:
+                    {
                         DoCastVictim(SPELL_IMPENDING_DOOM);
-                        events.ScheduleEvent(EVENT_IMPENDING_DOOM, 20000);
+                        events.RepeatEvent(20000);
                         break;
+                    }
                     case EVENT_LUCIFRON_CURSE:
+                    {
                         DoCastVictim(SPELL_LUCIFRON_CURSE);
-                        events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 15000);
+                        events.RepeatEvent(20000);
                         break;
+                    }
                     case EVENT_SHADOW_SHOCK:
+                    {
                         DoCastVictim(SPELL_SHADOW_SHOCK);
-                        events.ScheduleEvent(EVENT_SHADOW_SHOCK, 6000);
+                        events.RepeatEvent(5000);
                         break;
-                    default:
-                        break;
+                    }
                 }
             }
 
@@ -86,7 +93,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_lucifronAI(creature);
+        return GetMoltenCoreAI<boss_lucifronAI>(creature);
     }
 };
 

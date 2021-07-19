@@ -146,7 +146,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_pathaleon_the_calculatorAI(creature);
+        return GetMechanarAI<boss_pathaleon_the_calculatorAI>(creature);
     }
 };
 

@@ -7,12 +7,11 @@
 #ifndef _MODELINSTANCE_H_
 #define _MODELINSTANCE_H_
 
-#include <G3D/Matrix3.h>
-#include <G3D/Vector3.h>
-#include <G3D/AABox.h>
-#include <G3D/Ray.h>
-
 #include "Define.h"
+#include <G3D/AABox.h>
+#include <G3D/Matrix3.h>
+#include <G3D/Ray.h>
+#include <G3D/Vector3.h>
 
 namespace VMAP
 {
@@ -42,7 +41,7 @@ namespace VMAP
         bool operator==(const ModelSpawn& other) const { return ID == other.ID; }
         //uint32 hashCode() const { return ID; }
         // temp?
-        [[nodiscard]] const G3D::AABox& getBounds() const { return iBound; }
+        [[nodiscard]] const G3D::AABox& GetBounds() const { return iBound; }
 
         static bool readFromFile(FILE* rf, ModelSpawn& spawn);
         static bool writeToFile(FILE* rw, const ModelSpawn& spawn);
@@ -58,12 +57,11 @@ namespace VMAP
         void intersectPoint(const G3D::Vector3& p, AreaInfo& info) const;
         bool GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const;
         bool GetLiquidLevel(const G3D::Vector3& p, LocationInfo& info, float& liqHeight) const;
+        WorldModel* getWorldModel() { return iModel; }
     protected:
         G3D::Matrix3 iInvRot;
         float iInvScale{0.0f};
         WorldModel* iModel{nullptr};
-    public:
-        WorldModel* getWorldModel();
     };
 } // namespace VMAP
 

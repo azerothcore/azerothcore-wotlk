@@ -67,7 +67,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_magus_telestraAI>(creature);
+        return GetNexusAI<boss_magus_telestraAI>(creature);
     }
 
     struct boss_magus_telestraAI : public BossAI
@@ -271,7 +271,7 @@ public:
 
         void SelectTarget(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::RandomCheck(50));
+            targets.remove_if(Acore::RandomCheck(50));
         }
 
         void HandlePull(SpellEffIndex effIndex)
@@ -318,7 +318,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* /*player*/, Unit* target) override
+    bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;

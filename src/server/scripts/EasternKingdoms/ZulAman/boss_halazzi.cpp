@@ -77,14 +77,14 @@ public:
         uint32 BerserkTimer;
         uint32 TransformCount;
 
-        uint64 LynxGUID;
+        ObjectGuid LynxGUID;
 
         void Reset() override
         {
             instance->SetData(DATA_HALAZZIEVENT, NOT_STARTED);
             summons.DespawnAll();
 
-            LynxGUID = 0;
+            LynxGUID.Clear();
             TransformCount = 0;
             BerserkTimer = 600000;
             CheckTimer = 1000;
@@ -305,7 +305,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_halazziAI>(creature);
+        return GetZulAmanAI<boss_halazziAI>(creature);
     }
 };
 
@@ -367,7 +367,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_halazzi_lynxAI(creature);
+        return GetZulAmanAI<npc_halazzi_lynxAI>(creature);
     }
 };
 

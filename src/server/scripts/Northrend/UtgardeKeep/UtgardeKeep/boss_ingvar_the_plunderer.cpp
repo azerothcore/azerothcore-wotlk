@@ -93,7 +93,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_ingvar_the_plundererAI(pCreature);
+        return GetUtgardeKeepAI<boss_ingvar_the_plundererAI>(pCreature);
     }
 
     struct boss_ingvar_the_plundererAI : public ScriptedAI
@@ -106,13 +106,13 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 ValkyrGUID;
-        uint64 ThrowGUID;
+        ObjectGuid ValkyrGUID;
+        ObjectGuid ThrowGUID;
 
         void Reset() override
         {
-            ValkyrGUID = 0;
-            ThrowGUID = 0;
+            ValkyrGUID.Clear();
+            ThrowGUID.Clear();
             events.Reset();
             summons.DespawnAll();
             me->SetDisplayId(DISPLAYID_DEFAULT);
@@ -170,7 +170,6 @@ public:
                 ValkyrGUID = s->GetGUID();
                 s->SetCanFly(true);
                 s->SetDisableGravity(true);
-                s->SetHover(true);
                 s->SetPosition(s->GetPositionX(), s->GetPositionY(), s->GetPositionZ() + 35.0f, s->GetOrientation());
                 s->SetFacingTo(s->GetOrientation());
             }
@@ -195,14 +194,14 @@ public:
             if (apply)
             {
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             }
             else
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             }
@@ -368,7 +367,7 @@ public:
                         c->DespawnOrUnsummon();
                         summons.DespawnAll();
                     }
-                    ThrowGUID = 0;
+                    ThrowGUID.Clear();
                     SetEquipmentSlots(true);
                     break;
             }

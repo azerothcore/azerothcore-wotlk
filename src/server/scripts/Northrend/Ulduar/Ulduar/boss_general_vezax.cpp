@@ -101,7 +101,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_vezaxAI (pCreature);
+        return GetUlduarAI<boss_vezaxAI>(pCreature);
     }
 
     struct boss_vezaxAI : public ScriptedAI
@@ -232,7 +232,7 @@ public:
                         {
                             me->setAttackTimer(BASE_ATTACK, 2000);
                             Player* target = players.at(urand(0, players.size() - 1));
-                            me->SetUInt64Value(UNIT_FIELD_TARGET, target->GetGUID());
+                            me->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
                             me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
                             events.ScheduleEvent(EVENT_RESTORE_TARGET, 750);
                         }
@@ -240,7 +240,7 @@ public:
                     break;
                 case EVENT_RESTORE_TARGET:
                     if (me->GetVictim())
-                        me->SetUInt64Value(UNIT_FIELD_TARGET, me->GetVictim()->GetGUID());
+                        me->SetGuidValue(UNIT_FIELD_TARGET, me->GetVictim()->GetGUID());
                     break;
                 case EVENT_SPELL_SEARING_FLAMES:
                     if(!me->HasAura(SPELL_SARONITE_BARRIER))
@@ -291,8 +291,8 @@ public:
                             events.RepeatEvent(30000);
                         else
                         {
-                            for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
-                                if( Creature* sv = ObjectAccessor::GetCreature(*me, *itr) )
+                            for (ObjectGuid const& guid : summons)
+                                if (Creature* sv = ObjectAccessor::GetCreature(*me, guid))
                                 {
                                     sv->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                                     sv->GetMotionMaster()->MoveIdle();
@@ -394,7 +394,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_saronite_vaporsAI (pCreature);
+        return GetUlduarAI<npc_ulduar_saronite_vaporsAI>(pCreature);
     }
 
     struct npc_ulduar_saronite_vaporsAI : public NullCreatureAI
@@ -413,7 +413,7 @@ public:
 
             // killed saronite vapors, hard mode unavailable
             if( pInstance )
-                if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_VEZAX)) )
+                if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)) )
                     vezax->AI()->DoAction(1);
         }
     };
@@ -426,7 +426,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_saronite_animusAI (pCreature);
+        return GetUlduarAI<npc_ulduar_saronite_animusAI>(pCreature);
     }
 
     struct npc_ulduar_saronite_animusAI : public ScriptedAI
@@ -435,7 +435,7 @@ public:
         {
             pInstance = pCreature->GetInstanceScript();
             if( pInstance )
-                if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_VEZAX)) )
+                if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)) )
                     vezax->AI()->JustSummoned(me);
             timer = 0;
             me->SetInCombatWithZone();
@@ -449,7 +449,7 @@ public:
             me->DespawnOrUnsummon(3000);
 
             if( pInstance )
-                if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_VEZAX)) )
+                if( Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)) )
                     vezax->AI()->DoAction(2);
         }
 
@@ -644,7 +644,7 @@ class achievement_smell_saronite : public AchievementCriteriaScript
 public:
     achievement_smell_saronite() : AchievementCriteriaScript("achievement_smell_saronite") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -655,7 +655,7 @@ class achievement_shadowdodger : public AchievementCriteriaScript
 public:
     achievement_shadowdodger() : AchievementCriteriaScript("achievement_shadowdodger") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
     }

@@ -51,7 +51,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_cyanigosaAI (pCreature);
+        return GetVioletHoldAI<boss_cyanigosaAI>(pCreature);
     }
 
     struct boss_cyanigosaAI : public ScriptedAI

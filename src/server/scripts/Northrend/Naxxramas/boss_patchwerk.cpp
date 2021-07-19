@@ -44,7 +44,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_patchwerkAI (pCreature);
+        return GetNaxxramasAI<boss_patchwerkAI>(pCreature);
     }
 
     struct boss_patchwerkAI : public BossAI
@@ -131,7 +131,7 @@ public:
                             }
                         }
                         counter = 0;
-                        list<Unit*, std::allocator<Unit*>>::iterator itr;
+                        std::list<Unit*, std::allocator<Unit*>>::iterator itr;
                         for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr, ++counter)
                         {
                             // if there is only one target available

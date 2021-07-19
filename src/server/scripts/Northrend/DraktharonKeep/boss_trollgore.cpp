@@ -153,7 +153,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_trollgoreAI>(creature);
+        return GetDraktharonKeepAI<boss_trollgoreAI>(creature);
     }
 };
 
@@ -253,7 +253,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* /*player*/, Unit* target) override
+    bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;

@@ -179,7 +179,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_flame_leviathanAI (pCreature);
+        return GetUlduarAI<boss_flame_leviathanAI>(pCreature);
     }
 
     struct boss_flame_leviathanAI : public ScriptedAI
@@ -534,24 +534,24 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnGates(bool _start, bool _
     {
         // first one is ALWAYS turned on, unless leviathan is beaten
         GameObject* go = nullptr;
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_LIGHTNING_WALL2))))
             go->SetGoState(GO_STATE_READY);
 
         if (m_pInstance->GetData(TYPE_LEVIATHAN) == NOT_STARTED)
-            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS))))
+            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_LEVIATHAN_DOORS))))
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
     }
     else
     {
         GameObject* go = nullptr;
         if (_death)
-            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL1))))
+            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_LIGHTNING_WALL1))))
                 go->SetGoState(GO_STATE_ACTIVE);
 
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_LIGHTNING_WALL2))))
             go->SetGoState(GO_STATE_ACTIVE);
 
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_LEVIATHAN_DOORS))))
         {
             if (m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL || m_pInstance->GetData(TYPE_LEVIATHAN) == DONE)
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
@@ -569,16 +569,16 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnHealStations(bool _apply)
     GameObject* go = nullptr;
     if (_apply)
     {
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION1))))
             go->SetLootState(GO_READY);
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION2))))
             go->SetLootState(GO_READY);
     }
     else
     {
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION1))))
             go->SetLootState(GO_ACTIVATED);
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2))))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION2))))
             go->SetLootState(GO_ACTIVATED);
     }
 }
@@ -691,7 +691,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_flame_leviathan_seatAI (pCreature);
+        return GetUlduarAI<boss_flame_leviathan_seatAI>(pCreature);
     }
 
     struct boss_flame_leviathan_seatAI : public VehicleAI
@@ -800,7 +800,7 @@ public:
                 if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
                     device->SetUInt32Value(UNIT_FIELD_FLAGS, 0); // unselectable
 
-            if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetData64(TYPE_LEVIATHAN)))
+            if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(TYPE_LEVIATHAN)))
                 leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
         }
 
@@ -832,7 +832,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_flame_leviathan_defense_turretAI(creature);
+        return GetUlduarAI<boss_flame_leviathan_defense_turretAI>(creature);
     }
 };
 
@@ -868,7 +868,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_flame_leviathan_overload_deviceAI(creature);
+        return GetUlduarAI<boss_flame_leviathan_overload_deviceAI>(creature);
     }
 };
 
@@ -879,7 +879,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_freya_wardAI (pCreature);
+        return GetUlduarAI<npc_freya_wardAI>(pCreature);
     }
 
     struct npc_freya_wardAI : public NullCreatureAI
@@ -959,7 +959,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_hodirs_furyAI (pCreature);
+        return GetUlduarAI<npc_hodirs_furyAI>(pCreature);
     }
 
     struct npc_hodirs_furyAI : public NullCreatureAI
@@ -1038,7 +1038,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_mimirons_infernoAI(creature);
+        return GetUlduarAI<npc_mimirons_infernoAI>(creature);
     }
 
     struct npc_mimirons_infernoAI : public npc_escortAI
@@ -1066,7 +1066,7 @@ public:
         {
             summons.DespawnAll();
             _spellTimer = 0;
-            Start(false, false, 0, nullptr, false, true);
+            Start(false, false, ObjectGuid::Empty, nullptr, false, true);
             if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
             {
                 aur->SetMaxDuration(-1);
@@ -1100,7 +1100,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_thorims_hammerAI (pCreature);
+        return GetUlduarAI<npc_thorims_hammerAI>(pCreature);
     }
 
     struct npc_thorims_hammerAI : public NullCreatureAI
@@ -1156,7 +1156,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_pool_of_tarAI (pCreature);
+        return GetUlduarAI<npc_pool_of_tarAI>(pCreature);
     }
 
     struct npc_pool_of_tarAI : public NullCreatureAI
@@ -1204,7 +1204,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_brann_radioAI (pCreature);
+        return GetUlduarAI<npc_brann_radioAI>(pCreature);
     }
 
     struct npc_brann_radioAI : public NullCreatureAI
@@ -1309,7 +1309,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_storm_beacon_spawnAI (pCreature);
+        return GetUlduarAI<npc_storm_beacon_spawnAI>(pCreature);
     }
 
     struct npc_storm_beacon_spawnAI : public NullCreatureAI
@@ -1350,7 +1350,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_flame_leviathan_safety_containerAI (pCreature);
+        return GetUlduarAI<boss_flame_leviathan_safety_containerAI>(pCreature);
     }
 
     struct boss_flame_leviathan_safety_containerAI : public NullCreatureAI
@@ -1398,7 +1398,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_mechanoliftAI (pCreature);
+        return GetUlduarAI<npc_mechanoliftAI>(pCreature);
     }
 
     struct npc_mechanoliftAI : public NullCreatureAI
@@ -1633,7 +1633,7 @@ public:
         //! Vehicle must be in use by player
         bool playerFound = false;
         for (SeatMap::const_iterator itr = vehicle->Seats.begin(); itr != vehicle->Seats.end() && !playerFound; ++itr)
-            if (IS_PLAYER_GUID(itr->second.Passenger.Guid))
+            if (itr->second.Passenger.Guid.IsPlayer())
                 playerFound = true;
 
         return !playerFound;
@@ -1660,7 +1660,7 @@ public:
             else
             {
                 //! In the end, only one target should be selected
-                WorldObject* _target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 if (_target)
                     targets.push_back(_target);
@@ -1709,9 +1709,9 @@ public:
                 {
                     // use 99 because it is 3d search
                     std::list<WorldObject*> targetList;
-                    acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
-                    acore::WorldObjectListSearcher<acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
-                    GetCaster()->GetMap()->VisitAll(GetCaster()->m_positionX, GetCaster()->m_positionY, 99, searcher);
+                    Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
+                    Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
+                    Cell::VisitAllObjects(GetCaster(), searcher, 99.0f);
                     float minDist = 99 * 99;
                     Unit* target = nullptr;
                     for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
@@ -2076,7 +2076,7 @@ public:
     {
     }
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/, uint32 /*criteria_id*/) override
     {
         return target && _towerCount <= target->GetAI()->GetData(DATA_GET_TOWER_COUNT);
     }
@@ -2090,7 +2090,7 @@ class achievement_flame_leviathan_shutout : public AchievementCriteriaScript
 public:
     achievement_flame_leviathan_shutout() : AchievementCriteriaScript("achievement_flame_leviathan_shutout") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/, uint32 /*criteria_id*/) override
     {
         if (target)
             if (target->GetAI()->GetData(DATA_GET_SHUTDOWN))
@@ -2107,7 +2107,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (Vehicle* vehicle = player->GetVehicle())
             if (vehicle->GetCreatureEntry() == _entry1 || vehicle->GetCreatureEntry() == _entry2)
@@ -2125,7 +2125,7 @@ class achievement_flame_leviathan_unbroken : public AchievementCriteriaScript
 public:
     achievement_flame_leviathan_unbroken() : AchievementCriteriaScript("achievement_flame_leviathan_unbroken") {}
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (player->GetInstanceScript()->GetData(DATA_UNBROKEN_ACHIEVEMENT))

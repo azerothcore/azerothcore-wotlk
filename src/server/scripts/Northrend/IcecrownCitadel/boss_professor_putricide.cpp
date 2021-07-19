@@ -140,7 +140,7 @@ class AbominationDespawner
 public:
     explicit AbominationDespawner(Unit* owner) : _owner(owner) { }
 
-    bool operator()(uint64 guid)
+    bool operator()(ObjectGuid guid)
     {
         if (Unit* summon = ObjectAccessor::GetUnit(*_owner, guid))
         {
@@ -188,7 +188,7 @@ private:
 };
 
 // xinef: malleable goo selector, check for target validity
-struct MalleableGooSelector : public acore::unary_function<Unit*, bool>
+struct MalleableGooSelector : public Acore::unary_function<Unit*, bool>
 {
     const Unit* me;
     MalleableGooSelector(Unit const* unit) : me(unit) {}
@@ -411,7 +411,7 @@ public:
             switch (id)
             {
                 case POINT_FESTERGUT:
-                    if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_FESTERGUT)))
+                    if (Creature* c = instance->instance->GetCreature(instance->GetGuidData(DATA_FESTERGUT)))
                     {
                         if (c->IsInCombat())
                         {
@@ -427,7 +427,7 @@ public:
                     }
                     break;
                 case POINT_ROTFACE:
-                    if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_ROTFACE)))
+                    if (Creature* c = instance->instance->GetCreature(instance->GetGuidData(DATA_ROTFACE)))
                     {
                         if (c->IsInCombat())
                         {
@@ -730,13 +730,12 @@ public:
     npc_putricide_oozeAI(Creature* creature, uint32 hitTargetSpellId) : ScriptedAI(creature),
         _hitTargetSpellId(hitTargetSpellId), _newTargetSelectTimer(0)
     {
-        targetGUID = 0;
         me->SetReactState(REACT_PASSIVE);
     }
 
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
-    void SetGUID(uint64 guid, int32 type) override
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
         if (type == -1)
             targetGUID = guid;
@@ -745,7 +744,7 @@ public:
     void IsSummonedBy(Unit* /*summoner*/) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
             {
                 if (!professor->IsInCombat())
                     me->DespawnOrUnsummon(1);
@@ -756,7 +755,7 @@ public:
 
     void SelectNewTarget()
     {
-        targetGUID = 0;
+        targetGUID.Clear();
         me->InterruptNonMeleeSpells(true);
         me->AttackStop();
         me->GetMotionMaster()->Clear();
@@ -875,7 +874,7 @@ public:
 
         void ScaleRange(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 2.5f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 2.5f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
         }
 
         // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
@@ -1025,10 +1024,10 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             // vanish rank 1-3, mage invisibility
-            targets.remove_if(acore::UnitAuraCheck(true, 11327));
-            targets.remove_if(acore::UnitAuraCheck(true, 11329));
-            targets.remove_if(acore::UnitAuraCheck(true, 26888));
-            targets.remove_if(acore::UnitAuraCheck(true, 32612));
+            targets.remove_if(Acore::UnitAuraCheck(true, 11327));
+            targets.remove_if(Acore::UnitAuraCheck(true, 11329));
+            targets.remove_if(Acore::UnitAuraCheck(true, 26888));
+            targets.remove_if(Acore::UnitAuraCheck(true, 32612));
         }
 
         void Register() override
@@ -1099,8 +1098,8 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             // dbc has only 1 field for excluding, this will prevent anyone from getting both at the same time
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_VOLATILE_OOZE_PROTECTION));
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_GASEOUS_BLOAT_PROTECTION));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VOLATILE_OOZE_PROTECTION));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_GASEOUS_BLOAT_PROTECTION));
 
             if (targets.empty())
             {
@@ -1109,7 +1108,7 @@ public:
                 return;
             }
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
             _target = target;
@@ -1198,7 +1197,7 @@ public:
                 return;
 
             uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(triggerSpell);
+            SpellInfo const* spell = sSpellMgr->AssertSpellInfo(triggerSpell);
             spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, caster);
 
             int32 damage = spell->Effects[EFFECT_0].CalcValue(caster);
@@ -1257,8 +1256,8 @@ public:
                 }
             }
 
-            targets.remove_if(acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
-            acore::Containers::RandomResizeList(targets, 1);
+            targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
@@ -1274,7 +1273,7 @@ public:
 
             if (!GetHitUnit()->HasAura(plagueId))
             {
-                if (Creature* professor = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                if (Creature* professor = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 {
                     if (Aura* oldPlague = GetCaster()->GetAura(plagueId, professor->GetGUID()))
                     {
@@ -1414,7 +1413,7 @@ public:
             if (!instance)
                 return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
-            Creature* professor = ObjectAccessor::GetCreature(*GetExplTargetUnit(), instance->GetData64(DATA_PROFESSOR_PUTRICIDE));
+            Creature* professor = ObjectAccessor::GetCreature(*GetExplTargetUnit(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
             if (!professor)
                 return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
@@ -1508,7 +1507,7 @@ public:
             if (!instance)
                 return;
 
-            Creature* putricide = ObjectAccessor::GetCreature(*caster, instance->GetData64(DATA_PROFESSOR_PUTRICIDE));
+            Creature* putricide = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
             if (!putricide)
                 return;
 
@@ -1628,7 +1627,7 @@ public:
             if (targets.empty())
                 return;
 
-            targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             WorldObject* target = targets.front();
             targets.clear();
             targets.push_back(target);

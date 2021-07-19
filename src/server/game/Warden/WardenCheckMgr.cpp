@@ -4,13 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Util.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
-#include "WorldPacket.h"
 #include "WorldSession.h"
 
 WardenCheckMgr::WardenCheckMgr()
@@ -32,8 +30,8 @@ void WardenCheckMgr::LoadWardenChecks()
     // Check if Warden is enabled by config before loading anything
     if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
     {
-        sLog->outString(">> Warden disabled, loading checks skipped.");
-        sLog->outString();
+        LOG_INFO("server.loading", ">> Warden disabled, loading checks skipped.");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -41,8 +39,8 @@ void WardenCheckMgr::LoadWardenChecks()
 
     if (!result)
     {
-        sLog->outString(">> Loaded 0 Warden checks. DB table `warden_checks` is empty!");
-        sLog->outString();
+        LOG_INFO("server.loading", ">> Loaded 0 Warden checks. DB table `warden_checks` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -65,7 +63,7 @@ void WardenCheckMgr::LoadWardenChecks()
 
         if (checkType == LUA_EVAL_CHECK && id > 9999)
         {
-            sLog->outError("sql.sql: Warden Lua check with id %u found in `warden_checks`. Lua checks may have four-digit IDs at most. Skipped.", id);
+            LOG_ERROR("warden", "sql.sql: Warden Lua check with id %u found in `warden_checks`. Lua checks may have four-digit IDs at most. Skipped.", id);
             continue;
         }
 
@@ -124,13 +122,13 @@ void WardenCheckMgr::LoadWardenChecks()
             {
                 if (wardenCheck.Length > WARDEN_MAX_LUA_CHECK_LENGTH)
                 {
-                    sLog->outError("sql.sql: Found over-long Lua check for Warden check with id %u in `warden_checks`. Max length is %u. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
+                    LOG_ERROR("warden", "sql.sql: Found over-long Lua check for Warden check with id %u in `warden_checks`. Max length is %u. Skipped.", id, WARDEN_MAX_LUA_CHECK_LENGTH);
                     continue;
                 }
 
-                std::string str = fmt::sprintf("%04u", id);
-                ASSERT(str.size() == 4);
-                std::copy(str.begin(), str.end(), wardenCheck.IdStr.begin());
+                std::string str2 = Acore::StringFormat("%04u", id);
+                ASSERT(str2.size() == 4);
+                std::copy(str2.begin(), str2.end(), wardenCheck.IdStr.begin());
 
                 CheckIdPool[WARDEN_CHECK_LUA_TYPE].push_back(id);
                 break;
@@ -148,8 +146,8 @@ void WardenCheckMgr::LoadWardenChecks()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u warden checks.", count);
-    sLog->outString();
+    LOG_INFO("server.loading", ">> Loaded %u warden checks.", count);
+    LOG_INFO("server.loading", " ");
 }
 
 void WardenCheckMgr::LoadWardenOverrides()
@@ -157,8 +155,8 @@ void WardenCheckMgr::LoadWardenOverrides()
     // Check if Warden is enabled by config before loading anything
     if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
     {
-        sLog->outString(">> Warden disabled, loading check overrides skipped.");
-        sLog->outString();
+        LOG_INFO("server.loading", ">> Warden disabled, loading check overrides skipped.");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -167,8 +165,8 @@ void WardenCheckMgr::LoadWardenOverrides()
 
     if (!result)
     {
-        sLog->outString(">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
-        sLog->outString();
+        LOG_INFO("server.loading", ">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -183,10 +181,10 @@ void WardenCheckMgr::LoadWardenOverrides()
 
         // Check if action value is in range (0-2, see WardenActions enum)
         if (action > WARDEN_ACTION_BAN)
-            sLog->outError("Warden check override action out of range (ID: %u, action: %u)", checkId, action);
+            LOG_ERROR("warden", "Warden check override action out of range (ID: %u, action: %u)", checkId, action);
         // Check if check actually exists before accessing the CheckStore vector
         else if (checkId > CheckStore.size())
-            sLog->outError("Warden check action override for non-existing check (ID: %u, action: %u), skipped", checkId, action);
+            LOG_ERROR("warden", "Warden check action override for non-existing check (ID: %u, action: %u), skipped", checkId, action);
         else
         {
             CheckStore.at(checkId).Action = WardenActions(action);
@@ -194,8 +192,8 @@ void WardenCheckMgr::LoadWardenOverrides()
         }
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u warden action overrides.", count);
-    sLog->outString();
+    LOG_INFO("server.loading", ">> Loaded %u warden action overrides.", count);
+    LOG_INFO("server.loading", " ");
 }
 
 WardenCheck const* WardenCheckMgr::GetWardenDataById(uint16 Id)

@@ -16,7 +16,6 @@ EndScriptData */
 #include "ScriptedEscortAI.h"
 #include "ScriptMgr.h"
 
-
 enum Muglash
 {
     FACTION_QUEST           = 113,

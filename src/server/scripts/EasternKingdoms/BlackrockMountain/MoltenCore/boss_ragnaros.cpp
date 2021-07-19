@@ -147,7 +147,7 @@ public:
                             break;
                         case EVENT_INTRO_4:
                             Talk(SAY_ARRIVAL5_RAG);
-                            if (Creature* executus = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_MAJORDOMO_EXECUTUS)))
+                            if (Creature* executus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(BOSS_MAJORDOMO_EXECUTUS)))
                                 Unit::Kill(me, executus);
                             break;
                         case EVENT_INTRO_5:
@@ -291,7 +291,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ragnarosAI>(creature);
+        return GetMoltenCoreAI<boss_ragnarosAI>(creature);
     }
 };
 
@@ -323,7 +323,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_son_of_flameAI>(creature);
+        return GetMoltenCoreAI<npc_son_of_flameAI>(creature);
     }
 };
 

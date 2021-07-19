@@ -4,6 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "mana_tombs.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
@@ -35,7 +36,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_pandemoniusAI(creature);
+        return GetManaTombsAI<boss_pandemoniusAI>(creature);
     }
 
     struct boss_pandemoniusAI : public ScriptedAI

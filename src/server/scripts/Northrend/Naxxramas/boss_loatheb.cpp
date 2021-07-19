@@ -42,7 +42,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_loathebAI (pCreature);
+        return GetNaxxramasAI<boss_loathebAI>(pCreature);
     }
 
     struct boss_loathebAI : public BossAI
@@ -67,7 +67,7 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(BOSS_LOATHEB, NOT_STARTED);
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_LOATHEB_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_LOATHEB_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -108,7 +108,7 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(BOSS_LOATHEB, IN_PROGRESS);
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_LOATHEB_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_LOATHEB_GATE)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }
@@ -154,14 +154,7 @@ public:
                 case EVENT_INEVITABLE_DOOM:
                     me->CastSpell(me, RAID_MODE(SPELL_INEVITABLE_DOOM_10, SPELL_INEVITABLE_DOOM_25), false);
                     doomCounter++;
-                    if (doomCounter < 6)
-                    {
-                        events.RepeatEvent(30000);
-                    }
-                    else
-                    {
-                        events.RepeatEvent(15000);
-                    }
+                    events.RepeatEvent(doomCounter < 6 ? 30000 : 15000);
                     break;
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);

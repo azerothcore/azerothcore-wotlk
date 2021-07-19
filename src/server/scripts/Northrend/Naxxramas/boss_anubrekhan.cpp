@@ -8,16 +8,16 @@
 
 enum Says
 {
-    SAY_AGGRO           = 0,
-    SAY_GREET           = 1,
-    SAY_SLAY            = 2,
-    EMOTE_LOCUST        = 3
+    SAY_AGGRO                       = 0,
+    SAY_GREET                       = 1,
+    SAY_SLAY                        = 2,
+    EMOTE_LOCUST                    = 3
 };
 
 enum GuardSays
 {
-    EMOTE_SPAWN         = 1,
-    EMOTE_SCARAB        = 2
+    EMOTE_SPAWN                     = 1,
+    EMOTE_SCARAB                    = 2
 };
 
 enum Spells
@@ -54,7 +54,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_anubrekhanAI (pCreature);
+        return GetNaxxramasAI<boss_anubrekhanAI>(pCreature);
     }
 
     struct boss_anubrekhanAI : public BossAI
@@ -87,7 +87,7 @@ public:
             SummonCryptGuards();
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_ANUB_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_ANUB_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -151,7 +151,7 @@ public:
             Talk(SAY_AGGRO);
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_ANUB_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_ANUB_GATE)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }
@@ -183,7 +183,7 @@ public:
         {
             if (!me->IsInCombat() && sayGreet)
             {
-                for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+                for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 {
                     if (pInstance)
                     {

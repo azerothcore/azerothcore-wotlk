@@ -138,7 +138,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_muruAI>(creature);
+        return GetSunwellPlateauAI<boss_muruAI>(creature);
     }
 };
 
@@ -166,7 +166,7 @@ public:
         void EnterEvadeMode() override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_MURU)))
+                if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
                     if (!muru->IsInEvadeMode())
                         muru->AI()->EnterEvadeMode();
 
@@ -195,7 +195,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_MURU)))
+                if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
                     Unit::Kill(muru, muru);
         }
 
@@ -248,7 +248,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_entropiusAI>(creature);
+        return GetSunwellPlateauAI<boss_entropiusAI>(creature);
     }
 };
 
@@ -259,7 +259,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_singularityAI>(creature);
+        return GetSunwellPlateauAI<npc_singularityAI>(creature);
     }
 
     struct npc_singularityAI : public NullCreatureAI
@@ -394,7 +394,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            acore::Containers::RandomResizeList(targets, GetCaster()->GetAI()->GetData(DATA_NEGATIVE_ENERGY_TARGETS));
+            Acore::Containers::RandomResize(targets, GetCaster()->GetAI()->GetData(DATA_NEGATIVE_ENERGY_TARGETS));
         }
 
         void HandleScriptEffect(SpellEffIndex effIndex)

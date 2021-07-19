@@ -225,7 +225,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_high_astromancer_solarianAI>(creature);
+        return GetTheEyeAI<boss_high_astromancer_solarianAI>(creature);
     }
 };
 

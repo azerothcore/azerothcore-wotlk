@@ -6,8 +6,11 @@
 #define ARCATRAZ_H
 
 #include "CreatureAI.h"
+#include "CreatureAIImpl.h"
 #include "Player.h"
 #include "SpellScript.h"
+
+#define ArcatrazScriptName "instance_arcatraz"
 
 enum DataTypes
 {
@@ -53,5 +56,11 @@ enum SpellIds
     SPELL_TELEPORT_VISUAL                   = 35517,
     SPELL_SOUL_STEAL                        = 36782
 };
+
+template <class AI, class T>
+inline AI* GetArcatrazAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, ArcatrazScriptName);
+}
 
 #endif // ARCATRAZ_H

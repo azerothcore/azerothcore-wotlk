@@ -137,7 +137,7 @@ public:
                                         targetList.push_back((*itr)->getTarget());
                             }
 
-                            acore::Containers::RandomResizeList(targetList, 5);
+                            Acore::Containers::RandomResize(targetList, 5);
 
                             for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                                 DoCast(*itr, SPELL_DRAIN_MANA);
@@ -166,7 +166,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_moamAI(creature);
+        return GetRuinsOfAhnQirajAI<boss_moamAI>(creature);
     }
 };
 

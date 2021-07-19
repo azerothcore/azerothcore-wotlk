@@ -55,48 +55,8 @@ public:
             for (auto& i : HeiganEruption)
                 i.clear();
 
-            // GOs
-            _patchwerkGateGUID = 0;
-            _gluthGateGUID = 0;
-            _nothGateGUID = 0;
-            _heiganGateGUID = 0;
-            _heiganGateExitGUID = 0;
-            _loathebGateGUID = 0;
-            _anubGateGUID = 0;
-            _anubNextGateGUID = 0;
-            _faerlinaGateGUID = 0;
-            _maexxnaGateGUID = 0;
-            _thaddiusGateGUID = 0;
-            _horsemanGateGUID = 0;
-            _kelthuzadfloorGUID = 0;
-            _kelthuzadgateGUID = 0;
-            _kelthuzadportal1GUID = 0;
-            _kelthuzadportal2GUID = 0;
-            _kelthuzadportal3GUID = 0;
-            _kelthuzadportal4GUID = 0;
-            _sapphironGateGUID = 0;
-            _horsemanPortalGUID = 0;
-            _loathebPortalGUID = 0;
-            _maexxnaPortalGUID = 0;
-            _thaddiusPortalGUID = 0;
-            _deathknightEyePortalGUID = 0;
-            _plagueEyePortalGUID = 0;
-            _spiderEyePortalGUID = 0;
-            _abomEyePortalGUID = 0;
-
             // NPCs
             PatchwerkRoomTrash.clear();
-            _patchwerkGUID = 0;
-            _thaddiusGUID = 0;
-            _stalaggGUID = 0;
-            _feugenGUID = 0;
-            _zeliekGUID = 0;
-            _rivendareGUID = 0;
-            _blaumeuxGUID = 0;
-            _korthazzGUID = 0;
-            _sapphironGUID = 0;
-            _kelthuzadGUID = 0;
-            _lichkingGUID = 0;
 
             // Controls
             _horsemanKilled = 0;
@@ -120,50 +80,56 @@ public:
         std::set<GameObject*> HeiganEruption[4];
 
         // GOs
-        uint64 _patchwerkGateGUID;
-        uint64 _gluthGateGUID;
-        uint64 _nothGateGUID;
-        uint64 _heiganGateGUID;
-        uint64 _heiganGateExitGUID;
-        uint64 _loathebGateGUID;
-        uint64 _anubGateGUID;
-        uint64 _anubNextGateGUID;
-        uint64 _faerlinaGateGUID;
-        uint64 _maexxnaGateGUID;
-        uint64 _thaddiusGateGUID;
-        uint64 _gothikEnterGateGUID{};
-        uint64 _gothikInnerGateGUID{};
-        uint64 _gothikExitGateGUID{};
-        uint64 _horsemanGateGUID;
-        uint64 _kelthuzadfloorGUID;
-        uint64 _kelthuzadgateGUID;
-        uint64 _kelthuzadportal1GUID;
-        uint64 _kelthuzadportal2GUID;
-        uint64 _kelthuzadportal3GUID;
-        uint64 _kelthuzadportal4GUID;
-        uint64 _sapphironGateGUID;
-        uint64 _horsemanPortalGUID;
-        uint64 _loathebPortalGUID;
-        uint64 _maexxnaPortalGUID;
-        uint64 _thaddiusPortalGUID;
-        uint64 _deathknightEyePortalGUID;
-        uint64 _plagueEyePortalGUID;
-        uint64 _spiderEyePortalGUID;
-        uint64 _abomEyePortalGUID;
+        ObjectGuid _patchwerkGateGUID;
+        ObjectGuid _gluthGateGUID;
+        ObjectGuid _nothEntryGateGUID;
+        ObjectGuid _nothExitGateGUID;
+        ObjectGuid _heiganGateGUID;
+        ObjectGuid _heiganGateExitGUID;
+        ObjectGuid _loathebGateGUID;
+        ObjectGuid _anubGateGUID;
+        ObjectGuid _anubNextGateGUID;
+        ObjectGuid _faerlinaWebGUID;
+        ObjectGuid _faerlinaGateGUID;
+        ObjectGuid _maexxnaGateGUID;
+        ObjectGuid _thaddiusGateGUID;
+        ObjectGuid _gothikEnterGateGUID;
+        ObjectGuid _gothikInnerGateGUID;
+        ObjectGuid _gothikExitGateGUID{};
+        ObjectGuid _horsemanGateGUID;
+        ObjectGuid _kelthuzadFloorGUID;
+        ObjectGuid _kelthuzadGateGUID;
+        ObjectGuid _kelthuzadPortal1GUID;
+        ObjectGuid _kelthuzadPortal2GUID;
+        ObjectGuid _kelthuzadPortal3GUID;
+        ObjectGuid _kelthuzadPortal4GUID;
+        ObjectGuid _sapphironGateGUID;
+        ObjectGuid _horsemanPortalGUID;
+        ObjectGuid _loathebPortalGUID;
+        ObjectGuid _maexxnaPortalGUID;
+        ObjectGuid _thaddiusPortalGUID;
+        ObjectGuid _deathknightEyePortalGUID;
+        ObjectGuid _plagueEyePortalGUID;
+        ObjectGuid _spiderEyePortalGUID;
+        ObjectGuid _abomEyePortalGUID;
+        ObjectGuid _deathknightGlowEyePortalGUID;
+        ObjectGuid _plagueGlowEyePortalGUID;
+        ObjectGuid _spiderGlowEyePortalGUID;
+        ObjectGuid _abomGlowEyePortalGUID;
 
         // NPCs
-        std::list<uint64> PatchwerkRoomTrash;
-        uint64 _patchwerkGUID;
-        uint64 _thaddiusGUID;
-        uint64 _stalaggGUID;
-        uint64 _feugenGUID;
-        uint64 _zeliekGUID;
-        uint64 _rivendareGUID;
-        uint64 _blaumeuxGUID;
-        uint64 _korthazzGUID;
-        uint64 _sapphironGUID;
-        uint64 _kelthuzadGUID;
-        uint64 _lichkingGUID;
+        GuidList PatchwerkRoomTrash;
+        ObjectGuid _patchwerkGUID;
+        ObjectGuid _thaddiusGUID;
+        ObjectGuid _stalaggGUID;
+        ObjectGuid _feugenGUID;
+        ObjectGuid _zeliekGUID;
+        ObjectGuid _rivendareGUID;
+        ObjectGuid _blaumeuxGUID;
+        ObjectGuid _korthazzGUID;
+        ObjectGuid _sapphironGUID;
+        ObjectGuid _kelthuzadGUID;
+        ObjectGuid _lichkingGUID;
 
         // Controls
         uint8 _horsemanKilled;
@@ -293,14 +259,21 @@ public:
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case GO_NOTH_GATE:
-                    _nothGateGUID = pGo->GetGUID();
+                case GO_NOTH_ENTRY_GATE:
+                    _nothEntryGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_NOTH) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case GO_HEIGAN_ENTERANCE_GATE:
+                case GO_NOTH_EXIT_GATE:
+                    _nothExitGateGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_NOTH) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+                case GO_HEIGAN_ENTRY_GATE:
                     _heiganGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HEIGAN) == DONE || GetBossState(BOSS_NOTH) == DONE)
                     {
@@ -342,6 +315,13 @@ public:
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
+                case GO_FAERLINA_WEB:
+                    _faerlinaWebGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_FAERLINA) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
                 case GO_MAEXXNA_GATE:
                     _maexxnaGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_FAERLINA) == DONE)
@@ -369,7 +349,7 @@ public:
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case GO_HORSEMAN_GATE:
+                case GO_HORSEMEN_GATE:
                     _horsemanGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_GOTHIK) == DONE)
                     {
@@ -377,26 +357,26 @@ public:
                     }
                     break;
                 case GO_KELTHUZAD_FLOOR:
-                    _kelthuzadfloorGUID = pGo->GetGUID();
+                    _kelthuzadFloorGUID = pGo->GetGUID();
                     break;
                 case GO_KELTHUZAD_GATE:
-                    _kelthuzadgateGUID = pGo->GetGUID();
+                    _kelthuzadGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_SAPPHIRON) == DONE && _speakTimer == 0)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
                 case GO_KELTHUZAD_PORTAL_1:
-                    _kelthuzadportal1GUID = pGo->GetGUID();
+                    _kelthuzadPortal1GUID = pGo->GetGUID();
                     break;
                 case GO_KELTHUZAD_PORTAL_2:
-                    _kelthuzadportal2GUID = pGo->GetGUID();
+                    _kelthuzadPortal2GUID = pGo->GetGUID();
                     break;
                 case GO_KELTHUZAD_PORTAL_3:
-                    _kelthuzadportal3GUID = pGo->GetGUID();
+                    _kelthuzadPortal3GUID = pGo->GetGUID();
                     break;
                 case GO_KELTHUZAD_PORTAL_4:
-                    _kelthuzadportal4GUID = pGo->GetGUID();
+                    _kelthuzadPortal4GUID = pGo->GetGUID();
                     break;
                 case GO_SAPPHIRON_GATE:
                     _sapphironGateGUID = pGo->GetGUID();
@@ -405,34 +385,40 @@ public:
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case GO_DEATHKNIGHT_WING:
+                case GO_LOATHEB_PORTAL:
                     _loathebPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
                     {
-                        pGo->SetPhaseMask(1, true);
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_THADDIUS_PORTAL:
                     _thaddiusPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_THADDIUS) == DONE)
                     {
-                        pGo->SetPhaseMask(1, true);
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_MAEXXNA_PORTAL:
                     _maexxnaPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_MAEXXNA) == DONE)
                     {
-                        pGo->SetPhaseMask(1, true);
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_HORSEMAN_PORTAL:
                     _horsemanPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HORSEMAN) == DONE)
                     {
-                        pGo->SetPhaseMask(1, true);
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
+
+                // Glow portals at center-side
                 case GO_DEATHKNIGHT_EYE_PORTAL:
                     _deathknightEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HORSEMAN) == DONE)
@@ -456,6 +442,36 @@ public:
                     break;
                 case GO_ABOM_EYE_PORTAL:
                     _abomEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_THADDIUS) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+
+                // Glow portals at boss-side
+                case GO_MILI_EYE_RAMP_BOSS:
+                    _deathknightGlowEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_HORSEMAN) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+                case GO_PLAG_EYE_RAMP_BOSS:
+                    _plagueGlowEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_LOATHEB) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+                case GO_ARAC_EYE_RAMP_BOSS:
+                    _spiderGlowEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_MAEXXNA) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+                case GO_CONS_EYE_RAMP_BOSS:
+                    _abomGlowEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_THADDIUS) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
@@ -788,7 +804,7 @@ public:
                         }
                         break;
                     case BOSS_NOTH:
-                        if (GameObject* go = instance->GetGameObject(_nothGateGUID))
+                        if (GameObject* go = instance->GetGameObject(_nothExitGateGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
@@ -814,9 +830,14 @@ public:
                         }
                         if (GameObject* go = instance->GetGameObject(_loathebPortalGUID))
                         {
-                            go->SetPhaseMask(1, true);
+                            go->SetGoState(GO_STATE_ACTIVE);
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         }
                         if (GameObject* go = instance->GetGameObject(_plagueEyePortalGUID))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        if (GameObject* go = instance->GetGameObject(_plagueGlowEyePortalGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
@@ -849,9 +870,14 @@ public:
                         }
                         if (GameObject* go = instance->GetGameObject(_maexxnaPortalGUID))
                         {
-                            go->SetPhaseMask(1, true);
+                            go->SetGoState(GO_STATE_ACTIVE);
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         }
                         if (GameObject* go = instance->GetGameObject(_spiderEyePortalGUID))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        if (GameObject* go = instance->GetGameObject(_spiderGlowEyePortalGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
@@ -877,9 +903,14 @@ public:
                     case BOSS_THADDIUS:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
                         {
-                            go->SetPhaseMask(1, true);
+                            go->SetGoState(GO_STATE_ACTIVE);
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         }
                         if (GameObject* go = instance->GetGameObject(_abomEyePortalGUID))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        if (GameObject* go = instance->GetGameObject(_abomGlowEyePortalGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
@@ -888,9 +919,14 @@ public:
                     case BOSS_HORSEMAN:
                         if (GameObject* go = instance->GetGameObject(_horsemanPortalGUID))
                         {
-                            go->SetPhaseMask(1, true);
+                            go->SetGoState(GO_STATE_ACTIVE);
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         }
                         if (GameObject* go = instance->GetGameObject(_deathknightEyePortalGUID))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        if (GameObject* go = instance->GetGameObject(_deathknightGlowEyePortalGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
@@ -946,7 +982,7 @@ public:
                 {
                     kel->AI()->Talk(SAY_SAPP_DIALOG6);
                     _speakTimer = 0;
-                    if (GameObject* go = instance->GetGameObject(_kelthuzadgateGUID))
+                    if (GameObject* go = instance->GetGameObject(_kelthuzadGateGUID))
                     {
                         go->SetGoState(GO_STATE_ACTIVE);
                     }
@@ -993,7 +1029,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const override
+        ObjectGuid GetGuidData(uint32 id) const override
         {
             switch (id)
             {
@@ -1004,6 +1040,8 @@ public:
                     return _loathebGateGUID;
                 case DATA_ANUB_GATE:
                     return _anubGateGUID;
+                case DATA_FAERLINA_WEB:
+                    return _faerlinaWebGUID;
                 case DATA_MAEXXNA_GATE:
                     return _maexxnaGateGUID;
                 case DATA_GOTHIK_ENTER_GATE:
@@ -1012,18 +1050,24 @@ public:
                     return _gothikInnerGateGUID;
                 case DATA_GOTHIK_EXIT_GATE:
                     return _gothikExitGateGUID;
+                case DATA_HORSEMEN_GATE:
+                    return _horsemanGateGUID;
+                case DATA_THADDIUS_GATE:
+                    return _thaddiusGateGUID;
+                case DATA_NOTH_ENTRY_GATE:
+                    return _nothEntryGateGUID;
                 case DATA_KELTHUZAD_FLOOR:
-                    return _kelthuzadfloorGUID;
+                    return _kelthuzadFloorGUID;
                 case DATA_KELTHUZAD_GATE:
-                    return _kelthuzadgateGUID;
+                    return _kelthuzadGateGUID;
                 case DATA_KELTHUZAD_PORTAL_1:
-                    return _kelthuzadportal1GUID;
+                    return _kelthuzadPortal1GUID;
                 case DATA_KELTHUZAD_PORTAL_2:
-                    return _kelthuzadportal2GUID;
+                    return _kelthuzadPortal2GUID;
                 case DATA_KELTHUZAD_PORTAL_3:
-                    return _kelthuzadportal3GUID;
+                    return _kelthuzadPortal3GUID;
                 case DATA_KELTHUZAD_PORTAL_4:
-                    return _kelthuzadportal4GUID;
+                    return _kelthuzadPortal4GUID;
 
                 // NPCs
                 case DATA_THADDIUS_BOSS:
@@ -1034,10 +1078,11 @@ public:
                     return _feugenGUID;
                 case DATA_LICH_KING_BOSS:
                     return _lichkingGUID;
-
                 default:
-                    return 0;
+                    break;
             }
+
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override
@@ -1099,7 +1144,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_naxxramas_miscAI (pCreature);
+        return GetNaxxramasAI<boss_naxxramas_miscAI>(pCreature);
     }
 
     struct boss_naxxramas_miscAI : public NullCreatureAI
@@ -1130,10 +1175,20 @@ public:
                 timer += diff;
                 if (timer >= 5000)
                 {
-                    if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, *me, TEMPSUMMON_TIMED_DESPAWN, 9000))
+                    if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, 3128.59, -3118.81, 293.346, 4.76754, TEMPSUMMON_TIMED_DESPAWN, 15200))
                     {
                         cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + 50 * cos(me->GetOrientation()), me->GetPositionY() + 50 * sin(me->GetOrientation()), me->GetPositionZ(), false);
+                        cr->GetMotionMaster()->MovePoint(0, 3130.322, -3156.51, 293.324, false);
+                    }
+                    if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, *me, TEMPSUMMON_TIMED_DESPAWN, 14800))
+                    {
+                        cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                        cr->GetMotionMaster()->MovePoint(0, 3144.779, -3158.416, 293.324, false);
+                    }
+                    if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, 3175.42, -3134.86, 293.34, 4.284, TEMPSUMMON_TIMED_DESPAWN, 14800))
+                    {
+                        cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                        cr->GetMotionMaster()->MovePoint(0, 3158.778, -3164.201, 293.312, false);
                     }
                     timer = 0;
                 }
@@ -1141,9 +1196,9 @@ public:
             else if (me->GetEntry() == NPC_LIVING_POISON)
             {
                 Unit* target = nullptr;
-                acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
-                acore::UnitLastSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
-                me->VisitNearbyObject(1.5f, searcher);
+                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
+                Acore::UnitLastSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
+                Cell::VisitAllObjects(me, searcher, 1.5f);
                 if (target)
                 {
                     me->CastSpell(me, SPELL_FROGGER_EXPLODE, true);

@@ -70,7 +70,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 vanishTarget;
+        ObjectGuid vanishTarget;
         uint32 vanishDamage;
 
         void Reset() override
@@ -81,7 +81,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             vanishDamage = 0;
-            vanishTarget = 0;
+            vanishTarget.Clear();
 
             if (pInstance)
             {
@@ -105,7 +105,7 @@ public:
                 me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation(), true);
 
                 if (pInstance)
-                    pInstance->HandleGameObject(pInstance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
+                    pInstance->HandleGameObject(pInstance->GetGuidData(DATA_PRINCE_TALDARAM_PLATFORM), true);
             }
         }
 
@@ -126,7 +126,7 @@ public:
             events.Reset();
             events.ScheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
             events.ScheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
-            vanishTarget = 0;
+            vanishTarget.Clear();
             vanishDamage = 0;
         }
 
@@ -257,7 +257,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_taldaramAI(creature);
+        return GetAhnkahetAI<boss_taldaramAI>(creature);
     }
 };
 
@@ -281,8 +281,8 @@ public:
                 me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_FLAME_SPHERE_PERIODIC_H : SPELL_FLAME_SPHERE_PERIODIC, true);
 
                 float angle = rand_norm() * 2 * M_PI;
-                float x = me->GetPositionX() + DATA_SPHERE_DISTANCE * cos(angle);
-                float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * sin(angle);
+                float x = me->GetPositionX() + static_cast<float>(DATA_SPHERE_DISTANCE) * cos(angle);
+                float y = me->GetPositionY() + static_cast<float>(DATA_SPHERE_DISTANCE) * sin(angle);
                 me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
             }
         }
@@ -319,7 +319,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_taldaram_flamesphereAI(creature);
+        return GetAhnkahetAI<npc_taldaram_flamesphereAI>(creature);
     }
 };
 
@@ -334,7 +334,7 @@ public:
         if (!pInstance)
             return false;
 
-        Creature* pPrinceTaldaram = ObjectAccessor::GetCreature(*go, pInstance->GetData64(DATA_PRINCE_TALDARAM));
+        Creature* pPrinceTaldaram = ObjectAccessor::GetCreature(*go, pInstance->GetGuidData(DATA_PRINCE_TALDARAM));
         if (pPrinceTaldaram && pPrinceTaldaram->IsAlive())
         {
             go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);

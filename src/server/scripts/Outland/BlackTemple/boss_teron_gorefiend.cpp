@@ -49,7 +49,7 @@ enum Misc
     EVENT_TALK_KILL                 = 10
 };
 
-struct ShadowOfDeathSelector : public acore::unary_function<Unit*, bool>
+struct ShadowOfDeathSelector : public Acore::unary_function<Unit*, bool>
 {
     bool operator()(Unit const* target) const
     {
@@ -64,7 +64,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_teron_gorefiendAI>(creature);
+        return GetBlackTempleAI<boss_teron_gorefiendAI>(creature);
     }
 
     struct boss_teron_gorefiendAI : public BossAI

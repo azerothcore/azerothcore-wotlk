@@ -36,7 +36,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_mekgineer_steamriggerAI (creature);
+        return GetSteamVaultAI<boss_mekgineer_steamriggerAI>(creature);
     }
 
     struct boss_mekgineer_steamriggerAI : public ScriptedAI
@@ -147,7 +147,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_steamrigger_mechanicAI (creature);
+        return GetSteamVaultAI<npc_steamrigger_mechanicAI>(creature);
     }
 
     struct npc_steamrigger_mechanicAI : public ScriptedAI
@@ -157,14 +157,14 @@ public:
         }
 
         uint32 repairTimer;
-        uint64 bossGUID;
+        ObjectGuid bossGUID;
 
         void Reset() override
         {
             repairTimer = 0;
-            bossGUID = 0;
+            bossGUID.Clear();
             if (InstanceScript* instance = me->GetInstanceScript())
-                bossGUID = instance->GetData64(TYPE_MEKGINEER_STEAMRIGGER);
+                bossGUID = instance->GetGuidData(TYPE_MEKGINEER_STEAMRIGGER);
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override {}

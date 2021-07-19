@@ -166,7 +166,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_saviana_ragefireAI>(creature);
+        return GetRubySanctumAI<boss_saviana_ragefireAI>(creature);
     }
 };
 

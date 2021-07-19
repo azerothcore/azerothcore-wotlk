@@ -240,7 +240,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_grand_warlock_nethekurseAI>(creature);
+        return GetShatteredHallsAI<boss_grand_warlock_nethekurseAI>(creature);
     }
 };
 
@@ -291,7 +291,7 @@ public:
                             playerList.push_back(player);
 
                 if (!playerList.empty())
-                    target = acore::Containers::SelectRandomContainerElement(playerList);
+                    target = Acore::Containers::SelectRandomContainerElement(playerList);
             }
         }
 

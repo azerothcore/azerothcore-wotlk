@@ -10,13 +10,8 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-# Require a min version Cmake
-cmake_minimum_required(VERSION 3.8...3.19)
-
-# Fallback for using newer policies on CMake <3.12.
-if(${CMAKE_VERSION} VERSION_LESS 3.12)
-    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-endif()
+# Require version Cmake
+cmake_minimum_required(VERSION 3.16...3.21)
 
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
@@ -40,14 +35,15 @@ set(AC_PATH_ROOT "${CMAKE_SOURCE_DIR}")
 
 # set macro-directory
 list(APPEND CMAKE_MODULE_PATH
-        "${CMAKE_SOURCE_DIR}/src/cmake/macros"
-        "${CMAKE_SOURCE_DIR}/deps/cotire/CMake")
+        "${CMAKE_SOURCE_DIR}/src/cmake/macros")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
+include(ConfigureScripts)
+include(ConfigureModules)
 
 # some utils for cmake
-include(deps/drassil/cmake-utils/utils.cmake)
+include(deps/acore/cmake-utils/utils.cmake)
 
 include(src/cmake/ac_macros.cmake)
 
@@ -75,7 +71,6 @@ FOREACH(subdir ${sub_DIRS})
 
     STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
     if(EXISTS "${subdir}/CMakeLists.txt")
-        message("Loading module: ${subdir_rel}")
         add_subdirectory("${subdir_rel}")
     endif()
 ENDFOREACH()
@@ -105,10 +100,6 @@ CU_RUN_HOOK("AFTER_LOAD_CMAKE_MODULES")
 set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
-find_package(ACE REQUIRED)
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    add_definitions(-DACE_LACKS_AUTO_PTR=1)
-endif()
 find_package(MySQL REQUIRED)
 
 if(UNIX AND WITH_PERFTOOLS)

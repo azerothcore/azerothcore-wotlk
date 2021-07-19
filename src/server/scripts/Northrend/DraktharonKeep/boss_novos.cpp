@@ -77,7 +77,10 @@ public:
             BossAI::Reset();
             instance->SetBossState(DATA_NOVOS_CRYSTALS, IN_PROGRESS);
             instance->SetBossState(DATA_NOVOS_CRYSTALS, NOT_STARTED);
-            _crystalCounter = _summonTargetRightGUID = _summonTargetLeftGUID = _stage = 0;
+            _crystalCounter = 0;
+            _summonTargetRightGUID.Clear();
+            _summonTargetLeftGUID.Clear();
+            _stage = 0;
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -133,7 +136,7 @@ public:
                     }
             }
 
-            me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+            me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
             me->RemoveAllAuras();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -240,15 +243,15 @@ public:
     private:
         uint8 _crystalCounter;
         uint8 _stage;
-        uint64 _summonTargetRightGUID;
-        uint64 _summonTargetLeftGUID;
+        ObjectGuid _summonTargetRightGUID;
+        ObjectGuid _summonTargetLeftGUID;
 
         bool _achievement;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_novosAI>(creature);
+        return GetDraktharonKeepAI<boss_novosAI>(creature);
     }
 };
 
@@ -339,7 +342,7 @@ class achievement_oh_novos : public AchievementCriteriaScript
 public:
     achievement_oh_novos() : AchievementCriteriaScript("achievement_oh_novos") { }
 
-    bool OnCheck(Player* /*player*/, Unit* target) override
+    bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetAI()->GetData(target->GetEntry());
     }

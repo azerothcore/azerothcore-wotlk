@@ -32,7 +32,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_blackheart_the_inciterAI (creature);
+        return GetShadowLabyrinthAI<boss_blackheart_the_inciterAI>(creature);
     }
 
     struct boss_blackheart_the_inciterAI : public ScriptedAI

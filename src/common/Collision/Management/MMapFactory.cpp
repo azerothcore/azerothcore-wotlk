@@ -5,7 +5,7 @@
  */
 
 #include "MMapFactory.h"
-#include "World.h"
+#include <cstring>
 #include <set>
 
 namespace MMAP
@@ -18,15 +18,11 @@ namespace MMAP
     MMapManager* MMapFactory::createOrGetMMapManager()
     {
         if (g_MMapManager == nullptr)
+        {
             g_MMapManager = new MMapManager();
+        }
 
         return g_MMapManager;
-    }
-
-    bool MMapFactory::IsPathfindingEnabled(const Map* map)
-    {
-        if (!map) return false;
-        return !forbiddenMaps[map->GetId()] && (sWorld->getBoolConfig(CONFIG_ENABLE_MMAPS) ? true : map->IsBattlegroundOrArena());
     }
 
     void MMapFactory::InitializeDisabledMaps()
@@ -35,7 +31,9 @@ namespace MMAP
         int32 f[] = {616 /*EoE*/, 649 /*ToC25*/, 650 /*ToC5*/, -1};
         uint32 i = 0;
         while (f[i] >= 0)
+        {
             forbiddenMaps[f[i++]] = true;
+        }
     }
 
     void MMapFactory::clear()

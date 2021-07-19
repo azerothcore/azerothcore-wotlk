@@ -191,7 +191,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_eadricAI(pCreature);
+        return GetTrialOfTheChampionAI<boss_eadricAI>(pCreature);
     }
 };
 
@@ -210,7 +210,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         bool summoned;
-        uint64 MemoryGUID;
+        ObjectGuid MemoryGUID;
 
         void Reset() override
         {
@@ -220,7 +220,7 @@ public:
             {
                 if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     memory->DespawnOrUnsummon();
-                MemoryGUID = 0;
+                MemoryGUID.Clear();
             }
             me->SetReactState(REACT_PASSIVE);
             if( pInstance )
@@ -259,7 +259,7 @@ public:
         {
             if( param == 1 )
             {
-                MemoryGUID = 0;
+                MemoryGUID.Clear();
                 me->RemoveAura(SPELL_SHIELD);
                 Talk(TEXT_PALETRESS_MEMORY_DEFEATED);
             }
@@ -269,7 +269,7 @@ public:
                     if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     {
                         memory->DespawnOrUnsummon();
-                        MemoryGUID = 0;
+                        MemoryGUID.Clear();
                     }
             }
         }
@@ -374,7 +374,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_paletressAI(pCreature);
+        return GetTrialOfTheChampionAI<boss_paletressAI>(pCreature);
     }
 };
 
@@ -403,7 +403,7 @@ public:
         {
             me->DespawnOrUnsummon(20000);
             if( pInstance )
-                if( Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_PALETRESS)) )
+                if( Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_PALETRESS)) )
                     paletress->AI()->DoAction(1);
         }
 
@@ -459,7 +459,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_memoryAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_memoryAI>(pCreature);
     }
 };
 
@@ -598,7 +598,7 @@ public:
                     break;
             }
 
-            Start(false, true, 0);
+            Start(false, true);
             uiWaypoint = uiType;
         }
 
@@ -721,7 +721,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_argent_soldierAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_argent_soldierAI>(pCreature);
     }
 };
 

@@ -12,7 +12,7 @@
 #include "Chat.h"
 #include "CliRunnable.h"
 #include "Common.h"
-#include "Configuration/Config.h"
+#include "Config.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
@@ -21,6 +21,13 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldSession.h"
+
+static constexpr char CLI_PREFIX[] = "AC> ";
+
+static inline void PrintCliPrefix()
+{
+    printf("%s", CLI_PREFIX);
+}
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
 #include <readline/readline.h>
@@ -97,7 +104,7 @@ void utf8print(void* /*arg*/, const char* str)
 
 void commandFinished(void*, bool /*success*/)
 {
-    printf("AC> ");
+    PrintCliPrefix();
     fflush(stdout);
 }
 
@@ -117,7 +124,7 @@ int kb_hit_return()
 #endif
 
 /// %Thread start
-void CliRunnable::run()
+void CliThread()
 {
     ///- Display the list of available CLI functions then beep
     //TC_LOG_INFO("server.worldserver", "");
@@ -131,7 +138,7 @@ void CliRunnable::run()
 
     // print this here the first time
     // later it will be printed after command queue updates
-    printf("AC>");
+    PrintCliPrefix();
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
@@ -144,7 +151,7 @@ void CliRunnable::run()
         char commandbuf[256];
         command_str = fgets(commandbuf, sizeof(commandbuf), stdin);
 #else
-        command_str = readline("AC>");
+        command_str = readline(CLI_PREFIX);
         rl_bind_key('\t', rl_complete);
 #endif
 
@@ -160,7 +167,7 @@ void CliRunnable::run()
             if (!*command_str)
             {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-                printf("AC>");
+                PrintCliPrefix();
 #else
                 free(command_str);
 #endif
@@ -171,7 +178,7 @@ void CliRunnable::run()
             if (!consoleToUtf8(command_str, command))         // convert from console encoding to utf8
             {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-                printf("AC>");
+                PrintCliPrefix();
 #else
                 free(command_str);
 #endif

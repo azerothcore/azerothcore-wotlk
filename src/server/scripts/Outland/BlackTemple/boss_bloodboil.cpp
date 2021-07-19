@@ -65,7 +65,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_gurtogg_bloodboilAI>(creature);
+        return GetBlackTempleAI<boss_gurtogg_bloodboilAI>(creature);
     }
 
     struct boss_gurtogg_bloodboilAI : public BossAI
@@ -199,7 +199,7 @@ public:
             if (targets.empty())
                 return;
 
-            targets.sort(acore::ObjectDistanceOrderPred(GetCaster(), false));
+            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster(), false));
             if (targets.size() > GetSpellValue()->MaxAffectedTargets)
             {
                 std::list<WorldObject*>::iterator itr = targets.begin();

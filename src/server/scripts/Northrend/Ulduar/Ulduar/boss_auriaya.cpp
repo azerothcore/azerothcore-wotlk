@@ -95,7 +95,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_auriayaAI (pCreature);
+        return GetUlduarAI<boss_auriayaAI>(pCreature);
     }
 
     struct boss_auriayaAI : public ScriptedAI
@@ -278,7 +278,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_auriaya_sanctum_sentryAI (pCreature);
+        return GetUlduarAI<npc_auriaya_sanctum_sentryAI>(pCreature);
     }
 
     struct npc_auriaya_sanctum_sentryAI : public ScriptedAI
@@ -291,7 +291,7 @@ public:
         void EnterCombat(Unit*) override
         {
             if (me->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_AURIAYA)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_AURIAYA)))
                     cr->SetInCombatWithZone();
         }
 
@@ -340,7 +340,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_auriaya_feral_defenderAI (pCreature);
+        return GetUlduarAI<npc_auriaya_feral_defenderAI>(pCreature);
     }
 
     struct npc_auriaya_feral_defenderAI : public ScriptedAI
@@ -367,7 +367,7 @@ public:
         {
             // inform about our death, start timer
             if (me->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_AURIAYA)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_AURIAYA)))
                     cr->AI()->DoAction(_feralEssenceStack ? ACTION_FERAL_DEATH_WITH_STACK : ACTION_FERAL_DEATH);
 
             if (_feralEssenceStack)
@@ -460,11 +460,11 @@ class achievement_auriaya_crazy_cat_lady : public AchievementCriteriaScript
 public:
     achievement_auriaya_crazy_cat_lady() : AchievementCriteriaScript("achievement_auriaya_crazy_cat_lady") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_AURIAYA)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_AURIAYA)))
                     return cr->AI()->GetData(DATA_CRAZY_CAT);
 
         return false;
@@ -476,11 +476,11 @@ class achievement_auriaya_nine_lives : public AchievementCriteriaScript
 public:
     achievement_auriaya_nine_lives() : AchievementCriteriaScript("achievement_auriaya_nine_lives") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_AURIAYA)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_AURIAYA)))
                     return cr->AI()->GetData(DATA_NINE_LIVES);
 
         return false;

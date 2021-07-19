@@ -36,7 +36,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kriAI>(creature);
+        return GetTempleOfAhnQirajAI<boss_kriAI>(creature);
     }
 
     struct boss_kriAI : public ScriptedAI
@@ -131,7 +131,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_vemAI>(creature);
+        return GetTempleOfAhnQirajAI<boss_vemAI>(creature);
     }
 
     struct boss_vemAI : public ScriptedAI
@@ -222,7 +222,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_yaujAI>(creature);
+        return GetTempleOfAhnQirajAI<boss_yaujAI>(creature);
     }
 
     struct boss_yaujAI : public ScriptedAI
@@ -290,11 +290,11 @@ public:
                 switch (urand(0, 2))
                 {
                     case 0:
-                        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KRI)))
+                        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KRI)))
                             DoCast(kri, SPELL_HEAL);
                         break;
                     case 1:
-                        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VEM)))
+                        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VEM)))
                             DoCast(vem, SPELL_HEAL);
                         break;
                     case 2:

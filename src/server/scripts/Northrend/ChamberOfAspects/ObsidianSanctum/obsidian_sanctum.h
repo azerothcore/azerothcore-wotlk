@@ -2,10 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "CreatureAIImpl.h"
-
 #ifndef DEF_OBSIDIAN_SANCTUM_H
 #define DEF_OBSIDIAN_SANCTUM_H
+
+#include "CreatureAIImpl.h"
+
+#define ObsidianSanctumScriptName "instance_obsidian_sanctum"
 
 enum Data : uint32
 {
@@ -42,4 +44,11 @@ enum OSActions
     ACTION_CLEAR_PORTAL               = -1,
     ACTION_ADD_PORTAL                 = -2,
 };
+
+template <class AI, class T>
+inline AI* GetObsidianSanctumAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, ObsidianSanctumScriptName);
+}
+
 #endif

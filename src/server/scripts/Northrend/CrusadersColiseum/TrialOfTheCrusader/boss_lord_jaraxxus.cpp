@@ -83,7 +83,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_jaraxxusAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_jaraxxusAI>(pCreature);
     }
 
     struct boss_jaraxxusAI : public ScriptedAI
@@ -286,7 +286,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_fel_infernalAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_fel_infernalAI>(pCreature);
     }
 
     struct npc_fel_infernalAI : public ScriptedAI
@@ -356,7 +356,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_mistress_of_painAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_mistress_of_painAI>(pCreature);
     }
 
     struct npc_mistress_of_painAI : public ScriptedAI
@@ -474,12 +474,12 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             // get a list of players with mana
-            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(acore::PowerCheck(POWER_MANA, false));
+            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
             if (targets.empty())
                 return;
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }

@@ -173,7 +173,7 @@ public:
                 events.Reset();
                 events2.ScheduleEvent(EVENT_TALK_GOOD_1, 1000);
                 ClearPlayerAuras();
-                if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_SATHROVARR)))
+                if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
                 {
                     Sath->RemoveAllAuras();
                     Sath->GetMotionMaster()->MovementExpired();
@@ -232,7 +232,7 @@ public:
                     events2.ScheduleEvent(EVENT_TALK_GOOD_2, 1000);
                     break;
                 case EVENT_TALK_GOOD_2:
-                    if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_SATHROVARR)))
+                    if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
                     {
                         summons.Despawn(Sath);
                         Unit::Kill(me, Sath);
@@ -318,7 +318,7 @@ public:
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(10))
                     {
-                        if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_SATHROVARR)))
+                        if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
                             Sath->AI()->DoAction(ACTION_ENRAGE_OTHER);
                         DoAction(ACTION_ENRAGE);
                         break;
@@ -341,7 +341,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kalecgosAI>(creature);
+        return GetSunwellPlateauAI<boss_kalecgosAI>(creature);
     }
 };
 
@@ -362,7 +362,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kalecAI>(creature);
+        return GetSunwellPlateauAI<boss_kalecAI>(creature);
     }
 
     struct boss_kalecAI : public ScriptedAI
@@ -408,7 +408,7 @@ public:
         void JustDied(Unit*) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS)))
+                if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
                     kalecgos->AI()->DoAction(ACTION_KALEC_DIED);
         }
 
@@ -479,7 +479,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_sathrovarrAI>(creature);
+        return GetSunwellPlateauAI<boss_sathrovarrAI>(creature);
     }
 
     struct boss_sathrovarrAI : public ScriptedAI
@@ -576,9 +576,14 @@ public:
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(10))
                     {
-                        if (InstanceScript* instance = me->GetInstanceScript())
-                            if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS)))
+                        if (InstanceScript* instanceScript = me->GetInstanceScript())
+                        {
+                            if (Creature *kalecgos = ObjectAccessor::GetCreature(*me, instanceScript->GetGuidData(
+                                    NPC_KALECGOS)))
+                            {
                                 kalecgos->AI()->DoAction(ACTION_ENRAGE_OTHER);
+                            }
+                        }
                         DoAction(ACTION_ENRAGE);
                         break;
                     }
@@ -587,7 +592,7 @@ public:
                 case EVENT_CHECK_HEALTH2:
                     if (me->HealthBelowPct(1))
                     {
-                        if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS)))
+                        if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
                             kalecgos->AI()->DoAction(ACTION_SATH_BANISH);
                         DoAction(ACTION_BANISH);
                         break;
@@ -626,7 +631,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(SpectralBlastCheck(GetCaster()->GetVictim()));
-            acore::Containers::RandomResizeList(targets, 1);
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void HandleDummy(SpellEffIndex effIndex)

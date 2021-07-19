@@ -8,10 +8,10 @@
 #define _SIGNAL_HANDLER_H_
 
 #include <csignal>
-#include <unordered_set>
 #include <mutex>
+#include <unordered_set>
 
-namespace acore
+namespace Acore
 {
     /// Handle termination signals
     class SignalHandler
@@ -26,7 +26,9 @@ namespace acore
             std::lock_guard lock(_mutex);
 
             if (_handled.find(sig) != _handled.end())
+            {
                 return false;
+            }
 
             _handled.insert(sig);
             signal(sig, func);
@@ -36,7 +38,9 @@ namespace acore
         ~SignalHandler()
         {
             for (auto const& sig : _handled)
+            {
                 signal(sig, nullptr);
+            }
         }
     };
 }

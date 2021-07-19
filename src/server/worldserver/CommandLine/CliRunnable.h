@@ -12,11 +12,7 @@
 #define __CLIRUNNABLE_H
 
 /// Command Line Interface handling thread
-class CliRunnable : public acore::Runnable
-{
-public:
-    void run() override;
-};
+void CliThread();
 
 #endif
 

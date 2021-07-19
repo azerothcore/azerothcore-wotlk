@@ -13,7 +13,6 @@ EndScriptData */
 
 #include "Chat.h"
 #include "Language.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -94,12 +93,12 @@ public:
         {
             do
             {
-                Field* fields   = result->Fetch();
-                uint32 guid     = fields[0].GetUInt32();
-                float x         = fields[1].GetFloat();
-                float y         = fields[2].GetFloat();
-                float z         = fields[3].GetFloat();
-                uint16 mapId    = fields[4].GetUInt16();
+                Field* fields               = result->Fetch();
+                ObjectGuid::LowType guid    = fields[0].GetUInt32();
+                float x                     = fields[1].GetFloat();
+                float y                     = fields[2].GetFloat();
+                float z                     = fields[3].GetFloat();
+                uint16 mapId                = fields[4].GetUInt16();
 
                 if (handler->GetSession())
                     handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, cInfo->Name.c_str(), x, y, z, mapId);
@@ -149,7 +148,7 @@ public:
         // inventory case
         uint32 inventoryCount = 0;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_COUNT_ITEM);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_COUNT_ITEM);
         stmt->setUInt32(0, itemId);
         result = CharacterDatabase.Query(stmt);
 
@@ -378,13 +377,13 @@ public:
         {
             do
             {
-                Field* fields   = result->Fetch();
-                uint32 guid     = fields[0].GetUInt32();
-                float x         = fields[1].GetFloat();
-                float y         = fields[2].GetFloat();
-                float z         = fields[3].GetFloat();
-                uint16 mapId    = fields[4].GetUInt16();
-                uint32 entry    = fields[5].GetUInt32();
+                Field* fields               = result->Fetch();
+                ObjectGuid::LowType guid    = fields[0].GetUInt32();
+                float x                     = fields[1].GetFloat();
+                float y                     = fields[2].GetFloat();
+                float z                     = fields[3].GetFloat();
+                uint16 mapId                = fields[4].GetUInt16();
+                uint32 entry                = fields[5].GetUInt32();
 
                 if (handler->GetSession())
                     handler->PSendSysMessage(LANG_GO_LIST_CHAT, guid, entry, guid, gInfo->name.c_str(), x, y, z, mapId);
@@ -427,8 +426,8 @@ public:
             handler->PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, aura->GetId(), (handler->GetSession() ? ss_name.str().c_str() : name),
                                      aurApp->GetEffectMask(), aura->GetCharges(), aura->GetStackAmount(), aurApp->GetSlot(),
                                      aura->GetDuration(), aura->GetMaxDuration(), (aura->IsPassive() ? passiveStr : ""),
-                                     (talent ? talentStr : ""), IS_PLAYER_GUID(aura->GetCasterGUID()) ? "player" : "creature",
-                                     GUID_LOPART(aura->GetCasterGUID()));
+                                     (talent ? talentStr : ""), aura->GetCasterGUID().IsPlayer() ? "player" : "creature",
+                                     aura->GetCasterGUID().GetCounter());
         }
 
         if (!args || std::string(args) != "all")

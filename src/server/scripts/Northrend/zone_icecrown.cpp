@@ -105,20 +105,19 @@ public:
     {
         npc_battle_at_valhalasAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
-            playerGUID2 = 0;
         }
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
-        uint64 playerGUID2;
+        ObjectGuid playerGUID;
+        ObjectGuid playerGUID2;
         uint32 currentQuest;
 
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
             currentQuest = 0;
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
@@ -161,7 +160,7 @@ public:
             }
         }
 
-        void StartBattle(uint64 guid, uint32 questId)
+        void StartBattle(ObjectGuid guid, uint32 questId)
         {
             events.ScheduleEvent(EVENT_VALHALAS_FIRST, 6000);
             events.ScheduleEvent(EVENT_VALHALAS_CHECK_PLAYER, 30000);
@@ -172,8 +171,8 @@ public:
         void CheckSummons()
         {
             bool allow = true;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
+            for (ObjectGuid const& guid : summons)
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     if (cr->IsAlive())
                         allow = false;
 
@@ -448,13 +447,13 @@ public:
         npc_lord_areteAI(Creature* creature) : ScriptedAI(creature) {}
 
         EventMap events;
-        uint64 _landgrenGUID;
-        uint64 _landgrenSoulGUID;
+        ObjectGuid _landgrenGUID;
+        ObjectGuid _landgrenSoulGUID;
 
         void InitializeAI() override
         {
-            _landgrenGUID = 0;
-            _landgrenSoulGUID = 0;
+            _landgrenGUID.Clear();
+            _landgrenSoulGUID.Clear();
 
             events.Reset();
             events.RescheduleEvent(EVENT_START, 1000);
@@ -1413,6 +1412,36 @@ public:
     }
 };
 
+class spell_onslaught_or_call_bone_gryphon : public SpellScriptLoader
+{
+public:
+    spell_onslaught_or_call_bone_gryphon() : SpellScriptLoader("spell_onslaught_or_call_bone_gryphon") { }
+
+    class spell_onslaught_or_call_bone_gryphon_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_onslaught_or_call_bone_gryphon_SpellScript);
+
+        void ChangeSummonPos(SpellEffIndex /*effIndex*/)
+        {
+            WorldLocation summonPos = *GetExplTargetDest();
+            Position offset = { 0.0f, 0.0f, 3.0f, 0.0f };
+            summonPos.RelocateOffset(offset);
+            SetExplTargetDest(summonPos);
+            GetHitDest()->RelocateOffset(offset);
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_onslaught_or_call_bone_gryphon_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_onslaught_or_call_bone_gryphon_SpellScript();
+    }
+};
+
 // Theirs
 /*######
 ## npc_guardian_pavilion
@@ -1731,10 +1760,10 @@ public:
 
         SummonList Summons;
 
-        uint64 guidDalfors;
-        uint64 guidPriest[3];
-        uint64 guidMason[3];
-        uint64 guidHalof;
+        ObjectGuid guidDalfors;
+        ObjectGuid guidPriest[3];
+        ObjectGuid guidMason[3];
+        ObjectGuid guidHalof;
 
         void Reset() override
         {
@@ -2099,6 +2128,7 @@ void AddSC_icecrown()
     new spell_fight_fire_bomber();
     new spell_anti_air_rocket_bomber();
     new npc_infra_green_bomber_generic();
+    new spell_onslaught_or_call_bone_gryphon();
 
     // Theirs
     new npc_guardian_pavilion();
