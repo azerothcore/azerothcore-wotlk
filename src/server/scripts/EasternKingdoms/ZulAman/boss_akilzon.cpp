@@ -46,14 +46,15 @@ enum Says
     SAY_DEATH                   = 5
 };
 
-enum Misc
-{
-    NPC_SOARING_EAGLE           = 24858,
-    SE_LOC_X_MAX                = 400,
-    SE_LOC_X_MIN                = 335,
-    SE_LOC_Y_MAX                = 1435,
-    SE_LOC_Y_MIN                = 1370
-};
+constexpr auto NPC_SOARING_EAGLE = 24858;
+
+//enum Misc
+//{
+//    SE_LOC_X_MAX                = 400,
+//    SE_LOC_X_MIN                = 335,
+//    SE_LOC_Y_MAX                = 1435,
+//    SE_LOC_Y_MIN                = 1370
+//};
 
 enum Events
 {
