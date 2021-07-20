@@ -20,7 +20,6 @@ EndContentData */
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
-#include "WorldSession.h"
 
 /*######
 ## npc_ranger_lilatha
