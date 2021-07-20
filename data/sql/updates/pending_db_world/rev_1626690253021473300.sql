@@ -17,12 +17,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2659, 0, 1, 0, 0, 0, 100, 0, 5000, 6000, 10000, 10000, 0, 11, 11019, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Razorbeak Gryphon - In Combat - Cast \'Wing Flap\' Every 10 seconds');
 
 -- Added movement for Razorbeak Gryphon
-DELETE FROM `creature` WHERE (`id` = 2658) AND (`guid` IN (93550));
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(93550, 2658, 0, 0, 0, 1, 1, 935, 0, 138.441, -3310.63, 115.738, 1.23146, 350, 5, 0, 2059, 0, 1, 0, 0, 0, '', 0);
+
+UPDATE `creature` SET `wander_distance` = 5, `MovementType` = 1 WHERE `guid` = 93550; 
 
 -- Added movement for Razorbeak Skylord
-DELETE FROM `creature` WHERE (`id` = 2659) AND (`guid` IN (93612, 93615));
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(93612, 2659, 0, 0, 0, 1, 1, 1148, 0, 133.356, -4032.63, 127.874, 3.52646, 350, 5, 0, 2399, 0, 1, 0, 0, 0, '', 0),
-(93615, 2659, 0, 0, 0, 1, 1, 1148, 0, 200.395, -3662.88, 133.817, 3.43305, 350, 10, 0, 2399, 0, 1, 0, 0, 0, '', 0);
+
+UPDATE `creature` SET `wander_distance` = 5, `MovementType` = 1 WHERE `guid` = 93612; 
+UPDATE `creature` SET `wander_distance` = 10, `MovementType` = 1 WHERE `guid` = 93615;
+
