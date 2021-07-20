@@ -115,6 +115,11 @@ public:
 
         void Reset() override
         {
+            ResetData();
+        }
+
+        void ResetData()
+        {
             events.Reset();
             summons.DespawnAll();
             playerGUID.Clear();
@@ -216,7 +221,7 @@ public:
                 {
                     if (!player->HasQuest(quest))
                     {
-                        Reset();
+                        ResetData();
                         return;
                     }
                 }
@@ -322,7 +327,7 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI());
-        vAI->Reset();
+        vAI->ResetData();
 
         creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         if (vAI)
