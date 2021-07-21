@@ -49,9 +49,10 @@ target_include_directories(common
     ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(common
-  PUBLIC
+  PRIVATE
     acore-core-interface
-    ace
+  PUBLIC
+    boost
     argon2
     g3dlib
     Detour
@@ -60,6 +61,7 @@ target_link_libraries(common
     openssl
     threads
     jemalloc
+    stdfs
     fmt)
 
 set_target_properties(common

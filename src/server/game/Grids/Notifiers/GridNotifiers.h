@@ -23,7 +23,7 @@
 class Player;
 //class Map;
 
-namespace acore
+namespace Acore
 {
     struct VisibleNotifier
     {
@@ -1060,7 +1060,7 @@ namespace acore
         }
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, true, false))
                 return false;
 
             if (!me->IsValidAttackTarget(u))
@@ -1086,7 +1086,7 @@ namespace acore
         explicit NearestHostileUnitInAttackDistanceCheck(Creature const* creature, float dist) : me(creature), m_range(dist) {}
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, true, false))
                 return false;
 
             if (!me->CanStartAttack(u))

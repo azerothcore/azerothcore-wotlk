@@ -15,29 +15,29 @@ struct B32Impl
     static constexpr char Encode(uint8 v)
     {
         ASSERT(v < 0x20);
-        if (v < 26) return 'A'+v;
-        else        return '2' + (v-26);
+        if (v < 26) { return 'A' + v; }
+        else { return '2' + (v - 26); }
     }
 
     static constexpr uint8 DECODE_ERROR = 0xff;
     static constexpr uint8 Decode(uint8 v)
     {
-        if (v == '0') return Decode('O');
-        if (v == '1') return Decode('l');
-        if (v == '8') return Decode('B');
-        if (('A' <= v) && (v <= 'Z')) return (v-'A');
-        if (('a' <= v) && (v <= 'z')) return (v-'a');
-        if (('2' <= v) && (v <= '7')) return (v-'2')+26;
+        if (v == '0') { return Decode('O'); }
+        if (v == '1') { return Decode('l'); }
+        if (v == '8') { return Decode('B'); }
+        if (('A' <= v) && (v <= 'Z')) { return (v - 'A'); }
+        if (('a' <= v) && (v <= 'z')) { return (v - 'a'); }
+        if (('2' <= v) && (v <= '7')) { return (v - '2') + 26; }
         return DECODE_ERROR;
     }
 };
 
-/*static*/ std::string acore::Encoding::Base32::Encode(std::vector<uint8> const& data)
+/*static*/ std::string Acore::Encoding::Base32::Encode(std::vector<uint8> const& data)
 {
-    return acore::Impl::GenericBaseEncoding<B32Impl>::Encode(data);
+    return Acore::Impl::GenericBaseEncoding<B32Impl>::Encode(data);
 }
 
-/*static*/ Optional<std::vector<uint8>> acore::Encoding::Base32::Decode(std::string const& data)
+/*static*/ Optional<std::vector<uint8>> Acore::Encoding::Base32::Decode(std::string const& data)
 {
-    return acore::Impl::GenericBaseEncoding<B32Impl>::Decode(data);
+    return Acore::Impl::GenericBaseEncoding<B32Impl>::Decode(data);
 }
