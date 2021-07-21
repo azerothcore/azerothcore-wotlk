@@ -69,3 +69,4 @@ UPDATE `gameobject` SET `spawntimesecs` = @RESPAWN WHERE `guid` IN (SELECT `guid
 
 -- Drop temp table
 DROP TABLE TEMP_POOL_ENTRIES;
+
