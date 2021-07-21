@@ -12616,7 +12616,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
         // LootItem is being removed (looted) from the container, delete it from the DB.
         if (loot->containerGUID)
-            sLootItemStorage->RemoveStoredLootItem(loot->containerGUID, item->itemid, item->count, loot);
+            sLootItemStorage->RemoveStoredLootItem(loot->containerGUID, item->itemid, item->count, loot, item->itemIndex);
 
 #ifdef ELUNA
         sEluna->OnLootItem(this, newitem, item->count, this->GetLootGUID());
