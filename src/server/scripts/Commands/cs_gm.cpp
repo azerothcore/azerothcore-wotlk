@@ -17,6 +17,7 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "World.h"
 
@@ -88,9 +89,15 @@ public:
 
         WorldPacket data(12);
         if (strncmp(args, "on", 3) == 0)
+        {
             data.SetOpcode(SMSG_MOVE_SET_CAN_FLY);
+            sScriptMgr->AnticheatSetCanFlybyServer(target, true);
+        }
         else if (strncmp(args, "off", 4) == 0)
+        {
             data.SetOpcode(SMSG_MOVE_UNSET_CAN_FLY);
+            sScriptMgr->AnticheatSetCanFlybyServer(target, false);
+        }
         else
         {
             handler->SendSysMessage(LANG_USE_BOL);
@@ -148,9 +155,9 @@ public:
     static bool HandleGMListFullCommand(ChatHandler* handler, char const* /*args*/)
     {
         ///- Get the accounts with GM Level >0
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_GM_ACCOUNTS);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_GM_ACCOUNTS);
         stmt->setUInt8(0, uint8(SEC_MODERATOR));
-        stmt->setInt32(1, int32(realmID));
+        stmt->setInt32(1, int32(realm.Id.Realm));
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
         if (result)

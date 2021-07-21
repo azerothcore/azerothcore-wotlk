@@ -33,7 +33,8 @@
     "mhutchie.git-graph",
     "github.vscode-pull-request-github",
     "eamodio.gitlens",
-    "cschlosser.doxdocgen"
+    "cschlosser.doxdocgen",
+    "sanaajani.taskrunnercode"
   ],
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.

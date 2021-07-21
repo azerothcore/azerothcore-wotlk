@@ -291,7 +291,7 @@ public:
                             events.RepeatEvent(30000);
                         else
                         {
-                            for (ObjectGuid guid : summons)
+                            for (ObjectGuid const& guid : summons)
                                 if (Creature* sv = ObjectAccessor::GetCreature(*me, guid))
                                 {
                                     sv->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -644,7 +644,7 @@ class achievement_smell_saronite : public AchievementCriteriaScript
 public:
     achievement_smell_saronite() : AchievementCriteriaScript("achievement_smell_saronite") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -655,7 +655,7 @@ class achievement_shadowdodger : public AchievementCriteriaScript
 public:
     achievement_shadowdodger() : AchievementCriteriaScript("achievement_shadowdodger") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
     }

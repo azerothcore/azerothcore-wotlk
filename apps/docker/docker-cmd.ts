@@ -1,4 +1,4 @@
-import { Command } from "https://cdn.depjs.com/cmd/mod.ts";
+import { Command } from "https://cdn.deno.land/cmd/versions/v1.2.0/raw/mod.ts";
 import * as ink from "https://deno.land/x/ink/mod.ts";
 import {
   Input,
@@ -6,6 +6,12 @@ import {
 } from "https://deno.land/x/cliffy@v0.18.2/prompt/mod.ts";
 
 const program = new Command();
+
+const env = {
+  COMPOSE_DOCKER_CLI_BUILD: "1",
+  DOCKER_BUILDKIT: "1",
+  BUILDKIT_INLINE_CACHE: "1",
+};
 
 program
   .name("acore.sh docker")
@@ -16,85 +22,128 @@ shellCommandFactory(
   "start:app",
   "Startup the authserver and worldserver apps",
   ["docker-compose --profile app up"],
+  env,
 );
 
 shellCommandFactory(
   "start:app:d",
   "Startup the authserver and worldserver apps in detached mode",
   ["docker-compose --profile app up -d"],
+  env,
 );
 
 shellCommandFactory("build", "Build the authserver and worldserver", [
-  "docker-compose --profile all build",
+  "docker-compose --profile local build --parallel",
   "docker image prune -f",
-  "docker-compose run --rm ac-build bash bin/acore-docker-update",
-]);
-
-shellCommandFactory(
-  "build:clean",
-  "Clean and run build",
-  [
-    "docker-compose --profile all build",
-    "docker image prune -f",
-    `docker-compose run --rm ac-build bash acore.sh compiler clean`,
-    "docker-compose run --rm ac-build bash bin/acore-docker-update",
-  ],
-);
+  "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
+], env);
 
 shellCommandFactory(
   "build:nocache",
   "Build the authserver and worldserver without docker cache",
   [
-    "docker-compose --profile all build --no-cache",
+    "docker-compose --profile local build --no-cache --parallel",
     "docker image prune -f",
-    "docker-compose run --rm ac-build bash bin/acore-docker-update",
+    "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
   ],
+  env,
 );
 
 shellCommandFactory(
   "build:compile",
   "Run the compilation process only, without rebuilding all docker images and importing db",
   [
-    "docker-compose build ac-build",
+    "docker-compose build --parallel ac-build",
     "docker image prune -f",
-    "docker-compose run --rm ac-build bash acore.sh compiler build",
+    "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh 0",
   ],
+  env,
+);
+
+shellCommandFactory(
+  "clean:build",
+  "Clean build files",
+  [
+    "docker image prune -f",
+    `docker-compose run --rm ac-build bash acore.sh compiler clean`,
+  ],
+  env,
 );
 
 shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
-  ["docker-compose run --rm ac-worldserver bash acore.sh client-data"],
+  ["docker-compose run --rm ac-build bash acore.sh client-data"],
+  env,
 );
 
 shellCommandFactory(
   "db-import",
   "Create and upgrade the database with latest updates",
   ["docker-compose run --rm ac-build bash acore.sh db-assembler import-all"],
+  env,
 );
 
 shellCommandFactory(
   "dev:up",
-  "Start the dev server container",
-  ["docker-compose up ac-dev-server"],
+  "Start the dev server container in background",
+  ["docker-compose up -d ac-dev-server"],
+  env,
 );
 
 shellCommandFactory(
   "dev:build",
   "Build using the dev server, it uses volumes to compile which can be faster on linux & WSL",
   ["docker-compose run --rm ac-dev-server bash acore.sh compiler build"],
+  env,
 );
 
 shellCommandFactory(
   "dev:dash [args...]",
   "Execute acore dashboard within a running ac-dev-server",
   ["docker-compose run --rm ac-dev-server bash acore.sh"],
+  env,
 );
 
 shellCommandFactory(
   "dev:shell [args...]",
   "Open an interactive shell within the dev server",
-  ["docker-compose run --rm ac-dev-server bash"],
+  [
+    "docker-compose up -d ac-dev-server",
+    "docker-compose exec ac-dev-server bash",
+  ],
+  env,
+);
+
+shellCommandFactory(
+  "prod:build",
+  "Build producion services",
+  [
+    "docker-compose --profile prod build --parallel",
+    "docker image prune -f",
+  ],
+  env,
+);
+
+shellCommandFactory(
+  "prod:pull",
+  "Pull production services from the remote registry",
+  ["docker-compose --profile prod pull"],
+  env,
+);
+
+shellCommandFactory(
+  "prod:up",
+  "Start production services (foreground)",
+  ["docker-compose --profile prod-app up"],
+  env,
+);
+
+shellCommandFactory(
+  "prod:up:d",
+  "Start production services (background)",
+  ["docker-compose --profile prod-app up -d"],
+  env,
 );
 
 program
@@ -125,7 +174,7 @@ program
 
     if (!services) {
       console.error("No services available!");
-      return
+      return;
     }
 
     services.pop();
@@ -144,8 +193,8 @@ program
     }
 
     if (!selService) {
-        console.log(`Service ${service} is not available`)
-        return;
+      console.log(`Service ${service} is not available`);
+      return;
     }
 
     command = `docker attach ${selService.split(" ")[0]}`;
@@ -185,7 +234,7 @@ while (true) {
     const command = await Input.prompt({
       message: "Enter the command:",
     });
-    console.log(command)
+    console.log(command);
     await program.parseAsync(command.split(" "));
   } else {
     await program.parseAsync(Deno.args);
@@ -204,6 +253,7 @@ function shellCommandFactory(
   name: string,
   description: string,
   commands: string[],
+  env?: { [key: string]: string },
 ): Command {
   return program
     .command(name)
@@ -214,7 +264,7 @@ function shellCommandFactory(
         )
       }"\n`,
     )
-    .action(async (args: any[] | undefined) => {
+    .action(async (args: string[] | undefined) => {
       const { run } = Deno;
 
       for (const command of commands) {
@@ -231,6 +281,7 @@ function shellCommandFactory(
         const shellCmd = run({
           cmd,
           cwd: process.cwd(),
+          env: { ...process.env, ...env },
         });
 
         const status = await shellCmd.status();

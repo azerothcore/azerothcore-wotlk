@@ -7,7 +7,7 @@
 #include "ARC4.h"
 #include "Errors.h"
 
-acore::Crypto::ARC4::ARC4()
+Acore::Crypto::ARC4::ARC4()
     : _ctx(EVP_CIPHER_CTX_new())
 {
     EVP_CIPHER_CTX_init(_ctx);
@@ -15,12 +15,12 @@ acore::Crypto::ARC4::ARC4()
     ASSERT(result == 1);
 }
 
-acore::Crypto::ARC4::~ARC4()
+Acore::Crypto::ARC4::~ARC4()
 {
     EVP_CIPHER_CTX_free(_ctx);
 }
 
-void acore::Crypto::ARC4::Init(uint8 const* seed, size_t len)
+void Acore::Crypto::ARC4::Init(uint8 const* seed, size_t len)
 {
     int result1 = EVP_CIPHER_CTX_set_key_length(_ctx, len);
     ASSERT(result1 == 1);
@@ -28,7 +28,7 @@ void acore::Crypto::ARC4::Init(uint8 const* seed, size_t len)
     ASSERT(result2 == 1);
 }
 
-void acore::Crypto::ARC4::UpdateData(uint8* data, size_t len)
+void Acore::Crypto::ARC4::UpdateData(uint8* data, size_t len)
 {
     int outlen = 0;
     int result1 = EVP_EncryptUpdate(_ctx, data, &outlen, data, len);

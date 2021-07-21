@@ -16,6 +16,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
 #include "UpdateMask.h"
@@ -40,7 +41,7 @@ std::vector<ChatCommand> const& ChatHandler::getCommandTable()
         std::vector<ChatCommand> cmds = sScriptMgr->GetChatCommands();
         commandTableCache.swap(cmds);
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_COMMANDS);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_COMMANDS);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (result)
         {
@@ -114,7 +115,7 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     if (target)
         target_sec = target->GetSecurity();
     else if (target_account)
-        target_sec = AccountMgr::GetSecurity(target_account, realmID);
+        target_sec = AccountMgr::GetSecurity(target_account, realm.Id.Realm);
     else
         return true;                                        // caller must report error for (target == nullptr && target_account == 0)
 
@@ -372,12 +373,9 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
         // expected subcommand by full name DB content
         else if (*text)
         {
-            LOG_ERROR("server", "Table `command` have unexpected subcommand '%s' in command '%s', skip.", text, fullcommand.c_str());
+            LOG_ERROR("sql.sql", "Table `command` have unexpected subcommand '%s' in command '%s', skip.", text, fullcommand.c_str());
             return false;
         }
-
-        //if (table[i].SecurityLevel != security)
-        //    LOG_DEBUG("server", "Table `command` overwrite for command '%s' default security (%u) by %u", fullcommand.c_str(), table[i].SecurityLevel, security);
 
         table[i].SecurityLevel = security;
         table[i].Help          = help;
@@ -388,9 +386,9 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
     if (!cmd.empty())
     {
         if (&table == &getCommandTable())
-            LOG_ERROR("server", "Table `command` have non-existing command '%s', skip.", cmd.c_str());
+            LOG_ERROR("sql.sql", "Table `command` have non-existing command '%s', skip.", cmd.c_str());
         else
-            LOG_ERROR("server", "Table `command` have non-existing subcommand '%s' in command '%s', skip.", cmd.c_str(), fullcommand.c_str());
+            LOG_ERROR("sql.sql", "Table `command` have non-existing subcommand '%s' in command '%s', skip.", cmd.c_str(), fullcommand.c_str());
     }
 
     return false;
@@ -885,9 +883,9 @@ GameObject* ChatHandler::GetNearbyGameObject()
 
     Player* pl = m_session->GetPlayer();
     GameObject* obj = nullptr;
-    acore::NearestGameObjectCheck check(*pl);
-    acore::GameObjectLastSearcher<acore::NearestGameObjectCheck> searcher(pl, obj, check);
-    pl->VisitNearbyGridObject(SIZE_OF_GRIDS, searcher);
+    Acore::NearestGameObjectCheck check(*pl);
+    Acore::GameObjectLastSearcher<Acore::NearestGameObjectCheck> searcher(pl, obj, check);
+    Cell::VisitGridObjects(pl, searcher, SIZE_OF_GRIDS);
     return obj;
 }
 

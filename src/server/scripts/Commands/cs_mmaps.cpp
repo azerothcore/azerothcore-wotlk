@@ -1,18 +1,6 @@
 /*
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -25,7 +13,6 @@
 
 #include "CellImpl.h"
 #include "Chat.h"
-#include "DisableMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Map.h"
@@ -263,18 +250,11 @@ public:
         float radius = 40.0f;
         WorldObject* object = handler->GetSession()->GetPlayer();
 
-        CellCoord pair(acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY()));
-        Cell cell(pair);
-        cell.SetNoCreate();
-
-        std::list<Creature*> creatureList;
-
-        acore::AnyUnitInObjectRangeCheck go_check(object, radius);
-        acore::CreatureListSearcher<acore::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
-        TypeContainerVisitor<acore::CreatureListSearcher<acore::AnyUnitInObjectRangeCheck>, GridTypeMapContainer> go_visit(go_search);
-
         // Get Creatures
-        cell.Visit(pair, go_visit, *(object->GetMap()), *object, radius);
+        std::list<Creature*> creatureList;
+        Acore::AnyUnitInObjectRangeCheck go_check(object, radius);
+        Acore::CreatureListSearcher<Acore::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
+        Cell::VisitGridObjects(object, go_search, radius);
 
         if (!creatureList.empty())
         {
