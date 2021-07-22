@@ -11485,65 +11485,6 @@ bool Player::HasQuestForGO(int32 GOId) const
     return false;
 }
 
-bool Player::HasQuest(uint32 questId) const
-{
-    for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
-    {
-        uint32 questid = GetQuestSlotQuestId(i);
-        if (questid == questId)
-            return true;
-    }
-
-    return false;
-}
-
-void Player::UpdateForQuestWorldObjects()
-{
-    if (m_clientGUIDs.empty())
-        return;
-
-    UpdateData udata;
-    WorldPacket packet;
-    for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
-    {
-        if ((*itr).IsGameObject())
-        {
-            if (GameObject* obj = ObjectAccessor::GetGameObject(*this, *itr))
-                obj->BuildValuesUpdateBlockForPlayer(&udata, this);
-        }
-        else if ((*itr).IsCreatureOrVehicle())
-        {
-            Creature* obj = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
-            if (!obj)
-                continue;
-
-            // check if this unit requires quest specific flags
-            if (!obj->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
-                continue;
-
-            SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
-            for (SpellClickInfoContainer::const_iterator _itr = clickPair.first; _itr != clickPair.second; ++_itr)
-            {
-                //! This code doesn't look right, but it was logically converted to condition system to do the exact
-                //! same thing it did before. It definitely needs to be overlooked for intended functionality.
-                ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId);
-                bool buildUpdateBlock = false;
-                for (ConditionList::const_iterator jtr = conds.begin(); jtr != conds.end() && !buildUpdateBlock; ++jtr)
-                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
-                        buildUpdateBlock = true;
-
-                if (buildUpdateBlock)
-                {
-                    obj->BuildValuesUpdateBlockForPlayer(&udata, this);
-                    break;
-                }
-            }
-        }
-    }
-    udata.BuildPacket(&packet);
-    GetSession()->SendPacket(&packet);
-}
-
 void Player::SummonIfPossible(bool agree, ObjectGuid summoner_guid)
 {
     if (!agree)

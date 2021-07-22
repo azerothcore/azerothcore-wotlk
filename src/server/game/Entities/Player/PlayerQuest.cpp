@@ -84,6 +84,18 @@ void Player::PrepareQuestMenu(ObjectGuid guid)
     }
 }
 
+bool Player::HasQuest(uint32 questId) const
+{
+    for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (questid == questId)
+            return true;
+    }
+
+    return false;
+}
+
 void Player::SendPreparedQuest(ObjectGuid guid)
 {
     QuestMenu& questMenu = PlayerTalkClass->GetQuestMenu();
