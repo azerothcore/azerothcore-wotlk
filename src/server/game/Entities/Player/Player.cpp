@@ -13000,7 +13000,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         }
 
     // xinef: check amount of points spent in current talent tree
-    // xinef: be smart and quick, not retarded like TC
+    // xinef: be smart and quick
     uint32 spentPoints = 0;
     if (talentInfo->Row > 0)
     {
