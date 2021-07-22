@@ -6,7 +6,6 @@
 
 #include "blackrock_depths.h"
 #include "InstanceScript.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
 #define TIMER_TOMBOFTHESEVEN    15000

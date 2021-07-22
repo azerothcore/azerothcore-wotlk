@@ -368,7 +368,8 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
 // Constructor, copies most fields from LootStoreItem and generates random count
 LootItem::LootItem(LootStoreItem const& li)
 {
-    itemid      = li.itemid;
+    itemid       = li.itemid;
+    itemIndex    = 0;
     conditions   = li.conditions;
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
@@ -418,15 +419,9 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
     if ((pProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && player->GetTeamId(true) != TEAM_ALLIANCE)
         return false;
 
-    // Master looter can see certain items even if the character can't loot them
+    // Master looter can see all items even if the character can't loot them
     if (!isGivenByMasterLooter && isMasterLooter && allowQuestLoot)
     {
-        // check quest requirements (exclude items not under threshold)
-        if (!(pProto->FlagsCu & ITEM_FLAGS_CU_IGNORE_QUEST_STATUS) && (needs_quest || pProto->StartQuest))
-        {
-            return !is_underthreshold;
-        }
-
         return true;
     }
 
@@ -472,6 +467,7 @@ void Loot::AddItem(LootStoreItem const& item)
     {
         LootItem generatedLoot(item);
         generatedLoot.count = std::min(count, proto->GetMaxStackSize());
+        generatedLoot.itemIndex = lootItems.size();
         lootItems.push_back(generatedLoot);
         count -= proto->GetMaxStackSize();
 
