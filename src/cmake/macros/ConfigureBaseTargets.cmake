@@ -12,11 +12,11 @@ set(CXX_EXTENSIONS OFF)
 if (USE_CPP_20)
   # Enable support С++20
   set(CMAKE_CXX_STANDARD 20)
-  message(STATUS "Enabled С++20 standart")
+  message(STATUS "Enabled С++20 standard")
 else()
   # Enable support С++17
   set(CMAKE_CXX_STANDARD 17)
-  message(STATUS "Enabled С++17 standart")
+  message(STATUS "Enabled С++17 standard")
 endif()
 
 # An interface library to make the warnings level available to other targets
