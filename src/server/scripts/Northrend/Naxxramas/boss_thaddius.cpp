@@ -186,6 +186,11 @@ public:
                     }
                 }
             }
+
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSITIVE_POLARITY);
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSITIVE_CHARGE_STACK);
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_NEGATIVE_POLARITY);
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_NEGATIVE_CHARGE_STACK);
         }
 
         void KilledUnit(Unit* who) override
@@ -206,8 +211,10 @@ public:
             Talk(SAY_DEATH);
             if (pInstance)
             {
-                pInstance->DoRemoveAurasDueToSpellOnPlayers(28059);
-                pInstance->DoRemoveAurasDueToSpellOnPlayers(28084);
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSITIVE_POLARITY);
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POSITIVE_CHARGE_STACK);
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_NEGATIVE_POLARITY);
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_NEGATIVE_CHARGE_STACK);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
@@ -610,10 +617,10 @@ public:
                     }
                 }
             }
+
             if (count)
             {
-                uint32 spellId = 0;
-                spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_NEGATIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
+                uint32 spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_POSITIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
                 GetCaster()->SetAuraStack(spellId, GetCaster(), count);
             }
         }
@@ -669,6 +676,8 @@ public:
             Unit* caster = GetCaster();
             if (Unit* target = GetHitUnit())
             {
+                target->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_STACK);
+                target->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_STACK);
                 target->CastSpell(target, roll_chance_i(50) ? SPELL_POSITIVE_POLARITY : SPELL_NEGATIVE_POLARITY, true, nullptr, nullptr, caster->GetGUID());
             }
         }
