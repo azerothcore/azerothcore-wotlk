@@ -1085,7 +1085,7 @@ public:
         if (creature)
         {
             // update movement type
-            if (doNotDelete == false)
+            if (!doNotDelete)
                 creature->LoadPath(0);
 
             creature->SetDefaultMovementType(move_type);
@@ -1097,7 +1097,7 @@ public:
             }
             creature->SaveToDB();
         }
-        if (doNotDelete == false)
+        if (!doNotDelete)
         {
             handler->PSendSysMessage(LANG_MOVE_TYPE_SET, type_str);
         }

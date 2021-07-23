@@ -2582,7 +2582,7 @@ float Unit::CalculateLevelPenalty(SpellInfo const* spellProto) const
 
     float LvlPenalty = 0.0f;
 
-    // xinef: added brackets, trinity retards...
+    // xinef: added brackets
     if (spellProto->SpellLevel < 20)
         LvlPenalty = (20.0f - spellProto->SpellLevel) * 3.75f;
 
@@ -3884,6 +3884,7 @@ void Unit::HandleSafeUnitPointersOnDelete(Unit* thisUnit)
         return;
     for (std::set<SafeUnitPointer*>::iterator itr = thisUnit->SafeUnitPointerSet.begin(); itr != thisUnit->SafeUnitPointerSet.end(); ++itr)
         (*itr)->UnitDeleted();
+
     thisUnit->SafeUnitPointerSet.clear();
 }
 
