@@ -369,7 +369,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     unit->m_movementInfo.transport.seat = seat->first;
     unit->m_movementInfo.transport.guid = _me->GetGUID();
 
-    // xinef: removed retarded seat->first == 0 check...
+    // xinef: removed seat->first == 0 check...
     if (_me->GetTypeId() == TYPEID_UNIT
             && unit->GetTypeId() == TYPEID_PLAYER
             && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
