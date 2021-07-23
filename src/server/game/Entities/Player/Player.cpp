@@ -12616,7 +12616,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
         // LootItem is being removed (looted) from the container, delete it from the DB.
         if (loot->containerGUID)
-            sLootItemStorage->RemoveStoredLootItem(loot->containerGUID, item->itemid, item->count, loot);
+            sLootItemStorage->RemoveStoredLootItem(loot->containerGUID, item->itemid, item->count, loot, item->itemIndex);
 
 #ifdef ELUNA
         sEluna->OnLootItem(this, newitem, item->count, this->GetLootGUID());
@@ -13000,7 +13000,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         }
 
     // xinef: check amount of points spent in current talent tree
-    // xinef: be smart and quick, not retarded like TC
+    // xinef: be smart and quick
     uint32 spentPoints = 0;
     if (talentInfo->Row > 0)
     {
