@@ -12,7 +12,6 @@
 #include "CreatureTextMgr.h"
 #include "Group.h"
 #include "PassiveAI.h"
-#include "PetAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
