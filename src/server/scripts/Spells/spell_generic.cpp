@@ -19,10 +19,8 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceScript.h"
-#include "LFGMgr.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -31,6 +29,11 @@
 #include "SpellScript.h"
 #include "Vehicle.h"
 #include <array>
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+#include "GridNotifiersImpl.h"
 
 // Ours
 class spell_gen_model_visible : public SpellScriptLoader
@@ -4713,15 +4716,19 @@ public:
             {
                 Aura const* aura = GetHitAura();
                 if (!(aura && aura->GetStackAmount() == 3))
+                {
                     return;
+                }
 
                 target->CastSpell(target, SPELL_FOAM_SWORD_DEFEAT, true);
                 target->RemoveAurasDueToSpell(SPELL_BONKED);
 
-                if (Aura const* aura = target->GetAura(SPELL_ON_GUARD))
+                if (Aura const* onGuardAura = target->GetAura(SPELL_ON_GUARD))
                 {
-                    if (Item* item = target->GetItemByGuid(aura->GetCastItemGUID()))
+                    if (Item* item = target->GetItemByGuid(onGuardAura->GetCastItemGUID()))
+                    {
                         target->DestroyItemCount(item->GetEntry(), 1, true);
+                    }
                 }
             }
         }
