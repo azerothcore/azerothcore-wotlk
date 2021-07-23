@@ -558,10 +558,11 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             if (!owner->IsValidAttackTarget(TargetUnit))
                                 return;
 
-                        // pussywizard:
-                        if (Creature* creaturePet = pet->ToCreature())
-                            if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit))
-                                return;
+                        // pussywizard (excluded charmed)
+                        if (!pet->IsCharmed())
+                            if (Creature* creaturePet = pet->ToCreature())
+                                if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit))
+                                    return;
 
                         // Not let attack through obstructions
                         bool checkLos = !DisableMgr::IsPathfindingEnabled(pet->GetMap()) ||
