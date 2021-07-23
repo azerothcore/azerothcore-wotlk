@@ -6,7 +6,7 @@ DEBIAN_VERSION=$(lsb_release -sr)
 
 sudo apt-get update -y
 
-sudo apt-get install -y gdbserver gdb unzip curl libace-6.* libace-dev \
+sudo apt-get install -y gdbserver gdb unzip curl \
                      libncurses-dev libreadline-dev clang g++ \
                      gcc git cmake make ccache
 

@@ -11,7 +11,6 @@ SDComment: Place Holder
 SDCategory: Molten Core
 EndScriptData */
 
-#include "CreatureAI.h"
 #include "InstanceScript.h"
 #include "molten_core.h"
 #include "ObjectMgr.h"
