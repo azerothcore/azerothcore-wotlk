@@ -86,4 +86,4 @@ set(WITH_SOURCE_TREE       "hierarchical" CACHE STRING "Build the source tree fo
 set_property(CACHE WITH_SOURCE_TREE PROPERTY STRINGS no flat hierarchical)
 
 # If disable - use c++17
-option(USE_CPP_20 "Enable c++20 standart" 0)
+option(USE_CPP_20 "Enable c++20 standard" 0)
