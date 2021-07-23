@@ -100,8 +100,7 @@ public:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         {
                             Talk(SAY_SPIDER_SPAWN);
-                            Creature* Spider = nullptr;
-                            Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                            Creature* Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                             if (Spider)
                                 Spider->AI()->AttackStart(target);
                             Spider = me->SummonCreature(15041, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);

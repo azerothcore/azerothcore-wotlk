@@ -241,10 +241,10 @@ public:
         if (response)
             ticket->AppendResponse(response);
 
-        if (Player* player = ticket->GetPlayer())
+        if (Player* player2 = ticket->GetPlayer())
         {
-            ticket->SendResponse(player->GetSession());
-            ChatHandler(player->GetSession()).SendSysMessage(LANG_TICKET_COMPLETED);
+            ticket->SendResponse(player2->GetSession());
+            ChatHandler(player2->GetSession()).SendSysMessage(LANG_TICKET_COMPLETED);
         }
 
         Player* gm = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
