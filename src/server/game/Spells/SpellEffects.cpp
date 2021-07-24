@@ -3919,17 +3919,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         }
                         break;
                     }*/
-                    /* disabled for now, was being abused
-                    // 5,000 Gold
-                    case 46642:
-                    {
-                        if( !m_originalCaster || !unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
-                            return;
-
-                        unitTarget->ToPlayer()->ModifyMoney(5000 * GOLD);
-
-                        break;
-                    }*/
                     // Roll Dice - Decahedral Dwarven Dice
                     case 47770:
                         {
