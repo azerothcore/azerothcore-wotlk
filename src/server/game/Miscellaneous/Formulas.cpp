@@ -79,8 +79,7 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
                     xpMod *= 2.0f;
             }
 
-            // This requires TrinityCore creature_template.ExperienceModifier feature
-            // xpMod *= creature->GetCreatureTemplate()->ModExperience;
+            xpMod *= creature->GetCreatureTemplate()->ModExperience;
         }
 
         xpMod *= isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL);
