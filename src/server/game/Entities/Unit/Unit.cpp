@@ -11626,7 +11626,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
             // 100% critical chance against sitting target
             if (GetTypeId() == TYPEID_PLAYER && (IsSitState() || getStandState() == UNIT_STAND_STATE_SLEEP))
             {
-                return 100.f;
+                return 100.0f;
             }
             [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case SPELL_DAMAGE_CLASS_RANGED:
