@@ -2126,8 +2126,7 @@ public:
 // 13280 Gnomish Death Ray
 enum GnomishDeathRay
 {
-    SPELL_GNOMISH_DEATH_RAY_SELF = 13493,
-    SPELL_GNOMISH_DEATH_RAY_TARGET = 13279,
+    SPELL_GNOMISH_DEATH_RAY_TARGET  = 13279,
 };
 
 class spell_item_gnomish_death_ray : public SpellScriptLoader
@@ -2141,18 +2140,17 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return ValidateSpellInfo({ SPELL_GNOMISH_DEATH_RAY_SELF, SPELL_GNOMISH_DEATH_RAY_TARGET });
+            return ValidateSpellInfo({ SPELL_GNOMISH_DEATH_RAY_TARGET });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            Unit* caster = GetCaster();
-            if (Unit* target = GetHitUnit())
+            if (Unit* caster = GetCaster())
             {
-                if (urand(0, 99) < 15)
-                    caster->CastSpell(caster, SPELL_GNOMISH_DEATH_RAY_SELF, true, nullptr);    // failure
-                else
-                    caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true, nullptr);
+                if (Unit* target = ObjectAccessor::GetUnit(*caster, caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT)))
+                {
+                    caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true);
+                }
             }
         }
 

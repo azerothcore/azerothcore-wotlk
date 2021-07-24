@@ -19,10 +19,8 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceScript.h"
-#include "LFGMgr.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -32,7 +30,41 @@
 #include "Vehicle.h"
 #include <array>
 
-// Ours
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+#include "GridNotifiersImpl.h"
+
+// 46642 - 5,000 Gold
+class spell_gen_5000_gold : public SpellScriptLoader
+{
+  public:
+    spell_gen_5000_gold() : SpellScriptLoader("spell_gen_5000_gold") {}
+
+    class spell_gen_5000_gold_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_5000_gold_SpellScript);
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            if (Player* target = GetHitPlayer())
+            {
+                target->ModifyMoney(5000 * GOLD);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_5000_gold_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gen_5000_gold_SpellScript();
+    }
+};
+
 class spell_gen_model_visible : public SpellScriptLoader
 {
 public:
@@ -4713,15 +4745,19 @@ public:
             {
                 Aura const* aura = GetHitAura();
                 if (!(aura && aura->GetStackAmount() == 3))
+                {
                     return;
+                }
 
                 target->CastSpell(target, SPELL_FOAM_SWORD_DEFEAT, true);
                 target->RemoveAurasDueToSpell(SPELL_BONKED);
 
-                if (Aura const* aura = target->GetAura(SPELL_ON_GUARD))
+                if (Aura const* onGuardAura = target->GetAura(SPELL_ON_GUARD))
                 {
-                    if (Item* item = target->GetItemByGuid(aura->GetCastItemGUID()))
+                    if (Item* item = target->GetItemByGuid(onGuardAura->GetCastItemGUID()))
+                    {
                         target->DestroyItemCount(item->GetEntry(), 1, true);
+                    }
                 }
             }
         }
@@ -5142,7 +5178,7 @@ public:
 
 void AddSC_generic_spell_scripts()
 {
-    // ours:
+    new spell_gen_5000_gold();
     new spell_gen_model_visible();
     new spell_the_flag_of_ownership();
     new spell_gen_have_item_auras();
@@ -5189,8 +5225,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_flurry_of_claws();
     new spell_gen_throw_back();
     new spell_gen_haunted();
-
-    // theirs:
     new spell_gen_absorb0_hitlimit1();
     new spell_gen_adaptive_warding();
     new spell_gen_av_drekthar_presence();
