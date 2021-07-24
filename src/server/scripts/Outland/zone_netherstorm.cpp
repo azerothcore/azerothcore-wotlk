@@ -1097,7 +1097,7 @@ public:
         {
             if (!summons.empty())
             {
-                for (ObjectGuid guid : summons)
+                for (ObjectGuid const& guid : summons)
                     if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     {
                         float x, y, z, o;
@@ -1444,9 +1444,7 @@ public:
                 return true;
             }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("scripts.ai", "TSCR: npc_commander_dawnforge event already in progress, need to wait.");
-#endif
             return false;
         }
 

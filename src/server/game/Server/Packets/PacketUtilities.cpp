@@ -8,7 +8,6 @@
 #include "Errors.h"
 #include <utf8.h>
 #include <sstream>
-#include <array>
 
 WorldPackets::InvalidStringValueException::InvalidStringValueException(std::string const& value) :
     ByteBufferInvalidValueException("string", value.c_str()) { }
@@ -32,7 +31,7 @@ bool WorldPackets::Strings::Utf8::Validate(std::string const& value)
 
 //bool WorldPackets::Strings::Hyperlinks::Validate(std::string const& value)
 //{
-//    if (!Warhead::Hyperlinks::CheckAllLinks(value))
+//    if (!Acore::Hyperlinks::CheckAllLinks(value))
 //        throw InvalidHyperlinkException(value);
 //
 //    return true;

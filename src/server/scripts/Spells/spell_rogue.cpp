@@ -12,7 +12,6 @@
 
 #include "CellImpl.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
@@ -282,7 +281,7 @@ public:
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(enchant->spellid[s]);
                         if (!spellInfo)
                         {
-                            LOG_ERROR("server", "Player::CastItemCombatSpell Enchant %i, player (Name: %s, %s) cast unknown spell %i",
+                            LOG_ERROR("misc", "Player::CastItemCombatSpell Enchant %i, player (Name: %s, %s) cast unknown spell %i",
                                 enchant->ID, player->GetName().c_str(), player->GetGUID().ToString().c_str(), enchant->spellid[s]);
                             continue;
                         }

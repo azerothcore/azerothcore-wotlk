@@ -13,26 +13,26 @@
 */
 
 #include "AppenderDB.h"
+#include "AuthSocketMgr.h"
 #include "Banner.h"
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
+#include "DeadlineTimer.h"
 #include "GitRevision.h"
 #include "IPLocation.h"
 #include "Log.h"
-#include "RealmAcceptor.h"
+#include "IoContext.h"
+#include "MySQLThreading.h"
+#include "ProcessPriority.h"
 #include "RealmList.h"
 #include "SecretMgr.h"
 #include "SharedDefines.h"
-#include "SignalHandler.h"
 #include "Util.h"
-#include "ProcessPriority.h"
-#include <ace/ACE.h>
-#include <ace/Dev_Poll_Reactor.h>
-#include <ace/Sig_Handler.h>
-#include <ace/TP_Reactor.h>
+#include <boost/asio/signal_set.hpp>
 #include <boost/version.hpp>
+#include <csignal>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
@@ -40,23 +40,26 @@
 #define _ACORE_REALM_CONFIG "authserver.conf"
 #endif
 
+using boost::asio::ip::tcp;
+
 bool StartDB();
 void StopDB();
-
-bool stopEvent = false;                                     // Setting it to true stops the server
+void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error, int signalNumber);
+void KeepDatabaseAliveHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error);
+void BanExpiryHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error);
 
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
     LOG_INFO("server.authserver", "Usage: \n %s [<options>]\n"
-                    "    -c config_file           use config_file as configuration file\n\r",
-                    prog);
+        "    -c config_file           use config_file as configuration file\n\r", prog);
 }
 
 /// Launch the auth server
-extern int main(int argc, char** argv)
+int main(int argc, char** argv)
 {
     Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
+    signal(SIGABRT, &Acore::AbortHandler);
 
     // Command line parsing to get the configuration file name
     std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
@@ -97,17 +100,8 @@ extern int main(int argc, char** argv)
             LOG_INFO("server.authserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
             LOG_INFO("server.authserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
             LOG_INFO("server.authserver", "> Using Boost version:           %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
-            LOG_INFO("server.authserver", "> Using ACE version:             %s\n", ACE_VERSION);
         }
     );
-
-#if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-    ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
-#else
-    ACE_Reactor::instance(new ACE_Reactor(new ACE_TP_Reactor(), true), true);
-#endif
-
-    LOG_INFO("server.authserver", "Max allowed open files is %d", ACE::max_handles());
 
     // authserver PID file creation
     std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
@@ -131,75 +125,70 @@ extern int main(int argc, char** argv)
     // Load IP Location Database
     sIPLocation->Load();
 
+    std::shared_ptr<void> dbHandle(nullptr, [](void*) { StopDB(); });
+
+    std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
+
     // Get the list of realms for the server
-    sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
+    sRealmList->Initialize(*ioContext, sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
+
+    std::shared_ptr<void> sRealmListHandle(nullptr, [](void*) { sRealmList->Close(); });
+
     if (sRealmList->GetRealms().empty())
     {
         LOG_ERROR("server.authserver", "No valid realms specified.");
         return 1;
     }
 
-    // Launch the listening network socket
-    RealmAcceptor acceptor;
-
-    int32 rmport = sConfigMgr->GetOption<int32>("RealmServerPort", 3724);
-    if (rmport < 0 || rmport > 0xFFFF)
+    // Start the listening port (acceptor) for auth connections
+    int32 port = sConfigMgr->GetOption<int32>("RealmServerPort", 3724);
+    if (port < 0 || port > 0xFFFF)
     {
-        LOG_ERROR("server.authserver", "The specified RealmServerPort (%d) is out of the allowed range (1-65535)", rmport);
+        LOG_ERROR("server.authserver", "Specified port out of allowed range (1-65535)");
         return 1;
     }
 
-    std::string bind_ip = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
+    std::string bindIp = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
 
-    ACE_INET_Addr bind_addr(uint16(rmport), bind_ip.c_str());
-
-    if (acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
+    if (!sAuthSocketMgr.StartNetwork(*ioContext, bindIp, port))
     {
-        LOG_ERROR("server.authserver", "Auth server can not bind to %s:%d (possible error: port already in use)", bind_ip.c_str(), rmport);
+        LOG_ERROR("server.authserver", "Failed to initialize network");
         return 1;
     }
 
-    LOG_INFO("server.authserver", "Authserver listening to %s:%d", bind_ip.c_str(), rmport);
+    std::shared_ptr<void> sAuthSocketMgrHandle(nullptr, [](void*) { sAuthSocketMgr.StopNetwork(); });
 
-    // Initialize the signal handlers
-    Acore::SignalHandler signalHandler;
-    auto const _handler = [](int) { stopEvent = true; };
-
-    // Register authservers's signal handlers
-    signalHandler.handle_signal(SIGINT, _handler);
-    signalHandler.handle_signal(SIGTERM, _handler);
+    // Set signal handlers
+    boost::asio::signal_set signals(*ioContext, SIGINT, SIGTERM);
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-    signalHandler.handle_signal(SIGBREAK, _handler);
+    signals.add(SIGBREAK);
 #endif
+    signals.async_wait(std::bind(&SignalHandler, std::weak_ptr<Acore::Asio::IoContext>(ioContext), std::placeholders::_1, std::placeholders::_2));
 
     // Set process priority according to configuration settings
     SetProcessPriority("server.authserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
-    // maximum counter for next ping
-    uint32 numLoops = (sConfigMgr->GetOption<int32>("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
-    uint32 loopCounter = 0;
+    // Enabled a timed callback for handling the database keep alive ping
+    int32 dbPingInterval = sConfigMgr->GetOption<int32>("MaxPingTime", 30);
+    std::shared_ptr<Acore::Asio::DeadlineTimer> dbPingTimer = std::make_shared<Acore::Asio::DeadlineTimer>(*ioContext);
+    dbPingTimer->expires_from_now(boost::posix_time::minutes(dbPingInterval));
+    dbPingTimer->async_wait(std::bind(&KeepDatabaseAliveHandler, std::weak_ptr<Acore::Asio::DeadlineTimer>(dbPingTimer), dbPingInterval, std::placeholders::_1));
 
-    // Wait for termination signal
-    while (!stopEvent)
-    {
-        // dont move this outside the loop, the reactor will modify it
-        ACE_Time_Value interval(0, 100000);
+    int32 banExpiryCheckInterval = sConfigMgr->GetOption<int32>("BanExpiryCheckInterval", 60);
+    std::shared_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimer = std::make_shared<Acore::Asio::DeadlineTimer>(*ioContext);
+    banExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(banExpiryCheckInterval));
+    banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, std::weak_ptr<Acore::Asio::DeadlineTimer>(banExpiryCheckTimer), banExpiryCheckInterval, std::placeholders::_1));
 
-        if (ACE_Reactor::instance()->run_reactor_event_loop(interval) == -1)
-            break;
+    // Start the io service worker loop
+    ioContext->run();
 
-        if ((++loopCounter) == numLoops)
-        {
-            loopCounter = 0;
-            LOG_INFO("server.authserver", "Ping MySQL to keep connection alive");
-            LoginDatabase.KeepAlive();
-        }
-    }
-
-    // Close the Database Pool and library
-    StopDB();
+    banExpiryCheckTimer->cancel();
+    dbPingTimer->cancel();
 
     LOG_INFO("server.authserver", "Halting process...");
+
+    signals.cancel();
+
     return 0;
 }
 
@@ -211,7 +200,7 @@ bool StartDB()
     // Load databases
     // NOTE: While authserver is singlethreaded you should keep synch_threads == 1.
     // Increasing it is just silly since only 1 will be used ever.
-    DatabaseLoader loader;
+    DatabaseLoader loader("server.authserver");
     loader
         .AddDatabase(LoginDatabase, "Login");
 
@@ -228,4 +217,45 @@ void StopDB()
 {
     LoginDatabase.Close();
     MySQL::Library_End();
+}
+
+void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error, int /*signalNumber*/)
+{
+    if (!error)
+    {
+        if (std::shared_ptr<Acore::Asio::IoContext> ioContext = ioContextRef.lock())
+        {
+            ioContext->stop();
+        }
+    }
+}
+
+void KeepDatabaseAliveHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error)
+{
+    if (!error)
+    {
+        if (std::shared_ptr<Acore::Asio::DeadlineTimer> dbPingTimer = dbPingTimerRef.lock())
+        {
+            LOG_INFO("server.authserver", "Ping MySQL to keep connection alive");
+            LoginDatabase.KeepAlive();
+
+            dbPingTimer->expires_from_now(boost::posix_time::minutes(dbPingInterval));
+            dbPingTimer->async_wait(std::bind(&KeepDatabaseAliveHandler, dbPingTimerRef, dbPingInterval, std::placeholders::_1));
+        }
+    }
+}
+
+void BanExpiryHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error)
+{
+    if (!error)
+    {
+        if (std::shared_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimer = banExpiryCheckTimerRef.lock())
+        {
+            LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS));
+            LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPIRED_ACCOUNT_BANS));
+
+            banExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(banExpiryCheckInterval));
+            banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, banExpiryCheckTimerRef, banExpiryCheckInterval, std::placeholders::_1));
+        }
+    }
 }

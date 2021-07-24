@@ -12,12 +12,12 @@
  * types of object at the same time.
  */
 
-#include <map>
-#include <unordered_map>
-#include <vector>
 #include "Define.h"
 #include "Dynamic/TypeList.h"
 #include "GridRefManager.h"
+#include <map>
+#include <unordered_map>
+#include <vector>
 
 /*
  * @class ContainerMapList is a mulit-type container for map elements
@@ -136,6 +136,14 @@ public:
     SPECIFIC_TYPE* Find(KEY_TYPE const& handle)
     {
         return Acore::Find(_elements, handle, (SPECIFIC_TYPE*)nullptr);
+    }
+
+    template<class SPECIFIC_TYPE>
+    std::size_t Size() const
+    {
+        std::size_t size = 0;
+        Acore::Size(_elements, &size, (SPECIFIC_TYPE*)nullptr);
+        return size;
     }
 
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& GetElements() { return _elements; }

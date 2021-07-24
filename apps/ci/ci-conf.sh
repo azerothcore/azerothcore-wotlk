@@ -7,7 +7,7 @@ MTHREADS=$(($(grep -c ^processor /proc/cpuinfo) + 2))
 CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
-CSCRIPTS=ON
+CSCRIPTS=static
 CBUILD_TESTING=ON
 CSERVERS=ON
 CTOOLS=ON
@@ -70,9 +70,3 @@ case $COMPILER in
     exit 1
     ;;
 esac
-
-if [[ $EXTRA_LOGS ]]; then
-  echo "CEXTRA_LOGS=1" >> ./conf/config.sh
-else
-  echo "CEXTRA_LOGS=0" >> ./conf/config.sh
-fi

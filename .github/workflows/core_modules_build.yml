@@ -5,8 +5,12 @@ on:
       - 'master'
   pull_request:
 
+concurrency:
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  cancel-in-progress: true
+
 jobs:
-  build:
+  build-modules:
     strategy:
       fail-fast: false
       matrix:
@@ -14,12 +18,10 @@ jobs:
         os: [ubuntu-20.04]
         compiler: [clang]
         modules: [with]
-        extra_logs: [false]
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules-extra_logs-${{ matrix.extra_logs }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
-      EXTRA_LOGS: ${{ matrix.extra_logs }}
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2

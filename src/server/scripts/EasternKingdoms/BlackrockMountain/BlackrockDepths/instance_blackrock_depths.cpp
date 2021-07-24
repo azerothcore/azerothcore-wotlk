@@ -6,7 +6,6 @@
 
 #include "blackrock_depths.h"
 #include "InstanceScript.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
 #define TIMER_TOMBOFTHESEVEN    15000
@@ -249,9 +248,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("scripts.ai", "TSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
-#endif
 
             switch (type)
             {

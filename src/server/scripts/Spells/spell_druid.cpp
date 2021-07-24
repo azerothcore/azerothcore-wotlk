@@ -892,8 +892,8 @@ public:
                 if (AuraEffect const* idol = caster->GetAuraEffect(SPELL_DRUID_IDOL_OF_FERAL_SHADOWS, EFFECT_0))
                     amount += cp * idol->GetAmount();
                 // Idol of Worship. Can't be handled as SpellMod due its dependency from CPs
-                else if (AuraEffect const* idol = caster->GetAuraEffect(SPELL_DRUID_IDOL_OF_WORSHIP, EFFECT_0))
-                    amount += cp * idol->GetAmount();
+                else if (AuraEffect const* idol2 = caster->GetAuraEffect(SPELL_DRUID_IDOL_OF_WORSHIP, EFFECT_0))
+                    amount += cp * idol2->GetAmount();
 
                 amount += int32(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), cp));
             }

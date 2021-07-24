@@ -42,7 +42,7 @@ void ChannelMgr::LoadChannels()
     QueryResult result = CharacterDatabase.PQuery("SELECT channelId, name, team, announce, ownership, password FROM channels ORDER BY channelId ASC");
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 channels. DB table `channels` is empty.");
+        LOG_INFO("server.loading", ">> Loaded 0 channels. DB table `channels` is empty.");
         return;
     }
 
@@ -59,7 +59,7 @@ void ChannelMgr::LoadChannels()
         std::wstring channelWName;
         if (!Utf8toWStr(channelName, channelWName))
         {
-            LOG_ERROR("server", "Failed to load channel '%s' from database - invalid utf8 sequence? Deleted.", channelName.c_str());
+            LOG_ERROR("server.loading", "Failed to load channel '%s' from database - invalid utf8 sequence? Deleted.", channelName.c_str());
             toDelete.push_back({ channelName, team });
             continue;
         }
@@ -67,7 +67,7 @@ void ChannelMgr::LoadChannels()
         ChannelMgr* mgr = forTeam(team);
         if (!mgr)
         {
-            LOG_ERROR("server", "Failed to load custom chat channel '%s' from database - invalid team %u. Deleted.", channelName.c_str(), team);
+            LOG_ERROR("server.loading", "Failed to load custom chat channel '%s' from database - invalid team %u. Deleted.", channelName.c_str(), team);
             toDelete.push_back({ channelName, team });
             continue;
         }
@@ -94,14 +94,14 @@ void ChannelMgr::LoadChannels()
 
     for (auto pair : toDelete)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL);
         stmt->setString(0, pair.first);
         stmt->setUInt32(1, pair.second);
         CharacterDatabase.Execute(stmt);
     }
 
-    LOG_INFO("server", ">> Loaded %u channels in %ums", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u channels in %ums", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 Channel* ChannelMgr::GetJoinChannel(std::string const& name, uint32 channelId)
@@ -157,8 +157,8 @@ void ChannelMgr::LoadChannelRights()
     QueryResult result = CharacterDatabase.Query("SELECT name, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights");
     if (!result)
     {
-        LOG_INFO("server", ">>  Loaded 0 Channel Rights!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">>  Loaded 0 Channel Rights!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -184,8 +184,8 @@ void ChannelMgr::LoadChannelRights()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %d Channel Rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %d Channel Rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 const ChannelRights& ChannelMgr::GetChannelRightsFor(const std::string& name)

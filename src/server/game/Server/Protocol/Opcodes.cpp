@@ -489,7 +489,7 @@ void OpcodeTable::Initialize()
     /*0x172*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOUNTSPECIAL_ANIM,                                  STATUS_NEVER);
     /*0x173*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PET_TAME_FAILURE,                                   STATUS_NEVER);
     /*0x174*/ DEFINE_HANDLER(CMSG_PET_SET_ACTION,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandlePetSetAction                       );
-    /*0x175*/ DEFINE_HANDLER(CMSG_PET_ACTION,                                                       STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandlePetAction                          );
+    /*0x175*/ DEFINE_HANDLER(CMSG_PET_ACTION,                                                       STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandlePetAction                          );
     /*0x176*/ DEFINE_HANDLER(CMSG_PET_ABANDON,                                                      STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandlePetAbandon                         );
     /*0x177*/ DEFINE_HANDLER(CMSG_PET_RENAME,                                                       STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandlePetRename                          );
     /*0x178*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PET_NAME_INVALID,                                   STATUS_NEVER);
@@ -1430,7 +1430,7 @@ void OpcodeTable::Initialize()
 
 #undef DEFINE_HANDLER
 #undef DEFINE_SERVER_OPCODE_HANDLER
-};
+}
 
 template<typename T>
 inline std::string GetOpcodeNameForLoggingImpl(T id)
