@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627110823308609260');
 
--- Set Dreadscorn respawn to 5 hours
-UPDATE `creature` SET `spawntimesecs` = 18000 WHERE `id` = 8304 AND `guid` = 3902;
+-- Set Dreadscorn respawn to 6.5 hours
+UPDATE `creature` SET `spawntimesecs` = 23400 WHERE `id` = 8304 AND `guid` = 3902;
 
 -- Set Gnarl Leafbrother respawn to 40 hours
 UPDATE `creature` SET `spawntimesecs` = 144000 WHERE `id` = 5354 AND `guid` = 51842;
