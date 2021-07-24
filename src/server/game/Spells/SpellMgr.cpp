@@ -5568,6 +5568,9 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
 
+    ApplySpellFix({ 29069  }, [](SpellEntry* spellInfo) { spellInfo->EffectBasePoints[0] = 5000;
+    });
+
     ApplySpellFix({ 66320, 67472, 67473, 67475 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectRadiusIndex[0] = 7;
