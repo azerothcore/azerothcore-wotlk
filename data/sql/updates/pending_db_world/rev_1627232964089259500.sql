@@ -3,6 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627232964089259500');
 
 -- Delete previous spawns to have two spawns (38089 and 134366)
 DELETE FROM `creature` WHERE (`id` = 8299) AND (`guid` IN (134367, 134368, 134369, 134370, 134371, 134372, 134373, 134374, 134375, 134376, 134377, 134378, 134379));
+DELETE FROM `pool_creature` WHERE (`guid` IN (134367, 134368, 134369, 134370, 134371, 134372, 134373, 134374, 134375, 134376, 134377, 134378, 134379));
 
 -- Set the Creature Spiteflayer a patrol route movement and reduced movement speed
 UPDATE `creature_template` SET `MovementType` = 2, `speed_walk` = 1 WHERE (`entry` = 8299);
