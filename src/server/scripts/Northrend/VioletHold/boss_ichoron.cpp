@@ -57,10 +57,6 @@ enum eSpells
 #define SPELL_WATER_BOLT_VOLLEY             DUNGEON_MODE(SPELL_WATER_BOLT_VOLLEY_N, SPELL_WATER_BOLT_VOLLEY_H)
 #define SPELL_FRENZY                        DUNGEON_MODE(SPELL_FRENZY_N, SPELL_FRENZY_H)
 
-enum eEvents
-{
-    EVENT_SPELL_WATER_BOLT_VOLLEY = 1,
-};
 
 class boss_ichoron : public CreatureScript
 {
