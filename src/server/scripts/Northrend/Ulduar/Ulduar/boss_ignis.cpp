@@ -397,7 +397,7 @@ public:
                             if( me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID() )
                                 continue;
                             bool found = false;
-                            for(std::list<Creature*>::iterator iterator = icl.begin(); iterator != icl.end(); ++iterator)
+                            for (std::list<Creature*>::iterator iterator = icl.begin(); iterator != icl.end(); ++iterator)
                             {
                                 if ((*iterator)->GetVictim() && (*iterator)->GetVictim()->GetGUID() == temp->GetGUID())
                                 {
