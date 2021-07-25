@@ -4,6 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+/** \addtogroup u2w User to World Communication
+ *  @{
+ *  \file WorldSocketMgr.h
+ */
+
 #ifndef __WORLDSOCKETMGR_H
 #define __WORLDSOCKETMGR_H
 
