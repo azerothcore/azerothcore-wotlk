@@ -313,13 +313,13 @@ void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder co
     // load action bar, if data broken will fill later by default spells.
     if (!is_temporary_summoned)
     {
+        pet->GetCharmInfo()->LoadPetActionBar(holder.GetActionBar()); // action bar stored in already read string
         pet->_LoadSpells(holder.GetPreparedResult(PET_LOAD_QUERY_LOADSPELLS));
         pet->InitTalentForLevel();                               // re-init to check talent count
         pet->_LoadSpellCooldowns(holder.GetPreparedResult(PET_LOAD_QUERY_LOADSPELLCOOLDOWN));
         pet->LearnPetPassives();
         pet->InitLevelupSpellsForLevel();
         pet->CastPetAuras(current);
-        pet->GetCharmInfo()->LoadPetActionBar(holder.GetActionBar()); // action bar stored in already read string
     }
 
     pet->CleanupActionBar();                                     // remove unknown spells from action bar after load

@@ -6904,8 +6904,8 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         }
         else
         {
-            // Auras activated by use should not be removed on unequip
-            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+            // Auras activated by use should not be removed on unequip (with no charges)
+            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && spellData.SpellCharges <= 0)
             {
                 continue;
             }
