@@ -30,6 +30,7 @@ enum SpellData
     NPC_PROXIMITY_MINE                              = 34362,
     SPELL_MINE_EXPLOSION_25                         = 63009,
     SPELL_MINE_EXPLOSION_10                         = 66351,
+    SPELL_SUMMON_PROXIMITY_MINE                     = 65347,
 
     // PHASE 2:
     SPELL_HEAT_WAVE                                 = 64533,
@@ -1158,20 +1159,9 @@ public:
                     events.ScheduleEvent(EVENT_PROXIMITY_MINES_1, 8000);
                     break;
                 case EVENT_PROXIMITY_MINES_1:
+                    for (uint8 i = 0; i < 10; ++i)
                     {
-                        float angle = rand_norm() * 2 * M_PI;
-                        float x, y, z;
-                        me->GetPosition(x, y, z);
-                        for( uint8 i = 0; i < 17; ++i )
-                        {
-                            if( i == 7 )
-                                continue;
-
-                            float v_xmin = 0.1f * cos( angle + i * M_PI / 9 );
-                            float v_ymin = 0.1f * sin( angle + i * M_PI / 9 );
-                            if( Creature* pmNPC = me->SummonCreature(NPC_PROXIMITY_MINE, x + v_xmin, y + v_ymin, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 40000) )
-                                pmNPC->KnockbackFrom(x, y, 6.0f, 25.0f);
-                        }
+                        me->CastSpell(me, SPELL_SUMMON_PROXIMITY_MINE, true);
                     }
                     break;
                 case EVENT_FLAME_SUPPRESSION_50000:
@@ -2321,7 +2311,7 @@ public:
 
         void RemoveAll()
         {
-            for (ObjectGuid guid : FlameList)
+            for (ObjectGuid const& guid : FlameList)
                 if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                     c->DespawnOrUnsummon();
             FlameList.clear();
@@ -2523,7 +2513,7 @@ class achievement_mimiron_firefighter : public AchievementCriteriaScript
 public:
     achievement_mimiron_firefighter() : AchievementCriteriaScript("achievement_mimiron_firefighter") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -2534,7 +2524,7 @@ class achievement_mimiron_set_up_us_the_bomb_11 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_11() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_11") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(11);
     }
@@ -2545,7 +2535,7 @@ class achievement_mimiron_set_up_us_the_bomb_12 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_12() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_12") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(12);
     }
@@ -2556,7 +2546,7 @@ class achievement_mimiron_set_up_us_the_bomb_13 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_13() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_13") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(13);
     }

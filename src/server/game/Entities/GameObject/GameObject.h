@@ -662,8 +662,8 @@ union GameObjectValue
 
 struct GameObjectLocale
 {
-    StringVector Name;
-    StringVector CastBarCaption;
+    std::vector<std::string> Name;
+    std::vector<std::string> CastBarCaption;
 };
 
 // `gameobject_addon` table
@@ -759,8 +759,8 @@ public:
     // overwrite WorldObject function for proper name localization
     [[nodiscard]] std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
 
-    void SaveToDB();
-    void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
+    void SaveToDB(bool saveAddon = false);
+    void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool saveAddon = false);
     bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
     bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true);
     void DeleteFromDB();
@@ -812,8 +812,8 @@ public:
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
     void Refresh();
     void Delete();
-    void getFishLoot(Loot* loot, Player* loot_owner);
-    void getFishLootJunk(Loot* loot, Player* loot_owner);
+    void GetFishLoot(Loot* loot, Player* loot_owner);
+    void GetFishLootJunk(Loot* loot, Player* loot_owner);
     [[nodiscard]] GameobjectTypes GetGoType() const { return GameobjectTypes(GetByteValue(GAMEOBJECT_BYTES_1, 1)); }
     void SetGoType(GameobjectTypes type) { SetByteValue(GAMEOBJECT_BYTES_1, 1, type); }
     [[nodiscard]] GOState GetGoState() const { return GOState(GetByteValue(GAMEOBJECT_BYTES_1, 0)); }
@@ -843,7 +843,7 @@ public:
     void AddToSkillupList(ObjectGuid playerGuid) { m_SkillupList.push_back(playerGuid); }
     [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const
     {
-        for (ObjectGuid const guid : m_SkillupList)
+        for (ObjectGuid const& guid : m_SkillupList)
             if (guid == playerGuid)
                 return true;
 
@@ -953,6 +953,7 @@ public:
 
 protected:
     bool AIM_Initialize();
+    GameObjectModel* CreateModel();
     void UpdateModel();                                 // updates model in case displayId were changed
     uint32      m_spellId;
     time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
@@ -992,7 +993,7 @@ private:
     void UpdatePackedRotation();
 
     //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
-    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const override
+    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/, bool /*useBoundingRadius = true*/) const override
     {
         //! Following check does check 3d distance
         dist2compare += obj->GetObjectSize();

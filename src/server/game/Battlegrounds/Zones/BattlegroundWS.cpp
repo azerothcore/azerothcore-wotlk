@@ -4,7 +4,6 @@
 
 #include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
-#include "Creature.h"
 #include "GameGraveyard.h"
 #include "GameObject.h"
 #include "Language.h"
@@ -142,6 +141,26 @@ void BattlegroundWS::RespawnFlagAfterDrop(TeamId teamId)
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10);
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15);
     RemoveAssaultAuras();
+
+    CheckFlagKeeperInArea(teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+}
+
+void BattlegroundWS::CheckFlagKeeperInArea(TeamId teamId)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS || GetFlagState(teamId) != BG_WS_FLAG_STATE_ON_PLAYER)
+    {
+        return;
+    }
+
+    uint32 triggerId = teamId == TEAM_ALLIANCE ? BG_WS_TRIGGER_HORDE_FLAG_SPAWN : BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN;
+    AreaTrigger const* areaTrigger = sObjectMgr->GetAreaTrigger(triggerId);
+    if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(teamId)))
+    {
+        if (areaTrigger && player->IsInAreaTriggerRadius(areaTrigger))
+        {
+            HandleAreaTrigger(player, triggerId);
+        }
+    }
 }
 
 void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
@@ -287,6 +306,8 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
             _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10);
             _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15);
             RemoveAssaultAuras();
+
+            CheckFlagKeeperInArea(TEAM_HORDE);
             return;
         }
         else
@@ -318,6 +339,8 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
             _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10);
             _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15);
             RemoveAssaultAuras();
+
+            CheckFlagKeeperInArea(TEAM_ALLIANCE);
             return;
         }
         else
@@ -354,11 +377,11 @@ void BattlegroundWS::HandleAreaTrigger(Player* player, uint32 trigger)
 
     switch (trigger)
     {
-        case 3646: // Alliance Flag spawn
+        case BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN: // Alliance Flag spawn
             if (GetFlagState(TEAM_ALLIANCE) == BG_WS_FLAG_STATE_ON_BASE && GetFlagPickerGUID(TEAM_HORDE) == player->GetGUID())
                 EventPlayerCapturedFlag(player);
             break;
-        case 3647: // Horde Flag spawn
+        case BG_WS_TRIGGER_HORDE_FLAG_SPAWN: // Horde Flag spawn
             if (GetFlagState(TEAM_HORDE) == BG_WS_FLAG_STATE_ON_BASE && GetFlagPickerGUID(TEAM_ALLIANCE) == player->GetGUID())
                 EventPlayerCapturedFlag(player);
             break;
@@ -366,12 +389,12 @@ void BattlegroundWS::HandleAreaTrigger(Player* player, uint32 trigger)
         case 3688: // Not used
         case 4628: // Not used
         case 4629: // Not used
-        case 3686: // Alliance elixir of speed spawn
-        case 3687: // Horde elixir of speed spawn
-        case 3706: // Alliance elixir of regeneration spawn
-        case 3708: // Horde elixir of regeneration spawn
-        case 3707: // Alliance elixir of berserk spawn
-        case 3709: // Horde elixir of berserk spawn
+        case BG_WS_TRIGGER_ALLIANCE_ELIXIR_SPEED_SPAWN: // Alliance elixir of speed spawn
+        case BG_WS_TRIGGER_HORDE_ELIXIR_SPEED_SPAWN: // Horde elixir of speed spawn
+        case BG_WS_TRIGGER_ALLIANCE_ELIXIR_REGEN_SPAWN: // Alliance elixir of regeneration spawn
+        case BG_WS_TRIGGER_HORDE_ELIXIR_REGEN_SPAWN: // Horde elixir of regeneration spawn
+        case BG_WS_TRIGGER_ALLIANCE_ELIXIR_BERSERK_SPAWN: // Alliance elixir of berserk spawn
+        case BG_WS_TRIGGER_HORDE_ELIXIR_BERSERK_SPAWN: // Horde elixir of berserk spawn
             break;
     }
 }
@@ -382,12 +405,12 @@ bool BattlegroundWS::SetupBattleground()
     AddObject(BG_WS_OBJECT_A_FLAG, BG_OBJECT_A_FLAG_WS_ENTRY, 1540.423f, 1481.325f, 351.8284f, 3.089233f, 0, 0, 0.9996573f, 0.02617699f, RESPAWN_IMMEDIATELY);
     AddObject(BG_WS_OBJECT_H_FLAG, BG_OBJECT_H_FLAG_WS_ENTRY, 916.0226f, 1434.405f, 345.413f, 0.01745329f, 0, 0, 0.008726535f, 0.9999619f, RESPAWN_IMMEDIATELY);
     // buffs
-    AddObject(BG_WS_OBJECT_SPEEDBUFF_1, BG_OBJECTID_SPEEDBUFF_ENTRY, 1449.93f, 1470.71f, 342.6346f, -1.64061f, 0, 0, 0.7313537f, -0.6819983f, BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_SPEEDBUFF_2, BG_OBJECTID_SPEEDBUFF_ENTRY, 1005.171f, 1447.946f, 335.9032f, 1.64061f, 0, 0, 0.7313537f, 0.6819984f, BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_REGENBUFF_1, BG_OBJECTID_REGENBUFF_ENTRY, 1317.506f, 1550.851f, 313.2344f, -0.2617996f, 0, 0, 0.1305263f, -0.9914448f, BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_REGENBUFF_2, BG_OBJECTID_REGENBUFF_ENTRY, 1110.451f, 1353.656f, 316.5181f, -0.6806787f, 0, 0, 0.333807f, -0.9426414f, BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_BERSERKBUFF_1, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1320.09f, 1378.79f, 314.7532f, 1.186824f, 0, 0, 0.5591929f, 0.8290376f, BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_BERSERKBUFF_2, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1139.688f, 1560.288f, 306.8432f, -2.443461f, 0, 0, 0.9396926f, -0.3420201f, BUFF_RESPAWN_TIME);
+    AddObject(BG_WS_OBJECT_SPEEDBUFF_1, BG_OBJECTID_SPEEDBUFF_ENTRY, 1449.93f, 1470.71f, 342.6346f, -1.64061f, 0, 0, 0.7313537f, -0.6819983f, SPEED_BUFF_RESPAWN_TIME);
+    AddObject(BG_WS_OBJECT_SPEEDBUFF_2, BG_OBJECTID_SPEEDBUFF_ENTRY, 1005.171f, 1447.946f, 335.9032f, 1.64061f, 0, 0, 0.7313537f, 0.6819984f, SPEED_BUFF_RESPAWN_TIME);
+    AddObject(BG_WS_OBJECT_REGENBUFF_1, BG_OBJECTID_REGENBUFF_ENTRY, 1317.506f, 1550.851f, 313.2344f, -0.2617996f, 0, 0, 0.1305263f, -0.9914448f, RESTORATION_BUFF_RESPAWN_TIME);
+    AddObject(BG_WS_OBJECT_REGENBUFF_2, BG_OBJECTID_REGENBUFF_ENTRY, 1110.451f, 1353.656f, 316.5181f, -0.6806787f, 0, 0, 0.333807f, -0.9426414f, RESTORATION_BUFF_RESPAWN_TIME);
+    AddObject(BG_WS_OBJECT_BERSERKBUFF_1, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1320.09f, 1378.79f, 314.7532f, 1.186824f, 0, 0, 0.5591929f, 0.8290376f, BERSERKING_BUFF_RESPAWN_TIME);
+    AddObject(BG_WS_OBJECT_BERSERKBUFF_2, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1139.688f, 1560.288f, 306.8432f, -2.443461f, 0, 0, 0.9396926f, -0.3420201f, BERSERKING_BUFF_RESPAWN_TIME);
     // alliance gates
     AddObject(BG_WS_OBJECT_DOOR_A_1, BG_OBJECT_DOOR_A_1_WS_ENTRY, 1503.335f, 1493.466f, 352.1888f, 3.115414f, 0, 0, 0.9999143f, 0.01308903f, RESPAWN_IMMEDIATELY);
     AddObject(BG_WS_OBJECT_DOOR_A_2, BG_OBJECT_DOOR_A_2_WS_ENTRY, 1492.478f, 1457.912f, 342.9689f, 3.115414f, 0, 0, 0.9999143f, 0.01308903f, RESPAWN_IMMEDIATELY);

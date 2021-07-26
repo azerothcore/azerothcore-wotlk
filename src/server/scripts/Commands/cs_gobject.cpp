@@ -148,6 +148,7 @@ public:
 
         // fill the gameobject data and save to the db
         object->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), player->GetPhaseMaskForSpawn());
+        guidLow = object->GetSpawnId();
         // delete the old object and do a clean load from DB with a fresh new GameObject instance.
         // this is required to avoid weird behavior and memory leaks
         delete object;
@@ -223,9 +224,9 @@ public:
                 std::string name = id;
                 WorldDatabase.EscapeString(name);
                 result = WorldDatabase.PQuery(
-                             "SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseMask, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
-                             "FROM gameobject, gameobject_template WHERE gameobject_template.entry = gameobject.id AND map = %i AND name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'") " ORDER BY order_ ASC LIMIT 1",
-                             player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), name.c_str());
+                    "SELECT guid, id, position_x, position_y, position_z, orientation, map, phaseMask, (POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ "
+                    "FROM gameobject, gameobject_template WHERE gameobject_template.entry = gameobject.id AND map = %i AND name LIKE '%%%s%%' ORDER BY order_ ASC LIMIT 1",
+                    player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), name.c_str());
             }
         }
         else
@@ -402,12 +403,25 @@ public:
             oz = player->GetOrientation();
         }
 
-        object->SetWorldRotationAngles(oz, oy, ox);
-        object->DestroyForNearbyPlayers();
-        object->UpdateObjectVisibility();
+        Map* map = object->GetMap();
 
-        object->SaveToDB();
-        object->Refresh();
+        object->Relocate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), oz);
+        object->SetWorldRotationAngles(oz, oy, ox);
+
+        object->SaveToDB(true);
+
+        // Generate a completely new spawn with new guid
+        // 3.3.5a client caches recently deleted objects and brings them back to life
+        // when CreateObject block for this guid is received again
+        // however it entirely skips parsing that block and only uses already known location
+        object->Delete();
+
+        object = new GameObject();
+        if (!object->LoadGameObjectFromDB(guidLow, map))
+        {
+            delete object;
+            return false;
+        }
 
         handler->PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, object->GetSpawnId(), object->GetGOInfo()->name.c_str(), object->GetSpawnId(), oz, oy, ox);
 
@@ -438,12 +452,10 @@ public:
         char* toY = strtok(nullptr, " ");
         char* toZ = strtok(nullptr, " ");
 
+        Position pos;
         if (!toX)
         {
-            Player* player = handler->GetSession()->GetPlayer();
-            object->GetMap()->GameObjectRelocation(object, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), object->GetOrientation());
-            object->DestroyForNearbyPlayers();
-            object->UpdateObjectVisibility();
+            pos = handler->GetSession()->GetPlayer()->GetPosition();
         }
         else
         {
@@ -461,13 +473,31 @@ public:
                 return false;
             }
 
-            object->GetMap()->GameObjectRelocation(object, x, y, z, object->GetOrientation());
-            object->DestroyForNearbyPlayers();
-            object->UpdateObjectVisibility();
+            pos.Relocate(x, y, z);
         }
 
+        Map* map = object->GetMap();
+
+        pos.SetOrientation(object->GetOrientation());
+        object->Relocate(pos);
+
+        // update which cell has this gameobject registered for loading
+        sObjectMgr->RemoveGameobjectFromGrid(guidLow, object->GetGOData());
         object->SaveToDB();
-        object->Refresh();
+        sObjectMgr->AddGameobjectToGrid(guidLow, object->GetGOData());
+
+        // Generate a completely new spawn with new guid
+        // 3.3.5a client caches recently deleted objects and brings them back to life
+        // when CreateObject block for this guid is received again
+        // however it entirely skips parsing that block and only uses already known location
+        object->Delete();
+
+        object = new GameObject();
+        if (!object->LoadGameObjectFromDB(guidLow, map))
+        {
+            delete object;
+            return false;
+        }
 
         handler->PSendSysMessage(LANG_COMMAND_MOVEOBJMESSAGE, object->GetSpawnId(), object->GetGOInfo()->name.c_str(), object->GetSpawnId());
 
@@ -515,7 +545,7 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_NEAREST);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_NEAREST);
         stmt->setFloat(0, player->GetPositionX());
         stmt->setFloat(1, player->GetPositionY());
         stmt->setFloat(2, player->GetPositionZ());
@@ -525,8 +555,8 @@ public:
         stmt->setFloat(6, player->GetPositionZ());
         stmt->setFloat(7, distance * distance);
         stmt->setUInt32(8, player->GetPhaseMask());
-        PreparedQueryResult result = WorldDatabase.Query(stmt);
 
+        PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (result)
         {
             do

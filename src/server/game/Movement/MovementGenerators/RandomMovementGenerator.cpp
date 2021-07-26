@@ -13,6 +13,15 @@
 #include "Spell.h"
 #include "Util.h"
 
+template<class T>
+RandomMovementGenerator<T>::~RandomMovementGenerator() { }
+
+template<>
+RandomMovementGenerator<Creature>::~RandomMovementGenerator()
+{
+    delete _pathGenerator;
+}
+
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 {
@@ -54,7 +63,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         Map* map = creature->GetMap();
         float x = _destinationPoints[newPoint].x, y = _destinationPoints[newPoint].y, z = _destinationPoints[newPoint].z;
         // invalid coordinates
-        if (!acore::IsValidMapCoord(x, y))
+        if (!Acore::IsValidMapCoord(x, y))
         {
             _validPointsVector[_currentPoint].erase(randomIter);
             _preComputedPaths.erase(pathIdx);

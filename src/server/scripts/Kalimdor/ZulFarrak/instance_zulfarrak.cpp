@@ -87,6 +87,7 @@ public:
     };
 };
 
+// 10247 - Summon Zul'Farrak Zombies
 class spell_zulfarrak_summon_zulfarrak_zombies : public SpellScriptLoader
 {
 public:
@@ -126,6 +127,7 @@ public:
     }
 };
 
+// 10738 - Unlocking
 class spell_zulfarrak_unlocking : public SpellScriptLoader
 {
 public:
@@ -139,9 +141,9 @@ public:
         {
             GameObject* cage = GetHitGObj();
             std::list<WorldObject*> cagesList;
-            acore::AllWorldObjectsInRange objects(GetCaster(), 15.0f);
-            acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(GetCaster(), cagesList, objects);
-            GetCaster()->VisitNearbyObject(15.0f, searcher);
+            Acore::AllWorldObjectsInRange objects(GetCaster(), 15.0f);
+            Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(GetCaster(), cagesList, objects);
+            Cell::VisitAllObjects(GetCaster(), searcher, 15.0f);
             for (std::list<WorldObject*>::const_iterator itr = cagesList.begin(); itr != cagesList.end(); ++itr)
             {
                 if (GameObject* go = (*itr)->ToGameObject())

@@ -220,7 +220,7 @@ public:
                     {
                         if (!m_uiAncientGemGUID.empty())
                         {
-                            for (ObjectGuid const guid : m_uiAncientGemGUID)
+                            for (ObjectGuid const& guid : m_uiAncientGemGUID)
                             {
                                 //don't know how long it expected
                                 DoRespawnGameObject(guid, DAY);

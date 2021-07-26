@@ -50,10 +50,10 @@ target_include_directories(common
 
 target_link_libraries(common
   PRIVATE
-    game-interface
-  PUBLIC
     acore-core-interface
-    ace
+  PUBLIC
+    boost
+    argon2
     g3dlib
     Detour
     sfmt
@@ -61,6 +61,7 @@ target_link_libraries(common
     openssl
     threads
     jemalloc
+    stdfs
     fmt)
 
 set_target_properties(common

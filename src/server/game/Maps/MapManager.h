@@ -37,16 +37,22 @@ public:
         return (iter == i_maps.end() ? nullptr : iter->second);
     }
 
-    uint32 GetAreaId(uint32 mapid, float x, float y, float z) const
+    [[nodiscard]] uint32 GetAreaId(uint32 mapid, float x, float y, float z) const
     {
         Map const* m = const_cast<MapManager*>(this)->CreateBaseMap(mapid);
         return m->GetAreaId(x, y, z);
     }
-    uint32 GetZoneId(uint32 mapid, float x, float y, float z) const
+    [[nodiscard]] uint32 GetAreaId(uint32 mapid, Position const& pos) const { return GetAreaId(mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()); }
+    [[nodiscard]] uint32 GetAreaId(WorldLocation const& loc) const { return GetAreaId(loc.GetMapId(), loc); }
+
+    [[nodiscard]] uint32 GetZoneId(uint32 mapid, float x, float y, float z) const
     {
         Map const* m = const_cast<MapManager*>(this)->CreateBaseMap(mapid);
         return m->GetZoneId(x, y, z);
     }
+    [[nodiscard]] uint32 GetZoneId(uint32 mapid, Position const& pos) const { return GetZoneId(mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()); }
+    [[nodiscard]] uint32 GetZoneId(WorldLocation const& loc) const { return GetZoneId(loc.GetMapId(), loc); }
+
     void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, uint32 mapid, float x, float y, float z)
     {
         Map const* m = const_cast<MapManager*>(this)->CreateBaseMap(mapid);
@@ -71,19 +77,24 @@ public:
     static bool ExistMapAndVMap(uint32 mapid, float x, float y);
     static bool IsValidMAP(uint32 mapid, bool startUp);
 
+    static bool IsValidMapCoord(uint32 mapid, Position const& pos)
+    {
+        return IsValidMapCoord(mapid, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
+    }
+
     static bool IsValidMapCoord(uint32 mapid, float x, float y)
     {
-        return IsValidMAP(mapid, false) && acore::IsValidMapCoord(x, y);
+        return IsValidMAP(mapid, false) && Acore::IsValidMapCoord(x, y);
     }
 
     static bool IsValidMapCoord(uint32 mapid, float x, float y, float z)
     {
-        return IsValidMAP(mapid, false) && acore::IsValidMapCoord(x, y, z);
+        return IsValidMAP(mapid, false) && Acore::IsValidMapCoord(x, y, z);
     }
 
     static bool IsValidMapCoord(uint32 mapid, float x, float y, float z, float o)
     {
-        return IsValidMAP(mapid, false) && acore::IsValidMapCoord(x, y, z, o);
+        return IsValidMAP(mapid, false) && Acore::IsValidMapCoord(x, y, z, o);
     }
 
     static bool IsValidMapCoord(WorldLocation const& loc)

@@ -7,17 +7,22 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
+#include "ArenaTeam.h"
 #include "Battleground.h"
+#include "DatabaseEnvFwd.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
 #include "InstanceSaveMgr.h"
-#include "ArenaTeam.h"
 #include "Item.h"
+#include "KillRewarder.h"
 #include "MapReference.h"
 #include "ObjectMgr.h"
+#include "Optional.h"
 #include "PetDefines.h"
+#include "PlayerTaxi.h"
 #include "QuestDef.h"
 #include "SpellMgr.h"
+#include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
 #include <string>
@@ -49,6 +54,22 @@ typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_MAX_DAILY_QUESTS     25
 #define PLAYER_EXPLORED_ZONES_SIZE  128
+
+// corpse reclaim times
+#define DEATH_EXPIRE_STEP (5*MINUTE)
+#define MAX_DEATH_COUNT 3
+
+#define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
+#define PLAYER_SKILL_VALUE_INDEX(x) (PLAYER_SKILL_INDEX(x)+1)
+#define PLAYER_SKILL_BONUS_INDEX(x) (PLAYER_SKILL_INDEX(x)+2)
+
+#define SKILL_VALUE(x)         PAIR32_LOPART(x)
+#define SKILL_MAX(x)           PAIR32_HIPART(x)
+#define MAKE_SKILL_VALUE(v, m) MAKE_PAIR32(v, m)
+
+#define SKILL_TEMP_BONUS(x)    int16(PAIR32_LOPART(x))
+#define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
+#define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
 
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType
@@ -282,6 +303,14 @@ struct PlayerCreateInfoAction
 
 typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
 
+struct PlayerCreateInfoSkill
+{
+    uint16 SkillId;
+    uint16 Rank;
+};
+
+typedef std::list<PlayerCreateInfoSkill> PlayerCreateInfoSkills;
+
 struct PlayerInfo
 {
     // existence checked by displayId != 0
@@ -296,8 +325,9 @@ struct PlayerInfo
     uint16 displayId_m{0};
     uint16 displayId_f{0};
     PlayerCreateInfoItems item;
-    PlayerCreateInfoSpells spell;
+    PlayerCreateInfoSpells customSpells;
     PlayerCreateInfoActions action;
+    PlayerCreateInfoSkills skills;
 
     PlayerLevelInfo* levelInfo{nullptr};                             //[level-1] 0..MaxPlayerLevel-1
 };
@@ -666,14 +696,6 @@ struct ItemPosCount
 };
 typedef std::vector<ItemPosCount> ItemPosCountVec;
 
-enum TradeSlots
-{
-    TRADE_SLOT_COUNT            = 7,
-    TRADE_SLOT_TRADED_COUNT     = 6,
-    TRADE_SLOT_NONTRADED        = 6,
-    TRADE_SLOT_INVALID          = -1,
-};
-
 enum TransferAbortReason
 {
     TRANSFER_ABORT_NONE                     = 0x00,
@@ -907,64 +929,6 @@ enum EmoteBroadcastTextID
     EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES = 91243
 };
 
-class PlayerTaxi
-{
-public:
-    PlayerTaxi();
-    ~PlayerTaxi() = default;
-    // Nodes
-    void InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level);
-    void LoadTaxiMask(std::string const& data);
-
-    [[nodiscard]] bool IsTaximaskNodeKnown(uint32 nodeidx) const
-    {
-        uint8  field   = uint8((nodeidx - 1) / 32);
-        uint32 submask = 1 << ((nodeidx - 1) % 32);
-        return (m_taximask[field] & submask) == submask;
-    }
-    bool SetTaximaskNode(uint32 nodeidx)
-    {
-        uint8  field   = uint8((nodeidx - 1) / 32);
-        uint32 submask = 1 << ((nodeidx - 1) % 32);
-        if ((m_taximask[field] & submask) != submask)
-        {
-            m_taximask[field] |= submask;
-            return true;
-        }
-        else
-            return false;
-    }
-    void AppendTaximaskTo(ByteBuffer& data, bool all);
-
-    // Destinations
-    bool LoadTaxiDestinationsFromString(std::string const& values, TeamId teamId);
-    std::string SaveTaxiDestinationsToString();
-
-    void ClearTaxiDestinations() { m_TaxiDestinations.clear(); _taxiSegment = 0; }
-    void AddTaxiDestination(uint32 dest) { m_TaxiDestinations.push_back(dest); }
-    [[nodiscard]] uint32 GetTaxiSource() const { return m_TaxiDestinations.size() <= _taxiSegment + 1 ? 0 : m_TaxiDestinations[_taxiSegment]; }
-    [[nodiscard]] uint32 GetTaxiDestination() const { return m_TaxiDestinations.size() <= _taxiSegment + 1 ? 0 : m_TaxiDestinations[_taxiSegment + 1]; }
-    [[nodiscard]] uint32 GetCurrentTaxiPath() const;
-    uint32 NextTaxiDestination()
-    {
-        ++_taxiSegment;
-        return GetTaxiDestination();
-    }
-
-    // xinef:
-    void SetTaxiSegment(uint32 segment) { _taxiSegment = segment; }
-    [[nodiscard]] uint32 GetTaxiSegment() const { return _taxiSegment; }
-
-    [[nodiscard]] std::vector<uint32> const& GetPath() const { return m_TaxiDestinations; }
-    [[nodiscard]] bool empty() const { return m_TaxiDestinations.empty(); }
-
-    friend std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
-private:
-    TaxiMask m_taximask;
-    std::vector<uint32> m_TaxiDestinations;
-    uint32 _taxiSegment;
-};
-
 std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
 
 class Player;
@@ -1000,86 +964,6 @@ struct EntryPointData
 
     void ClearTaxiPath()     { taxiPath.clear(); }
     [[nodiscard]] bool HasTaxiPath() const { return !taxiPath.empty(); }
-};
-
-class TradeData
-{
-public:                                                 // constructors
-    TradeData(Player* player, Player* trader) : m_player(player),  m_trader(trader), m_accepted(false), m_acceptProccess(false), m_money(0), m_spell(0)
-    {
-    }
-
-    [[nodiscard]] Player* GetTrader() const { return m_trader; }
-    [[nodiscard]] TradeData* GetTraderData() const;
-
-    [[nodiscard]] Item* GetItem(TradeSlots slot) const;
-    [[nodiscard]] bool HasItem(ObjectGuid itemGuid) const;
-    [[nodiscard]] TradeSlots GetTradeSlotForItem(ObjectGuid itemGuid) const;
-    void SetItem(TradeSlots slot, Item* item);
-
-    [[nodiscard]] uint32 GetSpell() const { return m_spell; }
-    void SetSpell(uint32 spell_id, Item* castItem = nullptr);
-
-    [[nodiscard]] Item*  GetSpellCastItem() const;
-    [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem; }
-
-    [[nodiscard]] uint32 GetMoney() const { return m_money; }
-    void SetMoney(uint32 money);
-
-    [[nodiscard]] bool IsAccepted() const { return m_accepted; }
-    void SetAccepted(bool state, bool crosssend = false);
-
-    [[nodiscard]] bool IsInAcceptProcess() const { return m_acceptProccess; }
-    void SetInAcceptProcess(bool state) { m_acceptProccess = state; }
-
-private:                                                // internal functions
-    void Update(bool for_trader = true);
-
-private:                                                // fields
-    Player*    m_player;                                // Player who own of this TradeData
-    Player*    m_trader;                                // Player who trade with m_player
-
-    bool       m_accepted;                              // m_player press accept for trade list
-    bool       m_acceptProccess;                        // one from player/trader press accept and this processed
-
-    uint32     m_money;                                 // m_player place money to trade
-
-    uint32     m_spell;                                 // m_player apply spell to non-traded slot item
-    ObjectGuid m_spellCastItem;                         // applied spell casted by item use
-
-    ObjectGuid m_items[TRADE_SLOT_COUNT];               // traded itmes from m_player side including non-traded slot
-};
-
-class KillRewarder
-{
-public:
-    KillRewarder(Player* killer, Unit* victim, bool isBattleGround);
-
-    void Reward();
-
-private:
-    void _InitXP(Player* player);
-    void _InitGroupData();
-
-    void _RewardHonor(Player* player);
-    void _RewardXP(Player* player, float rate);
-    void _RewardReputation(Player* player, float rate);
-    void _RewardKillCredit(Player* player);
-    void _RewardPlayer(Player* player, bool isDungeon);
-    void _RewardGroup();
-
-    Player* _killer;
-    Unit* _victim;
-    Group* _group;
-    float _groupRate;
-    Player* _maxNotGrayMember;
-    uint32 _count;
-    uint32 _sumLevel;
-    uint32 _xp;
-    bool _isFullXP;
-    uint8 _maxLevel;
-    bool _isBattleGround;
-    bool _isPvP;
 };
 
 class Player : public Unit, public GridObject<Player>
@@ -1547,7 +1431,7 @@ public:
     /***                   LOAD SYSTEM                     ***/
     /*********************************************************/
 
-    bool LoadFromDB(ObjectGuid guid, SQLQueryHolder* holder);
+    bool LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& holder);
     [[nodiscard]] bool isBeingLoaded() const override;
 
     void Initialize(ObjectGuid::LowType guid);
@@ -1564,13 +1448,15 @@ public:
     /*********************************************************/
 
     void SaveToDB(bool create, bool logout);
-    void SaveInventoryAndGoldToDB(SQLTransaction& trans);                    // fast save function for item/money cheating preventing
-    void SaveGoldToDB(SQLTransaction& trans);
+    void SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logout);
+    void SaveInventoryAndGoldToDB(CharacterDatabaseTransaction trans);                    // fast save function for item/money cheating preventing
+    void SaveGoldToDB(CharacterDatabaseTransaction trans);
 
     static void SetUInt32ValueInArray(Tokenizer& data, uint16 index, uint32 value);
     static void SetFloatValueInArray(Tokenizer& data, uint16 index, float value);
-    static void Customize(ObjectGuid guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
+    static void Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDatabaseTransaction trans);
     static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid);
+    static void SavePositionInDB(WorldLocation const& loc, uint16 zoneId, ObjectGuid guid, CharacterDatabaseTransaction trans);
 
     static void DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally);
     static void DeleteOldCharacters();
@@ -1640,8 +1526,7 @@ public:
     uint32 GetMailCacheSize() { return m_mailCache.size();}
     Mail* GetMail(uint32 id);
 
-    PlayerMails::iterator GetMailBegin() { return m_mailCache.begin();}
-    PlayerMails::iterator GetMailEnd() { return m_mailCache.end();}
+    PlayerMails const& GetMails() const { return m_mailCache; }
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
@@ -1692,7 +1577,9 @@ public:
     void learnSpell(uint32 spellId);
     void removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporary);
     void resetSpells();
-    void learnDefaultSpells();
+    void LearnCustomSpells();
+    void LearnDefaultSkills();
+    void LearnDefaultSkill(uint32 skillId, uint16 rank);
     void learnQuestRewardedSpells();
     void learnQuestRewardedSpells(Quest const* quest);
     void learnSpellHighRank(uint32 spellid);
@@ -1727,6 +1614,7 @@ public:
     [[nodiscard]] uint8 GetSpecsCount() const { return m_specsCount; }
     void SetSpecsCount(uint8 count) { m_specsCount = count; }
     void ActivateSpec(uint8 spec);
+    void LoadActions(PreparedQueryResult result);
     void GetTalentTreePoints(uint8 (&specPoints)[3]) const;
     [[nodiscard]] uint8 GetMostPointsTalentTree() const;
     bool HasTankSpec();
@@ -1799,10 +1687,10 @@ public:
     void RemoveArenaSpellCooldowns(bool removeActivePetCooldowns = false);
     void RemoveAllSpellCooldown();
     void _LoadSpellCooldowns(PreparedQueryResult result);
-    void _SaveSpellCooldowns(SQLTransaction& trans, bool logout);
+    void _SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout);
     uint32 GetLastPotionId() { return m_lastPotionId; }
     void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
-    void UpdatePotionCooldown();
+    void UpdatePotionCooldown(Spell* spell = nullptr);
 
     void setResurrectRequestData(ObjectGuid guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
     {
@@ -2029,8 +1917,9 @@ public:
     [[nodiscard]] Corpse* GetCorpse() const;
     void SpawnCorpseBones(bool triggerSave = true);
     Corpse* CreateCorpse();
+    void RemoveCorpse();
     void KillPlayer();
-    static void OfflineResurrect(ObjectGuid const guid, SQLTransaction& trans);
+    static void OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans);
     bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
     WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
@@ -2066,7 +1955,7 @@ public:
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
-    void UpdateWeaponSkill (WeaponAttackType attType);
+    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType);
     void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence);
 
     void SetSkill(uint16 id, uint16 step, uint16 currVal, uint16 maxVal);
@@ -2145,8 +2034,8 @@ public:
     bool RewardHonor(Unit* victim, uint32 groupsize, int32 honor = -1, bool awardXP = true);
     [[nodiscard]] uint32 GetHonorPoints() const { return GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY); }
     [[nodiscard]] uint32 GetArenaPoints() const { return GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY); }
-    void ModifyHonorPoints(int32 value, SQLTransaction* trans = nullptr);      //! If trans is specified, honor save query will be added to trans
-    void ModifyArenaPoints(int32 value, SQLTransaction* trans = nullptr);      //! If trans is specified, arena point save query will be added to trans
+    void ModifyHonorPoints(int32 value, CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr));      //! If trans is specified, honor save query will be added to trans
+    void ModifyArenaPoints(int32 value, CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr));      //! If trans is specified, arena point save query will be added to trans
     [[nodiscard]] uint32 GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const;
     void SetHonorPoints(uint32 value);
     void SetArenaPoints(uint32 value);
@@ -2633,7 +2522,13 @@ public:
     std::string GetMapAreaAndZoneString();
     std::string GetCoordsMapAreaAndZoneString();
 
-protected:
+    void SetFarSightDistance(float radius);
+    void ResetFarSightDistance();
+    Optional<float> GetFarSightDistance() const;
+
+    float GetSightRange(const WorldObject* target = nullptr) const override;
+
+ protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
@@ -2721,24 +2616,24 @@ protected:
     /***                   SAVE SYSTEM                     ***/
     /*********************************************************/
 
-    void _SaveActions(SQLTransaction& trans);
-    void _SaveAuras(SQLTransaction& trans, bool logout);
-    void _SaveInventory(SQLTransaction& trans);
-    void _SaveMail(SQLTransaction& trans);
-    void _SaveQuestStatus(SQLTransaction& trans);
-    void _SaveDailyQuestStatus(SQLTransaction& trans);
-    void _SaveWeeklyQuestStatus(SQLTransaction& trans);
-    void _SaveMonthlyQuestStatus(SQLTransaction& trans);
-    void _SaveSeasonalQuestStatus(SQLTransaction& trans);
-    void _SaveSkills(SQLTransaction& trans);
-    void _SaveSpells(SQLTransaction& trans);
-    void _SaveEquipmentSets(SQLTransaction& trans);
-    void _SaveEntryPoint(SQLTransaction& trans);
-    void _SaveGlyphs(SQLTransaction& trans);
-    void _SaveTalents(SQLTransaction& trans);
-    void _SaveStats(SQLTransaction& trans);
-    void _SaveCharacter(bool create, SQLTransaction& trans);
-    void _SaveInstanceTimeRestrictions(SQLTransaction& trans);
+    void _SaveActions(CharacterDatabaseTransaction trans);
+    void _SaveAuras(CharacterDatabaseTransaction trans, bool logout);
+    void _SaveInventory(CharacterDatabaseTransaction trans);
+    void _SaveMail(CharacterDatabaseTransaction trans);
+    void _SaveQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveDailyQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveWeeklyQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveMonthlyQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveSeasonalQuestStatus(CharacterDatabaseTransaction trans);
+    void _SaveSkills(CharacterDatabaseTransaction trans);
+    void _SaveSpells(CharacterDatabaseTransaction trans);
+    void _SaveEquipmentSets(CharacterDatabaseTransaction trans);
+    void _SaveEntryPoint(CharacterDatabaseTransaction trans);
+    void _SaveGlyphs(CharacterDatabaseTransaction trans);
+    void _SaveTalents(CharacterDatabaseTransaction trans);
+    void _SaveStats(CharacterDatabaseTransaction trans);
+    void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
+    void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
 
     /*********************************************************/
     /***              ENVIRONMENTAL SYSTEM                 ***/
@@ -2913,7 +2808,7 @@ private:
     InventoryResult CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
     InventoryResult CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
-    Item* _LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, Field* fields);
+    Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;
@@ -2986,6 +2881,8 @@ private:
     Creature* m_CinematicObject;
 
     WorldLocation _corpseLocation;
+
+    Optional<float> _farSightDistance = { };
 };
 
 void AddItemsSetItem(Player* player, Item* item);
