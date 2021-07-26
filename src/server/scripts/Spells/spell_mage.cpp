@@ -971,7 +971,7 @@ public:
                 {
                     if (Unit* target = (selectCaster ? eventInfo.GetActor() : eventInfo.GetActionTarget()))
                     {
-                        if (AuraEffect const* aurEff = caster->GetAuraEffect(_spellInfo->Id, eventInfo.GetTriggerAuraEffectIndex(), caster->GetGUID()))
+                        if (AuraEffect const* aurEff = target->GetAuraEffect(_spellInfo->Id, eventInfo.GetTriggerAuraEffectIndex(), caster->GetGUID()))
                         {
                             ticksModifier = aurEff->GetTotalTicks();
                         }
