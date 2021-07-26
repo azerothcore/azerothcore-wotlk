@@ -26,6 +26,7 @@ Versions of MariaDB:
 
 | MariaDB Version | Supported          |
 | --------------- | ------------------ |
+| 10.6            | :white_check_mark: |
 | 10.5            | :white_check_mark: |
 | 10.4            | :white_check_mark: |
 | 10.3            | :white_check_mark: |
@@ -35,11 +36,10 @@ Versions of CLang:
 
 | CLang Version   | Supported          |
 | --------------- | ------------------ |
+| 12              | :white_check_mark: |
 | 11              | :white_check_mark: |
 | 10              | :white_check_mark: |
-| 9               | :white_check_mark: |
-| 7               | :white_check_mark: |
-| 6 and lower     | :red_circle:       |
+| 9 and lower     | :red_circle:       |
 
 Versions of GCC:
 

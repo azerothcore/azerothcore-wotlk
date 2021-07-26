@@ -93,6 +93,42 @@ public:
     }
 };
 
+class spell_warr_victory_rush : public SpellScriptLoader
+{
+public:
+    spell_warr_victory_rush() : SpellScriptLoader("spell_warr_victory_rush") { }
+
+    class spell_warr_victory_rush_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warr_victory_rush_SpellScript);
+
+        void VictoryRushHit()
+        {
+            if (Unit* player = GetCaster())
+            {
+                player->ModifyAuraState(AURA_STATE_WARRIOR_VICTORY_RUSH, false);
+                if (Unit* victim = GetHitUnit())
+                {
+                    if (victim->isDead())
+                    {
+                        player->ModifyAuraState(AURA_STATE_WARRIOR_VICTORY_RUSH, true);
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_warr_victory_rush_SpellScript::VictoryRushHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_warr_victory_rush_SpellScript();
+    }
+};
+
 class spell_warr_intervene : public SpellScriptLoader
 {
 public:
@@ -168,7 +204,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
             GetCaster()->RemoveAurasDueToSpell(SPELL_WARRIOR_SPELL_REFLECTION);
-            unitList.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            unitList.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             while (unitList.size() > GetSpellValue()->MaxAffectedTargets)
                 unitList.pop_back();
         }
@@ -963,6 +999,7 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_intervene();
     new spell_warr_improved_spell_reflection();
     new spell_warr_improved_spell_reflection_trigger();
+    new spell_warr_victory_rush();
 
     // Theirs
     new spell_warr_bloodthirst();

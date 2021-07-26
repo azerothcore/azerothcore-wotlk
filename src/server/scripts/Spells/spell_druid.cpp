@@ -19,7 +19,6 @@
 
 enum DruidSpells
 {
-    // Ours
     SPELL_DRUID_GLYPH_OF_WILD_GROWTH        = 62970,
     SPELL_DRUID_NURTURING_INSTINCT_R1       = 47179,
     SPELL_DRUID_NURTURING_INSTINCT_R2       = 47180,
@@ -30,8 +29,6 @@ enum DruidSpells
     SPELL_DRUID_BARKSKIN                    = 22812,
     SPELL_DRUID_GLYPH_OF_BARKSKIN           = 63057,
     SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER   = 63058,
-
-    // Theirs
     SPELL_DRUID_ENRAGE_MOD_DAMAGE           = 51185,
     SPELL_DRUID_GLYPH_OF_TYPHOON            = 62135,
     SPELL_DRUID_IDOL_OF_FERAL_SHADOWS       = 34241,
@@ -49,7 +46,7 @@ enum DruidSpells
     SPELL_DRUID_ITEM_T8_BALANCE_RELIC       = 64950,
 };
 
-// Ours
+// 70723 - Item - Druid T10 Balance 4P Bonus
 class spell_dru_t10_balance_4p_bonus : public SpellScriptLoader
 {
 public:
@@ -90,6 +87,7 @@ public:
     }
 };
 
+// -33872 - Nurturing Instinct
 class spell_dru_nurturing_instinct : public SpellScriptLoader
 {
 public:
@@ -124,6 +122,8 @@ public:
     }
 };
 
+/* 5487 - Bear Form
+   9634 - Dire Bear Form */
 class spell_dru_feral_swiftness : public SpellScriptLoader
 {
 public:
@@ -159,6 +159,7 @@ public:
     }
 };
 
+// 16864 - Omen of Clarity
 class spell_dru_omen_of_clarity : public SpellScriptLoader
 {
 public:
@@ -194,6 +195,7 @@ public:
     }
 };
 
+// 50419 - Brambles
 class spell_dru_brambles_treant : public SpellScriptLoader
 {
 public:
@@ -240,6 +242,7 @@ public:
     }
 };
 
+// 22812 - Barkskin
 class spell_dru_barkskin : public SpellScriptLoader
 {
 public:
@@ -273,6 +276,10 @@ public:
     }
 };
 
+/* 35669 - Serverside - Druid Pet Scaling 01
+   35670 - Serverside - Druid Pet Scaling 02
+   35671 - Serverside - Druid Pet Scaling 03
+   35672 - Serverside - Druid Pet Scaling 04 */
 class spell_dru_treant_scaling : public SpellScriptLoader
 {
 public:
@@ -364,7 +371,6 @@ public:
     }
 };
 
-// Theirs
 // -1850 - Dash
 class spell_dru_dash : public SpellScriptLoader
 {
@@ -477,8 +483,8 @@ public:
     }
 };
 
-// 34246 - Idol of the Emerald Queen
-// 60779 - Idol of Lush Moss
+/* 34246 - Increased Lifebloom Periodic
+   60779 - Idol of Lush Moss */
 class spell_dru_idol_lifebloom : public SpellScriptLoader
 {
 public:
@@ -680,7 +686,7 @@ public:
     }
 };
 
-// 48504 - Living Seed (Proc)
+// 48504 - Living Seed
 class spell_dru_living_seed_proc : public SpellScriptLoader
 {
 public:
@@ -713,7 +719,7 @@ public:
     }
 };
 
-// 69366 - Moonkin Form passive
+// 69366 - Moonkin Form (Passive)
 class spell_dru_moonkin_form_passive : public SpellScriptLoader
 {
 public:
@@ -886,8 +892,8 @@ public:
                 if (AuraEffect const* idol = caster->GetAuraEffect(SPELL_DRUID_IDOL_OF_FERAL_SHADOWS, EFFECT_0))
                     amount += cp * idol->GetAmount();
                 // Idol of Worship. Can't be handled as SpellMod due its dependency from CPs
-                else if (AuraEffect const* idol = caster->GetAuraEffect(SPELL_DRUID_IDOL_OF_WORSHIP, EFFECT_0))
-                    amount += cp * idol->GetAmount();
+                else if (AuraEffect const* idol2 = caster->GetAuraEffect(SPELL_DRUID_IDOL_OF_WORSHIP, EFFECT_0))
+                    amount += cp * idol2->GetAmount();
 
                 amount += int32(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), cp));
             }
@@ -1011,7 +1017,7 @@ public:
     }
 };
 
-// -50294 - Starfall (AOE)
+// -50294 - Starfall
 class spell_dru_starfall_aoe : public SpellScriptLoader
 {
 public:
@@ -1038,7 +1044,7 @@ public:
     }
 };
 
-// -50286 - Starfall (Dummy)
+// -50286 - Starfall
 class spell_dru_starfall_dummy : public SpellScriptLoader
 {
 public:
@@ -1050,7 +1056,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            acore::Containers::RandomResize(targets, 2);
+            Acore::Containers::RandomResize(targets, 2);
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1239,7 +1245,7 @@ public:
     }
 };
 
-// 70691 - Item T10 Restoration 4P Bonus
+// 70691 - Rejuvenation
 class spell_dru_t10_restoration_4p_bonus : public SpellScriptLoader
 {
 public:
@@ -1276,7 +1282,7 @@ public:
                     return;
                 }
 
-                tempTargets.sort(acore::HealthPctOrderPred());
+                tempTargets.sort(Acore::HealthPctOrderPred());
                 targets.clear();
                 targets.push_back(tempTargets.front());
             }
@@ -1313,13 +1319,13 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::RaidCheck(GetCaster(), false));
+            targets.remove_if(Acore::RaidCheck(GetCaster(), false));
 
             uint32 const maxTargets = GetCaster()->HasAura(SPELL_DRUID_GLYPH_OF_WILD_GROWTH) ? 6 : 5;
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::HealthPctOrderPred());
+                targets.sort(Acore::HealthPctOrderPred());
                 targets.resize(maxTargets);
             }
 
@@ -1391,7 +1397,6 @@ public:
 
 void AddSC_druid_spell_scripts()
 {
-    // Ours
     new spell_dru_t10_balance_4p_bonus();
     new spell_dru_nurturing_instinct();
     new spell_dru_feral_swiftness();
@@ -1400,8 +1405,6 @@ void AddSC_druid_spell_scripts()
     new spell_dru_barkskin();
     new spell_dru_treant_scaling();
     new spell_dru_berserk();
-
-    // Theirs
     new spell_dru_dash();
     new spell_dru_enrage();
     new spell_dru_glyph_of_starfire();

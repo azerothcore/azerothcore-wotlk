@@ -7,10 +7,10 @@
 #ifndef _MMAP_FACTORY_H
 #define _MMAP_FACTORY_H
 
-#include "MMapManager.h"
 #include "DetourAlloc.h"
-#include "DetourNavMesh.h"
 #include "DetourExtended.h"
+#include "DetourNavMesh.h"
+#include "MMapManager.h"
 #include <unordered_map>
 
 namespace MMAP

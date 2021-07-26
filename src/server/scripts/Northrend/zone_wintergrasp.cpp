@@ -798,6 +798,9 @@ public:
 /////// SPELLs
 ////////////////////////////////////////////////
 
+/* 56662, 61409 - Build Siege Vehicle (Force)
+   56664 - Build Catapult (Force)
+   56659 - Build Demolisher (Force) */
 class spell_wintergrasp_force_building : public SpellScriptLoader
 {
 public:
@@ -837,6 +840,9 @@ public:
     }
 };
 
+/* 56661, 61408 - Build Siege Engine
+   56663 - Build Catapult
+   56575 - Build Demolisher */
 class spell_wintergrasp_create_vehicle : public SpellScriptLoader
 {
 public:
@@ -875,6 +881,7 @@ public:
     }
 };
 
+// 49761 - Rocket-Propelled Goblin Grenade
 class spell_wintergrasp_rp_gg : public SpellScriptLoader
 {
 public:
@@ -911,6 +918,7 @@ public:
     }
 };
 
+// 58622 - Teleport to Lake Wintergrasp
 class spell_wintergrasp_portal : public SpellScriptLoader
 {
 public:
@@ -943,6 +951,7 @@ public:
     }
 };
 
+// 36444 - Wintergrasp Water
 class spell_wintergrasp_water : public SpellScriptLoader
 {
 public:
@@ -973,6 +982,7 @@ public:
     }
 };
 
+// 52107 - (Spell not exist in DBC)
 class spell_wintergrasp_hide_small_elementals : public SpellScriptLoader
 {
 public:
@@ -1003,6 +1013,9 @@ public:
     }
 };
 
+/* 57610, 51422 - Cannon
+   50999 - Boulder
+   57607 - Plague Slime */
 class spell_wg_reduce_damage_by_distance : public SpellScriptLoader
 {
 public:
@@ -1045,7 +1058,7 @@ class achievement_wg_didnt_stand_a_chance : public AchievementCriteriaScript
 public:
     achievement_wg_didnt_stand_a_chance() : AchievementCriteriaScript("achievement_wg_didnt_stand_a_chance") { }
 
-    bool OnCheck(Player* source, Unit* target) override
+    bool OnCheck(Player* source, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;
@@ -1069,7 +1082,7 @@ class achievement_wg_vehicular_gnomeslaughter : public AchievementCriteriaScript
 public:
     achievement_wg_vehicular_gnomeslaughter() : AchievementCriteriaScript("achievement_wg_vehicular_gnomeslaughter") { }
 
-    bool OnCheck(Player* source, Unit* target) override
+    bool OnCheck(Player* source, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;
@@ -1089,7 +1102,7 @@ class achievement_wg_within_our_grasp : public AchievementCriteriaScript
 public:
     achievement_wg_within_our_grasp() : AchievementCriteriaScript("achievement_wg_within_our_grasp") { }
 
-    bool OnCheck(Player*  /*source*/, Unit*  /*target*/) override
+    bool OnCheck(Player*  /*source*/, Unit*  /*target*/, uint32 /*criteria_id*/) override
     {
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)

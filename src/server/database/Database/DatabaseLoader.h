@@ -17,9 +17,11 @@ class DatabaseWorkerPool;
 
 // A helper class to initiate all database worker pools,
 // handles updating, delays preparing of statements and cleans up on failure.
-class DatabaseLoader
+class AC_DATABASE_API DatabaseLoader
 {
 public:
+    DatabaseLoader(std::string const& logger, uint32 const defaultUpdateMask = 0);
+
     // Register a database to the loader (lazy implemented)
     template <class T>
     DatabaseLoader& AddDatabase(DatabaseWorkerPool<T>& pool, std::string const& name);
@@ -40,6 +42,8 @@ public:
 
 private:
     bool OpenDatabases();
+    bool PopulateDatabases();
+    bool UpdateDatabases();
     bool PrepareStatements();
 
     using Predicate = std::function<bool()>;
@@ -49,7 +53,11 @@ private:
     // Returns false when there was an error.
     bool Process(std::queue<Predicate>& queue);
 
-    std::queue<Predicate> _open, _prepare;
+    std::string const _logger;
+    bool const _autoSetup;
+    uint32 const _updateFlags;
+
+    std::queue<Predicate> _open, _populate, _update, _prepare;
     std::stack<Closer> _close;
 };
 

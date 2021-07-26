@@ -1,4 +1,6 @@
-// Scripted by Xinef
+/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
 #include "Cell.h"
 #include "CellImpl.h"
@@ -725,9 +727,9 @@ public:
             // For nearby players, check if they have the same aura. If so, cast Romantic Picnic (45123)
             // required by achievement and "hearts" visual
             std::list<Player*> playerList;
-            acore::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE * 2);
-            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
-            target->VisitNearbyWorldObject(INTERACTION_DISTANCE * 2, searcher);
+            Acore::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE * 2);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
+            Cell::VisitWorldObjects(target, searcher, INTERACTION_DISTANCE * 2);
             for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
             {
                 if ((*itr) != target && (*itr)->HasAura(GetId())) // && (*itr)->getStandState() == UNIT_STAND_STATE_SIT)

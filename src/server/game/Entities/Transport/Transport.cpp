@@ -19,7 +19,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldModel.h"
-#include "WorldPacket.h"
 
 MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false)
 {
@@ -38,7 +37,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
 
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+        LOG_ERROR("entities.transport", "Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
                        guidlow, x, y);
         return false;
     }
@@ -49,7 +48,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
 
     if (!goinfo)
     {
-        LOG_ERROR("server", "Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
+        LOG_ERROR("entities.transport", "Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
         return false;
     }
 
@@ -58,7 +57,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     TransportTemplate const* tInfo = sTransportMgr->GetTransportTemplate(entry);
     if (!tInfo)
     {
-        LOG_ERROR("server", "Transport %u (name: %s) will not be created, missing `transport_template` entry.", entry, goinfo->name.c_str());
+        LOG_ERROR("entities.transport", "Transport %u (name: %s) will not be created, missing `transport_template` entry.", entry, goinfo->name.c_str());
         return false;
     }
 
@@ -129,7 +128,7 @@ void MotionTransport::Update(uint32 diff)
     if (AI())
         AI()->UpdateAI(diff);
     else if (!AIM_Initialize())
-        LOG_ERROR("server", "Could not initialize GameObjectAI for Transport");
+        LOG_ERROR("entities.transport", "Could not initialize GameObjectAI for Transport");
 
     if (GetKeyFrames().size() <= 1)
         return;
@@ -333,7 +332,7 @@ Creature* MotionTransport::CreateNPCPassenger(ObjectGuid::LowType guid, Creature
 
     if (!creature->IsPositionValid())
     {
-        LOG_ERROR("server", "Creature (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
+        LOG_ERROR("entities.transport", "Creature (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
             creature->GetGUID().ToString().c_str(), creature->GetPositionX(), creature->GetPositionY());
         delete creature;
         return nullptr;
@@ -375,7 +374,7 @@ GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObj
 
     if (!go->IsPositionValid())
     {
-        LOG_ERROR("server", "GameObject (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
+        LOG_ERROR("entities.transport", "GameObject (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
             go->GetGUID().ToString().c_str(), go->GetPositionX(), go->GetPositionY());
         delete go;
         return nullptr;
@@ -609,7 +608,7 @@ void MotionTransport::UpdatePassengerPositions(PassengerSet& passengers)
         CalculatePassengerPosition(x, y, z, &o);
 
         // check if position is valid
-        if (!acore::IsValidMapCoord(x, y, z))
+        if (!Acore::IsValidMapCoord(x, y, z))
             continue;
 
         switch (passenger->GetTypeId())
@@ -671,7 +670,7 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     m_stationaryPosition.Relocate(x, y, z, ang);
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
+        LOG_ERROR("entities.transport", "Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
         return false;
     }
 
@@ -732,7 +731,17 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     SetGoAnimProgress(animprogress);
     m_goValue.Transport.AnimationInfo = sTransportMgr->GetTransportAnimInfo(goinfo->entry);
     //ASSERT(m_goValue.Transport.AnimationInfo);
+    if (!m_goValue.Transport.AnimationInfo)
+    {
+        LOG_ERROR("vehicle", "StaticTransport::Create: No AnimationInfo was found for GameObject entry (%u)", goinfo->entry);
+        return false;
+    }
     //ASSERT(m_goValue.Transport.AnimationInfo->TotalTime > 0);
+    if (!m_goValue.Transport.AnimationInfo->TotalTime)
+    {
+        LOG_ERROR("vehicle", "StaticTransport::Create: AnimationInfo->TotalTime is 0 for GameObject entry (%u)", goinfo->entry);
+        return false;
+    }
     SetPauseTime(goinfo->transport.pauseAtTime);
     if (goinfo->transport.startOpen && goinfo->transport.pauseAtTime)
     {
@@ -875,7 +884,7 @@ void StaticTransport::RelocateToProgress(uint32 progress)
         float oriRotAngle = oriRotAngleCurr + percRot * (oriRotAngleNext - oriRotAngleCurr);
 
         // check if position is valid
-        if (!acore::IsValidMapCoord(pos.x, pos.y, pos.z))
+        if (!Acore::IsValidMapCoord(pos.x, pos.y, pos.z))
             return;
 
         // update position to new one
@@ -910,7 +919,7 @@ void StaticTransport::UpdatePassengerPositions()
         CalculatePassengerPosition(x, y, z, &o);
 
         // check if position is valid
-        if (!acore::IsValidMapCoord(x, y, z))
+        if (!Acore::IsValidMapCoord(x, y, z))
             continue;
 
         switch (passenger->GetTypeId())
