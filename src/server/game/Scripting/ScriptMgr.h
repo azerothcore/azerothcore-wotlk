@@ -195,7 +195,11 @@ public:
     // Called when the world is actually shut down.
     virtual void OnShutdown() { }
 
-    // Called just before the Client cache version string is sent.
+    /**
+     * @brief This hook runs before sending the cache version to the Client.
+     * 
+     * @param version The cache version that we will be sending to the Client. 
+     */
     virtual void OnBeforeSendClientCacheVersion(uint32& /*version*/) {}
 };
 
