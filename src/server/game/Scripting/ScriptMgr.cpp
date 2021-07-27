@@ -408,9 +408,9 @@ void ScriptMgr::OnAfterConfigLoad(bool reload)
     FOREACH_SCRIPT(WorldScript)->OnAfterConfigLoad(reload);
 }
 
-void ScriptMgr::OnBeforeSendClientCacheVersion(uint32& version)
+void ScriptMgr::OnBeforeFinalizePlayerWorldSession(uint32& version)
 {
-    FOREACH_SCRIPT(WorldScript)->OnBeforeSendClientCacheVersion(version);
+    FOREACH_SCRIPT(WorldScript)->OnBeforeFinalizePlayerWorldSession(version);
 }
 
 void ScriptMgr::OnMotdChange(std::string& newMotd)
