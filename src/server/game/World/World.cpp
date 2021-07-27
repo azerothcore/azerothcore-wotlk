@@ -313,7 +313,10 @@ void World::AddSession_(WorldSession* s)
 
     s->SendAuthResponse(AUTH_OK, true);
     s->SendAddonsInfo();
-    s->SendClientCacheVersion(sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION));
+
+    uint32 cacheVersion = sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION);
+    sScriptMgr->OnBeforeSendClientCacheVersion(cacheVersion);
+    s->SendClientCacheVersion(cacheVersion);
     s->SendTutorialsData();
 
     UpdateMaxSessionCounters();
@@ -399,7 +402,9 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
         pop_sess->SendAuthWaitQue(0);
         pop_sess->SendAddonsInfo();
 
-        pop_sess->SendClientCacheVersion(sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION));
+        uint32 cacheVersion = sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION);
+        sScriptMgr->OnBeforeSendClientCacheVersion(cacheVersion);
+        pop_sess->SendClientCacheVersion(cacheVersion);
         pop_sess->SendAccountDataTimes(GLOBAL_CACHE_MASK);
         pop_sess->SendTutorialsData();
 
