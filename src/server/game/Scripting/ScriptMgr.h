@@ -196,7 +196,7 @@ public:
     virtual void OnShutdown() { }
 
     // Called just before the Client cache version string is sent.
-    virtual void OnBeforeSendClientCache(uint32& /*version*/) { }
+    virtual void OnBeforeSendClientCacheVersion(uint32& /*version*/) {}
 };
 
 class FormulaScript : public ScriptObject
