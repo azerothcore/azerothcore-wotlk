@@ -194,6 +194,9 @@ public:
 
     // Called when the world is actually shut down.
     virtual void OnShutdown() { }
+
+    // Called just before the Client cache version string is sent.
+    virtual void OnBeforeSendClientCache(uint32& /*version*/) { }
 };
 
 class FormulaScript : public ScriptObject
@@ -1466,6 +1469,7 @@ public: /* WorldScript */
     void OnOpenStateChange(bool open);
     void OnBeforeConfigLoad(bool reload);
     void OnAfterConfigLoad(bool reload);
+    void OnBeforeSendClientCacheVersion(uint32& version);
     void OnMotdChange(std::string& newMotd);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
     void OnShutdownCancel();

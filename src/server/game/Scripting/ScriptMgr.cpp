@@ -408,6 +408,11 @@ void ScriptMgr::OnAfterConfigLoad(bool reload)
     FOREACH_SCRIPT(WorldScript)->OnAfterConfigLoad(reload);
 }
 
+void ScriptMgr::OnBeforeSendClientCacheVersion(uint32& version)
+{
+    FOREACH_SCRIPT(WorldScript)->OnBeforeSendClientCacheVersion(version);
+}
+
 void ScriptMgr::OnMotdChange(std::string& newMotd)
 {
     FOREACH_SCRIPT(WorldScript)->OnMotdChange(newMotd);
