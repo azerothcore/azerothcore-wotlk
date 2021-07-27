@@ -1354,6 +1354,41 @@ public:
     }
 };
 
+class spell_sha_flurry_proc : public SpellScriptLoader
+{
+public:
+    spell_sha_flurry_proc() : SpellScriptLoader("spell_sha_flurry_proc") {}
+
+    class spell_sha_flurry_proc_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_sha_flurry_proc_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            // Should not proc from Windfury Attack
+            if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            {
+                if (spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && (spellInfo->SpellFamilyFlags[0] & 0x00800000) != 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_sha_flurry_proc_AuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_sha_flurry_proc_AuraScript();
+    }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     // ours
@@ -1387,4 +1422,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_mana_tide_totem();
     new spell_sha_sentry_totem();
     new spell_sha_thunderstorm();
+    new spell_sha_flurry_proc();
 }
