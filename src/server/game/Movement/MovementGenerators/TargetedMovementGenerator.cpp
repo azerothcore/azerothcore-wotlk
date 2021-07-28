@@ -131,6 +131,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     if (!i_path || moveToward != _movingTowards)
         i_path = std::make_unique<PathGenerator>(owner);
+    else
+        i_path->Clear();
 
     float x, y, z;
     bool shortenPath;
