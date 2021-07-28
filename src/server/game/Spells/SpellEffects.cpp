@@ -4540,8 +4540,12 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
             // remove old glyph aura
             if (uint32 oldGlyph = player->GetGlyph(m_glyphIndex))
                 if (GlyphPropertiesEntry const* oldGlyphEntry = sGlyphPropertiesStore.LookupEntry(oldGlyph))
+                {
                     player->RemoveAurasDueToSpell(oldGlyphEntry->SpellId);
+                    player->SendLearnPacket(oldGlyphEntry->SpellId, false); // Send packet to properly handle clientside spell tooltips
+                }
 
+            player->SendLearnPacket(glyphEntry->SpellId, true); // Send packet to properly handle clientside spell tooltips
             player->CastSpell(m_caster, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
             player->SetGlyph(m_glyphIndex, glyph, !player->GetSession()->PlayerLoading());
             player->SendTalentsInfoData(false);
