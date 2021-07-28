@@ -196,7 +196,7 @@ public:
     virtual void OnShutdown() { }
 
     /**
-     * @brief This hook runs before sending the cache version to the Client.
+     * @brief This hook runs before finalizing the player world session. Can be also used to mutate the cache version of the Client.
      *
      * @param version The cache version that we will be sending to the Client.
      */
