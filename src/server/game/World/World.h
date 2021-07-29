@@ -389,7 +389,7 @@ public:
      *
      * @param session The World Session that we are finalizing.
      */
-    inline void FinalizePlayerWorldSession(WorldSession* session);
+    void FinalizePlayerWorldSession(WorldSession* session);
 
 protected:
     void _UpdateGameTime();
