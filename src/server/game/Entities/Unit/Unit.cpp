@@ -11598,30 +11598,36 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
         case SPELL_DAMAGE_CLASS_MELEE:
             // Custom crit by class
             if (caster)
+            {
                 switch (spellProto->SpellFamilyName)
                 {
-                    case SPELLFAMILY_DRUID:
-                        // Rend and Tear - bonus crit chance for Ferocious Bite on bleeding targets
-                        if (spellProto->SpellFamilyFlags[0] & 0x00800000
-                                && spellProto->SpellIconID == 1680
-                                && HasAuraState(AURA_STATE_BLEEDING))
-                        {
-                            if (AuraEffect const* rendAndTear = caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, 1))
-                                crit_chance += rendAndTear->GetAmount();
-                            break;
-                        }
+                case SPELLFAMILY_DRUID:
+                    // Rend and Tear - bonus crit chance for Ferocious Bite on bleeding targets
+                    if (spellProto->SpellFamilyFlags[0] & 0x00800000 && spellProto->SpellIconID == 1680 && HasAuraState(AURA_STATE_BLEEDING))
+                    {
+                        if (AuraEffect const* rendAndTear = caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, 1))
+                            crit_chance += rendAndTear->GetAmount();
                         break;
-                    case SPELLFAMILY_WARRIOR:
-                        // Victory Rush
-                        if (spellProto->SpellFamilyFlags[1] & 0x100)
-                        {
-                            // Glyph of Victory Rush
-                            if (AuraEffect const* aurEff = caster->GetAuraEffect(58382, 0))
-                                crit_chance += aurEff->GetAmount();
-                            break;
-                        }
+                    }
+                    break;
+                case SPELLFAMILY_WARRIOR:
+                    // Victory Rush
+                    if (spellProto->SpellFamilyFlags[1] & 0x100)
+                    {
+                        // Glyph of Victory Rush
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(58382, 0))
+                            crit_chance += aurEff->GetAmount();
                         break;
+                    }
+                    break;
                 }
+            }
+
+            // 100% critical chance against sitting target
+            if (GetTypeId() == TYPEID_PLAYER && (IsSitState() || getStandState() == UNIT_STAND_STATE_SLEEP))
+            {
+                return 100.0f;
+            }
             [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case SPELL_DAMAGE_CLASS_RANGED:
             {
@@ -19173,7 +19179,12 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
             GetMap()->CreatureRelocation(ToCreature(), x, y, z, orientation);
     }
     else if (turn)
+    {
         UpdateOrientation(orientation);
+
+        if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetFarSightDistance())
+            UpdateObjectVisibility(false);
+    }
 
     return (relocated || turn);
 }
@@ -19687,24 +19698,31 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
             if (active->IsVehicle())
                 active = player;
 
-            float dx = active->m_last_notify_position.GetPositionX() - active->GetPositionX();
-            float dy = active->m_last_notify_position.GetPositionY() - active->GetPositionY();
-            float dz = active->m_last_notify_position.GetPositionZ() - active->GetPositionZ();
-            float distsq = dx * dx + dy * dy + dz * dz;
+            if (!player->GetFarSightDistance())
+            {
+                float dx     = active->m_last_notify_position.GetPositionX() - active->GetPositionX();
+                float dy     = active->m_last_notify_position.GetPositionY() - active->GetPositionY();
+                float dz     = active->m_last_notify_position.GetPositionZ() - active->GetPositionZ();
+                float distsq = dx * dx + dy * dy + dz * dz;
 
-            float mindistsq = DynamicVisibilityMgr::GetReqMoveDistSq(active->FindMap()->GetEntry()->map_type);
-            if (distsq < mindistsq)
-                return;
+                float mindistsq = DynamicVisibilityMgr::GetReqMoveDistSq(active->FindMap()->GetEntry()->map_type);
+                if (distsq < mindistsq)
+                    return;
 
-            active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
+                active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
+            }
         }
 
         Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
         Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
         relocateNoLarge.SendToSelf();
-        Acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
-        Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
-        relocateLarge.SendToSelf();
+
+        if (!player->GetFarSightDistance())
+        {
+            Acore::PlayerRelocationNotifier relocateLarge(*player, true); // visit only large objects; maximum distance
+            Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
+            relocateLarge.SendToSelf();
+        }
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
     }
