@@ -26,6 +26,7 @@ Versions of MariaDB:
 
 | MariaDB Version | Supported          |
 | --------------- | ------------------ |
+| 10.6            | :white_check_mark: |
 | 10.5            | :white_check_mark: |
 | 10.4            | :white_check_mark: |
 | 10.3            | :white_check_mark: |
