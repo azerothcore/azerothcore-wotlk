@@ -11,6 +11,16 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (152280, 8201, 0, 0, 0, 1, 1, 0, 0, -8990.43, -3435.19, 24.91, 0, 43200, 0, 0, 1, 0, 2, 0, 0, 0, '', 0), --  Eastmoon Ruins
 (152281, 8201, 0, 0, 0, 1, 1, 0, 0, -9307.09, -2989.11, 9.249, 0, 43200, 0, 0, 1, 0, 2, 0, 0, 0, '', 0); -- Southmoon Ruins
 
+-- Added his 3 spawn points to the pool creature and added those 3 to a common pool template (366), with a max of 1 spawn at the same time
+DELETE FROM `pool_template` WHERE `entry` = 366;
+
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`)  VALUES (366, 1, "Omgorn the Lost Spawns");
+
+DELETE FROM `pool_creature` WHERE `guid` IN (51831, 152280, 152281);
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (51831, 366, 0, "Omgorn the Lost Dunemaul Compound Spawn");
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (152280, 366, 0, "Omgorn the Lost Eastmoon Ruins Spawn");
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (152281, 366, 0, "Omgorn the Lost Southmoon Ruins Spawn");
+
 -- Delete previous routes
 DELETE FROM `creature_addon` WHERE (`guid` IN (51831, 152280, 152281));
 
