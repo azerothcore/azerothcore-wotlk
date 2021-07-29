@@ -6513,7 +6513,9 @@ SpellCastResult Spell::CheckItems()
     {
         // Non-player case: Check if creature is disarmed
         if (!m_caster->CanUseAttackType(m_attackType) && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
+        {
             return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+        }
 
         return SPELL_CAST_OK;
     }
