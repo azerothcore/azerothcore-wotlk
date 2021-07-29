@@ -150,7 +150,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         case SMART_ACTION_TALK:
             {
                 ObjectList* targets = GetTargets(e, unit);
-                Creature* talker = e.target.type == 0 ? me : nullptr; // xinef: tc retardness fix
+                Creature* talker = e.target.type == 0 ? me : nullptr;
                 Unit* talkTarget = nullptr;
                 if (targets)
                 {
@@ -3603,7 +3603,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                     l->assign(objectList->begin(), objectList->end());
                 }
 
-                // xinef: return l, retardness... what if list is empty? will return empty list instead of null pointer
+                // xinef: return l, what if list is empty? will return empty list instead of null pointer
                 break;
             }
         case SMART_TARGET_CLOSEST_CREATURE:

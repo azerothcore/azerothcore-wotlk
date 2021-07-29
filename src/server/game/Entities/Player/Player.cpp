@@ -760,7 +760,7 @@ void Player::StopMirrorTimer(MirrorTimerType Type)
 bool Player::IsImmuneToEnvironmentalDamage()
 {
     // check for GM and death state included in isAttackableByAOE
-    return (!isTargetableForAttack(false, nullptr));
+    return (!isTargetableForAttack(false, nullptr)) || isTotalImmune();
 }
 
 uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
@@ -6904,8 +6904,8 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         }
         else
         {
-            // Auras activated by use should not be removed on unequip
-            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+            // Auras activated by use should not be removed on unequip (with no charges)
+            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && spellData.SpellCharges <= 0)
             {
                 continue;
             }
@@ -13000,7 +13000,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         }
 
     // xinef: check amount of points spent in current talent tree
-    // xinef: be smart and quick, not retarded like TC
+    // xinef: be smart and quick
     uint32 spentPoints = 0;
     if (talentInfo->Row > 0)
     {
@@ -15153,4 +15153,30 @@ void Player::SetServerSideVisibilityDetect(ServerSideVisibilityType type, Accoun
     sScriptMgr->OnSetServerSideVisibilityDetect(this, type, sec);
 
     m_serverSideVisibilityDetect.SetValue(type, sec);
+}
+
+void Player::SetFarSightDistance(float radius)
+{
+    _farSightDistance = radius;
+}
+
+void Player::ResetFarSightDistance()
+{
+    _farSightDistance.reset();
+}
+
+Optional<float> Player::GetFarSightDistance() const
+{
+    return _farSightDistance;
+}
+
+float Player::GetSightRange(const WorldObject* target) const
+{
+    float sightRange = WorldObject::GetSightRange(target);
+    if (_farSightDistance)
+    {
+        sightRange += *_farSightDistance;
+    }
+
+    return sightRange;
 }

@@ -125,7 +125,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleModPowerCost,                              // 73 SPELL_AURA_MOD_POWER_COST_SCHOOL
     &AuraEffect::HandleNoImmediateEffect,                         // 74 SPELL_AURA_REFLECT_SPELLS_SCHOOL  implemented in Unit::SpellHitResult
     &AuraEffect::HandleNoImmediateEffect,                         // 75 SPELL_AURA_MOD_LANGUAGE
-    &AuraEffect::HandleNoImmediateEffect,                         // 76 SPELL_AURA_FAR_SIGHT
+    &AuraEffect::HandleFarSight,                                  // 76 SPELL_AURA_FAR_SIGHT
     &AuraEffect::HandleModMechanicImmunity,                       // 77 SPELL_AURA_MECHANIC_IMMUNITY
     &AuraEffect::HandleAuraMounted,                               // 78 SPELL_AURA_MOUNTED
     &AuraEffect::HandleModDamagePercentDone,                      // 79 SPELL_AURA_MOD_DAMAGE_PERCENT_DONE
@@ -4359,7 +4359,7 @@ void AuraEffect::HandleAuraModIncreaseHealthPercent(AuraApplication const* aurAp
     float percent = target->GetHealthPct();
     target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(GetAmount()), apply);
 
-    // Xinef: idiots, pct was rounded down and could "kill" creature by setting its health to 0 making npc zombie
+    // Xinef: pct was rounded down and could "kill" creature by setting its health to 0 making npc zombie
     if (target->IsAlive())
         if (uint32 healthAmount = CalculatePct(target->GetMaxHealth(), percent))
             target->SetHealth(healthAmount);
@@ -5474,6 +5474,32 @@ void AuraEffect::HandleBindSight(AuraApplication const* aurApp, uint8 mode, bool
         return;
 
     caster->ToPlayer()->SetViewpoint(target, apply);
+}
+
+void AuraEffect::HandleFarSight(AuraApplication const* /*aurApp*/, uint8 mode, bool apply) const
+{
+    if (!(mode & AURA_EFFECT_HANDLE_REAL))
+    {
+        return;
+    }
+
+    Unit* caster = GetCaster();
+    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+    {
+        return;
+    }
+
+    Player* player = caster->ToPlayer();
+    if (apply)
+    {
+        player->SetFarSightDistance(m_spellInfo->GetMaxRange());
+    }
+    else
+    {
+        player->ResetFarSightDistance();
+    }
+
+    caster->UpdateObjectVisibility(!apply);
 }
 
 void AuraEffect::HandleForceReaction(AuraApplication const* aurApp, uint8 mode, bool apply) const
