@@ -8,7 +8,7 @@ DELETE FROM `pool_template` WHERE `entry` = 365;
 
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`)  VALUES (365, 1, "Olm the Wise Spawns");
 
-DELETE FROM `pool_creature` WHERE `guid` IN (911, 912, 913);
+DELETE FROM `pool_creature` WHERE `guid` IN (51897, 301303, 301304);
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (51897, 365, 0, "Olm the Wise Spawn 1");
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (301303, 365, 0, "Olm the Wise Spawn 2");
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (301304, 365, 0, "Olm the Wise Spawn 3");
