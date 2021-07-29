@@ -5631,9 +5631,9 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 {
     LOG_DEBUG("entities.player.loading", "Loading auras for player %s", GetGUID().ToString().c_str());
 
-    /*                                                     0           1      2           3                4           5        6        7        8             9             10
-    QueryResult* result = CharacterDatabase.PQuery("SELECT casterGuid, spell, effectMask, recalculateMask, stackCount, amount0, amount1, amount2, base_amount0, base_amount1, base_amount2,
-                                                    11           12          13
+    /*                                                     0           1         2           3      4                5           6        7        8        9             10            11
+    QueryResult* result = CharacterDatabase.PQuery("SELECT casterGuid, itemGuid, spell, effectMask, recalculateMask, stackCount, amount0, amount1, amount2, base_amount0, base_amount1, base_amount2,
+                                                    12           13          14
                                                     maxDuration, remainTime, remainCharges FROM character_aura WHERE guid = '%u'", GetGUID().GetCounter());
     */
 
@@ -5645,19 +5645,20 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             int32 damage[3];
             int32 baseDamage[3];
             ObjectGuid caster_guid = ObjectGuid(fields[0].GetUInt64());
-            uint32 spellid = fields[1].GetUInt32();
-            uint8 effmask = fields[2].GetUInt8();
-            uint8 recalculatemask = fields[3].GetUInt8();
-            uint8 stackcount = fields[4].GetUInt8();
-            damage[0] = fields[5].GetInt32();
-            damage[1] = fields[6].GetInt32();
-            damage[2] = fields[7].GetInt32();
-            baseDamage[0] = fields[8].GetInt32();
-            baseDamage[1] = fields[9].GetInt32();
-            baseDamage[2] = fields[10].GetInt32();
-            int32 maxduration = fields[11].GetInt32();
-            int32 remaintime = fields[12].GetInt32();
-            uint8 remaincharges = fields[13].GetUInt8();
+            ObjectGuid itemGuid = ObjectGuid(fields[1].GetUInt64());
+            uint32 spellid = fields[2].GetUInt32();
+            uint8 effmask = fields[3].GetUInt8();
+            uint8 recalculatemask = fields[4].GetUInt8();
+            uint8 stackcount = fields[5].GetUInt8();
+            damage[0] = fields[6].GetInt32();
+            damage[1] = fields[7].GetInt32();
+            damage[2] = fields[8].GetInt32();
+            baseDamage[0] = fields[9].GetInt32();
+            baseDamage[1] = fields[10].GetInt32();
+            baseDamage[2] = fields[11].GetInt32();
+            int32 maxduration = fields[12].GetInt32();
+            int32 remaintime = fields[13].GetInt32();
+            uint8 remaincharges = fields[14].GetUInt8();
 
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
             if (!spellInfo)
@@ -5693,7 +5694,7 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             else
                 remaincharges = 0;
 
-            if (Aura* aura = Aura::TryCreate(spellInfo, effmask, this, nullptr, &baseDamage[0], nullptr, caster_guid))
+            if (Aura* aura = Aura::TryCreate(spellInfo, effmask, this, nullptr, &baseDamage[0], nullptr, caster_guid, itemGuid))
             {
                 if (!aura->CanBeSaved())
                 {
