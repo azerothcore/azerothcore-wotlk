@@ -17,9 +17,10 @@ DELETE FROM `pool_template` WHERE `entry` = 366;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`)  VALUES (366, 1, "Omgorn the Lost Spawns");
 
 DELETE FROM `pool_creature` WHERE `guid` IN (51831, 152280, 152281);
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (51831, 366, 0, "Omgorn the Lost Dunemaul Compound Spawn");
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (152280, 366, 0, "Omgorn the Lost Eastmoon Ruins Spawn");
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (152281, 366, 0, "Omgorn the Lost Southmoon Ruins Spawn");
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
+(51831, 366, 0, "Omgorn the Lost Dunemaul Compound Spawn"),
+(152280, 366, 0, "Omgorn the Lost Eastmoon Ruins Spawn"),
+(152281, 366, 0, "Omgorn the Lost Southmoon Ruins Spawn");
 
 -- Delete previous routes
 DELETE FROM `creature_addon` WHERE (`guid` IN (51831, 152280, 152281));
