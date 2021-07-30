@@ -14,7 +14,8 @@ DELETE FROM `pool_template` WHERE `entry` = 367;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`)  VALUES (367, 1, "Death Howl Spawns");
 
 DELETE FROM `pool_creature` WHERE `guid` IN (40656, 152290 ,152291);
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (40656, 367, 0, "Death Howl Spawn 1");
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (152290, 367, 0, "Death Howl Spawn 2");
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (152291, 367, 0, "Death Howl Spawn 3");
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+(40656, 367, 0, "Death Howl Spawn 1"),
+(152290, 367, 0, "Death Howl Spawn 2"),
+(152291, 367, 0, "Death Howl Spawn 3");
 
