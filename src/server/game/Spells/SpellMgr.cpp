@@ -7081,12 +7081,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
     });
 
-    // Gnomish Death Ray
-    ApplySpellFix({ 13278, 13280 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
-    });
-
     // Stormchops
     ApplySpellFix({ 43730 }, [](SpellEntry* spellInfo)
     {
