@@ -15154,3 +15154,29 @@ void Player::SetServerSideVisibilityDetect(ServerSideVisibilityType type, Accoun
 
     m_serverSideVisibilityDetect.SetValue(type, sec);
 }
+
+void Player::SetFarSightDistance(float radius)
+{
+    _farSightDistance = radius;
+}
+
+void Player::ResetFarSightDistance()
+{
+    _farSightDistance.reset();
+}
+
+Optional<float> Player::GetFarSightDistance() const
+{
+    return _farSightDistance;
+}
+
+float Player::GetSightRange(const WorldObject* target) const
+{
+    float sightRange = WorldObject::GetSightRange(target);
+    if (_farSightDistance)
+    {
+        sightRange += *_farSightDistance;
+    }
+
+    return sightRange;
+}
