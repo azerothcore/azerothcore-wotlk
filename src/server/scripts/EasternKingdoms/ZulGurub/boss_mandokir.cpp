@@ -112,7 +112,7 @@ public:
             }
 
             killCount = 0;
-            me->RemoveAura(SPELL_FRENZY);
+            me->RemoveAurasDueToSpell(SPELL_FRENZY);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             summons.DespawnAll();
             instance->SetBossState(DATA_OHGAN, NOT_STARTED);
