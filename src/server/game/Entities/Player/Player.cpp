@@ -760,7 +760,7 @@ void Player::StopMirrorTimer(MirrorTimerType Type)
 bool Player::IsImmuneToEnvironmentalDamage()
 {
     // check for GM and death state included in isAttackableByAOE
-    return (!isTargetableForAttack(false, nullptr));
+    return (!isTargetableForAttack(false, nullptr)) || isTotalImmune();
 }
 
 uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
@@ -15153,4 +15153,30 @@ void Player::SetServerSideVisibilityDetect(ServerSideVisibilityType type, Accoun
     sScriptMgr->OnSetServerSideVisibilityDetect(this, type, sec);
 
     m_serverSideVisibilityDetect.SetValue(type, sec);
+}
+
+void Player::SetFarSightDistance(float radius)
+{
+    _farSightDistance = radius;
+}
+
+void Player::ResetFarSightDistance()
+{
+    _farSightDistance.reset();
+}
+
+Optional<float> Player::GetFarSightDistance() const
+{
+    return _farSightDistance;
+}
+
+float Player::GetSightRange(const WorldObject* target) const
+{
+    float sightRange = WorldObject::GetSightRange(target);
+    if (_farSightDistance)
+    {
+        sightRange += *_farSightDistance;
+    }
+
+    return sightRange;
 }
