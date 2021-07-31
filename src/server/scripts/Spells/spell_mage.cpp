@@ -23,6 +23,7 @@ enum MageSpells
     // Ours
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
     SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED         = 12486,
+    SPELL_MAGE_COMBUSTION                        = 11129,
 
     // Theirs
     SPELL_MAGE_COLD_SNAP                         = 11958,
@@ -493,6 +494,33 @@ public:
         return new spell_mage_glyph_of_eternal_water_AuraScript();
     }
 };
+
+class spell_mage_combustion_proc : public SpellScriptLoader
+{
+public:
+    spell_mage_combustion_proc() : SpellScriptLoader("spell_mage_combustion_proc") {}
+
+    class spell_mage_combustion_proc_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_mage_combustion_proc_AuraScript);
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_COMBUSTION);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_mage_combustion_proc_AuraScript();
+    }
+};
+
 
 // Theirs
 // Incanter's Absorbtion
@@ -1102,6 +1130,7 @@ void AddSC_mage_spell_scripts()
     new spell_mage_pet_scaling();
     new spell_mage_brain_freeze();
     new spell_mage_glyph_of_eternal_water();
+    new spell_mage_combustion_proc();
 
     // Theirs
     new spell_mage_blast_wave();
