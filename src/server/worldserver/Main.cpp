@@ -4,6 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+/// \addtogroup Acored Acore Daemon
+/// @{
+/// \file
+
 #include "ACSoap.h"
 #include "AppenderDB.h"
 #include "AsyncAcceptor.h"
