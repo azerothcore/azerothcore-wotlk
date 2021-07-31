@@ -521,7 +521,6 @@ public:
     }
 };
 
-
 // Theirs
 // Incanter's Absorbtion
 class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
