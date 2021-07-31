@@ -1,4 +1,4 @@
--- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627747768504565000');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627747768504565000');
 
 -- Add the gossip option
 UPDATE `creature_template` SET `ScriptName` = '', `npcflag` = 1, `type` = 3, `faction` = 31 WHERE (`entry`IN (14527, 14529, 14531, 14536));
