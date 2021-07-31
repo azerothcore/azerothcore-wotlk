@@ -89,7 +89,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14527, 0, 23, 0, 11, 0, 100, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Simone the Seductress - On spawn - Set Phase 1'),
 (14527, 0, 24, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Simone the Seductress - IC (Phase 1) - Cast Fools Plight Every 10 seconds'),
 (14527, 0, 25, 0, 40, 0, 100, 0, 134, 0, 0, 0, 53, 0, 14527, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Waypoint 134 Reached - Start Waypoint'),
-(14527, 0, 26, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Gossip Hello - Stop Waypoint'),
+(14527, 0, 26, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Gossip Hello - Stop Waypoint'),
 
 -- Franklin/Klinfran
 (14529, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 53, 0, 14529, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Spawn - Start WP'),
@@ -108,7 +108,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14529, 0, 17, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - OOC - Despawn'),
 (14529, 0, 18, 0, 40, 0, 100, 0, 145, 0, 0, 0, 53, 0, 14529, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Spawn - Start WP'),
 (14529, 0, 19, 0, 8, 0, 100, 0, 32851, 0, 10000, 10000, 1, 2, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Spellhit - Say Line 2'),
-(14529, 0, 20, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Gossip Hello - Stop Waypoint'),
+(14529, 0, 20, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Gossip Hello - Stop Waypoint'),
 
 -- Artorius
 (14531, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 53, 0, 14531, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Spawn - Start WP'),
@@ -127,7 +127,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14531, 0, 24, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - IC (Phase 1) - Cast Fools Plight Every 10 seconds'),
 (14531, 0, 25, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - OOC - Despawn'),
 (14531, 0, 26, 0, 40, 0, 100, 0, 156, 0, 0, 0, 53, 0, 14531, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Waypoint 156 Reached - Start Waypoint'),
-(14531, 0, 27, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Gossip Hello - Stop Waypoint'),
+(14531, 0, 27, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Gossip Hello - Stop Waypoint'),
 
 -- Nelson
 (14536, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 53, 0, 14536, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spawn - Start WP'),
@@ -149,7 +149,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14536, 0, 17, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - IC (Phase 1) - Cast Fools Plight Every 10 seconds'),
 (14536, 0, 18, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - OOC - Despawn'),
 (14536, 0, 19, 0, 40, 0, 100, 0, 97, 0, 0, 0, 53, 0, 14536, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On Spawn - Start WP'),
-(14536, 0, 20, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Gossip Hello - Stop Waypoint'),
+(14536, 0, 20, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Gossip Hello - Stop Waypoint'),
 
 (14528, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 19, 14527, 0, 0, 0, 0, 0, 0, 'Precious - On Spawn - Follow Simone the Inconspicuous'),
 (14528, 0, 3, 4, 38, 0, 100, 0, 1, 1, 0, 0, 36, 14538, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Precious - On Data Set - Change Entry'),
