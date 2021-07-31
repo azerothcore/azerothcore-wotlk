@@ -200,7 +200,7 @@ public:
      *
      * @param version The cache version that we will be sending to the Client.
      */
-    virtual void OnBeforeFinalizePlayerWorldSession(uint32& /*version*/) {}
+    virtual void OnBeforeFinalizePlayerWorldSession(uint32& /*cacheVersion*/) {}
 };
 
 class FormulaScript : public ScriptObject
@@ -1473,7 +1473,7 @@ public: /* WorldScript */
     void OnOpenStateChange(bool open);
     void OnBeforeConfigLoad(bool reload);
     void OnAfterConfigLoad(bool reload);
-    void OnBeforeFinalizePlayerWorldSession(uint32& version);
+    void OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion);
     void OnMotdChange(std::string& newMotd);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
     void OnShutdownCancel();
