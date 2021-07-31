@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627747768504565000');
+-- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627747768504565000');
 
 -- Add the gossip option
 UPDATE `creature_template` SET `ScriptName` = '', `npcflag` = 1, `type` = 3, `faction` = 31 WHERE (`entry`IN (14527, 14529, 14531, 14536));
@@ -188,9 +188,9 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (4602, 46020, 0, 0, 0, 0, 0, NULL), -- Franklin the Friendly
 (24439, 244390, 0, 0, 0, 0, 0, NULL); -- Simone the Inconspicuous
 
--- Nelson the Nice
-DELETE FROM `waypoint_data` WHERE id = 432240;
+DELETE FROM `waypoint_data` WHERE `id` IN (432240, 423010, 46020, 244390);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES
+-- Nelson the Nice
 (432240,1,-7723.94,1672.61,6.99932),
 (432240,2,-7723.53,1666.73,7.2381),
 (432240,3,-7723.16,1661.32,7.4734),
@@ -287,11 +287,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (432240,94,-7748.09,1687.89,4.62263),
 (432240,95,-7743.12,1683.57,5.96238),
 (432240,96,-7737.06,1681.2,7.02291),
-(432240,97,-7727.87,1677.6,7.20446);
+(432240,97,-7727.87,1677.6,7.20446),
 
 -- Artorius the Amiable
-DELETE FROM `waypoint_data` WHERE `id` = 423010;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES
 (423010, 1, 7913.4, -4596.38, 710.531),
 (423010, 2, 7919.91, -4592.35, 711.407),
 (423010, 3, 7924.55, -4589.47, 711.916),
@@ -447,11 +445,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (423010, 153, 7891.8, -4617.65, 711.935),
 (423010, 154, 7898.69, -4610.59, 710.972),
 (423010, 155, 7904.81, -4604.33, 710.23),
-(423010, 156, 7909.45, -4599.58, 710.154);
+(423010, 156, 7909.45, -4599.58, 710.154),
 
 -- Franklin the Friendly				
-DELETE FROM `waypoint_data` WHERE `id` = 46020;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES
 (46020, 1, -8313.42, -998.049, 175.241),
 (46020, 2, -8310.17, -1002.44, 174.264),
 (46020, 3, -8306.13, -1006.11, 172.951),
@@ -596,11 +592,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (46020, 142, -8302.87, -1011.59, 171.346),
 (46020, 143, -8302.87, -1011.59, 171.346),
 (46020, 144, -8310.08, -1001.99, 174.292),
-(46020, 145, -8314.66, -995.891, 175.714);
+(46020, 145, -8314.66, -995.891, 175.714),
 
 -- Simone the Inconspicuous
-DELETE FROM `waypoint_data` WHERE `id` = 244390;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES
 (244390, 1, -6979.98, -743.922, -265.829),
 (244390, 2, -6986.33, -765.548, -268.629),
 (244390, 3, -7007.75, -786.31, -273.191),
