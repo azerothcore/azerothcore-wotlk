@@ -1,6 +1,7 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627747768504565000');
+-- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627747768504565000');
 
-UPDATE `creature_template` SET `ScriptName` = '', `npcflag` = 1, `type` = 0 WHERE (`entry`IN (14527, 14529, 14531, 14536));
+-- Add the gossip option
+UPDATE `creature_template` SET `ScriptName` = '', `npcflag` = 1, `type` = 3, `faction` = 31 WHERE (`entry`IN (14527, 14529, 14531, 14536));
 -- 'npc_stave_of_the_ancients' Scripts need work. When they run this they instantly trandform without letting the gossip otion
 UPDATE `creature_template` SET `AIName`='SmartAI', `MovementType` = 2 WHERE  `entry` IN (14536,14531,14529,14527,14530,14533,14534,14535);
 -- Make them patrol
@@ -10,7 +11,7 @@ UPDATE `creature_template` SET `unit_class`= '2' WHERE `entry` IN (14533,14538);
 UPDATE `creature_template` SET `unit_class`= '1' WHERE `entry` IN (14530,14535,14534);
 
 -- The Cleaner
-UPDATE `creature_template` SET speed_run= 2.6, Mechanic_Immune_Mask= 650870623 WHERE entry = 14503;
+UPDATE `creature_template` SET speed_run= 2.6, Mechanic_Immune_Mask= 650870623, `MovementType` = 0 WHERE entry = 14503;
 
 -- Creeping Doom
 UPDATE `creature_template` SET speed_run = 0.33, speed_walk = 0.33 WHERE entry = 14761;
@@ -88,6 +89,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14527, 0, 23, 0, 11, 0, 100, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Simone the Seductress - On spawn - Set Phase 1'),
 (14527, 0, 24, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Simone the Seductress - IC (Phase 1) - Cast Fools Plight Every 10 seconds'),
 (14527, 0, 25, 0, 40, 0, 100, 0, 134, 0, 0, 0, 53, 0, 14527, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Waypoint 134 Reached - Start Waypoint'),
+(14527, 0, 26, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Gossip Hello - Stop Waypoint'),
 
 -- Franklin/Klinfran
 (14529, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 53, 0, 14529, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Spawn - Start WP'),
@@ -106,6 +108,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14529, 0, 17, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - OOC - Despawn'),
 (14529, 0, 18, 0, 40, 0, 100, 0, 145, 0, 0, 0, 53, 0, 14529, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Spawn - Start WP'),
 (14529, 0, 19, 0, 8, 0, 100, 0, 32851, 0, 10000, 10000, 1, 2, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Spellhit - Say Line 2'),
+(14529, 0, 20, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Gossip Hello - Stop Waypoint'),
 
 -- Artorius
 (14531, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 53, 0, 14531, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Spawn - Start WP'),
@@ -124,6 +127,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14531, 0, 24, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - IC (Phase 1) - Cast Fools Plight Every 10 seconds'),
 (14531, 0, 25, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - OOC - Despawn'),
 (14531, 0, 26, 0, 40, 0, 100, 0, 156, 0, 0, 0, 53, 0, 14531, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Waypoint 156 Reached - Start Waypoint'),
+(14531, 0, 27, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Gossip Hello - Stop Waypoint'),
 
 -- Nelson
 (14536, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 53, 0, 14536, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spawn - Start WP'),
@@ -144,13 +148,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14536, 0, 16, 0, 11, 0, 100, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On spawn - Set Phase 1'),
 (14536, 0, 17, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - IC (Phase 1) - Cast Fools Plight Every 10 seconds'),
 (14536, 0, 18, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - OOC - Despawn'),
-(14536, 0, 19, 0, 40, 0, 100, 0, 97, 0, 0, 0, 53, 0, 14536, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Spawn - Start WP'),
+(14536, 0, 19, 0, 40, 0, 100, 0, 97, 0, 0, 0, 53, 0, 14536, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On Spawn - Start WP'),
+(14536, 0, 20, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Gossip Hello - Stop Waypoint'),
+
 (14528, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 19, 14527, 0, 0, 0, 0, 0, 0, 'Precious - On Spawn - Follow Simone the Inconspicuous'),
 (14528, 0, 3, 4, 38, 0, 100, 0, 1, 1, 0, 0, 36, 14538, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Precious - On Data Set - Change Entry'),
 (14528, 0, 4, 0, 61, 0, 100, 0, 1, 1, 0, 0, 3, 0, 6688, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Precious - On Data Set - Change Model'),
 (14503, 0, 0, 1, 4, 0, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'The Cleaner - On Agro Cast Fools Plight'),
 (14503, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 11, 29230, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'The Cleaner - On Agro - Cast Spell Immunity'),
 (14503, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 100, 0, 0, 0, 0, 0, 0, 'The Cleaner - On Spawn - Start Combat');
+
 
 UPDATE `creature_template` SET `gossip_menu_id` = '60001' WHERE `entry` = 14536;
 UPDATE `creature_template` SET `gossip_menu_id` = '5868' WHERE `entry` = 14527;
