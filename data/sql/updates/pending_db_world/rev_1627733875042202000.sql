@@ -7,7 +7,7 @@ UPDATE `creature` SET `wander_distance` = 10, `MovementType` = 1 WHERE (`id` = 1
 -- Add new spawn point near the inn
 DELETE FROM `creature` WHERE (`guid` = 152292);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(152292, 1848, 0, 0, 0, 1, 1, 11412, 0, 1123.73, -1714.49, 62.33, 0, 86400, 5, 0, 1, 0, 1, 0, 0, 0, '', 0); --  Near inn in Sorrow hill
+(152292, 1848, 0, 0, 0, 1, 1, 0, 1, 1123.73, -1714.49, 62.33, 0, 86400, 5, 0, 1, 0, 1, 0, 0, 0, '', 0); --  Near inn in Sorrow hill
 
 -- Added his spawns pto the same pool so there can be only 1 Lord Maldazzar active at the same time
 DELETE FROM `pool_template` WHERE `entry` = 368;
