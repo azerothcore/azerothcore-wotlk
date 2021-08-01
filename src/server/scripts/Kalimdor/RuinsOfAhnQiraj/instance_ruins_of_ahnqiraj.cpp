@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "ruins_of_ahnqiraj.h"
+#include "ScriptMgr.h"
 
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {
@@ -18,17 +18,9 @@ public:
         instance_ruins_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(NUM_ENCOUNTER);
-
-            _kurinaxxGUID   = 0;
-            _rajaxxGUID     = 0;
-            _moamGUID       = 0;
-            _buruGUID       = 0;
-            _ayamissGUID    = 0;
-            _ossirianGUID   = 0;
-            _paralyzedGUID  = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -53,7 +45,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 bossId, EncounterState state)
+        bool SetBossState(uint32 bossId, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(bossId, state))
                 return false;
@@ -61,13 +53,13 @@ public:
             return true;
         }
 
-        void SetData64(uint32 type, uint64 data)
+        void SetGuidData(uint32 type, ObjectGuid data) override
         {
             if (type == DATA_PARALYZED)
                 _paralyzedGUID = data;
         }
 
-        uint64 GetData64(uint32 type) const
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -87,10 +79,10 @@ public:
                     return _paralyzedGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -101,7 +93,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* data)
+        void Load(char const* data) override
         {
             if (!data)
             {
@@ -134,16 +126,16 @@ public:
         }
 
     private:
-        uint64 _kurinaxxGUID;
-        uint64 _rajaxxGUID;
-        uint64 _moamGUID;
-        uint64 _buruGUID;
-        uint64 _ayamissGUID;
-        uint64 _ossirianGUID;
-        uint64 _paralyzedGUID;
+        ObjectGuid _kurinaxxGUID;
+        ObjectGuid _rajaxxGUID;
+        ObjectGuid _moamGUID;
+        ObjectGuid _buruGUID;
+        ObjectGuid _ayamissGUID;
+        ObjectGuid _ossirianGUID;
+        ObjectGuid _paralyzedGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_ruins_of_ahnqiraj_InstanceMapScript(map);
     }

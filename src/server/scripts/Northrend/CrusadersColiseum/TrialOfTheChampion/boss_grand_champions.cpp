@@ -2,14 +2,14 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "Vehicle.h"
-#include "trial_of_the_champion.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "trial_of_the_champion.h"
+#include "Vehicle.h"
 
 enum MountSpells
 {
@@ -127,9 +127,9 @@ class npc_toc5_player_vehicle : public CreatureScript
 public:
     npc_toc5_player_vehicle() : CreatureScript("npc_toc5_player_vehicle") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc5_player_vehicleAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_toc5_player_vehicleAI>(pCreature);
     }
 
     struct npc_toc5_player_vehicleAI : public NullCreatureAI
@@ -143,13 +143,13 @@ public:
         ConditionList conditions;
         uint16 m_ConditionsTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
             me->getHostileRefManager().setOnlineOfflineState(false);
         }
 
-        void OnCharmed(bool apply)
+        void OnCharmed(bool apply) override
         {
             if (me->IsDuringRemoveFromWorld())
                 return;
@@ -169,7 +169,7 @@ public:
         }
 
         // just in case, should be done in spell_gen_defend
-        void PassengerBoarded(Unit* who, int8  /*seat*/, bool apply)
+        void PassengerBoarded(Unit* who, int8  /*seat*/, bool apply) override
         {
             if (me->IsDuringRemoveFromWorld())
                 return;
@@ -184,8 +184,8 @@ public:
         }
 
         //void EnterEvadeMode() { CreatureAI::EnterEvadeMode(); }
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void UpdateAI(uint32 diff)
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void UpdateAI(uint32 diff) override
         {
             if (m_ConditionsTimer <= diff)
             {
@@ -198,8 +198,8 @@ public:
             else
                 m_ConditionsTimer -= diff;
         }
-        void AttackStart(Unit*  /*who*/) {}
-        void EnterCombat(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) override {}
+        void EnterCombat(Unit*  /*who*/) override {}
     };
 };
 
@@ -208,9 +208,9 @@ class npc_toc5_grand_champion_minion : public CreatureScript
 public:
     npc_toc5_grand_champion_minion() : CreatureScript("npc_toc5_grand_champion_minion") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc5_grand_champion_minionAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_toc5_grand_champion_minionAI>(pCreature);
     }
 
     struct npc_toc5_grand_champion_minionAI : public ScriptedAI
@@ -224,13 +224,13 @@ public:
         int32 ShieldTimer;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             ShieldTimer = 0;
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_MOUNT_CHARGE, urand(2500, 4000));
@@ -239,7 +239,7 @@ public:
             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( ShieldTimer <= (int32)diff )
             {
@@ -263,7 +263,7 @@ public:
                     break;
                 case EVENT_MOUNT_CHARGE:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -294,7 +294,7 @@ public:
                     break;
                 case EVENT_SHIELD_BREAKER:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -322,7 +322,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
             me->DespawnOrUnsummon(10000);
@@ -346,7 +346,7 @@ public:
             SetDespawnAtEnd(false);
             me->SetReactState(REACT_PASSIVE);
             BossOrder = 0;
-            NewMountGUID = 0;
+            NewMountGUID.Clear();
             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
@@ -379,10 +379,10 @@ public:
         EventMap events;
         uint32 BossOrder;
         bool MountPhase;
-        uint64 NewMountGUID;
-        uint64 UnitTargetGUID;
+        ObjectGuid NewMountGUID;
+        ObjectGuid UnitTargetGUID;
 
-        void Reset()
+        void Reset() override
         {
             if( pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED )
             {
@@ -394,7 +394,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if( pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED )
                 me->CallForHelp(100.0f);
@@ -466,12 +466,12 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == 1 )
             {
                 MountPhase = false;
-                NewMountGUID = 0;
+                NewMountGUID.Clear();
                 me->SetHealth(me->GetMaxHealth());
                 me->SetRegeneratingHealth(true);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -486,7 +486,7 @@ public:
                 ScheduleAbilitiesEvents();
         }
 
-        void SetData(uint32 uiType, uint32 uiData)
+        void SetData(uint32 uiType, uint32 uiData) override
         {
             BossOrder = uiType;
             if( uiData > 1 )
@@ -522,10 +522,10 @@ public:
                     return;
             }
 
-            Start(false, true, 0, nullptr);
+            Start(false, true);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if( MountPhase )
             {
@@ -578,9 +578,9 @@ public:
             }
         }
 
-        void EnterEvadeMode() {}
+        void EnterEvadeMode() override {}
 
-        void WaypointReached(uint32 i)
+        void WaypointReached(uint32 i) override
         {
             if( !pInstance )
                 return;
@@ -589,7 +589,7 @@ public:
                 pInstance->SetData(DATA_GRAND_CHAMPION_REACHED_DEST, BossOrder);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( id < 4 )
                 npc_escortAI::MovementInform(type, id);
@@ -621,7 +621,7 @@ public:
                             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
                             if( pInstance )
                                 pInstance->SetData(DATA_REACHED_NEW_MOUNT, 0);
-                            NewMountGUID = 0;
+                            NewMountGUID.Clear();
                         }
                 }
                 else if( id == 9 )
@@ -629,7 +629,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             switch( spell->Id )
             {
@@ -643,7 +643,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -679,7 +679,7 @@ public:
                                             if( Unit* c = v->GetBase() )
                                                 if( c->GetTypeId() == TYPEID_UNIT && c->ToCreature()->GetEntry() == (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_BATTLEWORG : VEHICLE_ARGENT_WARHORSE) )
                                                 {
-                                                    me->GetMotionMaster()->MovementExpired();;
+                                                    me->GetMotionMaster()->MovementExpired();
                                                     me->GetMotionMaster()->MoveIdle();
                                                     me->StopMoving();
                                                     me->CastSpell(me, SPELL_TRAMPLE_STUN, false);
@@ -711,12 +711,12 @@ public:
                             me->GetMotionMaster()->MovePoint(7, *mount);
                             events.RepeatEvent(200);
                             break;
-                        }                      
+                        }
                     }
                     break;
                 case EVENT_MOUNT_CHARGE:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -747,7 +747,7 @@ public:
                     break;
                 case EVENT_SHIELD_BREAKER:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -781,7 +781,7 @@ public:
                     events.RepeatEvent(5000);
                     break;
                 case EVEMT_MAGE_SPELL_BLAST_WAVE:
-                    me->CastSpell((Unit*)NULL, SPELL_BLAST_WAVE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_BLAST_WAVE, false);
                     events.RepeatEvent(13000);
                     break;
                 case EVEMT_MAGE_SPELL_HASTE:
@@ -829,10 +829,10 @@ public:
 
                 /****************** HUNTER ******************/
                 case EVENT_HUNTER_SPELL_DISENGAGE:
-                    
+
                     break;
                 case EVENT_HUNTER_SPELL_LIGHTNING_ARROWS:
-                    me->CastSpell((Unit*)NULL, SPELL_LIGHTNING_ARROWS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_LIGHTNING_ARROWS, false);
                     events.RepeatEvent(urand(20000, 25000));
                     break;
                 case EVENT_HUNTER_SPELL_MULTI_SHOT:
@@ -865,7 +865,7 @@ public:
                                     }
                                 }
                             }
-                            UnitTargetGUID = 0;
+                            UnitTargetGUID.Clear();
                         }
                         events.RepeatEvent(urand(15000, 20000));
                     }
@@ -879,7 +879,7 @@ public:
                     events.RepeatEvent(8000);
                     break;
                 case EVENT_ROGUE_SPELL_FAN_OF_KNIVES:
-                    me->CastSpell((Unit*)NULL, SPELL_FAN_OF_KNIVES, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FAN_OF_KNIVES, false);
                     events.RepeatEvent(14000);
                     break;
                 case EVENT_ROGUE_SPELL_POISON_BOTTLE:
@@ -918,7 +918,7 @@ public:
                     }
                     break;
                 case EVENT_WARRIOR_SPELL_ROLLING_THROW:
-                    
+
                     break;
                     /*************** WARRIOR END ****************/
             }
@@ -927,9 +927,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_grand_championAI(pCreature);
+        return GetTrialOfTheChampionAI<boss_grand_championAI>(pCreature);
     }
 };
 

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "karazhan.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Curator
 {
@@ -42,7 +42,7 @@ public:
     {
         boss_curatorAI(Creature* creature) : BossAI(creature, DATA_CURATOR) { }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ARCANE, true);
@@ -51,7 +51,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_POWER_BURN, true);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -60,13 +60,13 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -78,7 +78,7 @@ public:
             DoZoneInCombat();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (Unit* target = summon->SelectNearbyTarget(nullptr, 40.0f))
@@ -90,7 +90,7 @@ public:
             summon->SetInCombatWithZone();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -150,9 +150,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_curatorAI>(creature);
+        return GetKarazhanAI<boss_curatorAI>(creature);
     }
 };
 

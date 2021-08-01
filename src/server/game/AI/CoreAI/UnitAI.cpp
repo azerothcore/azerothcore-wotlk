@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "UnitAI.h"
-#include "Player.h"
 #include "Creature.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "Spell.h"
 #include "CreatureAIImpl.h"
+#include "Player.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "UnitAI.h"
 
 void UnitAI::AttackStart(Unit* victim)
 {
@@ -126,7 +126,7 @@ void UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
 void UnitAI::DoCast(uint32 spellId)
 {
     Unit* target = nullptr;
-    //sLog->outError("aggre %u %u", spellId, (uint32)AISpellInfo[spellId].target);
+
     switch (AISpellInfo[spellId].target)
     {
         default:
@@ -139,7 +139,7 @@ void UnitAI::DoCast(uint32 spellId)
         case AITARGET_ENEMY:
             {
                 const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
                 //float range = GetSpellMaxRange(spellInfo, false);
                 target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
                 break;
@@ -153,7 +153,7 @@ void UnitAI::DoCast(uint32 spellId)
         case AITARGET_DEBUFF:
             {
                 const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
                 float range = spellInfo->GetMaxRange(false);
 
                 DefaultTargetSelector targetSelector(me, range, playerOnly, -(int32)spellId);
@@ -191,7 +191,7 @@ void UnitAI::DoCastAOE(uint32 spellId, bool triggered)
     if (!triggered && me->HasUnitState(UNIT_STATE_CASTING))
         return;
 
-    me->CastSpell((Unit*)NULL, spellId, triggered);
+    me->CastSpell((Unit*)nullptr, spellId, triggered);
 }
 
 #define UPDATE_TARGET(a) {if (AIInfo->target<a) AIInfo->target=a;}
@@ -209,7 +209,7 @@ void UnitAI::FillAISpellInfo()
         if (!spellInfo)
             continue;
 
-        if (spellInfo->HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_DEAD))
+        if (spellInfo->HasAttribute(SPELL_ATTR0_ALLOW_CAST_WHILE_DEAD))
             AIInfo->condition = AICOND_DIE;
         else if (spellInfo->IsPassive() || spellInfo->GetDuration() == -1)
             AIInfo->condition = AICOND_AGGRO;
@@ -295,7 +295,6 @@ bool SpellTargetSelector::operator()(Unit const* target) const
     uint32 range_type = _spellInfo->RangeEntry ? _spellInfo->RangeEntry->type : 0;
     float max_range = _caster->GetSpellMaxRangeForTarget(target, _spellInfo);
     float min_range = _caster->GetSpellMinRangeForTarget(target, _spellInfo);
-
 
     if (target && target != _caster)
     {

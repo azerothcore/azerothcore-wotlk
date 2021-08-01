@@ -1,16 +1,16 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "vault_of_archavon.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
-#include "SpellAuras.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "vault_of_archavon.h"
 
 /* Vault of Archavon encounters:
 1 - Archavon the Stone Watcher event
@@ -30,10 +30,9 @@ public:
         {
         }
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            memset(&bossGUIDs, 0, sizeof(bossGUIDs));
 
             ArchavonDeath = 0;
             EmalonDeath = 0;
@@ -42,7 +41,7 @@ public:
             stoned = false;
         }
 
-        void OnPlayerEnter(Player* )
+        void OnPlayerEnter(Player* ) override
         {
             if (stoned)
             {
@@ -55,7 +54,7 @@ public:
             }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             checkTimer += diff;
             if (checkTimer >= 60000)
@@ -115,7 +114,7 @@ public:
             }
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS)
@@ -128,7 +127,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -147,21 +146,22 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             if (identifier < MAX_ENCOUNTER)
                 return bossGUIDs[identifier];
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
-        uint32 GetData(uint32 identifier) const
+        uint32 GetData(uint32 identifier) const override
         {
             if (identifier == DATA_STONED)
                 return (uint32)stoned;
             return 0;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -196,7 +196,7 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/) override
         {
             switch (criteria_id)
             {
@@ -218,7 +218,7 @@ public:
             return false;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -229,7 +229,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -266,10 +266,10 @@ public:
         bool stoned;
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint64 bossGUIDs[MAX_ENCOUNTER];
+        ObjectGuid bossGUIDs[MAX_ENCOUNTER];
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_vault_of_archavon_InstanceMapScript(map);
     }

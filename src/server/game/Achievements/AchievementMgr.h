@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,6 +14,7 @@
 #include "DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
+#include "ObjectGuid.h"
 
 typedef std::list<AchievementCriteriaEntry const*> AchievementCriteriaEntryList;
 typedef std::list<AchievementEntry const*>         AchievementEntryList;
@@ -69,7 +70,7 @@ class Unit;
 
 struct AchievementCriteriaData
 {
-    AchievementCriteriaDataType dataType;
+    AchievementCriteriaDataType dataType{ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE};
     union
     {
         // ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE              = 0 (no data)
@@ -186,7 +187,7 @@ struct AchievementCriteriaData
     };
     uint32 ScriptId;
 
-    AchievementCriteriaData() : dataType(ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE)
+    AchievementCriteriaData()
     {
         raw.value1 = 0;
         raw.value2 = 0;
@@ -206,13 +207,13 @@ struct AchievementCriteriaData
 
 struct AchievementCriteriaDataSet
 {
-    AchievementCriteriaDataSet() : criteria_id(0) {}
+    AchievementCriteriaDataSet()  {}
     typedef std::vector<AchievementCriteriaData> Storage;
     void Add(AchievementCriteriaData const& data) { storage.push_back(data); }
     bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;
     void SetCriteriaId(uint32 id) {criteria_id = id;}
 private:
-    uint32 criteria_id;
+    uint32 criteria_id{0};
     Storage storage;
 };
 
@@ -232,8 +233,8 @@ typedef std::map<uint32, AchievementReward> AchievementRewards;
 
 struct AchievementRewardLocale
 {
-    StringVector Subject;
-    StringVector Text;
+    std::vector<std::string> Subject;
+    std::vector<std::string> Text;
 };
 
 typedef std::map<uint32, AchievementRewardLocale> AchievementRewardLocales;
@@ -258,17 +259,17 @@ public:
     ~AchievementMgr();
 
     void Reset();
-    static void DeleteFromDB(uint32 lowguid);
+    static void DeleteFromDB(ObjectGuid::LowType lowguid);
     void LoadFromDB(PreparedQueryResult achievementResult, PreparedQueryResult criteriaResult);
-    void SaveToDB(SQLTransaction& trans);
+    void SaveToDB(CharacterDatabaseTransaction trans);
     void ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
     void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
     void CompletedAchievement(AchievementEntry const* entry);
     void CheckAllAchievementCriteria();
     void SendAllAchievementData() const;
     void SendRespondInspectAchievements(Player* player) const;
-    bool HasAchieved(uint32 achievementId) const;
-    Player* GetPlayer() const { return m_player; }
+    [[nodiscard]] bool HasAchieved(uint32 achievementId) const;
+    [[nodiscard]] Player* GetPlayer() const { return m_player; }
     void UpdateTimedAchievements(uint32 timeDiff);
     void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
     void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);   // used for quest and scripted timed achievements
@@ -295,8 +296,8 @@ private:
 
 class AchievementGlobalMgr
 {
-    AchievementGlobalMgr() {}
-    ~AchievementGlobalMgr() {}
+    AchievementGlobalMgr() = default;
+    ~AchievementGlobalMgr() = default;
 
 public:
     static AchievementGlobalMgr* instance();
@@ -304,7 +305,7 @@ public:
     bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
     bool isStatisticAchievement(AchievementEntry const* achievement) const;
 
-    AchievementCriteriaEntryList const* GetAchievementCriteriaByType(AchievementCriteriaTypes type) const
+    [[nodiscard]] AchievementCriteriaEntryList const* GetAchievementCriteriaByType(AchievementCriteriaTypes type) const
     {
         return &m_AchievementCriteriasByType[type];
     }
@@ -323,18 +324,18 @@ public:
         return nullptr;
     }
 
-    AchievementCriteriaEntryList const& GetTimedAchievementCriteriaByType(AchievementCriteriaTimedTypes type) const
+    [[nodiscard]] AchievementCriteriaEntryList const& GetTimedAchievementCriteriaByType(AchievementCriteriaTimedTypes type) const
     {
         return m_AchievementCriteriasByTimedType[type];
     }
 
-    AchievementCriteriaEntryList const* GetAchievementCriteriaByAchievement(uint32 id) const
+    [[nodiscard]] AchievementCriteriaEntryList const* GetAchievementCriteriaByAchievement(uint32 id) const
     {
         AchievementCriteriaListByAchievement::const_iterator itr = m_AchievementCriteriaListByAchievement.find(id);
         return itr != m_AchievementCriteriaListByAchievement.end() ? &itr->second : nullptr;
     }
 
-    AchievementEntryList const* GetAchievementByReferencedId(uint32 id) const
+    [[nodiscard]] AchievementEntryList const* GetAchievementByReferencedId(uint32 id) const
     {
         AchievementListByReferencedId::const_iterator itr = m_AchievementListByReferencedId.find(id);
         return itr != m_AchievementListByReferencedId.end() ? &itr->second : nullptr;
@@ -367,6 +368,9 @@ public:
     void LoadCompletedAchievements();
     void LoadRewards();
     void LoadRewardLocales();
+
+    [[nodiscard]] AchievementEntry const* GetAchievement(uint32 achievementId) const;
+
 private:
     AchievementCriteriaDataMap m_criteriaDataMap;
 

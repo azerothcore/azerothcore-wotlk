@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum eAIs
 {
@@ -38,7 +38,7 @@ struct boss_faction_championsAI : public ScriptedAI
     uint32 threatTimer;
     uint32 powerTimer;
 
-    void EnterCombat(Unit* /*who*/)
+    void EnterCombat(Unit* /*who*/) override
     {
         me->SetInCombatWithZone();
         RecalculateThreat();
@@ -46,7 +46,7 @@ struct boss_faction_championsAI : public ScriptedAI
             pInstance->SetData(TYPE_FACTION_CHAMPIONS_START, 0);
     }
 
-    void AttackStart(Unit* who)
+    void AttackStart(Unit* who) override
     {
         if( !who )
             return;
@@ -109,19 +109,19 @@ struct boss_faction_championsAI : public ScriptedAI
         e.DelayEventsToMax(delay, gcd);
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if( pInstance && mAIType != AI_PET )
             pInstance->SetData(TYPE_FACTION_CHAMPIONS, DONE);
     }
 
-    void KilledUnit(Unit*  /*who*/)
+    void KilledUnit(Unit*  /*who*/) override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FACTION_CHAMPIONS_PLAYER_DIED, 1);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);
@@ -189,7 +189,7 @@ struct boss_faction_championsAI : public ScriptedAI
         return nullptr;
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if (!me->IsInCombat())
             return;
@@ -254,9 +254,9 @@ class npc_toc_druid : public CreatureScript
 public:
     npc_toc_druid() : CreatureScript("npc_toc_druid") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_druidAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_druidAI>(pCreature);
     }
 
     struct npc_toc_druidAI : public boss_faction_championsAI
@@ -282,7 +282,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -384,9 +384,9 @@ class npc_toc_shaman : public CreatureScript
 public:
     npc_toc_shaman() : CreatureScript("npc_toc_shaman") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_shamanAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_shamanAI>(pCreature);
     }
 
     struct npc_toc_shamanAI : public boss_faction_championsAI
@@ -411,7 +411,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -446,9 +446,9 @@ public:
                     break;
                 case EVENT_SPELL_HEROISM_OR_BLOODLUST:
                     if( me->GetEntry() == NPC_ALLIANCE_SHAMAN_RESTORATION )
-                        me->CastSpell((Unit*)NULL, SPELL_HEROISM, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_HEROISM, true);
                     else
-                        me->CastSpell((Unit*)NULL, SPELL_BLOODLUST, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, true);
                     events.RepeatEvent(600000);
                     EventMapGCD(events, 1500);
                     break;
@@ -506,9 +506,9 @@ class npc_toc_paladin : public CreatureScript
 public:
     npc_toc_paladin() : CreatureScript("npc_toc_paladin") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_paladinAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_paladinAI>(pCreature);
     }
 
     struct npc_toc_paladinAI : public boss_faction_championsAI
@@ -534,7 +534,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -641,9 +641,9 @@ class npc_toc_priest : public CreatureScript
 public:
     npc_toc_priest() : CreatureScript("npc_toc_priest") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_priestAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_priestAI>(pCreature);
     }
 
     struct npc_toc_priestAI : public boss_faction_championsAI
@@ -667,7 +667,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -719,7 +719,7 @@ public:
                 case EVENT_SPELL_PSYCHIC_SCREAM:
                     if( HealthBelowPct(50) && EnemiesInRange(8.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_PSYCHIC_SCREAM, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_PSYCHIC_SCREAM, false);
                         events.RepeatEvent(30000);
                         EventMapGCD(events, 1500);
                     }
@@ -761,9 +761,9 @@ class npc_toc_shadow_priest : public CreatureScript
 public:
     npc_toc_shadow_priest() : CreatureScript("npc_toc_shadow_priest") {}
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_shadow_priestAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_shadow_priestAI>(pCreature);
     }
 
     struct npc_toc_shadow_priestAI : public boss_faction_championsAI
@@ -790,7 +790,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -869,7 +869,7 @@ public:
                 case EVENT_SPELL_PSYCHIC_SCREAM:
                     if( EnemiesInRange(8.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_PSYCHIC_SCREAM, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_PSYCHIC_SCREAM, false);
                         events.RepeatEvent(30000);
                         EventMapGCD(events, 1500);
                     }
@@ -915,9 +915,9 @@ class npc_toc_warlock : public CreatureScript
 public:
     npc_toc_warlock() : CreatureScript("npc_toc_warlock") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_warlockAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_warlockAI>(pCreature);
     }
 
     struct npc_toc_warlockAI : public boss_faction_championsAI
@@ -944,13 +944,13 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void JustSummoned(Creature* c)
+        void JustSummoned(Creature* c) override
         {
             if( Unit* target = c->SelectNearestTarget(200.0f) )
                 c->AI()->AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -967,12 +967,12 @@ public:
                     break;
                 case EVENT_SPELL_SUMMON_FELHUNTER:
                     DoSummon(35465, *me);
-                    
+
                     break;
                 case EVENT_SPELL_HELLFIRE:
                     if( EnemiesInRange(9.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_HELLFIRE, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_HELLFIRE, false);
                         events.RepeatEvent(30000);
                         EventMapGCD(events, 1500);
                     }
@@ -1059,9 +1059,9 @@ class npc_toc_mage : public CreatureScript
 public:
     npc_toc_mage() : CreatureScript("npc_toc_mage") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_mageAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_mageAI>(pCreature);
     }
 
     struct npc_toc_mageAI : public boss_faction_championsAI
@@ -1087,7 +1087,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1117,7 +1117,7 @@ public:
                 case EVENT_SPELL_ARCANE_EXPLOSION:
                     if( EnemiesInRange(9.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_ARCANE_EXPLOSION, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_ARCANE_EXPLOSION, false);
                         events.RepeatEvent(6000);
                         EventMapGCD(events, 1500);
                     }
@@ -1127,7 +1127,7 @@ public:
                 case EVENT_SPELL_BLINK:
                     if( HealthBelowPct(50) && EnemiesInRange(10.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_FROST_NOVA, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_FROST_NOVA, false);
                         events.RepeatEvent(15000);
                         EventMapGCD(events, 1500);
                         // blink disabled, fucking movement shit not working
@@ -1206,9 +1206,9 @@ class npc_toc_hunter : public CreatureScript
 public:
     npc_toc_hunter() : CreatureScript("npc_toc_hunter") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_hunterAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_hunterAI>(pCreature);
     }
 
     struct npc_toc_hunterAI : public boss_faction_championsAI
@@ -1235,13 +1235,13 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_RANGED) || IsCCed());
         }
 
-        void JustSummoned(Creature* c)
+        void JustSummoned(Creature* c) override
         {
             if( Unit* target = c->SelectNearestTarget(200.0f) )
                 c->AI()->AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1258,7 +1258,7 @@ public:
                     break;
                 case EVENT_SPELL_CALL_PET:
                     DoSummon(35610, *me);
-                    
+
                     break;
                 case EVENT_SPELL_AIMED_SHOT:
                     if( me->GetVictim() )
@@ -1359,9 +1359,9 @@ class npc_toc_boomkin : public CreatureScript
 public:
     npc_toc_boomkin() : CreatureScript("npc_toc_boomkin") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_boomkinAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_boomkinAI>(pCreature);
     }
 
     struct npc_toc_boomkinAI : public boss_faction_championsAI
@@ -1388,13 +1388,13 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void JustSummoned(Creature* c)
+        void JustSummoned(Creature* c) override
         {
             if( Unit* target = c->SelectNearestTarget(200.0f) )
                 c->AI()->AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1462,7 +1462,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FORCE_OF_NATURE:
-                    me->CastSpell((Unit*)NULL, SPELL_FORCE_OF_NATURE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FORCE_OF_NATURE, false);
                     events.RepeatEvent(180000);
                     EventMapGCD(events, 1500);
                     break;
@@ -1504,9 +1504,9 @@ class npc_toc_warrior : public CreatureScript
 public:
     npc_toc_warrior() : CreatureScript("npc_toc_warrior") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_warriorAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_warriorAI>(pCreature);
     }
 
     struct npc_toc_warriorAI : public boss_faction_championsAI
@@ -1533,7 +1533,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1566,7 +1566,7 @@ public:
                 case EVENT_SPELL_INTIMIDATING_SHOUT:
                     if( EnemiesInRange(8.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_INTIMIDATING_SHOUT, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_INTIMIDATING_SHOUT, false);
                         events.RepeatEvent(120000);
                         EventMapGCD(events, 1500);
                     }
@@ -1698,9 +1698,9 @@ class npc_toc_dk : public CreatureScript
 public:
     npc_toc_dk() : CreatureScript("npc_toc_dk") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_dkAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_dkAI>(pCreature);
     }
 
     struct npc_toc_dkAI : public boss_faction_championsAI
@@ -1725,7 +1725,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1854,9 +1854,9 @@ class npc_toc_rogue : public CreatureScript
 public:
     npc_toc_rogue() : CreatureScript("npc_toc_rogue") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_rogueAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_rogueAI>(pCreature);
     }
 
     struct npc_toc_rogueAI : public boss_faction_championsAI
@@ -1882,7 +1882,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -1987,7 +1987,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 enum eEnhShamanSpells
@@ -2013,9 +2012,9 @@ class npc_toc_enh_shaman : public CreatureScript
 public:
     npc_toc_enh_shaman() : CreatureScript("npc_toc_enh_shaman") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_enh_shamanAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_enh_shamanAI>(pCreature);
     }
 
     struct npc_toc_enh_shamanAI : public boss_faction_championsAI
@@ -2041,7 +2040,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -2103,18 +2102,17 @@ public:
                     break;
                 case EVENT_SPELL_HEROISM_OR_BLOODLUST:
                     if( me->GetEntry() == NPC_ALLIANCE_SHAMAN_RESTORATION )
-                        me->CastSpell((Unit*)NULL, SPELL_HEROISM, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_HEROISM, true);
                     else
-                        me->CastSpell((Unit*)NULL, SPELL_BLOODLUST, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, true);
                     events.RepeatEvent(600000);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SUMMON_TOTEM:
-                    me->CastSpell((Unit*)NULL, RAND(SPELL_GROUNDING_TOTEM, SPELL_WINDFURY_TOTEM, SPELL_TREMOR_TOTEM), false);
+                    me->CastSpell((Unit*)nullptr, RAND(SPELL_GROUNDING_TOTEM, SPELL_WINDFURY_TOTEM, SPELL_TREMOR_TOTEM), false);
                     events.RepeatEvent(30000);
                     EventMapGCD(events, 1500);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
@@ -2152,9 +2150,9 @@ class npc_toc_retro_paladin : public CreatureScript
 public:
     npc_toc_retro_paladin() : CreatureScript("npc_toc_retro_paladin") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_retro_paladinAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_retro_paladinAI>(pCreature);
     }
 
     struct npc_toc_retro_paladinAI : public boss_faction_championsAI
@@ -2180,7 +2178,7 @@ public:
             return !(me->HasUnitState(UNIT_STATE_CASTING) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -2233,7 +2231,7 @@ public:
                     }
                     if( EnemiesInRange(5.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_DIVINE_STORM, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_DIVINE_STORM, false);
                         events.RepeatEvent(urand(10000, 15000));
                         EventMapGCD(events, 1500);
                     }
@@ -2304,9 +2302,9 @@ class npc_toc_pet_warlock : public CreatureScript
 public:
     npc_toc_pet_warlock() : CreatureScript("npc_toc_pet_warlock") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_pet_warlockAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_pet_warlockAI>(pCreature);
     }
 
     struct npc_toc_pet_warlockAI : public boss_faction_championsAI
@@ -2325,7 +2323,7 @@ public:
             return !(me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -2357,12 +2355,11 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon();
         }
     };
-
 };
 
 enum eHunterPetSpells
@@ -2380,9 +2377,9 @@ class npc_toc_pet_hunter : public CreatureScript
 public:
     npc_toc_pet_hunter() : CreatureScript("npc_toc_pet_hunter") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc_pet_hunterAI (pCreature);
+        return GetTrialOfTheCrusaderAI<npc_toc_pet_hunterAI>(pCreature);
     }
 
     struct npc_toc_pet_hunterAI : public boss_faction_championsAI
@@ -2400,7 +2397,7 @@ public:
             return !IsCCed();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
             if( !UpdateVictim() )
@@ -2425,7 +2422,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon();
         }
@@ -2469,26 +2466,24 @@ public:
     {
         PrepareAuraScript(spell_faction_champion_warl_unstable_affliction_AuraScript);
 
-        bool Validate(SpellInfo const* /*spell*/)
+        bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_UNSTABLE_AFFLICTION_DISPEL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_UNSTABLE_AFFLICTION_DISPEL });
         }
 
         void HandleDispel(DispelInfo* dispelInfo)
         {
             if (Unit* caster = GetCaster())
-                caster->CastSpell(dispelInfo->GetDispeller(), SPELL_UNSTABLE_AFFLICTION_DISPEL, true, NULL, GetEffect(EFFECT_0));
+                caster->CastSpell(dispelInfo->GetDispeller(), SPELL_UNSTABLE_AFFLICTION_DISPEL, true, nullptr, GetEffect(EFFECT_0));
         }
 
-        void Register()
+        void Register() override
         {
             AfterDispel += AuraDispelFn(spell_faction_champion_warl_unstable_affliction_AuraScript::HandleDispel);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_faction_champion_warl_unstable_affliction_AuraScript();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,10 +11,10 @@ SDComment: Provides learn/unlearn/relearn-options for professions. Not supported
 SDCategory: NPCs
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "WorldSession.h"
 
@@ -220,8 +220,6 @@ enum SpecializationQuests
     Q_MASTER_POTION         = 10897,
 };
 
-
-
 /*###
 # formulas to calculate unlearning cost
 ###*/
@@ -275,9 +273,7 @@ bool EquippedOk(Player* player, uint32 spellId)
             if (item && item->GetTemplate()->RequiredSpell == reqSpell)
             {
                 //player has item equipped that require specialty. Not allow to unlearn, player has to unequip first
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_TSCR, "TSCR: player attempt to unlearn spell %u, but item %u is equipped.", reqSpell, item->GetEntry());
-#endif
+                LOG_DEBUG("scripts.ai", "TSCR: player attempt to unlearn spell %u, but item %u is equipped.", reqSpell, item->GetEntry());
                 return false;
             }
         }
@@ -416,7 +412,7 @@ void ProcessUnlearnAction(Player* player, Creature* creature, uint32 spellId, ui
             player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature, 0, 0);
     }
     else
-        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, NULL, nullptr);
+        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, nullptr, nullptr);
     CloseGossipMenuFor(player);
 }
 
@@ -1210,19 +1206,19 @@ public:
         {
             // Learn Goblin
             case GOSSIP_ACTION_INFO_DEF + 1:
-                ProcessCastaction(player, NULL, S_GOBLIN, S_LEARN_GOBLIN, DoLearnCost(player));
+                ProcessCastaction(player, nullptr, S_GOBLIN, S_LEARN_GOBLIN, DoLearnCost(player));
                 break;
             // Learn Gnomish
             case GOSSIP_ACTION_INFO_DEF + 2:
-                ProcessCastaction(player, NULL, S_GNOMISH, S_LEARN_GNOMISH, DoLearnCost(player));
+                ProcessCastaction(player, nullptr, S_GNOMISH, S_LEARN_GNOMISH, DoLearnCost(player));
                 break;
             //Unlearn Goblin
             case GOSSIP_ACTION_INFO_DEF + 3:
-                ProcessUnlearnAction(player, NULL, S_UNLEARN_GOBLIN, 0, DoHighUnlearnCost(player));
+                ProcessUnlearnAction(player, nullptr, S_UNLEARN_GOBLIN, 0, DoHighUnlearnCost(player));
                 break;
             //Unlearn Gnomish
             case GOSSIP_ACTION_INFO_DEF + 4:
-                ProcessUnlearnAction(player, NULL, S_UNLEARN_GNOMISH, 0, DoHighUnlearnCost(player));
+                ProcessUnlearnAction(player, nullptr, S_UNLEARN_GNOMISH, 0, DoHighUnlearnCost(player));
                 break;
         }
     }
@@ -1276,7 +1272,6 @@ public:
         return true;
     }
 };
-
 
 void AddSC_npc_professions()
 {

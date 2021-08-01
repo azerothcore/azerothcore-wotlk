@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,13 +12,13 @@ Category: commandscripts
 EndScriptData */
 
 #include "AccountMgr.h"
+#include "BanManager.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "BanManager.h"
 
 /// Ban function modes
 enum BanMode
@@ -304,7 +304,7 @@ public:
             return false;
 
         Player* target = ObjectAccessor::FindPlayerByName(args, false);
-        uint32 targetGuid = 0;
+        ObjectGuid targetGuid;
         std::string name(args);
 
         if (!target)
@@ -317,10 +317,11 @@ public:
             }
         }
         else
-            targetGuid = target->GetGUIDLow();
+            targetGuid = target->GetGUID();
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANINFO);
-        stmt->setUInt32(0, targetGuid);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANINFO);
+        stmt->setUInt32(0, targetGuid.GetCounter());
+
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
         if (!result)
         {
@@ -373,13 +374,12 @@ public:
                                  fields[0].GetCString(), fields[1].GetCString(), permanent ? handler->GetAcoreString(LANG_BANINFO_NEVER) : fields[2].GetCString(),
                                  permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[3].GetUInt64(), true).c_str(), fields[4].GetCString(), fields[5].GetCString());
 
-
         return true;
     }
 
     static bool HandleBanListAccountCommand(ChatHandler* handler, char const* args)
     {
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS);
         LoginDatabase.Execute(stmt);
 
         char* filterStr = strtok((char*)args, " ");
@@ -389,14 +389,14 @@ public:
 
         if (filter.empty())
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_ALL);
-            result = LoginDatabase.Query(stmt);
+            LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_ALL);
+            result = LoginDatabase.Query(stmt2);
         }
         else
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_BY_USERNAME);
-            stmt->setString(0, filter);
-            result = LoginDatabase.Query(stmt);
+            LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED_BY_USERNAME);
+            stmt2->setString(0, filter);
+            result = LoginDatabase.Query(stmt2);
         }
 
         if (!result)
@@ -496,7 +496,7 @@ public:
             return false;
 
         std::string filter(filterStr);
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUID_BY_NAME_FILTER);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUID_BY_NAME_FILTER);
         stmt->setString(0, filter);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
         if (!result)
@@ -513,8 +513,9 @@ public:
             do
             {
                 Field* fields = result->Fetch();
-                PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANNED_NAME);
+                CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANNED_NAME);
                 stmt2->setUInt32(0, fields[0].GetUInt32());
+
                 PreparedQueryResult banResult = CharacterDatabase.Query(stmt2);
                 if (banResult)
                     handler->PSendSysMessage("%s", (*banResult)[0].GetCString());
@@ -534,8 +535,9 @@ public:
 
                 std::string char_name = fields[1].GetString();
 
-                PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANINFO_LIST);
+                CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BANINFO_LIST);
                 stmt2->setUInt32(0, fields[0].GetUInt32());
+
                 PreparedQueryResult banInfo = CharacterDatabase.Query(stmt2);
                 if (banInfo)
                 {
@@ -573,7 +575,7 @@ public:
 
     static bool HandleBanListIPCommand(ChatHandler* handler, char const* args)
     {
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS);
         LoginDatabase.Execute(stmt);
 
         char* filterStr = strtok((char*)args, " ");
@@ -584,14 +586,14 @@ public:
 
         if (filter.empty())
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED_ALL);
-            result = LoginDatabase.Query(stmt);
+            LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED_ALL);
+            result = LoginDatabase.Query(stmt2);
         }
         else
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED_BY_IP);
-            stmt->setString(0, filter);
-            result = LoginDatabase.Query(stmt);
+            LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED_BY_IP);
+            stmt2->setString(0, filter);
+            result = LoginDatabase.Query(stmt2);
         }
 
         if (!result)

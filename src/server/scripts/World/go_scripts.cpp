@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -30,15 +30,15 @@ go_hive_pod
 go_veil_skith_cage
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "CellImpl.h"
+#include "GameObjectAI.h"
+#include "GridNotifiersImpl.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "GameObjectAI.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
-#include "Player.h"
 #include "WorldSession.h"
-#include "GridNotifiersImpl.h"
-#include "CellImpl.h"
 
 // Ours
 /*######
@@ -101,7 +101,7 @@ public:
             _timer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_timer)
             {
@@ -118,7 +118,7 @@ public:
         uint32 _timer;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_witherbark_totem_bundleAI(go);
     }
@@ -284,22 +284,22 @@ public:
             requireSummon = 0;
             int8 count = urand(1, 3);
             for (int8 i = 0; i < count; ++i)
-                go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionZ() + 0.5f, go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionZ(), go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
-        void OnStateChanged(uint32 state, Unit*  /*unit*/)
+        void OnStateChanged(uint32 state, Unit*  /*unit*/) override
         {
             if (requireSummon == 1 && state == GO_READY)
                 requireSummon = 2;
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (go->isSpawned() && requireSummon == 2)
                 SummonTadpoles();
         }
 
-        bool GossipHello(Player* player, bool  /*reportUse*/)
+        bool GossipHello(Player* player, bool  /*reportUse*/) override
         {
             if (requireSummon)
                 return false;
@@ -311,7 +311,7 @@ public:
                 GetCreatureListWithEntryInGrid(cList, go, NPC_WINTERFIN_TADPOLE, 5.0f);
                 for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
                 {
-                    player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE, 0);
+                    player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE);
                     (*itr)->DespawnOrUnsummon(urand(45000, 60000));
                     (*itr)->GetMotionMaster()->MoveFollow(player, 1.0f, frand(0.0f, 2 * M_PI), MOTION_SLOT_CONTROLLED);
                 }
@@ -320,7 +320,7 @@ public:
         }
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_tadpole_cageAI(go);
     }
@@ -342,16 +342,16 @@ public:
             timer { 0 }
         { }
 
-        void UpdateAI(uint32  diff)
+        void UpdateAI(uint32  diff) override
         {
             timer += diff;
             if (timer > 3000)
             {
                 timer = 0;
                 std::list<Player*> players;
-                acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                acore::PlayerListSearcher<acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                go->VisitNearbyWorldObject(0.3f, searcher);
+                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
+                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
+                Cell::VisitWorldObjects(go, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
@@ -367,7 +367,7 @@ public:
         uint32 timer;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_flamesAI(go);
     }
@@ -389,16 +389,16 @@ public:
             timer { 0 }
         { }
 
-        void UpdateAI(uint32  diff)
+        void UpdateAI(uint32  diff) override
         {
             timer += diff;
             if (timer > 3000)
             {
                 timer = 0;
                 std::list<Player*> players;
-                acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
-                acore::PlayerListSearcher<acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
-                go->VisitNearbyWorldObject(0.3f, searcher);
+                Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(go, 0.3f);
+                Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(go, players, checker);
+                Cell::VisitWorldObjects(go, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
@@ -414,12 +414,11 @@ public:
         uint32 timer;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_heatAI(go);
     }
 };
-
 
 // Theirs
 /*####
@@ -782,27 +781,6 @@ public:
     GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_midsummer_musicAI(go);
-    }
-};
-
-/*######
-## go_cat_figurine
-######*/
-
-enum CatFigurine
-{
-    SPELL_SUMMON_GHOST_SABER    = 5968,
-};
-
-class go_cat_figurine : public GameObjectScript
-{
-public:
-    go_cat_figurine() : GameObjectScript("go_cat_figurine") { }
-
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
-    {
-        player->CastSpell(player, SPELL_SUMMON_GHOST_SABER, true);
-        return false;
     }
 };
 
@@ -1248,7 +1226,7 @@ public:
             return false;
 
         pPrisoner->DespawnOrUnsummon();
-        player->KilledMonsterCredit(NPC_EBON_BLADE_PRISONER_HUMAN, 0);
+        player->KilledMonsterCredit(NPC_EBON_BLADE_PRISONER_HUMAN);
         switch (pPrisoner->GetEntry())
         {
             case NPC_EBON_BLADE_PRISONER_HUMAN:
@@ -1395,7 +1373,7 @@ public:
         /// _and_ CMSG_GAMEOBJECT_REPORT_USE, this GossipHello hook is called
         /// twice. The script's handling is fine as it won't remove two charges
         /// on the well. We have to find how to segregate REPORT_USE and USE.
-        bool GossipHello(Player* player, bool reportUse)
+        bool GossipHello(Player* player, bool reportUse) override
         {
             if (reportUse)
                 return false;
@@ -1437,7 +1415,7 @@ public:
         uint32 _stoneId;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_soulwellAI(go);
     }
@@ -1487,7 +1465,7 @@ public:
         if (qInfo)
         {
             /// @todo prisoner should help player for a short period of time
-            player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0], 0);
+            player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0]);
             pPrisoner->DisappearAndDie();
         }
         return true;
@@ -1656,7 +1634,6 @@ void AddSC_go_scripts()
     new go_pirate_day_music();
     new go_darkmoon_faire_music();
     new go_midsummer_music();
-    new go_cat_figurine();
     new go_gilded_brazier();
     //new go_shrine_of_the_birds();
     new go_southfury_moonstone();

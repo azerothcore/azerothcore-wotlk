@@ -5,10 +5,13 @@
 #ifndef DEF_ULDUAR_H
 #define DEF_ULDUAR_H
 
+#include "CellImpl.h"
 #include "Chat.h"
+#include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+
+#define UlduarScriptName "instance_ulduar"
 
 enum UlduarEncounters
 {
@@ -29,6 +32,9 @@ enum UlduarEncounters
     TYPE_YOGGSARON                          = 12,
     TYPE_ALGALON                            = 13,
     TYPE_WATCHERS                           = 14,
+    TYPE_SPAWN_HODIR_CACHE                  = 15,
+    TYPE_HODIR_HM_FAIL                      = 16,
+    TYPE_WINTER_CACHE                       = 17,
 };
 
 enum UlduarData
@@ -79,6 +85,11 @@ enum UlduarData
 
     // Tram
     DATA_CALL_TRAM                          = 710,
+
+    // Mage Barrier
+    DATA_MAGE_BARRIER                       = 800,
+    DATA_BRANN_MEMOTESAY                    = 801,
+    DATA_BRANN_EASY_MODE                    = 802,
 };
 
 enum UlduarNPCs
@@ -132,7 +143,7 @@ enum UlduarNPCs
     NPC_VEHICLE_CHOPPER                     = 33062,
     NPC_SALVAGED_DEMOLISHER                 = 33109,
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
-
+    NPC_BRANN_BASE_CAMP                     = 33579,
 
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,
@@ -246,7 +257,6 @@ enum UlduarMisc
     ACTION_TOWER_OF_FLAMES_DESTROYED        = 3,
     ACTION_TOWER_OF_LIFE_DESTROYED          = 4,
 
-
     // Algalon the Observer
     WORLD_STATE_ALGALON_DESPAWN_TIMER       = 4131,
     WORLD_STATE_ALGALON_TIMER_ENABLED       = 4132,
@@ -271,5 +281,11 @@ enum UlduarMisc
 
 Position const AlgalonSummonPos = {1632.531f, -304.8516f, 450.1123f, 1.530165f};
 Position const AlgalonLandPos   = {1632.668f, -302.7656f, 417.3211f, 1.530165f};
+
+template <class AI, class T>
+inline AI* GetUlduarAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, UlduarScriptName);
+}
 
 #endif

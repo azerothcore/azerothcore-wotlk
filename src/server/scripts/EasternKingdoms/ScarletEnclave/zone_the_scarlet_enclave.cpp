@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 /*####
 ## npc_valkyr_battle_maiden
@@ -64,11 +64,17 @@ public:
             {
                 Player* player = nullptr;
                 if (me->IsSummon())
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                {
+                    if (Unit * summoner = me->ToTempSummon()->GetSummoner())
+                    {
                         player = summoner->ToPlayer();
+                    }
+                }
 
                 if (!player)
+                {
                     phase = 3;
+                }
 
                 switch (phase)
                 {
@@ -78,17 +84,23 @@ public:
                         FlyBackTimer = 500;
                         break;
                     case 1:
-                        player->GetClosePoint(x, y, z, me->GetObjectSize());
+                        if (player)
+                        {
+                            player->GetClosePoint(x, y, z, me->GetObjectSize());
+                        }
                         z += 2.5f;
                         x -= 2.0f;
                         y -= 1.5f;
                         me->GetMotionMaster()->MovePoint(0, x, y, z);
-                        me->SetTarget(player->GetGUID());
+                        if (player)
+                        {
+                            me->SetTarget(player->GetGUID());
+                        }
                         me->SetVisible(true);
                         FlyBackTimer = 4500;
                         break;
                     case 2:
-                        if (!player->isResurrectRequested())
+                        if (player && !player->isResurrectRequested())
                         {
                             me->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_01);
                             DoCast(player, SPELL_REVIVE, true);
@@ -112,7 +124,6 @@ public:
             else FlyBackTimer -= diff;
         }
     };
-
 };
 
 void AddSC_the_scarlet_enclave()

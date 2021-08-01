@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,11 +15,12 @@ EndScriptData */
 npc_maghar_captive
 npc_creditmarker_visit_with_ancestors
 EndContentData */
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
+
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*#####
@@ -57,7 +58,7 @@ class npc_maghar_captive : public CreatureScript
 public:
     npc_maghar_captive() : CreatureScript("npc_maghar_captive") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_TOTEM_KARDASH_H)
         {
@@ -76,7 +77,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_maghar_captiveAI(creature);
     }
@@ -89,19 +90,19 @@ public:
         uint32 HealTimer;
         uint32 FrostShockTimer;
 
-        void Reset()
+        void Reset() override
         {
             ChainLightningTimer = 1000;
             HealTimer = 0;
             FrostShockTimer = 6000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoCast(me, SPELL_EARTHBIND_TOTEM, false);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
                 return;
@@ -113,7 +114,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -138,7 +139,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             if (summoned->GetEntry() == NPC_MURK_BRUTE)
                 summoned->AI()->Talk(SAY_MAG_NO_ESCAPE);
@@ -149,10 +150,9 @@ public:
             summoned->SetWalk(false);
             summoned->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             summoned->AI()->AttackStart(me);
-
         }
 
-        void SpellHitTarget(Unit* /*target*/, const SpellInfo* spell)
+        void SpellHitTarget(Unit* /*target*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_CHAIN_LIGHTNING)
             {
@@ -163,7 +163,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -214,7 +214,7 @@ class npc_creditmarker_visit_with_ancestors : public CreatureScript
 public:
     npc_creditmarker_visit_with_ancestors() : CreatureScript("npc_creditmarker_visit_with_ancestors") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_creditmarker_visit_with_ancestorsAI(creature);
     }
@@ -223,11 +223,11 @@ public:
     {
         npc_creditmarker_visit_with_ancestorsAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (!who)
@@ -287,7 +287,7 @@ public:
             {
                 corki->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 5, go->GetPositionY(), go->GetPositionZ());
                 if (player)
-                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_1, 0);
+                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_1);
             }
         }
 
@@ -297,7 +297,7 @@ public:
             {
                 corki->GetMotionMaster()->MovePoint(1, go->GetPositionX() - 5, go->GetPositionY(), go->GetPositionZ());
                 if (player)
-                    player->KilledMonsterCredit(NPC_CORKI_2, 0);
+                    player->KilledMonsterCredit(NPC_CORKI_2);
             }
         }
 
@@ -307,7 +307,7 @@ public:
             {
                 corki->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 4, go->GetPositionY(), go->GetPositionZ());
                 if (player)
-                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_3, 0);
+                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_3);
             }
         }
 
@@ -320,7 +320,7 @@ class npc_corki : public CreatureScript
 public:
     npc_corki() : CreatureScript("npc_corki") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_corkiAI(creature);
     }
@@ -332,13 +332,13 @@ public:
         uint32 Say_Timer;
         bool ReleasedFromCage;
 
-        void Reset()
+        void Reset() override
         {
             Say_Timer = 5000;
             ReleasedFromCage = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (ReleasedFromCage)
             {
@@ -352,7 +352,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
@@ -404,7 +404,7 @@ class npc_kurenai_captive : public CreatureScript
 public:
     npc_kurenai_captive() : CreatureScript("npc_kurenai_captive") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_TOTEM_KARDASH_A)
             creature->AI()->SetGUID(player->GetGUID(), quest->GetQuestId());
@@ -412,7 +412,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_kurenai_captiveAI(creature);
     }
@@ -425,7 +425,7 @@ public:
         uint32 HealTimer;
         uint32 FrostShockTimer;
 
-        void SetGUID(uint64 guid, int32  /*questId*/)
+        void SetGUID(ObjectGuid guid, int32  /*questId*/) override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             Start(true, false, guid);
@@ -436,19 +436,19 @@ public:
             me->SummonCreature(NPC_KUR_MURK_SCAVENGER, kurenaiAmbushA[0], kurenaiAmbushA[1], kurenaiAmbushA[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
         }
 
-        void Reset()
+        void Reset() override
         {
             ChainLightningTimer = 1000;
             HealTimer = 0;
             FrostShockTimer = 6000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoCast(me, SPELL_KUR_EARTHBIND_TOTEM, false);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
                 return;
@@ -460,7 +460,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -489,7 +489,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             if (summoned->GetEntry() == NPC_KUR_MURK_BRUTE)
                 summoned->AI()->Talk(SAY_KUR_NO_ESCAPE);
@@ -501,7 +501,7 @@ public:
             summoned->AI()->AttackStart(me);
         }
 
-        void SpellHitTarget(Unit* /*target*/, const SpellInfo* spell)
+        void SpellHitTarget(Unit* /*target*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_KUR_CHAIN_LIGHTNING)
             {
@@ -520,7 +520,7 @@ public:
             }
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -583,7 +583,7 @@ public:
 
         if (Creature* prisoner = go->FindNearestCreature(NPC_MAGHAR_PRISONER, 5.0f))
         {
-            player->KilledMonsterCredit(NPC_MAGHAR_PRISONER, 0);
+            player->KilledMonsterCredit(NPC_MAGHAR_PRISONER);
 
             prisoner->AI()->Talk(SAY_FREE, player);
             prisoner->DespawnOrUnsummon(6000);

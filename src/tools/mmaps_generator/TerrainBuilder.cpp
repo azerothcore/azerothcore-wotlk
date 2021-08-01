@@ -5,10 +5,9 @@
  */
 
 #include "TerrainBuilder.h"
-
 #include "PathCommon.h"
 #include "MapBuilder.h"
-
+#include "MapDefines.h"
 #include "VMapManager2.h"
 #include "MapTree.h"
 #include "ModelInstance.h"
@@ -73,7 +72,7 @@ namespace MMAP
     char const* MAP_VERSION_MAGIC = "v1.8";
 
     TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
-    TerrainBuilder::~TerrainBuilder() { }
+    TerrainBuilder::~TerrainBuilder() = default;
 
     /**************************************************************************/
     void TerrainBuilder::getLoopVars(Spot portion, int& loopStart, int& loopEnd, int& loopInc)
@@ -268,7 +267,6 @@ namespace MMAP
             fseek(mapFile, fheader.liquidMapOffset, SEEK_SET);
             if (fread(&lheader, sizeof(map_liquidHeader), 1, mapFile) != 1)
                 printf("TerrainBuilder::loadMap: Failed to read some data expected 1, read 0\n");
-
 
             float* liquid_map = nullptr;
 
@@ -594,7 +592,6 @@ namespace MMAP
             |    \|
             258---259 ... 515
         */
-
     }
 
     /**************************************************************************/
@@ -649,14 +646,14 @@ namespace MMAP
                 break;
 
             InstanceTreeMap instanceTrees;
-            ((VMapManager2*)vmapManager)->getInstanceMapTree(instanceTrees);
+            ((VMapManager2*)vmapManager)->GetInstanceMapTree(instanceTrees);
 
             if (!instanceTrees[mapID])
                 break;
 
             ModelInstance* models = nullptr;
             uint32 count = 0;
-            instanceTrees[mapID]->getModelInstances(models, count);
+            instanceTrees[mapID]->GetModelInstances(models, count);
 
             if (!models)
                 break;
@@ -674,7 +671,7 @@ namespace MMAP
                 retval = true;
 
                 std::vector<GroupModel> groupModels;
-                worldModel->getGroupModels(groupModels);
+                worldModel->GetGroupModels(groupModels);
 
                 // all M2s need to have triangle indices reversed
                 bool isM2 = instance.name.find(".m2") != std::string::npos || instance.name.find(".M2") != std::string::npos;
@@ -686,14 +683,14 @@ namespace MMAP
                 position.x -= 32 * GRID_SIZE;
                 position.y -= 32 * GRID_SIZE;
 
-                for (std::vector<GroupModel>::iterator it = groupModels.begin(); it != groupModels.end(); ++it)
+                for (auto & groupModel : groupModels)
                 {
                     std::vector<G3D::Vector3> tempVertices;
                     std::vector<G3D::Vector3> transformedVertices;
                     std::vector<MeshTriangle> tempTriangles;
                     WmoLiquid* liquid = nullptr;
 
-                    it->getMeshData(tempVertices, tempTriangles, liquid);
+                    groupModel.GetMeshData(tempVertices, tempTriangles, liquid);
 
                     // first handle collision mesh
                     transform(tempVertices, transformedVertices, scale, rotation, position);
@@ -710,7 +707,7 @@ namespace MMAP
                         std::vector<int> liqTris;
                         uint32 tilesX, tilesY, vertsX, vertsY;
                         G3D::Vector3 corner;
-                        liquid->getPosInfo(tilesX, tilesY, corner);
+                        liquid->GetPosInfo(tilesX, tilesY, corner);
                         vertsX = tilesX + 1;
                         vertsY = tilesY + 1;
                         uint8* flags = liquid->GetFlagsStorage();
@@ -778,9 +775,9 @@ namespace MMAP
                         }
 
                         uint32 liqOffset = meshData.liquidVerts.size() / 3;
-                        for (uint32 j = 0; j < liqVerts.size(); ++j)
+                        for (auto & liqVert : liqVerts)
                         {
-                            meshData.liquidVerts.append(liqVerts[j].y, liqVerts[j].z, liqVerts[j].x);
+                            meshData.liquidVerts.append(liqVert.y, liqVert.z, liqVert.x);
                         }
 
                         for (uint32 j = 0; j < liqTris.size() / 3; ++j)
@@ -802,10 +799,10 @@ namespace MMAP
     /**************************************************************************/
     void TerrainBuilder::transform(std::vector<G3D::Vector3>& source, std::vector<G3D::Vector3>& transformedVertices, float scale, G3D::Matrix3& rotation, G3D::Vector3& position)
     {
-        for (std::vector<G3D::Vector3>::iterator it = source.begin(); it != source.end(); ++it)
+        for (auto & it : source)
         {
             // apply tranform, then mirror along the horizontal axes
-            G3D::Vector3 v((*it) * rotation * scale + position);
+            G3D::Vector3 v(it * rotation * scale + position);
             v.x *= -1.f;
             v.y *= -1.f;
             transformedVertices.push_back(v);
@@ -815,11 +812,11 @@ namespace MMAP
     /**************************************************************************/
     void TerrainBuilder::copyVertices(std::vector<G3D::Vector3>& source, G3D::Array<float>& dest)
     {
-        for (std::vector<G3D::Vector3>::iterator it = source.begin(); it != source.end(); ++it)
+        for (auto & it : source)
         {
-            dest.push_back((*it).y);
-            dest.push_back((*it).z);
-            dest.push_back((*it).x);
+            dest.push_back(it.y);
+            dest.push_back(it.z);
+            dest.push_back(it.x);
         }
     }
 
@@ -828,20 +825,20 @@ namespace MMAP
     {
         if (flip)
         {
-            for (std::vector<MeshTriangle>::iterator it = source.begin(); it != source.end(); ++it)
+            for (auto & it : source)
             {
-                dest.push_back((*it).idx2 + offset);
-                dest.push_back((*it).idx1 + offset);
-                dest.push_back((*it).idx0 + offset);
+                dest.push_back(it.idx2 + offset);
+                dest.push_back(it.idx1 + offset);
+                dest.push_back(it.idx0 + offset);
             }
         }
         else
         {
-            for (std::vector<MeshTriangle>::iterator it = source.begin(); it != source.end(); ++it)
+            for (auto & it : source)
             {
-                dest.push_back((*it).idx0 + offset);
-                dest.push_back((*it).idx1 + offset);
-                dest.push_back((*it).idx2 + offset);
+                dest.push_back(it.idx0 + offset);
+                dest.push_back(it.idx1 + offset);
+                dest.push_back(it.idx2 + offset);
             }
         }
     }
@@ -939,7 +936,6 @@ namespace MMAP
                 meshData.offMeshConnectionsAreas.append((unsigned char)0xFF);
                 meshData.offMeshConnectionsFlags.append((unsigned short)0xFF);  // all movement masks can make this path
             }
-
         }
 
         delete [] buf;

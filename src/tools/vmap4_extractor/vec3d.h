@@ -85,12 +85,12 @@ public:
         return *this;
     }
 
-    float lengthSquared() const
+    [[nodiscard]] float lengthSquared() const
     {
         return x * x + y * y + z * z;
     }
 
-    float length() const
+    [[nodiscard]] float length() const
     {
         return sqrt(x * x + y * y + z * z);
     }
@@ -126,6 +126,12 @@ public:
     }
 };
 
+class AaBox3D
+{
+public:
+    Vec3D min;
+    Vec3D max;
+};
 
 class Vec2D
 {
@@ -192,12 +198,12 @@ public:
         return *this;
     }
 
-    float lengthSquared() const
+    [[nodiscard]] float lengthSquared() const
     {
         return x * x + y * y;
     }
 
-    float length() const
+    [[nodiscard]] float length() const
     {
         return sqrt(x * x + y * y);
     }
@@ -214,7 +220,6 @@ public:
         r.normalize();
         return r;
     }
-
 
     friend std::istream& operator>>(std::istream& in, Vec2D& v)
     {
@@ -234,5 +239,10 @@ inline void rotate(float x0, float y0, float* x, float* y, float angle)
     *x = xa * cosf(angle) - ya * sinf(angle) + x0;
     *y = xa * sinf(angle) + ya * cosf(angle) + y0;
 }
+
+struct Quaternion
+{
+    float X, Y, Z, W;
+};
 
 #endif

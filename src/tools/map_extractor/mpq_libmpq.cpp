@@ -50,13 +50,13 @@ void MPQArchive::close()
 
 MPQFile::MPQFile(const char* filename):
     eof(false),
-    buffer(0),
+    buffer(nullptr),
     pointer(0),
     size(0)
 {
-    for (ArchiveSet::iterator i = gOpenArchives.begin(); i != gOpenArchives.end(); ++i)
+    for (auto & gOpenArchive : gOpenArchives)
     {
-        mpq_archive* mpq_a = (*i)->mpq_a;
+        mpq_archive* mpq_a = gOpenArchive->mpq_a;
 
         uint32_t filenum;
         if (libmpq__file_number(mpq_a, filename, &filenum)) continue;
@@ -68,7 +68,7 @@ MPQFile::MPQFile(const char* filename):
         {
             //            printf("warning: file %s has size %d; cannot read.\n", filename, size);
             eof = true;
-            buffer = 0;
+            buffer = nullptr;
             return;
         }
         buffer = new char[size];
@@ -77,10 +77,9 @@ MPQFile::MPQFile(const char* filename):
         libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
         /*libmpq_file_getdata(&mpq_a, hash, fileno, (unsigned char*)buffer);*/
         return;
-
     }
     eof = true;
-    buffer = 0;
+    buffer = nullptr;
 }
 
 size_t MPQFile::read(void* dest, size_t bytes)
@@ -116,6 +115,6 @@ void MPQFile::seekRelative(int offset)
 void MPQFile::close()
 {
     delete[] buffer;
-    buffer = 0;
+    buffer = nullptr;
     eof = true;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,10 +11,10 @@ SDComment: SDComment: Timers may incorrect
 SDCategory: Karazhan
 EndScriptData */
 
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "karazhan.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -58,9 +58,9 @@ class boss_nightbane : public CreatureScript
 public:
     boss_nightbane() : CreatureScript("boss_nightbane") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_nightbaneAI (creature);
+        return GetKarazhanAI<boss_nightbaneAI>(creature);
     }
 
     struct boss_nightbaneAI : public ScriptedAI
@@ -97,7 +97,7 @@ public:
 
         uint32 MovePhase;
 
-        void Reset()
+        void Reset() override
         {
             BellowingRoarTimer = 30000;
             CharredEarthTimer = 15000;
@@ -120,10 +120,10 @@ public:
 
             if (instance)
             {
-                if (instance->GetData64(DATA_NIGHTBANE) == DONE)
+                if (instance->GetData(DATA_NIGHTBANE) == DONE)
                     me->DisappearAndDie();
                 else
-                    instance->SetData64(DATA_NIGHTBANE, NOT_STARTED);
+                    instance->SetData(DATA_NIGHTBANE, NOT_STARTED);
             }
 
             HandleTerraceDoors(true);
@@ -142,27 +142,27 @@ public:
         {
             if (instance)
             {
-                instance->HandleGameObject(instance->GetData64(DATA_MASTERS_TERRACE_DOOR_1), open);
-                instance->HandleGameObject(instance->GetData64(DATA_MASTERS_TERRACE_DOOR_2), open);
+                instance->HandleGameObject(instance->GetGuidData(DATA_MASTERS_TERRACE_DOOR_1), open);
+                instance->HandleGameObject(instance->GetGuidData(DATA_MASTERS_TERRACE_DOOR_2), open);
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (instance)
-                instance->SetData64(DATA_NIGHTBANE, IN_PROGRESS);
+                instance->SetData(DATA_NIGHTBANE, IN_PROGRESS);
 
             HandleTerraceDoors(false);
             Talk(YELL_AGGRO);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!Intro && !Flying)
                 ScriptedAI::AttackStart(who);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (instance)
                 instance->SetData(DATA_NIGHTBANE, DONE);
@@ -170,13 +170,13 @@ public:
             HandleTerraceDoors(true);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!Intro && !Flying)
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -216,7 +216,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->AI()->AttackStart(me->GetVictim());
         }
@@ -241,7 +241,7 @@ public:
             Skeletons = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (Intro)
             {
@@ -416,7 +416,6 @@ public:
             }
         }
     };
-
 };
 
 class go_blackened_urn : public GameObjectScript
@@ -429,7 +428,7 @@ public:
         if (InstanceScript* pInstance = go->GetInstanceScript())
         {
             if (pInstance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
-                if (Creature* cr = ObjectAccessor::GetCreature(*player, pInstance->GetData64(DATA_NIGHTBANE)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*player, pInstance->GetGuidData(DATA_NIGHTBANE)))
                     cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
         }
 

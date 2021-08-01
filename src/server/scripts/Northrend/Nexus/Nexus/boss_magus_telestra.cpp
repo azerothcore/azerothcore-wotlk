@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "nexus.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -65,9 +65,9 @@ class boss_magus_telestra : public CreatureScript
 public:
     boss_magus_telestra() : CreatureScript("boss_magus_telestra") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_magus_telestraAI>(creature);
+        return GetNexusAI<boss_magus_telestraAI>(creature);
     }
 
     struct boss_magus_telestraAI : public BossAI
@@ -79,7 +79,7 @@ public:
         uint8 copiesDied;
         bool achievement;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             copiesDied = 0;
@@ -89,14 +89,14 @@ public:
                 me->AddAura(SPELL_WEAR_CHRISTMAS_HAT, me);
         }
 
-        uint32 GetData(uint32 data) const
+        uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
                 return achievement;
             return 0;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -109,19 +109,19 @@ public:
                 events.ScheduleEvent(EVENT_MAGUS_HEALTH2, 1000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (who && me->Attack(who, true))
                 me->GetMotionMaster()->MoveChase(who, 20.0f);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -130,13 +130,13 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             summon->SetInCombatWithZone();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id >= SPELL_FIRE_MAGUS_DEATH && spellInfo->Id <= SPELL_ARCANE_MAGUS_DEATH && caster->ToCreature())
             {
@@ -153,7 +153,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -224,7 +224,7 @@ public:
     {
         PrepareAuraScript(spell_boss_magus_telestra_summon_telestra_clones_AuraScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
         }
@@ -238,7 +238,6 @@ public:
             GetUnitOwner()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetControlled(true, UNIT_STATE_STUNNED);
             GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
-
         }
 
         void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -248,14 +247,14 @@ public:
             GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_boss_magus_telestra_summon_telestra_clones_AuraScript::HandleApply, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_boss_magus_telestra_summon_telestra_clones_AuraScript::HandleRemove, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_boss_magus_telestra_summon_telestra_clones_AuraScript();
     }
@@ -272,7 +271,7 @@ public:
 
         void SelectTarget(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::RandomCheck(50));
+            targets.remove_if(Acore::RandomCheck(50));
         }
 
         void HandlePull(SpellEffIndex effIndex)
@@ -299,14 +298,14 @@ public:
             target->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_boss_magus_telestra_gravity_well_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnEffectHitTarget += SpellEffectFn(spell_boss_magus_telestra_gravity_well_SpellScript::HandlePull, EFFECT_0, SPELL_EFFECT_PULL_TOWARDS_DEST);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_boss_magus_telestra_gravity_well_SpellScript();
     }
@@ -319,7 +318,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* /*player*/, Unit* target)
+    bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;

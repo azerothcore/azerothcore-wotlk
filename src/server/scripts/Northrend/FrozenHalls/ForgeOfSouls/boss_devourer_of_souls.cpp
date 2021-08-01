@@ -2,13 +2,13 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "forge_of_souls.h"
-#include "Spell.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum eTexts
 {
@@ -83,7 +83,7 @@ public:
         SummonList summons;
         bool bAchiev;
 
-        void Reset()
+        void Reset() override
         {
             bAchiev = true;
             me->SetControlled(false, UNIT_STATE_ROOT);
@@ -95,7 +95,7 @@ public:
                 pInstance->SetData(DATA_DEVOURER, NOT_STARTED);
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             if (id == 1)
                 return bAchiev;
@@ -103,7 +103,7 @@ public:
             return 0;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_FACE_AGGRO);
             DoZoneInCombat();
@@ -131,7 +131,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_PHANTOM_BLAST_H)
                 bAchiev = false;
@@ -140,7 +140,7 @@ public:
                 me->SetOrientation(me->GetAngle(target));
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->DisableRotate(true);
-                me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                 me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MoveIdle();
@@ -152,9 +152,9 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const { return target->GetPositionZ() > 706.5f; }
+        bool CanAIAttack(const Unit* target) const override { return target->GetPositionZ() > 706.5f; }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -234,7 +234,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_FACE_DEATH);
             summons.DespawnAll();
@@ -242,7 +242,7 @@ public:
                 pInstance->SetData(DATA_DEVOURER, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -267,7 +267,7 @@ public:
                 Talk(textId);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() != NPC_CRUCIBLE_OF_SOULS)
                 summons.Summon(summon);
@@ -280,7 +280,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
@@ -288,12 +288,11 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_devourer_of_soulsAI(creature);
+        return GetForgeOfSoulsAI<boss_devourer_of_soulsAI>(creature);
     }
 };
-
 
 class spell_wailing_souls_periodic : public SpellScriptLoader
 {
@@ -306,7 +305,7 @@ public:
 
         int8 dir;
 
-        bool Load()
+        bool Load() override
         {
             dir = urand(0, 1) ? 1 : -1;
             return true;
@@ -338,7 +337,7 @@ public:
                         t->ToCreature()->SetReactState(REACT_AGGRESSIVE);
                     if (t->GetVictim())
                     {
-                        t->SetUInt64Value(UNIT_FIELD_TARGET, t->GetVictim()->GetGUID());
+                        t->SetGuidValue(UNIT_FIELD_TARGET, t->GetVictim()->GetGUID());
                         t->GetMotionMaster()->MoveChase(t->GetVictim());
                     }
                 }
@@ -347,18 +346,17 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_wailing_souls_periodic_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_wailing_souls_periodic_AuraScript();
     }
 };
-
 
 void AddSC_boss_devourer_of_souls()
 {

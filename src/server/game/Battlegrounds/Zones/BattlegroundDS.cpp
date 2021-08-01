@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -37,7 +37,6 @@ BattlegroundDS::BattlegroundDS()
 
 BattlegroundDS::~BattlegroundDS()
 {
-
 }
 
 void BattlegroundDS::PostUpdateImpl(uint32 diff)
@@ -161,7 +160,7 @@ void BattlegroundDS::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        sLog->outError("BattlegroundDS: Killer player not found");
+        LOG_ERROR("bg.battleground", "BattlegroundDS: Killer player not found");
         return;
     }
 
@@ -247,7 +246,7 @@ bool BattlegroundDS::SetupBattleground()
             || !AddObject(BG_DS_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 1229.44f, 759.35f, 17.89f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
             || !AddObject(BG_DS_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 1352.90f, 822.77f, 17.96f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
     {
-        sLog->outErrorDb("BatteGroundDS: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundDS: Failed to spawn some object!");
         return false;
     }
 

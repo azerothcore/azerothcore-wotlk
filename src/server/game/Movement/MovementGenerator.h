@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,11 +7,11 @@
 #ifndef ACORE_MOVEMENTGENERATOR_H
 #define ACORE_MOVEMENTGENERATOR_H
 
-#include "Define.h"
-#include "ObjectRegistry.h"
-#include "FactoryHolder.h"
 #include "Common.h"
+#include "Define.h"
+#include "FactoryHolder.h"
 #include "MotionMaster.h"
+#include "ObjectRegistry.h"
 
 class Unit;
 
@@ -41,25 +41,25 @@ template<class T, class D>
 class MovementGeneratorMedium : public MovementGenerator
 {
 public:
-    void Initialize(Unit* u)
+    void Initialize(Unit* u) override
     {
         //u->AssertIsType<T>();
         (static_cast<D*>(this))->DoInitialize(static_cast<T*>(u));
     }
 
-    void Finalize(Unit* u)
+    void Finalize(Unit* u) override
     {
         //u->AssertIsType<T>();
         (static_cast<D*>(this))->DoFinalize(static_cast<T*>(u));
     }
 
-    void Reset(Unit* u)
+    void Reset(Unit* u) override
     {
         //u->AssertIsType<T>();
         (static_cast<D*>(this))->DoReset(static_cast<T*>(u));
     }
 
-    bool Update(Unit* u, uint32 time_diff)
+    bool Update(Unit* u, uint32 time_diff) override
     {
         //u->AssertIsType<T>();
         return (static_cast<D*>(this))->DoUpdate(static_cast<T*>(u), time_diff);

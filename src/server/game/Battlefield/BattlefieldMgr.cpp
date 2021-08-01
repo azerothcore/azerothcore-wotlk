@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "BattlefieldMgr.h"
-#include "Zones/BattlefieldWG.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Zones/BattlefieldWG.h"
 
 BattlefieldMgr::BattlefieldMgr()
 {
     m_UpdateTimer = 0;
-    //sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Instantiating BattlefieldMgr");
+    //LOG_DEBUG("bg.battlefield", "Instantiating BattlefieldMgr");
 }
 
 BattlefieldMgr::~BattlefieldMgr()
 {
-    //sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Deleting BattlefieldMgr");
+    //LOG_DEBUG("bg.battlefield", "Deleting BattlefieldMgr");
     for (BattlefieldSet::iterator itr = m_BattlefieldSet.begin(); itr != m_BattlefieldSet.end(); ++itr)
         delete *itr;
 }
@@ -34,15 +34,15 @@ void BattlefieldMgr::InitBattlefield()
     // respawn, init variables
     if (!pBf->SetupBattlefield())
     {
-        sLog->outString();
-        sLog->outString("Battlefield : Wintergrasp init failed.");
+        LOG_ERROR("server.loading", "Battlefield: Wintergrasp init failed.");
+        LOG_INFO("server.loading", " ");
         delete pBf;
     }
     else
     {
         m_BattlefieldSet.push_back(pBf);
-        sLog->outString();
-        sLog->outString("Battlefield : Wintergrasp successfully initiated.");
+        LOG_INFO("server.loading", "Battlefield: Wintergrasp successfully initiated.");
+        LOG_INFO("server.loading", " ");
     }
 
     /* For Cataclysm: Tol Barad
@@ -50,17 +50,13 @@ void BattlefieldMgr::InitBattlefield()
        // respawn, init variables
        if(!pBf->SetupBattlefield())
        {
-    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-       sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Battlefield : Tol Barad init failed.");
-    #endif
+       LOG_DEBUG("bg.battlefield", "Battlefield : Tol Barad init failed.");
        delete pBf;
        }
        else
        {
        m_BattlefieldSet.push_back(pBf);
-    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-       sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Battlefield : Tol Barad successfully initiated.");
-    #endif
+       LOG_DEBUG("bg.battlefield", "Battlefield : Tol Barad successfully initiated.");
        } */
 }
 
@@ -79,9 +75,7 @@ void BattlefieldMgr::HandlePlayerEnterZone(Player* player, uint32 zoneid)
         return;
 
     itr->second->HandlePlayerEnterZone(player, zoneid);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Player %u entered outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
-#endif
+    LOG_DEBUG("bg.battlefield", "Player %s entered outdoorpvp id %u", player->GetGUID().ToString().c_str(), itr->second->GetTypeId());
 }
 
 void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
@@ -94,9 +88,7 @@ void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
     if (!itr->second->HasPlayer(player))
         return;
     itr->second->HandlePlayerLeaveZone(player, zoneid);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Player %u left outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
-#endif
+    LOG_DEBUG("bg.battlefield", "Player %s left outdoorpvp id %u", player->GetGUID().ToString().c_str(), itr->second->GetTypeId());
 }
 
 Battlefield* BattlefieldMgr::GetBattlefieldToZoneId(uint32 zoneid)

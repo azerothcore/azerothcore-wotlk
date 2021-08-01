@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,10 +8,10 @@
 #define __ACORE_REPUTATION_MGR_H
 
 #include "Common.h"
-#include "SharedDefines.h"
-#include "Language.h"
 #include "DBCStructure.h"
+#include "Language.h"
 #include "QueryResult.h"
+#include "SharedDefines.h"
 #include <map>
 
 static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
@@ -56,12 +56,12 @@ public:                                                 // constructors and glob
         _visibleFactionCount(0), _honoredFactionCount(0), _reveredFactionCount(0), _exaltedFactionCount(0), _sendFactionIncreased(false) {}
     ~ReputationMgr() {}
 
-    void SaveToDB(SQLTransaction& trans);
+    void SaveToDB(CharacterDatabaseTransaction trans);
     void LoadFromDB(PreparedQueryResult result);
 public:                                                 // statics
     static const int32 PointsInRank[MAX_REPUTATION_RANK];
-    static const int32 Reputation_Cap    =  42999;
-    static const int32 Reputation_Bottom = -42000;
+    static const int32 Reputation_Cap;
+    static const int32 Reputation_Bottom;
 
     static ReputationRank ReputationToRank(int32 standing);
 public:                                                 // accessors

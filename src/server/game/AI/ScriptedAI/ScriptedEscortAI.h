@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  */
 
@@ -7,8 +7,9 @@
 #define SC_ESCORTAI_H
 
 #include "ScriptSystem.h"
+#include "ScriptedCreature.h"
 
-#define DEFAULT_MAX_PLAYER_DISTANCE 50
+#define DEFAULT_MAX_PLAYER_DISTANCE 100
 
 struct Escort_Waypoint
 {
@@ -40,25 +41,25 @@ struct npc_escortAI : public ScriptedAI
 {
 public:
     explicit npc_escortAI(Creature* creature);
-    ~npc_escortAI() {}
+    ~npc_escortAI() override {}
 
     // CreatureAI functions
-    void AttackStart(Unit* who);
+    void AttackStart(Unit* who) override;
 
-    void MoveInLineOfSight(Unit* who);
+    void MoveInLineOfSight(Unit* who) override;
 
-    void JustDied(Unit*);
+    void JustDied(Unit*) override;
 
-    void JustRespawned();
+    void JustRespawned() override;
 
     void ReturnToLastPoint();
 
-    void EnterEvadeMode();
+    void EnterEvadeMode() override;
 
-    void UpdateAI(uint32 diff);                   //the "internal" update, calls UpdateEscortAI()
+    void UpdateAI(uint32 diff) override;                   //the "internal" update, calls UpdateEscortAI()
     virtual void UpdateEscortAI(uint32 diff);     //used when it's needed to add code in update (abilities, scripted events, etc)
 
-    void MovementInform(uint32, uint32);
+    void MovementInform(uint32, uint32) override;
 
     // EscortAI functions
     void AddWaypoint(uint32 id, float x, float y, float z, uint32 waitTime = 0);    // waitTime is in ms
@@ -77,13 +78,13 @@ public:
     virtual void WaypointReached(uint32 pointId) = 0;
     virtual void WaypointStart(uint32 /*pointId*/) {}
 
-    void Start(bool isActiveAttacker = true, bool run = false, uint64 playerGUID = 0, Quest const* quest = NULL, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
+    void Start(bool isActiveAttacker = true, bool run = false, ObjectGuid playerGUID = ObjectGuid::Empty, Quest const* quest = nullptr, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
 
     void SetRun(bool on = true);
     void SetEscortPaused(bool on);
 
     bool HasEscortState(uint32 escortState) { return (m_uiEscortState & escortState); }
-    virtual bool IsEscorted() { return (m_uiEscortState & STATE_ESCORT_ESCORTING); }
+    bool IsEscorted() override { return (m_uiEscortState & STATE_ESCORT_ESCORTING); }
 
     void SetMaxPlayerDistance(float newMax) { MaxPlayerDistance = newMax; }
     float GetMaxPlayerDistance() { return MaxPlayerDistance; }
@@ -92,7 +93,7 @@ public:
     void SetDespawnAtFar(bool despawn) { DespawnAtFar = despawn; }
     bool GetAttack() { return m_bIsActiveAttacker; }//used in EnterEvadeMode override
     void SetCanAttack(bool attack) { m_bIsActiveAttacker = attack; }
-    uint64 GetEventStarterGUID() { return m_uiPlayerGUID; }
+    ObjectGuid GetEventStarterGUID() { return m_uiPlayerGUID; }
 
     void AddEscortState(uint32 escortState) { m_uiEscortState |= escortState; }
     void RemoveEscortState(uint32 escortState) { m_uiEscortState &= ~escortState; }
@@ -105,7 +106,7 @@ private:
     bool IsPlayerOrGroupInRange();
     void FillPointMovementListForCreature();
 
-    uint64 m_uiPlayerGUID;
+    ObjectGuid m_uiPlayerGUID;
     uint32 m_uiWPWaitTimer;
     uint32 m_uiPlayerCheckTimer;
     uint32 m_uiEscortState;
@@ -126,4 +127,3 @@ private:
     bool HasImmuneToNPCFlags;
 };
 #endif
-

@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "temple_of_ahnqiraj.h"
 
@@ -82,14 +82,14 @@ public:
     {
         boss_viscidusAI(Creature* creature) : BossAI(creature, DATA_VISCIDUS) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             _hitcounter = 0;
             _phase = PHASE_FROST;
         }
 
-        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             if (!attacker || _phase != PHASE_MELEE)
                 return;
@@ -128,7 +128,7 @@ public:
                 Talk(EMOTE_CRACK);
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if ((spell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && _phase == PHASE_FROST && me->GetHealthPct() > 5.0f)
             {
@@ -157,7 +157,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.Reset();
@@ -171,19 +171,19 @@ public:
             events.ScheduleEvent(EVENT_POISON_SHOCK, urand(7000, 12000));
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             summons.DespawnAll();
             ScriptedAI::EnterEvadeMode();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             DoCast(me, SPELL_VISCIDUS_SUICIDE);
             summons.DespawnAll();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -234,9 +234,9 @@ public:
         Phases _phase;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_viscidusAI(creature);
+        return GetTempleOfAhnQirajAI<boss_viscidusAI>(creature);
     }
 };
 
@@ -249,11 +249,11 @@ public:
     {
         npc_glob_of_viscidusAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             InstanceScript* Instance = me->GetInstanceScript();
 
-            if (Creature* Viscidus = me->GetMap()->GetCreature(Instance->GetData64(DATA_VISCIDUS)))
+            if (Creature* Viscidus = me->GetMap()->GetCreature(Instance->GetGuidData(DATA_VISCIDUS)))
             {
                 if (BossAI* ViscidusAI = dynamic_cast<BossAI*>(Viscidus->GetAI()))
                     ViscidusAI->SummonedCreatureDespawn(me);
@@ -271,7 +271,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 /*type*/, uint32 id)
+        void MovementInform(uint32 /*type*/, uint32 id) override
         {
             if (id == ROOM_CENTER)
             {
@@ -282,9 +282,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_glob_of_viscidusAI>(creature);
+        return GetTempleOfAhnQirajAI<npc_glob_of_viscidusAI>(creature);
     }
 };
 

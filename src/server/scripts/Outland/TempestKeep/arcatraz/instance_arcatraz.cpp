@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
 #include "arcatraz.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
 
 DoorData const doorData[] =
 {
@@ -24,16 +24,9 @@ public:
         {
             SetBossNumber(MAX_ENCOUTER);
             LoadDoorData(doorData);
-
-            DalliahGUID       = 0;
-            SoccothratesGUID  = 0;
-            MellicharGUID     = 0;
-            WardensShieldGUID = 0;
-
-            memset(StasisPodGUIDs, 0, 5 * sizeof(uint64));
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -49,7 +42,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -80,7 +73,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -93,7 +86,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -110,12 +103,12 @@ public:
             }
         }
 
-        uint32 GetData(uint32  /*type*/) const
+        uint32 GetData(uint32  /*type*/) const override
         {
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -126,10 +119,11 @@ public:
                 case DATA_WARDENS_SHIELD:
                     return WardensShieldGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -147,7 +141,7 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -158,7 +152,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -191,14 +185,14 @@ public:
         }
 
     protected:
-        uint64 DalliahGUID;
-        uint64 SoccothratesGUID;
-        uint64 StasisPodGUIDs[5];
-        uint64 MellicharGUID;
-        uint64 WardensShieldGUID;
+        ObjectGuid DalliahGUID;
+        ObjectGuid SoccothratesGUID;
+        ObjectGuid StasisPodGUIDs[5];
+        ObjectGuid MellicharGUID;
+        ObjectGuid WardensShieldGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_arcatraz_InstanceMapScript(map);
     }
@@ -208,4 +202,3 @@ void AddSC_instance_arcatraz()
 {
     new instance_arcatraz();
 }
-

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "magisters_terrace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Yells
 {
@@ -69,9 +69,9 @@ class boss_priestess_delrissa : public CreatureScript
 public:
     boss_priestess_delrissa() : CreatureScript("boss_priestess_delrissa") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_priestess_delrissaAI(creature);
+        return GetMagistersTerraceAI<boss_priestess_delrissaAI>(creature);
     }
 
     struct boss_priestess_delrissaAI : public ScriptedAI
@@ -88,7 +88,7 @@ public:
         uint8 PlayersKilled;
         uint8 HelpersKilled;
 
-        void Reset()
+        void Reset() override
         {
             PlayersKilled = SAY_PLAYER_KILLED;
             HelpersKilled = SAY_HELPER_DIED;
@@ -98,25 +98,25 @@ public:
             me->SetLootMode(0);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             std::list<uint32> helpersList;
             for (uint8 i = 0; i < MAX_HELPERS_COUNT; ++i)
                 helpersList.push_back(helpersEntries[i]);
-            acore::Containers::RandomResizeList(helpersList, MAX_ACTIVE_HELPERS);
+            Acore::Containers::RandomResize(helpersList, MAX_ACTIVE_HELPERS);
 
             uint8 j = 0;
             for (std::list<uint32>::const_iterator itr = helpersList.begin(); itr != helpersList.end(); ++itr, ++j)
                 me->SummonCreature(*itr, helpersLocations[j], TEMPSUMMON_MANUAL_DESPAWN, 0);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature*  /*summon*/, Unit*)
+        void SummonedCreatureDies(Creature*  /*summon*/, Unit*) override
         {
             if (me->IsAlive() && HelpersKilled < SAY_PLAYER_KILLED)
             {
@@ -134,7 +134,7 @@ public:
             ++HelpersKilled;
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
             summons.DoZoneInCombat();
@@ -150,7 +150,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_IMMUNITY, 4000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -159,7 +159,7 @@ public:
                 Talk(PlayersKilled++);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -167,7 +167,7 @@ public:
                 instance->SetData(DATA_DELRISSA_EVENT, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -199,7 +199,7 @@ public:
                 case EVENT_SPELL_PW_SHIELD:
                     {
                         std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H));
-                        if (Unit* target = acore::Containers::SelectRandomContainerElement(cList))
+                        if (Unit* target = Acore::Containers::SelectRandomContainerElement(cList))
                             me->CastSpell(target, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H), false);
                         events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 10000);
                         break;
@@ -216,7 +216,7 @@ public:
                                 target = me;
                                 break;
                             case 2:
-                                target = ObjectAccessor::GetCreature(*me, acore::Containers::SelectRandomContainerElement(summons));
+                                target = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(summons));
                                 break;
                         }
 
@@ -300,21 +300,21 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
         events.Reset();
         summons.DespawnAll();
         actualEventId = 0;
     }
 
-    void JustSummoned(Creature* summon)
+    void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
-        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_DELRISSA)))
+        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
             if (!delrissa->IsAlive())
             {
                 delrissa->Respawn();
@@ -323,9 +323,9 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode();
     }
 
-    void EnterCombat(Unit* who)
+    void EnterCombat(Unit* who) override
     {
-        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_DELRISSA)))
+        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
             if (delrissa->IsAlive() && !delrissa->IsInCombat())
                 delrissa->AI()->AttackStart(who);
 
@@ -337,24 +337,24 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         RecalculateThreat();
     }
 
-    void JustDied(Unit* /*killer*/)
+    void JustDied(Unit* /*killer*/) override
     {
         summons.DespawnAll();
     }
 
-    void KilledUnit(Unit* victim)
+    void KilledUnit(Unit* victim) override
     {
-        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_DELRISSA)))
+        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
             delrissa->AI()->KilledUnit(victim);
     }
 
-    void AttackStart(Unit* victim)
+    void AttackStart(Unit* victim) override
     {
         if (victim && me->Attack(victim, true))
             me->GetMotionMaster()->MoveChase(victim, aiType == AI_TYPE_MELEE ? 0.0f : 20.0f);
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         actualEventId = 0;
         events.Update(diff);
@@ -385,7 +385,6 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
                 RecalculateThreat();
                 events.ScheduleEvent(EVENT_HELPER_RESET_THREAT, urand(8000, 10000));
                 break;
-
         }
     }
 };
@@ -413,16 +412,16 @@ class boss_kagani_nightstrike : public CreatureScript
 public:
     boss_kagani_nightstrike() : CreatureScript("boss_kagani_nightstrike") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_kagani_nightstrikeAI(creature);
+        return GetMagistersTerraceAI<boss_kagani_nightstrikeAI>(creature);
     }
 
     struct boss_kagani_nightstrikeAI : public boss_priestess_lackey_commonAI
     {
         boss_kagani_nightstrikeAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -433,13 +432,13 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BACKSTAB, 4000);
         }
 
-        void MovementInform(uint32 type, uint32  /*point*/)
+        void MovementInform(uint32 type, uint32  /*point*/) override
         {
             if (type == CHASE_MOTION_TYPE && me->HasAura(SPELL_VANISH) && me->GetVictim())
                 me->CastSpell(me->GetVictim(), SPELL_KIDNEY_SHOT, false);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -513,17 +512,16 @@ class boss_ellris_duskhallow : public CreatureScript
 public:
     boss_ellris_duskhallow() : CreatureScript("boss_ellris_duskhallow") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_ellris_duskhallowAI(creature);
+        return GetMagistersTerraceAI<boss_ellris_duskhallowAI>(creature);
     }
 
     struct boss_ellris_duskhallowAI : public boss_priestess_lackey_commonAI
     {
-
         boss_ellris_duskhallowAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             me->CastSpell(me, SPELL_SUMMON_IMP, false);
             boss_priestess_lackey_commonAI::EnterCombat(who);
@@ -535,7 +533,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FEAR, 15000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -592,16 +590,16 @@ class boss_eramas_brightblaze : public CreatureScript
 public:
     boss_eramas_brightblaze() : CreatureScript("boss_eramas_brightblaze") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_eramas_brightblazeAI(creature);
+        return GetMagistersTerraceAI<boss_eramas_brightblazeAI>(creature);
     }
 
     struct boss_eramas_brightblazeAI : public boss_priestess_lackey_commonAI
     {
         boss_eramas_brightblazeAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -610,7 +608,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FISTS, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -666,16 +664,16 @@ class boss_yazzai : public CreatureScript
 public:
     boss_yazzai() : CreatureScript("boss_yazzai") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_yazzaiAI(creature);
+        return GetMagistersTerraceAI<boss_yazzaiAI>(creature);
     }
 
     struct boss_yazzaiAI : public boss_priestess_lackey_commonAI
     {
         boss_yazzaiAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -688,7 +686,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BLINK, 5000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -774,16 +772,16 @@ class boss_warlord_salaris : public CreatureScript
 public:
     boss_warlord_salaris() : CreatureScript("boss_warlord_salaris") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_warlord_salarisAI(creature);
+        return GetMagistersTerraceAI<boss_warlord_salarisAI>(creature);
     }
 
     struct boss_warlord_salarisAI : public boss_priestess_lackey_commonAI
     {
         boss_warlord_salarisAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
             me->CastSpell(me, SPELL_BATTLE_SHOUT, false);
@@ -796,7 +794,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_INTERCEPT, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -860,22 +858,22 @@ class boss_garaxxas : public CreatureScript
 public:
     boss_garaxxas() : CreatureScript("boss_garaxxas") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_garaxxasAI(creature);
+        return GetMagistersTerraceAI<boss_garaxxasAI>(creature);
     }
 
     struct boss_garaxxasAI : public boss_priestess_lackey_commonAI
     {
         boss_garaxxasAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) {}
 
-        void Reset()
+        void Reset() override
         {
             boss_priestess_lackey_commonAI::Reset();
             me->SummonCreature(NPC_SLIVER, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
             me->CastSpell(me, SPELL_FREEZING_TRAP, true);
@@ -887,7 +885,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_WING_CLIP, 4000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -949,23 +947,23 @@ class boss_apoko : public CreatureScript
 public:
     boss_apoko() : CreatureScript("boss_apoko") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_apokoAI(creature);
+        return GetMagistersTerraceAI<boss_apokoAI>(creature);
     }
 
     struct boss_apokoAI : public boss_priestess_lackey_commonAI
     {
         boss_apokoAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        uint32 Totem_Timer;
+//        uint32 Totem_Timer;
         uint8  Totem_Amount;
         uint32 War_Stomp_Timer;
-        uint32 Purge_Timer;
+//        uint32 Purge_Timer;
         uint32 Healing_Wave_Timer;
-        uint32 Frost_Shock_Timer;
+//        uint32 Frost_Shock_Timer;
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -978,7 +976,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FROST_SHOCK, 8000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1047,16 +1045,16 @@ class boss_zelfan : public CreatureScript
 public:
     boss_zelfan() : CreatureScript("boss_zelfan") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_zelfanAI(creature);
+        return GetMagistersTerraceAI<boss_zelfanAI>(creature);
     }
 
     struct boss_zelfanAI : public boss_priestess_lackey_commonAI
     {
         boss_zelfanAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -1067,7 +1065,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_IRON_BOMB, 5000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

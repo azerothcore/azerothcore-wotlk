@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "trial_of_the_crusader.h"
 #include "Group.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "trial_of_the_crusader.h"
 
 #define CLEANUP_CHECK_INTERVAL  5000
 std::map<uint32, bool> validDedicatedInsanityItems;
@@ -34,30 +34,30 @@ public:
         std::string str_data;
         EventMap events;
 
-        uint64 NPC_BarrettGUID;
-        uint64 NPC_TirionGUID;
-        uint64 NPC_FizzlebangGUID;
-        uint64 NPC_GarroshGUID;
-        uint64 NPC_VarianGUID;
+        ObjectGuid NPC_BarrettGUID;
+        ObjectGuid NPC_TirionGUID;
+        ObjectGuid NPC_FizzlebangGUID;
+        ObjectGuid NPC_GarroshGUID;
+        ObjectGuid NPC_VarianGUID;
 
-        uint64 NPC_GormokGUID;
-        uint64 NPC_DreadscaleGUID;
-        uint64 NPC_AcidmawGUID;
-        uint64 NPC_IcehowlGUID;
-        uint64 NPC_JaraxxusGUID;
-        std::vector<uint64> NPC_ChampionGUIDs;
-        uint64 NPC_LightbaneGUID;
-        uint64 NPC_DarkbaneGUID;
-        uint64 NPC_LichKingGUID;
-        uint64 NPC_AnubarakGUID;
+        ObjectGuid NPC_GormokGUID;
+        ObjectGuid NPC_DreadscaleGUID;
+        ObjectGuid NPC_AcidmawGUID;
+        ObjectGuid NPC_IcehowlGUID;
+        ObjectGuid NPC_JaraxxusGUID;
+        GuidVector NPC_ChampionGUIDs;
+        ObjectGuid NPC_LightbaneGUID;
+        ObjectGuid NPC_DarkbaneGUID;
+        ObjectGuid NPC_LichKingGUID;
+        ObjectGuid NPC_AnubarakGUID;
 
-        uint64 NPC_PurpleGroundGUID;
-        uint64 NPC_PortalGUID;
+        ObjectGuid NPC_PurpleGroundGUID;
+        ObjectGuid NPC_PortalGUID;
 
-        uint64 GO_MainGateGUID;
-        uint64 GO_EnterGateGUID;
-        uint64 GO_WebDoorGUID;
-        uint64 GO_FloorGUID;
+        ObjectGuid GO_MainGateGUID;
+        ObjectGuid GO_EnterGateGUID;
+        ObjectGuid GO_WebDoorGUID;
+        ObjectGuid GO_FloorGUID;
 
         void SpawnAnubArak()
         {
@@ -72,8 +72,8 @@ public:
                 }
 
                 // move corpses
-                const uint64 npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
-                for (const uint64 i : npcs)
+                const ObjectGuid npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
+                for (ObjectGuid const& i : npcs)
                 {
                     if (Creature* c = instance->GetCreature(i))
                     {
@@ -136,7 +136,7 @@ public:
                     }
         }
 
-        void OnUnitDeath(Unit* u)
+        void OnUnitDeath(Unit* u) override
         {
             if (bNooneDied && u->GetTypeId() == TYPEID_PLAYER)
             {
@@ -145,7 +145,7 @@ public:
             }
         }
 
-        void Initialize()
+        void Initialize() override
         {
             CLEANED = false;
             EncounterStatus = NOT_STARTED;
@@ -161,33 +161,10 @@ public:
             events.Reset();
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0);
 
-            NPC_BarrettGUID = 0;
-            NPC_TirionGUID = 0;
-            NPC_FizzlebangGUID = 0;
-            NPC_GarroshGUID = 0;
-            NPC_VarianGUID = 0;
-
-            NPC_GormokGUID = 0;
-            NPC_DreadscaleGUID = 0;
-            NPC_AcidmawGUID = 0;
-            NPC_IcehowlGUID = 0;
-            NPC_JaraxxusGUID = 0;
             NPC_ChampionGUIDs.clear();
-            NPC_LightbaneGUID = 0;
-            NPC_DarkbaneGUID = 0;
-            NPC_LichKingGUID = 0;
-            NPC_AnubarakGUID = 0;
-
-            NPC_PurpleGroundGUID = 0;
-            NPC_PortalGUID = 0;
-
-            GO_MainGateGUID = 0;
-            GO_EnterGateGUID = 0;
-            GO_WebDoorGUID = 0;
-            GO_FloorGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             Map::PlayerList const& pl = instance->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
@@ -200,7 +177,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch( creature->GetEntry() )
             {
@@ -250,7 +227,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch( go->GetEntry() )
             {
@@ -278,7 +255,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch( type )
             {
@@ -324,7 +301,7 @@ public:
                 case TYPE_GORMOK:
                     if( data == DONE )
                     {
-                        if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], NULL, 25000))
+                        if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
                         {
                             trigger->SetDisplayId(11686);
                             trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -346,7 +323,7 @@ public:
                     {
                         if( ++Counter == 2 )
                         {
-                            if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], NULL, 25000))
+                            if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
                             {
                                 trigger->SetDisplayId(11686);
                                 trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -425,8 +402,8 @@ public:
                             InstanceProgress = INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD;
                             events.RescheduleEvent(EVENT_SCENE_FACTION_CHAMPIONS_DEAD, 2500);
 
-                            for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                                if( Creature* c = instance->GetCreature(*itr) )
+                            for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                                if (Creature* c = instance->GetCreature(guid))
                                     c->DespawnOrUnsummon(15000);
                             NPC_ChampionGUIDs.clear();
 
@@ -478,10 +455,10 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         AchievementTimer = 0;
-                        for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                            if( Creature* c = instance->GetCreature(*itr) )
-                                if( !c->IsInCombat() )
-                                    if( Unit* target = c->SelectNearestTarget(200.0f) )
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                            if (Creature* c = instance->GetCreature(guid))
+                                if (!c->IsInCombat())
+                                    if (Unit* target = c->SelectNearestTarget(200.0f))
                                         c->AI()->AttackStart(target);
                     }
                     break;
@@ -533,13 +510,13 @@ public:
                             events.RescheduleEvent(EVENT_SCENE_501, 20000);
                         }
                         if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
-                            floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+                            floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                     }
                     break;
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch( type )
             {
@@ -549,7 +526,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch( type )
             {
@@ -566,10 +543,11 @@ public:
                 case TYPE_ANUBARAK:
                     return NPC_AnubarakGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             events.Update(diff);
             switch( events.ExecuteEvent() )
@@ -609,7 +587,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_VarianGUID) )
                             c->AI()->Talk(SAY_STAGE_0_03a);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_003, 5000);
                     }
                     break;
@@ -617,7 +595,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_GarroshGUID) )
                             c->AI()->Talk(SAY_STAGE_0_03h);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_004, 8000);
                     }
                     break;
@@ -630,7 +608,7 @@ public:
                             c->AI()->Talk(SAY_STAGE_0_02);
                         HandleGameObject(GO_MainGateGUID, true);
                         HandleGameObject(GO_EnterGateGUID, false);
-                        
+
                         events.RescheduleEvent(EVENT_SUMMON_GORMOK, 1000);
                         if (instance->IsHeroic())
                         {
@@ -653,14 +631,14 @@ public:
                     if( Creature* c = instance->GetCreature(NPC_IcehowlGUID) )
                         if (c->IsAlive())
                             c->CastSpell(c, 26662, true);
-                    
+
                     break;
                 case EVENT_SUMMON_GORMOK:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             if( Creature* gormok = c->SummonCreature(NPC_GORMOK, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY(), Locs[LOC_BEHIND_GATE].GetPositionZ(), Locs[LOC_BEHIND_GATE].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000) )
                                 gormok->GetMotionMaster()->MovePoint(0, Locs[LOC_GATE_FRONT].GetPositionX(), Locs[LOC_GATE_FRONT].GetPositionY(), Locs[LOC_GATE_FRONT].GetPositionZ());
-                        
+
                         events.RescheduleEvent(EVENT_GORMOK_ATTACK, 10000);
                         events.RescheduleEvent(EVENT_CLOSE_GATE, 6000);
                     }
@@ -686,7 +664,7 @@ public:
                         northrendBeastsMask |= 16;
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_0_04);
-                        
+
                         events.RescheduleEvent(EVENT_OPEN_GATE, 3000);
                         events.RescheduleEvent(EVENT_SUMMON_ACIDMAW_AND_DREADSCALE, 4000);
                         break;
@@ -700,16 +678,16 @@ public:
                             if( Creature* acidmaw = c->SummonCreature(NPC_ACIDMAW, Locs[LOC_ACIDMAW].GetPositionX(), Locs[LOC_ACIDMAW].GetPositionY(), Locs[LOC_ACIDMAW].GetPositionZ(), Locs[LOC_ACIDMAW].GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN) )
                                 acidmaw->AddAura(53421, acidmaw);
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_005_2, 4000);
                         break;
                     }
-                    
+
                 case EVENT_SCENE_005_2:
                     {
                         if( Creature* dreadscale = instance->GetCreature(NPC_DreadscaleGUID) )
                             dreadscale->GetMotionMaster()->MovePoint(0, Locs[LOC_DREADSCALE].GetPositionX(), Locs[LOC_DREADSCALE].GetPositionY(), Locs[LOC_DREADSCALE].GetPositionZ());
-                        
+
                         events.RescheduleEvent(EVENT_ACIDMAW_AND_DREADSCALE_ATTACK, 7000);
                         break;
                     }
@@ -747,7 +725,7 @@ public:
                         northrendBeastsMask |= 32;
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_0_05);
-                        
+
                         events.RescheduleEvent(EVENT_OPEN_GATE, 2000);
                         events.RescheduleEvent(EVENT_SUMMON_ICEHOWL, 3000);
                         break;
@@ -757,7 +735,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             if( Creature* icehowl = c->SummonCreature(NPC_ICEHOWL, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY(), Locs[LOC_BEHIND_GATE].GetPositionZ(), Locs[LOC_BEHIND_GATE].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000) )
                                 icehowl->GetMotionMaster()->MovePoint(0, Locs[LOC_GATE_FRONT].GetPositionX(), Locs[LOC_GATE_FRONT].GetPositionY(), Locs[LOC_GATE_FRONT].GetPositionZ());
-                        
+
                         events.RescheduleEvent(EVENT_ICEHOWL_ATTACK, 10000);
                         events.RescheduleEvent(EVENT_CLOSE_GATE, 6000);
                         break;
@@ -813,7 +791,7 @@ public:
                         HandleGameObject(GO_MainGateGUID, false);
                         if( Creature* c = instance->GetCreature(NPC_FizzlebangGUID) )
                             c->AI()->Talk(SAY_STAGE_1_02);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_103, 11000);
                         break;
                     }
@@ -826,7 +804,7 @@ public:
                             if( Creature* trigger = c->SummonCreature(NPC_PURPLE_GROUND, Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), Locs[LOC_CENTER].GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN) )
                                 NPC_PurpleGroundGUID = trigger->GetGUID();
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_104, 5000);
                         break;
                     }
@@ -843,7 +821,7 @@ public:
                             }
                             c->HandleEmoteCommand(EMOTE_STATE_SPELL_PRECAST);
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SUMMON_JARAXXUS, 5000);
                         break;
                     }
@@ -856,7 +834,7 @@ public:
                             c->HandleEmoteCommand(EMOTE_STATE_NONE);
                             c->AI()->Talk(SAY_STAGE_1_04);
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_105, 3000);
                         break;
                     }
@@ -866,11 +844,11 @@ public:
                             c->SetFacingTo(M_PI / 2);
                         if( Creature* c = instance->GetCreature(NPC_PurpleGroundGUID) )
                             c->DespawnOrUnsummon();
-                        NPC_PurpleGroundGUID = 0;
+                        NPC_PurpleGroundGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_PortalGUID) )
                             c->DespawnOrUnsummon();
-                        NPC_PortalGUID = 0;
-                        
+                        NPC_PortalGUID.Clear();
+
                         events.RescheduleEvent(EVENT_SCENE_106, 10000);
                         break;
                     }
@@ -878,7 +856,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
                             c->AI()->Talk(SAY_STAGE_1_05);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_107, 5000);
                         break;
                     }
@@ -886,7 +864,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_FizzlebangGUID) )
                             c->AI()->Talk(SAY_STAGE_1_06);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_108, 800);
                         break;
                     }
@@ -902,7 +880,7 @@ public:
                                 Unit::Kill(f, f);
                             }
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_109, 5000);
                         break;
                     }
@@ -912,7 +890,7 @@ public:
                             c->SetFacingTo(3 * M_PI / 2);
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_1_07);
-                        
+
                         events.RescheduleEvent(EVENT_JARAXXUS_ATTACK, 6000);
                         break;
                     }
@@ -936,7 +914,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_1_08);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_111, 18000);
                         break;
                     }
@@ -944,7 +922,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_GarroshGUID) )
                             c->AI()->Talk(SAY_STAGE_1_09);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_112, 9000);
                         break;
                     }
@@ -952,7 +930,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_VarianGUID) )
                             c->AI()->Talk(SAY_STAGE_1_10);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_113, 5000);
                         break;
                     }
@@ -963,7 +941,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                             c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                         break;
-                    } 
+                    }
                 case EVENT_SCENE_201:
                     {
                         // move Jaraxxus to side, can't remove corpse because of loot!
@@ -976,7 +954,7 @@ public:
 
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_2_01);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_202, 9000);
                         break;
                     }
@@ -1009,7 +987,7 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
                             c->AI()->Talk(SAY_STAGE_2_03);
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_204, 5000);
                         break;
                     }
@@ -1027,7 +1005,7 @@ public:
                                 c->AI()->Talk(SAY_STAGE_2_04a);
                             events.RescheduleEvent(EVENT_SCENE_205, 5000);
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SUMMON_CHAMPIONS, 2500);
                         break;
                     }
@@ -1115,8 +1093,8 @@ public:
                     }
                 case EVENT_CHAMPIONS_ATTACK:
                     {
-                        for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                            if( Creature* c = instance->GetCreature(*itr) )
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                            if (Creature* c = instance->GetCreature(guid))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -1137,7 +1115,7 @@ public:
                         if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                             c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                         break;
-                    }   
+                    }
                 case EVENT_SCENE_301:
                     {
                         if( Creature* c = instance->GetCreature(NPC_TirionGUID) )
@@ -1165,7 +1143,7 @@ public:
                             if( Creature* t = c->SummonCreature(NPC_DARKBANE, Locs[LOC_VALKYR_LEFT].GetPositionX(), Locs[LOC_VALKYR_LEFT].GetPositionY(), Locs[LOC_VALKYR_LEFT].GetPositionZ(), Locs[LOC_VALKYR_LEFT].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000) )
                                 t->GetMotionMaster()->MovePoint(0, Locs[LOC_VALKYR_DEST_LEFT].GetPositionX(), Locs[LOC_VALKYR_DEST_LEFT].GetPositionY(), Locs[LOC_VALKYR_DEST_LEFT].GetPositionZ());
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_304, 6250);
                         break;
                     }
@@ -1302,7 +1280,7 @@ public:
 
                         break;
                     }
-                    
+
                 case EVENT_SCENE_407:
                     {
                         if( Creature* c = instance->GetCreature(NPC_LichKingGUID) )
@@ -1327,7 +1305,7 @@ public:
                         {
                             if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
                                 floor->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);//floor->ModifyHealth(-10000000, c);
-                            c->CastSpell((Unit*)NULL, 68193, true);
+                            c->CastSpell((Unit*)nullptr, 68193, true);
                             c->SetVisible(false);
                             c->SetDisplayId(11686);
                             if( Creature* t = c->FindNearestCreature(NPC_WORLD_TRIGGER, 500.0f, true) )
@@ -1336,7 +1314,7 @@ public:
                             InstanceProgress = INSTANCE_PROGRESS_ANUB_ARAK;
                             SpawnAnubArak();
                         }
-                        
+
                         events.RescheduleEvent(EVENT_SCENE_410, 2000);
                         break;
                     }
@@ -1412,11 +1390,10 @@ public:
                         }
                         break;
                     }
-                    
             }
         }
 
-        void OnPlayerEnter(Player* plr)
+        void OnPlayerEnter(Player* plr) override
         {
             if( instance->IsHeroic() )
             {
@@ -1470,16 +1447,16 @@ public:
                         c->AI()->DoAction(-1); // despawn summons
                         c->DespawnOrUnsummon();
                     }
-                    NPC_GormokGUID = 0;
+                    NPC_GormokGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_AcidmawGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_AcidmawGUID = 0;
+                    NPC_AcidmawGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_DreadscaleGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_DreadscaleGUID = 0;
+                    NPC_DreadscaleGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_IcehowlGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_IcehowlGUID = 0;
+                    NPC_IcehowlGUID.Clear();
                     northrendBeastsMask = 0;
                     break;
                 case INSTANCE_PROGRESS_BEASTS_DEAD:
@@ -1487,16 +1464,16 @@ public:
                         c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     if( Creature* c = instance->GetCreature(NPC_FizzlebangGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_FizzlebangGUID = 0;
+                    NPC_FizzlebangGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_JaraxxusGUID = 0;
+                    NPC_JaraxxusGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_PurpleGroundGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_PurpleGroundGUID = 0;
+                    NPC_PurpleGroundGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_PortalGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_PortalGUID = 0;
+                    NPC_PortalGUID.Clear();
                     break;
                 case INSTANCE_PROGRESS_JARAXXUS_INTRO_DONE:
                     if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
@@ -1516,8 +1493,8 @@ public:
                 case INSTANCE_PROGRESS_JARAXXUS_DEAD:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                         c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                        if( Creature* c = instance->GetCreature(*itr) )
+                    for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                        if (Creature* c = instance->GetCreature(guid))
                             c->DespawnOrUnsummon();
                     NPC_ChampionGUIDs.clear();
                     break;
@@ -1529,18 +1506,18 @@ public:
                         c->AI()->DoAction(-1);
                         c->DespawnOrUnsummon();
                     }
-                    NPC_DarkbaneGUID = 0;
+                    NPC_DarkbaneGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_LightbaneGUID) )
                     {
                         c->AI()->DoAction(-1);
                         c->DespawnOrUnsummon();
                     }
-                    NPC_LightbaneGUID = 0;
+                    NPC_LightbaneGUID.Clear();
                     break;
                 case INSTANCE_PROGRESS_VALKYR_DEAD:
                 case INSTANCE_PROGRESS_ANUB_ARAK:
                     /*if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
-                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);*/
+                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);*/
                     if (Creature* c = instance->GetCreature(NPC_BarrettGUID))
                     {
                         if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK)
@@ -1559,19 +1536,19 @@ public:
                     }
                     if( Creature* c = instance->GetCreature(NPC_LichKingGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_LichKingGUID = 0;
+                    NPC_LichKingGUID.Clear();
 
                     if( Creature* c = instance->GetCreature(NPC_AnubarakGUID) )
                     {
                         c->AI()->DoAction(-1);
                         c->DespawnOrUnsummon();
                     }
-                    NPC_AnubarakGUID = 0;
+                    NPC_AnubarakGUID.Clear();
 
                     break;
                 case INSTANCE_PROGRESS_DONE:
                     if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
-                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                     {
                         c->SetVisible(false);
@@ -1602,7 +1579,7 @@ public:
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream saveStream;
@@ -1614,7 +1591,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             EncounterStatus = NOT_STARTED;
             CLEANED = false;
@@ -1652,7 +1629,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -1717,7 +1694,7 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_trial_of_the_crusader_InstanceMapScript(map);
     }

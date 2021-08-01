@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,10 +17,10 @@ npc_rizzle_sprysprocket
 npc_depth_charge
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*######
@@ -50,15 +50,15 @@ public:
         uint32 morphtimer;
         bool spellhit;
 
-        void Reset()
+        void Reset() override
         {
             morphtimer = 0;
             spellhit = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell)
+        void SpellHit(Unit* unit, const SpellInfo* spell) override
         {
             if (spellhit)
                 return;
@@ -81,7 +81,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // we mustn't remove the Creature in the same round in which we cast the summon spell, otherwise there will be no summons
             if (spellhit && morphtimer >= 5000)
@@ -107,7 +107,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_spitelashesAI(creature);
     }
@@ -218,7 +218,7 @@ public:
             MustDieTimer = 3000;
             CurrWP = 0;
 
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
 
             MustDie = false;
             Escape = false;
@@ -357,7 +357,7 @@ public:
         }
 
     private:
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
         uint32 SpellEscapeTimer;
         uint32 TeleportTimer;
         uint32 CheckTimer;
@@ -402,7 +402,7 @@ public:
         bool WeMustDie;
         uint32 WeMustDieTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetHover(true);
             me->SetSwim(true);
@@ -411,11 +411,11 @@ public:
             WeMustDieTimer = 1000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void AttackStart(Unit* /*who*/) { }
+        void AttackStart(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!who)
                 return;
@@ -428,7 +428,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (WeMustDie)
             {
@@ -441,7 +441,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_depth_chargeAI(creature);
     }

@@ -9,7 +9,7 @@ CollectSourceFiles(
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(shared 
+add_library(shared
   ${PRIVATE_SOURCES})
 
 CollectIncludeDirectories(
@@ -23,8 +23,10 @@ target_include_directories(shared
     ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(shared
+  PRIVATE
+    acore-core-interface
   PUBLIC
-    common)
+    database)
 
 set_target_properties(shared
   PROPERTIES

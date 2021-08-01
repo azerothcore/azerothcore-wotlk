@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -110,7 +110,7 @@ public:
             return false;
 
         Player* target;
-        uint64 target_guid;
+        ObjectGuid target_guid;
         std::string target_name;
         if (!handler->extractPlayerTarget(nameStr, &target, &target_guid, &target_name))
             return false;
@@ -121,8 +121,8 @@ public:
                 target->TeleportTo(target->m_homebindMapId, target->m_homebindX, target->m_homebindY, target->m_homebindZ, target->GetOrientation());
             else
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
-                stmt->setUInt32(0, target_guid);
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
+                stmt->setUInt32(0, target_guid.GetCounter());
                 PreparedQueryResult resultDB = CharacterDatabase.Query(stmt);
 
                 if (resultDB)
@@ -153,12 +153,12 @@ public:
         if (target)
         {
             // check online security
-            if (handler->HasLowerSecurity(target, 0))
+            if (handler->HasLowerSecurity(target))
                 return false;
 
             std::string chrNameLink = handler->playerLink(target_name);
 
-            if (target->IsBeingTeleported() == true)
+            if (target->IsBeingTeleported())
             {
                 handler->PSendSysMessage(LANG_IS_TELEPORTED, chrNameLink.c_str());
                 handler->SetSentErrorMessage(true);
@@ -212,7 +212,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
@@ -250,7 +250,7 @@ public:
                 continue;
 
             // check online security
-            if (handler->HasLowerSecurity(player, 0))
+            if (handler->HasLowerSecurity(player))
                 return false;
 
             std::string plNameLink = handler->GetNameLink(player);

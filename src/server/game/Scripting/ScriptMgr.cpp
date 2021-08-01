@@ -1,80 +1,45 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "Chat.h"
 #include "Config.h"
+#include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "GossipDef.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
-#include "ScriptLoader.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "ScriptSystem.h"
-#include "Transport.h"
-#include "Vehicle.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "GossipDef.h"
-#include "ScriptedGossip.h"
-#include "CreatureAI.h"
-#include "Player.h"
+#include "Transport.h"
+#include "Vehicle.h"
+#include "SmartAI.h"
 #include "WorldPacket.h"
-#include "Chat.h"
 
 #ifdef ELUNA
-#include "LuaEngine.h"
 #include "ElunaUtility.h"
+#include "LuaEngine.h"
 #endif
 
-// Specialize for each script type class like so:
-template class ScriptRegistry<SpellScriptLoader>;
-template class ScriptRegistry<ServerScript>;
-template class ScriptRegistry<WorldScript>;
-template class ScriptRegistry<FormulaScript>;
-template class ScriptRegistry<WorldMapScript>;
-template class ScriptRegistry<InstanceMapScript>;
-template class ScriptRegistry<BattlegroundMapScript>;
-template class ScriptRegistry<ItemScript>;
-template class ScriptRegistry<CreatureScript>;
-template class ScriptRegistry<GameObjectScript>;
-template class ScriptRegistry<AreaTriggerScript>;
-template class ScriptRegistry<BattlegroundScript>;
-template class ScriptRegistry<OutdoorPvPScript>;
-template class ScriptRegistry<CommandScript>;
-template class ScriptRegistry<WeatherScript>;
-template class ScriptRegistry<AuctionHouseScript>;
-template class ScriptRegistry<ConditionScript>;
-template class ScriptRegistry<VehicleScript>;
-template class ScriptRegistry<DynamicObjectScript>;
-template class ScriptRegistry<TransportScript>;
-template class ScriptRegistry<AchievementCriteriaScript>;
-template class ScriptRegistry<PlayerScript>;
-template class ScriptRegistry<GuildScript>;
-template class ScriptRegistry<GroupScript>;
-template class ScriptRegistry<GlobalScript>;
-template class ScriptRegistry<UnitScript>;
-template class ScriptRegistry<AllCreatureScript>;
-template class ScriptRegistry<AllMapScript>;
-template class ScriptRegistry<MovementHandlerScript>;
-template class ScriptRegistry<BGScript>;
-template class ScriptRegistry<SpellSC>;
-template class ScriptRegistry<AccountScript>;
-template class ScriptRegistry<GameEventScript>;
-template class ScriptRegistry<MailScript>;
+struct TSpellSummary
+{
+    uint8 Targets; // set of enum SelectTarget
+    uint8 Effects; // set of enum SelectEffect
+}*SpellSummary;
 
 #include "ScriptMgrMacros.h"
 
 ScriptMgr::ScriptMgr()
-    : _scriptCount(0), _scheduledScripts(0)
-{
+    : _scriptCount(0), _scheduledScripts(0), _script_loader_callback(nullptr) { }
 
-}
-
-ScriptMgr::~ScriptMgr()
-{
-}
+ScriptMgr::~ScriptMgr() { }
 
 ScriptMgr* ScriptMgr::instance()
 {
@@ -84,8 +49,15 @@ ScriptMgr* ScriptMgr::instance()
 
 void ScriptMgr::Initialize()
 {
-    AddScripts();
-    sLog->outString("Loading C++ scripts");
+    LOG_INFO("server.loading", "> Loading C++ scripts");
+    LOG_INFO("server.loading", " ");
+
+    AddSC_SmartScripts();
+
+    ASSERT(_script_loader_callback,
+        "Script loader callback wasn't registered!");
+
+    _script_loader_callback();
 }
 
 void ScriptMgr::Unload()
@@ -124,11 +96,19 @@ void ScriptMgr::Unload()
     SCR_CLEAR(GlobalScript);
     SCR_CLEAR(ModuleScript);
     SCR_CLEAR(BGScript);
+    SCR_CLEAR(AchievementScript);
+    SCR_CLEAR(ArenaTeamScript);
     SCR_CLEAR(SpellSC);
     SCR_CLEAR(GameEventScript);
     SCR_CLEAR(MailScript);
+    SCR_CLEAR(MiscScript);
+    SCR_CLEAR(PetScript);
+    SCR_CLEAR(ArenaScript);
+    SCR_CLEAR(CommandSC);
 
 #undef SCR_CLEAR
+
+    delete[] SpellSummary;
 }
 
 void ScriptMgr::LoadDatabase()
@@ -157,54 +137,59 @@ void ScriptMgr::LoadDatabase()
 
     CheckIfScriptsInDatabaseExist();
 
-    sLog->outString(">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server.loading", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
-
-struct TSpellSummary
-{
-    uint8 Targets;                                          // set of enum SelectTarget
-    uint8 Effects;                                          // set of enum SelectEffect
-}* SpellSummary;
 
 void ScriptMgr::CheckIfScriptsInDatabaseExist()
 {
-    ObjectMgr::ScriptNameContainer& sn = sObjectMgr->GetScriptNames();
-    for (ObjectMgr::ScriptNameContainer::iterator itr = sn.begin(); itr != sn.end(); ++itr)
-        if (uint32 sid = sObjectMgr->GetScriptId((*itr).c_str()))
+    for (auto const& scriptName : sObjectMgr->GetScriptNames())
+    {
+        if (uint32 sid = sObjectMgr->GetScriptId(scriptName.c_str()))
         {
             if (!ScriptRegistry<SpellScriptLoader>::GetScriptById(sid) &&
-                    !ScriptRegistry<ServerScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<WorldScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<FormulaScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<WorldMapScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<InstanceMapScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<BattlegroundMapScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<ItemScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<CreatureScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<GameObjectScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<AreaTriggerScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<BattlegroundScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<OutdoorPvPScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<CommandScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<WeatherScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<AuctionHouseScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<ConditionScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<VehicleScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<TransportScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<BGScript>::GetScriptById(sid) &&
-                    !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
-                    !ScriptRegistry<GroupScript>::GetScriptById(sid))
-                sLog->outErrorDb("Script named '%s' is assigned in the database, but has no code!", (*itr).c_str());
+                !ScriptRegistry<ServerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WorldScript>::GetScriptById(sid) &&
+                !ScriptRegistry<FormulaScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WorldMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<InstanceMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BattlegroundMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ItemScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CreatureScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GameObjectScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AreaTriggerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BattlegroundScript>::GetScriptById(sid) &&
+                !ScriptRegistry<OutdoorPvPScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CommandScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WeatherScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AuctionHouseScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ConditionScript>::GetScriptById(sid) &&
+                !ScriptRegistry<VehicleScript>::GetScriptById(sid) &&
+                !ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) &&
+                !ScriptRegistry<TransportScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
+                !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BGScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AchievementScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ArenaTeamScript>::GetScriptById(sid) &&
+                !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
+                !ScriptRegistry<MiscScript>::GetScriptById(sid) &&
+                !ScriptRegistry<PetScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CommandSC>::GetScriptById(sid) &&
+                !ScriptRegistry<ArenaScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GroupScript>::GetScriptById(sid))
+                {
+                    LOG_ERROR("sql.sql", "Script named '%s' is assigned in the database, but has no code!", scriptName.c_str());
+                }
         }
+    }
 }
 
 void ScriptMgr::FillSpellSummary()
 {
+    UnitAI::FillAISpellInfo();
+
     SpellSummary = new TSpellSummary[sSpellMgr->GetSpellInfoStoreSize()];
 
     SpellInfo const* pTempSpell;
@@ -345,6 +330,11 @@ void ScriptMgr::CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<S
     }
 }
 
+void ScriptMgr::OnBeforePlayerDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeDurabilityRepair(player, npcGUID, itemGUID, discountMod, guildBank);
+}
+
 void ScriptMgr::OnNetworkStart()
 {
     FOREACH_SCRIPT(ServerScript)->OnNetworkStart();
@@ -355,18 +345,18 @@ void ScriptMgr::OnNetworkStop()
     FOREACH_SCRIPT(ServerScript)->OnNetworkStop();
 }
 
-void ScriptMgr::OnSocketOpen(WorldSocket* socket)
+void ScriptMgr::OnSocketOpen(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
     FOREACH_SCRIPT(ServerScript)->OnSocketOpen(socket);
 }
 
-void ScriptMgr::OnSocketClose(WorldSocket* socket, bool wasNew)
+void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
-    FOREACH_SCRIPT(ServerScript)->OnSocketClose(socket, wasNew);
+    FOREACH_SCRIPT(ServerScript)->OnSocketClose(socket);
 }
 
 void ScriptMgr::OnPacketReceive(WorldSession* session, WorldPacket const& packet)
@@ -389,7 +379,6 @@ void ScriptMgr::OnPacketSend(WorldSession* session, WorldPacket const& packet)
     FOREACH_SCRIPT(ServerScript)->OnPacketSend(session, copy);
 }
 
-
 void ScriptMgr::OnOpenStateChange(bool open)
 {
 #ifdef ELUNA
@@ -397,7 +386,6 @@ void ScriptMgr::OnOpenStateChange(bool open)
 #endif
     FOREACH_SCRIPT(WorldScript)->OnOpenStateChange(open);
 }
-
 
 void ScriptMgr::OnLoadCustomDatabaseTable()
 {
@@ -497,7 +485,6 @@ void ScriptMgr::OnGroupRateCalculation(float& rate, uint32 count, bool isRaid)
                 continue; \
             if (C->MapID == V->GetId()) \
             {
-
 #define SCR_MAP_END \
                 return; \
             } \
@@ -719,7 +706,6 @@ bool ScriptMgr::OnItemRemove(Player* player, Item* item)
 #endif
     GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
     return tmpscript->OnRemove(player, item);
-
 }
 
 bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo const* spellInfo, Item* item)
@@ -1326,19 +1312,29 @@ void ScriptMgr::OnShutdown()
     FOREACH_SCRIPT(WorldScript)->OnShutdown();
 }
 
-bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
+bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id)
 {
     ASSERT(source);
-    // target can be NULL.
+    // target can be nullptr.
 
     GET_SCRIPT_RET(AchievementCriteriaScript, scriptId, tmpscript, false);
-    return tmpscript->OnCheck(source, target);
+    return tmpscript->OnCheck(source, target, criteria_id);
 }
 
 // Player
 void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
+}
+
+void ScriptMgr::OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnSendInitialPacketsBeforeAddToMap(player, data);
+}
+
+void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBattlegroundDesertion(player, desertionType);
 }
 
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
@@ -1500,7 +1496,7 @@ void ScriptMgr::OnPlayerEmote(Player* player, uint32 emote)
     FOREACH_SCRIPT(PlayerScript)->OnEmote(player, emote);
 }
 
-void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, uint64 guid)
+void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, ObjectGuid guid)
 {
 #ifdef ELUNA
     sEluna->OnTextEmote(player, textEmote, emoteNum, guid);
@@ -1519,6 +1515,11 @@ void ScriptMgr::OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck)
 void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
 {
     FOREACH_SCRIPT(PlayerScript)->OnBeforeUpdate(player, p_time);
+}
+
+void ScriptMgr::OnPlayerUpdate(Player* player, uint32 p_time)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnUpdate(player, p_time);
 }
 
 void ScriptMgr::OnPlayerLogin(Player* player)
@@ -1558,15 +1559,15 @@ void ScriptMgr::OnPlayerSave(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnSave(player);
 }
 
-void ScriptMgr::OnPlayerDelete(uint64 guid, uint32 accountId)
+void ScriptMgr::OnPlayerDelete(ObjectGuid guid, uint32 accountId)
 {
 #ifdef ELUNA
-    sEluna->OnDelete(GUID_LOPART(guid));
+    sEluna->OnDelete(guid.GetCounter());
 #endif
     FOREACH_SCRIPT(PlayerScript)->OnDelete(guid, accountId);
 }
 
-void ScriptMgr::OnPlayerFailedDelete(uint64 guid, uint32 accountId)
+void ScriptMgr::OnPlayerFailedDelete(ObjectGuid guid, uint32 accountId)
 {
     FOREACH_SCRIPT(PlayerScript)->OnFailedDelete(guid, accountId);
 }
@@ -1617,9 +1618,31 @@ void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
     FOREACH_SCRIPT(PlayerScript)->OnRemoveFromBattleground(player, bg);
 }
 
+bool ScriptMgr::OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+    if (!itr->second->OnBeforeAchiComplete(player, achievement))
+        ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
 void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* achievement)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAchiComplete(player, achievement);
+}
+
+bool ScriptMgr::OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+    if (!itr->second->OnBeforeCriteriaProgress(player, criteria))
+        ret = false; // we change ret value only when scripts return false
+
+    return ret;
 }
 
 void ScriptMgr::OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
@@ -1627,12 +1650,12 @@ void ScriptMgr::OnCriteriaProgress(Player* player, AchievementCriteriaEntry cons
     FOREACH_SCRIPT(PlayerScript)->OnCriteriaProgress(player, criteria);
 }
 
-void ScriptMgr::OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData)
+void ScriptMgr::OnAchievementSave(CharacterDatabaseTransaction trans, Player* player, uint16 achiId, CompletedAchievementData achiData)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAchiSave(trans, player, achiId, achiData);
 }
 
-void ScriptMgr::OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData)
+void ScriptMgr::OnCriteriaSave(CharacterDatabaseTransaction trans, Player* player, uint16 critId, CriteriaProgress criteriaData)
 {
     FOREACH_SCRIPT(PlayerScript)->OnCriteriaSave(trans, player, critId, criteriaData);
 }
@@ -1667,7 +1690,22 @@ void ScriptMgr::OnPlayerJoinArena(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinArena(player);
 }
 
-void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid)
+void ScriptMgr::GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32& teamID) const
+{
+    FOREACH_SCRIPT(PlayerScript)->GetCustomGetArenaTeamId(player, slot, teamID);
+}
+
+void ScriptMgr::GetCustomArenaPersonalRating(const Player* player, uint8 slot, uint32& rating) const
+{
+    FOREACH_SCRIPT(PlayerScript)->GetCustomArenaPersonalRating(player, slot, rating);
+}
+
+void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(const Player* player, uint32 minSlot, uint32& maxArenaRating) const
+{
+    FOREACH_SCRIPT(PlayerScript)->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating);
+}
+
+void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLootItem(player, item, count, lootguid);
 }
@@ -1690,13 +1728,24 @@ void ScriptMgr::OnFirstLogin(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnFirstLogin(player);
 }
 
-bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err)
+bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, ObjectGuid BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err)
 {
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
     if (!itr->second->CanJoinInBattlegroundQueue(player, BattlemasterGuid, BGTypeID, joinAsGroup, err))
         ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::ShouldBeRewardedWithMoneyInsteadOfExp(Player* player)
+{
+    bool ret = false; // return false by default if not scripts
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret)
+        if (itr->second->ShouldBeRewardedWithMoneyInsteadOfExp(player))
+            ret = true; // we change ret value only when a script returns true
 
     return ret;
 }
@@ -1725,6 +1774,11 @@ void ScriptMgr::OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& 
 void ScriptMgr::OnAccountLogin(uint32 accountId)
 {
     FOREACH_SCRIPT(AccountScript)->OnAccountLogin(accountId);
+}
+
+void ScriptMgr::OnLastIpUpdate(uint32 accountId, std::string ip)
+{
+    FOREACH_SCRIPT(AccountScript)->OnLastIpUpdate(accountId, ip);
 }
 
 void ScriptMgr::OnFailedAccountLogin(uint32 accountId)
@@ -1826,7 +1880,7 @@ void ScriptMgr::OnGuildItemMove(Guild* guild, Player* player, Item* pItem, bool 
     FOREACH_SCRIPT(GuildScript)->OnItemMove(guild, player, pItem, isSrcBank, srcContainer, srcSlotId, isDestBank, destContainer, destSlotId);
 }
 
-void ScriptMgr::OnGuildEvent(Guild* guild, uint8 eventType, uint32 playerGuid1, uint32 playerGuid2, uint8 newRank)
+void ScriptMgr::OnGuildEvent(Guild* guild, uint8 eventType, ObjectGuid::LowType playerGuid1, ObjectGuid::LowType playerGuid2, uint8 newRank)
 {
 #ifdef ELUNA
     sEluna->OnEvent(guild, eventType, playerGuid1, playerGuid2, newRank);
@@ -1834,7 +1888,7 @@ void ScriptMgr::OnGuildEvent(Guild* guild, uint8 eventType, uint32 playerGuid1, 
     FOREACH_SCRIPT(GuildScript)->OnEvent(guild, eventType, playerGuid1, playerGuid2, newRank);
 }
 
-void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, uint32 playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
+void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
 {
 #ifdef ELUNA
     sEluna->OnBankEvent(guild, eventType, tabId, playerGuid, itemOrMoney, itemStackCount, destTabId);
@@ -1843,7 +1897,7 @@ void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, uin
 }
 
 // Group
-void ScriptMgr::OnGroupAddMember(Group* group, uint64 guid)
+void ScriptMgr::OnGroupAddMember(Group* group, ObjectGuid guid)
 {
     ASSERT(group);
 #ifdef ELUNA
@@ -1852,7 +1906,7 @@ void ScriptMgr::OnGroupAddMember(Group* group, uint64 guid)
     FOREACH_SCRIPT(GroupScript)->OnAddMember(group, guid);
 }
 
-void ScriptMgr::OnGroupInviteMember(Group* group, uint64 guid)
+void ScriptMgr::OnGroupInviteMember(Group* group, ObjectGuid guid)
 {
     ASSERT(group);
 #ifdef ELUNA
@@ -1861,7 +1915,7 @@ void ScriptMgr::OnGroupInviteMember(Group* group, uint64 guid)
     FOREACH_SCRIPT(GroupScript)->OnInviteMember(group, guid);
 }
 
-void ScriptMgr::OnGroupRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, const char* reason)
+void ScriptMgr::OnGroupRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, const char* reason)
 {
     ASSERT(group);
 #ifdef ELUNA
@@ -1870,7 +1924,7 @@ void ScriptMgr::OnGroupRemoveMember(Group* group, uint64 guid, RemoveMethod meth
     FOREACH_SCRIPT(GroupScript)->OnRemoveMember(group, guid, method, kicker, reason);
 }
 
-void ScriptMgr::OnGroupChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid)
+void ScriptMgr::OnGroupChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid)
 {
     ASSERT(group);
 #ifdef ELUNA
@@ -1889,7 +1943,7 @@ void ScriptMgr::OnGroupDisband(Group* group)
 }
 
 // Global
-void ScriptMgr::OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid)
+void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
 {
     ASSERT(trans);
     ASSERT(itemGuid);
@@ -1902,7 +1956,7 @@ void ScriptMgr::OnGlobalMirrorImageDisplayItem(const Item* item, uint32& display
     FOREACH_SCRIPT(GlobalScript)->OnMirrorImageDisplayItem(item, display);
 }
 
-void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32>& ap)
+void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap)
 {
     FOREACH_SCRIPT(GlobalScript)->OnBeforeUpdateArenaPoints(at, ap);
 }
@@ -1917,14 +1971,30 @@ void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRa
     FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, canRate, lootMode, LootStoreItem, store);
 }
 
-void ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store)
+bool ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store)
 {
-    FOREACH_SCRIPT(GlobalScript)->OnItemRoll(player, LootStoreItem,  chance, loot, store);
+    bool ret = true; // return true by default
+
+    FOR_SCRIPTS_RET(GlobalScript, itr, end, ret)
+        if (!itr->second->OnItemRoll(player, LootStoreItem, chance, loot, store))
+            ret = false; // we change ret value only when a script returns false
+
+    return ret;
 }
 
-void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData)
+bool ScriptMgr::OnBeforeLootEqualChanced(Player const* player, LootStoreItemList EqualChanced, Loot& loot, LootStore const& store) {
+    bool ret = true; // return true by default
+
+    FOR_SCRIPTS_RET(GlobalScript, itr, end, ret)
+        if (!itr->second->OnBeforeLootEqualChanced(player, EqualChanced, loot, store))
+            ret = false; // we change ret value only when a script returns false
+
+    return ret;
+}
+
+void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData, lfg::LFGDungeonData const* dungeon)
 {
-    FOREACH_SCRIPT(GlobalScript)->OnInitializeLockedDungeons(player, level, lockData);
+    FOREACH_SCRIPT(GlobalScript)->OnInitializeLockedDungeons(player, level, lockData, dungeon);
 }
 
 void ScriptMgr::OnAfterInitializeLockedDungeons(Player* player)
@@ -1993,12 +2063,12 @@ void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 o
     FOREACH_SCRIPT(MovementHandlerScript)->OnPlayerMove(player, movementInfo, opcode);
 }
 
-void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot)
+void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot)
 {
     FOREACH_SCRIPT(PlayerScript)->OnBeforeBuyItemFromVendor(player, vendorguid, vendorslot, item, count, bag, slot);
 }
 
-void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore)
+void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, Item* item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAfterStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
 }
@@ -2097,15 +2167,29 @@ void ScriptMgr::OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battl
     FOREACH_SCRIPT(BGScript)->OnCheckNormalMatch(queue, Coef, bgTemplate, bracket_id, minPlayers, maxPlayers);
 }
 
-bool ScriptMgr::CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
+void ScriptMgr::OnGetSlotByType(const uint32 type, uint8& slot)
 {
-    bool ret = true;
+    FOREACH_SCRIPT(ArenaTeamScript)->OnGetSlotByType(type, slot);
+}
 
-    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
-    if (!itr->second->CanSendMessageQueue(queue, leader, bg, bracketEntry))
-        ret = false; // we change ret value only when scripts return false
+void ScriptMgr::OnGetArenaPoints(ArenaTeam* at, float& points)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnGetArenaPoints(at, points);
+}
 
-    return ret;
+void ScriptMgr::OnArenaTypeIDToQueueID(const BattlegroundTypeId bgTypeId, const uint8 arenaType, uint32& queueTypeID)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
+}
+
+void ScriptMgr::OnArenaQueueIdToArenaType(const BattlegroundQueueTypeId bgQueueTypeId, uint8& ArenaType)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnQueueIdToArenaType(bgQueueTypeId, ArenaType);
+}
+
+void ScriptMgr::OnSetArenaMaxPlayersPerTeam(const uint8 arenaType, uint32& maxPlayerPerTeam)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayerPerTeam);
 }
 
 // SpellSC
@@ -2136,6 +2220,914 @@ void ScriptMgr::OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver c
     FOREACH_SCRIPT(MailScript)->OnBeforeMailDraftSendMailTo(mailDraft, receiver, sender, checked, deliver_delay, custom_expiration, deleteMailItemsFromDB, sendMail);
 }
 
+void ScriptMgr::OnBeforeUpdatingPersonalRating(int32& mod, uint32 type)
+{
+    FOREACH_SCRIPT(FormulaScript)->OnBeforeUpdatingPersonalRating(mod, type);
+}
+
+bool ScriptMgr::OnBeforePlayerQuestComplete(Player* player, uint32 quest_id)
+{
+    bool ret=true;
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+    if (!itr->second->OnBeforeQuestComplete(player, quest_id))
+        ret=false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
+}
+
+bool ScriptMgr::CanJoinInArenaQueue(Player* player, ObjectGuid BattlemasterGuid, uint8 arenaslot, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, uint8 IsRated, GroupJoinBattlegroundResult& err)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanJoinInArenaQueue(player, BattlemasterGuid, arenaslot, BGTypeID, joinAsGroup, IsRated, err))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanBattleFieldPort(Player* player, uint8 arenaType, BattlegroundTypeId BGTypeID, uint8 action)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanBattleFieldPort(player, arenaType, BGTypeID, action))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanGroupInvite(Player* player, std::string& membername)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanGroupInvite(player, membername))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanGroupAccept(Player* player, Group* group)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanGroupAccept(player, group))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanSellItem(Player* player, Item* item, Creature* creature)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSellItem(player, item, creature))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSendMail(player, receiverGuid, mailbox, subject, body, money, COD, item))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::PetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type)
+{
+    FOREACH_SCRIPT(PlayerScript)->PetitionBuy(player, creature, charterid, cost, type);
+}
+
+void ScriptMgr::PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost)
+{
+    FOREACH_SCRIPT(PlayerScript)->PetitionShowList(player, creature, CharterEntry, CharterDispayID, CharterCost);
+}
+
+void ScriptMgr::OnRewardKillRewarder(Player* player, bool isDungeon, float& rate)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnRewardKillRewarder(player, isDungeon, rate);
+}
+
+bool ScriptMgr::CanGiveMailRewardAtGiveLevel(Player* player, uint8 level)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanGiveMailRewardAtGiveLevel(player, level))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnDeleteFromDB(trans, guid);
+}
+
+bool ScriptMgr::CanRepopAtGraveyard(Player* player)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanRepopAtGraveyard(player))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnGetMaxSkillValue(player, skill, result, IsPure);
+}
+
+bool ScriptMgr::CanAreaExploreAndOutdoor(Player* player)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanAreaExploreAndOutdoor(player))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnVictimRewardBefore(player, victim, killer_title, victim_title);
+}
+
+void ScriptMgr::OnVictimRewardAfter(Player* player, Player* victim, uint32& killer_title, uint32& victim_rank, float& honor_f)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnVictimRewardAfter(player, victim, killer_title, victim_rank, honor_f);
+}
+
+void ScriptMgr::OnCustomScalingStatValueBefore(Player* player, ItemTemplate const* proto, uint8 slot, bool apply, uint32& CustomScalingStatValue)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnCustomScalingStatValueBefore(player, proto, slot, apply, CustomScalingStatValue);
+}
+
+void ScriptMgr::OnCustomScalingStatValue(Player* player, ItemTemplate const* proto, uint32& statType, int32& val, uint8 itemProtoStatNumber, uint32 ScalingStatValue, ScalingStatValuesEntry const* ssv)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnCustomScalingStatValue(player, proto, statType, val, itemProtoStatNumber, ScalingStatValue, ssv);
+}
+
+bool ScriptMgr::CanArmorDamageModifier(Player* player)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanArmorDamageModifier(player))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnGetFeralApBonus(Player* player, int32& feral_bonus, int32 dpsMod, ItemTemplate const* proto, ScalingStatValuesEntry const* ssv)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnGetFeralApBonus(player, feral_bonus, dpsMod, proto, ssv);
+}
+
+bool ScriptMgr::CanApplyWeaponDependentAuraDamageMod(Player* player, Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanApplyWeaponDependentAuraDamageMod(player, item, attackType, aura, apply))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, Item* item, bool apply, bool form_change)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanApplyEquipSpell(player, spellInfo, item, apply, form_change))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanApplyEquipSpellsItemSet(Player* player, ItemSetEffect* eff)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanApplyEquipSpellsItemSet(player, eff))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanCastItemCombatSpell(player, target, attType, procVictim, procEx, item, proto))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanCastItemUseSpell(Player* player, Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanCastItemUseSpell(player, item, targets, cast_count, glyphIndex))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnApplyAmmoBonuses(Player* player, ItemTemplate const* proto, float& currentAmmoDPS)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnApplyAmmoBonuses(player, proto, currentAmmoDPS);
+}
+
+bool ScriptMgr::CanEquipItem(Player* player, uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanEquipItem(player, slot, dest, pItem, swap, not_loading))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanUnequipItem(Player* player, uint16 pos, bool swap)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanUnequipItem(player, pos, swap))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanUseItem(Player* player, ItemTemplate const* proto, InventoryResult& result)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanUseItem(player, proto, result))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool update)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSaveEquipNewItem(player, item, pos, update))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanApplyEnchantment(player, item, slot, apply, apply_dur, ignore_condition))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnGetQuestRate(Player* player, float& result)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnGetQuestRate(player, result);
+}
+
+bool ScriptMgr::PassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, ObjectGuid guid)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->PassedQuestKilledMonsterCredit(player, qinfo, entry, real_entry, guid))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8 slot, uint8& err, uint16& dest)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CheckItemInSlotAtLoadInventory(player, item, slot, err, dest))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::NotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->NotAvoidSatisfy(player, ar, target_map, report))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::NotVisibleGloballyFor(Player* player, Player const* u)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->NotVisibleGloballyFor(player, u))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnGetArenaPersonalRating(Player* player, uint8 slot, uint32& result)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnGetArenaPersonalRating(player, slot, result);
+}
+
+void ScriptMgr::OnGetArenaTeamId(Player* player, uint8 slot, uint32& result)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnGetArenaTeamId(player, slot, result);
+}
+
+void ScriptMgr::OnIsFFAPvP(Player* player, bool& result)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnIsFFAPvP(player, result);
+}
+
+void ScriptMgr::OnIsPvP(Player* player, bool& result)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnIsPvP(player, result);
+}
+
+void ScriptMgr::OnGetMaxSkillValueForLevel(Player* player, uint16& result)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnGetMaxSkillValueForLevel(player, result);
+}
+
+bool ScriptMgr::NotSetArenaTeamInfoField(Player* player, uint8 slot, ArenaTeamInfoType type, uint32 value)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->NotSetArenaTeamInfoField(player, slot, type, value))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanJoinLfg(player, roles, dungeons, comment))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanInitTrade(Player* player, Player* target)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanInitTrade(player, target))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnSetServerSideVisibility(player, type, sec);
+}
+
+void ScriptMgr::OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnSetServerSideVisibilityDetect(player, type, sec);
+}
+
+void ScriptMgr::AnticheatSetSkipOnePacketForASH(Player* player, bool apply)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetSkipOnePacketForASH(player, apply);
+}
+
+void ScriptMgr::AnticheatSetCanFlybyServer(Player* player, bool apply)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetCanFlybyServer(player, apply);
+}
+
+void ScriptMgr::AnticheatSetUnderACKmount(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetUnderACKmount(player);
+}
+
+void ScriptMgr::AnticheatSetRootACKUpd(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetRootACKUpd(player);
+}
+
+void ScriptMgr::AnticheatSetJumpingbyOpcode(Player* player, bool jump)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetJumpingbyOpcode(player, jump);
+}
+
+void ScriptMgr::AnticheatUpdateMovementInfo(Player* player, MovementInfo const& movementInfo)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatUpdateMovementInfo(player, movementInfo);
+}
+
+bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->AnticheatHandleDoubleJump(player, mover))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->AnticheatCheckMovementInfo(player, movementInfo, mover, jump))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+bool ScriptMgr::CanGuildSendBankList(Guild const* guild, WorldSession* session, uint8 tabId, bool sendAllSlots)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(GuildScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanGuildSendBankList(guild, session, tabId, sendAllSlots))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+bool ScriptMgr::CanGroupJoinBattlegroundQueue(Group const* group, Player* member, Battleground const* bgTemplate, uint32 MinPlayerCount, bool isRated, uint32 arenaSlot)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(GroupScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanGroupJoinBattlegroundQueue(group, member, bgTemplate, MinPlayerCount, isRated, arenaSlot))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+void ScriptMgr::OnCreate(Group* group, Player* leader)
+{
+    FOREACH_SCRIPT(GroupScript)->OnCreate(group, leader);
+}
+
+void ScriptMgr::OnAuraRemove(Unit* unit, AuraApplication* aurApp, AuraRemoveMode mode)
+{
+    FOREACH_SCRIPT(UnitScript)->OnAuraRemove(unit, aurApp, mode);
+}
+
+bool ScriptMgr::IfNormalReaction(Unit const* unit, Unit const* target, ReputationRank& repRank)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->IfNormalReaction(unit, target, repRank))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::IsNeedModSpellDamagePercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->IsNeedModSpellDamagePercent(unit, auraEff, doneTotalMod, spellProto))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::IsNeedModMeleeDamagePercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->IsNeedModMeleeDamagePercent(unit, auraEff, doneTotalMod, spellProto))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->IsNeedModHealPercent(unit, auraEff, doneTotalMod, spellProto))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSetPhaseMask(unit, newPhaseMask, update))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index)
+{
+    bool ret = false;
+
+    FOR_SCRIPTS_RET(UnitScript, itr, end, ret) // return true by default if not scripts
+        if (itr->second->IsCustomBuildValuesUpdate(unit, updateType, fieldBuffer, target, index))
+            ret = true; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+void ScriptMgr::OnQueueUpdate(BattlegroundQueue* queue, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId)
+{
+    FOREACH_SCRIPT(BGScript)->OnQueueUpdate(queue, bracket_id, isRated, arenaRatedTeamId);
+}
+
+bool ScriptMgr::CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSendMessageBGQueue(queue, leader, bg, bracketEntry))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->OnBeforeSendJoinMessageArenaQueue(queue, leader, ginfo, bracketEntry, isRated))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->OnBeforeSendExitMessageArenaQueue(queue, ginfo))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanModAuraEffectDamageDone(AuraEffect const* auraEff, Unit* target, AuraApplication const* aurApp, uint8 mode, bool apply)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanModAuraEffectDamageDone(auraEff, target, aurApp, mode, apply))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanModAuraEffectModDamagePercentDone(AuraEffect const* auraEff, Unit* target, AuraApplication const* aurApp, uint8 mode, bool apply)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanModAuraEffectModDamagePercentDone(auraEff, target, aurApp, mode, apply))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnSpellCheckCast(Spell* spell, bool strict, SpellCastResult& res)
+{
+    FOREACH_SCRIPT(SpellSC)->OnSpellCheckCast(spell, strict, res);
+}
+
+bool ScriptMgr::CanPrepare(Spell* spell, SpellCastTargets const* targets, AuraEffect const* triggeredByAura)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanPrepare(spell, targets, triggeredByAura))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanScalingEverything(Spell* spell)
+{
+    bool ret = false;
+
+    FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
+        if (itr->second->CanScalingEverything(spell))
+            ret = true; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanSelectSpecTalent(Spell* spell)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(SpellSC, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSelectSpecTalent(spell))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnScaleAuraUnitAdd(Spell* spell, Unit* target, uint32 effectMask, bool checkIfValid, bool implicit, uint8 auraScaleMask, TargetInfo& targetInfo)
+{
+    FOREACH_SCRIPT(SpellSC)->OnScaleAuraUnitAdd(spell, target, effectMask, checkIfValid, implicit, auraScaleMask, targetInfo);
+}
+
+void ScriptMgr::OnRemoveAuraScaleTargets(Spell* spell, TargetInfo& targetInfo, uint8 auraScaleMask, bool& needErase)
+{
+    FOREACH_SCRIPT(SpellSC)->OnRemoveAuraScaleTargets(spell, targetInfo, auraScaleMask, needErase);
+}
+
+void ScriptMgr::OnBeforeAuraRankForLevel(SpellInfo const* spellInfo, SpellInfo const* latestSpellInfo, uint8 level)
+{
+    FOREACH_SCRIPT(SpellSC)->OnBeforeAuraRankForLevel(spellInfo, latestSpellInfo, level);
+}
+
+void ScriptMgr::SetRealmCompleted(AchievementEntry const* achievement)
+{
+    FOREACH_SCRIPT(AchievementScript)->SetRealmCompleted(achievement);
+}
+
+bool ScriptMgr::IsCompletedCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(AchievementScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->IsCompletedCriteria(mgr, achievementCriteria, achievement, progress))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::IsRealmCompleted(AchievementGlobalMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(AchievementScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->IsRealmCompleted(globalmgr, achievement, completionTime))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnBeforeCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList)
+{
+    FOREACH_SCRIPT(AchievementScript)->OnBeforeCheckCriteria(mgr, achievementCriteriaList);
+}
+
+bool ScriptMgr::CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(AchievementScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanCheckCriteria(mgr, achievementCriteria))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnInitStatsForLevel(Guardian* guardian, uint8 petlevel)
+{
+    FOREACH_SCRIPT(PetScript)->OnInitStatsForLevel(guardian, petlevel);
+}
+
+void ScriptMgr::OnCalculateMaxTalentPointsForLevel(Pet* pet, uint8 level, uint8& points)
+{
+    FOREACH_SCRIPT(PetScript)->OnCalculateMaxTalentPointsForLevel(pet, level, points);
+}
+
+bool ScriptMgr::CanUnlearnSpellSet(Pet* pet, uint32 level, uint32 spell)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PetScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanUnlearnSpellSet(pet, level, spell))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellEntry)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PetScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanUnlearnSpellDefault(pet, spellEntry))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanResetTalents(Pet* pet)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PetScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanResetTalents(pet))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(ArenaScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanAddMember(team, PlayerGuid))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+void ScriptMgr::OnGetPoints(ArenaTeam* team, uint32 memberRating, float& points)
+{
+    FOREACH_SCRIPT(ArenaScript)->OnGetPoints(team, memberRating, points);
+}
+
+bool ScriptMgr::CanSaveToDB(ArenaTeam* team)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(ArenaScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSaveToDB(team))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+void ScriptMgr::OnItemCreate(Item* item, ItemTemplate const* itemProto, Player const* owner)
+{
+    FOREACH_SCRIPT(MiscScript)->OnItemCreate(item, itemProto, owner);
+}
+
+bool ScriptMgr::CanApplySoulboundFlag(Item* item, ItemTemplate const* proto)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(MiscScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanApplySoulboundFlag(item, proto))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnConstructObject(Object* origin)
+{
+    FOREACH_SCRIPT(MiscScript)->OnConstructObject(origin);
+}
+
+void ScriptMgr::OnDestructObject(Object* origin)
+{
+    FOREACH_SCRIPT(MiscScript)->OnDestructObject(origin);
+}
+
+void ScriptMgr::OnConstructPlayer(Player* origin)
+{
+    FOREACH_SCRIPT(MiscScript)->OnConstructPlayer(origin);
+}
+
+void ScriptMgr::OnDestructPlayer(Player* origin)
+{
+    FOREACH_SCRIPT(MiscScript)->OnDestructPlayer(origin);
+}
+
+void ScriptMgr::OnConstructGroup(Group* origin)
+{
+    FOREACH_SCRIPT(MiscScript)->OnConstructGroup(origin);
+}
+
+void ScriptMgr::OnDestructGroup(Group* origin)
+{
+    FOREACH_SCRIPT(MiscScript)->OnDestructGroup(origin);
+}
+
+void ScriptMgr::OnConstructInstanceSave(InstanceSave* origin)
+{
+    FOREACH_SCRIPT(MiscScript)->OnConstructInstanceSave(origin);
+}
+
+void ScriptMgr::OnDestructInstanceSave(InstanceSave* origin)
+{
+    FOREACH_SCRIPT(MiscScript)->OnDestructInstanceSave(origin);
+}
+
+bool ScriptMgr::CanItemApplyEquipSpell(Player* player, Item* item)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(MiscScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanItemApplyEquipSpell(player, item))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanSendAuctionHello(WorldSession const* session, ObjectGuid guid, Creature* creature)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(MiscScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSendAuctionHello(session, guid, creature))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::ValidateSpellAtCastSpell(Player* player, uint32& oldSpellId, uint32& spellId, uint8& castCount, uint8& castFlags)
+{
+    FOREACH_SCRIPT(MiscScript)->ValidateSpellAtCastSpell(player, oldSpellId, spellId, castCount, castFlags);
+}
+
+void ScriptMgr::ValidateSpellAtCastSpellResult(Player* player, Unit* mover, Spell* spell, uint32 oldSpellId, uint32 spellId)
+{
+    FOREACH_SCRIPT(MiscScript)->ValidateSpellAtCastSpellResult(player, mover, spell, oldSpellId, spellId);
+}
+
+void ScriptMgr::OnAfterLootTemplateProcess(Loot* loot, LootTemplate const* tab, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode)
+{
+    FOREACH_SCRIPT(MiscScript)->OnAfterLootTemplateProcess(loot, tab, store, lootOwner, personal, noEmptyError, lootMode);
+}
+
+void ScriptMgr::OnInstanceSave(InstanceSave* instanceSave)
+{
+    FOREACH_SCRIPT(MiscScript)->OnInstanceSave(instanceSave);
+}
+
+void ScriptMgr::OnPlayerSetPhase(const AuraEffect* auraEff, AuraApplication const* aurApp, uint8 mode, bool apply, uint32& newPhase)
+{
+    FOREACH_SCRIPT(MiscScript)->OnPlayerSetPhase(auraEff, aurApp, mode, apply, newPhase);
+}
+
+void ScriptMgr::OnHandleDevCommand(Player* player, std::string& argstr)
+{
+    FOREACH_SCRIPT(CommandSC)->OnHandleDevCommand(player, argstr);
+}
+
+///-
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
 {
@@ -2323,6 +3315,12 @@ BGScript::BGScript(char const* name)
     ScriptRegistry<BGScript>::AddScript(this);
 }
 
+ArenaTeamScript::ArenaTeamScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<ArenaTeamScript>::AddScript(this);
+}
+
 SpellSC::SpellSC(char const* name)
     : ScriptObject(name)
 {
@@ -2347,3 +3345,74 @@ MailScript::MailScript(const char* name)
     ScriptRegistry<MailScript>::AddScript(this);
 }
 
+AchievementScript::AchievementScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<AchievementScript>::AddScript(this);
+}
+
+PetScript::PetScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<PetScript>::AddScript(this);
+}
+
+ArenaScript::ArenaScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<ArenaScript>::AddScript(this);
+}
+
+MiscScript::MiscScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<MiscScript>::AddScript(this);
+}
+
+CommandSC::CommandSC(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<CommandSC>::AddScript(this);
+}
+
+// Specialize for each script type class like so:
+template class ScriptRegistry<SpellScriptLoader>;
+template class ScriptRegistry<ServerScript>;
+template class ScriptRegistry<WorldScript>;
+template class ScriptRegistry<FormulaScript>;
+template class ScriptRegistry<WorldMapScript>;
+template class ScriptRegistry<InstanceMapScript>;
+template class ScriptRegistry<BattlegroundMapScript>;
+template class ScriptRegistry<ItemScript>;
+template class ScriptRegistry<CreatureScript>;
+template class ScriptRegistry<GameObjectScript>;
+template class ScriptRegistry<AreaTriggerScript>;
+template class ScriptRegistry<BattlegroundScript>;
+template class ScriptRegistry<OutdoorPvPScript>;
+template class ScriptRegistry<CommandScript>;
+template class ScriptRegistry<WeatherScript>;
+template class ScriptRegistry<AuctionHouseScript>;
+template class ScriptRegistry<ConditionScript>;
+template class ScriptRegistry<VehicleScript>;
+template class ScriptRegistry<DynamicObjectScript>;
+template class ScriptRegistry<TransportScript>;
+template class ScriptRegistry<AchievementCriteriaScript>;
+template class ScriptRegistry<PlayerScript>;
+template class ScriptRegistry<GuildScript>;
+template class ScriptRegistry<GroupScript>;
+template class ScriptRegistry<GlobalScript>;
+template class ScriptRegistry<UnitScript>;
+template class ScriptRegistry<AllCreatureScript>;
+template class ScriptRegistry<AllMapScript>;
+template class ScriptRegistry<MovementHandlerScript>;
+template class ScriptRegistry<BGScript>;
+template class ScriptRegistry<ArenaTeamScript>;
+template class ScriptRegistry<SpellSC>;
+template class ScriptRegistry<AccountScript>;
+template class ScriptRegistry<GameEventScript>;
+template class ScriptRegistry<MailScript>;
+template class ScriptRegistry<AchievementScript>;
+template class ScriptRegistry<MiscScript>;
+template class ScriptRegistry<PetScript>;
+template class ScriptRegistry<ArenaScript>;
+template class ScriptRegistry<CommandSC>;

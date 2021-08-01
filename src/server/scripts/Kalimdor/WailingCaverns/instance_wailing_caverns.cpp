@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "wailing_caverns.h"
 
 class instance_wailing_caverns : public InstanceMapScript
@@ -11,7 +11,7 @@ class instance_wailing_caverns : public InstanceMapScript
 public:
     instance_wailing_caverns() : InstanceMapScript("instance_wailing_caverns", 43) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_wailing_caverns_InstanceMapScript(map);
     }
@@ -20,15 +20,12 @@ public:
     {
         instance_wailing_caverns_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&_encounters, 0, sizeof(_encounters));
-
-            DiscipleOfNaralexGUID = 0;
-            SerpentisGUID = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_DISCIPLE_OF_NARALEX)
                 DiscipleOfNaralexGUID = creature->GetGUID();
@@ -36,7 +33,7 @@ public:
                 SerpentisGUID = creature->GetGUID();
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -68,7 +65,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -81,14 +78,14 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "W C " << _encounters[0] << ' ' << _encounters[1] << ' ' << _encounters[2] << ' ' << _encounters[3] << ' ' << _encounters[4];
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
                 return;
@@ -109,8 +106,8 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-        uint64 DiscipleOfNaralexGUID;
-        uint64 SerpentisGUID;
+        ObjectGuid DiscipleOfNaralexGUID;
+        ObjectGuid SerpentisGUID;
     };
 };
 

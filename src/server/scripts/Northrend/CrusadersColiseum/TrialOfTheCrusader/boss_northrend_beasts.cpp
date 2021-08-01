@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_crusader.h"
 #include "Vehicle.h"
-#include "Player.h"
 
 /***********
 ** GORMOK
@@ -66,9 +66,9 @@ class npc_snobold_vassal : public CreatureScript
 public:
     npc_snobold_vassal() : CreatureScript("npc_snobold_vassal") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_snobold_vassalAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_snobold_vassalAI>(pCreature);
     }
 
     struct npc_snobold_vassalAI : public ScriptedAI
@@ -76,21 +76,21 @@ public:
         npc_snobold_vassalAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
-            TargetGUID = 0;
+            TargetGUID.Clear();
             me->SetReactState(REACT_PASSIVE);
         }
 
         InstanceScript* pInstance;
         EventMap events;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, urand(10000, 30000));
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SNOBOLLED, 1500);
@@ -98,16 +98,16 @@ public:
             events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 25000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if( who->GetGUID() != TargetGUID )
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !TargetGUID && !me->GetVehicle() )
                 return;
@@ -124,7 +124,7 @@ public:
                 me->CombatStop(true);
                 me->SetHealth(me->GetMaxHealth());
                 if( pInstance )
-                    if( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK)) )
+                    if( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) )
                         if( gormok->IsAlive() )
                             if( Vehicle* vk = gormok->GetVehicleKit() )
                                 for( uint8 i = 0; i < 4; ++i )
@@ -134,7 +134,7 @@ public:
                                         Reset();
                                         break;
                                     }
-                TargetGUID = 0;
+                TargetGUID.Clear();
                 return;
             }
 
@@ -149,8 +149,8 @@ public:
                     break;
                 case EVENT_SPELL_SNOBOLLED:
                     if( t->GetTypeId() == TYPEID_PLAYER )
-                        me->CastSpell((Unit*)NULL, SPELL_SNOBOLLED, true);
-                    
+                        me->CastSpell((Unit*)nullptr, SPELL_SNOBOLLED, true);
+
                     break;
                 case EVENT_SPELL_BATTER:
                     if( t->GetTypeId() == TYPEID_PLAYER )
@@ -161,9 +161,9 @@ public:
                     {
                         if( t->GetTypeId() != TYPEID_PLAYER && pInstance )
                         {
-                            std::vector<uint64> validPlayers;
+                            GuidVector validPlayers;
                             Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                            Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK));
+                            Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK));
 
                             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             {
@@ -194,7 +194,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             if( Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID))
             {
@@ -204,7 +204,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == 1 && !TargetGUID )
                 me->DespawnOrUnsummon();
@@ -217,9 +217,9 @@ class boss_gormok : public CreatureScript
 public:
     boss_gormok() : CreatureScript("boss_gormok") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_gormokAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_gormokAI>(pCreature);
     }
 
     struct boss_gormokAI : public ScriptedAI
@@ -234,16 +234,16 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();
@@ -258,14 +258,14 @@ public:
                         snobold->SendMovementFlagUpdate();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -290,7 +290,7 @@ public:
                         events.RepeatEvent(2500);
                     break;
                 case EVENT_SPELL_STAGGERING_STOMP:
-                    me->CastSpell((Unit*)NULL, SPELL_STAGGERING_STOMP, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_STAGGERING_STOMP, false);
                     events.RepeatEvent(urand(20000, 25000));
                     break;
                 case EVENT_PICK_SNOBOLD_TARGET:
@@ -298,7 +298,7 @@ public:
                         for( uint8 i = 0; i < 4; ++i )
                             if( Unit* snobold = vk->GetPassenger(i) )
                             {
-                                std::vector<uint64> validPlayers;
+                                GuidVector validPlayers;
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                                 {
@@ -358,7 +358,7 @@ public:
                                         snobold->ToCreature()->DespawnOrUnsummon();
                                 }
                         }
-                        PlayerGUID = 0;
+                        PlayerGUID.Clear();
                     }
                     break;
             }
@@ -366,7 +366,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             summons.DoAction(1);
 
@@ -374,12 +374,12 @@ public:
                 pInstance->SetData(TYPE_GORMOK, DONE);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch( param )
             {
@@ -389,7 +389,7 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -399,7 +399,6 @@ public:
         }
     };
 };
-
 
 /***********
 ** ACIDMAW AND DREADSCALE
@@ -474,7 +473,7 @@ struct boss_jormungarAI : public ScriptedAI
     uint32 _MODEL_MOBILE;
     uint32 _TYPE_OTHER;
 
-    void DoAction(int32 param)
+    void DoAction(int32 param) override
     {
         switch( param )
         {
@@ -515,18 +514,18 @@ struct boss_jormungarAI : public ScriptedAI
             events.RescheduleEvent(EVENT_SUBMERGE, urand(45000, 50000));
     }
 
-    void EnterCombat(Unit* /*who*/)
+    void EnterCombat(Unit* /*who*/) override
     {
         me->setActive(true);
         ScheduleEvents();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         me->setActive(false);
     }
 
-    void AttackStart(Unit* who)
+    void AttackStart(Unit* who) override
     {
         if( me->GetDisplayId() == _MODEL_STATIONARY )
         {
@@ -539,7 +538,7 @@ struct boss_jormungarAI : public ScriptedAI
             ScriptedAI::AttackStart(who);
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if( !UpdateVictim() )
             return;
@@ -562,7 +561,7 @@ struct boss_jormungarAI : public ScriptedAI
 
                     // second one submerge 1.5sec after the first one, used also for synchronizing
                     if( pInstance )
-                        if( Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetData64(_TYPE_OTHER)) )
+                        if( Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(_TYPE_OTHER)) )
                             c->AI()->DoAction(-1);
 
                     events.Reset();
@@ -582,7 +581,7 @@ struct boss_jormungarAI : public ScriptedAI
                     me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
                     me->StopMovingOnCurrentPos();
                     DoResetThreat();
-                    
+
                     events.RescheduleEvent(EVENT_EMERGE, 6000);
                 }
                 break;
@@ -616,7 +615,7 @@ struct boss_jormungarAI : public ScriptedAI
                 events.RepeatEvent(20000);
                 break;
             case EVENT_SPELL_SWEEP:
-                me->CastSpell((Unit*)NULL, SPELL_SWEEP_0, false);
+                me->CastSpell((Unit*)nullptr, SPELL_SWEEP_0, false);
                 events.RepeatEvent(urand(15000, 30000));
                 break;
             case EVENT_SPELL_BITE:
@@ -644,18 +643,18 @@ struct boss_jormungarAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if( pInstance )
         {
-            if( Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(_TYPE_OTHER)) )
+            if( Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(_TYPE_OTHER)) )
                 if( c->IsAlive() )
                     c->AI()->DoAction(-2);
             pInstance->SetData(TYPE_JORMUNGAR, DONE);
         }
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         events.Reset();
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -684,10 +683,9 @@ public:
         }
     };
 
-
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_acidmawAI(creature);
+        return GetTrialOfTheCrusaderAI<boss_acidmawAI>(creature);
     }
 };
 
@@ -710,12 +708,11 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_dreadscaleAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_dreadscaleAI>(pCreature);
     }
 };
-
 
 /***********
 ** ICEHOWL
@@ -755,9 +752,9 @@ class boss_icehowl : public CreatureScript
 public:
     boss_icehowl() : CreatureScript("boss_icehowl") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_icehowlAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_icehowlAI>(pCreature);
     }
 
     struct boss_icehowlAI : public ScriptedAI
@@ -779,16 +776,16 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
         float destX, destY, destZ;
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->GetReactState() != REACT_PASSIVE)
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();
@@ -798,7 +795,7 @@ public:
             events.RescheduleEvent(EVENT_JUMP_MIDDLE, 30000);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
         }
@@ -817,7 +814,7 @@ public:
             return false;
         }
 
-        void MovementInform(uint32  /*type*/, uint32 id)
+        void MovementInform(uint32  /*type*/, uint32 id) override
         {
             if( id == EVENT_CHARGE )
             {
@@ -836,7 +833,7 @@ public:
                 if( !DoTrampleIfValid() )
                 {
                     me->CastSpell(me, SPELL_STAGGERED_DAZE, true);
-                    me->CastSpell((Unit*)NULL, SPELL_TRAMPLE, true);
+                    me->CastSpell((Unit*)nullptr, SPELL_TRAMPLE, true);
                     Talk(EMOTE_TRAMPLE_CRASH);
                     events.DelayEvents(15000);
                 }
@@ -850,7 +847,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -870,7 +867,7 @@ public:
                     events.RepeatEvent(urand(15000, 30000));
                     break;
                 case EVENT_SPELL_WHIRL:
-                    me->CastSpell((Unit*)NULL, SPELL_WHIRL, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_WHIRL, false);
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_ARCTIC_BREATH:
@@ -885,21 +882,21 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), 40.0f, 12.0f);
-                    me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                     events.Reset();
                     events.RescheduleEvent(EVENT_SPELL_MASSIVE_CRASH, 2000);
                     break;
                 case EVENT_SPELL_MASSIVE_CRASH:
                     me->GetMotionMaster()->Clear();
-                    me->CastSpell((Unit*)NULL, SPELL_MASSIVE_CRASH, false);
-                    
+                    me->CastSpell((Unit*)nullptr, SPELL_MASSIVE_CRASH, false);
+
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;
                 case EVENT_GAZE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
                     {
                         TargetGUID = target->GetGUID();
-                        me->SetUInt64Value(UNIT_FIELD_TARGET, TargetGUID);
+                        me->SetGuidValue(UNIT_FIELD_TARGET, TargetGUID);
                         me->SetFacingToObject(target);
                         Talk(EMOTE_TRAMPLE_STARE, target);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
@@ -914,7 +911,7 @@ public:
                         me->GetMotionMaster()->MovementExpired();
                         me->SetReactState(REACT_AGGRESSIVE);
                     }
-                    
+
                     break;
                 case EVENT_JUMP_BACK:
                     {
@@ -961,9 +958,9 @@ public:
                     me->DisableSpline();
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveCharge(destX, destY, destZ + 1.0f, 65.0f);
-                    me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                     events.RescheduleEvent(EVENT_CHECK_TRAMPLE_PLAYERS, 100);
-                    
+
                     break;
                 case EVENT_CHECK_TRAMPLE_PLAYERS:
                     if( DoTrampleIfValid() )
@@ -982,7 +979,7 @@ public:
                     break;
                 case EVENT_REFRESH_POSITION:
                     //me->SetFacingTo(me->GetOrientation());
-                    
+
                     break;
             }
 
@@ -990,7 +987,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -998,7 +995,7 @@ public:
                 pInstance->SetData(TYPE_FAILED, 1);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if( !pInstance )
                 return;
@@ -1024,7 +1021,6 @@ public:
         }
     };
 };
-
 
 void AddSC_boss_northrend_beasts()
 {

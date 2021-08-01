@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "karazhan.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "karazhan.h"
 
 enum eSay
 {
@@ -75,14 +75,14 @@ public:
     {
         boss_midnightAI(Creature* creature) : BossAI(creature, DATA_ATTUMEN) { }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->SetVisible(true);
             _healthPct = 100.0f;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             events.ScheduleEvent(EVENT_CHECK_HEALTH_95, 0);
@@ -90,13 +90,13 @@ public:
             DoZoneInCombat();
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (Creature* attumen = summons.GetCreatureWithEntry(NPC_ATTUMEN_THE_HUNTSMAN))
                 attumen->AI()->Talk(SAY_ATTUMEN_MIDNIGHT_KILL);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             summon->SetInCombatWithZone();
@@ -110,13 +110,13 @@ public:
                 summon->CastSpell(summon, SPELL_SPAWN_SMOKE1, true);
         }
 
-        void SetData(uint32 type, uint32 /*data*/)
+        void SetData(uint32 type, uint32 /*data*/) override
         {
             if (type == DATA_ATTUMEN_READY)
                 events.ScheduleEvent(EVENT_SUMMON_ATTUMEN_MOUNTED, 0);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
+        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
         {
             if (summon->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED)
             {
@@ -125,7 +125,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -175,7 +175,7 @@ public:
             EnterEvadeIfOutOfCombatArea();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->GetHomePosition().GetExactDist2d(me) > 50.0f || me->GetPositionZ() > 60.0f;
         }
@@ -184,9 +184,9 @@ public:
         float _healthPct;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_midnightAI>(creature);
+        return GetKarazhanAI<boss_midnightAI>(creature);
     }
 };
 
@@ -201,12 +201,12 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             _events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_ATTUMEN1_APPEAR);
             _events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 0);
@@ -215,7 +215,7 @@ public:
             _events.ScheduleEvent(EVENT_RANDOM_YELL, urand(25000, 45000));
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (_events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -224,7 +224,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Mechanic == MECHANIC_DISARM && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -237,7 +237,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_MOUNT_TARGET_MIDNIGHT)
             {
@@ -247,7 +247,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == POINT_MOVE_TO_MIDNIGHT)
             {
@@ -257,7 +257,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -297,9 +297,9 @@ public:
         EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_attumenAI>(creature);
+        return GetKarazhanAI<boss_attumenAI>(creature);
     }
 };
 
@@ -314,12 +314,12 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             _events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_SPELL_SHADOW_CLEAVE, 6000);
             _events.ScheduleEvent(EVENT_SPELL_INTANGIBLE_PRESENCE, 15000);
@@ -328,7 +328,7 @@ public:
             _events.ScheduleEvent(EVENT_SPELL_KNOCKDOWN, 11000);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (_events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -337,12 +337,12 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_ATTUMEN2_DEATH);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Mechanic == MECHANIC_DISARM && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -351,7 +351,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == POINT_MOVE_TO_MIDNIGHT)
             {
@@ -361,7 +361,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -402,9 +402,9 @@ public:
         EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_attumen_midnightAI>(creature);
+        return GetKarazhanAI<boss_attumen_midnightAI>(creature);
     }
 };
 
@@ -431,15 +431,14 @@ public:
                 caster->TauntFadeOut(target);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_midnight_fixate_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_midnight_fixate_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
-
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_midnight_fixate_AuraScript();
     }

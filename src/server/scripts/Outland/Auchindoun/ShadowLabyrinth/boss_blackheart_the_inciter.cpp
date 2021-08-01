@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "shadow_labyrinth.h"
 
 enum BlackheartTheInciter
@@ -30,9 +30,9 @@ class boss_blackheart_the_inciter : public CreatureScript
 public:
     boss_blackheart_the_inciter() : CreatureScript("boss_blackheart_the_inciter") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_blackheart_the_inciterAI (creature);
+        return GetShadowLabyrinthAI<boss_blackheart_the_inciterAI>(creature);
     }
 
     struct boss_blackheart_the_inciterAI : public ScriptedAI
@@ -47,7 +47,7 @@ public:
 
         bool InciteChaos;
 
-        void Reset()
+        void Reset() override
         {
             InciteChaos = false;
             events.Reset();
@@ -56,20 +56,20 @@ public:
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, NOT_STARTED);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (instance)
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_INCITE, 20000);
@@ -81,14 +81,14 @@ public:
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, IN_PROGRESS);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (InciteChaos && SelectTargetFromPlayerList(100.0f))
                 return;
             CreatureAI::EnterEvadeMode();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -135,7 +135,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_blackheart_the_inciter()

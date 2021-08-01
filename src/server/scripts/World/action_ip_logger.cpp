@@ -3,14 +3,13 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  */
 
-#include "ScriptMgr.h"
 #include "Channel.h"
-#include "Guild.h"
 #include "Group.h"
+#include "Guild.h"
+#include "ScriptMgr.h"
 
 enum IPLoggingTypes
 {
-
     // AccountActionIpLogger();
     ACCOUNT_LOGIN = 0,
     ACCOUNT_FAIL_LOGIN = 1,
@@ -129,7 +128,7 @@ public:
         {
             // As we can assume most account actions are NOT failed login, so this is the more accurate check.
             // For those, we need last_ip...
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
 
             stmt->setUInt32(0, playerGuid);
             stmt->setUInt32(1, characterGuid);
@@ -140,7 +139,7 @@ public:
         }
         else // ... but for failed login, we query last_attempt_ip from account table. Which we do with an unique query
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FACL_IP_LOGGING);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FACL_IP_LOGGING);
 
             stmt->setUInt32(0, playerGuid);
             stmt->setUInt32(1, characterGuid);
@@ -195,7 +194,7 @@ public:
 
         // We declare all the required variables
         uint32 playerGuid = player->GetSession()->GetAccountId();
-        uint32 characterGuid = player->GetGUIDLow();
+        ObjectGuid::LowType characterGuid = player->GetGUID().GetCounter();
         const std::string currentIp = player->GetSession()->GetRemoteAddress();
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it...
 
@@ -225,7 +224,7 @@ public:
         }
 
         // Once we have done everything, we can insert the new log.
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_CHAR_IP_LOGGING);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_CHAR_IP_LOGGING);
 
         stmt->setUInt32(0, playerGuid);
         stmt->setUInt32(1, characterGuid);
@@ -246,18 +245,18 @@ public:
     CharacterDeleteActionIpLogger() : PlayerScript("CharacterDeleteActionIpLogger") { }
 
     // CHARACTER_DELETE = 10
-    void OnDelete(uint64 guid, uint32 accountId) override
+    void OnDelete(ObjectGuid guid, uint32 accountId) override
     {
         DeleteIPLogAction(guid, accountId, CHARACTER_DELETE);
     }
 
     // CHARACTER_FAILED_DELETE = 11
-    void OnFailedDelete(uint64 guid, uint32 accountId) override
+    void OnFailedDelete(ObjectGuid guid, uint32 accountId) override
     {
         DeleteIPLogAction(guid, accountId, CHARACTER_FAILED_DELETE);
     }
 
-    void DeleteIPLogAction(uint64 guid, uint32 playerGuid, IPLoggingTypes aType)
+    void DeleteIPLogAction(ObjectGuid guid, ObjectGuid::LowType playerGuid, IPLoggingTypes aType)
     {
         if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
             return;
@@ -266,7 +265,7 @@ public:
         // Else, this script isn't loaded in the first place: We require no config check.
 
         // We declare all the required variables
-        uint32 characterGuid = GUID_LOPART(guid); // We have no access to any member function of Player* or WorldSession*. So use old-fashioned way.
+        ObjectGuid::LowType characterGuid = guid.GetCounter(); // We have no access to any member function of Player* or WorldSession*. So use old-fashioned way.
         // Query playerGuid/accountId, as we only have characterGuid
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it later.
 
@@ -288,8 +287,7 @@ public:
         }
 
         // Once we have done everything, we can insert the new log.
-        PreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
-
+        LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
         stmt2->setUInt32(0, playerGuid);
         stmt2->setUInt32(1, characterGuid);
         stmt2->setUInt8(2, aType);
@@ -302,7 +300,6 @@ public:
         return;
     }
 };
-
 
 void AddSC_action_ip_logger()
 {

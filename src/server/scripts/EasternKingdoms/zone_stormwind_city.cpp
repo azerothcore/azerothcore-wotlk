@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -20,11 +20,11 @@ npc_marzon_silent_blade
 npc_lord_gregor_lescovar
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_bartleby
@@ -41,7 +41,7 @@ class npc_bartleby : public CreatureScript
 public:
     npc_bartleby() : CreatureScript("npc_bartleby") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_BEAT)
         {
@@ -51,7 +51,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_bartlebyAI(creature);
     }
@@ -65,13 +65,13 @@ public:
 
         uint32 m_uiNormalFaction;
 
-        void Reset()
+        void Reset() override
         {
             if (me->getFaction() != m_uiNormalFaction)
                 me->setFaction(m_uiNormalFaction);
         }
 
-        void AttackedBy(Unit* pAttacker)
+        void AttackedBy(Unit* pAttacker) override
         {
             if (me->GetVictim())
                 return;
@@ -82,7 +82,7 @@ public:
             AttackStart(pAttacker);
         }
 
-        void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
         {
             if (pDoneBy && (uiDamage >= me->GetHealth() || me->HealthBelowPctDamaged(15, uiDamage)))
             {
@@ -123,7 +123,7 @@ class npc_lord_gregor_lescovar : public CreatureScript
 public:
     npc_lord_gregor_lescovar() : CreatureScript("npc_lord_gregor_lescovar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lord_gregor_lescovarAI(creature);
     }
@@ -135,17 +135,17 @@ public:
         uint32 uiTimer;
         uint32 uiPhase;
 
-        uint64 MarzonGUID;
+        ObjectGuid MarzonGUID;
 
-        void Reset()
+        void Reset() override
         {
             uiTimer = 0;
             uiPhase = 0;
 
-            MarzonGUID = 0;
+            MarzonGUID.Clear();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DisappearAndDie();
 
@@ -156,7 +156,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (Creature* pMarzon = ObjectAccessor::GetCreature(*me, MarzonGUID))
             {
@@ -165,7 +165,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -202,7 +202,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             if (uiPhase)
             {
@@ -276,7 +276,7 @@ class npc_marzon_silent_blade : public CreatureScript
 public:
     npc_marzon_silent_blade() : CreatureScript("npc_marzon_silent_blade") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_marzon_silent_bladeAI(creature);
     }
@@ -288,12 +288,12 @@ public:
             me->SetWalk(true);
         }
 
-        void Reset()
+        void Reset() override
         {
             me->RestoreFaction();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_MARZON_2);
 
@@ -307,7 +307,7 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DisappearAndDie();
 
@@ -321,7 +321,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 uiType, uint32 /*uiId*/)
+        void MovementInform(uint32 uiType, uint32 /*uiId*/) override
         {
             if (uiType != POINT_MOTION_TYPE)
                 return;
@@ -343,7 +343,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -377,7 +377,7 @@ class npc_tyrion_spybot : public CreatureScript
 public:
     npc_tyrion_spybot() : CreatureScript("npc_tyrion_spybot") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_tyrion_spybotAI(creature);
     }
@@ -389,13 +389,13 @@ public:
         uint32 uiTimer;
         uint32 uiPhase;
 
-        void Reset()
+        void Reset() override
         {
             uiTimer = 0;
             uiPhase = 0;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -419,7 +419,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             if (uiPhase)
             {
@@ -434,7 +434,10 @@ public:
                             break;
                         case 2:
                             if (Creature* pTyrion = me->FindNearestCreature(NPC_TYRION, 10.0f))
-                                pTyrion->AI()->Talk(SAY_TYRION_1);
+                            {
+                                if (Player* player = GetPlayerForEscort())
+                                    pTyrion->AI()->Talk(SAY_TYRION_1, player);
+                            }
                             uiTimer = 3000;
                             uiPhase = 3;
                             break;
@@ -516,7 +519,7 @@ class npc_tyrion : public CreatureScript
 public:
     npc_tyrion() : CreatureScript("npc_tyrion") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_THE_ATTACK)
         {

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "karazhan.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
 
 enum Yells
@@ -80,13 +80,13 @@ public:
 
         InstanceScript* instance;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             BossAI::InitializeAI();
             InitializeGuests();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             BossAI::JustReachedHome();
             InitializeGuests();
@@ -113,13 +113,13 @@ public:
             _events2.ScheduleEvent(EVENT_GUEST_TALK, 10000);
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -135,7 +135,7 @@ public:
             DoZoneInCombat();
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -144,7 +144,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             summons.clear();
             BossAI::JustDied(killer);
@@ -153,7 +153,7 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GARROTE);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
@@ -165,10 +165,10 @@ public:
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
                     guestList.push_back(summon);
 
-            return acore::Containers::SelectRandomContainerElement(guestList);
+            return Acore::Containers::SelectRandomContainerElement(guestList);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events2.Update(diff);
             switch (_events2.ExecuteEvent())
@@ -239,9 +239,9 @@ public:
         uint8 _activeGuests;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_moroesAI>(creature);
+        return GetKarazhanAI<boss_moroesAI>(creature);
     }
 };
 
@@ -265,16 +265,15 @@ public:
                 GetCaster()->RemoveAurasDueToSpell(SPELL_VANISH);
                 GetCaster()->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), target->GetOrientation());
             }
-
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_moroes_vanish_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_moroes_vanish_SpellScript();
     }

@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `skill_fishing_base_level`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `skill_fishing_base_level` 
 (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Area identifier',
-  `skill` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Base skill level requirement',
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Area identifier',
+  `skill` SMALLINT NOT NULL DEFAULT 0 COMMENT 'Base skill level requirement',
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Fishing system';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Fishing system';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `skill_fishing_base_level` WRITE;
@@ -81,6 +81,7 @@ INSERT INTO `skill_fishing_base_level` VALUES
 (3140,330),
 (3430,-70),
 (3433,-20),
+(3479,225),
 (3483,280),
 (3518,380),
 (3519,355),

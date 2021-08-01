@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  */
 
@@ -10,10 +10,10 @@ SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellScript.h"
 #include "zulaman.h"
 
 enum Says
@@ -114,7 +114,6 @@ enum Spells
     // Koragg
     SPELL_COLD_STARE                = 43593,
     SPELL_MIGHTY_BLOW               = 43592
-
 };
 
 #define ORIENT                  1.5696f
@@ -237,7 +236,6 @@ struct boss_hexlord_addAI : public ScriptedAI
 class boss_hexlord_malacrass : public CreatureScript
 {
 public:
-
     boss_hexlord_malacrass()
         : CreatureScript("boss_hexlord_malacrass")
     {
@@ -249,16 +247,14 @@ public:
         {
             instance = creature->GetInstanceScript();
             SelectAddEntry();
-            for (uint8 i = 0; i < 4; ++i)
-                AddGUID[i] = 0;
         }
 
         InstanceScript* instance;
 
-        uint64 AddGUID[4];
+        ObjectGuid AddGUID[4];
         uint32 AddEntry[4];
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 SpiritBolts_Timer;
         uint32 DrainPower_Timer;
@@ -329,7 +325,7 @@ public:
             {
                 Unit* Temp = ObjectAccessor::GetUnit(*me, AddGUID[i]);
                 if (Temp && Temp->IsAlive())
-                    Unit::DealDamage(Temp, Temp, Temp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    Unit::DealDamage(Temp, Temp, Temp->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
         }
 
@@ -435,7 +431,7 @@ public:
                     trigger->GetMotionMaster()->MoveChase(me);
 
                     //DoCast(target, SPELL_SIPHON_SOUL, true);
-                    //me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
+                    //me->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
                     //me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_SIPHON_SOUL);
 
                     PlayerGUID = target->GetGUID();
@@ -500,14 +496,13 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_hex_lord_malacrassAI>(creature);
+        return GetZulAmanAI<boss_hex_lord_malacrassAI>(creature);
     }
 };
 
 class boss_thurg : public CreatureScript
 {
 public:
-
     boss_thurg()
         : CreatureScript("boss_thurg")
     {
@@ -515,7 +510,6 @@ public:
 
     struct boss_thurgAI : public boss_hexlord_addAI
     {
-
         boss_thurgAI(Creature* creature) : boss_hexlord_addAI(creature) { }
 
         uint32 bloodlust_timer;
@@ -559,14 +553,13 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_thurgAI>(creature);
+        return GetZulAmanAI<boss_thurgAI>(creature);
     }
 };
 
 class boss_alyson_antille : public CreatureScript
 {
 public:
-
     boss_alyson_antille()
         : CreatureScript("boss_alyson_antille")
     {
@@ -657,7 +650,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_alyson_antilleAI>(creature);
+        return GetZulAmanAI<boss_alyson_antilleAI>(creature);
     }
 };
 
@@ -707,7 +700,6 @@ struct boss_gazakrothAI : public boss_hexlord_addAI
 class boss_lord_raadan : public CreatureScript
 {
 public:
-
     boss_lord_raadan()
         : CreatureScript("boss_lord_raadan")
     {
@@ -726,7 +718,6 @@ public:
             thunderclap_timer = 13000;
 
             boss_hexlord_addAI::Reset();
-
         }
         void UpdateAI(uint32 diff) override
         {
@@ -753,14 +744,13 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_lord_raadanAI>(creature);
+        return GetZulAmanAI<boss_lord_raadanAI>(creature);
     }
 };
 
 class boss_darkheart : public CreatureScript
 {
 public:
-
     boss_darkheart()
         : CreatureScript("boss_darkheart")
     {
@@ -795,15 +785,13 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_darkheartAI>(creature);
+        return GetZulAmanAI<boss_darkheartAI>(creature);
     }
 };
-
 
 class boss_slither : public CreatureScript
 {
 public:
-
     boss_slither()
         : CreatureScript("boss_slither")
     {
@@ -855,14 +843,13 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_slitherAI>(creature);
+        return GetZulAmanAI<boss_slitherAI>(creature);
     }
 };
 
 class boss_fenstalker : public CreatureScript
 {
 public:
-
     boss_fenstalker()
         : CreatureScript("boss_fenstalker")
     {
@@ -878,7 +865,6 @@ public:
         {
             volatileinf_timer = 15000;
             boss_hexlord_addAI::Reset();
-
         }
         void UpdateAI(uint32 diff) override
         {
@@ -899,14 +885,13 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_fenstalkerAI>(creature);
+        return GetZulAmanAI<boss_fenstalkerAI>(creature);
     }
 };
 
 class boss_koragg : public CreatureScript
 {
 public:
-
     boss_koragg()
         : CreatureScript("boss_koragg")
     {
@@ -924,7 +909,6 @@ public:
             coldstare_timer = 15000;
             mightyblow_timer = 10000;
             boss_hexlord_addAI::Reset();
-
         }
         void UpdateAI(uint32 diff) override
         {
@@ -949,7 +933,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_koraggAI>(creature);
+        return GetZulAmanAI<boss_koraggAI>(creature);
     }
 };
 
@@ -964,15 +948,13 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WL_UNSTABLE_AFFL_DISPEL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WL_UNSTABLE_AFFL_DISPEL });
         }
 
         void HandleDispel(DispelInfo* dispelInfo)
         {
             if (Unit* caster = GetCaster())
-                caster->CastSpell(dispelInfo->GetDispeller(), SPELL_WL_UNSTABLE_AFFL_DISPEL, true, NULL, GetEffect(EFFECT_0));
+                caster->CastSpell(dispelInfo->GetDispeller(), SPELL_WL_UNSTABLE_AFFL_DISPEL, true, nullptr, GetEffect(EFFECT_0));
         }
 
         void Register() override
@@ -1000,4 +982,3 @@ void AddSC_boss_hex_lord_malacrass()
     new boss_alyson_antille();
     new spell_hexlord_unstable_affliction();
 }
-

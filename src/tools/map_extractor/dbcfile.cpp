@@ -7,12 +7,13 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include "dbcfile.h"
+
 #include "mpq_libmpq04.h"
+#include <utility>
 
-DBCFile::DBCFile(const std::string& filename):
-    filename(filename), recordSize(0), recordCount(0), fieldCount(0), stringSize(0), data(nullptr), stringTable(nullptr)
+DBCFile::DBCFile(std::string  filename):
+    filename(std::move(filename)), recordSize(0), recordCount(0), fieldCount(0), stringSize(0), data(nullptr), stringTable(nullptr)
 {
-
 }
 
 bool DBCFile::open()
@@ -86,4 +87,3 @@ DBCFile::Iterator DBCFile::end()
     assert(data);
     return Iterator(*this, stringTable);
 }
-

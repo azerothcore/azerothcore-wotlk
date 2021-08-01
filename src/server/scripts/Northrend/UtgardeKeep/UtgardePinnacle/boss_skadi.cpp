@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "utgarde_pinnacle.h"
-#include "Vehicle.h"
 #include "CombatAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "utgarde_pinnacle.h"
+#include "Vehicle.h"
 
 enum Misc
 {
@@ -98,9 +98,9 @@ class boss_skadi : public CreatureScript
 public:
     boss_skadi() : CreatureScript("boss_skadi") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_skadiAI (pCreature);
+        return GetUtgardePinnacleAI<boss_skadiAI>(pCreature);
     }
 
     struct boss_skadiAI : public ScriptedAI
@@ -113,14 +113,14 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
-        uint64 GraufGUID;
+        ObjectGuid GraufGUID;
         bool SecondPhase, EventStarted;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            if (Creature* cr = me->SummonCreature(NPC_GRAUF, 341.741f, -516.955f, 104.669f, 3.12414f))
+            if (Creature* cr = me->SummonCreature(NPC_GRAUF, 341.741f, -516.955f, 116.669f, 3.12414f))
             {
                 GraufGUID = cr->GetGUID();
                 summons.Summon(cr);
@@ -145,7 +145,7 @@ public:
 
         Creature* GetGrauf() { return ObjectAccessor::GetCreature(*me, GraufGUID); }
 
-        void EnterCombat(Unit*  /*pWho*/)
+        void EnterCombat(Unit*  /*pWho*/) override
         {
             if (!EventStarted)
             {
@@ -165,9 +165,8 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
-
             if (param == ACTION_PHASE2)
             {
                 SecondPhase = true;
@@ -182,7 +181,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() && SecondPhase)
                 return;
@@ -232,7 +231,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/)
+        void JustDied(Unit*  /*pKiller*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -240,11 +239,11 @@ public:
             if (m_pInstance)
             {
                 m_pInstance->SetData(DATA_SKADI_THE_RUTHLESS, DONE);
-                m_pInstance->HandleGameObject(m_pInstance->GetData64(SKADI_DOOR), true);
+                m_pInstance->HandleGameObject(m_pInstance->GetGuidData(SKADI_DOOR), true);
             }
         }
 
-        void KilledUnit(Unit*  /*pVictim*/)
+        void KilledUnit(Unit*  /*pVictim*/) override
         {
             if (urand(0, 1))
                 return;
@@ -259,9 +258,9 @@ class boss_skadi_grauf : public CreatureScript
 public:
     boss_skadi_grauf() : CreatureScript("boss_skadi_grauf") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_skadi_graufAI (pCreature);
+        return GetUtgardePinnacleAI<boss_skadi_graufAI>(pCreature);
     }
 
     struct boss_skadi_graufAI : public VehicleAI
@@ -277,7 +276,7 @@ public:
         uint8 currentPos;
         uint8 AchievementHitCount;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -286,7 +285,7 @@ public:
             me->RemoveAllAuras();
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
             {
@@ -306,11 +305,10 @@ public:
                 AchievementHitCount++;
                 if (AchievementHitCount >= 3 && m_pInstance)
                     m_pInstance->SetData(DATA_SKADI_ACHIEVEMENT, true);
-
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == 47593) // SPELL_FLAME_VISUAL trigger
                 target->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
@@ -340,7 +338,7 @@ public:
             }
         }
 
-        void MovementInform(uint32  /*uiType*/, uint32 Id)
+        void MovementInform(uint32  /*uiType*/, uint32 Id) override
         {
             switch(Id)
             {
@@ -375,7 +373,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
         }
@@ -426,7 +424,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -497,7 +495,7 @@ public:
                 uint8 count = m_pInstance->GetData(SKADI_HITS) + 1;
                 m_pInstance->SetData(SKADI_HITS, count);
 
-                if (Creature* grauf = ObjectAccessor::GetCreature(*pPlayer, m_pInstance->GetData64(DATA_GRAUF)))
+                if (Creature* grauf = ObjectAccessor::GetCreature(*pPlayer, m_pInstance->GetGuidData(DATA_GRAUF)))
                 {
                     if (count >= 3)
                     {
@@ -507,7 +505,7 @@ public:
 
                     grauf->AI()->DoAction(ACTION_MYGIRL_ACHIEVEMENT);
                 }
-                go->CastSpell((Unit*)NULL, SPELL_LAUNCH_HARPOON);
+                go->CastSpell((Unit*)nullptr, SPELL_LAUNCH_HARPOON);
             }
 
         return true;

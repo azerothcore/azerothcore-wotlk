@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "serpent_shrine.h"
 
 enum Talk
@@ -81,9 +81,9 @@ class boss_hydross_the_unstable : public CreatureScript
 public:
     boss_hydross_the_unstable() : CreatureScript("boss_hydross_the_unstable") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_hydross_the_unstableAI>(creature);
+        return GetSerpentShrineAI<boss_hydross_the_unstableAI>(creature);
     }
 
     struct boss_hydross_the_unstableAI : public BossAI
@@ -92,12 +92,12 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             BossAI::JustReachedHome();
             if (!me->HasAura(SPELL_BLUE_BEAM))
@@ -155,7 +155,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -165,7 +165,7 @@ public:
             SetForm(false, true);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -174,7 +174,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             summon->CastSpell(summon, SPELL_ELEMENTAL_SPAWNIN, true);
@@ -186,18 +186,18 @@ public:
                 summon->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             summons.Despawn(summon);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_DEATH : SAY_CLEAN_DEATH);
             BossAI::JustDied(killer);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -264,7 +264,6 @@ public:
                         me->CastSpell(target, SPELL_VILE_SLUDGE, false);
                     events.ScheduleEvent(EVENT_SPELL_VILE_SLUDGE, 15000, GROUP_ABILITIES);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
@@ -295,14 +294,14 @@ public:
                     caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_hydross_cleansing_field_aura_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_hydross_cleansing_field_aura_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hydross_cleansing_field_aura_AuraScript();
     }
@@ -325,13 +324,13 @@ public:
                 GetTarget()->CastSpell(GetTarget(), SPELL_BLUE_BEAM, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectApplyFn(spell_hydross_cleansing_field_command_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hydross_cleansing_field_command_AuraScript();
     }
@@ -351,13 +350,13 @@ public:
             GetTarget()->RemoveAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, GetCasterGUID(), GetAura());
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_hydross_mark_of_hydross_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hydross_mark_of_hydross_AuraScript();
     }

@@ -3,15 +3,15 @@
 */
 
 #include "halls_of_reflection.h"
-#include "Transport.h"
 #include "MapManager.h"
+#include "Transport.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
 public:
     UtherBatteredHiltEvent(Creature& owner, uint8 eventId) : _owner(owner), _eventId(eventId) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         switch (_eventId)
         {
@@ -27,7 +27,7 @@ public:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_HALT);
                 break;
             case 3:
-                _owner.CastSpell((Unit*)NULL, 69966, true);
+                _owner.CastSpell((Unit*)nullptr, 69966, true);
                 _owner.AI()->Talk(SAY_BATTERED_HILT_REALIZE);
                 if (InstanceScript* instance = _owner.GetInstanceScript())
                     instance->SetData(DATA_BATTERED_HILT, 4);
@@ -76,7 +76,7 @@ public:
                 _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(5000));
                 break;
             case 13:
-                _owner.CastSpell((Unit*)NULL, 73036, true);
+                _owner.CastSpell((Unit*)nullptr, 73036, true);
                 _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(3000));
                 break;
             case 14:
@@ -106,7 +106,7 @@ class instance_halls_of_reflection : public InstanceMapScript
 public:
     instance_halls_of_reflection() : InstanceMapScript("instance_halls_of_reflection", 668) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_halls_of_reflection_InstanceMapScript(pMap);
     }
@@ -117,28 +117,28 @@ public:
 
         uint32 EncounterMask;
         TeamId TeamIdInInstance;
-        uint64 NPC_FalricGUID;
-        uint64 NPC_MarwynGUID;
-        uint64 NPC_LichKingIntroGUID;
-        uint64 NPC_LeaderIntroGUID;
-        uint64 NPC_GuardGUID;
-        uint64 NPC_UtherGUID;
-        uint64 NPC_LichKingGUID;
-        uint64 NPC_LeaderGUID;
-        uint64 NPC_IceWallTargetGUID[4];
-        uint64 NPC_AltarBunnyGUID;
-        uint64 NPC_QuelDelarGUID;
-        uint64 NPC_ShipCaptainGUID;
-        uint64 GO_FrostmourneGUID;
-        uint64 GO_FrostmourneAltarGUID;
-        uint64 GO_FrontDoorGUID;
-        uint64 GO_ArthasDoorGUID;
-        uint64 GO_CaveInGUID;
-        uint64 GO_DoorBeforeThroneGUID;
-        uint64 GO_DoorAfterThroneGUID;
-        uint64 GO_IceWallGUID;
+        ObjectGuid NPC_FalricGUID;
+        ObjectGuid NPC_MarwynGUID;
+        ObjectGuid NPC_LichKingIntroGUID;
+        ObjectGuid NPC_LeaderIntroGUID;
+        ObjectGuid NPC_GuardGUID;
+        ObjectGuid NPC_UtherGUID;
+        ObjectGuid NPC_LichKingGUID;
+        ObjectGuid NPC_LeaderGUID;
+        ObjectGuid NPC_IceWallTargetGUID[4];
+        ObjectGuid NPC_AltarBunnyGUID;
+        ObjectGuid NPC_QuelDelarGUID;
+        ObjectGuid NPC_ShipCaptainGUID;
+        ObjectGuid GO_FrostmourneGUID;
+        ObjectGuid GO_FrostmourneAltarGUID;
+        ObjectGuid GO_FrontDoorGUID;
+        ObjectGuid GO_ArthasDoorGUID;
+        ObjectGuid GO_CaveInGUID;
+        ObjectGuid GO_DoorBeforeThroneGUID;
+        ObjectGuid GO_DoorAfterThroneGUID;
+        ObjectGuid GO_IceWallGUID;
 
-        uint64 NPC_TrashGUID[NUM_OF_TRASH];
+        ObjectGuid NPC_TrashGUID[NUM_OF_TRASH];
         bool TrashActive[NUM_OF_TRASH];
         uint8 TrashCounter;
         uint32 chosenComposition[8][5];
@@ -152,39 +152,17 @@ public:
         bool IsDuringLKFight;
         uint32 BatteredHiltStatus;
 
-        uint64 NPC_FrostswornGeneralGUID;
-        uint64 NPC_SpiritualReflectionGUID[5];
+        ObjectGuid NPC_FrostswornGeneralGUID;
+        ObjectGuid NPC_SpiritualReflectionGUID[5];
 
         uint32 outroTimer;
         uint8 outroStep;
         MotionTransport* T1;
 
-        void Initialize()
+        void Initialize() override
         {
             EncounterMask = 0;
             TeamIdInInstance = TEAM_NEUTRAL;
-            NPC_FalricGUID = 0;
-            NPC_MarwynGUID = 0;
-            NPC_LichKingIntroGUID = 0;
-            NPC_LeaderIntroGUID = 0;
-            NPC_GuardGUID = 0;
-            NPC_UtherGUID = 0;
-            NPC_LichKingGUID = 0;
-            NPC_LeaderGUID = 0;
-            memset(&NPC_IceWallTargetGUID, 0, sizeof(NPC_IceWallTargetGUID));
-            NPC_AltarBunnyGUID = 0;
-            NPC_QuelDelarGUID = 0;
-            NPC_ShipCaptainGUID = 0;
-            GO_FrostmourneGUID = 0;
-            GO_FrostmourneAltarGUID = 0;
-            GO_FrontDoorGUID = 0;
-            GO_ArthasDoorGUID = 0;
-            GO_CaveInGUID = 0;
-            GO_DoorBeforeThroneGUID = 0;
-            GO_DoorAfterThroneGUID = 0;
-            GO_IceWallGUID = 0;
-
-            memset(&NPC_TrashGUID, 0, sizeof(NPC_TrashGUID));
             memset(&TrashActive, 0, sizeof(TrashActive));
             TrashCounter = 0;
             memset(&chosenComposition, 0, sizeof(chosenComposition));
@@ -198,20 +176,17 @@ public:
             IsDuringLKFight = false;
             BatteredHiltStatus = 0;
 
-            NPC_FrostswornGeneralGUID = 0;
-            memset(&NPC_SpiritualReflectionGUID, 0, sizeof(NPC_SpiritualReflectionGUID));
-
             outroTimer = 0;
             outroStep = 0;
             T1 = nullptr;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             return (instance->HavePlayers() && WaveNumber)  || IsDuringLKFight; // during LK fight npcs are active and will unset this variable
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -372,13 +347,13 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch(go->GetEntry())
             {
                 case GO_FROSTMOURNE:
                     GO_FrostmourneGUID = go->GetGUID();
-                    HandleGameObject(0, false, go);
+                    HandleGameObject(ObjectGuid::Empty, false, go);
                     if (EncounterMask & (1 << DATA_INTRO))
                         go->SetPhaseMask(2, true);
                     break;
@@ -387,11 +362,11 @@ public:
                     break;
                 case GO_FRONT_DOOR:
                     GO_FrontDoorGUID = go->GetGUID();
-                    HandleGameObject(0, true, go);
+                    HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ARTHAS_DOOR:
                     GO_ArthasDoorGUID = go->GetGUID();
-                    HandleGameObject(0, (EncounterMask & (1 << DATA_MARWYN)), go);
+                    HandleGameObject(ObjectGuid::Empty, (EncounterMask & (1 << DATA_MARWYN)), go);
                     break;
                 case GO_CAVE_IN:
                     GO_CaveInGUID = go->GetGUID();
@@ -408,7 +383,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -478,8 +453,8 @@ public:
                                     {
                                         if (!c->IsAlive())
                                             c->Respawn();
-                                        c->SetDisableGravity(true);
                                         c->SetCanFly(true);
+                                        c->SetDisableGravity(true);
                                         c->SetVisible(true);
 
                                         Item* i;
@@ -501,8 +476,8 @@ public:
                                 if (c->IsVisible())
                                 {
                                     c->SetInCombatWithZone();
-                                    c->SetDisableGravity(false);
                                     c->SetCanFly(false);
+                                    c->SetDisableGravity(false);
                                     c->GetMotionMaster()->MoveJump(fg->GetPositionX(), fg->GetPositionY(), fg->GetPositionZ(), 20.0f, 10.0f);
                                 }
                     break;
@@ -573,7 +548,7 @@ public:
                     [[fallthrough]];
                 case ACTION_DELETE_ICE_WALL:
                     HandleGameObject(GO_IceWallGUID, true);
-                    GO_IceWallGUID = 0;
+                    GO_IceWallGUID.Clear();
                     break;
                 case DATA_LICH_KING:
                     if (data == DONE)
@@ -663,7 +638,7 @@ public:
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch(type)
             {
@@ -683,7 +658,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch(type)
             {
@@ -714,10 +689,10 @@ public:
                     return GO_FrontDoorGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -728,7 +703,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -755,7 +730,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             if (WaveNumber && reqKillCount)
                 if (unit->GetEntry() == NPC_WAVE_MERCENARY || unit->GetEntry() == NPC_WAVE_FOOTMAN || unit->GetEntry() == NPC_WAVE_RIFLEMAN || unit->GetEntry() == NPC_WAVE_PRIEST || unit->GetEntry() == NPC_WAVE_MAGE)
@@ -947,7 +922,7 @@ public:
             reqKillCount = 0;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (!instance->HavePlayers())
                 return;
@@ -1198,7 +1173,7 @@ public:
                             outroTimer = 0;
                             for (Map::PlayerList::const_iterator itr = instance->GetPlayers().begin(); itr != instance->GetPlayers().end(); ++itr)
                                 if (Player* p = itr->GetSource())
-                                    p->KilledMonsterCredit(NPC_WRATH_OF_THE_LICH_KING_CREDIT, 0);
+                                    p->KilledMonsterCredit(NPC_WRATH_OF_THE_LICH_KING_CREDIT);
                             if (TeamIdInInstance == TEAM_ALLIANCE)
                                 if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                                 {

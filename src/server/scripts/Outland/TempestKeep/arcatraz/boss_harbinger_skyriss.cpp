@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "arcatraz.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Says
 {
@@ -58,14 +58,14 @@ public:
         SummonList summons;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             me->SetInCombatWithZone();
@@ -79,13 +79,13 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_MANA_BURN, 25000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             summons.DespawnAll();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->SetHealth(summon->CountPctFromMaxHealth(summon->GetEntry() == NPC_HARBINGER_SKYRISS_66 ? 66 : 33));
             summons.Summon(summon);
@@ -94,13 +94,13 @@ public:
             me->SendMovementFlagUpdate();
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -161,9 +161,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_harbinger_skyrissAI(creature);
+        return GetArcatrazAI<boss_harbinger_skyrissAI>(creature);
     }
 };
 
@@ -171,4 +171,3 @@ void AddSC_boss_harbinger_skyriss()
 {
     new boss_harbinger_skyriss();
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,8 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -34,9 +34,9 @@ class boss_kri : public CreatureScript
 public:
     boss_kri() : CreatureScript("boss_kri") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kriAI>(creature);
+        return GetTempleOfAhnQirajAI<boss_kriAI>(creature);
     }
 
     struct boss_kriAI : public ScriptedAI
@@ -55,7 +55,7 @@ public:
         bool VemDead;
         bool Death;
 
-        void Reset()
+        void Reset() override
         {
             Cleave_Timer = urand(4000, 8000);
             ToxicVolley_Timer = urand(6000, 12000);
@@ -65,18 +65,18 @@ public:
             Death = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -122,7 +122,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class boss_vem : public CreatureScript
@@ -130,9 +129,9 @@ class boss_vem : public CreatureScript
 public:
     boss_vem() : CreatureScript("boss_vem") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_vemAI>(creature);
+        return GetTempleOfAhnQirajAI<boss_vemAI>(creature);
     }
 
     struct boss_vemAI : public ScriptedAI
@@ -150,7 +149,7 @@ public:
 
         bool Enraged;
 
-        void Reset()
+        void Reset() override
         {
             Charge_Timer = urand(15000, 27000);
             KnockBack_Timer = urand(8000, 20000);
@@ -159,7 +158,7 @@ public:
             Enraged = false;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetData(DATA_VEM_DEATH, 0);
             if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
@@ -167,11 +166,11 @@ public:
             instance->SetData(DATA_BUG_TRIO_DEATH, 1);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -214,7 +213,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class boss_yauj : public CreatureScript
@@ -222,9 +220,9 @@ class boss_yauj : public CreatureScript
 public:
     boss_yauj() : CreatureScript("boss_yauj") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_yaujAI>(creature);
+        return GetTempleOfAhnQirajAI<boss_yaujAI>(creature);
     }
 
     struct boss_yaujAI : public ScriptedAI
@@ -242,7 +240,7 @@ public:
 
         bool VemDead;
 
-        void Reset()
+        void Reset() override
         {
             Heal_Timer = urand(25000, 40000);
             Fear_Timer = urand(12000, 24000);
@@ -251,7 +249,7 @@ public:
             VemDead = false;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (instance->GetData(DATA_BUG_TRIO_DEATH) < 2)// Unlootable if death
                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -267,11 +265,11 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -292,11 +290,11 @@ public:
                 switch (urand(0, 2))
                 {
                     case 0:
-                        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KRI)))
+                        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_KRI)))
                             DoCast(kri, SPELL_HEAL);
                         break;
                     case 1:
-                        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VEM)))
+                        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VEM)))
                             DoCast(vem, SPELL_HEAL);
                         break;
                     case 2:
@@ -326,7 +324,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_bug_trio()

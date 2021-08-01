@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,9 +11,9 @@ SDComment: some spells doesnt work correctly
 SDCategory: Molten Core
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "molten_core.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {
@@ -60,7 +60,6 @@ enum Events
     EVENT_INTRO_4               = 11,
     EVENT_INTRO_5               = 12
 };
-
 
 class boss_ragnaros : public CreatureScript
 {
@@ -148,7 +147,7 @@ public:
                             break;
                         case EVENT_INTRO_4:
                             Talk(SAY_ARRIVAL5_RAG);
-                            if (Creature* executus = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_MAJORDOMO_EXECUTUS)))
+                            if (Creature* executus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(BOSS_MAJORDOMO_EXECUTUS)))
                                 Unit::Kill(me, executus);
                             break;
                         case EVENT_INTRO_5:
@@ -255,7 +254,6 @@ public:
                                         _hasSubmergedOnce = true;
                                         _isBanished = true;
                                         _emergeTimer = 90000;
-
                                     }
                                     else
                                     {
@@ -291,9 +289,9 @@ public:
         bool _isBanished;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ragnarosAI>(creature);
+        return GetMoltenCoreAI<boss_ragnarosAI>(creature);
     }
 };
 
@@ -323,9 +321,9 @@ public:
         InstanceScript* instance;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_son_of_flameAI>(creature);
+        return GetMoltenCoreAI<npc_son_of_flameAI>(creature);
     }
 };
 

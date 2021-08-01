@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,10 +11,10 @@ SDComment: Adds NYI
 SDCategory: Molten Core
 EndScriptData */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "molten_core.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -55,7 +55,7 @@ public:
         {
         }
 
-        void EnterCombat(Unit* victim)
+        void EnterCombat(Unit* victim) override
         {
             BossAI::EnterCombat(victim);
             events.ScheduleEvent(EVENT_DARK_STRIKE, 10000);
@@ -65,7 +65,7 @@ public:
             events.ScheduleEvent(EVENT_FLAMESPEAR, 2000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -91,7 +91,7 @@ public:
                         {
                             std::list<Creature*> healers = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
                             if (!healers.empty())
-                                DoCast(acore::Containers::SelectRandomContainerElement(healers), SPELL_INSPIRE);
+                                DoCast(Acore::Containers::SelectRandomContainerElement(healers), SPELL_INSPIRE);
 
                             DoCast(me, SPELL_INSPIRE);
                             events.ScheduleEvent(EVENT_INSPIRE, urand(20000, 26000));
@@ -115,9 +115,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_sulfuronAI(creature);
+        return GetMoltenCoreAI<boss_sulfuronAI>(creature);
     }
 };
 
@@ -132,17 +132,17 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* victim)
+        void EnterCombat(Unit* victim) override
         {
             ScriptedAI::EnterCombat(victim);
             events.ScheduleEvent(EVENT_HEAL, urand(15000, 30000));
@@ -150,7 +150,7 @@ public:
             events.ScheduleEvent(EVENT_IMMOLATE, 8000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -191,9 +191,9 @@ public:
         EventMap events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_flamewaker_priestAI(creature);
+        return GetMoltenCoreAI<npc_flamewaker_priestAI>(creature);
     }
 };
 

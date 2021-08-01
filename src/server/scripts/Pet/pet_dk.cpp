@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,14 +9,13 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_dk_".
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "CombatAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CombatAI.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
 enum DeathKnightSpells
@@ -41,10 +40,10 @@ public:
             _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
             _despawning = false;
             _initialSelection = true;
-            _targetGUID = 0;
+            _targetGUID.Clear();
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == 1)
             {
@@ -53,7 +52,7 @@ public:
             }
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             Unit* owner = me->GetOwner();
@@ -62,16 +61,20 @@ public:
 
             // Xinef: Night of the Dead avoidance
             if (Aura* aur = me->GetAura(SPELL_DK_NIGHT_OF_THE_DEAD))
-                if (Unit* owner = me->GetOwner())
-                    if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2718, 0))
-                        if (aur->GetEffect(0))
-                            aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2718, 0))
+                {
+                    if (aur->GetEffect(0))
+                    {
+                        aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                    }
+                }
 
-            float tz = me->GetMap()->GetHeight(me->GetPhaseMask(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
-            me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
-            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
+
+            float tz = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
+            me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
+            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             _selectionTimer = 2000;
             _initialCastTimer = 0;
         }
@@ -98,7 +101,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             RemoveTargetAura();
             _targetGUID = who->GetGUID();
@@ -112,7 +115,7 @@ public:
                 target->RemoveAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetGUID());
         }
 
-        void Reset()
+        void Reset() override
         {
             _selectionTimer = 0;
             me->SetReactState(REACT_PASSIVE);
@@ -147,16 +150,16 @@ public:
             _despawning = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_initialSelection)
             {
                 _initialSelection = false;
                 // Find victim of Summon Gargoyle spell
                 std::list<Unit*> targets;
-                acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50);
-                acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-                me->VisitNearbyObject(50, searcher);
+                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50);
+                Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+                Cell::VisitAllObjects(me, searcher, 50.0f);
                 for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                     if ((*iter)->GetAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID()))
                     {
@@ -198,7 +201,7 @@ public:
         }
 
     private:
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
         uint32 _despawnTimer;
         uint32 _selectionTimer;
         uint32 _initialCastTimer;
@@ -206,7 +209,7 @@ public:
         bool _initialSelection;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_dk_ebon_gargoyleAI(creature);
     }
@@ -221,14 +224,14 @@ public:
     {
         npc_pet_dk_ghoulAI(Creature* c) : CombatAI(c) { }
 
-        void JustDied(Unit* /*who*/)
+        void JustDied(Unit* /*who*/) override
         {
             if (me->IsGuardian() || me->IsSummon())
                 me->ToTempSummon()->UnSummon();
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_dk_ghoulAI (pCreature);
     }
@@ -243,7 +246,7 @@ public:
     {
         npc_pet_dk_army_of_the_deadAI(Creature* creature) : CombatAI(creature) { }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             CombatAI::InitializeAI();
             ((Minion*)me)->SetFollowAngle(rand_norm() * 2 * M_PI);
@@ -254,7 +257,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_dk_army_of_the_deadAI (creature);
     }
@@ -269,7 +272,7 @@ public:
     {
         npc_pet_dk_dancing_rune_weaponAI(Creature* creature) : NullCreatureAI(creature) { }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             // Xinef: Hit / Expertise scaling
             me->AddAura(61017, me);
@@ -280,7 +283,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_dk_dancing_rune_weaponAI (creature);
     }

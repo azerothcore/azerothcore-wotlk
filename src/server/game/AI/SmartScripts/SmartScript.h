@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -10,12 +10,10 @@
 #include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "Unit.h"
-#include "Spell.h"
 #include "GridNotifiers.h"
-
 #include "SmartScriptMgr.h"
-//#include "SmartAI.h"
+#include "Spell.h"
+#include "Unit.h"
 
 class SmartScript
 {
@@ -27,14 +25,14 @@ public:
     void GetScript();
     void FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at);
 
-    void ProcessEventsFor(SMART_EVENT e, Unit* unit = NULL, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = NULL, GameObject* gob = nullptr);
-    void ProcessEvent(SmartScriptHolder& e, Unit* unit = NULL, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = NULL, GameObject* gob = nullptr);
+    void ProcessEventsFor(SMART_EVENT e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
+    void ProcessEvent(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
     bool CheckTimer(SmartScriptHolder const& e) const;
     void RecalcTimer(SmartScriptHolder& e, uint32 min, uint32 max);
     void UpdateTimer(SmartScriptHolder& e, uint32 const diff);
     void InitTimer(SmartScriptHolder& e);
-    void ProcessAction(SmartScriptHolder& e, Unit* unit = NULL, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = NULL, GameObject* gob = nullptr);
-    void ProcessTimedAction(SmartScriptHolder& e, uint32 const& min, uint32 const& max, Unit* unit = NULL, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = NULL, GameObject* gob = nullptr);
+    void ProcessAction(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
+    void ProcessTimedAction(SmartScriptHolder& e, uint32 const& min, uint32 const& max, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
     ObjectList* GetTargets(SmartScriptHolder const& e, Unit* invoker = nullptr);
     ObjectList* GetWorldObjectsInDist(float dist);
     void InstallTemplate(SmartScriptHolder const& e);
@@ -107,7 +105,7 @@ public:
             smart = false;
 
         if (!smart)
-            sLog->outErrorDb("SmartScript: Action target Creature(entry: %u) is not using SmartAI, action skipped to prevent crash.", c ? c->GetEntry() : (me ? me->GetEntry() : 0));
+            LOG_ERROR("sql.sql", "SmartScript: Action target Creature(entry: %u) is not using SmartAI, action skipped to prevent crash.", c ? c->GetEntry() : (me ? me->GetEntry() : 0));
 
         return smart;
     }
@@ -121,7 +119,7 @@ public:
         if (!go || go->GetAIName() != "SmartGameObjectAI")
             smart = false;
         if (!smart)
-            sLog->outErrorDb("SmartScript: Action target GameObject(entry: %u) is not using SmartGameObjectAI, action skipped to prevent crash.", g ? g->GetEntry() : (go ? go->GetEntry() : 0));
+            LOG_ERROR("sql.sql", "SmartScript: Action target GameObject(entry: %u) is not using SmartGameObjectAI, action skipped to prevent crash.", g ? g->GetEntry() : (go ? go->GetEntry() : 0));
 
         return smart;
     }
@@ -147,7 +145,7 @@ public:
         else
             mCounterList.insert(std::make_pair(id, value));
 
-        ProcessEventsFor(SMART_EVENT_COUNTER_SET, NULL, id);
+        ProcessEventsFor(SMART_EVENT_COUNTER_SET, nullptr, id);
     }
 
     uint32 GetCounterValue(uint32 id)
@@ -158,35 +156,27 @@ public:
         return 0;
     }
 
-    GameObject* FindGameObjectNear(WorldObject* searchObject, uint32 guid) const
+    GameObject* FindGameObjectNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
     {
-        GameObject* gameObject = nullptr;
+        auto bounds = searchObject->GetMap()->GetGameObjectBySpawnIdStore().equal_range(guid);
+        if (bounds.first == bounds.second)
+            return nullptr;
 
-        CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
-        Cell cell(p);
-
-        acore::GameObjectWithDbGUIDCheck goCheck(guid);
-        acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck> checker(searchObject, gameObject, goCheck);
-
-        TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
-        cell.Visit(p, objectChecker, *searchObject->GetMap(), *searchObject, searchObject->GetVisibilityRange());
-
-        return gameObject;
+        return bounds.first->second;
     }
 
-    Creature* FindCreatureNear(WorldObject* searchObject, uint32 guid) const
+    Creature* FindCreatureNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
     {
-        Creature* creature = nullptr;
-        CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
-        Cell cell(p);
+        auto bounds = searchObject->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
+        if (bounds.first == bounds.second)
+            return nullptr;
 
-        acore::CreatureWithDbGUIDCheck target_check(guid);
-        acore::CreatureSearcher<acore::CreatureWithDbGUIDCheck> checker(searchObject, creature, target_check);
+        auto creatureItr = std::find_if(bounds.first, bounds.second, [](Map::CreatureBySpawnIdContainer::value_type const& pair)
+        {
+            return pair.second->IsAlive();
+        });
 
-        TypeContainerVisitor<acore::CreatureSearcher <acore::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);
-        cell.Visit(p, unit_checker, *searchObject->GetMap(), *searchObject, searchObject->GetVisibilityRange());
-
-        return creature;
+        return creatureItr != bounds.second ? creatureItr->second : bounds.first->second;
     }
 
     ObjectListMap* mTargetStorage;
@@ -194,30 +184,39 @@ public:
     void OnReset();
     void ResetBaseObject()
     {
-        if (meOrigGUID)
+        WorldObject* lookupRoot = me;
+        if (!lookupRoot)
+            lookupRoot = go;
+
+        if (lookupRoot)
         {
-            if (Creature* m = HashMapHolder<Creature>::Find(meOrigGUID))
+            if (meOrigGUID)
             {
-                me = m;
-                go = nullptr;
+                if (Creature* m = ObjectAccessor::GetCreature(*lookupRoot, meOrigGUID))
+                {
+                    me = m;
+                    go = nullptr;
+                }
+            }
+
+            if (goOrigGUID)
+            {
+                if (GameObject* o = ObjectAccessor::GetGameObject(*lookupRoot, goOrigGUID))
+                {
+                    me = nullptr;
+                    go = o;
+                }
             }
         }
-        if (goOrigGUID)
-        {
-            if (GameObject* o = HashMapHolder<GameObject>::Find(goOrigGUID))
-            {
-                me = nullptr;
-                go = o;
-            }
-        }
-        goOrigGUID = 0;
-        meOrigGUID = 0;
+
+        goOrigGUID.Clear();
+        meOrigGUID.Clear();
     }
 
     //TIMED_ACTIONLIST (script type 9 aka script9)
     void SetScript9(SmartScriptHolder& e, uint32 entry);
     Unit* GetLastInvoker(Unit* invoker = nullptr);
-    uint64 mLastInvoker;
+    ObjectGuid mLastInvoker;
     typedef std::unordered_map<uint32, uint32> CounterMap;
     CounterMap mCounterList;
 
@@ -264,9 +263,9 @@ private:
     SmartAIEventList mTimedActionList;
     bool isProcessingTimedActionList;
     Creature* me;
-    uint64 meOrigGUID;
+    ObjectGuid meOrigGUID;
     GameObject* go;
-    uint64 goOrigGUID;
+    ObjectGuid goOrigGUID;
     AreaTrigger const* trigger;
     SmartScriptType mScriptType;
     uint32 mEventPhase;
@@ -307,7 +306,6 @@ private:
                     mStoredEvents.erase(i);
                     return;
                 }
-
             }
         }
     }
@@ -321,7 +319,6 @@ private:
                 {
                     return (*i);
                 }
-
             }
         }
         SmartScriptHolder s;

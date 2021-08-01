@@ -1,41 +1,35 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "DatabaseEnv.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Opcodes.h"
-#include "Log.h"
 #include "ObjectMgr.h"
+#include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "UpdateMask.h"
 #include "WaypointMovementGenerator.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 void WorldSession::HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TAXINODE_STATUS_QUERY");
-#endif
+    LOG_DEBUG("network", "WORLD: Received CMSG_TAXINODE_STATUS_QUERY");
 
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
     SendTaxiStatus(guid);
 }
 
-void WorldSession::SendTaxiStatus(uint64 guid)
+void WorldSession::SendTaxiStatus(ObjectGuid guid)
 {
     // cheating checks
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
     if (!unit)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WorldSession::SendTaxiStatus - Unit (GUID: %u) not found.", uint32(GUID_LOPART(guid)));
-#endif
+        LOG_DEBUG("network", "WorldSession::SendTaxiStatus - Unit (%s) not found.", guid.ToString().c_str());
         return;
     }
 
@@ -45,35 +39,27 @@ void WorldSession::SendTaxiStatus(uint64 guid)
     if (curloc == 0)
         return;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: current location %u ", curloc);
-#endif
+    LOG_DEBUG("network", "WORLD: current location %u ", curloc);
 
     WorldPacket data(SMSG_TAXINODE_STATUS, 9);
     data << guid;
     data << uint8(GetPlayer()->m_taxi.IsTaximaskNodeKnown(curloc) ? 1 : 0);
     SendPacket(&data);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_TAXINODE_STATUS");
-#endif
+    LOG_DEBUG("network", "WORLD: Sent SMSG_TAXINODE_STATUS");
 }
 
 void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TAXIQUERYAVAILABLENODES");
-#endif
+    LOG_DEBUG("network", "WORLD: Received CMSG_TAXIQUERYAVAILABLENODES");
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // cheating checks
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!unit)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTaxiQueryAvailableNodes - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
-#endif
+        LOG_DEBUG("network", "WORLD: HandleTaxiQueryAvailableNodes - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
         return;
     }
 
@@ -100,20 +86,16 @@ void WorldSession::SendTaxiMenu(Creature* unit)
     bool lastTaxiCheaterState = GetPlayer()->isTaxiCheater();
     if (unit->GetEntry() == 29480) GetPlayer()->SetTaxiCheater(true); // Grimwing in Ebon Hold, special case. NOTE: Not perfect, Zul'Aman should not be included according to WoWhead, and I think taxicheat includes it.
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_TAXINODE_STATUS_QUERY %u ", curloc);
-#endif
+    LOG_DEBUG("network", "WORLD: CMSG_TAXINODE_STATUS_QUERY %u ", curloc);
 
     WorldPacket data(SMSG_SHOWTAXINODES, (4 + 8 + 4 + 8 * 4));
     data << uint32(1);
-    data << uint64(unit->GetGUID());
+    data << unit->GetGUID();
     data << uint32(curloc);
     GetPlayer()->m_taxi.AppendTaximaskTo(data, GetPlayer()->isTaxiCheater());
     SendPacket(&data);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_SHOWTAXINODES");
-#endif
+    LOG_DEBUG("network", "WORLD: Sent SMSG_SHOWTAXINODES");
 
     GetPlayer()->SetTaxiCheater(lastTaxiCheaterState);
 }
@@ -131,6 +113,8 @@ void WorldSession::SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathN
         GetPlayer()->Mount(mountDisplayId);
 
     GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path, pathNode);
+
+    sScriptMgr->AnticheatSetSkipOnePacketForASH(GetPlayer(), true);
 }
 
 bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
@@ -147,7 +131,7 @@ bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
         SendPacket(&msg);
 
         WorldPacket update(SMSG_TAXINODE_STATUS, 9);
-        update << uint64(unit->GetGUID());
+        update << unit->GetGUID();
         update << uint8(1);
         SendPacket(&update);
 
@@ -168,11 +152,9 @@ void WorldSession::SendDiscoverNewTaxiNode(uint32 nodeid)
 
 void WorldSession::HandleActivateTaxiExpressOpcode (WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ACTIVATETAXIEXPRESS");
-#endif
+    LOG_DEBUG("network", "WORLD: Received CMSG_ACTIVATETAXIEXPRESS");
 
-    uint64 guid;
+    ObjectGuid guid;
     uint32 node_count;
 
     recvData >> guid >> node_count;
@@ -180,9 +162,7 @@ void WorldSession::HandleActivateTaxiExpressOpcode (WorldPacket& recvData)
     Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleActivateTaxiExpressOpcode - Unit (GUID: %u) not found or you can't interact with it.", uint32(GUID_LOPART(guid)));
-#endif
+        LOG_DEBUG("network", "WORLD: HandleActivateTaxiExpressOpcode - Unit (%s) not found or you can't interact with it.", guid.ToString().c_str());
         return;
     }
     std::vector<uint32> nodes;
@@ -205,21 +185,17 @@ void WorldSession::HandleActivateTaxiExpressOpcode (WorldPacket& recvData)
     if (nodes.empty())
         return;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ACTIVATETAXIEXPRESS from %d to %d", nodes.front(), nodes.back());
-#endif
+    LOG_DEBUG("network", "WORLD: Received CMSG_ACTIVATETAXIEXPRESS from %d to %d", nodes.front(), nodes.back());
 
     GetPlayer()->ActivateTaxiPathTo(nodes, npc, 0);
 }
 
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_MOVE_SPLINE_DONE");
-#endif
+    LOG_DEBUG("network", "WORLD: Received CMSG_MOVE_SPLINE_DONE");
 
-    uint64 guid; // used only for proper packet read
-    recvData.readPackGUID(guid);
+    ObjectGuid guid; // used only for proper packet read
+    recvData >> guid.ReadAsPacked();
 
     MovementInfo movementInfo;                              // used only for proper packet read
     movementInfo.guid = guid;
@@ -230,24 +206,18 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ACTIVATETAXI");
-#endif
+    LOG_DEBUG("network", "WORLD: Received CMSG_ACTIVATETAXI");
 
-    uint64 guid;
+    ObjectGuid guid;
     std::vector<uint32> nodes;
     nodes.resize(2);
 
     recvData >> guid >> nodes[0] >> nodes[1];
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ACTIVATETAXI from %d to %d", nodes[0], nodes[1]);
-#endif
+    LOG_DEBUG("network", "WORLD: Received CMSG_ACTIVATETAXI from %d to %d", nodes[0], nodes[1]);
     Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleActivateTaxiOpcode - Unit (GUID: %u) not found or you can't interact with it.", uint32(GUID_LOPART(guid)));
-#endif
+        LOG_DEBUG("network", "WORLD: HandleActivateTaxiOpcode - Unit (%s) not found or you can't interact with it.", guid.ToString().c_str());
         return;
     }
 
@@ -269,7 +239,5 @@ void WorldSession::SendActivateTaxiReply(ActivateTaxiReply reply)
     data << uint32(reply);
     SendPacket(&data);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_ACTIVATETAXIREPLY");
-#endif
+    LOG_DEBUG("network", "WORLD: Sent SMSG_ACTIVATETAXIREPLY");
 }

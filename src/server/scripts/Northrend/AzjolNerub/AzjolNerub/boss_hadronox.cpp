@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "azjol_nerub.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -72,14 +72,14 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             summons.DoAction(ACTION_DESPAWN_ADDS);
             BossAI::Reset();
             me->SummonCreature(NPC_ANUB_AR_CRUSHER, 542.9f, 519.5f, 741.24f, 2.14f);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
             {
@@ -92,14 +92,14 @@ public:
             }
         }
 
-        uint32 GetData(uint32 data) const
+        uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
                 return !me->isActiveObject() || events.GetNextEventTime(EVENT_HADRONOX_MOVE4) != 0;
             return 0;
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
 
@@ -112,7 +112,7 @@ public:
                 summon->GetMotionMaster()->MovePath(3000014, false);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (!me->IsAlive() || !victim->HasAura(SPELL_LEECH_POISON))
                 return;
@@ -120,12 +120,12 @@ public:
             me->ModifyHealth(int32(me->CountPctFromMaxHealth(10)));
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.RescheduleEvent(EVENT_HADRONOX_ACID, 10000);
             events.RescheduleEvent(EVENT_HADRONOX_LEECH, 4000);
@@ -143,7 +143,7 @@ public:
             return false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -178,24 +178,23 @@ public:
                 case EVENT_HADRONOX_MOVE2:
                 case EVENT_HADRONOX_MOVE3:
                     Talk(SAY_HADRONOX_EMOTE);
-                    me->GetMotionMaster()->MoveCharge(hadronoxSteps[eventId - 1].GetPositionX(), hadronoxSteps[eventId - 1].GetPositionY(), hadronoxSteps[eventId - 1].GetPositionZ(), 10.0f, 0, NULL, true);
+                    me->GetMotionMaster()->MoveCharge(hadronoxSteps[eventId - 1].GetPositionX(), hadronoxSteps[eventId - 1].GetPositionY(), hadronoxSteps[eventId - 1].GetPositionZ(), 10.0f, 0, nullptr, true);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
             EnterEvadeIfOutOfCombatArea();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->isActiveObject() && !AnyPlayerValid();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_hadronoxAI(creature);
+        return GetAzjolNerubAI<boss_hadronoxAI>(creature);
     }
 };
 
@@ -211,7 +210,7 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             summons.DespawnAll();
             events.Reset();
@@ -225,7 +224,7 @@ public:
                     }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if(summon->GetEntry() != me->GetEntry())
             {
@@ -235,7 +234,7 @@ public:
             summons.Summon(summon);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_DESPAWN_ADDS)
             {
@@ -244,7 +243,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             if (me->ToTempSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
@@ -260,7 +259,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -290,9 +289,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_anub_ar_crusherAI(creature);
+        return GetAzjolNerubAI<npc_anub_ar_crusherAI>(creature);
     }
 };
 
@@ -326,7 +325,7 @@ public:
             GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(_delay);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_hadronox_summon_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectApply += AuraEffectApplyFn(spell_hadronox_summon_periodic_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -337,7 +336,7 @@ public:
         uint32 _spellEntry;
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hadronox_summon_periodic_AuraScript(_delay, _spellEntry);
     }
@@ -363,13 +362,13 @@ public:
                     caster->CastSpell(caster, SPELL_LEECH_POISON_HEAL, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_hadronox_leech_poison_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_LEECH, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hadronox_leech_poison_AuraScript();
     }
@@ -382,7 +381,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* /*player*/, Unit* target)
+    bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;

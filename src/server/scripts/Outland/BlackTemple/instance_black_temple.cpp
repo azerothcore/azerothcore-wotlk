@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
 #include "black_temple.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
 
 DoorData const doorData[] =
 {
@@ -39,21 +39,10 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
 
-            ShadeOfAkamaGUID            = 0;
-            AkamaShadeGUID              = 0;
-            TeronGorefiendGUID          = 0;
-            ReliquaryGUID               = 0;
             ashtongueGUIDs.clear();
-            GathiosTheShattererGUID     = 0;
-            HighNethermancerZerevorGUID = 0;
-            LadyMalandeGUID             = 0;
-            VerasDarkshadowGUID         = 0;
-            IllidariCouncilGUID         = 0;
-            AkamaGUID                   = 0;
-            IllidanStormrageGUID        = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -120,7 +109,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -142,7 +131,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -164,7 +153,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -188,18 +177,18 @@ public:
                     return IllidanStormrageGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
 
             if (type == DATA_SHADE_OF_AKAMA && state == DONE)
             {
-                for (std::list<uint64>::const_iterator itr = ashtongueGUIDs.begin(); itr != ashtongueGUIDs.end(); ++itr)
-                    if (Creature* ashtongue = instance->GetCreature(*itr))
+                for (ObjectGuid const& guid : ashtongueGUIDs)
+                    if (Creature* ashtongue = instance->GetCreature(guid))
                         ashtongue->setFaction(FACTION_ASHTONGUE);
             }
             else if (type == DATA_ILLIDARI_COUNCIL && state == DONE)
@@ -211,7 +200,7 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -222,7 +211,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -255,21 +244,21 @@ public:
         }
 
     protected:
-        uint64 ShadeOfAkamaGUID;
-        uint64 AkamaShadeGUID;
-        uint64 TeronGorefiendGUID;
-        uint64 ReliquaryGUID;
-        std::list<uint64> ashtongueGUIDs;
-        uint64 GathiosTheShattererGUID;
-        uint64 HighNethermancerZerevorGUID;
-        uint64 LadyMalandeGUID;
-        uint64 VerasDarkshadowGUID;
-        uint64 IllidariCouncilGUID;
-        uint64 AkamaGUID;
-        uint64 IllidanStormrageGUID;
+        ObjectGuid ShadeOfAkamaGUID;
+        ObjectGuid AkamaShadeGUID;
+        ObjectGuid TeronGorefiendGUID;
+        ObjectGuid ReliquaryGUID;
+        GuidList ashtongueGUIDs;
+        ObjectGuid GathiosTheShattererGUID;
+        ObjectGuid HighNethermancerZerevorGUID;
+        ObjectGuid LadyMalandeGUID;
+        ObjectGuid VerasDarkshadowGUID;
+        ObjectGuid IllidariCouncilGUID;
+        ObjectGuid AkamaGUID;
+        ObjectGuid IllidanStormrageGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_black_temple_InstanceMapScript(map);
     }
@@ -284,7 +273,7 @@ public:
     {
         PrepareAuraScript(spell_black_template_harpooners_mark_AuraScript)
 
-        bool Load()
+        bool Load() override
         {
             _turtleSet.clear();
             return true;
@@ -304,25 +293,25 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (std::set<uint64>::const_iterator itr = _turtleSet.begin(); itr != _turtleSet.end(); ++itr)
-                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
+            for (ObjectGuid const& guid : _turtleSet)
+                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
                     turtle->TauntFadeOut(GetUnitOwner());
                     turtle->AddThreat(GetUnitOwner(), -10000000.0f);
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_black_template_harpooners_mark_AuraScript::HandleEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_black_template_harpooners_mark_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
 
     private:
-        std::set<uint64> _turtleSet;
+        GuidSet _turtleSet;
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_template_harpooners_mark_AuraScript();
     }
@@ -352,13 +341,13 @@ public:
             target->RemoveAurasDueToSpell(SPELL_AURA_MOD_FEAR);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_black_template_free_friend_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_black_template_free_friend_SpellScript();
     }
@@ -386,14 +375,14 @@ public:
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_CHEST_PAINS, true);
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_black_temple_curse_of_the_bleakheart_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_the_bleakheart_AuraScript::Update, EFFECT_0, SPELL_AURA_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_temple_curse_of_the_bleakheart_AuraScript();
     }
@@ -414,13 +403,13 @@ public:
                 GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_2].CalcValue(), true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_skeleton_shot_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_temple_skeleton_shot_AuraScript();
     }
@@ -441,13 +430,13 @@ public:
                 caster->CastSpell(GetTarget(), SPELL_WYVERN_STING, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_wyvern_sting_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_temple_wyvern_sting_AuraScript();
     }
@@ -465,17 +454,17 @@ public:
         void Update(AuraEffect const* effect)
         {
             PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)NULL, 50.0f))
+            if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)nullptr, 50.0f))
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_charge_rage_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_temple_charge_rage_AuraScript();
     }
@@ -497,13 +486,13 @@ public:
             GetAura()->GetEffect(effect->GetEffIndex())->SetAmount(effect->GetAmount() + 500);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_shadow_inferno_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_temple_shadow_inferno_AuraScript();
     }
@@ -540,7 +529,7 @@ public:
             GetUnitOwner()->RemoveAurasDueToSpell(SPELL_CHAOTIC_CHARGE);
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_black_temple_spell_absorption_AuraScript::CalculateAmount, EFFECT_2, SPELL_AURA_SCHOOL_ABSORB);
             OnEffectAbsorb += AuraEffectAbsorbFn(spell_black_temple_spell_absorption_AuraScript::Absorb, EFFECT_2);
@@ -548,7 +537,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_temple_spell_absorption_AuraScript();
     }
@@ -570,13 +559,13 @@ public:
                 GetCaster()->CastSpell(target, GetEffectValue(), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_black_temple_bloodbolt_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_black_temple_bloodbolt_SpellScript();
     }
@@ -597,13 +586,13 @@ public:
             GetTarget()->CastCustomSpell(GetSpellInfo()->Effects[EFFECT_1].CalcValue(), SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage(), GetTarget(), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectProc += AuraEffectProcFn(spell_black_temple_consuming_strikes_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_temple_consuming_strikes_AuraScript();
     }
@@ -624,13 +613,13 @@ public:
                 SetDuration(0);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_vitality_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_temple_curse_of_vitality_AuraScript();
     }
@@ -653,13 +642,13 @@ public:
                 GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA2, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_dementia_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_temple_dementia_AuraScript();
     }

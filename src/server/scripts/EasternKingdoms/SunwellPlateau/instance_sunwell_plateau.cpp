@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "sunwell_plateau.h"
 
 DoorData const doorData[] =
@@ -29,25 +29,9 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-
-            KalecgosDragonGUID          = 0;
-            SathrovarrGUID              = 0;
-            BrutallusGUID               = 0;
-            MadrigosaGUID               = 0;
-            FelmystGUID                 = 0;
-            AlythessGUID                = 0;
-            SacrolashGUID               = 0;
-            MuruGUID                    = 0;
-            KilJaedenGUID               = 0;
-            KilJaedenControllerGUID     = 0;
-            AnveenaGUID                 = 0;
-            KalecgosKjGUID              = 0;
-
-            IceBarrierGUID              = 0;
-            memset(&blueFlightOrbGUID, 0, sizeof(blueFlightOrbGUID));
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             instance->LoadGrid(1477.94f, 643.22f);
             instance->LoadGrid(1641.45f, 988.08f);
@@ -64,7 +48,7 @@ public:
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
                     Player* player = itr->GetSource();
-                    if (player && !player->HasAura(45839, 0))
+                    if (player && !player->HasAura(45839))
                         return player;
                 }
             }
@@ -74,9 +58,9 @@ public:
             return nullptr;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
-            if (creature->GetDBTableGUIDLow() > 0 || !IS_PLAYER_GUID(creature->GetOwnerGUID()))
+            if (creature->GetSpawnId() > 0 || !creature->GetOwnerGUID().IsPlayer())
                 creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
 
             switch (creature->GetEntry())
@@ -146,7 +130,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -179,7 +163,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -196,7 +180,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const
+        ObjectGuid GetGuidData(uint32 id) const override
         {
             switch (id)
             {
@@ -232,10 +216,11 @@ public:
                 case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4:
                     return blueFlightOrbGUID[id - DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1];
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -246,7 +231,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -279,24 +264,24 @@ public:
         }
 
     protected:
-        uint64 KalecgosDragonGUID;
-        uint64 SathrovarrGUID;
-        uint64 BrutallusGUID;
-        uint64 MadrigosaGUID;
-        uint64 FelmystGUID;
-        uint64 AlythessGUID;
-        uint64 SacrolashGUID;
-        uint64 MuruGUID;
-        uint64 KilJaedenGUID;
-        uint64 KilJaedenControllerGUID;
-        uint64 AnveenaGUID;
-        uint64 KalecgosKjGUID;
+        ObjectGuid KalecgosDragonGUID;
+        ObjectGuid SathrovarrGUID;
+        ObjectGuid BrutallusGUID;
+        ObjectGuid MadrigosaGUID;
+        ObjectGuid FelmystGUID;
+        ObjectGuid AlythessGUID;
+        ObjectGuid SacrolashGUID;
+        ObjectGuid MuruGUID;
+        ObjectGuid KilJaedenGUID;
+        ObjectGuid KilJaedenControllerGUID;
+        ObjectGuid AnveenaGUID;
+        ObjectGuid KalecgosKjGUID;
 
-        uint64 IceBarrierGUID;
-        uint64 blueFlightOrbGUID[4];
+        ObjectGuid IceBarrierGUID;
+        ObjectGuid blueFlightOrbGUID[4];
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_sunwell_plateau_InstanceMapScript(map);
     }
@@ -330,13 +315,13 @@ public:
                     GetCaster()->CastSpell(target, RAND(SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH), true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterCast += SpellCastFn(spell_cataclysm_breath_SpellScript::HandleAfterCast);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_cataclysm_breath_SpellScript();
     }

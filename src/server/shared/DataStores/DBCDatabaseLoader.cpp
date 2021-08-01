@@ -1,16 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2020 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "DBCDatabaseLoader.h"
-#include "Common.h"
 #include "DatabaseEnv.h"
+#include "DBCDatabaseLoader.h"
 #include "Errors.h"
-#include "Log.h"
 #include "StringFormat.h"
-#include <sstream>
 
 DBCDatabaseLoader::DBCDatabaseLoader(char const* tableName, char const* dbcFormatString, std::vector<char*>& stringPool)
     : _sqlTableName(tableName),
@@ -28,7 +25,7 @@ DBCDatabaseLoader::DBCDatabaseLoader(char const* tableName, char const* dbcForma
 
 char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 {
-    std::string query = acore::StringFormat("SELECT * FROM `%s` ORDER BY `ID` DESC", _sqlTableName);
+    std::string query = Acore::StringFormat("SELECT * FROM `%s` ORDER BY `ID` DESC", _sqlTableName);
 
     // no error if empty set
     QueryResult result = WorldDatabase.Query(query.c_str());

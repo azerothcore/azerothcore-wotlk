@@ -1,12 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "blackrock_depths.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include <vector>
 
 enum Spells
 {
@@ -38,16 +39,16 @@ const Position SummonPositions[7] =
     {1012.252747f, -206.696487f, -61.980618f, 3.617599f},
 };
 
-vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 };
+std::vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 };
 
 class boss_ambassador_flamelash : public CreatureScript
 {
 public:
     boss_ambassador_flamelash() : CreatureScript("boss_ambassador_flamelash") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ambassador_flamelashAI>(creature);
+        return GetBlackrockDepthsAI<boss_ambassador_flamelashAI>(creature);
     }
 
     struct boss_ambassador_flamelashAI : public BossAI
@@ -60,7 +61,7 @@ public:
         SummonList summons;
 
         // This will allow to find a valid position to spawn them
-        vector<int> validPosition;
+        std::vector<int> validPosition;
         bool foundValidPosition = false;
 
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
@@ -206,9 +207,9 @@ class npc_burning_spirit : public CreatureScript
 public:
     npc_burning_spirit() : CreatureScript("npc_burning_spirit") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_burning_spiritAI>(creature);
+        return GetBlackrockDepthsAI<npc_burning_spiritAI>(creature);
     }
 
     struct npc_burning_spiritAI : public CreatureAI

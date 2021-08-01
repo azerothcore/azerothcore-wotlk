@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_botanica.h"
 
 enum Spells
@@ -45,14 +45,13 @@ enum Misc
 class boss_laj : public CreatureScript
 {
 public:
-
     boss_laj() : CreatureScript("boss_laj") { }
 
     struct boss_lajAI : public BossAI
     {
         boss_lajAI(Creature* creature) : BossAI(creature, DATA_LAJ) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             me->SetDisplayId(MODEL_DEFAULT);
@@ -86,7 +85,7 @@ public:
             me->CastSpell(me, _lastTransform, true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
 
@@ -95,7 +94,7 @@ public:
             events.ScheduleEvent(EVENT_TELEPORT, 20000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -132,9 +131,9 @@ public:
         uint32 _lastTransform;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_lajAI(creature);
+        return GetTheBotanicaAI<boss_lajAI>(creature);
     }
 };
 
@@ -142,4 +141,3 @@ void AddSC_boss_laj()
 {
     new boss_laj();
 }
-

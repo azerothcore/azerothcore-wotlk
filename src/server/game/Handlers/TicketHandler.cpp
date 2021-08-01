@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "zlib.h"
-#include "Common.h"
+#include "Chat.h"
 #include "Language.h"
-#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "TicketMgr.h"
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "Chat.h"
 #include "WorldSession.h"
+#include "zlib.h"
 
 void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
 {
@@ -33,7 +31,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
     GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID());
 
     if (ticket && ticket->IsCompleted())
-        sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());;
+        sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
 
     // Player must not have ticket
     if (!ticket || ticket->IsClosed())
@@ -79,7 +77,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
             }
             else
             {
-                sLog->outError("CMSG_GMTICKET_CREATE possibly corrupt. Uncompression failed.");
+                LOG_ERROR("network.opcode", "CMSG_GMTICKET_CREATE possibly corrupt. Uncompression failed.");
                 recvData.rfinish();
                 return;
             }
@@ -116,7 +114,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
     GMTicketResponse response = GMTICKET_RESPONSE_UPDATE_ERROR;
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
-        SQLTransaction trans = SQLTransaction(nullptr);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetMessage(message);
         ticket->SaveToDB(trans);
 
@@ -177,7 +175,7 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
     recv_data >> mainSurvey;
 
     std::unordered_set<uint32> surveyIds;
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     // sub_survey1, r1, comment1, sub_survey2, r2, comment2, sub_survey3, r3, comment3, sub_survey4, r4, comment4, sub_survey5, r5, comment5, sub_survey6, r6, comment6, sub_survey7, r7, comment7, sub_survey8, r8, comment8, sub_survey9, r9, comment9, sub_survey10, r10, comment10,
     for (uint8 i = 0; i < 10; i++)
     {
@@ -195,7 +193,7 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
         if (!surveyIds.insert(subSurveyId).second)
             continue;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SUBSURVEY);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SUBSURVEY);
         stmt->setUInt32(0, nextSurveyID);
         stmt->setUInt32(1, subSurveyId);
         stmt->setUInt32(2, rank);
@@ -206,8 +204,8 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
     std::string comment; // just a guess
     recv_data >> comment;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SURVEY);
-    stmt->setUInt32(0, GUID_LOPART(GetPlayer()->GetGUID()));
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GM_SURVEY);
+    stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
     stmt->setUInt32(1, nextSurveyID);
     stmt->setUInt32(2, mainSurvey);
     stmt->setString(3, comment);
@@ -229,8 +227,8 @@ void WorldSession::HandleReportLag(WorldPacket& recv_data)
     recv_data >> y;
     recv_data >> z;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_LAG_REPORT);
-    stmt->setUInt32(0, GUID_LOPART(GetPlayer()->GetGUID()));
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_LAG_REPORT);
+    stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
     stmt->setUInt8 (1, lagType);
     stmt->setUInt16(2, mapId);
     stmt->setFloat (3, x);

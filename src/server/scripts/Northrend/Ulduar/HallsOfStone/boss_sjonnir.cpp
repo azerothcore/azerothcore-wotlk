@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_stone.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -96,9 +96,9 @@ class boss_sjonnir : public CreatureScript
 public:
     boss_sjonnir() : CreatureScript("boss_sjonnir") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sjonnirAI (pCreature);
+        return GetHallsOfStoneAI<boss_sjonnirAI>(pCreature);
     }
 
     struct boss_sjonnirAI : public ScriptedAI
@@ -115,7 +115,7 @@ public:
         uint8 SummonPhase;
         uint8 SlugeCount;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -132,13 +132,13 @@ public:
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetData64(GO_SJONNIR_DOOR)))
+                    if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_SJONNIR_DOOR)))
                         doors->SetGoState(GO_STATE_ACTIVE);
 
-                    if (GameObject* console = me->GetMap()->GetGameObject( pInstance->GetData64(GO_SJONNIR_CONSOLE)))
+                    if (GameObject* console = me->GetMap()->GetGameObject( pInstance->GetGuidData(GO_SJONNIR_CONSOLE)))
                         console->SetGoState(GO_STATE_READY);
 
-                    if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                    if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                     {
                         brann->setDeathState(JUST_DIED);
                         brann->Respawn();
@@ -148,7 +148,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -165,16 +165,16 @@ public:
             {
                 pInstance->SetData(BOSS_SJONNIR, IN_PROGRESS);
 
-                if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetData64(GO_SJONNIR_DOOR)))
+                if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_SJONNIR_DOOR)))
                     doors->SetGoState(GO_STATE_READY);
 
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
-                    if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                    if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                         brann->AI()->DoAction(3);
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_SLUG_KILLED)
             {
@@ -184,7 +184,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -205,7 +205,7 @@ public:
                             events.ScheduleEvent(EVENT_SUMMON, 1500);
 
                             if (pInstance)
-                                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                                 {
                                     brann->MonsterYell("What in the name o' Madoran did THAT do? Oh! Wait: I just about got it...", LANG_UNIVERSAL, 0);
                                     brann->PlayDirectSound(14276);
@@ -214,7 +214,7 @@ public:
 
                         if (HealthBelowPct(20))
                         {
-                            if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                            if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                             {
                                 brann->MonsterYell("Ha, that did it! Help's a-comin'! Take this, ya glowin' iron brute!", LANG_UNIVERSAL, 0);
                                 brann->PlayDirectSound(14277);
@@ -261,7 +261,7 @@ public:
                     }
                 case EVENT_SUMMON_SPEACH:
                     {
-                        if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                        if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                         {
                             brann->MonsterYell("This is a wee bit trickier that before... Oh, bloody--incomin'!", LANG_UNIVERSAL, 0);
                             brann->PlayDirectSound(14275);
@@ -306,7 +306,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -314,15 +314,15 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(BOSS_SJONNIR, DONE);
-                if (GameObject* sd = me->GetMap()->GetGameObject(pInstance->GetData64(GO_SJONNIR_DOOR)))
+                if (GameObject* sd = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_SJONNIR_DOOR)))
                     sd->SetGoState(GO_STATE_ACTIVE);
 
-                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                     brann->AI()->DoAction(4);
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (urand(0, 1))
                 return;
@@ -333,7 +333,7 @@ public:
         void ActivatePipe(uint8 side)
         {
             if (pInstance)
-                if (GameObject* pipe = me->GetMap()->GetGameObject(pInstance->GetData64(side == POS_GEN_RIGHT ? GO_RIGHT_PIPE : GO_LEFT_PIPE)))
+                if (GameObject* pipe = me->GetMap()->GetGameObject(pInstance->GetGuidData(side == POS_GEN_RIGHT ? GO_RIGHT_PIPE : GO_LEFT_PIPE)))
                     pipe->SendCustomAnim(0);
         }
 
@@ -377,16 +377,16 @@ class boss_sjonnir_dwarf : public CreatureScript
 public:
     boss_sjonnir_dwarf() : CreatureScript("boss_sjonnir_dwarf") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sjonnir_dwarfAI (pCreature);
+        return GetHallsOfStoneAI<boss_sjonnir_dwarfAI>(pCreature);
     }
 
     struct boss_sjonnir_dwarfAI : public ScriptedAI
     {
         boss_sjonnir_dwarfAI(Creature* c) : ScriptedAI(c) { }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -401,9 +401,9 @@ class boss_sjonnir_iron_sludge : public CreatureScript
 public:
     boss_sjonnir_iron_sludge() : CreatureScript("boss_sjonnir_iron_sludge") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sjonnir_iron_sludgeAI (pCreature);
+        return GetHallsOfStoneAI<boss_sjonnir_iron_sludgeAI>(pCreature);
     }
 
     struct boss_sjonnir_iron_sludgeAI : public ScriptedAI
@@ -411,22 +411,22 @@ public:
         boss_sjonnir_iron_sludgeAI(Creature* c) : ScriptedAI(c) { }
 
         EventMap events;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_TOXIC_VOLLEY, 5000);
         }
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (Creature* sjonnir = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_SJONNIR)))
+                if (Creature* sjonnir = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_SJONNIR)))
                     sjonnir->AI()->DoAction(ACTION_SLUG_KILLED);
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -457,9 +457,9 @@ class boss_sjonnir_malformed_ooze : public CreatureScript
 public:
     boss_sjonnir_malformed_ooze() : CreatureScript("boss_sjonnir_malformed_ooze") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sjonnir_malformed_oozeAI (pCreature);
+        return GetHallsOfStoneAI<boss_sjonnir_malformed_oozeAI>(pCreature);
     }
 
     struct boss_sjonnir_malformed_oozeAI : public ScriptedAI
@@ -467,16 +467,16 @@ public:
         boss_sjonnir_malformed_oozeAI(Creature* c) : ScriptedAI(c) {    }
 
         EventMap events;
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == 0)
                 events.RescheduleEvent(EVENT_MALFORMED_OOZE_CHECK, 1000);
         }
 
-        void EnterCombat(Unit*) { }
-        void MoveInLineOfSight(Unit*) { }
+        void EnterCombat(Unit*) override { }
+        void MoveInLineOfSight(Unit*) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())

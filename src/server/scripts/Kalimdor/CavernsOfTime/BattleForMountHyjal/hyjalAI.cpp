@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,15 +11,15 @@ SDComment:
 SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "hyjalAI.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "hyjal_trash.h"
+#include "hyjalAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 
 enum Spawns
 {
@@ -308,8 +308,6 @@ hyjalAI::hyjalAI(Creature* creature) : npc_escortAI(creature), Summons(me)
     instance = creature->GetInstanceScript();
     VeinsSpawned[0] = false;
     VeinsSpawned[1] = false;
-    for (uint8 i = 0; i < 14; ++i)
-        VeinGUID[i] = 0;
     InfernalCount = 0;
     TeleportTimer = 1000;
     Overrun = false;
@@ -340,9 +338,9 @@ void hyjalAI::Reset()
     IsDummy = false;
     me->setActive(true);
     // GUIDs
-    PlayerGUID = 0;
-    BossGUID[0] = 0;
-    BossGUID[1] = 0;
+    PlayerGUID.Clear();
+    BossGUID[0].Clear();
+    BossGUID[1].Clear();
 
     // Timers
     NextWaveTimer = 10000;
@@ -476,7 +474,6 @@ void hyjalAI::SummonCreature(uint32 entry, float Base[4][3])
         default:
             creature = me->SummonCreature(entry, SpawnLoc[0], SpawnLoc[1], SpawnLoc[2], 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
             break;
-
     }
 
     if (creature)
@@ -657,7 +654,7 @@ void hyjalAI::DeSpawnVeins()
 {
     if (Faction == 1)
     {
-        Creature* unit = ObjectAccessor::GetCreature((*me), instance->GetData64(DATA_JAINAPROUDMOORE));
+        Creature* unit = ObjectAccessor::GetCreature((*me), instance->GetGuidData(DATA_JAINAPROUDMOORE));
         if (!unit)return;
         hyjalAI* ai = CAST_AI(hyjalAI, unit->AI());
         if (!ai)return;
@@ -669,7 +666,7 @@ void hyjalAI::DeSpawnVeins()
     }
     else if (Faction)
     {
-        Creature* unit = ObjectAccessor::GetCreature((*me), instance->GetData64(DATA_THRALL));
+        Creature* unit = ObjectAccessor::GetCreature((*me), instance->GetGuidData(DATA_THRALL));
         if (!unit)return;
         hyjalAI* ai = CAST_AI(hyjalAI, unit->AI());
         if (!ai)return;
@@ -706,7 +703,6 @@ void hyjalAI::UpdateAI(uint32 diff)
                     HideNearPos(5037.76f, -1889.71f);
                     for (uint8 i = 0; i < 92; ++i)//summon fires
                         me->SummonGameObject(GO_ROARING_FLAME, AllianceFirePos[i][0], AllianceFirePos[i][1], AllianceFirePos[i][2], AllianceFirePos[i][3], AllianceFirePos[i][4], AllianceFirePos[i][5], AllianceFirePos[i][6], AllianceFirePos[i][7], 0);
-
                 }
                 else me->SetVisible(true);
                 break;
@@ -719,7 +715,6 @@ void hyjalAI::UpdateAI(uint32 diff)
                     HideNearPos(5542.2f, -2629.36f);
                     for (uint8 i = 0; i < 65; ++i)//summon fires
                         me->SummonGameObject(GO_ROARING_FLAME, HordeFirePos[i][0], HordeFirePos[i][1], HordeFirePos[i][2], HordeFirePos[i][3], HordeFirePos[i][4], HordeFirePos[i][5], HordeFirePos[i][6], HordeFirePos[i][7], 0);
-
                 }
                 else me->SetVisible(true);
                 break;
@@ -819,7 +814,7 @@ void hyjalAI::UpdateAI(uint32 diff)
                     EventBegun = false;
                     CheckTimer = 0;
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    BossGUID[i] = 0;
+                    BossGUID[i].Clear();
                     instance->DoUpdateWorldState(WORLD_STATE_ENEMY, 0); // Reset world state for enemies to disable it
                 }
             }
@@ -893,17 +888,12 @@ void hyjalAI::JustDied(Unit* /*killer*/)
 
 void hyjalAI::HideNearPos(float x, float y)
 {
-    CellCoord pair(acore::ComputeCellCoord(x, y));
-    Cell cell(pair);
-    cell.SetNoCreate();
-
     // First get all creatures.
     std::list<Creature*> creatures;
-    acore::AllFriendlyCreaturesInGrid creature_check(me);
-    acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
+    Acore::AllFriendlyCreaturesInGrid creature_check(me);
+    Acore::CreatureListSearcher<Acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
 
-    TypeContainerVisitor <acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> creature_visitor(creature_searcher);
-    cell.Visit(pair, creature_visitor, *(me->GetMap()), *me, me->GetGridActivationRange());
+    Cell::VisitGridObjects(x, y, me->GetMap(), creature_searcher, me->GetGridActivationRange());
 
     if (!creatures.empty())
     {
@@ -917,14 +907,9 @@ void hyjalAI::HideNearPos(float x, float y)
 
 void hyjalAI::RespawnNearPos(float x, float y)
 {
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    acore::RespawnDo u_do;
-    acore::WorldObjectWorker<acore::RespawnDo> worker(me, u_do);
-    TypeContainerVisitor<acore::WorldObjectWorker<acore::RespawnDo>, GridTypeMapContainer > obj_worker(worker);
-    cell.Visit(p, obj_worker, *me->GetMap(), *me, me->GetGridActivationRange());
+    Acore::RespawnDo u_do;
+    Acore::WorldObjectWorker<Acore::RespawnDo> worker(me, u_do);
+    Cell::VisitGridObjects(x, y, me->GetMap(), worker, me->GetGridActivationRange());
 }
 
 void hyjalAI::WaypointReached(uint32 waypointId)
@@ -948,19 +933,11 @@ void hyjalAI::WaypointReached(uint32 waypointId)
         }
         //do some talking
         //all alive guards walk near here
-        CellCoord pair(acore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
-        Cell cell(pair);
-        cell.SetNoCreate();
-
         // First get all creatures.
         std::list<Creature*> creatures;
-        acore::AllFriendlyCreaturesInGrid creature_check(me);
-        acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
-        TypeContainerVisitor
-        <acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid>,
-        GridTypeMapContainer> creature_visitor(creature_searcher);
-
-        cell.Visit(pair, creature_visitor, *(me->GetMap()), *me, me->GetGridActivationRange());
+        Acore::AllFriendlyCreaturesInGrid creature_check(me);
+        Acore::CreatureListSearcher<Acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
+        Cell::VisitGridObjects(me, creature_searcher, me->GetGridActivationRange());
 
         if (!creatures.empty())
         {
@@ -989,18 +966,10 @@ void hyjalAI::DoOverrun(uint32 faction, const uint32 diff)
     {
         if (TeleportTimer <= diff)
         {
-            CellCoord pair(acore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
-            Cell cell(pair);
-            cell.SetNoCreate();
-
             std::list<Creature*> creatures;
-            acore::AllFriendlyCreaturesInGrid creature_check(me);
-            acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
-            TypeContainerVisitor
-            <acore::CreatureListSearcher<acore::AllFriendlyCreaturesInGrid>,
-            GridTypeMapContainer> creature_visitor(creature_searcher);
-
-            cell.Visit(pair, creature_visitor, *(me->GetMap()), *me, me->GetGridActivationRange());
+            Acore::AllFriendlyCreaturesInGrid creature_check(me);
+            Acore::CreatureListSearcher<Acore::AllFriendlyCreaturesInGrid> creature_searcher(me, creatures, creature_check);
+            Cell::VisitGridObjects(me, creature_searcher, me->GetGridActivationRange());
 
             if (!creatures.empty())
             {

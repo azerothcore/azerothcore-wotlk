@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "old_hillsbrad.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum CaptainSkarloc
 {
@@ -44,9 +44,9 @@ class boss_captain_skarloc : public CreatureScript
 public:
     boss_captain_skarloc() : CreatureScript("boss_captain_skarloc") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_captain_skarlocAI>(creature);
+        return GetOldHillsbradAI<boss_captain_skarlocAI>(creature);
     }
 
     struct boss_captain_skarlocAI : public ScriptedAI
@@ -57,17 +57,17 @@ public:
         EventMap events2;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events2.Reset();
             summons.DespawnAll();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_THRALL_GUID)))
+            if (Creature* thrall = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_THRALL_GUID)))
                 thrall->AI()->JustSummoned(summon);
             summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
@@ -80,7 +80,7 @@ public:
                 summon->GetMotionMaster()->MovePoint(0, 2056.870f, 234.853f, 63.839f);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
 
@@ -94,7 +94,7 @@ public:
             me->Mount(SKARLOC_MOUNT_MODEL);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != ESCORT_MOTION_TYPE)
                 return;
@@ -122,7 +122,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_DEVOTION_AURA, true);
 
@@ -134,19 +134,19 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 1000);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             me->GetInstanceScript()->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_SKARLOC_KILLED);
             me->GetInstanceScript()->SetData(DATA_THRALL_ADD_FLAG, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -198,13 +198,11 @@ public:
                     me->CastSpell(me, SPELL_CONSECRATION, false);
                     events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 20000);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_captain_skarloc()

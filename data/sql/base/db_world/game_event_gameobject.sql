@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `game_event_gameobject`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event_gameobject` 
 (
-  `eventEntry` tinyint(4) NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
-  `guid` int(10) unsigned NOT NULL,
+  `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
+  `guid` INT unsigned NOT NULL,
   PRIMARY KEY (`guid`,`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `game_event_gameobject` WRITE;
@@ -25,6 +25,8 @@ INSERT INTO `game_event_gameobject` VALUES
 (4,2555),
 (4,2892),
 (32,3110),
+(24,4719),
+(24,4720),
 (4,4727),
 (15,11012),
 (24,11140),
@@ -14792,6 +14794,8 @@ INSERT INTO `game_event_gameobject` VALUES
 (2,58770),
 (66,59029),
 (65,59043),
+(24,59177),
+(24,59178),
 (65,59616),
 (66,59624),
 (2,59886),
@@ -16143,6 +16147,16 @@ INSERT INTO `game_event_gameobject` VALUES
 (12,78020),
 (12,78021),
 (12,78022),
+(12,78033),
+(12,78066),
+(12,78105),
+(12,78106),
+(12,78107),
+(12,78109),
+(12,78111),
+(12,78113),
+(12,78117),
+(12,78120),
 (24,80000),
 (24,80001),
 (24,80002),
@@ -18530,6 +18544,7 @@ INSERT INTO `game_event_gameobject` VALUES
 (9,152113),
 (9,152114),
 (9,152115),
+(15,164445),
 (1,220100),
 (1,220101),
 (1,220102),

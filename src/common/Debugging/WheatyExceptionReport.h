@@ -3,13 +3,13 @@
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS && !defined(__MINGW32__)
 
+#include <dbghelp.h>
+#include <mutex>
+#include <set>
+#include <stack>
+#include <stdlib.h>
 #include <winnt.h>
 #include <winternl.h>
-#include <dbghelp.h>
-#include <set>
-#include <stdlib.h>
-#include <stack>
-#include <mutex>
 #define countof  _countof
 
 #define WER_MAX_ARRAY_ELEMENTS_COUNT 10
@@ -134,7 +134,6 @@ struct SymbolDetail
 class WheatyExceptionReport
 {
 public:
-
     WheatyExceptionReport();
     ~WheatyExceptionReport();
 
@@ -196,7 +195,6 @@ private:
     static void PushSymbolDetail();
     static void PopSymbolDetail();
     static void PrintSymbolDetail();
-
 };
 
 extern WheatyExceptionReport g_WheatyExceptionReport;       //  global instance of class

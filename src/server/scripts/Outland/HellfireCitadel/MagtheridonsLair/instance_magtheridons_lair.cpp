@@ -2,11 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "InstanceScript.h"
 #include "magtheridons_lair.h"
-
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 DoorData const doorData[] =
 {
@@ -33,15 +32,14 @@ public:
             LoadMinionData(minionData);
         }
 
-        void Initialize()
+        void Initialize() override
         {
             _wardersSet.clear();
             _cubesSet.clear();
             _columnSet.clear();
-            _magtheridonGUID = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -57,7 +55,7 @@ public:
             }
         }
 
-        void OnCreatureRemove(Creature* creature)
+        void OnCreatureRemove(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -67,7 +65,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -89,7 +87,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -111,7 +109,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 id, EncounterState state)
+        bool SetBossState(uint32 id, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(id, state))
                 return false;
@@ -120,8 +118,8 @@ public:
             {
                 if (state == IN_PROGRESS)
                 {
-                    for (std::set<uint64>::const_iterator itr = _wardersSet.begin(); itr != _wardersSet.end(); ++itr)
-                        if (Creature* warder = instance->GetCreature(*itr))
+                    for (ObjectGuid const& guid : _wardersSet)
+                        if (Creature* warder = instance->GetCreature(guid))
                             if (warder->IsAlive())
                             {
                                 warder->InterruptNonMeleeSpells(true);
@@ -130,8 +128,8 @@ public:
                 }
                 else
                 {
-                    for (std::set<uint64>::const_iterator itr = _cubesSet.begin(); itr != _cubesSet.end(); ++itr)
-                        if (GameObject* cube = instance->GetGameObject(*itr))
+                    for (ObjectGuid const& guid : _cubesSet)
+                        if (GameObject* cube = instance->GetGameObject(guid))
                             cube->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
                     if (state == NOT_STARTED)
@@ -141,7 +139,7 @@ public:
             return true;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -151,19 +149,19 @@ public:
                             magtheridon->SetInCombatWithZone();
                     break;
                 case DATA_ACTIVATE_CUBES:
-                    for (std::set<uint64>::const_iterator itr = _cubesSet.begin(); itr != _cubesSet.end(); ++itr)
-                        if (GameObject* cube = instance->GetGameObject(*itr))
+                    for (ObjectGuid const& guid : _cubesSet)
+                        if (GameObject* cube = instance->GetGameObject(guid))
                             cube->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_COLLAPSE:
-                    for (std::set<uint64>::const_iterator itr = _columnSet.begin(); itr != _columnSet.end(); ++itr)
-                        if (GameObject* column = instance->GetGameObject(*itr))
+                    for (ObjectGuid const& guid : _columnSet)
+                        if (GameObject* column = instance->GetGameObject(guid))
                             column->SetGoState(GOState(data));
                     break;
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -174,7 +172,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -207,14 +205,13 @@ public:
         }
 
     private:
-        uint64 _magtheridonGUID;
-        std::set<uint64> _wardersSet;
-        std::set<uint64> _cubesSet;
-        std::set<uint64> _columnSet;
-
+        ObjectGuid _magtheridonGUID;
+        GuidSet _wardersSet;
+        GuidSet _cubesSet;
+        GuidSet _columnSet;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_magtheridons_lair_InstanceMapScript(map);
     }
@@ -224,4 +221,3 @@ void AddSC_instance_magtheridons_lair()
 {
     new instance_magtheridons_lair();
 }
-

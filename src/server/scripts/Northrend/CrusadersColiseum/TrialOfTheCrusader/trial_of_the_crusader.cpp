@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_crusader.h"
-#include "Player.h"
 
 enum MenuTexts
 {

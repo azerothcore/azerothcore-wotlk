@@ -1,21 +1,20 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Totem.h"
-#include "Log.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
-#include "SpellMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Totem.h"
 #include "WorldPacket.h"
 
-Totem::Totem(SummonPropertiesEntry const* properties, uint64 owner) : Minion(properties, owner, false)
+Totem::Totem(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion(properties, owner, false)
 {
     m_unitTypeMask |= UNIT_MASK_TOTEM;
     m_duration = 0;
@@ -45,13 +44,13 @@ void Totem::InitStats(uint32 duration)
 {
     // client requires SMSG_TOTEM_CREATED to be sent before adding to world and before removing old totem
     // Xinef: Set level for Unit totems
-    if (Unit* owner = ObjectAccessor::FindUnit(m_owner))
+    if (Unit* owner = ObjectAccessor::GetUnit(*this, m_owner))
     {
         if (owner->GetTypeId() == TYPEID_PLAYER && m_Properties->Slot >= SUMMON_SLOT_TOTEM && m_Properties->Slot < MAX_TOTEM_SLOT)
         {
             WorldPacket data(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4);
             data << uint8(m_Properties->Slot - 1);
-            data << uint64(GetGUID());
+            data << GetGUID();
             data << uint32(duration);
             data << uint32(GetUInt32Value(UNIT_CREATED_BY_SPELL));
             owner->ToPlayer()->SendDirectMessage(&data);
@@ -69,7 +68,6 @@ void Totem::InitStats(uint32 duration)
     if (SpellInfo const* totemSpell = sSpellMgr->GetSpellInfo(GetSpell()))
         if (totemSpell->CalcCastTime())   // If spell has cast time -> its an active totem
             m_type = TOTEM_ACTIVE;
-
 
     m_duration = duration;
 }
@@ -110,7 +108,7 @@ void Totem::UnSummon(uint32 msTime)
     {
         if (owner->m_SummonSlot[i] == GetGUID())
         {
-            owner->m_SummonSlot[i] = 0;
+            owner->m_SummonSlot[i].Clear();
             break;
         }
     }
@@ -127,7 +125,7 @@ void Totem::UnSummon(uint32 msTime)
         player->SendAutoRepeatCancel(this);
 
         if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
-            player->SendCooldownEvent(spell, 0, NULL, false);
+            player->SendCooldownEvent(spell, 0, nullptr, false);
 
         if (Group* group = player->GetGroup())
         {
@@ -152,6 +150,12 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) con
             spellInfo->IsPositive() && spellInfo->Effects[index].TargetA.GetTarget() != TARGET_UNIT_CASTER &&
             spellInfo->Effects[index].TargetA.GetCheckType() != TARGET_CHECK_ENTRY && spellInfo->Id != 55277 && spellInfo->Id != 6277)
         return true;
+
+    // Cyclone shouldn't be casted on totems
+    if (spellInfo->Id == SPELL_CYCLONE)
+    {
+        return true;
+    }
 
     switch (spellInfo->Effects[index].ApplyAuraName)
     {

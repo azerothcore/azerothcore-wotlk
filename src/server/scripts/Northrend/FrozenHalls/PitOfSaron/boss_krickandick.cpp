@@ -2,16 +2,16 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "pit_of_saron.h"
-#include "Vehicle.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
-#include "WorldSession.h"
 #include "Opcodes.h"
+#include "PassiveAI.h"
+#include "pit_of_saron.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
+#include "WorldSession.h"
 
 enum Yells
 {
@@ -72,7 +72,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_AGGRESSIVE);
             events.Reset();
@@ -80,12 +80,12 @@ public:
                 pInstance->SetData(DATA_ICK, NOT_STARTED);
         }
 
-        bool CanAIAttack(const Unit*  /*who*/) const
+        bool CanAIAttack(const Unit*  /*who*/) const override
         {
             return pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_FINISHED_INTRO;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (Creature* k = GetKrick())
                 k->AI()->Talk(SAY_AGGRO);
@@ -100,7 +100,7 @@ public:
                 pInstance->SetData(DATA_ICK, IN_PROGRESS);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (!target || !spell)
                 return;
@@ -108,7 +108,7 @@ public:
             {
                 WorldPacket data;
 
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, NULL, EMOTE_ICK_CHASING);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_ICK_CHASING);
                 target->ToPlayer()->GetSession()->SendPacket(&data);
 
                 AttackStart(target);
@@ -122,10 +122,10 @@ public:
             if (Vehicle* v = me->GetVehicleKit())
                 if (Unit* p = v->GetPassenger(0))
                     return p->ToCreature();
-            return (Creature*)NULL;
+            return (Creature*)nullptr;
         }
 
-        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
                 if (Creature* krick = GetKrick())
@@ -146,7 +146,7 @@ public:
                 }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -202,7 +202,7 @@ public:
                     me->SetReactState(REACT_AGGRESSIVE);
                     if (!UpdateVictim())
                         return;
-                    
+
                     break;
                 case EVENT_SPECIAL:
                     switch(urand(0, 2))
@@ -241,14 +241,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_ICK, DONE);
             me->RemoveAllAuras();
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             // if during pursuit ick kills his target, set to aggressive again
             if (who && me->GetVictim() && who->GetGUID() == me->GetVictim()->GetGUID())
@@ -260,14 +260,14 @@ public:
                     k->AI()->Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        void JustSummoned(Creature*  /*summon*/)
+        void JustSummoned(Creature*  /*summon*/) override
         {
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_ickAI(creature);
+        return GetPitOfSaronAI<boss_ickAI>(creature);
     }
 };
 
@@ -286,7 +286,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -295,7 +295,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
@@ -307,7 +307,7 @@ public:
                     {
                         pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_KRICK_SCENE);
 
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_FIRST_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                         {
                             c->GetMotionMaster()->Clear();
                             c->UpdatePosition(SBSLeaderStartPos, true);
@@ -315,14 +315,14 @@ public:
                             c->AI()->Reset();
                         }
                     }
-                    
+
                     events.RescheduleEvent(1, 3000);
                     break;
                 case 1:
                     Talk(SAY_OUTRO_KRICK_1);
                     if (pInstance)
                     {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_FIRST_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                         {
                             float angle = me->GetAngle(c);
                             me->SetFacingTo(angle);
@@ -332,56 +332,56 @@ public:
                         }
 
                         for (uint8 i = 0; i < 2; ++i)
-                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID + i)))
+                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GUARD_1_GUID + i)))
                                 c->DespawnOrUnsummon();
                     }
-                    
+
                     events.RescheduleEvent(2, 7000);
                     break;
                 case 2:
                     if (pInstance)
                     {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                         {
                             c->setActive(true);
                             c->UpdatePosition(SBSTyrannusStartPos, true);
                             c->SetHomePosition(SBSTyrannusStartPos);
                         }
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_FIRST_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                             c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_1 : SAY_SYLVANAS_KRICK_1);
                     }
-                    
+
                     events.RescheduleEvent(3, 6500);
                     break;
                 case 3:
                     Talk(SAY_OUTRO_KRICK_2);
-                    
+
                     events.RescheduleEvent(4, 17000);
                     break;
                 case 4:
                     if (pInstance)
                     {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE + 10, false);
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_FIRST_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                             c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_2 : SAY_SYLVANAS_KRICK_2);
                     }
-                    
+
                     events.RescheduleEvent(5, 6500);
                     break;
                 case 5:
                     Talk(SAY_OUTRO_KRICK_3);
-                    
+
                     events.RescheduleEvent(6, 6500);
                     break;
                 case 6:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                         {
                             c->SetFacingToObject(me);
                             c->AI()->Talk(SAY_TYRANNUS_KRICK_1);
                         }
-                    
+
                     events.RescheduleEvent(7, 4000);
                     break;
                 case 7:
@@ -392,21 +392,20 @@ public:
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 9.0f, 0.5f * 7.0f);
 
-                    
                     events.RescheduleEvent(8, 2000);
                     break;
                 case 8:
                     Talk(SAY_OUTRO_KRICK_4);
-                    
+
                     events.RescheduleEvent(9, 1500);
                     break;
                 case 9:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->CastSpell(c, 69753, false);
 
                     me->SetReactState(REACT_PASSIVE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->AddUnitState(UNIT_STATE_DIED);
@@ -415,22 +414,22 @@ public:
 
                     me->RemoveAllAuras();
                     me->GetMotionMaster()->MoveFall(0, true);
-                    
+
                     events.RescheduleEvent(10, 5000);
                     break;
                 case 10:
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_KRICK_2);
-                    
+
                     events.RescheduleEvent(11, 9000);
                     break;
                 case 11:
                     if (pInstance)
                     {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->GetMotionMaster()->MovePoint(1, 809.39f, 74.69f, 541.54f);
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_FIRST_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                         {
                             c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_3 : SAY_SYLVANAS_KRICK_3);
                             c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE + 11, false);
@@ -438,15 +437,15 @@ public:
                     }
                     me->setActive(false);
                     Unit::Kill(me, me);
-                    
+
                     break;
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_krickAI(creature);
+        return GetPitOfSaronAI<boss_krickAI>(creature);
     }
 };
 
@@ -473,13 +472,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_krick_explosive_barrage_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_krick_explosive_barrage_AuraScript();
     }
@@ -509,13 +508,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_exploding_orb_auto_grow_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_exploding_orb_auto_grow_AuraScript();
     }

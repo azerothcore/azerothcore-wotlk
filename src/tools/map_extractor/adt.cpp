@@ -34,7 +34,7 @@ bool isHole(int holes, int i, int j)
 //
 ADT_file::ADT_file()
 {
-    a_grid = 0;
+    a_grid = nullptr;
 }
 
 ADT_file::~ADT_file()
@@ -44,7 +44,7 @@ ADT_file::~ADT_file()
 
 void ADT_file::free()
 {
-    a_grid = 0;
+    a_grid = nullptr;
     FileLoader::free();
 }
 

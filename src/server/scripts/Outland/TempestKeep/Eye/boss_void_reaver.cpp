@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_eye.h"
 
 enum voidReaver
@@ -27,7 +27,6 @@ enum voidReaver
 class boss_void_reaver : public CreatureScript
 {
 public:
-
     boss_void_reaver() : CreatureScript("boss_void_reaver") { }
 
     struct boss_void_reaverAI : public BossAI
@@ -41,24 +40,24 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_MANA_LEECH, true);
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -70,7 +69,7 @@ public:
             me->CallForHelp(105.0f);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -106,15 +105,15 @@ public:
             EnterEvadeIfOutOfCombatArea();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->GetDistance2d(432.59f, 371.93f) > 105.0f;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_void_reaverAI>(creature);
+        return GetTheEyeAI<boss_void_reaverAI>(creature);
     }
 };
 
@@ -122,4 +121,3 @@ void AddSC_boss_void_reaver()
 {
     new boss_void_reaver();
 }
-

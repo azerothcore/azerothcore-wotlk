@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -20,11 +20,11 @@ npc_kservant
 npc_ishanah
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 /*######
@@ -119,7 +119,6 @@ enum Salsalabim
 
     // Spells
     SPELL_MAGNETIC_PULL            = 31705
-
 };
 
 class npc_salsalabim : public CreatureScript
@@ -315,7 +314,7 @@ class npc_kservant : public CreatureScript
 public:
     npc_kservant() : CreatureScript("npc_kservant") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_kservantAI(creature);
     }
@@ -325,7 +324,7 @@ public:
     public:
         npc_kservantAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -403,7 +402,7 @@ public:
             }
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (!summoner)
                 return;
@@ -413,7 +412,7 @@ public:
                 Start(false, false, summoner->GetGUID());
         }
 
-        void Reset() { }
+        void Reset() override { }
     };
 };
 

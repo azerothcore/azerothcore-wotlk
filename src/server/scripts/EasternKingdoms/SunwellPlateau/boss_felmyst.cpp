@@ -2,12 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "sunwell_plateau.h"
 
 enum Yells
@@ -97,7 +96,7 @@ public:
     {
     }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         std::list<Creature*> cList;
         _caster->GetCreaturesWithEntryInRange(cList, 70.0f, NPC_FOG_TRIGGER);
@@ -128,7 +127,7 @@ public:
 
         EventMap events2;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
             {
@@ -138,7 +137,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -148,7 +147,7 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -156,14 +155,13 @@ public:
                 events2.ScheduleEvent(EVENT_INTRO_2, 3000);
         }
 
-
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
                 Talk(YELL_KILL);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
             Talk(YELL_DEATH);
@@ -173,7 +171,7 @@ public:
             me->SummonCreature(NPC_KALEC, 1526.28f, 700.10f, 60.0f, 4.33f);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -194,7 +192,7 @@ public:
             }
             else if (point == POINT_AIR_BREATH_START1)
             {
-                me->SetTarget(0);
+                me->SetTarget();
                 me->SetFacingTo(4.71f);
                 events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 2000);
                 events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 5000);
@@ -209,7 +207,7 @@ public:
             }
             else if (point == POINT_AIR_BREATH_START2)
             {
-                me->SetTarget(0);
+                me->SetTarget();
                 me->SetFacingTo(1.57f);
                 events.ScheduleEvent(EVENT_FLIGHT_EMOTE, 2000);
                 events.ScheduleEvent(EVENT_CORRUPT_TRIGGERS, 5000);
@@ -222,12 +220,12 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -277,7 +275,7 @@ public:
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     break;
                 case EVENT_LAND:
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
                     break;
                 case EVENT_SPELL_BERSERK:
                     Talk(YELL_BERSERK);
@@ -309,7 +307,7 @@ public:
                     break;
                 case EVENT_FLIGHT_SEQ:
                     Talk(YELL_TAKEOFF);
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SetDisableGravity(true);
                     me->SendMovementFlagUpdate();
@@ -325,7 +323,7 @@ public:
                     me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, false, true);
                     break;
                 case EVENT_FLIGHT_VAPOR:
-                    me->CastSpell(me, SPELL_SUMMON_DEMONIC_VAPOR, true);
+                    me->CastCustomSpell(SPELL_SUMMON_DEMONIC_VAPOR, SPELLVALUE_MAX_TARGETS, 1, me, true);
                     break;
                 case EVENT_FLIGHT_BREATH1:
                     {
@@ -365,7 +363,6 @@ public:
                 case EVENT_LAND_FIGHT:
                     me->GetMotionMaster()->MovePoint(POINT_GROUND, 1500.0f, 552.8f, 26.52f, false, true);
                     break;
-
             }
 
             if (!me->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
@@ -373,9 +370,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_felmystAI>(creature);
+        return GetSunwellPlateauAI<boss_felmystAI>(creature);
     }
 };
 
@@ -384,22 +381,22 @@ class npc_demonic_vapor : public CreatureScript
 public:
     npc_demonic_vapor() : CreatureScript("npc_demonic_vapor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_demonic_vaporAI(creature);
+        return GetSunwellPlateauAI<npc_demonic_vaporAI>(creature);
     }
 
     struct npc_demonic_vaporAI : public NullCreatureAI
     {
         npc_demonic_vaporAI(Creature* creature) : NullCreatureAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_SPAWN_TRIGGER, true);
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_PERIODIC, true);
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
             {
@@ -420,9 +417,9 @@ class npc_demonic_vapor_trail : public CreatureScript
 public:
     npc_demonic_vapor_trail() : CreatureScript("npc_demonic_vapor_trail") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_demonic_vapor_trailAI(creature);
+        return GetSunwellPlateauAI<npc_demonic_vapor_trailAI>(creature);
     }
 
     struct npc_demonic_vapor_trailAI : public NullCreatureAI
@@ -433,18 +430,18 @@ public:
         }
 
         uint32 timer;
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
         }
 
-        void SpellHitTarget(Unit*, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit*, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer)
             {
@@ -457,7 +454,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->SetInCombatWithZone();
             summon->AI()->AttackStart(summon->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f));
@@ -481,13 +478,13 @@ public:
                 target->CastSpell(GetCaster(), SPELL_FOG_OF_CORRUPTION_CHARM, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_felmyst_fog_of_corruption_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_felmyst_fog_of_corruption_SpellScript();
     }
@@ -514,14 +511,14 @@ public:
             Unit::Kill(GetCaster(), GetTarget(), false);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_felmyst_fog_of_corruption_charm_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_felmyst_fog_of_corruption_charm_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_felmyst_fog_of_corruption_charm_AuraScript();
     }
@@ -536,7 +533,7 @@ public:
             return true;
 
         Creature* cr = object->ToCreature();
-        return cr->GetDBTableGUIDLow() != 54780 && cr->GetDBTableGUIDLow() != 54787 && cr->GetDBTableGUIDLow() != 54801;
+        return cr->GetSpawnId() != 54780 && cr->GetSpawnId() != 54787 && cr->GetSpawnId() != 54801;
     }
 };
 
@@ -554,13 +551,13 @@ public:
             unitList.remove_if(DoorsGuidCheck());
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_felmyst_open_brutallus_back_doors_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_felmyst_open_brutallus_back_doors_SpellScript();
     }

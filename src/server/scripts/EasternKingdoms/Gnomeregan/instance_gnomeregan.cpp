@@ -2,18 +2,19 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "Player.h"
-#include "SpellScript.h"
-#include "ScriptMgr.h"
+#include "gnomeregan.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 class instance_gnomeregan : public InstanceMapScript
 {
 public:
     instance_gnomeregan() : InstanceMapScript("instance_gnomeregan", 90) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_gnomeregan_InstanceMapScript(map);
     }
@@ -36,12 +37,12 @@ class npc_kernobee : public CreatureScript
 public:
     npc_kernobee() : CreatureScript("npc_kernobee") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_kernobeeAI(creature);
+        return GetGnomereganAI<npc_kernobeeAI>(creature);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_A_FINE_MESS)
         {
@@ -56,19 +57,18 @@ public:
     {
         npc_kernobeeAI(Creature* creature) : PassiveAI(creature)
         {
-            playerGUID = 0;
             checkTimer = 0;
         }
 
         uint32 checkTimer;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(ObjectGuid guid, int32) override
         {
             playerGUID = guid;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             checkTimer += diff;
             if (checkTimer >= 2000)
@@ -100,13 +100,13 @@ public:
                 PreventHitDefaultEffect(effIndex);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHit += SpellEffectFn(spell_gnomeregan_radiation_bolt_SpellScript::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gnomeregan_radiation_bolt_SpellScript;
     }

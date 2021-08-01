@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,8 @@ SDComment: Mind Control not working because of core bug. Shades visible for all.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "zulgurub.h"
 
 enum Say
@@ -54,17 +54,17 @@ public:
     {
         boss_jindoAI(Creature* creature) : BossAI(creature, DATA_JINDO) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_BRAINWASHTOTEM, 20000);
@@ -75,7 +75,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -165,9 +165,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_jindoAI(creature);
+        return GetZulGurubAI<boss_jindoAI>(creature);
     }
 };
 
@@ -175,7 +175,6 @@ public:
 class npc_healing_ward : public CreatureScript
 {
 public:
-
     npc_healing_ward()
         : CreatureScript("npc_healing_ward")
     {
@@ -192,21 +191,21 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() override
         {
             Heal_Timer = 2000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Heal_Timer
             if (Heal_Timer <= diff)
             {
-                Unit* pJindo = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_JINDO));
+                Unit* pJindo = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_JINDO));
                 if (pJindo)
                     DoCast(pJindo, SPELL_HEAL);
                 Heal_Timer = 3000;
@@ -217,9 +216,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_healing_wardAI>(creature);
+        return GetZulGurubAI<npc_healing_wardAI>(creature);
     }
 };
 
@@ -227,7 +226,6 @@ public:
 class npc_shade_of_jindo : public CreatureScript
 {
 public:
-
     npc_shade_of_jindo()
         : CreatureScript("npc_shade_of_jindo")
     {
@@ -239,17 +237,16 @@ public:
 
         uint32 ShadowShock_Timer;
 
-        void Reset()
+        void Reset() override
         {
             ShadowShock_Timer = 1000;
             DoCast(me, SPELL_INVISIBLE, true);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
-
             //ShadowShock_Timer
             if (ShadowShock_Timer <= diff)
             {
@@ -262,9 +259,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_shade_of_jindoAI(creature);
+        return GetZulGurubAI<npc_shade_of_jindoAI>(creature);
     }
 };
 

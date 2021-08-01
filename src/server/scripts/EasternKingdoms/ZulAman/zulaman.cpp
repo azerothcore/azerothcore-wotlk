@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,13 +15,13 @@ EndScriptData */
 npc_forest_frog
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "zulaman.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "zulaman.h"
 
 /*######
 ## npc_forest_frog
@@ -117,7 +117,6 @@ enum ForestFrog
 class npc_forest_frog : public CreatureScript
 {
 public:
-
     npc_forest_frog() : CreatureScript("npc_forest_frog") { }
 
     struct npc_forest_frogAI : public ScriptedAI
@@ -130,7 +129,7 @@ public:
         InstanceScript* instance;
         EventMap events;
         uint8 eventTimer;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         void Reset() override { }
 
@@ -147,7 +146,7 @@ public:
             events.Update(diff);
             if (eventTimer)
             {
-                Player* player = me->GetMap()->GetPlayer(PlayerGUID);
+                Player* player = ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID);
                 switch (events.ExecuteEvent())
                 {
                     case 1:
@@ -429,7 +428,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_forest_frogAI>(creature);
+        return GetZulAmanAI<npc_forest_frogAI>(creature);
     }
 };
 
@@ -455,7 +454,7 @@ public:
         }
 
         bool IsLoot;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         void Reset() override { }
 
@@ -476,7 +475,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_zulaman_hostageAI(creature);
+        return GetZulAmanAI<npc_zulaman_hostageAI>(creature);
     }
 
     bool OnGossipHello(Player* player, Creature* creature) override
@@ -584,7 +583,6 @@ enum Weapons
 class npc_harrison_jones : public CreatureScript
 {
 public:
-
     npc_harrison_jones() : CreatureScript("npc_harrison_jones")
     {
     }
@@ -600,18 +598,18 @@ public:
 
         uint8 _gongEvent;
         uint32 _gongTimer;
-        uint64 uiTargetGUID;
+        ObjectGuid uiTargetGUID;
 
-        void Reset()
+        void Reset() override
         {
             _gongEvent = 0;
             _gongTimer = 0;
-            uiTargetGUID = 0;
+            uiTargetGUID.Clear();
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void sGossipSelect(Player* player, uint32 sender, uint32 action)
+        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
         {
             if (me->GetCreatureTemplate()->GossipMenuId == sender && !action)
             {
@@ -624,21 +622,21 @@ public:
             }
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell)
+        void SpellHit(Unit*, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_COSMETIC_SPEAR_THROW)
             {
                 me->RemoveAllAuras();
                 me->SetEntry(NPC_HARRISON_JONES_2);
                 me->SetDisplayId(MODEL_HARRISON_JONES_2);
-                me->SetTarget(0);
-                me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_DEAD);
+                me->SetTarget();
+                me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 instance->SetData(DATA_GONGEVENT, DONE);
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_gongEvent)
             {
@@ -661,14 +659,14 @@ public:
                             _gongTimer = 4000;
                             break;
                         case GONG_EVENT_3:
-                            if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetData64(GO_STRANGE_GONG)))
+                            if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetGuidData(GO_STRANGE_GONG)))
                                 gong->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                             _gongEvent = GONG_EVENT_4;
                             _gongTimer = 105000;
                             break;
                         case GONG_EVENT_4:
                             me->RemoveAura(SPELL_BANGING_THE_GONG);
-                            if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetData64(GO_STRANGE_GONG)))
+                            if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetGuidData(GO_STRANGE_GONG)))
                                 gong->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
                             // trigger or gong will need to be scripted to set IN_PROGRESS after enough hits.
@@ -730,7 +728,7 @@ public:
                                 }
                             }
 
-                            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_MASSIVE_GATE)))
+                            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_MASSIVE_GATE)))
                                 gate->SetGoState(GO_STATE_ACTIVE);
                             _gongTimer = 2000;
                             _gongEvent = GONG_EVENT_8;
@@ -768,9 +766,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_harrison_jonesAI>(creature);
+        return GetZulAmanAI<npc_harrison_jonesAI>(creature);
     }
 };
 
@@ -789,13 +787,13 @@ public:
             GetHitGObj()->SendCustomAnim(0);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_banging_the_gong_SpellScript::Activate, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_banging_the_gong_SpellScript();
     }

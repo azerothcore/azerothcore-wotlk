@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "trial_of_the_champion.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "trial_of_the_champion.h"
 
 enum Spells
 {
@@ -84,7 +84,6 @@ enum Models
     MODEL_GHOST                     = 21300
 };
 
-
 class boss_black_knight : public CreatureScript
 {
 public:
@@ -102,7 +101,7 @@ public:
         SummonList summons;
         uint8 Phase;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -116,13 +115,13 @@ public:
             //me->SetLootMode(0); // [LOOT]
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon(1);
             ScriptedAI::EnterEvadeMode();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
             {
@@ -142,15 +141,14 @@ public:
                 summons.clear();
 
                 me->CastSpell(me, SPELL_BK_FEIGN_DEATH, true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 me->AddUnitState(UNIT_STATE_DIED);
-
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == -1 )
             {
@@ -163,8 +161,8 @@ public:
 
                 pInstance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
                 Talk(TEXT_BK_AGGRO);
-                me->CastSpell((Unit*)NULL, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
-                if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ANNOUNCER)) )
+                me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
+                if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)) )
                     announcer->DespawnOrUnsummon();
 
                 events.Reset();
@@ -176,7 +174,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell)
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell) override
         {
             switch( spell->Id )
             {
@@ -185,7 +183,7 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
 
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->ClearUnitState(UNIT_STATE_DIED);
@@ -221,7 +219,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -239,7 +237,7 @@ public:
                     if( pInstance && !summons.empty() )
                         if( Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
                             ghoul->MonsterYell("[Zombie] .... . Brains ....", LANG_UNIVERSAL, 0);
-                    
+
                     break;
                 case EVENT_SPELL_PLAGUE_STRIKE:
                     if( me->GetVictim() )
@@ -267,7 +265,7 @@ public:
                     events.RepeatEvent(urand(14000, 17000));
                     break;
                 case EVENT_SPELL_DEATH_BITE:
-                    me->CastSpell((Unit*)NULL, SPELL_DEATH_BITE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_DEATH_BITE, false);
                     events.RepeatEvent(urand(2000, 4000));
                     break;
                 case EVENT_SPELL_MARKED_DEATH:
@@ -280,7 +278,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if( Unit* target = summon->SelectNearestTarget(200.0f) )
@@ -290,7 +288,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if( victim->GetTypeId() == TYPEID_PLAYER )
             {
@@ -301,9 +299,9 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
-            me->CastSpell((Unit*)NULL, SPELL_BK_KILL_CREDIT, true);
+            me->CastSpell((Unit*)nullptr, SPELL_BK_KILL_CREDIT, true);
             Talk(TEXT_BK_DEATH);
             if( pInstance )
                 pInstance->SetData(BOSS_BLACK_KNIGHT, DONE);
@@ -312,9 +310,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_black_knightAI (pCreature);
+        return GetTrialOfTheChampionAI<boss_black_knightAI>(pCreature);
     }
 };
 
@@ -327,13 +325,13 @@ public:
     {
         npc_black_knight_skeletal_gryphonAI(Creature* pCreature) : npc_escortAI(pCreature) {}
 
-        void Reset()
+        void Reset() override
         {
-            Start(false, true, 0, NULL);
+            Start(false, true, ObjectGuid::Empty, nullptr);
             SetDespawnAtEnd(true);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == 1 )
             {
@@ -344,7 +342,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 i)
+        void WaypointReached(uint32 i) override
         {
             if( i == 12 )
             {
@@ -359,16 +357,15 @@ public:
             }
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) override
         {
             npc_escortAI::UpdateAI(uiDiff);
         }
-
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_black_knight_skeletal_gryphonAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_black_knight_skeletal_gryphonAI>(pCreature);
     }
 };
 
@@ -387,12 +384,12 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             if (me->GetEntry() == NPC_RISEN_JAEREN || me->GetEntry() == NPC_RISEN_ARELAS)
@@ -400,7 +397,7 @@ public:
             events.RescheduleEvent(2, urand(3000, 4000)); // claw
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_BK_GHOUL_EXPLODE)
             {
@@ -409,7 +406,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             switch(spell->Id)
             {
@@ -430,7 +427,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -449,7 +446,7 @@ public:
                         if (me->GetDistance(target) > 5.0f && me->GetDistance(target) < 30.0f)
                         {
                             me->CastSpell(target, SPELL_LEAP, false);
-                            
+
                             break;
                         }
                     events.RepeatEvent(1000);
@@ -465,9 +462,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_black_knight_ghoulAI (pCreature);
+        return GetTrialOfTheChampionAI<npc_black_knight_ghoulAI>(pCreature);
     }
 };
 

@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "temple_of_ahnqiraj.h"
 
@@ -45,26 +45,26 @@ public:
     {
         boss_skeramAI(Creature* creature) : BossAI(creature, DATA_SKERAM) { }
 
-        void Reset()
+        void Reset() override
         {
             _flag = 0;
             _hpct = 75.0f;
             me->SetVisible(true);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->IsSummon())
                 ((TempSummon*)me)->UnSummon();
         }
 
-        void JustSummoned(Creature* creature)
+        void JustSummoned(Creature* creature) override
         {
             // Shift the boss and images (Get it? *Shift*?)
             uint8 rand = 0;
@@ -101,7 +101,7 @@ public:
             creature->SetHealth(creature->GetMaxHealth() * (me->GetHealthPct() / 100.0f));
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (!me->IsSummon())
                 Talk(SAY_DEATH);
@@ -109,7 +109,7 @@ public:
                 me->RemoveCorpse();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.Reset();
@@ -122,7 +122,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -177,9 +177,9 @@ public:
         uint8 _flag;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_skeramAI(creature);
+        return GetTempleOfAhnQirajAI<boss_skeramAI>(creature);
     }
 };
 
@@ -197,13 +197,13 @@ public:
             targets.remove_if(PlayerOrPetCheck());
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_skeram_arcane_explosion_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_skeram_arcane_explosion_SpellScript();
     }

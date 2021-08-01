@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,16 +7,15 @@
 #ifndef ACORE_WAYPOINTMOVEMENTGENERATOR_H
 #define ACORE_WAYPOINTMOVEMENTGENERATOR_H
 
-/** @page PathMovementGenerator is used to generate movements
+/** PathMovementGenerator is used to generate movements
  * of waypoints and flight paths.  Each serves the purpose
  * of generate activities so that it generates updated
  * packets for the players.
  */
 
 #include "MovementGenerator.h"
-#include "WaypointManager.h"
-
 #include "Player.h"
+#include "WaypointManager.h"
 
 #define FLIGHT_TRAVEL_UPDATE  100
 #define TIMEDIFF_NEXT_WP      250
@@ -45,7 +44,7 @@ class WaypointMovementGenerator<Creature> : public MovementGeneratorMedium< Crea
 {
 public:
     WaypointMovementGenerator(uint32 _path_id = 0, bool _repeating = true)
-        : PathMovementBase((WaypointPath const*)NULL), i_nextMoveTime(0), m_isArrivalDone(false), path_id(_path_id), repeating(_repeating)  {}
+        : PathMovementBase((WaypointPath const*)nullptr), i_nextMoveTime(0), m_isArrivalDone(false), path_id(_path_id), repeating(_repeating)  {}
     ~WaypointMovementGenerator() { i_path = nullptr; }
     void DoInitialize(Creature*);
     void DoFinalize(Creature*);
@@ -60,7 +59,6 @@ public:
     void LoadPath(Creature*);
 
 private:
-
     void Stop(int32 time) { i_nextMoveTime.Reset(time);}
 
     bool Stopped() { return !i_nextMoveTime.Passed();}

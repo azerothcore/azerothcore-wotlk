@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {
@@ -47,7 +47,7 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_ENRAGE, 0);
@@ -58,7 +58,7 @@ public:
             _inEnrage = false;
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             victim->CastSpell(victim, SPELL_MARK_DEATH, 0);
 
@@ -68,24 +68,24 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who && who->GetTypeId() == TYPEID_PLAYER && me->IsValidAttackTarget(who))
-                if (who->HasAura(SPELL_MARK_DEATH, 0) && !who->HasAura(27827)) // Spirit of Redemption
+                if (who->HasAura(SPELL_MARK_DEATH) && !who->HasAura(27827)) // Spirit of Redemption
                     who->CastSpell(who, SPELL_AURA_DEATH, 1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -146,7 +146,7 @@ public:
         bool _inEnrage;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_doomwalkerAI (creature);
     }

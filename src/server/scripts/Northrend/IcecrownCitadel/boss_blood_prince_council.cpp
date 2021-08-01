@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
 #include "icecrown_citadel.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 
 enum Texts
 {
@@ -140,7 +140,7 @@ class StandUpEvent : public BasicEvent
 public:
     StandUpEvent(Creature& owner) : BasicEvent(), _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
     {
         _owner.HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
         return true;
@@ -155,7 +155,7 @@ class ShockVortexExplodeEvent : public BasicEvent
 public:
     ShockVortexExplodeEvent(Creature& owner) : BasicEvent(), _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
     {
         _owner.CastSpell(&_owner, SPELL_SHOCK_VORTEX_PERIODIC, true);
         return true;
@@ -186,7 +186,7 @@ public:
             _canDie = true;
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             if (me->IsAlive())
@@ -211,7 +211,7 @@ public:
         bool _evading;
         bool _canDie;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -221,16 +221,16 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             bool valid = true;
-            if (Creature* keleseth = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 if (!keleseth->IsAlive() || keleseth->IsInEvadeMode())
                     valid = false;
-            if (Creature* taldaram = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 if (!taldaram->IsAlive() || taldaram->IsInEvadeMode())
                     valid = false;
-            if (Creature* valanar = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 if (!valanar->IsAlive() || valanar->IsInEvadeMode())
                     valid = false;
             if (!valid)
@@ -248,10 +248,10 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 if (!taldaram->IsInEvadeMode())
                     taldaram->SetInCombatWithZone();
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 if (!valanar->IsInEvadeMode())
                     valanar->SetInCombatWithZone();
 
@@ -264,12 +264,12 @@ public:
                 me->AddAura(SPELL_SHADOW_PRISON, me);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             ScriptedAI::AttackStartCaster(who, 10.0f);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             events.Reset();
             summons.DespawnAll();
@@ -289,21 +289,21 @@ public:
             }
 
             Talk(SAY_KELESETH_DEATH);
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 if (taldaram->IsAlive())
                     Unit::Kill(taldaram, taldaram);
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 if (valanar->IsAlive())
                     Unit::Kill(valanar, valanar);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             ScriptedAI::JustRespawned();
             JustReachedHome();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             _canDie = true;
             me->setActive(false);
@@ -312,12 +312,12 @@ public:
             me->SetHealth(1);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!_isEmpowered)
             {
@@ -327,7 +327,7 @@ public:
             }
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/)
+        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/) override
         {
             if (target->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -336,25 +336,25 @@ public:
                 instance->SetData(DATA_ORB_WHISPERER_ACHIEVEMENT, 0);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KELESETH_KILL);
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == 71080 && me->IsInCombat() && !me->IsInEvadeMode())
                 DoAction(ACTION_CAST_INVOCATION);
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
                 case ACTION_STAND_UP:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -379,7 +379,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -405,7 +405,7 @@ public:
             DoSpellAttackIfReady(_isEmpowered ? SPELL_EMPOWERED_SHADOW_LANCE : SPELL_SHADOW_LANCE);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (_evading)
                 return;
@@ -413,16 +413,16 @@ public:
             me->SetHealth(me->GetMaxHealth());
             DoAction(ACTION_REMOVE_INVOCATION);
             _evading = true;
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 taldaram->AI()->EnterEvadeMode();
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 valanar->AI()->EnterEvadeMode();
             ScriptedAI::EnterEvadeMode();
             _evading = false;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<boss_prince_kelesethAI>(creature);
     }
@@ -445,7 +445,7 @@ public:
             _canDie = true;
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             if (me->IsAlive())
@@ -470,7 +470,7 @@ public:
         bool _evading;
         bool _canDie;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -480,16 +480,16 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             bool valid = true;
-            if (Creature* keleseth = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 if (!keleseth->IsAlive() || keleseth->IsInEvadeMode())
                     valid = false;
-            if (Creature* taldaram = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 if (!taldaram->IsAlive() || taldaram->IsInEvadeMode())
                     valid = false;
-            if (Creature* valanar = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 if (!valanar->IsAlive() || valanar->IsInEvadeMode())
                     valid = false;
             if (!valid)
@@ -507,10 +507,10 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 if (!keleseth->IsInEvadeMode())
                     keleseth->SetInCombatWithZone();
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 if (!valanar->IsInEvadeMode())
                     valanar->SetInCombatWithZone();
 
@@ -523,7 +523,7 @@ public:
                 me->AddAura(SPELL_SHADOW_PRISON, me);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             events.Reset();
             summons.DespawnAll();
@@ -543,21 +543,21 @@ public:
             }
 
             Talk(EMOTE_TALDARAM_DEATH);
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 if (keleseth->IsAlive())
                     Unit::Kill(keleseth, keleseth);
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 if (valanar->IsAlive())
                     Unit::Kill(valanar, valanar);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             ScriptedAI::JustRespawned();
             JustReachedHome();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             _canDie = true;
             me->setActive(false);
@@ -566,7 +566,7 @@ public:
             me->SetHealth(1);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
 
@@ -581,12 +581,12 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!_isEmpowered)
             {
@@ -596,7 +596,7 @@ public:
             }
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/)
+        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/) override
         {
             if (target->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -605,25 +605,25 @@ public:
                 instance->SetData(DATA_ORB_WHISPERER_ACHIEVEMENT, 0);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_TALDARAM_KILL);
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == 71081 && me->IsInCombat() && !me->IsInEvadeMode())
                 DoAction(ACTION_CAST_INVOCATION);
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
                 case ACTION_STAND_UP:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -644,14 +644,14 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_INVOCATION_OF_BLOOD_TALDARAM);
                     break;
                 case ACTION_FLAME_BALL_CHASE:
-                    summons.DoAction(ACTION_FLAME_BALL_CHASE, 1);
+                    summons.DoAction(ACTION_FLAME_BALL_CHASE);
                     break;
                 default:
                     break;
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -689,7 +689,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (_evading)
                 return;
@@ -697,16 +697,16 @@ public:
             me->SetHealth(me->GetMaxHealth());
             DoAction(ACTION_REMOVE_INVOCATION);
             _evading = true;
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 keleseth->AI()->EnterEvadeMode();
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 valanar->AI()->EnterEvadeMode();
             ScriptedAI::EnterEvadeMode();
             _evading = false;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<boss_prince_taldaramAI>(creature);
     }
@@ -729,7 +729,7 @@ public:
             _canDie = true;
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             if (me->IsAlive())
@@ -753,7 +753,7 @@ public:
         uint32 invocationOrder[3];
         uint8 currentInvocationIndex;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -764,16 +764,16 @@ public:
             instance->SetBossState(DATA_BLOOD_PRINCE_COUNCIL, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             bool valid = true;
-            if (Creature* keleseth = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 if (!keleseth->IsAlive() || keleseth->IsInEvadeMode())
                     valid = false;
-            if (Creature* taldaram = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 if (!taldaram->IsAlive() || taldaram->IsInEvadeMode())
                     valid = false;
-            if (Creature* valanar = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 if (!valanar->IsAlive() || valanar->IsInEvadeMode())
                     valid = false;
             if (!valid)
@@ -793,10 +793,10 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 if (!keleseth->IsInEvadeMode())
                     keleseth->SetInCombatWithZone();
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 if (!taldaram->IsInEvadeMode())
                     taldaram->SetInCombatWithZone();
 
@@ -817,7 +817,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             events.Reset();
             summons.DespawnAll();
@@ -838,21 +838,21 @@ public:
 
             Talk(SAY_VALANAR_DEATH);
             instance->SetBossState(DATA_BLOOD_PRINCE_COUNCIL, DONE);
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 if (keleseth->IsAlive())
                     Unit::Kill(keleseth, keleseth);
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 if (taldaram->IsAlive())
                     Unit::Kill(taldaram, taldaram);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             BossAI::JustRespawned();
             JustReachedHome();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             _canDie = true;
             me->setActive(false);
@@ -862,7 +862,7 @@ public:
             DoAction(ACTION_CAST_INVOCATION);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             switch (summon->GetEntry())
@@ -879,7 +879,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!_isEmpowered)
             {
@@ -889,7 +889,7 @@ public:
             }
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/)
+        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/) override
         {
             if (target->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -898,25 +898,25 @@ public:
                 instance->SetData(DATA_ORB_WHISPERER_ACHIEVEMENT, 0);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_VALANAR_KILL);
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == 71070 && me->IsInCombat() && !me->IsInEvadeMode())
                 DoAction(ACTION_CAST_INVOCATION);
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
                 case ACTION_STAND_UP:
                     summons.DespawnEntry(WORLD_TRIGGER);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -944,8 +944,8 @@ public:
 
         bool CheckRoom()
         {
-            Creature* keleseth = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_KELESETH_GUID));
-            Creature* taldaram = instance->instance->GetCreature(instance->GetData64(DATA_PRINCE_TALDARAM_GUID));
+            Creature* keleseth = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_KELESETH_GUID));
+            Creature* taldaram = instance->instance->GetCreature(instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID));
             if (keleseth && taldaram && CheckBoundary(me) && CheckBoundary(keleseth) && CheckBoundary(taldaram))
                 return true;
 
@@ -953,7 +953,7 @@ public:
             return false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() || !CheckRoom())
                 return;
@@ -968,10 +968,10 @@ public:
                 case EVENT_INVOCATION_OF_BLOOD:
                     {
                         uint32 visualSpellId = 0;
-                        Creature* current = instance->instance->GetCreature(instance->GetData64(invocationOrder[currentInvocationIndex]));
+                        Creature* current = instance->instance->GetCreature(instance->GetGuidData(invocationOrder[currentInvocationIndex]));
                         if (++currentInvocationIndex >= 3)
                             currentInvocationIndex = 0;
-                        Creature* next = instance->instance->GetCreature(instance->GetData64(invocationOrder[currentInvocationIndex]));
+                        Creature* next = instance->instance->GetCreature(instance->GetGuidData(invocationOrder[currentInvocationIndex]));
                         switch (invocationOrder[currentInvocationIndex])
                         {
                             case DATA_PRINCE_KELESETH_GUID:
@@ -992,7 +992,7 @@ public:
                         next->SetHealth(current->GetHealth());
                         current->AI()->DoAction(ACTION_REMOVE_INVOCATION);
                         current->SetHealth(1);
-                        current->CastSpell((Unit*)NULL, visualSpellId, true);
+                        current->CastSpell((Unit*)nullptr, visualSpellId, true);
                         next->AI()->Talk(1);
                     }
                     events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 46000);
@@ -1028,7 +1028,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (_evading)
                 return;
@@ -1036,16 +1036,16 @@ public:
             me->SetHealth(me->GetMaxHealth());
             DoAction(ACTION_REMOVE_INVOCATION);
             _evading = true;
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 keleseth->AI()->EnterEvadeMode();
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 taldaram->AI()->EnterEvadeMode();
             BossAI::EnterEvadeMode();
             _evading = false;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<boss_prince_valanarAI>(creature);
     }
@@ -1065,7 +1065,7 @@ public:
             me->m_SightDistance = 100.0f; // for MoveInLineOfSight distance
         }
 
-        void Reset()
+        void Reset() override
         {
             _events.Reset();
             me->SetDisableGravity(true);
@@ -1080,7 +1080,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (_introDone)
                 return;
@@ -1104,7 +1104,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == POINT_INTRO_DESPAWN)
             {
@@ -1112,7 +1112,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!_events.GetPhaseMask())
             {
@@ -1127,15 +1127,15 @@ public:
                 me->GetMotionMaster()->MovePoint(POINT_INTRO_DESPAWN, introFinalPos);
                 _events.Reset();
 
-                if (Creature* keleseth = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
+                if (Creature* keleseth = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
                 {
                     keleseth->AI()->DoAction(ACTION_STAND_UP);
                 }
-                if (Creature* taldaram = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
+                if (Creature* taldaram = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
                 {
                     taldaram->AI()->DoAction(ACTION_STAND_UP);
                 }
-                if (Creature* valanar = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+                if (Creature* valanar = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 {
                     valanar->AI()->DoAction(ACTION_STAND_UP);
                 }
@@ -1148,7 +1148,7 @@ public:
         bool _introDone;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_blood_queen_lana_thelAI>(creature);
     }
@@ -1165,7 +1165,7 @@ public:
 
         uint16 timer;
 
-        void Reset()
+        void Reset() override
         {
             timer = 0;
             me->SetReactState(REACT_DEFENSIVE);
@@ -1173,7 +1173,7 @@ public:
             me->CastSpell(me, SPELL_SHADOW_RESONANCE_AURA, true);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (who != me->GetVictim())
             {
@@ -1184,7 +1184,7 @@ public:
             ScriptedAI::AttackStart(who);
         }
 
-        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType det, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType det, SpellSchoolMask) override
         {
             if (!attacker || attacker == me || attacker == me->GetVictim() || (det != DIRECT_DAMAGE && det != SPELL_DIRECT_DAMAGE))
                 return;
@@ -1193,12 +1193,12 @@ public:
             me->AddThreat(attacker, 500000000.0f);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon(1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -1225,7 +1225,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_dark_nucleusAI>(creature);
     }
@@ -1240,7 +1240,6 @@ public:
     {
         npc_ball_of_flameAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
         {
-            _chaseGUID = 0;
             _exploded = false;
             _started = false;
             if (me->GetEntry() == NPC_BALL_OF_INFERNO_FLAME)
@@ -1249,19 +1248,19 @@ public:
         }
 
         InstanceScript* _instance;
-        uint64 _chaseGUID;
+        ObjectGuid _chaseGUID;
         bool _exploded;
         bool _started;
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (_started)
                 ScriptedAI::AttackStart(who);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32  /*id*/) override
         {
             if (type == CHASE_MOTION_TYPE && !_exploded)
             {
@@ -1276,12 +1275,12 @@ public:
             }
         }
 
-        void SetGUID(uint64 guid, int32 /*type*/)
+        void SetGUID(ObjectGuid guid, int32 /*type*/) override
         {
             _chaseGUID = guid;
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action != ACTION_FLAME_BALL_CHASE || me->IsInCombat())
             {
@@ -1317,7 +1316,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/)
+        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/) override
         {
             if (target->GetTypeId() != TYPEID_PLAYER)
             {
@@ -1331,7 +1330,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_ball_of_flameAI>(creature);
     }
@@ -1354,18 +1353,18 @@ public:
         float _groundZ;
         bool exploded;
 
-        void IsSummonedBy(Unit* /*summoner*/)
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
             {
-                if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
+                if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
                 {
                     valanar->AI()->JustSummoned(me);
                 }
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             _events.Reset();
             _events.RescheduleEvent(EVENT_BOMB_DESPAWN, 60000);
@@ -1376,11 +1375,11 @@ public:
             me->GetPosition(x, y, z);
             _x = x;
             _y = y;
-            _groundZ = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, z, true, 500.0f);
+            _groundZ = me->GetMapHeight(x, y, z, true, 500.0f);
             me->GetMotionMaster()->MoveCharge(_x, _y, _groundZ, me->GetSpeed(MOVE_WALK));
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == SPELL_KINETIC_BOMB_EXPLOSION)
             {
@@ -1399,7 +1398,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
             switch (_events.ExecuteEvent())
@@ -1418,7 +1417,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetIcecrownCitadelAI<npc_kinetic_bombAI>(creature);
     }
@@ -1437,17 +1436,17 @@ public:
         {
             if (GetTarget()->GetTypeId() == TYPEID_PLAYER && GetTarget()->isMoving())
             {
-                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, NULL, aurEff);
+                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, nullptr, aurEff);
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_council_shadow_prison_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_blood_council_shadow_prison_AuraScript();
     }
@@ -1473,13 +1472,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_blood_council_shadow_prison_SpellScript::AddExtraDamage);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_blood_council_shadow_prison_SpellScript();
     }
@@ -1500,13 +1499,13 @@ public:
             GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_taldaram_glittering_sparks_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_taldaram_glittering_sparks_SpellScript();
     }
@@ -1521,7 +1520,7 @@ public:
     {
         PrepareSpellScript(spell_taldaram_summon_flame_ball_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             if (GetCaster()->GetTypeId() != TYPEID_UNIT)
             {
@@ -1537,13 +1536,13 @@ public:
             GetCaster()->ToCreature()->AI()->DoAction(ACTION_FLAME_BALL_CHASE);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_taldaram_summon_flame_ball_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_taldaram_summon_flame_ball_SpellScript();
     }
@@ -1564,13 +1563,13 @@ public:
                 aur->SetStackAmount(uint8(GetSpellInfo()->StackAmount));
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_taldaram_ball_of_inferno_flame_SpellScript::ModAuraStack);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_taldaram_ball_of_inferno_flame_SpellScript();
     }
@@ -1594,7 +1593,7 @@ public:
             GetHitDest()->RelocateOffset(offset);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHit += SpellEffectFn(spell_valanar_kinetic_bomb_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
         }
@@ -1619,18 +1618,18 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_valanar_kinetic_bomb_AuraScript::HandleDummyTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_valanar_kinetic_bomb_SpellScript();
     }
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_valanar_kinetic_bomb_AuraScript();
     }
@@ -1652,13 +1651,13 @@ public:
             dmgInfo.AbsorbDamage(absorbAmount);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectAbsorb += AuraEffectAbsorbFn(spell_valanar_kinetic_bomb_absorb_AuraScript::OnAbsorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_valanar_kinetic_bomb_absorb_AuraScript();
     }
@@ -1679,13 +1678,13 @@ public:
                 target->AI()->DoAction(ACTION_KINETIC_BOMB_JUMP);
         }
 
-        void Register()
+        void Register() override
         {
             BeforeHit += SpellHitFn(spell_valanar_kinetic_bomb_knockback_SpellScript::KnockIntoAir);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_valanar_kinetic_bomb_knockback_SpellScript();
     }
@@ -1711,13 +1710,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             BeforeCast += SpellCastFn(spell_valanar_kinetic_bomb_summon_SpellScript::SelectDest);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_valanar_kinetic_bomb_summon_SpellScript();
     }
@@ -1748,7 +1747,7 @@ public:
                     float destY = summoner->GetPositionY() + sin(angle + a * M_PI) * i * 10.0f;
                     if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY, summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS) && destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                     {
-                        float destZ = summoner->GetMap()->GetHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ() + 10.0f);
+                        float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());
                         if (fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
                         {
                             dest._position.Relocate(destX, destY, destZ);
@@ -1760,13 +1759,13 @@ public:
             dest._position.Relocate(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ());
         }
 
-        void Register()
+        void Register() override
         {
             OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_blood_council_summon_shadow_resonance_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_blood_council_summon_shadow_resonance_SpellScript();
     }

@@ -132,4 +132,3 @@ void Geometry::AddAdt( ADT* adt )
     if (!adt->_WorldModelHandler->Triangles.empty())
         AddData(adt->_WorldModelHandler->Vertices, adt->_WorldModelHandler->Triangles);
 }
-

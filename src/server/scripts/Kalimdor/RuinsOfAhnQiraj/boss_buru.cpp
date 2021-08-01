@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
 #include "ruins_of_ahnqiraj.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 enum Emotes
 {
@@ -59,18 +59,18 @@ public:
         {
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             BossAI::EnterEvadeMode();
 
-            for (std::list<uint64>::iterator i = Eggs.begin(); i != Eggs.end(); ++i)
-                if (Creature* egg = me->GetMap()->GetCreature(*Eggs.begin()))
+            for (ObjectGuid const& guid : Eggs)
+                if (Creature* egg = me->GetMap()->GetCreature(guid))
                     egg->Respawn();
 
             Eggs.clear();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             _EnterCombat();
             Talk(EMOTE_TARGET, who);
@@ -83,14 +83,14 @@ public:
             _phase = PHASE_EGG;
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_EXPLODE)
                 if (_phase == PHASE_EGG)
                     Unit::DealDamage(me, me, 45000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 ChaseNewVictim();
@@ -114,14 +114,14 @@ public:
             }
         }
 
-        void ManageRespawn(uint64 EggGUID)
+        void ManageRespawn(ObjectGuid EggGUID)
         {
             ChaseNewVictim();
             Eggs.push_back(EggGUID);
             events.ScheduleEvent(EVENT_RESPAWN_EGG, 100000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -171,12 +171,12 @@ public:
         }
     private:
         uint8 _phase;
-        std::list<uint64> Eggs;
+        GuidList Eggs;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_buruAI(creature);
+        return GetRuinsOfAhnQirajAI<boss_buruAI>(creature);
     }
 };
 
@@ -193,28 +193,28 @@ public:
             SetCombatMovement(false);
         }
 
-        void EnterCombat(Unit* attacker)
+        void EnterCombat(Unit* attacker) override
         {
-            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetData64(DATA_BURU)))
+            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
                 if (!buru->IsInCombat())
                     buru->AI()->AttackStart(attacker);
         }
 
-        void JustSummoned(Creature* who)
+        void JustSummoned(Creature* who) override
         {
             if (who->GetEntry() == NPC_HATCHLING)
-                if (Creature* buru = me->GetMap()->GetCreature(_instance->GetData64(DATA_BURU)))
+                if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
                     if (Unit* target = buru->AI()->SelectTarget(SELECT_TARGET_RANDOM))
                         who->AI()->AttackStart(target);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             DoCastAOE(SPELL_EXPLODE, true);
             DoCastAOE(SPELL_EXPLODE_2, true); // Unknown purpose
             DoCast(me, SPELL_SUMMON_HATCHLING, true);
 
-            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetData64(DATA_BURU)))
+            if (Creature* buru = me->GetMap()->GetCreature(_instance->GetGuidData(DATA_BURU)))
                 if (boss_buru::boss_buruAI* buruAI = dynamic_cast<boss_buru::boss_buruAI*>(buru->AI()))
                     buruAI->ManageRespawn(me->GetGUID());
         }
@@ -222,9 +222,9 @@ public:
         InstanceScript* _instance;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_buru_eggAI>(creature);
+        return GetRuinsOfAhnQirajAI<npc_buru_eggAI>(creature);
     }
 };
 
@@ -249,14 +249,14 @@ public:
                 Unit::DealDamage(GetCaster(), target, -16 * GetCaster()->GetDistance(target) + 500);
         }
 
-        void Register()
+        void Register() override
         {
             AfterCast += SpellCastFn(spell_egg_explosion_SpellScript::HandleAfterCast);
             OnEffectHitTarget += SpellEffectFn(spell_egg_explosion_SpellScript::HandleDummyHitTarget, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_egg_explosion_SpellScript();
     }

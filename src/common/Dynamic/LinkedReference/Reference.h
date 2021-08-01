@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -27,16 +27,18 @@ protected:
     // Tell our refFrom (source) object, that the link is cut (Target destroyed)
     virtual void sourceObjectDestroyLink() = 0;
 public:
-    Reference() { iRefTo = NULL; iRefFrom = NULL; }
-    virtual ~Reference() { }
+    Reference() { iRefTo = nullptr; iRefFrom = nullptr; }
+    virtual ~Reference() = default;
 
     // Create new link
     void link(TO* toObj, FROM* fromObj)
     {
-        ASSERT(fromObj);                                // fromObj MUST not be NULL
+        ASSERT(fromObj);                                // fromObj MUST not be nullptr
         if (isValid())
+        {
             unlink();
-        if (toObj != NULL)
+        }
+        if (toObj != nullptr)
         {
             iRefTo = toObj;
             iRefFrom = fromObj;
@@ -50,8 +52,8 @@ public:
     {
         targetObjectDestroyLink();
         delink();
-        iRefTo = NULL;
-        iRefFrom = NULL;
+        iRefTo = nullptr;
+        iRefFrom = nullptr;
     }
 
     // Link is invalid due to destruction of referenced target object. Call comes from the refTo object
@@ -60,28 +62,28 @@ public:
     {
         sourceObjectDestroyLink();
         delink();
-        iRefTo = NULL;
+        iRefTo = nullptr;
     }
 
-    bool isValid() const                                // Only check the iRefTo
+    [[nodiscard]] bool isValid() const                                // Only check the iRefTo
     {
-        return iRefTo != NULL;
+        return iRefTo != nullptr;
     }
 
     Reference<TO, FROM>*        next()       { return ((Reference<TO, FROM>*) LinkedListElement::next()); }
-    Reference<TO, FROM> const* next() const { return ((Reference<TO, FROM> const*) LinkedListElement::next()); }
+    [[nodiscard]] Reference<TO, FROM> const* next() const { return ((Reference<TO, FROM> const*) LinkedListElement::next()); }
     Reference<TO, FROM>*        prev()       { return ((Reference<TO, FROM>*) LinkedListElement::prev()); }
-    Reference<TO, FROM> const* prev() const { return ((Reference<TO, FROM> const*) LinkedListElement::prev()); }
+    [[nodiscard]] Reference<TO, FROM> const* prev() const { return ((Reference<TO, FROM> const*) LinkedListElement::prev()); }
 
     Reference<TO, FROM>*        nocheck_next()       { return ((Reference<TO, FROM>*) LinkedListElement::nocheck_next()); }
-    Reference<TO, FROM> const* nocheck_next() const { return ((Reference<TO, FROM> const*) LinkedListElement::nocheck_next()); }
+    [[nodiscard]] Reference<TO, FROM> const* nocheck_next() const { return ((Reference<TO, FROM> const*) LinkedListElement::nocheck_next()); }
     Reference<TO, FROM>*        nocheck_prev()       { return ((Reference<TO, FROM>*) LinkedListElement::nocheck_prev()); }
-    Reference<TO, FROM> const* nocheck_prev() const { return ((Reference<TO, FROM> const*) LinkedListElement::nocheck_prev()); }
+    [[nodiscard]] Reference<TO, FROM> const* nocheck_prev() const { return ((Reference<TO, FROM> const*) LinkedListElement::nocheck_prev()); }
 
     TO* operator ->() const { return iRefTo; }
-    TO* getTarget() const { return iRefTo; }
+    [[nodiscard]] TO* getTarget() const { return iRefTo; }
 
-    FROM* GetSource() const { return iRefFrom; }
+    [[nodiscard]] FROM* GetSource() const { return iRefFrom; }
 };
 
 //=====================================================

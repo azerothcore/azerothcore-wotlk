@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "black_temple.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Says
 {
@@ -58,9 +58,9 @@ class boss_mother_shahraz : public CreatureScript
 public:
     boss_mother_shahraz() : CreatureScript("boss_mother_shahraz") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_shahrazAI>(creature);
+        return GetBlackTempleAI<boss_shahrazAI>(creature);
     }
 
     struct boss_shahrazAI : public BossAI
@@ -69,12 +69,12 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -90,7 +90,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_SABER_LASH, 4000);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -99,13 +99,13 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -173,13 +173,13 @@ public:
                 GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_random_periodic_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_mother_shahraz_random_periodic_AuraScript();
     }
@@ -201,13 +201,13 @@ public:
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_beam_periodic_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_mother_shahraz_beam_periodic_AuraScript();
     }
@@ -234,14 +234,14 @@ public:
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
         }
 
-        void Register()
+        void Register() override
         {
             DoCheckProc += AuraCheckProcFn(spell_mother_shahraz_saber_lash_AuraScript::CheckProc);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_saber_lash_AuraScript::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_mother_shahraz_saber_lash_AuraScript();
     }
@@ -258,15 +258,15 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_SABER_LASH_IMMUNITY));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SABER_LASH_IMMUNITY));
             if (targets.size() <= 1)
                 FinishCast(SPELL_FAILED_DONT_REPORT);
         }
 
         void SetDest(SpellDestination& dest)
         {
-            std::list<Spell::TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-            for (std::list<Spell::TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+            std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+            for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
                 if (Unit* target = ObjectAccessor::GetUnit(*GetCaster(), ihit->targetGUID))
                 {
                     dest.Relocate(*target);
@@ -281,7 +281,7 @@ public:
                 GetCaster()->CastSpell(target, SPELL_FATAL_ATTRACTION_AURA, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mother_shahraz_fatal_attraction_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
             OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_mother_shahraz_fatal_attraction_SpellScript::SetDest, EFFECT_1, TARGET_DEST_CASTER_RANDOM);
@@ -289,7 +289,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_mother_shahraz_fatal_attraction_SpellScript();
     }
@@ -314,13 +314,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_mother_shahraz_fatal_attraction_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_mother_shahraz_fatal_attraction_dummy_SpellScript();
     }
@@ -344,13 +344,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_fatal_attraction_aura_AuraScript::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_mother_shahraz_fatal_attraction_aura_AuraScript();
     }

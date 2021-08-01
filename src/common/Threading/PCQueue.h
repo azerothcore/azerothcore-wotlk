@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
@@ -7,10 +7,10 @@
 #ifndef _PCQ_H
 #define _PCQ_H
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
-#include <atomic>
 #include <type_traits>
 
 template <typename T>
@@ -23,7 +23,6 @@ private:
     std::atomic<bool> _shutdown;
 
 public:
-
     ProducerConsumerQueue<T>() : _shutdown(false) { }
 
     void Push(const T& value)
@@ -46,7 +45,9 @@ public:
         std::lock_guard<std::mutex> lock(_queueLock);
 
         if (_queue.empty() || _shutdown)
+        {
             return false;
+        }
 
         value = _queue.front();
 
@@ -62,10 +63,14 @@ public:
         // we could be using .wait(lock, predicate) overload here but it is broken
         // https://connect.microsoft.com/VisualStudio/feedback/details/1098841
         while (_queue.empty() && !_shutdown)
+        {
             _condition.wait(lock);
+        }
 
         if (_queue.empty() || _shutdown)
+        {
             return;
+        }
 
         value = _queue.front();
 
@@ -95,7 +100,7 @@ private:
     typename std::enable_if<std::is_pointer<E>::value>::type DeleteQueuedObject(E& obj) { delete obj; }
 
     template<typename E = T>
-    typename std::enable_if < !std::is_pointer<E>::value >::type DeleteQueuedObject(E const& /*packet*/) { }
+    typename std::enable_if<!std::is_pointer<E>::value>::type DeleteQueuedObject(E const& /*packet*/) { }
 };
 
 #endif

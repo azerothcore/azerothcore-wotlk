@@ -68,11 +68,11 @@ public:
 class WDT_file : public FileLoader
 {
 public:
-    bool   prepareLoadedData();
+    bool   prepareLoadedData() override;
 
     WDT_file();
     ~WDT_file();
-    void free();
+    void free() override;
 
     wdt_MPHD* mphd;
     wdt_MAIN* main;

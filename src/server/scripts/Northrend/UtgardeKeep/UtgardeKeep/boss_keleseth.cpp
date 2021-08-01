@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
-#include "utgarde_keep.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "PassiveAI.h"
+#include "utgarde_keep.h"
 
 enum eTexts
 {
@@ -48,14 +48,14 @@ class npc_frost_tomb : public CreatureScript
 public:
     npc_frost_tomb() : CreatureScript("npc_frost_tomb") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_frost_tombAI(pCreature);
+        return GetUtgardeKeepAI<npc_frost_tombAI>(pCreature);
     }
 
     struct npc_frost_tombAI : public NullCreatureAI
     {
-        npc_frost_tombAI(Creature* c) : NullCreatureAI(c), PrisonerGUID(0)
+        npc_frost_tombAI(Creature* c) : NullCreatureAI(c)
         {
             if (TempSummon* t = c->ToTempSummon())
                 if (Unit* s = t->GetSummoner())
@@ -64,15 +64,15 @@ public:
                     if( me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic() )
                     {
                         const int32 dmg = 2000;
-                        c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, NULL, &dmg, NULL, true);
+                        c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, nullptr, &dmg, nullptr, true);
                     }
                     else
                         c->CastSpell(s, SPELL_FROST_TOMB_AURA, true);
                 }
         }
-        uint64 PrisonerGUID;
+        ObjectGuid PrisonerGUID;
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (killer->GetGUID() != me->GetGUID())
                 if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -84,7 +84,7 @@ public:
             me->DespawnOrUnsummon(5000);
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (PrisonerGUID)
             {
@@ -98,7 +98,6 @@ public:
             }
         }
     };
-
 };
 
 class boss_keleseth : public CreatureScript
@@ -106,9 +105,9 @@ class boss_keleseth : public CreatureScript
 public:
     boss_keleseth() : CreatureScript("boss_keleseth") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_kelesethAI (pCreature);
+        return GetUtgardeKeepAI<boss_kelesethAI>(pCreature);
     }
 
     struct boss_kelesethAI : public ScriptedAI
@@ -121,14 +120,14 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if (pInstance)
                 pInstance->SetData(DATA_KELESETH, NOT_STARTED);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
         /*void KilledUnit(Unit * victim)
         {
@@ -137,14 +136,14 @@ public:
             DoScriptText(SAY_KILL, me);
         }*/
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_KELESETH, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_SHADOWBOLT, 0);
@@ -158,7 +157,7 @@ public:
                 pInstance->SetData(DATA_KELESETH, IN_PROGRESS);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if( !who )
                 return;
@@ -166,7 +165,7 @@ public:
             UnitAI::AttackStartCaster(who, 12.0f);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -215,7 +214,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 enum eSkeletonEnum
@@ -235,9 +233,9 @@ class npc_vrykul_skeleton : public CreatureScript
 public:
     npc_vrykul_skeleton() : CreatureScript("npc_vrykul_skeleton") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_vrykul_skeletonAI (pCreature);
+        return GetUtgardeKeepAI<npc_vrykul_skeletonAI>(pCreature);
     }
 
     struct npc_vrykul_skeletonAI : public ScriptedAI
@@ -250,7 +248,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_DECREPIFY, urand(10000, 20000));
@@ -258,7 +256,7 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, urand(25000, 120000));
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -271,14 +269,14 @@ public:
                 me->GetMotionMaster()->MoveIdle();
                 me->StopMoving();
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 events.RescheduleEvent(EVENT_RESURRECT, 12000);
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
             {
@@ -306,14 +304,14 @@ public:
                     break;
                 case EVENT_SPELL_BONE_ARMOR:
                     if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
-                        me->CastSpell((Unit*)NULL, SPELL_BONE_ARMOR, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_BONE_ARMOR, false);
                     events.RepeatEvent(urand(40000, 120000));
                     break;
                 case EVENT_RESURRECT:
                     events.DelayEvents(3500);
                     DoCast(me, SPELL_SCOURGE_RESURRECTION, true);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     events.RescheduleEvent(EVENT_RESURRECT_2, 3000);
@@ -329,7 +327,6 @@ public:
                 DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class spell_frost_tomb : public SpellScriptLoader
@@ -346,16 +343,16 @@ public:
             PreventDefaultAction();
             if (aurEff->GetTickNumber() == 1)
                 if( Unit* target = GetTarget() )
-                    target->CastSpell((Unit*)NULL, SPELL_FROST_TOMB_SUMMON, true);
+                    target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tombAuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_frost_tombAuraScript();
     }

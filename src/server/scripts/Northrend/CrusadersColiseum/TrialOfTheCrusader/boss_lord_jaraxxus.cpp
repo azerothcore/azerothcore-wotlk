@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum JaraxxusTexts
 {
@@ -76,15 +76,14 @@ enum JaraxxusEvents
     EVENT_SPELL_MISTRESS_KISS,
 };
 
-
 class boss_jaraxxus : public CreatureScript
 {
 public:
     boss_jaraxxus() : CreatureScript("boss_jaraxxus") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_jaraxxusAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_jaraxxusAI>(pCreature);
     }
 
     struct boss_jaraxxusAI : public ScriptedAI
@@ -100,7 +99,7 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if( pInstance )
@@ -113,7 +112,7 @@ public:
                 c->DespawnOrUnsummon();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();
@@ -133,7 +132,7 @@ public:
                 pInstance->SetData(TYPE_JARAXXUS, IN_PROGRESS);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             switch( spell->Id )
             {
@@ -179,7 +178,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -233,15 +232,15 @@ public:
                 case EVENT_SUMMON_NETHER_PORTAL:
                     Talk(EMOTE_NETHER_PORTAL);
                     Talk(SAY_MISTRESS_OF_PAIN);
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_NETHER_PORTAL, false);
-                    
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_NETHER_PORTAL, false);
+
                     events.RescheduleEvent(EVENT_SUMMON_VOLCANO, 60000);
                     break;
                 case EVENT_SUMMON_VOLCANO:
                     Talk(EMOTE_INFERNAL_ERUPTION);
                     Talk(SAY_INFERNAL_ERUPTION);
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_VOLCANO, false);
-                    
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOLCANO, false);
+
                     events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 60000);
                     break;
             }
@@ -249,7 +248,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -257,17 +256,17 @@ public:
                 pInstance->SetData(TYPE_JARAXXUS, DONE);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -276,7 +275,7 @@ public:
                 pInstance->SetData(TYPE_FAILED, 1);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
     };
 };
 
@@ -285,9 +284,9 @@ class npc_fel_infernal : public CreatureScript
 public:
     npc_fel_infernal() : CreatureScript("npc_fel_infernal") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_fel_infernalAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_fel_infernalAI>(pCreature);
     }
 
     struct npc_fel_infernalAI : public ScriptedAI
@@ -296,7 +295,7 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             if( Unit* target = me->SelectNearestTarget(200.0f) )
             {
@@ -307,7 +306,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_FEL_STEAK, urand(7000, 20000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -338,17 +337,16 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon(10000);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon();
         }
     };
-
 };
 
 class npc_mistress_of_pain : public CreatureScript
@@ -356,9 +354,9 @@ class npc_mistress_of_pain : public CreatureScript
 public:
     npc_mistress_of_pain() : CreatureScript("npc_mistress_of_pain") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_mistress_of_painAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_mistress_of_painAI>(pCreature);
     }
 
     struct npc_mistress_of_painAI : public ScriptedAI
@@ -367,7 +365,7 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             if( Unit* target = me->SelectNearestTarget(200.0f) )
             {
@@ -381,13 +379,13 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_MISTRESS_KISS, urand(10000, 15000));
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo*  /*spell*/)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo*  /*spell*/) override
         {
             //if (caster && spell && spell->Id == 66287 /*control vehicle*/)
             //  caster->ClearUnitState(UNIT_STATE_ONVEHICLE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -412,7 +410,7 @@ public:
                     events.RepeatEvent(urand(25000, 30000));
                     break;
                 case EVENT_SPELL_MISTRESS_KISS:
-                    me->CastSpell((Unit*)NULL, SPELL_MISTRESS_KISS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_MISTRESS_KISS, false);
                     events.RepeatEvent(urand(25000, 35000));
                     break;
             }
@@ -420,17 +418,16 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon(10000);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon();
         }
     };
-
 };
 
 class spell_toc25_mistress_kiss : public SpellScriptLoader
@@ -453,13 +450,13 @@ public:
                     }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_toc25_mistress_kiss_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_toc25_mistress_kiss_AuraScript();
     }
@@ -477,12 +474,12 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             // get a list of players with mana
-            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(acore::PowerCheck(POWER_MANA, false));
+            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
             if (targets.empty())
                 return;
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }
@@ -492,14 +489,14 @@ public:
             GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mistress_kiss_area_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnEffectHitTarget += SpellEffectFn(spell_mistress_kiss_area_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_mistress_kiss_area_SpellScript();
     }

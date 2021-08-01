@@ -1,14 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
-#include "WaypointManager.h"
-#include "MapManager.h"
 #include "Log.h"
+#include "WaypointManager.h"
 
 WaypointMgr::WaypointMgr()
 {
@@ -42,8 +41,8 @@ void WaypointMgr::Load()
 
     if (!result)
     {
-        sLog->outErrorDb(">> Loaded 0 waypoints. DB table `waypoint_data` is empty!");
-        sLog->outString();
+        LOG_ERROR("sql.sql", ">> Loaded 0 waypoints. DB table `waypoint_data` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -62,8 +61,8 @@ void WaypointMgr::Load()
         float z = fields[4].GetFloat();
         float o = fields[5].GetFloat();
 
-        acore::NormalizeMapCoord(x);
-        acore::NormalizeMapCoord(y);
+        Acore::NormalizeMapCoord(x);
+        Acore::NormalizeMapCoord(y);
 
         wp->id = fields[1].GetUInt32();
         wp->x = x;
@@ -87,8 +86,8 @@ void WaypointMgr::Load()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u waypoints in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server.loading", ">> Loaded %u waypoints in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void WaypointMgr::ReloadPath(uint32 id)
@@ -102,7 +101,7 @@ void WaypointMgr::ReloadPath(uint32 id)
         _waypointStore.erase(itr);
     }
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_ID);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_BY_ID);
 
     stmt->setUInt32(0, id);
 
@@ -123,8 +122,8 @@ void WaypointMgr::ReloadPath(uint32 id)
         float z = fields[3].GetFloat();
         float o = fields[4].GetFloat();
 
-        acore::NormalizeMapCoord(x);
-        acore::NormalizeMapCoord(y);
+        Acore::NormalizeMapCoord(x);
+        Acore::NormalizeMapCoord(y);
 
         wp->id = fields[0].GetUInt32();
         wp->x = x;
@@ -145,6 +144,5 @@ void WaypointMgr::ReloadPath(uint32 id)
         wp->event_chance = fields[8].GetUInt8();
 
         path.push_back(wp);
-
     } while (result->NextRow());
 }

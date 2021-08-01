@@ -1,18 +1,6 @@
 /*
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -23,19 +11,18 @@
 * mmap sub-commands
 */
 
-#include "ScriptMgr.h"
+#include "CellImpl.h"
 #include "Chat.h"
-#include "DisableMgr.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "PointMovementGenerator.h"
-#include "PathGenerator.h"
-#include "MMapFactory.h"
-#include "Map.h"
-#include "TargetedMovementGenerator.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "Map.h"
+#include "MMapFactory.h"
+#include "ObjectMgr.h"
+#include "PathGenerator.h"
+#include "Player.h"
+#include "PointMovementGenerator.h"
+#include "ScriptMgr.h"
+#include "TargetedMovementGenerator.h"
 
 class mmaps_commandscript : public CommandScript
 {
@@ -55,7 +42,7 @@ public:
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "mmap", SEC_ADMINISTRATOR, true, NULL, "", mmapCommandTable },
+            { "mmap", SEC_ADMINISTRATOR, true, nullptr, "", mmapCommandTable },
         };
         return commandTable;
     }
@@ -85,9 +72,11 @@ public:
         if (para && strcmp(para, "true") == 0)
             useStraightPath = true;
 
-        bool useStraightLine = false;
-        if (para && strcmp(para, "line") == 0)
-            useStraightLine = true;
+        bool useRaycast = false;
+        if (para && (strcmp(para, "line") == 0 || strcmp(para, "ray") == 0 || strcmp(para, "raycast") == 0))
+        {
+            useRaycast = true;
+        }
 
         // unit locations
         float x, y, z;
@@ -96,11 +85,12 @@ public:
         // path
         PathGenerator path(target);
         path.SetUseStraightPath(useStraightPath);
+        path.SetUseRaycast(useRaycast);
         bool result = path.CalculatePath(x, y, z, false);
 
         Movement::PointsArray const& pointPath = path.GetPath();
         handler->PSendSysMessage("%s's path to %s:", target->GetName().c_str(), player->GetName().c_str());
-        handler->PSendSysMessage("Building: %s", useStraightPath ? "StraightPath" : useStraightLine ? "Raycast" : "SmoothPath");
+        handler->PSendSysMessage("Building: %s", useStraightPath ? "StraightPath" : useRaycast ? "Raycast" : "SmoothPath");
         handler->PSendSysMessage("Result: %s - Length: " SZFMTD " - Type: %u", (result ? "true" : "false"), pointPath.size(), path.GetPathType());
 
         G3D::Vector3 const& start = path.GetStartPosition();
@@ -154,7 +144,7 @@ public:
         handler->PSendSysMessage("Calc   [%02i, %02i]", tilex, tiley);
 
         // navmesh poly -> navmesh tile location
-        dtQueryFilter filter = dtQueryFilter();
+        dtQueryFilterExt filter = dtQueryFilterExt();
         dtPolyRef polyRef = INVALID_POLYREF;
         if (dtStatusFailed(navmeshquery->findNearestPoly(location, extents, &filter, &polyRef, nullptr)))
         {
@@ -260,18 +250,11 @@ public:
         float radius = 40.0f;
         WorldObject* object = handler->GetSession()->GetPlayer();
 
-        CellCoord pair(acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY()));
-        Cell cell(pair);
-        cell.SetNoCreate();
-
-        std::list<Creature*> creatureList;
-
-        acore::AnyUnitInObjectRangeCheck go_check(object, radius);
-        acore::CreatureListSearcher<acore::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
-        TypeContainerVisitor<acore::CreatureListSearcher<acore::AnyUnitInObjectRangeCheck>, GridTypeMapContainer> go_visit(go_search);
-
         // Get Creatures
-        cell.Visit(pair, go_visit, *(object->GetMap()), *object, radius);
+        std::list<Creature*> creatureList;
+        Acore::AnyUnitInObjectRangeCheck go_check(object, radius);
+        Acore::CreatureListSearcher<Acore::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
+        Cell::VisitGridObjects(object, go_search, radius);
 
         if (!creatureList.empty())
         {

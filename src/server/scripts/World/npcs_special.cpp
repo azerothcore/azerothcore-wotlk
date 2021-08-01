@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,7 +14,6 @@ EndScriptData
 
 /* ContentData
 npc_air_force_bots       80%    support for misc (invisible) guard bots in areas where player allowed to fly. Summon guards after a preset time if tagged by spell
-npc_lunaclaw_spirit      80%    support for quests 6001/6002 (Body and Heart)
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
 npc_dancing_flames      100%    midsummer event NPC
 npc_guardian            100%    guardianAI used to prevent players from accessing off-limits areas. Not in use by SD2
@@ -26,29 +25,27 @@ npc_locksmith            75%    list of keys needs to be confirmed
 npc_firework            100%    NPC's summoned by rockets and rocket clusters, for making them cast visual
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "World.h"
+#include "Cell.h"
+#include "CellImpl.h"
+#include "Chat.h"
+#include "CombatAI.h"
 #include "CreatureTextMgr.h"
-#include "PassiveAI.h"
+#include "DBCStructure.h"
 #include "GameEventMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "SpellAuras.h"
-#include "CombatAI.h"
+#include "Group.h"
+#include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
-#include "Chat.h"
-#include "Group.h"
-#include "WaypointManager.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SmartAI.h"
-#include "DBCStructure.h"
+#include "SpellAuras.h"
+#include "WaypointManager.h"
+#include "World.h"
 
 enum elderClearwater
 {
@@ -304,8 +301,6 @@ public:
     }
 };
 
-
-
 enum eTrainingDummy
 {
     SPELL_STUN_PERMANENT        = 61204
@@ -326,13 +321,13 @@ public:
 
         uint32 resetTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_STUN_PERMANENT, true);
             resetTimer = 5000;
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!_EnterEvadeMode())
                 return;
@@ -340,13 +335,13 @@ public:
             Reset();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             resetTimer = 5000;
             damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -360,10 +355,10 @@ public:
                 resetTimer -= diff;
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_training_dummyAI(creature);
     }
@@ -385,14 +380,14 @@ public:
 
         uint32 deathTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetControlled(true, UNIT_STATE_STUNNED); //disable rotate
             me->SetLootRecipient(me->GetOwner());
             me->SelectLevel();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!_EnterEvadeMode())
                 return;
@@ -400,7 +395,7 @@ public:
             Reset();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->HasUnitState(UNIT_STATE_STUNNED))
                 me->SetControlled(true, UNIT_STATE_STUNNED);//disable rotate
@@ -416,15 +411,14 @@ public:
                 deathTimer -= diff;
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_target_dummyAI(creature);
     }
 };
-
 
 // Theirs
 /*########
@@ -494,7 +488,7 @@ public:
         npc_air_force_botsAI(Creature* creature) : ScriptedAI(creature)
         {
             SpawnAssoc = nullptr;
-            SpawnedGUID = 0;
+            SpawnedGUID.Clear();
 
             // find the correct spawnhandling
             static uint32 entryCount = sizeof(spawnAssociations) / sizeof(SpawnAssociation);
@@ -509,14 +503,14 @@ public:
             }
 
             if (!SpawnAssoc)
-                sLog->outErrorDb("TCSR: Creature template entry %u has ScriptName npc_air_force_bots, but it's not handled by that script", creature->GetEntry());
+                LOG_ERROR("sql.sql", "TCSR: Creature template entry %u has ScriptName npc_air_force_bots, but it's not handled by that script", creature->GetEntry());
             else
             {
                 CreatureTemplate const* spawnedTemplate = sObjectMgr->GetCreatureTemplate(SpawnAssoc->spawnedCreatureEntry);
 
                 if (!spawnedTemplate)
                 {
-                    sLog->outErrorDb("TCSR: Creature template entry %u does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
+                    LOG_ERROR("sql.sql", "TCSR: Creature template entry %u does not exist in DB, which is required by npc_air_force_bots", SpawnAssoc->spawnedCreatureEntry);
                     SpawnAssoc = nullptr;
                     return;
                 }
@@ -524,9 +518,9 @@ public:
         }
 
         SpawnAssociation* SpawnAssoc;
-        uint64 SpawnedGUID;
+        ObjectGuid SpawnedGUID;
 
-        void Reset() {}
+        void Reset() override {}
 
         Creature* SummonGuard()
         {
@@ -536,7 +530,7 @@ public:
                 SpawnedGUID = summoned->GetGUID();
             else
             {
-                sLog->outErrorDb("TCSR: npc_air_force_bots: wasn't able to spawn Creature %u", SpawnAssoc->spawnedCreatureEntry);
+                LOG_ERROR("sql.sql", "TCSR: npc_air_force_bots: wasn't able to spawn Creature %u", SpawnAssoc->spawnedCreatureEntry);
                 SpawnAssoc = nullptr;
             }
 
@@ -553,7 +547,7 @@ public:
             return nullptr;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (!SpawnAssoc)
@@ -567,11 +561,11 @@ public:
                 if (!playerTarget)
                     return;
 
-                Creature* lastSpawnedGuard = SpawnedGUID == 0 ? NULL : GetSummonedGuard();
+                Creature* lastSpawnedGuard = !SpawnedGUID ? nullptr : GetSummonedGuard();
 
                 // prevent calling ObjectAccessor::GetUnit at next MoveInLineOfSight call - speedup
                 if (!lastSpawnedGuard)
-                    SpawnedGUID = 0;
+                    SpawnedGUID.Clear();
 
                 switch (SpawnAssoc->spawnType)
                 {
@@ -630,50 +624,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_air_force_botsAI(creature);
-    }
-};
-
-/*######
-## npc_lunaclaw_spirit
-######*/
-
-enum LunaclawSpirit
-{
-    QUEST_BODY_HEART_A      = 6001,
-    QUEST_BODY_HEART_H      = 6002,
-
-    TEXT_ID_DEFAULT         = 4714,
-    TEXT_ID_PROGRESS        = 4715
-};
-
-#define GOSSIP_ITEM_GRANT   "You have thought well, spirit. I ask you to grant me the strength of your body and the strength of your heart."
-
-class npc_lunaclaw_spirit : public CreatureScript
-{
-public:
-    npc_lunaclaw_spirit() : CreatureScript("npc_lunaclaw_spirit") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_BODY_HEART_A) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_BODY_HEART_H) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_GRANT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, TEXT_ID_DEFAULT, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            SendGossipMenuFor(player, TEXT_ID_PROGRESS, creature->GetGUID());
-            player->AreaExploredOrEventHappens(player->GetTeamId() == TEAM_ALLIANCE ? QUEST_BODY_HEART_A : QUEST_BODY_HEART_H);
-        }
-        return true;
     }
 };
 
@@ -683,8 +636,7 @@ public:
 
 enum ChickenCluck
 {
-    EMOTE_HELLO_A       = 0,
-    EMOTE_HELLO_H       = 1,
+    EMOTE_HELLO         = 0,
     EMOTE_CLUCK_TEXT    = 2,
 
     QUEST_CLUCK         = 3861,
@@ -739,7 +691,7 @@ public:
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                         me->setFaction(FACTION_FRIENDLY);
-                        Talk(player->GetTeamId() == TEAM_HORDE ? EMOTE_HELLO_H : EMOTE_HELLO_A);
+                        Talk(EMOTE_HELLO);
                     }
                     break;
                 case TEXT_EMOTE_CHEER:
@@ -799,7 +751,7 @@ public:
         bool Active;
         uint32 CanIteract;
 
-        void Reset()
+        void Reset() override
         {
             Active = true;
             CanIteract = 3500;
@@ -811,7 +763,7 @@ public:
             me->SendMovementFlagUpdate();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!Active)
             {
@@ -826,9 +778,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void ReceiveEmote(Player* player, uint32 emote)
+        void ReceiveEmote(Player* player, uint32 emote) override
         {
             if (me->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ()) && me->IsWithinDistInMap(player, 30.0f))
             {
@@ -858,7 +810,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dancing_flamesAI(creature);
     }
@@ -940,7 +892,7 @@ public:
     {
         npc_doctorAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 SummonPatientTimer;
         uint32 SummonPatientCount;
@@ -949,12 +901,12 @@ public:
 
         bool Event;
 
-        std::list<uint64> Patients;
+        GuidList Patients;
         std::vector<Location*> Coordinates;
 
-        void Reset()
+        void Reset() override
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
 
             SummonPatientTimer = 10000;
             SummonPatientCount = 0;
@@ -1031,10 +983,9 @@ public:
                     {
                         if (!Patients.empty())
                         {
-                            std::list<uint64>::const_iterator itr;
-                            for (itr = Patients.begin(); itr != Patients.end(); ++itr)
+                            for (ObjectGuid const& guid : Patients)
                             {
-                                if (Creature* patient = ObjectAccessor::GetCreature((*me), *itr))
+                                if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
                                     patient->setDeathState(JUST_DIED);
                             }
                         }
@@ -1053,12 +1004,12 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff);
+        void UpdateAI(uint32 diff) override;
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if ((quest->GetQuestId() == 6624) || (quest->GetQuestId() == 6622))
             CAST_AI(npc_doctor::npc_doctorAI, creature->AI())->BeginEvent(player);
@@ -1066,7 +1017,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_doctorAI(creature);
     }
@@ -1085,12 +1036,12 @@ public:
     {
         npc_injured_patientAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 DoctorGUID;
+        ObjectGuid DoctorGUID;
         Location* Coord;
 
-        void Reset()
+        void Reset() override
         {
-            DoctorGUID = 0;
+            DoctorGUID.Clear();
             Coord = nullptr;
 
             //no select
@@ -1122,9 +1073,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             Player* player = caster->ToPlayer();
             if (!player || !me->IsAlive() || spell->Id != 20804)
@@ -1164,7 +1115,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             //lower HP on every world tick makes it a useful counter, not officlone though
             if (me->IsAlive() && me->GetHealth() > 6)
@@ -1184,7 +1135,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_injured_patientAI(creature);
     }
@@ -1217,7 +1168,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
                     patientEntry = HordeSoldierId[rand() % 3];
                     break;
                 default:
-                    sLog->outError("TSCR: Invalid entry for Triage doctor. Please check your database");
+                    LOG_ERROR("scripts", "TSCR: Invalid entry for Triage doctor. Please check your database");
                     return;
             }
 
@@ -1226,7 +1177,7 @@ void npc_doctor::npc_doctorAI::UpdateAI(uint32 diff)
                 if (Creature* Patient = me->SummonCreature(patientEntry, point->x, point->y, point->z, point->o, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                 {
                     //303, this flag appear to be required for client side item->spell to work (TARGET_SINGLE_FRIEND)
-                    Patient->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+                    Patient->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
                     Patients.push_back(Patient->GetGUID());
                     CAST_AI(npc_injured_patient::npc_injured_patientAI, Patient->AI())->DoctorGUID = me->GetGUID();
@@ -1284,31 +1235,31 @@ public:
             Reset();
         }
 
-        uint64 CasterGUID;
+        ObjectGuid CasterGUID;
 
         bool IsHealed;
         bool CanRun;
 
         uint32 RunAwayTimer;
 
-        void Reset()
+        void Reset() override
         {
-            CasterGUID = 0;
+            CasterGUID.Clear();
 
             IsHealed = false;
             CanRun = false;
 
             RunAwayTimer = 5000;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            me->SetPvP(true);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             // expect database to have RegenHealth=0
             me->SetHealth(me->CountPctFromMaxHealth(70));
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_LESSER_HEAL_R2 || spell->Id == SPELL_FORTITUDE_R1)
             {
@@ -1418,12 +1369,11 @@ public:
             }
         }
 
-        void WaypointReached(uint32 /*waypointId*/)
+        void WaypointReached(uint32 /*waypointId*/) override
         {
-
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (CanRun && !me->IsInCombat())
             {
@@ -1442,7 +1392,7 @@ public:
                                 break;
                         }
 
-                        Start(false, true, true);
+                        Start(false, true);
                     }
                     else
                         EnterEvadeMode();                       //something went wrong
@@ -1457,7 +1407,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_garments_of_questsAI(creature);
     }
@@ -1481,16 +1431,16 @@ public:
     {
         npc_guardianAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -1503,7 +1453,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_guardianAI(creature);
     }
@@ -1681,8 +1631,8 @@ public:
     {
         npc_steam_tonkAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
-        void EnterCombat(Unit* /*who*/) { }
+        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) override { }
 
         void OnPossess(bool apply)
         {
@@ -1699,7 +1649,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_steam_tonkAI(creature);
     }
@@ -1739,12 +1689,12 @@ public:
     {
         npc_wormholeAI(Creature* creature) : PassiveAI(creature) { }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             _showUnderground = urand(0, 100) == 0; // Guessed value, it is really rare though
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             return (type == DATA_SHOW_UNDERGROUND && _showUnderground) ? 1 : 0;
         }
@@ -1844,7 +1794,6 @@ public:
             }
         }
     };
-
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -1999,7 +1948,6 @@ public:
 ## npc_experience
 ######*/
 
-#define EXP_COST                100000 //10 00 00 copper (10golds)
 #define GOSSIP_TEXT_EXP         14736
 #define GOSSIP_XP_OFF           "I no longer wish to gain experience."
 #define GOSSIP_XP_ON            "I wish to start gaining experience again."
@@ -2022,6 +1970,7 @@ public:
         ClearGossipMenuFor(player);
         bool noXPGain = player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
         bool doSwitch = false;
+        auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
 
         switch (action)
         {
@@ -2040,16 +1989,18 @@ public:
         }
         if (doSwitch)
         {
-            if (!player->HasEnoughMoney(EXP_COST))
+            if (!player->HasEnoughMoney(toggleXpCost))
+            {
                 player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            }
             else if (noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
             else if (!noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
         }
@@ -2286,7 +2237,7 @@ public:
             return 0;
         }
 
-        void Reset()
+        void Reset() override
         {
             if (GameObject* launcher = FindNearestLauncher())
             {
@@ -2331,7 +2282,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_fireworkAI(creature);
     }
@@ -2356,7 +2307,7 @@ class npc_spring_rabbit : public CreatureScript
 public:
     npc_spring_rabbit() : CreatureScript("npc_spring_rabbit") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_spring_rabbitAI(creature);
     }
@@ -2369,12 +2320,12 @@ public:
         uint32 jumpTimer;
         uint32 bunnyTimer;
         uint32 searchTimer;
-        uint64 rabbitGUID;
+        ObjectGuid rabbitGUID;
 
-        void Reset()
+        void Reset() override
         {
             inLove = false;
-            rabbitGUID = 0;
+            rabbitGUID.Clear();
             jumpTimer = urand(5000, 10000);
             bunnyTimer = urand(10000, 20000);
             searchTimer = urand(5000, 10000);
@@ -2382,16 +2333,16 @@ public:
                 me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DoAction(int32 /*param*/)
+        void DoAction(int32 /*param*/) override
         {
             inLove = true;
             if (Unit* owner = me->GetOwner())
                 owner->CastSpell(owner, SPELL_SPRING_FLING, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (inLove)
             {
@@ -2456,7 +2407,7 @@ public:
     {
         npc_stable_masterAI(Creature* creature) : SmartAI(creature) { }
 
-        void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId)
+        void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
         {
             SmartAI::sGossipSelect(player, menuId, gossipListId);
             if (menuId != STABLE_MASTER_GOSSIP_SUB_MENU)
@@ -2493,7 +2444,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_stable_masterAI(creature);
     }
@@ -2509,7 +2460,6 @@ void AddSC_npcs_special()
 
     // Theirs
     new npc_air_force_bots();
-    new npc_lunaclaw_spirit();
     new npc_chicken_cluck();
     new npc_dancing_flames();
     new npc_doctor();

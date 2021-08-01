@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,12 +11,12 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "Item.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
 #include "temple_of_ahnqiraj.h"
 #include "WorldPacket.h"
-#include "Item.h"
-#include "Spell.h"
 
 enum Spells
 {
@@ -51,8 +51,6 @@ enum Misc
     TELEPORTTIME                  = 30000
 };
 
-
-
 struct boss_twinemperorsAI : public ScriptedAI
 {
     boss_twinemperorsAI(Creature* creature): ScriptedAI(creature)
@@ -72,7 +70,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     uint32 EnrageTimer;
 
     virtual bool IAmVeklor() = 0;
-    virtual void Reset() = 0;
+    void Reset() override = 0;
     virtual void CastSpellOnBug(Creature* target) = 0;
 
     void TwinReset()
@@ -91,10 +89,10 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     Creature* GetOtherBoss()
     {
-        return ObjectAccessor::GetCreature(*me, instance->GetData64(IAmVeklor() ? DATA_VEKNILASH : DATA_VEKLOR));
+        return ObjectAccessor::GetCreature(*me, instance->GetGuidData(IAmVeklor() ? DATA_VEKNILASH : DATA_VEKLOR));
     }
 
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         Unit* pOtherBoss = GetOtherBoss();
         if (pOtherBoss)
@@ -111,7 +109,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*killer*/)
+    void JustDied(Unit* /*killer*/) override
     {
         Creature* pOtherBoss = GetOtherBoss();
         if (pOtherBoss)
@@ -125,12 +123,12 @@ struct boss_twinemperorsAI : public ScriptedAI
             DoPlaySoundToSet(me, IAmVeklor() ? SOUND_VL_DEATH : SOUND_VN_DEATH);
     }
 
-    void KilledUnit(Unit* /*victim*/)
+    void KilledUnit(Unit* /*victim*/) override
     {
         DoPlaySoundToSet(me, IAmVeklor() ? SOUND_VL_KILL : SOUND_VN_KILL);
     }
 
-    void EnterCombat(Unit* who)
+    void EnterCombat(Unit* who) override
     {
         DoZoneInCombat();
         Creature* pOtherBoss = GetOtherBoss();
@@ -148,7 +146,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* caster, const SpellInfo* entry)
+    void SpellHit(Unit* caster, const SpellInfo* entry) override
     {
         if (caster == me)
             return;
@@ -275,14 +273,14 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (!who || me->GetVictim())
             return;
 
         if (me->_CanDetectFeignDeathOf(who) && me->CanCreatureAttack(who))
         {
-            if (me->IsWithinDistInMap(who, PULL_RANGE) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
+            if (me->IsWithinDistInMap(who, PULL_RANGE, true, false) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
             {
                 //if (who->HasStealthAura())
                 //    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
@@ -373,14 +371,14 @@ class boss_veknilash : public CreatureScript
 public:
     boss_veknilash() : CreatureScript("boss_veknilash") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_veknilashAI>(creature);
+        return GetTempleOfAhnQirajAI<boss_veknilashAI>(creature);
     }
 
     struct boss_veknilashAI : public boss_twinemperorsAI
     {
-        bool IAmVeklor() {return false;}
+        bool IAmVeklor() override {return false;}
         boss_veknilashAI(Creature* creature) : boss_twinemperorsAI(creature) { }
 
         uint32 UpperCut_Timer;
@@ -392,7 +390,7 @@ public:
 
         Creature* Summoned;
 
-        void Reset()
+        void Reset() override
         {
             TwinReset();
             UpperCut_Timer = urand(14000, 29000);
@@ -403,7 +401,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
         }
 
-        void CastSpellOnBug(Creature* target)
+        void CastSpellOnBug(Creature* target) override
         {
             target->setFaction(14);
             target->AI()->AttackStart(me->getThreatManager().getHostilTarget());
@@ -411,7 +409,7 @@ public:
             target->SetFullHealth();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -454,7 +452,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class boss_veklor : public CreatureScript
@@ -462,14 +459,14 @@ class boss_veklor : public CreatureScript
 public:
     boss_veklor() : CreatureScript("boss_veklor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_veklorAI>(creature);
+        return GetTempleOfAhnQirajAI<boss_veklorAI>(creature);
     }
 
     struct boss_veklorAI : public boss_twinemperorsAI
     {
-        bool IAmVeklor() {return true;}
+        bool IAmVeklor() override {return true;}
         boss_veklorAI(Creature* creature) : boss_twinemperorsAI(creature) { }
 
         uint32 ShadowBolt_Timer;
@@ -482,7 +479,7 @@ public:
 
         Creature* Summoned;
 
-        void Reset()
+        void Reset() override
         {
             TwinReset();
             ShadowBolt_Timer = 0;
@@ -494,14 +491,14 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
         }
 
-        void CastSpellOnBug(Creature* target)
+        void CastSpellOnBug(Creature* target) override
         {
             target->setFaction(14);
             target->AddAura(SPELL_EXPLODEBUG, target);
             target->SetFullHealth();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -566,7 +563,7 @@ public:
             //DoMeleeAttackIfReady();
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!who)
                 return;
@@ -582,7 +579,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_boss_twinemperors()

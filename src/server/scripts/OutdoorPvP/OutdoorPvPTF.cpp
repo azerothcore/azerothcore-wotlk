@@ -1,18 +1,19 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "OutdoorPvPTF.h"
-#include "OutdoorPvPMgr.h"
-#include "OutdoorPvP.h"
-#include "WorldPacket.h"
-#include "Player.h"
-#include "ObjectMgr.h"
 #include "Language.h"
+#include "MapManager.h"
+#include "ObjectMgr.h"
+#include "OutdoorPvP.h"
+#include "OutdoorPvPMgr.h"
+#include "OutdoorPvPTF.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
+#include "WorldPacket.h"
 
 OutdoorPvPTF::OutdoorPvPTF()
 {
@@ -250,6 +251,8 @@ bool OutdoorPvPTF::SetupOutdoorPvP()
     for (uint8 i = 0; i < OutdoorPvPTFBuffZonesNum; ++i)
         RegisterZone(OutdoorPvPTFBuffZones[i]);
 
+    SetMapFromZone(OutdoorPvPTFBuffZones[0]);
+
     AddCapturePoint(new OPvPCapturePointTF(this, TF_TOWER_NW));
     AddCapturePoint(new OPvPCapturePointTF(this, TF_TOWER_N));
     AddCapturePoint(new OPvPCapturePointTF(this, TF_TOWER_NE));
@@ -329,9 +332,9 @@ void OPvPCapturePointTF::ChangeState()
             break;
     }
 
-    GameObject* flag = HashMapHolder<GameObject>::Find(m_capturePointGUID);
-    if (flag)
-        flag->SetGoArtKit(artkit);
+    auto bounds = sMapMgr->FindMap(530, 0)->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
+    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+        itr->second->SetGoArtKit(artkit);
 
     UpdateTowerState();
 }
@@ -350,13 +353,12 @@ void OPvPCapturePointTF::SendChangePhase()
 class OutdoorPvP_terokkar_forest : public OutdoorPvPScript
 {
 public:
-
     OutdoorPvP_terokkar_forest()
         : OutdoorPvPScript("outdoorpvp_tf")
     {
     }
 
-    OutdoorPvP* GetOutdoorPvP() const
+    OutdoorPvP* GetOutdoorPvP() const override
     {
         return new OutdoorPvPTF();
     }

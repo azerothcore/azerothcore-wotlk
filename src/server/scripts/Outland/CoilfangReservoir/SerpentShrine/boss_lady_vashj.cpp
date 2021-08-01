@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "serpent_shrine.h"
 #include "Spell.h"
-#include "Player.h"
 #include "WorldSession.h"
 
 enum Says
@@ -72,10 +72,10 @@ class startFollow : public BasicEvent
 public:
     startFollow(Unit* owner) : _owner(owner)  { }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         if (InstanceScript* instance = _owner->GetInstanceScript())
-            if (Creature* vashj = ObjectAccessor::GetCreature(*_owner, instance->GetData64(NPC_LADY_VASHJ)))
+            if (Creature* vashj = ObjectAccessor::GetCreature(*_owner, instance->GetGuidData(NPC_LADY_VASHJ)))
                 _owner->GetMotionMaster()->MoveFollow(vashj, 3.0f, vashj->GetAngle(_owner), MOTION_SLOT_CONTROLLED);
         return true;
     }
@@ -89,9 +89,9 @@ class boss_lady_vashj : public CreatureScript
 public:
     boss_lady_vashj() : CreatureScript("boss_lady_vashj") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_lady_vashjAI>(creature);
+        return GetSerpentShrineAI<boss_lady_vashjAI>(creature);
     }
 
     struct boss_lady_vashjAI : public BossAI
@@ -104,13 +104,13 @@ public:
         bool intro;
         int32 count;
 
-        void Reset()
+        void Reset() override
         {
             count = 0;
             BossAI::Reset();
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -119,13 +119,13 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -137,7 +137,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == WORLD_TRIGGER)
@@ -153,7 +153,7 @@ public:
                 summon->GetMotionMaster()->MovePoint(POINT_HOME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, true);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!intro && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -164,7 +164,7 @@ public:
             BossAI::MoveInLineOfSight(who);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE || id != POINT_HOME)
                 return;
@@ -180,7 +180,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             EnterEvadeIfOutOfCombatArea();
             if (!UpdateVictim())
@@ -275,7 +275,7 @@ public:
             }
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->GetHomePosition().GetExactDist2d(me) > 80.0f || !SelectTargetFromPlayerList(100.0f);
         }
@@ -363,7 +363,7 @@ public:
             if (CheckTimer <= diff)
             {
                 // check if vashj is death
-                Unit* Vashj = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_LADYVASHJ));
+                Unit* Vashj = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LADYVASHJ));
                 if (!Vashj || !Vashj->IsAlive() || CAST_AI(boss_lady_vashj::boss_lady_vashjAI, Vashj->ToCreature()->AI())->Phase != 3)
                 {
                     // remove
@@ -396,13 +396,13 @@ public:
             Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(5));
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_lady_vashj_magic_barrier_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_SCHOOL_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_lady_vashj_magic_barrier_AuraScript();
     }
@@ -424,13 +424,13 @@ public:
                 target->DestroyItemCount(ITEM_TAINTED_CORE, -1, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_lady_vashj_remove_tainted_cores_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_lady_vashj_remove_tainted_cores_SpellScript();
     }
@@ -451,13 +451,13 @@ public:
             GetCaster()->CastSpell(GetCaster(), RAND(SPELL_SUMMON_SPOREBAT1, SPELL_SUMMON_SPOREBAT2, SPELL_SUMMON_SPOREBAT3, SPELL_SUMMON_SPOREBAT4), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_lady_vashj_summon_sporebat_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_lady_vashj_summon_sporebat_SpellScript();
     }
@@ -479,13 +479,13 @@ public:
                 target->CastSpell(target, SPELL_TOXIC_SPORES, true, nullptr, nullptr, GetCaster()->GetGUID());
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_lady_vashj_spore_drop_effect_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_lady_vashj_spore_drop_effect_SpellScript();
     }

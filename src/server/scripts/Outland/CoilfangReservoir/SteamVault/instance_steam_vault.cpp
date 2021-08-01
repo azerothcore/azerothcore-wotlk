@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "steam_vault.h"
 
 class go_main_chambers_access_panel : public GameObjectScript
@@ -33,7 +33,6 @@ public:
 
         return true;
     }
-
 };
 
 class instance_steam_vault : public InstanceMapScript
@@ -41,7 +40,7 @@ class instance_steam_vault : public InstanceMapScript
 public:
     instance_steam_vault() : InstanceMapScript("instance_steam_vault", 545) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_steam_vault_InstanceMapScript(map);
     }
@@ -52,22 +51,17 @@ public:
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-        uint64 MekgineerGUID;
-        uint64 MainChambersDoor;
-        uint64 AccessPanelHydro;
-        uint64 AccessPanelMek;
+        ObjectGuid MekgineerGUID;
+        ObjectGuid MainChambersDoor;
+        ObjectGuid AccessPanelHydro;
+        ObjectGuid AccessPanelMek;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
-            MekgineerGUID = 0;
-            MainChambersDoor = 0;
-            AccessPanelHydro = 0;
-            AccessPanelMek = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS)
@@ -76,7 +70,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -86,33 +80,33 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
                 case GO_MAIN_CHAMBERS_DOOR:
                     MainChambersDoor = go->GetGUID();
                     if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL && GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ACCESS_PANEL_HYDRO:
                     AccessPanelHydro = go->GetGUID();
                     if (GetData(TYPE_HYDROMANCER_THESPIA) == DONE)
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     else if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ACCESS_PANEL_MEK:
                     AccessPanelMek = go->GetGUID();
                     if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == DONE)
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     else if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -153,7 +147,7 @@ public:
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -165,14 +159,15 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             if (data == TYPE_MEKGINEER_STEAMRIGGER)
                 return MekgineerGUID;
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -183,7 +178,7 @@ public:
             return stream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {

@@ -1,16 +1,16 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ConfusedMovementGenerator.h"
 #include "Creature.h"
 #include "MapManager.h"
-#include "ConfusedMovementGenerator.h"
-#include "VMapFactory.h"
-#include "MoveSplineInit.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
 #include "Player.h"
+#include "VMapFactory.h"
 
 #ifdef MAP_BASED_RAND_GEN
 #define rand_norm() unit.rand_norm()
@@ -37,10 +37,10 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
         float wanderY = y + (wander_distance * (float)rand_norm() - wander_distance / 2);
 
         // prevent invalid coordinates generation
-        acore::NormalizeMapCoord(wanderX);
-        acore::NormalizeMapCoord(wanderY);
+        Acore::NormalizeMapCoord(wanderX);
+        Acore::NormalizeMapCoord(wanderY);
 
-        float new_z = map->GetHeight(unit->GetPhaseMask(), wanderX, wanderY, z, true);
+        float new_z = unit->GetMapHeight(wanderX, wanderY, z);
         if (new_z <= INVALID_HEIGHT || fabs(z - new_z) > 3.0f) // pussywizard
         {
             i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx - 1][0] : x;
@@ -60,7 +60,6 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
                 i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx - 1][2] : z;
                 continue;
             }
-
         }
         else
         {
@@ -91,7 +90,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
 template<>
 void ConfusedMovementGenerator<Creature>::_InitSpecific(Creature* creature, bool& is_water_ok, bool& is_land_ok)
 {
-    is_water_ok = creature->CanSwim();
+    is_water_ok = creature->CanEnterWater();
     is_land_ok  = creature->CanWalk();
 }
 
@@ -139,7 +138,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
             float y = i_waypoints[i_nextMove][1];
             float z = i_waypoints[i_nextMove][2];
             Movement::MoveSplineInit init(unit);
-            init.MoveTo(x, y, z);
+            init.MoveTo(x, y, z, true);
             init.Launch();
         }
     }

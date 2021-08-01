@@ -1,15 +1,17 @@
-// Scripted by Xinef
+/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "GridNotifiers.h"
+#include "CellImpl.h"
 #include "GossipDef.h"
-#include "SpellScript.h"
+#include "GridNotifiers.h"
+#include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "Group.h"
-#include "CellImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 ///////////////////////////////////////
 ////// ITEMS FIXES, BASIC STUFF
@@ -77,13 +79,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_trick_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_trick_SpellScript();
     }
@@ -107,7 +109,7 @@ public:
                 GetCaster()->CastSpell(target, target->getGender() ? _femaleSpell : _maleSpell, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_put_costume_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
@@ -117,7 +119,7 @@ public:
         uint32 _femaleSpell;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_put_costume_SpellScript(_maleSpell, _femaleSpell);
     }
@@ -153,13 +155,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_trick_or_treat_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_trick_or_treat_SpellScript();
     }
@@ -191,13 +193,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_candy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_candy_SpellScript();
     }
@@ -226,13 +228,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_tricky_treat_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_tricky_treat_SpellScript();
     }
@@ -280,7 +282,7 @@ public:
         PrepareSpellScript(spell_hallows_end_bucket_lands_SpellScript);
 
         bool handled;
-        bool Load() { handled = false; return true; }
+        bool Load() override { handled = false; return true; }
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (handled || !GetCaster())
@@ -293,13 +295,13 @@ public:
                 GetCaster()->CastSpell(tgt, SPELL_WATER_SPLASH, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hallows_end_bucket_lands_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_hallows_end_bucket_lands_SpellScript();
     }
@@ -342,14 +344,14 @@ public:
                 aEff->SetAmount(1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_hallows_end_base_fire_AuraScript::HandleEffectPeriodicUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectApply += AuraEffectApplyFn(spell_hallows_end_base_fire_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hallows_end_base_fire_AuraScript();
     }
@@ -368,13 +370,13 @@ public:
 
         uint32 eventStarted;
         bool allowQuest;
-        uint64 horseGUID;
+        ObjectGuid horseGUID;
 
         void Reset() override
         {
             eventStarted = 0;
             allowQuest = false;
-            horseGUID = 0;
+            horseGUID.Clear();
         }
 
         void GetInitXYZ(float& x, float& y, float& z, float& o, uint32& path)
@@ -543,12 +545,12 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetDisableGravity(true);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_START_FIRE)
             {
@@ -580,7 +582,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_soh_fire_triggerAI(creature);
     }
@@ -606,12 +608,12 @@ public:
         bool Unmount;
         EventMap events;
         uint32 counter;
-        std::list<uint64> unitList;
+        GuidList unitList;
         int32 pos;
-        void EnterCombat(Unit*) {}
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void EnterCombat(Unit*) override {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             pos = param;
         }
@@ -658,7 +660,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             unitList.clear();
             std::list<Creature*> temp;
@@ -673,7 +675,7 @@ public:
             events.ScheduleEvent(3, 15000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -699,8 +701,8 @@ public:
                             if (counter > 12)
                             {
                                 bool failed = false;
-                                for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                                    if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+                                for (ObjectGuid const& guid : unitList)
+                                    if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                                         if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                                         {
                                             failed = true;
@@ -753,8 +755,8 @@ public:
         Unit* getTrigger()
         {
             std::list<Unit*> tmpList;
-            for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+            for (ObjectGuid const& guid : unitList)
+                if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                     if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                         tmpList.push_back(c);
 
@@ -772,8 +774,8 @@ public:
             {
                 me->MonsterYell("Fire consumes! You've tried and failed. Let there be no doubt, justice prevailed!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(11967);
-                for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                    if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+                for (ObjectGuid const& guid : unitList)
+                    if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                         c->RemoveAllAuras();
 
                 me->DespawnOrUnsummon(1);
@@ -788,7 +790,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == 8)
             {
@@ -796,7 +798,7 @@ public:
             }
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             me->MonsterYell("So eager you are, for my blood to spill. Yet to vanquish me, 'tis my head you must kill!", LANG_UNIVERSAL, 0);
             me->PlayDirectSound(11969);
@@ -810,9 +812,9 @@ public:
         {
             float radius = 100.0f;
             std::list<Player*> players;
-            acore::AnyPlayerInObjectRangeCheck checker(me, radius);
-            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
-            me->VisitNearbyWorldObject(radius, searcher);
+            Acore::AnyPlayerInObjectRangeCheck checker(me, radius);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Cell::VisitWorldObjects(me, searcher, radius);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
@@ -824,7 +826,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hallows_end_sohAI(creature);
     }
@@ -842,12 +844,12 @@ public:
         }
 
         uint32 timer;
-        void Reset()
+        void Reset() override
         {
             timer = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             timer += diff;
             if (timer >= 5000)
@@ -855,7 +857,7 @@ public:
                     me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_WATER_SPLASH && caster->ToPlayer())
             {
@@ -867,13 +869,13 @@ public:
                     else
                         me->RemoveAllAuras();
 
-                    caster->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
+                    caster->ToPlayer()->KilledMonsterCredit(me->GetEntry());
                 }
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hallows_end_train_fireAI(creature);
     }
@@ -918,7 +920,6 @@ enum headlessHorseman
     SPELL_PUMPKIN_AURA                              = 42294,
     SPELL_BURNING_BODY                              = 43184,
 
-
     // NP
     SPELL_HORSEMAN_SMOKE                            = 42355,
     SPELL_SPIRIT_PARTICLES_GREEN_CHEST              = 43161,
@@ -955,13 +956,13 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint8 talkCount;
         bool inFight;
         uint8 phase;
         uint32 health;
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             summons.DespawnAll();
             me->MonsterSay("This end have I reached before. What new adventure lies in store?", LANG_UNIVERSAL, 0);
@@ -971,24 +972,23 @@ public:
             for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
                 (*itr)->ToCreature()->DespawnOrUnsummon(500);
 
-
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
                 sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 285, me->FindMap());
         }
 
-        void KilledUnit(Unit*  /*who*/)
+        void KilledUnit(Unit*  /*who*/) override
         {
             me->MonsterYell("Your body lies beaten, battered and broken. Let my curse be your own, fate has spoken.", LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_SLAY);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             health = param;
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUMMONING_RHYME_TARGET)
             {
@@ -997,7 +997,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
             {
@@ -1020,7 +1020,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == WAYPOINT_MOTION_TYPE)
             {
@@ -1041,10 +1041,10 @@ public:
 
         Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : nullptr; }
 
-        void EnterCombat(Unit*) { me->SetInCombatWithZone(); }
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void EnterCombat(Unit*) override { me->SetInCombatWithZone(); }
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // We die... :(
             if (damage >= me->GetHealth())
@@ -1075,13 +1075,13 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
             talkCount = 0;
             phase = 0;
             inFight = false;
@@ -1091,7 +1091,7 @@ public:
             me->SetSpeed(MOVE_WALK, 5.0f, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -1207,7 +1207,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_headless_horsemanAI(creature);
     }
@@ -1228,7 +1228,7 @@ public:
         uint32 timer;
         bool handled;
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
             {
@@ -1239,7 +1239,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             switch (spellInfo->Id)
             {
@@ -1279,7 +1279,7 @@ public:
             return nullptr;
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // We die... :(
             if (damage >= me->GetHealth())
@@ -1306,7 +1306,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             pct = 0;
             timer = 0;
@@ -1314,7 +1314,7 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             timer += diff;
             if (timer >= 30000)
@@ -1338,7 +1338,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_headless_horseman_headAI(creature);
     }
@@ -1357,10 +1357,10 @@ public:
 
         uint32 timer;
 
-        void AttackStart(Unit* ) { }
-        void MoveInLineOfSight(Unit* ) { }
+        void AttackStart(Unit* ) override { }
+        void MoveInLineOfSight(Unit* ) override { }
 
-        void Reset()
+        void Reset() override
         {
             if (Player* player = me->SelectNearestPlayer(3.0f))
                 me->CastSpell(player, SPELL_SQUASH_SOUL, true);
@@ -1369,7 +1369,7 @@ public:
             me->CastSpell(me, SPELL_PUMPKIN_VISUAL, true);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SPROUTING)
             {
@@ -1380,7 +1380,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer)
             {
@@ -1394,7 +1394,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_headless_horseman_pumpkinAI(creature);
     }
@@ -1405,7 +1405,7 @@ class go_loosely_turned_soil : public GameObjectScript
 public:
     go_loosely_turned_soil() : GameObjectScript("go_loosely_turned_soil") { }
 
-    bool OnQuestReward(Player* player, GameObject* go, Quest const* /*quest*/, uint32 /*opt*/)
+    bool OnQuestReward(Player* player, GameObject* go, Quest const* /*quest*/, uint32 /*opt*/) override
     {
         if (player->FindNearestCreature(NPC_HEADLESS_HORSEMAN_MOUNTED, 100.0f))
             return true;

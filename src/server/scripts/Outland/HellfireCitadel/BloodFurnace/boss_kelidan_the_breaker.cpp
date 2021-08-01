@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuras.h"
 #include "blood_furnace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
 
 enum eKelidan
 {
@@ -54,7 +54,6 @@ const float ShadowmoonChannelers[5][4] =
 class boss_kelidan_the_breaker : public CreatureScript
 {
 public:
-
     boss_kelidan_the_breaker() : CreatureScript("boss_kelidan_the_breaker")
     {
     }
@@ -64,16 +63,15 @@ public:
         boss_kelidan_the_breakerAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-            memset(&channelers, 0, sizeof(channelers));
         }
 
         InstanceScript* instance;
         EventMap events;
-        uint64 channelers[5];
+        ObjectGuid channelers[5];
         uint32 checkTimer;
         bool addYell;
 
-        void Reset()
+        void Reset() override
         {
             addYell = false;
             checkTimer = 5000;
@@ -87,7 +85,7 @@ public:
                 instance->SetData(DATA_KELIDAN, NOT_STARTED);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPELL_VOLLEY, 1000);
             events.ScheduleEvent(EVENT_SPELL_CORRUPTION, 5000);
@@ -100,13 +98,13 @@ public:
                 instance->SetData(DATA_KELIDAN, IN_PROGRESS);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (urand(0, 1))
                 Talk(SAY_KILL);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_CHANNELER_ENGAGED)
             {
@@ -173,11 +171,11 @@ public:
                 if (!channeler)
                     channeler = me->SummonCreature(NPC_CHANNELER, ShadowmoonChannelers[i][0], ShadowmoonChannelers[i][1], ShadowmoonChannelers[i][2], ShadowmoonChannelers[i][3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000);
 
-                channelers[i] = channeler ? channeler->GetGUID() : 0;
+                channelers[i] = channeler ? channeler->GetGUID() : ObjectGuid::Empty;
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DIE);
             if (instance)
@@ -185,8 +183,8 @@ public:
                 // Xinef: load grid with start doors
                 me->GetMap()->LoadGrid(0, -111.0f);
                 instance->SetData(DATA_KELIDAN, DONE);
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR1), true);
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR6), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR1), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR6), true);
             }
         }
 
@@ -212,7 +210,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, apply);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -264,16 +262,15 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_kelidan_the_breakerAI(creature);
+        return GetBloodFurnaceAI<boss_kelidan_the_breakerAI>(creature);
     }
 };
 
 class npc_shadowmoon_channeler : public CreatureScript
 {
 public:
-
     npc_shadowmoon_channeler() : CreatureScript("npc_shadowmoon_channeler") {}
 
     struct npc_shadowmoon_channelerAI : public ScriptedAI
@@ -282,7 +279,7 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
@@ -290,11 +287,11 @@ public:
         Creature* GetKelidan()
         {
             if (me->GetInstanceScript())
-                return ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_KELIDAN));
+                return ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_KELIDAN));
             return nullptr;
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             if (Creature* kelidan = GetKelidan())
                 kelidan->AI()->DoAction(ACTION_CHANNELER_ENGAGED);
@@ -304,13 +301,13 @@ public:
             events.ScheduleEvent(EVENT_SPELL_MARK, urand(5000, 6500));
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             if (Creature* kelidan = GetKelidan())
                 kelidan->AI()->DoAction(ACTION_CHANNELER_DIED);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -336,9 +333,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_shadowmoon_channelerAI(creature);
+        return GetBloodFurnaceAI<npc_shadowmoon_channelerAI>(creature);
     }
 };
 
@@ -347,4 +344,3 @@ void AddSC_boss_kelidan_the_breaker()
     new boss_kelidan_the_breaker();
     new npc_shadowmoon_channeler();
 }
-

@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #ifndef TRINITYSERVER_MOVESPLINEFLAG_H
 #define TRINITYSERVER_MOVESPLINEFLAG_H
-#include "MovementTypedefs.h"
 
+#include "MovementTypedefs.h"
 #include <string>
 
 namespace Movement
@@ -63,7 +63,7 @@ namespace Movement
         };
 
         inline uint32& raw() { return (uint32&) * this; }
-        inline const uint32& raw() const { return (const uint32&) * this; }
+        [[nodiscard]] inline const uint32& raw() const { return (const uint32&) * this; }
 
         MoveSplineFlag() { raw() = 0; }
         MoveSplineFlag(uint32 f) { raw() = f; }
@@ -77,16 +77,16 @@ namespace Movement
 
         // Constant interface
 
-        bool isSmooth() const { return raw() & Mask_CatmullRom; }
-        bool isLinear() const { return !isSmooth(); }
-        bool isFacing() const { return raw() & Mask_Final_Facing; }
+        [[nodiscard]] bool isSmooth() const { return raw() & Mask_CatmullRom; }
+        [[nodiscard]] bool isLinear() const { return !isSmooth(); }
+        [[nodiscard]] bool isFacing() const { return raw() & Mask_Final_Facing; }
 
-        uint8 getAnimationId() const { return animId; }
-        bool hasAllFlags(uint32 f) const { return (raw() & f) == f; }
-        bool hasFlag(uint32 f) const { return (raw() & f) != 0; }
+        [[nodiscard]] uint8 getAnimationId() const { return animId; }
+        [[nodiscard]] bool hasAllFlags(uint32 f) const { return (raw() & f) == f; }
+        [[nodiscard]] bool hasFlag(uint32 f) const { return (raw() & f) != 0; }
         uint32 operator & (uint32 f) const { return (raw() & f); }
         uint32 operator | (uint32 f) const { return (raw() | f); }
-        std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
         // Not constant interface
 

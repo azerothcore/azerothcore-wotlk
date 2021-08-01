@@ -2,9 +2,12 @@ name: core-build
 on:
   push:
     branches:
-      - '**'         # matches every branch
-      - '!coverity_scan'   # excludes coverity_scan
+      - 'master'
   pull_request:
+
+concurrency:
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -14,17 +17,20 @@ jobs:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
         os: [ubuntu-20.04]
         compiler: [clang]
-        modules: [with, without]
+        modules: [without]
         # we can include specific combinations here
         include:
           - os: ubuntu-20.04
-            compiler: clang9
+            compiler: clang12
+            modules: without
+          - os: ubuntu-20.04
+            compiler: clang11
             modules: without
           - os: ubuntu-18.04
-            compiler: clang # default in 18.04 is clang 6
+            compiler: clang10
             modules: without
           - os: ubuntu-18.04
-            compiler: gcc # default in 18.04 is gcc 7
+            compiler: gcc8
             modules: without
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
@@ -45,15 +51,17 @@ jobs:
       - name: Cache
         uses: actions/cache@v2
         with:
-          path: /home/runner/.ccache
+          path: var/ccache
           key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
       - name: Configure OS
-        run: source ./apps/ci/ci-install.sh
+        run: source ./acore.sh install-deps
         env:
           CONTINUOUS_INTEGRATION: true
+      - name: Create conf/config.sh
+        run: source ./apps/ci/ci-conf.sh
       - name: Import db
         run: source ./apps/ci/ci-import-db.sh
       - name: Build
@@ -64,113 +72,3 @@ jobs:
         run: source ./apps/ci/ci-error-check.sh
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
-
-  mac-build:
-    strategy:
-      fail-fast: false
-    runs-on: macos-10.15
-    name: macos-10.15
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache
-        uses: actions/cache@v1.1.2
-        with:
-          path: /Users/runner/.ccache
-          key: ccache:macos-10.15:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            ccache:macos-10.15:${{ github.ref }}
-            ccache:macos-10.15
-      - name: Configure OS
-        run: source ./apps/ci/mac/ci-install.sh
-      - name: Build
-        run: source ./apps/ci/mac/ci-compile.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh
-
-  windows-build:
-    strategy:
-      fail-fast: false
-    runs-on: windows-2019
-    name: windows-2019-MSVC16
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure OS
-        run: choco install --no-progress openssl
-      - name: Build
-        shell: bash
-        run: |
-          mkdir -p build && cd build
-          cmake .. -DTOOLS=ON
-          cmake --build . --config Release --parallel 4
-      - name: Copy dll files
-        shell: bash
-        run: |
-          cp "/c/mysql-5.7.21-winx64/lib/libmysql.dll" "build/bin/Release/"
-          cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
-          cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
-      - uses: actions/upload-artifact@v2
-        with:
-          name: windows-2019-MSVC16-release
-          path: build/bin/Release
-
-  docker-build:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          ./bin/acore-docker-build-no-scripts
-
-  docker-worldserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker build -t azerothcore/worldserver -f docker/worldserver/Dockerfile docker/worldserver
-
-  docker-authserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
-
-  docker-database:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker build -t azerothcore/database -f docker/database/Dockerfile .

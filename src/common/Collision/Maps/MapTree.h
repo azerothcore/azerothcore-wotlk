@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,8 +7,8 @@
 #ifndef _MAPTREE_H
 #define _MAPTREE_H
 
-#include "Define.h"
 #include "BoundingIntervalHierarchy.h"
+#include "Define.h"
 #include <unordered_map>
 
 namespace VMAP
@@ -19,9 +19,9 @@ namespace VMAP
 
     struct LocationInfo
     {
-        LocationInfo(): hitInstance(0), hitModel(0), ground_Z(-G3D::inf()) { }
-        const ModelInstance* hitInstance;
-        const GroupModel* hitModel;
+        LocationInfo():  ground_Z(-G3D::inf()) { }
+        const ModelInstance* hitInstance{nullptr};
+        const GroupModel* hitModel{nullptr};
         float ground_Z;
     };
 
@@ -45,7 +45,7 @@ namespace VMAP
         std::string iBasePath;
 
     private:
-        bool getIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const;
+        bool GetIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const;
         //bool containsLoadedMapTile(unsigned int pTileIdent) const { return(iLoadedMapTiles.containsKey(pTileIdent)); }
     public:
         static std::string getTileFileName(uint32 mapID, uint32 tileX, uint32 tileY);
@@ -56,31 +56,30 @@ namespace VMAP
         StaticMapTree(uint32 mapID, const std::string& basePath);
         ~StaticMapTree();
 
-        bool isInLineOfSight(const G3D::Vector3& pos1, const G3D::Vector3& pos2) const;
-        bool getObjectHitPos(const G3D::Vector3& pos1, const G3D::Vector3& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
-        float getHeight(const G3D::Vector3& pPos, float maxSearchDist) const;
-        bool getAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
+        [[nodiscard]] bool isInLineOfSight(const G3D::Vector3& pos1, const G3D::Vector3& pos2) const;
+        bool GetObjectHitPos(const G3D::Vector3& pos1, const G3D::Vector3& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
+        [[nodiscard]] float getHeight(const G3D::Vector3& pPos, float maxSearchDist) const;
+        bool GetAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
         bool GetLocationInfo(const G3D::Vector3& pos, LocationInfo& info) const;
 
         bool InitMap(const std::string& fname, VMapManager2* vm);
         void UnloadMap(VMapManager2* vm);
         bool LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
         void UnloadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
-        bool isTiled() const { return iIsTiled; }
-        uint32 numLoadedTiles() const { return iLoadedTiles.size(); }
-        void getModelInstances(ModelInstance*& models, uint32& count);
+        [[nodiscard]] bool isTiled() const { return iIsTiled; }
+        [[nodiscard]] uint32 numLoadedTiles() const { return iLoadedTiles.size(); }
+        void GetModelInstances(ModelInstance*& models, uint32& count);
     };
 
     struct AreaInfo
     {
-        AreaInfo(): result(false), ground_Z(-G3D::inf()), flags(0), adtId(0),
-            rootId(0), groupId(0) { }
-        bool result;
+        AreaInfo():  ground_Z(-G3D::inf()) { }
+        bool result{false};
         float ground_Z;
-        uint32 flags;
-        int32 adtId;
-        int32 rootId;
-        int32 groupId;
+        uint32 flags{0};
+        int32 adtId{0};
+        int32 rootId{0};
+        int32 groupId{0};
     };
 }                                                           // VMAP
 

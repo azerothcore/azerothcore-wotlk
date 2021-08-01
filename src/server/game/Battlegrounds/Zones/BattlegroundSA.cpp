@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "BattlegroundSA.h"
-#include "Language.h"
-#include "Player.h"
+#include "GameGraveyard.h"
 #include "GameObject.h"
+#include "Language.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "GameGraveyard.h"
 
 BattlegroundSA::BattlegroundSA()
 {
@@ -20,7 +20,7 @@ BattlegroundSA::BattlegroundSA()
     StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_SA_START_HALF_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_SA_HAS_BEGUN;
     BgObjects.resize(BG_SA_MAXOBJ);
-    BgCreatures.resize(BG_SA_MAXNPC + BG_SA_MAX_GY);
+    BgCreatures.resize(static_cast<uint16>(BG_SA_MAXNPC) + BG_SA_MAX_GY);
     TimerEnabled = false;
     UpdateWaitTimer = 0;
     SignaledRoundTwo = false;
@@ -85,7 +85,7 @@ bool BattlegroundSA::ResetObjs()
     for (uint8 i = 0; i < BG_SA_MAXNPC; i++)
         DelCreature(i);
 
-    for (uint8 i = BG_SA_MAXNPC; i < BG_SA_MAXNPC + BG_SA_MAX_GY; i++)
+    for (uint8 i = BG_SA_MAXNPC; i < static_cast<uint16>(BG_SA_MAXNPC) + BG_SA_MAX_GY; i++)
         DelCreature(i);
 
     for (uint8 i = 0; i < 6; ++i)
@@ -169,7 +169,7 @@ bool BattlegroundSA::ResetObjs()
 
         if (!sg)
         {
-            sLog->outError("SOTA: Can't find GY entry %u", BG_SA_GYEntries[i]);
+            LOG_ERROR("bg.battleground", "SOTA: Can't find GY entry %u", BG_SA_GYEntries[i]);
             return false;
         }
 
@@ -182,7 +182,7 @@ bool BattlegroundSA::ResetObjs()
         {
             GraveyardStatus[i] = GetOtherTeamId(Attackers);
             if (!AddSpiritGuide(i + BG_SA_MAXNPC, sg->x, sg->y, sg->z, BG_SA_GYOrientation[i], GetOtherTeamId(Attackers)))
-                sLog->outError("SOTA: couldn't spawn GY: %u", i);
+                LOG_ERROR("bg.battleground", "SOTA: couldn't spawn GY: %u", i);
         }
     }
 
@@ -624,21 +624,28 @@ void BattlegroundSA::EventPlayerDamagedGO(Player* /*player*/, GameObject* go, ui
             case BG_SA_BLUE_GATE:
             case BG_SA_GREEN_GATE:
                 {
-                    GameObject* go = nullptr;
-                    if ((go = GetBGObject(BG_SA_RED_GATE)))
-                        go->SetDestructibleBuildingModifyState(true);
-                    if ((go = GetBGObject(BG_SA_PURPLE_GATE)))
-                        go->SetDestructibleBuildingModifyState(true);
+                    if (auto redGate = GetBGObject(BG_SA_RED_GATE))
+                    {
+                        redGate->SetDestructibleBuildingModifyState(true);
+                    }
+                    if (auto purpleGate = GetBGObject(BG_SA_PURPLE_GATE))
+                    {
+                        purpleGate->SetDestructibleBuildingModifyState(true);
+                    }
                     break;
                 }
             case BG_SA_RED_GATE:
             case BG_SA_PURPLE_GATE:
-                if (GameObject*  go = GetBGObject(BG_SA_YELLOW_GATE))
-                    go->SetDestructibleBuildingModifyState(true);
+                if (auto yellowGate = GetBGObject(BG_SA_YELLOW_GATE))
+                {
+                    yellowGate->SetDestructibleBuildingModifyState(true);
+                }
                 break;
             case BG_SA_YELLOW_GATE:
-                if (GameObject*  go = GetBGObject(BG_SA_ANCIENT_GATE))
-                    go->SetDestructibleBuildingModifyState(true);
+                if (auto ancientGate = GetBGObject(BG_SA_ANCIENT_GATE))
+                {
+                    ancientGate->SetDestructibleBuildingModifyState(true);
+                }
                 break;
         }
     }
@@ -795,7 +802,6 @@ GraveyardStruct const* BattlegroundSA::GetClosestGraveyard(Player* player)
     if (!closest && GraveyardStatus[BG_SA_BEACH_GY] == player->GetTeamId())
         return sGraveyard->GetGraveyard(BG_SA_GYEntries[BG_SA_BEACH_GY]);
 
-
     return closest;
 }
 
@@ -877,7 +883,7 @@ void BattlegroundSA::EventPlayerClickedOnFlag(Player* Source, GameObject* gameOb
             break;
         default:
             return;
-    };
+    }
 }
 
 void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
@@ -887,13 +893,13 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
 
     GraveyardStatus[i] = Source->GetTeamId();
     // Those who are waiting to resurrect at this node are taken to the closest own node's graveyard
-    std::vector<uint64> ghost_list = m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]];
+    GuidVector& ghost_list = m_ReviveQueue[BgCreatures[static_cast<uint16>(BG_SA_MAXNPC) + i]];
     if (!ghost_list.empty())
     {
         GraveyardStruct const* ClosestGrave = nullptr;
-        for (std::vector<uint64>::const_iterator itr = ghost_list.begin(); itr != ghost_list.end(); ++itr)
+        for (ObjectGuid const& guid : ghost_list)
         {
-            Player* player = ObjectAccessor::FindPlayer(*itr);
+            Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)
                 continue;
 
@@ -903,20 +909,21 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
             if (ClosestGrave)
                 player->TeleportTo(GetMapId(), ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, player->GetOrientation());
         }
+
         // xinef: clear resurrect queue for this creature
-        m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]].clear();
+        ghost_list.clear();
     }
 
-    DelCreature(BG_SA_MAXNPC + i);
+    DelCreature(static_cast<uint16>(BG_SA_MAXNPC) + i);
 
     GraveyardStruct const* sg = sGraveyard->GetGraveyard(BG_SA_GYEntries[i]);
     if (!sg)
     {
-        sLog->outError("BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);
+        LOG_ERROR("bg.battleground", "BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);
         return;
     }
 
-    AddSpiritGuide(i + BG_SA_MAXNPC, sg->x, sg->y, sg->z, BG_SA_GYOrientation[i], GraveyardStatus[i]);
+    AddSpiritGuide(i + static_cast<uint16>(BG_SA_MAXNPC), sg->x, sg->y, sg->z, BG_SA_GYOrientation[i], GraveyardStatus[i]);
     uint32 npc = 0;
     uint32 flag = 0;
 
@@ -996,7 +1003,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
         default:
             ABORT();
             break;
-    };
+    }
 }
 
 void BattlegroundSA::EventPlayerUsedGO(Player* Source, GameObject* object)

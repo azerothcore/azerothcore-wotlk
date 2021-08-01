@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -13,7 +13,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif // WIN32
-using namespace acore;
+using namespace Acore;
 
 Thread::Thread() : m_task(nullptr), m_iThreadId(), m_ThreadImp()
 {
@@ -25,7 +25,9 @@ Thread::Thread(Runnable* instance) : m_task(instance), m_ThreadImp(&Thread::Thre
 
     // register reference to m_task to prevent it deeltion until destructor
     if (m_task)
+    {
         m_task->incReference();
+    }
 }
 
 Thread::~Thread()
@@ -34,13 +36,17 @@ Thread::~Thread()
 
     // deleted runnable object (if no other references)
     if (m_task)
+    {
         m_task->decReference();
+    }
 }
 
 bool Thread::wait()
 {
     if (m_iThreadId == std::thread::id() || !m_task)
+    {
         return false;
+    }
 
     bool res = true;
 
@@ -61,7 +67,9 @@ bool Thread::wait()
 void Thread::destroy()
 {
     if (m_iThreadId == std::thread::id() || !m_task)
+    {
         return;
+    }
 
     // FIXME: We need to make sure that all threads can be trusted to
     // halt execution on their own as this is not an interrupt
@@ -116,7 +124,6 @@ void Thread::setPriority(Priority priority)
         default:
             break;
     }
-
 
     // remove this ASSERT in case you don't want to know is thread priority change was successful or not
     ASSERT(_ok);

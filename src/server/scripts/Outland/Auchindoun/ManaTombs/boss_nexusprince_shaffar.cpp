@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Player.h"
+#include "mana_tombs.h"
 
 enum ePrince
 {
@@ -37,9 +37,9 @@ class boss_nexusprince_shaffar : public CreatureScript
 public:
     boss_nexusprince_shaffar() : CreatureScript("boss_nexusprince_shaffar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_nexusprince_shaffarAI (creature);
+        return GetManaTombsAI<boss_nexusprince_shaffarAI>(creature);
     }
 
     struct boss_nexusprince_shaffarAI : public ScriptedAI
@@ -53,7 +53,7 @@ public:
         SummonList summons;
         bool HasTaunted;
 
-        void Reset()
+        void Reset() override
         {
             float dist = 8.0f;
             float posX, posY, posZ, angle;
@@ -66,7 +66,7 @@ public:
             me->SummonCreature(NPC_BEACON, posX + dist, posY, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!HasTaunted && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 100.0f))
             {
@@ -75,7 +75,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             Talk(SAY_AGGRO);
 
@@ -87,7 +87,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FROST_NOVA, 15000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (me->IsInCombat() && summon->GetEntry() == NPC_BEACON)
             {
@@ -99,24 +99,24 @@ public:
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             summons.Despawn(summon);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEAD);
             summons.DespawnAll();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -166,9 +166,9 @@ class npc_yor : public CreatureScript
 public:
     npc_yor() : CreatureScript("npc_yor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_yorAI(creature);
+        return GetManaTombsAI<npc_yorAI>(creature);
     }
 
     struct npc_yorAI : public ScriptedAI

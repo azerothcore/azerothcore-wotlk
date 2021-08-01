@@ -2,16 +2,16 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
 #include "blackfathom_deeps.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
 
 class instance_blackfathom_deeps : public InstanceMapScript
 {
 public:
     instance_blackfathom_deeps() : InstanceMapScript("instance_blackfathom_deeps", 48) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_blackfathom_deeps_InstanceMapScript(map);
     }
@@ -20,21 +20,20 @@ public:
     {
         instance_blackfathom_deeps_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&_encounters, 0, sizeof(_encounters));
-            _akumaiPortalGUID = 0;
             _requiredDeaths = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (creature->IsSummon() && (creature->GetEntry() == NPC_BARBED_CRUSTACEAN || creature->GetEntry() == NPC_AKU_MAI_SERVANT ||
                                          creature->GetEntry() == NPC_MURKSHALLOW_SOFTSHELL || creature->GetEntry() == NPC_AKU_MAI_SNAPJAW))
                 ++_requiredDeaths;
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             if (unit->IsSummon() && (unit->GetEntry() == NPC_BARBED_CRUSTACEAN || unit->GetEntry() == NPC_AKU_MAI_SERVANT ||
                                      unit->GetEntry() == NPC_MURKSHALLOW_SOFTSHELL || unit->GetEntry() == NPC_AKU_MAI_SNAPJAW))
@@ -45,7 +44,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* gameobject)
+        void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -69,13 +68,13 @@ public:
                     break;
                 case GO_AKU_MAI_DOOR:
                     if (_encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     _akumaiPortalGUID = gameobject->GetGUID();
                     break;
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -93,14 +92,14 @@ public:
                 SaveToDB();
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "B L " << _encounters[0] << ' ' << _encounters[1] << ' ' << _encounters[2] << ' ' << _encounters[3] << ' ' << _encounters[4] << ' ' << _encounters[5];
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
                 return;
@@ -121,7 +120,7 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-        uint64 _akumaiPortalGUID;
+        ObjectGuid _akumaiPortalGUID;
         uint8 _requiredDeaths;
     };
 };

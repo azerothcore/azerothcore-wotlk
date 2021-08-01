@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -10,12 +10,11 @@
  * Scriptnames of files in this file should be prefixed with "spell_rog_".
  */
 
-#include "ScriptMgr.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum RogueSpells
 {
@@ -59,14 +58,14 @@ public:
             SetDuration(0);
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_rog_savage_combat_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN);
             OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_rog_savage_combat_AuraScript::Update, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_savage_combat_AuraScript();
     }
@@ -86,18 +85,17 @@ public:
             return eventInfo.GetTypeMask() & PROC_FLAG_DONE_MELEE_AUTO_ATTACK;
         }
 
-        void Register()
+        void Register() override
         {
             DoCheckProc += AuraCheckProcFn(spell_rog_combat_potency_AuraScript::CheckProc);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_combat_potency_AuraScript();
     }
 };
-
 
 // Theirs
 // 13877, 33735, (check 51211, 65956) - Blade Flurry
@@ -110,16 +108,14 @@ public:
     {
         PrepareAuraScript(spell_rog_blade_flurry_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK });
         }
 
-        bool Load()
+        bool Load() override
         {
-            _procTargetGUID = 0;
+            _procTargetGUID.Clear();
             return true;
         }
 
@@ -146,21 +142,21 @@ public:
                 CustomSpellValues values;
                 values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
                 values.AddSpellMod(SPELLVALUE_FORCED_CRIT_RESULT, int32(eventInfo.GetHitMask() & PROC_EX_CRITICAL_HIT));
-                GetTarget()->CastCustomSpell(SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK, values, procTarget, TRIGGERED_FULL_MASK, NULL, aurEff);
+                GetTarget()->CastCustomSpell(SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK, values, procTarget, TRIGGERED_FULL_MASK, nullptr, aurEff);
             }
         }
 
-        void Register()
+        void Register() override
         {
             DoCheckProc += AuraCheckProcFn(spell_rog_blade_flurry_AuraScript::CheckProc);
             OnEffectProc += AuraEffectProcFn(spell_rog_blade_flurry_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_MOD_MELEE_HASTE);
         }
 
     private:
-        uint64 _procTargetGUID;
+        ObjectGuid _procTargetGUID;
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_blade_flurry_AuraScript();
     }
@@ -178,14 +174,12 @@ public:
 
         uint32 absorbChance;
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ROGUE_CHEAT_DEATH_COOLDOWN });
         }
 
-        bool Load()
+        bool Load() override
         {
             absorbChance = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
             return GetUnitOwner()->ToPlayer();
@@ -217,14 +211,14 @@ public:
                 absorbAmount = dmgInfo.GetDamage();
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_rog_cheat_death_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
             OnEffectAbsorb += AuraEffectAbsorbFn(spell_rog_cheat_death_AuraScript::Absorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_cheat_death_AuraScript();
     }
@@ -240,7 +234,7 @@ public:
     {
         PrepareSpellScript(spell_rog_deadly_poison_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             _stackAmount = 0;
             // at this point CastItem must already be initialized
@@ -264,7 +258,6 @@ public:
 
             if (Unit* target = GetHitUnit())
             {
-
                 Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
 
                 if (item == GetCastItem())
@@ -288,7 +281,8 @@ public:
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(enchant->spellid[s]);
                         if (!spellInfo)
                         {
-                            sLog->outError("Player::CastItemCombatSpell Enchant %i, player (Name: %s, GUID: %u) cast unknown spell %i", enchant->ID, player->GetName().c_str(), player->GetGUIDLow(), enchant->spellid[s]);
+                            LOG_ERROR("misc", "Player::CastItemCombatSpell Enchant %i, player (Name: %s, %s) cast unknown spell %i",
+                                enchant->ID, player->GetName().c_str(), player->GetGUID().ToString().c_str(), enchant->spellid[s]);
                             continue;
                         }
 
@@ -309,7 +303,7 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             BeforeHit += SpellHitFn(spell_rog_deadly_poison_SpellScript::HandleBeforeHit);
             AfterHit += SpellHitFn(spell_rog_deadly_poison_SpellScript::HandleAfterHit);
@@ -318,7 +312,7 @@ public:
         uint8 _stackAmount;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_rog_deadly_poison_SpellScript();
     }
@@ -364,7 +358,7 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnCheckCast += SpellCheckCastFn(spell_rog_killing_spree_SpellScript::CheckCast);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rog_killing_spree_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
@@ -372,7 +366,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_rog_killing_spree_SpellScript();
     }
@@ -381,13 +375,14 @@ public:
     {
         PrepareAuraScript(spell_rog_killing_spree_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROGUE_KILLING_SPREE_TELEPORT)
-                    || !sSpellMgr->GetSpellInfo(SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG)
-                    || !sSpellMgr->GetSpellInfo(SPELL_ROGUE_KILLING_SPREE_DMG_BUFF))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_ROGUE_KILLING_SPREE_TELEPORT,
+                    SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG,
+                    SPELL_ROGUE_KILLING_SPREE_DMG_BUFF
+                });
         }
 
         void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -399,7 +394,7 @@ public:
         {
             while (!_targets.empty())
             {
-                uint64 guid = acore::Containers::SelectRandomContainerElement(_targets);
+                ObjectGuid guid = Acore::Containers::SelectRandomContainerElement(_targets);
                 if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                 {
                     // xinef: target may be no longer valid
@@ -428,7 +423,7 @@ public:
             GetTarget()->RemoveAurasDueToSpell(SPELL_ROGUE_KILLING_SPREE_DMG_BUFF);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_rog_killing_spree_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_rog_killing_spree_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
@@ -442,10 +437,10 @@ public:
         }
 
     private:
-        std::list<uint64> _targets;
+        GuidList _targets;
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_killing_spree_AuraScript();
     }
@@ -463,7 +458,7 @@ public:
 
         uint32 absorbPct;
 
-        bool Load()
+        bool Load() override
         {
             absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
             return true;
@@ -482,14 +477,14 @@ public:
                 absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_rog_nerves_of_steel_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
             OnEffectAbsorb += AuraEffectAbsorbFn(spell_rog_nerves_of_steel_AuraScript::Absorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_nerves_of_steel_AuraScript();
     }
@@ -505,16 +500,14 @@ public:
     {
         PrepareSpellScript(spell_rog_preparation_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetCaster()->GetTypeId() == TYPEID_PLAYER;
         }
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROGUE_GLYPH_OF_PREPARATION))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ROGUE_GLYPH_OF_PREPARATION });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -526,7 +519,7 @@ public:
             PlayerSpellMap const& spellMap = caster->GetSpellMap();
             for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
                 if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
                 {
                     if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep
@@ -556,13 +549,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_rog_preparation_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_rog_preparation_SpellScript();
     }
@@ -578,11 +571,9 @@ public:
     {
         PrepareAuraScript(spell_rog_prey_on_the_weak_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROGUE_PREY_ON_THE_WEAK))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ROGUE_PREY_ON_THE_WEAK });
         }
 
         void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
@@ -604,13 +595,13 @@ public:
                 target->RemoveAurasDueToSpell(SPELL_ROGUE_PREY_ON_THE_WEAK);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_rog_prey_on_the_weak_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_prey_on_the_weak_AuraScript();
     }
@@ -626,7 +617,7 @@ public:
     {
         PrepareAuraScript(spell_rog_rupture_AuraScript);
 
-        bool Load()
+        bool Load() override
         {
             Unit* caster = GetCaster();
             return caster && caster->GetTypeId() == TYPEID_PLAYER;
@@ -656,13 +647,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_rog_rupture_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_rupture_AuraScript();
     }
@@ -678,16 +669,14 @@ public:
     {
         PrepareSpellScript(spell_rog_shiv_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetCaster()->GetTypeId() == TYPEID_PLAYER;
         }
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROGUE_SHIV_TRIGGERED))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ROGUE_SHIV_TRIGGERED });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -697,13 +686,13 @@ public:
                 caster->CastSpell(unitTarget, SPELL_ROGUE_SHIV_TRIGGERED, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_rog_shiv_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_rog_shiv_SpellScript();
     }
@@ -719,16 +708,12 @@ public:
     {
         PrepareAuraScript(spell_rog_tricks_of_the_trade_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST, SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC });
         }
 
-        bool Load()
+        bool Load() override
         {
             _redirectTarget = nullptr;
             return true;
@@ -756,7 +741,7 @@ public:
             Remove(AURA_REMOVE_BY_DEFAULT); // maybe handle by proc charges
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_rog_tricks_of_the_trade_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             DoCheckProc += AuraCheckProcFn(spell_rog_tricks_of_the_trade_AuraScript::CheckProc);
@@ -767,7 +752,7 @@ public:
         Unit* _redirectTarget;
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_tricks_of_the_trade_AuraScript();
     }
@@ -788,13 +773,13 @@ public:
             GetTarget()->ResetRedirectThreat();
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_rog_tricks_of_the_trade_proc_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_rog_tricks_of_the_trade_proc_AuraScript();
     }

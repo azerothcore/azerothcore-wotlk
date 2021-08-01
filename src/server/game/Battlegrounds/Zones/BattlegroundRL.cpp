@@ -1,13 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "BattlegroundRL.h"
 #include "Language.h"
-#include "Object.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -29,7 +27,6 @@ BattlegroundRL::BattlegroundRL()
 
 BattlegroundRL::~BattlegroundRL()
 {
-
 }
 
 void BattlegroundRL::StartingEventCloseDoors()
@@ -70,7 +67,7 @@ void BattlegroundRL::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        sLog->outError("Killer player not found");
+        LOG_ERROR("bg.battleground", "Killer player not found");
         return;
     }
 
@@ -155,7 +152,7 @@ bool BattlegroundRL::SetupBattleground()
             || !AddObject(BG_RL_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 1298.61f, 1598.59f, 31.62f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
             || !AddObject(BG_RL_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 1273.71f, 1734.05f, 31.61f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
     {
-        sLog->outErrorDb("BatteGroundRL: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundRL: Failed to spawn some object!");
         return false;
     }
 

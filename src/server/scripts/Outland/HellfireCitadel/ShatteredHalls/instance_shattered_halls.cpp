@@ -2,17 +2,17 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "shattered_halls.h"
 #include "CreatureTextMgr.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
+#include "shattered_halls.h"
 
 class instance_shattered_halls : public InstanceMapScript
 {
 public:
     instance_shattered_halls() : InstanceMapScript("instance_shattered_halls", 540) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_shattered_halls_InstanceMapScript(map);
     }
@@ -21,43 +21,38 @@ public:
     {
         instance_shattered_halls_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void Initialize()
+        void Initialize() override
         {
             SetBossNumber(ENCOUNTER_COUNT);
-            nethekurseDoor1GUID = 0;
-            nethekurseDoor2GUID = 0;
-            warchiefKargathGUID = 0;
 
-            executionerGUID = 0;
-            memset(&prisonerGUID, 0, sizeof(prisonerGUID));
             TeamIdInInstance = TEAM_NEUTRAL;
             RescueTimer = 100 * MINUTE * IN_MILLISECONDS;
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
                 case GO_GRAND_WARLOCK_CHAMBER_DOOR_1:
                     nethekurseDoor1GUID = go->GetGUID();
                     if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_GRAND_WARLOCK_CHAMBER_DOOR_2:
                     nethekurseDoor2GUID = go->GetGUID();
                     if (GetBossState(DATA_NETHEKURSE) == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -95,7 +90,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -118,7 +113,7 @@ public:
             return true;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == DATA_ENTERED_ROOM && data == DATA_ENTERED_ROOM && RescueTimer == 100 * MINUTE * IN_MILLISECONDS)
             {
@@ -126,13 +121,13 @@ public:
                 instance->LoadGrid(230, -80);
 
                 if (Creature* kargath = instance->GetCreature(warchiefKargathGUID))
-                    sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
+                    sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
 
                 RescueTimer = 80 * MINUTE * IN_MILLISECONDS;
             }
         }
 
-        uint64 GetData64(uint32 data) const
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -143,10 +138,11 @@ public:
                 case DATA_EXECUTIONER:
                     return executionerGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (RescueTimer && RescueTimer < 100 * MINUTE * IN_MILLISECONDS)
             {
@@ -177,7 +173,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -188,7 +184,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {
@@ -223,12 +219,12 @@ public:
         }
 
     protected:
-        uint64 warchiefKargathGUID;
-        uint64 nethekurseDoor1GUID;
-        uint64 nethekurseDoor2GUID;
+        ObjectGuid warchiefKargathGUID;
+        ObjectGuid nethekurseDoor1GUID;
+        ObjectGuid nethekurseDoor2GUID;
 
-        uint64 executionerGUID;
-        uint64 prisonerGUID[3];
+        ObjectGuid executionerGUID;
+        ObjectGuid prisonerGUID[3];
         uint32 RescueTimer;
         TeamId TeamIdInInstance;
     };
@@ -245,7 +241,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            acore::Containers::RandomResizeList(unitList, 1);
+            Acore::Containers::RandomResize(unitList, 1);
         }
 
         void HandleScriptEffect(SpellEffIndex effIndex)
@@ -255,14 +251,14 @@ public:
                 target->CastSpell(target, 30953, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_tsh_shoot_flame_arrow_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
             OnEffectHitTarget += SpellEffectFn(spell_tsh_shoot_flame_arrow_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_tsh_shoot_flame_arrow_SpellScript();
     }
@@ -273,7 +269,7 @@ class at_shattered_halls_execution : public AreaTriggerScript
 public:
     at_shattered_halls_execution() : AreaTriggerScript("at_shattered_halls_execution") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (InstanceScript* instanceScript = player->GetInstanceScript())
             instanceScript->SetData(DATA_ENTERED_ROOM, DATA_ENTERED_ROOM);

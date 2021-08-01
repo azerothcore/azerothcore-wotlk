@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2020 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -22,10 +22,11 @@ char constexpr CharTitlesEntryfmt[] = "nxssssssssssssssssxssssssssssssssssxi";
 char constexpr ChatChannelsEntryfmt[] = "nixssssssssssssssssxxxxxxxxxxxxxxxxxx"; // ChatChannelsEntryfmt, index not used (more compact store)
 char constexpr ChrClassesEntryfmt[] = "nxixssssssssssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxixii";
 char constexpr ChrRacesEntryfmt[] = "nxixiixixxxxixssssssssssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxi";
-char constexpr CinematicSequencesEntryfmt[] = "nxxxxxxxxx";
+char constexpr CinematicCameraEntryfmt[] = "nsiffff";
+char constexpr CinematicSequencesEntryfmt[] = "nxixxxxxxx";
 char constexpr CreatureDisplayInfofmt[] = "nixxfxxxxxxxxxxx";
 char constexpr CreatureFamilyfmt[] = "nfifiiiiixssssssssssssssssxx";
-char constexpr CreatureModelDatafmt[] = "nxxxfxxxxxxxxxxffxxxxxxxxxxx";
+char constexpr CreatureModelDatafmt[] = "nxxxfxxxxxxxxxfffxxxxxxxxxxx";
 char constexpr CreatureSpellDatafmt[] = "niiiixxxx";
 char constexpr CreatureTypefmt[] = "nxxxxxxxxxxxxxxxxxx";
 char constexpr CurrencyTypesfmt[] = "xnxi";
@@ -81,6 +82,8 @@ char constexpr ScalingStatDistributionfmt[] = "niiiiiiiiiiiiiiiiiiiii";
 char constexpr ScalingStatValuesfmt[] = "iniiiiiiiiiiiiiiiiiiiiii";
 char constexpr SkillLinefmt[] = "nixssssssssssssssssxxxxxxxxxxxxxxxxxxixxxxxxxxxxxxxxxxxi";
 char constexpr SkillLineAbilityfmt[] = "niiiixxiiiiixx";
+char constexpr SkillRaceClassInfofmt[] = "diiiixix";
+char constexpr SkillTiersfmt[] = "nxxxxxxxxxxxxxxxxiiiiiiiiiiiiiiii";
 char constexpr SoundEntriesfmt[] = "nxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 char constexpr SpellCastTimefmt[] = "nixx";
 char constexpr SpellCategoryfmt[] = "ni";

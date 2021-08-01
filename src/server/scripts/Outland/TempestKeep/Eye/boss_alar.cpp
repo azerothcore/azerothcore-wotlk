@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_eye.h"
 #include "WaypointManager.h"
-#include "MoveSplineInit.h"
 
 enum Spells
 {
@@ -62,7 +62,6 @@ enum Misc
 
     EVENT_MOVE_TO_PHASE_2       = 20,
     EVENT_FINISH_DIVE           = 21
-
 };
 
 // Xinef: Ruse of the Ashtongue (10946)
@@ -89,13 +88,13 @@ public:
         uint8 noQuillTimes;
         bool startPath;
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             BossAI::JustReachedHome();
             startPath = true;
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             platform = 0;
@@ -105,13 +104,13 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             events.ScheduleEvent(EVENT_SWITCH_PLATFORM, 0);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             me->SetModelVisible(true);
             BossAI::JustDied(killer);
@@ -127,16 +126,16 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_EMBER_OF_ALAR)
                 summon->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_FIRE, true);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() && platform < POINT_MIDDLE)
             {
@@ -157,7 +156,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
             {
@@ -177,7 +176,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (startPath)
             {
@@ -326,9 +325,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_alarAI>(creature);
+        return GetTheEyeAI<boss_alarAI>(creature);
     }
 };
 
@@ -339,7 +338,7 @@ public:
     {
     }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         _caster->CastSpell(_caster, _spellId, true);
         return true;
@@ -371,13 +370,13 @@ public:
             GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 2), GetUnitOwner()->m_Events.CalculateTime(24 * 40));
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_alar_flame_quills_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_alar_flame_quills_AuraScript();
     }
@@ -396,17 +395,17 @@ public:
         {
             PreventHitEffect(effIndex);
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* alar = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(NPC_ALAR)))
+                if (Creature* alar = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_ALAR)))
                     Unit::DealDamage(GetCaster(), alar, alar->CountPctFromMaxHealth(2));
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_alar_ember_blast_SpellScript::HandleForceCast, EFFECT_2, SPELL_EFFECT_FORCE_CAST);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_alar_ember_blast_SpellScript();
     }
@@ -441,14 +440,14 @@ public:
             GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_alar_ember_blast_death_AuraScript::OnApply, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_alar_ember_blast_death_AuraScript::OnRemove, EFFECT_2, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_alar_ember_blast_death_AuraScript();
     }
@@ -469,13 +468,13 @@ public:
             GetUnitOwner()->SetDisplayId(DISPLAYID_INVISIBLE);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_alar_dive_bomb_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_alar_dive_bomb_AuraScript();
     }

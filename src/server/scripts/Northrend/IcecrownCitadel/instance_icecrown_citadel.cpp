@@ -2,19 +2,19 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "ScriptedCreature.h"
-#include "Map.h"
 #include "AccountMgr.h"
+#include "CreatureTextMgr.h"
+#include "Group.h"
 #include "icecrown_citadel.h"
+#include "InstanceScript.h"
+#include "Map.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Transport.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Transport.h"
-#include "Group.h"
-#include "CreatureTextMgr.h"
 
 enum EventIds
 {
@@ -120,7 +120,7 @@ class RespawnEvent : public BasicEvent
 public:
     RespawnEvent(Creature& owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         _owner.RemoveCorpse(false);
         _owner.Respawn();
@@ -136,7 +136,7 @@ class DelayedCastMincharEvent : public BasicEvent
 public:
     DelayedCastMincharEvent(Creature* trigger, uint32 spellId) : _trigger(trigger), _spellId(spellId) {}
 
-    bool Execute(uint64 /*time*/, uint32 /*diff*/)
+    bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         if (Creature* minchar = _trigger->FindNearestCreature(NPC_INFILTRATOR_MINCHAR_BQ, 50.0f, true))
             _trigger->CastSpell(minchar, _spellId, true);
@@ -160,63 +160,15 @@ public:
             // pussywizard:
             IsBuffAvailable = true;
             WeeklyQuestId10 = 0;
-            PutricideEnteranceDoorGUID = 0;
-            GasReleaseValveGUID = 0;
-            OozeReleaseValveGUID = 0;
             PutricideEventProgress = 0;
             LichKingHeroicAvailable = true;
             LichKingRandomWhisperTimer = 120 * IN_MILLISECONDS;
             DarkwhisperElevatorTimer = 3000;
-            memset(&WeeklyQuestNpcGUID, 0, sizeof(WeeklyQuestNpcGUID));
-            ScourgeTransporterFirstGUID = 0;
 
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
             TeamIdInInstance = TEAM_NEUTRAL;
             HeroicAttempts = MaxHeroicAttempts;
-            LadyDeathwhisperGUID = 0;
-            LadyDeathwisperElevatorGUID = 0;
-            GunshipGUID = 0;
-            EnemyGunshipGUID = 0;
-            GunshipArmoryGUID = 0;
-            DeathbringerSaurfangGUID = 0;
-            DeathbringerSaurfangDoorGUID = 0;
-            DeathbringerSaurfangEventGUID = 0;
-            DeathbringersCacheGUID = 0;
-            SaurfangTeleportGUID = 0;
-            PlagueSigilGUID = 0;
-            BloodwingSigilGUID = 0;
-            FrostwingSigilGUID = 0;
-            memset(PutricidePipeGUIDs, 0, 2 * sizeof(uint64));
-            memset(PutricideGateGUIDs, 0, 2 * sizeof(uint64));
-            PutricideCollisionGUID = 0;
-            FestergutGUID = 0;
-            RotfaceGUID = 0;
-            ProfessorPutricideGUID = 0;
-            PutricideTableGUID = 0;
-            memset(BloodCouncilGUIDs, 0, 3 * sizeof(uint64));
-            BloodCouncilControllerGUID = 0;
-            BloodQueenLanaThelGUID = 0;
-            CrokScourgebaneGUID = 0;
-            memset(CrokCaptainGUIDs, 0, 4 * sizeof(uint64));
-            SisterSvalnaGUID = 0;
-            ValithriaDreamwalkerGUID = 0;
-            ValithriaLichKingGUID = 0;
-            ValithriaTriggerGUID = 0;
-            PutricadeTrapGUID = 0;
-            SindragosaGauntletGUID = 0;
-            SindragosaGUID = 0;
-            SpinestalkerGUID = 0;
-            RimefangGUID = 0;
-            TheLichKingTeleportGUID = 0;
-            TheLichKingGUID = 0;
-            HighlordTirionFordringGUID = 0;
-            TerenasMenethilGUID = 0;
-            ArthasPlatformGUID = 0;
-            ArthasPrecipiceGUID = 0;
-            FrozenThroneEdgeGUID = 0;
-            FrozenThroneWindGUID = 0;
-            FrozenThroneWarningGUID = 0;
             IsBonedEligible = true;
             IsOozeDanceEligible = true;
             IsNauseaEligible = true;
@@ -227,7 +179,7 @@ public:
             BloodPrinceTrashCount = 0;
         }
 
-        void FillInitialWorldStates(WorldPacket& data)
+        void FillInitialWorldStates(WorldPacket& data) override
         {
             if (instance->IsHeroic())
             {
@@ -239,7 +191,7 @@ public:
             }
         }
 
-        void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea)
+        void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea) override
         {
             if (newArea == 4890 /*Putricide's Laboratory of Alchemical Horrors and Fun*/ ||
                     newArea == 4891 /*The Sanctum of Blood*/ ||
@@ -255,7 +207,7 @@ public:
             }
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
@@ -268,7 +220,7 @@ public:
                 SpawnGunship();
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -279,7 +231,7 @@ public:
             }
 
             // apply ICC buff to pets/summons
-            if (GetData(DATA_BUFF_AVAILABLE) && IS_PLAYER_GUID(creature->GetOwnerGUID()) && creature->HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && creature->CanHaveThreatList())
+            if (GetData(DATA_BUFF_AVAILABLE) && creature->GetOwnerGUID().IsPlayer() && creature->HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && creature->CanHaveThreatList())
                 if (Unit* owner = creature->GetOwner())
                     if (Player* plr = owner->ToPlayer())
                     {
@@ -509,13 +461,13 @@ public:
             }
         }
 
-        void OnCreatureRemove(Creature* creature)
+        void OnCreatureRemove(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_SINDRAGOSA)
-                SindragosaGUID = 0;
+                SindragosaGUID.Clear();
         }
 
-        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data)
+        uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -560,7 +512,7 @@ public:
             return entry;
         }
 
-        uint32 GetGameObjectEntry(uint32 /*guidLow*/, uint32 entry)
+        uint32 GetGameObjectEntry(ObjectGuid::LowType /*guidLow*/, uint32 entry) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -591,7 +543,7 @@ public:
             return entry;
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             Creature* creature = unit->ToCreature();
             if (!creature)
@@ -620,14 +572,14 @@ public:
 
                     if (creature->AI()->GetData(1/*DATA_FROSTWYRM_OWNER*/) == DATA_SPINESTALKER)
                     {
-                        SpinestalkerTrash.erase(creature->GetDBTableGUIDLow());
+                        SpinestalkerTrash.erase(creature->GetSpawnId());
                         if (SpinestalkerTrash.empty())
                             if (Creature* spinestalk = instance->GetCreature(SpinestalkerGUID))
                                 spinestalk->AI()->DoAction(ACTION_START_FROSTWYRM);
                     }
                     else
                     {
-                        RimefangTrash.erase(creature->GetDBTableGUIDLow());
+                        RimefangTrash.erase(creature->GetSpawnId());
                         if (RimefangTrash.empty())
                             if (Creature* spinestalk = instance->GetCreature(RimefangGUID))
                                 spinestalk->AI()->DoAction(ACTION_START_FROSTWYRM);
@@ -642,7 +594,7 @@ public:
                         if (GetBossState(DATA_SINDRAGOSA) == DONE)
                             return;
 
-                        FrostwyrmGUIDs.erase(creature->GetDBTableGUIDLow());
+                        FrostwyrmGUIDs.erase(creature->GetSpawnId());
                         if (FrostwyrmGUIDs.empty())
                         {
                             instance->LoadGrid(SindragosaSpawnPos.GetPositionX(), SindragosaSpawnPos.GetPositionY());
@@ -664,7 +616,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -861,7 +813,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -893,14 +845,14 @@ public:
                     break;
                 case GO_THE_SKYBREAKER_A:
                 case GO_ORGRIMS_HAMMER_H:
-                    GunshipGUID = 0;
+                    GunshipGUID.Clear();
                     break;
                 default:
                     break;
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -941,7 +893,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -1014,7 +966,7 @@ public:
                     break;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void HandleDropAttempt(bool drop = true)
@@ -1051,7 +1003,7 @@ public:
                     _player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, _player->GetItemCount(ITEM_GOBLIN_ROCKET_PACK), true);
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -1223,7 +1175,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -1390,7 +1342,7 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/) override
         {
             switch (criteria_id)
             {
@@ -1426,7 +1378,7 @@ public:
             return false;
         }
 
-        bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const
+        bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const override
         {
             switch (bossId)
             {
@@ -1589,8 +1541,8 @@ public:
                     if (stalkers.empty())
                         return;
 
-                    stalkers.sort(acore::ObjectDistanceOrderPred(teleporter));
-                    stalkers.front()->CastSpell((Unit*)NULL, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
+                    stalkers.sort(Acore::ObjectDistanceOrderPred(teleporter));
+                    stalkers.front()->CastSpell((Unit*)nullptr, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
                     stalkers.pop_front();
                     for (std::list<Creature*>::iterator itr = stalkers.begin(); itr != stalkers.end(); ++itr)
                         (*itr)->AI()->Reset();
@@ -1598,7 +1550,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -1607,12 +1559,11 @@ public:
                        << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' '
                        << uint32(LichKingHeroicAvailable ? 1 : 0) << ' ' << BloodPrinceTrashCount << ' ' << uint32(IsBuffAvailable ? 1 : 0);
 
-
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
         }
 
-        void Load(const char* str)
+        void Load(const char* str) override
         {
             if (!str)
             {
@@ -1668,7 +1619,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             // Xinef: A Feast of Souls (24547) whispers
             if (LichKingRandomWhisperTimer <= diff)
@@ -1682,7 +1633,7 @@ public:
                             uint8 id = urand(0, 15);
                             std::string const& text = sCreatureTextMgr->GetLocalizedChatString(NPC_THE_LICH_KING_LH, 0, 20 + id, 0, LOCALE_enUS);
                             WorldPacket data;
-                            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, 0, player->GetGUID(), text, CHAT_TAG_NONE, "The Lich King");
+                            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, ObjectGuid::Empty, player->GetGUID(), text, CHAT_TAG_NONE, "The Lich King");
                             player->SendPlaySound(17235 + id, true);
                             player->SendDirectMessage(&data);
                         }
@@ -1750,7 +1701,7 @@ public:
                         }
                     case EVENT_REBUILD_PLATFORM:
                         if (GameObject* platform = instance->GetGameObject(ArthasPlatformGUID))
-                            platform->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+                            platform->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                         if (GameObject* edge = instance->GetGameObject(FrozenThroneEdgeGUID))
                             edge->SetGoState(GO_STATE_READY);
                         if (GameObject* wind = instance->GetGameObject(FrozenThroneWindGUID))
@@ -1765,7 +1716,7 @@ public:
             }
         }
 
-        void ProcessEvent(WorldObject* source, uint32 eventId)
+        void ProcessEvent(WorldObject* source, uint32 eventId) override
         {
             switch (eventId)
             {
@@ -1816,19 +1767,19 @@ public:
                     }
                     break;
                 case EVENT_TELEPORT_TO_FROSMOURNE: // Harvest Soul (normal mode)
-                    if (Creature* terenas = instance->SummonCreature(NPC_TERENAS_MENETHIL_FROSTMOURNE, TerenasSpawn, NULL, 65000))
+                    if (Creature* terenas = instance->SummonCreature(NPC_TERENAS_MENETHIL_FROSTMOURNE, TerenasSpawn, nullptr, 65000))
                     {
                         terenas->AI()->DoAction(ACTION_FROSTMOURNE_INTRO);
                         std::list<Creature*> triggers;
                         GetCreatureListWithEntryInGrid(triggers, terenas, NPC_WORLD_TRIGGER_INFINITE_AOI, 100.0f);
                         if (!triggers.empty())
                         {
-                            triggers.sort(acore::ObjectDistanceOrderPred(terenas, false));
+                            triggers.sort(Acore::ObjectDistanceOrderPred(terenas, false));
                             Unit* visual = triggers.front();
                             visual->CastSpell(visual, SPELL_FROSTMOURNE_TELEPORT_VISUAL, true);
                         }
 
-                        if (Creature* warden = instance->SummonCreature(NPC_SPIRIT_WARDEN, SpiritWardenSpawn, NULL, 65000))
+                        if (Creature* warden = instance->SummonCreature(NPC_SPIRIT_WARDEN, SpiritWardenSpawn, nullptr, 65000))
                         {
                             terenas->AI()->AttackStart(warden);
                             warden->AddThreat(terenas, 300000.0f);
@@ -1871,7 +1822,7 @@ public:
                     break;
             }
         }
-        
+
         void SetPositionTraps(GameObject* go)
         {
             std::vector<Position> trapPositions;
@@ -1894,75 +1845,75 @@ public:
                     return;
             }
 
-            go->Relocate(acore::Containers::SelectRandomContainerElement(trapPositions));
+            go->Relocate(Acore::Containers::SelectRandomContainerElement(trapPositions));
         }
 
     protected:
         // pussywizard:
         bool IsBuffAvailable;
         uint32 WeeklyQuestId10; // contains id from 10man for any difficulty (for simplicity)
-        uint64 WeeklyQuestNpcGUID[WeeklyNPCs];
-        uint64 PutricideEnteranceDoorGUID;
+        ObjectGuid WeeklyQuestNpcGUID[WeeklyNPCs];
+        ObjectGuid PutricideEnteranceDoorGUID;
         uint32 PutricideEventProgress;
-        uint64 GasReleaseValveGUID;
-        uint64 OozeReleaseValveGUID;
+        ObjectGuid GasReleaseValveGUID;
+        ObjectGuid OozeReleaseValveGUID;
         bool LichKingHeroicAvailable;
         uint32 LichKingRandomWhisperTimer;
         uint32 DarkwhisperElevatorTimer;
-        uint64 ScourgeTransporterFirstGUID;
+        ObjectGuid ScourgeTransporterFirstGUID;
 
         EventMap Events;
-        uint64 LadyDeathwhisperGUID;
-        uint64 LadyDeathwisperElevatorGUID;
-        uint64 GunshipGUID;
-        uint64 EnemyGunshipGUID;
-        uint64 GunshipArmoryGUID;
-        uint64 DeathbringerSaurfangGUID;
-        uint64 DeathbringerSaurfangDoorGUID;
-        uint64 DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
-        uint64 DeathbringersCacheGUID;
-        uint64 SaurfangTeleportGUID;
-        uint64 PlagueSigilGUID;
-        uint64 BloodwingSigilGUID;
-        uint64 FrostwingSigilGUID;
-        uint64 PutricidePipeGUIDs[2];
-        uint64 PutricideGateGUIDs[2];
-        uint64 PutricideCollisionGUID;
-        uint64 FestergutGUID;
-        uint64 RotfaceGUID;
-        uint64 ProfessorPutricideGUID;
-        uint64 PutricideTableGUID;
-        uint64 BloodCouncilGUIDs[3];
-        uint64 BloodCouncilControllerGUID;
-        uint64 BloodQueenLanaThelGUID;
-        uint64 CrokScourgebaneGUID;
-        uint64 CrokCaptainGUIDs[4];
-        uint64 SisterSvalnaGUID;
-        uint64 ValithriaDreamwalkerGUID;
-        uint64 ValithriaLichKingGUID;
-        uint64 ValithriaTriggerGUID;
-        uint64 PutricadeTrapGUID;
-        uint64 SindragosaGauntletGUID;
-        uint64 SindragosaGUID;
-        uint64 SpinestalkerGUID;
-        uint64 RimefangGUID;
-        uint64 TheLichKingTeleportGUID;
-        uint64 TheLichKingGUID;
-        uint64 HighlordTirionFordringGUID;
-        uint64 TerenasMenethilGUID;
-        uint64 ArthasPlatformGUID;
-        uint64 ArthasPrecipiceGUID;
-        uint64 FrozenThroneEdgeGUID;
-        uint64 FrozenThroneWindGUID;
-        uint64 FrozenThroneWarningGUID;
-        uint64 FrozenBolvarGUID;
-        uint64 PillarsChainedGUID;
-        uint64 PillarsUnchainedGUID;
+        ObjectGuid LadyDeathwhisperGUID;
+        ObjectGuid LadyDeathwisperElevatorGUID;
+        ObjectGuid GunshipGUID;
+        ObjectGuid EnemyGunshipGUID;
+        ObjectGuid GunshipArmoryGUID;
+        ObjectGuid DeathbringerSaurfangGUID;
+        ObjectGuid DeathbringerSaurfangDoorGUID;
+        ObjectGuid DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
+        ObjectGuid DeathbringersCacheGUID;
+        ObjectGuid SaurfangTeleportGUID;
+        ObjectGuid PlagueSigilGUID;
+        ObjectGuid BloodwingSigilGUID;
+        ObjectGuid FrostwingSigilGUID;
+        ObjectGuid PutricidePipeGUIDs[2];
+        ObjectGuid PutricideGateGUIDs[2];
+        ObjectGuid PutricideCollisionGUID;
+        ObjectGuid FestergutGUID;
+        ObjectGuid RotfaceGUID;
+        ObjectGuid ProfessorPutricideGUID;
+        ObjectGuid PutricideTableGUID;
+        ObjectGuid BloodCouncilGUIDs[3];
+        ObjectGuid BloodCouncilControllerGUID;
+        ObjectGuid BloodQueenLanaThelGUID;
+        ObjectGuid CrokScourgebaneGUID;
+        ObjectGuid CrokCaptainGUIDs[4];
+        ObjectGuid SisterSvalnaGUID;
+        ObjectGuid ValithriaDreamwalkerGUID;
+        ObjectGuid ValithriaLichKingGUID;
+        ObjectGuid ValithriaTriggerGUID;
+        ObjectGuid PutricadeTrapGUID;
+        ObjectGuid SindragosaGauntletGUID;
+        ObjectGuid SindragosaGUID;
+        ObjectGuid SpinestalkerGUID;
+        ObjectGuid RimefangGUID;
+        ObjectGuid TheLichKingTeleportGUID;
+        ObjectGuid TheLichKingGUID;
+        ObjectGuid HighlordTirionFordringGUID;
+        ObjectGuid TerenasMenethilGUID;
+        ObjectGuid ArthasPlatformGUID;
+        ObjectGuid ArthasPrecipiceGUID;
+        ObjectGuid FrozenThroneEdgeGUID;
+        ObjectGuid FrozenThroneWindGUID;
+        ObjectGuid FrozenThroneWarningGUID;
+        ObjectGuid FrozenBolvarGUID;
+        ObjectGuid PillarsChainedGUID;
+        ObjectGuid PillarsUnchainedGUID;
         TeamId TeamIdInInstance;
         uint32 ColdflameJetsState;
-        std::set<uint32> FrostwyrmGUIDs;
-        std::set<uint32> SpinestalkerTrash;
-        std::set<uint32> RimefangTrash;
+        std::set<ObjectGuid::LowType> FrostwyrmGUIDs;
+        std::set<ObjectGuid::LowType> SpinestalkerTrash;
+        std::set<ObjectGuid::LowType> RimefangTrash;
         uint32 BloodQuickeningState;
         uint32 HeroicAttempts;
         uint16 BloodQuickeningMinutes;
@@ -1973,7 +1924,7 @@ public:
         bool IsOrbWhispererEligible;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_icecrown_citadel_InstanceMapScript(map);
     }

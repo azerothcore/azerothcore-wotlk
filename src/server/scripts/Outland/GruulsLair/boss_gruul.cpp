@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
 #include "gruuls_lair.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 enum Yells
 {
@@ -51,13 +51,13 @@ public:
     {
         boss_gruulAI(Creature* creature) : BossAI(creature, DATA_GRUUL) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             _caveInTimer = 29000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
@@ -69,7 +69,7 @@ public:
             events.ScheduleEvent(EVENT_GROUND_SLAM, 35000);
         }
 
-        void KilledUnit(Unit*  /*who*/)
+        void KilledUnit(Unit*  /*who*/) override
         {
             if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
             {
@@ -78,13 +78,13 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -113,7 +113,13 @@ public:
                     break;
                 case EVENT_HURTFUL_STRIKE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 5.0f))
+                    {
                         me->CastSpell(target, SPELL_HURTFUL_STRIKE, false);
+                    }
+                    else
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_HURTFUL_STRIKE, false);
+                    }
                     events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 15000);
                     break;
                 case EVENT_GROUND_SLAM:
@@ -122,23 +128,28 @@ public:
                     events.DelayEvents(8001);
                     events.ScheduleEvent(EVENT_GROUND_SLAM, 60000);
                     events.ScheduleEvent(EVENT_SHATTER, 8000);
+                    me->SetControlled(true, UNIT_STATE_ROOT);
                     break;
                 case EVENT_SHATTER:
                     Talk(SAY_SHATTER);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
                     me->CastSpell(me, SPELL_SHATTER, false);
                     break;
             }
 
-            DoMeleeAttackIfReady();
+            if (!me->HasUnitState(UNIT_STATE_ROOT))
+            {
+                DoMeleeAttackIfReady();
+            }
         }
 
     private:
         uint32 _caveInTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_gruulAI>(creature);
+        return GetGruulsLairAI<boss_gruulAI>(creature);
     }
 };
 
@@ -157,13 +168,13 @@ public:
                 target->KnockbackFrom(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), 15.0f, 15.0f);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_gruul_ground_slam_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gruul_ground_slam_SpellScript();
     }
@@ -178,19 +189,19 @@ public:
     {
         PrepareAuraScript(spell_gruul_ground_slam_trigger_AuraScript);
 
-        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             if (GetUnitOwner()->GetAuraCount(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell) == 5)
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_STONED, true);
         }
 
-        void Register()
+        void Register() override
         {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_gruul_ground_slam_trigger_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_gruul_ground_slam_trigger_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_gruul_ground_slam_trigger_AuraScript();
     }
@@ -210,17 +221,17 @@ public:
             if (Unit* target = GetHitUnit())
             {
                 target->RemoveAurasDueToSpell(SPELL_STONED);
-                target->CastSpell((Unit*)NULL, SPELL_SHATTER_EFFECT, true);
+                target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_gruul_shatter_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gruul_shatter_SpellScript();
     }
@@ -249,13 +260,13 @@ public:
                 SetHitDamage(int32(GetHitDamage() * ((radius - distance) / radius)));
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_gruul_shatter_effect_SpellScript::CalculateDamage);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gruul_shatter_effect_SpellScript();
     }

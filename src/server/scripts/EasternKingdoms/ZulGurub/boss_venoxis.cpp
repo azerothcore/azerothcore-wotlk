@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "zulgurub.h"
 
@@ -80,7 +79,7 @@ public:
     {
         boss_venoxisAI(Creature* creature) : BossAI(creature, DATA_VENOXIS) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             // remove all spells and auras from previous attempts
@@ -93,14 +92,14 @@ public:
             events.SetPhase(PHASE_ONE);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_VENOXIS_DEATH);
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             me->SetReactState(REACT_AGGRESSIVE);
@@ -119,7 +118,7 @@ public:
             DoZoneInCombat();
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             // check if venoxis is ready to transform
             if (!_transformed && !HealthAbovePct(50))
@@ -136,7 +135,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -251,9 +250,9 @@ public:
         bool _frenzied;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_venoxisAI(creature);
+        return GetZulGurubAI<boss_venoxisAI>(creature);
     }
 };
 

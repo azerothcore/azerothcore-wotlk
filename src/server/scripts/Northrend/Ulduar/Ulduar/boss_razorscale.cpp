@@ -2,16 +2,16 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellScript.h"
-#include "ulduar.h"
-#include "SpellAuras.h"
+#include "MoveSplineInit.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "ulduar.h"
 #include "WaypointManager.h"
-#include "MoveSplineInit.h"
 
 #define SPELL_FLAMEBUFFET_10                64016
 #define SPELL_FLAMEBUFFET_25                64023
@@ -70,7 +70,6 @@
 #define TEXT_DEEP_BREATH                    "Razorscale takes a deep breath..."
 #define TEXT_GROUNDED_PERMANENTLY           "Razorscale grounded permanently!"
 
-
 #define CORDS_GROUND                        588.0f, -166.0f, 391.1f
 #define CORDS_AIR                           588.0f, -178.0f, 490.0f
 #define REPAIR_POINTS                       25
@@ -112,9 +111,9 @@ class boss_razorscale : public CreatureScript
 public:
     boss_razorscale() : CreatureScript("boss_razorscale") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_razorscaleAI (pCreature);
+        return GetUlduarAI<boss_razorscaleAI>(pCreature);
     }
 
     struct boss_razorscaleAI : public ScriptedAI
@@ -128,25 +127,27 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 ExpeditionEngineerGUIDs[3];
-        uint64 CommanderGUID;
+        ObjectGuid ExpeditionEngineerGUIDs[3];
+        ObjectGuid CommanderGUID;
         float cords[4][2];
         bool bGroundPhase;
         bool startPath;
         uint8 flyTimes;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            memset(&ExpeditionEngineerGUIDs, 0, sizeof(ExpeditionEngineerGUIDs));
-            CommanderGUID = 0;
+
+            for (uint8 i = 0; i < 3; ++i)
+                ExpeditionEngineerGUIDs[i].Clear();
+
+            CommanderGUID.Clear();
             bGroundPhase = false;
             flyTimes = 0;
 
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            me->SetHover(true);
             me->SendMovementFlagUpdate();
             me->setActive(true);
 
@@ -154,13 +155,13 @@ public:
                 pInstance->SetData(TYPE_RAZORSCALE, NOT_STARTED);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (who && me->Attack(who, true) && bGroundPhase)
                 me->GetMotionMaster()->MoveChase(who);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             me->SetInCombatWithZone();
             events.Reset();
@@ -190,7 +191,7 @@ public:
                 pInstance->SetData(TYPE_RAZORSCALE, IN_PROGRESS);
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  /*Killer*/) override
         {
             summons.DespawnAll();
 
@@ -198,7 +199,7 @@ public:
                 pInstance->SetData(TYPE_RAZORSCALE, DONE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (!caster || !pInstance)
                 return;
@@ -208,11 +209,11 @@ public:
                 case SPELL_LAUNCH_CHAIN:
                     {
                         uint32 spell = 0;
-                        if( caster->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1) )
+                        if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1) )
                             spell = SPELL_CHAIN_1;
-                        else if( caster->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_2) )
+                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2) )
                             spell = SPELL_CHAIN_2;
-                        else if( caster->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_3) )
+                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3) )
                             spell = SPELL_CHAIN_3;
                         else
                             spell = SPELL_CHAIN_4;
@@ -245,7 +246,7 @@ public:
                             events.CancelEvent(EVENT_SPELL_FIREBALL);
                             events.CancelEvent(EVENT_SPELL_DEVOURING_FLAME);
                             events.CancelEvent(EVENT_SUMMON_MOLE_MACHINES);
-                            me->SetTarget(0);
+                            me->SetTarget();
                             me->SendMeleeAttackStop(me->GetVictim());
                             me->GetMotionMaster()->MoveLand(0, CORDS_GROUND, 25.0f);
                         }
@@ -254,7 +255,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (me->GetPositionZ() > 440.0f) // protection, razorscale is attackable (so harpoons can hit him, etc.), but should not receive dmg while in air
                 damage = 0;
@@ -262,7 +263,7 @@ public:
                 events.RescheduleEvent(EVENT_WARN_DEEP_BREATH, 0);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == POINT_RAZORSCALE_INIT)
             {
@@ -285,7 +286,6 @@ public:
                 me->SetFacingTo(M_PI / 2);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->CastSpell(me, 62794, true);
                 events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30000);
             }
@@ -297,7 +297,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (startPath)
             {
@@ -431,7 +431,6 @@ public:
                             if( npc_entry )
                                 if (Creature* c = me->SummonCreature(npc_entry, x, y, 391.1f, j * M_PI / 2, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                                     DoZoneInCombat(c);
-
                         }
                     }
                     break;
@@ -448,7 +447,7 @@ public:
                     me->SetInCombatWithZone(); // just in case
                     if (pInstance)
                         for( int i = 0; i < 4; ++i )
-                            if( uint64 guid = pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i) )
+                            if( ObjectGuid guid = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
                                 if( Creature* hfs = ObjectAccessor::GetCreature(*me, guid) )
                                 {
                                     me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
@@ -500,7 +499,6 @@ public:
                         me->StopMoving();
                         me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SetHover(true);
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
                         events.ScheduleEvent(EVENT_RESUME_FIXING, 22000);
@@ -547,33 +545,33 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             startPath = true;
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             summons.Summon(s);
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             if (id == 1)
                 return (flyTimes <= 1 ? 1 : 0);
             return 0;
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim && victim->GetEntry() == NPC_DARK_RUNE_GUARDIAN)
                 if (pInstance)
                     pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_DARK_RUNE_GUARDIAN, 1, me);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
@@ -599,7 +597,7 @@ public:
         if (instance->GetData(TYPE_RAZORSCALE) == DONE)
             return true;
 
-        Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetData64(TYPE_RAZORSCALE));
+        Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
         if (!razorscale || razorscale->IsInCombat())
             return true;
 
@@ -619,12 +617,12 @@ public:
             if (!instance || instance->GetData(TYPE_RAZORSCALE) == DONE)
                 return true;
 
-            Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetData64(TYPE_RAZORSCALE));
+            Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
             if (razorscale && !razorscale->IsInCombat())
             {
                 // reset npcs NPC_HARPOON_FIRE_STATE
                 for (uint8 i = 0; i < 4; ++i)
-                    if (Creature* hfs = ObjectAccessor::GetCreature(*creature, instance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i)))
+                    if (Creature* hfs = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i)))
                         hfs->AI()->SetData(1, 0);
 
                 if (razorscale->AI())
@@ -642,7 +640,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_ulduar_expedition_commanderAI>(creature);
+        return GetUlduarAI<npc_ulduar_expedition_commanderAI>(creature);
     }
 
     struct npc_ulduar_expedition_commanderAI : public NullCreatureAI
@@ -677,9 +675,9 @@ class npc_ulduar_harpoonfirestate : public CreatureScript
 public:
     npc_ulduar_harpoonfirestate() : CreatureScript("npc_ulduar_harpoonfirestate") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_harpoonfirestateAI (pCreature);
+        return GetUlduarAI<npc_ulduar_harpoonfirestateAI>(pCreature);
     }
 
     struct npc_ulduar_harpoonfirestateAI : public NullCreatureAI
@@ -692,7 +690,7 @@ public:
         InstanceScript* pInstance;
         uint8 repairPoints;
 
-        void Reset()
+        void Reset() override
         {
             repairPoints = 0;
         }
@@ -701,11 +699,11 @@ public:
         {
             if (pInstance)
             {
-                if( me->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1) )
+                if( me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1) )
                     return GO_HARPOON_GUN_1;
-                else if( me->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_2) )
+                else if( me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2) )
                     return GO_HARPOON_GUN_2;
-                else if( me->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_3) )
+                else if( me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3) )
                     return GO_HARPOON_GUN_3;
                 else
                     return GO_HARPOON_GUN_4;
@@ -713,7 +711,7 @@ public:
             return 0;
         }
 
-        void SetData(uint32 id, uint32 value)
+        void SetData(uint32 id, uint32 value) override
         {
             switch (id)
             {
@@ -750,7 +748,7 @@ public:
                 case 3: // shoot
                     if (pInstance)
                     {
-                        Creature* razorscale = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_RAZORSCALE));
+                        Creature* razorscale = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_RAZORSCALE));
                         if (!razorscale)
                             return;
                         if (!razorscale->HasAura(value))
@@ -760,7 +758,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             switch (id)
             {
@@ -777,9 +775,9 @@ class npc_ulduar_expedition_engineer : public CreatureScript
 public:
     npc_ulduar_expedition_engineer() : CreatureScript("npc_ulduar_expedition_engineer") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_expedition_engineerAI (pCreature);
+        return GetUlduarAI<npc_ulduar_expedition_engineerAI>(pCreature);
     }
 
     struct npc_ulduar_expedition_engineerAI : public NullCreatureAI
@@ -792,23 +790,23 @@ public:
         InstanceScript* pInstance;
         bool working;
         uint16 timer;
-        uint64 fixingGUID;
+        ObjectGuid fixingGUID;
 
-        void Reset()
+        void Reset() override
         {
             working = false;
             timer = 0;
-            fixingGUID = 0;
+            fixingGUID.Clear();
         }
 
-        void SetData(uint32 id, uint32  /*value*/)
+        void SetData(uint32 id, uint32  /*value*/) override
         {
             switch (id)
             {
                 case 1: // start/resume repairing
                     working = true;
                     timer = 0;
-                    fixingGUID = 0;
+                    fixingGUID.Clear();
                     break;
                 case 2: // stop repairing
                     Reset();
@@ -818,7 +816,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (working)
             {
@@ -839,14 +837,14 @@ public:
 
                                 c->AI()->SetData(2, 0);
                                 if (c->AI()->GetData(2))
-                                    fixingGUID = 0;
+                                    fixingGUID.Clear();
                             }
                     }
 
                     if (!fixingGUID)
                     {
                         Creature* razorscale = nullptr;
-                        if( uint64 rsGUID = pInstance->GetData64(TYPE_RAZORSCALE) )
+                        if( ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
                             razorscale = ObjectAccessor::GetCreature(*me, rsGUID);
 
                         if( !razorscale || !razorscale->IsInCombat() )
@@ -857,7 +855,7 @@ public:
                         }
 
                         for( int i = 0; i < 4; ++i )
-                            if( uint64 fs_GUID = pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i) )
+                            if( ObjectGuid fs_GUID = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
                                 if( Creature* fs = ObjectAccessor::GetCreature(*me, fs_GUID) )
                                     if (!fs->AI()->GetData(2))
                                     {
@@ -895,7 +893,7 @@ public:
             return true;
 
         Creature* rs = nullptr;
-        if( uint64 rsGUID = pInstance->GetData64(TYPE_RAZORSCALE) )
+        if( ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
             rs = ObjectAccessor::GetCreature(*go, rsGUID);
 
         if( !rs || !rs->IsInCombat() )
@@ -927,7 +925,7 @@ public:
                 break;
         }
 
-        if( uint64 g = pInstance->GetData64(npc) )
+        if( ObjectGuid g = pInstance->GetGuidData(npc) )
             if( Creature* hfs = ObjectAccessor::GetCreature(*go, g) )
                 hfs->AI()->SetData(3, spell);
 
@@ -941,9 +939,9 @@ class npc_ulduar_dark_rune_guardian : public CreatureScript
 public:
     npc_ulduar_dark_rune_guardian() : CreatureScript("npc_ulduar_dark_rune_guardian") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_dark_rune_guardianAI (pCreature);
+        return GetUlduarAI<npc_ulduar_dark_rune_guardianAI>(pCreature);
     }
 
     struct npc_ulduar_dark_rune_guardianAI : public ScriptedAI
@@ -952,17 +950,17 @@ public:
 
         uint32 timer2;
 
-        void Reset()
+        void Reset() override
         {
             timer2 = 6000;
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return target && target->GetEntry() != NPC_RAZORSCALE;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -988,9 +986,9 @@ class npc_ulduar_dark_rune_watcher : public CreatureScript
 public:
     npc_ulduar_dark_rune_watcher() : CreatureScript("npc_ulduar_dark_rune_watcher") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_dark_rune_watcherAI (pCreature);
+        return GetUlduarAI<npc_ulduar_dark_rune_watcherAI>(pCreature);
     }
 
     struct npc_ulduar_dark_rune_watcherAI : public ScriptedAI
@@ -1000,18 +998,18 @@ public:
         uint32 timer1;
         uint32 timer2;
 
-        void Reset()
+        void Reset() override
         {
             timer1 = 6000;
             timer2 = 2000;
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return target && target->GetEntry() != NPC_RAZORSCALE;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -1044,9 +1042,9 @@ class npc_ulduar_dark_rune_sentinel : public CreatureScript
 public:
     npc_ulduar_dark_rune_sentinel() : CreatureScript("npc_ulduar_dark_rune_sentinel") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_dark_rune_sentinelAI (pCreature);
+        return GetUlduarAI<npc_ulduar_dark_rune_sentinelAI>(pCreature);
     }
 
     struct npc_ulduar_dark_rune_sentinelAI : public ScriptedAI
@@ -1056,18 +1054,18 @@ public:
         uint32 timer1;
         uint32 timer2;
 
-        void Reset()
+        void Reset() override
         {
             timer1 = urand(1000, 2000);
             timer2 = 6000;
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return target && target->GetEntry() != NPC_RAZORSCALE;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -1098,7 +1096,7 @@ class achievement_quick_shave : public AchievementCriteriaScript
 public:
     achievement_quick_shave() : AchievementCriteriaScript("achievement_quick_shave") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetTypeId() == TYPEID_UNIT && target->GetEntry() == NPC_RAZORSCALE && target->ToCreature()->AI()->GetData(1);
     }
@@ -1109,7 +1107,7 @@ class achievement_iron_dwarf_medium_rare : public AchievementCriteriaScript
 public:
     achievement_iron_dwarf_medium_rare() : AchievementCriteriaScript("achievement_iron_dwarf_medium_rare") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_RAZORSCALE;
     }

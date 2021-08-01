@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,13 +12,13 @@ SDComment:
 SDCategory: CrystalsongForest
 Script Data End */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SmartScriptMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "PassiveAI.h"
 
 enum ePreparationsForWar
 {
@@ -43,7 +43,7 @@ public:
         uint32 searchForShipTimer;
         uint32 transportEntry;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
             if (!path || path->empty())
@@ -71,14 +71,14 @@ public:
             transportEntry = (me->GetEntry() == NPC_HAMMERHEAD ? TRANSPORT_ORGRIMS_HAMMER : TRANSPORT_THE_SKYBREAKER);
         }
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32  /*id*/) override
         {
             if (type == ESCORT_MOTION_TYPE)
                 if (++pointId == 17) // path size
                     searchForShipTimer = 3000;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // horde 7.55f, -0.09, 34.44, 3.13, +20
             // ally 45.18f, 0.03, 40.09, 3.14 +5
@@ -130,7 +130,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_preparations_for_war_vehicleAI(creature);
     }
@@ -165,14 +165,14 @@ public:
             SetCombatMovement(false);
         }
 
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
 
-        void Reset()
+        void Reset() override
         {
-            targetGUID = 0;
+            targetGUID.Clear();
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (me->IsNonMeleeSpellCast(false))
                 return;
@@ -204,16 +204,14 @@ public:
                 if (!targetGUID)
                     if (Creature* pOrb = GetClosestCreatureWithEntry(me, NPC_TRANSITUS_SHIELD_DUMMY, 32.0f))
                         targetGUID = pOrb->GetGUID();
-
             }
 
             if (Creature* pOrb = ObjectAccessor::GetCreature(*me, targetGUID))
                 DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
-
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_warmage_violetstandAI(creature);
     }

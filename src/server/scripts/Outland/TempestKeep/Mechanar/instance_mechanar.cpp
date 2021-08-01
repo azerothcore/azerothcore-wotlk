@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "mechanar.h"
+#include "ScriptMgr.h"
 
 static DoorData const doorData[] =
 {
@@ -26,13 +26,12 @@ public:
             SetBossNumber(MAX_ENCOUNTER);
             LoadDoorData(doorData);
 
-            _pathaleonGUID = 0;
             _passageEncounter = 0;
             _passageTimer = 0;
             _passageGUIDs.clear();
         }
 
-        void OnGameObjectCreate(GameObject* gameObject)
+        void OnGameObjectCreate(GameObject* gameObject) override
         {
             switch (gameObject->GetEntry())
             {
@@ -46,7 +45,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* gameObject)
+        void OnGameObjectRemove(GameObject* gameObject) override
         {
             switch (gameObject->GetEntry())
             {
@@ -60,13 +59,13 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_PATHALEON_THE_CALCULATOR)
                 _pathaleonGUID = creature->GetGUID();
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             if (unit->GetTypeId() == TYPEID_UNIT)
                 if (_passageEncounter > ENCOUNTER_PASSAGE_NOT_STARTED && _passageEncounter < ENCOUNTER_PASSAGE_DONE)
@@ -91,7 +90,7 @@ public:
             _passageGUIDs.insert(summon->GetGUID());
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
                 return;
@@ -180,7 +179,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -188,7 +187,7 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -200,7 +199,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* str)
+        void Load(const char* str) override
         {
             if (!str)
             {
@@ -237,13 +236,13 @@ public:
         }
 
     private:
-        uint64 _pathaleonGUID;
+        ObjectGuid _pathaleonGUID;
         uint32 _passageTimer;
         uint32 _passageEncounter;
-        std::set<uint64> _passageGUIDs;
+        GuidSet _passageGUIDs;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_mechanar_InstanceMapScript(map);
     }

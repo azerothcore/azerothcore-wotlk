@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "Battleground.h"
 #include "BattlegroundRV.h"
-#include "ObjectAccessor.h"
+#include "GameObject.h"
 #include "Language.h"
+#include "ObjectAccessor.h"
+#include "Pet.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "GameObject.h"
 #include "WorldSession.h"
-#include "Pet.h"
 
 BattlegroundRV::BattlegroundRV()
 {
@@ -71,7 +71,7 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                 setTimer(BG_RV_CLOSE_FIRE_TIMER);
                 setState(BG_RV_STATE_CLOSE_FIRE);
 
-                for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+                for (auto itr = m_Players.begin(); itr != m_Players.end(); ++itr)
                     if (Player* player = itr->second)
                     {
                         // Demonic Circle Summon
@@ -90,16 +90,16 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                                     if (totem->GetPositionZ() < 28.0f)
                                         TeleportUnitToNewZ(totem, 28.28f, true);
 
-                        for (Unit::ControlSet::const_iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
+                        for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
                         {
-                            if ((*itr)->GetPositionZ() < 28.0f)
-                                TeleportUnitToNewZ((*itr), 28.28f, true);
+                            if ((*itr2)->GetPositionZ() < 28.0f)
+                                TeleportUnitToNewZ((*itr2), 28.28f, true);
 
                             // Xinef: override stay position
-                            if (CharmInfo* charmInfo = (*itr)->GetCharmInfo())
+                            if (CharmInfo* charmInfo = (*itr2)->GetCharmInfo())
                                 if (charmInfo->IsAtStay())
                                 {
-                                    (*itr)->StopMovingOnCurrentPos();
+                                    (*itr2)->StopMovingOnCurrentPos();
                                     charmInfo->SaveStayPosition(false);
                                 }
                         }
@@ -279,7 +279,7 @@ bool BattlegroundRV::SetupBattleground()
             || !AddObject(BG_RV_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 757.02f, -267.30f, 2.80f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
        )
     {
-        sLog->outErrorDb("BatteGroundRV: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundRV: Failed to spawn some object!");
         return false;
     }
 

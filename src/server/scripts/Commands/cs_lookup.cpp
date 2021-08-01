@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -1333,7 +1333,7 @@ public:
             limit = limitStr ? atoi(limitStr) : -1;
         }
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
         stmt->setString(0, ip);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1353,7 +1353,7 @@ public:
                 (account))
             return false;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_NAME);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_NAME);
         stmt->setString(0, account);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1369,7 +1369,7 @@ public:
         char* limitStr = strtok(nullptr, " ");
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
         stmt->setString(0, email);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1404,7 +1404,7 @@ public:
             uint32 accountId        = fields[0].GetUInt32();
             std::string accountName = fields[1].GetString();
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
             stmt->setUInt32(0, accountId);
             PreparedQueryResult result2 = CharacterDatabase.Query(stmt);
 
@@ -1414,11 +1414,11 @@ public:
 
                 do
                 {
-                    Field* characterFields  = result2->Fetch();
-                    uint32 guid             = characterFields[0].GetUInt32();
-                    std::string name        = characterFields[1].GetString();
+                    Field* characterFields   = result2->Fetch();
+                    ObjectGuid::LowType guid = characterFields[0].GetUInt32();
+                    std::string name         = characterFields[1].GetString();
                     uint8 plevel = 0, prace = 0, pclass = 0;
-                    bool online = (ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER)) != nullptr);
+                    bool online = ObjectAccessor::FindPlayerByLowGUID(guid) != nullptr;
 
                     if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid))
                     {

@@ -2,10 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "ahnkahet.h"
-
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Yells
 {
@@ -88,8 +87,8 @@ public:
         bool isFlying;
         bool startFly;
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
-        void MoveInLineOfSight(Unit*) { }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
+        void MoveInLineOfSight(Unit*) override { }
 
         void SpawnInitiate(bool start)
         {
@@ -135,7 +134,6 @@ public:
                 me->SummonCreature(NPC_INITIATE, 366.861f, -721.702f, -16.1797f, 5.65409f);
                 me->SummonCreature(NPC_INITIATE, 362.343f, -718.019f, -16.1797f, 5.51665f);
                 me->SummonCreature(NPC_INITIATE, 358.906f, -714.357f, -16.1797f, 5.35957f);
-
             }
         }
 
@@ -146,7 +144,7 @@ public:
 
             uint8 rnd = urand(0, summons.size() - 1);
             uint8 loop = 0;
-            for (std::list<uint64>::iterator i = summons.begin(); i != summons.end();)
+            for (GuidList::iterator i = summons.begin(); i != summons.end();)
             {
                 Creature* summon = ObjectAccessor::GetCreature(*me, *i);
                 if (summon && summon->GetEntry() == NPC_INITIATE && loop >= rnd)
@@ -170,7 +168,7 @@ public:
             events.RescheduleEvent(EVENT_JEDOGA_MOVE_UP, urand(20000, 25000));
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_INITIATE_DIED)
             {
@@ -199,7 +197,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
             {
@@ -219,7 +217,7 @@ public:
             me->CastSpell(me, SPELL_LIGHTNING_BOLTS, true);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_JEDOGA_SHADOWSEEKER_EVENT, IN_PROGRESS);
@@ -227,7 +225,7 @@ public:
             Talk(TEXT_AGGRO);
         }
 
-        void KilledUnit(Unit* Victim)
+        void KilledUnit(Unit* Victim) override
         {
             if (!Victim || Victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -235,7 +233,7 @@ public:
             Talk(TEXT_SLAY);
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit* /*Killer*/) override
         {
             Talk(TEXT_DEATH);
             if (pInstance)
@@ -263,7 +261,7 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void MovementInform(uint32 Type, uint32 PointId)
+        void MovementInform(uint32 Type, uint32 PointId) override
         {
             if (Type != POINT_MOTION_TYPE)
                 return;
@@ -294,7 +292,7 @@ public:
                 startFly = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // Start text
             if (introCheck)
@@ -391,9 +389,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_jedoga_shadowseekerAI(creature);
+        return GetAhnkahetAI<boss_jedoga_shadowseekerAI>(creature);
     }
 };
 
@@ -412,19 +410,19 @@ public:
         InstanceScript* pInstance;
         int32 Timer;
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!Timer)
                 ScriptedAI::AttackStart(who);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!Timer)
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void Reset()
+        void Reset() override
         {
             Timer = 0;
 
@@ -447,12 +445,12 @@ public:
             }
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit* Killer) override
         {
             if (!pInstance || Killer == me)
                 return;
 
-            Creature* boss = me->GetMap()->GetCreature(pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER));
+            Creature* boss = me->GetMap()->GetCreature(pInstance->GetGuidData(DATA_JEDOGA_SHADOWSEEKER));
             if (boss)
             {
                 if (Timer)
@@ -462,7 +460,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_ACTIVATE)
             {
@@ -471,19 +469,19 @@ public:
             }
         }
 
-        void MovementInform(uint32 Type, uint32 PointId)
+        void MovementInform(uint32 Type, uint32 PointId) override
         {
             if (Type == POINT_MOTION_TYPE && PointId == POINT_RITUAL)
             {
                 Unit::Kill(me, me);
                 me->DespawnOrUnsummon(5000);
-                Creature* boss = me->GetMap()->GetCreature(pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER));
+                Creature* boss = me->GetMap()->GetCreature(pInstance->GetGuidData(DATA_JEDOGA_SHADOWSEEKER));
                 if (boss)
                     boss->AI()->DoAction(ACTION_HERALD);
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (Timer)
             {
@@ -521,9 +519,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_jedoga_initiandAI(creature);
+        return GetAhnkahetAI<npc_jedoga_initiandAI>(creature);
     }
 };
 

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "culling_of_stratholme.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
 
 enum Spells
@@ -45,9 +45,9 @@ class boss_salramm : public CreatureScript
 public:
     boss_salramm() : CreatureScript("boss_salramm") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_salrammAI (creature);
+        return GetCullingOfStratholmeAI<boss_salrammAI>(creature);
     }
 
     struct boss_salrammAI : public ScriptedAI
@@ -59,15 +59,15 @@ public:
 
         EventMap events;
         SummonList summons;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
         }
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 7000);
@@ -78,13 +78,13 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_CURSE, 25000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if (!urand(0, 1))
                 return;
@@ -103,7 +103,7 @@ public:
                     }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -145,7 +145,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class spell_boss_salramm_steal_flesh : public SpellScriptLoader
@@ -168,13 +167,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_boss_salramm_steal_flesh_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_boss_salramm_steal_flesh_AuraScript();
     }

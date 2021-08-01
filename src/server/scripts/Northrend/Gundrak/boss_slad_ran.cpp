@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "gundrak.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -59,9 +59,9 @@ class boss_slad_ran : public CreatureScript
 public:
     boss_slad_ran() : CreatureScript("boss_slad_ran") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_slad_ranAI(creature);
+        return GetGundrakAI<boss_slad_ranAI>(creature);
     }
 
     struct boss_slad_ranAI : public BossAI
@@ -70,26 +70,26 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             _achievement = true;
         }
 
-        uint32 GetData(uint32 data) const
+        uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
                 return uint32(_achievement);
             return 0;
         }
 
-        void SetData(uint32 data, uint32)
+        void SetData(uint32 data, uint32) override
         {
             if (data == me->GetEntry())
                 _achievement = false;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -101,14 +101,14 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             Talk(EMOTE_ALTAR);
             BossAI::JustDied(killer);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -117,13 +117,13 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->SetInCombatWithZone();
             summons.Summon(summon);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -204,13 +204,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_sladran_grip_of_sladran_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_sladran_grip_of_sladran_AuraScript();
     }
@@ -223,7 +223,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* /*player*/, Unit* target)
+    bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -13,14 +13,14 @@ SQLUpdate:
 
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "zulaman.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "Weather.h"
+#include "zulaman.h"
 
 enum Spells
 {
@@ -46,14 +46,15 @@ enum Says
     SAY_DEATH                   = 5
 };
 
-enum Misc
-{
-    NPC_SOARING_EAGLE           = 24858,
-    SE_LOC_X_MAX                = 400,
-    SE_LOC_X_MIN                = 335,
-    SE_LOC_Y_MAX                = 1435,
-    SE_LOC_Y_MIN                = 1370
-};
+constexpr auto NPC_SOARING_EAGLE = 24858;
+
+//enum Misc
+//{
+//    SE_LOC_X_MAX                = 400,
+//    SE_LOC_X_MIN                = 335,
+//    SE_LOC_Y_MAX                = 1435,
+//    SE_LOC_Y_MIN                = 1370
+//};
 
 enum Events
 {
@@ -76,17 +77,19 @@ public:
     {
         boss_akilzonAI(Creature* creature) : BossAI(creature, DATA_AKILZONEVENT)
         {
-            memset(BirdGUIDs, 0, sizeof(BirdGUIDs));
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
 
-            TargetGUID = 0;
-            CloudGUID = 0;
-            CycloneGUID = 0;
-            memset(BirdGUIDs, 0, sizeof(BirdGUIDs));
+            TargetGUID.Clear();
+            CloudGUID.Clear();
+            CycloneGUID.Clear();
+
+            for (uint8 i = 0; i < 8; ++i)
+                BirdGUIDs[i].Clear();
+
             StormCount = 0;
             isRaining = false;
 
@@ -96,7 +99,7 @@ public:
             SetWeather(WEATHER_STATE_FINE, 0.0f);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_STATIC_DISRUPTION, urand(10000, 20000)); // 10 to 20 seconds (bosskillers)
             events.ScheduleEvent(EVENT_GUST_OF_WIND, urand(20000, 30000));      // 20 to 30 seconds(bosskillers)
@@ -112,7 +115,7 @@ public:
                 instance->SetData(DATA_AKILZONEVENT, IN_PROGRESS);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             _JustDied();
@@ -120,7 +123,7 @@ public:
                 instance->SetData(DATA_AKILZONEVENT, DONE);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
@@ -147,22 +150,11 @@ public:
                 for (uint8 i = 2; i < StormCount; ++i)
                     bp0 *= 2;
 
-                CellCoord p(acore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
-                Cell cell(p);
-                cell.SetNoCreate();
-
                 std::list<Unit*> tempUnitMap;
 
-                {
-                    acore::AnyAoETargetUnitInObjectRangeCheck u_check(me, me, SIZE_OF_GRIDS);
-                    acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck> searcher(me, tempUnitMap, u_check);
-
-                    TypeContainerVisitor<acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
-                    TypeContainerVisitor<acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
-
-                    cell.Visit(p, world_unit_searcher, *me->GetMap(), *me, SIZE_OF_GRIDS);
-                    cell.Visit(p, grid_unit_searcher, *me->GetMap(), *me, SIZE_OF_GRIDS);
-                }
+                Acore::AnyAoETargetUnitInObjectRangeCheck u_check(me, me, SIZE_OF_GRIDS);
+                Acore::UnitListSearcher<Acore::AnyAoETargetUnitInObjectRangeCheck> searcher(me, tempUnitMap, u_check);
+                Cell::VisitAllObjects(me, searcher, SIZE_OF_GRIDS);
 
                 // deal damage
                 for (std::list<Unit*>::const_iterator i = tempUnitMap.begin(); i != tempUnitMap.end(); ++i)
@@ -200,16 +192,16 @@ public:
                 StormCount = 0; // finish
                 events.ScheduleEvent(EVENT_SUMMON_EAGLES, 5000);
                 me->InterruptNonMeleeSpells(false);
-                CloudGUID = 0;
+                CloudGUID.Clear();
                 if (Cloud)
-                    Unit::DealDamage(Cloud, Cloud, Cloud->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    Unit::DealDamage(Cloud, Cloud, Cloud->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 SetWeather(WEATHER_STATE_FINE, 0.0f);
                 isRaining = false;
             }
             events.ScheduleEvent(EVENT_STORM_SEQUENCE, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -353,17 +345,17 @@ public:
         }
 
     private:
-        uint64 BirdGUIDs[8];
-        uint64 TargetGUID;
-        uint64 CycloneGUID;
-        uint64 CloudGUID;
+        ObjectGuid BirdGUIDs[8];
+        ObjectGuid TargetGUID;
+        ObjectGuid CycloneGUID;
+        ObjectGuid CloudGUID;
         uint8  StormCount;
         bool   isRaining;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_akilzonAI>(creature);
+        return GetZulAmanAI<boss_akilzonAI>(creature);
     }
 };
 
@@ -378,38 +370,37 @@ public:
 
         uint32 EagleSwoop_Timer;
         bool arrived;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
 
-        void Reset()
+        void Reset() override
         {
             EagleSwoop_Timer = urand(5000, 10000);
             arrived = true;
-            TargetGUID = 0;
+            TargetGUID.Clear();
             me->SetDisableGravity(true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
-
-        void MovementInform(uint32, uint32)
+        void MovementInform(uint32, uint32) override
         {
             arrived = true;
             if (TargetGUID)
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, TargetGUID))
                     DoCast(target, SPELL_EAGLE_SWOOP, true);
-                TargetGUID = 0;
+                TargetGUID.Clear();
                 me->SetSpeed(MOVE_RUN, 1.2f);
                 EagleSwoop_Timer = urand(5000, 10000);
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (EagleSwoop_Timer <= diff)
                 EagleSwoop_Timer = 0;
@@ -443,9 +434,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_akilzon_eagleAI(creature);
+        return GetZulAmanAI<npc_akilzon_eagleAI>(creature);
     }
 };
 
@@ -454,4 +445,3 @@ void AddSC_boss_akilzon()
     new boss_akilzon();
     new npc_akilzon_eagle();
 }
-

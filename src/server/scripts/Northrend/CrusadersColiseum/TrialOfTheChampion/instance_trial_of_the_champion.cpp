@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Group.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
-#include "Player.h"
-#include "Group.h"
 
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
@@ -19,7 +19,7 @@ class instance_trial_of_the_champion : public InstanceMapScript
 public:
     instance_trial_of_the_champion() : InstanceMapScript("instance_trial_of_the_champion", 650) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_trial_of_the_champion_InstanceMapScript(pMap);
     }
@@ -34,26 +34,26 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
 
-        std::list<uint64> VehicleList;
+        GuidList VehicleList;
         EventMap events;
         uint8 Counter;
         uint8 temp1, temp2;
         bool shortver;
         bool bAchievIveHadWorse;
 
-        uint64 NPC_AnnouncerGUID;
-        uint64 NPC_TirionGUID;
-        uint64 NPC_GrandChampionGUID[3];
-        uint64 NPC_GrandChampionMinionsGUID[3][3];
-        uint64 NPC_ArgentChampionGUID;
-        uint64 NPC_ArgentSoldierGUID[3][3];
-        uint64 NPC_MemoryEntry;
-        uint64 NPC_BlackKnightVehicleGUID;
-        uint64 NPC_BlackKnightGUID;
-        uint64 GO_MainGateGUID;
-        uint64 GO_EnterGateGUID;
+        ObjectGuid NPC_AnnouncerGUID;
+        ObjectGuid NPC_TirionGUID;
+        ObjectGuid NPC_GrandChampionGUID[3];
+        ObjectGuid NPC_GrandChampionMinionsGUID[3][3];
+        ObjectGuid NPC_ArgentChampionGUID;
+        ObjectGuid NPC_ArgentSoldierGUID[3][3];
+        uint32 NPC_MemoryEntry;
+        ObjectGuid NPC_BlackKnightVehicleGUID;
+        ObjectGuid NPC_BlackKnightGUID;
+        ObjectGuid GO_MainGateGUID;
+        ObjectGuid GO_EnterGateGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             TeamIdInInstance = TEAM_NEUTRAL;
             InstanceProgress = 0;
@@ -68,21 +68,9 @@ public:
             temp2 = 0;
             shortver = false;
             bAchievIveHadWorse = true;
-
-            NPC_AnnouncerGUID = 0;
-            NPC_TirionGUID = 0;
-            memset(&NPC_GrandChampionGUID, 0, sizeof(NPC_GrandChampionGUID));
-            memset(&NPC_GrandChampionMinionsGUID, 0, sizeof(NPC_GrandChampionMinionsGUID));
-            memset(&NPC_ArgentSoldierGUID, 0, sizeof(NPC_ArgentSoldierGUID));
-            NPC_ArgentChampionGUID = 0;
-            NPC_MemoryEntry = 0;
-            NPC_BlackKnightVehicleGUID = 0;
-            NPC_BlackKnightGUID = 0;
-            GO_MainGateGUID = 0;
-            GO_EnterGateGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                 if( m_auiEncounter[i] == IN_PROGRESS )
@@ -91,7 +79,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -185,7 +173,7 @@ public:
                         creature->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, ca->mount);
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch( go->GetEntry() )
             {
@@ -204,7 +192,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream saveStream;
@@ -214,7 +202,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             CLEANED = false;
             events.Reset();
@@ -245,7 +233,6 @@ public:
                 for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                     if( m_auiEncounter[i] == IN_PROGRESS )
                         m_auiEncounter[i] = NOT_STARTED;
-
             }
             else
                 OUT_LOAD_INST_DATA_FAIL;
@@ -255,7 +242,7 @@ public:
 
         // EVENT STUFF BELOW:
 
-        void OnPlayerEnter(Player*)
+        void OnPlayerEnter(Player*) override
         {
             if( DoNeedCleanup(true) )
                 InstanceCleanup();
@@ -292,8 +279,8 @@ public:
                 case INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_3:
                     // revert to INSTANCE_PROGRESS_INITIAL
                     {
-                        for( std::list<uint64>::const_iterator itr = VehicleList.begin(); itr != VehicleList.end(); ++itr )
-                            if( Creature* veh = instance->GetCreature(*itr) )
+                        for (ObjectGuid const& guid : VehicleList)
+                            if (Creature* veh = instance->GetCreature(guid))
                             {
                                 veh->DespawnOrUnsummon();
                                 veh->SetRespawnTime(3);
@@ -304,11 +291,11 @@ public:
                             {
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[i][j]) )
                                     c->DespawnOrUnsummon();
-                                NPC_GrandChampionMinionsGUID[i][j] = 0;
+                                NPC_GrandChampionMinionsGUID[i][j].Clear();
                             }
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                                 c->DespawnOrUnsummon();
-                            NPC_GrandChampionGUID[i] = 0;
+                            NPC_GrandChampionGUID[i].Clear();
                         }
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
@@ -373,14 +360,14 @@ public:
                             {
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                     c->DespawnOrUnsummon();
-                                NPC_ArgentSoldierGUID[i][j] = 0;
+                                NPC_ArgentSoldierGUID[i][j].Clear();
                             }
                         if( Creature* c = instance->GetCreature(NPC_ArgentChampionGUID) )
                         {
                             c->AI()->DoAction(-1); // paletress despawn memory
                             c->DespawnOrUnsummon();
                         }
-                        NPC_ArgentChampionGUID = 0;
+                        NPC_ArgentChampionGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
                             c->DespawnOrUnsummon();
@@ -398,13 +385,13 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_BlackKnightVehicleGUID) )
                             c->DespawnOrUnsummon();
-                        NPC_BlackKnightVehicleGUID = 0;
+                        NPC_BlackKnightVehicleGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
                             c->AI()->DoAction(-1);
                             c->DespawnOrUnsummon();
                         }
-                        NPC_BlackKnightGUID = 0;
+                        NPC_BlackKnightGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
                             c->DespawnOrUnsummon();
@@ -432,7 +419,7 @@ public:
             CLEANED = true;
         }
 
-        uint32 GetData(uint32 uiData) const
+        uint32 GetData(uint32 uiData) const override
         {
             switch( uiData )
             {
@@ -445,7 +432,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiData) const
+        ObjectGuid GetGuidData(uint32 uiData) const override
         {
             switch( uiData )
             {
@@ -455,10 +442,10 @@ public:
                     return NPC_ArgentChampionGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
-        void SetData(uint32 uiType, uint32 uiData)
+        void SetData(uint32 uiType, uint32 uiData) override
         {
             switch( uiType )
             {
@@ -580,8 +567,8 @@ public:
                             {
                                 Counter = 0;
                                 InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED;
-                                for( std::list<uint64>::const_iterator itr = VehicleList.begin(); itr != VehicleList.end(); ++itr )
-                                    if( Creature* veh = instance->GetCreature(*itr) )
+                                for (ObjectGuid const& guid : VehicleList)
+                                    if (Creature* veh = instance->GetCreature(guid))
                                         veh->DespawnOrUnsummon();
                                 events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOVE_SIDE, 0);
                             }
@@ -606,7 +593,7 @@ public:
                                 c->GetMotionMaster()->MovePoint(9, 747.36f, 670.07f, 411.9f);
                                 if (!creditCasted)
                                 {
-                                    c->CastSpell((Unit*)NULL, 68572, true);
+                                    c->CastSpell((Unit*)nullptr, 68572, true);
                                     creditCasted = true;
                                 }
                             }
@@ -743,7 +730,6 @@ public:
                         pAdd->GetMotionMaster()->MoveFollow(pBoss, 2.0f, (i + 1)*M_PI / 2);
                         pAdd->SetReactState(REACT_PASSIVE);
                     }
-
             }
 
             if (!shortver)
@@ -756,7 +742,7 @@ public:
                 }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             events.Update(diff);
             switch( events.ExecuteEvent() )
@@ -962,7 +948,7 @@ public:
                     {
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                             tirion->AI()->Talk(TEXT_GRATZ_SLAIN_CHAMPIONS);
-                        
+
                         HandleGameObject(GO_EnterGateGUID, true);
                     }
                     break;
@@ -1219,7 +1205,7 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {

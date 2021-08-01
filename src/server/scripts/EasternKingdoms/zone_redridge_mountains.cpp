@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -10,10 +10,10 @@ SD%Complete: 100%
 SDComment: Support for quest 219.
 Script Data End */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 enum CorporalKeeshan
 {
@@ -36,7 +36,7 @@ public:
     {
         npc_corporal_keeshanAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             timer = 0;
             phase = 0;
@@ -45,7 +45,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        void sQuestAccept(Player* player, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_MISSING_IN_ACTION)
             {
@@ -56,7 +56,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -83,7 +83,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (HasEscortState(STATE_ESCORT_NONE))
                 return;
@@ -155,7 +155,7 @@ public:
         uint32 shieldBashTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_corporal_keeshanAI(creature);
     }

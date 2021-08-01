@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,16 +7,19 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 
+#include "Containers.h"
 #include "Define.h"
 #include "Errors.h"
-#include "Containers.h"
 #include <algorithm>
+#include <array>
 #include <cctype>
+#include <list>
+#include <map>
 #include <string>
 #include <vector>
 #include <list>
 #include <map>
-#include <ace/INET_Addr.h>
+#include <array>
 
 // Searcher for map of structs
 template<typename T, class S> struct Finder
@@ -43,10 +46,10 @@ public:
     Tokenizer(const std::string& src, char const sep, uint32 vectorReserve = 0);
     ~Tokenizer() { delete[] m_str; }
 
-    const_iterator begin() const { return m_storage.begin(); }
-    const_iterator end() const { return m_storage.end(); }
+    [[nodiscard]] const_iterator begin() const { return m_storage.begin(); }
+    [[nodiscard]] const_iterator end() const { return m_storage.end(); }
 
-    size_type size() const { return m_storage.size(); }
+    [[nodiscard]] size_type size() const { return m_storage.size(); }
 
     reference operator [] (size_type i) { return m_storage[i]; }
     const_reference operator [] (size_type i) const { return m_storage[i]; }
@@ -70,42 +73,12 @@ uint32 TimeStringToSecs(const std::string& timestring);
 std::string TimeToTimestampStr(time_t t);
 std::string TimeToHumanReadable(time_t t);
 
-/* Return a random number in the range min..max. */
-int32 irand(int32 min, int32 max);
-
-/* Return a random number in the range min..max (inclusive). */
-uint32 urand(uint32 min, uint32 max);
-
-/* Return a random number in the range 0 .. UINT32_MAX. */
-uint32 rand32();
-
-/* Return a random number in the range min..max */
-float frand(float min, float max);
-
-/* Return a random double from 0.0 to 1.0 (exclusive). */
-double rand_norm();
-
-/* Return a random double from 0.0 to 100.0 (exclusive). */
-double rand_chance();
-
-uint32 urandweighted(size_t count, double const* chances);
-
-/* Return true if a random roll fits in the specified chance (range 0-100). */
-inline bool roll_chance_f(float chance)
-{
-    return chance > rand_chance();
-}
-
-/* Return true if a random roll fits in the specified chance (range 0-100). */
-inline bool roll_chance_i(int32 chance)
-{
-    return chance > irand(0, 99);
-}
-
 inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
 {
     if (val == -100.0f)     // prevent set var to zero
+    {
         val = -99.99f;
+    }
     var *= (apply ? (100.0f + val) / 100.0f : 100.0f / (100.0f + val));
 }
 
@@ -156,60 +129,100 @@ void utf8truncate(std::string& utf8str, size_t len);
 inline bool isBasicLatinCharacter(wchar_t wchar)
 {
     if (wchar >= L'a' && wchar <= L'z')                      // LATIN SMALL LETTER A - LATIN SMALL LETTER Z
+    {
         return true;
+    }
     if (wchar >= L'A' && wchar <= L'Z')                      // LATIN CAPITAL LETTER A - LATIN CAPITAL LETTER Z
+    {
         return true;
+    }
     return false;
 }
 
 inline bool isExtendedLatinCharacter(wchar_t wchar)
 {
     if (isBasicLatinCharacter(wchar))
+    {
         return true;
+    }
     if (wchar >= 0x00C0 && wchar <= 0x00D6)                  // LATIN CAPITAL LETTER A WITH GRAVE - LATIN CAPITAL LETTER O WITH DIAERESIS
+    {
         return true;
+    }
     if (wchar >= 0x00D8 && wchar <= 0x00DE)                  // LATIN CAPITAL LETTER O WITH STROKE - LATIN CAPITAL LETTER THORN
+    {
         return true;
+    }
     if (wchar == 0x00DF)                                     // LATIN SMALL LETTER SHARP S
+    {
         return true;
+    }
     if (wchar >= 0x00E0 && wchar <= 0x00F6)                  // LATIN SMALL LETTER A WITH GRAVE - LATIN SMALL LETTER O WITH DIAERESIS
+    {
         return true;
+    }
     if (wchar >= 0x00F8 && wchar <= 0x00FE)                  // LATIN SMALL LETTER O WITH STROKE - LATIN SMALL LETTER THORN
+    {
         return true;
+    }
     if (wchar >= 0x0100 && wchar <= 0x012F)                  // LATIN CAPITAL LETTER A WITH MACRON - LATIN SMALL LETTER I WITH OGONEK
+    {
         return true;
+    }
     if (wchar == 0x1E9E)                                     // LATIN CAPITAL LETTER SHARP S
+    {
         return true;
+    }
     return false;
 }
 
 inline bool isCyrillicCharacter(wchar_t wchar)
 {
     if (wchar >= 0x0410 && wchar <= 0x044F)                  // CYRILLIC CAPITAL LETTER A - CYRILLIC SMALL LETTER YA
+    {
         return true;
+    }
     if (wchar == 0x0401 || wchar == 0x0451)                  // CYRILLIC CAPITAL LETTER IO, CYRILLIC SMALL LETTER IO
+    {
         return true;
+    }
     return false;
 }
 
 inline bool isEastAsianCharacter(wchar_t wchar)
 {
     if (wchar >= 0x1100 && wchar <= 0x11F9)                  // Hangul Jamo
+    {
         return true;
+    }
     if (wchar >= 0x3041 && wchar <= 0x30FF)                  // Hiragana + Katakana
+    {
         return true;
+    }
     if (wchar >= 0x3131 && wchar <= 0x318E)                  // Hangul Compatibility Jamo
+    {
         return true;
+    }
     if (wchar >= 0x31F0 && wchar <= 0x31FF)                  // Katakana Phonetic Ext.
+    {
         return true;
+    }
     if (wchar >= 0x3400 && wchar <= 0x4DB5)                  // CJK Ideographs Ext. A
+    {
         return true;
+    }
     if (wchar >= 0x4E00 && wchar <= 0x9FC3)                  // Unified CJK Ideographs
+    {
         return true;
+    }
     if (wchar >= 0xAC00 && wchar <= 0xD7A3)                  // Hangul Syllables
+    {
         return true;
+    }
     if (wchar >= 0xFF01 && wchar <= 0xFFEE)                  // Halfwidth forms
+    {
         return true;
+    }
     return false;
 }
 
@@ -227,7 +240,9 @@ inline bool isNumeric(char const* str)
 {
     for (char const* c = str; *c; ++c)
         if (!isNumeric(*c))
+        {
             return false;
+        }
 
     return true;
 }
@@ -239,55 +254,77 @@ inline bool isNumericOrSpace(wchar_t wchar)
 
 inline bool isBasicLatinString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isBasicLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isBasicLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
+        {
             return false;
+        }
     return true;
 }
 
 inline bool isExtendedLatinString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isExtendedLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isExtendedLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
+        {
             return false;
+        }
     return true;
 }
 
 inline bool isCyrillicString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isCyrillicCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isCyrillicCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
+        {
             return false;
+        }
     return true;
 }
 
 inline bool isEastAsianString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isEastAsianCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isEastAsianCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
+        {
             return false;
+        }
     return true;
 }
 
 inline wchar_t wcharToUpper(wchar_t wchar)
 {
     if (wchar >= L'a' && wchar <= L'z')                      // LATIN SMALL LETTER A - LATIN SMALL LETTER Z
+    {
         return wchar_t(uint16(wchar) - 0x0020);
+    }
     if (wchar == 0x00DF)                                     // LATIN SMALL LETTER SHARP S
+    {
         return wchar_t(0x1E9E);
+    }
     if (wchar >= 0x00E0 && wchar <= 0x00F6)                  // LATIN SMALL LETTER A WITH GRAVE - LATIN SMALL LETTER O WITH DIAERESIS
+    {
         return wchar_t(uint16(wchar) - 0x0020);
+    }
     if (wchar >= 0x00F8 && wchar <= 0x00FE)                  // LATIN SMALL LETTER O WITH STROKE - LATIN SMALL LETTER THORN
+    {
         return wchar_t(uint16(wchar) - 0x0020);
+    }
     if (wchar >= 0x0101 && wchar <= 0x012F)                  // LATIN SMALL LETTER A WITH MACRON - LATIN SMALL LETTER I WITH OGONEK (only %2=1)
     {
         if (wchar % 2 == 1)
+        {
             return wchar_t(uint16(wchar) - 0x0001);
+        }
     }
     if (wchar >= 0x0430 && wchar <= 0x044F)                  // CYRILLIC SMALL LETTER A - CYRILLIC SMALL LETTER YA
+    {
         return wchar_t(uint16(wchar) - 0x0020);
+    }
     if (wchar == 0x0451)                                     // CYRILLIC SMALL LETTER IO
+    {
         return wchar_t(0x0401);
+    }
 
     return wchar;
 }
@@ -300,22 +337,36 @@ inline wchar_t wcharToUpperOnlyLatin(wchar_t wchar)
 inline wchar_t wcharToLower(wchar_t wchar)
 {
     if (wchar >= L'A' && wchar <= L'Z')                      // LATIN CAPITAL LETTER A - LATIN CAPITAL LETTER Z
+    {
         return wchar_t(uint16(wchar) + 0x0020);
+    }
     if (wchar >= 0x00C0 && wchar <= 0x00D6)                  // LATIN CAPITAL LETTER A WITH GRAVE - LATIN CAPITAL LETTER O WITH DIAERESIS
+    {
         return wchar_t(uint16(wchar) + 0x0020);
+    }
     if (wchar >= 0x00D8 && wchar <= 0x00DE)                  // LATIN CAPITAL LETTER O WITH STROKE - LATIN CAPITAL LETTER THORN
+    {
         return wchar_t(uint16(wchar) + 0x0020);
+    }
     if (wchar >= 0x0100 && wchar <= 0x012E)                  // LATIN CAPITAL LETTER A WITH MACRON - LATIN CAPITAL LETTER I WITH OGONEK (only %2=0)
     {
         if (wchar % 2 == 0)
+        {
             return wchar_t(uint16(wchar) + 0x0001);
+        }
     }
     if (wchar == 0x1E9E)                                     // LATIN CAPITAL LETTER SHARP S
+    {
         return wchar_t(0x00DF);
+    }
     if (wchar == 0x0401)                                     // CYRILLIC CAPITAL LETTER IO
+    {
         return wchar_t(0x0451);
+    }
     if (wchar >= 0x0410 && wchar <= 0x042F)                  // CYRILLIC CAPITAL LETTER A - CYRILLIC CAPITAL LETTER YA
+    {
         return wchar_t(uint16(wchar) + 0x0020);
+    }
 
     return wchar;
 }
@@ -334,18 +385,35 @@ bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 bool IsIPAddress(char const* ipaddress);
 
-/// Checks if address belongs to the a network with specified submask
-bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_INET_Addr const& subnetMask);
-
-/// Transforms ACE_INET_Addr address into string format "dotted_ip:port"
-std::string GetAddressString(ACE_INET_Addr const& addr);
-
 uint32 CreatePIDFile(const std::string& filename);
 uint32 GetPID();
 
-std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
-void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
-bool StringToBool(std::string const& str);
+bool StringEqualI(std::string_view str1, std::string_view str2);
+
+namespace Acore::Impl
+{
+    std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
+    void HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse = false);
+}
+
+template<typename Container>
+std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
+{
+    return Acore::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
+}
+
+template<size_t Size>
+void HexStrToByteArray(std::string const& str, std::array<uint8, Size>& buf, bool reverse = false)
+{
+    Acore::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
+}
+template<size_t Size>
+std::array<uint8, Size> HexStrToByteArray(std::string const& str, bool reverse = false)
+{
+    std::array<uint8, Size> arr;
+    HexStrToByteArray(str, arr, reverse);
+    return arr;
+}
 
 bool StringContainsStringI(std::string const& haystack, std::string const& needle);
 template <typename T>
@@ -404,12 +472,12 @@ public:
         part[2] = p3;
     }
 
-    inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] == p1 && part[1] == p2 && part[2] == p3);
     }
 
-    inline bool HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline bool HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] & p1 || part[1] & p2 || part[2] & p3);
     }
@@ -426,9 +494,13 @@ public:
         for (uint8 i = 3; i > 0; --i)
         {
             if (part[i - 1] < right.part[i - 1])
+            {
                 return true;
+            }
             else if (part[i - 1] > right.part[i - 1])
+            {
                 return false;
+            }
         }
         return false;
     }
@@ -558,27 +630,12 @@ bool CompareValues(ComparisionType type, T val1, T val2)
     }
 }
 
-/*
-* SFMT wrapper satisfying UniformRandomNumberGenerator concept for use in <random> algorithms
-*/
-class SFMTEngine
-{
-public:
-    typedef uint32 result_type;
-
-    static constexpr result_type min() { return std::numeric_limits<result_type>::min(); }
-    static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
-    result_type operator()() const { return rand32(); }
-
-    static SFMTEngine& Instance();
-};
-
 class EventMap
 {
     typedef std::multimap<uint32, uint32> EventStore;
 
 public:
-    EventMap() : _time(0), _phase(0), _lastEvent(0) { }
+    EventMap()  { }
 
     /**
     * @name Reset
@@ -605,7 +662,7 @@ public:
     * @name GetTimer
     * @return Current timer value.
     */
-    uint32 GetTimer() const
+    [[nodiscard]] uint32 GetTimer() const
     {
         return _time;
     }
@@ -619,7 +676,7 @@ public:
     * @name GetPhaseMask
     * @return Active phases as mask.
     */
-    uint8 GetPhaseMask() const
+    [[nodiscard]] uint8 GetPhaseMask() const
     {
         return _phase;
     }
@@ -628,7 +685,7 @@ public:
     * @name Empty
     * @return True, if there are no events scheduled.
     */
-    bool Empty() const
+    [[nodiscard]] bool Empty() const
     {
         return _eventMap.empty();
     }
@@ -869,7 +926,7 @@ public:
     * @param eventId Wanted event id.
     * @return Time of found event.
     */
-    uint32 GetNextEventTime(uint32 eventId) const
+    [[nodiscard]] uint32 GetNextEventTime(uint32 eventId) const
     {
         if (Empty())
         {
@@ -891,7 +948,7 @@ public:
      * @name GetNextEventTime
      * @return Time of next event.
      */
-    uint32 GetNextEventTime() const
+    [[nodiscard]] uint32 GetNextEventTime() const
     {
         return Empty() ? 0 : _eventMap.begin()->first;
     }
@@ -908,11 +965,18 @@ public:
     }
 
 private:
-    uint32 _time;
-    uint32 _phase;
-    uint32 _lastEvent;
+    uint32 _time{0};
+    uint32 _phase{0};
+    uint32 _lastEvent{0};
 
     EventStore _eventMap;
 };
+
+template<typename E>
+typename std::underlying_type<E>::type AsUnderlyingType(E enumValue)
+{
+    static_assert(std::is_enum<E>::value, "AsUnderlyingType can only be used with enums");
+    return static_cast<typename std::underlying_type<E>::type>(enumValue);
+}
 
 #endif

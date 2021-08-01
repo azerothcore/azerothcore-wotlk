@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -109,15 +109,15 @@ struct hyjalAI : public npc_escortAI
 {
     hyjalAI(Creature* creature);
 
-    void Reset();                                           // Generically used to reset our variables. Do *not* call in EnterEvadeMode as this may make problems if the raid is still in combat
+    void Reset() override;                                           // Generically used to reset our variables. Do *not* call in EnterEvadeMode as this may make problems if the raid is still in combat
 
-    void EnterEvadeMode();                                  // Send creature back to spawn location and evade.
+    void EnterEvadeMode() override;                                  // Send creature back to spawn location and evade.
 
-    void EnterCombat(Unit* /*who*/);                                  // Used to reset cooldowns for our spells and to inform the raid that we're under attack
+    void EnterCombat(Unit* /*who*/) override;                                  // Used to reset cooldowns for our spells and to inform the raid that we're under attack
 
-    void UpdateAI(uint32 diff);                       // Called to summon waves, check for boss deaths and to cast our spells.
+    void UpdateAI(uint32 diff) override;                       // Called to summon waves, check for boss deaths and to cast our spells.
 
-    void JustDied(Unit* /*killer*/);                             // Called on death, informs the raid that they have failed.
+    void JustDied(Unit* /*killer*/) override;                             // Called on death, informs the raid that they have failed.
 
     void SetFaction(uint32 _faction)                        // Set the faction to either Alliance or Horde in Hyjal
     {
@@ -128,13 +128,13 @@ struct hyjalAI : public npc_escortAI
 
     void SpawnVeins();
     void DeSpawnVeins();
-    void JustSummoned(Creature* summoned);
-    void SummonedCreatureDespawn(Creature* summoned);
+    void JustSummoned(Creature* summoned) override;
+    void SummonedCreatureDespawn(Creature* summoned) override;
     void HideNearPos(float x, float y);
     void RespawnNearPos(float x, float y);
-    void WaypointReached(uint32 waypointId);
+    void WaypointReached(uint32 waypointId) override;
     void DoOverrun(uint32 faction, const uint32 diff);
-    void MoveInLineOfSight(Unit* who);
+    void MoveInLineOfSight(Unit* who) override;
 
     void SummonCreature(uint32 entry, float Base[4][3]);    // Summons a creature for that wave in that base
 
@@ -148,9 +148,9 @@ struct hyjalAI : public npc_escortAI
 public:
     InstanceScript* instance;
 
-    uint64 PlayerGUID;
-    uint64 BossGUID[2];
-    uint64 VeinGUID[14];
+    ObjectGuid PlayerGUID;
+    ObjectGuid BossGUID[2];
+    ObjectGuid VeinGUID[14];
 
     uint32 NextWaveTimer;
     uint32 WaveCount;
@@ -181,7 +181,7 @@ public:
     bool IsDummy;
     uint32 MassTeleportTimer;
     bool DoMassTeleport;
-    uint64 DummyGuid;
+    ObjectGuid DummyGuid;
 
     struct Spell
     {
@@ -192,7 +192,6 @@ public:
 
 private:
     uint32 SpellTimer[3];
-    //std::list<uint64> CreatureList;
+    //GuidList CreatureList;
 };
 #endif
-

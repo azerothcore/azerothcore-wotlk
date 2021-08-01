@@ -3,14 +3,14 @@
 (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
 */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
-#include "Player.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum Yells
 {
@@ -115,9 +115,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if( IsHeroic() )
             events.RescheduleEvent(EVENT_SPELL_TOUCH, urand(10000, 25000), 1);
 
-        me->SetDisableGravity(true);
-        me->SetHover(true);
         me->SetCanFly(true);
+        me->SetDisableGravity(true);
     }
 
     InstanceScript* pInstance;
@@ -126,7 +125,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
     int32 LastSynchroHP;
     uint8 SpecialMask;
 
-    void DoAction(int32 a)
+    void DoAction(int32 a) override
     {
         switch( a )
         {
@@ -188,7 +187,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     Creature* GetSister()
     {
-        return ObjectAccessor::GetCreature(*me, pInstance->GetData64(me->GetEntry() == NPC_DARKBANE ? NPC_LIGHTBANE : NPC_DARKBANE));
+        return ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(me->GetEntry() == NPC_DARKBANE ? NPC_LIGHTBANE : NPC_DARKBANE));
     }
 
     /*void AttackStart(Unit* victim)
@@ -197,7 +196,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
             me->GetMotionMaster()->MoveChase(victim, 0.0f, 0.0f, 6.0f);
     }*/
 
-    void EnterCombat(Unit* /*who*/)
+    void EnterCombat(Unit* /*who*/) override
     {
         me->setActive(true);
         me->LowerPlayerDamageReq(me->GetMaxHealth());
@@ -214,7 +213,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
             pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21853);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         me->setActive(false);
     }
@@ -265,7 +264,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 }
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         if( !UpdateVictim() )
             return;
@@ -276,7 +275,9 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if( me->HasUnitState(UNIT_STATE_CASTING) )
             return;
 
-        switch( events.ExecuteEvent() )
+        uint8 eventId = events.ExecuteEvent();
+
+        switch(eventId)
         {
             case 0:
                 break;
@@ -288,13 +289,12 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     twin->CastSpell(twin, SPELL_BERSERK, true);
                     twin->AI()->Talk(SAY_BERSERK);
                 }
-                
+
                 break;
             case EVENT_SUMMON_BALLS_1:
             case EVENT_SUMMON_BALLS_2:
             case EVENT_SUMMON_BALLS_3:
                 {
-                    uint8 eventId = events.ExecuteEvent();
                     uint8 count = 0;
                     if( IsHeroic() )
                         count = eventId == EVENT_SUMMON_BALLS_3 ? 36 : 6;
@@ -306,7 +306,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                         if( Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500) )
                             boss_twin_valkyrAI::JustSummoned(ball);
                     }
-                    
+
                     switch( eventId )
                     {
                         case EVENT_SUMMON_BALLS_1:
@@ -372,7 +372,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     events.RepeatEvent(urand(45000,50000));
                     */
 
-                    std::vector<uint64> tList;
+                    GuidVector tList;
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
                     if (pList.getSize())
                     {
@@ -402,7 +402,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     switch( s )
                     {
                         case 0: // light vortex
-                            me->CastSpell((Unit*)NULL, SPELL_LIGHT_VORTEX, false);
+                            me->CastSpell((Unit*)nullptr, SPELL_LIGHT_VORTEX, false);
                             Talk(EMOTE_VORTEX);
                             Talk(SAY_LIGHT);
                             if( Creature* twin = GetSister() )
@@ -411,7 +411,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                         case 1: // dark vortex
                             if( Creature* twin = GetSister() )
                             {
-                                twin->CastSpell((Unit*)NULL, SPELL_DARK_VORTEX, false);
+                                twin->CastSpell((Unit*)nullptr, SPELL_DARK_VORTEX, false);
                                 twin->AI()->Talk(EMOTE_VORTEX);
                                 twin->AI()->Talk(SAY_NIGHT);
                                 Talk(SAY_NIGHT);
@@ -448,14 +448,14 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 break;
             case EVENT_REMOVE_DUAL_WIELD:
                 me->SetCanDualWield(false);
-                
+
                 break;
         }
 
         myDoMeleeAttackIfReady();
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         DoAction(-1);
         Talk(SAY_DEATH);
@@ -472,17 +472,17 @@ struct boss_twin_valkyrAI : public ScriptedAI
             }
     }
 
-    void JustSummoned(Creature* s)
+    void JustSummoned(Creature* s) override
     {
         summons.Summon(s);
     }
 
-    void SummonedCreatureDespawn(Creature* s)
+    void SummonedCreatureDespawn(Creature* s) override
     {
         summons.Despawn(s);
     }
 
-    void KilledUnit(Unit* who)
+    void KilledUnit(Unit* who) override
     {
         if( who->GetTypeId() == TYPEID_PLAYER )
         {
@@ -493,7 +493,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if( pInstance )
             pInstance->SetData(TYPE_FAILED, 0);
@@ -505,9 +505,9 @@ class boss_eydis : public CreatureScript
 public:
     boss_eydis() : CreatureScript("boss_eydis") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_eydisAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_eydisAI>(pCreature);
     }
 
     struct boss_eydisAI : public boss_twin_valkyrAI
@@ -522,7 +522,7 @@ public:
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
-        void JustSummoned(Creature*  /*s*/) {}
+        void JustSummoned(Creature*  /*s*/) override {}
     };
 };
 
@@ -531,9 +531,9 @@ class boss_fjola : public CreatureScript
 public:
     boss_fjola() : CreatureScript("boss_fjola") {}
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_fjolaAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_fjolaAI>(pCreature);
     }
 
     struct boss_fjolaAI : public boss_twin_valkyrAI
@@ -548,7 +548,7 @@ public:
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
-        void JustSummoned(Creature*  /*s*/) {}
+        void JustSummoned(Creature*  /*s*/) override {}
     };
 };
 
@@ -666,9 +666,9 @@ class npc_concentrated_ball : public CreatureScript
 public:
     npc_concentrated_ball() : CreatureScript("npc_concentrated_ball") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_concentrated_ballAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_concentrated_ballAI>(pCreature);
     }
 
     struct npc_concentrated_ballAI : public NullCreatureAI
@@ -684,13 +684,13 @@ public:
 
         bool despawning;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == 1)
                 despawning = true;
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( type != POINT_MOTION_TYPE || id != 0 )
                 return;
@@ -705,7 +705,7 @@ public:
             me->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + sin(angle) * 47.0f, me->GetPositionZ());
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if( despawning )
                 return;
@@ -795,13 +795,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectAbsorb += AuraEffectAbsorbFn(spell_valkyr_essence_auraAuraScript::HandleAfterEffectAbsorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_valkyr_essence_auraAuraScript();
     }
@@ -835,7 +835,7 @@ public:
                             CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
                             int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
                             if (caster->CanApplyResilience())
-                                Unit::ApplyResilience(plr, NULL, &dmg, false, CR_CRIT_TAKEN_SPELL);
+                                Unit::ApplyResilience(plr, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
                             uint32 damage = dmg;
                             Unit::CalcAbsorbResist(caster, plr, GetSpellInfo()->GetSchoolMask(), DOT, damage, &absorb, &resist, GetSpellInfo());
                             Unit::DealDamageMods(plr, damage, &absorb);
@@ -849,13 +849,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_touchAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_valkyr_touchAuraScript();
     }
@@ -880,19 +880,19 @@ public:
                             {
                                 me->AI()->DoAction(1); // despawning = true;
                                 me->GetMotionMaster()->MoveIdle();
-                                me->CastSpell((Unit*)NULL, me->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
+                                me->CastSpell((Unit*)nullptr, me->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
                                 me->SetDisplayId(11686);
                                 me->DespawnOrUnsummon(1500);
                             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_ball_periodic_dummyAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_valkyr_ball_periodic_dummyAuraScript();
     }

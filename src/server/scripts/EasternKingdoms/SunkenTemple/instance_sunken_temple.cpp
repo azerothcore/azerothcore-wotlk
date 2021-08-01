@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "sunken_temple.h"
-#include "Player.h"
 #include "CreatureAI.h"
+#include "InstanceScript.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "sunken_temple.h"
 
 class instance_sunken_temple : public InstanceMapScript
 {
@@ -20,17 +20,14 @@ public:
         {
         }
 
-        void Initialize()
+        void Initialize() override
         {
             _statuePhase = 0;
             _defendersKilled = 0;
             memset(&_encounters, 0, sizeof(_encounters));
-
-            _forcefieldGUID = 0;
-            _jammalanGUID = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -39,17 +36,17 @@ public:
                     break;
             }
 
-            if (creature->IsAlive() && creature->GetDBTableGUIDLow() && creature->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && creature->GetEntry() != NPC_SHADE_OF_ERANIKUS)
+            if (creature->IsAlive() && creature->GetSpawnId() && creature->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && creature->GetEntry() != NPC_SHADE_OF_ERANIKUS)
                 _dragonkinList.push_back(creature->GetGUID());
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             if (unit->GetTypeId() == TYPEID_UNIT && unit->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && unit->GetEntry() != NPC_SHADE_OF_ERANIKUS)
                 _dragonkinList.remove(unit->GetGUID());
         }
 
-        void OnGameObjectCreate(GameObject* gameobject)
+        void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -80,7 +77,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -99,9 +96,9 @@ public:
                     }
                     break;
                 case DATA_ERANIKUS_FIGHT:
-                    for (std::list<uint64>::const_iterator itr = _dragonkinList.begin(); itr != _dragonkinList.end(); ++itr)
+                    for (ObjectGuid const& guid : _dragonkinList)
                     {
-                        if (Creature* creature = instance->GetCreature(*itr))
+                        if (Creature* creature = instance->GetCreature(guid))
                             if (instance->IsGridLoaded(creature->GetPositionX(), creature->GetPositionY()))
                                 creature->SetInCombatWithZone();
                     }
@@ -116,7 +113,7 @@ public:
             SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -133,7 +130,7 @@ public:
             return 0;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             _events.Update(diff);
             switch (_events.ExecuteEvent())
@@ -146,14 +143,14 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "T A " << _encounters[0] << ' ' << _encounters[1] << ' ' << _encounters[2] << ' ' << _statuePhase << ' ' << _defendersKilled;
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
                 return;
@@ -180,13 +177,13 @@ public:
         uint32 _defendersKilled;
         uint32 _encounters[MAX_ENCOUNTERS];
 
-        uint64 _forcefieldGUID;
-        uint64 _jammalanGUID;
-        std::list<uint64> _dragonkinList;
+        ObjectGuid _forcefieldGUID;
+        ObjectGuid _jammalanGUID;
+        GuidList _dragonkinList;
         EventMap _events;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_sunken_temple_InstanceMapScript(map);
     }
@@ -203,7 +200,7 @@ class at_malfurion_stormrage : public AreaTriggerScript
 public:
     at_malfurion_stormrage() : AreaTriggerScript("at_malfurion_stormrage") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         if (player->GetInstanceScript() && !player->FindNearestCreature(NPC_MALFURION_STORMRAGE, 15.0f) &&
                 player->GetQuestStatus(QUEST_THE_CHARGE_OF_DRAGONFLIGHTS) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_ERANIKUS_TYRANT_OF_DREAMS) != QUEST_STATUS_REWARDED)
@@ -231,13 +228,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_temple_of_atal_hakkar_hex_of_jammal_an_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_temple_of_atal_hakkar_hex_of_jammal_an_AuraScript();
     }
@@ -268,13 +265,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHit += SpellEffectFn(spell_temple_of_atal_hakkar_awaken_the_soulflayer_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_temple_of_atal_hakkar_awaken_the_soulflayer_SpellScript();
     }

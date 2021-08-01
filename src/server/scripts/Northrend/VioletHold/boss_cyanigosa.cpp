@@ -2,10 +2,10 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "violet_hold.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "violet_hold.h"
 
 enum Yells
 {
@@ -49,9 +49,9 @@ class boss_cyanigosa : public CreatureScript
 public:
     boss_cyanigosa() : CreatureScript("boss_cyanigosa") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_cyanigosaAI (pCreature);
+        return GetVioletHoldAI<boss_cyanigosaAI>(pCreature);
     }
 
     struct boss_cyanigosaAI : public ScriptedAI
@@ -64,12 +64,12 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
             Talk(SAY_AGGRO);
@@ -82,7 +82,7 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_MANA_DESTRUCTION, 20000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (!target || !spell)
                 return;
@@ -94,8 +94,7 @@ public:
             }
         }
 
-
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -110,7 +109,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_ARCANE_VACUUM:
-                    me->CastSpell((Unit*)NULL, SPELL_ARCANE_VACUUM, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ARCANE_VACUUM, false);
                     DoResetThreat();
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->setAttackTimer(BASE_ATTACK, 3000);
@@ -119,7 +118,7 @@ public:
                     break;
                 case EVENT_UNROOT:
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    
+
                     break;
                 case EVENT_SPELL_BLIZZARD:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true))
@@ -144,12 +143,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_BOSS_DIED, 0);
-            float h = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+            float h = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             if (h != INVALID_HEIGHT && me->GetPositionZ() - h > 3.0f)
             {
                 me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), h, me->GetOrientation(), true); // move to ground
@@ -158,16 +157,16 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim && victim->GetGUID() == me->GetGUID())
                 return;
             Talk(SAY_SLAY);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             ScriptedAI::EnterEvadeMode();

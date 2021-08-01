@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "ruins_of_ahnqiraj.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {
@@ -51,7 +51,7 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             me->SetPower(POWER_MANA, 0);
@@ -60,7 +60,7 @@ public:
             //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             if (!_isStonePhase && HealthBelowPct(45))
             {
@@ -69,7 +69,7 @@ public:
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
@@ -94,7 +94,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -137,7 +137,7 @@ public:
                                         targetList.push_back((*itr)->getTarget());
                             }
 
-                            acore::Containers::RandomResizeList(targetList, 5);
+                            Acore::Containers::RandomResize(targetList, 5);
 
                             for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                                 DoCast(*itr, SPELL_DRAIN_MANA);
@@ -164,9 +164,9 @@ public:
         bool _isStonePhase;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_moamAI(creature);
+        return GetRuinsOfAhnQirajAI<boss_moamAI>(creature);
     }
 };
 

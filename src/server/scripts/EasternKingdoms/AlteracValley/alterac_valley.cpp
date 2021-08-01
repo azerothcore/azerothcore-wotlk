@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -75,7 +75,7 @@ public:
     {
         npc_av_marshal_or_warmasterAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_CHARGE_TARGET, urand(2 * IN_MILLISECONDS, 12 * IN_MILLISECONDS));
@@ -88,12 +88,12 @@ public:
             _hasAura = false;
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             Reset();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // I have a feeling this isn't blizzlike, but owell, I'm only passing by and cleaning up.
             if (!_hasAura)
@@ -159,7 +159,7 @@ public:
         bool _hasAura;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_av_marshal_or_warmasterAI(creature);
     }

@@ -1,15 +1,17 @@
-// Scripted by Xinef
+/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "SpellScript.h"
-#include "LFGMgr.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
+#include "LFGMgr.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 ///////////////////////////////////////
 ////// GOS
@@ -22,11 +24,20 @@
 enum Spells
 {
     SPELL_GOBLIN_DISGUISE           = 71450,
-    SPELL_GOBLIN_ALLY_COMPLETE      = 71522,
-    SPELL_GOBLIN_HORDE_COMPLETE     = 71539,
     SPELL_GOBLIN_CARRY_CRATE        = 71459,
 
     NPC_SOMETHING_STINKS_CREDIT     = 37558,
+};
+
+enum Quests
+{
+    QUEST_PILGRIM_HORDE             = 24541,
+    QUEST_PILGRIM_ALLIANCE          = 24656
+};
+
+enum SupplySentrySay
+{
+    SAY_SUPPLY_SENTRY_0 = 0
 };
 
 class npc_love_in_air_supply_sentry : public CreatureScript
@@ -42,32 +53,40 @@ public:
 
         uint32 lock;
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (lock > 1000 && me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->HasAura(SPELL_GOBLIN_DISGUISE) && !who->HasAura(SPELL_GOBLIN_CARRY_CRATE))
             {
                 lock = 0;
                 if (urand(0, 1))
-                    me->MonsterSay("Time is money, friend. Go go go!", LANG_UNIVERSAL, who->ToPlayer());
+                {
+                    me->AI()->Talk(SAY_SUPPLY_SENTRY_0, who->ToPlayer());
+                }
                 else
-                    me->MonsterSay("That crate won't deliver itself, friend. Get a move on!", LANG_UNIVERSAL, who->ToPlayer());
+                {
+                    me->AI()->Talk(SAY_SUPPLY_SENTRY_0, who->ToPlayer());
+                }
 
                 if (who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
-                    who->CastSpell(who, SPELL_GOBLIN_ALLY_COMPLETE, true);
+                {
+                    who->ToPlayer()->CompleteQuest(QUEST_PILGRIM_ALLIANCE);
+                }
                 else
-                    who->CastSpell(who, SPELL_GOBLIN_HORDE_COMPLETE, true);
+                {
+                    who->ToPlayer()->CompleteQuest(QUEST_PILGRIM_HORDE);
+                }
 
                 me->CastSpell(who, SPELL_GOBLIN_CARRY_CRATE, true);
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             lock += diff;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_supply_sentryAI(creature);
     }
@@ -101,7 +120,7 @@ public:
 
         int32 delay;
 
-        void Reset()
+        void Reset() override
         {
             delay = 0;
             me->SetReactState(REACT_AGGRESSIVE);
@@ -120,7 +139,7 @@ public:
             return false;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (delay == 0 && me->GetDistance(who) < 7.0f && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -134,17 +153,25 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (delay > 0)
                 delay -= std::min<int32>(delay, diff);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_snivelAI(creature);
     }
+};
+
+enum SnivelRealSay
+{
+    SAY_SNIVEL_REAL_0 = 0,
+    SAY_SNIVEL_REAL_1 = 1,
+    SAY_SNIVEL_REAL_2 = 2,
+    SAY_SNIVEL_REAL_3 = 3
 };
 
 class npc_love_in_air_snivel_real : public CreatureScript
@@ -173,10 +200,10 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->MonsterSay("What are you staring at? Haven't you ever seen a genius before?", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0);
                                 return false;
                             case 2:
-                                me->MonsterSay("This'll teach you to mind your own business!", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1);
                                 return true;
                         }
                         break;
@@ -187,13 +214,13 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->MonsterSay("That's right. I'd like to list some of these 'fireworks'.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0);
                                 return false;
                             case 2:
-                                me->MonsterSay("Those'll net me a nice profit when I return from the South Seas.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1);
                                 return false;
                             case 3:
-                                me->MonsterSay("You... Don't think I don't see you. Leave me alone!", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_2);
                                 return true;
                         }
                         break;
@@ -205,16 +232,16 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->MonsterSay("Thanks for the great cut and shave, buddy.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0);
                                 return false;
                             case 2:
-                                me->MonsterSay("Here's a little something extra since I'll be away.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1);
                                 return false;
                             case 3:
-                                me->MonsterSay("On second thought, keep the whole bag. I have to, uh, get going.", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_2);
                                 return false;
                             case 4:
-                                me->MonsterSay("Did you really think you could corner me this easily?", LANG_UNIVERSAL, 0);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_3);
                                 return true;
                         }
                         break;
@@ -224,7 +251,7 @@ public:
             return true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             actionTimer += diff;
             if (actionTimer >= 7000)
@@ -243,7 +270,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_snivel_realAI(creature);
     }
@@ -282,6 +309,14 @@ enum hummel
     EVENT_SPELL_THROW               = 5,
 };
 
+enum HummelSay
+{
+    SAY_HUMMEL_0 = 0,
+    SAY_HUMMEL_1 = 1,
+    SAY_HUMMEL_2 = 2,
+    SAY_HUMMEL_5 = 5
+};
+
 class npc_love_in_air_hummel : public CreatureScript
 {
 public:
@@ -297,7 +332,7 @@ public:
         EventMap events;
         uint32 speachTimer;
 
-        void Reset()
+        void Reset() override
         {
             speachTimer = 0;
             me->setFaction(35);
@@ -307,21 +342,21 @@ public:
             me->SummonCreature(NPC_APOTHECARY_BAXTER, -209.602f, 2215.42f, 79.7633f, 0.723503f);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
                 speachTimer = 1;
         }
 
-        void JustDied(Unit* )
+        void JustDied(Unit* ) override
         {
-            me->MonsterSay("...please don't think less of me.", LANG_UNIVERSAL, 0);
+            me->AI()->Talk(SAY_HUMMEL_5);
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
                 sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 288, me->FindMap());
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
             cr->setFaction(35);
@@ -329,24 +364,24 @@ public:
             cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (speachTimer)
             {
                 speachTimer += diff;
                 if (speachTimer < 10000)
                 {
-                    me->MonsterSay("Did they bother to tell you who I am and why I am doing this?", LANG_UNIVERSAL, 0);
+                    me->AI()->Talk(SAY_HUMMEL_0);
                     speachTimer = 10000;
                 }
                 else if (speachTimer >= 16000 && speachTimer < 20000)
                 {
-                    me->MonsterSay("...or are they just using you like they do everybody else?", LANG_UNIVERSAL, 0);
+                    me->AI()->Talk(SAY_HUMMEL_1);
                     speachTimer = 20000;
                 }
                 else if (speachTimer >= 26000 && speachTimer < 30000)
                 {
-                    me->MonsterSay("But what does it matter. It is time for this to end.", LANG_UNIVERSAL, 0);
+                    me->AI()->Talk(SAY_HUMMEL_2);
                     speachTimer = 0;
                     me->setFaction(16);
                     me->SetInCombatWithZone();
@@ -377,14 +412,14 @@ public:
                     {
                         EntryCheckPredicate pred(NPC_APOTHECARY_BAXTER);
                         summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        
+
                         break;
                     }
                 case EVENT_CALL_FRYE:
                     {
                         EntryCheckPredicate pred(NPC_APOTHECARY_FRYE);
                         summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        
+
                         break;
                     }
                 case EVENT_SPELL_PERFUME_SPRAY:
@@ -401,18 +436,23 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_hummelAI(creature);
     }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest* _Quest, uint32 /*slot*/)
+    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest* _Quest, uint32 /*slot*/) override
     {
         if (_Quest->GetQuestId() == QUEST_YOUVE_BEEN_SERVED)
             creature->AI()->DoAction(ACTION_START_EVENT);
 
         return true;
     }
+};
+
+enum HummelHelperSay
+{
+    SAY_HUMMEL_HELPER_SAY_5 = 5,
 };
 
 class npc_love_in_air_hummel_helper : public CreatureScript
@@ -428,11 +468,11 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_RELEASE_HELPER)
             {
@@ -453,9 +493,12 @@ public:
             }
         }
 
-        void JustDied(Unit* ) { me->MonsterSay("...please don't think less of me.", LANG_UNIVERSAL, 0); }
+        void JustDied(Unit* ) override
+        {
+            me->AI()->Talk(SAY_HUMMEL_HELPER_SAY_5);
+        }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -490,7 +533,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_love_in_air_hummel_helperAI(creature);
     }
@@ -539,14 +582,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_love_in_air_perfume_immune_AuraScript::HandleEffectApply, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_love_in_air_perfume_immune_AuraScript::HandleEffectRemove, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_love_in_air_perfume_immune_AuraScript();
     }
@@ -563,7 +606,7 @@ public:
 
         void PeriodicTick(AuraEffect const* /*aurEff*/)
         {
-            uint64 guid = (GetCaster() ? GetCaster()->GetGUID() : 0);
+            ObjectGuid guid = GetCaster() ? GetCaster()->GetGUID() : ObjectGuid::Empty;
             if (Unit* target = GetTarget())
             {
                 uint32 spellId = (GetId() == SPELL_THROW_COLOGNE ? 68934 : 68927);
@@ -574,13 +617,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_love_in_air_periodic_perfumes_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_love_in_air_periodic_perfumes_AuraScript();
     }
@@ -624,13 +667,13 @@ public:
             target->AddItem(items[urand(0, 7)], 1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_item_create_heart_candy_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_item_create_heart_candy_SpellScript();
     }
@@ -684,9 +727,9 @@ public:
             // For nearby players, check if they have the same aura. If so, cast Romantic Picnic (45123)
             // required by achievement and "hearts" visual
             std::list<Player*> playerList;
-            acore::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE * 2);
-            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
-            target->VisitNearbyWorldObject(INTERACTION_DISTANCE * 2, searcher);
+            Acore::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE * 2);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
+            Cell::VisitWorldObjects(target, searcher, INTERACTION_DISTANCE * 2);
             for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
             {
                 if ((*itr) != target && (*itr)->HasAura(GetId())) // && (*itr)->getStandState() == UNIT_STAND_STATE_SIT)
@@ -705,14 +748,14 @@ public:
                 target->RemoveAura(SPELL_ROMANTIC_PICNIC_ACHIEV);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_love_is_in_the_air_romantic_picnic_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_love_is_in_the_air_romantic_picnic_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_love_is_in_the_air_romantic_picnic_AuraScript();
     }
@@ -735,11 +778,9 @@ public:
     {
         PrepareAuraScript(spell_gen_aura_service_uniform_AuraScript);
 
-        bool Validate(SpellInfo const* /*spell*/)
+        bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SERVICE_UNIFORM))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SERVICE_UNIFORM });
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -762,14 +803,14 @@ public:
                 target->RestoreDisplayId();
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_gen_aura_service_uniform_AuraScript::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_gen_aura_service_uniform_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_gen_aura_service_uniform_AuraScript();
     }

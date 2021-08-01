@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -21,11 +21,10 @@ struct PetSpell
     PetSpellType type;
 };
 
-
 class AsynchPetSummon
 {
 public:
-    AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, uint64 casterGUID) :
+    AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, ObjectGuid casterGUID) :
         m_entry(entry), pos(position), m_petType(petType),
         m_duration(duration), m_createdBySpell(createdBySpell), m_casterGUID(casterGUID) { }
 
@@ -33,7 +32,7 @@ public:
     Position pos;
     PetType m_petType;
     uint32 m_duration, m_createdBySpell;
-    uint64 m_casterGUID;
+    ObjectGuid m_casterGUID;
 };
 
 typedef std::unordered_map<uint32, PetSpell> PetSpellMap;
@@ -45,7 +44,7 @@ class Pet : public Guardian
 {
 public:
     explicit Pet(Player* owner, PetType type = MAX_PET_TYPE);
-    virtual ~Pet();
+    ~Pet() override;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -59,7 +58,7 @@ public:
 
     bool IsPermanentPetFor(Player* owner) const;              // pet have tab in character windows and set UNIT_FIELD_PETNUMBER
 
-    bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 pet_number);
+    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 pet_number);
     bool CreateBaseAtCreature(Creature* creature);
     bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
     bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
@@ -68,7 +67,7 @@ public:
     bool isBeingLoaded() const override { return m_loading;}
     void SavePetToDB(PetSaveMode mode, bool logout);
     void Remove(PetSaveMode mode, bool returnreagent = false);
-    static void DeleteFromDB(uint32 guidlow);
+    static void DeleteFromDB(ObjectGuid::LowType guidlow);
 
     void setDeathState(DeathState s, bool despawn = false) override;                   // overwrite virtual Creature::setDeathState and Unit::setDeathState
     void Update(uint32 diff) override;                           // overwrite virtual Creature::Update and Unit::Update
@@ -114,9 +113,9 @@ public:
     void ClearCastWhenWillAvailable();
     void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
 
-    void _SaveSpellCooldowns(SQLTransaction& trans, bool logout);
-    void _SaveAuras(SQLTransaction& trans, bool logout);
-    void _SaveSpells(SQLTransaction& trans);
+    void _SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout);
+    void _SaveAuras(CharacterDatabaseTransaction trans, bool logout);
+    void _SaveSpells(CharacterDatabaseTransaction trans);
 
     void _LoadSpellCooldowns(PreparedQueryResult result);
     void _LoadAuras(PreparedQueryResult result, uint32 timediff);
@@ -141,7 +140,7 @@ public:
 
     uint8 GetMaxTalentPointsForLevel(uint8 level);
     uint8 GetFreeTalentPoints() { return GetByteValue(UNIT_FIELD_BYTES_1, 1); }
-    void SetFreeTalentPoints(uint8 points) { SetByteValue(UNIT_FIELD_BYTES_1, 1, points); }
+    void SetFreeTalentPoints(uint8 points) { SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_PET_TALENTS, points); }
 
     uint32  m_usedTalentCount;
 

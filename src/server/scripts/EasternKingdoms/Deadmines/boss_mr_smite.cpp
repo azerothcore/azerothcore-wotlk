@@ -2,10 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "deadmines.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
-enum Spels
+enum Spells
 {
     SPELL_SMITE_STOMP       = 6432,
     SPELL_SMITE_SLAM        = 6435,
@@ -31,9 +32,9 @@ class boss_mr_smite : public CreatureScript
 public:
     boss_mr_smite() : CreatureScript("boss_mr_smite") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_mr_smiteAI>(creature);
+        return GetDeadminesAI<boss_mr_smiteAI>(creature);
     }
 
     struct boss_mr_smiteAI : public ScriptedAI
@@ -46,7 +47,7 @@ public:
         bool health67;
         bool health34;
 
-        void Reset()
+        void Reset() override
         {
             health67 = false;
             health34 = false;
@@ -57,14 +58,14 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_CHECK_HEALTH1, 500);
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 500);
             events.ScheduleEvent(EVENT_SMITE_SLAM, 3000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -72,10 +73,6 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case EVENT_SMITE_SLAM:
-                    me->CastSpell(me->GetVictim(), SPELL_SMITE_SLAM, false);
-                    events.ScheduleEvent(EVENT_SMITE_SLAM, 15000);
-                    break;
                 case EVENT_CHECK_HEALTH1:
                     if (me->HealthBelowPct(67) && !health67)
                     {
@@ -106,6 +103,15 @@ public:
                     }
                     events.ScheduleEvent(EVENT_CHECK_HEALTH2, 500);
                     break;
+                case EVENT_SMITE_SLAM:
+                    if (me->HealthBelowPct(33))
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_SMITE_SLAM, false);
+                        events.ScheduleEvent(EVENT_SMITE_SLAM, 6000);
+                        break;
+                    }
+                    events.ScheduleEvent(EVENT_SMITE_SLAM, 500);
+                    break;
                 case EVENT_SWAP_WEAPON1:
                     me->LoadEquipment(EQUIP_TWO_SWORDS);
                     me->SetCanDualWield(true);
@@ -133,12 +139,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
 
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(5.558f);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             events.ScheduleEvent(point == EQUIP_TWO_SWORDS ? EVENT_SWAP_WEAPON1 : EVENT_SWAP_WEAPON2, 1500);

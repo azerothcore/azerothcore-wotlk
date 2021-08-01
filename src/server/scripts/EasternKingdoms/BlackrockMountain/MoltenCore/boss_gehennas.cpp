@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,23 +11,23 @@ SDComment: Adds MC NYI
 SDCategory: Molten Core
 EndScriptData */
 
-#include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "molten_core.h"
 
 enum Spells
 {
-    SPELL_GEHENNAS_CURSE    = 19716,
-    SPELL_RAIN_OF_FIRE      = 19717,
-    SPELL_SHADOW_BOLT       = 19728,
+    SPELL_GEHENNAS_CURSE        = 19716,
+    SPELL_RAIN_OF_FIRE          = 19717,
+    SPELL_SHADOW_BOLT_RANDOM    = 19728,
+    SPELL_SHADOW_BOLT_VICTIM    = 19729,
 };
 
 enum Events
 {
     EVENT_GEHENNAS_CURSE    = 1,
-    EVENT_RAIN_OF_FIRE      = 2,
-    EVENT_SHADOW_BOLT       = 3,
+    EVENT_RAIN_OF_FIRE,
+    EVENT_SHADOW_BOLT,
 };
 
 class boss_gehennas : public CreatureScript
@@ -41,44 +41,73 @@ public:
         {
         }
 
-        void EnterCombat(Unit* victim)
+        void EnterCombat(Unit* /*attacker*/) override
         {
-            BossAI::EnterCombat(victim);
-            events.ScheduleEvent(EVENT_GEHENNAS_CURSE, 12000);
+            _EnterCombat();
+            events.ScheduleEvent(EVENT_GEHENNAS_CURSE, urand(6000, 9000));
             events.ScheduleEvent(EVENT_RAIN_OF_FIRE, 10000);
-            events.ScheduleEvent(EVENT_SHADOW_BOLT, 6000);
+            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 5000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
-            while (uint32 eventId = events.ExecuteEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
                     case EVENT_GEHENNAS_CURSE:
+                    {
                         DoCastVictim(SPELL_GEHENNAS_CURSE);
-                        events.ScheduleEvent(EVENT_GEHENNAS_CURSE, urand(22000, 30000));
+                        events.RepeatEvent(urand(25000, 30000));
                         break;
+                    }
                     case EVENT_RAIN_OF_FIRE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    {
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        {
                             DoCast(target, SPELL_RAIN_OF_FIRE);
-                        events.ScheduleEvent(EVENT_RAIN_OF_FIRE, urand(4000, 12000));
+                        }
+                        events.RepeatEvent(6000);
                         break;
+                    }
                     case EVENT_SHADOW_BOLT:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-                            DoCast(target, SPELL_SHADOW_BOLT);
-                        events.ScheduleEvent(EVENT_SHADOW_BOLT, 7000);
+                    {
+                        if (urand(0, 1))
+                        {
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                            {
+                                DoCast(target, SPELL_SHADOW_BOLT_RANDOM);
+                            }
+                            else
+                            {
+                                DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
+                            }
+                        }
+                        else
+                        {
+                            DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
+                        }
+
+                        events.RepeatEvent(5000);
                         break;
-                    default:
-                        break;
+                    }
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
                 }
             }
 
@@ -86,9 +115,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_gehennasAI(creature);
+        return GetMoltenCoreAI<boss_gehennasAI>(creature);
     }
 };
 

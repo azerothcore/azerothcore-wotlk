@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "trial_of_the_champion.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "trial_of_the_champion.h"
 
 enum EadricSpells
 {
@@ -88,7 +88,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->SetReactState(REACT_PASSIVE);
@@ -96,13 +96,13 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( type == POINT_MOTION_TYPE && id == 1 )
                 me->SetFacingTo(3 * M_PI / 2);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
             {
@@ -113,7 +113,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16000);
@@ -124,20 +124,20 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == 66905 && me->GetHealth() == 1) // hammer throw back damage (15k)
                 me->CastSpell(me, 68197, true);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if( damage >= me->GetHealth() )
             {
                 damage = me->GetHealth() - 1;
                 if( me->getFaction() != 35 )
                 {
-                    me->CastSpell((Unit*)NULL, 68575, true); // achievements
+                    me->CastSpell((Unit*)nullptr, 68575, true); // achievements
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, 68574, me); // paletress' spell credits encounter, but shouldn't credit achievements
                     me->setFaction(35);
                     events.Reset();
@@ -152,7 +152,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -167,7 +167,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_RADIANCE:
-                    me->CastSpell((Unit*)NULL, SPELL_RADIANCE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_RADIANCE, false);
                     me->MonsterTextEmote(TEXT_RADIATE, 0, true);
                     events.RepeatEvent(16000);
                     break;
@@ -189,9 +189,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_eadricAI(pCreature);
+        return GetTrialOfTheChampionAI<boss_eadricAI>(pCreature);
     }
 };
 
@@ -210,9 +210,9 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         bool summoned;
-        uint64 MemoryGUID;
+        ObjectGuid MemoryGUID;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summoned = false;
@@ -220,20 +220,20 @@ public:
             {
                 if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     memory->DespawnOrUnsummon();
-                MemoryGUID = 0;
+                MemoryGUID.Clear();
             }
             me->SetReactState(REACT_PASSIVE);
             if( pInstance )
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( type == POINT_MOTION_TYPE && id == 1 )
                 me->SetFacingTo(3 * M_PI / 2);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
             {
@@ -244,7 +244,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, urand(9000, 12000));
@@ -255,11 +255,11 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == 1 )
             {
-                MemoryGUID = 0;
+                MemoryGUID.Clear();
                 me->RemoveAura(SPELL_SHIELD);
                 Talk(TEXT_PALETRESS_MEMORY_DEFEATED);
             }
@@ -269,12 +269,12 @@ public:
                     if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     {
                         memory->DespawnOrUnsummon();
-                        MemoryGUID = 0;
+                        MemoryGUID.Clear();
                     }
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             //if( me->HasAura(SPELL_SHIELD) )
             //  return;
@@ -285,7 +285,7 @@ public:
 
                 if( me->getFaction() != 35 )
                 {
-                    me->CastSpell((Unit*)NULL, 68574, true); // achievements
+                    me->CastSpell((Unit*)nullptr, 68574, true); // achievements
                     me->setFaction(35);
                     events.Reset();
                     Talk(TEXT_PALETRESS_DEATH);
@@ -302,7 +302,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if( pInstance )
                 pInstance->SetData(DATA_MEMORY_ENTRY, summon->GetEntry());
@@ -316,7 +316,7 @@ public:
             me->CastSpell(me, uiSpells[uiRandom], true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -327,11 +327,11 @@ public:
             {
                 me->InterruptNonMeleeSpells(true);
                 Talk(TEXT_PALETRESS_MEMORY_SUMMON);
-                me->CastSpell((Unit*)NULL, SPELL_HOLY_NOVA, false);
+                me->CastSpell((Unit*)nullptr, SPELL_HOLY_NOVA, false);
                 me->CastSpell(me, SPELL_SHIELD, false);
-                me->CastSpell((Unit*)NULL, SPELL_SUMMON_MEMORY, false);
+                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_MEMORY, false);
                 SummonMemory();
-                me->CastSpell((Unit*)NULL, SPELL_CONFESS, false);
+                me->CastSpell((Unit*)nullptr, SPELL_CONFESS, false);
                 events.ScheduleEvent(EVENT_SPELL_RENEW, urand(6000, 8000));
                 summoned = true;
                 return;
@@ -372,9 +372,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_paletressAI(pCreature);
+        return GetTrialOfTheChampionAI<boss_paletressAI>(pCreature);
     }
 };
 
@@ -397,17 +397,17 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset() {}
+        void Reset() override {}
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon(20000);
             if( pInstance )
-                if( Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_PALETRESS)) )
+                if( Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_PALETRESS)) )
                     paletress->AI()->DoAction(1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             UpdateVictim();
 
@@ -423,7 +423,7 @@ public:
                 case EVENT_MEMORY_SCALE:
                     me->SetObjectScale(1.0f);
                     events.ScheduleEvent(EVENT_MEMORY_START_ATTACK, 5000);
-                    
+
                     break;
                 case EVENT_MEMORY_START_ATTACK:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -457,12 +457,11 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_memoryAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_memoryAI>(pCreature);
     }
 };
-
 
 enum ArgentSoldierSpells
 {
@@ -525,13 +524,13 @@ public:
         uint8 uiWaypoint;
         bool bCheck;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             bCheck = false;
         }
 
-        void WaypointReached(uint32 uiPoint)
+        void WaypointReached(uint32 uiPoint) override
         {
             if( uiPoint == 1 )
             {
@@ -550,7 +549,7 @@ public:
             }
         }
 
-        void SetData(uint32 uiType, uint32 /*uiData*/)
+        void SetData(uint32 uiType, uint32 /*uiData*/) override
         {
             AddWaypoint(0, me->GetPositionX(), 660.0f, 411.80f);
             switch( me->GetEntry() )
@@ -599,11 +598,11 @@ public:
                     break;
             }
 
-            Start(false, true, 0);
+            Start(false, true);
             uiWaypoint = uiType;
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if( bCheck && damage >= me->GetHealth() )
             {
@@ -611,11 +610,11 @@ public:
                 damage = me->GetHealth() - 1;
                 events.DelayEvents(10000);
                 me->CastSpell(me, SPELL_DIVINE_SHIELD_H, true);
-                me->CastSpell((Unit*)NULL, SPELL_FINAL_MEDITATION_H, true);
+                me->CastSpell((Unit*)nullptr, SPELL_FINAL_MEDITATION_H, true);
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             switch( me->GetEntry() )
             {
@@ -641,7 +640,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -679,7 +678,7 @@ public:
                     events.RepeatEvent(urand(12000, 15000));
                     break;
                 case EVENT_PRIESTESS_SPELL_FOUNTAIN_OF_LIGHT:
-                    me->CastSpell((Unit*)NULL, SPELL_FOUNTAIN_OF_LIGHT, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FOUNTAIN_OF_LIGHT, false);
                     events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_PRIESTESS_SPELL_MIND_CONTROL_H:
@@ -712,7 +711,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             me->DespawnOrUnsummon(10000);
             if( pInstance )
@@ -720,9 +719,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_argent_soldierAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_argent_soldierAI>(pCreature);
     }
 };
 
@@ -747,14 +746,14 @@ public:
                 targets.push_back(*itr);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_eadric_radiance_SpellScript();
     }
@@ -784,13 +783,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_toc5_light_rain_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_toc5_light_rain_SpellScript();
     }
@@ -815,13 +814,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectAbsorb += AuraEffectAbsorbFn(spell_reflective_shield_AuraScript::HandleAfterEffectAbsorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_reflective_shield_AuraScript();
     }

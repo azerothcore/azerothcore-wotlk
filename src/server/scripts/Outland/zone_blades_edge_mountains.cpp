@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,17 +17,17 @@ npc_daranelle
 go_legion_obelisk
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
 
 // Ours
 enum deathsdoorfell
@@ -64,8 +64,8 @@ public:
 
         EventMap events;
         bool PartyTime;
-        uint64 PlayerGUID;
-        uint64 CannonGUID;
+        ObjectGuid PlayerGUID;
+        ObjectGuid CannonGUID;
         uint8 count;
 
         void Reset() override
@@ -77,8 +77,8 @@ public:
         void Initialize()
         {
             PartyTime = false;
-            PlayerGUID = 0;
-            CannonGUID = 0;
+            PlayerGUID.Clear();
+            CannonGUID.Clear();
             count = 0;
         }
 
@@ -106,9 +106,9 @@ public:
                     if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                     {
                         if (GetClosestCreatureWithEntry(me, NPC_SOUTH_GATE, 200.0f))
-                            player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, TRIGGERED_NONE);
+                            player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT);
                         else if (GetClosestCreatureWithEntry(me, NPC_NORTH_GATE, 200.0f))
-                            player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, TRIGGERED_NONE);
+                            player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT);
                         // complete quest part
                         if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_EXPLOSION_BUNNY, 200.0f))
                             bunny->CastSpell(nullptr, SPELL_EXPLOSION, TRIGGERED_NONE);
@@ -222,13 +222,13 @@ public:
             GetTarget()->CastSpell(GetTarget(), 40898, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_npc22275_crystal_prison_AuraScript();
     }
@@ -279,7 +279,7 @@ public:
         uint32 ManaBurn_Timer;
         uint32 IntangiblePresence_Timer;
 
-        void Reset()
+        void Reset() override
         {
             IsNihil = false;
             NihilSpeech_Timer = 3000;
@@ -290,9 +290,9 @@ public:
             IntangiblePresence_Timer = 15000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
@@ -302,7 +302,7 @@ public:
         }
 
         //in case Creature was not summoned (not expected)
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -315,7 +315,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_T_PHASE_MODULATOR && caster->GetTypeId() == TYPEID_PLAYER)
             {
@@ -347,7 +347,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (IsNihil)
             {
@@ -416,7 +416,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_nether_drakeAI(creature);
     }
@@ -444,11 +444,11 @@ public:
     {
         npc_daranelleAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
@@ -469,7 +469,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_daranelleAI(creature);
     }
@@ -560,14 +560,14 @@ public:
         uint8 gameLevel;
         uint8 fails;
         uint8 gameTicks;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint32 clusterIds[SIMON_MAX_COLORS];
         float zCoordCorrection;
         float searchDistance;
         EventMap _events;
         std::list<uint8> colorSequence, playableSequence, playerSequence;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
 
@@ -621,7 +621,7 @@ public:
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
@@ -647,7 +647,7 @@ public:
         }
 
         // Called by color clusters script (go_simon_cluster) and used for knowing the button pressed by player
-        void SetData(uint32 type, uint32 /*data*/)
+        void SetData(uint32 type, uint32 /*data*/) override
         {
             if (!listening)
                 return;
@@ -670,7 +670,7 @@ public:
         }
 
         // Used for getting involved player guid. Parameter id is used for defining if is a large(Monument) or small(Relic) node
-        void SetGUID(uint64 guid, int32 id)
+        void SetGUID(ObjectGuid guid, int32 id) override
         {
             me->SetCanFly(true);
 
@@ -697,9 +697,9 @@ public:
             me->SetObjectScale(large ? 2.0f : 1.0f);
 
             std::list<WorldObject*> ClusterList;
-            acore::AllWorldObjectsInRange objects(me, searchDistance);
-            acore::WorldObjectListSearcher<acore::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
-            me->VisitNearbyObject(searchDistance, searcher);
+            Acore::AllWorldObjectsInRange objects(me, searchDistance);
+            Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
+            Cell::VisitAllObjects(me, searcher, searchDistance);
 
             for (std::list<WorldObject*>::const_iterator i = ClusterList.begin(); i != ClusterList.end(); ++i)
             {
@@ -810,7 +810,6 @@ public:
             for (std::list<uint8>::const_iterator i = colorSequence.begin(); i != colorSequence.end(); ++i)
                 playableSequence.push_back(*i);
         }
-
 
         // Remove any existant glowing auras over clusters and set clusters ready for interating with them.
         void PrepareClusters(bool clustersOnly = false)
@@ -960,7 +959,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             // Cast SPELL_BAD_PRESS_DAMAGE with scaled basepoints when the visual hits the target.
             // Need Fix: When SPELL_BAD_PRESS_TRIGGER hits target it triggers spell SPELL_BAD_PRESS_DAMAGE by itself
@@ -992,7 +991,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_simon_bunnyAI(creature);
     }
@@ -1074,18 +1073,18 @@ public:
     {
         npc_oscillating_frequency_scanner_master_bunnyAI(Creature* creature) : ScriptedAI(creature)
         {
-            playerGuid = 0;
+            playerGuid.Clear();
             timer = 500;
         }
 
-        void Reset()
+        void Reset() override
         {
             if (GetClosestCreatureWithEntry(me, NPC_OSCILLATING_FREQUENCY_SCANNER_TOP_BUNNY, 25.0f))
                 me->DespawnOrUnsummon();
             else
             {
                 // Spell 37392 does not exist in dbc, manually spawning
-                me->SummonCreature(NPC_OSCILLATING_FREQUENCY_SCANNER_TOP_BUNNY, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.5f, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 50000);
+                me->SummonCreature(NPC_OSCILLATING_FREQUENCY_SCANNER_TOP_BUNNY, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 50000);
                 me->SummonGameObject(GO_OSCILLATING_FREQUENCY_SCANNER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), 0, 0, 0, 0, 50);
                 me->DespawnOrUnsummon(50000);
             }
@@ -1093,13 +1092,13 @@ public:
             timer = 500;
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (summoner && summoner->isType(TYPEMASK_PLAYER))
                 playerGuid = summoner->GetGUID();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer <= diff)
             {
@@ -1113,11 +1112,11 @@ public:
         }
 
     private:
-        uint64 playerGuid;
+        ObjectGuid playerGuid;
         uint32 timer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_oscillating_frequency_scanner_master_bunnyAI(creature);
     }
@@ -1139,13 +1138,13 @@ public:
                     player->CompleteQuest(QUEST_GAUGING_THE_RESONANT_FREQUENCY);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_oscillating_field_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_oscillating_field_SpellScript();
     }

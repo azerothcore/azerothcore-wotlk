@@ -49,7 +49,7 @@ public:
         uint8 uiHopelessnessCount;
         uint16 startFightTimer;
 
-        void Reset()
+        void Reset() override
         {
             startFightTimer = 0;
             uiHopelessnessCount = 0;
@@ -60,7 +60,7 @@ public:
                 pInstance->SetData(DATA_FALRIC, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
@@ -69,7 +69,7 @@ public:
             events.ScheduleEvent(EVENT_DEFILING_HORROR, 20000);
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -78,7 +78,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (startFightTimer)
             {
@@ -115,7 +115,7 @@ public:
                     break;
                 case EVENT_DEFILING_HORROR:
                     Talk(SAY_DEFILING_HORROR);
-                    me->CastSpell((Unit*)NULL, SPELL_DEFILING_HORROR, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_DEFILING_HORROR, false);
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     events.DelayEventsToMax(5000, 0);
                     events.ScheduleEvent(EVENT_UNROOT, 4000);
@@ -130,7 +130,7 @@ public:
             {
                 if (uiHopelessnessCount)
                     me->RemoveOwnedAura(hopelessnessId[uiHopelessnessCount - 1][DUNGEON_MODE(0, 1)]);
-                me->CastSpell((Unit*)NULL, hopelessnessId[uiHopelessnessCount][DUNGEON_MODE(0, 1)], true);
+                me->CastSpell((Unit*)nullptr, hopelessnessId[uiHopelessnessCount][DUNGEON_MODE(0, 1)], true);
                 ++uiHopelessnessCount;
             }
 
@@ -138,20 +138,20 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_FALRIC, DONE);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             ScriptedAI::EnterEvadeMode();
@@ -160,9 +160,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_falricAI(creature);
+        return GetHallsOfReflectionAI<boss_falricAI>(creature);
     }
 };
 

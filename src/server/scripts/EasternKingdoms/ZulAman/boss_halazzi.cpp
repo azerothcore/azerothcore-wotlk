@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "zulaman.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "zulaman.h"
 
 enum Spells
 {
@@ -77,14 +77,14 @@ public:
         uint32 BerserkTimer;
         uint32 TransformCount;
 
-        uint64 LynxGUID;
+        ObjectGuid LynxGUID;
 
-        void Reset()
+        void Reset() override
         {
             instance->SetData(DATA_HALAZZIEVENT, NOT_STARTED);
             summons.DespawnAll();
 
-            LynxGUID = 0;
+            LynxGUID.Clear();
             TransformCount = 0;
             BerserkTimer = 600000;
             CheckTimer = 1000;
@@ -95,14 +95,14 @@ public:
             EnterPhase(PHASE_LYNX);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             instance->SetData(DATA_HALAZZIEVENT, IN_PROGRESS);
             Talk(SAY_AGGRO);
             EnterPhase(PHASE_LYNX);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->AI()->AttackStart(me->GetVictim());
             if (summon->GetEntry() == NPC_SPIRIT_LYNX)
@@ -110,19 +110,19 @@ public:
             summons.Summon(summon);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() && Phase != PHASE_ENRAGE)
                 damage = 0;
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell)
+        void SpellHit(Unit*, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_TRANSFORM_SPLIT2)
                 EnterPhase(PHASE_HUMAN);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (Phase != PHASE_MERGE)
                 ScriptedAI::AttackStart(who);
@@ -179,7 +179,7 @@ public:
             Phase = NextPhase;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -288,7 +288,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -296,16 +296,16 @@ public:
             Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetData(DATA_HALAZZIEVENT, DONE);
             Talk(SAY_DEATH);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_halazziAI>(creature);
+        return GetZulAmanAI<boss_halazziAI>(creature);
     }
 };
 
@@ -322,27 +322,27 @@ public:
         uint32 FrenzyTimer;
         uint32 shredder_timer;
 
-        void Reset()
+        void Reset() override
         {
             FrenzyTimer = urand(30000, 50000);  //frenzy every 30-50 seconds
             shredder_timer = 4000;
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
                 damage = 0;
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit* /*who*/) {/*DoZoneInCombat();*/ }
+        void EnterCombat(Unit* /*who*/) override {/*DoZoneInCombat();*/ }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -363,12 +363,11 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_halazzi_lynxAI(creature);
+        return GetZulAmanAI<npc_halazzi_lynxAI>(creature);
     }
 };
 

@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
 #include "blood_furnace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum eEnums
 {
@@ -25,7 +25,6 @@ enum eEnums
 class boss_broggok : public CreatureScript
 {
 public:
-
     boss_broggok() : CreatureScript("boss_broggok")
     {
     }
@@ -41,7 +40,7 @@ public:
         EventMap events;
         bool canAttack;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
 
@@ -53,12 +52,12 @@ public:
                 instance->SetData(DATA_BROGGOK, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->setFaction(16);
             summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -66,7 +65,7 @@ public:
             summoned->CastSpell(summoned, SPELL_POISON, false, 0, 0, me->GetGUID());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() || !canAttack)
                 return;
@@ -90,23 +89,22 @@ public:
                     me->CastSpell(me, SPELL_POISON_CLOUD, false);
                     events.RepeatEvent(20000);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (instance)
             {
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR4), true);
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR5), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR4), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR5), true);
                 instance->SetData(DATA_BROGGOK, DONE);
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
@@ -124,12 +122,11 @@ public:
                     break;
             }
         }
-
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_broggokAI(creature);
+        return GetBloodFurnaceAI<boss_broggokAI>(creature);
     }
 };
 
@@ -142,7 +139,7 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
             if (instance->GetData(DATA_BROGGOK) != DONE && instance->GetData(DATA_BROGGOK) != IN_PROGRESS)
-                if (Creature* broggok = ObjectAccessor::GetCreature(*go, instance->GetData64(DATA_BROGGOK)))
+                if (Creature* broggok = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_BROGGOK)))
                 {
                     instance->SetData(DATA_BROGGOK, IN_PROGRESS);
                     broggok->AI()->DoAction(ACTION_PREPARE_BROGGOK);
@@ -163,7 +160,7 @@ public:
     {
         PrepareAuraScript(spell_broggok_poison_cloud_AuraScript);
 
-        bool Validate(SpellInfo const* spellInfo)
+        bool Validate(SpellInfo const* spellInfo) override
         {
             if (!sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell))
                 return false;
@@ -176,16 +173,16 @@ public:
 
             uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
             int32 mod = int32(((float(aurEff->GetTickNumber()) / aurEff->GetTotalTicks()) * 0.9f + 0.1f) * 10000 * 2 / 3);
-            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_RADIUS_MOD, mod, (Unit*)NULL, TRIGGERED_FULL_MASK, NULL, aurEff);
+            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_RADIUS_MOD, mod, (Unit*)nullptr, TRIGGERED_FULL_MASK, nullptr, aurEff);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_broggok_poison_cloud_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_broggok_poison_cloud_AuraScript();
     }

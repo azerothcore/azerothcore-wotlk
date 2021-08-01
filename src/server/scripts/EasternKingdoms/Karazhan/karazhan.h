@@ -1,24 +1,15 @@
 /*
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
-*
-* This program is free software; you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by the
-* Free Software Foundation; either version 2 of the License, or (at your
-* option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-* more details.
-*
-* You should have received a copy of the GNU General Public License along
-* with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ */
 
 #ifndef DEF_KARAZHAN_H
 #define DEF_KARAZHAN_H
 
+#include "CreatureAIImpl.h"
+
+#define KarazhanScriptName "instance_karazhan"
 #define DataHeader "KZ"
 
 uint32 const EncounterCount = 12;
@@ -118,5 +109,11 @@ enum KarazhanSpells
     SPELL_OVERLOAD = 29766,
     SPELL_BLINK = 29884
 };
+
+template <class AI, class T>
+inline AI* GetKarazhanAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, KarazhanScriptName);
+}
 
 #endif

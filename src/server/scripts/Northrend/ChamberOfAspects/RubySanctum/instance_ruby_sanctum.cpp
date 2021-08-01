@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
-#include "ruby_sanctum.h"
 #include "Player.h"
+#include "ruby_sanctum.h"
+#include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "WorldPacket.h"
 
@@ -34,20 +34,9 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-
-            BaltharusTheWarbornGUID  = 0;
-            XerestraszaGUID          = 0;
-            GeneralZarithrianGUID    = 0;
-            memset(ZarithrianSpawnStalkerGUID, 0, 2 * sizeof(uint64));
-
-            HalionGUID               = 0;
-            TwilightHalionGUID       = 0;
-            OrbCarrierGUID           = 0;
-            HalionControllerGUID     = 0;
-            FlameRingGUID            = 0;
         }
 
-        void OnPlayerEnter(Player* /*player*/)
+        void OnPlayerEnter(Player* /*player*/) override
         {
             if (GetBossState(DATA_HALION_INTRO_DONE) != DONE && GetBossState(DATA_GENERAL_ZARITHRIAN) == DONE)
             {
@@ -57,7 +46,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -101,11 +90,10 @@ public:
                     if (Creature* halion = instance->GetCreature(HalionGUID))
                         halion->AI()->JustSummoned(creature);
                     break;
-
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -124,7 +112,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -139,7 +127,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -165,10 +153,10 @@ public:
                     return FlameRingGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -197,7 +185,7 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -208,14 +196,14 @@ public:
             return saveStream.str();
         }
 
-        void FillInitialWorldStates(WorldPacket& data)
+        void FillInitialWorldStates(WorldPacket& data) override
         {
             data << uint32(WORLDSTATE_CORPOREALITY_MATERIAL) << uint32(50);
             data << uint32(WORLDSTATE_CORPOREALITY_TWILIGHT) << uint32(50);
             data << uint32(WORLDSTATE_CORPOREALITY_TOGGLE) << uint32(0);
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -256,19 +244,19 @@ public:
         }
 
     protected:
-        uint64 BaltharusTheWarbornGUID;
-        uint64 XerestraszaGUID;
-        uint64 GeneralZarithrianGUID;
-        uint64 ZarithrianSpawnStalkerGUID[2];
+        ObjectGuid BaltharusTheWarbornGUID;
+        ObjectGuid XerestraszaGUID;
+        ObjectGuid GeneralZarithrianGUID;
+        ObjectGuid ZarithrianSpawnStalkerGUID[2];
 
-        uint64 HalionGUID;
-        uint64 TwilightHalionGUID;
-        uint64 HalionControllerGUID;
-        uint64 OrbCarrierGUID;
-        uint64 FlameRingGUID;
+        ObjectGuid HalionGUID;
+        ObjectGuid TwilightHalionGUID;
+        ObjectGuid HalionControllerGUID;
+        ObjectGuid OrbCarrierGUID;
+        ObjectGuid FlameRingGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_ruby_sanctum_InstanceMapScript(map);
     }
@@ -294,13 +282,13 @@ public:
                 GetCaster()->CastCustomSpell(SPELL_RALLY, SPELLVALUE_AURA_STACK, count, GetCaster(), true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_ruby_sanctum_rallying_shout_SpellScript::CountAllies);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ruby_sanctum_rallying_shout_SpellScript();
     }

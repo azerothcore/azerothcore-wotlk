@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -18,11 +18,10 @@ npc_the_scourge_cauldron
 npc_andorhal_tower
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 /*######
@@ -154,7 +153,7 @@ class npc_the_scourge_cauldron : public CreatureScript
 public:
     npc_the_scourge_cauldron() : CreatureScript("npc_the_scourge_cauldron") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_the_scourge_cauldronAI(creature);
     }
@@ -163,21 +162,21 @@ public:
     {
         npc_the_scourge_cauldronAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
         void DoDie()
         {
             //summoner dies here
-            Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+            Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             //override any database `spawntimesecs` to prevent duplicated summons
             uint32 rTime = me->GetRespawnDelay();
             if (rTime < 600)
                 me->SetRespawnDelay(600);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!who)
                 return;
@@ -239,7 +238,7 @@ class npc_andorhal_tower : public CreatureScript
 public:
     npc_andorhal_tower() : CreatureScript("npc_andorhal_tower") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_andorhal_towerAI(creature);
     }
@@ -251,7 +250,7 @@ public:
             SetCombatMovement(false);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (!who || who->GetTypeId() != TYPEID_PLAYER)
@@ -260,141 +259,6 @@ public:
             if (me->FindNearestGameObject(GO_BEACON_TORCH, 10.0f))
                 if (Player* player = who->ToPlayer())
                     player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-        }
-    };
-};
-
-/*######
-##  npc_anchorite_truuen
-######*/
-
-enum Truuen
-{
-    NPC_GHOST_UTHER             = 17233,
-    NPC_THEL_DANIS              = 1854,
-    NPC_GHOUL                   = 1791,      //ambush
-
-    QUEST_TOMB_LIGHTBRINGER     = 9446,
-
-    SAY_WP_0                    = 0,  //Beware! We are attacked!
-    SAY_WP_1                    = 1,  //It must be the purity of the Mark of the Lightbringer that is drawing forth the Scourge to attack us. We must proceed with caution lest we be overwhelmed!
-    SAY_WP_2                    = 2,  //This land truly needs to be cleansed by the Light! Let us continue on to the tomb. It isn't far now...
-    SAY_WP_3                    = 0,  //Be welcome, friends!
-    SAY_WP_4                    = 0,  //Thank you for coming here in remembrance of me. Your efforts in recovering that symbol, while unnecessary, are certainly touching to an old man's heart.
-    SAY_WP_5                    = 1,  //Please, rise my friend. Keep the Blessing as a symbol of the strength of the Light and how heroes long gone might once again rise in each of us to inspire.
-    SAY_WP_6                    = 2   //Thank you my friend for making this possible. This is a day that I shall never forget! I think I will stay a while. Please return to High Priestess MacDonnell at the camp. I know that she'll be keenly interested to know of what has transpired here.
-};
-
-class npc_anchorite_truuen : public CreatureScript
-{
-public:
-    npc_anchorite_truuen() : CreatureScript("npc_anchorite_truuen") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
-    {
-        npc_escortAI* pEscortAI = CAST_AI(npc_anchorite_truuen::npc_anchorite_truuenAI, creature->AI());
-
-        if (quest->GetQuestId() == QUEST_TOMB_LIGHTBRINGER)
-            pEscortAI->Start(true, true, player->GetGUID());
-        return false;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_anchorite_truuenAI(creature);
-    }
-
-    struct npc_anchorite_truuenAI : public npc_escortAI
-    {
-        npc_anchorite_truuenAI(Creature* creature) : npc_escortAI(creature) { }
-
-        uint32 m_uiChatTimer;
-
-        uint64 UghostGUID;
-        uint64 TheldanisGUID;
-
-        Creature* Ughost;
-        Creature* Theldanis;
-
-        void Reset()
-        {
-            m_uiChatTimer = 7000;
-        }
-
-        void JustSummoned(Creature* summoned)
-        {
-            if (summoned->GetEntry() == NPC_GHOUL)
-                summoned->AI()->AttackStart(me);
-        }
-
-        void WaypointReached(uint32 waypointId)
-        {
-            Player* player = GetPlayerForEscort();
-
-            switch (waypointId)
-            {
-                case 8:
-                    Talk(SAY_WP_0);
-                    me->SummonCreature(NPC_GHOUL, me->GetPositionX() + 7.0f, me->GetPositionY() + 7.0f, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 90000);
-                    me->SummonCreature(NPC_GHOUL, me->GetPositionX() + 5.0f, me->GetPositionY() + 5.0f, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 90000);
-                    break;
-                case 9:
-                    Talk(SAY_WP_1);
-                    break;
-                case 14:
-                    me->SummonCreature(NPC_GHOUL, me->GetPositionX() + 7.0f, me->GetPositionY() + 7.0f, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 90000);
-                    me->SummonCreature(NPC_GHOUL, me->GetPositionX() + 5.0f, me->GetPositionY() + 5.0f, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 90000);
-                    me->SummonCreature(NPC_GHOUL, me->GetPositionX() + 10.0f, me->GetPositionY() + 10.0f, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 90000);
-                    me->SummonCreature(NPC_GHOUL, me->GetPositionX() + 8.0f, me->GetPositionY() + 8.0f, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 90000);
-                    break;
-                case 15:
-                    Talk(SAY_WP_2);
-                    break;
-                case 21:
-                    Theldanis = GetClosestCreatureWithEntry(me, NPC_THEL_DANIS, 150);
-                    if (Theldanis)
-                        Theldanis->AI()->Talk(SAY_WP_3);
-                    break;
-                case 23:
-                    Ughost = me->SummonCreature(NPC_GHOST_UTHER, 971.86f, -1825.42f, 81.99f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    if (Ughost)
-                    {
-                        Ughost->SetDisableGravity(true);
-                        Ughost->AI()->Talk(SAY_WP_4, me);
-                    }
-                    m_uiChatTimer = 4000;
-                    break;
-                case 24:
-                    if (Ughost)
-                        Ughost->AI()->Talk(SAY_WP_5, me);
-                    m_uiChatTimer = 4000;
-                    break;
-                case 25:
-                    if (Ughost)
-                        Ughost->AI()->Talk(SAY_WP_6, me);
-                    m_uiChatTimer = 4000;
-                    break;
-                case 26:
-                    if (player)
-                        player->GroupEventHappens(QUEST_TOMB_LIGHTBRINGER, me);
-                    break;
-            }
-        }
-
-        void EnterCombat(Unit* /*who*/) { }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            if (Player* player = GetPlayerForEscort())
-                player->FailQuest(QUEST_TOMB_LIGHTBRINGER);
-        }
-
-        void UpdateAI(uint32 uiDiff)
-        {
-            npc_escortAI::UpdateAI(uiDiff);
-            DoMeleeAttackIfReady();
-            if (HasEscortState(STATE_ESCORT_ESCORTING))
-                m_uiChatTimer = 6000;
         }
     };
 };
@@ -409,5 +273,4 @@ void AddSC_western_plaguelands()
     new npc_myranda_the_hag();
     new npc_the_scourge_cauldron();
     new npc_andorhal_tower();
-    new npc_anchorite_truuen();
 }

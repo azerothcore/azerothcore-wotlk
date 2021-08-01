@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,15 +17,15 @@ npc_highborne_lamenter
 npc_parqual_fintallas
 EndContentData */
 
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "SpellAuras.h"
 #include "ObjectAccessor.h"
-#include "SpellScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 /*######
 ## npc_lady_sylvanas_windrunner
@@ -106,8 +106,7 @@ public:
         void Reset() override
         {
             LamentEvent = false;
-            targetGUID = 0;
-            playerGUID = 0;
+            playerGUID.Clear();
             _events.Reset();
         }
 
@@ -120,7 +119,7 @@ public:
             _events.ScheduleEvent(EVENT_MULTI_SHOT, 10000);
         }
 
-        void SetGUID(uint64 guid, int32 type) override
+        void SetGUID(ObjectGuid guid, int32 type) override
         {
             if (type == GUID_EVENT_INVOKER)
             {
@@ -223,8 +222,7 @@ public:
     private:
         EventMap _events;
         bool LamentEvent;
-        uint64 targetGUID;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -242,7 +240,7 @@ class npc_highborne_lamenter : public CreatureScript
 public:
     npc_highborne_lamenter() : CreatureScript("npc_highborne_lamenter") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_highborne_lamenterAI(creature);
     }
@@ -480,7 +478,6 @@ enum ThrallMisc
     THRALL_SAY_THRONE_9 = 33,
     THRALL_SAY_THRONE_10 = 34,
     THRALL_SAY_THRONE_11 = 35,
-
 
     // Sounds
     SOUND_THRALL_1 = 16212,
@@ -952,7 +949,7 @@ public:
                     if (Creature* jaina = GetClosestCreatureWithEntry(creature, NPC_JAINA, 50.0f))
                         ai->jainaGUID = jaina->GetGUID();
                     else
-                        ai->jainaGUID = 0;
+                        ai->jainaGUID.Clear();
                     ai->SetDespawnAtEnd(false);
                     ai->SetDespawnAtFar(false);
                 }
@@ -980,9 +977,6 @@ public:
     {
         npc_varian_wrynnAI(Creature* creature) : npc_escortAI(creature)
         {
-            memset(generatorGUID, 0, sizeof(generatorGUID));
-            memset(allianceForcesGUID, 0, sizeof(allianceForcesGUID));
-            memset(hordeForcesGUID, 0, sizeof(hordeForcesGUID));
             allianceGuardsGUID.clear();
         }
 
@@ -994,17 +988,17 @@ public:
 
         uint32 whirlwindTimer;
 
-        uint64 jainaGUID;
-        uint64 putressGUID;
-        uint64 blightWormGUID;
-        uint64 khanokGUID;
-        uint64 thrallGUID;
-        uint64 sylvanasGUID;
+        ObjectGuid jainaGUID;
+        ObjectGuid putressGUID;
+        ObjectGuid blightWormGUID;
+        ObjectGuid khanokGUID;
+        ObjectGuid thrallGUID;
+        ObjectGuid sylvanasGUID;
 
-        uint64 generatorGUID[GENERATOR_MAXCOUNT];
-        uint64 allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
-        uint64 hordeForcesGUID[HORDE_FORCE_MAXCOUNT];
-        std::vector<uint64> allianceGuardsGUID;
+        ObjectGuid generatorGUID[GENERATOR_MAXCOUNT];
+        ObjectGuid allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
+        ObjectGuid hordeForcesGUID[HORDE_FORCE_MAXCOUNT];
+        GuidVector allianceGuardsGUID;
 
         EventMap _events;
 
@@ -1037,7 +1031,7 @@ public:
                 bStepping = false;
                 step = 0;
                 phaseTimer = 0;
-                jainaGUID = 0;
+                jainaGUID.Clear();
                 _events.ScheduleEvent(EVENT_WHIRLWIND, 5 * IN_MILLISECONDS);
                 _events.ScheduleEvent(EVENT_HEROIC_LEAP, 10 * IN_MILLISECONDS);
                 _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2 * IN_MILLISECONDS);
@@ -1047,38 +1041,38 @@ public:
                 if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
                 {
                     putress->DespawnOrUnsummon();
-                    putressGUID = 0;
+                    putressGUID.Clear();
                 }
 
                 if (Creature* blightWorm = ObjectAccessor::GetCreature(*me, blightWormGUID))
                 {
                     blightWorm->DespawnOrUnsummon();
-                    blightWormGUID = 0;
+                    blightWormGUID.Clear();
                 }
 
                 if (Creature* khanok = ObjectAccessor::GetCreature(*me, khanokGUID))
                 {
                     khanok->DespawnOrUnsummon();
-                    khanokGUID = 0;
+                    khanokGUID.Clear();
                 }
 
                 if (Creature* thrall = ObjectAccessor::GetCreature(*me, thrallGUID))
                 {
                     thrall->DespawnOrUnsummon();
-                    thrallGUID = 0;
+                    thrallGUID.Clear();
                 }
 
                 if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasGUID))
                 {
                     sylvanas->DespawnOrUnsummon();
-                    sylvanasGUID = 0;
+                    sylvanasGUID.Clear();
                 }
 
                 for (uint8 i = 0; i < GENERATOR_MAXCOUNT; ++i)
                 {
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, generatorGUID[i]))
                     {
-                        generatorGUID[i] = 0;
+                        generatorGUID[i].Clear();
                         temp->DespawnOrUnsummon();
                     }
                 }
@@ -1087,13 +1081,13 @@ public:
                 {
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, allianceForcesGUID[i]))
                     {
-                        allianceForcesGUID[i] = 0;
+                        allianceForcesGUID[i].Clear();
                         temp->DespawnOrUnsummon();
                     }
                 }
 
-                for (std::vector<uint64>::const_iterator i = allianceGuardsGUID.begin(); i != allianceGuardsGUID.end(); ++i)
-                    if (Creature* temp = ObjectAccessor::GetCreature(*me, *i))
+                for (ObjectGuid const& guid : allianceGuardsGUID)
+                    if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon();
 
                 allianceGuardsGUID.clear();
@@ -1102,22 +1096,22 @@ public:
                 {
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, hordeForcesGUID[i]))
                     {
-                        hordeForcesGUID[i] = 0;
+                        hordeForcesGUID[i].Clear();
                         temp->DespawnOrUnsummon();
                     }
                 }
             }
         }
 
-        void JustSummoned(Creature* summoned) override
+        void JustSummoned(Creature* summonedCreature) override
         {
-            switch (summoned->GetEntry())
+            switch (summonedCreature->GetEntry())
             {
                 case NPC_GENERATOR:
-                    summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
-                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
-                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
+                    summonedCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
+                    summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
+                    summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                     break;
                 default:
                     break;
@@ -2237,9 +2231,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_INGEST))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_INGEST });
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
@@ -2294,7 +2286,7 @@ public:
                             thrall_ai->SetDespawnAtFar(false);
                         }
                         else
-                            thrall_ai->sylvanasfollowGUID = 0;
+                            thrall_ai->sylvanasfollowGUID.Clear();
                     }
                     break;
                 }
@@ -2332,7 +2324,6 @@ public:
     {
         npc_thrall_bfuAI(Creature* creature) : npc_escortAI(creature)
         {
-            memset(allianceForcesGUID, 0, sizeof(allianceForcesGUID));
             hordeGuardsGUID.clear();
         }
 
@@ -2342,14 +2333,14 @@ public:
         uint32 step;
         uint32 phaseTimer;
 
-        uint64 sylvanasfollowGUID;
-        uint64 allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
-        uint64 ValimathrasGUID;
-        uint64 ValimathrasPortalGUID;
-        uint64 WrynnGUID;
-        uint64 JainaGUID;
-        uint64 SaurfangGUID;
-        std::vector<uint64> hordeGuardsGUID;
+        ObjectGuid sylvanasfollowGUID;
+        ObjectGuid allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
+        ObjectGuid ValimathrasGUID;
+        ObjectGuid ValimathrasPortalGUID;
+        ObjectGuid WrynnGUID;
+        ObjectGuid JainaGUID;
+        ObjectGuid SaurfangGUID;
+        GuidVector hordeGuardsGUID;
 
         EventMap _events;
 
@@ -2387,7 +2378,7 @@ public:
                 EnableAttack = false;
                 step = 0;
                 phaseTimer = 0;
-                sylvanasfollowGUID = 0;
+                sylvanasfollowGUID.Clear();
                 _events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, 3 * IN_MILLISECONDS);
                 _events.ScheduleEvent(EVENT_LAVA_BURST, 5 * IN_MILLISECONDS);
                 _events.ScheduleEvent(EVENT_THUNDER, 8 * IN_MILLISECONDS);
@@ -2397,35 +2388,35 @@ public:
                 if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
                 {
                     valimathras->DespawnOrUnsummon();
-                    ValimathrasGUID = 0;
+                    ValimathrasGUID.Clear();
                 }
 
                 if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
                 {
                     valimathrasportal->DespawnOrUnsummon();
-                    ValimathrasPortalGUID = 0;
+                    ValimathrasPortalGUID.Clear();
                 }
 
                 if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
                 {
                     wrynn->DespawnOrUnsummon();
-                    WrynnGUID = 0;
+                    WrynnGUID.Clear();
                 }
 
                 if (Creature* jaina = ObjectAccessor::GetCreature(*me, JainaGUID))
                 {
                     jaina->DespawnOrUnsummon();
-                    JainaGUID = 0;
+                    JainaGUID.Clear();
                 }
 
                 if (Creature* saurfang = ObjectAccessor::GetCreature(*me, SaurfangGUID))
                 {
                     saurfang->DespawnOrUnsummon();
-                    SaurfangGUID = 0;
+                    SaurfangGUID.Clear();
                 }
 
-                for (std::vector<uint64>::const_iterator i = hordeGuardsGUID.begin(); i != hordeGuardsGUID.end(); ++i)
-                    if (Creature* temp = ObjectAccessor::GetCreature(*me, *i))
+                for (ObjectGuid const& guid : hordeGuardsGUID)
+                    if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon();
 
                 hordeGuardsGUID.clear();

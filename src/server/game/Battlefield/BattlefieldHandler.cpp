@@ -1,19 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Battlefield.h"
+#include "BattlefieldMgr.h"
 #include "Common.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 //This send to player windows for invite player to join the war
 //Param1:(BattleId) the BattleId of Bf
@@ -90,7 +89,7 @@ void WorldSession::HandleBfQueueInviteResponse(WorldPacket& recvData)
     uint8 Accepted;
 
     recvData >> BattleId >> Accepted;
-    //sLog->outError("HandleQueueInviteResponse: BattleID:%u Accepted:%u", BattleId, Accepted);
+
     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BattleId);
     if (!Bf)
         return;
@@ -108,7 +107,7 @@ void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
     uint8 Accepted;
 
     recvData >> BattleId >> Accepted;
-    //sLog->outError("HandleBattlefieldInviteResponse: BattleID:%u Accepted:%u", BattleId, Accepted);
+
     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BattleId);
     if (!Bf)
         return;
@@ -130,7 +129,7 @@ void WorldSession::HandleBfExitRequest(WorldPacket& recvData)
     uint32 BattleId;
 
     recvData >> BattleId;
-    //sLog->outError("HandleBfExitRequest: BattleID:%u ", BattleId);
+
     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BattleId);
     if (!Bf)
         return;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,13 +12,13 @@ SDComment: For what is 63990+63991? Same function but don't work correct...
 SDCategory: Dalaran
 Script Data End */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "World.h"
+#include "WorldSession.h"
 
 // Ours
 class npc_steam_powered_auctioneer : public CreatureScript
@@ -30,7 +30,7 @@ public:
     {
         npc_steam_powered_auctioneerAI(Creature* creature) : ScriptedAI(creature) {}
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             if (player->GetTeamId() == TEAM_ALLIANCE)
                 return me->GetEntry() == 35594;
@@ -39,7 +39,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_steam_powered_auctioneerAI(creature);
     }
@@ -54,7 +54,7 @@ public:
     {
         npc_mei_francis_mountAI(Creature* creature) : ScriptedAI(creature) {}
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             if (player->GetTeamId() == TEAM_ALLIANCE)
                 return me->GetEntry() == 32206 || me->GetEntry() == 32335 || me->GetEntry() == 31851;
@@ -63,7 +63,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_mei_francis_mountAI(creature);
     }
@@ -136,7 +136,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _aquanosGUID = 0;
+            _aquanosGUID.Clear();
         }
 
         void SetData(uint32 type, uint32 /*data*/) override
@@ -221,7 +221,7 @@ public:
 
     private:
         EventMap _events;
-        uint64 _aquanosGUID;
+        ObjectGuid _aquanosGUID;
         uint8 _lCount;
         uint32 _lSource;
 
@@ -303,7 +303,7 @@ public:
     {
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_archmage_landalockAI(creature);
     }
@@ -313,7 +313,7 @@ public:
         npc_archmage_landalockAI(Creature* creature) : ScriptedAI(creature)
         {
             _switchImageTimer = MINUTE * IN_MILLISECONDS;
-            _summonGUID = 0;
+            _summonGUID.Clear();
         }
 
         uint32 GetImageEntry(uint32 QuestId)
@@ -347,7 +347,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* image)
+        void JustSummoned(Creature* image) override
         {
             // xinef: screams like a baby
             if (image->GetEntry() != NPC_ANUBREKHAN_IMAGE)
@@ -355,7 +355,7 @@ public:
             _summonGUID = image->GetGUID();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             ScriptedAI::UpdateAI(diff);
 
@@ -372,7 +372,7 @@ public:
                         continue;
 
                     uint32 newEntry = GetImageEntry(questId);
-                    if (GUID_ENPART(_summonGUID) != newEntry)
+                    if (_summonGUID.GetEntry() != newEntry)
                     {
                         if (Creature* image = ObjectAccessor::GetCreature(*me, _summonGUID))
                             image->DespawnOrUnsummon();
@@ -387,7 +387,7 @@ public:
         }
     private:
         uint32 _switchImageTimer;
-        uint64 _summonGUID;
+        ObjectGuid _summonGUID;
     };
 };
 
@@ -429,13 +429,13 @@ public:
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
         }
 
-        void Reset() {}
+        void Reset() override {}
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) override {}
 
-        void AttackStart(Unit* /*who*/) {}
+        void AttackStart(Unit* /*who*/) override {}
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!who || !who->IsInWorld() || who->GetZoneId() != 4395)
                 return;
@@ -482,10 +482,10 @@ public:
             return;
         }
 
-        void UpdateAI(uint32 /*diff*/) {}
+        void UpdateAI(uint32 /*diff*/) override {}
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_mageguard_dalaranAI(creature);
     }
@@ -521,7 +521,7 @@ public:
             me->setActive(true);
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetVisible(false);
             events.ScheduleEvent(EVENT_SELECT_TARGET, IN_MILLISECONDS);
@@ -540,20 +540,19 @@ public:
 
             if (PlayerInDalaranList.empty())
                 return nullptr;
-            return acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
+            return Acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
         }
 
         void SendMailToPlayer(Player* player)
         {
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             int16 deliverDelay = irand(MAIL_DELIVER_DELAY_MIN, MAIL_DELIVER_DELAY_MAX);
             MailDraft(MAIL_MINIGOB_ENTRY, true).SendMailTo(trans, MailReceiver(player), MailSender(MAIL_CREATURE, me->GetEntry()), MAIL_CHECK_MASK_NONE, deliverDelay);
             CharacterDatabase.CommitTransaction(trans);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
-
             if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
                 return;
 
@@ -600,7 +599,7 @@ public:
         EventMap events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_minigob_manabonkAI(creature);
     }
@@ -611,7 +610,7 @@ class npc_dalaran_mage : public CreatureScript
 public:
     npc_dalaran_mage() : CreatureScript("npc_dalaran_mage") {}
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dalaran_mageAI(creature);
     }
@@ -620,7 +619,6 @@ public:
     {
         npc_dalaran_mageAI(Creature* creature) : ScriptedAI(creature)
         {
-
         }
 
         uint32 CoC_Timer;
@@ -640,18 +638,18 @@ public:
             restoremana_timer = 10000;
         }
 
-        void Reset()
+        void Reset() override
         {
             Initialize();
             me->AddAura(1908, me);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
-        void UpdateAI(uint32 diff)
-        {
 
+        void UpdateAI(uint32 diff) override
+        {
             if (!UpdateVictim())
                 return;
 
@@ -711,13 +709,12 @@ public:
     };
 };
 
-
 class npc_dalaran_warrior : public CreatureScript
 {
 public:
     npc_dalaran_warrior() : CreatureScript("npc_dalaran_warrior") {}
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dalaran_warriorAI(creature);
     }
@@ -742,19 +739,18 @@ public:
             disarm_timer = 50000;
         }
 
-        void Reset()
+        void Reset() override
         {
             Initialize();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->AddAura(1908, me);
             Battleshout_timer = 1000;
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
-
             if (!UpdateVictim())
                 return;
 

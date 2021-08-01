@@ -5,18 +5,19 @@
 #ifndef ICECROWN_CITADEL_H_
 #define ICECROWN_CITADEL_H_
 
-#include "Player.h"
 #include "Chat.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
-#include "Map.h"
 #include "Creature.h"
-#include "SpellMgr.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 #include "InstanceScript.h"
-#include "ScriptedGossip.h"
+#include "Map.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
 
 #define ICCScriptName "instance_icecrown_citadel"
 
@@ -579,11 +580,9 @@ public:
     public:
         spell_trigger_spell_from_caster_SpellScript(uint32 triggerId) : SpellScript(), _triggerId(triggerId) { }
 
-        bool Validate(SpellInfo const* /*spell*/)
+        bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(_triggerId))
-                return false;
-            return true;
+            return ValidateSpellInfo({ _triggerId });
         }
 
         void HandleTrigger()
@@ -591,7 +590,7 @@ public:
             GetCaster()->CastSpell(GetHitUnit(), _triggerId, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_trigger_spell_from_caster_SpellScript::HandleTrigger);
         }
@@ -599,7 +598,7 @@ public:
         uint32 _triggerId;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_trigger_spell_from_caster_SpellScript(_triggerId);
     }
@@ -608,14 +607,10 @@ private:
     uint32 _triggerId;
 };
 
-template<class AI>
-CreatureAI* GetIcecrownCitadelAI(Creature* creature)
+template <class AI, class T>
+inline AI* GetIcecrownCitadelAI(T* obj)
 {
-    if (InstanceMap* instance = creature->GetMap()->ToInstanceMap())
-        if (instance->GetInstanceScript())
-            if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
-                return new AI(creature);
-    return nullptr;
+    return GetInstanceAI<AI>(obj, ICCScriptName);
 }
 
 #endif // ICECROWN_CITADEL_H_

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "magtheridons_lair.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum Yells
@@ -69,9 +69,9 @@ enum Events
 class DealDebrisDamage : public BasicEvent
 {
 public:
-    DealDebrisDamage(Creature& creature, uint64 targetGUID) : _owner(creature), _targetGUID(targetGUID) { }
+    DealDebrisDamage(Creature& creature, ObjectGuid targetGUID) : _owner(creature), _targetGUID(targetGUID) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         if (Unit* target = ObjectAccessor::GetUnit(_owner, _targetGUID))
             target->CastSpell(target, SPELL_DEBRIS_DAMAGE, true, nullptr, nullptr, _owner.GetGUID());
@@ -80,13 +80,12 @@ public:
 
 private:
     Creature& _owner;
-    uint64 _targetGUID;
+    ObjectGuid _targetGUID;
 };
 
 class boss_magtheridon : public CreatureScript
 {
 public:
-
     boss_magtheridon() : CreatureScript("boss_magtheridon") { }
 
     struct boss_magtheridonAI : public BossAI
@@ -95,8 +94,7 @@ public:
 
         EventMap events2;
 
-
-        void Reset()
+        void Reset() override
         {
             events2.Reset();
             events2.ScheduleEvent(EVENT_RANDOM_TAUNT, 90000);
@@ -106,7 +104,7 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
             {
@@ -115,15 +113,15 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events2.Reset();
             _EnterCombat();
@@ -131,10 +129,9 @@ public:
             events.ScheduleEvent(EVENT_EMOTE2, 60000);
             events.ScheduleEvent(EVENT_EMOTE3, 120000);
             events.ScheduleEvent(EVENT_ENTER_COMBAT, 123000);
-
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -153,7 +150,6 @@ public:
                     events2.ScheduleEvent(EVENT_CHECK_GRASP, 0);
                     break;
             }
-
 
             if (!UpdateVictim() || !CheckInRoom())
                 return;
@@ -248,9 +244,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_magtheridonAI>(creature);
+        return GetMagtheridonsLairAI<boss_magtheridonAI>(creature);
     }
 };
 
@@ -269,13 +265,13 @@ public:
                 target->CastSpell(target, SPELL_BLAZE_SUMMON, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_magtheridon_blaze_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_magtheridon_blaze_SpellScript();
     }
@@ -292,7 +288,7 @@ public:
 
         void HandleDummyApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetUnitOwner()->CastSpell((Unit*)NULL, SPELL_SHADOW_GRASP_VISUAL, false);
+            GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_SHADOW_GRASP_VISUAL, false);
         }
 
         void HandleDummyRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -305,7 +301,7 @@ public:
             GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_MIND_EXHAUSTION, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_magtheridon_shadow_grasp_AuraScript::HandleDummyApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_magtheridon_shadow_grasp_AuraScript::HandleDummyRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -313,7 +309,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_magtheridon_shadow_grasp_AuraScript();
     }
@@ -325,4 +321,3 @@ void AddSC_boss_magtheridon()
     new spell_magtheridon_blaze();
     new spell_magtheridon_shadow_grasp();
 }
-

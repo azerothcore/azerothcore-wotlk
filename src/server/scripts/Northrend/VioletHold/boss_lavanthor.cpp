@@ -2,8 +2,8 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "violet_hold.h"
 
 enum eSpells
@@ -34,9 +34,9 @@ class boss_lavanthor : public CreatureScript
 public:
     boss_lavanthor() : CreatureScript("boss_lavanthor") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_lavanthorAI (pCreature);
+        return GetVioletHoldAI<boss_lavanthorAI>(pCreature);
     }
 
     struct boss_lavanthorAI : public ScriptedAI
@@ -49,12 +49,12 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
             events.Reset();
@@ -65,7 +65,7 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_CAUTERIZING_FLAMES, 3000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -92,7 +92,7 @@ public:
                     events.RepeatEvent(urand(14000, 20000));
                     break;
                 case EVENT_SPELL_CAUTERIZING_FLAMES:
-                    me->CastSpell((Unit*)NULL, SPELL_FLAME_BREATH, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FLAME_BREATH, false);
                     events.RepeatEvent(urand(10000, 16000));
                     break;
             }
@@ -100,15 +100,15 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);

@@ -5,6 +5,10 @@
 #ifndef DEF_SCHOLOMANCE_H
 #define DEF_SCHOLOMANCE_H
 
+#include "CreatureAIImpl.h"
+
+#define ScholomanceScriptName "instance_scholomance"
+
 enum DataTypes
 {
     DATA_KIRTONOS_THE_HERALD            = 0,
@@ -57,5 +61,11 @@ enum SpellIds
     SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT        = 17946,
     SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN      = 17948
 };
+
+template <class AI, class T>
+inline AI* GetScholomanceAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, ScholomanceScriptName);
+}
 
 #endif

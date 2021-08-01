@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,10 +7,9 @@
 #ifndef _VMAPTOOLS_H
 #define _VMAPTOOLS_H
 
-#include <G3D/CollisionDetection.h>
+#include "Define.h"
 #include <G3D/AABox.h>
-
-#include "NodeValueAccess.h"
+#include <G3D/CollisionDetection.h>
 
 /**
 The Class is mainly taken from G3D/AABSPTree.h but modified to be able to use our internal data structure.
@@ -40,9 +39,7 @@ namespace VMAP
 
     class MyCollisionDetection
     {
-    private:
     public:
-
         static bool collisionLocationForMovingPointFixedAABox(
             const G3D::Vector3&     origin,
             const G3D::Vector3&     dir,
@@ -50,7 +47,6 @@ namespace VMAP
             G3D::Vector3&           location,
             bool&                   Inside)
         {
-
             // Integer representation of a floating-point value.
 #define IR(x)   (reinterpret_cast<G3D::uint32 const&>(x))
 

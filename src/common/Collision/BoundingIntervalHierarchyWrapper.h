@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,11 +7,10 @@
 #ifndef _BIH_WRAP
 #define _BIH_WRAP
 
-#include "G3D/Table.h"
+#include "BoundingIntervalHierarchy.h"
 #include "G3D/Array.h"
 #include "G3D/Set.h"
-#include "BoundingIntervalHierarchy.h"
-
+#include "G3D/Table.h"
 
 template<class T, class BoundsFunc = BoundsTrait<T>>
 class BIHWrap
@@ -29,9 +28,13 @@ class BIHWrap
         bool operator() (const G3D::Ray& ray, uint32 idx, float& maxDist, bool stopAtFirstHit)
         {
             if (idx >= objects_size)
+            {
                 return false;
+            }
             if (const T* obj = objects[idx])
+            {
                 return _callback(ray, *obj, maxDist, stopAtFirstHit);
+            }
             return false;
         }
 
@@ -39,9 +42,13 @@ class BIHWrap
         void operator() (const G3D::Vector3& p, uint32 idx)
         {
             if (idx >= objects_size)
+            {
                 return;
+            }
             if (const T* obj = objects[idx])
+            {
                 _callback(p, *obj);
+            }
         }
     };
 
@@ -68,15 +75,21 @@ public:
         uint32 Idx = 0;
         const T* temp;
         if (m_obj2Idx.getRemove(&obj, temp, Idx))
-            m_objects[Idx] = NULL;
+        {
+            m_objects[Idx] = nullptr;
+        }
         else
+        {
             m_objects_to_push.remove(&obj);
+        }
     }
 
     void balance()
     {
         if (unbalanced_times == 0)
+        {
             return;
+        }
 
         unbalanced_times = 0;
         m_objects.fastClear();
@@ -84,7 +97,7 @@ public:
         m_objects_to_push.getMembers(m_objects);
         //assert that m_obj2Idx has all the keys
 
-        m_tree.build(m_objects, BoundsFunc::getBounds2);
+        m_tree.build(m_objects, BoundsFunc::GetBounds2);
     }
 
     template<typename RayCallback>

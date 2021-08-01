@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,8 +9,8 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_hun_".
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum HunterSpells
 {
@@ -19,11 +19,6 @@ enum HunterSpells
     SPELL_HUNTER_MIND_NUMBING_POISON    = 25810, // Viper
     SPELL_HUNTER_GLYPH_OF_SNAKE_TRAP    = 56849,
     SPELL_HUNTER_PET_SCALING            = 62915
-};
-
-enum HunterCreatures
-{
-    NPC_HUNTER_VIPER                    = 19921
 };
 
 class npc_pet_hunter_snake_trap : public CreatureScript
@@ -35,7 +30,7 @@ public:
     {
         npc_pet_hunter_snake_trapAI(Creature* creature) : ScriptedAI(creature) { _init = false; }
 
-        void Reset()
+        void Reset() override
         {
             _spellTimer = urand(1500, 3000);
 
@@ -48,7 +43,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             // _EnterEvadeMode();
             me->DeleteThreatList();
@@ -65,7 +60,7 @@ public:
         }
 
         //Redefined for random target selection:
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!me->GetVictim() && who->isTargetableForAttack() && (me->IsHostileTo(who)) && who->isInAccessiblePlaceFor(me))
             {
@@ -80,7 +75,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -96,6 +91,7 @@ public:
                 _init = true;
 
                 CreatureTemplate const* Info = me->GetCreatureTemplate();
+                CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(me->getLevel(), Info->unit_class);
                 uint32 health = uint32(107 * (me->getLevel() - 40) * 0.025f);
                 me->SetCreateHealth(health);
 
@@ -110,7 +106,7 @@ public:
                 //Add delta to make them not all hit the same time
                 uint32 delta = urand(0, 700);
                 me->SetAttackTime(BASE_ATTACK, Info->BaseAttackTime + delta);
-                me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, float(Info->attackpower));
+                me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, float(stats->AttackPower));
                 me->CastSpell(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
 
                 // Glyph of Snake Trap
@@ -136,7 +132,7 @@ public:
         uint32 _spellTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_hunter_snake_trapAI(creature);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -64,18 +64,22 @@ void EventProcessor::KillAllEvents(bool force)
             delete i_old->second;
 
             if (!force)                                      // need per-element cleanup
+            {
                 m_events.erase (i_old);
+            }
         }
     }
 
     // fast clear event list (in force case)
     if (force)
+    {
         m_events.clear();
+    }
 }
 
 void EventProcessor::AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime)
 {
-    if (set_addtime) Event->m_addTime = m_time;
+    if (set_addtime) { Event->m_addTime = m_time; }
     Event->m_execTime = e_time;
     m_events.insert(std::pair<uint64, BasicEvent*>(e_time, Event));
 }

@@ -1,16 +1,16 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ruins_of_ahnqiraj.h"
+#include "Opcodes.h"
 #include "Player.h"
+#include "ruins_of_ahnqiraj.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "WorldPacket.h"
-#include "Opcodes.h"
 
 enum Texts
 {
@@ -80,20 +80,20 @@ public:
             SaidIntro = false;
         }
 
-        uint64 TriggerGUID;
-        uint64 CrystalGUID;
+        ObjectGuid TriggerGUID;
+        ObjectGuid CrystalGUID;
         uint8 CrystalIterator;
         bool SaidIntro;
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             CrystalIterator = 0;
-            TriggerGUID = 0;
-            CrystalGUID = 0;
+            TriggerGUID.Clear();
+            CrystalGUID.Clear();
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             for (uint8 i = 0; i < NUM_WEAKNESS; ++i)
             {
@@ -106,7 +106,7 @@ public:
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_TRIGGER_WEAKNESS)
                 if (Creature* Trigger = me->GetMap()->GetCreature(TriggerGUID))
@@ -114,7 +114,7 @@ public:
                         Trigger->CastSpell(Trigger, SpellWeakness[urand(0, 4)], false);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.Reset();
@@ -144,19 +144,19 @@ public:
             SpawnNextCrystal();
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             Cleanup();
             summons.DespawnAll();
             BossAI::EnterEvadeMode();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Cleanup();
             _JustDied();
@@ -184,12 +184,12 @@ public:
                 {
                     CrystalGUID = Crystal->GetGUID();
                     ++CrystalIterator;
-                    Crystal->SetOwnerGUID(0);
+                    Crystal->SetOwnerGUID(ObjectGuid::Empty);
                 }
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (!SaidIntro)
@@ -200,7 +200,7 @@ public:
             BossAI::MoveInLineOfSight(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -258,9 +258,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ossirianAI>(creature);
+        return GetRuinsOfAhnQirajAI<boss_ossirianAI>(creature);
     }
 };
 

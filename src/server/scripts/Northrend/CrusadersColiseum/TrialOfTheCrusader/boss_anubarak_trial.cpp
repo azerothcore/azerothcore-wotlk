@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum AnubTexts
 {
@@ -58,7 +58,7 @@ class HideNpcEvent : public BasicEvent
 public:
     HideNpcEvent(Creature& owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         _owner.SetVisible(false);
         return true;
@@ -135,9 +135,9 @@ class boss_anubarak_trial : public CreatureScript
 public:
     boss_anubarak_trial() : CreatureScript("boss_anubarak_trial") {}
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_anubarak_trialAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_anubarak_trialAI>(pCreature);
     };
 
     struct boss_anubarak_trialAI : public ScriptedAI
@@ -157,10 +157,10 @@ public:
         EventMap events;
         bool bIntro;
         bool bPhase3;
-        uint64 SphereGUID[6];
-        uint64 BurrowGUID[4];
+        ObjectGuid SphereGUID[6];
+        ObjectGuid BurrowGUID[4];
 
-        void Reset()
+        void Reset() override
         {
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -178,7 +178,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch( param )
             {
@@ -188,7 +188,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();
@@ -200,9 +200,9 @@ public:
             if( !IsHeroic() )
                 events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4000);
 
-            for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+            for (ObjectGuid const& guid : summons)
                 if (pInstance)
-                    if(Creature* c = pInstance->instance->GetCreature(*itr) )
+                    if (Creature* c = pInstance->instance->GetCreature(guid))
                     {
                         c->GetMotionMaster()->MoveIdle();
                         c->StopMoving();
@@ -223,12 +223,12 @@ public:
                 pInstance->SetData(TYPE_ANUBARAK, IN_PROGRESS);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -246,7 +246,7 @@ public:
                 events.CancelEvent(EVENT_EMERGE_2);
                 if( !IsHeroic() )
                     events.CancelEvent(EVENT_SUMMON_NERUBIAN);
-                me->CastSpell((Unit*)NULL, SPELL_LEECHING_SWARM, false);
+                me->CastSpell((Unit*)nullptr, SPELL_LEECHING_SWARM, false);
                 Talk(EMOTE_LEECHING_SWARM);
                 Talk(SAY_LEECHING_SWARM);
                 return;
@@ -353,7 +353,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if( !summon )
                 return;
@@ -361,7 +361,7 @@ public:
             summons.Summon(summon);
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             events.Reset();
             summons.DespawnAll();
@@ -387,13 +387,13 @@ public:
                     }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
                 Talk(SAY_KILL_PLAYER);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -402,7 +402,7 @@ public:
                 pInstance->SetData(TYPE_FAILED, 1);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER || me->GetExactDistSq(who) > 6400.0f) // 80yd*80yd
                 return;
@@ -420,7 +420,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE;
         }
@@ -432,9 +432,9 @@ class npc_swarm_scarab : public CreatureScript
 public:
     npc_swarm_scarab() : CreatureScript("npc_swarm_scarab") {}
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_swarm_scarabAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_swarm_scarabAI>(pCreature);
     };
 
     struct npc_swarm_scarabAI : public ScriptedAI
@@ -444,13 +444,13 @@ public:
         int32 determinationTimer;
         int32 despawnTimer;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == 1 )
                 despawnTimer = 2000;
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetCorpseDelay(10 * 60);
             me->CastSpell(me, SPELL_ACID_MANDIBLE, true);
@@ -469,12 +469,12 @@ public:
                 }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( despawnTimer )
             {
@@ -503,13 +503,13 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             me->CastSpell(me, RAID_MODE(SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25, SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25), true);
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
@@ -521,9 +521,9 @@ class npc_frost_sphere : public CreatureScript
 public:
     npc_frost_sphere() : CreatureScript("npc_frost_sphere") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_frost_sphereAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_frost_sphereAI>(pCreature);
     };
 
     struct npc_frost_sphereAI : public NullCreatureAI
@@ -558,7 +558,7 @@ public:
 
         uint32 permafrostTimer;
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if( me->GetHealth() <= damage )
             {
@@ -573,7 +573,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if( spell->Id == SPELL_SPIKE_FAIL )
             {
@@ -582,7 +582,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( permafrostTimer )
             {
@@ -610,9 +610,9 @@ class npc_nerubian_burrower : public CreatureScript
 public:
     npc_nerubian_burrower() : CreatureScript("npc_nerubian_burrower") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_nerubian_burrowerAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_nerubian_burrowerAI>(pCreature);
     };
 
     struct npc_nerubian_burrowerAI : public ScriptedAI
@@ -621,14 +621,14 @@ public:
         {
             // I am summoned by another npc (SPELL_EFFECT_FORCE_CAST), inform Anub'arak
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (uint64 guid = pInstance->GetData64(TYPE_ANUBARAK))
+                if (ObjectGuid guid = pInstance->GetGuidData(TYPE_ANUBARAK))
                     if (Creature* anub = pInstance->instance->GetCreature(guid))
                         CAST_AI(boss_anubarak_trial::boss_anubarak_trialAI, anub->AI())->JustSummoned(me);
         }
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             me->SetCorpseDelay(10 * 60);
             me->CastSpell(me, SPELL_EXPOSE_WEAKNESS, true);
@@ -644,7 +644,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if( !target || !spell )
                 return;
@@ -663,7 +663,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -691,7 +691,7 @@ public:
                         me->CastSpell(me, SPELL_EXPOSE_WEAKNESS, true);
                         me->CastSpell(me, SPELL_SPIDER_FRENZY, true);
                         me->CastSpell(me, SPELL_SUBMERGE, false);
-                        
+
                         events.DelayEvents(15000);
                         events.RescheduleEvent(EVENT_EMERGE, 10000);
                     }
@@ -704,7 +704,7 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_EMERGE, false);
                     me->RemoveAura(SPELL_SUBMERGE);
-                    
+
                     events.RescheduleEvent(EVENT_SUBMERGE, 30000);
                     break;
             }
@@ -712,12 +712,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE;
         }
@@ -729,9 +729,9 @@ class npc_anubarak_spike : public CreatureScript
 public:
     npc_anubarak_spike() : CreatureScript("npc_anubarak_spike") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_anubarak_spikeAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_anubarak_spikeAI>(pCreature);
     };
 
     struct npc_anubarak_spikeAI : public ScriptedAI
@@ -743,15 +743,15 @@ public:
         }
 
         EventMap events;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == -1 )
             {
                 if( Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
                     target->RemoveAura(SPELL_MARK);
-                TargetGUID = 0;
+                TargetGUID.Clear();
                 me->RemoveAllAuras();
                 me->GetMotionMaster()->MoveIdle();
                 events.Reset();
@@ -764,7 +764,7 @@ public:
             if (TargetGUID)
                 if( Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
                     target->RemoveAura(SPELL_MARK);
-            TargetGUID = 0;
+            TargetGUID.Clear();
             if (!next)
             {
                 events.Reset();
@@ -788,12 +788,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             SelectNewTarget(false);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( TargetGUID )
             {
@@ -813,12 +813,12 @@ public:
                     break;
                 case 1:
                     me->CastSpell(me, SPELL_SPIKE_SPEED2, true);
-                    
+
                     events.RescheduleEvent(2, 7000);
                     break;
                 case 2:
                     me->CastSpell(me, SPELL_SPIKE_SPEED3, true);
-                    
+
                     break;
                 case 3:
                     Reset();
@@ -826,7 +826,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
@@ -855,17 +855,17 @@ public:
                     Remove();
                     return;
                 }
-                target->CastSpell((Unit*)NULL, SPELL_IMPALE, true);
+                target->CastSpell((Unit*)nullptr, SPELL_IMPALE, true);
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_pursuing_spikesAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pursuing_spikesAuraScript();
     }
@@ -887,13 +887,9 @@ public:
     {
         PrepareAuraScript(spell_gen_leeching_swarm_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellEntry*/)
+        bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_DMG))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
         }
 
         void HandleEffectPeriodic(AuraEffect const* aurEff)
@@ -909,13 +905,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_leeching_swarm_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_gen_leeching_swarm_AuraScript();
     }
@@ -940,14 +936,13 @@ public:
                 }
         }
 
-
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_gen_leeching_swarm_dmg_SpellScript::HandleAfterHit);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gen_leeching_swarm_dmg_SpellScript();
     }

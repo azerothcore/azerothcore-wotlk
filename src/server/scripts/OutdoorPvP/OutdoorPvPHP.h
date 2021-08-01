@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -31,9 +31,9 @@ enum OutdoorPvPHPTowerType
 
 const uint32 HP_CREDITMARKER[HP_TOWER_NUM] = {19032, 19028, 19029};
 
-const uint32 HP_CapturePointEvent_Enter[HP_TOWER_NUM] = {11404, 11396, 11388};
+//const uint32 HP_CapturePointEvent_Enter[HP_TOWER_NUM] = {11404, 11396, 11388};
 
-const uint32 HP_CapturePointEvent_Leave[HP_TOWER_NUM] = {11403, 11395, 11387};
+//const uint32 HP_CapturePointEvent_Leave[HP_TOWER_NUM] = {11403, 11395, 11387};
 
 enum OutdoorPvPHPWorldStates
 {
@@ -77,42 +77,39 @@ const go_type HPTowerFlags[HP_TOWER_NUM] =
 class OPvPCapturePointHP : public OPvPCapturePoint
 {
 public:
-
     OPvPCapturePointHP(OutdoorPvP* pvp, OutdoorPvPHPTowerType type);
 
-    void ChangeState();
+    void ChangeState() override;
 
-    void SendChangePhase();
+    void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
     // used when player is activated/inactivated in the area
-    bool HandlePlayerEnter(Player* player);
-    void HandlePlayerLeave(Player* player);
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
 private:
-
     OutdoorPvPHPTowerType m_TowerType;
 };
 
 class OutdoorPvPHP : public OutdoorPvP
 {
 public:
-
     OutdoorPvPHP();
 
-    bool SetupOutdoorPvP();
+    bool SetupOutdoorPvP() override;
 
-    void HandlePlayerEnterZone(Player* player, uint32 zone);
-    void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
+    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
 
-    bool Update(uint32 diff);
+    bool Update(uint32 diff) override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-    void SendRemoveWorldStates(Player* player);
+    void SendRemoveWorldStates(Player* player) override;
 
-    void HandleKillImpl(Player* player, Unit* killed);
+    void HandleKillImpl(Player* player, Unit* killed) override;
 
     uint32 GetAllianceTowersControlled() const;
     void SetAllianceTowersControlled(uint32 count);
@@ -121,7 +118,6 @@ public:
     void SetHordeTowersControlled(uint32 count);
 
 private:
-
     // how many towers are controlled
     uint32 m_AllianceTowersControlled;
     uint32 m_HordeTowersControlled;

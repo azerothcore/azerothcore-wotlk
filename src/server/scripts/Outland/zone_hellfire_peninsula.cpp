@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -18,13 +18,13 @@ npc_wounded_blood_elf
 npc_fel_guard_hound
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "WorldSession.h"
 
 // Ours
 
@@ -50,18 +50,17 @@ public:
                 GetCaster()->CastSpell(target, 39322 /*SPELL_HEAL_BARADA*/, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_q10935_the_exorcism_of_colonel_jules_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q10935_the_exorcism_of_colonel_jules_SpellScript();
     }
 };
-
 
 // Theirs
 /*######
@@ -87,7 +86,7 @@ public:
     {
         npc_aeranasAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             faction_Timer = 8000;
             envelopingWinds_Timer = 9000;
@@ -99,7 +98,7 @@ public:
             Talk(SAY_SUMMON);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (faction_Timer)
             {
@@ -148,7 +147,7 @@ public:
         uint32 shock_Timer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_aeranasAI(creature);
     }
@@ -180,14 +179,14 @@ public:
                 Start(false, true, creature->GetOwner()->GetGUID());
         }
 
-        void Reset()
+        void Reset() override
         {
             ryga = nullptr;
             me->CastSpell(me, SPELL_ANCESTRAL_WOLF_BUFF, false);
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (!ryga && who->GetEntry() == NPC_RYGA && me->IsWithinDistInMap(who, 15.0f))
@@ -197,7 +196,7 @@ public:
             npc_escortAI::MoveInLineOfSight(who);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             me->CastSpell(me, SPELL_ANCESTRAL_WOLF_BUFF, false);
             switch (waypointId)
@@ -219,7 +218,7 @@ public:
         Creature* ryga;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ancestral_wolfAI(creature);
     }
@@ -252,20 +251,20 @@ public:
     {
         npc_wounded_blood_elfAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
                 Talk(SAY_ELF_AGGRO);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->AI()->AttackStart(me);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        void sQuestAccept(Player* player, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_ROAD_TO_FALCON_WATCH)
             {
@@ -274,7 +273,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -309,7 +308,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_wounded_blood_elfAI(creature);
     }
@@ -334,13 +333,13 @@ public:
     {
         npc_fel_guard_houndAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             checkTimer = 5000; //check for creature every 5 sec
-            helboarGUID = 0;
+            helboarGUID.Clear();
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE || id != 1)
                 return;
@@ -355,7 +354,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (checkTimer <= diff)
             {
@@ -379,10 +378,10 @@ public:
 
     private:
         uint32 checkTimer;
-        uint64 helboarGUID;
+        ObjectGuid helboarGUID;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_fel_guard_houndAI(creature);
     }

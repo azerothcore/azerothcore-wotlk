@@ -53,7 +53,6 @@ void WDT::ReadTileTable()
 
             if (flags & hasTileFlag)
                 TileTable.push_back(TilePos(x, y));
-
         }
     }
 }

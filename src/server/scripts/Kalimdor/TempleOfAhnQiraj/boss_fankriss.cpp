@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,9 @@ SDComment: sound not implemented
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "temple_of_ahnqiraj.h"
 
 #define SOUND_SENTENCE_YOU 8588
 #define SOUND_SERVE_TO     8589
@@ -34,9 +35,9 @@ class boss_fankriss : public CreatureScript
 public:
     boss_fankriss() : CreatureScript("boss_fankriss") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_fankrissAI(creature);
+        return GetTempleOfAhnQirajAI<boss_fankrissAI>(creature);
     }
 
     struct boss_fankrissAI : public ScriptedAI
@@ -53,7 +54,7 @@ public:
         Creature* Hatchling;
         Creature* Spawn;
 
-        void Reset()
+        void Reset() override
         {
             MortalWound_Timer = urand(10000, 15000);
             SpawnHatchlings_Timer = urand(6000, 12000);
@@ -92,11 +93,11 @@ public:
                 Spawn->AI()->AttackStart(victim);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -202,7 +203,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_fankriss()

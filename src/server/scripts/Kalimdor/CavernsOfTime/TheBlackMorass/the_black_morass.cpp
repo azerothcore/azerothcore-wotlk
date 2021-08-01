@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "the_black_morass.h"
-#include "MoveSplineInit.h"
 
 enum medivhSays
 {
@@ -63,7 +63,7 @@ class NpcRunToHome : public BasicEvent
 public:
     NpcRunToHome(Creature& owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         _owner.GetMotionMaster()->MoveTargetedHome();
         return true;
@@ -78,9 +78,9 @@ class npc_medivh_bm : public CreatureScript
 public:
     npc_medivh_bm() : CreatureScript("npc_medivh_bm") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_medivh_bmAI(creature);
+        return GetTheBlackMorassAI<npc_medivh_bmAI>(creature);
     }
 
     struct npc_medivh_bmAI : public ScriptedAI
@@ -108,7 +108,7 @@ public:
         Movement::PointsArray groundArray;
         Movement::PointsArray airArray;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->CastSpell(me, SPELL_MANA_SHIELD, true);
@@ -117,10 +117,10 @@ public:
                 me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (instance)
-                instance->SetData64(DATA_SUMMONED_NPC, summon->GetGUID());
+                instance->SetGuidData(DATA_SUMMONED_NPC, summon->GetGUID());
 
             if (summon->GetEntry() == NPC_DP_CRYSTAL_STALKER)
             {
@@ -138,13 +138,13 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             if (instance)
-                instance->SetData64(DATA_DELETED_NPC, summon->GetGUID());
+                instance->SetGuidData(DATA_DELETED_NPC, summon->GetGUID());
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!events.Empty() || (instance && instance->GetData(TYPE_AEONUS) == DONE))
                 return;
@@ -167,9 +167,9 @@ public:
             }
         }
 
-        void AttackStart(Unit* ) { }
+        void AttackStart(Unit* ) override { }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_OUTRO)
             {
@@ -181,14 +181,14 @@ public:
             }
         }
 
-        void JustDied(Unit* )
+        void JustDied(Unit* ) override
         {
             me->SetRespawnTime(DAY);
             events.Reset();
             Talk(SAY_DEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (uint32 eventId = events.ExecuteEvent())
@@ -246,9 +246,6 @@ public:
                         cr->AI()->Talk(SAY_ORCS_ANSWER);
                     }
                     break;
-
-
-
             }
         }
 
@@ -258,7 +255,7 @@ public:
             {
                 if (Creature* cr = me->SummonCreature(NPC_SHADOW_COUNCIL_ENFORCER, -2091.731f, 7133.083f - 3.0f * i, 34.589f, 0.0f))
                 {
-                    cr->GetMotionMaster()->MovePoint(0, (first && i == 3) ? x + 2.0f : x, cr->GetPositionY() + y, cr->GetMap()->GetHeight(x, cr->GetPositionY() + y, MAX_HEIGHT, true));
+                    cr->GetMotionMaster()->MovePoint(0, (first && i == 3) ? x + 2.0f : x, cr->GetPositionY() + y, cr->GetMapHeight(x, cr->GetPositionY() + y, cr->GetPositionZ(), true));
                     cr->m_Events.AddEvent(new NpcRunToHome(*cr), cr->m_Events.CalculateTime(homeTime + urand(0, 2000)));
                     cr->DespawnOrUnsummon(duration + urand(0, 2000));
                 }
@@ -266,7 +263,6 @@ public:
         }
     };
 };
-
 
 enum timeRift
 {
@@ -279,9 +275,9 @@ class npc_time_rift : public CreatureScript
 public:
     npc_time_rift() : CreatureScript("npc_time_rift") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_time_riftAI(creature);
+        return GetTheBlackMorassAI<npc_time_riftAI>(creature);
     }
 
     struct npc_time_riftAI : public NullCreatureAI
@@ -289,14 +285,13 @@ public:
         npc_time_riftAI(Creature* creature) : NullCreatureAI(creature)
         {
             instance = creature->GetInstanceScript();
-            riftKeeperGUID = 0;
         }
 
         EventMap events;
         InstanceScript* instance;
-        uint64 riftKeeperGUID;
+        ObjectGuid riftKeeperGUID;
 
-        void Reset()
+        void Reset() override
         {
             if (instance && instance->GetData(DATA_RIFT_NUMBER) >= 18)
             {
@@ -308,7 +303,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(ObjectGuid guid, int32) override
         {
             riftKeeperGUID = guid;
         }
@@ -321,7 +316,7 @@ public:
             if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 150000))
                 if (instance)
                 {
-                    if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_MEDIVH)))
+                    if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
                     {
                         float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
                         summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
@@ -344,7 +339,7 @@ public:
                 DoSummonAtRift(entry);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -390,13 +385,13 @@ public:
                 instance->SetData(DATA_DAMAGE_SHIELD, 1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_morass_corrupt_medivh_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_morass_corrupt_medivh_AuraScript();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -37,21 +37,21 @@ public:
         return i_cells[x][y];
     }
 
-    GridType const& GetGridType(const uint32 x, const uint32 y) const
+    [[nodiscard]] GridType const& GetGridType(const uint32 x, const uint32 y) const
     {
         ASSERT(x < N && y < N);
         return i_cells[x][y];
     }
 
-    uint32 GetGridId(void) const { return i_gridId; }
-    int32 getX() const { return i_x; }
-    int32 getY() const { return i_y; }
+    [[nodiscard]] uint32 GetGridId() const { return i_gridId; }
+    [[nodiscard]] int32 getX() const { return i_x; }
+    [[nodiscard]] int32 getY() const { return i_y; }
 
     void link(GridRefManager<NGrid<N, ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> >* pTo)
     {
         i_Reference.link(pTo, this);
     }
-    bool isGridObjectDataLoaded() const { return i_GridObjectDataLoaded; }
+    [[nodiscard]] bool isGridObjectDataLoaded() const { return i_GridObjectDataLoaded; }
     void setGridObjectDataLoaded(bool pLoaded) { i_GridObjectDataLoaded = pLoaded; }
 
     /*
@@ -101,4 +101,3 @@ private:
     bool i_GridObjectDataLoaded;
 };
 #endif
-

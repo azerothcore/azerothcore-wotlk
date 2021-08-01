@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,9 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "temple_of_ahnqiraj.h"
 
 enum Sartura
 {
@@ -34,9 +35,9 @@ class boss_sartura : public CreatureScript
 public:
     boss_sartura() : CreatureScript("boss_sartura") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_sarturaAI(creature);
+        return GetTempleOfAhnQirajAI<boss_sarturaAI>(creature);
     }
 
     struct boss_sarturaAI : public ScriptedAI
@@ -55,7 +56,7 @@ public:
         bool WhirlWind;
         bool AggroReset;
 
-        void Reset()
+        void Reset() override
         {
             WhirlWind_Timer = 30000;
             WhirlWindRandom_Timer = urand(3000, 7000);
@@ -68,25 +69,24 @@ public:
             AggroReset = false;
             Enraged = false;
             EnragedHard = false;
-
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -175,7 +175,6 @@ public:
             }
         }
     };
-
 };
 
 class npc_sartura_royal_guard : public CreatureScript
@@ -183,9 +182,9 @@ class npc_sartura_royal_guard : public CreatureScript
 public:
     npc_sartura_royal_guard() : CreatureScript("npc_sartura_royal_guard") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_sartura_royal_guardAI(creature);
+        return GetTempleOfAhnQirajAI<npc_sartura_royal_guardAI>(creature);
     }
 
     struct npc_sartura_royal_guardAI : public ScriptedAI
@@ -202,7 +201,7 @@ public:
         bool WhirlWind;
         bool AggroReset;
 
-        void Reset()
+        void Reset() override
         {
             WhirlWind_Timer = 30000;
             WhirlWindRandom_Timer = urand(3000, 7000);
@@ -215,11 +214,11 @@ public:
             AggroReset = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -296,7 +295,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_sartura()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,8 @@ SDComment: Teleport not included, spell reflect not effecting dots (Core problem
 SDCategory: Azshara
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Say
 {
@@ -35,7 +35,7 @@ class boss_azuregos : public CreatureScript
 public:
     boss_azuregos() : CreatureScript("boss_azuregos") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_azuregosAI(creature);
     }
@@ -54,7 +54,7 @@ public:
         uint32 EnrageTimer;
         bool Enraged;
 
-        void Reset()
+        void Reset() override
         {
             MarkOfFrostTimer = 35000;
             ManaStormTimer = urand(5000, 17000);
@@ -67,9 +67,9 @@ public:
             Enraged = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())

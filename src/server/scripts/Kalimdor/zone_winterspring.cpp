@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,11 +17,11 @@ npc_ranshalla
 go_elune_fire
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 // Ours
@@ -59,7 +59,7 @@ class npc_stave_of_the_ancients : public CreatureScript
 public:
     npc_stave_of_the_ancients() : CreatureScript("npc_stave_of_the_ancients") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_stave_of_the_ancientsAI(creature);
     }
@@ -89,26 +89,26 @@ public:
             }
         }
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         EventMap events;
         uint32 changeEntry;
         bool damaged;
 
-        void Reset()
+        void Reset() override
         {
             if (me->GetOriginalEntry() != me->GetEntry())
                 me->UpdateEntry(me->GetOriginalEntry());
 
             events.Reset();
-            playerGUID = 0;
+            playerGUID.Clear();
             damaged = false;
         }
 
-        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
         {
             if (!damaged)
             {
-                if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID())))
+                if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer()))
                 {
                     damaged = true;
                     me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
@@ -118,7 +118,7 @@ public:
                 damaged = false;
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             switch (changeEntry)
             {
@@ -141,7 +141,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->GetEntry() != changeEntry && who->GetTypeId() == TYPEID_PLAYER && who->ToPlayer()->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
             {
@@ -153,7 +153,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             uint32 eventId = events.ExecuteEvent();
@@ -209,7 +209,6 @@ public:
         }
     };
 };
-
 
 // Theirs
 /*######
@@ -468,7 +467,7 @@ class npc_ranshalla : public CreatureScript
 {
 public:
     npc_ranshalla() : CreatureScript("npc_ranshalla") { }
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_GUARDIANS_ALTAR)
         {
@@ -483,7 +482,7 @@ public:
 
         return false;
     }
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ranshallaAI(creature);
     }
@@ -498,13 +497,13 @@ public:
 
         uint32 _delayTimer;
 
-        uint64 _firstPriestessGUID;
-        uint64 _secondPriestessGUID;
-        uint64 _guardEluneGUID;
-        uint64 _voiceEluneGUID;
-        uint64 _altarGUID;
+        ObjectGuid _firstPriestessGUID;
+        ObjectGuid _secondPriestessGUID;
+        ObjectGuid _guardEluneGUID;
+        ObjectGuid _voiceEluneGUID;
+        ObjectGuid _altarGUID;
 
-        void Reset()
+        void Reset() override
         {
             _delayTimer = 0;
         }
@@ -570,7 +569,7 @@ public:
             StartNextDialogueText(SAY_PRIESTESS_ALTAR_3);
         }
 
-        void WaypointReached(uint32 pointId)
+        void WaypointReached(uint32 pointId) override
         {
             switch (pointId)
             {
@@ -622,7 +621,7 @@ public:
             }
         }
 
-        void JustDidDialogueStep(int32 entry)
+        void JustDidDialogueStep(int32 entry) override
         {
             switch (entry)
             {
@@ -721,7 +720,7 @@ public:
             }
         }
 
-        Creature* GetSpeakerByEntry(int32 entry)
+        Creature* GetSpeakerByEntry(int32 entry) override
         {
             switch (entry)
             {
@@ -736,10 +735,9 @@ public:
                 default:
                     return nullptr;
             }
-
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             DialogueUpdate(diff);
 

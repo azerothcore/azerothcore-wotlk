@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
@@ -14,13 +14,12 @@
 
 #include "Define.h"
 
-namespace acore
+namespace Acore
 {
     template<typename MUTEX>
     class GeneralLock
     {
     public:
-
         GeneralLock(MUTEX& m)
             : i_mutex(m)
         {
@@ -33,7 +32,6 @@ namespace acore
         }
 
     private:
-
         GeneralLock(const GeneralLock&);
         GeneralLock& operator=(const GeneralLock&);
         MUTEX& i_mutex;
@@ -43,7 +41,6 @@ namespace acore
     class SingleThreaded
     {
     public:
-
         struct Lock                                     // empty object
         {
             Lock()
@@ -63,7 +60,6 @@ namespace acore
     class ObjectLevelLockable
     {
     public:
-
         ObjectLevelLockable()
             : i_mtx()
         {
@@ -74,19 +70,16 @@ namespace acore
         class Lock
         {
         public:
-
             Lock(ObjectLevelLockable<T, MUTEX>& host)
                 : i_lock(host.i_mtx)
             {
             }
 
         private:
-
             GeneralLock<MUTEX> i_lock;
         };
 
     private:
-
         // prevent the compiler creating a copy construct
         ObjectLevelLockable(const ObjectLevelLockable<T, MUTEX>&);
         ObjectLevelLockable<T, MUTEX>& operator=(const ObjectLevelLockable<T, MUTEX>&);
@@ -98,7 +91,6 @@ namespace acore
     class ClassLevelLockable
     {
     public:
-
         ClassLevelLockable()
         {
         }
@@ -108,7 +100,6 @@ namespace acore
         class Lock
         {
         public:
-
             Lock(const T& /*host*/)
             {
                 ClassLevelLockable<T, MUTEX>::si_mtx.lock();
@@ -131,14 +122,13 @@ namespace acore
         };
 
     private:
-
         static MUTEX si_mtx;
     };
 }
 
-template<class T, class MUTEX> MUTEX acore::ClassLevelLockable<T, MUTEX>::si_mtx;
+template<class T, class MUTEX> MUTEX Acore::ClassLevelLockable<T, MUTEX>::si_mtx;
 
 #define INSTANTIATE_CLASS_MUTEX(CTYPE, MUTEX) \
-    template class acore::ClassLevelLockable<CTYPE, MUTEX>
+    template class Acore::ClassLevelLockable<CTYPE, MUTEX>
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,8 +8,8 @@
 #define AZEROTHCORE_CHAT_H
 
 #include "SharedDefines.h"
+#include "Errors.h"
 #include "WorldSession.h"
-
 #include <vector>
 
 class ChatHandler;
@@ -46,7 +46,7 @@ public:
     virtual ~ChatHandler() { }
 
     // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
-    static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, uint64 senderGUID, uint64 receiverGUID, std::string const& message, uint8 chatTag,
+    static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string const& message, uint8 chatTag,
                                   std::string const& senderName = "", std::string const& receiverName = "",
                                   uint32 achievementId = 0, bool gmMessage = false, std::string const& channelName = "");
 
@@ -80,7 +80,7 @@ public:
     virtual LocaleConstant GetSessionDbcLocale() const;
     virtual int GetSessionDbLocaleIndex() const;
 
-    bool HasLowerSecurity(Player* target, uint64 guid, bool strong = false);
+    bool HasLowerSecurity(Player* target, ObjectGuid guid = ObjectGuid::Empty, bool strong = false);
     bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
 
     void SendGlobalGMSysMessage(const char* str);
@@ -94,23 +94,24 @@ public:
     char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
     char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = nullptr);
 
-    // if args have single value then it return in arg2 and arg1 == NULL
+    // if args have single value then it return in arg2 and arg1 == nullptr
     void      extractOptFirstArg(char* args, char** arg1, char** arg2);
     char*     extractQuotedArg(char* args);
 
     uint32    extractSpellIdFromLink(char* text);
-    uint64    extractGuidFromLink(char* text);
+    ObjectGuid::LowType extractLowGuidFromLink(char* text, HighGuid& guidHigh);
     GameTele const* extractGameTeleFromLink(char* text);
-    bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, uint64& guid, bool offline = false);
+    bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline = false);
     std::string extractPlayerNameFromLink(char* text);
     // select by arg (name/link) or in-game selection online/offline player
-    bool extractPlayerTarget(char* args, Player** player, uint64* player_guid = NULL, std::string* player_name = nullptr);
+    bool extractPlayerTarget(char* args, Player** player, ObjectGuid* player_guid = nullptr, std::string* player_name = nullptr);
 
     std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:" + name + "|h[" + name + "]|h|r" : name; }
     std::string GetNameLink(Player* chr) const;
 
     GameObject* GetNearbyGameObject();
-    GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid, uint32 entry);
+    GameObject* GetObjectFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid);
+    Creature* GetCreatureFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid);
     bool HasSentErrorMessage() const { return sentErrorMessage; }
     void SetSentErrorMessage(bool val) { sentErrorMessage = val; }
     static bool LoadCommandTable() { return load_command_table; }
@@ -124,8 +125,7 @@ protected:
     bool ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd);
 
 private:
-
-    WorldSession* m_session;                           // != NULL for chat command call and NULL for CLI command
+    WorldSession* m_session;                           // != nullptr for chat command call and nullptr for CLI command
 
     // common global flag
     static bool load_command_table;

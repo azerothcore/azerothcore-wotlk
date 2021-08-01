@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
 #include "deadmines.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
 
 class instance_deadmines : public InstanceMapScript
 {
@@ -17,12 +17,12 @@ public:
         {
         }
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&_encounters, 0, sizeof(_encounters));
         }
 
-        void OnGameObjectCreate(GameObject* gameobject)
+        void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -32,12 +32,12 @@ public:
                     break;
                 case GO_IRON_CLAD_DOOR:
                     if (_encounters[TYPE_CANNON] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -51,14 +51,14 @@ public:
                 SaveToDB();
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "D E " << _encounters[0] << ' ' << _encounters[1];
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
                 return;
@@ -81,7 +81,7 @@ public:
         uint32 _encounters[MAX_ENCOUNTERS];
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_deadmines_InstanceMapScript(map);
     }

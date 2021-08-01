@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,8 @@ SDComment: Almost finished.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "zulgurub.h"
 
 enum Says
@@ -76,7 +76,7 @@ public:
         bool Enraged;
         bool WasDead;
 
-        void Reset()
+        void Reset() override
         {
             if (events.IsInPhase(PHASE_TWO))
                 me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
@@ -85,13 +85,13 @@ public:
             WasDead = false;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_MORTALCLEAVE, 4000, 0, PHASE_ONE);     // Phase 1
@@ -101,12 +101,12 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             instance->SetBossState(DATA_THEKAL, NOT_STARTED);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -160,7 +160,7 @@ public:
                             if (instance->GetBossState(DATA_LORKHAN) == SPECIAL)
                             {
                                 //Resurrect LorKhan
-                                if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_LORKHAN)))
+                                if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LORKHAN)))
                                 {
                                     pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                                     pLorKhan->setFaction(14);
@@ -173,7 +173,7 @@ public:
                             if (instance->GetBossState(DATA_ZATH) == SPECIAL)
                             {
                                 //Resurrect Zath
-                                if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_ZATH)))
+                                if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH)))
                                 {
                                     pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                                     pZath->setFaction(14);
@@ -237,9 +237,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_thekalAI>(creature);
+        return GetZulGurubAI<boss_thekalAI>(creature);
     }
 };
 
@@ -266,7 +266,7 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() override
         {
             Shield_Timer = 1000;
             BloodLust_Timer = 16000;
@@ -282,11 +282,11 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -310,8 +310,8 @@ public:
             //Casting Greaterheal to Thekal or Zath if they are in meele range.
             if (GreaterHeal_Timer <= diff)
             {
-                Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_THEKAL));
-                Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_ZATH));
+                Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THEKAL));
+                Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH));
 
                 if (!pThekal || !pZath)
                     return;
@@ -346,7 +346,7 @@ public:
                 if (instance->GetBossState(DATA_THEKAL) == SPECIAL)
                 {
                     //Resurrect Thekal
-                    if (Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_THEKAL)))
+                    if (Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THEKAL)))
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -358,7 +358,7 @@ public:
                 if (instance->GetBossState(DATA_ZATH) == SPECIAL)
                 {
                     //Resurrect Zath
-                    if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_ZATH)))
+                    if (Unit* pZath = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_ZATH)))
                     {
                         pZath->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pZath->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -390,9 +390,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_zealot_lorkhanAI>(creature);
+        return GetZulGurubAI<npc_zealot_lorkhanAI>(creature);
     }
 };
 
@@ -400,7 +400,6 @@ public:
 class npc_zealot_zath : public CreatureScript
 {
 public:
-
     npc_zealot_zath()
         : CreatureScript("npc_zealot_zath")
     {
@@ -424,7 +423,7 @@ public:
 
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() override
         {
             SweepingStrikes_Timer = 13000;
             SinisterStrike_Timer = 8000;
@@ -441,11 +440,11 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -500,7 +499,7 @@ public:
                 if (instance->GetBossState(DATA_LORKHAN) == SPECIAL)
                 {
                     //Resurrect LorKhan
-                    if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_LORKHAN)))
+                    if (Unit* pLorKhan = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LORKHAN)))
                     {
                         pLorKhan->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pLorKhan->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -512,7 +511,7 @@ public:
                 if (instance->GetBossState(DATA_THEKAL) == SPECIAL)
                 {
                     //Resurrect Thekal
-                    if (Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_THEKAL)))
+                    if (Unit* pThekal = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THEKAL)))
                     {
                         pThekal->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         pThekal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -544,9 +543,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_zealot_zathAI>(creature);
+        return GetZulGurubAI<npc_zealot_zathAI>(creature);
     }
 };
 

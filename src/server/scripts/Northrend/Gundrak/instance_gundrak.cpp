@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "gundrak.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 DoorData const doorData[] =
 {
@@ -21,7 +21,7 @@ class instance_gundrak : public InstanceMapScript
 public:
     instance_gundrak() : InstanceMapScript("instance_gundrak", 604) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_gundrak_InstanceMapScript(pMap);
     }
@@ -32,27 +32,23 @@ public:
         {
         }
 
-        uint64 _sladRanAltarGUID;
-        uint64 _moorabiAltarGUID;
-        uint64 _drakkariAltarGUID;
-        uint64 _bridgeGUIDs[6];
+        ObjectGuid _sladRanAltarGUID;
+        ObjectGuid _moorabiAltarGUID;
+        ObjectGuid _drakkariAltarGUID;
+        ObjectGuid _bridgeGUIDs[6];
         uint32 _keysInCount;
         uint32 _activateTimer;
 
-        void Initialize()
+        void Initialize() override
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
 
-            _sladRanAltarGUID = 0;
-            _moorabiAltarGUID = 0;
-            _drakkariAltarGUID = 0;
             _keysInCount = 0;
             _activateTimer = 0;
-            memset(&_bridgeGUIDs, 0, sizeof(_bridgeGUIDs));
         }
 
-        void OnGameObjectCreate(GameObject* gameobject)
+        void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -102,7 +98,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* gameobject)
+        void OnGameObjectRemove(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -116,7 +112,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32)
+        void SetData(uint32 type, uint32) override
         {
             switch (type)
             {
@@ -151,7 +147,7 @@ public:
             }
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
             {
@@ -188,14 +184,14 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "G D " << GetBossSaveData();
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
                 return;
@@ -216,7 +212,7 @@ public:
             }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (!_activateTimer)
                 return;

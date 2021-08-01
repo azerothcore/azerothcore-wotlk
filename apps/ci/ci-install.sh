@@ -7,8 +7,8 @@ MTHREADS=$(($(grep -c ^processor /proc/cpuinfo) + 2))
 CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
-CSCRIPTS=ON
-CUNIT_TESTS=ON
+CSCRIPTS=static
+CBUILD_TESTING=ON
 CSERVERS=ON
 CTOOLS=ON
 CSCRIPTPCH=OFF
@@ -33,6 +33,12 @@ case $COMPILER in
     echo "CCOMPILERCXX=\"g++\"" >> ./conf/config.sh
     ;;
 
+  "gcc8" )
+    time sudo apt-get install -y gcc-8 g++-8
+    echo "CCOMPILERC=\"gcc-8\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"g++-8\"" >> ./conf/config.sh
+    ;;
+
   "gcc10" )
     time sudo apt-get install -y gcc-10 g++-10
     echo "CCOMPILERC=\"gcc-10\"" >> ./conf/config.sh
@@ -46,22 +52,22 @@ case $COMPILER in
     echo "CCOMPILERCXX=\"clang++\"" >> ./conf/config.sh
     ;;
 
-  "clang6" )
-    time sudo apt-get install -y clang-6.0
-    echo "CCOMPILERC=\"clang-6.0\"" >> ./conf/config.sh
-    echo "CCOMPILERCXX=\"clang++-6.0\"" >> ./conf/config.sh
-    ;;
-
-  "clang9" )
-    time sudo apt-get install -y clang-9
-    echo "CCOMPILERC=\"clang-9\"" >> ./conf/config.sh
-    echo "CCOMPILERCXX=\"clang++-9\"" >> ./conf/config.sh
-    ;;
-
   "clang10" )
     time sudo apt-get install -y clang-10
     echo "CCOMPILERC=\"clang-10\"" >> ./conf/config.sh
     echo "CCOMPILERCXX=\"clang++-10\"" >> ./conf/config.sh
+    ;;
+
+  "clang11" )
+    time sudo apt-get install -y clang-11
+    echo "CCOMPILERC=\"clang-11\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++-11\"" >> ./conf/config.sh
+    ;;
+
+  "clang12" )
+    time sudo apt-get install -y clang-12
+    echo "CCOMPILERC=\"clang-12\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++-12\"" >> ./conf/config.sh
     ;;
 
   * )

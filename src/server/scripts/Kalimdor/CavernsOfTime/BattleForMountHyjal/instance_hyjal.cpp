@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
@@ -11,14 +11,14 @@ SDComment: Instance Data Scripts and functions to acquire mobs and set encounter
 SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "ScriptedCreature.h"
-#include "hyjal_trash.h"
-#include "Player.h"
-#include "WorldPacket.h"
-#include "Opcodes.h"
 #include "Chat.h"
+#include "hyjal_trash.h"
+#include "InstanceScript.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "WorldPacket.h"
 
 /* Battle of Mount Hyjal encounters:
 0 - Rage Winterchill event
@@ -36,7 +36,7 @@ class instance_hyjal : public InstanceMapScript
 public:
     instance_hyjal() : InstanceMapScript("instance_hyjal", 534) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_mount_hyjal_InstanceMapScript(map);
     }
@@ -45,22 +45,12 @@ public:
     {
         instance_mount_hyjal_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
             m_uiAncientGemGUID.clear();
 
-            RageWinterchill    = 0;
-            Anetheron          = 0;
-            Kazrogal           = 0;
-            Azgalor            = 0;
-            Archimonde         = 0;
-            JainaProudmoore    = 0;
-            Thrall             = 0;
-            TyrandeWhisperwind = 0;
-            HordeGate          = 0;
-            ElfGate            = 0;
             RaidDamage         = 0;
             Trash              = 0;
             hordeRetreat       = 0;
@@ -69,7 +59,7 @@ public:
             ArchiYell          = false;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < EncounterCount; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS)
@@ -78,23 +68,23 @@ public:
             return false;
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
                 case GO_HORDE_ENCAMPMENT_PORTAL:
                     HordeGate = go->GetGUID();
                     if (allianceRetreat)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     else
-                        HandleGameObject(0, false, go);
+                        HandleGameObject(ObjectGuid::Empty, false, go);
                     break;
                 case GO_NIGHT_ELF_VILLAGE_PORTAL:
                     ElfGate = go->GetGUID();
                     if (hordeRetreat)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     else
-                        HandleGameObject(0, false, go);
+                        HandleGameObject(ObjectGuid::Empty, false, go);
                     break;
                 case GO_ANCIENT_GEM:
                     m_uiAncientGemGUID.push_back(go->GetGUID());
@@ -102,7 +92,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -133,7 +123,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -155,10 +145,10 @@ public:
                     return TyrandeWhisperwind;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -230,10 +220,10 @@ public:
                     {
                         if (!m_uiAncientGemGUID.empty())
                         {
-                            for (std::list<uint64>::const_iterator itr = m_uiAncientGemGUID.begin(); itr != m_uiAncientGemGUID.end(); ++itr)
+                            for (ObjectGuid const& guid : m_uiAncientGemGUID)
                             {
                                 //don't know how long it expected
-                                DoRespawnGameObject(*itr, DAY);
+                                DoRespawnGameObject(guid, DAY);
                             }
                         }
                     }
@@ -275,10 +265,9 @@ public:
                 SaveToDB();
                 OUT_SAVE_INST_DATA_COMPLETE;
             }
-
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -304,12 +293,12 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -329,17 +318,17 @@ public:
     protected:
         uint32 m_auiEncounter[EncounterCount];
         std::string str_data;
-        std::list<uint64> m_uiAncientGemGUID;
-        uint64 RageWinterchill;
-        uint64 Anetheron;
-        uint64 Kazrogal;
-        uint64 Azgalor;
-        uint64 Archimonde;
-        uint64 JainaProudmoore;
-        uint64 Thrall;
-        uint64 TyrandeWhisperwind;
-        uint64 HordeGate;
-        uint64 ElfGate;
+        GuidList m_uiAncientGemGUID;
+        ObjectGuid RageWinterchill;
+        ObjectGuid Anetheron;
+        ObjectGuid Kazrogal;
+        ObjectGuid Azgalor;
+        ObjectGuid Archimonde;
+        ObjectGuid JainaProudmoore;
+        ObjectGuid Thrall;
+        ObjectGuid TyrandeWhisperwind;
+        ObjectGuid HordeGate;
+        ObjectGuid ElfGate;
         uint32 Trash;
         uint32 hordeRetreat;
         uint32 allianceRetreat;

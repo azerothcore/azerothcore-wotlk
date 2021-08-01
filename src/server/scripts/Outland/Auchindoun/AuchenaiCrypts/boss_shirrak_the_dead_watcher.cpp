@@ -2,15 +2,15 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "auchenai_crypts.h"
 #include "Player.h"
-#include "SpellScript.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum eShirrak
 {
-
     SPELL_INHIBIT_MAGIC                 = 32264,
     SPELL_ATTRACT_MAGIC                 = 32265,
     SPELL_CARNIVOROUS_BITE_N            = 36383,
@@ -38,9 +38,9 @@ class boss_shirrak_the_dead_watcher : public CreatureScript
 public:
     boss_shirrak_the_dead_watcher() : CreatureScript("boss_shirrak_the_dead_watcher") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_shirrak_the_dead_watcherAI (creature);
+        return GetAuchenaiCryptsAI<boss_shirrak_the_dead_watcherAI>(creature);
     }
 
     struct boss_shirrak_the_dead_watcherAI : public ScriptedAI
@@ -50,22 +50,22 @@ public:
         }
 
         EventMap events;
-        uint64 focusGUID;
+        ObjectGuid focusGUID;
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             ScriptedAI::EnterEvadeMode();
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
-            focusGUID = 0;
+            focusGUID.Clear();
             me->SetControlled(false, UNIT_STATE_ROOT);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_SPELL_INHIBIT_MAGIC, 0);
             events.ScheduleEvent(EVENT_SPELL_ATTRACT_MAGIC, 28000);
@@ -73,12 +73,12 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FOCUS_FIRE, 17000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->CastSpell(summon, SPELL_FOCUS_FIRE_VISUAL, true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_FOCUS_CAST)
                 target->CastSpell(target, DUNGEON_MODE(SPELL_FIERY_BLAST_N, SPELL_FIERY_BLAST_H), false);
@@ -95,7 +95,7 @@ public:
             return 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             uint32 eventId = events.ExecuteEvent();
@@ -127,7 +127,6 @@ public:
 
             if (!UpdateVictim())
                 return;
-
 
             switch (eventId)
             {
@@ -198,7 +197,7 @@ public:
                     SetDuration(0);
         }
 
-        void Register()
+        void Register() override
         {
             // Base channel
             if (m_scriptSpellId == 33401)
@@ -211,7 +210,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_auchenai_possess_AuraScript();
     }

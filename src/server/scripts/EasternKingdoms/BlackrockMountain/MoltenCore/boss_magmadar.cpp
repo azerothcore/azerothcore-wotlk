@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,10 +11,10 @@ SDComment: Conflag on ground nyi
 SDCategory: Molten Core
 EndScriptData */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "molten_core.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {
@@ -52,13 +52,13 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             DoCast(me, SPELL_MAGMA_SPIT, true);
         }
 
-        void EnterCombat(Unit* victim)
+        void EnterCombat(Unit* victim) override
         {
             BossAI::EnterCombat(victim);
             events.ScheduleEvent(EVENT_FRENZY, 30000);
@@ -66,7 +66,7 @@ public:
             events.ScheduleEvent(EVENT_LAVA_BOMB, 12000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -103,9 +103,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_magmadarAI(creature);
+        return GetMoltenCoreAI<boss_magmadarAI>(creature);
     }
 };
 
@@ -128,7 +128,7 @@ public:
 
         void removeFeignDeath()
         {
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
             me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
             me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -138,7 +138,7 @@ public:
             me->DisableRotate(false);
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (me->HealthBelowPctDamaged(0, damage))
             {
@@ -147,7 +147,7 @@ public:
                     killer = attacker;
                     events.ScheduleEvent(EVENT_IGNITE, 10000);
                     me->SetHealth(1);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -162,22 +162,22 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             removeFeignDeath();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             removeFeignDeath();
         }
 
-        void EnterCombat(Unit* /*victim*/)
+        void EnterCombat(Unit* /*victim*/) override
         {
             events.ScheduleEvent(EVENT_SERRATED_BITE, 10000); // timer may be wrong
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() && !smoldering)
                 return;
@@ -204,7 +204,7 @@ public:
                             {
                                 Talk(EMOTE_IGNITE);
                                 me->SetFullHealth();
-                                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                                 me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                                 me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -237,9 +237,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_magmadar_core_houndAI(creature);
+        return GetMoltenCoreAI<npc_magmadar_core_houndAI>(creature);
     }
 };
 

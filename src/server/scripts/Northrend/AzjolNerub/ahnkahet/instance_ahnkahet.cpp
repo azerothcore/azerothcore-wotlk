@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "Player.h"
 #include "ahnkahet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 class instance_ahnkahet : public InstanceMapScript
 {
@@ -17,14 +17,14 @@ public:
     {
         instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        uint64 Elder_Nadox;
-        uint64 Prince_Taldaram;
-        uint64 Jedoga_Shadowseeker;
-        uint64 Herald_Volazj;
-        uint64 Amanitar;
+        ObjectGuid Elder_Nadox;
+        ObjectGuid Prince_Taldaram;
+        ObjectGuid Jedoga_Shadowseeker;
+        ObjectGuid Herald_Volazj;
+        ObjectGuid Amanitar;
 
-        uint64 Prince_TaldaramPlatform;
-        uint64 Prince_TaldaramGate;
+        ObjectGuid Prince_TaldaramPlatform;
+        ObjectGuid Prince_TaldaramGate;
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         uint32 spheres;
@@ -32,25 +32,17 @@ public:
         bool nadoxAchievement;
         bool jedogaAchievement;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-            Elder_Nadox = 0;
-            Prince_Taldaram = 0;
-            Jedoga_Shadowseeker = 0;
-            Herald_Volazj = 0;
-            Amanitar = 0;
-
-            Prince_TaldaramPlatform = 0;
-            Prince_TaldaramGate = 0;
             spheres = NOT_STARTED;
 
             nadoxAchievement = false;
             jedogaAchievement = false;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS) return true;
@@ -58,7 +50,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* pCreature) override
         {
             switch(pCreature->GetEntry())
             {
@@ -80,14 +72,14 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* pGo)
+        void OnGameObjectCreate(GameObject* pGo) override
         {
             switch(pGo->GetEntry())
             {
                 case 193564:
                     Prince_TaldaramPlatform = pGo->GetGUID();
                     if (m_auiEncounter[1] == DONE)
-                        HandleGameObject(0, true, pGo);
+                        HandleGameObject(ObjectGuid::Empty, true, pGo);
 
                     break;
                 case 193093:
@@ -113,13 +105,13 @@ public:
                 case 192236:
                     Prince_TaldaramGate = pGo->GetGUID(); // Web gate past Prince Taldaram
                     if (m_auiEncounter[1] == DONE)
-                        HandleGameObject(0, true, pGo);
+                        HandleGameObject(ObjectGuid::Empty, true, pGo);
 
                     break;
             }
         }
 
-        uint64 GetData64(uint32 identifier) const
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch(identifier)
             {
@@ -137,10 +129,10 @@ public:
                     return Prince_TaldaramPlatform;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -152,7 +144,7 @@ public:
             return false;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -183,7 +175,7 @@ public:
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch(type)
             {
@@ -201,7 +193,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -214,7 +206,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -243,7 +235,6 @@ public:
                         m_auiEncounter[i] = NOT_STARTED;
 
                 spheres = data5;
-
             }
             else OUT_LOAD_INST_DATA_FAIL;
 
@@ -251,7 +242,7 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_ahnkahet_InstanceScript(map);
     }
@@ -282,18 +273,17 @@ public:
                             PlayerList.push_back(player);
 
                 if (!PlayerList.empty())
-                    caster->CastSpell(acore::Containers::SelectRandomContainerElement(PlayerList), caster->GetMap()->IsHeroic() ? SPELL_SHADOW_SICKLE_H : SPELL_SHADOW_SICKLE, true);
-
+                    caster->CastSpell(Acore::Containers::SelectRandomContainerElement(PlayerList), caster->GetMap()->IsHeroic() ? SPELL_SHADOW_SICKLE_H : SPELL_SHADOW_SICKLE, true);
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_sickle_periodic_damage_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_shadow_sickle_periodic_damage_AuraScript();
     }

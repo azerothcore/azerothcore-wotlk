@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,10 +8,10 @@
 #define AZEROTHCORE_ITEM_H
 
 #include "Common.h"
-#include "Object.h"
-#include "LootMgr.h"
-#include "ItemTemplate.h"
 #include "DatabaseEnv.h"
+#include "ItemTemplate.h"
+#include "LootMgr.h"
+#include "Object.h"
 
 class SpellInfo;
 class Bag;
@@ -132,12 +132,15 @@ enum BuyResult
 
 enum SellResult
 {
-    SELL_ERR_CANT_FIND_ITEM                      = 1,
-    SELL_ERR_CANT_SELL_ITEM                      = 2,       // merchant doesn't like that item
-    SELL_ERR_CANT_FIND_VENDOR                    = 3,       // merchant doesn't like you
-    SELL_ERR_YOU_DONT_OWN_THAT_ITEM              = 4,       // you don't own that item
-    SELL_ERR_UNK                                 = 5,       // nothing appears...
-    SELL_ERR_ONLY_EMPTY_BAG                      = 6        // can only do with empty bags
+    SELL_ERR_CANT_FIND_ITEM                      = 1,       // The item was not found.
+    SELL_ERR_CANT_SELL_ITEM                      = 2,       // The merchant doesn't want that item.
+    SELL_ERR_CANT_FIND_VENDOR                    = 3,       // The merchant doesn't like you.
+    SELL_ERR_YOU_DONT_OWN_THAT_ITEM              = 4,       // You don't own that item.
+    SELL_ERR_UNK                                 = 5,       // Nothing appears...
+    SELL_ERR_ONLY_EMPTY_BAG                      = 6,       // You can only do that with empty bags.
+    SELL_ERR_CANT_SELL_TO_THIS_MERCHANT          = 7,       // You cannot sell items to this merchant.
+    SELL_ERR_MUST_REPAIR_ITEM_DURABILITY_TO_USE  = 8,       // You must repair that item's durability to use it.
+    SELL_INTERNAL_BAG_ERROR                      = 9        // Internal Bag Error
 };
 
 // -1 from client enchantment slot number
@@ -196,90 +199,90 @@ bool ItemCanGoIntoBag(ItemTemplate const* proto, ItemTemplate const* pBagProto);
 class Item : public Object
 {
 public:
-    static Item* CreateItem(uint32 item, uint32 count, Player const* player = NULL, bool clone = false, uint32 randomPropertyId = 0);
+    static Item* CreateItem(uint32 item, uint32 count, Player const* player = nullptr, bool clone = false, uint32 randomPropertyId = 0);
     Item* CloneItem(uint32 count, Player const* player = nullptr) const;
 
     Item();
 
-    virtual bool Create(uint32 guidlow, uint32 itemid, Player const* owner);
+    virtual bool Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner);
 
-    ItemTemplate const* GetTemplate() const;
+    [[nodiscard]] ItemTemplate const* GetTemplate() const;
 
-    uint64 GetOwnerGUID()    const { return GetUInt64Value(ITEM_FIELD_OWNER); }
-    void SetOwnerGUID(uint64 guid) { SetUInt64Value(ITEM_FIELD_OWNER, guid); }
-    Player* GetOwner() const;
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(ITEM_FIELD_OWNER); }
+    void SetOwnerGUID(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
+    [[nodiscard]] Player* GetOwner() const;
 
     void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val); }
-    bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND); }
-    bool IsBoundAccountWide() const { return (GetTemplate()->Flags & ITEM_FLAG_IS_BOUND_TO_ACCOUNT) != 0; }
+    [[nodiscard]] bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND); }
+    [[nodiscard]] bool IsBoundAccountWide() const { return (GetTemplate()->Flags & ITEM_FLAG_IS_BOUND_TO_ACCOUNT) != 0; }
     bool IsBindedNotWith(Player const* player) const;
-    bool IsBoundByEnchant() const;
-    bool IsBoundByTempEnchant() const;
-    virtual void SaveToDB(SQLTransaction& trans);
-    virtual bool LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entry);
-    static void DeleteFromDB(SQLTransaction& trans, uint32 itemGuid);
-    virtual void DeleteFromDB(SQLTransaction& trans);
-    static void DeleteFromInventoryDB(SQLTransaction& trans, uint32 itemGuid);
-    void DeleteFromInventoryDB(SQLTransaction& trans);
+    [[nodiscard]] bool IsBoundByEnchant() const;
+    [[nodiscard]] bool IsBoundByTempEnchant() const;
+    virtual void SaveToDB(CharacterDatabaseTransaction trans);
+    virtual bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry);
+    static void DeleteFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
+    virtual void DeleteFromDB(CharacterDatabaseTransaction trans);
+    static void DeleteFromInventoryDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
+    void DeleteFromInventoryDB(CharacterDatabaseTransaction trans);
     void SaveRefundDataToDB();
-    void DeleteRefundDataFromDB(SQLTransaction* trans);
+    void DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans);
 
     Bag* ToBag() { if (IsBag()) return reinterpret_cast<Bag*>(this); else return nullptr; }
-    const Bag* ToBag() const { if (IsBag()) return reinterpret_cast<const Bag*>(this); else return nullptr; }
+    [[nodiscard]] const Bag* ToBag() const { if (IsBag()) return reinterpret_cast<const Bag*>(this); else return nullptr; }
 
-    bool IsLocked() const { return !HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_UNLOCKED); }
-    bool IsBag() const { return GetTemplate()->InventoryType == INVTYPE_BAG; }
-    bool IsCurrencyToken() const { return GetTemplate()->IsCurrencyToken(); }
-    bool IsNotEmptyBag() const;
-    bool IsBroken() const { return GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0 && GetUInt32Value(ITEM_FIELD_DURABILITY) == 0; }
-    bool CanBeTraded(bool mail = false, bool trade = false) const;
+    [[nodiscard]] bool IsLocked() const { return !HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_UNLOCKED); }
+    [[nodiscard]] bool IsBag() const { return GetTemplate()->InventoryType == INVTYPE_BAG; }
+    [[nodiscard]] bool IsCurrencyToken() const { return GetTemplate()->IsCurrencyToken(); }
+    [[nodiscard]] bool IsNotEmptyBag() const;
+    [[nodiscard]] bool IsBroken() const { return GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0 && GetUInt32Value(ITEM_FIELD_DURABILITY) == 0; }
+    [[nodiscard]] bool CanBeTraded(bool mail = false, bool trade = false) const;
     void SetInTrade(bool b = true) { mb_in_trade = b; }
-    bool IsInTrade() const { return mb_in_trade; }
+    [[nodiscard]] bool IsInTrade() const { return mb_in_trade; }
 
     bool HasEnchantRequiredSkill(const Player* player) const;
-    uint32 GetEnchantRequiredLevel() const;
+    [[nodiscard]] uint32 GetEnchantRequiredLevel() const;
 
     bool IsFitToSpellRequirements(SpellInfo const* spellInfo) const;
-    bool IsLimitedToAnotherMapOrZone(uint32 cur_mapId, uint32 cur_zoneId) const;
-    bool GemsFitSockets() const;
+    [[nodiscard]] bool IsLimitedToAnotherMapOrZone(uint32 cur_mapId, uint32 cur_zoneId) const;
+    [[nodiscard]] bool GemsFitSockets() const;
 
-    uint32 GetCount() const { return GetUInt32Value(ITEM_FIELD_STACK_COUNT); }
+    [[nodiscard]] uint32 GetCount() const { return GetUInt32Value(ITEM_FIELD_STACK_COUNT); }
     void SetCount(uint32 value) { SetUInt32Value(ITEM_FIELD_STACK_COUNT, value); }
-    uint32 GetMaxStackCount() const { return GetTemplate()->GetMaxStackSize(); }
+    [[nodiscard]] uint32 GetMaxStackCount() const { return GetTemplate()->GetMaxStackSize(); }
     // Checks if this item has sockets, whether built-in or added by an upgrade.
-    bool HasSocket() const;
-    uint8 GetGemCountWithID(uint32 GemID) const;
-    uint8 GetGemCountWithLimitCategory(uint32 limitCategory) const;
+    [[nodiscard]] bool HasSocket() const;
+    [[nodiscard]] uint8 GetGemCountWithID(uint32 GemID) const;
+    [[nodiscard]] uint8 GetGemCountWithLimitCategory(uint32 limitCategory) const;
     InventoryResult CanBeMergedPartlyWith(ItemTemplate const* proto) const;
 
-    uint8 GetSlot() const {return m_slot;}
+    [[nodiscard]] uint8 GetSlot() const {return m_slot;}
     Bag* GetContainer() { return m_container; }
-    uint8 GetBagSlot() const;
+    [[nodiscard]] uint8 GetBagSlot() const;
     void SetSlot(uint8 slot) { m_slot = slot; }
-    uint16 GetPos() const { return uint16(GetBagSlot()) << 8 | GetSlot(); }
+    [[nodiscard]] uint16 GetPos() const { return uint16(GetBagSlot()) << 8 | GetSlot(); }
     void SetContainer(Bag* container) { m_container = container; }
 
-    bool IsInBag() const { return m_container != nullptr; }
-    bool IsEquipped() const;
+    [[nodiscard]] bool IsInBag() const { return m_container != nullptr; }
+    [[nodiscard]] bool IsEquipped() const;
 
     uint32 GetSkill();
     uint32 GetSpell();
 
     // RandomPropertyId (signed but stored as unsigned)
-    int32 GetItemRandomPropertyId() const { return GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID); }
-    uint32 GetItemSuffixFactor() const { return GetUInt32Value(ITEM_FIELD_PROPERTY_SEED); }
+    [[nodiscard]] int32 GetItemRandomPropertyId() const { return GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID); }
+    [[nodiscard]] uint32 GetItemSuffixFactor() const { return GetUInt32Value(ITEM_FIELD_PROPERTY_SEED); }
     void SetItemRandomProperties(int32 randomPropId);
     void UpdateItemSuffixFactor();
     static int32 GenerateItemRandomPropertyId(uint32 item_id);
-    void SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges, uint64 caster = 0);
+    void SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges, ObjectGuid caster = ObjectGuid::Empty);
     void SetEnchantmentDuration(EnchantmentSlot slot, uint32 duration, Player* owner);
     void SetEnchantmentCharges(EnchantmentSlot slot, uint32 charges);
     void ClearEnchantment(EnchantmentSlot slot);
-    uint32 GetEnchantmentId(EnchantmentSlot slot)       const { return GetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET);}
-    uint32 GetEnchantmentDuration(EnchantmentSlot slot) const { return GetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET);}
-    uint32 GetEnchantmentCharges(EnchantmentSlot slot)  const { return GetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET);}
+    [[nodiscard]] uint32 GetEnchantmentId(EnchantmentSlot slot)       const { return GetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET);}
+    [[nodiscard]] uint32 GetEnchantmentDuration(EnchantmentSlot slot) const { return GetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET);}
+    [[nodiscard]] uint32 GetEnchantmentCharges(EnchantmentSlot slot)  const { return GetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET);}
 
-    std::string const& GetText() const { return m_text; }
+    [[nodiscard]] std::string const& GetText() const { return m_text; }
     void SetText(std::string const& text) { m_text = text; }
 
     void SendUpdateSockets();
@@ -288,37 +291,37 @@ public:
     void UpdateDuration(Player* owner, uint32 diff);
 
     // spell charges (signed but stored as unsigned)
-    int32 GetSpellCharges(uint8 index/*0..5*/ = 0) const { return GetInt32Value(ITEM_FIELD_SPELL_CHARGES + index); }
+    [[nodiscard]] int32 GetSpellCharges(uint8 index/*0..5*/ = 0) const { return GetInt32Value(ITEM_FIELD_SPELL_CHARGES + index); }
     void  SetSpellCharges(uint8 index/*0..5*/, int32 value) { SetInt32Value(ITEM_FIELD_SPELL_CHARGES + index, value); }
 
     Loot loot;
     bool m_lootGenerated;
 
     // Update States
-    ItemUpdateState GetState() const { return uState; }
+    [[nodiscard]] ItemUpdateState GetState() const { return uState; }
     void SetState(ItemUpdateState state, Player* forplayer = nullptr);
     void AddToUpdateQueueOf(Player* player);
     void RemoveFromUpdateQueueOf(Player* player);
-    bool IsInUpdateQueue() const { return uQueuePos != -1; }
-    uint32 GetQueuePos() const { return uQueuePos; }
+    [[nodiscard]] bool IsInUpdateQueue() const { return uQueuePos != -1; }
+    [[nodiscard]] uint32 GetQueuePos() const { return uQueuePos; }
     void FSetState(ItemUpdateState state)               // forced
     {
         uState = state;
     }
 
-    bool hasQuest(uint32 quest_id) const { return GetTemplate()->StartQuest == quest_id; }
-    bool hasInvolvedQuest(uint32 /*quest_id*/) const { return false; }
-    bool IsPotion() const { return GetTemplate()->IsPotion(); }
-    bool IsWeaponVellum() const { return GetTemplate()->IsWeaponVellum(); }
-    bool IsArmorVellum() const { return GetTemplate()->IsArmorVellum(); }
-    bool IsConjuredConsumable() const { return GetTemplate()->IsConjuredConsumable(); }
+    [[nodiscard]] bool hasQuest(uint32 quest_id) const override { return GetTemplate()->StartQuest == quest_id; }
+    [[nodiscard]] bool hasInvolvedQuest(uint32 /*quest_id*/) const override { return false; }
+    [[nodiscard]] bool IsPotion() const { return GetTemplate()->IsPotion(); }
+    [[nodiscard]] bool IsWeaponVellum() const { return GetTemplate()->IsWeaponVellum(); }
+    [[nodiscard]] bool IsArmorVellum() const { return GetTemplate()->IsArmorVellum(); }
+    [[nodiscard]] bool IsConjuredConsumable() const { return GetTemplate()->IsConjuredConsumable(); }
 
     // Item Refund system
-    void SetNotRefundable(Player* owner, bool changestate = true, SQLTransaction* trans = nullptr);
-    void SetRefundRecipient(uint32 pGuidLow) { m_refundRecipient = pGuidLow; }
+    void SetNotRefundable(Player* owner, bool changestate = true, CharacterDatabaseTransaction* trans = nullptr);
+    void SetRefundRecipient(ObjectGuid::LowType pGuidLow) { m_refundRecipient = pGuidLow; }
     void SetPaidMoney(uint32 money) { m_paidMoney = money; }
     void SetPaidExtendedCost(uint32 iece) { m_paidExtendedCost = iece; }
-    uint32 GetRefundRecipient() { return m_refundRecipient; }
+    ObjectGuid::LowType GetRefundRecipient() { return m_refundRecipient; }
     uint32 GetPaidMoney() { return m_paidMoney; }
     uint32 GetPaidExtendedCost() { return m_paidExtendedCost; }
 
@@ -331,9 +334,11 @@ public:
     void ClearSoulboundTradeable(Player* currentOwner);
     bool CheckSoulboundTradeExpire();
 
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&);
+    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
+    void AddToObjectUpdate() override;
+    void RemoveFromObjectUpdate() override;
 
-    uint32 GetScriptId() const { return GetTemplate()->ScriptId; }
+    [[nodiscard]] uint32 GetScriptId() const { return GetTemplate()->ScriptId; }
 private:
     std::string m_text;
     uint8 m_slot;

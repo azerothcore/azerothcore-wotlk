@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,19 +14,19 @@ EndScriptData */
 /* ContentData
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
-#include "Player.h"
-#include "Vehicle.h"
+#include "CellImpl.h"
+#include "Chat.h"
+#include "CombatAI.h"
 #include "CreatureTextMgr.h"
 #include "PassiveAI.h"
-#include "CombatAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
-#include "Chat.h"
-#include "CellImpl.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 /********
@@ -51,7 +51,7 @@ class npc_conversing_with_the_depths_trigger : public CreatureScript
 public:
     npc_conversing_with_the_depths_trigger() : CreatureScript("npc_conversing_with_the_depths_trigger") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_conversing_with_the_depths_triggerAI (pCreature);
     }
@@ -64,17 +64,17 @@ public:
         bool secondpart;
         int32 timer;
         uint8 step;
-        uint64 pGUID;
-        uint64 oachanoaGUID;
+        ObjectGuid pGUID;
+        ObjectGuid oachanoaGUID;
 
-        void Reset()
+        void Reset() override
         {
             running = false;
             secondpart = false;
             timer = 0;
             step = 0;
-            pGUID = 0;
-            oachanoaGUID = 0;
+            pGUID.Clear();
+            oachanoaGUID.Clear();
         }
 
         void NextStep(const uint32 time)
@@ -105,7 +105,7 @@ public:
                 c->DespawnOrUnsummon();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( running )
             {
@@ -234,7 +234,7 @@ public:
             }
         }
 
-        void Start(uint64 g)
+        void Start(ObjectGuid g)
         {
             running = true;
             pGUID = g;
@@ -260,7 +260,6 @@ public:
         return true;
     }
 };
-
 
 enum hourglass
 {
@@ -293,7 +292,7 @@ class npc_hourglass_of_eternity : public CreatureScript
 public:
     npc_hourglass_of_eternity() : CreatureScript("npc_hourglass_of_eternity") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_hourglass_of_eternityAI (pCreature);
     }
@@ -302,14 +301,14 @@ public:
     {
         npc_hourglass_of_eternityAI(Creature* c) : ScriptedAI(c) {}
 
-        uint64 summonerGUID;
-        uint64 futureGUID;
+        ObjectGuid summonerGUID;
+        ObjectGuid futureGUID;
         EventMap events;
         uint8 count[3];
         uint8 phase;
 
         bool IsFuture() { return me->GetEntry() == NPC_FUTURE_HOURGLASS; }
-        void InitializeAI()
+        void InitializeAI() override
         {
             if (me->ToTempSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
@@ -338,13 +337,12 @@ public:
         Player* getSummoner() { return ObjectAccessor::GetPlayer(*me, summonerGUID); }
         Creature* getFuture() { return ObjectAccessor::GetCreature(*me, futureGUID); }
 
-
         uint32 randEntry()
         {
             return NPC_INFINITE_ASSAILANT + urand(0, 2);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -464,7 +462,7 @@ class npc_future_you : public CreatureScript
 public:
     npc_future_you() : CreatureScript("npc_future_you") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_future_youAI (pCreature);
     }
@@ -473,25 +471,25 @@ public:
     {
         npc_future_youAI(Creature* c) : ScriptedAI(c) {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
             me->ClearUnitState(UNIT_STATE_EVADE);
         }
 
-        void Reset()
+        void Reset() override
         {
             if (me->ToTempSummon() && me->ToTempSummon()->GetSummoner())
                 me->setFaction(me->ToTempSummon()->GetSummoner()->getFaction());
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!me->GetVictim() && who->GetEntry() >= NPC_INFINITE_ASSAILANT && who->GetEntry() <= NPC_INFINITE_TIMERENDER)
                 AttackStart(who);
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -512,7 +510,7 @@ class npc_mindless_ghoul : public CreatureScript
 public:
     npc_mindless_ghoul() : CreatureScript("npc_mindless_ghoul") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_mindless_ghoulAI (pCreature);
     }
@@ -524,12 +522,12 @@ public:
             me->SetCorpseDelay(1);
         }
 
-        bool CanAIAttack(const Unit* who) const
+        bool CanAIAttack(const Unit* who) const override
         {
             return who->GetEntry() == NPC_INJURED_7TH_LEGION_SOLDER;
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             me->SetCorpseDelay(1);
         }
@@ -541,7 +539,7 @@ class npc_injured_7th_legion_soldier : public CreatureScript
 public:
     npc_injured_7th_legion_soldier() : CreatureScript("npc_injured_7th_legion_soldier") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_injured_7th_legion_soldierAI (pCreature);
     }
@@ -550,7 +548,7 @@ public:
     {
         npc_injured_7th_legion_soldierAI(Creature* c) : NullCreatureAI(c) {}
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_FEAR_AURA_WITH_COWER, true);
             me->SetWalk(false);
@@ -560,7 +558,7 @@ public:
             me->GetMotionMaster()->MovePath(path, false);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
@@ -573,7 +571,7 @@ public:
                 if (TempSummon* summon = me->ToTempSummon())
                     if (Unit* owner = summon->GetSummoner())
                         if (Player* player = owner->ToPlayer())
-                            player->KilledMonsterCredit(me->GetEntry(), 0);
+                            player->KilledMonsterCredit(me->GetEntry());
             }
         }
     };
@@ -584,7 +582,7 @@ class npc_heated_battle : public CreatureScript
 public:
     npc_heated_battle() : CreatureScript("npc_heated_battle") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_heated_battleAI (pCreature);
     }
@@ -593,7 +591,7 @@ public:
     {
         npc_heated_battleAI(Creature* c) : CombatAI(c) {}
 
-        void Reset()
+        void Reset() override
         {
             me->SetCorpseDelay(60);
             CombatAI::Reset();
@@ -601,7 +599,7 @@ public:
                 AttackStart(target);
         }
 
-        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
         {
             if (who && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -632,13 +630,13 @@ public:
             GetCaster()->SummonCreature(NPC_PRINCE_ARTHAS, 4821.3f, -580.14f, 163.541f, 4.57f);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHit += SpellEffectFn(spell_q12478_frostmourne_cavern_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q12478_frostmourne_cavern_SpellScript();
     }
@@ -672,14 +670,14 @@ public:
                 (*itr)->SetSpeed(MOVE_RUN, 1.1f, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_q12243_fire_upon_the_waters_AuraScript::HandleApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_q12243_fire_upon_the_waters_AuraScript::HandleRemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_q12243_fire_upon_the_waters_AuraScript();
     }
@@ -742,7 +740,7 @@ class npc_q24545_lich_king : public CreatureScript
 public:
     npc_q24545_lich_king() : CreatureScript("npc_q24545_lich_king") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_q24545_lich_kingAI (pCreature);
     }
@@ -755,7 +753,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
         void CleanAll(bool fromReset = true)
         {
@@ -775,18 +773,18 @@ public:
             if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_2, 150.0f))
                 go->Delete();
             WretchedGhoulCleaner cleaner;
-            acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
-            me->VisitNearbyGridObject(150.0f, worker);
+            Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+            Cell::VisitGridObjects(me, worker, 150.0f);
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events.ScheduleEvent(998, 10000);
             events.ScheduleEvent(999, 0);
             events.ScheduleEvent(1, 3000);
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
 
             CleanAll();
 
@@ -802,17 +800,18 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(uint64 guid, int32  /*id*/)
+        void SetGUID(ObjectGuid guid, int32  /*id*/) override
         {
             if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
                 return;
+
             me->setActive(true);
             playerGUID = guid;
             events.ScheduleEvent(2, 900000);
             events.ScheduleEvent(3, 0);
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (!playerGUID || type != data)
                 return;
@@ -839,13 +838,13 @@ public:
                     c->CastSpell(c, SPELL_SAC_HOLY_ZONE_AURA, true);
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_3, 150.0f))
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                    playerGUID = 0;
+                    playerGUID.Clear();
                     events.RescheduleEvent(2, 60000);
                 }
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -904,7 +903,7 @@ public:
                     events.ScheduleEvent(7, 11000);
                     break;
                 case 6: // repel hammer
-                    me->CastSpell((Unit*)NULL, SPELL_SAC_REPEL_HAMMER, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SAC_REPEL_HAMMER, false);
                     if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_1, 150.0f, true))
                         c->CastSpell(c, SPELL_SAC_BLUE_EXPLOSION, true);
 
@@ -923,7 +922,7 @@ public:
                     events.ScheduleEvent(9, 11500);
                     break;
                 case 8: // summon ghouls
-                    me->CastSpell((Unit*)NULL, SPELL_SAC_SUMMON_GHOULS_AURA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SAC_SUMMON_GHOULS_AURA, false);
                     break;
                 case 9: // talk 3
                     Talk(3);
@@ -988,8 +987,8 @@ public:
                 case 17: // kill vegard
                     {
                         WretchedGhoulCleaner cleaner;
-                        acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
-                        me->VisitNearbyGridObject(150.0f, worker);
+                        Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+                        Cell::VisitGridObjects(me, worker, 150.0f);
 
                         if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
                             if (Creature* v = me->FindNearestCreature(NPC_SAC_VEGARD_1, 50.0f, true))
@@ -1010,7 +1009,6 @@ public:
                                     }
                                     c->ToCreature()->DespawnOrUnsummon(1);
                                 }
-
                     }
                     break;
                 case 18: // summon vegard
@@ -1019,21 +1017,21 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             summons.Despawn(summon);
         }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spell)
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_SAC_REPEL_HAMMER && target->GetTypeId() == TYPEID_UNIT)
             {
-                target->CastSpell((Unit*)NULL, SPELL_SAC_THROW_HAMMER, true);
+                target->CastSpell((Unit*)nullptr, SPELL_SAC_THROW_HAMMER, true);
                 target->ToCreature()->DespawnOrUnsummon(1);
                 if (Unit* c = target->GetVehicleBase())
                     c->RemoveAurasDueToSpell(SPELL_SAC_HOLY_ZONE_AURA);
@@ -1047,7 +1045,7 @@ class at_q24545_frostmourne_cavern : public AreaTriggerScript
 public:
     at_q24545_frostmourne_cavern() : AreaTriggerScript("at_q24545_frostmourne_cavern") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (player->GetPhaseMask() & 2)
             if (Creature* c = player->FindNearestCreature(NPC_SAC_LICH_KING, 60.0f, true))
@@ -1062,7 +1060,7 @@ class SACActivateEvent : public BasicEvent
 public:
     SACActivateEvent(Creature* owner) : _owner(owner) {}
 
-    bool Execute(uint64 /*time*/, uint32 /*diff*/)
+    bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         if (!_owner->IsAlive())
             return true;
@@ -1082,7 +1080,7 @@ class SACDeactivateEvent : public BasicEvent
 public:
     SACDeactivateEvent(Creature* owner) : _owner(owner) {}
 
-    bool Execute(uint64 /*time*/, uint32 /*diff*/)
+    bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         _owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         _owner->SetReactState(REACT_PASSIVE);
@@ -1099,7 +1097,7 @@ class npc_q24545_wretched_ghoul : public CreatureScript
 public:
     npc_q24545_wretched_ghoul() : CreatureScript("npc_q24545_wretched_ghoul") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_q24545_wretched_ghoulAI (pCreature);
     }
@@ -1111,12 +1109,12 @@ public:
             Deactivate();
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetCorpseDelay(3);
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == -1)
                 Activate();
@@ -1129,14 +1127,14 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) || target->HasUnitState(UNIT_STATE_STUNNED) || me->GetDisplayId() == 11686)
                 return false;
@@ -1158,13 +1156,13 @@ public:
             me->SetDisplayId(11686);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->RemoveAurasDueToSpell(SPELL_SAC_GHOUL_AREA_AURA);
             me->m_Events.AddEvent(new SACDeactivateEvent(me), me->m_Events.CalculateTime(4000));
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             Deactivate();
         }
@@ -1195,7 +1193,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
-            acore::Containers::RandomResizeList(targets, 2);
+            Acore::Containers::RandomResize(targets, 2);
         }
 
         void HandleScript(SpellEffIndex effIndex)
@@ -1206,14 +1204,14 @@ public:
                     target->ToCreature()->AI()->DoAction(GetSpellInfo()->Id == 70790 ? -2 : -1);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_q24545_aod_special_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
             OnEffectHitTarget += SpellEffectFn(spell_q24545_aod_special_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q24545_aod_special_SpellScript();
     }
@@ -1224,7 +1222,7 @@ class npc_q24545_vegard_dummy : public CreatureScript
 public:
     npc_q24545_vegard_dummy() : CreatureScript("npc_q24545_vegard_dummy") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_q24545_vegard_dummyAI (pCreature);
     }
@@ -1238,7 +1236,7 @@ public:
 
         bool done;
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!done)
             {
@@ -1246,7 +1244,6 @@ public:
                 me->CastSpell(me, SPELL_SAC_EMERGE, true);
             }
         }
-
     };
 };
 
@@ -1255,7 +1252,7 @@ class npc_q24545_vegard : public CreatureScript
 public:
     npc_q24545_vegard() : CreatureScript("npc_q24545_vegard") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_q24545_vegardAI (pCreature);
     }
@@ -1277,7 +1274,7 @@ public:
 
         EventMap events;
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(1);
             me->DespawnOrUnsummon(10000);
@@ -1285,13 +1282,13 @@ public:
                 c->AI()->SetData(3, 3);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
                 Talk(2);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             UpdateVictim();
             events.Update(diff);
@@ -1308,7 +1305,7 @@ public:
                         AttackStart(t);
                     break;
                 case 2:
-                    me->CastSpell((Unit*)NULL, 70866, false);
+                    me->CastSpell((Unit*)nullptr, 70866, false);
                     events.RepeatEvent(urand(30000, 35000));
                     break;
                 case 3:
@@ -1341,7 +1338,7 @@ class npc_spiritual_insight : public CreatureScript
 public:
     npc_spiritual_insight() : CreatureScript("npc_spiritual_insight") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_spiritual_insightAI (pCreature);
     }
@@ -1366,7 +1363,7 @@ public:
             return 5;
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -1383,8 +1380,6 @@ public:
         }
     };
 };
-
-
 
 // Theirs
 
@@ -1507,16 +1502,21 @@ public:
             talkWing = 0;
         }
 
-        void Reset()
+        void Reset() override
         {
             talkWing = 0;
-            memset(audienceList, 0, sizeof(audienceList));
-            memset(imageList, 0, sizeof(imageList));
+
+            for (uint8 i = 0; i < 10; ++i)
+                audienceList[i].Clear();
+
+            for (uint8 i = 0; i < 5; ++i)
+                imageList[i].Clear();
+
             _events.ScheduleEvent(EVENT_GET_TARGETS, 5000);
             _events.ScheduleEvent(EVENT_START_RANDOM, 20000);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE)
             {
@@ -1671,7 +1671,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
 
@@ -1736,12 +1736,12 @@ public:
         }
     private:
         EventMap _events;
-        uint64   audienceList[10];
-        uint64   imageList[5];
-        uint8    talkWing;
+        ObjectGuid audienceList[10];
+        ObjectGuid imageList[5];
+        uint8 talkWing;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_commander_eligor_dawnbringerAI(creature);
     }
@@ -1800,13 +1800,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q12096_q12092_dummy_SpellScript();
     }
@@ -1832,13 +1832,13 @@ public:
             lothalor->DespawnOrUnsummon(4000);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_bark_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q12096_q12092_bark_SpellScript();
     }
@@ -1868,16 +1868,16 @@ public:
     {
         npc_torturer_lecraftAI(Creature* creature) : ScriptedAI(creature)
         {
-            _playerGUID = 0;
+            _playerGUID.Clear();
         }
 
-        void Reset()
+        void Reset() override
         {
             _textCounter = 1;
-            _playerGUID  = 0;
+            _playerGUID.Clear();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             _events.ScheduleEvent(EVENT_HEMORRHAGE, urand(5000, 8000));
             _events.ScheduleEvent(EVENT_KIDNEY_SHOT, urand(12000, 15000));
@@ -1886,7 +1886,7 @@ public:
                 Talk (SAY_AGGRO, player);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (spell->Id != SPELL_HIGH_EXECUTORS_BRANDING_IRON)
                 return;
@@ -1902,7 +1902,7 @@ public:
                 Talk(_textCounter, player);
 
                 if (_textCounter == 5)
-                    player->KilledMonsterCredit(NPC_TORTURER_LECRAFT, 0);
+                    player->KilledMonsterCredit(NPC_TORTURER_LECRAFT);
 
                 ++_textCounter;
 
@@ -1911,7 +1911,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1939,10 +1939,10 @@ public:
     private:
         EventMap _events;
         uint8    _textCounter;
-        uint64   _playerGUID;
+        ObjectGuid   _playerGUID;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_torturer_lecraftAI(creature);
     }

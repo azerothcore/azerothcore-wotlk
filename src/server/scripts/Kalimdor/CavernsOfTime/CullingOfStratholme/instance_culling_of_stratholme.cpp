@@ -2,20 +2,20 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "CreatureTextMgr.h"
 #include "culling_of_stratholme.h"
 #include "Player.h"
-#include "TemporarySummon.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "TemporarySummon.h"
 
 class instance_culling_of_stratholme : public InstanceMapScript
 {
 public:
     instance_culling_of_stratholme() : InstanceMapScript("instance_culling_of_stratholme", 595) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_culling_of_stratholme_InstanceMapScript(pMap);
     }
@@ -24,14 +24,6 @@ public:
     {
         instance_culling_of_stratholme_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
-            // NPCs
-            _arthasGUID = 0;
-            _infiniteGUID = 0;
-
-            // GOs
-            _shkafGateGUID = 0;
-            _exitGateGUID = 0;
-
             // Instance
             _crateCount = 0;
             _showCrateTimer = 0;
@@ -41,12 +33,12 @@ public:
             _loadTimer = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             return false;
         }
 
-        void FillInitialWorldStates(WorldPacket& data)
+        void FillInitialWorldStates(WorldPacket& data) override
         {
             data << uint32(WORLDSTATE_SHOW_CRATES) << uint32(0);
             data << uint32(WORLDSTATE_CRATES_REVEALED) << uint32(_crateCount);
@@ -55,7 +47,7 @@ public:
             data << uint32(WORLDSTATE_TIME_GUARDIAN_SHOW) << uint32(0);
         }
 
-        void OnPlayerEnter(Player* plr)
+        void OnPlayerEnter(Player* plr) override
         {
             if (instance->GetPlayersCountExceptGMs() == 1)
                 SetData(DATA_ARTHAS_REPOSITION, 2);
@@ -66,7 +58,7 @@ public:
                 plr->CastSpell(plr, ((plr->getGender() == GENDER_MALE) ? SPELL_HUMAN_MALE : SPELL_HUMAN_FEMALE), true);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -83,7 +75,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -100,7 +92,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -137,7 +129,7 @@ public:
                         Map::PlayerList const& PlayerList = instance->GetPlayers();
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                i->GetSource()->KilledMonsterCredit(NPC_GRAIN_CREATE_TRIGGER, 0);
+                                i->GetSource()->KilledMonsterCredit(NPC_GRAIN_CREATE_TRIGGER);
 
                         _showCrateTimer++;
                         if (GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_CRATES_FOUND)
@@ -166,14 +158,13 @@ public:
                     else if (Creature* arthas = instance->GetCreature(_arthasGUID))
                         Reposition(arthas);
                     return;
-
             }
 
             if (type == DATA_ARTHAS_EVENT)
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -185,7 +176,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -196,10 +187,11 @@ public:
                 case DATA_EXIT_GATE:
                     return _exitGateGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (_loadTimer)
             {
@@ -256,7 +248,6 @@ public:
                     if (instance->IsHeroic() && _infiniteGUID)
                         if (Creature* cr = instance->GetCreature(_infiniteGUID))
                             cr->AI()->DoAction(ACTION_RUN_OUT_OF_TIME);
-
                 }
                 else if (div > divAfter)
                 {
@@ -357,7 +348,7 @@ public:
             instance->LoadGrid(LeaderIntroPos6.GetPositionX(), LeaderIntroPos6.GetPositionY());
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -368,7 +359,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -400,12 +391,12 @@ public:
 
     private:
         // NPCs
-        uint64 _arthasGUID;
-        uint64 _infiniteGUID;
+        ObjectGuid _arthasGUID;
+        ObjectGuid _infiniteGUID;
 
         // GOs
-        uint64 _shkafGateGUID;
-        uint64 _exitGateGUID;
+        ObjectGuid _shkafGateGUID;
+        ObjectGuid _exitGateGUID;
         uint32 _encounterState;
         uint32 _crateCount;
         uint32 _showCrateTimer;

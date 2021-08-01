@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -337,7 +337,7 @@ enum AuraType
     SPELL_AURA_ABILITY_PERIODIC_CRIT = 286,
     SPELL_AURA_DEFLECT_SPELLS = 287,
     SPELL_AURA_IGNORE_HIT_DIRECTION = 288,
-    SPELL_AURA_289 = 289,
+    SPELL_AURA_PREVENT_DURABILITY_LOSS = 289,
     SPELL_AURA_MOD_CRIT_PCT = 290,
     SPELL_AURA_MOD_XP_QUEST_PCT = 291,
     SPELL_AURA_OPEN_STABLE = 292,

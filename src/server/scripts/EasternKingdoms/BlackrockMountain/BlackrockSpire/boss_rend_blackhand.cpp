@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Player.h"
 #include "blackrock_spire.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -52,7 +52,6 @@ enum Misc
     REND_PATH_1                     = 1379680,
     REND_PATH_2                     = 1379681,
 };
-
 
 struct Wave
 {
@@ -111,7 +110,6 @@ static Wave Wave6[] = // 27 sec
     { 10442, 212.2642f, -430.7648f, 110.9807f }
 };
 
-
 /*Position const GythLoc =      { 211.762f,  -397.5885f, 111.1817f,  4.747295f   };
 Position const Teleport1Loc = { 194.2993f, -474.0814f, 121.4505f, -0.01225555f };
 Position const Teleport2Loc = { 216.485f,  -434.93f,   110.888f,  -0.01225555f };*/
@@ -161,7 +159,7 @@ public:
     {
         boss_rend_blackhandAI(Creature* creature) : BossAI(creature, DATA_WARCHIEF_REND_BLACKHAND) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
 
@@ -173,15 +171,15 @@ public:
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PREPARATION);
             gythEvent = false;
-            victorGUID = 0;
-            waveDoorGUID = 0;
+            victorGUID.Clear();
+            waveDoorGUID.Clear();
 
             summons.DespawnAll();
 
             if (Creature* victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 5.0f, true))
                 victor->Respawn(true);
 
-            if (GameObject* exitDoor = me->GetMap()->GetGameObject(instance->GetData64(GO_GYTH_ENTRY_DOOR)))
+            if (GameObject* exitDoor = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GYTH_ENTRY_DOOR)))
                 exitDoor->SetGoState(GO_STATE_ACTIVE);
 
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, NOT_STARTED);
@@ -196,7 +194,7 @@ public:
                 waveDoor->UseDoorOrButton();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
 
@@ -213,7 +211,7 @@ public:
                 Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_WHIRLWIND,     urand(13000, 15000));
@@ -221,19 +219,19 @@ public:
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(17000, 19000));
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             if (Creature* victor = me->FindNearestCreature(NPC_LORD_VICTOR_NEFARIUS, 75.0f, true))
                 victor->AI()->SetData(1, 2);
 
-            if (GameObject* exitDoor = me->GetMap()->GetGameObject(instance->GetData64(GO_GYTH_ENTRY_DOOR)))
+            if (GameObject* exitDoor = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GYTH_ENTRY_DOOR)))
                 exitDoor->SetGoState(GO_STATE_ACTIVE);
 
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, DONE);
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == AREATRIGGER && data == AREATRIGGER_BLACKROCK_STADIUM)
             {
@@ -260,7 +258,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == WAYPOINT_MOTION_TYPE)
             {
@@ -273,7 +271,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (gythEvent)
             {
@@ -289,7 +287,7 @@ public:
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_0);
 
-                            if (GameObject* door2 = me->GetMap()->GetGameObject(instance->GetData64(GO_GYTH_ENTRY_DOOR)))
+                            if (GameObject* door2 = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GYTH_ENTRY_DOOR)))
                                 door2->SetGoState(GO_STATE_READY);
 
                             events.ScheduleEvent(EVENT_START_2, 4000);
@@ -467,13 +465,13 @@ public:
 
     private:
         bool   gythEvent;
-        uint64 victorGUID;
-        uint64 waveDoorGUID;
+        ObjectGuid victorGUID;
+        ObjectGuid waveDoorGUID;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_rend_blackhandAI>(creature);
+        return GetBlackrockSpireAI<boss_rend_blackhandAI>(creature);
     }
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,35 +7,36 @@
 #ifndef ACORE_GRIDNOTIFIERS_H
 #define ACORE_GRIDNOTIFIERS_H
 
-#include "ObjectGridLoader.h"
-#include "UpdateData.h"
-#include <iostream>
-
 #include "Corpse.h"
-#include "Object.h"
+#include "CreatureAI.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "Object.h"
+#include "ObjectGridLoader.h"
+#include "Optional.h"
 #include "Player.h"
-#include "Unit.h"
-#include "CreatureAI.h"
 #include "Spell.h"
+#include "Unit.h"
+#include "UpdateData.h"
 #include "WorldSession.h"
+#include <iostream>
 
 class Player;
 //class Map;
 
-namespace acore
+namespace Acore
 {
     struct VisibleNotifier
     {
         Player& i_player;
-        Player::ClientGUIDs vis_guids;
+        GuidUnorderedSet vis_guids;
         std::vector<Unit*>& i_visibleNow;
         bool i_gobjOnly;
         bool i_largeOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) : i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
+        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) :
+            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
         {
             i_visibleNow.clear();
         }
@@ -58,7 +59,7 @@ namespace acore
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player& player, bool largeOnly) : VisibleNotifier(player, false, largeOnly) {}
+        PlayerRelocationNotifier(Player& player, bool largeOnly): VisibleNotifier(player, false, largeOnly) { }
 
         template<class T> void Visit(GridRefManager<T>& m) { VisibleNotifier::Visit(m); }
         void Visit(PlayerMapType&);
@@ -719,18 +720,6 @@ namespace acore
         NearestGameObjectTypeInObjectRangeCheck(NearestGameObjectTypeInObjectRangeCheck const&);
     };
 
-    class GameObjectWithDbGUIDCheck
-    {
-    public:
-        GameObjectWithDbGUIDCheck(uint32 db_guid) : i_db_guid(db_guid) {}
-        bool operator()(GameObject const* go) const
-        {
-            return go->GetDBTableGUIDLow() == i_db_guid;
-        }
-    private:
-        uint32 i_db_guid;
-    };
-
     // Unit checks
 
     class MostHPMissingInRange
@@ -860,18 +849,6 @@ namespace acore
         float i_range;
     };
 
-    class CreatureWithDbGUIDCheck
-    {
-    public:
-        CreatureWithDbGUIDCheck(uint32 lowguid) : i_lowguid(lowguid) {}
-        bool operator()(Creature* u)
-        {
-            return u->GetDBTableGUIDLow() == i_lowguid;
-        }
-    private:
-        uint32 i_lowguid;
-    };
-
     class AnyFriendlyUnitInObjectRangeCheck
     {
     public:
@@ -956,7 +933,7 @@ namespace acore
         bool operator()(Unit* u)
         {
             if (u->isTargetableForAttack(true, i_funit) && i_obj->IsWithinDistInMap(u, i_range) &&
-                    !i_funit->IsFriendlyTo(u) && i_funit->CanSeeOrDetect(u))
+                (i_funit->IsInCombatWith(u) || i_funit->IsHostileTo(u)) && i_obj->CanSeeOrDetect(u))
             {
                 i_range = i_obj->GetDistance(u);        // use found unit range as new range limit for next check
                 return true;
@@ -1085,7 +1062,7 @@ namespace acore
         }
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, true, false))
                 return false;
 
             if (!me->IsValidAttackTarget(u))
@@ -1111,7 +1088,7 @@ namespace acore
         explicit NearestHostileUnitInAttackDistanceCheck(Creature const* creature, float dist) : me(creature), m_range(dist) {}
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, true, false))
                 return false;
 
             if (!me->CanStartAttack(u))
@@ -1403,21 +1380,21 @@ namespace acore
     class ObjectGUIDCheck
     {
     public:
-        ObjectGUIDCheck(uint64 GUID, bool equals) : _GUID(GUID), _equals(equals) {}
+        ObjectGUIDCheck(ObjectGuid GUID, bool equals) : _GUID(GUID), _equals(equals) {}
         bool operator()(WorldObject const* object)
         {
             return (object->GetGUID() == _GUID) == _equals;
         }
 
     private:
-        uint64 _GUID;
+        ObjectGuid _GUID;
         bool _equals;
     };
 
     class UnitAuraCheck
     {
     public:
-        UnitAuraCheck(bool present, uint32 spellId, uint64 casterGUID = 0) : _present(present), _spellId(spellId), _casterGUID(casterGUID) {}
+        UnitAuraCheck(bool present, uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty) : _present(present), _spellId(spellId), _casterGUID(casterGUID) {}
         bool operator()(Unit const* unit) const
         {
             return unit->HasAura(_spellId, _casterGUID) == _present;
@@ -1431,7 +1408,7 @@ namespace acore
     private:
         bool _present;
         uint32 _spellId;
-        uint64 _casterGUID;
+        ObjectGuid _casterGUID;
     };
 
     class AllWorldObjectsInExactRange

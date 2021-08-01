@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,10 +8,11 @@
 #define ACORE_MOTIONMASTER_H
 
 #include "Common.h"
-#include <vector>
-#include "SharedDefines.h"
 #include "Object.h"
+#include "SharedDefines.h"
 #include "Spline/MoveSpline.h"
+#include <optional>
+#include <vector>
 
 class MovementGenerator;
 class Unit;
@@ -66,6 +67,31 @@ enum RotateDirection
     ROTATE_DIRECTION_RIGHT
 };
 
+struct ChaseRange
+{
+    ChaseRange(float range);
+    ChaseRange(float _minRange, float _maxRange);
+    ChaseRange(float _minRange, float _minTolerance, float _maxTolerance, float _maxRange);
+
+    // this contains info that informs how we should path!
+    float MinRange;     // we have to move if we are within this range...    (min. attack range)
+    float MinTolerance; // ...and if we are, we will move this far away
+    float MaxRange;     // we have to move if we are outside this range...   (max. attack range)
+    float MaxTolerance; // ...and if we are, we will move into this range
+};
+
+struct ChaseAngle
+{
+    ChaseAngle(float angle, float _tolerance = M_PI_4);
+
+    float RelativeAngle; // we want to be at this angle relative to the target (0 = front, M_PI = back)
+    float Tolerance;     // but we'll tolerate anything within +- this much
+
+    float UpperBound() const;
+    float LowerBound() const;
+    bool IsAngleOkay(float relativeAngle) const;
+};
+
 // assume it is 25 yard per 0.6 second
 #define SPEED_CHARGE    42.0f
 
@@ -85,7 +111,7 @@ private:
             --_top;
     }
 
-    bool needInitTop() const
+    [[nodiscard]] bool needInitTop() const
     {
         if (empty())
             return false;
@@ -93,7 +119,6 @@ private:
     }
     void InitTop();
 public:
-
     explicit MotionMaster(Unit* unit) : _expList(nullptr), _top(-1), _owner(unit), _cleanFlag(MMCF_NONE)
     {
         for (uint8 i = 0; i < MAX_MOTION_SLOT; ++i)
@@ -107,20 +132,20 @@ public:
     void Initialize();
     void InitDefault();
 
-    bool empty() const { return (_top < 0); }
-    int size() const { return _top + 1; }
-    _Ty top() const
+    [[nodiscard]] bool empty() const { return (_top < 0); }
+    [[nodiscard]] int size() const { return _top + 1; }
+    [[nodiscard]] _Ty top() const
     {
         ASSERT(!empty());
         return Impl[_top];
     }
-    _Ty GetMotionSlot(int slot) const
+    [[nodiscard]] _Ty GetMotionSlot(int slot) const
     {
         ASSERT(slot >= 0);
         return Impl[slot];
     }
 
-    uint8 GetCleanFlags() const { return _cleanFlag; }
+    [[nodiscard]] uint8 GetCleanFlags() const { return _cleanFlag; }
 
     void DirectDelete(_Ty curr);
     void DelayedDelete(_Ty curr);
@@ -164,7 +189,11 @@ public:
     void MoveTargetedHome();
     void MoveRandom(float wanderDistance = 0.0f);
     void MoveFollow(Unit* target, float dist, float angle, MovementSlot slot = MOTION_SLOT_ACTIVE);
-    void MoveChase(Unit* target, float dist = 0.0f, float angle = 0.0f);
+    void MoveChase(Unit* target, std::optional<ChaseRange> dist = {}, std::optional<ChaseAngle> angle = {});
+    void MoveChase(Unit* target, float dist, float angle) { MoveChase(target, ChaseRange(dist), ChaseAngle(angle)); }
+    void MoveChase(Unit* target, float dist) { MoveChase(target, ChaseRange(dist)); }
+    void MoveCircleTarget(Unit* target);
+    void MoveBackwards(Unit* target, float dist);
     void MoveConfused();
     void MoveFleeing(Unit* enemy, uint32 time = 0);
     void MovePoint(uint32 id, const Position& pos, bool generatePath = true, bool forceDestination = true)
@@ -173,12 +202,12 @@ public:
     void MoveSplinePath(Movement::PointsArray* path);
 
     // These two movement types should only be used with creatures having landing/takeoff animations
-    void MoveLand(uint32 id, Position const& pos, float speed);
-    void MoveLand(uint32 id, float x, float y, float z, float speed); // pussywizard: added for easy calling by passing 3 floats x, y, z
-    void MoveTakeoff(uint32 id, Position const& pos, float speed);
-    void MoveTakeoff(uint32 id, float x, float y, float z, float speed); // pussywizard: added for easy calling by passing 3 floats x, y, z
+    void MoveLand(uint32 id, Position const& pos, float speed = 0.0f);
+    void MoveLand(uint32 id, float x, float y, float z, float speed = 0.0f); // pussywizard: added for easy calling by passing 3 floats x, y, z
+    void MoveTakeoff(uint32 id, Position const& pos, float speed = 0.0f);
+    void MoveTakeoff(uint32 id, float x, float y, float z, float speed = 0.0f); // pussywizard: added for easy calling by passing 3 floats x, y, z
 
-    void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE, const Movement::PointsArray* path = NULL, bool generatePath = false, float orientation = 0.0f);
+    void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE, const Movement::PointsArray* path = nullptr, bool generatePath = false, float orientation = 0.0f);
     void MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ);
     void MoveJumpTo(float angle, float speedXY, float speedZ);
     void MoveJump(Position const& pos, float speedXY, float speedZ, uint32 id = 0)
@@ -193,9 +222,9 @@ public:
     void MovePath(uint32 path_id, bool repeatable);
     void MoveRotate(uint32 time, RotateDirection direction);
 
-    MovementGeneratorType GetCurrentMovementGeneratorType() const;
-    MovementGeneratorType GetMotionSlotType(int slot) const;
-    uint32 GetCurrentSplineId() const; // Xinef: Escort system
+    [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
+    [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
+    [[nodiscard]] uint32 GetCurrentSplineId() const; // Xinef: Escort system
 
     void propagateSpeedChange();
     void ReinitializeMovement();

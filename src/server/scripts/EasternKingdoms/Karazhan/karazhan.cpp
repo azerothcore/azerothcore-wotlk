@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
@@ -17,12 +17,12 @@ npc_berthold
 npc_image_of_medivh
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "karazhan.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -126,7 +126,7 @@ public:
 
         InstanceScript* instance;
 
-        uint64 m_uiSpotlightGUID;
+        ObjectGuid m_uiSpotlightGUID;
 
         uint32 TalkCount;
         uint32 TalkTimer;
@@ -138,7 +138,7 @@ public:
 
         void Reset() override
         {
-            m_uiSpotlightGUID = 0;
+            m_uiSpotlightGUID.Clear();
 
             TalkCount = 0;
             TalkTimer = 2000;
@@ -168,7 +168,7 @@ public:
             {
                 case 0:
                     DoCast(me, SPELL_TUXEDO, false);
-                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_STAGEDOORLEFT));
+                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
                     break;
                 case 4:
                     TalkCount = 0;
@@ -184,12 +184,12 @@ public:
                     }
                     break;
                 case 8:
-                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_STAGEDOORLEFT));
+                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
                     PerformanceReady = true;
                     break;
                 case 9:
                     PrepareEncounter();
-                    instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_CURTAINS));
+                    instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_CURTAINS));
                     break;
             }
         }
@@ -228,9 +228,7 @@ public:
 
         void PrepareEncounter()
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
-#endif
+            LOG_DEBUG("scripts.ai", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
             uint8 index = 0;
             uint8 count = 0;
 
@@ -395,7 +393,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_barnesAI(creature);
+        return GetKarazhanAI<npc_barnesAI>(creature);
     }
 };
 
@@ -413,7 +411,6 @@ public:
 #define SAY_DIALOG_ARCANAGOS_8      "What have you done, wizard? This cannot be! I'm burning from... within!"
 #define SAY_DIALOG_MEDIVH_9         "He should not have angered me. I must go... recover my strength now..."
 
-
 //static float MedivPos[4] = {-11161.49f, -1902.24f, 91.48f, 1.94f};
 static float ArcanagosPos[4] = {-11169.75f, -1881.48f, 107.39f, 4.83f};
 
@@ -422,9 +419,9 @@ class npc_image_of_medivh : public CreatureScript
 public:
     npc_image_of_medivh() : CreatureScript("npc_image_of_medivh") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_image_of_medivhAI(creature);
+        return GetKarazhanAI<npc_image_of_medivhAI>(creature);
     }
 
     struct npc_image_of_medivhAI : public ScriptedAI
@@ -438,7 +435,7 @@ public:
 
         InstanceScript* instance;
 
-        uint64 ArcanagosGUID;
+        ObjectGuid ArcanagosGUID;
 
         uint32 YellTimer;
         uint8 Step;
@@ -447,13 +444,13 @@ public:
 
         bool EventStarted;
 
-        void Reset()
+        void Reset() override
         {
-            ArcanagosGUID = 0;
+            ArcanagosGUID.Clear();
             MTimer = 0;
             ATimer = 0;
 
-            if (instance && instance->GetData64(DATA_IMAGE_OF_MEDIVH) == 0)
+            if (instance && !instance->GetGuidData(DATA_IMAGE_OF_MEDIVH))
             {
                 Creature* Arcanagos = me->SummonCreature(NPC_ARCANAGOS, ArcanagosPos[0], ArcanagosPos[1], ArcanagosPos[2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 if (!Arcanagos)
@@ -462,7 +459,7 @@ public:
                     return;
                 }
 
-                instance->SetData64(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
+                instance->SetGuidData(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
                 EventStarted = true;
                 ArcanagosGUID = Arcanagos->GetGUID();
 
@@ -475,11 +472,11 @@ public:
                 me->DespawnOrUnsummon();
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) override {}
 
-        uint32 NextStep(uint32 Step)
+        uint32 NextStep(uint32 nextStep)
         {
-            switch(Step)
+            switch(nextStep)
             {
                 case 1:
                     me->MonsterYell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL, 0);
@@ -556,12 +553,10 @@ public:
                 default:
                     return 2000;
             }
-
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
-
             if (YellTimer <= diff)
             {
                 if (EventStarted)
@@ -588,7 +583,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_karazhan()

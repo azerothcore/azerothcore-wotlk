@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "mechanar.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Says
 {
@@ -39,7 +39,7 @@ public:
     {
         boss_nethermancer_sepethreaAI(Creature* creature) : BossAI(creature, DATA_NETHERMANCER_SEPRETHREA) { }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_FROST_ATTACK, 6000);
@@ -50,7 +50,7 @@ public:
             me->CastSpell(me, SPELL_SUMMON_RAGIN_FLAMES, true);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (Unit* victim = me->GetVictim())
@@ -61,13 +61,13 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             events.Reset();
             if (instance)
@@ -82,7 +82,7 @@ public:
                     Unit::Kill(summon, summon);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -113,9 +113,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_nethermancer_sepethreaAI(creature);
+        return GetMechanarAI<boss_nethermancer_sepethreaAI>(creature);
     }
 };
 
@@ -140,18 +140,18 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, true);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_SPELL_FIRE_TAIL, 500);
             events.ScheduleEvent(EVENT_SPELL_INFERNO, urand(10000, 20000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -176,11 +176,10 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
     };
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_ragin_flamesAI(creature);
+        return GetMechanarAI<npc_ragin_flamesAI>(creature);
     }
 };
 
@@ -198,13 +197,13 @@ public:
             GetUnitOwner()->CastCustomSpell(SPELL_INFERNO_DAMAGE, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetUnitOwner(), TRIGGERED_FULL_MASK);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_ragin_flames_inferno_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ragin_flames_inferno_AuraScript();
     }

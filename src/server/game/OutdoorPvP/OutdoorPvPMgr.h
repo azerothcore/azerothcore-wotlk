@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -55,7 +55,7 @@ public:
     bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
 
     // handle custom go if registered
-    bool HandleOpenGo(Player* player, uint64 guid);
+    bool HandleOpenGo(Player* player, GameObject* go);
 
     ZoneScript* GetZoneScript(uint32 zoneId);
 
@@ -63,14 +63,14 @@ public:
 
     void Update(uint32 diff);
 
-    void HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+    void HandleGossipOption(Player* player, Creature* creatured, uint32 gossipid);
 
     bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso);
 
     void HandleDropFlag(Player* player, uint32 spellId);
 
     // pussywizard: lock required because different functions affect m_players
-    ACE_Thread_Mutex _lock;
+    std::mutex _lock;
 
 private:
     typedef std::vector<OutdoorPvP*> OutdoorPvPSet;

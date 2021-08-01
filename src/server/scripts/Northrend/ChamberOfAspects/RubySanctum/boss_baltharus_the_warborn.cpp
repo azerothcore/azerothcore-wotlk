@@ -3,10 +3,10 @@
 */
 
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
 #include "ruby_sanctum.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 
 enum Texts
 {
@@ -74,7 +74,7 @@ class DelayedTalk : public BasicEvent
 public:
     DelayedTalk(Creature* owner, uint32 talkId) : _owner(owner), _talkId(talkId) { }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         _owner->AI()->Talk(_talkId);
         return true;
@@ -90,7 +90,7 @@ class RestoreFight : public BasicEvent
 public:
     RestoreFight(Creature* owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         _owner->SetReactState(REACT_AGGRESSIVE);
         _owner->SetInCombatWithZone();
@@ -113,24 +113,24 @@ public:
             _introDone = false;
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             BossAI::InitializeAI();
             me->CastSpell(me, SPELL_BARRIER_CHANNEL, false);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             BossAI::JustReachedHome();
             me->CastSpell(me, SPELL_BARRIER_CHANNEL, false);
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_INTRO_BALTHARUS && !_introDone)
             {
@@ -145,7 +145,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -163,16 +163,16 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
 
-            if (Creature* xerestrasza = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_XERESTRASZA)))
+            if (Creature* xerestrasza = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_XERESTRASZA)))
                 xerestrasza->AI()->DoAction(ACTION_BALTHARUS_DEATH);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -181,7 +181,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             summon->SetHealth(me->GetHealth());
@@ -190,7 +190,7 @@ public:
             summon->m_Events.AddEvent(new RestoreFight(summon), summon->m_Events.CalculateTime(2000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -252,9 +252,9 @@ public:
         bool _introDone;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_baltharus_the_warbornAI>(creature);
+        return GetRubySanctumAI<boss_baltharus_the_warbornAI>(creature);
     }
 };
 
@@ -269,7 +269,7 @@ public:
         {
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_CLEAVE, urand(5000, 10000));
@@ -277,7 +277,7 @@ public:
             _events.ScheduleEvent(EVENT_ENERVATING_BRAND, urand(10000, 15000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -311,9 +311,9 @@ public:
         EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_baltharus_the_warborn_cloneAI>(creature);
+        return GetRubySanctumAI<npc_baltharus_the_warborn_cloneAI>(creature);
     }
 };
 
@@ -336,13 +336,13 @@ public:
                         target->CastSpell(caster, SPELL_SIPHONED_MIGHT, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_baltharus_enervating_brand_trigger_SpellScript::CheckDistance);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_baltharus_enervating_brand_trigger_SpellScript();
     }
@@ -361,17 +361,17 @@ public:
             _introDone = false;
         }
 
-        void Reset()
+        void Reset() override
         {
             _events.Reset();
-            me->RemoveFlag(UNIT_NPC_FLAGS, GOSSIP_OPTION_QUESTGIVER);
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
             // Xinef: after soft reset npc is no longer present
             if (me->GetInstanceScript()->GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE)
                 me->DespawnOrUnsummon(1);
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_BALTHARUS_DEATH)
             {
@@ -394,7 +394,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_isIntro)
                 return;
@@ -426,7 +426,7 @@ public:
                     Talk(SAY_XERESTRASZA_EVENT_6);
                     break;
                 case EVENT_XERESTRASZA_EVENT_7:
-                    me->SetFlag(UNIT_NPC_FLAGS, GOSSIP_OPTION_QUESTGIVER);
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_XERESTRASZA_EVENT_7);
                     me->setActive(false);
                     break;
@@ -439,9 +439,9 @@ public:
         bool _introDone;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_xerestraszaAI>(creature);
+        return GetRubySanctumAI<npc_xerestraszaAI>(creature);
     }
 };
 
@@ -450,14 +450,14 @@ class at_baltharus_plateau : public AreaTriggerScript
 public:
     at_baltharus_plateau() : AreaTriggerScript("at_baltharus_plateau") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
-            if (Creature* xerestrasza = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_XERESTRASZA)))
+            if (Creature* xerestrasza = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_XERESTRASZA)))
                 xerestrasza->AI()->DoAction(ACTION_INTRO_BALTHARUS);
 
-            if (Creature* baltharus = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_BALTHARUS_THE_WARBORN)))
+            if (Creature* baltharus = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_BALTHARUS_THE_WARBORN)))
                 baltharus->AI()->DoAction(ACTION_INTRO_BALTHARUS);
         }
 

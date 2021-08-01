@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "nexus.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum eEnums
 {
@@ -52,9 +52,9 @@ class boss_ormorok : public CreatureScript
 public:
     boss_ormorok() : CreatureScript("boss_ormorok") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ormorokAI>(creature);
+        return GetNexusAI<boss_ormorokAI>(creature);
     }
 
     struct boss_ormorokAI : public BossAI
@@ -65,13 +65,13 @@ public:
 
         uint8 _spikesCount;
 
-        void Reset()
+        void Reset() override
         {
             _spikesCount = 0;
             BossAI::Reset();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -84,13 +84,13 @@ public:
                 events.ScheduleEvent(EVENT_ORMOROK_SUMMON, 17000);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -99,12 +99,12 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -153,7 +153,7 @@ public:
                         float o = rand_norm() * 2.0f * M_PI;
                         float x = me->GetPositionX() + 5.0f * _spikesCount * cos(o);
                         float y = me->GetPositionY() + 5.0f * _spikesCount * sin(o);
-                        float h = me->GetMap()->GetHeight(x, y, me->GetPositionZ() + 5.0f);
+                        float h = me->GetMapHeight(x, y, me->GetPositionZ());
 
                         if (h != INVALID_HEIGHT)
                             me->SummonCreature(NPC_CRYSTAL_SPIKE, x, y, h, 0, TEMPSUMMON_TIMED_DESPAWN, 7000);
@@ -172,9 +172,9 @@ class npc_crystal_spike : public CreatureScript
 public:
     npc_crystal_spike() : CreatureScript("npc_crystal_spike") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return GetInstanceAI<npc_crystal_spikeAI>(pCreature);
+        return GetNexusAI<npc_crystal_spikeAI>(pCreature);
     }
 
     struct npc_crystal_spikeAI : public NullCreatureAI
@@ -184,9 +184,9 @@ public:
         }
 
         int32 _damageTimer;
-        uint64 _gameObjectGUID;
+        ObjectGuid _gameObjectGUID;
 
-        void Reset()
+        void Reset() override
         {
             if (GameObject* gameobject = me->SummonGameObject(GO_CRYSTAL_SPIKE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3500))
                 _gameObjectGUID = gameobject->GetGUID();
@@ -194,7 +194,7 @@ public:
             _damageTimer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_damageTimer)
             {
