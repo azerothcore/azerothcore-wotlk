@@ -128,6 +128,7 @@ struct CreatureTemplate
     float   ModHealth;
     float   ModMana;
     float   ModArmor;
+    float   ModExperience;
     bool    RacialLeader;
     uint32  movementId;
     bool    RegenHealth;
