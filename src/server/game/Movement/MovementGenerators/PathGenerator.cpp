@@ -903,7 +903,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
             float y = result[0];
             float z = result[1];
             if (_source->GetMap() && _source->GetMap()->HasEnoughWater(_sourceUnit, x, y, z))
-                result[1] -= _source->GetMinHeightInWater(); //ˮ����С�߶�
+                result[1] -= _source->GetMinHeightInWater();
             else
             {
                 _source->UpdateAllowedPositionZ(x, y, z);
@@ -972,7 +972,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
                     float y = iterPos[0];
                     float z = iterPos[1];
                     if (_source->GetMap() && _source->GetMap()->HasEnoughWater(_sourceUnit, x, y, z))
-                        iterPos[1] -= _source->GetMinHeightInWater(); //ˮ����С�߶�
+                        iterPos[1] -= _source->GetMinHeightInWater();
                     else
                     {
                         _source->UpdateAllowedPositionZ(x, y, z);
