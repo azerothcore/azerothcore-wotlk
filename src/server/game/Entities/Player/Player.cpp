@@ -3204,6 +3204,9 @@ void Player::learnSpell(uint32 spellId)
         if (itr2 != m_spells.end() && itr2->second->State != PLAYERSPELL_REMOVED && !itr2->second->IsInSpec(m_activeSpec))
             learnSpell(itr2->first);
     }
+#ifdef ELUNA
+  sEluna->OnLearnSpell(this, spellId);
+#endif
 }
 
 void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTemporary)
