@@ -895,18 +895,18 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
             LOG_DEBUG("maps", "PathGenerator::FindSmoothPath: Cannot find height at position X: %f Y: %f Z: %f for %s",
                 result[2], result[0], result[1], _source->GetGUID().ToString().c_str());
 
-        /*if (_sourceUnit->GetTypeId() == TYPEID_UNIT)
-            _sourceUnit->UpdateAllowedPositionZ(result[2], result[0], result[1]);*/
-        if (_sourceUnit->GetTypeId() == TYPEID_UNIT)
+        /*if (_source->GetTypeId() == TYPEID_UNIT)
+            _source->UpdateAllowedPositionZ(result[2], result[0], result[1]);*/
+        if (_source->GetTypeId() == TYPEID_UNIT)
         {
             float x = result[2];
             float y = result[0];
             float z = result[1];
-            if (_sourceUnit->GetMap() && _sourceUnit->GetMap()->HasEnoughWater(_sourceUnit, x, y, z))
-                result[1] -= _sourceUnit->GetMinHeightInWater(); //ˮ����С�߶�
+            if (_source->GetMap() && _source->GetMap()->HasEnoughWater(_sourceUnit, x, y, z))
+                result[1] -= _source->GetMinHeightInWater(); //ˮ����С�߶�
             else
             {
-                _sourceUnit->UpdateAllowedPositionZ(x, y, z);
+                _source->UpdateAllowedPositionZ(x, y, z);
                 result[1] = z;
             }
         }
@@ -964,18 +964,18 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
                 if (dtStatusFailed(_navMeshQuery->getPolyHeight(polys[0], iterPos, &iterPos[1])))
                     return DT_FAILURE;
 
-                /*if (_sourceUnit->GetTypeId() == TYPEID_UNIT)
-                   _sourceUnit->UpdateAllowedPositionZ(iterPos[2], iterPos[0], iterPos[1]);*/
-                if (_sourceUnit->GetTypeId() == TYPEID_UNIT)
+                /*if (_source->GetTypeId() == TYPEID_UNIT)
+                   _source->UpdateAllowedPositionZ(iterPos[2], iterPos[0], iterPos[1]);*/
+                if (_source->GetTypeId() == TYPEID_UNIT)
                 {
                     float x = iterPos[2];
                     float y = iterPos[0];
                     float z = iterPos[1];
-                    if (_sourceUnit->GetMap() && _sourceUnit->GetMap()->HasEnoughWater(_sourceUnit, x, y, z))
-                        iterPos[1] -= _sourceUnit->GetMinHeightInWater(); //ˮ����С�߶�
+                    if (_source->GetMap() && _source->GetMap()->HasEnoughWater(_sourceUnit, x, y, z))
+                        iterPos[1] -= _source->GetMinHeightInWater(); //ˮ����С�߶�
                     else
                     {
-                        _sourceUnit->UpdateAllowedPositionZ(x, y, z);
+                        _source->UpdateAllowedPositionZ(x, y, z);
                         iterPos[1] = z;
                     }
                 }
