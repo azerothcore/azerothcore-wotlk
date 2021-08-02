@@ -894,7 +894,23 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
         if (dtStatusFailed(_navMeshQuery->getPolyHeight(polys[0], result, &result[1])))
             LOG_DEBUG("maps", "PathGenerator::FindSmoothPath: Cannot find height at position X: %f Y: %f Z: %f for %s",
                 result[2], result[0], result[1], _source->GetGUID().ToString().c_str());
-        result[1] += 0.5f;
+
+        /*if (_sourceUnit->GetTypeId() == TYPEID_UNIT)
+            _sourceUnit->UpdateAllowedPositionZ(result[2], result[0], result[1]);*/
+        if (_sourceUnit->GetTypeId() == TYPEID_UNIT)
+        {
+            float x = result[2];
+            float y = result[0];
+            float z = result[1];
+            if (_sourceUnit->GetMap() && _sourceUnit->GetMap()->HasEnoughWater(_sourceUnit, x, y, z))
+                result[1] -= _sourceUnit->GetMinHeightInWater(); //ˮ����С�߶�
+            else
+            {
+                _sourceUnit->UpdateAllowedPositionZ(x, y, z);
+                result[1] = z;
+            }
+        }
+
         dtVcopy(iterPos, result);
 
         bool canCheckSlope = _slopeCheck && (GetPathType() & ~(PATHFIND_NOT_USING_PATH));
@@ -947,7 +963,22 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
                 dtVcopy(iterPos, connectionEndPos);
                 if (dtStatusFailed(_navMeshQuery->getPolyHeight(polys[0], iterPos, &iterPos[1])))
                     return DT_FAILURE;
-                iterPos[1] += 0.5f;
+
+                /*if (_sourceUnit->GetTypeId() == TYPEID_UNIT)
+                   _sourceUnit->UpdateAllowedPositionZ(iterPos[2], iterPos[0], iterPos[1]);*/
+                if (_sourceUnit->GetTypeId() == TYPEID_UNIT)
+                {
+                    float x = iterPos[2];
+                    float y = iterPos[0];
+                    float z = iterPos[1];
+                    if (_sourceUnit->GetMap() && _sourceUnit->GetMap()->HasEnoughWater(_sourceUnit, x, y, z))
+                        iterPos[1] -= _sourceUnit->GetMinHeightInWater(); //ˮ����С�߶�
+                    else
+                    {
+                        _sourceUnit->UpdateAllowedPositionZ(x, y, z);
+                        iterPos[1] = z;
+                    }
+                }
             }
         }
 
