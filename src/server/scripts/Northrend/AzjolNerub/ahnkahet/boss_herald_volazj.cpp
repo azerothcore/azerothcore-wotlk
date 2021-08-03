@@ -371,7 +371,6 @@ public:
 
             if (targets.empty())
             {
-                targets.clear();
                 return;
             }
 
