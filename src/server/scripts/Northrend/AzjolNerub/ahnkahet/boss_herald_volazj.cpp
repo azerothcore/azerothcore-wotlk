@@ -410,7 +410,9 @@ public:
                     // Should not make clone of current player target
                     Player const* plrClone = *itr2 ? (*itr2)->ToPlayer() : nullptr;
                     if (!plrClone || plrClone == plrTarget)
+                    {
                         continue;
+                    }
 
                     if (Unit* summon = caster->SummonCreature(NPC_TWISTED_VISAGE, plrClone->GetPosition(), TEMPSUMMON_CORPSE_DESPAWN, 0))
                     {
