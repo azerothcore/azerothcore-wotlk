@@ -405,16 +405,24 @@ public:
                 plrTarget->CastSpell(plrTarget, InsanitySpells.at(insanityCounter), true);
 
                 // Summon clone
-                if (Unit* summon = caster->SummonCreature(NPC_TWISTED_VISAGE, *plrTarget, TEMPSUMMON_CORPSE_DESPAWN, 0))
+                for (std::list<WorldObject*>::const_iterator itr2 = targets.begin(); itr2 != targets.end(); ++itr2)
                 {
-                    summon->AddThreat(plrTarget, 0.0f);
-                    summon->SetInCombatWith(plrTarget);
-                    plrTarget->SetInCombatWith(summon);
+                    // Should not make clone of current player target
+                    Player const* plrClone = *itr2 ? (*itr2)->ToPlayer() : nullptr;
+                    if (!plrClone || plrClone == plrTarget)
+                        continue;
 
-                    plrTarget->CastSpell(summon, SPELL_CLONE_PLAYER, true);
-                    summon->SetPhaseMask(1 | (1 << (4 + insanityCounter)), true);
-                    summon->SetUInt32Value(UNIT_FIELD_MINDAMAGE, plrTarget->GetUInt32Value(UNIT_FIELD_MINDAMAGE));
-                    summon->SetUInt32Value(UNIT_FIELD_MAXDAMAGE, plrTarget->GetUInt32Value(UNIT_FIELD_MAXDAMAGE));
+                    if (Unit* summon = caster->SummonCreature(NPC_TWISTED_VISAGE, plrClone->GetPosition(), TEMPSUMMON_CORPSE_DESPAWN, 0))
+                    {
+                        summon->AddThreat(plrTarget, 0.0f);
+                        summon->SetInCombatWith(plrTarget);
+                        plrTarget->SetInCombatWith(summon);
+
+                        plrTarget->CastSpell(summon, SPELL_CLONE_PLAYER, true);
+                        summon->SetPhaseMask(1 | (1 << (4 + insanityCounter)), true);
+                        summon->SetUInt32Value(UNIT_FIELD_MINDAMAGE, plrClone->GetUInt32Value(UNIT_FIELD_MINDAMAGE));
+                        summon->SetUInt32Value(UNIT_FIELD_MAXDAMAGE, plrClone->GetUInt32Value(UNIT_FIELD_MAXDAMAGE));
+                    }
                 }
 
                 ++insanityCounter;
