@@ -167,7 +167,7 @@ public:
             std::ostringstream saveStream;
             // Encounter states
             saveStream << "A K " << GetBossSaveData();
-            
+
             // Extra data
             saveStream << teldaramSpheres[0] << ' ' << teldaramSpheres[1];
 
