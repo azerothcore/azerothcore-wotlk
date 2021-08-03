@@ -98,8 +98,8 @@ public:
         {
             if (instance)
             {
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR4), true);
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR5), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR4), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR5), true);
                 instance->SetData(DATA_BROGGOK, DONE);
             }
         }
@@ -139,7 +139,7 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
             if (instance->GetData(DATA_BROGGOK) != DONE && instance->GetData(DATA_BROGGOK) != IN_PROGRESS)
-                if (Creature* broggok = ObjectAccessor::GetCreature(*go, instance->GetData64(DATA_BROGGOK)))
+                if (Creature* broggok = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_BROGGOK)))
                 {
                     instance->SetData(DATA_BROGGOK, IN_PROGRESS);
                     broggok->AI()->DoAction(ACTION_PREPARE_BROGGOK);

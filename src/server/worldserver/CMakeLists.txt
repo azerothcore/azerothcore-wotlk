@@ -16,7 +16,7 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
 if( WIN32 )
-  list(APPEND PRIVATE_SOURCES ${winDebugging})
+  list(APPEND PRIVATE_SOURCES ${winDebugging} ${winService})
   if ( MSVC )
     list(APPEND PRIVATE_SOURCES worldserver.rc)
   endif()
@@ -54,14 +54,13 @@ target_include_directories(worldserver
 
 target_link_libraries(worldserver
   PRIVATE
-    game-interface
+    acore-core-interface
   PUBLIC
-    game
-    shared
     scripts
+    game
     gsoap
     readline
-    ${GPERFTOOLS_LIBRARIES})
+    gperftools)
 
 set_target_properties(worldserver
   PROPERTIES

@@ -30,6 +30,7 @@ enum SpellData
     NPC_PROXIMITY_MINE                              = 34362,
     SPELL_MINE_EXPLOSION_25                         = 63009,
     SPELL_MINE_EXPLOSION_10                         = 66351,
+    SPELL_SUMMON_PROXIMITY_MINE                     = 65347,
 
     // PHASE 2:
     SPELL_HEAT_WAVE                                 = 64533,
@@ -267,10 +268,10 @@ enum ComputerTalks
     TALK_COMPUTER_ZERO = 12,
 };
 
-#define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_MIMIRON))
-#define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_LEVIATHAN_MKII))
-#define GetVX001() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_VX001))
-#define GetACU() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_ACU))
+#define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_MIMIRON))
+#define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_LEVIATHAN_MKII))
+#define GetVX001() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_VX001))
+#define GetACU() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_ACU))
 
 class boss_mimiron : public CreatureScript
 {
@@ -779,7 +780,7 @@ public:
 
                         if( pInstance )
                             for( uint16 i = 0; i < 3; ++i )
-                                if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                                if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                                     if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                                         if( door->GetGoState() != GO_STATE_ACTIVE )
                                         {
@@ -862,7 +863,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_ACTIVE )
                             {
@@ -893,7 +894,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_READY )
                             {
@@ -1158,20 +1159,9 @@ public:
                     events.ScheduleEvent(EVENT_PROXIMITY_MINES_1, 8000);
                     break;
                 case EVENT_PROXIMITY_MINES_1:
+                    for (uint8 i = 0; i < 10; ++i)
                     {
-                        float angle = rand_norm() * 2 * M_PI;
-                        float x, y, z;
-                        me->GetPosition(x, y, z);
-                        for( uint8 i = 0; i < 17; ++i )
-                        {
-                            if( i == 7 )
-                                continue;
-
-                            float v_xmin = 0.1f * cos( angle + i * M_PI / 9 );
-                            float v_ymin = 0.1f * sin( angle + i * M_PI / 9 );
-                            if( Creature* pmNPC = me->SummonCreature(NPC_PROXIMITY_MINE, x + v_xmin, y + v_ymin, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 40000) )
-                                pmNPC->KnockbackFrom(x, y, 6.0f, 25.0f);
-                        }
+                        me->CastSpell(me, SPELL_SUMMON_PROXIMITY_MINE, true);
                     }
                     break;
                 case EVENT_FLAME_SUPPRESSION_50000:
@@ -2257,7 +2247,7 @@ public:
             if(instance->GetData(TYPE_MIMIRON) != NOT_STARTED)
                 return false;
 
-            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetData64(TYPE_MIMIRON)))
+            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetGuidData(TYPE_MIMIRON)))
             {
                 c->AI()->SetData(0, 7);
                 c->AI()->AttackStart(player);
@@ -2292,7 +2282,7 @@ public:
             }
         }
 
-        std::list<uint64> FlameList;
+        GuidList FlameList;
         EventMap events;
         uint32 CreateTime;
 
@@ -2314,15 +2304,15 @@ public:
             }
         }
 
-        void RemoveFlame(uint64 guid)
+        void RemoveFlame(ObjectGuid guid)
         {
             FlameList.remove(guid);
         }
 
         void RemoveAll()
         {
-            for( std::list<uint64>::iterator itr = FlameList.begin(); itr != FlameList.end(); ++itr )
-                if (Creature* c = ObjectAccessor::GetCreature(*me, (*itr)))
+            for (ObjectGuid const& guid : FlameList)
+                if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                     c->DespawnOrUnsummon();
             FlameList.clear();
             me->DespawnOrUnsummon();
@@ -2523,7 +2513,7 @@ class achievement_mimiron_firefighter : public AchievementCriteriaScript
 public:
     achievement_mimiron_firefighter() : AchievementCriteriaScript("achievement_mimiron_firefighter") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -2534,7 +2524,7 @@ class achievement_mimiron_set_up_us_the_bomb_11 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_11() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_11") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(11);
     }
@@ -2545,7 +2535,7 @@ class achievement_mimiron_set_up_us_the_bomb_12 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_12() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_12") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(12);
     }
@@ -2556,7 +2546,7 @@ class achievement_mimiron_set_up_us_the_bomb_13 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_13() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_13") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(13);
     }

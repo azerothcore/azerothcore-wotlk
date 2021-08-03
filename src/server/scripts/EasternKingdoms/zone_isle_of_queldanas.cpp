@@ -122,8 +122,8 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
-        uint64 morlenGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid morlenGUID;
 
         void Reset() override
         {
@@ -131,8 +131,8 @@ public:
             me->SetRegeneratingHealth(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            playerGUID = 0;
-            morlenGUID = 0;
+            playerGUID.Clear();
+            morlenGUID.Clear();
             summons.DespawnAll();
             if (Creature* c = me->FindNearestCreature(NPC_THALORIEN_REMAINS, 100.0f, true))
                 c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -378,7 +378,7 @@ public:
                     break;
                 case EVENT_OUTRO_KNEEL:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
-                        p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT, 0);
+                        p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     events.ScheduleEvent(EVENT_DISAPPEAR, 6000);
                     break;
@@ -492,13 +492,13 @@ public:
         npc_grand_magister_rommathAI(Creature* c) : NullCreatureAI(c)
         {
             announced = false;
-            playerGUID = 0;
+            playerGUID.Clear();
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
         EventMap events;
         bool announced;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
         void MoveInLineOfSight(Unit* who) override
         {

@@ -17,13 +17,15 @@
 #include "GridRefManager.h"
 #include "MapRefManager.h"
 #include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "PathGenerator.h"
 #include "SharedDefines.h"
 #include "Timer.h"
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <bitset>
 #include <list>
+#include <memory>
+#include <mutex>
+#include <shared_mutex>
 
 class Unit;
 class WorldPacket;
@@ -46,7 +48,7 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 class PathGenerator;
-namespace acore
+namespace Acore
 {
     struct ObjectUpdater;
     struct LargeObjectUpdater;
@@ -54,9 +56,9 @@ namespace acore
 
 struct ScriptAction
 {
-    uint64 sourceGUID;
-    uint64 targetGUID;
-    uint64 ownerGUID;                                       // owner of source if source is item
+    ObjectGuid sourceGUID;
+    ObjectGuid targetGUID;
+    ObjectGuid ownerGUID;                                   // owner of source if source is item
     ScriptInfo const* script;                               // pointer to static script data
 };
 
@@ -291,14 +293,14 @@ public:
     template<class T> bool AddToMap(T*, bool checkTransport = false);
     template<class T> void RemoveFromMap(T*, bool);
 
-    void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                            TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
-    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                                  TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                                  TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                                  TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
 
     virtual void Update(const uint32, const uint32, bool thread = true);
 
@@ -316,13 +318,13 @@ public:
 
     [[nodiscard]] bool IsRemovalGrid(float x, float y) const
     {
-        GridCoord p = acore::ComputeGridCoord(x, y);
+        GridCoord p = Acore::ComputeGridCoord(x, y);
         return !getNGrid(p.x_coord, p.y_coord);
     }
 
     [[nodiscard]] bool IsGridLoaded(float x, float y) const
     {
-        return IsGridLoaded(acore::ComputeGridCoord(x, y));
+        return IsGridLoaded(Acore::ComputeGridCoord(x, y));
     }
 
     void LoadGrid(float x, float y);
@@ -338,10 +340,8 @@ public:
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
 
     // pussywizard: movemaps, mmaps
-    [[nodiscard]] ACE_RW_Thread_Mutex& GetMMapLock() const { return *(const_cast<ACE_RW_Thread_Mutex*>(&MMapLock)); }
+    [[nodiscard]] std::shared_mutex& GetMMapLock() const { return *(const_cast<std::shared_mutex*>(&MMapLock)); }
     // pussywizard:
-    std::unordered_set<Object*> i_objectsToUpdate;
-    void BuildAndSendUpdateForObjects(); // definition in ObjectAccessor.cpp, below ObjectAccessor::Update, because it does the same for a map
     std::unordered_set<Unit*> i_objectsForDelayedVisibility;
     void HandleDelayedVisibility();
 
@@ -406,9 +406,6 @@ public:
     void AddObjectToSwitchList(WorldObject* obj, bool on);
     virtual void DelayedUpdate(const uint32 diff);
 
-    void UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair);
-    void UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair);
-
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
@@ -440,10 +437,6 @@ public:
     void RemoveFromActive(T* obj);
 
     template<class T> void SwitchGridContainers(T* obj, bool on);
-    template<class NOTIFIER> void VisitAll(const float& x, const float& y, float radius, NOTIFIER& notifier);
-    template<class NOTIFIER> void VisitFirstFound(const float& x, const float& y, float radius, NOTIFIER& notifier);
-    template<class NOTIFIER> void VisitWorld(const float& x, const float& y, float radius, NOTIFIER& notifier);
-    template<class NOTIFIER> void VisitGrid(const float& x, const float& y, float radius, NOTIFIER& notifier);
     CreatureGroupHolderType CreatureGroupHolder;
 
     void UpdateIteratorBack(Player* player);
@@ -451,13 +444,39 @@ public:
     TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, Unit* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
-    Player* GetPlayer(uint64 guid);
-    Creature* GetCreature(uint64 guid);
-    GameObject* GetGameObject(uint64 guid);
-    Transport* GetTransport(uint64 guid);
-    DynamicObject* GetDynamicObject(uint64 guid);
-    Pet* GetPet(uint64 guid);
-    Corpse* GetCorpse(uint64 guid);
+
+    Corpse* GetCorpse(ObjectGuid const guid);
+    Creature* GetCreature(ObjectGuid const guid);
+    GameObject* GetGameObject(ObjectGuid const guid);
+    Transport* GetTransport(ObjectGuid const guid);
+    DynamicObject* GetDynamicObject(ObjectGuid const guid);
+    Pet* GetPet(ObjectGuid const guid);
+
+    MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
+
+    typedef std::unordered_multimap<ObjectGuid::LowType, Creature*> CreatureBySpawnIdContainer;
+    CreatureBySpawnIdContainer& GetCreatureBySpawnIdStore() { return _creatureBySpawnIdStore; }
+
+    typedef std::unordered_multimap<ObjectGuid::LowType, GameObject*> GameObjectBySpawnIdContainer;
+    GameObjectBySpawnIdContainer& GetGameObjectBySpawnIdStore() { return _gameobjectBySpawnIdStore; }
+
+    std::unordered_set<Corpse*> const* GetCorpsesInCell(uint32 cellId) const
+    {
+        auto itr = _corpsesByCell.find(cellId);
+        if (itr != _corpsesByCell.end())
+            return &itr->second;
+
+        return nullptr;
+    }
+
+    Corpse* GetCorpseByPlayer(ObjectGuid const& ownerGuid) const
+    {
+        auto itr = _corpsesByPlayer.find(ownerGuid);
+        if (itr != _corpsesByPlayer.end())
+            return itr->second;
+
+        return nullptr;
+    }
 
     MapInstanced* ToMapInstanced() { if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return nullptr;  }
     [[nodiscard]] const MapInstanced* ToMapInstanced() const { if (Instanceable())  return (const MapInstanced*)((MapInstanced*)this); else return nullptr;  }
@@ -480,7 +499,7 @@ public:
     void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
     [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _dynamicTree.contains(model);}
     [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
-    bool getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
+    bool GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
     [[nodiscard]] float GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const
     {
         return _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
@@ -488,32 +507,39 @@ public:
     /*
         RESPAWN TIMES
     */
-    [[nodiscard]] time_t GetLinkedRespawnTime(uint64 guid) const;
-    [[nodiscard]] time_t GetCreatureRespawnTime(uint32 dbGuid) const
+    [[nodiscard]] time_t GetLinkedRespawnTime(ObjectGuid guid) const;
+    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid::LowType dbGuid) const
     {
-        std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
+        std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
         if (itr != _creatureRespawnTimes.end())
             return itr->second;
 
         return time_t(0);
     }
 
-    [[nodiscard]] time_t GetGORespawnTime(uint32 dbGuid) const
+    [[nodiscard]] time_t GetGORespawnTime(ObjectGuid::LowType dbGuid) const
     {
-        std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
+        std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
         if (itr != _goRespawnTimes.end())
             return itr->second;
 
         return time_t(0);
     }
 
-    void SaveCreatureRespawnTime(uint32 dbGuid, time_t& respawnTime);
-    void RemoveCreatureRespawnTime(uint32 dbGuid);
-    void SaveGORespawnTime(uint32 dbGuid, time_t& respawnTime);
-    void RemoveGORespawnTime(uint32 dbGuid);
+    void SaveCreatureRespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
+    void RemoveCreatureRespawnTime(ObjectGuid::LowType dbGuid);
+    void SaveGORespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
+    void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
     void LoadRespawnTimes();
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
+
+    void LoadCorpseData();
+    void DeleteCorpseData();
+    void AddCorpse(Corpse* corpse);
+    void RemoveCorpse(Corpse* corpse);
+    Corpse* ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia = false);
+    void RemoveOldCorpses();
 
     static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);
 
@@ -538,6 +564,23 @@ public:
     [[nodiscard]] TransportsContainer const& GetAllTransports() const { return _transports; }
 
     DataMap CustomData;
+
+    template<HighGuid high>
+    inline ObjectGuid::LowType GenerateLowGuid()
+    {
+        static_assert(ObjectGuidTraits<high>::MapSpecific, "Only map specific guid can be generated in Map context");
+        return GetGuidSequenceGenerator<high>().Generate();
+    }
+
+    void AddUpdateObject(Object* obj)
+    {
+        _updateObjects.insert(obj);
+    }
+
+    void RemoveUpdateObject(Object* obj)
+    {
+        _updateObjects.erase(obj);
+    }
 
 private:
     void LoadMapAndVMap(int gx, int gy);
@@ -579,10 +622,12 @@ private:
 
     void UpdateActiveCells(const float& x, const float& y, const uint32 t_diff);
 
+    void SendObjectUpdates();
+
 protected:
-    ACE_Thread_Mutex Lock;
-    ACE_Thread_Mutex GridLock;
-    ACE_RW_Thread_Mutex MMapLock;
+    std::mutex Lock;
+    std::mutex GridLock;
+    std::shared_mutex MMapLock;
 
     MapEntry const* i_mapEntry;
     uint8 i_spawnMode;
@@ -611,7 +656,7 @@ private:
     Creature* _GetScriptCreature(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
     WorldObject* _GetScriptWorldObject(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
     void _ScriptProcessDoor(Object* source, Object* target, const ScriptInfo* scriptInfo) const;
-    GameObject* _FindGameObject(WorldObject* pWorldObject, uint32 guid) const;
+    GameObject* _FindGameObject(WorldObject* pWorldObject, ObjectGuid::LowType guid) const;
 
     //used for fast base_map (e.g. MapInstanced class object) search for
     //InstanceMaps and BattlegroundMaps...
@@ -658,11 +703,31 @@ private:
             m_activeNonPlayers.erase(obj);
     }
 
-    std::unordered_map<uint32 /*dbGUID*/, time_t> _creatureRespawnTimes;
-    std::unordered_map<uint32 /*dbGUID*/, time_t> _goRespawnTimes;
+    std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
+    std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
 
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;
+
+    template<HighGuid high>
+    inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
+    {
+        auto itr = _guidGenerators.find(high);
+        if (itr == _guidGenerators.end())
+            itr = _guidGenerators.insert(std::make_pair(high, std::unique_ptr<ObjectGuidGenerator<high>>(new ObjectGuidGenerator<high>()))).first;
+
+        return *itr->second;
+    }
+
+    std::map<HighGuid, std::unique_ptr<ObjectGuidGeneratorBase>> _guidGenerators;
+    MapStoredObjectTypesContainer _objectsStore;
+    CreatureBySpawnIdContainer _creatureBySpawnIdStore;
+    GameObjectBySpawnIdContainer _gameobjectBySpawnIdStore;
+    std::unordered_map<uint32/*cellId*/, std::unordered_set<Corpse*>> _corpsesByCell;
+    std::unordered_map<ObjectGuid, Corpse*> _corpsesByPlayer;
+    std::unordered_set<Corpse*> _corpseBones;
+
+    std::unordered_set<Object*> _updateObjects;
 };
 
 enum InstanceResetMethod
@@ -684,7 +749,7 @@ public:
     void AfterPlayerUnlinkFromMap() override;
     void Update(const uint32, const uint32, bool thread = true) override;
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
-    bool Reset(uint8 method, std::list<uint32>* globalSkipList = nullptr);
+    bool Reset(uint8 method, GuidList* globalSkipList = nullptr);
     [[nodiscard]] uint32 GetScriptId() const { return i_script_id; }
     [[nodiscard]] std::string const& GetScriptName() const;
     [[nodiscard]] InstanceScript* GetInstanceScript() { return instance_data; }
@@ -740,55 +805,4 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
     }
 }
 
-template<class NOTIFIER>
-inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, WorldTypeMapContainer> world_object_notifier(notifier);
-    cell.Visit(p, world_object_notifier, *this, radius, x, y);
-    TypeContainerVisitor<NOTIFIER, GridTypeMapContainer >  grid_object_notifier(notifier);
-    cell.Visit(p, grid_object_notifier, *this, radius, x, y);
-}
-
-// should be used with Searcher notifiers, tries to search world if nothing found in grid
-template<class NOTIFIER>
-inline void Map::VisitFirstFound(const float& x, const float& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, WorldTypeMapContainer> world_object_notifier(notifier);
-    cell.Visit(p, world_object_notifier, *this, radius, x, y);
-    if (!notifier.i_object)
-    {
-        TypeContainerVisitor<NOTIFIER, GridTypeMapContainer >  grid_object_notifier(notifier);
-        cell.Visit(p, grid_object_notifier, *this, radius, x, y);
-    }
-}
-
-template<class NOTIFIER>
-inline void Map::VisitWorld(const float& x, const float& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, WorldTypeMapContainer> world_object_notifier(notifier);
-    cell.Visit(p, world_object_notifier, *this, radius, x, y);
-}
-
-template<class NOTIFIER>
-inline void Map::VisitGrid(const float& x, const float& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, GridTypeMapContainer >  grid_object_notifier(notifier);
-    cell.Visit(p, grid_object_notifier, *this, radius, x, y);
-}
 #endif

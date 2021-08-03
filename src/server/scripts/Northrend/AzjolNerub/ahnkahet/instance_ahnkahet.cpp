@@ -17,15 +17,7 @@ public:
 
     struct instance_ahnkahet_InstanceScript : public InstanceScript
     {
-        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap),
-            elderNadox_GUID(0),
-            princeTaldaram_GUID(0),
-            jedogaShadowseeker_GUID(0),
-            heraldVolazj_GUID(0),
-            amanitar_GUID(0),
-            taldaramPlatform_GUID(0),
-            taldaramGate_GUID(0),
-            canSaveBossStates(false)
+        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap), canSaveBossStates(false)
         {
             SetBossNumber(MAX_ENCOUNTER);
             teldaramSpheres.fill(NOT_STARTED);
@@ -62,7 +54,7 @@ public:
                     taldaramPlatform_GUID = pGo->GetGUID();
                     if (IsAllSpheresActivated() || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
-                        HandleGameObject(0, true, pGo);
+                        HandleGameObject(ObjectGuid::Empty, true, pGo);
                     }
 
                     break;
@@ -87,7 +79,7 @@ public:
                     taldaramGate_GUID = pGo->GetGUID(); // Web gate past Prince Taldaram
                     if (GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
-                        HandleGameObject(0, true, pGo);
+                        HandleGameObject(ObjectGuid::Empty, true, pGo);
                     }
 
                     break;
@@ -149,7 +141,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -165,7 +157,7 @@ public:
                     return amanitar_GUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override
@@ -173,7 +165,11 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "A K " << GetBossSaveData() << teldaramSpheres[0] << ' ' << teldaramSpheres[1];
+            // Encounter states
+            saveStream << "A K " << GetBossSaveData();
+            
+            // Extra data
+            saveStream << teldaramSpheres[0] << ' ' << teldaramSpheres[1];
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
@@ -196,6 +192,7 @@ public:
 
             if (dataHead1 == 'A' && dataHead2 == 'K')
             {
+                // Encounter states
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 {
                     uint32 tmpState;
@@ -208,6 +205,7 @@ public:
                     SetBossState(i, EncounterState(tmpState));
                 }
 
+                // Extra data
                 loadStream >> teldaramSpheres[0] >> teldaramSpheres[1];
             }
             else
@@ -221,15 +219,15 @@ public:
         }
 
     private:
-        uint64 elderNadox_GUID;
-        uint64 princeTaldaram_GUID;
-        uint64 jedogaShadowseeker_GUID;
-        uint64 heraldVolazj_GUID;
-        uint64 amanitar_GUID;
+        ObjectGuid elderNadox_GUID;
+        ObjectGuid princeTaldaram_GUID;
+        ObjectGuid jedogaShadowseeker_GUID;
+        ObjectGuid heraldVolazj_GUID;
+        ObjectGuid amanitar_GUID;
 
         // Teldaram related
-        uint64 taldaramPlatform_GUID;
-        uint64 taldaramGate_GUID;
+        ObjectGuid taldaramPlatform_GUID;
+        ObjectGuid taldaramGate_GUID;
         std::array<uint32, 2> teldaramSpheres;  // Used to identify activation status for sphere activation
         bool canSaveBossStates;     // Indicates that it is safe to trigger SaveToDB call in SetBossState
 

@@ -104,7 +104,7 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 if (InstanceScript* pInstance = me->GetInstanceScript())
                 {
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_ARTHAS)))
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_ARTHAS)))
                         cr->AI()->DoAction(ACTION_KILLED_MALGANIS);
 
                     // give credit to players

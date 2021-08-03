@@ -39,9 +39,11 @@ list(APPEND CMAKE_MODULE_PATH
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
+include(ConfigureScripts)
+include(ConfigureModules)
 
 # some utils for cmake
-include(deps/drassil/cmake-utils/utils.cmake)
+include(deps/acore/cmake-utils/utils.cmake)
 
 include(src/cmake/ac_macros.cmake)
 
@@ -69,7 +71,6 @@ FOREACH(subdir ${sub_DIRS})
 
     STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
     if(EXISTS "${subdir}/CMakeLists.txt")
-        message("Loading module: ${subdir_rel}")
         add_subdirectory("${subdir_rel}")
     endif()
 ENDFOREACH()
@@ -99,10 +100,6 @@ CU_RUN_HOOK("AFTER_LOAD_CMAKE_MODULES")
 set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
-find_package(ACE REQUIRED)
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    add_definitions(-DACE_LACKS_AUTO_PTR=1)
-endif()
 find_package(MySQL REQUIRED)
 
 if(UNIX AND WITH_PERFTOOLS)

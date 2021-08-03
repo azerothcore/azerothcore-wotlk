@@ -209,12 +209,16 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 Helpers[8]{ };
+        ObjectGuid Helpers[8];
         bool berserk{ false };
         bool bAchievCheese{ true };
         bool bAchievGettingCold{ true };
         bool bAchievCoolestFriends{ true };
         uint16 addSpawnTimer{ 0 };
+
+        // Used to make Hodir disengage whenever he leaves his room
+        const Position ENTRANCE_DOOR{ 1999.160034f, -297.792999f, 431.960999f, 0 };
+        const Position EXIT_DOOR{ 1999.709961f, -166.259003f, 432.822998f, 0 };
 
         void Reset() override
         {
@@ -369,22 +373,12 @@ public:
             }
         }
 
-        bool IsInRoom()
-        {
-            // Calculate the distance between his home position to the gate
-            if (me->GetExactDist(me->GetHomePosition().GetPositionX(),
-                me->GetHomePosition().GetPositionY(),
-                me->GetHomePosition().GetPositionZ()) > 80.0f)
-            {
-                EnterEvadeMode();
-                return false;
-            }
-            return true;
-        }
-
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoom()) { return; }
+            if (!IsInRoom(&ENTRANCE_DOOR, Axis::AXIS_Y, false) || !IsInRoom(&EXIT_DOOR, Axis::AXIS_Y, true))
+            {
+                return;
+            }
 
             if (!UpdateVictim())
             {
@@ -397,9 +391,6 @@ public:
                 }
                 return;
             }
-
-            if( !berserk && (me->GetPositionX() < 1940.0f || me->GetPositionX() > 2070.0f || me->GetPositionY() < -300.0f || me->GetPositionY() > -155.0f) )
-                events.RescheduleEvent(EVENT_BERSERK, 1);
 
             events.Update(diff);
 
@@ -433,9 +424,9 @@ public:
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             targets.push_back(itr->GetSource());
-                        targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-                        targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-                        acore::Containers::RandomResizeList(targets, (RAID_MODE(2,3)));
+                        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+                        Acore::Containers::RandomResize(targets, (RAID_MODE(2,3)));
                         for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                         {
                             float prevZ = (*itr)->GetPositionZ();
@@ -481,7 +472,7 @@ public:
 
         Creature* GetHelper(uint8 index)
         {
-            return (Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : nullptr);
+            return Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : nullptr;
         }
 
         void SpawnHelpers()
@@ -656,7 +647,7 @@ public:
         {
             if (pInstance && doneBy)
                 if (pInstance->GetData(TYPE_HODIR) == NOT_STARTED)
-                    if (Creature* hodir = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_HODIR)))
+                    if (Creature* hodir = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_HODIR)))
                         hodir->AI()->AttackStart(doneBy);
         }
 
@@ -714,7 +705,7 @@ public:
             {
                 if( GameObject* fire = me->FindNearestGameObject(194300, 1.0f) )
                 {
-                    fire->SetOwnerGUID(0);
+                    fire->SetOwnerGUID(ObjectGuid::Empty);
                     fire->Delete();
                 }
                 me->DespawnOrUnsummon(); // this will remove DynObjects
@@ -792,7 +783,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -825,7 +816,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
-                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                     hodir->AI()->SetData(4, 1);
         }
     };
@@ -888,7 +879,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -922,7 +913,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
-                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                     hodir->AI()->SetData(4, 1);
         }
     };
@@ -992,7 +983,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -1022,7 +1013,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
-                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                     hodir->AI()->SetData(4, 1);
         }
     };
@@ -1086,7 +1077,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -1137,7 +1128,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
-                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                     hodir->AI()->SetData(4, 1);
         }
     };
@@ -1245,7 +1236,7 @@ public:
                     {
                         if (GetStackAmount() == 2) // increasing from 2 to 3 (not checking >= to improve performance)
                             if (InstanceScript* pInstance = target->GetInstanceScript())
-                                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                                     hodir->AI()->SetData(2, 1);
                         ModStackAmount(1);
                         counter = 0;
@@ -1280,9 +1271,9 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-            acore::Containers::RandomResizeList(targets, 1);
+            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void Register() override
@@ -1458,7 +1449,7 @@ class achievement_cheese_the_freeze : public AchievementCriteriaScript
 public:
     achievement_cheese_the_freeze() : AchievementCriteriaScript("achievement_cheese_the_freeze") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -1469,7 +1460,7 @@ class achievement_getting_cold_in_here : public AchievementCriteriaScript
 public:
     achievement_getting_cold_in_here() : AchievementCriteriaScript("achievement_getting_cold_in_here") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
     }
@@ -1480,7 +1471,7 @@ class achievement_i_could_say_that_this_cache_was_rare : public AchievementCrite
 public:
     achievement_i_could_say_that_this_cache_was_rare() : AchievementCriteriaScript("achievement_i_could_say_that_this_cache_was_rare") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(3);
     }
@@ -1491,7 +1482,7 @@ class achievement_i_have_the_coolest_friends : public AchievementCriteriaScript
 public:
     achievement_i_have_the_coolest_friends() : AchievementCriteriaScript("achievement_i_have_the_coolest_friends") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(4);
     }
@@ -1502,7 +1493,7 @@ class achievement_staying_buffed_all_winter_10 : public AchievementCriteriaScrip
 public:
     achievement_staying_buffed_all_winter_10() : AchievementCriteriaScript("achievement_staying_buffed_all_winter_10") {}
 
-    bool OnCheck(Player* player, Unit*  /*target*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/, uint32 /*criteria_id*/) override
     {
         return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_10);
     }
@@ -1513,7 +1504,7 @@ class achievement_staying_buffed_all_winter_25 : public AchievementCriteriaScrip
 public:
     achievement_staying_buffed_all_winter_25() : AchievementCriteriaScript("achievement_staying_buffed_all_winter_25") {}
 
-    bool OnCheck(Player* player, Unit*  /*target*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/, uint32 /*criteria_id*/) override
     {
         return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_25);
     }

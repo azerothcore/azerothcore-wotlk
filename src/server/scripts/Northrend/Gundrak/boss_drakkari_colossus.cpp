@@ -343,7 +343,7 @@ public:
         {
             if (me->ToTempSummon())
             {
-                if (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID()))
+                if (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         summoner->GetAI()->DoAction(ACTION_INFORM);
                 return;

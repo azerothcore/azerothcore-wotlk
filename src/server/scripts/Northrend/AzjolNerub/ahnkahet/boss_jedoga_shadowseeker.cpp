@@ -145,7 +145,6 @@ public:
     struct boss_jedoga_shadowseekerAI : public BossAI
     {
         boss_jedoga_shadowseekerAI(Creature* pCreature) : BossAI(pCreature, DATA_JEDOGA_SHADOWSEEKER),
-            sacraficeTarget_GUID(0),
             sayPreachTimer(120000),
             combatSummonsSummoned(false),
             ritualTriggered(false),
@@ -201,7 +200,7 @@ public:
                 }
             }
 
-            sacraficeTarget_GUID = 0;
+            sacraficeTarget_GUID.Clear();
             sayPreachTimer = 120000;
             ritualTriggered = false;
             volunteerWork = true;
@@ -222,7 +221,7 @@ public:
             {
                 case NPC_TWILIGHT_INITIATE:
                 {
-                    std::list<uint64>::iterator itr = std::find(oocSummons.begin(), oocSummons.end(), summon->GetGUID());
+                    GuidList::iterator itr = std::find(oocSummons.begin(), oocSummons.end(), summon->GetGUID());
                     if (itr == oocSummons.end())
                     {
                         break;
@@ -374,7 +373,7 @@ public:
                     me->SetFacingTo(5.66f);
                     if (!summons.empty())
                     {
-                        sacraficeTarget_GUID = acore::Containers::SelectRandomContainerElement(summons);
+                        sacraficeTarget_GUID = Acore::Containers::SelectRandomContainerElement(summons);
                         if (Creature* volunteer = ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
                         {
                             Talk(SAY_SACRIFICE_1);
@@ -406,7 +405,7 @@ public:
                     DoCastSelf(SPELL_LIGHTNING_BOLTS, true);
                     if (!oocTriggers.empty())
                     {
-                        for (uint64 const& guid : oocTriggers)
+                        for (ObjectGuid const& guid : oocTriggers)
                         {
                             if (Creature* trigger = ObjectAccessor::GetCreature(*me, guid))
                             {
@@ -514,9 +513,9 @@ public:
         }
 
     private:
-        std::list<uint64> oocSummons;
-        std::list<uint64> oocTriggers;
-        uint64 sacraficeTarget_GUID;
+        GuidList oocSummons;
+        GuidList oocTriggers;
+        ObjectGuid sacraficeTarget_GUID;
         uint32 sayPreachTimer;
         bool combatSummonsSummoned;
         bool ritualTriggered;
@@ -534,7 +533,7 @@ public:
         {
             if (!oocTriggers.empty())
             {
-                for (uint64 const guid : oocTriggers)
+                for (ObjectGuid const& guid : oocTriggers)
                 {
                     if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                     {
@@ -546,7 +545,7 @@ public:
 
             if (!oocSummons.empty())
             {
-                for (uint64 const guid : oocSummons)
+                for (ObjectGuid const& guid : oocSummons)
                 {
                     if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                     {
@@ -630,7 +629,7 @@ public:
             }
             else if (id == POINT_RITUAL)
             {
-                if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER)))
+                if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_JEDOGA_SHADOWSEEKER)))
                 {
                     jedoga->AI()->Talk(SAY_SACRIFICE_2);
                     jedoga->CastSpell(nullptr, SPELL_SACRIFICE_BEAM);
@@ -750,7 +749,7 @@ class achievement_volunteer_work : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* /*player*/, Unit* target) override
+        bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
         {
             if (Creature const* jedoga = target ? target->ToCreature() : nullptr)
             {

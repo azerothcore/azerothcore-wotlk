@@ -153,7 +153,6 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->SetHover(false);
             me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
 
             whelpSpam = false;
@@ -277,7 +276,6 @@ public:
                     case 13:
                         me->SetCanFly(false);
                         me->SetDisableGravity(false);
-                        me->SetHover(false);
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
                         events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 0);
                         break;
@@ -368,7 +366,6 @@ public:
                         me->DisableSpline();
                         me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SetHover(true);
                         me->SetOrientation(OnyxiaMoveData[0].o);
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(11, OnyxiaMoveData[1].x + 1.0f, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z, 12.0f);

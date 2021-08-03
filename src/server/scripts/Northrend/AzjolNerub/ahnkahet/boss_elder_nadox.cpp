@@ -7,6 +7,7 @@
 #include "ahnkahet.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "Containers.h"
 
 enum Misc
 {
@@ -63,7 +64,6 @@ public:
     struct boss_elder_nadoxAI : public BossAI
     {
         boss_elder_nadoxAI(Creature* creature) : BossAI(creature, DATA_PRINCE_TALDARAM),
-            previousSwarmEgg_GUID(0),
             guardianSummoned(false),
             respectYourElders(true)
         {
@@ -76,7 +76,7 @@ public:
             // Clear eggs data
             swarmEggs.clear();
             guardianEggs.clear();
-            previousSwarmEgg_GUID = 0;
+            previousSwarmEgg_GUID.Clear();
             guardianSummoned = false;
             respectYourElders = true;
         }
@@ -220,9 +220,9 @@ public:
         }
 
     private:
-        std::list<uint64> swarmEggs;
-        std::list<uint64> guardianEggs;
-        uint64 previousSwarmEgg_GUID;   // This will prevent casting summoning spells on same egg twice
+        GuidList swarmEggs;
+        GuidList guardianEggs;
+        ObjectGuid previousSwarmEgg_GUID;   // This will prevent casting summoning spells on same egg twice
         bool guardianSummoned;
         bool respectYourElders;
 
@@ -236,12 +236,12 @@ public:
                 }
 
                 // Make a copy of guid list
-                std::list<uint64> swarmEggs2 = swarmEggs;
+                GuidList swarmEggs2 = swarmEggs;
 
                 // Remove previous egg
                 if (previousSwarmEgg_GUID)
                 {
-                    std::list<uint64>::iterator itr = std::find(swarmEggs2.begin(), swarmEggs2.end(), previousSwarmEgg_GUID);
+                    std::list<ObjectGuid>::iterator itr = std::find(swarmEggs2.begin(), swarmEggs2.end(), previousSwarmEgg_GUID);
                     if (itr != swarmEggs2.end())
                     {
                         swarmEggs2.erase(itr);
@@ -253,7 +253,7 @@ public:
                     return;
                 }
 
-                previousSwarmEgg_GUID = acore::Containers::SelectRandomContainerElement(swarmEggs2);
+                previousSwarmEgg_GUID = Acore::Containers::SelectRandomContainerElement(swarmEggs2);
 
                 if (Creature* egg = ObjectAccessor::GetCreature(*me, previousSwarmEgg_GUID))
                 {
@@ -272,7 +272,7 @@ public:
                     return;
                 }
 
-                uint64 const guardianEggGUID = acore::Containers::SelectRandomContainerElement(guardianEggs);
+                ObjectGuid const& guardianEggGUID = Acore::Containers::SelectRandomContainerElement(guardianEggs);
                 if (Creature* egg = ObjectAccessor::GetCreature(*me, guardianEggGUID))
                 {
                     egg->CastSpell(egg, SPELL_SUMMON_SWARM_GUARD, true, nullptr, nullptr, me->GetGUID());
@@ -396,7 +396,7 @@ class achievement_respect_your_elders : public AchievementCriteriaScript
     public:
         achievement_respect_your_elders() : AchievementCriteriaScript("achievement_respect_your_elders") { }
 
-        bool OnCheck(Player* /*player*/, Unit* target) override
+        bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
         {
             return target && target->GetAI()->GetData(DATA_RESPECT_YOUR_ELDERS);
         }

@@ -208,7 +208,6 @@ public:
     struct boss_taldaramAI : public BossAI
     {
         boss_taldaramAI(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM),
-            vanishTarget_GUID(0),
             vanishDamage(0)
         {
         }
@@ -243,7 +242,7 @@ public:
             _Reset();
 
             vanishDamage = 0;
-            vanishTarget_GUID = 0;
+            vanishTarget_GUID.Clear();
         }
 
         void DoAction(int32 action) override
@@ -251,7 +250,7 @@ public:
             if (action == ACTION_REMOVE_PRISON || action == ACTION_REMOVE_PRISON_AT_RESET)
             {
                 me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
-                instance->HandleGameObject(instance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_PRINCE_TALDARAM_PLATFORM), true);
 
                 if (action == ACTION_REMOVE_PRISON)
                 {
@@ -295,7 +294,7 @@ public:
                     {
                         ScheduleCombatEvents();
                         me->CastStop();
-                        vanishTarget_GUID = 0;
+                        vanishTarget_GUID.Clear();
                         vanishDamage = 0;
                     }
                 }
@@ -319,7 +318,7 @@ public:
 
             if (vanishTarget_GUID && victim->GetGUID() == vanishTarget_GUID)
             {
-                vanishTarget_GUID = 0;
+                vanishTarget_GUID.Clear();
                 vanishDamage = 0;
             }
         }
@@ -481,7 +480,7 @@ public:
 
     private:
         Position victimSperePos;
-        uint64 vanishTarget_GUID;
+        ObjectGuid vanishTarget_GUID;
         uint32 vanishDamage;
 
         void ScheduleCombatEvents()
@@ -489,7 +488,7 @@ public:
             events.Reset();
             events.RescheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
             events.RescheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
-            vanishTarget_GUID = 0;
+            vanishTarget_GUID.Clear();
             vanishDamage = 0;
         }
     };
@@ -524,7 +523,7 @@ public:
         uint32 const objectIndex = go->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;
         if (pInstance->GetData(objectIndex) == NOT_STARTED)
         {
-            Creature* taldaram = ObjectAccessor::GetCreature(*go, pInstance->GetData64(DATA_PRINCE_TALDARAM));
+            Creature* taldaram = ObjectAccessor::GetCreature(*go, pInstance->GetGuidData(DATA_PRINCE_TALDARAM));
             if (taldaram && taldaram->IsAlive())
             {
                 taldaram->AI()->Talk(SAY_SPHERE_ACTIVATED);

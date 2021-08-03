@@ -105,14 +105,17 @@ public:
         {
             if (me->GetPositionZ() > 140.0f)
             {
-                killCount = 0;
                 events.ScheduleEvent(EVENT_CHECK_START, 1000);
-                if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_VILEBRANCH_SPEAKER)))
+                if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VILEBRANCH_SPEAKER)))
                     if (!speaker->IsAlive())
                         speaker->Respawn(true);
             }
+
+            killCount = 0;
+            me->RemoveAurasDueToSpell(SPELL_FRENZY);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             summons.DespawnAll();
+            instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
         }
 
@@ -157,7 +160,7 @@ public:
             if (++killCount == 3)
             {
                 Talk(SAY_DING_KILL);
-                if (Creature* jindo = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_JINDO)))
+                if (Creature* jindo = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_JINDO)))
                     if (jindo->IsAlive())
                         jindo->AI()->Talk(SAY_GRATS_JINDO);
                 DoCast(me, SPELL_LEVEL_UP, true);
@@ -261,7 +264,7 @@ public:
 
     private:
         uint8 killCount;
-        uint64 chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
+        ObjectGuid chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
     };
 
     CreatureAI* GetAI(Creature* creature) const override

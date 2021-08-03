@@ -4,28 +4,27 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Item.h"
 #include "Map.h"
 #include "ObjectAccessor.h"
 #include "SpellInfo.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
-using namespace acore;
+using namespace Acore;
 
 void VisibleNotifier::Visit(GameObjectMapType& m)
 {
     for (GameObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        if (i_largeOnly != iter->GetSource()->IsVisibilityOverridden())
+        GameObject* go = iter->GetSource();
+        if (i_largeOnly != go->IsVisibilityOverridden())
             continue;
-        vis_guids.erase(iter->GetSource()->GetGUID());
-        i_player.UpdateVisibilityOf(iter->GetSource(), i_data, i_visibleNow);
+
+        vis_guids.erase(go->GetGUID());
+        i_player.UpdateVisibilityOf(go, i_data, i_visibleNow);
     }
 }
 
@@ -61,14 +60,16 @@ void VisibleNotifier::SendToSelf()
             }
         }
 
-    for (Player::ClientGUIDs::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
+    for (GuidUnorderedSet::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
     {
         if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
+        {
             if (i_largeOnly != obj->IsVisibilityOverridden())
                 continue;
+        }
 
         // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
-        if (IS_TRANSPORT_GUID(*it))
+        if ((*it).IsTransport())
             if (GameObject* staticTrans = i_player.GetMap()->GetGameObject(*it))
                 if (i_player.CanSeeOrDetect(staticTrans, false, true))
                     continue;
@@ -76,7 +77,7 @@ void VisibleNotifier::SendToSelf()
         i_player.m_clientGUIDs.erase(*it);
         i_data.AddOutOfRangeGUID(*it);
 
-        if (IS_PLAYER_GUID(*it))
+        if ((*it).IsPlayer())
         {
             Player* player = ObjectAccessor::FindPlayer(*it);
             if (player && player->IsInMap(&i_player))
@@ -95,6 +96,7 @@ void VisibleNotifier::SendToSelf()
     {
         if (i_largeOnly != (*it)->IsVisibilityOverridden())
             continue;
+
         i_player.GetInitialVisiblePackets(*it);
     }
 }
@@ -127,7 +129,7 @@ void VisibleChangesNotifier::Visit(CreatureMapType& m)
 void VisibleChangesNotifier::Visit(DynamicObjectMapType& m)
 {
     for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        if (IS_PLAYER_GUID(iter->GetSource()->GetCasterGUID()))
+        if (iter->GetSource()->GetCasterGUID().IsPlayer())
             if (Unit* caster = iter->GetSource()->GetCaster())
                 if (Player* player = caster->ToPlayer())
                     if (player->m_seer == iter->GetSource())
@@ -245,7 +247,7 @@ void MessageDistDeliverer::Visit(DynamicObjectMapType& m)
     for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         DynamicObject* target = iter->GetSource();
-        if (!IS_PLAYER_GUID(target->GetCasterGUID()) || !target->InSamePhase(i_phaseMask))
+        if (!target->GetCasterGUID().IsPlayer() || !target->InSamePhase(i_phaseMask))
             continue;
 
         // Xinef: Check whether the dynobject allows to see through it
@@ -311,7 +313,7 @@ void MessageDistDelivererToHostile::Visit(DynamicObjectMapType& m)
     for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         DynamicObject* target = iter->GetSource();
-        if (!IS_PLAYER_GUID(target->GetCasterGUID()) || !target->InSamePhase(i_phaseMask))
+        if (!target->GetCasterGUID().IsPlayer() || !target->InSamePhase(i_phaseMask))
             continue;
 
         if (target->GetExactDist2dSq(i_source) > i_distSq)

@@ -9,7 +9,6 @@
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
 #include "PlayerDump.h"
-#include "UpdateFields.h"
 #include "World.h"
 
 #define DUMP_TABLE_COUNT 27
@@ -100,7 +99,7 @@ bool findnth(std::string& str, int n, std::string::size_type& s, std::string::si
 std::string gettablename(std::string& str)
 {
     std::string::size_type s = 13;
-    std::string::size_type e = str.find(_TABLE_SIM_, s);
+    std::string::size_type e = str.find("`", s);
     if (e == std::string::npos)
         return "";
 
@@ -188,7 +187,7 @@ std::string CreateDumpString(char const* tableName, QueryResult result)
 {
     if (!tableName || !result) return "";
     std::ostringstream ss;
-    ss << "INSERT INTO " << _TABLE_SIM_ << tableName << _TABLE_SIM_ << " VALUES (";
+    ss << "INSERT INTO `" << tableName << "` VALUES (";
     Field* fields = result->Fetch();
     for (uint32 i = 0; i < result->GetFieldCount(); ++i)
     {
@@ -328,7 +327,7 @@ bool PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const* tab
                 case DTT_CHARACTER:
                     {
                         if (result->GetFieldCount() <= 74)          // avoid crashes on next check
-                            sLog->outCrash("PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
+                            LOG_FATAL("entities.player.dump", "PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
 
                         if (result->Fetch()[74].GetUInt32())        // characters.deleteInfos_Account - if filled error
                             return false;
@@ -415,18 +414,19 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
     // make sure the same guid doesn't already exist and is safe to use
     bool incHighest = true;
-    if (guid != 0 && guid < sObjectMgr->_hiCharGuid)
+    if (guid != 0 && guid < sObjectMgr->GetGenerator<HighGuid::Player>().GetNextAfterMaxUsed())
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_GUID);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_GUID);
         stmt->setUInt32(0, guid);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
         if (result)
-            guid = sObjectMgr->_hiCharGuid;                     // use first free if exists
-        else incHighest = false;
+            guid = sObjectMgr->GetGenerator<HighGuid::Player>().GetNextAfterMaxUsed();                     // use first free if exists
+        else
+            incHighest = false;
     }
     else
-        guid = sObjectMgr->_hiCharGuid;
+        guid = sObjectMgr->GetGenerator<HighGuid::Player>().GetNextAfterMaxUsed();
 
     // normalize the name if specified and check if it exists
     if (!normalizePlayerName(name))
@@ -434,7 +434,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
     if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
         stmt->setString(0, name);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -464,7 +464,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     uint8 playerClass = 0;
     uint8 level = 1;
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     while (!feof(fin))
     {
         if (!fgets(buf, 32000, fin))
@@ -503,7 +503,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
         std::string tn = gettablename(line);
         if (tn.empty())
         {
-            sLog->outError("LoadPlayerDump: Can't extract table name from line: '%s'!", line.c_str());
+            LOG_ERROR("entities.player.dump", "LoadPlayerDump: Can't extract table name from line: '%s'!", line.c_str());
             ROLLBACK(DUMP_FILE_BROKEN);
         }
 
@@ -520,7 +520,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
         if (i == DUMP_TABLE_COUNT)
         {
-            sLog->outError("LoadPlayerDump: Unknown table: '%s'!", tn.c_str());
+            LOG_ERROR("entities.player.dump", "LoadPlayerDump: Unknown table: '%s'!", tn.c_str());
             ROLLBACK(DUMP_FILE_BROKEN);
         }
 
@@ -544,7 +544,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                         // check if the original name already exists
                         name = getnth(line, 3);
 
-                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+                        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
                         stmt->setString(0, name);
                         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -586,9 +586,9 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     if (!changenth(line, 1, newguid))           // character_inventory.guid update
                         ROLLBACK(DUMP_FILE_BROKEN);
 
-                    if (!changeGuid(line, 2, items, sObjectMgr->_hiItemGuid, true))
+                    if (!changeGuid(line, 2, items, sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed(), true))
                         ROLLBACK(DUMP_FILE_BROKEN);             // character_inventory.bag update
-                    if (!changeGuid(line, 4, items, sObjectMgr->_hiItemGuid))
+                    if (!changeGuid(line, 4, items, sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed()))
                         ROLLBACK(DUMP_FILE_BROKEN);             // character_inventory.item update
                     break;
                 }
@@ -604,7 +604,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                 {
                     if (!changeGuid(line, 1, mails, sObjectMgr->_mailId))
                         ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.id
-                    if (!changeGuid(line, 2, items, sObjectMgr->_hiItemGuid))
+                    if (!changeGuid(line, 2, items, sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed()))
                         ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.item_guid
                     if (!changenth(line, 3, newguid))           // mail_items.receiver
                         ROLLBACK(DUMP_FILE_BROKEN);
@@ -613,7 +613,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
             case DTT_ITEM:
                 {
                     // item, owner, data field:item, owner guid
-                    if (!changeGuid(line, 1, items, sObjectMgr->_hiItemGuid))
+                    if (!changeGuid(line, 1, items, sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed()))
                         ROLLBACK(DUMP_FILE_BROKEN);              // item_instance.guid update
                     if (!changenth(line, 3, newguid))           // item_instance.owner_guid update
                         ROLLBACK(DUMP_FILE_BROKEN);
@@ -623,7 +623,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                 {
                     if (!changenth(line, 1, newguid))           // character_gifts.guid update
                         ROLLBACK(DUMP_FILE_BROKEN);
-                    if (!changeGuid(line, 2, items, sObjectMgr->_hiItemGuid))
+                    if (!changeGuid(line, 2, items, sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed()))
                         ROLLBACK(DUMP_FILE_BROKEN);             // character_gifts.item_guid update
                     break;
                 }
@@ -670,7 +670,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     break;
                 }
             default:
-                sLog->outError("Unknown dump table type: %u", type);
+                LOG_ERROR("entities.player.dump", "Unknown dump table type: %u", type);
                 break;
         }
 
@@ -684,11 +684,11 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     // in case of name conflict player has to rename at login anyway
     sWorld->AddGlobalPlayerData(guid, account, name, gender, race, playerClass, level, mails.size(), 0);
 
-    sObjectMgr->_hiItemGuid += items.size();
+    sObjectMgr->GetGenerator<HighGuid::Item>().Set(sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed() + items.size());
     sObjectMgr->_mailId     += mails.size();
 
     if (incHighest)
-        ++sObjectMgr->_hiCharGuid;
+        sObjectMgr->GetGenerator<HighGuid::Player>().Generate();
 
     fclose(fin);
 
