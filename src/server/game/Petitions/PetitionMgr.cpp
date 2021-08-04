@@ -100,10 +100,6 @@ void PetitionMgr::RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type)
     {
         if (itr->second.ownerGuid == ownerGuid && (!type || type == itr->second.petitionType))
         {
-            // remove signatures
-            SignatureStore.erase(itr->first);
-            PetitionStore.erase(itr++);
-
             // Remove invalid charter item
             if (type == itr->second.petitionType)
             {
@@ -115,6 +111,10 @@ void PetitionMgr::RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type)
                     }
                 }
             }
+
+            // remove signatures
+            SignatureStore.erase(itr->first);
+            PetitionStore.erase(itr++);
         }
         else
             ++itr;
