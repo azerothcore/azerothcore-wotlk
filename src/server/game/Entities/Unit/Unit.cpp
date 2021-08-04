@@ -198,7 +198,6 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_rootTimes = 0;
 
     m_state = 0;
-    m_petCatchUp = false;
     m_deathState = ALIVE;
 
     for (uint8 i = 0; i < CURRENT_MAX_SPELL; ++i)
@@ -13579,32 +13578,10 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                         }
                         else
                         {
-                            // special treatment for player pets in order to avoid stuttering
                             float ownerSpeed = followed->GetSpeedRate(mtype);
-                            float distOwner = GetDistance(followed);
-                            float minDist = 2.5f;
-
-                            if (ToCreature()->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
-                            {
-                                // different minimum distance for vanity pets
-                                minDist = 5.0f;
-
-                                if (mtype == MOVE_FLIGHT)
-                                    mtype = MOVE_RUN; // vanity pets use run speed for flight
-                            }
-
-                            float maxDist = ownerSpeed >= 1.0f ? minDist * ownerSpeed * 1.5f : minDist * 1.5f;
-
-                            if (distOwner < minDist && m_petCatchUp)
-                                m_petCatchUp = false;
-
-                            if (distOwner > maxDist && !m_petCatchUp)
-                                m_petCatchUp = true;
-
-                            if (m_petCatchUp)
-                                speed = ownerSpeed * 1.05f;
-                            else
-                                speed = ownerSpeed * 0.95f;
+                            if (speed < ownerSpeed || IsWithinDist3d(followed, 10.0f))
+                                speed = ownerSpeed;
+                            speed *= std::min(std::max(1.0f, 0.75f + (GetDistance(followed) - PET_FOLLOW_DIST) * 0.05f), 1.3f);
                         }
                     }
                     else
