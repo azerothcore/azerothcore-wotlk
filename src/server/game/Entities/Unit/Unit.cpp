@@ -5138,16 +5138,23 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
     if (dispelMask & (1 << DISPEL_DISEASE) && HasAura(50536))
         dispelMask &= ~(1 << DISPEL_DISEASE);
 
-    bool positive = IsFriendlyTo(caster);
+    ReputationRank rank = GetReactionTo(caster);
+    bool positive = rank >= REP_FRIENDLY;
 
-    // Unit not at war with caster's player should be treated as a friendly unit
-    if (!positive)
+    // Neutral unit not at war with caster should be treated as a friendly unit
+    if (rank == REP_NEUTRAL)
     {
         if (Player* casterPlayer = caster->GetAffectingPlayer())
         {
-            if (FactionTemplateEntry const* factionTemplate = GetFactionTemplateEntry())
+            if (FactionTemplateEntry const* factionTemplateEntry = GetFactionTemplateEntry())
             {
-                positive = !casterPlayer->GetReputationMgr().IsAtWar(GetFactionTemplateEntry()->faction);
+                if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionTemplateEntry->faction))
+                {
+                    if (factionEntry->CanBeSetAtWar())
+                    {
+                        positive = !casterPlayer->GetReputationMgr().IsAtWar(factionEntry);
+                    }
+                }
             }
         }
     }
