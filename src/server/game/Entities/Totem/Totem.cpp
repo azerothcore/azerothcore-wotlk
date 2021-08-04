@@ -89,7 +89,9 @@ void Totem::InitSummon()
     }
 
     if (!IsInWater())
+    {
         GetMotionMaster()->MoveFall();
+    }
 }
 
 void Totem::UnSummon(uint32 msTime)
