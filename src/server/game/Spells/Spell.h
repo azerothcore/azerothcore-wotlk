@@ -715,6 +715,7 @@ protected:
     // we can't store original aura link to prevent access to deleted auras
     // and in same time need aura data and after aura deleting.
     SpellInfo const* m_triggeredByAuraSpell;
+    int8 m_triggeredByAuraEffectIndex;
 
     bool m_skipCheck;
     uint8 m_auraScaleMask;
