@@ -303,7 +303,7 @@ public:
     {
         npc_ahnkahar_nerubianAI(Creature* c) : ScriptedAI(c) { }
 
-        void Reset()
+        void Reset() override
         {
             DoCastSelf(me->GetEntry() == NPC_AHNKAHAR_GUARDIAN ? SPELL_GUARDIAN_AURA : SPELL_SWARMER_AURA, true);
             uiSprintTimer = 10000;
@@ -376,7 +376,7 @@ public:
 
         uint32 _targetCount;
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ahn_kahet_swarmer_aura_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
             OnEffectHitTarget += SpellEffectFn(spell_ahn_kahet_swarmer_aura_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
