@@ -303,7 +303,6 @@ public:
     {
         npc_ahnkahar_nerubianAI(Creature* c) : ScriptedAI(c) { }
 
-
         void Reset()
         {
             DoCastSelf(me->GetEntry() == NPC_AHNKAHAR_GUARDIAN ? SPELL_GUARDIAN_AURA : SPELL_SWARMER_AURA, true);
