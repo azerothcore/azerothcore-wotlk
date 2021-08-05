@@ -5047,8 +5047,6 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             {
                 sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
             }
-
-            m_caster->AddUnitState(UNIT_STATE_CHARGING);
         }
         else
         {
@@ -5068,8 +5066,6 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             {
                 sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
             }
-
-            m_caster->AddUnitState(UNIT_STATE_CHARGING);
         }
     }
 
@@ -5077,8 +5073,6 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
     {
         if (!unitTarget)
             return;
-
-        m_caster->ClearUnitState(UNIT_STATE_CHARGING);
 
         if (m_caster->ToPlayer())
         {
