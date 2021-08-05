@@ -1,3 +1,19 @@
+-- DB update 2021_08_05_01 -> 2021_08_05_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_08_05_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_08_05_01 2021_08_05_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1627578885877631300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627578885877631300');
 
 -- ID changed to match the rest of the moonwells
@@ -11,3 +27,13 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (42907, 177272, 0, 0, 0, 1, 1, -8753.33, 1106.74, 91.2191, 5.7876, 0, 0, 0.245266, -0.969456, 120, 100, 1, '', 0),
 (49711, 177272, 1, 0, 0, 1, 1, 9727.51, 962.386, 1293.19, -0.148352, 0, 0, -0.074108, 0.99725, 900, 100, 1, '', 0);
 
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_08_05_02' WHERE sql_rev = '1627578885877631300';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
