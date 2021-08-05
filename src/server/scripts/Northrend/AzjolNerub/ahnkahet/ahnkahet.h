@@ -7,7 +7,7 @@
 #define DEF_AHNKAHET_H
 
 #define AhnahetScriptName "instance_ahnkahet"
-
+constexpr uint32 MAX_ENCOUNTER = 5;
 enum AhnkahetData
 {
     // Main encounters
@@ -16,8 +16,8 @@ enum AhnkahetData
     DATA_JEDOGA_SHADOWSEEKER    = 2,
     DATA_HERALD_VOLAZJ          = 3,
     DATA_AMANITAR               = 4,
-    MAX_ENCOUNTER               = 5,
-    // MISC DATA
+
+    // Other data
     // Teldram encounter related
     DATA_PRINCE_TALDARAM_PLATFORM,
     DATA_TELDRAM_SPHERE1,
