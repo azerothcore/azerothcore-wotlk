@@ -102,7 +102,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectTeleUnitsFaceCaster,                      // 43 SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER
     &Spell::EffectLearnSkill,                               // 44 SPELL_EFFECT_SKILL_STEP
     &Spell::EffectAddHonor,                                 // 45 SPELL_EFFECT_ADD_HONOR                honor/pvp related
-    &Spell::EffectUnused,                                   // 46 SPELL_EFFECT_SPAWN clientside, unit appears as if it was just spawned
+    &Spell::EffectUnused,                                   // 46 SPELL_EFFECT_SPAWN client-side, unit appears as if it was just spawned
     &Spell::EffectTradeSkill,                               // 47 SPELL_EFFECT_TRADE_SKILL
     &Spell::EffectUnused,                                   // 48 SPELL_EFFECT_STEALTH                  one spell: Base Stealth
     &Spell::EffectUnused,                                   // 49 SPELL_EFFECT_DETECT                   one spell: Detect
@@ -4540,8 +4540,12 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
             // remove old glyph aura
             if (uint32 oldGlyph = player->GetGlyph(m_glyphIndex))
                 if (GlyphPropertiesEntry const* oldGlyphEntry = sGlyphPropertiesStore.LookupEntry(oldGlyph))
+                {
                     player->RemoveAurasDueToSpell(oldGlyphEntry->SpellId);
+                    player->SendLearnPacket(oldGlyphEntry->SpellId, false); // Send packet to properly handle client-side spell tooltips
+                }
 
+            player->SendLearnPacket(glyphEntry->SpellId, true); // Send packet to properly handle client-side spell tooltips
             player->CastSpell(m_caster, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
             player->SetGlyph(m_glyphIndex, glyph, !player->GetSession()->PlayerLoading());
             player->SendTalentsInfoData(false);
@@ -5043,8 +5047,6 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             {
                 sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
             }
-
-            m_caster->AddUnitState(UNIT_STATE_CHARGING);
         }
         else
         {
@@ -5064,8 +5066,6 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             {
                 sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
             }
-
-            m_caster->AddUnitState(UNIT_STATE_CHARGING);
         }
     }
 
@@ -5073,8 +5073,6 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
     {
         if (!unitTarget)
             return;
-
-        m_caster->ClearUnitState(UNIT_STATE_CHARGING);
 
         if (m_caster->ToPlayer())
         {

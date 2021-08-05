@@ -10719,8 +10719,11 @@ void Unit::EnergizeBySpell(Unit* victim, uint32 spellID, uint32 damage, Powers p
     // needs to be called after sending spell log
     victim->ModifyPower(powerType, damage);
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
-    victim->getHostileRefManager().threatAssist(this, float(damage) * 0.5f, spellInfo);
+    if (powerType != POWER_HAPPINESS)
+    {
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+        victim->getHostileRefManager().threatAssist(this, float(damage) * 0.5f, spellInfo);
+    }
 }
 
 float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype)
