@@ -5647,6 +5647,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_CHARGE:
                 {
+                    if (m_caster->HasUnitState(UNIT_STATE_CHARGING))
+                    {
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+
                     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR)
                     {
                         // Warbringer - can't be handled in proc system - should be done before checkcast root check and charge effect process
