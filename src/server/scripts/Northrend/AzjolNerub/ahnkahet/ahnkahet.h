@@ -60,4 +60,5 @@ inline AI* GetAhnkahetAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, AhnahetScriptName);
 }
+
 #endif // DEF_AHNKAHET_H
