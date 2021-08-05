@@ -3070,6 +3070,9 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
 
     // add new enchanting if equipped
     item_owner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, true);
+
+    item_owner->RemoveTradeableItem(itemTarget);
+    itemTarget->ClearSoulboundTradeable(item_owner);
 }
 
 void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
