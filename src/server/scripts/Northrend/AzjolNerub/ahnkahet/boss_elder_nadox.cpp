@@ -309,7 +309,7 @@ public:
             uiSprintTimer = 10000;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
