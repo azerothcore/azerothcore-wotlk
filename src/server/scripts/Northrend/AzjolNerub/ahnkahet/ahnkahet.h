@@ -17,7 +17,6 @@ enum AhnkahetData
     DATA_HERALD_VOLAZJ          = 3,
     DATA_AMANITAR               = 4,
     MAX_ENCOUNTER               = 5,
-
     // MISC DATA
     // Teldram encounter related
     DATA_PRINCE_TALDARAM_PLATFORM,
@@ -32,7 +31,6 @@ enum AhnKahetCreatures
     NPC_JEDOGA_SHADOWSEEKER         = 29310,
     NPC_HERALD_JOLAZJ               = 29311,
     NPC_AMANITAR                    = 30258,
-
     // Teldaram and Jedoga encounter related
     NPC_JEDOGA_CONTROLLER           = 30181,
 };
