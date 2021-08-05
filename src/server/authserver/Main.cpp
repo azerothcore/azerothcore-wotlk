@@ -91,17 +91,16 @@ int main(int argc, char** argv)
     sLog->Initialize();
 
     Acore::Banner::Show("authserver",
-        [](char const* text)
+        [](std::string_view text)
         {
-            LOG_INFO("server.authserver", "%s", text);
+            FMT_LOG_INFO("server.authserver", text);
         },
         []()
         {
-            LOG_INFO("server.authserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
-            LOG_INFO("server.authserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            LOG_INFO("server.authserver", "> Using Boost version:           %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
-        }
-    );
+            FMT_LOG_INFO("server.authserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
+            FMT_LOG_INFO("server.authserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            FMT_LOG_INFO("server.authserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+        });
 
     // authserver PID file creation
     std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
