@@ -713,11 +713,15 @@ public:
             AddPct(amount, healModifier);
 
         // Arena - Dampening
-        if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_ARENA_DAMPENING, EFFECT_0))
-            AddPct(amount, dampening->GetAmount());
+        if (AuraEffect const* arenaDampening = caster->GetAuraEffect(SPELL_GENERIC_ARENA_DAMPENING, EFFECT_0))
+        {
+            AddPct(amount, arenaDampening->GetAmount());
+        }
         // Battleground - Dampening
-        else if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_BATTLEGROUND_DAMPENING, EFFECT_0))
-            AddPct(amount, dampening->GetAmount());
+        else if (AuraEffect const* bgDampening = caster->GetAuraEffect(SPELL_GENERIC_BATTLEGROUND_DAMPENING, EFFECT_0))
+        {
+            AddPct(amount, bgDampening->GetAmount());
+        }
 
         return amount;
     }

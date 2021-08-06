@@ -369,7 +369,7 @@ struct Position
     float m_positionZ = 0;
     float m_orientation = 0;
 
-    bool operator==(Position const& a);
+    bool operator==(Position const& a) const;
 
     inline bool operator!=(Position const& a)
     {
@@ -919,7 +919,7 @@ public:
 
     [[nodiscard]] float GetGridActivationRange() const;
     [[nodiscard]] float GetVisibilityRange() const;
-    float GetSightRange(const WorldObject* target = nullptr) const;
+    virtual float GetSightRange(const WorldObject* target = nullptr) const;
     //bool CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth = false, bool distanceCheck = false) const;
     bool CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth = false, bool distanceCheck = false, bool checkAlert = false) const;
 

@@ -17,6 +17,7 @@
 #include "KillRewarder.h"
 #include "MapReference.h"
 #include "ObjectMgr.h"
+#include "Optional.h"
 #include "PetDefines.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
@@ -53,6 +54,22 @@ typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_MAX_DAILY_QUESTS     25
 #define PLAYER_EXPLORED_ZONES_SIZE  128
+
+// corpse reclaim times
+#define DEATH_EXPIRE_STEP (5*MINUTE)
+#define MAX_DEATH_COUNT 3
+
+#define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
+#define PLAYER_SKILL_VALUE_INDEX(x) (PLAYER_SKILL_INDEX(x)+1)
+#define PLAYER_SKILL_BONUS_INDEX(x) (PLAYER_SKILL_INDEX(x)+2)
+
+#define SKILL_VALUE(x)         PAIR32_LOPART(x)
+#define SKILL_MAX(x)           PAIR32_HIPART(x)
+#define MAKE_SKILL_VALUE(v, m) MAKE_PAIR32(v, m)
+
+#define SKILL_TEMP_BONUS(x)    int16(PAIR32_LOPART(x))
+#define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
+#define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
 
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType
@@ -2505,7 +2522,13 @@ public:
     std::string GetMapAreaAndZoneString();
     std::string GetCoordsMapAreaAndZoneString();
 
-protected:
+    void SetFarSightDistance(float radius);
+    void ResetFarSightDistance();
+    Optional<float> GetFarSightDistance() const;
+
+    float GetSightRange(const WorldObject* target = nullptr) const override;
+
+ protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
@@ -2858,6 +2881,8 @@ private:
     Creature* m_CinematicObject;
 
     WorldLocation _corpseLocation;
+
+    Optional<float> _farSightDistance = { };
 };
 
 void AddItemsSetItem(Player* player, Item* item);

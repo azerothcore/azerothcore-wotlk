@@ -313,13 +313,13 @@ void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder co
     // load action bar, if data broken will fill later by default spells.
     if (!is_temporary_summoned)
     {
+        pet->GetCharmInfo()->LoadPetActionBar(holder.GetActionBar()); // action bar stored in already read string
         pet->_LoadSpells(holder.GetPreparedResult(PET_LOAD_QUERY_LOADSPELLS));
         pet->InitTalentForLevel();                               // re-init to check talent count
         pet->_LoadSpellCooldowns(holder.GetPreparedResult(PET_LOAD_QUERY_LOADSPELLCOOLDOWN));
         pet->LearnPetPassives();
         pet->InitLevelupSpellsForLevel();
         pet->CastPetAuras(current);
-        pet->GetCharmInfo()->LoadPetActionBar(holder.GetActionBar()); // action bar stored in already read string
     }
 
     pet->CleanupActionBar();                                     // remove unknown spells from action bar after load
@@ -446,8 +446,9 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
             }
         }
 
-        for (std::vector<Unit*>::iterator itr = controlled.begin(); itr != controlled.end(); ++itr)
-            HandlePetActionHelper(*itr, guid1, spellid, flag, guid2);
+        for (Unit* pet : controlled)
+            if (pet && pet->IsInWorld() && pet->GetMap() == _player->GetMap())
+                HandlePetActionHelper(pet, guid1, spellid, flag, guid2);
     }
 }
 
@@ -557,10 +558,11 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             if (!owner->IsValidAttackTarget(TargetUnit))
                                 return;
 
-                        // pussywizard:
-                        if (Creature* creaturePet = pet->ToCreature())
-                            if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit))
-                                return;
+                        // pussywizard (excluded charmed)
+                        if (!pet->IsCharmed())
+                            if (Creature* creaturePet = pet->ToCreature())
+                                if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit))
+                                    return;
 
                         // Not let attack through obstructions
                         bool checkLos = !DisableMgr::IsPathfindingEnabled(pet->GetMap()) ||
