@@ -121,6 +121,11 @@ public:
                     Talk(SAY_LAST_ADD);
                     DoCastAOE(SPELL_CHAMPION);
                 }
+                // 50% of adds
+                else if (remainingAdds == 4)
+                {
+                    DoCastAOE(SPELL_IMMUNE_POLY);
+                }
                 else if (!remainingAdds)
                 {
                     instance->SetBossState(BOSS_MAJORDOMO_EXECUTUS, DONE);
@@ -128,6 +133,7 @@ public:
                     me->setFaction(FACTION_FRIENDLY);
                     EnterEvadeMode();
                     Talk(SAY_DEFEAT);
+                    return;
                 }
                 DoCastAOE(SPELL_ENCOURAGEMENT);
             }
@@ -211,7 +217,7 @@ public:
             {
                 events.Update(diff);
 
-                while (uint32 eventId = events.ExecuteEvent())
+                while (uint32 const eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
                     {
