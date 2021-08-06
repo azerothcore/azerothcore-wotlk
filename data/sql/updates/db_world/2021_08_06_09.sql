@@ -1,3 +1,19 @@
+-- DB update 2021_08_06_08 -> 2021_08_06_09
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_08_06_08';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_08_06_08 2021_08_06_09 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1627813955000857700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627813955000857700');
 
 -- Corrupted Songflower despawn after the quest is completed
@@ -126,3 +142,13 @@ UPDATE `gameobject_template` SET `Data3` = 1, `Data5` = 1, `AIName` = 'SmartGame
 -- Spawns of cleansed items must be deleted to be fixed
 DELETE FROM `gameobject` WHERE (`id` IN (164884, 173326, 174616, 174617, 174618, 174619, 174620, 174621, 174710, 174711)); 
 
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_08_06_09' WHERE sql_rev = '1627813955000857700';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
