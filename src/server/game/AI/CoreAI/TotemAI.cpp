@@ -78,7 +78,7 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
 
     if (!victim && me->GetCharmerOrOwnerOrSelf()->IsInCombat())
     {
-        victim = me->GetCharmerOrOwnerOrSelf()->GetVictim();
+        victim = me->GetCharmerOrOwnerOrSelf()->getAttackerForHelper();
     }
 
     // If have target
