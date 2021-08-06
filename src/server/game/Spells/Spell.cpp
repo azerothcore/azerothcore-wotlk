@@ -3244,10 +3244,14 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             triggeredByAura->GetBase()->SetDuration(0);
         }
 
-        SendCastResult(result);
+        // Allows to cast melee attack spell if result is SPELL_FAILED_OUT_OF_RANGE
+        if (!IsNextMeleeSwingSpell() || result != SPELL_FAILED_OUT_OF_RANGE)
+        {
+            SendCastResult(result);
 
-        finish(false);
-        return result;
+            finish(false);
+            return result;
+        }
     }
 
     // Prepare data for triggers
