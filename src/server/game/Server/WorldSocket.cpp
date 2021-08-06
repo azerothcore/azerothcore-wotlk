@@ -463,7 +463,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         stmt->setString(0, address);
         stmt->setString(1, authSession->Account);
         LoginDatabase.Execute(stmt);
-        // This also allows to check for possible "hack" attempts on account   
+        // This also allows to check for possible "hack" attempts on account
     }
 
     // even if auth credentials are bad, try using the session key we have - client cannot read auth response error without it
