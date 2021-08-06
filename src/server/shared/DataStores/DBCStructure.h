@@ -875,6 +875,11 @@ struct FactionEntry
     {
         return reputationListID >= 0;
     }
+
+    [[nodiscard]] bool CanBeSetAtWar() const
+    {
+        return reputationListID >= 0 && BaseRepRaceMask[0] == 1791;
+    }
 };
 
 #define MAX_FACTION_RELATIONS 4
