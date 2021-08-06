@@ -37,6 +37,7 @@ enum Spells
     SPELL_AEGIS_OF_RAGNAROS = 20620,
     SPELL_TELEPORT          = 20618,
     SPELL_SUMMON_RAGNAROS   = 19774,
+    SPELL_ENCOURAGEMENT     = 21086,
 };
 
 enum Events
@@ -64,13 +65,11 @@ public:
 
     struct boss_majordomoAI : public BossAI
     {
-        boss_majordomoAI(Creature* creature) : BossAI(creature, BOSS_MAJORDOMO_EXECUTUS)
-        {
-        }
+        boss_majordomoAI(Creature* creature) : BossAI(creature, BOSS_MAJORDOMO_EXECUTUS) { }
 
         void KilledUnit(Unit* victim) override
         {
-            if (roll_chance_i(25) && victim->GetTypeId() == TYPEID_PLAYER)
+            if (roll_chance_i(25) && victim->IsPlayer())
             {
                 Talk(SAY_SLAY);
             }
@@ -87,6 +86,15 @@ public:
 
             // Call every flamewaker around him
             me->CallForHelp(30);
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+        {
+            summons.Despawn(summon);
+            if (summon->GetEntry() == NPC_FLAMEWAKER_HEALER || summon->GetEntry() == NPC_FLAMEWAKER_ELITE)
+            {
+                DoCastAOE(SPELL_ENCOURAGEMENT);
+            }
         }
 
         void UpdateAI(uint32 diff) override
