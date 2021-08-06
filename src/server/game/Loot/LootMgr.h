@@ -15,8 +15,8 @@
 #include "SharedDefines.h"
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <vector>
-
 
 enum RollType
 {
@@ -143,6 +143,7 @@ typedef GuidSet AllowedLooterSet;
 struct LootItem
 {
     uint32  itemid;
+    uint32  itemIndex;
     uint32  randomSuffix;
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition
@@ -243,7 +244,7 @@ public:
     // Rolls for every item in the template and adds the rolled items the the loot
     void Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId = 0) const;
     void CopyConditions(ConditionList conditions);
-    void CopyConditions(LootItem* li) const;
+    bool CopyConditions(LootItem* li, uint32 conditionLootId = 0) const;
 
     // True if template includes at least 1 quest drop entry
     [[nodiscard]] bool HasQuestDrop(LootTemplateMap const& store, uint8 groupId = 0) const;
@@ -310,6 +311,7 @@ struct Loot
     uint32 gold;
     uint8 unlootedCount{0};
     ObjectGuid roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
+    ObjectGuid lootOwnerGUID;
     LootType loot_type{LOOT_NONE};      // required for achievement system
 
     // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
@@ -370,9 +372,9 @@ struct Loot
     bool hasItemForAll() const;
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
+    void FillNotNormalLootFor(Player* player, bool presentAtLooting);
 
 private:
-    void FillNotNormalLootFor(Player* player, bool presentAtLooting);
     QuestItemList* FillFFALoot(Player* player);
     QuestItemList* FillQuestLoot(Player* player);
     QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting);

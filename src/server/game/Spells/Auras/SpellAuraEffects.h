@@ -287,6 +287,7 @@ public:
     void HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleChannelDeathItem(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleBindSight(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleFarSight(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleForceReaction(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleAuraEmpathy(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleAuraModFaction(AuraApplication const* aurApp, uint8 mode, bool apply) const;
@@ -320,7 +321,7 @@ public:
     void HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
 };
 
-namespace acore
+namespace Acore
 {
     // Binary predicate for sorting the priority of absorption aura effects
     class AbsorbAuraOrderPred

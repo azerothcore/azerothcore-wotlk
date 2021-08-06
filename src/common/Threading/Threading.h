@@ -7,10 +7,10 @@
 #ifndef THREADING_H
 #define THREADING_H
 
-#include <thread>
 #include <atomic>
+#include <thread>
 
-namespace acore
+namespace Acore
 {
     class Runnable
     {
@@ -22,7 +22,9 @@ namespace acore
         void decReference()
         {
             if (!--m_refs)
+            {
                 delete this;
+            }
         }
     private:
         std::atomic_long m_refs;

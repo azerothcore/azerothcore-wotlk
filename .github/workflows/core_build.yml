@@ -5,6 +5,10 @@ on:
       - 'master'
   pull_request:
 
+concurrency:
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
@@ -13,43 +17,31 @@ jobs:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler*modules builds
         os: [ubuntu-20.04]
         compiler: [clang]
-        modules: [with, without]
-        extra_logs: [false]
+        modules: [without]
         # we can include specific combinations here
         include:
           - os: ubuntu-20.04
-            compiler: clang11
+            compiler: clang12
             modules: without
-            extra_logs: true
           - os: ubuntu-20.04
             compiler: clang11
             modules: without
-            extra_logs: false
-          - os: ubuntu-20.04
-            compiler: clang9
-            modules: without
-            extra_logs: false
           - os: ubuntu-18.04
-            compiler: clang # default in 18.04 is clang 6
+            compiler: clang10
             modules: without
-            extra_logs: false
           - os: ubuntu-18.04
             compiler: gcc8
             modules: without
-            extra_logs: false
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
             modules: without
-            extra_logs: false
           - os: ubuntu-20.04
             compiler: gcc10
             modules: without
-            extra_logs: false
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules-extra_logs-${{ matrix.extra_logs }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
-      EXTRA_LOGS: ${{ matrix.extra_logs }}
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2

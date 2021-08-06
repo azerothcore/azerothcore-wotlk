@@ -7,8 +7,8 @@
 #ifndef _TILEASSEMBLER_H_
 #define _TILEASSEMBLER_H_
 
-#include <G3D/Vector3.h>
 #include <G3D/Matrix3.h>
+#include <G3D/Vector3.h>
 #include <map>
 #include <set>
 
@@ -80,23 +80,23 @@ namespace VMAP
 
     class TileAssembler
     {
-        private:
-            std::string iDestDir;
-            std::string iSrcDir;
-            G3D::Table<std::string, unsigned int > iUniqueNameIds;
-            MapData mapData;
-            std::set<std::string> spawnedModelFiles;
+    private:
+        std::string iDestDir;
+        std::string iSrcDir;
+        G3D::Table<std::string, unsigned int > iUniqueNameIds;
+        MapData mapData;
+        std::set<std::string> spawnedModelFiles;
 
-        public:
-            TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName);
-            virtual ~TileAssembler();
+    public:
+        TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName);
+        virtual ~TileAssembler();
 
-            bool convertWorld2();
-            bool readMapSpawns();
-            bool calculateTransformedBound(ModelSpawn &spawn);
-            void exportGameobjectModels();
+        bool convertWorld2();
+        bool readMapSpawns();
+        bool calculateTransformedBound(ModelSpawn& spawn);
+        void exportGameobjectModels();
 
-            bool convertRawFile(const std::string& pModelFilename);
+        bool convertRawFile(const std::string& pModelFilename);
     };
 
 }                                                           // VMAP

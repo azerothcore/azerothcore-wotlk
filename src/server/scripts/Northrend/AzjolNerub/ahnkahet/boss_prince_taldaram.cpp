@@ -281,8 +281,8 @@ public:
                 me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_FLAME_SPHERE_PERIODIC_H : SPELL_FLAME_SPHERE_PERIODIC, true);
 
                 float angle = rand_norm() * 2 * M_PI;
-                float x = me->GetPositionX() + DATA_SPHERE_DISTANCE * cos(angle);
-                float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * sin(angle);
+                float x = me->GetPositionX() + static_cast<float>(DATA_SPHERE_DISTANCE) * cos(angle);
+                float y = me->GetPositionY() + static_cast<float>(DATA_SPHERE_DISTANCE) * sin(angle);
                 me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
             }
         }

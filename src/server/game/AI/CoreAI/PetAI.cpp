@@ -5,7 +5,6 @@
  */
 
 #include "Creature.h"
-#include "DBCStores.h"
 #include "Errors.h"
 #include "Group.h"
 #include "ObjectAccessor.h"
@@ -17,8 +16,6 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
-#include "World.h"
-#include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
 {
@@ -58,9 +55,7 @@ void PetAI::_stopAttack()
 {
     if (!me->IsAlive())
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "Creature stoped attacking cuz his dead [%s]", me->GetGUID().ToString().c_str());
-#endif
+        LOG_DEBUG("entities.unit.ai", "Creature stoped attacking cuz his dead [%s]", me->GetGUID().ToString().c_str());
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop();
@@ -156,9 +151,7 @@ void PetAI::UpdateAI(uint32 diff)
 
         if (_needToStop())
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "Pet AI stopped attacking [%s]", me->GetGUID().ToString().c_str());
-#endif
+            LOG_DEBUG("entities.unit.ai", "Pet AI stopped attacking [%s]", me->GetGUID().ToString().c_str());
             _stopAttack();
             return;
         }
@@ -272,7 +265,7 @@ void PetAI::UpdateAI(uint32 diff)
                 // No enemy, check friendly
                 if (!spellUsed)
                 {
-                    for (ObjectGuid const guid : m_AllySet)
+                    for (ObjectGuid const& guid : m_AllySet)
                     {
                         Unit* ally = ObjectAccessor::GetUnit(*me, guid);
 

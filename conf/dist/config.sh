@@ -60,7 +60,7 @@ CDEBUG=OFF
 # * MinSizeRel: same as Release but optimizing for size rather than speed.
 CTYPE=${CTYPE:-Release}
 # compile scripts
-CSCRIPTS=${CSCRIPTS:-ON}
+CSCRIPTS=${CSCRIPTS:-static}
 # compile unit tests
 CBUILD_TESTING=OFF
 # compile server
@@ -70,15 +70,13 @@ CTOOLS=${CTOOLS:-OFF}
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=${CSCRIPTPCH:-ON}
 CCOREPCH=${CCOREPCH:-ON}
-# enable/disable extra logs
-CEXTRA_LOGS=0
 
 # Skip specific modules from compilation (cmake reconfigure needed)
 # use semicolon ; to separate modules
 CDISABLED_AC_MODULES=""
 
 # you can add your custom definitions here ( -D )
-# example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON -DENABLE_EXTRA_LOGS=ON"
+# example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON
 #
 CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
 
@@ -87,6 +85,47 @@ CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
 #
 AC_CCACHE=${AC_CCACHE:-false}
 export CCACHE_DIR=${CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
+
+##############################################
+#
+#  GOOGLE PERF TOOLS
+#
+#  Repository: https://github.com/gperftools/gperftools#readme
+#  Documentation: https://gperftools.github.io/gperftools/
+#
+# Install (Ubuntu):
+#  sudo apt-get install google-perftools libgoogle-perftools-dev
+# Note: dependencies above are already installed in docker
+#
+# Usage:
+#  1. To enable the gperftools you need to compile with the -DWITH_PERFTOOLS=ON compiler flag. You can use CCUSTOMOPTIONS above to set it for the dashboard compiler
+#  2. Configure the variable below accordingly to your needs
+#  3. run the worldserver with the "./acore.sh run-worldserver"
+#  4. run "killall -12 worldserver"  This command will start the monitoring process. Run "killall -12 worldserver" again to stop the process when you want
+#  5. At this time you will have the .prof file ready in the folder configured below.
+#  Run "google-pprof --callgrind <path/of/worldserver/bin> </path/of/prof/file>" This will generate a callgrind file that can be read with
+#  QCacheGrind, KCacheGrind and any other compatible tools
+#
+##############################################
+
+# files used by gperftools to store monitored information
+export CPUPROFILE=${CPUPROFILE:-"$BINPATH/logs/worldserver-cpu.prof"}
+# heap profile is disabled by default. Uncomment this line to enable it
+# export HEAPPROFILE=${HEAPPROFILE:-"$BINPATH/logs/worldserver-heap.prof"}
+
+# signal to send to the kill command to start/stop the profiling process. kill -12
+export CPUPROFILESIGNAL=${CPUPROFILESIGNAL:-12}
+
+# How many interrupts/second the cpu-profiler samples.
+#export CPUPROFILE_FREQUENCY=${CPUPROFILESIGNAL:-100}
+
+# If set to any value (including 0 or the empty string), use ITIMER_REAL instead of ITIMER_PROF to gather profiles.
+# In general, ITIMER_REAL is not as accurate as ITIMER_PROF, and also interacts badly with use of alarm(),
+# so prefer ITIMER_PROF unless you have a reason prefer ITIMER_REAL.
+#export CPUPROFILE_REALTIME=${CPUPROFILE_REALTIME}
+
+# Other values for HEAPCHECK: minimal, normal (equivalent to "1"), strict, draconian
+#export HEAPCHECK=${HEAPCHECK:-normal}
 
 
 ##############################################
