@@ -27,7 +27,6 @@ public:
     struct instance_molten_core_InstanceMapScript : public InstanceScript
     {
         instance_molten_core_InstanceMapScript(Map* map) : InstanceScript(map),
-            _deadBossCount(0),
             _ragnarosAddDeaths(0)
         {
             SetBossNumber(MAX_ENCOUNTER);
@@ -239,7 +238,6 @@ public:
         ObjectGuid _golemaggTheIncineratorGUID;
         ObjectGuid _majordomoExecutusGUID;
         ObjectGuid _cacheOfTheFirelordGUID;
-        uint8 _deadBossCount;
         uint8 _ragnarosAddDeaths;
         std::unordered_map<uint8, ObjectGuid> _circlesGUIDs;
     };
