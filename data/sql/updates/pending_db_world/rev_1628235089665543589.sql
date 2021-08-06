@@ -20,3 +20,15 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 DELETE FROM `creature_text` WHERE `CreatureID`=12018 AND `GroupID`=7 AND `ID`=0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (12018, 7, 0, 'You think you\'ve won already? Perhaps you\'ll need another lesson in pain!', 14, 0, 100, 0, 0, 0, 8545, 0, 'majordomo SAY_LAST_ADD');
+
+-- Majordomu summon
+DELETE FROM `creature_summon_groups` WHERE `summonerId`=12018;
+INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`) VALUES
+(12018, 0, 1, 11663, 761.652, -1164.3, -119.533, 3.3919, 1, 10000),
+(12018, 0, 1, 11663, 747.323, -1149.24, -120.06, 3.6629, 1, 10000),
+(12018, 0, 1, 11663, 766.734, -1183.16, -119.292, 2.9889, 1, 10000),
+(12018, 0, 1, 11663, 757.364, -1198.31, -118.652, 2.3095, 1, 10000),
+(12018, 0, 1, 11664, 752.349, -1159.19, -119.261, 3.6032, 1, 10000),
+(12018, 0, 1, 11664, 738.015, -1152.22, -119.512, 4.0792, 1, 10000),
+(12018, 0, 1, 11664, 757.246, -1189.79, -118.633, 2.5333, 1, 10000),
+(12018, 0, 1, 11664, 745.916, -1199.35, -118.119, 1.8932, 1, 10000);

@@ -39,6 +39,7 @@ enum Spells
     SPELL_SUMMON_RAGNAROS   = 19774,
     SPELL_ENCOURAGEMENT     = 21086,
     SPELL_CHAMPION          = 21090,
+    SPELL_IMMUNE_POLY       = 21087,
 };
 
 enum Events
@@ -57,6 +58,7 @@ enum Misc
 {
     GOSSIP_HELLO        = 4995,
     FACTION_FRIENDLY    = 35,
+    SUMMON_GROUP_ADDS   = 1,
 };
 
 class boss_majordomo : public CreatureScript
@@ -67,6 +69,17 @@ public:
     struct boss_majordomoAI : public BossAI
     {
         boss_majordomoAI(Creature* creature) : BossAI(creature, BOSS_MAJORDOMO_EXECUTUS) { }
+
+        void Reset() override
+        {
+            me->ResetLootMode();
+            events.Reset();
+            summons.DespawnAll();
+            if (instance->GetBossState(BOSS_MAJORDOMO_EXECUTUS) != DONE)
+                instance->SetBossState(BOSS_MAJORDOMO_EXECUTUS, NOT_STARTED);
+
+            me->SummonCreatureGroup(SUMMON_GROUP_ADDS);
+        }
 
         void KilledUnit(Unit* victim) override
         {
@@ -89,21 +102,44 @@ public:
             me->CallForHelp(30);
         }
 
+        // Disabled events
+        void JustDied(Unit* /*killer*/) override {}
+
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
         {
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_FLAMEWAKER_HEALER || summon->GetEntry() == NPC_FLAMEWAKER_ELITE)
             {
-                // Last remaining add
-                if (std::count_if(summons.begin(), summons.end(), [](ObjectGuid const& summonGuid)
+                uint32 const remainingAdds = std::count_if(summons.begin(), summons.end(), [](ObjectGuid const& summonGuid)
                 {
                     return summonGuid.GetEntry() == NPC_FLAMEWAKER_HEALER || summonGuid.GetEntry() == NPC_FLAMEWAKER_ELITE;
-                }) == 1)
+                });
+
+                // Last remaining add
+                if (remainingAdds == 1)
                 {
                     Talk(SAY_LAST_ADD);
                     DoCastAOE(SPELL_CHAMPION);
                 }
+                else if (!remainingAdds)
+                {
+                    instance->SetBossState(BOSS_MAJORDOMO_EXECUTUS, DONE);
+                    me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
+                    me->setFaction(FACTION_FRIENDLY);
+                    EnterEvadeMode();
+                    Talk(SAY_DEFEAT);
+                }
                 DoCastAOE(SPELL_ENCOURAGEMENT);
+            }
+        }
+
+        void JustReachedHome() override
+        {
+            _JustReachedHome();
+            if (instance->GetBossState(BOSS_MAJORDOMO_EXECUTUS) == DONE)
+            {
+                events.Reset();
+                events.ScheduleEvent(EVENT_OUTRO_1, 32000);
             }
         }
 
@@ -117,17 +153,6 @@ public:
                 }
 
                 events.Update(diff);
-
-                if (!me->FindNearestCreature(NPC_FLAMEWAKER_HEALER, 100.0f) && !me->FindNearestCreature(NPC_FLAMEWAKER_ELITE, 100.0f))
-                {
-                    me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
-                    me->setFaction(FACTION_FRIENDLY);
-                    EnterEvadeMode();
-                    Talk(SAY_DEFEAT);
-                    _JustDied();
-                    events.ScheduleEvent(EVENT_OUTRO_1, 32000);
-                    return;
-                }
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                 {
@@ -173,6 +198,11 @@ public:
                             break;
                         }
                     }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        return;
+                    }
                 }
 
                 DoMeleeAttackIfReady();
@@ -194,8 +224,6 @@ public:
                             break;
                         case EVENT_OUTRO_3:
                             Talk(SAY_ARRIVAL2_MAJ);
-                            break;
-                        default:
                             break;
                     }
                 }

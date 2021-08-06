@@ -31,7 +31,7 @@ enum Encounters
 enum Actions
 {
     ACTION_START_RAGNAROS       = 0,
-    ACTION_START_RAGNAROS_ALT   = 1,
+    ACTION_START_RAGNAROS_ALT   = -1,
 };
 
 Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};

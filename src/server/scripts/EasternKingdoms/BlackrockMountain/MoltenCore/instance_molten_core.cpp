@@ -17,19 +17,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
 
-Position const SummonPositions[10] =
-{
-    {759.542f, -1173.43f, -118.974f, 3.3048f},
-    {761.652f, -1164.30f, -119.533f, 3.3919f},
-    {747.323f, -1149.24f, -120.060f, 3.6629f},
-    {766.734f, -1183.16f, -119.292f, 2.9889f},
-    {757.364f, -1198.31f, -118.652f, 2.3095f},
-    {752.349f, -1159.19f, -119.261f, 3.6032f},
-    {738.015f, -1152.22f, -119.512f, 4.0792f},
-    {757.246f, -1189.79f, -118.633f, 2.5333f},
-    {745.916f, -1199.35f, -118.119f, 1.8932f},
-    {838.510f, -829.840f, -232.000f, 2.00000f},
-};
+Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f};
 
 class instance_molten_core : public InstanceMapScript
 {
@@ -38,17 +26,19 @@ public:
 
     struct instance_molten_core_InstanceMapScript : public InstanceScript
     {
-        instance_molten_core_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_molten_core_InstanceMapScript(Map* map) : InstanceScript(map),
+            _deadBossCount(0),
+            _ragnarosAddDeaths(0)
         {
             SetBossNumber(MAX_ENCOUNTER);
-            _deadBossCount = 0;
-            _ragnarosAddDeaths = 0;
         }
 
         void OnPlayerEnter(Player* /*player*/) override
         {
             if (CheckMajordomoExecutus())
+            {
                 SummonMajordomoExecutus();
+            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -60,8 +50,6 @@ public:
                     break;
                 case NPC_MAJORDOMO_EXECUTUS:
                     _majordomoExecutusGUID = creature->GetGUID();
-                    break;
-                default:
                     break;
             }
         }
@@ -94,8 +82,6 @@ public:
                 case GO_CIRCLE_SULFURON:
                     _circlesGUIDs[6] = go->GetGUID();
                     break;
-                default:
-                    break;
             }
         }
 
@@ -104,9 +90,13 @@ public:
             if (type == DATA_RAGNAROS_ADDS)
             {
                 if (data == 1)
+                {
                     ++_ragnarosAddDeaths;
+                }
                 else if (data == 0)
+                {
                     _ragnarosAddDeaths = 0;
+                }
             }
         }
 
@@ -137,11 +127,17 @@ public:
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(bossId, state))
+            {
                 return false;
+            }
 
             if (state == DONE && bossId < BOSS_MAJORDOMO_EXECUTUS)
+            {
                 if (CheckMajordomoExecutus())
+                {
                     SummonMajordomoExecutus();
+                }
+            }
 
             if (bossId == BOSS_MAJORDOMO_EXECUTUS && state == DONE)
             {
@@ -153,33 +149,35 @@ public:
 
         void SummonMajordomoExecutus()
         {
-            if (_majordomoExecutusGUID)
+            if (instance->GetCreature(_majordomoExecutusGUID))
+            {
                 return;
+            }
 
             if (GetBossState(BOSS_MAJORDOMO_EXECUTUS) != DONE)
             {
-                instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, SummonPositions[0]);
-                instance->SummonCreature(NPC_FLAMEWAKER_HEALER, SummonPositions[1]);
-                instance->SummonCreature(NPC_FLAMEWAKER_HEALER, SummonPositions[2]);
-                instance->SummonCreature(NPC_FLAMEWAKER_HEALER, SummonPositions[3]);
-                instance->SummonCreature(NPC_FLAMEWAKER_HEALER, SummonPositions[4]);
-                instance->SummonCreature(NPC_FLAMEWAKER_ELITE, SummonPositions[5]);
-                instance->SummonCreature(NPC_FLAMEWAKER_ELITE, SummonPositions[6]);
-                instance->SummonCreature(NPC_FLAMEWAKER_ELITE, SummonPositions[7]);
-                instance->SummonCreature(NPC_FLAMEWAKER_ELITE, SummonPositions[8]);
+                instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, MajordomoSummonPos);
             }
             else if (TempSummon* summon = instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, RagnarosTelePos))
+            {
                 summon->AI()->DoAction(ACTION_START_RAGNAROS_ALT);
+            }
         }
 
         bool CheckMajordomoExecutus() const
         {
             if (GetBossState(BOSS_RAGNAROS) == DONE)
+            {
                 return false;
+            }
 
             for (uint8 i = 0; i < BOSS_MAJORDOMO_EXECUTUS; ++i)
+            {
                 if (GetBossState(i) != DONE)
+                {
                     return false;
+                }
+            }
 
             return true;
         }
@@ -217,16 +215,22 @@ public:
                     uint32 tmpState;
                     loadStream >> tmpState;
                     if (tmpState == IN_PROGRESS || tmpState > TO_BE_DECIDED)
+                    {
                         tmpState = NOT_STARTED;
+                    }
 
-                    SetBossState(i, EncounterState(tmpState));
+                    SetBossState(i, static_cast<EncounterState>(tmpState));
                 }
 
                 if (CheckMajordomoExecutus())
+                {
                     SummonMajordomoExecutus();
+                }
             }
             else
+            {
                 OUT_LOAD_INST_DATA_FAIL;
+            }
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
