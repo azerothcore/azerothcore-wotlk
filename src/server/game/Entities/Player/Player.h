@@ -17,6 +17,7 @@
 #include "KillRewarder.h"
 #include "MapReference.h"
 #include "ObjectMgr.h"
+#include "Optional.h"
 #include "PetDefines.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
@@ -2521,7 +2522,13 @@ public:
     std::string GetMapAreaAndZoneString();
     std::string GetCoordsMapAreaAndZoneString();
 
-protected:
+    void SetFarSightDistance(float radius);
+    void ResetFarSightDistance();
+    Optional<float> GetFarSightDistance() const;
+
+    float GetSightRange(const WorldObject* target = nullptr) const override;
+
+ protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
@@ -2874,6 +2881,8 @@ private:
     Creature* m_CinematicObject;
 
     WorldLocation _corpseLocation;
+
+    Optional<float> _farSightDistance = { };
 };
 
 void AddItemsSetItem(Player* player, Item* item);
