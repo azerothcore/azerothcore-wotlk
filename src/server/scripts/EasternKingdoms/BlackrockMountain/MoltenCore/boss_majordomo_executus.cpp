@@ -24,9 +24,9 @@ enum Texts
     SAY_SLAY            = 2,
     SAY_SPECIAL         = 3,
     SAY_DEFEAT          = 4,
-
     SAY_SUMMON_MAJ      = 5,
-    SAY_ARRIVAL2_MAJ    = 6
+    SAY_ARRIVAL2_MAJ    = 6,
+    SAY_LAST_ADD        = 7,
 };
 
 enum Spells
@@ -38,6 +38,7 @@ enum Spells
     SPELL_TELEPORT          = 20618,
     SPELL_SUMMON_RAGNAROS   = 19774,
     SPELL_ENCOURAGEMENT     = 21086,
+    SPELL_CHAMPION          = 21090,
 };
 
 enum Events
@@ -93,6 +94,15 @@ public:
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_FLAMEWAKER_HEALER || summon->GetEntry() == NPC_FLAMEWAKER_ELITE)
             {
+                // Last remaining add
+                if (std::count_if(summons.begin(), summons.end(), [](ObjectGuid const& summonGuid)
+                {
+                    return summonGuid.GetEntry() == NPC_FLAMEWAKER_HEALER || summonGuid.GetEntry() == NPC_FLAMEWAKER_ELITE;
+                }) == 1)
+                {
+                    Talk(SAY_LAST_ADD);
+                    DoCastAOE(SPELL_CHAMPION);
+                }
                 DoCastAOE(SPELL_ENCOURAGEMENT);
             }
         }
