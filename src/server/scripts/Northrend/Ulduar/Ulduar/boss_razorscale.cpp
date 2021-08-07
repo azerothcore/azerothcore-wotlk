@@ -209,22 +209,17 @@ public:
                     {
                         uint32 spellId = SPELL_CHAIN_4;
 
-                        switch(caster->GetGUID()) {
-                            case pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1:
-                            {
-                                spellId = SPELL_CHAIN_1;
-                                break;
-                            }
-                            case pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2:
-                            {
-                                spellId = SPELL_CHAIN_2;
-                                break;
-                            }
-                            case pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3:
-                            {
-                                spellId = SPELL_CHAIN_3;
-                                break;
-                            }
+                        if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
+                        {
+                            spellId = SPELL_CHAIN_1;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
+                        {
+                            spellId = SPELL_CHAIN_2;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
+                        {
+                            spellId = SPELL_CHAIN_3;
                         }
 
                         caster->CastSpell(me, spellId, true);
