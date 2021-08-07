@@ -3205,7 +3205,7 @@ void Player::learnSpell(uint32 spellId)
             learnSpell(itr2->first);
     }
 #ifdef ELUNA
-  sEluna->OnLearnSpell(this, spellId);
+    sEluna->OnLearnSpell(this, spellId);
 #endif
 }
 
