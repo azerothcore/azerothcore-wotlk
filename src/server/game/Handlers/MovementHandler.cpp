@@ -77,7 +77,7 @@ void WorldSession::HandleMoveWorldportAck()
     Map* newMap = sMapMgr->CreateMap(loc.GetMapId(), GetPlayer());
     // the CanEnter checks are done in TeleporTo but conditions may change
     // while the player is in transit, for example the map may get full
-    if (!newMap || !newMap->CanEnter(GetPlayer(), false))
+    if (!newMap || newMap->CannotEnter(GetPlayer(), false))
     {
         LOG_ERROR("network.opcode", "Map %d could not be created for player %s, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUID().ToString().c_str());
         GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
