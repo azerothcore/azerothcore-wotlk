@@ -704,13 +704,12 @@ public:
                     {
                         instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
                         m_leviathanTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED] = data;
-                        if (GameObject* gameObject = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][0]))
+                        for (uint8 i = 0; i < 2; ++i)
                         {
-                            gameObject->SetGoState(GO_STATE_ACTIVE);
-                        }
-                        if (GameObject* gameObject = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][1]))
-                        {
-                            gameObject->SetGoState(GO_STATE_ACTIVE);
+                            if (GameObject *gameObject = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][i]))
+                            {
+                                gameObject->SetGoState(GO_STATE_ACTIVE);
+                            }
                         }
                         return;
                     }
