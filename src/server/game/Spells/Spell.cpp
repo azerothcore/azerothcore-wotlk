@@ -3244,10 +3244,14 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             triggeredByAura->GetBase()->SetDuration(0);
         }
 
-        SendCastResult(result);
+        // Allows to cast melee attack spell if result is SPELL_FAILED_OUT_OF_RANGE
+        if (!IsNextMeleeSwingSpell() || result != SPELL_FAILED_OUT_OF_RANGE)
+        {
+            SendCastResult(result);
 
-        finish(false);
-        return result;
+            finish(false);
+            return result;
+        }
     }
 
     // Prepare data for triggers
@@ -5647,6 +5651,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_CHARGE:
                 {
+                    if (m_caster->HasUnitState(UNIT_STATE_CHARGING))
+                    {
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+
                     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR)
                     {
                         // Warbringer - can't be handled in proc system - should be done before checkcast root check and charge effect process
@@ -6513,6 +6522,12 @@ SpellCastResult Spell::CheckItems()
     Player* player = m_caster->ToPlayer();
     if (!player)
     {
+        // Non-player case: Check if creature is disarmed
+        if (!m_caster->CanUseAttackType(m_attackType) && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
+        {
+            return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+        }
+
         return SPELL_CAST_OK;
     }
 
@@ -7043,11 +7058,11 @@ SpellCastResult Spell::CheckItems()
 
             // skip spell if no weapon in slot or broken
             if (!item || item->IsBroken())
-                return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+                return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
 
             // skip spell if weapon not fit to triggered spell
             if (!item->IsFitToSpellRequirements(m_spellInfo))
-                return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+                return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
         }
 
         // offhand hand weapon required
@@ -7057,11 +7072,11 @@ SpellCastResult Spell::CheckItems()
 
             // skip spell if no weapon in slot or broken
             if (!item || item->IsBroken())
-                return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+                return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
 
             // skip spell if weapon not fit to triggered spell
             if (!item->IsFitToSpellRequirements(m_spellInfo))
-                return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+                return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
         }
     }
 

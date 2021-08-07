@@ -955,6 +955,7 @@ private:
     uint32 _spellPhaseMask;
     uint32 _hitMask;
     uint32 _cooldown;
+    Spell* _spell;
     DamageInfo* _damageInfo;
     HealInfo* _healInfo;
     SpellInfo const* const _triggeredByAuraSpell;
@@ -969,8 +970,9 @@ public:
     [[nodiscard]] uint32 GetSpellTypeMask() const { return _spellTypeMask; }
     [[nodiscard]] uint32 GetSpellPhaseMask() const { return _spellPhaseMask; }
     [[nodiscard]] uint32 GetHitMask() const { return _hitMask; }
-    [[nodiscard]] SpellInfo const* GetSpellInfo() const { return nullptr; }
+    [[nodiscard]] SpellInfo const* GetSpellInfo() const;
     [[nodiscard]] SpellSchoolMask GetSchoolMask() const { return SPELL_SCHOOL_MASK_NONE; }
+    [[nodiscard]] Spell* GetProcSpell() const { return _spell; }
     [[nodiscard]] DamageInfo* GetDamageInfo() const { return _damageInfo; }
     [[nodiscard]] HealInfo* GetHealInfo() const { return _healInfo; }
     [[nodiscard]] SpellInfo const* GetTriggerAuraSpell() const { return _triggeredByAuraSpell; }
@@ -2625,7 +2627,6 @@ private:
     bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
 
     uint32 _oldFactionId;           ///< faction before charm
-    bool m_petCatchUp;
 
     float processDummyAuras(float TakenTotalMod) const;
 };

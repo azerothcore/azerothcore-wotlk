@@ -443,8 +443,11 @@ public:
         void HandleAnimation()
         {
             Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
+
             if (!player)
+            {
                 return;
+            }
 
             Creature* Fandral = player->FindNearestCreature(C_FANDRAL_STAGHELM, 100.0f);
             Creature* Arygos = player->FindNearestCreature(C_ARYGOS, 100.0f);
@@ -455,7 +458,7 @@ public:
                 return;
 
             AnimationTimer = EventAnim[AnimationCount].Timer;
-            if (eventEnd == false)
+            if (!eventEnd)
             {
                 switch (AnimationCount)
                 {
@@ -636,10 +639,9 @@ public:
                     case 51:
                         {
                             uint32 entries[4] = { 15423, 15424, 15414, 15422 };
-                            Unit* mob = nullptr;
                             for (uint8 i = 0; i < 4; ++i)
                             {
-                                mob = player->FindNearestCreature(entries[i], 50, me);
+                                Unit* mob = player->FindNearestCreature(entries[i], 50, me);
                                 while (mob)
                                 {
                                     mob->RemoveFromWorld();
@@ -675,8 +677,7 @@ public:
                         me->GetMotionMaster()->MoveCharge(-8117.99f, 1532.24f, 3.94f, 4);
                         break;
                     case 60:
-                        if (player)
-                            Talk(ANACHRONOS_SAY_10, player);
+                        Talk(ANACHRONOS_SAY_10, player);
                         me->GetMotionMaster()->MoveCharge(-8113.46f, 1524.16f, 2.89f, 4);
                         break;
                     case 61:
@@ -926,8 +927,6 @@ public:
 
             if (Group* EventGroup = player->GetGroup())
             {
-                Player* groupMember = nullptr;
-
                 uint8 GroupMemberCount = 0;
                 uint8 DeadMemberCount = 0;
                 uint8 FailedMemberCount = 0;
@@ -936,7 +935,7 @@ public:
 
                 for (Group::member_citerator itr = members.begin(); itr != members.end(); ++itr)
                 {
-                    groupMember = ObjectAccessor::GetPlayer(*me, itr->guid);
+                    Player* groupMember = ObjectAccessor::GetPlayer(*me, itr->guid);
                     if (!groupMember)
                         continue;
                     if (!groupMember->IsWithinDistInMap(me, EVENT_AREA_RADIUS) && groupMember->GetQuestStatus(QUEST_A_PAWN_ON_THE_ETERNAL_BOARD) == QUEST_STATUS_INCOMPLETE)
@@ -997,7 +996,7 @@ void npc_qiraj_war_spawn::npc_qiraj_war_spawnAI::JustDied(Unit* /*slayer*/)
     if (Creature* mob = ObjectAccessor::GetCreature(*me, MobGUID))
         if (npc_anachronos_quest_trigger::npc_anachronos_quest_triggerAI* triggerAI = CAST_AI(npc_anachronos_quest_trigger::npc_anachronos_quest_triggerAI, mob->AI()))
             triggerAI->LiveCounter();
-};
+}
 
 /*#####
 # go_crystalline_tear
