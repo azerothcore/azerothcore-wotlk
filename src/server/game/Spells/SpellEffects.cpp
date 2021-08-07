@@ -1191,7 +1191,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
                 uint32 mapid = destTarget->GetMapId();
                 float x, y, z, orientation;
                 destTarget->GetPosition(x, y, z, orientation);
-                target->TeleportTo(mapid, x, y, z, orientation, TELE_TO_GM_MODE); // skip CanPlayerEnter check
+                target->TeleportTo(mapid, x, y, z, orientation, TELE_TO_GM_MODE); // skip PlayerCannotEnter check
             }
             return;
     }
