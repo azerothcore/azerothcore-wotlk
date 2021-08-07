@@ -4,7 +4,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1628024682672891800');
 UPDATE `creature_template_addon` SET `auras`='9205' WHERE `entry` IN (15318, 15521);
 -- Loro, also found missing passive aura "shield spike" in sniffs
 DELETE FROM `creature_template_addon` WHERE  `entry`=5714;
-INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES ('5714', '9205 12782');
+INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES (5714, '9205 12782');
 UPDATE `creature_template_addon` SET `auras`='9205' WHERE  `entry`=2440;
 
 -- 25% chance to reset threat  on melee attack done
