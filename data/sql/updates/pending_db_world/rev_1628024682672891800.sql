@@ -10,7 +10,7 @@ UPDATE `creature_template_addon` SET `auras`='9205' WHERE  `entry`=2440;
 -- 25% chance to reset threat  on melee attack done
 UPDATE `creature_template_addon` SET `auras`='11838' WHERE  `entry` IN (7267, 10478, 14605);
 DELETE FROM `creature_template_addon` WHERE  `entry`=14880;
-INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES ('14880', '11838');
+INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES (14880, '11838');
 
 -- 20% chance to reset threat  on melee attack done
 UPDATE `creature_template_addon` SET `auras`='13767' WHERE  `entry`=9032;
