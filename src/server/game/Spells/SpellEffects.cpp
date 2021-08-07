@@ -1198,7 +1198,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
                 uint32 mapid = destTarget->GetMapId();
                 float x, y, z, orientation;
                 destTarget->GetPosition(x, y, z, orientation);
-                target->TeleportTo(mapid, x, y, z, orientation, TELE_TO_GM_MODE); // skip CanPlayerEnter check
+                target->TeleportTo(mapid, x, y, z, orientation, TELE_TO_GM_MODE); // skip PlayerCannotEnter check
             }
             return;
     }
@@ -5090,7 +5090,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         }
 
         // not all charge effects used in negative spells
-        if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetTarget() == unitTarget->GetGUID())
             m_caster->Attack(unitTarget, true);
     }
 }

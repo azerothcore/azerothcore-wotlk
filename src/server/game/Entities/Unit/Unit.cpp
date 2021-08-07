@@ -154,10 +154,24 @@ uint32 DamageInfo::GetUnmitigatedDamage() const
     return m_damage + m_cleanDamage + m_absorb + m_resist;
 }
 
-ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell* /*spell*/, DamageInfo* damageInfo, HealInfo* healInfo, SpellInfo const* triggeredByAuraSpell, int8 procAuraEffectIndex)
+ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell* spell, DamageInfo* damageInfo, HealInfo* healInfo, SpellInfo const* triggeredByAuraSpell, int8 procAuraEffectIndex)
     : _actor(actor), _actionTarget(actionTarget), _procTarget(procTarget), _typeMask(typeMask), _spellTypeMask(spellTypeMask), _spellPhaseMask(spellPhaseMask),
-      _hitMask(hitMask), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell), _procAuraEffectIndex(procAuraEffectIndex)
+      _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell), _procAuraEffectIndex(procAuraEffectIndex)
 {
+}
+
+SpellInfo const* ProcEventInfo::GetSpellInfo() const
+{
+    if (_spell)
+        return _spell->GetSpellInfo();
+
+    if (_damageInfo)
+        return _damageInfo->GetSpellInfo();
+
+    if (_healInfo)
+        return _healInfo->GetSpellInfo();
+
+    return nullptr;
 }
 
 // we can disable this warning for this since it only
@@ -2088,7 +2102,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
 
             // create procs
             createProcFlags(spellInfo, BASE_ATTACK, false, procAttacker, procVictim);
-            caster->ProcDamageAndSpellFor(true, attacker, procVictim, procEx, BASE_ATTACK, spellInfo, splitted, nullptr, -1, &splittedDmgInfo);
+            caster->ProcDamageAndSpellFor(true, attacker, procVictim, procEx, BASE_ATTACK, spellInfo, splitted, nullptr, -1, nullptr, &splittedDmgInfo);
 
             if (attacker)
                 attacker->SendSpellNonMeleeDamageLog(caster, (*itr)->GetSpellInfo(), splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false);
@@ -2273,7 +2287,7 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
 
         DamageInfo dmgInfo(damageInfo);
         ProcDamageAndSpell(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.damage,
-            damageInfo.attackType, nullptr, nullptr, -1, &dmgInfo);
+            damageInfo.attackType, nullptr, nullptr, -1, nullptr, &dmgInfo);
 
         if (GetTypeId() == TYPEID_PLAYER)
             LOG_DEBUG("entities.unit", "AttackerStateUpdate: (Player) %s attacked %s for %u dmg, absorbed %u, blocked %u, resisted %u.",
@@ -5189,7 +5203,27 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
     if (dispelMask & (1 << DISPEL_DISEASE) && HasAura(50536))
         dispelMask &= ~(1 << DISPEL_DISEASE);
 
-    bool positive = IsFriendlyTo(caster);
+    ReputationRank rank = GetReactionTo(caster);
+    bool positive = rank >= REP_FRIENDLY;
+
+    // Neutral unit not at war with caster should be treated as a friendly unit
+    if (rank == REP_NEUTRAL)
+    {
+        if (Player* casterPlayer = caster->GetAffectingPlayer())
+        {
+            if (FactionTemplateEntry const* factionTemplateEntry = GetFactionTemplateEntry())
+            {
+                if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionTemplateEntry->faction))
+                {
+                    if (factionEntry->CanBeSetAtWar())
+                    {
+                        positive = !casterPlayer->GetReputationMgr().IsAtWar(factionEntry);
+                    }
+                }
+            }
+        }
+    }
+
     Unit::VisibleAuraMap const* visibleAuras = GetVisibleAuras();
     for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
     {
@@ -5886,15 +5920,15 @@ void Unit::SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, 
     SendSpellNonMeleeDamageLog(&log);
 }
 
-void Unit::ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellInfo const* procSpell, SpellInfo const* procAura, int8 procAuraEffectIndex, DamageInfo* damageInfo, HealInfo* healInfo)
+void Unit::ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellInfo const* procSpellInfo, SpellInfo const* procAura, int8 procAuraEffectIndex, Spell const* procSpell, DamageInfo* damageInfo, HealInfo* healInfo)
 {
     // Not much to do if no flags are set.
     if (procAttacker)
-        ProcDamageAndSpellFor(false, victim, procAttacker, procExtra, attType, procSpell, amount, procAura, procAuraEffectIndex, damageInfo, healInfo);
+        ProcDamageAndSpellFor(false, victim, procAttacker, procExtra, attType, procSpellInfo, amount, procAura, procAuraEffectIndex, procSpell, damageInfo, healInfo);
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
     if (victim && victim->IsAlive() && procVictim)
-        victim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, procAura, procAuraEffectIndex, damageInfo, healInfo);
+        victim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpellInfo, amount, procAura, procAuraEffectIndex, procSpell, damageInfo, healInfo);
 }
 
 void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo)
@@ -15532,7 +15566,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
     return procEx;
 }
 
-void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpell, uint32 damage, SpellInfo const* procAura, int8 procAuraEffectIndex, DamageInfo* damageInfo, HealInfo* healInfo)
+void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura, int8 procAuraEffectIndex, Spell const* procSpell, DamageInfo* damageInfo, HealInfo* healInfo)
 {
     // Player is loaded now - do not allow passive spell casts to proc
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetSession()->PlayerLoading())
@@ -15556,7 +15590,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST | PROC_EX_PARRY | PROC_EX_DODGE))
             {
                 if (target->GetTypeId() != TYPEID_PLAYER)
-                    ToPlayer()->UpdateCombatSkills(target, attType, isVictim);
+                    ToPlayer()->UpdateCombatSkills(target, attType, isVictim, procSpell ? procSpell->m_weaponItem : nullptr);
             }
             // Update defence if player is victim and we block
             else if (isVictim && procExtra & (PROC_EX_BLOCK))
@@ -15656,10 +15690,10 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
 
         // xinef: fix spell procing from damaging / healing casts if spell has DoT / HoT effect only
         // only player spells are taken into account
-        if (!active && !isVictim && !(procFlag & PROC_FLAG_DONE_PERIODIC) && procSpell && procSpell->SpellFamilyName && (procSpell->HasAura(SPELL_AURA_PERIODIC_DAMAGE) || procSpell->HasAura(SPELL_AURA_PERIODIC_HEAL)))
+        if (!active && !isVictim && !(procFlag & PROC_FLAG_DONE_PERIODIC) && procSpellInfo && procSpellInfo->SpellFamilyName && (procSpellInfo->HasAura(SPELL_AURA_PERIODIC_DAMAGE) || procSpellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL)))
             active = true;
 
-        if (!IsTriggeredAtSpellProcEvent(target, triggerData.aura, procSpell, procFlag, procExtra, attType, isVictim, active, triggerData.spellProcEvent, eventInfo))
+        if (!IsTriggeredAtSpellProcEvent(target, triggerData.aura, procSpellInfo, procFlag, procExtra, attType, isVictim, active, triggerData.spellProcEvent, eventInfo))
             continue;
 
         // do checks using conditions table
@@ -15788,7 +15822,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         bool handled = i->aura->CallScriptProcHandlers(aurApp, eventInfo);
 
         // "handled" is needed as long as proc can be handled in multiple places
-        if (!handled && HandleAuraProc(target, damage, i->aura, procSpell, procFlag, procExtra, cooldown, &handled))
+        if (!handled && HandleAuraProc(target, damage, i->aura, procSpellInfo, procFlag, procExtra, cooldown, &handled))
         {
             uint32 Id = i->aura->GetId();
             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell %u (triggered with value by %s aura of spell %u)", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), Id);
@@ -15817,7 +15851,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell %u (triggered by %s aura of spell %u)", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
                             // Don`t drop charge or add cooldown for not started trigger
-                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpell, procFlag, procExtra, cooldown))
+                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown))
                                 takeCharges = true;
                             break;
                         }
@@ -15835,7 +15869,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_DUMMY:
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell id %u (triggered by %s dummy aura of spell %u)", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
-                            if (HandleDummyAuraProc(target, damage, triggeredByAura, procSpell, procFlag, procExtra, cooldown))
+                            if (HandleDummyAuraProc(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown))
                                 takeCharges = true;
                             break;
                         }
@@ -15849,7 +15883,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_OVERRIDE_CLASS_SCRIPTS:
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell id %u (triggered by %s aura of spell %u)", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
-                            if (HandleOverrideClassScriptAuraProc(target, damage, triggeredByAura, procSpell, cooldown))
+                            if (HandleOverrideClassScriptAuraProc(target, damage, triggeredByAura, procSpellInfo, cooldown))
                                 takeCharges = true;
                             break;
                         }
@@ -15876,40 +15910,40 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         {
                             LOG_DEBUG("spells.aura", "ProcDamageAndSpell: casting spell %u (triggered with value by %s aura of spell %u)", spellInfo->Id, (isVictim ? "a victim's" : "an attacker's"), triggeredByAura->GetId());
 
-                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpell, procFlag, procExtra, cooldown))
+                            if (HandleProcTriggerSpell(target, damage, triggeredByAura, procSpellInfo, procFlag, procExtra, cooldown))
                                 takeCharges = true;
                             break;
                         }
                     case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
                         // Skip melee hits or instant cast spells
                         // xinef: check channeled spells which are affected by haste also
-                        if (procSpell && (procSpell->SpellFamilyName || GetTypeId() != TYPEID_PLAYER) &&
-                                (procSpell->CalcCastTime() > 0 /*||
+                        if (procSpellInfo && (procSpellInfo->SpellFamilyName || GetTypeId() != TYPEID_PLAYER) &&
+                                (procSpellInfo->CalcCastTime() > 0 /*||
                         (procSpell->IsChanneled() && procSpell->GetDuration() > 0 && (HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, procSpell) || procSpell->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC)))*/))
                             takeCharges = true;
                         break;
                     case SPELL_AURA_REFLECT_SPELLS_SCHOOL:
                         // Skip Melee hits and spells ws wrong school
-                        if (procSpell && (triggeredByAura->GetMiscValue() & procSpell->SchoolMask))         // School check
+                        if (procSpellInfo && (triggeredByAura->GetMiscValue() & procSpellInfo->SchoolMask)) // School check
                             takeCharges = true;
                         break;
                     case SPELL_AURA_SPELL_MAGNET:
                         // Skip Melee hits and targets with magnet aura
-                        if (procSpell && (triggeredByAura->GetBase()->GetUnitOwner()->ToUnit() == ToUnit()))         // Magnet
+                        if (procSpellInfo && (triggeredByAura->GetBase()->GetUnitOwner()->ToUnit() == ToUnit())) // Magnet
                             takeCharges = true;
                         break;
                     case SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT:
                     case SPELL_AURA_MOD_POWER_COST_SCHOOL:
                         // Skip melee hits and spells ws wrong school or zero cost
-                        if (procSpell &&
-                                (procSpell->ManaCost != 0 || procSpell->ManaCostPercentage != 0 || (procSpell->SpellFamilyFlags[1] & 0x2)) && // Cost check, mutilate include
-                                (triggeredByAura->GetMiscValue() & procSpell->SchoolMask))          // School check
+                        if (procSpellInfo &&
+                                (procSpellInfo->ManaCost != 0 || procSpellInfo->ManaCostPercentage != 0 || (procSpellInfo->SpellFamilyFlags[1] & 0x2)) && // Cost check, mutilate include
+                                (triggeredByAura->GetMiscValue() & procSpellInfo->SchoolMask))          // School check
                             takeCharges = true;
                         break;
                     case SPELL_AURA_MECHANIC_IMMUNITY:
                     case SPELL_AURA_MOD_MECHANIC_RESISTANCE:
                         // Compare mechanic
-                        if (procSpell && procSpell->Mechanic == uint32(triggeredByAura->GetMiscValue()))
+                        if (procSpellInfo && procSpellInfo->Mechanic == uint32(triggeredByAura->GetMiscValue()))
                             takeCharges = true;
                         break;
                     case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
@@ -15927,8 +15961,9 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         {
                             // Spell own direct damage at apply wont break the CC
                             // Xinef: Or when the aura is at full duration (assume that such auras should be added at the end, skipping all damage procs etc.)
-                            if (procSpell)
-                                if ((!i->aura->IsPermanent() && i->aura->GetDuration() == i->aura->GetMaxDuration()) || procSpell->Id == triggeredByAura->GetId() || procSpell->HasAttribute(SPELL_ATTR4_REACTIVE_DAMAGE_PROC))
+                            if (procSpellInfo)
+                                if ((!i->aura->IsPermanent() && i->aura->GetDuration() == i->aura->GetMaxDuration()) || procSpellInfo->Id == triggeredByAura->GetId() ||
+                                    procSpellInfo->HasAttribute(SPELL_ATTR4_REACTIVE_DAMAGE_PROC))
                                     break;
 
                             // chargeable mods are breaking on hit
@@ -15946,7 +15981,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             break;
                         }
                     case SPELL_AURA_ABILITY_IGNORE_AURASTATE:
-                        if (procSpell && procSpell->Id == 20647) // hack for warriors execute, both dummy and damage spell are affected by ignore aurastate aura
+                        if (procSpellInfo && procSpellInfo->Id == 20647) // hack for warriors execute, both dummy and damage spell are affected by ignore aurastate aura
                             break;
                         takeCharges = true;
                         break;
@@ -15959,7 +15994,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         // Remove charge (aura can be removed by triggers)
         // xinef: take into account attribute6 of proc spell
         if (prepare && useCharges && takeCharges)
-            if (!procSpell || isVictim || !procSpell->HasAttribute(SPELL_ATTR6_DO_NOT_CONSUME_RESOURCES))
+            if (!procSpellInfo || isVictim || !procSpellInfo->HasAttribute(SPELL_ATTR6_DO_NOT_CONSUME_RESOURCES))
                 i->aura->DropCharge();
 
         i->aura->CallScriptAfterProcHandlers(aurApp, eventInfo);

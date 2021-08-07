@@ -490,6 +490,7 @@ public:
 
     SpellInfo const* m_spellInfo;
     Item* m_CastItem;
+    Item* m_weaponItem;
     ObjectGuid m_castItemGUID;
     uint8 m_cast_count;
     uint32 m_glyphIndex;
