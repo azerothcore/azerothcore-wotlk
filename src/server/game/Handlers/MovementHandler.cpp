@@ -319,7 +319,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         return;
     }
 
-    if (plrMover && !sScriptMgr->AnticheatNoFallingDamage(plrMover, opcode))
+    if (!sScriptMgr->AnticheatNoFallingDamage(_player, opcode))
     {
         plrMover->GetSession()->KickPlayer();
         recvData.rfinish();
@@ -349,18 +349,15 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     ReadMovementInfo(recvData, &movementInfo);
 
     // [CMSG_MOVE_CHNG_TRANSPORT 0x038D (909)]
-    if (plrMover && opcode == CMSG_MOVE_CHNG_TRANSPORT)
+    if (opcode == CMSG_MOVE_CHNG_TRANSPORT)
     {
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
     }
 
     if (!movementInfo.pos.IsPositionValid())
     {
-        if (plrMover)
-        {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-            sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-        }
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
+        sScriptMgr->AnticheatUpdateMovementInfo(_player, movementInfo);
 
         return;
     }
@@ -376,11 +373,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // Xinef: skip moving packets
         if (movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING))
         {
-            if (plrMover)
-            {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-                sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-            }
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
+            sScriptMgr->AnticheatUpdateMovementInfo(_player, movementInfo);
 
             return;
         }
@@ -400,11 +394,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
         {
-            if (plrMover)
-            {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-                sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-            }
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
+            sScriptMgr->AnticheatUpdateMovementInfo(_player, movementInfo);
 
             return;
         }
@@ -412,11 +403,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         if (!Acore::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
                                     movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
         {
-            if (plrMover)
-            {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-                sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
-            }
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(_player, true);
+            sScriptMgr->AnticheatUpdateMovementInfo(_player, movementInfo);
 
             return;
         }
@@ -494,11 +482,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     {
         mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
 
+        sScriptMgr->AnticheatSetSuccessfullyLanded(_player);
+        sScriptMgr->AnticheatSetJumpingbyOpcode(_player, false);
+
         if (plrMover)
         {
-            sScriptMgr->AnticheatSetSuccessfullyLanded(plrMover);
-            sScriptMgr->AnticheatSetJumpingbyOpcode(plrMover, false);
-
             plrMover->ResetFallingData(movementInfo.pos.GetPositionZ()); // for MSG_MOVE_START_SWIM (no HandleFall(movementInfo))
         }
     }
@@ -513,17 +501,17 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (opcode == MSG_MOVE_JUMP)
     {
         jumpopcode = true;
-        if (plrMover && !sScriptMgr->AnticheatHandleDoubleJump(plrMover, mover))
+        if (!sScriptMgr->AnticheatHandleDoubleJump(_player, mover))
         {
-            plrMover->GetSession()->KickPlayer();
+            KickPlayer();
             return;
         }
     }
 
     /* start some hack detection */
-    if (plrMover && !sScriptMgr->AnticheatCheckMovementInfo(plrMover, movementInfo, mover, jumpopcode))
+    if (!sScriptMgr->AnticheatCheckMovementInfo(_player, movementInfo, mover, jumpopcode))
     {
-        plrMover->GetSession()->KickPlayer();
+        KickPlayer();
         return;
     }
 
