@@ -17,6 +17,7 @@
 #include "KillRewarder.h"
 #include "MapReference.h"
 #include "ObjectMgr.h"
+#include "Optional.h"
 #include "PetDefines.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
@@ -1954,8 +1955,8 @@ public:
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
-    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType);
-    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence);
+    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* item = nullptr);
+    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item = nullptr);
 
     void SetSkill(uint16 id, uint16 step, uint16 currVal, uint16 maxVal);
     [[nodiscard]] uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus + temp bonus
@@ -2517,7 +2518,13 @@ public:
     std::string GetMapAreaAndZoneString();
     std::string GetCoordsMapAreaAndZoneString();
 
-protected:
+    void SetFarSightDistance(float radius);
+    void ResetFarSightDistance();
+    Optional<float> GetFarSightDistance() const;
+
+    float GetSightRange(const WorldObject* target = nullptr) const override;
+
+ protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
@@ -2869,6 +2876,8 @@ private:
     Creature* m_CinematicObject;
 
     WorldLocation _corpseLocation;
+
+    Optional<float> _farSightDistance = { };
 };
 
 void AddItemsSetItem(Player* player, Item* item);

@@ -955,11 +955,14 @@ private:
     uint32 _spellPhaseMask;
     uint32 _hitMask;
     uint32 _cooldown;
+    Spell* _spell;
     DamageInfo* _damageInfo;
     HealInfo* _healInfo;
     SpellInfo const* const _triggeredByAuraSpell;
+    int8 _procAuraEffectIndex;
+
 public:
-    explicit ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell* spell, DamageInfo* damageInfo, HealInfo* healInfo, SpellInfo const* triggeredByAuraSpell);
+    explicit ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell* spell, DamageInfo* damageInfo, HealInfo* healInfo, SpellInfo const* triggeredByAuraSpell = nullptr, int8 procAuraEffectIndex = -1);
     Unit* GetActor() { return _actor; };
     [[nodiscard]] Unit* GetActionTarget() const { return _actionTarget; }
     [[nodiscard]] Unit* GetProcTarget() const { return _procTarget; }
@@ -967,11 +970,13 @@ public:
     [[nodiscard]] uint32 GetSpellTypeMask() const { return _spellTypeMask; }
     [[nodiscard]] uint32 GetSpellPhaseMask() const { return _spellPhaseMask; }
     [[nodiscard]] uint32 GetHitMask() const { return _hitMask; }
-    [[nodiscard]] SpellInfo const* GetSpellInfo() const { return nullptr; }
+    [[nodiscard]] SpellInfo const* GetSpellInfo() const;
     [[nodiscard]] SpellSchoolMask GetSchoolMask() const { return SPELL_SCHOOL_MASK_NONE; }
+    [[nodiscard]] Spell* GetProcSpell() const { return _spell; }
     [[nodiscard]] DamageInfo* GetDamageInfo() const { return _damageInfo; }
     [[nodiscard]] HealInfo* GetHealInfo() const { return _healInfo; }
     [[nodiscard]] SpellInfo const* GetTriggerAuraSpell() const { return _triggeredByAuraSpell; }
+    [[nodiscard]] int8 GetTriggerAuraEffectIndex() const { return _procAuraEffectIndex; }
     [[nodiscard]] uint32 GetProcCooldown() const { return _cooldown; }
     void SetProcCooldown(uint32 cooldown) { _cooldown = cooldown; }
 };
@@ -1622,8 +1627,8 @@ public:
     static void Kill(Unit* killer, Unit* victim, bool durabilityLoss = true, WeaponAttackType attackType = BASE_ATTACK, SpellInfo const* spellProto = nullptr);
     static int32 DealHeal(Unit* healer, Unit* victim, uint32 addhealth);
 
-    void ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpell = nullptr, SpellInfo const* procAura = nullptr);
-    void ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpell, uint32 damage, SpellInfo const* procAura = nullptr);
+    void ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpellInfo = nullptr, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr);
+    void ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr);
 
     void GetProcAurasTriggeredOnEvent(std::list<AuraApplication*>& aurasTriggeringProc, std::list<AuraApplication*>* procAuras, ProcEventInfo eventInfo);
     void TriggerAurasProcOnEvent(CalcDamageInfo& damageInfo);
@@ -2622,7 +2627,6 @@ private:
     bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
 
     uint32 _oldFactionId;           ///< faction before charm
-    bool m_petCatchUp;
 
     float processDummyAuras(float TakenTotalMod) const;
 };

@@ -473,8 +473,8 @@ void ObjectMgr::LoadCreatureTemplates()
                          "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, type, "
 //                        40          41      42              43        44              45         46       47       48      49
                          "type_flags, lootid, pickpocketloot, skinloot, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-//                        50           51           52              53            54             55            56          57           58                    59                        60           61
-                         "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
+//                        50           51           52              53            54             55                  56            57          58           59                    60                        61           62
+                         "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
                          "FROM creature_template;");
 
     if (!result)
@@ -600,13 +600,14 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.ModHealth             = fields[52].GetFloat();
     creatureTemplate.ModMana               = fields[53].GetFloat();
     creatureTemplate.ModArmor              = fields[54].GetFloat();
-    creatureTemplate.RacialLeader          = fields[55].GetBool();
-    creatureTemplate.movementId            = fields[56].GetUInt32();
-    creatureTemplate.RegenHealth           = fields[57].GetBool();
-    creatureTemplate.MechanicImmuneMask    = fields[58].GetUInt32();
-    creatureTemplate.SpellSchoolImmuneMask = fields[59].GetUInt8();
-    creatureTemplate.flags_extra           = fields[60].GetUInt32();
-    creatureTemplate.ScriptID              = GetScriptId(fields[61].GetCString());
+    creatureTemplate.ModExperience         = fields[55].GetFloat();
+    creatureTemplate.RacialLeader          = fields[56].GetBool();
+    creatureTemplate.movementId            = fields[57].GetUInt32();
+    creatureTemplate.RegenHealth           = fields[58].GetBool();
+    creatureTemplate.MechanicImmuneMask    = fields[59].GetUInt32();
+    creatureTemplate.SpellSchoolImmuneMask = fields[60].GetUInt8();
+    creatureTemplate.flags_extra           = fields[61].GetUInt32();
+    creatureTemplate.ScriptID              = GetScriptId(fields[62].GetCString());
 }
 
 void ObjectMgr::LoadCreatureTemplateResistances()

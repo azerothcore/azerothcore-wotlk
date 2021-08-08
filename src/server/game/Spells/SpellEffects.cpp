@@ -102,7 +102,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectTeleUnitsFaceCaster,                      // 43 SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER
     &Spell::EffectLearnSkill,                               // 44 SPELL_EFFECT_SKILL_STEP
     &Spell::EffectAddHonor,                                 // 45 SPELL_EFFECT_ADD_HONOR                honor/pvp related
-    &Spell::EffectUnused,                                   // 46 SPELL_EFFECT_SPAWN clientside, unit appears as if it was just spawned
+    &Spell::EffectUnused,                                   // 46 SPELL_EFFECT_SPAWN client-side, unit appears as if it was just spawned
     &Spell::EffectTradeSkill,                               // 47 SPELL_EFFECT_TRADE_SKILL
     &Spell::EffectUnused,                                   // 48 SPELL_EFFECT_STEALTH                  one spell: Base Stealth
     &Spell::EffectUnused,                                   // 49 SPELL_EFFECT_DETECT                   one spell: Detect
@@ -1180,7 +1180,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
                 uint32 mapid = destTarget->GetMapId();
                 float x, y, z, orientation;
                 destTarget->GetPosition(x, y, z, orientation);
-                target->TeleportTo(mapid, x, y, z, orientation, TELE_TO_GM_MODE); // skip CanPlayerEnter check
+                target->TeleportTo(mapid, x, y, z, orientation, TELE_TO_GM_MODE); // skip PlayerCannotEnter check
             }
             return;
     }
@@ -3059,6 +3059,9 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
 
     // add new enchanting if equipped
     item_owner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, true);
+
+    item_owner->RemoveTradeableItem(itemTarget);
+    itemTarget->ClearSoulboundTradeable(item_owner);
 }
 
 void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
@@ -3908,17 +3911,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         }
                         break;
                     }*/
-                    /* disabled for now, was being abused by idiots
-                    // 5,000 Gold
-                    case 46642:
-                    {
-                        if( !m_originalCaster || !unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
-                            return;
-
-                        unitTarget->ToPlayer()->ModifyMoney(5000 * GOLD);
-
-                        break;
-                    }*/
                     // Roll Dice - Decahedral Dwarven Dice
                     case 47770:
                         {
@@ -4540,8 +4532,12 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
             // remove old glyph aura
             if (uint32 oldGlyph = player->GetGlyph(m_glyphIndex))
                 if (GlyphPropertiesEntry const* oldGlyphEntry = sGlyphPropertiesStore.LookupEntry(oldGlyph))
+                {
                     player->RemoveAurasDueToSpell(oldGlyphEntry->SpellId);
+                    player->SendLearnPacket(oldGlyphEntry->SpellId, false); // Send packet to properly handle client-side spell tooltips
+                }
 
+            player->SendLearnPacket(glyphEntry->SpellId, true); // Send packet to properly handle client-side spell tooltips
             player->CastSpell(m_caster, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
             player->SetGlyph(m_glyphIndex, glyph, !player->GetSession()->PlayerLoading());
             player->SendTalentsInfoData(false);
@@ -5033,7 +5029,15 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if (m_pathFinder)
         {
             m_caster->GetMotionMaster()->MoveCharge(m_pathFinder->GetEndPosition().x, m_pathFinder->GetEndPosition().y, m_pathFinder->GetEndPosition().z, 42.0f, EVENT_CHARGE, &m_pathFinder->GetPath());
+<<<<<<< HEAD
             m_caster->AddUnitState(UNIT_STATE_CHARGING);
+=======
+
+            if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            {
+                sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+            }
+>>>>>>> master
         }
         else
         {
@@ -5048,7 +5052,15 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             }
 
             m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT);
+<<<<<<< HEAD
             m_caster->AddUnitState(UNIT_STATE_CHARGING);
+=======
+
+            if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            {
+                sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+            }
+>>>>>>> master
         }
     }
 
@@ -5057,10 +5069,17 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if (!unitTarget)
             return;
 
+<<<<<<< HEAD
         m_caster->ClearUnitState(UNIT_STATE_CHARGING);
+=======
+        if (m_caster->ToPlayer())
+        {
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
+        }
+>>>>>>> master
 
         // not all charge effects used in negative spells
-        if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetTarget() == unitTarget->GetGUID())
             m_caster->Attack(unitTarget, true);
     }
 }
