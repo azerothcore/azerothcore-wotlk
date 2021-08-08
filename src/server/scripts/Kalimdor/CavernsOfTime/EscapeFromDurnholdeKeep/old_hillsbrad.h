@@ -40,9 +40,6 @@ enum NpcIds
 
     NPC_CAPTAIN_SKARLOC     = 17862,
     NPC_SKARLOC_MOUNT       = 18798,
-
-    NPC_LORDAERON_SENTRY    = 17815,
-    NPC_LORDAERON_WATCHMAN  = 17814,
 };
 
 enum GobjectIds
@@ -54,7 +51,6 @@ enum GobjectIds
 
 enum MiscIds
 {
-    QUEST_DIVERSION                 = 10283,
     WORLD_STATE_BARRELS_PLANTED     = 2436,
     SKARLOC_MOUNT_MODEL             = 18223,
 

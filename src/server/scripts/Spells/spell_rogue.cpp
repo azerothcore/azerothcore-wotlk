@@ -398,7 +398,7 @@ public:
                 if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                 {
                     // xinef: target may be no longer valid
-                    if (!GetTarget()->IsValidAttackTarget(target))
+                    if (!GetTarget()->IsValidAttackTarget(target) || target->HasStealthAura() || target->HasInvisibilityAura())
                     {
                         _targets.remove(guid);
                         continue;
