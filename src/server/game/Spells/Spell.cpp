@@ -6123,7 +6123,9 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_AURA_HOVER:
                 {
                     if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_MOUNT) != 0 && m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsMounted())
+                    {
                         return SPELL_FAILED_NOT_ON_MOUNTED;
+                    }
                     break;
                 }
             default:
