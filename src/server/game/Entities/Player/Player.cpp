@@ -13217,14 +13217,6 @@ void Player::AddKnownCurrency(uint32 itemId)
         SetFlag64(PLAYER_FIELD_KNOWN_CURRENCIES, (1LL << (ctEntry->BitIndex - 1)));
 }
 
-<<<<<<< HEAD
-void Player::UpdateFallInformationIfNeed(float z)
-{
-    m_lastFallZ = z;
-}
-
-=======
->>>>>>> master
 void Player::UnsummonPetTemporaryIfAny()
 {
     Pet* pet = GetPet();

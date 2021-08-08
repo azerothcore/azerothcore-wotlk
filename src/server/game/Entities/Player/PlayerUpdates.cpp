@@ -2297,12 +2297,9 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type,
                                                 unit);
 }
 
-void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo,
-                                         uint16              opcode)
+void Player::UpdateFallInformationIfNeed(float z)
 {
-    if (m_lastFallTime >= minfo.fallTime ||
-        m_lastFallZ <= minfo.pos.GetPositionZ() || opcode == MSG_MOVE_FALL_LAND)
-        SetFallInformation(minfo.fallTime, minfo.pos.GetPositionZ());
+    m_lastFallZ = z;
 }
 
 void Player::UpdateSpecCount(uint8 count)

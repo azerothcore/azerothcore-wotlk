@@ -5029,15 +5029,11 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if (m_pathFinder)
         {
             m_caster->GetMotionMaster()->MoveCharge(m_pathFinder->GetEndPosition().x, m_pathFinder->GetEndPosition().y, m_pathFinder->GetEndPosition().z, 42.0f, EVENT_CHARGE, &m_pathFinder->GetPath());
-<<<<<<< HEAD
-            m_caster->AddUnitState(UNIT_STATE_CHARGING);
-=======
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
                 sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
             }
->>>>>>> master
         }
         else
         {
@@ -5052,15 +5048,11 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             }
 
             m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT);
-<<<<<<< HEAD
-            m_caster->AddUnitState(UNIT_STATE_CHARGING);
-=======
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
                 sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
             }
->>>>>>> master
         }
     }
 
@@ -5069,14 +5061,10 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if (!unitTarget)
             return;
 
-<<<<<<< HEAD
-        m_caster->ClearUnitState(UNIT_STATE_CHARGING);
-=======
         if (m_caster->ToPlayer())
         {
             sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
         }
->>>>>>> master
 
         // not all charge effects used in negative spells
         if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetTarget() == unitTarget->GetGUID())
