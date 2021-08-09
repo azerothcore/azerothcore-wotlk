@@ -18348,14 +18348,9 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
     else
     {
         WorldObject::UpdateObjectVisibility(true);
-
-        // pussywizard: generally this is not needed here, delayed notifier will handle this, call only for pets
-        if ((IsGuardian() || IsPet()) && GetOwnerGUID().IsPlayer())
-        {
-            Acore::AIRelocationNotifier notifier(*this);
-            float radius = 60.0f;
-            Cell::VisitAllObjects(this, notifier, radius);
-        }
+        Acore::AIRelocationNotifier notifier(*this);
+        float radius = 60.0f;
+        Cell::VisitAllObjects(this, notifier, radius);
     }
 }
 
