@@ -57,24 +57,7 @@ DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 22045);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (22045, 0, 0, 0, 0, 0, 100, 0, 5000, 10000, 15000, 20000, 11, 38621, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Vengeful Husk - In Combat - Cast \'38621\'');
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18548;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 18548);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18548, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 32932, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Firewing Courier - On Aggro - Cast \'32932\' (No Repeat)');
-
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18456;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 18456);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18456, 0, 0, 0, 0, 0, 100, 0, 5000, 10000, 15000, 20000, 11, 3391, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Tuurem Scavenger - In Combat - Cast \'3391\''),
-(18456, 0, 1, 0, 2, 0, 100, 1, 5, 30, 0, 0, 25, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Tuurem Scavenger - Between 5-30% Health - Flee For Assist (No Repeat)');
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18449;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 18449);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18449, 0, 0, 0, 11, 0, 100, 1, 0, 0, 0, 0, 11, 29651, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Shienor Talonite - On Respawn - Cast \'29651\' (No Repeat)'),
-(18449, 0, 1, 0, 0, 0, 100, 0, 5000, 10000, 15000, 20000, 11, 3391, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Shienor Talonite - In Combat - Cast \'3391\'');
-
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 22265;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 22265);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(22265, 0, 0, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 31273, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Shadowwing Owl - Between 20-80% Health - Cast \'31273\' (No Repeat)');
+(18449, 0, 0, 0, 11, 0, 100, 1, 0, 0, 0, 0, 11, 29651, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Shienor Talonite - On Respawn - Cast \'29651\' (No Repeat)');
