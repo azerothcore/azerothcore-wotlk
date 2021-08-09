@@ -33,11 +33,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (22283, 0, 1, 0, 0, 0, 100, 0, 2700, 3000, 8700, 9000, 11, 39083, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Eredar Stormbringer - In Combat - Cast \'39083\''),
 (22283, 0, 2, 0, 2, 0, 100, 1, 10, 30, 0, 0, 11, 39082, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Eredar Stormbringer - Between 10-30% Health - Cast \'39082\' (No Repeat)');
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20514;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 20514);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(20514, 0, 0, 0, 2, 0, 100, 1, 5, 10, 0, 0, 11, 13339, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Searing Elemental - Between 5-10% Health - Cast \'13339\' (No Repeat)');
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 22221;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 22221);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -221,11 +216,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21956, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 5781, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Rema - Between 20-80% Health - Cast \'5781\' (No Repeat)'),
 (21956, 0, 2, 0, 2, 0, 100, 1, 10, 30, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Rema - Between 10-30% Health - Cast \'8599\' (No Repeat)');
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21033;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21033);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21033, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 37839, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Bladewing Bloodletter - On Aggro - Cast \'37839\' (No Repeat)'),
-(21033, 0, 1, 0, 2, 0, 100, 0, 50, 90, 10, 40, 11, 37838, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Bladewing Bloodletter - Between 50-90% Health - Cast \'37838\'');
+(21033, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 37839, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Bladewing Bloodletter - On Aggro - Cast \'37839\''),
+(21033, 0, 1, 0, 2, 0, 100, 1, 20, 40, 0, 0, 11, 37838, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Bladewing Bloodletter - Between 20-40% Health - Cast \'37838\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 22052;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 22052);
@@ -426,7 +420,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21382;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21382);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21382, 0, 0, 0, 1, 0, 100, 0, 5000, 10000, 15000, 20000, 11, 37653, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Wyrmcult Zealot - Out of Combat - Cast \'37653\''),
+(21382, 0, 0, 0, 1, 0, 100, 0, 5000, 10000, 15000, 20000, 11, 37635, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Wyrmcult Zealot - Out of Combat - Cast \'37635\''),
 (21382, 0, 1, 0, 0, 0, 100, 0, 2700, 3200, 8900, 9600, 11, 20714, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Wyrmcult Zealot - In Combat - Cast \'20714\''),
 (21382, 0, 2, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 32009, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Wyrmcult Zealot - Between 20-80% Health - Cast \'32009\' (No Repeat)'),
 (21382, 0, 3, 0, 2, 0, 100, 1, 10, 30, 0, 0, 11, 8599, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Wyrmcult Zealot - Between 10-30% Health - Cast \'8599\' (No Repeat)');
@@ -463,13 +457,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23386;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 23386);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(23386, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 42415, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Gan\'arg Analyzer - On Aggro - Cast \'42415\' (No Repeat)'),
-(23386, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 3391, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Gan\'arg Analyzer - Between 20-80% Health - Cast \'3391\' (No Repeat)');
-
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 22202;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 22202);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(22202, 0, 0, 0, 0, 0, 100, 0, 2700, 3500, 9600, 12400, 11, 9613, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Nightmare Imp - In Combat - Cast \'9613\'');
+(23386, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 42415, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Gan\'arg Analyzer - On Aggro - Cast \'42415\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 22298;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 22298);
