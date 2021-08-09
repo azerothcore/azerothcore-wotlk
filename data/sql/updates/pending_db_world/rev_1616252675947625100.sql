@@ -146,11 +146,11 @@ DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21839);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (21839, 0, 0, 0, 0, 0, 100, 0, 4800, 6400, 14600, 16200, 11, 32914, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Mature Silkwing - In Combat - Cast \'32914\'');
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20747;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 20747);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(20747, 0, 0, 1, 2, 0, 100, 0, 5, 15, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Silkwing Larva - Between 5-15% Health - Say Line 0'),
-(20747, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 11, 36948, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Silkwing Larva - Between 5-15% Health - Cast \'36948\'');
+(20747, 0, 0, 0, 2, 0, 100, 1, 5, 40, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Silkwing Larva - Between 5-40% Health - Say Line 0 (No Repeat)'),
+(20747, 0, 1, 2, 2, 0, 100, 1, 5, 40, 0, 0, 11, 36948, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Silkwing Larva - Between 5-40% Health - Cast \'36948\' (No Repeat)'),
+(20747, 0, 2, 0, 61, 0, 100, 1, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Silkwing Larva - Between 5-40% Health - Kill Self (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21373;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21373);
