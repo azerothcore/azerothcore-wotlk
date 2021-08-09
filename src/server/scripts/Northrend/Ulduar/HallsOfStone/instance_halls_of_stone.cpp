@@ -187,8 +187,8 @@ public:
 
             if (data == DONE)
             {
-                isMaidenOfGriefDead = (type == BOSS_MAIDEN_OF_GRIEF ? true : isMaidenOfGriefDead);
-                isKrystalusDead = (type == BOSS_KRYSTALLUS ? true : isKrystalusDead);
+                isMaidenOfGriefDead = type == BOSS_MAIDEN_OF_GRIEF || isMaidenOfGriefDead;
+                isKrystalusDead = type == BOSS_KRYSTALLUS || isKrystalusDead;
             }
 
             if (isMaidenOfGriefDead && isKrystalusDead)
