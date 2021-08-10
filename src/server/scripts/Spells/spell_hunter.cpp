@@ -429,7 +429,11 @@ public:
 
         bool CheckProc(ProcEventInfo& procInfo)
         {
-            SpellInfo const* spellInfo = procInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
             // Xinef: cannot proc from volley damage
             if (spellInfo && (spellInfo->SpellFamilyFlags[0] & 0x2000) && spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
                 return false;

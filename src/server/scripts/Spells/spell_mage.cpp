@@ -127,11 +127,15 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetActionTarget())
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            if (!damageInfo->GetSpellInfo() || !eventInfo.GetActionTarget())
                 return false;
 
             // Need Interrupt or Silenced mechanic
-            if (!(eventInfo.GetDamageInfo()->GetSpellInfo()->GetAllEffectsMechanicMask() & ((1 << MECHANIC_INTERRUPT) | (1 << MECHANIC_SILENCE))))
+            if (!(damageInfo->GetSpellInfo()->GetAllEffectsMechanicMask() & ((1 << MECHANIC_INTERRUPT) | (1 << MECHANIC_SILENCE))))
                 return false;
 
             // Xinef: immuned effect should just eat charge
@@ -180,7 +184,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            const SpellInfo* spellInfo = damageInfo->GetSpellInfo();
             if (!spellInfo || (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK))
                 return true;
 
@@ -251,14 +259,20 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetSpellInfo(); // eventInfo.GetSpellInfo()
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            return damageInfo->GetSpellInfo(); // eventInfo.GetSpellInfo()
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
-            int32 mana = int32(eventInfo.GetDamageInfo()->GetSpellInfo()->CalcPowerCost(GetTarget(), eventInfo.GetDamageInfo()->GetSchoolMask()));
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            SpellInfo const* spellInfo = damageInfo ? damageInfo->GetSpellInfo() : nullptr;
+            int32 mana = int32(spellInfo ? spellInfo->CalcPowerCost(GetTarget(), damageInfo->GetSchoolMask()) : 0);
             mana = CalculatePct(mana, aurEff->GetAmount());
 
             GetTarget()->CastCustomSpell(SPELL_MAGE_BURNOUT_TRIGGER, SPELLVALUE_BASE_POINT0, mana, GetTarget(), true, nullptr, aurEff);
@@ -442,7 +456,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            const SpellInfo* spellInfo = damageInfo->GetSpellInfo();
             if (!spellInfo)
                 return false;
 
@@ -854,9 +872,10 @@ public:
                 return false;
 
             // Molten Armor
-            if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
-                if (spellInfo->SpellFamilyFlags[1] & 0x8)
-                    return false;
+            if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
+                if (SpellInfo const* spellInfo = damageInfo->GetSpellInfo())
+                    if (spellInfo->SpellFamilyFlags[1] & 0x8)
+                        return false;
 
             return true;
         }
@@ -868,7 +887,8 @@ public:
             SpellInfo const* igniteDot = sSpellMgr->AssertSpellInfo(SPELL_MAGE_IGNITE);
             int32 pct = 8 * GetSpellInfo()->GetRank();
 
-            int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks());
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            int32 amount = int32(CalculatePct(damageInfo ? damageInfo->GetDamage() : 0, pct) / igniteDot->GetMaxTicks());
 
             // Xinef: implement ignite bug
             eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_MAGE_IGNITE, SPELL_AURA_PERIODIC_DAMAGE, amount);
@@ -982,7 +1002,13 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            _spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+            {
+                return false;
+            }
+
+            _spellInfo = damageInfo->GetSpellInfo();
             if (!_spellInfo)
             {
                 return false;
@@ -1018,7 +1044,8 @@ public:
         {
             PreventDefaultAction();
 
-            int32 mana = int32(_spellInfo->CalcPowerCost(GetTarget(), eventInfo.GetDamageInfo()->GetSchoolMask()) / ticksModifier);
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            int32 mana = int32(damageInfo ? (_spellInfo->CalcPowerCost(GetTarget(), damageInfo->GetSchoolMask()) / ticksModifier) : 0);
             mana = CalculatePct(mana, aurEff->GetAmount());
 
             if (mana > 0)

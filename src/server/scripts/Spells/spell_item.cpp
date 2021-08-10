@@ -657,7 +657,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
             if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
                 return false;
 
@@ -1251,7 +1255,8 @@ public:
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if ((eventInfo.GetActionTarget()->GetHealth() - eventInfo.GetDamageInfo()->GetDamage()) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if ((eventInfo.GetActionTarget()->GetHealth() - (damageInfo ? damageInfo->GetDamage() : 0)) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
                 return;
 
             const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/);
@@ -2361,7 +2366,8 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 bp = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            int32 bp = CalculatePct(int32(damageInfo ? damageInfo->GetDamage() : 0), aurEff->GetAmount());
             GetTarget()->CastCustomSpell(SPELL_ITEM_NECROTIC_TOUCH_PROC, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
@@ -2811,8 +2817,12 @@ public:
             /*if (!GetTarget()->FindMap() || GetTarget()->FindMap()->IsBattlegroundOrArena())
                 return false;*/
 
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
-                if (!eventInfo.GetDamageInfo()->GetDamage())
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            if (const SpellInfo* procSpell = damageInfo->GetSpellInfo())
+                if (!damageInfo->GetDamage())
                 {
                     if (procSpell->SpellFamilyName == SPELLFAMILY_WARRIOR)
                     {
