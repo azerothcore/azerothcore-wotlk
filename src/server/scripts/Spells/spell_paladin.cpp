@@ -752,7 +752,7 @@ public:
             PreventDefaultAction();
             // return damage % to attacker but < 50% own total health
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-            int32 damage = int32(std::min(CalculatePct(damageInfo ? damageInfo->GetDamage() : 0, aurEff->GetAmount()), GetTarget()->GetMaxHealth() / 2));
+            int32 damage = int32(std::min(CalculatePct(damageInfo ? damageInfo->GetDamage() : 1, aurEff->GetAmount()), GetTarget()->GetMaxHealth() / 2));
             GetTarget()->CastCustomSpell(SPELL_PALADIN_EYE_FOR_AN_EYE_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
