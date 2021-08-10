@@ -3518,7 +3518,8 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 heal = int32(eventInfo.GetDamageInfo()->GetDamage() / 2);
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            int32 heal = int32(damageInfo ? damageInfo->GetDamage() / 2 : 0);
             GetTarget()->CastCustomSpell(SPELL_DARK_HUNGER_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), true, nullptr, aurEff);
         }
 

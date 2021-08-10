@@ -1046,15 +1046,29 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            SpellInfo const* procSpell = damageInfo->GetSpellInfo();
+            if (!procSpell)
+                return false;
+
+            return eventInfo.GetActor() && eventInfo.GetActionTarget() && (damageInfo->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
         }
 
         void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             Unit* victim = eventInfo.GetActionTarget();
-            SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            SpellInfo const* procSpell = damageInfo->GetSpellInfo();
+            if (!procSpell)
+                return false;
 
             //uint32 markCount = 0;
             //if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
@@ -1100,8 +1114,15 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            SpellInfo const* procSpell = damageInfo->GetSpellInfo();
+            if (!procSpell)
+                return false;
+
+            return eventInfo.GetActor() && eventInfo.GetActionTarget() && (damageInfo->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
         }
 
         void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
