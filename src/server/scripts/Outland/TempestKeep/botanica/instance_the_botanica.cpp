@@ -148,7 +148,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            if (SpellInfo const* spellInfo = damageInfo->GetSpellInfo())
             {
                 if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > time(nullptr))
                     return false;
