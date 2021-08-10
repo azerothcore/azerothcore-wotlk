@@ -644,7 +644,8 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 amount = aurEff->GetAmount() + eventInfo.GetDamageInfo()->GetDamage();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            int32 amount = aurEff->GetAmount() + (damageInfo ? damageInfo->GetDamage() : 0);
 
             uint8 num = amount / 15000;
             if (amount >= 15000)
