@@ -2924,7 +2924,16 @@ void Player::_addTalentAurasAndSpells(uint32 spellId)
     else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
     {
         if (IsNeedCastPassiveSpellAtLearn(spellInfo))
+        {
             CastSpell(this, spellId, true);
+            if (!HasAura(spellId))
+            {
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+                {
+                    Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, this, this);
+                }
+            }
+        }
     }
 }
 
