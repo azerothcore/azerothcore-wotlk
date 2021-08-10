@@ -888,7 +888,7 @@ public:
             int32 pct = 8 * GetSpellInfo()->GetRank();
 
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-            int32 amount = int32(CalculatePct(damageInfo ? damageInfo->GetDamage() : 0, pct) / igniteDot->GetMaxTicks());
+            int32 amount = int32(CalculatePct(damageInfo ? damageInfo->GetDamage() : 1, pct) / igniteDot->GetMaxTicks());
 
             // Xinef: implement ignite bug
             eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_MAGE_IGNITE, SPELL_AURA_PERIODIC_DAMAGE, amount);
