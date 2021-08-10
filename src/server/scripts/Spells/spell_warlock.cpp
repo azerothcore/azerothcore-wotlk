@@ -886,14 +886,19 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetDamage() && GetTarget()->IsAlive();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            return damageInfo->GetDamage() && GetTarget()->IsAlive();
         }
 
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
-            int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()));
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            int32 amount = int32(CalculatePct(damageInfo ? damageInfo->GetDamage() : 0, aurEff->GetAmount()));
             // Glyph of Siphon Life
             if (AuraEffect const* glyph = GetTarget()->GetAuraEffect(SPELL_WARLOCK_GLYPH_OF_SIPHON_LIFE, EFFECT_0))
                 AddPct(amount, glyph->GetAmount());
@@ -1090,14 +1095,16 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             // Xinef: Added charm check
-            return (GetTarget()->GetGuardianPet() || GetTarget()->GetCharm()) && eventInfo.GetDamageInfo()->GetDamage();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            return (GetTarget()->GetGuardianPet() || GetTarget()->GetCharm()) && damageInfo && damageInfo->GetDamage();
         }
 
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
-            int32 heal = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            int32 heal = CalculatePct(int32(damageInfo ? damageInfo->GetDamage() : 0), aurEff->GetAmount());
             GetTarget()->CastCustomSpell(SPELL_WARLOCK_FEL_SYNERGY_HEAL, SPELLVALUE_BASE_POINT0, heal, (Unit*)nullptr, true, nullptr, aurEff); // TARGET_UNIT_PET
         }
 
