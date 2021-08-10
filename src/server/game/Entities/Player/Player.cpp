@@ -9723,6 +9723,9 @@ void Player::ContinueTaxiFlight()
         return;
     }
 
+    if (IsInDisallowedMountForm())
+        RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);
 }
 
