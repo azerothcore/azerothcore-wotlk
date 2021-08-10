@@ -2958,8 +2958,9 @@ public:
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
-            int32 damage = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), 60);
-            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, nullptr, aurEff);
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            int32 damage = CalculatePct(int32(damageInfo ? damageInfo->GetDamage() : 0), 60);
+            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, damageInfo ? damageInfo->GetAttacker() : nullptr, true, nullptr, aurEff);
         }
 
         void Register() override
