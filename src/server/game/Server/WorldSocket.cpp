@@ -575,7 +575,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     _authed = true;
 
-    sScriptMgr->OnLastIpUpdate(id, address);
+    sScriptMgr->OnLastIpUpdate(account.Id, address);
 
     _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
         account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime);
