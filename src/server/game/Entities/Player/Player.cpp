@@ -2928,10 +2928,7 @@ void Player::_addTalentAurasAndSpells(uint32 spellId)
             CastSpell(this, spellId, true);
             if (!HasAura(spellId))
             {
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
-                {
-                    Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, this, this);
-                }
+                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, this, this);
             }
         }
     }
