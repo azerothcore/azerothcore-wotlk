@@ -141,7 +141,8 @@ public:
 
             uint32 triggered_spell_id = 70809;
             SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(triggered_spell_id);
-            int32 amount = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            int32 amount = CalculatePct(damageInfo ? damageInfo->GetDamage() : 0, aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
             eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_HEAL, amount, EFFECT_0);
         }
 
@@ -1107,13 +1108,17 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            return damageInfo && damageInfo->GetSpellInfo();
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 mana = eventInfo.GetDamageInfo()->GetSpellInfo()->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask());
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+                return;
+            int32 mana = damageInfo->GetSpellInfo()->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask());
             int32 damage = CalculatePct(mana, 35);
 
             GetTarget()->CastCustomSpell(SPELL_SHAMAN_ITEM_MANA_SURGE, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true, nullptr, aurEff);
