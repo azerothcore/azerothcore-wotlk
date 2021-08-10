@@ -403,7 +403,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
             if (!spellInfo)
                 return false;
 
@@ -762,7 +766,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
             if (!spellInfo)
                 return false;
 
@@ -916,7 +924,15 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return !eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->IsTargetingArea();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
+            if (!spellInfo)
+                return false;
+
+            return !spellInfo->IsTargetingArea();
         }
 
         void Register() override
@@ -1683,7 +1699,8 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo || !damageInfo->GetSpellInfo())
                 return false;
 
             // find Mage Armor
@@ -2134,7 +2151,8 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo || !damageInfo->GetSpellInfo())
                 return false;
 
             if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
