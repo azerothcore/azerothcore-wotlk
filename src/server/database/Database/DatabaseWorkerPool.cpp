@@ -27,9 +27,17 @@
 #include <sstream>
 #endif
 
+#if !defined(WITH_MARIADB)
+
 #define MIN_MYSQL_SERVER_VERSION 50700u
 #define MIN_MYSQL_CLIENT_VERSION 50700u
 
+#else
+
+#define MIN_MYSQL_SERVER_VERSION 100603u
+#define MIN_MYSQL_CLIENT_VERSION 30203u
+
+#endif
 class PingOperation : public SQLOperation
 {
     //! Operation for idle delaythreads
@@ -47,8 +55,11 @@ DatabaseWorkerPool<T>::DatabaseWorkerPool()
 {
     WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
     WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.7.\nSearch the wiki for ACE00043 in Common Errors (https://www.azerothcore.org/wiki/common-errors).");
+#if !defined(WITH_MARIADB)
     WPFatal(mysql_get_client_version() == MYSQL_VERSION_ID, "Used MySQL library version (%s id %lu) does not match the version id used to compile AzerothCore (id %u).\nSearch the wiki for ACE00046 in Common Errors (https://www.azerothcore.org/wiki/common-errors).",
         mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
+#else
+#endif
 }
 
 template <class T>

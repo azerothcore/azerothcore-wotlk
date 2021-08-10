@@ -164,4 +164,10 @@ if (USE_CPP_20)
   message(" *** Please note that this is an experimental feature!")
 endif()
 
+if (MARIADB_10_6)
+message("")
+message(" *** Enabled Build with mariadb 10.6")
+add_definitions(-DWITH_MARIADB)
+endif()
+
 message("")
