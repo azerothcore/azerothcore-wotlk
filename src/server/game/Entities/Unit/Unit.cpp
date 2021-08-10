@@ -9057,25 +9057,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             break;
     }
 
-    // Sword Specialization
-    if (auraSpellInfo->SpellFamilyName == SPELLFAMILY_GENERIC)
-    {
-        if (auraSpellInfo->SpellIconID == 1462 && procSpell)
-        {
-            if (Player* plr = ToPlayer())
-            {
-                if (!victim || plr->HasSpellCooldown(16459))
-                    return false;
-
-                plr->AddSpellCooldown(16459, 0, cooldown);
-
-                if (plr->IsWithinMeleeRange(victim))
-                    plr->AttackerStateUpdate(victim);
-                return true;
-            }
-        }
-    }
-    else if (auraSpellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
+    if (auraSpellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
     {
         // Xinef: keep this order, Aura 70656 has SpellIconID 85!
         // Item - Death Knight T10 Melee 4P Bonus
