@@ -142,7 +142,7 @@ public:
             uint32 triggered_spell_id = 70809;
             SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(triggered_spell_id);
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-            int32 amount = CalculatePct(damageInfo ? damageInfo->GetDamage() : 0, aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
+            int32 amount = CalculatePct(damageInfo ? damageInfo->GetDamage() : 1, aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
             eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_HEAL, amount, EFFECT_0);
         }
 
