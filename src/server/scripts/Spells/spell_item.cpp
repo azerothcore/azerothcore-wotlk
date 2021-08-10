@@ -2367,7 +2367,7 @@ public:
         {
             PreventDefaultAction();
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-            int32 bp = CalculatePct(int32(damageInfo ? damageInfo->GetDamage() : 0), aurEff->GetAmount());
+            int32 bp = CalculatePct(int32(damageInfo ? damageInfo->GetDamage() : 1), aurEff->GetAmount());
             GetTarget()->CastCustomSpell(SPELL_ITEM_NECROTIC_TOUCH_PROC, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
