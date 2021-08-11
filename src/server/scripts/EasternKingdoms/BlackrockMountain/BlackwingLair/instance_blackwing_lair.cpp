@@ -143,8 +143,8 @@ public:
                 case DATA_FIREMAW:
                 case DATA_EBONROC:
                 case DATA_FLAMEGOR:
-                    if (GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
-                        return false;
+                    //if (GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
+                    //   return false;
                     break;
                 case DATA_CHROMAGGUS:
                     if (GetBossState(DATA_FIREMAW) != DONE
