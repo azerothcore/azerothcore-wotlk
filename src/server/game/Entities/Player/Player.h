@@ -1955,8 +1955,8 @@ public:
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
-    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType);
-    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence);
+    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* item = nullptr);
+    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item = nullptr);
 
     void SetSkill(uint16 id, uint16 step, uint16 currVal, uint16 maxVal);
     [[nodiscard]] uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus + temp bonus

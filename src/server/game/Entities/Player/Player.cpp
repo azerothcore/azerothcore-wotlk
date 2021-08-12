@@ -1435,10 +1435,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
         // Check enter rights before map getting to avoid creating instance copy for player
         // this check not dependent from map instance copy and same for all instance copies of selected map
-        if (!(options & TELE_TO_GM_MODE) && !sMapMgr->CanPlayerEnter(mapid, this, false))
+        if (!(options & TELE_TO_GM_MODE) && sMapMgr->PlayerCannotEnter(mapid, this, false))
             return false;
 
-        // if CanPlayerEnter -> CanEnter: checked above
+        // if PlayerCannotEnter -> CanEnter: checked above
         {
             //lets reset near teleport flag if it wasn't reset during chained teleports
             SetSemaphoreTeleportNear(0);
@@ -1459,8 +1459,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             SetSelection(ObjectGuid::Empty);
 
             CombatStop();
-
-            ResetContestedPvP();
 
             // remove arena spell coldowns/buffs now to also remove pet's cooldowns before it's temporarily unsummoned
             if (mEntry->IsBattleArena() && (HasPendingSpectatorForBG(0) || !HasPendingSpectatorForBG(GetBattlegroundId())))

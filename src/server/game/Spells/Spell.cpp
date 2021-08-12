@@ -659,6 +659,8 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
 
     // xinef:
     _spellTargetsSelected = false;
+
+    m_weaponItem = nullptr;
 }
 
 Spell::~Spell()
@@ -2538,7 +2540,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell, m_triggeredByAuraEffectIndex);
+            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell, m_triggeredByAuraEffectIndex, this);
     }
     // Do damage and triggers
     else if (m_damage > 0)
@@ -2612,7 +2614,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
         {
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell, m_triggeredByAuraEffectIndex);
+            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell, m_triggeredByAuraEffectIndex, this);
             if (caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
                     m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
                 caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim, procEx);
@@ -2629,7 +2631,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
         {
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell, m_triggeredByAuraEffectIndex);
+            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell, m_triggeredByAuraEffectIndex, this);
             // Xinef: eg. rogue poisons can proc off cheap shot, etc. so this block should be here also
             // Xinef: ofc count only spells that HIT the target, little hack used to fool the system
             if ((procEx & PROC_EX_NORMAL_HIT || procEx & PROC_EX_CRITICAL_HIT) && caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
@@ -6118,6 +6120,14 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                     break;
                 }
+            case SPELL_AURA_HOVER:
+                {
+                    if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_MOUNT) != 0 && m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsMounted())
+                    {
+                        return SPELL_FAILED_NOT_ON_MOUNTED;
+                    }
+                    break;
+                }
             default:
                 break;
         }
@@ -7078,6 +7088,8 @@ SpellCastResult Spell::CheckItems()
             if (!item->IsFitToSpellRequirements(m_spellInfo))
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
         }
+
+        m_weaponItem = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true);
     }
 
     return SPELL_CAST_OK;
