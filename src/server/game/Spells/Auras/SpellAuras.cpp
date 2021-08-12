@@ -850,7 +850,7 @@ void Aura::RefreshDuration(bool withMods)
 {
     Unit* caster = GetCaster();
 
-    if(!caster)
+    if (!caster)
         return;
 
     if (withMods && caster)
@@ -878,7 +878,7 @@ void Aura::RefreshTimers(bool periodicReset /*= false*/)
     RefreshDuration();
     Unit* caster = GetCaster();
 
-    if(!caster)
+    if (!caster)
         return;
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -934,7 +934,7 @@ void Aura::SetStackAmount(uint8 stackAmount)
     m_stackAmount = stackAmount;
     Unit* caster = GetCaster();
 
-    if(!caster)
+    if (!caster)
         return;
 
     std::list<AuraApplication*> applications;
