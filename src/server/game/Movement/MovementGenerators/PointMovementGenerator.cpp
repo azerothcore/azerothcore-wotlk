@@ -139,6 +139,9 @@ void PointMovementGenerator<T>::DoFinalize(T* unit)
     if (id == EVENT_CHARGE)
     {
         unit->ClearUnitState(UNIT_STATE_CHARGING);
+
+        if (Unit* target = ObjectAccessor::GetUnit(*unit, _chargeTargetGUID))
+            unit->Attack(target, true);
     }
 
     if (unit->movespline->Finalized())
