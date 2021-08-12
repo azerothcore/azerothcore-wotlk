@@ -6993,12 +6993,12 @@ bool Player::CheckInstanceLoginValid()
             return false;
     }
 
-    // pussywizard: check CanEnter for GetMap(), because in CanPlayerEnter it is called for a map decided before loading screen (can change)
-    if (!GetMap()->CanEnter(this, true))
+    // pussywizard: check CanEnter for GetMap(), because in PlayerCannotEnter it is called for a map decided before loading screen (can change)
+    if (GetMap()->CannotEnter(this, true))
         return false;
 
     // do checks for satisfy accessreqs, instance full, encounter in progress (raid), perm bind group != perm bind player
-    return sMapMgr->CanPlayerEnter(GetMap()->GetId(), this, true);
+    return sMapMgr->PlayerCannotEnter(GetMap()->GetId(), this, true) == Map::CAN_ENTER;
 }
 
 bool Player::CheckInstanceCount(uint32 instanceId) const

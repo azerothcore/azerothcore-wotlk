@@ -1435,10 +1435,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
         // Check enter rights before map getting to avoid creating instance copy for player
         // this check not dependent from map instance copy and same for all instance copies of selected map
-        if (!(options & TELE_TO_GM_MODE) && !sMapMgr->CanPlayerEnter(mapid, this, false))
+        if (!(options & TELE_TO_GM_MODE) && sMapMgr->PlayerCannotEnter(mapid, this, false))
             return false;
 
-        // if CanPlayerEnter -> CanEnter: checked above
+        // if PlayerCannotEnter -> CanEnter: checked above
         {
             //lets reset near teleport flag if it wasn't reset during chained teleports
             SetSemaphoreTeleportNear(0);
@@ -1459,8 +1459,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             SetSelection(ObjectGuid::Empty);
 
             CombatStop();
-
-            ResetContestedPvP();
 
             // remove arena spell coldowns/buffs now to also remove pet's cooldowns before it's temporarily unsummoned
             if (mEntry->IsBattleArena() && (HasPendingSpectatorForBG(0) || !HasPendingSpectatorForBG(GetBattlegroundId())))
@@ -2668,6 +2666,21 @@ void Player::SendInitialSpells()
         data << uint16(0);                                  // it's not slot id
 
         ++spellCount;
+    }
+
+    // Added spells from glyphs too (needed by spell tooltips)
+    for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
+    {
+        if (uint32 glyph = GetGlyph(i))
+        {
+            if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph))
+            {
+                data << uint32(glyphEntry->SpellId);
+                data << uint16(0); // it's not slot id
+
+                ++spellCount;
+            }
+        }
     }
 
     // xinef: we have to send talents, but not those on m_spells list
@@ -10955,7 +10968,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
 
         // Don't replace longer cooldowns by equip cooldown if we have any.
         SpellCooldowns::iterator itr = m_spellCooldowns.find(spellData.SpellId);
-        if (itr != m_spellCooldowns.end() && itr->second.itemid == pItem->GetEntry() && itr->second.end > time(nullptr) + 30)
+        if (itr != m_spellCooldowns.end() && itr->second.itemid == pItem->GetEntry() && itr->second.end > World::GetGameTimeMS() + 30 * IN_MILLISECONDS)
             continue;
 
         // xinef: dont apply eqiup cooldown for spells with this attribute
@@ -14122,11 +14135,22 @@ void Player::ActivateSpec(uint8 spec)
     }
 
     // xinef: apply glyphs from second spec
-    if(GetActiveSpec() != oldSpec)
+    if (GetActiveSpec() != oldSpec)
+    {
         for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
-            if (uint32 glyphId = m_Glyphs[GetActiveSpec()][slot])
+        {
+            uint32 glyphId = m_Glyphs[GetActiveSpec()][slot];
+            if (glyphId)
+            {
                 if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
+                {
                     CastSpell(this, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
+                }
+            }
+
+            SetGlyph(slot, glyphId, true);
+        }
+    }
 
     m_usedTalentCount = spentTalents;
     InitTalentForLevel();

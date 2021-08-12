@@ -271,7 +271,6 @@ enum TwiggyFlathead
     NPC_BIG_WILL                = 6238,
     NPC_AFFRAY_CHALLENGER       = 6240,
 
-    SAY_BIG_WILL_READY          = 0,
     SAY_TWIGGY_FLATHEAD_BEGIN   = 0,
     SAY_TWIGGY_FLATHEAD_FRAY    = 1,
     SAY_TWIGGY_FLATHEAD_DOWN    = 2,
@@ -466,7 +465,7 @@ public:
                                 EnterEvadeMode();
                                 return;
                             }
-                            else if (creature) // Makes BIG WILL attackable.
+                            else // Makes BIG WILL attackable.
                             {
                                 creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
