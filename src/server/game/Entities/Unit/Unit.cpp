@@ -1661,12 +1661,10 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
                 damage = this->SpellDamageBonusTaken(caster, i_spellProto, damage, SPELL_DIRECT_DAMAGE);
 
             uint32 absorb = 0;
-            uint32 resist = 0;
 
             DamageInfo dmgInfo(victim, this, damage, i_spellProto, i_spellProto->GetSchoolMask(), SPELL_DIRECT_DAMAGE);
             Unit::CalcAbsorbResist(dmgInfo);
             absorb = dmgInfo.GetAbsorb();
-            resist = dmgInfo.GetResist();
             damage = dmgInfo.GetDamage();
 
             Unit::DealDamageMods(this, damage, &absorb);
