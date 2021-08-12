@@ -8,58 +8,77 @@
 #define __EVENTPROCESSOR_H
 
 #include "Define.h"
+#include "Duration.h"
 
 #include <map>
 
+class EventProcessor;
 // Note. All times are in milliseconds here.
 
 class BasicEvent
 {
-public:
-    BasicEvent()
+
+    friend class EventProcessor;
+
+    enum class AbortState : uint8
     {
-        to_Abort = false;
-        m_addTime = 0;
-        m_execTime = 0;
-    }
-    virtual ~BasicEvent() = default;                           // override destructor to perform some actions on event removal
+        STATE_RUNNING,
+        STATE_ABORT_SCHEDULED,
+        STATE_ABORTED
+        };
 
-    // this method executes when the event is triggered
-    // return false if event does not want to be deleted
-    // e_time is execution time, p_time is update interval
-    virtual bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) { return true; }
+    public:
+        BasicEvent()
+            : m_abortState(AbortState::STATE_RUNNING), m_addTime(0), m_execTime(0) { }
 
-    [[nodiscard]] virtual bool IsDeletable() const { return true; }   // this event can be safely deleted
+        virtual ~BasicEvent() { }                           // override destructor to perform some actions on event removal
 
-    virtual void Abort(uint64 /*e_time*/) { }           // this method executes when the event is aborted
+        // this method executes when the event is triggered
+        // return false if event does not want to be deleted
+        // e_time is execution time, p_time is update interval
+        virtual bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) { return true; }
 
-    bool to_Abort;                                      // set by externals when the event is aborted, aborted events don't execute
-    // and get Abort call when deleted
+        [[nodiscard]] virtual bool IsDeletable() const { return true; }   // this event can be safely deleted
 
-    // these can be used for time offset control
-    uint64 m_addTime;                                   // time when the event was added to queue, filled by event handler
-    uint64 m_execTime;                                  // planned time of next execution, filled by event handler
+        virtual void Abort(uint64 /*e_time*/) { }           // this method executes when the event is aborted
+
+        // Aborts the event at the next update tick
+        void ScheduleAbort();
+
+    private:
+        void SetAborted();
+        bool IsRunning() const { return (m_abortState == AbortState::STATE_RUNNING); }
+        bool IsAbortScheduled() const { return (m_abortState == AbortState::STATE_ABORT_SCHEDULED); }
+        bool IsAborted() const { return (m_abortState == AbortState::STATE_ABORTED); }
+
+        AbortState m_abortState;                            // set by externals when the event is aborted, aborted events don't execute
+
+        // these can be used for time offset control
+        uint64 m_addTime;                                   // time when the event was added to queue, filled by event handler
+        uint64 m_execTime;                                  // planned time of next execution, filled by event handler
 };
 
 typedef std::multimap<uint64, BasicEvent*> EventList;
 
 class EventProcessor
 {
-public:
-    EventProcessor();
-    ~EventProcessor();
+    public:
+        EventProcessor() : m_time(0) { }
+        ~EventProcessor();
 
-    void Update(uint32 p_time);
-    void KillAllEvents(bool force);
-    void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
-    [[nodiscard]] uint64 CalculateTime(uint64 t_offset) const;
+        void Update(uint32 p_time);
+        void KillAllEvents(bool force);
+        void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
+        void ModifyEventTime(BasicEvent* event, Milliseconds newTime);
+        [[nodiscard]] uint64 CalculateTime(uint64 t_offset) const;
 
-    // Xinef: calculates next queue tick time
-    [[nodiscard]] uint64 CalculateQueueTime(uint64 delay) const;
+        //calculates next queue tick time
+        [[nodiscard]] uint64 CalculateQueueTime(uint64 delay) const;
 
-protected:
-    uint64 m_time;
-    EventList m_events;
-    bool m_aborting;
+    protected:
+        uint64 m_time;
+        EventList m_events;
+        bool m_aborting;
 };
+
 #endif

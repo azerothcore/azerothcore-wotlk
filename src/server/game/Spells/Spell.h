@@ -20,7 +20,9 @@ class DynamicObject;
 class WorldObject;
 class Aura;
 class SpellScript;
+class SpellEvent;
 class ByteBuffer;
+class BasicEvent;
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 
@@ -521,6 +523,8 @@ public:
     uint64 GetDelayMoment() const { return m_delayMoment; }
     uint64 GetDelayTrajectory() const { return m_delayTrajectory; }
 
+    uint64 CalculateDelayMomentForDst() const;
+    void RecalculateDelayMomentForDst();
     bool IsNeedSendToClient(bool go) const;
 
     CurrentSpellTypes GetCurrentContainer() const;
@@ -710,6 +714,7 @@ protected:
     uint32 m_spellState;
     int32 m_timer;
 
+    SpellEvent* _spellEvent;
     TriggerCastFlags _triggeredCastFlags;
 
     // if need this can be replaced by Aura copy
@@ -788,29 +793,16 @@ namespace Acore
 
 typedef void(Spell::*pEffect)(SpellEffIndex effIndex);
 
-class SpellEvent : public BasicEvent
-{
-public:
-    SpellEvent(Spell* spell);
-    ~SpellEvent() override;
-
-    bool Execute(uint64 e_time, uint32 p_time) override;
-    void Abort(uint64 e_time) override;
-    bool IsDeletable() const override;
-protected:
-    Spell* m_Spell;
-};
-
 class ReflectEvent : public BasicEvent
 {
-public:
-    ReflectEvent(Unit* caster, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
-    bool Execute(uint64 e_time, uint32 p_time) override;
-
-protected:
-    Unit* _caster;
-    ObjectGuid _targetGUID;
-    const SpellInfo* _spellInfo;
+    public:
+        ReflectEvent(Unit* caster, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
+        bool Execute(uint64 e_time, uint32 p_time) override;
+    
+    protected:
+        Unit* _caster;
+        ObjectGuid _targetGUID;
+        const SpellInfo* _spellInfo;
 };
 
 #endif

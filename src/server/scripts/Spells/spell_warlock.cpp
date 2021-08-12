@@ -759,7 +759,7 @@ public:
                 // Refresh corruption on target
                 if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x2, 0, 0, GetCaster()->GetGUID()))
                 {
-                    aur->GetBase()->RefreshTimersWithMods();
+                    aur->GetBase()->RefreshTimers();
                     aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
                 }
         }

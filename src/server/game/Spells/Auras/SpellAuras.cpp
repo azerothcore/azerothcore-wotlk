@@ -846,12 +846,30 @@ void Aura::SetDuration(int32 duration, bool withMods)
     SetNeedClientUpdateForTargets();
 }
 
-void Aura::RefreshDuration()
+void Aura::RefreshDuration(bool withMods)
 {
-    SetDuration(GetMaxDuration());
+    Unit* caster = GetCaster();
 
+    if(!caster)
+        return;
+
+    if (withMods && caster)
+    {
+        int32 duration = m_spellInfo->GetMaxDuration();
+        // Calculate duration of periodics affected by haste.
+        if (caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
+            duration = int32(duration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+        SetMaxDuration(duration);
+        SetDuration(duration);
+    }
+    else
+        SetDuration(GetMaxDuration());
     if ((m_spellInfo->ManaPerSecond || m_spellInfo->ManaPerSecondPerLevel) && !m_spellInfo->HasAttribute(SPELL_ATTR2_NO_TARGET_PER_SECOND_COST))
         m_timeCla = 1 * IN_MILLISECONDS;
+    // also reset periodic counters
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        if (AuraEffect* aurEff = m_effects[i])
+            aurEff->ResetTicks();
 }
 
 void Aura::RefreshTimers(bool periodicReset /*= false*/)
@@ -859,27 +877,13 @@ void Aura::RefreshTimers(bool periodicReset /*= false*/)
     m_maxDuration = CalcMaxDuration();
     RefreshDuration();
     Unit* caster = GetCaster();
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        if (HasEffect(i))
-        {
-            GetEffect(i)->CalculatePeriodic(caster, periodicReset, false);
-            GetEffect(i)->CalculatePeriodicData();
-        }
-}
 
-// xinef: dot's rolling function
-void Aura::RefreshTimersWithMods()
-{
-    Unit* caster = GetCaster();
-    m_maxDuration = CalcMaxDuration();
-    if ((caster && caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo)) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
-        m_maxDuration = int32(m_maxDuration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+    if(!caster)
+        return;
 
-    // xinef: we should take ModSpellDuration into account, but none of the spells using this function is affected by contents of ModSpellDuration
-    RefreshDuration();
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        if (HasEffect(i))
-            GetEffect(i)->CalculatePeriodic(caster, false, false);
+        if (AuraEffect* aurEff = m_effects[i])
+            aurEff->CalculatePeriodic(caster, periodicReset, false);
 }
 
 void Aura::SetCharges(uint8 charges)
@@ -929,6 +933,9 @@ void Aura::SetStackAmount(uint8 stackAmount)
 {
     m_stackAmount = stackAmount;
     Unit* caster = GetCaster();
+
+    if(!caster)
+        return;
 
     std::list<AuraApplication*> applications;
     GetApplicationList(applications);

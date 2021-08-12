@@ -851,7 +851,7 @@ public:
         void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             PreventDefaultAction();
-            if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummoner())
+            if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
             {
                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_16_ENTRYID));
                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_17_ENTRYID));
@@ -1189,9 +1189,8 @@ public:
         {
             SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
             amount = talentSpell->Effects[EFFECT_0].CalcValue(GetCaster());
-            if (Unit* totem = GetCaster())
-                if (Unit* owner = totem->ToTotem()->GetSummoner())
-                    amount += int32(2 * owner->GetTotalAttackPowerValue(BASE_ATTACK));
+            if (Player* player = GetCaster()->ToPlayer())
+                amount += int32(2 * player->GetTotalAttackPowerValue(BASE_ATTACK));
             canBeRecalculated = false;
         }
 
