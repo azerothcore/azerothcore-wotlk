@@ -537,7 +537,7 @@ void WorldSession::SendStablePetCallback(ObjectGuid guid, PreparedQueryResult re
     }
     else if (_player->IsPetDismissed() || _player->GetTemporaryUnsummonedPetNumber())
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT_SYNS);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_SLOT);
         stmt->setUInt32(0, _player->GetGUID().GetCounter());
         stmt->setUInt8(1, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
 

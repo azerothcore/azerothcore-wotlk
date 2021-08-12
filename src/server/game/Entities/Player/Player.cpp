@@ -14929,7 +14929,7 @@ bool Player::IsPetDismissed()
      * Check PET_SAVE_NOT_IN_SLOT means the pet is dismissed. If someone ever
      * Changes the slot flag, they will break this validation.
      */
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT_SYNS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_SLOT);
     stmt->setUInt32(0, GetGUID().GetCounter());
     stmt->setUInt8(1, uint8(PET_SAVE_NOT_IN_SLOT));
 
