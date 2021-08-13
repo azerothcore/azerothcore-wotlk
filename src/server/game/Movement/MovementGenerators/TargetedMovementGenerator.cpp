@@ -232,12 +232,20 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 //-----------------------------------------------//
 
 template<class T>
-bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, float range, std::optional<ChaseAngle> angle)
+bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target)
 {
-    if (owner->GetExactDistSq(target) > G3D::square(owner->GetCombatReach() + target->GetCombatReach() + range))
+    if (!_lastTargetPosition)
         return false;
 
-    return !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner));
+    float exactDistSq = target->GetExactDistSq(_lastTargetPosition->GetPositionX(), _lastTargetPosition->GetPositionY(), _lastTargetPosition->GetPositionZ());
+    float distanceTolerance = PET_FOLLOW_DIST;
+    // For creatures, increase tolerance
+    if (target->GetTypeId() == TYPEID_UNIT)
+    {
+        distanceTolerance *= PET_FOLLOW_DIST;
+    }
+
+    return exactDistSq <= distanceTolerance;
 }
 
 template<class T>
@@ -274,86 +282,50 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
-    i_recheckDistance.Update(time_diff);
-    if (i_recheckDistance.Passed())
+    if (PositionOkay(owner, target))
     {
-        i_recheckDistance.Reset(100);
-
-        if (i_recalculateTravel && PositionOkay(owner, target, _range, _angle))
+        if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
-            i_recalculateTravel = false;
+            owner->ClearUnitState(UNIT_STATE_FOLLOW_MOVE);
             i_path = nullptr;
-            owner->StopMoving();
-            _lastTargetPosition.reset();
             MovementInform(owner);
-            return true;
         }
-    }
-
-    if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
-    {
-        i_recalculateTravel = false;
-        i_path = nullptr;
-        owner->ClearUnitState(UNIT_STATE_FOLLOW_MOVE);
-        MovementInform(owner);
-    }
-
-    Position targetPosition = i_target->GetPosition();
-
-    if (_lastTargetPosition && _lastTargetPosition->GetExactDistSq(&targetPosition) == 0.0f)
-        return true;
-
-    _lastTargetPosition = targetPosition;
-
-    if (PositionOkay(owner, target, _range + PET_FOLLOW_DIST) && !owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE))
-        return true;
-
-    if (!i_path)
-        i_path = std::make_unique<PathGenerator>(owner);
-
-    float x, y, z;
-    // select angle
-    float tAngle;
-    float const curAngle = target->GetRelativeAngle(owner);
-    if (!oPet)
-    {
-        // for non pets, keep the relative angle
-        // decided during the summon
-        tAngle = _angle.RelativeAngle;
-    }
-    else if (_angle.IsAngleOkay(curAngle))
-    {
-        tAngle = curAngle;
     }
     else
     {
-        float const diffUpper = Position::NormalizeOrientation(curAngle - _angle.UpperBound());
-        float const diffLower = Position::NormalizeOrientation(_angle.LowerBound() - curAngle);
-        if (diffUpper < diffLower)
-            tAngle = _angle.UpperBound();
+        _lastTargetPosition = target->GetPosition();
+
+        if (!i_path)
+            i_path = std::make_unique<PathGenerator>(owner);
         else
-            tAngle = _angle.LowerBound();
+            i_path->Clear();
+
+        float distance = _range - target->GetCombatReach();
+
+        float relAngle = _angle.RelativeAngle;
+        float x, y, z;
+        target->GetNearPoint(owner, x, y, z, owner->GetCombatReach(), distance, target->ToAbsoluteAngle(relAngle));
+
+        if (owner->IsHovering())
+            owner->UpdateAllowedPositionZ(x, y, z);
+
+        bool success = i_path->CalculatePath(x, y, z, forceDest);
+        if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
+        {
+            if (!owner->IsStopped())
+                owner->StopMoving();
+
+            return true;
+        }
+
+        owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
+
+        Movement::MoveSplineInit init(owner);
+        init.MovebyPath(i_path->GetPath());
+        init.SetFacing(target->GetOrientation());
+        init.SetWalk(target->IsWalking());
+        init.Launch();
     }
-
-    target->GetNearPoint(owner, x, y, z, _range, 0.f, target->ToAbsoluteAngle(tAngle));
-
-    i_recalculateTravel = true;
-
-    bool success = i_path->CalculatePath(x, y, z, forceDest);
-    if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
-    {
-        if (cOwner)
-            cOwner->SetCannotReachTarget(true);
-        return true;
-    }
-
-    owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
-
-    Movement::MoveSplineInit init(owner);
-    init.MovebyPath(i_path->GetPath());
-    init.SetFacing(target->GetOrientation());
-    init.SetWalk(target->IsWalking());
-    init.Launch();
 
     return true;
 }

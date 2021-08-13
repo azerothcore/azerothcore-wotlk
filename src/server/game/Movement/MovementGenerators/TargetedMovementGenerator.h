@@ -64,7 +64,7 @@ class FollowMovementGenerator : public MovementGeneratorMedium<T, FollowMovement
 {
 public:
     FollowMovementGenerator(Unit* target, float range, ChaseAngle angle)
-        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
+        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckDistance(0), _range(range), _angle(angle) {}
     ~FollowMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
@@ -79,7 +79,7 @@ public:
 
     void unitSpeedChanged() { _lastTargetPosition.reset(); }
 
-    bool PositionOkay(T* owner, Unit* target, float range, std::optional<ChaseAngle> angle = {});
+    bool PositionOkay(T* owner, Unit* target);
 
     static void _clearUnitStateMove(T* u) { u->ClearUnitState(UNIT_STATE_FOLLOW_MOVE); }
     static void _addUnitStateMove(T* u) { u->AddUnitState(UNIT_STATE_FOLLOW_MOVE); }
@@ -89,7 +89,6 @@ public:
 private:
     std::unique_ptr<PathGenerator> i_path;
     TimeTrackerSmall i_recheckDistance;
-    bool i_recalculateTravel;
 
     std::optional<Position> _lastTargetPosition;
     float _range;
