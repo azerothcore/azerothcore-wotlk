@@ -588,7 +588,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 continue;
         }
 
-        if (quality != 0xffffffff && proto->Quality != quality)
+        if (quality != 0xffffffff && proto->Quality < quality)
             continue;
 
         if (levelmin != 0x00 && (proto->RequiredLevel < levelmin || (levelmax != 0x00 && proto->RequiredLevel > levelmax)))

@@ -4,6 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+/// \addtogroup Acored
+/// @{
+/// \file
 #include "Common.h"
 #include "Errors.h"
 #include "ObjectMgr.h"
