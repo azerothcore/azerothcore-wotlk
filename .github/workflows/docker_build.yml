@@ -101,6 +101,6 @@ jobs:
       - name: Deploy Production images
         #env:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && steps.extract_branch.outputs.branch == 'master'
         run: |
           docker-compose --profile prod push

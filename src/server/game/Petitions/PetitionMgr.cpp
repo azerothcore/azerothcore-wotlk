@@ -5,6 +5,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "PetitionMgr.h"
+#include "Player.h"
 #include "QueryResult.h"
 #include "Timer.h"
 
@@ -99,6 +100,18 @@ void PetitionMgr::RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type)
     {
         if (itr->second.ownerGuid == ownerGuid && (!type || type == itr->second.petitionType))
         {
+            // Remove invalid charter item
+            if (type == itr->second.petitionType)
+            {
+                if (Player* owner = ObjectAccessor::FindConnectedPlayer(ownerGuid))
+                {
+                    if (Item* item = owner->GetItemByGuid(itr->first))
+                    {
+                        owner->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+                    }
+                }
+            }
+
             // remove signatures
             SignatureStore.erase(itr->first);
             PetitionStore.erase(itr++);
