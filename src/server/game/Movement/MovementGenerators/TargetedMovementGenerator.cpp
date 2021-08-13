@@ -242,7 +242,7 @@ bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target)
     // For creatures, increase tolerance
     if (target->GetTypeId() == TYPEID_UNIT)
     {
-        distanceTolerance *= PET_FOLLOW_DIST;
+        distanceTolerance += PET_FOLLOW_DIST;
     }
 
     return exactDistSq <= distanceTolerance;
