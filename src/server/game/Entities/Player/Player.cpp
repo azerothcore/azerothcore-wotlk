@@ -1460,8 +1460,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             CombatStop();
 
-            ResetContestedPvP();
-
             // remove arena spell coldowns/buffs now to also remove pet's cooldowns before it's temporarily unsummoned
             if (mEntry->IsBattleArena() && (HasPendingSpectatorForBG(0) || !HasPendingSpectatorForBG(GetBattlegroundId())))
             {
@@ -3180,7 +3178,7 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const
             (!form && spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_WHILE_NOT_SHAPESHIFTED)));
 }
 
-void Player::learnSpell(uint32 spellId)
+void Player::learnSpell(uint32 spellId, bool temporary)
 {
     // Xinef: don't allow to learn active spell once more
     if (HasActiveSpell(spellId))
@@ -3191,7 +3189,7 @@ void Player::learnSpell(uint32 spellId)
 
     uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
     bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
-    bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true);
+    bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true, temporary);
     if (added)
     {
         sScriptMgr->OnPlayerLearnSpell(this, spellId);
@@ -3208,7 +3206,7 @@ void Player::learnSpell(uint32 spellId)
         // pussywizard: next ranks must not be in current spec (otherwise no need to learn already learnt)
         PlayerSpellMap::iterator itr = m_spells.find(nextSpell);
         if (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && !itr->second->IsInSpec(m_activeSpec))
-            learnSpell(nextSpell);
+            learnSpell(nextSpell, temporary);
     }
 
     // xinef: if we learn new spell, check all spells requiring this spell, if we have such a spell, and it is not in current spec - learn it
@@ -3217,7 +3215,7 @@ void Player::learnSpell(uint32 spellId)
     {
         PlayerSpellMap::iterator itr2 = m_spells.find(itr->second);
         if (itr2 != m_spells.end() && itr2->second->State != PLAYERSPELL_REMOVED && !itr2->second->IsInSpec(m_activeSpec))
-            learnSpell(itr2->first);
+            learnSpell(itr2->first, temporary);
     }
 }
 
@@ -11026,7 +11024,7 @@ void Player::LearnCustomSpells()
             GetName().c_str(), GetGUID().ToString().c_str(), uint32(getClass()), uint32(getRace()), tspell);
         if (!IsInWorld())                                   // will send in INITIAL_SPELLS in list anyway at map add
         {
-            addSpell(tspell, true, true);
+            addSpell(tspell, SPEC_MASK_ALL, true);
         }
         else                                               // but send in normal spell in game learn case
         {
@@ -11225,13 +11223,14 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
                     continue;
                 }
             }
+
             if (!IsInWorld())
             {
                 addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true, false);
             }
             else
             {
-                learnSpell(pAbility->Spell);
+                learnSpell(pAbility->Spell, true);
             }
         }
     }

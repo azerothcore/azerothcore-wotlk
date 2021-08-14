@@ -2786,10 +2786,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             // xinef: triggered spells should not prolong combat
             if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS) && !m_triggeredByAuraSpell)
             {
-                // xinef: start combat with hostile unit...
-                if (Unit* hostile = unit->getAttackerForHelper())
-                    m_caster->CombatStart(hostile, true);
-                //m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
+                m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
                 unit->getHostileRefManager().threatAssist(m_caster, 0.0f);
             }
         }
@@ -6118,6 +6115,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_targets.GetUnitTarget()->getPowerType() != POWER_MANA)
                         return SPELL_FAILED_BAD_TARGETS;
 
+                    break;
+                }
+            case SPELL_AURA_HOVER:
+                {
+                    if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_MOUNT) != 0 && m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsMounted())
+                    {
+                        return SPELL_FAILED_NOT_ON_MOUNTED;
+                    }
                     break;
                 }
             default:
