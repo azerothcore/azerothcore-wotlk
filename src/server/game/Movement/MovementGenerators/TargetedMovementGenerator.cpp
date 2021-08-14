@@ -231,8 +231,40 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 
 //-----------------------------------------------//
 
+static Position const PredictPosition(Unit* target)
+{
+    Position pos = target->GetPosition();
+
+     // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
+    float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
+    float orientation = target->GetOrientation();
+
+    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD))
+    {
+        pos.m_positionX += cos(orientation) * speed;
+        pos.m_positionY += sin(orientation) * speed;
+    }
+    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_BACKWARD))
+    {
+        pos.m_positionX -= cos(orientation) * speed;
+        pos.m_positionY -= sin(orientation) * speed;
+    }
+    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT))
+    {
+        pos.m_positionX += cos(orientation + M_PI / 2.f) * speed;
+        pos.m_positionY += sin(orientation + M_PI / 2.f) * speed;
+    }
+    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT))
+    {
+        pos.m_positionX += cos(orientation - M_PI / 2.f) * speed;
+        pos.m_positionY += sin(orientation - M_PI / 2.f) * speed;
+    }
+
+    return pos;
+}
+
 template<class T>
-bool FollowMovementGenerator<T>::PositionOkay(Unit* target)
+bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, bool isPlayerPet, bool& targetIsMoving)
 {
     if (!_lastTargetPosition)
         return false;
@@ -242,10 +274,19 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target)
     // For creatures, increase tolerance
     if (target->GetTypeId() == TYPEID_UNIT)
     {
-        distanceTolerance += _range;
+        distanceTolerance += _range + _range;
     }
 
-    return exactDistSq <= distanceTolerance;
+    if (exactDistSq > distanceTolerance)
+        return false;
+
+    if (isPlayerPet && !owner->isMoving())
+    {
+        targetIsMoving = target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
+        return !targetIsMoving;
+    }
+
+    return true;
 }
 
 template<class T>
@@ -282,7 +323,8 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
-    if (PositionOkay(target))
+    bool targetIsMoving = false;
+    if (PositionOkay(owner, target, followingMaster && target->GetTypeId() == TYPEID_PLAYER, targetIsMoving))
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
@@ -293,7 +335,14 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
     else
     {
-        _lastTargetPosition = target->GetPosition();
+        Position targetPosition = target->GetPosition();
+        _lastTargetPosition = targetPosition;
+
+        // If player is moving and their position is not updated, we need to predict position
+        if (targetIsMoving)
+        {
+            targetPosition = PredictPosition(target);
+        }
 
         if (!i_path)
             i_path = std::make_unique<PathGenerator>(owner);
@@ -304,7 +353,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         float relAngle = _angle.RelativeAngle;
         float x, y, z;
-        target->GetNearPoint(owner, x, y, z, owner->GetCombatReach(), distance, target->ToAbsoluteAngle(relAngle));
+        target->GetNearPoint(owner, x, y, z, owner->GetCombatReach(), distance, target->ToAbsoluteAngle(relAngle), 0.f, &targetPosition);
 
         if (owner->IsHovering())
             owner->UpdateAllowedPositionZ(x, y, z);
@@ -319,6 +368,8 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         }
 
         owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
+
+        _updateSpeed(owner);
 
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(i_path->GetPath());

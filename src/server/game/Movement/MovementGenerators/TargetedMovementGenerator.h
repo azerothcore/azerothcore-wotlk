@@ -79,7 +79,7 @@ public:
 
     void unitSpeedChanged() { _lastTargetPosition.reset(); }
 
-    bool PositionOkay(Unit* target);
+    bool PositionOkay(T* owner, Unit* target, bool isPlayerPet, bool& targetIsMoving);
 
     static void _clearUnitStateMove(T* u) { u->ClearUnitState(UNIT_STATE_FOLLOW_MOVE); }
     static void _addUnitStateMove(T* u) { u->AddUnitState(UNIT_STATE_FOLLOW_MOVE); }
