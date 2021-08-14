@@ -232,7 +232,7 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 //-----------------------------------------------//
 
 template<class T>
-bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target)
+bool FollowMovementGenerator<T>::PositionOkay(Unit* target)
 {
     if (!_lastTargetPosition)
         return false;
@@ -282,7 +282,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
-    if (PositionOkay(owner, target))
+    if (PositionOkay(target))
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
