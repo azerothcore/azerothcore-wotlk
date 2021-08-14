@@ -238,7 +238,7 @@ bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target)
         return false;
 
     float exactDistSq = target->GetExactDistSq(_lastTargetPosition->GetPositionX(), _lastTargetPosition->GetPositionY(), _lastTargetPosition->GetPositionZ());
-    float distanceTolerance = _range;
+    float distanceTolerance = 0.25f;
     // For creatures, increase tolerance
     if (target->GetTypeId() == TYPEID_UNIT)
     {
