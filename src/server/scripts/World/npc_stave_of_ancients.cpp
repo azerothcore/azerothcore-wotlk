@@ -150,6 +150,11 @@ public:
             playerGUID.Clear();
             events.Reset();
 
+            if (InNormalForm())
+            {
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+
             if (me->HasAura(ARTORIUS_SPELL_STINGING_TRAUMA))
             {
                 me->RemoveAura(ARTORIUS_SPELL_STINGING_TRAUMA);
@@ -169,6 +174,7 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             RevealForm();
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
             if (!InNormalForm())
             {
