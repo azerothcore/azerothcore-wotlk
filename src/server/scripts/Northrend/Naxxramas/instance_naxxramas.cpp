@@ -646,7 +646,7 @@ public:
             }
 
             // Horseman handling
-            if (bossId == BOSS_HORSEMAN && _horsemanLoadDoneState == false)
+            if (bossId == BOSS_HORSEMAN && !_horsemanLoadDoneState)
             {
                 if (state == DONE)
                 {
