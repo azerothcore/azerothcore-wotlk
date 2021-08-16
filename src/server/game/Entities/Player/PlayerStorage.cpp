@@ -7812,7 +7812,9 @@ void Player::RemoveItemAurasOnUnequip(Item* item)
         _Spell const& spellData = item->GetTemplate()->Spells[i];
 
         if (!spellData.SpellId)
+        {
             continue;
+        }
 
         if (HasAura(spellData.SpellId))
         {
