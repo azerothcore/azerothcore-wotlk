@@ -140,12 +140,6 @@ public:
                     if (GetBossState(DATA_VAELASTRAZ_THE_CORRUPT) != DONE)
                         return false;
                     break;
-                case DATA_FIREMAW:
-                case DATA_EBONROC:
-                case DATA_FLAMEGOR:
-                    if (GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
-                        return false;
-                    break;
                 case DATA_CHROMAGGUS:
                     if (GetBossState(DATA_FIREMAW) != DONE
                         || GetBossState(DATA_EBONROC) != DONE
