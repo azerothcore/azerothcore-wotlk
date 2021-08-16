@@ -2093,9 +2093,9 @@ void ScriptMgr::OnAfterUpdateAttackPowerAndDamage(Player* player, float& level, 
     FOREACH_SCRIPT(PlayerScript)->OnAfterUpdateAttackPowerAndDamage(player, level, base_attPower, attPowerMod, attPowerMultiplier, ranged);
 }
 
-void ScriptMgr::OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel)
+void ScriptMgr::OnBeforeInitTalentForLevel(Player* player, uint32& talentPointsForLevel)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnBeforeInitTalentForLevel(player, level, talentPointsForLevel);
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeInitTalentForLevel(player, talentPointsForLevel);
 }
 
 void ScriptMgr::OnAfterArenaRatingCalculation(Battleground* const bg, int32& winnerMatchmakerChange, int32& loserMatchmakerChange, int32& winnerChange, int32& loserChange)

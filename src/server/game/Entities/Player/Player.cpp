@@ -2469,6 +2469,8 @@ void Player::InitTalentForLevel()
 {
     uint32 talentPointsForLevel = CalculateTalentsPoints();
 
+    sScriptMgr->OnBeforeInitTalentForLevel(this, talentPointsForLevel);
+
     // xinef: more talent points that we have are used, reset
     if (m_usedTalentCount > talentPointsForLevel)
         resetTalents(true);
@@ -12659,7 +12661,6 @@ uint32 Player::CalculateTalentsPoints() const
     {
         talentPointsForLevel = getLevel() < 56 ? 0 : getLevel() - 55;
         talentPointsForLevel += m_questRewardTalentCount;
-
         if (talentPointsForLevel > base_talent)
             talentPointsForLevel = base_talent;
     }
