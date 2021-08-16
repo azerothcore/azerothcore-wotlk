@@ -4,6 +4,7 @@
  */
 
 // This is where scripts' loading functions should be declared:
+void AddSC_account_script();
 void AddSC_areatrigger_scripts();
 void AddSC_emerald_dragons();
 void AddSC_generic_creature();
@@ -24,6 +25,7 @@ void AddSC_player_scripts();
 // void Add${NameOfDirectory}Scripts()
 void AddWorldScripts()
 {
+    AddSC_account_script();
     AddSC_areatrigger_scripts();
     AddSC_emerald_dragons();
     AddSC_generic_creature();

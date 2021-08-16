@@ -1041,6 +1041,13 @@ public:
     // Called when an account logged in successfully
     virtual void OnAccountLogin(uint32 /*accountId*/) { }
 
+    /**
+     * @brief This hook runs after account logout in successfully
+     *
+     * @param accountId account number
+     */
+    virtual void OnAccountLogout(uint32 /*accountId*/) { }
+
     // Called when an ip logged in successfully
     virtual void OnLastIpUpdate(uint32 /*accountId*/, std::string /*ip*/) { }
 
@@ -1725,6 +1732,7 @@ public: /* PlayerScript */
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);
+    void OnAccountLogout(uint32 accountId);
     void OnLastIpUpdate(uint32 accountId, std::string ip);
     void OnFailedAccountLogin(uint32 accountId);
     void OnEmailChange(uint32 accountId);

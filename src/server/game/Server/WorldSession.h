@@ -230,7 +230,7 @@ struct PacketCounter
 class WorldSession
 {
 public:
-    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
     bool PlayerLoading() const { return m_playerLoading; }
@@ -382,8 +382,7 @@ public:
 
     void DoLootRelease(ObjectGuid lguid);
 
-    // Account mute time
-    time_t m_muteTime;
+    bool CanSpeak() const;
 
     // Locales
     LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }

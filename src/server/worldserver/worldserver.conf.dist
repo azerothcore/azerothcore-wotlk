@@ -3223,6 +3223,15 @@ ShowKickInWorld = 0
 ShowMuteInWorld = 0
 
 #
+#     Mute.AddAfterLogin.Enable
+#        Description: Add mute time after login player.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+
+Mute.AddAfterLogin.Enable = 1
+
+#
 #     ShowBanInWorld
 #        Description: Determines whether a message is broadcast to the entire server when a
 #                     player gets banned.
