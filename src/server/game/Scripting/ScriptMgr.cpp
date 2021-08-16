@@ -1395,6 +1395,11 @@ void ScriptMgr::OnPlayerTalentsReset(Player* player, bool noCost)
     FOREACH_SCRIPT(PlayerScript)->OnTalentsReset(player, noCost);
 }
 
+void ScriptMgr::OnAfterTalentsReset(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAfterTalentsReset(player);
+}
+
 void ScriptMgr::OnPlayerMoneyChanged(Player* player, int32& amount)
 {
 #ifdef ELUNA

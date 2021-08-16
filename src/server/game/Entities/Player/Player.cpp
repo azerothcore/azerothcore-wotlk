@@ -3685,6 +3685,8 @@ bool Player::resetTalents(bool noResetCost)
         m_resetTalentsTime = time(nullptr);
     }
 
+    sScriptMgr->OnAfterTalentsReset(this);
+
     return true;
 }
 

@@ -729,6 +729,13 @@ public:
     // Called when a player's talent points are reset (right before the reset is done)
     virtual void OnTalentsReset(Player* /*player*/, bool /*noCost*/) { }
 
+    /**
+     * @brief Fired after resetting a players talents has completed.
+     *
+     * @param player The player whos talents were reset.
+     */
+    virtual void OnAfterTalentsReset(Player* /*player*/) { }
+
     // Called for player::update
     virtual void OnBeforeUpdate(Player* /*player*/, uint32 /*p_time*/) { }
     virtual void OnUpdate(Player* /*player*/, uint32 /*p_time*/) { }
@@ -1596,6 +1603,7 @@ public: /* PlayerScript */
     void OnPlayerLevelChanged(Player* player, uint8 oldLevel);
     void OnPlayerFreeTalentPointsChanged(Player* player, uint32 newPoints);
     void OnPlayerTalentsReset(Player* player, bool noCost);
+    void OnAfterTalentsReset(Player* player);
     void OnPlayerMoneyChanged(Player* player, int32& amount);
     void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
     void OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
