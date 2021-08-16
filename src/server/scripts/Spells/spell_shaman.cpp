@@ -48,7 +48,9 @@ enum ShamanSpells
     SPELL_SHAMAN_TOTEM_EARTHBIND_TOTEM          = 6474,
     SPELL_SHAMAN_TOTEM_EARTHEN_POWER            = 59566,
     SPELL_SHAMAN_TOTEM_HEALING_STREAM_HEAL      = 52042,
-    SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1    = 51554
+    SPELL_SHAMAN_BLESSING_OF_THE_ETERNALS_R1    = 51554,
+    SPELL_SHAMAN_STORMSTRIKE                    = 17364,
+    SPELL_SHAMAN_LAVA_LASH                      = 60103
 };
 
 enum ShamanSpellIcons
@@ -1369,9 +1371,7 @@ public:
             // Should not proc from Windfury Attack, Stormstrike and Lava Lash
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
             {
-                constexpr uint32 STORMSTRIKE = 17364;
-                constexpr uint32 LAVA_LASH   = 60103;
-                constexpr std::array<uint32, 2> spellIcons = {STORMSTRIKE, LAVA_LASH};
+                constexpr std::array<uint32, 2> spellIcons = {SPELL_SHAMAN_STORMSTRIKE, SPELL_SHAMAN_LAVA_LASH};
                 const auto found = std::find(std::begin(spellIcons), std::end(spellIcons), spellInfo->Id);
 
                 if ((spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && (spellInfo->SpellFamilyFlags[0] & 0x00800000) != 0) || found != std::end(spellIcons))
