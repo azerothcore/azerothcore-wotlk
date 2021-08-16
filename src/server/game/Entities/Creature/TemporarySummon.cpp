@@ -32,7 +32,10 @@ WorldObject* TempSummon::GetSummoner() const
 Unit* TempSummon::GetSummonerUnit() const
 {
     if (WorldObject* summoner = GetSummoner())
+    {
         return summoner->ToUnit();
+    }
+    
     return nullptr;
 }
 
