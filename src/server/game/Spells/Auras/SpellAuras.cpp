@@ -867,6 +867,7 @@ void Aura::RefreshDuration(bool withMods)
 
     if ((m_spellInfo->ManaPerSecond || m_spellInfo->ManaPerSecondPerLevel) && !m_spellInfo->HasAttribute(SPELL_ATTR2_NO_TARGET_PER_SECOND_COST))
         m_timeCla = 1 * IN_MILLISECONDS;
+
     // also reset periodic counters
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (AuraEffect* aurEff = m_effects[i])
