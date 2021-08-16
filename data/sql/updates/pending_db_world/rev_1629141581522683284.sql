@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1629141581522683284');
 
-DELETE FROM creature WHERE (id = 1023);
-INSERT INTO creature (guid, id, map, zoneId, areaId, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, currentwaypoint, curhealth, curmana, MovementType, npcflag, unit_flags, dynamicflags, ScriptName, VerifiedBuild) VALUES
+DELETE FROM `creature` WHERE `id` IN (1022, 1023);
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (10981, 1023, 0, 0, 0, 1, 1, 949, 0, -3478.4, -1789.35, 17.335, 5.82652, 300, 10, 0, 787, 0, 1, 0, 0, 0, '', 0),
 (11021, 1023, 0, 0, 0, 1, 1, 949, 0, -3423.08, -1844.35, 17.3932, 2.99666, 300, 3, 0, 787, 0, 1, 0, 0, 0, '', 0),
 (11023, 1023, 0, 0, 0, 1, 1, 949, 0, -3445.97, -1823.6, 23.7985, 5.95543, 300, 5, 0, 787, 0, 1, 0, 0, 0, '', 0),
@@ -11,10 +11,7 @@ INSERT INTO creature (guid, id, map, zoneId, areaId, spawnMask, phaseMask, model
 (11051, 1023, 0, 0, 0, 1, 1, 949, 0, -3478.14, -1748.96, 23.9907, 5.89592, 300, 3, 0, 787, 0, 1, 0, 0, 0, '', 0),
 (11052, 1023, 0, 0, 0, 1, 1, 949, 0, -3521.59, -1783.81, 23.7833, 3.31749, 300, 3, 0, 787, 0, 1, 0, 0, 0, '', 0),
 (11053, 1023, 0, 0, 0, 1, 1, 949, 0, -3490.06, -1721.54, 33.9626, 3.56658, 300, 3, 0, 787, 0, 1, 0, 0, 0, '', 0),
-(3110383, 1023, 0, 0, 0, 1, 1, 0, 0, -3512.49, -1751.08, 24.5119, 5.08749, 300, 3, 0, 788, 0, 1, 0, 0, 0, '', 0);
-
-DELETE FROM creature WHERE (id = 1022);
-INSERT INTO creature (guid, id, map, zoneId, areaId, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, currentwaypoint, curhealth, curmana, MovementType, npcflag, unit_flags, dynamicflags, ScriptName, VerifiedBuild) VALUES
+(3110383, 1023, 0, 0, 0, 1, 1, 0, 0, -3512.49, -1751.08, 24.5119, 5.08749, 300, 3, 0, 788, 0, 1, 0, 0, 0, '', 0),
 (10956, 1022, 0, 0, 0, 1, 1, 648, 0, -3440.66, -1706.21, 57.0167, 2.98022, 300, 5, 0, 734, 0, 1, 0, 0, 0, '', 0),
 (10968, 1022, 0, 0, 0, 1, 1, 648, 0, -3491.11, -1654.28, 62.576, 4.24776, 300, 3, 0, 734, 0, 1, 0, 0, 0, '', 0),
 (10979, 1022, 0, 0, 0, 1, 1, 648, 0, -3554.14, -1746.71, 78.8366, 5.74131, 300, 5, 0, 734, 0, 1, 0, 0, 0, '', 0),
