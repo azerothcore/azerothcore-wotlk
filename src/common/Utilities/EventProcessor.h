@@ -13,8 +13,8 @@
 #include <map>
 
 class EventProcessor;
-// Note. All times are in milliseconds here.
 
+// Note. All times are in milliseconds here.
 class BasicEvent
 {
 
