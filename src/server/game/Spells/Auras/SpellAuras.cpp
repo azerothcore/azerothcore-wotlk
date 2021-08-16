@@ -860,6 +860,7 @@ void Aura::RefreshDuration(bool withMods)
         if (caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
             duration = int32(duration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
         SetMaxDuration(duration);
+
         SetDuration(duration);
     }
     else
