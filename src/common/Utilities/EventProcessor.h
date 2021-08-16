@@ -31,7 +31,7 @@ class BasicEvent
         BasicEvent()
             : m_abortState(AbortState::STATE_RUNNING), m_addTime(0), m_execTime(0) { }
 
-        virtual ~BasicEvent() { }                           // override destructor to perform some actions on event removal
+        virtual ~BasicEvent() { } // override destructor to perform some actions on event removal
 
         // this method executes when the event is triggered
         // return false if event does not want to be deleted
