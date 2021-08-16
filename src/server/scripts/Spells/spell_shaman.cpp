@@ -1366,10 +1366,15 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            // Should not proc from Windfury Attack
+            // Should not proc from Windfury Attack, Stormstrike and Lava Lash
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
             {
-                if (spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && (spellInfo->SpellFamilyFlags[0] & 0x00800000) != 0)
+                constexpr uint32 STORMSTRIKE = 17364;
+                constexpr uint32 LAVA_LASH   = 60103;
+                constexpr std::array<uint32, 2> spellIcons = {STORMSTRIKE, LAVA_LASH};
+                const auto found = std::find(std::begin(spellIcons), std::end(spellIcons), spellInfo->Id);
+
+                if ((spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && (spellInfo->SpellFamilyFlags[0] & 0x00800000) != 0) || found != std::end(spellIcons))
                 {
                     return false;
                 }
