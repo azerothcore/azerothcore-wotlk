@@ -1272,7 +1272,9 @@ public:
             PreventDefaultAction();
             SpellInfo const* procSpell = eventInfo.GetSpellInfo();
             if (!procSpell)
+            {
                 return;
+            }
 
             int32 mana = procSpell->CalcPowerCost(GetTarget(), procSpell->GetSchoolMask());
             ApplyPct(mana, aurEff->GetAmount());
