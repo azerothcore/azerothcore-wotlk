@@ -457,7 +457,7 @@ struct Position
 
     [[nodiscard]] bool IsPositionValid() const;
 
-    float GetExactDist2dSq(const float x, const float y) const
+    [[nodiscard]] float GetExactDist2dSq(const float x, const float y) const
     {
         float dx = x - m_positionX;
         float dy = y - m_positionY;
