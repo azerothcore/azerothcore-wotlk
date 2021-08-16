@@ -36,7 +36,7 @@ class BasicEvent
         // this method executes when the event is triggered
         // return false if event does not want to be deleted
         // e_time is execution time, p_time is update interval
-        virtual bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) { return true; }
+        [[nodiscard]] virtual bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) { return true; }
 
         [[nodiscard]] virtual bool IsDeletable() const { return true; }   // this event can be safely deleted
 
