@@ -12652,19 +12652,22 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
 uint32 Player::CalculateTalentsPoints() const
 {
+    uint8 currentLevel = getLevel();
     uint32 talentPointsForLevel = 0;
-    uint32 base_talent = getLevel() < 10 ? 0 : getLevel() - 9;
+    uint32 baseTalents = currentLevel < 10 ? 0 : currentLevel - 9;
 
     if (getClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
     {
-        talentPointsForLevel = base_talent;
+        talentPointsForLevel = baseTalents;
     }
     else
     {
-        talentPointsForLevel = getLevel() < 56 ? 0 : getLevel() - 55;
+        talentPointsForLevel = currentLevel < 56 ? 0 : currentLevel - 55;
         talentPointsForLevel += m_questRewardTalentCount;
-        if (talentPointsForLevel > base_talent)
-            talentPointsForLevel = base_talent;
+        if (talentPointsForLevel > baseTalents)
+        {
+            talentPointsForLevel = baseTalents;
+        }
     }
 
     talentPointsForLevel += m_extraBonusTalentCount;
