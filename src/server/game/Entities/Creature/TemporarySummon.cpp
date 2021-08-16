@@ -17,7 +17,10 @@ TempSummon::TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner
     m_timer(0), m_lifetime(0)
 {
     if (owner)
+    {
         m_summonerGUID = owner;
+    }
+            
     m_unitTypeMask |= UNIT_MASK_SUMMON;
 }
 
