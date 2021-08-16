@@ -864,6 +864,7 @@ void Aura::RefreshDuration(bool withMods)
     }
     else
         SetDuration(GetMaxDuration());
+
     if ((m_spellInfo->ManaPerSecond || m_spellInfo->ManaPerSecondPerLevel) && !m_spellInfo->HasAttribute(SPELL_ATTR2_NO_TARGET_PER_SECOND_COST))
         m_timeCla = 1 * IN_MILLISECONDS;
     // also reset periodic counters
