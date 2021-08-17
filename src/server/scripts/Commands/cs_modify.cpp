@@ -469,7 +469,9 @@ public:
     static bool CheckModifySpeed(ChatHandler* handler, char const* args, Unit* target, float& speed, float minimumBound, float maximumBound, bool checkInFlight = true)
     {
         if (!*args)
+        {
             return false;
+        }
 
         speed = (float)atof((char*)args);
 
