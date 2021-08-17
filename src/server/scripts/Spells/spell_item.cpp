@@ -2126,8 +2126,7 @@ public:
 // 13280 Gnomish Death Ray
 enum GnomishDeathRay
 {
-    SPELL_GNOMISH_DEATH_RAY_SELF = 13493,
-    SPELL_GNOMISH_DEATH_RAY_TARGET = 13279,
+    SPELL_GNOMISH_DEATH_RAY_TARGET  = 13279,
 };
 
 class spell_item_gnomish_death_ray : public SpellScriptLoader
@@ -2141,18 +2140,17 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return ValidateSpellInfo({ SPELL_GNOMISH_DEATH_RAY_SELF, SPELL_GNOMISH_DEATH_RAY_TARGET });
+            return ValidateSpellInfo({ SPELL_GNOMISH_DEATH_RAY_TARGET });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            Unit* caster = GetCaster();
-            if (Unit* target = GetHitUnit())
+            if (Unit* caster = GetCaster())
             {
-                if (urand(0, 99) < 15)
-                    caster->CastSpell(caster, SPELL_GNOMISH_DEATH_RAY_SELF, true, nullptr);    // failure
-                else
-                    caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true, nullptr);
+                if (Unit* target = ObjectAccessor::GetUnit(*caster, caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT)))
+                {
+                    caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true);
+                }
             }
         }
 
@@ -4290,6 +4288,46 @@ public:
     }
 };
 
+enum GoblinBomb
+{
+    SPELL_SUMMON_GOBLIN_BOMB = 13258,
+};
+
+// 23134 - Goblin Bomb
+class spell_item_goblin_bomb : public SpellScriptLoader
+{
+public:
+    spell_item_goblin_bomb() : SpellScriptLoader("spell_item_goblin_bomb") {}
+
+    class spell_item_goblin_bomb_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_goblin_bomb_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_SUMMON_GOBLIN_BOMB });
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->CastSpell(caster, SPELL_SUMMON_GOBLIN_BOMB, true, GetCastItem());
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_item_goblin_bomb_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_goblin_bomb_SpellScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // Ours
@@ -4397,4 +4435,5 @@ void AddSC_item_spell_scripts()
     new spell_item_muisek_vessel();
     new spell_item_greatmothers_soulcatcher();
     new spell_item_eggnog();
+    new spell_item_goblin_bomb();
 }

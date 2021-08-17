@@ -771,8 +771,36 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     bool teleported = false;
     if (player->GetMapId() != at->target_mapId)
     {
-        if (!sMapMgr->CanPlayerEnter(at->target_mapId, player, false))
+       if (Map::EnterState denyReason = sMapMgr->PlayerCannotEnter(at->target_mapId, player, false))
+        {
+            bool reviveAtTrigger = false; // should we revive the player if he is trying to enter the correct instance?
+            switch (denyReason)
+            {
+                case Map::CANNOT_ENTER_NOT_IN_RAID:
+                case Map::CANNOT_ENTER_INSTANCE_BIND_MISMATCH:
+                case Map::CANNOT_ENTER_TOO_MANY_INSTANCES:
+                case Map::CANNOT_ENTER_MAX_PLAYERS:
+                case Map::CANNOT_ENTER_ZONE_IN_COMBAT:
+                    reviveAtTrigger = true;
+                    break;
+                default:
+                    break;
+            }
+
+            if (reviveAtTrigger) // check if the player is touching the areatrigger leading to the map his corpse is on
+            {
+                if (!player->IsAlive() && player->HasCorpse())
+                {
+                    if (player->GetCorpseLocation().GetMapId() == at->target_mapId)
+                    {
+                        player->ResurrectPlayer(0.5f);
+                        player->SpawnCorpseBones();
+                    }
+                }
+            }
+
             return;
+        }
 
         if (Group* group = player->GetGroup())
             if (group->isLFGGroup() && player->GetMap()->IsDungeon())

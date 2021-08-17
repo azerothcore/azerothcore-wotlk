@@ -2803,19 +2803,19 @@ void InstanceMap::InitVisibilityDistance()
 /*
     Do map specific checks to see if the player can enter
 */
-bool InstanceMap::CanEnter(Player* player, bool loginCheck)
+Map::EnterState InstanceMap::CannotEnter(Player* player, bool loginCheck)
 {
     if (!loginCheck && player->GetMapRef().getTarget() == this)
     {
         LOG_ERROR("maps", "InstanceMap::CanEnter - player %s (%s) already in map %d, %d, %d!",
             player->GetName().c_str(), player->GetGUID().ToString().c_str(), GetId(), GetInstanceId(), GetSpawnMode());
         ABORT();
-        return false;
+        return CANNOT_ENTER_ALREADY_IN_MAP;
     }
 
     // allow GM's to enter
     if (player->IsGameMaster())
-        return Map::CanEnter(player, loginCheck);
+        return Map::CannotEnter(player, loginCheck);
 
     // cannot enter if the instance is full (player cap), GMs don't count
     uint32 maxPlayers = GetMaxPlayers();
@@ -2823,7 +2823,7 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
     {
         LOG_DEBUG("maps", "MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName().c_str());
         player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
-        return false;
+        return CANNOT_ENTER_MAX_PLAYERS;
     }
 
     // cannot enter while an encounter is in progress on raids
@@ -2831,7 +2831,7 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
     if (checkProgress && GetInstanceScript() && GetInstanceScript()->IsEncounterInProgress())
     {
         player->SendTransferAborted(GetId(), TRANSFER_ABORT_ZONE_IN_COMBAT);
-        return false;
+        return CANNOT_ENTER_ZONE_IN_COMBAT;
     }
 
     // xinef: dont allow LFG Group to enter other instance that is selected
@@ -2840,7 +2840,7 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
             if (!sLFGMgr->inLfgDungeonMap(group->GetGUID(), GetId(), GetDifficulty()))
             {
                 player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAP_NOT_ALLOWED);
-                return false;
+                return CANNOT_ENTER_UNSPECIFIED_REASON;
             }
 
     // cannot enter if instance is in use by another party/soloer that have a permanent save in the same instance id
@@ -2856,18 +2856,18 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
                 if (!player->GetGroup()) // player has not group and there is someone inside, deny entry
                 {
                     player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
-                    return false;
+                    return CANNOT_ENTER_INSTANCE_BIND_MISMATCH;
                 }
                 // player inside instance has no group or his groups is different to entering player's one, deny entry
                 if (!iPlayer->GetGroup() || iPlayer->GetGroup() != player->GetGroup())
                 {
                     player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
-                    return false;
+                    return CANNOT_ENTER_INSTANCE_BIND_MISMATCH;
                 }
                 break;
             }
 
-    return Map::CanEnter(player, loginCheck);
+    return Map::CannotEnter(player, loginCheck);
 }
 
 /*
@@ -3166,21 +3166,21 @@ void BattlegroundMap::InitVisibilityDistance()
         m_VisibleDistance = 30.0f;
 }
 
-bool BattlegroundMap::CanEnter(Player* player, bool loginCheck)
+Map::EnterState BattlegroundMap::CannotEnter(Player* player, bool loginCheck)
 {
     if (!loginCheck && player->GetMapRef().getTarget() == this)
     {
         LOG_ERROR("maps", "BGMap::CanEnter - player %s is already in map!", player->GetGUID().ToString().c_str());
         ABORT();
-        return false;
+        return CANNOT_ENTER_ALREADY_IN_MAP;
     }
 
     if (player->GetBattlegroundId() != GetInstanceId())
-        return false;
+        return CANNOT_ENTER_INSTANCE_BIND_MISMATCH;
 
     // pussywizard: no need to check player limit here, invitations are limited by Battleground::GetFreeSlotsForTeam
 
-    return Map::CanEnter(player, loginCheck);
+    return Map::CannotEnter(player, loginCheck);
 }
 
 bool BattlegroundMap::AddPlayerToMap(Player* player)

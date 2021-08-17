@@ -393,7 +393,25 @@ public:
 
     [[nodiscard]] uint32 GetInstanceId() const { return i_InstanceId; }
     [[nodiscard]] uint8 GetSpawnMode() const { return (i_spawnMode); }
-    virtual bool CanEnter(Player* /*player*/, bool /*loginCheck = false*/) { return true; }
+
+    enum EnterState
+    {
+        CAN_ENTER = 0,
+        CANNOT_ENTER_ALREADY_IN_MAP = 1, // Player is already in the map
+        CANNOT_ENTER_NO_ENTRY, // No map entry was found for the target map ID
+        CANNOT_ENTER_UNINSTANCED_DUNGEON, // No instance template was found for dungeon map
+        CANNOT_ENTER_DIFFICULTY_UNAVAILABLE, // Requested instance difficulty is not available for target map
+        CANNOT_ENTER_NOT_IN_RAID, // Target instance is a raid instance and the player is not in a raid group
+        CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE, // Player is dead and their corpse is not in target instance
+        CANNOT_ENTER_INSTANCE_BIND_MISMATCH, // Player's permanent instance save is not compatible with their group's current instance bind
+        CANNOT_ENTER_TOO_MANY_INSTANCES, // Player has entered too many instances recently
+        CANNOT_ENTER_MAX_PLAYERS, // Target map already has the maximum number of players allowed
+        CANNOT_ENTER_ZONE_IN_COMBAT, // A boss encounter is currently in progress on the target map
+        CANNOT_ENTER_UNSPECIFIED_REASON
+    };
+
+    virtual EnterState CannotEnter(Player* /*player*/, bool /*loginCheck = false*/) { return CAN_ENTER; }
+
     [[nodiscard]] const char* GetMapName() const;
 
     // have meaning only for instanced map (that have set real difficulty)
@@ -772,7 +790,7 @@ public:
     [[nodiscard]] InstanceScript const* GetInstanceScript() const { return instance_data; }
     void PermBindAllPlayers();
     void UnloadAll() override;
-    bool CanEnter(Player* player, bool loginCheck = false) override;
+    EnterState CannotEnter(Player* player, bool loginCheck = false) override;
     void SendResetWarnings(uint32 timeLeft) const;
 
     [[nodiscard]] uint32 GetMaxPlayers() const;
@@ -794,7 +812,7 @@ public:
 
     bool AddPlayerToMap(Player*) override;
     void RemovePlayerFromMap(Player*, bool) override;
-    bool CanEnter(Player* player, bool loginCheck = false) override;
+    EnterState CannotEnter(Player* player, bool loginCheck = false) override;
     void SetUnload();
     //void UnloadAll(bool pForce);
     void RemoveAllPlayers() override;

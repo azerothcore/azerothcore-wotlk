@@ -916,7 +916,7 @@ public:
 
     [[nodiscard]] float GetGridActivationRange() const;
     [[nodiscard]] float GetVisibilityRange() const;
-    float GetSightRange(const WorldObject* target = nullptr) const;
+    virtual float GetSightRange(const WorldObject* target = nullptr) const;
     //bool CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth = false, bool distanceCheck = false) const;
     bool CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth = false, bool distanceCheck = false, bool checkAlert = false) const;
 

@@ -933,7 +933,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
+void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* item /*= nullptr*/)
 {
     if (IsInFeralForm())
         return; // always maximized SKILL_FERAL_COMBAT in fact
@@ -949,6 +949,11 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
 
     Item* tmpitem = GetWeaponForAttack(attType, true);
+    if (item && item != tmpitem && !item->IsBroken())
+    {
+        tmpitem = item;
+    }
+
     if (!tmpitem && attType == BASE_ATTACK)
     {
         // Keep unarmed & fist weapon skills in sync
@@ -974,8 +979,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType)
     UpdateAllCritPercentages();
 }
 
-void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType,
-                                bool defence)
+void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item /*= nullptr*/)
 {
     uint8 plevel    = getLevel(); // if defense than victim == attacker
     uint8 greylevel = Acore::XP::GetGrayLevel(plevel);
@@ -1009,7 +1013,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType,
         if (defence)
             UpdateDefense();
         else
-            UpdateWeaponSkill(victim, attType);
+            UpdateWeaponSkill(victim, attType, item);
     }
     else
         return;

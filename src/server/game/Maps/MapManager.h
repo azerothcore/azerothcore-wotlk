@@ -119,7 +119,7 @@ public:
 
     void DoDelayedMovesAndRemoves();
 
-    bool CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck = false);
+    Map::EnterState PlayerCannotEnter(uint32 mapid, Player* player, bool loginCheck = false);
     void InitializeVisibilityDistanceInfo();
 
     /* statistics */
