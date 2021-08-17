@@ -2789,10 +2789,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             // xinef: triggered spells should not prolong combat
             if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS) && !m_triggeredByAuraSpell)
             {
-                // xinef: start combat with hostile unit...
-                if (Unit* hostile = unit->getAttackerForHelper())
-                    m_caster->CombatStart(hostile, true);
-                //m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
+                m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
                 unit->getHostileRefManager().threatAssist(m_caster, 0.0f);
             }
         }
@@ -5668,7 +5665,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                             m_caster->RemoveMovementImpairingAuras(true);
                     }
                     if (m_caster->HasUnitState(UNIT_STATE_ROOT))
-                        return SPELL_FAILED_ROOTED;
+                    {
+                        // Exception for Master's Call
+                        if (m_spellInfo->Id != 54216)
+                        {
+                            return SPELL_FAILED_ROOTED;
+                        }
+                    }
                     if (m_caster->GetTypeId() == TYPEID_PLAYER)
                         if (Unit* target = m_targets.GetUnitTarget())
                             if (!target->IsAlive())
