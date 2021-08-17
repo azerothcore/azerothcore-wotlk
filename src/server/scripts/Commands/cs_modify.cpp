@@ -813,7 +813,7 @@ public:
         }
 
         NotifyModification(handler, target, LANG_YOU_GIVE_MOUNT, LANG_MOUNT_GIVED);
-        
+
         target->Mount(mount);
         target->SetSpeed(MOVE_RUN, speed, true);
         target->SetSpeed(MOVE_FLIGHT, speed, true);
