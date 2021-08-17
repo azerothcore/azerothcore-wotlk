@@ -6907,8 +6907,12 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         if (!spellData.SpellId)
             continue;
 
+        // Spells that should stay on the caster after removing the item.
+        std::array<uint32, 1> spellExceptions = { /*Electromagnetic Gigaflux Reactivator*/ 11826 };
+        const auto found = std::find(std::begin(spellExceptions), std::end(spellExceptions), spellData.SpellId);
+
         // wrong triggering type
-        if (apply)
+        if (apply || form_change)
         {
             if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
             {
@@ -6917,8 +6921,8 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         }
         else
         {
-            // Auras activated by use should not be removed on unequip (with no charges)
-            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && spellData.SpellCharges <= 0)
+            // If the spell is an exception do not remove it.
+            if (found != std::end(spellExceptions))
             {
                 continue;
             }

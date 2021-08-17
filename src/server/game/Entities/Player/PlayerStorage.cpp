@@ -2873,16 +2873,6 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
         RemoveEnchantmentDurations(pItem);
         RemoveItemDurations(pItem);
         RemoveTradeableItem(pItem);
-        // Remove item spell auras
-        for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-        {
-            const _Spell& spellData = pItem->GetTemplate()->Spells[i];
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
-            if (spellInfo)
-            {
-                ApplyEquipSpell(spellInfo, pItem, false, false);
-            }
-        }
 
         if (bag == INVENTORY_SLOT_BAG_0)
         {
