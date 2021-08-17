@@ -201,6 +201,8 @@ public:
 #endif
     }
 
+    size_t QueueSize() const;
+
 private:
     uint32 OpenConnections(InternalIndex type, uint8 numConnections);
 
@@ -213,8 +215,6 @@ private:
     T* GetFreeConnection();
 
     char const* GetDatabaseName() const;
-
-    size_t QueueSize() const;
 
     //! Queue shared by async worker threads.
     std::unique_ptr<ProducerConsumerQueue<SQLOperation*>> _queue;
