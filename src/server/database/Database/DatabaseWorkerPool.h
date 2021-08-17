@@ -214,6 +214,9 @@ private:
 
     char const* GetDatabaseName() const;
 
+
+    size_t QueueSize() const;
+
     //! Queue shared by async worker threads.
     std::unique_ptr<ProducerConsumerQueue<SQLOperation*>> _queue;
     std::array<std::vector<std::unique_ptr<T>>, IDX_SIZE> _connections;
