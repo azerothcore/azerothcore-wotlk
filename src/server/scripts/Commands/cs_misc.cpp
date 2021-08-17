@@ -1958,7 +1958,7 @@ public:
             auto const& [_muteDate, _muteTime, _reason, _author] = *muteInfo;
 
             muteTime = std::abs(_muteTime);
-            muteLeft = secsToTimeString(static_cast<uint64>(_muteDate + muteTime) - GameTime::GetGameTime(), true);
+            muteLeft = secsToTimeString(static_cast<uint64>(_muteDate + muteTime) - time(nullptr), true);
             muteReason = _reason;
             muteBy = _author;
         }
@@ -2266,13 +2266,15 @@ public:
         uint32 notSpeakTime = uint32(atoi(delayStr));
 
         // must have strong lesser security level
-        if (handler->HasLowerSecurity (target, targetGuid, true))
+        if (handler->HasLowerSecurity(target, targetGuid, true))
             return false;
 
-        sMute->MutePlayer(player->GetName(), notSpeakTime, handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetWarheadString(LANG_CONSOLE), muteReasonStr);
+        sMute->MutePlayer(target->GetName(), notSpeakTime, handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
 
-        if (!CONF_GET_BOOL("ShowMuteInWorld"))
-            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(player->GetName()).c_str(), notSpeakTime, muteReasonStr.c_str());
+        if (!sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
+        {
+            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(target->GetName()).c_str(), notSpeakTime, muteReasonStr.c_str());
+        }
 
         return true;
     }

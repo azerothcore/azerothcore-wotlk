@@ -6,15 +6,11 @@
 #include "MuteMgr.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "GameConfig.h"
-#include "GameTime.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "TextBuilder.h"
 #include "Timer.h"
 #include "World.h"
-//#include "CharacterCache.h"
 
 MuteMgr* MuteMgr::instance()
 {
@@ -31,7 +27,7 @@ void MuteMgr::MutePlayer(std::string const& targetName, uint32 notSpeakTime, std
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_MUTE);
     stmt->setUInt32(0, accountId);
 
-    uint32 muteDate = GameTime::GetGameTime() + notSpeakTime * MINUTE;
+    uint32 muteDate = static_cast<uint32>(time(nullptr)) + notSpeakTime * MINUTE;
 
     /*
      * Mute will be in effect right away.
@@ -40,9 +36,11 @@ void MuteMgr::MutePlayer(std::string const& targetName, uint32 notSpeakTime, std
     int32 muteTime = sWorld->getBoolConfig(CONFIG_MUTE_ADD_AFTER_LOGIN) && !targetSession ? -int32(notSpeakTime * MINUTE) : notSpeakTime * MINUTE;
 
     if (targetSession)
+    {
         AddMuteTime(accountId, muteDate);
+    }
 
-    stmt->setUInt32(1, static_cast<uint32>(GameTime::GetGameTime()));
+    stmt->setUInt32(1, static_cast<uint32>(time(nullptr)));
     stmt->setInt64(2, muteTime);
     stmt->setString(3, muteBy);
     stmt->setString(4, muteReason);
@@ -53,16 +51,15 @@ void MuteMgr::MutePlayer(std::string const& targetName, uint32 notSpeakTime, std
         return "|cffffffff|Hplayer:" + targetName + "|h[" + targetName + "]|h|r";
     };
 
-    if (CONF_GET_BOOL("ShowMuteInWorld"))
+    if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
     {
-        Warhead::Text::SendWorldText([&](uint8 index)
-        {
-            return Warhead::Text::GetLocaleMessage(index, LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy, GetPlayerLink(), notSpeakTime, muteReason);
-        });
+        sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), GetPlayerLink().c_str(), notSpeakTime, muteReason.c_str());
     }
 
     if (targetSession)
+    {
         ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy, muteReason);
+    }
 }
 
 void MuteMgr::UnMutePlayer(std::string const& targetName)
@@ -72,7 +69,9 @@ void MuteMgr::UnMutePlayer(std::string const& targetName)
     DeleteMuteTime(accountId);
 
     if (auto targetSession = sWorld->FindSession(accountId))
+    {
         ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
+    }
 }
 
 void MuteMgr::AddMuteTime(uint32 accountID, uint32 muteTime)
@@ -80,7 +79,9 @@ void MuteMgr::AddMuteTime(uint32 accountID, uint32 muteTime)
     // Check exist
     auto itr = _listSessions.find(accountID);
     if (itr != _listSessions.end())
+    {
         return;
+    }
 
     _listSessions.emplace(accountID, muteTime);
 }
@@ -90,7 +91,9 @@ void MuteMgr::SetMuteTime(uint32 accountID, uint32 muteTime)
     // Check empty
     auto itr = _listSessions.find(accountID);
     if (itr == _listSessions.end())
+    {
         return;
+    }
 
     _listSessions.erase(accountID);
     _listSessions.emplace(accountID, muteTime);
@@ -101,7 +104,9 @@ uint32 MuteMgr::GetMuteTime(uint32 accountID)
     // Check exist
     auto itr = _listSessions.find(accountID);
     if (itr == _listSessions.end())
+    {
         return 0;
+    }
 
     return _listSessions.at(accountID);
 }
@@ -119,7 +124,9 @@ void MuteMgr::DeleteMuteTime(uint32 accountID, bool delFromDB /*= true*/)
     // Check exist account muted
     auto itr = _listSessions.find(accountID);
     if (itr == _listSessions.end())
+    {
         return;
+    }
 
     _listSessions.erase(accountID);
 }
@@ -127,7 +134,7 @@ void MuteMgr::DeleteMuteTime(uint32 accountID, bool delFromDB /*= true*/)
 void MuteMgr::CheckMuteExpired(uint32 accountID)
 {
     uint32 _muteTime = GetMuteTime(accountID);
-    uint32 timeNow = GameTime::GetGameTime();
+    uint32 timeNow   = time(nullptr);
 
     if (!_muteTime || _muteTime > timeNow)
         return;
@@ -142,12 +149,12 @@ std::string const MuteMgr::GetMuteTimeString(uint32 accountID)
     if (!_muteTime)
         return "";
 
-    return Warhead::Time::ToTimeString<Seconds>(_muteTime - GameTime::GetGameTime());
+    return secsToTimeString(_muteTime - time(nullptr), true);
 }
 
 bool MuteMgr::CanSpeak(uint32 accountID)
 {
-    return GetMuteTime(accountID) <= GameTime::GetGameTime();
+    return GetMuteTime(accountID) <= static_cast<uint32>(time(nullptr));
 }
 
 void MuteMgr::LoginAccount(uint32 accountID)
@@ -175,7 +182,9 @@ void MuteMgr::LoginAccount(uint32 accountID)
 
     //! Negative mutetime indicates amount of seconds to be muted effective on next login - which is now.
     if (mutetime < 0)
+    {
         UpdateMuteAccount(accountID, mutedate, std::abs(mutetime));
+    }
 }
 
 void MuteMgr::UpdateMuteAccount(uint32 accountID, uint32 muteDate, int32 muteTime)
@@ -188,7 +197,9 @@ void MuteMgr::UpdateMuteAccount(uint32 accountID, uint32 muteDate, int32 muteTim
     LoginDatabase.Execute(stmt);
 
     if (auto session = sWorld->FindSession(accountID))
+    {
         SetMuteTime(accountID, muteDate);
+    }
 }
 
 Optional<std::tuple<uint32, int32, std::string, std::string>> MuteMgr::GetMuteInfo(uint32 accountID)
@@ -198,7 +209,9 @@ Optional<std::tuple<uint32, int32, std::string, std::string>> MuteMgr::GetMuteIn
 
     PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (!result)
+    {
         return std::nullopt;
+    }
 
     Field* fields = result->Fetch();
 

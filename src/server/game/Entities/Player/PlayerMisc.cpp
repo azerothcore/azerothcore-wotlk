@@ -5,6 +5,7 @@
  */
 
 #include "MapManager.h"
+#include "MuteMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 
