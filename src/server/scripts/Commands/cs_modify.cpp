@@ -785,7 +785,7 @@ public:
         }
 
         uint32 mount = atoul(mount_cstr);
-        if (!sCreatureDisplayInfoStore.LookupEntry(mount) && mount != 0)
+        if (!sCreatureDisplayInfoStore.LookupEntry(mount))
         {
             handler->SendSysMessage(LANG_NO_MOUNT);
             handler->SetSentErrorMessage(true);
