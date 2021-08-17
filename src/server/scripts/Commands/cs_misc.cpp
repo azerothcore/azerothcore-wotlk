@@ -2269,11 +2269,12 @@ public:
         if (handler->HasLowerSecurity(target, targetGuid, true))
             return false;
 
-        sMute->MutePlayer(target->GetName(), notSpeakTime, handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
+        sMute->MutePlayer(targetName, notSpeakTime, handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
 
         if (!sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
         {
-            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(target->GetName()).c_str(), notSpeakTime, muteReasonStr.c_str());
+            // You has disabled % s\'s chat for %u minutes. Reason: %s.
+            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(targetName).c_str(), notSpeakTime, muteReasonStr.c_str());
         }
 
         return true;
