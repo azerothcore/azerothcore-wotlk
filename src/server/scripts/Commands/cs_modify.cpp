@@ -81,7 +81,9 @@ public:
         {
             handler->PSendSysMessage(resourceMessage, handler->GetNameLink(player).c_str(), args...);
             if (handler->needReportToTarget(player))
+            {
                 ChatHandler(player->GetSession()).PSendSysMessage(resourceReportMessage, handler->GetNameLink().c_str(), std::forward<Args>(args)...);
+            }
         }
     }
 
