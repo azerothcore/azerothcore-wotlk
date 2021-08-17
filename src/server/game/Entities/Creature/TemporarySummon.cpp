@@ -20,7 +20,7 @@ TempSummon::TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner
     {
         m_summonerGUID = owner;
     }
-            
+
     m_unitTypeMask |= UNIT_MASK_SUMMON;
 }
 
@@ -35,7 +35,7 @@ Unit* TempSummon::GetSummonerUnit() const
     {
         return summoner->ToUnit();
     }
-    
+
     return nullptr;
 }
 
