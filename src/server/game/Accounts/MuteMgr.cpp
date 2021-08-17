@@ -58,7 +58,7 @@ void MuteMgr::MutePlayer(std::string const& targetName, uint32 notSpeakTime, std
 
     if (targetSession)
     {
-        ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy, muteReason);
+        ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy.c_str(), muteReason.c_str());
     }
 }
 
@@ -70,7 +70,7 @@ void MuteMgr::UnMutePlayer(std::string const& targetName)
 
     if (auto targetSession = sWorld->FindSession(accountId))
     {
-        ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
+        ChatHandler(targetSession).SendSysMessage(LANG_YOUR_CHAT_ENABLED);
     }
 }
 
