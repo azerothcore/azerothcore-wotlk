@@ -1242,7 +1242,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return ValidateSpellInfo({ SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT, SPELL_HUNTER_VICIOUS_VIPER });
+            return ValidateSpellInfo({ SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT });
         }
 
         bool CheckProc(ProcEventInfo& eventInfo)
