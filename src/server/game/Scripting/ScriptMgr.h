@@ -915,7 +915,7 @@ public:
     virtual void OnBeforeUpdateAttackPowerAndDamage(Player* /*player*/, float& /*level*/, float& /*val2*/, bool /*ranged*/) { }
     virtual void OnAfterUpdateAttackPowerAndDamage(Player* /*player*/, float& /*level*/, float& /*base_attPower*/, float& /*attPowerMod*/, float& /*attPowerMultiplier*/, bool /*ranged*/) { }
 
-    virtual void OnBeforeInitTalentForLevel(Player* /*player*/, uint8& /*level*/, uint32& /*talentPointsForLevel*/) { }
+    virtual void OnBeforeInitTalentForLevel(Player* /*player*/, uint32& /*talentPointsForLevel*/) { }
 
     virtual void OnFirstLogin(Player* /*player*/) { }
 
@@ -1665,7 +1665,7 @@ public: /* PlayerScript */
     void OnAfterUpdateMaxHealth(Player* player, float& value);
     void OnBeforeUpdateAttackPowerAndDamage(Player* player, float& level, float& val2, bool ranged);
     void OnAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged);
-    void OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
+    void OnBeforeInitTalentForLevel(Player* player, uint32& talentPointsForLevel);
     void OnFirstLogin(Player* player);
     void OnPlayerCompleteQuest(Player* player, Quest const* quest);
     void OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType);

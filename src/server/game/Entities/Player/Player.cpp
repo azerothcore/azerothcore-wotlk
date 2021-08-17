@@ -2468,9 +2468,8 @@ void Player::GiveLevel(uint8 level)
 void Player::InitTalentForLevel()
 {
     uint32 talentPointsForLevel = CalculateTalentsPoints();
-    uint8 level = getLevel();
 
-    sScriptMgr->OnBeforeInitTalentForLevel(this, level, talentPointsForLevel);
+    sScriptMgr->OnBeforeInitTalentForLevel(this, talentPointsForLevel);
 
     // xinef: more talent points that we have are used, reset
     if (m_usedTalentCount > talentPointsForLevel)
