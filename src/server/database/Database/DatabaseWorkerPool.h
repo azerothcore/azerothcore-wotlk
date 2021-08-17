@@ -214,7 +214,6 @@ private:
 
     char const* GetDatabaseName() const;
 
-
     size_t QueueSize() const;
 
     //! Queue shared by async worker threads.
