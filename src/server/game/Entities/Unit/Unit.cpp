@@ -13580,29 +13580,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             {
                 if (GetTypeId() == TYPEID_UNIT)
                 {
-                    Unit* followed = nullptr;
-                    if (GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                    {
-                        followed = static_cast<FollowMovementGenerator<Creature>const*>(GetMotionMaster()->top())->GetTarget();
-                    }
-
-                    if (followed && !IsInCombat() && !IsVehicle() && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED) && (IsPet() || IsGuardian() || GetGUID() == followed->GetCritterGUID() || GetCharmerOrOwnerGUID() == followed->GetGUID()))
-                    {
-                        if (followed->GetTypeId() != TYPEID_PLAYER)
-                        {
-                            if (speed < followed->GetSpeedRate(mtype) + 0.1f)
-                                speed = followed->GetSpeedRate(mtype) + 0.1f; // pets derive speed from owner when not in combat
-                        }
-                        else
-                        {
-                            float ownerSpeed = followed->GetSpeedRate(mtype);
-                            if (speed < ownerSpeed || IsWithinDist3d(followed, 10.0f))
-                                speed = ownerSpeed;
-                            speed *= std::min(std::max(1.0f, 0.75f + (GetDistance(followed) - PET_FOLLOW_DIST) * 0.05f), 1.3f);
-                        }
-                    }
-                    else
-                        speed *= ToCreature()->GetCreatureTemplate()->speed_run;    // at this point, MOVE_WALK is never reached
+                    speed *= ToCreature()->GetCreatureTemplate()->speed_run;    // at this point, MOVE_WALK is never reached
                 }
 
                 // Normalize speed by 191 aura SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED if need

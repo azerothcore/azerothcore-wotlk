@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 #include <sstream>
+#include "G3D/Vector3.h"
 
 #ifdef ELUNA
 class ElunaEventProcessor;
@@ -374,6 +375,11 @@ struct Position
     inline bool operator!=(Position const& a)
     {
         return !(operator==(a));
+    }
+
+    operator G3D::Vector3() const
+    {
+        return { m_positionX, m_positionY, m_positionZ };
     }
 
     void Relocate(float x, float y)
