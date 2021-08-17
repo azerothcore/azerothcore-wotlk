@@ -186,7 +186,7 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
     }
 }
 
-void CreatureGroup::FormationReset(bool dismiss, bool initiMotionMaster)
+void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
 {
     if (m_members.size() && m_members.begin()->second->groupAI == 5)
         return;
@@ -195,7 +195,7 @@ void CreatureGroup::FormationReset(bool dismiss, bool initiMotionMaster)
     {
         if (itr->first != m_leader && itr->first->IsAlive())
         {
-            if (initiMotionMaster == true)
+            if (initMotionMaster)
             {
                 if (dismiss)
                     itr->first->GetMotionMaster()->Initialize();
