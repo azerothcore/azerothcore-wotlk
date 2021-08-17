@@ -59,7 +59,7 @@ public:
 
     void AddMember(Creature* member);
     void RemoveMember(Creature* member);
-    void FormationReset(bool dismiss);
+    void FormationReset(bool dismiss, bool initiMotionMaster);
 
     void LeaderMoveTo(float x, float y, float z, bool run);
     void MemberAttackStart(Creature* member, Unit* target);
