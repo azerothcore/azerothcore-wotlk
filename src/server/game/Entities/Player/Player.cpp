@@ -6912,7 +6912,7 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         const auto found = std::find(std::begin(spellExceptions), std::end(spellExceptions), spellData.SpellId);
 
         // wrong triggering type
-        if (apply || form_change)
+        if (apply)
         {
             if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
             {
