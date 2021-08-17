@@ -1268,6 +1268,7 @@ public:
     void SendEnchantmentDurations();
     void BuildEnchantmentsInfoData(WorldPacket* data);
     void AddItemDurations(Item* item);
+    void RemoveItemAurasOnUnequip(Item* item);
     void RemoveItemDurations(Item* item);
     void SendItemDurations();
     void LoadCorpse(PreparedQueryResult result);
