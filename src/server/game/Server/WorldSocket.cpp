@@ -452,13 +452,13 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     AccountInfo account(result->Fetch());
 
     // For hook purposes, we get Remoteaddress at this point.
-    std::string ipAddress = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true) ? GetRemoteIpAddress().to_string() : "0.0.0.0";
+    std::string address = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true) ? GetRemoteIpAddress().to_string() : "0.0.0.0";
 
     LoginDatabasePreparedStatement* stmt = nullptr;
 
     // As we don't know if attempted login process by ip works, we update last_attempt_ip right away
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_ATTEMPT_IP);
-    stmt->setString(0, ipAddress);
+    stmt->setString(0, address);
     stmt->setString(1, authSession->Account);
     LoginDatabase.Execute(stmt);
     // This also allows to check for possible "hack" attempts on account
@@ -470,7 +470,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (sWorld->IsClosed())
     {
         SendAuthResponseError(AUTH_REJECT);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", ipAddress.c_str());
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", address.c_str());
         DelayedCloseSocket();
         return;
     }
@@ -479,7 +479,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     {
         SendAuthResponseError(REALM_LIST_REALM_NOT_FOUND);
         LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s requested connecting with realm id %u but this realm has id %u set in config.",
-            ipAddress.c_str(), authSession->RealmID, realm.Id.Realm);
+            address.c_str(), authSession->RealmID, realm.Id.Realm);
         DelayedCloseSocket();
         return;
     }
@@ -489,7 +489,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (wardenActive && account.OS != "Win" && account.OS != "OSX")
     {
         SendAuthResponseError(AUTH_REJECT);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", ipAddress.c_str(), account.OS.c_str());
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s attempted to log in using invalid client OS (%s).", address.c_str(), account.OS.c_str());
         DelayedCloseSocket();
         return;
     }
@@ -508,21 +508,21 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (sha.GetDigest() != authSession->Digest)
     {
         SendAuthResponseError(AUTH_FAILED);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Authentication failed for account: %u ('%s') address: %s", account.Id, authSession->Account.c_str(), ipAddress.c_str());
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Authentication failed for account: %u ('%s') address: %s", account.Id, authSession->Account.c_str(), address.c_str());
         DelayedCloseSocket();
         return;
     }
 
-    if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(ipAddress))
+    if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(address))
         _ipCountry = location->CountryCode;
 
     ///- Re-check ip locking (same check as in auth).
     if (account.IsLockedToIP)
     {
-        if (account.LastIP != ipAddress)
+        if (account.LastIP != address)
         {
             SendAuthResponseError(AUTH_FAILED);
-            LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs. Original IP: %s, new IP: %s).", account.LastIP.c_str(), ipAddress.c_str());
+            LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs. Original IP: %s, new IP: %s).", account.LastIP.c_str(), address.c_str());
             // We could log on hook only instead of an additional db log, however action logger is config based. Better keep DB logging as well
             sScriptMgr->OnFailedAccountLogin(account.Id);
             DelayedCloseSocket();
@@ -563,11 +563,11 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
-    LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.", authSession->Account.c_str(), ipAddress.c_str());
+    LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.", authSession->Account.c_str(), address.c_str());
 
     // Update the last_ip in the database as it was successful for login
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_IP);
-    stmt->setString(0, ipAddress);
+    stmt->setString(0, address);
     stmt->setString(1, authSession->Account);
 
     LoginDatabase.Execute(stmt);
@@ -636,7 +636,7 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
                 if (_worldSession && AccountMgr::IsPlayerAccount(_worldSession->GetSecurity()))
                 {
                     LOG_ERROR("network", "WorldSocket::HandlePing: %s kicked for over-speed pings (address: %s)",
-                        _worldSession->GetPlayerInfo().c_str(), ipAddress.c_str());
+                        _worldSession->GetPlayerInfo().c_str(), address.c_str());
 
                     return false;
                 }
@@ -655,7 +655,7 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
             _worldSession->SetLatency(latency);
         else
         {
-            LOG_ERROR("network", "WorldSocket::HandlePing: peer sent CMSG_PING, but is not authenticated or got recently kicked, address = %s", ipAddress.c_str());
+            LOG_ERROR("network", "WorldSocket::HandlePing: peer sent CMSG_PING, but is not authenticated or got recently kicked, address = %s", address.c_str());
             return false;
         }
     }
