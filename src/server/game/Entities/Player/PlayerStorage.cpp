@@ -2873,7 +2873,16 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
         RemoveEnchantmentDurations(pItem);
         RemoveItemDurations(pItem);
         RemoveTradeableItem(pItem);
-        RemoveItemAurasOnUnequip(pItem);
+        // Remove item spell auras
+        for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+        {
+            const _Spell& spellData = pItem->GetTemplate()->Spells[i];
+            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
+            if (spellInfo)
+            {
+                ApplyEquipSpell(spellInfo, pItem, false, false);
+            }
+        }
 
         if (bag == INVENTORY_SLOT_BAG_0)
         {
@@ -7803,22 +7812,4 @@ void Player::outDebugValues() const
     LOG_DEBUG("entities.player", "MIN_OFFHAND_DAMAGE is: \t%f\tMAX_OFFHAND_DAMAGE is: \t%f", GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE), GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE));
     LOG_DEBUG("entities.player", "MIN_RANGED_DAMAGE is: \t%f\tMAX_RANGED_DAMAGE is: \t%f", GetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE), GetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE));
     LOG_DEBUG("entities.player", "ATTACK_TIME is: \t%u\t\tRANGE_ATTACK_TIME is: \t%u", GetAttackTime(BASE_ATTACK), GetAttackTime(RANGED_ATTACK));
-}
-
-void Player::RemoveItemAurasOnUnequip(Item* item)
-{
-    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-    {
-        _Spell const& spellData = item->GetTemplate()->Spells[i];
-
-        if (!spellData.SpellId)
-        {
-            continue;
-        }
-
-        if (HasAura(spellData.SpellId))
-        {
-            RemoveAura(spellData.SpellId);
-        }
-    }
 }
