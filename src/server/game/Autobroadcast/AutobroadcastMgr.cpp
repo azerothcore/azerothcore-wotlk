@@ -7,6 +7,7 @@
 #include "Chat.h"
 #include "Language.h"
 #include "Player.h"
+#include "GridNotifiers.h"
 
 AutobroadcastMgr* AutobroadcastMgr::instance()
 {
@@ -104,7 +105,7 @@ void AutobroadcastMgr::Send()
 
     const AnnounceType announceType = static_cast<AnnounceType>(sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER));
 
-    const auto sendNotification = [](LocaleConstant locale, const std::string_view message)
+    const auto sendAsNotification = [](LocaleConstant locale, const std::string_view message)
     {
         WorldPacket data(SMSG_NOTIFICATION, (message.size() + 1));
         data << message;
@@ -118,6 +119,24 @@ void AutobroadcastMgr::Send()
         }
     };
 
+    const auto sendAsAnnouncement = [&](LocaleConstant locale, uint32 string_id, ...)
+    {
+        va_list ap;
+        va_start(ap, string_id);
+
+        Acore::WorldTextBuilder wt_builder(string_id, &ap);
+        Acore::LocalizedPacketListDo<Acore::WorldTextBuilder> wt_do(wt_builder);
+        for(const auto& [id, session] : sWorld->GetAllSessions())
+        {
+            if (!session || !session->GetPlayer() || !session->GetPlayer()->IsInWorld() || session->GetSessionDbLocaleIndex() != locale)
+                continue;
+
+            wt_do(session->GetPlayer());
+        }
+
+        va_end(ap);
+    };
+
     for (const auto& [localeId, message] : msg)
     {
         if (message.empty())
@@ -128,14 +147,14 @@ void AutobroadcastMgr::Send()
         switch (announceType)
         {
         case AnnounceType::WORLD:
-            sWorld->SendTextToSpecificLocale(localeId, LANG_AUTO_BROADCAST, message.c_str());
+            sendAsAnnouncement(localeId, LANG_AUTO_BROADCAST, message.c_str());
             break;
         case AnnounceType::NOTIFICATION:
-            sendNotification(localeId, message.c_str());
+            sendAsNotification(localeId, message.c_str());
             break;
         case AnnounceType::BOTH:
-            sWorld->SendTextToSpecificLocale(localeId, LANG_AUTO_BROADCAST, message.c_str());
-            sendNotification(localeId, message.c_str());
+            sendAsAnnouncement(localeId, LANG_AUTO_BROADCAST, message.c_str());
+            sendAsNotification(localeId, message.c_str());
             break;
         }
     }

@@ -2368,47 +2368,47 @@ void World::SendGlobalGMMessage(WorldPacket* packet, WorldSession* self, TeamId 
 
 namespace Acore
 {
-    class WorldWorldTextBuilder
+    WorldTextBuilder::WorldTextBuilder(uint32 textId, va_list* args)
+        : i_textId(textId), i_args(args) {}
+
+    void WorldTextBuilder::operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
     {
-    public:
-        typedef std::vector<WorldPacket*> WorldPacketList;
-        explicit WorldWorldTextBuilder(uint32 textId, va_list* args = nullptr) : i_textId(textId), i_args(args) {}
-        void operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
+        char const* text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
+
+        if (i_args)
         {
-            char const* text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
+            // we need copy va_list before use or original va_list will corrupted
+            va_list ap;
+            va_copy(ap, *i_args);
 
-            if (i_args)
-            {
-                // we need copy va_list before use or original va_list will corrupted
-                va_list ap;
-                va_copy(ap, *i_args);
+            char str[2048];
+            vsnprintf(str, 2048, text, ap);
+            va_end(ap);
 
-                char str[2048];
-                vsnprintf(str, 2048, text, ap);
-                va_end(ap);
-
-                do_helper(data_list, &str[0]);
-            }
-            else
-                do_helper(data_list, (char*)text);
+            do_helper(data_list, &str[0]);
         }
-    private:
-        char* lineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
-        void do_helper(WorldPacketList& data_list, char* text)
+        else
+            do_helper(data_list, (char*) text);
+    }
+
+    char* WorldTextBuilder::lineFromMessage(char*& pos)
+    {
+        char* start = strtok(pos, "\n");
+        pos         = nullptr;
+        return start;
+    }
+
+    void WorldTextBuilder::do_helper(WorldPacketList& data_list, char* text)
+    {
+        char* pos = text;
+        while (char* line = lineFromMessage(pos))
         {
-            char* pos = text;
-            while (char* line = lineFromMessage(pos))
-            {
-                WorldPacket* data = new WorldPacket();
-                ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
-                data_list.push_back(data);
-            }
+            WorldPacket* data = new WorldPacket();
+            ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+            data_list.push_back(data);
         }
-
-        uint32 i_textId;
-        va_list* i_args;
-    };
-}                                                           // namespace Acore
+    }
+} // namespace Acore
 
 /// Send a System Message to all players (except self if mentioned)
 void World::SendWorldText(uint32 string_id, ...)
@@ -2416,8 +2416,8 @@ void World::SendWorldText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Acore::WorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -2435,8 +2435,8 @@ void World::SendGMText(uint32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Acore::WorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -2446,25 +2446,6 @@ void World::SendGMText(uint32 string_id, ...)
             continue;
 
         wt_do(itr->second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
-/// Send a System Message with string_id to all players with specific locale
-void World::SendTextToSpecificLocale(LocaleConstant locale, uint32 string_id, ...)
-{
-    va_list ap;
-    va_start(ap, string_id);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (const auto [id, session] : m_sessions)
-    {
-        if (!session || !session->GetPlayer() || !session->GetPlayer()->IsInWorld() || session->GetSessionDbLocaleIndex() != locale)
-            continue;
-
-        wt_do(session->GetPlayer());
     }
 
     va_end(ap);

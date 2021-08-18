@@ -148,6 +148,24 @@ struct PetitionData
 {
 };
 
+namespace Acore
+{
+    class WorldTextBuilder
+    {
+    public:
+        typedef std::vector<WorldPacket*> WorldPacketList;
+        explicit WorldTextBuilder(uint32 textId, va_list* args = nullptr);
+        void operator()(WorldPacketList& data_list, LocaleConstant loc_idx);
+
+    private:
+        char* lineFromMessage(char*& pos);
+        void  do_helper(WorldPacketList& data_list, char* text);
+
+        uint32   i_textId;
+        va_list* i_args;
+    };
+} // namespace Acore
+
 /// The World
 class World: public IWorld
 {
@@ -255,7 +273,6 @@ public:
     void SendWorldText(uint32 string_id, ...);
     void SendGlobalText(const char* text, WorldSession* self);
     void SendGMText(uint32 string_id, ...);
-    void SendTextToSpecificLocale(LocaleConstant locale, uint32 string_id, ...);
     void SendGlobalMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
     void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
     bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
