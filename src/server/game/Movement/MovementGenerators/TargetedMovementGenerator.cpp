@@ -272,7 +272,8 @@ static Position const PredictPosition(Unit* target)
         pos.m_positionX -= cos(orientation) * speed;
         pos.m_positionY -= sin(orientation) * speed;
     }
-    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT))
+
+    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT))
     {
         pos.m_positionX += cos(orientation + M_PI / 2.f) * speed;
         pos.m_positionY += sin(orientation + M_PI / 2.f) * speed;
@@ -300,12 +301,16 @@ bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, bool isPla
         distanceTolerance += _range + _range;
     }
 
+    if (isPlayerPet)
+    {
+        targetIsMoving = target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
+    }
+
     if (exactDistSq > distanceTolerance)
         return false;
 
     if (isPlayerPet)
     {
-        targetIsMoving = target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
         if (!targetIsMoving)
         {
             if (i_recheckPredictedDistanceTimer.GetExpiry())
@@ -362,7 +367,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     bool targetIsMoving = false;
-    if (PositionOkay(owner, target, followingMaster && target->GetTypeId() == TYPEID_PLAYER, targetIsMoving, time_diff))
+    if (PositionOkay(owner, target, owner->IsGuardian() && target->GetTypeId() == TYPEID_PLAYER, targetIsMoving, time_diff))
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
@@ -423,7 +428,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(i_path->GetPath());
         init.SetWalk(target->IsWalking());
-        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), followingMaster && target->GetTypeId() == TYPEID_PLAYER))
+        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian() && target->GetTypeId() == TYPEID_PLAYER))
             init.SetVelocity(*velocity);
         init.Launch();
     }
