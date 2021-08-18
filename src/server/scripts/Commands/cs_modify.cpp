@@ -19,6 +19,7 @@ EndScriptData */
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "StringConvert.h"
 
 class modify_commandscript : public CommandScript
 {
@@ -473,7 +474,7 @@ public:
             return false;
         }
 
-        speed = (float)atof((char*)args);
+        speed = std::atof(args);
 
         if (speed > maximumBound || speed < minimumBound)
         {
@@ -493,7 +494,9 @@ public:
         {
             // check online security
             if (handler->HasLowerSecurity(player, ObjectGuid::Empty))
+            {
                 return false;
+            }
 
             if (player->IsInFlight() && checkInFlight)
             {
@@ -784,9 +787,14 @@ public:
         char const* mount_cstr = strtok(const_cast<char*>(args), " ");
         char const* speed_cstr = strtok(nullptr, " ");
 
-        if (!mount_cstr || !speed_cstr)
+        if (!mount_cstr)
         {
             return false;
+        }
+
+        if (!speed_cstr)
+        {
+            speed_cstr = "1";
         }
 
         uint32 mount = atoul(mount_cstr);
