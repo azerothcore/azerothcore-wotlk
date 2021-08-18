@@ -12,10 +12,10 @@ UPDATE `creature_template` SET `unit_class`= '2' WHERE `entry` IN (14533,14538);
 UPDATE `creature_template` SET `unit_class`= '1' WHERE `entry` IN (14530,14535,14534);
 
 -- The Cleaner
-UPDATE `creature_template` SET speed_run= 2.6, Mechanic_Immune_Mask= 650870623, `MovementType` = 0 WHERE entry = 14503;
+UPDATE `creature_template` SET `speed_run` = 2.6,` Mechanic_Immune_Mask` = 650870623, `MovementType` = 0 WHERE entry = 14503;
 
 -- Creeping Doom
-UPDATE `creature_template` SET speed_run = 0.33, speed_walk = 0.33 WHERE entry = 14761;
+UPDATE `creature_template` SET `speed_run` = 0.33, `speed_walk` = 0.33 WHERE entry = 14761;
 
 DELETE FROM `creature_text` WHERE `CreatureID` IN (14536,14531,14529,14527,14503,14530,14533,14534,14535);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
@@ -157,10 +157,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14503, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 100, 0, 0, 0, 0, 0, 0, 0, 'The Cleaner - On Spawn - Start Combat');
 
 
-UPDATE `creature_template` SET `gossip_menu_id` = '60001' WHERE `entry` = 14536;
-UPDATE `creature_template` SET `gossip_menu_id` = '5868' WHERE `entry` = 14527;
-UPDATE `creature_template` SET `gossip_menu_id` = '60003' WHERE `entry` = 14529;
-UPDATE `creature_template` SET `gossip_menu_id` = '60004' WHERE `entry` = 14531;
+UPDATE `creature_template` SET `gossip_menu_id` = 60001 WHERE `entry` = 14536;
+UPDATE `creature_template` SET `gossip_menu_id` = 5868 WHERE `entry` = 14527;
+UPDATE `creature_template` SET `gossip_menu_id` = 60003 WHERE `entry` = 14529;
+UPDATE `creature_template` SET `gossip_menu_id` = 60004 WHERE `entry` = 14531;
 
 DELETE FROM `gossip_menu` WHERE `MenuID` BETWEEN 60001 AND 60004;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES 
