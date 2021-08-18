@@ -1198,7 +1198,7 @@ public:
             amount = talentSpell->Effects[EFFECT_0].CalcValue(owner);
             if (Player* player = owner->ToPlayer())
             {
-                amount += int32(2 * owner->GetTotalAttackPowerValue(BASE_ATTACK));
+                amount += int32(2 * player->GetTotalAttackPowerValue(BASE_ATTACK));
             }
         }
 
