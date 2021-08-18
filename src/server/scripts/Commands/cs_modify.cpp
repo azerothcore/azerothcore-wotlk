@@ -76,7 +76,8 @@ public:
         return commandTable;
     }
 
-    template<typename... Args> static void NotifyModification(ChatHandler* handler, Unit* target, AcoreStrings resourceMessage, AcoreStrings resourceReportMessage, Args&&... args)
+    template<typename... Args>
+    static void NotifyModification(ChatHandler* handler, Unit* target, AcoreStrings resourceMessage, AcoreStrings resourceReportMessage, Args&&... args)
     {
         if (Player* player = target->ToPlayer())
         {
