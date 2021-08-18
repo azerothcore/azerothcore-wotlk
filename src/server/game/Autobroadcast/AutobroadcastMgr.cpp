@@ -4,9 +4,9 @@
 
 #include "AutobroadcastMgr.h"
 #include "Config.h"
+#include "Chat.h"
 #include "Language.h"
 #include "Player.h"
-#include "Chat.h"
 
 AutobroadcastMgr* AutobroadcastMgr::instance()
 {
@@ -112,7 +112,7 @@ void AutobroadcastMgr::Send()
         }
 
         const LocaleConstant playerLocale = session->GetSessionDbcLocale();
-        const std::string_view localeMsg = msg[playerLocale];
+        const std::string& localeMsg = msg[playerLocale];
 
         if (localeMsg.empty())
         {
@@ -122,14 +122,14 @@ void AutobroadcastMgr::Send()
         switch (announceType)
         {
         case AnnounceType::WORLD:
-            ChatHandler(session).PSendSysMessage(LANG_AUTO_BROADCAST, localeMsg.data());
+            ChatHandler(session).PSendSysMessage(LANG_AUTO_BROADCAST, localeMsg.c_str());
             break;
         case AnnounceType::NOTIFICATION:
-            session->SendNotification(localeMsg.data());
+            session->SendNotification(localeMsg.c_str());
             break;
         case AnnounceType::BOTH:
-            ChatHandler(session).PSendSysMessage(LANG_AUTO_BROADCAST, localeMsg.data());
-            session->SendNotification(localeMsg.data());
+            ChatHandler(session).PSendSysMessage(LANG_AUTO_BROADCAST, localeMsg.c_str());
+            session->SendNotification(localeMsg.c_str());
             break;
         }
     }
