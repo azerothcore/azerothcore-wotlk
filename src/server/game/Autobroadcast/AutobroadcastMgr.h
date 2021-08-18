@@ -24,12 +24,11 @@ public:
 
 private:
     typedef std::map<LocaleConstant, std::string> AutobroadcastTextMap;
-    AutobroadcastTextMap m_AutobroadcastTextLocale;
-
-    typedef std::map<uint8, AutobroadcastTextMap> AutobroadcastsLocaleMap;
-    AutobroadcastsLocaleMap m_Autobroadcasts;
-
+    typedef std::map<uint8, AutobroadcastTextMap> AutobroadcastsMap;
     typedef std::map<uint8, uint8> AutobroadcastsWeightMap;
+
+    AutobroadcastTextMap m_AutobroadcastTextLocale;
+    AutobroadcastsMap m_Autobroadcasts;
     AutobroadcastsWeightMap m_AutobroadcastsWeights;
 };
 
