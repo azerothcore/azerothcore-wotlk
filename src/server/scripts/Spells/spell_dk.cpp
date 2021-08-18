@@ -1188,7 +1188,7 @@ public:
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
             SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
-            
+
             Unit* owner = GetCaster()->GetOwner();
             if (!owner)
             {
