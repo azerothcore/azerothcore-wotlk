@@ -2451,6 +2451,28 @@ void World::SendGMText(uint32 string_id, ...)
     va_end(ap);
 }
 
+/// Send a System Message with string_id to all players with specific locale
+void World::SendTextToSpecificLocale(LocaleConstant locale, uint32 string_id, ...)
+{
+    va_list ap;
+    va_start(ap, string_id);
+
+    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    for (const auto [id, session] : m_sessions)
+    {
+        if (!session || !session->GetPlayer() || !session->GetPlayer()->IsInWorld() || locale >= TOTAL_LOCALES)
+            continue;
+
+        if (session->GetSessionDbcLocale() != locale)
+            continue;
+
+        wt_do(session->GetPlayer());
+    }
+
+    va_end(ap);
+}
+
 /// DEPRECATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
 void World::SendGlobalText(const char* text, WorldSession* self)
 {

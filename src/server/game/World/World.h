@@ -255,6 +255,7 @@ public:
     void SendWorldText(uint32 string_id, ...);
     void SendGlobalText(const char* text, WorldSession* self);
     void SendGMText(uint32 string_id, ...);
+    void SendTextToSpecificLocale(LocaleConstant locale, uint32 string_id, ...);
     void SendGlobalMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
     void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
     bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);

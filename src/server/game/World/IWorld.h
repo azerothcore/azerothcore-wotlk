@@ -539,6 +539,7 @@ public:
     virtual void SendWorldText(uint32 string_id, ...) = 0;
     virtual void SendGlobalText(const char* text, WorldSession* self) = 0;
     virtual void SendGMText(uint32 string_id, ...) = 0;
+    virtual void SendTextToSpecificLocale(LocaleConstant locale, uint32 string_id, ...) = 0;
     virtual void SendGlobalMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;

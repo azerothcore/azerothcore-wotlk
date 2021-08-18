@@ -104,17 +104,16 @@ void AutobroadcastMgr::Send()
 
     const AnnounceType announceType = static_cast<AnnounceType>(sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER));
 
-    for (const auto [id, session] : sWorld->GetAllSessions())
+    const auto sendNotification = [](const std::string_view message)
     {
-        if (!session || !session->GetPlayer() || !session->GetPlayer()->IsInWorld())
-        {
-            continue;
-        }
+        WorldPacket data(SMSG_NOTIFICATION, (message.size() + 1));
+        data << message;
+        sWorld->SendGlobalMessage(&data);
+    };
 
-        const LocaleConstant playerLocale = session->GetSessionDbcLocale();
-        const std::string& localeMsg = msg[playerLocale];
-
-        if (localeMsg.empty())
+    for (const auto& [localeId, message] : msg)
+    {
+        if (message.empty())
         {
             continue;
         }
@@ -122,14 +121,14 @@ void AutobroadcastMgr::Send()
         switch (announceType)
         {
         case AnnounceType::WORLD:
-            ChatHandler(session).PSendSysMessage(LANG_AUTO_BROADCAST, localeMsg.c_str());
+            sWorld->SendTextToSpecificLocale(localeId, LANG_AUTO_BROADCAST, message.c_str());
             break;
         case AnnounceType::NOTIFICATION:
-            session->SendNotification(localeMsg.c_str());
+            sendNotification(message.c_str());
             break;
         case AnnounceType::BOTH:
-            ChatHandler(session).PSendSysMessage(LANG_AUTO_BROADCAST, localeMsg.c_str());
-            session->SendNotification(localeMsg.c_str());
+            sWorld->SendTextToSpecificLocale(localeId, LANG_AUTO_BROADCAST, message.c_str());
+            sendNotification(message.c_str());
             break;
         }
     }
