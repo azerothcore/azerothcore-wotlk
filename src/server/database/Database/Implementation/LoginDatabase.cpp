@@ -124,7 +124,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
 
     // Mute system
     PrepareStatement(LOGIN_INS_ACCOUNT_MUTE, "INSERT INTO `account_muted` (`accountid`, `mutedate`, `mutetime`, `mutedby`, `mutereason`, `active`) VALUES (?, ?, ?, ?, ?, 1)", CONNECTION_ASYNC);
-    PrepareStatement(LOGIN_UPD_ACCOUNT_MUTE, "UPDATE `account_muted` SET `mutedate` = ?, `mutetime` = ? WHERE `accountid` = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_ACCOUNT_MUTE_DATE, "UPDATE `account_muted` SET `mutedate` = ? WHERE `accountid` = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO, "SELECT `mutedate`, `mutetime`, `mutereason`, `mutedby` FROM `account_muted` WHERE `accountid` = ? ORDER BY `mutedate` ASC", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_ACCOUNT_MUTE, "SELECT `mutedate`, `mutetime`, `mutereason`, `mutedby` FROM `account_muted` WHERE `accountid` = ? AND `active` = 1 AND UNIX_TIMESTAMP() <= `mutedate` + ABS(`mutetime`) ORDER BY `mutedate` + ABS(`mutetime`) DESC LIMIT 1", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_UPD_ACCOUNT_MUTE_EXPIRED, "UPDATE `account_muted` SET `active` = 0 WHERE `active` = 1 AND `mutetime` > 0 AND `accountid` = ? AND UNIX_TIMESTAMP() >= `mutedate` + `mutetime`", CONNECTION_ASYNC);
