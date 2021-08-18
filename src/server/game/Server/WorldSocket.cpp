@@ -471,7 +471,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (sWorld->IsClosed())
     {
         SendAuthResponseError(AUTH_REJECT);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", address.c_str());
+        LOG_ERROR("network", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", GetRemoteIpAddress().to_string().c_str());
         DelayedCloseSocket();
         return;
     }
@@ -480,7 +480,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     {
         SendAuthResponseError(REALM_LIST_REALM_NOT_FOUND);
         LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client %s requested connecting with realm id %u but this realm has id %u set in config.",
-            address.c_str(), authSession->RealmID, realm.Id.Realm);
+            GetRemoteIpAddress().to_string().c_str(), authSession->RealmID, realm.Id.Realm);
         DelayedCloseSocket();
         return;
     }
@@ -639,7 +639,7 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
                 if (_worldSession && AccountMgr::IsPlayerAccount(_worldSession->GetSecurity()))
                 {
                     LOG_ERROR("network", "WorldSocket::HandlePing: %s kicked for over-speed pings (address: %s)",
-                        _worldSession->GetPlayerInfo().c_str(), address.c_str());
+                        _worldSession->GetPlayerInfo().c_str(), GetRemoteIpAddress().to_string().c_str());
 
                     return false;
                 }
@@ -658,7 +658,7 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
             _worldSession->SetLatency(latency);
         else
         {
-            LOG_ERROR("network", "WorldSocket::HandlePing: peer sent CMSG_PING, but is not authenticated or got recently kicked, address = %s", address.c_str());
+            LOG_ERROR("network", "WorldSocket::HandlePing: peer sent CMSG_PING, but is not authenticated or got recently kicked, address = %s", GetRemoteIpAddress().to_string().c_str());
             return false;
         }
     }
