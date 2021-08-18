@@ -474,7 +474,7 @@ public:
             return false;
         }
 
-        speed = std::atof(args);
+        speed = double(std::atof(args));
 
         if (speed > maximumBound || speed < minimumBound)
         {
@@ -797,7 +797,7 @@ public:
             speed_cstr = "1";
         }
 
-        uint32 mount = atoul(mount_cstr);
+        uint32 mount = uint32(std::stoul(mount_cstr));
         if (!sCreatureDisplayInfoStore.LookupEntry(mount))
         {
             handler->SendSysMessage(LANG_NO_MOUNT);
