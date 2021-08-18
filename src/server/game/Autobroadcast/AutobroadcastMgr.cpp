@@ -20,6 +20,7 @@ void AutobroadcastMgr::Load()
 
     m_Autobroadcasts.clear();
     m_AutobroadcastsWeights.clear();
+    m_AutobroadcastTextLocale.clear();
 
     const uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST);
