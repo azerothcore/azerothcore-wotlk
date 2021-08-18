@@ -23,10 +23,10 @@ public:
     void Send();
 
 private:
-    typedef std::map<LocaleConstant, std::string> AutobroadcastTextLocale;
-    AutobroadcastTextLocale m_AutobroadcastTextLocale;
+    typedef std::map<LocaleConstant, std::string> AutobroadcastTextMap;
+    AutobroadcastTextMap m_AutobroadcastTextLocale;
 
-    typedef std::map<uint8, AutobroadcastTextLocale> AutobroadcastsLocaleMap;
+    typedef std::map<uint8, AutobroadcastTextMap> AutobroadcastsLocaleMap;
     AutobroadcastsLocaleMap m_Autobroadcasts;
 
     typedef std::map<uint8, uint8> AutobroadcastsWeightMap;

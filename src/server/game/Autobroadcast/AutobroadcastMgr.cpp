@@ -69,7 +69,7 @@ void AutobroadcastMgr::Send()
     uint32 weight = 0;
     AutobroadcastsWeightMap selectionWeights;
 
-    AutobroadcastTextLocale msg;
+    AutobroadcastTextMap msg;
 
     for (const auto [id, weightId] : m_AutobroadcastsWeights)
     {
