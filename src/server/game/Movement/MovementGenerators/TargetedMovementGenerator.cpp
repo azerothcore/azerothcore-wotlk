@@ -238,15 +238,28 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
         (owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID()))
     {
         UnitMoveType moveType = Movement::SelectSpeedType(target->GetUnitMovementFlags());
-        speed = target->GetSpeed(moveType);
+        speed = std::max(target->GetSpeed(moveType), owner->GetSpeed(moveType));
 
         if (playerPet)
         {
-            float distance = owner->GetDistance2d(dest.x, dest.y);
-            if (distance >= 1.f)
+            float distance = owner->GetDistance2d(dest.x, dest.y) - (*speed / 2.f);
+            if (distance > 0.f)
             {
                 float multiplier = 1.f + (distance / 10.f);
                 *speed *= multiplier;
+            }
+            else
+            {
+                switch (moveType)
+                {
+                    case MOVE_RUN_BACK:
+                    case MOVE_SWIM_BACK:
+                    case MOVE_FLIGHT_BACK:
+                        break;
+                    default:
+                        *speed *= 0.9f;
+                        break;
+                }
             }
         }
     }
@@ -288,7 +301,7 @@ static Position const PredictPosition(Unit* target)
 }
 
 template<class T>
-bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, bool isPlayerPet, bool& targetIsMoving, uint32 diff)
+bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bool& targetIsMoving, uint32 diff)
 {
     if (!_lastTargetPosition)
         return false;
@@ -367,7 +380,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     bool targetIsMoving = false;
-    if (PositionOkay(owner, target, owner->IsGuardian() && target->GetTypeId() == TYPEID_PLAYER, targetIsMoving, time_diff))
+    if (PositionOkay(target, owner->IsGuardian() && target->GetTypeId() == TYPEID_PLAYER, targetIsMoving, time_diff))
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
@@ -391,7 +404,12 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         // If player is moving and their position is not updated, we need to predict position
         if (targetIsMoving)
         {
-            targetPosition = PredictPosition(target);
+            Position predictedPosition = PredictPosition(target);
+            if (_lastPredictedPosition && _lastPredictedPosition->GetExactDistSq(&predictedPosition) < 0.25f)
+                return true;
+
+            _lastPredictedPosition = predictedPosition;
+            targetPosition = predictedPosition;
             i_recheckPredictedDistance = true;
         }
         else

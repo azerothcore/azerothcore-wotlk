@@ -79,7 +79,7 @@ public:
 
     void unitSpeedChanged() { _lastTargetPosition.reset(); }
 
-    bool PositionOkay(T* owner, Unit* target, bool isPlayerPet, bool& targetIsMoving, uint32 diff);
+    bool PositionOkay(Unit* target, bool isPlayerPet, bool& targetIsMoving, uint32 diff);
 
     static void _clearUnitStateMove(T* u) { u->ClearUnitState(UNIT_STATE_FOLLOW_MOVE); }
     static void _addUnitStateMove(T* u) { u->AddUnitState(UNIT_STATE_FOLLOW_MOVE); }
@@ -92,6 +92,7 @@ private:
     bool i_recheckPredictedDistance;
 
     Optional<Position> _lastTargetPosition;
+    Optional<Position> _lastPredictedPosition;
     float _range;
     ChaseAngle _angle;
 };
