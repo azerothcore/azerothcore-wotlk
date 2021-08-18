@@ -7271,6 +7271,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Speed = 0.0f;
     });
 
+    // 53651 Light's Beacon
+    ApplySpellFix({ 53651 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
