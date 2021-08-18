@@ -397,12 +397,14 @@ public:
                             if( me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID() )
                                 continue;
                             bool found = false;
-                            for( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
-                                if( (*itr)->GetVictim() && (*itr)->GetVictim()->GetGUID() == temp->GetGUID() )
+                            for (std::list<Creature*>::iterator iterator = icl.begin(); iterator != icl.end(); ++iterator)
+                            {
+                                if ((*iterator)->GetVictim() && (*iterator)->GetVictim()->GetGUID() == temp->GetGUID())
                                 {
                                     found = true;
                                     break;
                                 }
+                            }
 
                             if( !found )
                                 playerGUIDs.push_back(temp->GetGUID());

@@ -88,16 +88,17 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     if (!result)
         return PET_LOAD_NO_RESULT;
 
-    if (!GetPlayer() || GetPlayer()->GetPet() || GetPlayer()->GetVehicle() || GetPlayer()->IsSpectator())
+    Player* owner = GetPlayer();
+    if (!owner || owner->GetPet() || owner->GetVehicle() || owner->IsSpectator() || owner->IsBeingTeleportedFar())
+    {
         return PET_LOAD_ERROR;
+    }
 
     Field* fields = result->Fetch();
 
     // Xinef: this can happen if fetch is called twice, impossibru.
     if (!fields)
         return PET_LOAD_ERROR;
-
-    Player* owner = GetPlayer();
 
     // update for case of current pet "slot = 0"
     uint32 petentry = fields[1].GetUInt32();
