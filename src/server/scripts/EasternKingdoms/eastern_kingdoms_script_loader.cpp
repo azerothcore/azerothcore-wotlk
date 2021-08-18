@@ -25,7 +25,6 @@ void AddSC_boss_drakkisath();                //Blackrock Spire
 void AddSC_boss_halycon();
 void AddSC_boss_highlordomokk();
 void AddSC_boss_overlordwyrmthalak();
-void AddSC_boss_shadowvosh();
 void AddSC_boss_thebeast();
 void AddSC_boss_warmastervoone();
 void AddSC_boss_quatermasterzigris();
@@ -162,7 +161,6 @@ void AddEasternKingdomsScripts()
     AddSC_boss_halycon();
     AddSC_boss_highlordomokk();
     AddSC_boss_overlordwyrmthalak();
-    AddSC_boss_shadowvosh();
     AddSC_boss_thebeast();
     AddSC_boss_warmastervoone();
     AddSC_boss_quatermasterzigris();
