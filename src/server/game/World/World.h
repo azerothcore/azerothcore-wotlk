@@ -163,7 +163,6 @@ public:
     WorldSession* FindOfflineSession(uint32 id) const;
     WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const;
     void AddSession(WorldSession* s);
-    void SendAutoBroadcast();
     bool KickSession(uint32 id);
     /// Get the number of current active sessions
     void UpdateMaxSessionCounters();
@@ -368,8 +367,6 @@ public:
     char const* GetCharacterDBRevision() const { return m_CharacterDBRevision.c_str(); }
     char const* GetAuthDBRevision() const { return m_AuthDBRevision.c_str(); }
 
-    void LoadAutobroadcasts();
-
     void UpdateAreaDependentAuras();
 
     uint32 GetCleaningFlags() const { return m_CleaningFlags; }
@@ -477,12 +474,6 @@ private:
     std::string m_WorldDBRevision;
     std::string m_CharacterDBRevision;
     std::string m_AuthDBRevision;
-
-    typedef std::map<uint8, std::string> AutobroadcastsMap;
-    AutobroadcastsMap m_Autobroadcasts;
-
-    typedef std::map<uint8, uint8> AutobroadcastsWeightMap;
-    AutobroadcastsWeightMap m_AutobroadcastsWeights;
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;

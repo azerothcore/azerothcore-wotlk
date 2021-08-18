@@ -495,7 +495,6 @@ public:
     virtual WorldSession* FindOfflineSession(uint32 id) const = 0;
     virtual WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const = 0;
     virtual void AddSession(WorldSession* s) = 0;
-    virtual void SendAutoBroadcast() = 0;
     virtual bool KickSession(uint32 id) = 0;
     virtual void UpdateMaxSessionCounters() = 0;
     virtual const SessionMap& GetAllSessions() const = 0;
@@ -590,7 +589,6 @@ public:
     virtual char const* GetWorldDBRevision() const = 0;
     virtual char const* GetCharacterDBRevision() const = 0;
     virtual char const* GetAuthDBRevision() const = 0;
-    virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     virtual uint32 GetCleaningFlags() const = 0;
     virtual void   SetCleaningFlags(uint32 flags) = 0;

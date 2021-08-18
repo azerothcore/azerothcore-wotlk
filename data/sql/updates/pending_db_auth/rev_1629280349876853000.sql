@@ -1,0 +1,14 @@
+INSERT INTO `version_db_auth` (`sql_rev`) VALUES ('1629280349876853000');
+
+ALTER TABLE autobroadcast CHANGE COLUMN text text_enUS LONGTEXT NOT NULL;
+
+ALTER TABLE autobroadcast
+    ADD text_deDE LONGTEXT NOT NULL,
+    ADD text_frFR LONGTEXT NOT NULL,
+    ADD text_ruRU LONGTEXT NOT NULL,
+    ADD text_esES LONGTEXT NOT NULL,
+    ADD text_esMX LONGTEXT NOT NULL,
+    ADD text_koKR LONGTEXT NOT NULL,
+    ADD text_zhCN LONGTEXT NOT NULL,
+    ADD text_zhTW LONGTEXT NOT NULL
+AFTER text_enUS;

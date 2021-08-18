@@ -13,6 +13,7 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "AuctionHouseMgr.h"
+#include "AutobroadcastMgr.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
 #include "CreatureTextMgr.h"
@@ -378,7 +379,7 @@ public:
     static bool HandleReloadAutobroadcastCommand(ChatHandler* handler, const char* /*args*/)
     {
         LOG_INFO("server.loading", "Re-Loading Autobroadcasts...");
-        sWorld->LoadAutobroadcasts();
+        sAutobroadcastMgr->Load();
         handler->SendGlobalGMSysMessage("DB table `autobroadcast` reloaded.");
         return true;
     }
