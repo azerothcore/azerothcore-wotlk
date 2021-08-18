@@ -7277,6 +7277,11 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
     });
 
+    // 16097 Shadow Hunter Vosh'gajin - Hex
+    ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo) {
+        spellInfo->CastingTimeIndex = 16;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
