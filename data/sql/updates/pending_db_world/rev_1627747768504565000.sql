@@ -3,7 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627747768504565000');
 -- Add the gossip option
 UPDATE `creature_template` SET `ScriptName` = '', `npcflag` = 1, `type` = 3, `faction` = 31 WHERE (`entry`IN (14527, 14529, 14531, 14536));
 UPDATE `creature_template` SET `ScriptName` = '' WHERE (`entry`IN (14538));
--- 'npc_stave_of_the_ancients' Scripts need work. When they run this they instantly trandform without letting the gossip otion
+-- 'npc_stave_of_the_ancients' Script is going to be removed and instead use the smart scripts
 UPDATE `creature_template` SET `AIName`='SmartAI', `MovementType` = 2 WHERE  `entry` IN (14536,14531,14529,14527,14530,14533,14534,14535);
 -- Make them patrol
 UPDATE `creature` SET `MovementType` = 2 WHERE `id` IN (14536,14531,14529,14527,14503,14530,14533,14534,14535,14503);
@@ -16,7 +16,6 @@ UPDATE `creature_template` SET speed_run= 2.6, Mechanic_Immune_Mask= 650870623, 
 
 -- Creeping Doom
 UPDATE `creature_template` SET speed_run = 0.33, speed_walk = 0.33 WHERE entry = 14761;
-
 
 DELETE FROM `creature_text` WHERE `CreatureID` IN (14536,14531,14529,14527,14503,14530,14533,14534,14535);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
@@ -76,8 +75,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1453600, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Script - Stop WP'),
 
 -- Simone
-(14527, 0, 1, 3, 11, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Spawn - Set Active'),
-(14527, 0, 2, 0, 62, 0, 100, 0, 5868, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Gossip Select - Close Gossip'),
+(14527, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Spawn - Set Active'),
+(14527, 0, 2, 3, 62, 0, 100, 0, 5868, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Gossip Select - Close Gossip'),
 (14527, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1452700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simone the Inconspicuous - On Gossip Select - Run Script'),
 (14527, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Simone the Seductress - On Agro Cast Fools Plight'),
 (14527, 0, 5, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 12, 14503, 8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Simone the Seductress - On Agro Summon The Cleaner'),
@@ -100,57 +99,57 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14528, 0, 3, 0, 61, 0, 100, 0, 1, 1, 0, 0, 0, 3, 0, 6688, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Precious - On Data Set - Change Model'),
 
 -- Franklin/Klinfran
-(14529, 0, 1, 3, 11, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Spawn - Set Active'),
-(14529, 0, 2, 0, 62, 0, 100, 0, 60003, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Gossip Select - Close Gossip'),
-(14529, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1452900, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Gossip Select - Run Script'),
-(14529, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Agro Cast Fools Plight'),
-(14529, 0, 5, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 12, 14503, 8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Agro Summon The Cleaner'),
-(14529, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Evade - Despawn The Cleaner'),
-(14529, 0, 7, 0, 0, 0, 100, 0, 1000, 1000, 20000, 30000, 0, 11, 32851, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - In combat - Cast Demonic Frenzy'),
-(14529, 0, 8, 9, 8, 0, 100, 0, 3043, 0, 0, 0, 0, 28, 32851, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Spellhit - Remove Demonic Frenzy'),
-(14529, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 11, 23260, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Spellhit - Cast Entropic Sting'),
-(14529, 0, 10, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Death - Despawn The Cleaner'),
-(14529, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On spawn - Set Phase 1'),
-(14529, 0, 12, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - In combat (Phase 1) - Cast Fools Plight Every 10 seconds'),
-(14529, 0, 13, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - OOC - Despawn'),
-(14529, 0, 14, 0, 8, 0, 100, 0, 32851, 0, 10000, 10000, 0, 1, 2, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Klinfran the Crazed - On Spellhit - Say Line 2'),
+(14529, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Respawn - Set Active On'),
+(14529, 0, 2, 3, 62, 0, 100, 0, 60003, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Gossip Option 0 Selected - Close Gossip'),
+(14529, 0, 3, 0, 61, 0, 100, 0, 60003, 0, 0, 0, 0, 80, 1452900, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Gossip Option 0 Selected - Run Script'),
+(14529, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Aggro - Cast \'Fool`s Plight\''),
+(14529, 0, 5, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 12, 14503, 8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Aggro - Summon Creature \'The Cleaner\''),
+(14529, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Evade - Despawn Instant'),
+(14529, 0, 7, 0, 0, 0, 100, 0, 1000, 1000, 20000, 30000, 0, 11, 32851, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - In Combat - Cast \'Demonic Frenzy\''),
+(14529, 0, 8, 9, 8, 0, 100, 0, 3043, 0, 0, 0, 0, 28, 32851, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Spellhit \'Scorpid Sting\' - Remove Aura \'Demonic Frenzy\''),
+(14529, 0, 9, 0, 61, 0, 100, 0, 3043, 0, 0, 0, 0, 11, 23260, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Spellhit \'Scorpid Sting\' - Cast \'Entropic Sting\''),
+(14529, 0, 10, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Just Died - Despawn Instant'),
+(14529, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Respawn - Set Event Phase 1'),
+(14529, 0, 12, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - In Combat - Cast \'Fool`s Plight\' (Phase 1)'),
+(14529, 0, 13, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - Out of Combat - Despawn Instant (Phase 2) (No Repeat)'),
+(14529, 0, 14, 0, 8, 0, 100, 0, 32851, 0, 10000, 10000, 0, 1, 2, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Spellhit \'Demonic Frenzy\' - Say Line 2'),
 (14529, 0, 15, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Franklin the Friendly - On Gossip Hello - Stop Waypoint'),
 
 -- Artorius
-(14531, 0, 1, 3, 11, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Spawn - Set Active'),
-(14531, 0, 2, 0, 62, 0, 100, 0, 60004, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Gossip Select - Close Gossip'),
-(14531, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1453100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Gossip Select - Run Script'),
-(14531, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - On Agro Cast Fools Plight'),
-(14531, 0, 5, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 12, 14503, 8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - On Agro Summon The Cleaner'),
-(14531, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - On Evade - Despawn The Cleaner'),
-(14531, 0, 7, 0, 0, 0, 100, 0, 5000, 8000, 15000, 20000, 0, 11, 23257, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - In combat Cast - Demonic Frenzy'),
-(14531, 0, 8, 0, 0, 0, 100, 0, 7500, 7500, 60000, 90000, 0, 11, 23298, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - In combat Cast - Demonic Doom'),
-(14531, 0, 9, 10, 8, 0, 100, 0, 1978, 0, 0, 0, 0, 11, 23299, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Spellhit - cast stinging trauma'),
-(14531, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Spellhit Say - Despawn The Cleaner'),
-(14531, 0, 11, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - On Death - Despawn The Cleaner'),
-(14531, 0, 12, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - On spawn - Set Phase 1'),
-(14531, 0, 13, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - IC (Phase 1) - Cast Fools Plight Every 10 seconds'),
-(14531, 0, 14, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - OOC - Despawn'),
-(14531, 0, 15, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Doombringer - On Gossip Hello - Stop Waypoint'),
+(14531, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Respawn - Set Active On'),
+(14531, 0, 2, 3, 62, 0, 100, 0, 60004, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Gossip Option 0 Selected - Close Gossip'),
+(14531, 0, 3, 0, 61, 0, 100, 0, 60004, 0, 0, 0, 0, 80, 1453100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Gossip Option 0 Selected - Run Script'),
+(14531, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Aggro - Cast \'Fool`s Plight\''),
+(14531, 0, 5, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 12, 14503, 8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Aggro - Summon Creature \'The Cleaner\''),
+(14531, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Evade - Despawn Instant'),
+(14531, 0, 7, 0, 0, 0, 100, 0, 5000, 8000, 15000, 20000, 0, 11, 23257, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - In Combat - Cast \'Demonic Enrage\''),
+(14531, 0, 8, 0, 0, 0, 100, 0, 7500, 7500, 60000, 90000, 0, 11, 23298, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - In Combat - Cast \'Demonic Doom\''),
+(14531, 0, 9, 10, 8, 0, 100, 0, 1978, 0, 0, 0, 0, 11, 23299, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Spellhit \'Serpent Sting\' - Cast \'Stinging Trauma\''),
+(14531, 0, 10, 0, 61, 0, 100, 0, 1978, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Spellhit \'Serpent Sting\' - Set Faction 0'),
+(14531, 0, 11, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Just Died - Despawn Instant'),
+(14531, 0, 12, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Respawn - Set Event Phase 1'),
+(14531, 0, 13, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - In Combat - Cast \'Fool`s Plight\' (Phase 1)'),
+(14531, 0, 14, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - Out of Combat - Despawn Instant (Phase 2) (No Repeat)'),
+(14531, 0, 15, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Artorius the Amiable - On Gossip Hello - Stop Waypoint'),
 
 -- Nelson
-(14536, 0, 1, 3, 11, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spawn - Set Active'),
-(14536, 0, 2, 3, 62, 0, 100, 0, 60001, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Gossip Select - Close Gossip'),
-(14536, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 80, 1453600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Gossip Select - Run Script'),
-(14536, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On Agro Cast Fools Plight'),
-(14536, 0, 5, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 12, 14503, 8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On Agro Summon The Cleaner'),
-(14536, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On Evade - Despawn The Cleaner'),
-(14536, 0, 7, 0, 0, 0, 100, 0, 1000, 1000, 45000, 60000, 0, 11, 23272, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - IC Cast Soul Flame'),
-(14536, 0, 8, 0, 0, 0, 100, 0, 10000, 15000, 15000, 20000, 0, 11, 23275, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - IC Dreadful Fright'),
-(14536, 0, 9, 0, 0, 0, 100, 0, 3000, 6000, 15000, 15000, 0, 11, 23589, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - IC Cast Creeping Doom'),
-(14536, 0, 10, 11, 8, 0, 100, 0, 2974, 0, 0, 0, 0, 11, 23279, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On Spellhit Cast Crippling Crip'),
-(14536, 0, 11, 0, 61, 0, 100, 0, 2974, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spellhit \'Wing Clip\' - Say Line 2'),
-(14536, 0, 12, 0, 8, 0, 100, 0, 13810, 0, 0, 0, 0, 28, 23272, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On Spellhit Cast Crippling Crip'),
-(14536, 0, 13, 0, 1, 0, 100, 0, 900000, 900000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On Spellhit (Frost Trap Aura)- Remove Soul Flame'),
-(14536, 0, 14, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On Death - Despawn The Cleaner'),
-(14536, 0, 15, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - On spawn - Set Phase 1'),
-(14536, 0, 16, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - IC (Phase 1) - Cast Fools Plight Every 10 seconds'),
-(14536, 0, 17, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 0, 'Solenor the Slayer - OOC - Despawn'),
+(14536, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Respawn - Set Active On'),
+(14536, 0, 2, 3, 62, 0, 100, 0, 60001, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Gossip Option 0 Selected - Close Gossip'),
+(14536, 0, 3, 0, 61, 0, 100, 0, 60001, 0, 0, 0, 0, 80, 1453600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Gossip Option 0 Selected - Run Script'),
+(14536, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Aggro - Cast \'Fool`s Plight\''),
+(14536, 0, 5, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 12, 14503, 8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Aggro - Summon Creature \'The Cleaner\''),
+(14536, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Evade - Despawn Instant'),
+(14536, 0, 7, 0, 0, 0, 100, 0, 1000, 1000, 45000, 60000, 0, 11, 23272, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - In Combat - Cast \'Soul Flame\''),
+(14536, 0, 8, 0, 0, 0, 100, 0, 10000, 15000, 15000, 20000, 0, 11, 23275, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - In Combat - Cast \'Dreadful Fright\''),
+(14536, 0, 9, 0, 0, 0, 100, 0, 3000, 6000, 15000, 15000, 0, 11, 23589, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - In Combat - Cast \'Creeping Doom\''),
+(14536, 0, 10, 11, 8, 0, 100, 0, 2974, 0, 0, 0, 0, 11, 23279, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spellhit \'Wing Clip\' - Cast \'Crippling Clip\''),
+(14536, 0, 11, 0, 61, 0, 100, 0, 2974, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spellhit \'Wing Clip\' - No Action Type'),
+(14536, 0, 12, 0, 8, 0, 100, 0, 13810, 0, 0, 0, 0, 28, 23272, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spellhit \'Frost Trap Aura\' - Remove Aura \'Soul Flame\''),
+(14536, 0, 13, 0, 1, 0, 100, 0, 900000, 900000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - Out of Combat - Despawn Instant'),
+(14536, 0, 14, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Just Died - Despawn Instant'),
+(14536, 0, 15, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Respawn - Set Event Phase 1'),
+(14536, 0, 16, 0, 0, 1, 100, 0, 10000, 10000, 10000, 10000, 0, 11, 23504, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - In Combat - Cast \'Fool`s Plight\' (Phase 1)'),
+(14536, 0, 17, 0, 1, 2, 100, 1, 900000, 900000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14538, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - Out of Combat - Despawn Instant (Phase 2) (No Repeat)'),
 (14536, 0, 18, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 55, 90000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Gossip Hello - Stop Waypoint'),
 
 (14503, 0, 0, 1, 4, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'The Cleaner - On Agro Cast Fools Plight'),
