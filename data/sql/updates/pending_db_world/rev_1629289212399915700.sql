@@ -226,8 +226,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) SELECT `entry`
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) SELECT `pool_id`, `mother_pool`, `chance`, `description` FROM TEMP_POOL_POOL_ENTRIES;
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) SELECT `guid`, `pool_entry`, `chance`, `description` FROM TEMP_POOL_ENTRIES;
 
-#DROP TABLE TEMP_POOL_GUIDS;
-#DROP TABLE TEMP_DUP_ORES;
 DROP TABLE TEMP_POOL_TEMPLATES;
 DROP TABLE TEMP_POOL_POOL_ENTRIES;
 DROP TABLE TEMP_POOL_ENTRIES;
