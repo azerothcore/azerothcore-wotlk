@@ -143,7 +143,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14536, 0, 8, 0, 0, 0, 100, 0, 10000, 15000, 15000, 20000, 0, 11, 23275, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - In Combat - Cast \'Dreadful Fright\''),
 (14536, 0, 9, 0, 0, 0, 100, 0, 3000, 6000, 15000, 15000, 0, 11, 23589, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - In Combat - Cast \'Creeping Doom\''),
 (14536, 0, 10, 11, 8, 0, 100, 0, 2974, 0, 0, 0, 0, 11, 23279, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spellhit \'Wing Clip\' - Cast \'Crippling Clip\''),
-(14536, 0, 11, 0, 61, 0, 100, 0, 2974, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spellhit \'Wing Clip\' - No Action Type'),
+(14536, 0, 11, 0, 61, 0, 100, 0, 2974, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spellhit \'Wing Clip\' - Say Line 2'),
 (14536, 0, 12, 0, 8, 0, 100, 0, 13810, 0, 0, 0, 0, 28, 23272, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Spellhit \'Frost Trap Aura\' - Remove Aura \'Soul Flame\''),
 (14536, 0, 13, 0, 1, 0, 100, 0, 900000, 900000, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - Out of Combat - Despawn Instant'),
 (14536, 0, 14, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 14503, 0, 0, 0, 0, 0, 0, 0, 'Nelson the Nice - On Just Died - Despawn Instant'),
