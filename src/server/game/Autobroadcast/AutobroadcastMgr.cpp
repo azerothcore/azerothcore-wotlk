@@ -38,7 +38,7 @@ void AutobroadcastMgr::Load()
     do
     {
         Field* fields = result->Fetch();
-        uint8 id = fields[0].GetUInt8();
+        const uint8 id = fields[0].GetUInt8();
 
         m_AutobroadcastsWeights[id] = fields[1].GetUInt8();
 
@@ -64,7 +64,9 @@ void AutobroadcastMgr::Load()
 void AutobroadcastMgr::Send()
 {
     if (m_Autobroadcasts.empty())
+    {
         return;
+    }
 
     uint32 weight = 0;
     AutobroadcastsWeightMap selectionWeights;
@@ -102,16 +104,20 @@ void AutobroadcastMgr::Send()
 
     const AnnounceType announceType = static_cast<AnnounceType>(sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER));
 
-    for (const auto& [id, session] : sWorld->GetAllSessions())
+    for (const auto [id, session] : sWorld->GetAllSessions())
     {
         if (!session || !session->GetPlayer() || !session->GetPlayer()->IsInWorld())
+        {
             continue;
+        }
 
         const LocaleConstant playerLocale = session->GetSessionDbcLocale();
         const std::string_view localeMsg = msg[playerLocale];
 
         if (localeMsg.empty())
+        {
             continue;
+        }
 
         switch (announceType)
         {
