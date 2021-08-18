@@ -6,6 +6,7 @@
 #define _AUTOBROADCAST_MANAGER_H_
 
 #include "Common.h"
+#include <map>
 
 enum class AnnounceType : uint8
 {
