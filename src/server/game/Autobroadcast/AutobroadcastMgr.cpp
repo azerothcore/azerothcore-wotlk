@@ -104,11 +104,18 @@ void AutobroadcastMgr::Send()
 
     const AnnounceType announceType = static_cast<AnnounceType>(sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER));
 
-    const auto sendNotification = [](const std::string_view message)
+    const auto sendNotification = [](LocaleConstant locale, const std::string_view message)
     {
         WorldPacket data(SMSG_NOTIFICATION, (message.size() + 1));
         data << message;
-        sWorld->SendGlobalMessage(&data);
+
+        for (const auto& [id, session] : sWorld->GetAllSessions())
+        {
+            if (!session || !session->GetPlayer() || !session->GetPlayer()->IsInWorld() || session->GetSessionDbLocaleIndex() != locale)
+                continue;
+
+            session->SendPacket(&data);
+        }
     };
 
     for (const auto& [localeId, message] : msg)
@@ -124,11 +131,11 @@ void AutobroadcastMgr::Send()
             sWorld->SendTextToSpecificLocale(localeId, LANG_AUTO_BROADCAST, message.c_str());
             break;
         case AnnounceType::NOTIFICATION:
-            sendNotification(message.c_str());
+            sendNotification(localeId, message.c_str());
             break;
         case AnnounceType::BOTH:
             sWorld->SendTextToSpecificLocale(localeId, LANG_AUTO_BROADCAST, message.c_str());
-            sendNotification(message.c_str());
+            sendNotification(localeId, message.c_str());
             break;
         }
     }

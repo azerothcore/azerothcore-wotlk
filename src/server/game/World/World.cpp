@@ -2461,10 +2461,7 @@ void World::SendTextToSpecificLocale(LocaleConstant locale, uint32 string_id, ..
     Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
     for (const auto [id, session] : m_sessions)
     {
-        if (!session || !session->GetPlayer() || !session->GetPlayer()->IsInWorld() || locale >= TOTAL_LOCALES)
-            continue;
-
-        if (session->GetSessionDbcLocale() != locale)
+        if (!session || !session->GetPlayer() || !session->GetPlayer()->IsInWorld() || session->GetSessionDbLocaleIndex() != locale)
             continue;
 
         wt_do(session->GetPlayer());
