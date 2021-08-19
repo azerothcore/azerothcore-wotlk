@@ -11844,13 +11844,19 @@ bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
 {
     WorldObject const* player = GetCorpse();
     if (!player || IsAlive())
+    {
         player = this;
+    }
 
     if (!pRewardSource || !player->IsInMap(pRewardSource))
+    {
         return false;
+    }
 
     if (pRewardSource->GetMap()->IsDungeon())
+    {
         return true;
+    }
 
     return pRewardSource->GetDistance(player) <= sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE);
 }
@@ -11863,7 +11869,9 @@ bool Player::IsAtLootRewardDistance(WorldObject const* pRewardSource) const
     }
 
     if (HasPendingBind())
+    {
         return false;
+    }
 
     return pRewardSource->HasAllowedLooter(GetGUID());
 }
