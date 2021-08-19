@@ -1041,6 +1041,12 @@ public:
     [[nodiscard]] virtual float GetCollisionWidth() const { return GetObjectSize(); }
     [[nodiscard]] virtual float GetCollisionRadius() const { return GetObjectSize() / 2; }
 
+    void AddAllowedLooter(ObjectGuid guid);
+    void ResetAllowedLooters();
+    void SetAllowedLooters(GuidUnorderedSet const looters);
+    [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
+    [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
+
 protected:
     std::string m_name;
     bool m_isActive;
@@ -1085,6 +1091,8 @@ private:
     bool CanDetectInvisibilityOf(WorldObject const* obj) const;
     //bool CanDetectStealthOf(WorldObject const* obj) const;
     bool CanDetectStealthOf(WorldObject const* obj, bool checkAlert = false) const;
+
+    GuidUnorderedSet _allowedLooters;
 };
 
 namespace Acore

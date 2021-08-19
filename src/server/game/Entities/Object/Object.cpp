@@ -3032,3 +3032,33 @@ float WorldObject::GetFloorZ() const
 
     return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT)));
 }
+
+void WorldObject::AddAllowedLooter(ObjectGuid guid)
+{
+    _allowedLooters.insert(guid);
+}
+
+void WorldObject::SetAllowedLooters(GuidUnorderedSet const looters)
+{
+    _allowedLooters = looters;
+}
+
+void WorldObject::ResetAllowedLooters()
+{
+    _allowedLooters.clear();
+}
+
+bool WorldObject::HasAllowedLooter(ObjectGuid guid) const
+{
+    if (_allowedLooters.empty())
+    {
+        return true;
+    }
+
+    return _allowedLooters.find(guid) != _allowedLooters.end();
+}
+
+GuidUnorderedSet const& WorldObject::GetAllowedLooters() const
+{
+    return _allowedLooters;
+}
