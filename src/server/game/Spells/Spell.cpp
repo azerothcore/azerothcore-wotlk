@@ -2667,8 +2667,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         }
     }
 
-    if (missInfo != SPELL_MISS_EVADE && effectUnit != m_caster && m_caster->IsFriendlyTo(effectUnit) && m_spellInfo->IsPositive() && effectUnit->IsInCombat())
+    if (missInfo != SPELL_MISS_EVADE && effectUnit != m_caster && m_caster->IsFriendlyTo(effectUnit) && m_spellInfo->IsPositive() &&
+        effectUnit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT))
+    {
         m_caster->SetInCombatWith(effectUnit);
+    }
 
     // Check for SPELL_ATTR7_CAN_CAUSE_INTERRUPT
     if (m_spellInfo->HasAttribute(SPELL_ATTR7_CAN_CAUSE_INTERRUPT) && effectUnit->GetTypeId() != TYPEID_PLAYER)
@@ -2786,10 +2789,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             // xinef: triggered spells should not prolong combat
             if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS) && !m_triggeredByAuraSpell)
             {
-                // xinef: start combat with hostile unit...
-                if (Unit* hostile = unit->getAttackerForHelper())
-                    m_caster->CombatStart(hostile, true);
-                //m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
+                m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
                 unit->getHostileRefManager().threatAssist(m_caster, 0.0f);
             }
         }
@@ -5665,7 +5665,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                             m_caster->RemoveMovementImpairingAuras(true);
                     }
                     if (m_caster->HasUnitState(UNIT_STATE_ROOT))
-                        return SPELL_FAILED_ROOTED;
+                    {
+                        // Exception for Master's Call
+                        if (m_spellInfo->Id != 54216)
+                        {
+                            return SPELL_FAILED_ROOTED;
+                        }
+                    }
                     if (m_caster->GetTypeId() == TYPEID_PLAYER)
                         if (Unit* target = m_targets.GetUnitTarget())
                             if (!target->IsAlive())
@@ -6118,6 +6124,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_targets.GetUnitTarget()->getPowerType() != POWER_MANA)
                         return SPELL_FAILED_BAD_TARGETS;
 
+                    break;
+                }
+            case SPELL_AURA_HOVER:
+                {
+                    if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_MOUNT) != 0 && m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsMounted())
+                    {
+                        return SPELL_FAILED_NOT_ON_MOUNTED;
+                    }
                     break;
                 }
             default:
