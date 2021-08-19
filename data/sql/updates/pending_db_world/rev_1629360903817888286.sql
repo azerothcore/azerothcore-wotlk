@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1629360903817888286');
 
 -- Delete Thick Wolfhide from various creatures
-DELETE FROM `skinning_loot_template` WHERE `item` = 8368 AND `entry` IN (1817, 2680, 2681, 2730, 2923, 2924, 2925, 2926, 5286, 5287, 5288, 5438, 5984, 5985, 7055, 8211, 8921, 8922, 9042, 9416, 9690, 9694, 9696, 9697, 10077, 10221, 10981, 12121, 12122, 12418, 13036, 14282, 22540, 22546, 22737, 22738, 31964, 31970, 31975, 31977, 37294, 37296);
+DELETE FROM `skinning_loot_template` WHERE `item` = 8368 AND `entry` IN (1817, 2680, 2681, 2730, 2923, 2924, 2925, 2926, 5286, 5287, 5288, 5984, 5985, 7055, 8211, 8921, 8922, 9042, 9416, 9690, 9694, 9696, 9697, 10150, 10156, 10221, 10981, 12121, 12122, 12418, 13036, 14282, 22540, 22546, 22737, 22738, 31964, 31970, 31975, 31977, 37294, 37296);
 
 -- Adjust skinning drop rates for Diseased Wolf
 UPDATE `skinning_loot_template` SET `Chance` = 41.3 WHERE `Entry` = 1817 AND `Item` = 4304;
@@ -65,9 +65,9 @@ UPDATE `skinning_loot_template` SET `Chance` = 5.2 WHERE `Entry` = 5288 AND `Ite
 UPDATE `skinning_loot_template` SET `Chance` = 20.4 WHERE `Entry` = 5288 AND `Item` = 8170;
 
 -- Adjust skinning drop rates for Tamed Cat
-UPDATE `skinning_loot_template` SET `Chance` = 74.7 WHERE `Entry` = 5438 AND `Item` = 4304;
-UPDATE `skinning_loot_template` SET `Chance` = 4.2 WHERE `Entry` = 5438 AND `Item` = 8169;
-UPDATE `skinning_loot_template` SET `Chance` = 21.1 WHERE `Entry` = 5438 AND `Item` = 8170;
+UPDATE `skinning_loot_template` SET `Chance` = 74.7 WHERE `Entry` = 10150 AND `Item` = 4304;
+UPDATE `skinning_loot_template` SET `Chance` = 4.2 WHERE `Entry` = 10150 AND `Item` = 8169;
+UPDATE `skinning_loot_template` SET `Chance` = 21.1 WHERE `Entry` = 10150 AND `Item` = 8170;
 
 -- Adjust skinning drop rates for Starving Snickerfang
 UPDATE `skinning_loot_template` SET `Chance` = 74 WHERE `Entry` = 5984 AND `Item` = 4304;
@@ -138,9 +138,9 @@ UPDATE `skinning_loot_template` SET `Chance` = 51.8 WHERE `Entry` = 9697 AND `It
 UPDATE `skinning_loot_template` SET `Chance` = 5.5 WHERE `Entry` = 9697 AND `Item` = 8171;
 
 -- Adjust skinning drop rates for Deathmaw
-UPDATE `skinning_loot_template` SET `Chance` = 10.5 WHERE `Entry` = 10077 AND `Item` = 4304;
-UPDATE `skinning_loot_template` SET `Chance` = 85.3 WHERE `Entry` = 10077 AND `Item` = 8170;
-UPDATE `skinning_loot_template` SET `Chance` = 4.2 WHERE `Entry` = 10077 AND `Item` = 8171;
+UPDATE `skinning_loot_template` SET `Chance` = 10.5 WHERE `Entry` = 10156 AND `Item` = 4304;
+UPDATE `skinning_loot_template` SET `Chance` = 85.3 WHERE `Entry` = 10156 AND `Item` = 8170;
+UPDATE `skinning_loot_template` SET `Chance` = 4.2 WHERE `Entry` = 10156 AND `Item` = 8171;
 
 -- Adjust skinning drop rates for Bloodaxe Worg Pup
 UPDATE `skinning_loot_template` SET `Chance` = 41.6 WHERE `Entry` = 10221 AND `Item` = 4304;
