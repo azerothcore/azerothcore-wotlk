@@ -1229,6 +1229,63 @@ public:
     }
 };
 
+// -42243 - Volley (Trigger one)
+class spell_hun_volley_trigger : public SpellScriptLoader
+{
+public:
+    spell_hun_volley_trigger() : SpellScriptLoader("spell_hun_volley_trigger") {}
+
+    class spell_hun_volley_trigger_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_volley_trigger_SpellScript);
+
+        void SelectTarget(std::list<WorldObject*>& targets)
+        {
+            // It's here because Volley is an AOE spell so there is no specific target to be attacked
+            // Let's select one of our targets
+            if (!targets.empty())
+            {
+                _target = *(targets.begin());
+            }
+        }
+
+        void HandleFinish()
+        {
+            if (!_target || _target->GetTypeId() != TYPEID_UNIT)
+                return;
+
+            Unit* caster = GetCaster();
+            if (!caster || !caster->IsPlayer())
+                return;
+
+            for (Unit::ControlSet::iterator itr = caster->m_Controlled.begin(); itr != caster->m_Controlled.end(); ++itr)
+            {
+                if (Unit* pet = *itr)
+                {
+                    if (pet->IsAlive() && pet->GetTypeId() == TYPEID_UNIT)
+                    {
+                        pet->ToCreature()->AI()->OwnerAttacked(_target->ToUnit());
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_volley_trigger_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+            AfterCast += SpellCastFn(spell_hun_volley_trigger_SpellScript::HandleFinish);
+        }
+
+    private:
+        WorldObject* _target = nullptr;
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_hun_volley_trigger_SpellScript();
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     // Ours
@@ -1257,4 +1314,5 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_sniper_training();
     new spell_hun_tame_beast();
     new spell_hun_viper_attack_speed();
+    new spell_hun_volley_trigger();
 }
