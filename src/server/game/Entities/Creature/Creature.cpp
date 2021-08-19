@@ -3044,19 +3044,19 @@ void Creature::UpdateMovementFlags()
     if (liquidData.Status == LIQUID_MAP_NO_WATER)
     {
         if (ground > INVALID_HEIGHT)
-            IsInAir = G3D::fuzzyGt(z, ground + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(z, ground - GROUND_HEIGHT_TOLERANCE); // Can be underground too, prevent the falling
+            isInAir = G3D::fuzzyGt(z, ground + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(z, ground - GROUND_HEIGHT_TOLERANCE); // Can be underground too, prevent the falling
         else
-            IsInAir = true;
+            isInAir = true;
     }
     else
     {
         switch (liquidData.Status)
         {
             case LIQUID_MAP_ABOVE_WATER:
-                IsInAir = true;
+                isInAir = true;
                 break;
             case LIQUID_MAP_WATER_WALK:
-                IsInAir = true;
+                isInAir = true;
                 [[fallthrough]];
             case LIQUID_MAP_IN_WATER:
                 Swim = z - liquidData.DepthLevel > GetCollisionHeight() * 0.75f; // Shallow water at ~75% of collision height
@@ -3073,7 +3073,7 @@ void Creature::UpdateMovementFlags()
 
     if (info->InhabitType & INHABIT_AIR)
     {
-        if (IsInAir && !IsFalling())
+        if (isInAir && !IsFalling())
         {
             if (info->InhabitType & INHABIT_GROUND)
                 SetCanFly(true);
