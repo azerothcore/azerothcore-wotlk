@@ -8,11 +8,11 @@ UPDATE `creature_template` SET `AIName`='SmartAI', `MovementType` = 2 WHERE  `en
 -- Make them patrol
 UPDATE `creature` SET `MovementType` = 2 WHERE `id` IN (14536,14531,14529,14527,14503,14530,14533,14534,14535,14503);
 
-UPDATE `creature_template` SET `unit_class`= '2' WHERE `entry` IN (14533,14538);
-UPDATE `creature_template` SET `unit_class`= '1' WHERE `entry` IN (14530,14535,14534);
+UPDATE `creature_template` SET `unit_class`= 2 WHERE `entry` IN (14533,14538);
+UPDATE `creature_template` SET `unit_class`= 1 WHERE `entry` IN (14530,14535,14534);
 
 -- The Cleaner
-UPDATE `creature_template` SET `speed_run` = 2.6, `Mechanic_Immune_Mask` = 650870623, `MovementType` = 0 WHERE entry = 14503;
+UPDATE `creature_template` SET `speed_run` = 2.6, `Mechanic_Immune_Mask` = 650870623, `MovementType` = 0 WHERE `entry` = 14503;
 
 -- Creeping Doom
 UPDATE `creature_template` SET `speed_run` = 0.33, `speed_walk` = 0.33 WHERE entry = 14761;
