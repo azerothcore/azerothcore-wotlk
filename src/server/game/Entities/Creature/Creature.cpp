@@ -3035,7 +3035,7 @@ void Creature::UpdateMovementFlags()
     float z = GetPositionZ();
     float ground = GetFloorZ();
 
-    bool IsInAir = false;
+    bool isInAir = false;
     bool Swim = false;
 
     bool canHover = CanHover();

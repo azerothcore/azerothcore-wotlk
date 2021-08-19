@@ -157,7 +157,7 @@ struct DynamicTreeAreaInfoCallback
 
     void operator()(G3D::Vector3 const& p, GameObjectModel const& obj)
     {
-        obj.intersectPoint(p, _areaInfo, _phaseMask);
+        obj.IntersectPoint(p, _areaInfo, _phaseMask);
     }
 
     VMAP::AreaInfo const& GetAreaInfo() const
@@ -290,7 +290,7 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, 
     }
 }
 
-bool DynamicMapTree::getAreaInfo(float x, float y, float& z, uint32 phasemask, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
+bool DynamicMapTree::GetAreaInfo(float x, float y, float& z, uint32 phasemask, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
 {
     G3D::Vector3 v(x, y, z + 0.5f);
     DynamicTreeAreaInfoCallback intersectionCallBack(phasemask);
@@ -307,7 +307,7 @@ bool DynamicMapTree::getAreaInfo(float x, float y, float& z, uint32 phasemask, u
     return false;
 }
 
-void DynamicMapTree::getAreaAndLiquidData(float x, float y, float z, uint32 phasemask, uint8 reqLiquidType, VMAP::AreaAndLiquidData& data) const
+void DynamicMapTree::GetAreaAndLiquidData(float x, float y, float z, uint32 phasemask, uint8 reqLiquidType, VMAP::AreaAndLiquidData& data) const
 {
     G3D::Vector3 v(x, y, z + 0.5f);
     DynamicTreeLocationInfoCallback intersectionCallBack(phasemask);

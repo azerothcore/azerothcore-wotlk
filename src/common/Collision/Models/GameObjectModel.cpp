@@ -189,9 +189,9 @@ bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool Sto
     return hit;
 }
 
-void GameObjectModel::intersectPoint(G3D::Vector3 const& point, VMAP::AreaInfo& info, uint32 ph_mask) const
+void GameObjectModel::IntersectPoint(G3D::Vector3 const& point, VMAP::AreaInfo& info, uint32 ph_mask) const
 {
-    if (!(phasemask & ph_mask) || !owner->IsSpawned() || !isMapObject())
+    if (!(phasemask & ph_mask) || !owner->IsSpawned() || !IsMapObject())
         return;
 
     if (!iBound.contains(point))
@@ -212,7 +212,7 @@ void GameObjectModel::intersectPoint(G3D::Vector3 const& point, VMAP::AreaInfo& 
 
 bool GameObjectModel::GetLocationInfo(G3D::Vector3 const& point, VMAP::LocationInfo& info, uint32 ph_mask) const
 {
-    if (!(phasemask & ph_mask) || !owner->IsSpawned() || !isMapObject())
+    if (!(phasemask & ph_mask) || !owner->IsSpawned() || !IsMapObject())
         return false;
 
     if (!iBound.contains(point))

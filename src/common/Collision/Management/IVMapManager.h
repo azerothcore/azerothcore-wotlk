@@ -108,7 +108,7 @@ namespace VMAP
         virtual bool GetAreaInfo(uint32 pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const      = 0;
         virtual bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 ReqLiquidType, float& level, float& floor, uint32& type, uint32& mogpFlags) const = 0;
         // get both area + liquid data in a single vmap lookup
-        virtual void getAreaAndLiquidData(uint32 mapId, float x, float y, float z, uint8 reqLiquidType, AreaAndLiquidData& data) const = 0;
+        virtual void GetAreaAndLiquidData(uint32 mapId, float x, float y, float z, uint8 reqLiquidType, AreaAndLiquidData& data) const = 0;
     };
 }
 
