@@ -144,7 +144,7 @@ void AutobroadcastMgr::Send()
             continue;
         }
 
-        switch (announceType)
+        switch (announceType) //@todo Change to using enum with c++20
         {
         case AnnounceType::WORLD:
             sendAsAnnouncement(localeId, LANG_AUTO_BROADCAST, message.c_str());
