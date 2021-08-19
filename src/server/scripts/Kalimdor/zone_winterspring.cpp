@@ -607,9 +607,6 @@ public:
 
 void AddSC_winterspring()
 {
-    // Ours
-    new npc_stave_of_the_ancients();
-
     // Theirs
     new npc_rivern_frostwind();
     new npc_ranshalla();
