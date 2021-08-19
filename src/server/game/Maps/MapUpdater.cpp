@@ -62,7 +62,10 @@ MapUpdater::MapUpdater(): pending_requests(0)
 
 MapUpdater::~MapUpdater()
 {
-    deactivate();
+    if (activated())
+    {
+        deactivate();
+    }
 }
 
 void MapUpdater::activate(size_t num_threads)
@@ -83,7 +86,10 @@ void MapUpdater::deactivate()
 
     for (auto& thread : _workerThreads)
     {
-        thread.join();
+        if (thread.joinable())
+        {
+            thread.join();
+        }
     }
 }
 
