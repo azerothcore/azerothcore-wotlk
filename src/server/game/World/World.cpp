@@ -312,7 +312,7 @@ void World::AddSession_(WorldSession* s)
     }
 
     s->SendAuthResponse(AUTH_OK, true);
-    
+
     FinalizePlayerWorldSession(s);
 
     UpdateMaxSessionCounters();
