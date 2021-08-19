@@ -70,6 +70,7 @@ MapUpdater::~MapUpdater()
 
 void MapUpdater::activate(size_t num_threads)
 {
+    _workerThreads.reserve(num_threads);
     for (size_t i = 0; i < num_threads; ++i)
     {
         _workerThreads.push_back(std::thread(&MapUpdater::WorkerThread, this));
