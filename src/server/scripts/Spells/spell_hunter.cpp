@@ -1251,7 +1251,7 @@ public:
 
         void HandleFinish()
         {
-            if (!_target || _target->GetTypeId() != TYPEID_UNIT)
+            if (!_target)
                 return;
 
             Unit* caster = GetCaster();
