@@ -856,10 +856,7 @@ public:
         LOG_INFO("server.loading", "Re-Loading Page Texts...");
         sObjectMgr->LoadPageTexts();
         handler->SendGlobalGMSysMessage("DB table `page_texts` reloaded.");
-        if (handler->GetSession())
-        {
-            handler->GetSession()->SendNotification("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
-        }
+        handler->SendGlobalGMSysMessage("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
         return true;
     }
 
@@ -1061,10 +1058,7 @@ public:
         LOG_INFO("server.loading", "Re-Loading Page Text Locale ... ");
         sObjectMgr->LoadPageTextLocales();
         handler->SendGlobalGMSysMessage("DB table `page_text_locale` reloaded.");
-        if (handler->GetSession())
-        {
-            handler->GetSession()->SendNotification("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
-        }
+        handler->SendGlobalGMSysMessage("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
         return true;
     }
 
