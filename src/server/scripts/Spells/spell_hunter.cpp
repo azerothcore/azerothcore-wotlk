@@ -1252,11 +1252,15 @@ public:
         void HandleFinish()
         {
             if (!_target)
+            {
                 return;
+            }
 
             Unit* caster = GetCaster();
             if (!caster || !caster->IsPlayer())
+            {
                 return;
+            }
 
             for (Unit::ControlSet::iterator itr = caster->m_Controlled.begin(); itr != caster->m_Controlled.end(); ++itr)
             {
