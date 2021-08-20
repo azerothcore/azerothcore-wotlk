@@ -19,7 +19,7 @@ void Player::UpdateSpeakTime(uint32 specialMessageLimit)
     if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
         return;
 
-    time_t current = time (nullptr);
+    time_t current = time(nullptr);
     if (m_speakTime > current)
     {
         uint32 max_count = specialMessageLimit ? specialMessageLimit : sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_COUNT);
@@ -31,12 +31,7 @@ void Player::UpdateSpeakTime(uint32 specialMessageLimit)
         if (m_speakCount >= max_count)
         {
             // prevent overwrite mute time, if message send just before mutes set, for example.
-            time_t new_mute = current + sWorld->getIntConfig(CONFIG_CHATFLOOD_MUTE_TIME);
-
-            if (sMute->GetMuteTime(GetSession()->GetAccountId()) < new_mute)
-            {
-                sMute->SetMuteTime(GetSession()->GetAccountId(), new_mute);
-            }
+            sMute->CheckSpeakTime(GetSession()->GetAccountId(), current + sWorld->getIntConfig(CONFIG_CHATFLOOD_MUTE_TIME));
 
             m_speakCount = 0;
         }

@@ -56,7 +56,7 @@ void MuteMgr::MutePlayer(std::string const& targetName, Seconds notSpeakTime, st
 
     if (targetSession)
     {
-        ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime.count(), muteBy.c_str(), muteReason.c_str());
+        ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(notSpeakTime.count()).c_str(), muteBy.c_str(), muteReason.c_str());
     }
 }
 
@@ -204,7 +204,7 @@ void MuteMgr::LoginAccount(uint32 accountID)
 
 void MuteMgr::UpdateMuteAccount(uint32 accountID, uint64 muteDate, Seconds muteTime)
 {
-    // UPDATE `account_muted` SET `mutedate` = ?, `mutetime` = ? WHERE `accountid` = ?
+    // UPDATE `account_muted` SET `mutedate` = ? WHERE `accountid` = ?
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_MUTE_DATE);
     stmt->setUInt32(0, muteDate);
     stmt->setUInt32(1, accountID);
@@ -213,7 +213,7 @@ void MuteMgr::UpdateMuteAccount(uint32 accountID, uint64 muteDate, Seconds muteT
     SetMuteTime(accountID, muteDate);
 }
 
-Optional<std::tuple<uint32, int32, std::string, std::string>> MuteMgr::GetMuteInfo(uint32 accountID)
+Optional<std::tuple<uint32, Seconds, std::string, std::string>> MuteMgr::GetMuteInfo(uint32 accountID)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE);
     stmt->setUInt32(0, accountID);
@@ -226,5 +226,13 @@ Optional<std::tuple<uint32, int32, std::string, std::string>> MuteMgr::GetMuteIn
 
     Field* fields = result->Fetch();
 
-    return std::make_tuple(fields[0].GetUInt32(), fields[1].GetInt32(), fields[2].GetString(), fields[3].GetString());
+    return std::make_tuple(fields[0].GetUInt32(), Seconds(fields[1].GetUInt32()), fields[2].GetString(), fields[3].GetString());
+}
+
+void MuteMgr::CheckSpeakTime(uint32 accountID, time_t muteDate)
+{
+    if (GetMuteDate(accountID) < muteDate)
+    {
+        SetMuteTime(accountID, muteDate);
+    }
 }

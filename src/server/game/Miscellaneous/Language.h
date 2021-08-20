@@ -809,7 +809,7 @@ enum AcoreStrings
     LANG_PINFO_PLAYER                   = 35400,
     LANG_PINFO_GM_ACTIVE                = 35401,
     LANG_PINFO_BANNED                   = 35402,
-    LANG_PINFO_MUTED                    = 35403,
+    //LANG_PINFO_MUTED                    = 35403, (550)
     LANG_PINFO_ACC_ACCOUNT              = 35404,
     LANG_PINFO_ACC_LASTLOGIN            = 35405,
     LANG_PINFO_ACC_OS                   = 749,

@@ -27,8 +27,9 @@ public:
     void DeleteMuteTime(uint32 accountID, bool delFromDB = true);
     void CheckMuteExpired(uint32 accountID);
     bool CanSpeak(uint32 accountID);
+    void CheckSpeakTime(uint32 accountID, time_t muteDate);
     void LoginAccount(uint32 accountID);
-    Optional<std::tuple<uint32, int32, std::string, std::string>> GetMuteInfo(uint32 accountID);
+    Optional<std::tuple<uint32, Seconds, std::string, std::string>> GetMuteInfo(uint32 accountID);
 
 private:
     std::unordered_map<uint32 /*acc id*/, uint64 /*unix time*/> _listSessions;

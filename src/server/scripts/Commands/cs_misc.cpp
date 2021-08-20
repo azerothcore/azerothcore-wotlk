@@ -28,6 +28,7 @@
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "StringConvert.h"
 #include "TargetedMovementGenerator.h"
 #include "WeatherMgr.h"
 
@@ -1820,7 +1821,7 @@ public:
 
         // Mute data print variables
         std::string muteLeft          = "0000-00-00_00-00-00";
-        uint32 muteTime               = 0;
+        Seconds muteTime              = 0s;
         std::string muteReason        = handler->GetAcoreString(LANG_NO_REASON);
         std::string muteBy            = handler->GetAcoreString(LANG_UNKNOWN);
 
@@ -1957,8 +1958,8 @@ public:
         {
             auto const& [_muteDate, _muteTime, _reason, _author] = *muteInfo;
 
-            muteTime = std::abs(_muteTime);
-            muteLeft = secsToTimeString(static_cast<uint64>(_muteDate + muteTime) - time(nullptr), true);
+            muteTime = _muteTime;
+            muteLeft = secsToTimeString(static_cast<uint64>(_muteDate + muteTime.count()) - time(nullptr), true);
             muteReason = _reason;
             muteBy = _author;
         }
@@ -2040,8 +2041,8 @@ public:
             handler->PSendSysMessage(LANG_PINFO_BANNED, banType.c_str(), banReason.c_str(), banTime > 0 ? secsToTimeString(banTime - time(nullptr), true).c_str() : handler->GetAcoreString(LANG_PERMANENTLY), bannedBy.c_str());
 
         // Output IV. LANG_PINFO_MUTED if mute is applied
-        if (muteTime)
-            handler->PSendSysMessage(LANG_PINFO_MUTED, muteReason.c_str(), secsToTimeString(muteTime - time(nullptr), true).c_str(), muteLeft.c_str(), muteBy.c_str());
+        if (muteTime > 0s)
+            handler->PSendSysMessage(LANG_PINFO_MUTE, muteReason.c_str(), secsToTimeString(muteTime.count(), true).c_str(), muteLeft.c_str(), muteBy.c_str());
 
         // Output V. LANG_PINFO_ACC_ACCOUNT
         handler->PSendSysMessage(LANG_PINFO_ACC_ACCOUNT, userName.c_str(), accId, security);
@@ -2263,18 +2264,24 @@ public:
             if (WorldSession* session = sWorld->FindSession(accountId))
                 target = session->GetPlayer();
 
-        uint32 notSpeakTime = uint32(atoi(delayStr));
+        auto notSpeakTime = Acore::StringTo<uint32>(delayStr);
+
+        if (!notSpeakTime)
+        {
+            // Bad value delayStr (not number)
+            return false;
+        }
 
         // must have strong lesser security level
         if (handler->HasLowerSecurity(target, targetGuid, true))
             return false;
 
-        sMute->MutePlayer(targetName, notSpeakTime, handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
+        sMute->MutePlayer(targetName, Minutes(*notSpeakTime), handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
 
         if (!sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
         {
-            // You has disabled % s\'s chat for %u minutes. Reason: %s.
-            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(targetName).c_str(), notSpeakTime, muteReasonStr.c_str());
+            // You has disabled % s\'s chat for %s. Reason: %s.
+            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(targetName).c_str(), secsToTimeString(Minutes(*notSpeakTime).count()).c_str(), muteReasonStr.c_str());
         }
 
         return true;
