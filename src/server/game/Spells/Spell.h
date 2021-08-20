@@ -76,6 +76,30 @@ enum SpellRangeFlag
     SPELL_RANGE_RANGED              = 2,     //hunter range and ranged weapon
 };
 
+enum SpellIdForClient
+{
+    WARRIOR_SLAM_RANK_1 = 1464,
+    WARRIOR_SLAM_RANK_2 = 8820,
+    WARRIOR_SLAM_RANK_3 = 11604,
+    WARRIOR_SLAM_RANK_4 = 11605,
+    WARRIOR_SLAM_RANK_5 = 25241,
+    WARRIOR_SLAM_RANK_6 = 25242,
+    WARRIOR_SLAM_RANK_7 = 47474,
+    WARRIOR_SLAM_RANK_8 = 47475,
+    WARRIOR_SLAM_CLIENT = 50783,
+
+    WARRIOR_EXECUTE_RANK_1 = 5308,
+    WARRIOR_EXECUTE_RANK_2 = 20658,
+    WARRIOR_EXECUTE_RANK_3 = 20660,
+    WARRIOR_EXECUTE_RANK_4 = 20661,
+    WARRIOR_EXECUTE_RANK_5 = 20662,
+    WARRIOR_EXECUTE_RANK_6 = 25234,
+    WARRIOR_EXECUTE_RANK_7 = 25236,
+    WARRIOR_EXECUTE_RANK_8 = 47470,
+    WARRIOR_EXECUTE_RANK_9 = 47471,
+    WARRIOR_EXECUTE_CLIENT = 20647
+};
+
 struct SpellDestination
 {
     SpellDestination();
@@ -537,6 +561,9 @@ public:
 
     void SetSpellValue(SpellValueMod mod, int32 value);
     SpellValue const* GetSpellValue() { return m_spellValue; }
+
+    uint32 GetTranslatedSpellIdForClientCombaLog();
+    bool   CheckIfMissedSpellNeedToBeSent();
 
     // xinef: moved to public
     void LoadScripts();

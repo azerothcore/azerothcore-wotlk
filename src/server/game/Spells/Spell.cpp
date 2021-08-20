@@ -2430,13 +2430,19 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         }
     }
 
+    bool TmpSendSpellMissSent = false;
+
     if (spellHitTarget)
     {
         SpellMissInfo missInfo2 = DoSpellHitOnUnit(spellHitTarget, mask, target->scaleAura);
         if (missInfo2 != SPELL_MISS_NONE)
         {
             if (missInfo2 != SPELL_MISS_MISS)
+            {
                 m_caster->SendSpellMiss(spellHitTarget, m_spellInfo->Id, missInfo2);
+                TmpSendSpellMissSent = true;
+            }
+
             m_damage = 0;
             spellHitTarget = nullptr;
 
@@ -2645,6 +2651,20 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
             if (unitTarget->ToCreature()->IsAIEnabled)
                 unitTarget->ToCreature()->AI()->AttackStart(m_caster);
+        }
+
+        // send log for spells that wouldn't make it into the combat log as missed or blocked or w/e (ex. slam/execute of warrior)
+        // send only if not already done above
+
+        if (!TmpSendSpellMissSent)
+        {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                if (CheckIfMissedSpellNeedToBeSent())
+                {
+                    caster->SendSpellMiss(unitTarget, GetTranslatedSpellIdForClientCombaLog(), missInfo);
+                }
+            }
         }
     }
 
@@ -8253,6 +8273,68 @@ void Spell::OnSpellLaunch()
                 visual->prepare(&m_targets);
             }
         }
+    }
+}
+
+
+
+uint32 Spell::GetTranslatedSpellIdForClientCombaLog()
+{
+    switch (m_spellInfo->Id)
+    {
+    case WARRIOR_SLAM_RANK_1:
+    case WARRIOR_SLAM_RANK_2:
+    case WARRIOR_SLAM_RANK_3:
+    case WARRIOR_SLAM_RANK_4:
+    case WARRIOR_SLAM_RANK_5:
+    case WARRIOR_SLAM_RANK_6:
+    case WARRIOR_SLAM_RANK_7:
+    case WARRIOR_SLAM_RANK_8:
+        return WARRIOR_SLAM_CLIENT;
+
+    case WARRIOR_EXECUTE_RANK_1:
+    case WARRIOR_EXECUTE_RANK_2:
+    case WARRIOR_EXECUTE_RANK_3:
+    case WARRIOR_EXECUTE_RANK_4:
+    case WARRIOR_EXECUTE_RANK_5:
+    case WARRIOR_EXECUTE_RANK_6:
+    case WARRIOR_EXECUTE_RANK_7:
+    case WARRIOR_EXECUTE_RANK_8:
+    case WARRIOR_EXECUTE_RANK_9:
+        return WARRIOR_EXECUTE_CLIENT;
+
+    default:
+        return m_spellInfo->Id;
+    }
+}
+
+bool Spell::CheckIfMissedSpellNeedToBeSent()
+{
+    switch (m_spellInfo->Id)
+    {
+    case WARRIOR_SLAM_RANK_1:
+    case WARRIOR_SLAM_RANK_2:
+    case WARRIOR_SLAM_RANK_3:
+    case WARRIOR_SLAM_RANK_4:
+    case WARRIOR_SLAM_RANK_5:
+    case WARRIOR_SLAM_RANK_6:
+    case WARRIOR_SLAM_RANK_7:
+    case WARRIOR_SLAM_RANK_8:
+    case WARRIOR_SLAM_CLIENT:
+    case WARRIOR_EXECUTE_RANK_1:
+    case WARRIOR_EXECUTE_RANK_2:
+    case WARRIOR_EXECUTE_RANK_3:
+    case WARRIOR_EXECUTE_RANK_4:
+    case WARRIOR_EXECUTE_RANK_5:
+    case WARRIOR_EXECUTE_RANK_6:
+    case WARRIOR_EXECUTE_RANK_7:
+    case WARRIOR_EXECUTE_RANK_8:
+    case WARRIOR_EXECUTE_RANK_9:
+    case WARRIOR_EXECUTE_CLIENT:
+        return true;
+
+    default:
+        return false;
     }
 }
 
