@@ -7,6 +7,7 @@
 #include "WorldSocket.h"
 #include "AccountMgr.h"
 #include "BigNumber.h"
+#include "Config.h"
 #include "CryptoHash.h"
 #include "CryptoRandom.h"
 #include "DatabaseEnv.h"
@@ -452,10 +453,12 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     AccountInfo account(result->Fetch());
 
     // For hook purposes, we get Remoteaddress at this point.
-    std::string address = GetRemoteIpAddress().to_string();
+    std::string address = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true) ? GetRemoteIpAddress().to_string() : "0.0.0.0";
+
+    LoginDatabasePreparedStatement* stmt = nullptr;
 
     // As we don't know if attempted login process by ip works, we update last_attempt_ip right away
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_ATTEMPT_IP);
+    stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_ATTEMPT_IP);
     stmt->setString(0, address);
     stmt->setString(1, authSession->Account);
     LoginDatabase.Execute(stmt);
@@ -540,6 +543,17 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         }
     }
 
+    //! Negative mutetime indicates amount of minutes to be muted effective on next login - which is now.
+    if (account.MuteTime < 0)
+    {
+        account.MuteTime = time(nullptr) + llabs(account.MuteTime);
+
+        auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME_LOGIN);
+        stmt->setInt64(0, account.MuteTime);
+        stmt->setUInt32(1, account.Id);
+        LoginDatabase.Execute(stmt);
+    }
+
     if (account.IsBanned)
     {
         SendAuthResponseError(AUTH_BANNED);
@@ -574,6 +588,8 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     sScriptMgr->OnAccountLogin(account.Id);
 
     _authed = true;
+
+    sScriptMgr->OnLastIpUpdate(account.Id, address);
 
     _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
         account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime);

@@ -9862,7 +9862,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
 
-    if (creature && !IsPet())
+    if (creature && !IsControllableGuardian())
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);
@@ -13489,9 +13489,8 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
         case MOVE_FLIGHT_BACK:
         case MOVE_RUN_BACK:
         case MOVE_SWIM_BACK:
-            break;
         case MOVE_WALK:
-            return;
+            break;
         case MOVE_RUN:
             {
                 if (IsMounted()) // Use on mount auras
@@ -18330,14 +18329,9 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
     else
     {
         WorldObject::UpdateObjectVisibility(true);
-
-        // pussywizard: generally this is not needed here, delayed notifier will handle this, call only for pets
-        if ((IsGuardian() || IsPet()) && GetOwnerGUID().IsPlayer())
-        {
-            Acore::AIRelocationNotifier notifier(*this);
-            float radius = 60.0f;
-            Cell::VisitAllObjects(this, notifier, radius);
-        }
+        Acore::AIRelocationNotifier notifier(*this);
+        float radius = 60.0f;
+        Cell::VisitAllObjects(this, notifier, radius);
     }
 }
 
