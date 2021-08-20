@@ -13489,9 +13489,8 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
         case MOVE_FLIGHT_BACK:
         case MOVE_RUN_BACK:
         case MOVE_SWIM_BACK:
-            break;
         case MOVE_WALK:
-            return;
+            break;
         case MOVE_RUN:
             {
                 if (IsMounted()) // Use on mount auras
