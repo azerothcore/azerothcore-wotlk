@@ -1834,8 +1834,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (apply)
                         target->CastSpell(target, 70725, true);
                 }
-                else if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_MOD_BASE_RESISTANCE_PCT, SPELLFAMILY_DRUID, 107, 0))
-                    aurEff->RecalculateAmount();
+                else
+                {
+                    // Enrage armor reduction
+                    target->HandleStatModifier(UNIT_MOD_ARMOR, BASE_PCT, target->GetShapeshiftForm() == FORM_DIREBEAR ? -16.0f : -27.0f, apply);
+                }
             }
             break;
     }
