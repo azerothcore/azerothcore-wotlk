@@ -17,7 +17,6 @@ EndScriptData */
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
-#include "WorldSession.h"
 
 /*######
 ## npc_oox22fe
