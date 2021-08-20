@@ -1,3 +1,19 @@
+-- DB update 2021_08_20_00 -> 2021_08_20_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_08_20_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_08_20_00 2021_08_20_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1629141581522683284'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1629141581522683284');
 
 DELETE FROM `creature` WHERE `id` IN (1022, 1023);
@@ -26,3 +42,13 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (11047, 1022, 0, 0, 0, 1, 1, 648, 0, -3577.12, -1862.63, 33.4269, 4.73934, 300, 3, 0, 734, 0, 1, 0, 0, 0, '', 0),
 (11048, 1022, 0, 0, 0, 1, 1, 648, 0, -3551.23, -1813.87, 25.3162, 1.6862, 300, 3, 0, 734, 0, 1, 0, 0, 0, '', 0),
 (11050, 1022, 0, 0, 0, 1, 1, 648, 0, -3480.99, -1880.51, 23.4294, 0.656766, 300, 5, 0, 734, 0, 1, 0, 0, 0, '', 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_08_20_01' WHERE sql_rev = '1629141581522683284';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
