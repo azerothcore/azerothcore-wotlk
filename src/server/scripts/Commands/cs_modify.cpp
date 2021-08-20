@@ -475,7 +475,7 @@ public:
             return false;
         }
 
-        speed = double(std::atof(args));
+        speed = Acore::StringTo<float>(args).value();
 
         if (speed > maximumBound || speed < minimumBound)
         {
