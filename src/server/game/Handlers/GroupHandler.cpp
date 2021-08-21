@@ -81,8 +81,10 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (GetPlayer()->IsGameMaster() && !GetPlayer()->IsAcceptingInvites())
+    // Check if a GM is blocking their invites
+    if (player->GetSession()->GetSecurity() && !player->IsAcceptingInvites())
     {
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_BAD_PLAYER_NAME_S);
         return;
     }
 
