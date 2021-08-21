@@ -517,6 +517,7 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_SPECTATOR_ON       = 0x0080,               // Marks if player is spectactor
     PLAYER_EXTRA_PVP_DEATH          = 0x0100,               // store PvP death status until corpse creating.
     PLAYER_EXTRA_SHOW_DK_PET        = 0x0400,               // Marks if player should see ghoul on login screen
+    PLAYER_EXTRA_ACCEPT_INVITES     = 0x0800
 };
 
 // 2^n values
@@ -1058,8 +1059,8 @@ public:
     void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
-    void SetAcceptInvites(bool on) { m_IsAcceptingInvites = on; }
-    [[nodiscard]] bool IsAcceptingInvites() const { return m_IsAcceptingInvites; }
+    void SetAcceptInvites(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_INVITES; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_INVITES; }
+    [[nodiscard]] bool IsAcceptingInvites() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_INVITES; }
     [[nodiscard]] bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
     void SetGameMaster(bool on);
     [[nodiscard]] bool isGMChat() const { return m_ExtraFlags & PLAYER_EXTRA_GM_CHAT; }
@@ -2885,8 +2886,6 @@ private:
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
-
-    bool m_IsAcceptingInvites;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

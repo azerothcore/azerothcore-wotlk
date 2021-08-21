@@ -404,8 +404,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_isInstantFlightOn = true;
 
-    m_IsAcceptingInvites = false;
-
     sScriptMgr->OnConstructPlayer(this);
 }
 
