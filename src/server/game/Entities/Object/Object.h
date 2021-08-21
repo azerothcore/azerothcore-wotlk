@@ -658,9 +658,47 @@ public:
         Relocate(x, y, z, o);
     }
 
+    void SetMapId(uint32 mapId)
+    {
+        m_mapId = mapId;
+    }
+
     [[nodiscard]] uint32 GetMapId() const
     {
         return m_mapId;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+        z = m_positionZ;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z, float& o) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+        z = m_positionZ;
+        o = m_orientation;
+    }
+
+    void GetWorldLocation(WorldLocation* location) const
+    {
+        if (location)
+        {
+            location->Relocate(m_positionX, m_positionY, m_positionZ, m_orientation);
+            location->SetMapId(m_mapId);
+        }
     }
 
     [[nodiscard]] WorldLocation GetWorldLocation() const

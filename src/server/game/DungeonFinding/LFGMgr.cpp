@@ -1603,6 +1603,26 @@ namespace lfg
 
         _SaveToDB(gguid);
 
+        // Select a player inside to be teleported to
+        WorldLocation const* teleportLocation = nullptr;
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* plr = itr->GetSource();
+            if (plr && plr->GetMapId() == uint32(dungeon->map))
+            {
+                // Remove bind to that map
+                if (!sInstanceSaveMgr->PlayerIsPermBoundToInstance(plr->GetGUID(), dungeon->map, plr->GetDungeonDifficulty()))
+                {
+                    sInstanceSaveMgr->PlayerUnbindInstance(plr->GetGUID(), dungeon->map, plr->GetDungeonDifficulty(), true);
+                }
+
+                if (!proposal.isNew && !teleportLocation)
+                {
+                    teleportLocation = plr;
+                }
+            }
+        }
+
         bool randomDungeon = false;
         // Teleport Player
         for (LfgGuidList::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
@@ -1617,7 +1637,8 @@ namespace lfg
                     randomDungeon = true;
                     player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
                 }
-                TeleportPlayer(player, false);
+
+                TeleportPlayer(player, false, teleportLocation);
             }
 
         if (randomDungeon)
@@ -1952,7 +1973,7 @@ namespace lfg
        @param[in]     out Teleport out (true) or in (false)
        @param[in]     fromOpcode Function called from opcode handlers? (Default false)
     */
-    void LFGMgr::TeleportPlayer(Player* player, bool out, bool fromOpcode /*= false*/)
+    void LFGMgr::TeleportPlayer(Player* player, bool out, WorldLocation const* teleportLocation /*= nullptr*/)
     {
         LFGDungeonData const* dungeon = nullptr;
         Group* group = player->GetGroup();
@@ -1986,7 +2007,7 @@ namespace lfg
             error = LFG_TELEPORTERROR_IN_VEHICLE;
         else if (player->GetCharmGUID())
             error = LFG_TELEPORTERROR_CHARMING;
-        else if (player->GetMapId() != uint32(dungeon->map))  // Do not teleport players in dungeon to the entrance
+        else
         {
             uint32 mapid = dungeon->map;
             float x = dungeon->x;
@@ -1994,32 +2015,21 @@ namespace lfg
             float z = dungeon->z;
             float orientation = dungeon->o;
 
-            if (!fromOpcode)
+            if (teleportLocation)
             {
-                // Select a player inside to be teleported to
-                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                {
-                    Player* plrg = itr->GetSource();
-                    if (plrg && plrg != player && plrg->GetMapId() == uint32(dungeon->map))
-                    {
-                        mapid = plrg->GetMapId();
-                        x = plrg->GetPositionX();
-                        y = plrg->GetPositionY();
-                        z = plrg->GetPositionZ();
-                        orientation = plrg->GetOrientation();
-                        break;
-                    }
-                }
+                teleportLocation->GetWorldLocation(mapid, x, y, z, orientation);
             }
 
-            if (!player->GetMap()->IsDungeon())
+            if (!player->GetMap()->IsDungeon() || player->GetEntryPoint().GetMapId() == MAPID_INVALID)
+            {
                 player->SetEntryPoint();
+            }
 
-            if (!player->TeleportTo(mapid, x, y, z, orientation))
+            if (!player->TeleportTo(mapid, x, y, z, orientation, 0, nullptr, mapid == player->GetMapId()))
+            {
                 error = LFG_TELEPORTERROR_INVALID_LOCATION;
+            }
         }
-        else
-            error = LFG_TELEPORTERROR_INVALID_LOCATION;
 
         if (error != LFG_TELEPORTERROR_OK)
             player->GetSession()->SendLfgTeleportError(uint8(error));

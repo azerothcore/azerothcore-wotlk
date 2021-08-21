@@ -15,12 +15,15 @@
  */
 
 #include "Containers.h"
+#include "DBCStores.h"
 #include "Group.h"
+#include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "LFGQueue.h"
 #include "Log.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "World.h"
 
 namespace lfg
@@ -397,9 +400,8 @@ namespace lfg
             return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
         }
 
-        ObjectGuid gguid = check.front();
         proposal.queues = strGuids;
-        proposal.isNew = numLfgGroups != 1 || sLFGMgr->GetOldState(gguid) != LFG_STATE_DUNGEON;
+        proposal.isNew = numLfgGroups != 1 || sLFGMgr->GetOldState(proposal.group) != LFG_STATE_DUNGEON;
 
         if (!sLFGMgr->AllQueued(check)) // can't create proposal
             return LFG_COMPATIBILITY_PENDING;
@@ -410,6 +412,7 @@ namespace lfg
         proposal.leader.Clear();
         proposal.dungeonId = Acore::Containers::SelectRandomContainerElement(proposalDungeons);
 
+        uint32 completedEncounters = 0;
         bool leader = false;
         for (LfgRolesMap::const_iterator itRoles = proposalRoles.begin(); itRoles != proposalRoles.end(); ++itRoles)
         {
@@ -429,7 +432,26 @@ namespace lfg
             data.group = proposalGroups.find(itRoles->first)->second;
             if (!proposal.isNew && data.group && data.group == proposal.group) // Player from existing group, autoaccept
                 data.accept = LFG_ANSWER_AGREE;
+
+            if (!completedEncounters && !proposal.isNew)
+            {
+                if (LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(proposal.dungeonId))
+                {
+                    if (Player* player = ObjectAccessor::FindConnectedPlayer(itRoles->first))
+                    {
+                        if (player->GetMapId() == dungeon->map)
+                        {
+                            if (InstanceScript* instance = player->GetInstanceScript())
+                            {
+                                completedEncounters = instance->GetCompletedEncounterMask();
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        proposal.encounters = completedEncounters;
 
         for (uint8 i = 0; i < 5 && proposal.queues.guids[i]; ++i)
             RemoveFromQueue(proposal.queues.guids[i], true);
