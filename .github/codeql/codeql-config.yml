@@ -6,7 +6,7 @@ queries:
   # we include both even though one is a superset of the
   # other, because we're testing the parsing logic and
   # that the suites exist in the codeql bundle.
-  - uses: security-extended
-  - uses: security-and-quality
+  # - uses: security-extended
+  # - uses: security-and-quality
 paths-ignore:
   - deps
