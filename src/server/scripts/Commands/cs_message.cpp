@@ -32,7 +32,8 @@ public:
             { "gmannounce",     SEC_GAMEMASTER,      true,   &HandleGMAnnounceCommand,           "" },
             { "notify",         SEC_GAMEMASTER,      true,   &HandleNotifyCommand,               "" },
             { "gmnotify",       SEC_GAMEMASTER,      true,   &HandleGMNotifyCommand,             "" },
-            { "whispers",       SEC_MODERATOR,       false,  &HandleWhispersCommand,             "" }
+            { "whispers",       SEC_MODERATOR,       false,  &HandleWhispersCommand,             "" },
+            { "invites",        SEC_MODERATOR,       false,  &HandleInvitesCommand,              "" },
         };
         return commandTable;
     }
@@ -137,6 +138,41 @@ public:
             handler->GetSession()->GetPlayer()->ClearWhisperWhiteList();
             handler->GetSession()->GetPlayer()->SetAcceptWhispers(false);
             handler->SendSysMessage(LANG_COMMAND_WHISPEROFF);
+            return true;
+        }
+
+        handler->SendSysMessage(LANG_USE_BOL);
+        handler->SetSentErrorMessage(true);
+        return false;
+    }
+
+    // Enable/Disable accepting of invites (for GM)
+    static bool HandleInvitesCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        if (!*args)
+        {
+            handler->PSendSysMessage("Accepting Invites: %s", player->IsAcceptingInvites() ? handler->GetAcoreString(LANG_ON) : handler->GetAcoreString(LANG_OFF));
+            return true;
+        }
+
+        std::string argStr = (char*)args;
+        // invites on
+        if (argStr == "on")
+        {
+            player->SetAcceptInvites(true);
+            handler->PSendSysMessage("Accepting Invites: ON");
+            return true;
+        }
+
+        // invites off
+        if (argStr == "off")
+        {
+            handler->GetSession()->GetPlayer()->SetAcceptInvites(false);
+            handler->PSendSysMessage("Accepting Invites: OFF");
             return true;
         }
 

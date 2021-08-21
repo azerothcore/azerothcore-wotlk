@@ -1058,6 +1058,8 @@ public:
     void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
+    void SetAcceptInvites(bool on) { m_IsAcceptingInvites = on; }
+    [[nodiscard]] bool IsAcceptingInvites() const { return m_IsAcceptingInvites; }
     [[nodiscard]] bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
     void SetGameMaster(bool on);
     [[nodiscard]] bool isGMChat() const { return m_ExtraFlags & PLAYER_EXTRA_GM_CHAT; }
@@ -2883,6 +2885,8 @@ private:
     WorldLocation _corpseLocation;
 
     Optional<float> _farSightDistance = { };
+
+    bool m_IsAcceptingInvites;
 };
 
 void AddItemsSetItem(Player* player, Item* item);
