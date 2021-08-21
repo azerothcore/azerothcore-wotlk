@@ -2202,6 +2202,12 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
     if (!IsHostileTo(enemy))
         return false;
 
+    // Check if can see the enemy
+    if (!CanSeeOrDetect(enemy))
+    {
+        return false;
+    }
+
     return true;
 }
 
