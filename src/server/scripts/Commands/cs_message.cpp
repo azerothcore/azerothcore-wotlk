@@ -151,7 +151,9 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)
+        {
             return false;
+        }
 
         if (!*args)
         {
