@@ -7,7 +7,7 @@
 #ifndef ACORE_WAYPOINTMOVEMENTGENERATOR_H
 #define ACORE_WAYPOINTMOVEMENTGENERATOR_H
 
-/** @page PathMovementGenerator is used to generate movements
+/** PathMovementGenerator is used to generate movements
  * of waypoints and flight paths.  Each serves the purpose
  * of generate activities so that it generates updated
  * packets for the players.
