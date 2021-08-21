@@ -157,7 +157,7 @@ public:
 
         if (!*args)
         {
-            handler->PSendSysMessage("Accepting Invites: %s", player->IsAcceptingInvites() ? handler->GetAcoreString(LANG_ON) : handler->GetAcoreString(LANG_OFF));
+            handler->PSendSysMessage(LANG_COMMAND_INVITE_ACCEPTING, player->IsAcceptingInvites() ? handler->GetAcoreString(LANG_ON) : handler->GetAcoreString(LANG_OFF));
             return true;
         }
 
@@ -166,15 +166,15 @@ public:
         if (argStr == "on")
         {
             player->SetAcceptInvites(true);
-            handler->PSendSysMessage("Accepting Invites: ON");
+            handler->SendSysMessage(LANG_COMMAND_INVITE_ACCEPT_ON);
             return true;
         }
 
         // invites off
         if (argStr == "off")
         {
-            handler->GetSession()->GetPlayer()->SetAcceptInvites(false);
-            handler->PSendSysMessage("Accepting Invites: OFF");
+            player->SetAcceptInvites(false);
+            handler->SendSysMessage(LANG_COMMAND_INVITE_ACCEPT_OFF);
             return true;
         }
 

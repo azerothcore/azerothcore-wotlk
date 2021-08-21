@@ -1355,7 +1355,11 @@ enum AcoreStrings
     LANG_BG_READY_CHECK_ERROR                     = 30084,
 
     LANG_DEBUG_BG_CONF                            = 30085,
-    LANG_DEBUG_ARENA_CONF                         = 30086
+    LANG_DEBUG_ARENA_CONF                         = 30086,
+
+    LANG_COMMAND_INVITE_ACCEPTING                 = 30087,
+    LANG_COMMAND_INVITE_ACCEPT_ON                 = 30088,
+    LANG_COMMAND_INVITE_ACCEPT_OFF                = 30089,
 
     // 30087-30095 reserved for passive anticheat
 };
