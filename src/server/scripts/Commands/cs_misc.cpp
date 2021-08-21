@@ -2264,7 +2264,7 @@ public:
             if (WorldSession* session = sWorld->FindSession(accountId))
                 target = session->GetPlayer();
 
-        auto notSpeakTime = Acore::StringTo<uint32>(delayStr);
+        auto notSpeakTime = TimeStringToSecs(delayStr);
 
         if (!notSpeakTime)
         {
@@ -2276,12 +2276,12 @@ public:
         if (handler->HasLowerSecurity(target, targetGuid, true))
             return false;
 
-        sMute->MutePlayer(targetName, Minutes(*notSpeakTime), handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
+        sMute->MutePlayer(targetName, Seconds(notSpeakTime), handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
 
         if (!sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
         {
             // You has disabled % s\'s chat for %s. Reason: %s.
-            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(targetName).c_str(), secsToTimeString(Minutes(*notSpeakTime).count()).c_str(), muteReasonStr.c_str());
+            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(targetName).c_str(), secsToTimeString(notSpeakTime).c_str(), muteReasonStr.c_str());
         }
 
         return true;
