@@ -7302,7 +7302,6 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->MaxAffectedTargets = 1;
         spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
-
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
