@@ -379,6 +379,7 @@ void Unit::Update(uint32 p_time)
     // WARNING! Order of execution here is important, do not change.
     // Spells must be processed with event system BEFORE they go to _UpdateSpells.
     // Or else we may have some SPELL_STATE_FINISHED spells stalled in pointers, that is bad.
+
     m_Events.Update(p_time);
 
     if (!IsInWorld())
@@ -16525,14 +16526,30 @@ void Unit::SetContestedPvP(Player* attackedPlayer)
 {
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
 
-    if (!player || (attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->opponent == attackedPlayer))))
+    if (!player || (attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->opponent == attackedPlayer)) || player->InBattleground()))
         return;
 
+    // check if there any any guards that should give a fuck about the contested flag on player
+
+    std::list<Unit*>                                                           targets;
+    Acore::NearestContestedGuardUnitInAggroRangeCheck                          u_check(this);
+    Acore::UnitListSearcher<Acore::NearestContestedGuardUnitInAggroRangeCheck> searcher(this, targets, u_check);
+    Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
+
+    // return if there are no contested guards in aggro range
+
+    if (!targets.size())
+    {
+        return;
+    }
+
     player->SetContestedPvPTimer(30000);
+
     if (!player->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
     {
         player->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
         player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
+
         // call MoveInLineOfSight for nearby contested guards
         AddToNotify(NOTIFY_AI_RELOCATION);
     }
