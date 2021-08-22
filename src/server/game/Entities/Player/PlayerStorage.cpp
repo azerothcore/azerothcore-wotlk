@@ -5499,6 +5499,22 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
                     SetAcceptWhispers(true);
                 break;
         }
+
+        switch (sWorld->getIntConfig(CONFIG_GM_MAIL_TO))
+        {
+            default:
+            case 0:      // disable
+                break;
+            case 1:      // enable
+                SetAcceptMail(true);
+                break;
+            case 2:      // save state
+                if (extraflags & PLAYER_EXTRA_ACCEPT_MAIL)
+                {
+                    SetAcceptMail(true);
+                }
+                break;
+        }
     }
 
     // RaF stuff.

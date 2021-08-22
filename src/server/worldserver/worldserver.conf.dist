@@ -1968,6 +1968,15 @@ GM.Chat = 2
 GM.WhisperingTo = 2
 
 #
+#    GM.MailTo
+#        Description: Is GM accepting mail from player by default or not.
+#        Default:     2 - (Last save state)
+#                     0 - (Disable)
+#                     1 - (Enable)
+
+GM.MailTo = 2
+
+#
 #    GM.InGMList.Level
 #        Description: Maximum GM level shown in GM list (if enabled) in non-GM state (.gm off).
 #        Default:     3 - (Anyone)

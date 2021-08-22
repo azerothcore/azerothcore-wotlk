@@ -173,6 +173,14 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             mails_count = playerData->mailCount;
         }
     }
+
+    // Check if a GM is blocking mail.
+    if (receive->GetSession()->GetSecurity() && !receive->IsAcceptingMail())
+    {
+        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
+        return;
+    }
+
     //do not allow to have more than 100 mails in mailbox.. mails count is in opcode uint8!!! - so max can be 255..
     if (mails_count > 100)
     {

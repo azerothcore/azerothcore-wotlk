@@ -1355,8 +1355,12 @@ enum AcoreStrings
     LANG_BG_READY_CHECK_ERROR                     = 30084,
 
     LANG_DEBUG_BG_CONF                            = 30085,
-    LANG_DEBUG_ARENA_CONF                         = 30086
+    LANG_DEBUG_ARENA_CONF                         = 30086,
 
     // 30087-30095 reserved for passive anticheat
+
+    LANG_COMMAND_ACCEPT_MAIL                      = 30099,
+    LANG_COMMAND_ACCEPT_MAIL_ON                   = 30100,
+    LANG_COMMAND_ACCEPT_MAIL_OFF                  = 30101,
 };
 #endif

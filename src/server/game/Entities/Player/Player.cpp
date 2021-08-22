@@ -159,9 +159,12 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_spellModTakingSpell = nullptr;
     //m_pad = 0;
 
-    // players always accept
+    // players always accept whispers && mail
     if (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    {
         SetAcceptWhispers(true);
+        SetAcceptMail(true);
+    }
 
     m_comboPoints = 0;
 
@@ -2216,6 +2219,8 @@ void Player::SetGMVisible(bool on)
         m_ExtraFlags |= PLAYER_EXTRA_GM_INVISIBLE;          //add flag
 
         SetAcceptWhispers(false);
+
+        SetAcceptMail(false);
         SetGameMaster(true);
 
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());

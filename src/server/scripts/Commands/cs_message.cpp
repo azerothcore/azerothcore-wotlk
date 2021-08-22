@@ -32,7 +32,8 @@ public:
             { "gmannounce",     SEC_GAMEMASTER,      true,   &HandleGMAnnounceCommand,           "" },
             { "notify",         SEC_GAMEMASTER,      true,   &HandleNotifyCommand,               "" },
             { "gmnotify",       SEC_GAMEMASTER,      true,   &HandleGMNotifyCommand,             "" },
-            { "whispers",       SEC_MODERATOR,       false,  &HandleWhispersCommand,             "" }
+            { "whispers",       SEC_MODERATOR,       false,  &HandleWhispersCommand,             "" },
+            { "mail",           SEC_MODERATOR,       false,  &HandleMailCommand,                 "" }
         };
         return commandTable;
     }
@@ -137,6 +138,42 @@ public:
             handler->GetSession()->GetPlayer()->ClearWhisperWhiteList();
             handler->GetSession()->GetPlayer()->SetAcceptWhispers(false);
             handler->SendSysMessage(LANG_COMMAND_WHISPEROFF);
+            return true;
+        }
+
+        handler->SendSysMessage(LANG_USE_BOL);
+        handler->SetSentErrorMessage(true);
+        return false;
+    }
+
+    static bool HandleMailCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+        {
+            return true;
+        }
+
+        if (!*args)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_ACCEPT_MAIL, player->IsAcceptingMail() ? handler->GetAcoreString(LANG_ON) : handler->GetAcoreString(LANG_OFF));
+            return true;
+        }
+
+        std::string argStr = (char*)args;
+        // mail on
+        if (argStr == "on")
+        {
+            player->SetAcceptMail(true);
+            handler->SendSysMessage(LANG_COMMAND_ACCEPT_MAIL_ON);
+            return true;
+        }
+
+        // mail off
+        if (argStr == "off")
+        {
+            player->SetAcceptMail(false);
+            handler->SendSysMessage(LANG_COMMAND_ACCEPT_MAIL_OFF);
             return true;
         }
 
