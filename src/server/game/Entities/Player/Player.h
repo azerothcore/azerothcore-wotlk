@@ -509,7 +509,7 @@ enum PlayerExtraFlags
 {
     // gm abilities
     PLAYER_EXTRA_GM_ON              = 0x0001,
-    PLAYER_EXTRA_ACCEPT_WHISPERS    = 0x0004,
+    PLAYER_EXTRA_ACCEPT_WHISPERS    = 0x0004,               // Marks if GM accepts whispers
     PLAYER_EXTRA_TAXICHEAT          = 0x0008,
     PLAYER_EXTRA_GM_INVISIBLE       = 0x0010,
     PLAYER_EXTRA_GM_CHAT            = 0x0020,               // Show GM badge in chat messages
@@ -517,7 +517,7 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_SPECTATOR_ON       = 0x0080,               // Marks if player is spectactor
     PLAYER_EXTRA_PVP_DEATH          = 0x0100,               // store PvP death status until corpse creating.
     PLAYER_EXTRA_SHOW_DK_PET        = 0x0400,               // Marks if player should see ghoul on login screen
-    PLAYER_EXTRA_ACCEPT_INVITES     = 0x0800
+    PLAYER_EXTRA_ACCEPT_INVITES     = 0x0800                // Marks if GM accepts whispers
 };
 
 // 2^n values
