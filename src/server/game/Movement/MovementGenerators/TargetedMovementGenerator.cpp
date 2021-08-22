@@ -119,7 +119,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     bool withinRange = owner->IsInDist(target, maxRange);
     bool withinLOS   = owner->IsWithinLOS(tarX, tarY, tarZ);
-    bool moveToward  = !withinRange || (withinRange && !withinLOS);
+    bool moveToward  = !(withinRange && withinLOS);
 
     _mutualChase = mutualChase;
 
