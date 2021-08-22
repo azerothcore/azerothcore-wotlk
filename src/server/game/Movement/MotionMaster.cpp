@@ -580,7 +580,7 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
 }
 
-void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id, const Movement::PointsArray* path, bool generatePath, float orientation /* = 0.0f*/)
+void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id, const Movement::PointsArray* path, bool generatePath, float orientation /* = 0.0f*/, ObjectGuid targetGUID /*= ObjectGuid::Empty*/)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
@@ -592,12 +592,12 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id,
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
         LOG_DEBUG("movement.motionmaster", "Player (%s) charge point (X: %f Y: %f Z: %f)", _owner->GetGUID().ToString().c_str(), x, y, z);
-        Mutate(new PointMovementGenerator<Player>(id, x, y, z, speed, orientation, path, generatePath, generatePath), MOTION_SLOT_CONTROLLED);
+        Mutate(new PointMovementGenerator<Player>(id, x, y, z, speed, orientation, path, generatePath, generatePath, targetGUID), MOTION_SLOT_CONTROLLED);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature (%s) charge point (X: %f Y: %f Z: %f)", _owner->GetGUID().ToString().c_str(), x, y, z);
-        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, speed, orientation, path, generatePath, generatePath), MOTION_SLOT_CONTROLLED);
+        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, speed, orientation, path, generatePath, generatePath, targetGUID), MOTION_SLOT_CONTROLLED);
     }
 }
 

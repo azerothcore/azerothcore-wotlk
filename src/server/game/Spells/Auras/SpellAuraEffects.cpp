@@ -3324,6 +3324,7 @@ void AuraEffect::HandleAuraModDecreaseSpeed(AuraApplication const* aurApp, uint8
 
     Unit* target = aurApp->GetTarget();
 
+    target->UpdateSpeed(MOVE_WALK, true);
     target->UpdateSpeed(MOVE_RUN, true);
     target->UpdateSpeed(MOVE_SWIM, true);
     target->UpdateSpeed(MOVE_FLIGHT, true);

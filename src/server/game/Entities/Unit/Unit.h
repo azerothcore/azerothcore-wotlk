@@ -1500,12 +1500,13 @@ public:
     [[nodiscard]] uint32 HasUnitTypeMask(uint32 mask) const { return mask & m_unitTypeMask; }
     void AddUnitTypeMask(uint32 mask) { m_unitTypeMask |= mask; }
     [[nodiscard]] uint32 GetUnitTypeMask() const { return m_unitTypeMask; }
-    [[nodiscard]] bool IsSummon() const   { return m_unitTypeMask & UNIT_MASK_SUMMON; }
+    [[nodiscard]] bool IsSummon() const { return m_unitTypeMask & UNIT_MASK_SUMMON; }
     [[nodiscard]] bool IsGuardian() const { return m_unitTypeMask & UNIT_MASK_GUARDIAN; }
-    [[nodiscard]] bool IsPet() const      { return m_unitTypeMask & UNIT_MASK_PET; }
+    [[nodiscard]] bool IsControllableGuardian() const { return m_unitTypeMask & UNIT_MASK_CONTROLABLE_GUARDIAN; }
+    [[nodiscard]] bool IsPet() const { return m_unitTypeMask & UNIT_MASK_PET; }
     [[nodiscard]] bool IsHunterPet() const { return m_unitTypeMask & UNIT_MASK_HUNTER_PET; }
-    [[nodiscard]] bool IsTotem() const    { return m_unitTypeMask & UNIT_MASK_TOTEM; }
-    [[nodiscard]] bool IsVehicle() const  { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
+    [[nodiscard]] bool IsTotem() const { return m_unitTypeMask & UNIT_MASK_TOTEM; }
+    [[nodiscard]] bool IsVehicle() const { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
 
     [[nodiscard]] uint8 getLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
     uint8 getLevelForTarget(WorldObject const* /*target*/) const override { return getLevel(); }
