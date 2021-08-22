@@ -379,7 +379,6 @@ void Unit::Update(uint32 p_time)
     // WARNING! Order of execution here is important, do not change.
     // Spells must be processed with event system BEFORE they go to _UpdateSpells.
     // Or else we may have some SPELL_STATE_FINISHED spells stalled in pointers, that is bad.
-
     m_Events.Update(p_time);
 
     if (!IsInWorld())
@@ -16531,12 +16530,12 @@ void Unit::SetContestedPvP(Player* attackedPlayer)
 
     // check if there any any guards that should give a fuck about the contested flag on player
 
-    std::list<Unit*>                                                           targets;
-    Acore::NearestContestedGuardUnitInAggroRangeCheck                          u_check(this);
-    Acore::UnitListSearcher<Acore::NearestContestedGuardUnitInAggroRangeCheck> searcher(this, targets, u_check);
+    std::list<Unit*>                                                                targets;
+    Acore::NearestVisibleDetectableContestedGuardUnitCheck                          u_check(this);
+    Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
     Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
 
-    // return if there are no contested guards in aggro range
+    // return if there are no contested guards found
 
     if (!targets.size())
     {
@@ -16544,7 +16543,6 @@ void Unit::SetContestedPvP(Player* attackedPlayer)
     }
 
     player->SetContestedPvPTimer(30000);
-
     if (!player->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
     {
         player->AddUnitState(UNIT_STATE_ATTACK_PLAYER);

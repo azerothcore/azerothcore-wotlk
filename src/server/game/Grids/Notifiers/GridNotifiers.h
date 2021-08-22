@@ -1103,10 +1103,10 @@ namespace Acore
         NearestHostileUnitInAttackDistanceCheck(NearestHostileUnitInAttackDistanceCheck const&);
     };
 
-    class NearestContestedGuardUnitInAggroRangeCheck
+    class NearestVisibleDetectableContestedGuardUnitCheck
     {
     public:
-        explicit NearestContestedGuardUnitInAggroRangeCheck(Unit const* unit) : me(unit) {}
+        explicit NearestVisibleDetectableContestedGuardUnitCheck(Unit const* unit) : me(unit) {}
         bool operator()(Unit* u)
         {
             if (!u->CanSeeOrDetect(me, true, true, false))
@@ -1120,7 +1120,7 @@ namespace Acore
 
     private:
         Unit const* me;
-        NearestContestedGuardUnitInAggroRangeCheck(NearestContestedGuardUnitInAggroRangeCheck const&);
+        NearestVisibleDetectableContestedGuardUnitCheck(NearestVisibleDetectableContestedGuardUnitCheck const&);
     };
 
     class AnyAssistCreatureInRangeCheck
