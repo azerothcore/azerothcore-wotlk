@@ -1459,8 +1459,10 @@ public:
             {
                 case EVENT_RC_RUNIC_SMASH_TRIGGER:
                     _nextTriggerPos += 16.0f;
-                    if (!(_nextTriggerPos > -260.0f))
+                    if (_nextTriggerPos <= -260.0f)
+                    {
                         events.RescheduleEvent(EVENT_RC_RUNIC_SMASH_TRIGGER, 500);
+                    }
 
                     RunRunicSmash(true);
                     break;

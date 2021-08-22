@@ -1178,25 +1178,6 @@ public:
     };
 };
 
-enum ScriptedTextNorgannonDellorah
-{
-    DELLORAH_SAY_1 = 0,
-    DELLORAH_SAY_2 = 1,
-    DELLORAH_SAY_3 = 2,
-    DELLORAH_SAY_4 = 3,
-    DELLORAH_SAY_5 = 4,
-    DELLORAH_SAY_6 = 5,
-    DELLORAH_SAY_7 = 6,
-
-    NORGANNON_SAY_1 = 0,
-    NORGANNON_SAY_2 = 1,
-    NORGANNON_SAY_3 = 2,
-    NORGANNON_SAY_4 = 3,
-    NORGANNON_SAY_5 = 4,
-
-    RHYDIAN_EMOTE = 0,
-};
-
 class npc_brann_radio : public CreatureScript
 {
 public:
