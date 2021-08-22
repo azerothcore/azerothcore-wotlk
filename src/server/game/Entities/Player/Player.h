@@ -517,7 +517,7 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_SPECTATOR_ON       = 0x0080,               // Marks if player is spectactor
     PLAYER_EXTRA_PVP_DEATH          = 0x0100,               // store PvP death status until corpse creating.
     PLAYER_EXTRA_SHOW_DK_PET        = 0x0400,               // Marks if player should see ghoul on login screen
-    PLAYER_EXTRA_ACCEPT_INVITES     = 0x0800                // Marks if GM accepts whispers
+    PLAYER_EXTRA_ACCEPT_INVITES     = 0x0800                // Marks if GM accepts invites
 };
 
 // 2^n values
