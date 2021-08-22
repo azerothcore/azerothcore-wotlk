@@ -704,11 +704,13 @@ public:
                     {
                         instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
                         m_leviathanTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED] = data;
-                        GameObject* gobj = nullptr;
-                        if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][0])))
-                            gobj->SetGoState(GO_STATE_ACTIVE);
-                        if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][1])))
-                            gobj->SetGoState(GO_STATE_ACTIVE);
+                        for (uint8 i = 0; i < 2; ++i)
+                        {
+                            if (GameObject *gameObject = instance->GetGameObject(m_leviathanVisualTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED][i]))
+                            {
+                                gameObject->SetGoState(GO_STATE_ACTIVE);
+                            }
+                        }
                         return;
                     }
 
@@ -890,7 +892,6 @@ public:
                 case DATA_THORIM_FIRST_DOORS:
                 case DATA_THORIM_SECOND_DOORS:
                     return m_thorimGameobjectsGUID[data - DATA_THORIM_LEVER_GATE];
-                    break;
 
                 // Hodir chests
                 case GO_HODIR_CHEST_HARD:
@@ -1229,15 +1230,20 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounter
 
     if (mode < VEHICLE_POS_NONE)
     {
-        TempSummon* veh = nullptr;
         for (uint8 i = 0; i < (instance->Is25ManRaid() ? 5 : 2); ++i)
         {
-            if ((veh = instance->SummonCreature(NPC_SALVAGED_SIEGE_ENGINE, vehiclePositions[15 * mode + i])))
+            if (TempSummon* veh = instance->SummonCreature(NPC_SALVAGED_SIEGE_ENGINE, vehiclePositions[15 * mode + i]))
+            {
                 _leviathanVehicles.push_back(veh->GetGUID());
-            if ((veh = instance->SummonCreature(NPC_VEHICLE_CHOPPER, vehiclePositions[15 * mode + i + 5])))
+            }
+            if (TempSummon* veh = instance->SummonCreature(NPC_VEHICLE_CHOPPER, vehiclePositions[15 * mode + i + 5]))
+            {
                 _leviathanVehicles.push_back(veh->GetGUID());
-            if ((veh = instance->SummonCreature(NPC_SALVAGED_DEMOLISHER, vehiclePositions[15 * mode + i + 10])))
+            }
+            if (TempSummon* veh = instance->SummonCreature(NPC_SALVAGED_DEMOLISHER, vehiclePositions[15 * mode + i + 10]))
+            {
                 _leviathanVehicles.push_back(veh->GetGUID());
+            }
         }
     }
 }

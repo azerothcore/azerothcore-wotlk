@@ -148,9 +148,9 @@ const Position PosSummonDead[5] =
     {2664.8f, -3340.7f, 268.23f, 3.7f}
 };
 
-const Position PosGroundLivingSide = {2691.2f, -3387.0f, 267.68f, 1.52f};
-const Position PosGroundDeadSide   = {2693.5f, -3334.6f, 267.68f, 4.67f};
-const Position PosPlatform         = {2640.5f, -3360.6f, 285.26f, 0.0f};
+//const Position PosGroundLivingSide = {2691.2f, -3387.0f, 267.68f, 1.52f};
+//const Position PosGroundDeadSide   = {2693.5f, -3334.6f, 267.68f, 4.67f};
+//const Position PosPlatform         = {2640.5f, -3360.6f, 285.26f, 0.0f};
 
 #define POS_Y_GATE  -3360.78f
 #define POS_Y_WEST  -3285.0f

@@ -19,7 +19,6 @@ EndScriptData */
 #include "hyjalAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptMgr.h"
 
 enum Spawns
 {
