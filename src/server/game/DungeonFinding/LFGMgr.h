@@ -18,6 +18,7 @@
 class Group;
 class Player;
 class Quest;
+class WorldLocation;
 
 namespace lfg
 {
