@@ -1608,18 +1608,10 @@ namespace lfg
         for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* plr = itr->GetSource();
-            if (plr && plr->GetMapId() == uint32(dungeon->map))
+            if (plr && plr->GetMapId() == uint32(dungeon->map) && !proposal.isNew)
             {
-                // Remove bind to that map
-                if (!sInstanceSaveMgr->PlayerIsPermBoundToInstance(plr->GetGUID(), dungeon->map, plr->GetDungeonDifficulty()))
-                {
-                    sInstanceSaveMgr->PlayerUnbindInstance(plr->GetGUID(), dungeon->map, plr->GetDungeonDifficulty(), true);
-                }
-
-                if (!proposal.isNew && !teleportLocation)
-                {
-                    teleportLocation = plr;
-                }
+                teleportLocation = plr;
+                break;
             }
         }
 
@@ -1630,6 +1622,16 @@ namespace lfg
             {
                 if (player->GetGroup() != grp) // pussywizard: could not add because group was full (some shitness happened)
                     continue;
+
+                if (player->GetMapId() == uint32(dungeon->map))
+                {
+                    // Remove bind to that map
+                    if (!sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty()))
+                    {
+                        sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
+                    }
+                }
+
                 // Add the cooldown spell if queued for a random dungeon
                 // xinef: add aura
                 if ((randomDungeon || selectedRandomLfgDungeon(player->GetGUID())) && !player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN))
