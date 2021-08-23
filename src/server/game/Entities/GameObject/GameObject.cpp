@@ -2585,7 +2585,7 @@ bool GameObject::IsAtInteractDistance(Player const* player, SpellInfo const* spe
             return maxRange * maxRange >= GetExactDistSq(player);
         }
 
-        if (GameObjectDisplayInfoEntry const* displayInfo = sGameObjectDisplayInfoStore.LookupEntry(GetGOInfo()->displayId))
+        if (sGameObjectDisplayInfoStore.LookupEntry(GetGOInfo()->displayId))
         {
             return IsAtInteractDistance(*player, maxRange);
         }
