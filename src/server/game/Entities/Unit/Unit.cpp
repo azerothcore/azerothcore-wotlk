@@ -16525,8 +16525,22 @@ void Unit::SetContestedPvP(Player* attackedPlayer)
 {
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
 
-    if (!player || (attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->opponent == attackedPlayer))))
+    if (!player || (attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->opponent == attackedPlayer)) || player->InBattleground()))
         return;
+
+    // check if there any any guards that should give a fuck about the contested flag on player
+
+    std::list<Unit*>                                                                targets;
+    Acore::NearestVisibleDetectableContestedGuardUnitCheck                          u_check(this);
+    Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
+    Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
+
+    // return if there are no contested guards found
+
+    if (!targets.size())
+    {
+        return;
+    }
 
     player->SetContestedPvPTimer(30000);
     if (!player->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
