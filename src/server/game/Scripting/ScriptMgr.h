@@ -194,6 +194,13 @@ public:
 
     // Called when the world is actually shut down.
     virtual void OnShutdown() { }
+
+    /**
+     * @brief This hook runs before finalizing the player world session. Can be also used to mutate the cache version of the Client.
+     *
+     * @param version The cache version that we will be sending to the Client.
+     */
+    virtual void OnBeforeFinalizePlayerWorldSession(uint32& /*cacheVersion*/) {}
 };
 
 class FormulaScript : public ScriptObject
@@ -1473,6 +1480,7 @@ public: /* WorldScript */
     void OnOpenStateChange(bool open);
     void OnBeforeConfigLoad(bool reload);
     void OnAfterConfigLoad(bool reload);
+    void OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion);
     void OnMotdChange(std::string& newMotd);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
     void OnShutdownCancel();
