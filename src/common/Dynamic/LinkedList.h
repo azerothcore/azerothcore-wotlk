@@ -209,13 +209,13 @@ public:
         bool operator!=(Iterator const& _Right) const
         {
             // test for iterator inequality
-            return *this != _Right;
+            return (!(*this == _Right));
         }
 
         bool operator==(pointer const& _Right) const
         {
             // test for pointer equality
-            return (_Ptr != _Right);
+            return (!(*this == _Right));
         }
 
         bool operator!=(pointer const& _Right) const
