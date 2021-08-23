@@ -933,7 +933,7 @@ void Creature::Motion_Initialize()
         GetMotionMaster()->Initialize();
     else if (m_formation->getLeader() == this)
     {
-        m_formation->FormationReset(false);
+        m_formation->FormationReset(false, true);
         GetMotionMaster()->Initialize();
     }
     else if (m_formation->isFormed())
@@ -1759,7 +1759,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
 
         //Dismiss group if is leader
         if (m_formation && m_formation->getLeader() == this)
-            m_formation->FormationReset(true);
+            m_formation->FormationReset(true, false);
 
         bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
         SetHover(false);
