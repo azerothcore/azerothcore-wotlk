@@ -215,13 +215,13 @@ public:
         bool operator==(pointer const& _Right) const
         {
             // test for pointer equality
-            return (!(*this == _Right));
+            return (_Ptr != _Right);
         }
 
         bool operator!=(pointer const& _Right) const
         {
             // test for pointer equality
-            return *this != _Right;
+            return (!(*this == _Right));
         }
 
         bool operator==(const_reference _Right) const
