@@ -182,21 +182,21 @@ namespace Acore
 
             return CreateChildProcess([&](child& c) -> int
             {
-                int result;
+                int res;
                 my_child = std::reference_wrapper<child>(c);
 
                 try
                 {
                     c.wait();
-                    result = c.exit_code();
+                    res = c.exit_code();
                 }
                 catch (...)
                 {
-                    result = EXIT_FAILURE;
+                    res = EXIT_FAILURE;
                 }
 
                 my_child.reset();
-                return was_terminated ? EXIT_FAILURE : result;
+                return was_terminated ? EXIT_FAILURE : res;
 
             }, executable, args, logger, input_file, is_secure);
         }

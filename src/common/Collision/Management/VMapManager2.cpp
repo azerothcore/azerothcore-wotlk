@@ -21,7 +21,6 @@
 #include "MapDefines.h"
 #include "MapTree.h"
 #include "ModelInstance.h"
-#include "VMapDefinitions.h"
 #include "WorldModel.h"
 #include <G3D/Vector3.h>
 #include <iomanip>
@@ -243,7 +242,7 @@ namespace VMAP
             {
                 Vector3 pos = convertPositionToInternalRep(x, y, z);
                 float height = instanceTree->second->getHeight(pos, maxSearchDist);
-                if (!(height < G3D::finf()))
+                if (height >= G3D::finf())
                 {
                     return height = VMAP_INVALID_HEIGHT_VALUE;    // No height
                 }
