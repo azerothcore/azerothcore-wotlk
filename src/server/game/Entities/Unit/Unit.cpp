@@ -16525,7 +16525,7 @@ void Unit::SetContestedPvP(Player* attackedPlayer)
 {
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
 
-    if (!player || (attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->opponent == attackedPlayer)) || player->InBattleground()))
+    if (!player || ((attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->opponent == attackedPlayer))) || player->InBattleground()))
         return;
 
     // check if there any any guards that should give a fuck about the contested flag on player
