@@ -662,6 +662,14 @@ namespace lfg
         if (isRaid && grp && (grp->isLFGGroup() || guid != grp->GetLeaderGUID()))
             return;
 
+         // Do not allow to change dungeon in the middle of a current dungeon
+        if (!isRaid && isContinue && grp->GetMembersCount() == 5)
+        {
+            dungeons.clear();
+            dungeons.insert(GetDungeon(gguid));
+            joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
+        }
+
         // Can't join. Send result
         if (joinData.result != LFG_JOIN_OK)
         {
