@@ -4,6 +4,7 @@
  */
 
 #include "ProcessPriority.h"
+#include "Log.h"
 
 #ifdef _WIN32 // Windows
 #include <Windows.h>
