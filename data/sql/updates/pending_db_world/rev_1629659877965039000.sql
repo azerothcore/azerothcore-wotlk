@@ -11,4 +11,4 @@ UPDATE `acore_string` SET `content_default` = 'OFF' WHERE `entry` = 39;
 
 DELETE FROM `command` WHERE `name` = 'mail';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
-('mail', 1, 'Syntax: .mail on|off\r\nEnable/disable accepting mail by GM from players');
+('mail', 1, 'Syntax: .mail on|off\r\nEnable/disable accepting mail from other players.\rShow current status if the command is sent without arguments.');
