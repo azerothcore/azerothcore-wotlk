@@ -4865,7 +4865,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
                                          tableName.c_str(), tmp.Talk.ChatType, tmp.id);
                         continue;
                     }
-                    if (!sObjectMgr->GetBroadcastText(uint32(tmp.Talk.TextID)))
+                    if (!GetBroadcastText(uint32(tmp.Talk.TextID)))
                     {
                         LOG_ERROR("sql.sql", "Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u",
                                          tableName.c_str(), tmp.Talk.TextID, tmp.id);
@@ -5626,7 +5626,7 @@ void ObjectMgr::LoadGossipText()
         {
             if (gText.Options[i].BroadcastTextID)
             {
-                if (!sObjectMgr->GetBroadcastText(gText.Options[i].BroadcastTextID))
+                if (!GetBroadcastText(gText.Options[i].BroadcastTextID))
                 {
                     LOG_ERROR("sql.sql", "GossipText (Id: %u) in table `npc_text` has non-existing or incompatible BroadcastTextID%u %u.", id, i, gText.Options[i].BroadcastTextID);
                     gText.Options[i].BroadcastTextID = 0;
