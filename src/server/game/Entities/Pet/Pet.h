@@ -62,10 +62,11 @@ public:
     bool CreateBaseAtCreature(Creature* creature);
     bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
     bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
-    static SpellCastResult TryLoadFromDB(Player* owner, bool current = false, PetType mandatoryPetType = MAX_PET_TYPE);
-    static bool LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry = 0, uint32 petnumber = 0, bool current = false, AsynchPetSummon* info = nullptr);
+    static std::pair<PetStable::PetInfo const*, PetSaveMode> GetLoadPetInfo(PetStable const& stable, uint32 petEntry, uint32 petnumber, bool current);
+    bool LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current);
     bool isBeingLoaded() const override { return m_loading;}
     void SavePetToDB(PetSaveMode mode, bool logout);
+    void FillPetInfo(PetStable::PetInfo* petInfo) const;
     void Remove(PetSaveMode mode, bool returnreagent = false);
     static void DeleteFromDB(ObjectGuid::LowType guidlow);
 
@@ -87,7 +88,6 @@ public:
     void GivePetLevel(uint8 level);
     void SynchronizeLevelWithOwner();
     bool HaveInDiet(ItemTemplate const* item) const;
-    uint32 GetCurrentFoodBenefitLevel(uint32 itemlevel) const;
     void SetDuration(int32 dur) { m_duration = dur; }
     int32 GetDuration() const { return m_duration; }
 
@@ -117,7 +117,6 @@ public:
     void _SaveAuras(CharacterDatabaseTransaction trans, bool logout);
     void _SaveSpells(CharacterDatabaseTransaction trans);
 
-    void _LoadSpellCooldowns(PreparedQueryResult result);
     void _LoadAuras(PreparedQueryResult result, uint32 timediff);
     void _LoadSpells(PreparedQueryResult result);
 
@@ -128,6 +127,7 @@ public:
     bool unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
     bool removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
     void CleanupActionBar();
+    std::string GenerateActionBarData() const;
 
     PetSpellMap     m_spells;
     AutoSpellList   m_autospells;
@@ -152,14 +152,11 @@ public:
 
     bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
 
-    Player* GetOwner() const { return m_owner; }
-    void SetLoading(bool load) { m_loading = load; }
-    void HandleAsynchLoadSucceed();
-    static void HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 asynchLoadType, uint8 loadResult);
-    uint8 GetAsynchLoadType() const { return asynchLoadType; }
-    void SetAsynchLoadType(uint8 type) { asynchLoadType = type; }
+    Player* GetOwner() const;
+
+    std::string GetDebugInfo() const override;
+
 protected:
-    Player* m_owner;
     int32   m_happinessTimer;
     PetType m_petType;
     int32   m_duration;                                 // time until unsummon (used mostly for summoned guardians and not used for controlled pets)
@@ -177,13 +174,9 @@ protected:
     uint8 asynchLoadType;
 
 private:
-    void SaveToDB(uint32, uint8, uint32) override                // override of Creature::SaveToDB     - must not be called
-    {
-        ABORT();
-    }
-    void DeleteFromDB() override                                 // override of Creature::DeleteFromDB - must not be called
-    {
-        ABORT();
-    }
+        void SaveToDB(uint32, uint8, uint32) override                // override of Creature::SaveToDB     - must not be called
+        {
+            ABORT();
+        }
 };
 #endif
