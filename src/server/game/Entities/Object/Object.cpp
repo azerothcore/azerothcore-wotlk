@@ -2539,7 +2539,7 @@ namespace Acore
 
 //===================================================================================================
 
-void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance2d, float absAngle) const
+void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance2d, float absAngle, Position const* startPos) const
 {
     float effectiveReach = GetCombatReach();
 
@@ -2561,24 +2561,28 @@ void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y
         }
     }
 
-    x = GetPositionX() + (effectiveReach + distance2d) * std::cos(absAngle);
-    y = GetPositionY() + (effectiveReach + distance2d) * std::sin(absAngle);
+    float positionX = startPos ? startPos->GetPositionX() : GetPositionX();
+    float positionY = startPos ? startPos->GetPositionY() : GetPositionY();
+
+    x = positionX + (effectiveReach + distance2d) * std::cos(absAngle);
+    y = positionY + (effectiveReach + distance2d) * std::sin(absAngle);
 
     Acore::NormalizeMapCoord(x);
     Acore::NormalizeMapCoord(y);
 }
 
-void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle) const
+void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle, Position const* startPos) const
 {
-    GetNearPoint2D(nullptr, x, y, distance2d, absAngle);
+    GetNearPoint2D(nullptr, x, y, distance2d, absAngle, startPos);
 }
 
-void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ) const
+void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ, Position const* startPos) const
 {
-    GetNearPoint2D(x, y, distance2d + searcher_size, absAngle);
+    GetNearPoint2D(x, y, distance2d + searcher_size, absAngle, startPos);
     z = GetPositionZ();
 
-    if (searcher) {
+    if (searcher)
+    {
         if (Unit const* unit = searcher->ToUnit(); Unit const* target = ToUnit())
         {
             if (unit && target && unit->IsInWater() && target->IsInWater())
@@ -2614,7 +2618,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, 
     // loop in a circle to look for a point in LoS using small steps
     for (float angle = float(M_PI) / 8; angle < float(M_PI) * 2; angle += float(M_PI) / 8)
     {
-        GetNearPoint2D(x, y, distance2d + searcher_size, absAngle + angle);
+        GetNearPoint2D(x, y, distance2d + searcher_size, absAngle + angle, startPos);
         z = GetPositionZ();
         UpdateAllowedPositionZ(x, y, z);
         if (controlZ && fabsf(GetPositionZ() - z) > controlZ)
@@ -3031,4 +3035,34 @@ float WorldObject::GetFloorZ() const
         return m_staticFloorZ;
 
     return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT)));
+}
+
+void WorldObject::AddAllowedLooter(ObjectGuid guid)
+{
+    _allowedLooters.insert(guid);
+}
+
+void WorldObject::SetAllowedLooters(GuidUnorderedSet const looters)
+{
+    _allowedLooters = looters;
+}
+
+void WorldObject::ResetAllowedLooters()
+{
+    _allowedLooters.clear();
+}
+
+bool WorldObject::HasAllowedLooter(ObjectGuid guid) const
+{
+    if (_allowedLooters.empty())
+    {
+        return true;
+    }
+
+    return _allowedLooters.find(guid) != _allowedLooters.end();
+}
+
+GuidUnorderedSet const& WorldObject::GetAllowedLooters() const
+{
+    return _allowedLooters;
 }

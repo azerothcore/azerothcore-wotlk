@@ -933,7 +933,7 @@ void Creature::Motion_Initialize()
         GetMotionMaster()->Initialize();
     else if (m_formation->getLeader() == this)
     {
-        m_formation->FormationReset(false);
+        m_formation->FormationReset(false, true);
         GetMotionMaster()->Initialize();
     }
     else if (m_formation->isFormed())
@@ -1139,11 +1139,9 @@ void Creature::SetLootRecipient(Unit* unit, bool withGroup)
         m_lootRecipient.Clear();
         m_lootRecipientGroup = 0;
         RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED);
+        ResetAllowedLooters();
         return;
     }
-
-    //if (unit->GetTypeId() != TYPEID_PLAYER && !unit->IsVehicle())
-    //    return;
 
     Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself();
     if (!player)                                             // normal creature, no player involved
@@ -1151,10 +1149,38 @@ void Creature::SetLootRecipient(Unit* unit, bool withGroup)
 
     m_lootRecipient = player->GetGUID();
 
+    Map* map = GetMap();
+    if (map && map->IsDungeon() && (isWorldBoss() || IsDungeonBoss()))
+    {
+        AddAllowedLooter(m_lootRecipient);
+    }
+
     if (withGroup)
     {
         if (Group* group = player->GetGroup())
+        {
             m_lootRecipientGroup = group->GetGUID().GetCounter();
+
+            if (map && map->IsDungeon() && (isWorldBoss() || IsDungeonBoss()))
+            {
+                Map::PlayerList const& PlayerList = map->GetPlayers();
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                {
+                    if (Player* groupMember = i->GetSource())
+                    {
+                        if (groupMember->IsGameMaster() || groupMember->IsSpectator())
+                        {
+                            continue;
+                        }
+
+                        if (groupMember->GetGroup() == group)
+                        {
+                            AddAllowedLooter(groupMember->GetGUID());
+                        }
+                    }
+                }
+            }
+        }
     }
     else
         m_lootRecipientGroup = 0;
@@ -1759,7 +1785,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
 
         //Dismiss group if is leader
         if (m_formation && m_formation->getLeader() == this)
-            m_formation->FormationReset(true);
+            m_formation->FormationReset(true, false);
 
         bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
         SetHover(false);

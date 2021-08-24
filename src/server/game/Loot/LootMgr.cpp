@@ -510,7 +510,7 @@ void Loot::AddItem(LootStoreItem const& item)
 }
 
 // Calls processor of corresponding LootTemplate (which handles everything including references)
-bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode /*= LOOT_MODE_DEFAULT*/)
+bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode /*= LOOT_MODE_DEFAULT*/, WorldObject* lootSource /*= nullptr*/)
 {
     // Must be provided
     if (!lootOwner)
@@ -541,9 +541,15 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
         roundRobinPlayer = lootOwner->GetGUID();
 
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-            if (Player* player = itr->GetSource())   // should actually be looted object instead of lootOwner but looter has to be really close so doesnt really matter
-                if (player->IsInMap(lootOwner)) // pussywizard: multithreading crashfix
-                    FillNotNormalLootFor(player, player->IsAtGroupRewardDistance(lootOwner));
+        {
+            if (Player* player = itr->GetSource()) // should actually be looted object instead of lootOwner but looter has to be really close so doesnt really matter
+            {
+                if (player->IsAtLootRewardDistance(lootSource ? lootSource : lootOwner))
+                {
+                    FillNotNormalLootFor(player);
+                }
+            }
+        }
 
         for (uint8 i = 0; i < items.size(); ++i)
         {
@@ -554,12 +560,12 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     }
     // ... for personal loot
     else
-        FillNotNormalLootFor(lootOwner, true);
+        FillNotNormalLootFor(lootOwner);
 
     return true;
 }
 
-void Loot::FillNotNormalLootFor(Player* player, bool presentAtLooting)
+void Loot::FillNotNormalLootFor(Player* player)
 {
     ObjectGuid playerGuid = player->GetGUID();
 
@@ -573,11 +579,7 @@ void Loot::FillNotNormalLootFor(Player* player, bool presentAtLooting)
 
     qmapitr = PlayerNonQuestNonFFAConditionalItems.find(playerGuid);
     if (qmapitr == PlayerNonQuestNonFFAConditionalItems.end())
-        FillNonQuestNonFFAConditionalLoot(player, presentAtLooting);
-
-    // if not auto-processed player will have to come and pick it up manually
-    if (!presentAtLooting)
-        return;
+        FillNonQuestNonFFAConditionalLoot(player);
 
     // Process currency items
     uint32 max_slot = GetMaxSlotInLootFor(player);
@@ -658,7 +660,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     return ql;
 }
 
-QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting)
+QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
 {
     QuestItemList* ql = new QuestItemList();
 
@@ -667,8 +669,8 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player, bool pres
         LootItem& item = items[i];
         if (!item.is_looted && !item.freeforall && (item.AllowedForPlayer(player) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT ))))
         {
-            if (presentAtLooting)
-                item.AddAllowedLooter(player);
+            item.AddAllowedLooter(player);
+
             if (!item.conditions.empty())
             {
                 ql->push_back(QuestItem(i));

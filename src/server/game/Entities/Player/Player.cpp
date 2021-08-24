@@ -6907,6 +6907,10 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         if (!spellData.SpellId)
             continue;
 
+        // Spells that should stay on the caster after removing the item.
+        constexpr std::array<uint32, 1> spellExceptions = { /*Electromagnetic Gigaflux Reactivator*/ 11826 };
+        const auto found = std::find(std::begin(spellExceptions), std::end(spellExceptions), spellData.SpellId);
+
         // wrong triggering type
         if (apply)
         {
@@ -6917,8 +6921,8 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         }
         else
         {
-            // Auras activated by use should not be removed on unequip (with no charges)
-            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && spellData.SpellCharges <= 0)
+            // If the spell is an exception do not remove it.
+            if (found != std::end(spellExceptions))
             {
                 continue;
             }
@@ -7556,7 +7560,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 if (groupRules)
                     group->UpdateLooterGuid(go, true);
 
-                loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false, go->GetLootMode());
+                loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false, go->GetLootMode(), go);
                 go->SetLootGenerationTime();
 
                 // get next RR player (for next loot)
@@ -11842,16 +11846,38 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
 
 bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
 {
-    if (!pRewardSource || !IsInMap(pRewardSource))
-        return false;
-    const WorldObject* player = GetCorpse();
+    WorldObject const* player = GetCorpse();
     if (!player || IsAlive())
+    {
         player = this;
+    }
+
+    if (!pRewardSource || !player->IsInMap(pRewardSource))
+    {
+        return false;
+    }
 
     if (pRewardSource->GetMap()->IsDungeon())
+    {
         return true;
+    }
 
     return pRewardSource->GetDistance(player) <= sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE);
+}
+
+bool Player::IsAtLootRewardDistance(WorldObject const* pRewardSource) const
+{
+    if (!IsAtGroupRewardDistance(pRewardSource))
+    {
+        return false;
+    }
+
+    if (HasPendingBind())
+    {
+        return false;
+    }
+
+    return pRewardSource->HasAllowedLooter(GetGUID());
 }
 
 bool Player::IsAtRecruitAFriendDistance(WorldObject const* pOther) const
