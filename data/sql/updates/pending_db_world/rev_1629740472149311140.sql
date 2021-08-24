@@ -8,7 +8,7 @@ UPDATE `gameobject` SET `position_x` = 1225.07, `position_y` = -244.98, `positio
 UPDATE `gossip_menu` SET `textid` = 2598 WHERE `menuid` = 1945;
 
 -- Fix the text and broadcast option of the gossip texts
-UPDATE `gossip_menu_option` SET `OptionText` = 'I have paid your price, Gloom´rel.  Now, teach me your secrets!', `OptionBroadcastTextID` = 4900 WHERE (`MenuID` = 1945) AND (`OptionID` IN (0));
+UPDATE `gossip_menu_option` SET `OptionText` = 'I have paid your price, Gloom''rel.  Now, teach me your secrets!', `OptionBroadcastTextID` = 4900 WHERE (`MenuID` = 1945) AND (`OptionID` IN (0));
 UPDATE `gossip_menu_option` SET `OptionText` = 'Gloom''rel, tell me your secrets!', `OptionBroadcastTextID` = 4897 WHERE (`MenuID` = 1945) AND (`OptionID` IN (1));
 
 -- Fixed the completion and the reward text, they were switched
