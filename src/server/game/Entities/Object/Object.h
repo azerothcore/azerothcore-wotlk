@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 #include <sstream>
+#include "G3D/Vector3.h"
 
 #ifdef ELUNA
 class ElunaEventProcessor;
@@ -374,6 +375,11 @@ struct Position
     inline bool operator!=(Position const& a)
     {
         return !(operator==(a));
+    }
+
+    operator G3D::Vector3() const
+    {
+        return { m_positionX, m_positionY, m_positionZ };
     }
 
     void Relocate(float x, float y)
@@ -796,9 +802,9 @@ public:
     ElunaEventProcessor* elunaEvents;
 #endif
 
-    void GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance, float absAngle) const;
-    void GetNearPoint2D(float& x, float& y, float distance, float absAngle) const;
-    void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0) const;
+    void GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance, float absAngle, Position const* startPos = nullptr) const;
+    void GetNearPoint2D(float& x, float& y, float distance, float absAngle, Position const* startPos = nullptr) const;
+    void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0, Position const* startPos = nullptr) const;
     void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
     bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, const WorldObject* forWho = nullptr, bool force = false) const;
     void MovePosition(Position& pos, float dist, float angle);
