@@ -9,7 +9,7 @@ UPDATE `gossip_menu` SET `textid` = 2598 WHERE `menuid` = 1945;
 
 -- Fix the text and broadcast option of the gossip texts
 UPDATE `gossip_menu_option` SET `OptionText` = 'I have paid your price, Gloom´rel.  Now, teach me your secrets!', `OptionBroadcastTextID` = 4900 WHERE (`MenuID` = 1945) AND (`OptionID` IN (0));
-UPDATE `gossip_menu_option` SET `OptionText` = 'Gloom`rel, tell me your secrets!', `OptionBroadcastTextID` = 4897 WHERE (`MenuID` = 1945) AND (`OptionID` IN (1));
+UPDATE `gossip_menu_option` SET `OptionText` = 'Gloom''rel, tell me your secrets!', `OptionBroadcastTextID` = 4897 WHERE (`MenuID` = 1945) AND (`OptionID` IN (1));
 
 -- Fixed the completion and the reward text, they were switched
 UPDATE `quest_offer_reward` SET `RewardText` = 'The gems make no sound as they fall into depths of the chalice...' WHERE (`ID` = 4083);
