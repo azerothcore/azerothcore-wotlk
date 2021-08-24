@@ -11,6 +11,8 @@ UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 3  WHERE (`guid` I
 
 UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 4  WHERE (`guid` IN (91719 ,91721, 91728 ));
 
+UPDATE `creature_template` SET `MovementType` = 1 WHERE (`entry` IN (5229,5231,5232,5234,5236,5237,5238,5239,5240,5241,22143,22144,22148,23022));
+
 
 
 
