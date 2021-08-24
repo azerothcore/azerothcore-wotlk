@@ -88,6 +88,7 @@ public:
     void GivePetLevel(uint8 level);
     void SynchronizeLevelWithOwner();
     bool HaveInDiet(ItemTemplate const* item) const;
+    uint32 GetCurrentFoodBenefitLevel(uint32 itemlevel) const;
     void SetDuration(int32 dur) { m_duration = dur; }
     int32 GetDuration() const { return m_duration; }
 

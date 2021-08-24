@@ -5633,7 +5633,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!pet->HaveInDiet(foodItem->GetTemplate()))
                         return SPELL_FAILED_WRONG_PET_FOOD;
 
-                    if (foodItem->GetTemplate()->GetBaseItemLevel() + 30 <= pet->getLevel())
+                    if (!pet->GetCurrentFoodBenefitLevel(foodItem->GetTemplate()->ItemLevel))
                         return SPELL_FAILED_FOOD_LOWLEVEL;
 
                     if (m_caster->IsInCombat() || pet->IsInCombat())
