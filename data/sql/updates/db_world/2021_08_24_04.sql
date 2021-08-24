@@ -1,3 +1,19 @@
+-- DB update 2021_08_24_03 -> 2021_08_24_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_08_24_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_08_24_03 2021_08_24_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1629312732062343549'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1629312732062343549');
 
 -- Set the Creature Fingat a patrol route movement
@@ -163,3 +179,13 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (1342410,11,-10980.29,-3700.14,14.512859,0,0,0,0,100,0),
 (1342410,12,-10874.46,-3639.08,11.60,0,0,0,0,100,0),
 (1342410,13,-10854.40,-3671.45,19.85,0,0,0,0,100,0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_08_24_04' WHERE sql_rev = '1629312732062343549';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
