@@ -7291,6 +7291,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
     });
 
+    // Sacred Cleansing
+    ApplySpellFix({ 53659 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 5; // 40yd
+    });
+
     // Ulduar: Kologarn Focused Eyebeam Summon Trigger
     ApplySpellFix({ 63342 }, [](SpellEntry* spellInfo)
     {

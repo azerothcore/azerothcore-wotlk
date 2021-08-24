@@ -425,17 +425,10 @@ public:
                                         cacheEntry = GO_CRUSADERS_CACHE_25_H;
                                         break;
                                 }
+
                                 if (GameObject* go = c->SummonGameObject(cacheEntry, Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), Locs[LOC_CENTER].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 630000000))
                                 {
-                                    Map::PlayerList const& pl = instance->GetPlayers();
-                                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                        if (Player* plr = itr->GetSource())
-                                            if (Group* g = plr->GetGroup())
-                                                if (!plr->IsGameMaster() && g->GetLeaderGUID() == plr->GetGUID())
-                                                {
-                                                    go->SetLootRecipient(plr);
-                                                    break;
-                                                }
+                                    go->SetLootRecipient(instance);
                                 }
                             }
 
@@ -1375,16 +1368,7 @@ public:
                                     if (GameObject* chest = c->SummonGameObject(tributeChest, 665.12f, 143.78f, 142.12f, 0.0f, 0, 0, 0, 0, 90000000))
                                     {
                                         chest->SetRespawnTime(chest->GetRespawnDelay());
-
-                                        Map::PlayerList const& pl = instance->GetPlayers();
-                                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                            if (Player* plr = itr->GetSource())
-                                                if (Group* g = plr->GetGroup())
-                                                    if (!plr->IsGameMaster() && g->GetLeaderGUID() == plr->GetGUID())
-                                                    {
-                                                        chest->SetLootRecipient(plr);
-                                                        break;
-                                                    }
+                                        chest->SetLootRecipient(instance);
                                     }
                                 }
                         }
