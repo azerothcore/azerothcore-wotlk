@@ -15,12 +15,29 @@
 class Creature;
 class CreatureGroup;
 
+enum GroupAIFlags : uint16
+{
+    GROUP_AI_FLAG_MEMBER_ASSIST_LEADER  = 0x001,
+    GROUP_AI_FLAG_LEADER_ASSIST_MEMBER  = 0x002,
+    //GROUP_AI_FLAG_UNK1                  = 0x004,
+    //GROUP_AI_FLAG_UNK2                  = 0x008,
+    //GROUP_AI_FLAG_UNK3                  = 0x010,
+    //GROUP_AI_FLAG_UNK4                  = 0x020,
+    //GROUP_AI_FLAG_UNK5                  = 0x040,
+    //GROUP_AI_FLAG_UNK6                  = 0x080,
+    //GROUP_AI_FLAG_UNK7                  = 0x100,
+    GROUP_AI_FLAG_FOLLOW_LEADER         = 0x200,
+
+    // Used to verify valid and usable flags
+    GROUP_AI_FLAG_SUPPORTED = GROUP_AI_FLAG_MEMBER_ASSIST_LEADER | GROUP_AI_FLAG_LEADER_ASSIST_MEMBER | GROUP_AI_FLAG_FOLLOW_LEADER
+};
+
 struct FormationInfo
 {
     ObjectGuid::LowType leaderGUID;
     float follow_dist;
     float follow_angle;
-    uint8 groupAI;
+    uint16 groupAI;
     uint32 point_1;
     uint32 point_2;
 };
