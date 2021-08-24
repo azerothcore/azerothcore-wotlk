@@ -361,7 +361,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     if (owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET))
         owner->ToPlayer()->SetLastPetNumber(petInfo->PetNumber);
 
-    owner->GetSession()->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(new PetLoadQueryHolder(ownerid, petInfo->PetNumber)))
+    owner->GetSession()->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(std::make_shared<PetLoadQueryHolder>(ownerid, petInfo->PetNumber)))
         .AfterComplete([this, owner, session = owner->GetSession(), isTemporarySummon, current, lastSaveTime = petInfo->LastSaveTime](SQLQueryHolderBase* holder)
     {
         if (session->GetPlayer() != owner || owner->GetPet() != this)
@@ -374,14 +374,14 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         InitTalentForLevel(); // set original talents points before spell loading
 
         uint32 timediff = uint32(time(nullptr)) - lastSaveTime);
-        _LoadAuras(holder->GetPreparedResult(PetLoadQueryHolder::AURAS), timediff);
+        _LoadAuras(holder.GetPreparedResult(PetLoadQueryHolder::AURAS), timediff);
 
         // load action bar
         if (!isTemporarySummon)
         {
             _LoadSpells(holder->GetPreparedResult(PetLoadQueryHolder::SPELLS));
             InitTalentForLevel();    // re-init to check talent count
-            GetSpellHistory()->LoadFromDB<Pet>(holder->GetPreparedResult(PetLoadQueryHolder::COOLDOWNS));
+            GetSpellHistory()->LoadFromDB<Pet>(holder.GetPreparedResult(PetLoadQueryHolder::COOLDOWNS));
             LearnPetPassives();
             InitLevelupSpellsForLevel();
             if (GetMap()->IsBattleArena())
@@ -403,7 +403,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
         if (getPetType() == HUNTER_PET)
         {
-            if (PreparedQueryResult result = holder->GetPreparedResult(PetLoadQueryHolder::DECLINED_NAMES))
+            if (PreparedQueryResult result = holder.GetPreparedResult(PetLoadQueryHolder::DECLINED_NAMES))
             {
                 m_declinedname = std::make_unique<DeclinedName>();
                 Field* fields = result->Fetch();
