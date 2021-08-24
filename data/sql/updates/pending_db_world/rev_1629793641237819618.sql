@@ -20,6 +20,30 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (5831,10,-650.82,-3609.06,92.96,'Swiftmane'),
 (5831,11,-686.02,-3593.70,91.82,'Swiftmane');
 
+-- Delete previous routes
+DELETE FROM `creature_addon` WHERE (`guid` = 20433);
+
+-- Routes
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES
+(20433, 204330, 0, 0, 0, 0, 0, NULL);
+
+-- Delete all waypoints routes
+DELETE FROM `waypoint_data` WHERE `id` = 204330;
+
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+-- Waypoint route 1 (GUID: 20433)
+(204330,1,-668.03,-3536.53,92.14,0,0,0,0,100,0),
+(204330,2,-616.04,-3500.51,94.52,0,0,0,0,100,0),
+(204330,3,-560.47,-3482.41,91.84,0,0,0,0,100,0),
+(204330,4,-500.34,-3476.90,94.87,0,0,0,0,100,0),
+(204330,5,-475.50,-3486.94,92.70,0,0,0,0,100,0),
+(204330,6,-464.66,-3512.42,95.44,0,0,0,0,100,0),
+(204330,7,-480.57,-3555.76,91.66,0,0,0,0,100,0),
+(204330,8,-520.76,-3582.95,93.10,0,0,0,0,100,0),
+(204330,9,-568.98,-3603.25,92.10,0,0,0,0,100,0),
+(204330,10,-650.82,-3609.06,92.96,0,0,0,0,100,0),
+(204330,11,-686.02,-3593.70,91.82,0,0,0,0,100,0);
+
 -- Add action for her to run in the route
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5831;
 
