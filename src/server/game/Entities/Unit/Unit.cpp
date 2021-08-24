@@ -743,6 +743,24 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     // Hook for OnDamage Event
     sScriptMgr->OnDamage(attacker, victim, damage);
 
+    // Trigger formation events
+    if (victim != attacker)
+    {
+        // Trigger current unit formation
+        if (Creature* pCreature = attacker->ToCreature())
+        {
+            if (CreatureGroup* group = pCreature->GetFormation())
+                group->MemberAttackStart(pCreature, victim, true);
+        }
+
+        // Trigger victim unit formation
+        if (Creature* pvictimCreat = victim->ToCreature())
+        {
+            if (CreatureGroup* group = pvictimCreat->GetFormation())
+                group->MemberAttackStart(pvictimCreat, attacker, true);
+        }
+    }
+
     if (victim->GetTypeId() == TYPEID_PLAYER && attacker != victim)
     {
         // Signal to pets that their owner was attacked
@@ -13010,7 +13028,9 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
                 creature->AI()->EnterCombat(enemy);
 
             if (creature->GetFormation())
-                creature->GetFormation()->MemberAttackStart(creature, enemy);
+            {
+                creature->GetFormation()->MemberAttackStart(creature, enemy, false);
+            }
         }
 
         creature->RefreshSwimmingFlag();

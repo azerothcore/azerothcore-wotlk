@@ -62,7 +62,7 @@ public:
     void FormationReset(bool dismiss, bool initMotionMaster);
 
     void LeaderMoveTo(float x, float y, float z, bool run);
-    void MemberAttackStart(Creature* member, Unit* target);
+    void MemberAttackStart(Creature* member, Unit* target, bool forced);
 
 private:
     Creature* m_leader; //Important do not forget sometimes to work with pointers instead synonims :D:D

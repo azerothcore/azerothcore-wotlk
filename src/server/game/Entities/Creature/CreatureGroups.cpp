@@ -157,32 +157,44 @@ void CreatureGroup::RemoveMember(Creature* member)
     member->SetFormation(nullptr);
 }
 
-void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
+void CreatureGroup::MemberAttackStart(Creature* member, Unit* target, bool forced)
 {
-    uint8 groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()]->groupAI;
+    uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()]->groupAI;
     if (!groupAI)
+    {
         return;
+    }
 
     if (groupAI == 1 && member != m_leader)
+    {
         return;
+    }
 
     for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         if (m_leader) // avoid crash if leader was killed and reset.
+        {
             LOG_DEBUG("entities.unit", "GROUP ATTACK: group instance id %u calls member instid %u", m_leader->GetInstanceId(), member->GetInstanceId());
+        }
 
-        //Skip one check
-        if (itr->first == member)
+        Creature const* creatureMember = itr->first;
+        if (!creatureMember || creatureMember == member || creatureMember->isDead() || creatureMember->GetVictim())
+        {
             continue;
+        }
 
-        if (!itr->first->IsAlive())
-            continue;
+        if (member->IsInEvadeMode() && forced)
+        {
+            member->ClearUnitState(UNIT_STATE_EVADE);
+        }
 
-        if (itr->first->GetVictim())
-            continue;
-
-        if (itr->first->IsValidAttackTarget(target) && itr->first->AI())
-            itr->first->AI()->AttackStart(target);
+        if (creatureMember->IsValidAttackTarget(target))
+        {
+            if (CreatureAI* memberAI = creatureMember->AI())
+            {
+                memberAI->AttackStart(target);
+            }
+        }
     }
 }
 
