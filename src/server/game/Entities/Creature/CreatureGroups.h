@@ -15,7 +15,7 @@
 class Creature;
 class CreatureGroup;
 
-enum GroupAIFlags : uint16
+enum class GroupAIFlags : uint16
 {
     GROUP_AI_FLAG_MEMBER_ASSIST_LEADER  = 0x001,
     GROUP_AI_FLAG_LEADER_ASSIST_MEMBER  = 0x002,

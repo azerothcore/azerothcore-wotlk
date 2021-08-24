@@ -99,24 +99,30 @@ void FormationMgr::LoadCreatureFormations()
         FormationInfo* group_member         = new FormationInfo();
         group_member->leaderGUID            = fields[0].GetUInt32();
         ObjectGuid::LowType const memberGUID = fields[1].GetUInt32();
+        float const follow_dist       = fields[2].GetFloat();
+        float const follow_angle      = fields[3].GetFloat() * static_cast<float>(M_PI) / 180;
 
         //If creature is group leader we may skip loading of dist/angle
         if (group_member->leaderGUID != memberGUID)
         {
-            group_member->follow_dist       = fields[2].GetFloat();
-            group_member->follow_angle      = fields[3].GetFloat() * static_cast<float>(M_PI) / 180;
+            group_member->follow_dist       = follow_dist;
+            group_member->follow_angle      = follow_angle * static_cast<float>(M_PI) / 180;
         }
         else
         {
             group_member->follow_dist       = 0.0f;
             group_member->follow_angle      = 0.0f;
+            if (follow_dist > 0.0f || follow_angle > 0.0f)
+            {
+                LOG_ERROR("sql.sql", "creature_formations table leader guid %u cannot have follow distance or follow angle.", group_member->leaderGUID);
+            }
         }
 
         group_member->groupAI               = fields[4].GetUInt16();
 
-        if (!(group_member->groupAI & GROUP_AI_FLAG_SUPPORTED))
+        if (!(group_member->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
         {
-            LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value.", group_member->leaderGUID, memberGUID);
+            LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u).", group_member->leaderGUID, memberGUID, group_member->groupAI);
         }
 
         group_member->point_1               = fields[5].GetUInt16();
@@ -176,14 +182,14 @@ void CreatureGroup::RemoveMember(Creature* member)
 void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 {
     uint8 const groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()]->groupAI;
-    if (member == _leader)
+    if (member == m_leader)
     {
-        if (!(groupAI & GROUP_AI_FLAG_MEMBER_ASSIST_LEADER))
+        if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_MEMBER_ASSIST_LEADER)))
         {
             return;
         }
     }
-    else if (!(groupAI & GROUP_AI_FLAG_LEADER_ASSIST_MEMBER))
+    else if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_LEADER_ASSIST_MEMBER)))
     {
         return;
     }
@@ -210,7 +216,7 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 
 void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
 {
-    if (m_members.size() && !(m_members.begin()->second->groupAI & GROUP_AI_FLAG_FOLLOW_LEADER))
+    if (m_members.size() && !(m_members.begin()->second->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
     {
         return;
     }
@@ -246,7 +252,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
     }
 
     uint8 const groupAI = sFormationMgr->CreatureGroupMap[m_leader->GetSpawnId()]->groupAI;
-    if (!(groupAI & GROUP_AI_FLAG_FOLLOW_LEADER))
+    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
     {
         return;
     }
