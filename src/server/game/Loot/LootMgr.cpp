@@ -51,20 +51,23 @@ struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, b
         if (!(item->lootmode & _lootMode))
             return true;
 
-        ItemTemplate const* _proto = sObjectMgr->GetItemTemplate(item->itemid);
-        if (!_proto)
-            return true;
+        if (!item->reference)
+        {
+            ItemTemplate const* _proto = sObjectMgr->GetItemTemplate(item->itemid);
+            if (!_proto)
+                return true;
 
-        uint8 foundDuplicates = 0;
-        for (std::vector<LootItem>::const_iterator itr = _loot.items.begin(); itr != _loot.items.end(); ++itr)
-            if (itr->itemid == item->itemid)
-            {
-                ++foundDuplicates;
-                if (_proto->InventoryType == 0 && foundDuplicates == 3 && _proto->ItemId != 47242 /*Trophy of the Crusade*/)      // Non-equippable items are limited to 3 drops
-                    return true;
-                else if (_proto->InventoryType != 0 && foundDuplicates == 1) // Equippable item are limited to 1 drop
-                    return true;
-            }
+            uint8 foundDuplicates = 0;
+            for (std::vector<LootItem>::const_iterator itr = _loot.items.begin(); itr != _loot.items.end(); ++itr)
+                if (itr->itemid == item->itemid)
+                {
+                    ++foundDuplicates;
+                    if (_proto->InventoryType == 0 && foundDuplicates == 3 && _proto->ItemId != 47242 /*Trophy of the Crusade*/) // Non-equippable items are limited to 3 drops
+                        return true;
+                    else if (_proto->InventoryType != 0 && foundDuplicates == 1) // Equippable item are limited to 1 drop
+                        return true;
+                }
+        }
 
         return false;
     }
@@ -80,9 +83,9 @@ public:
     LootGroup() { }
     ~LootGroup();
 
-    void AddEntry(LootStoreItem* item);                 // Adds an entry to the group (at loading stage)
-    bool HasQuestDrop() const;                          // True if group includes at least 1 quest drop entry
-    bool HasQuestDropForPlayer(Player const* player) const;
+    void AddEntry(LootStoreItem* item);                     // Adds an entry to the group (at loading stage)
+    bool HasQuestDrop(LootTemplateMap const& store) const;  // True if group includes at least 1 quest drop entry
+    bool HasQuestDropForPlayer(Player const* player, LootTemplateMap const& store) const;
     // The same for active quests of the player
     void Process(Loot& loot, Player const* player, LootStore const& lootstore, uint16 lootMode) const;    // Rolls an item from the group (if any) and adds the item to the loot
     float RawTotalChance() const;                       // Overall chance for the group (without equal chanced items)
@@ -1226,29 +1229,101 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
 }
 
 // True if group includes at least 1 quest drop entry
-bool LootTemplate::LootGroup::HasQuestDrop() const
+bool LootTemplate::LootGroup::HasQuestDrop(LootTemplateMap const& store) const
 {
     for (LootStoreItemList::const_iterator i = ExplicitlyChanced.begin(); i != ExplicitlyChanced.end(); ++i)
-        if ((*i)->needs_quest)
+    {
+        LootStoreItem* item = *i;
+        if (item->reference > 0) // References
+        {
+            LootTemplateMap::const_iterator Referenced = store.find(item->reference);
+            if (Referenced == store.end())
+            {
+                continue; // Error message [should be] already printed at loading stage
+            }
+
+            if (Referenced->second->HasQuestDrop(store, item->groupid))
+            {
+                return true;
+            }
+        }
+        else if (item->needs_quest)
+        {
             return true;
+        }
+    }
 
     for (LootStoreItemList::const_iterator i = EqualChanced.begin(); i != EqualChanced.end(); ++i)
-        if ((*i)->needs_quest)
+    {
+        LootStoreItem* item = *i;
+        if (item->reference > 0) // References
+        {
+            LootTemplateMap::const_iterator Referenced = store.find(item->reference);
+            if (Referenced == store.end())
+            {
+                continue; // Error message [should be] already printed at loading stage
+            }
+
+            if (Referenced->second->HasQuestDrop(store, item->groupid))
+            {
+                return true;
+            }
+        }
+        else if (item->needs_quest)
+        {
             return true;
+        }
+    }
 
     return false;
 }
 
 // True if group includes at least 1 quest drop entry for active quests of the player
-bool LootTemplate::LootGroup::HasQuestDropForPlayer(Player const* player) const
+bool LootTemplate::LootGroup::HasQuestDropForPlayer(Player const* player, LootTemplateMap const& store) const
 {
     for (LootStoreItemList::const_iterator i = ExplicitlyChanced.begin(); i != ExplicitlyChanced.end(); ++i)
-        if (player->HasQuestForItem((*i)->itemid))
-            return true;
+    {
+        LootStoreItem* item = *i;
+        if (item->reference > 0)                        // References processing
+        {
+            LootTemplateMap::const_iterator Referenced = store.find(item->reference);
+            if (Referenced == store.end())
+            {
+                continue;                                   // Error message already printed at loading stage
+            }
+
+            if (Referenced->second->HasQuestDropForPlayer(store, player, item->groupid))
+            {
+                return true;
+            }
+        }
+        else if (player->HasQuestForItem(item->itemid))
+        {
+            return true;                                    // active quest drop found
+        }
+    }
 
     for (LootStoreItemList::const_iterator i = EqualChanced.begin(); i != EqualChanced.end(); ++i)
-        if (player->HasQuestForItem((*i)->itemid))
-            return true;
+    {
+        LootStoreItem* item = *i;
+        if (item->reference > 0)                        // References processing
+        {
+            LootTemplateMap::const_iterator Referenced = store.find(item->reference);
+            if (Referenced == store.end())
+            {
+                continue;                                   // Error message already printed at loading stage
+            }
+
+            if (Referenced->second->HasQuestDropForPlayer(store, player, item->groupid))
+            {
+                return true;
+            }
+        }
+        else if (player->HasQuestForItem(item->itemid))
+        {
+            return true;                                    // active quest drop found
+        }
+    }
 
     return false;
 }
@@ -1266,7 +1341,26 @@ void LootTemplate::LootGroup::CopyConditions(ConditionList /*conditions*/)
 void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStore const& store, uint16 lootMode) const
 {
     if (LootStoreItem const* item = Roll(loot, player, store, lootMode))
-        loot.AddItem(*item);
+    {
+        bool rate = store.IsRatesAllowed();
+
+        if (item->reference > 0) // References processing
+        {
+            if (LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(item->reference))
+            {
+                uint32 maxcount = uint32(float(item->maxcount) * sWorld->getRate(RATE_DROP_ITEM_REFERENCED_AMOUNT));
+                sScriptMgr->OnAfterRefCount(player, loot, rate, lootMode, const_cast<LootStoreItem*>(item), maxcount, store);
+                for (uint32 loop = 0; loop < maxcount; ++loop) // Ref multiplicator
+                    Referenced->Process(loot, store, lootMode, player, item->groupid);
+            }
+        }
+        else
+        {
+            // Plain entries (not a reference, not grouped)
+            sScriptMgr->OnBeforeDropAddItem(player, loot, rate, lootMode, const_cast<LootStoreItem*>(item), store);
+            loot.AddItem(*item); // Chance is already checked, just add
+        }
+    }
 }
 
 // Overall chance for the group without equal chanced items
@@ -1353,16 +1447,21 @@ LootTemplate::~LootTemplate()
 // Adds an entry to the group (at loading stage)
 void LootTemplate::AddEntry(LootStoreItem* item)
 {
-    if (item->groupid > 0 && item->reference == 0)            // Group
+    if (item->groupid > 0)  // Group
     {
         if (item->groupid >= Groups.size())
-            Groups.resize(item->groupid, nullptr);               // Adds new group the the loot template if needed
-        if (!Groups[item->groupid - 1])
-            Groups[item->groupid - 1] = new LootGroup();
+        {
+            Groups.resize(item->groupid, nullptr);  // Adds new group the the loot template if needed
+        }
 
-        Groups[item->groupid - 1]->AddEntry(item);            // Adds new entry to the group
+        if (!Groups[item->groupid - 1])
+        {
+            Groups[item->groupid - 1] = new LootGroup();
+        }
+
+        Groups[item->groupid - 1]->AddEntry(item);  // Adds new entry to the group
     }
-    else                                                      // Non-grouped entries and references are stored together
+    else                                            // Non-grouped entries
         Entries.push_back(item);
 }
 
@@ -1543,7 +1642,7 @@ bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) con
         if (!Groups[groupId - 1])
             return false;
 
-        return Groups[groupId - 1]->HasQuestDrop();
+        return Groups[groupId - 1]->HasQuestDrop(store);
     }
 
     for (LootStoreItemList::const_iterator i = Entries.begin(); i != Entries.end(); ++i)
@@ -1554,6 +1653,7 @@ bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) con
             LootTemplateMap::const_iterator Referenced = store.find(item->reference);
             if (Referenced == store.end())
                 continue;                                   // Error message [should be] already printed at loading stage
+
             if (Referenced->second->HasQuestDrop(store, item->groupid))
                 return true;
         }
@@ -1563,9 +1663,15 @@ bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) con
 
     // Now processing groups
     for (LootGroups::const_iterator i = Groups.begin(); i != Groups.end(); ++i)
+    {
         if (LootGroup* group = *i)
-            if (group->HasQuestDrop())
+        {
+            if (group->HasQuestDrop(store))
+            {
                 return true;
+            }
+        }
+    }
 
     return false;
 }
@@ -1581,7 +1687,7 @@ bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player co
         if (!Groups[groupId - 1])
             return false;
 
-        return Groups[groupId - 1]->HasQuestDropForPlayer(player);
+        return Groups[groupId - 1]->HasQuestDropForPlayer(player, store);
     }
 
     // Checking non-grouped entries
@@ -1602,9 +1708,15 @@ bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player co
 
     // Now checking groups
     for (LootGroups::const_iterator i = Groups.begin(); i != Groups.end(); ++i)
+    {
         if (LootGroup* group = *i)
-            if (group->HasQuestDropForPlayer(player))
+        {
+            if (group->HasQuestDropForPlayer(player, store))
+            {
                 return true;
+            }
+        }
+    }
 
     return false;
 }
