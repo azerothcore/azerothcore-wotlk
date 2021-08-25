@@ -1489,8 +1489,8 @@ void Player::UpdatePotionCooldown(Spell* spell)
     {
         if (spell->IsIgnoringCooldowns())
             return;
-        else
-            SendCooldownEvent(spell->m_spellInfo, m_lastPotionId, spell);
+
+        SendCooldownEvent(spell->m_spellInfo, m_lastPotionId, spell);
     }
 
     SetLastPotionId(0);
