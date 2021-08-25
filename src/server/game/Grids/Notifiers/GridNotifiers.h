@@ -1110,10 +1110,14 @@ namespace Acore
         bool operator()(Unit* u)
         {
             if (!u->CanSeeOrDetect(me, true, true, false))
+            {
                 return false;
+            }
 
             if (!u->IsContestedGuard())
+            {
                 return false;
+            }                
 
             return true;
         }
