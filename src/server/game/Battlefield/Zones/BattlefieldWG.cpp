@@ -531,7 +531,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
         case NPC_TAUNKA_SPIRIT_GUIDE:
             {
                 TeamId teamId = (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE);
-                uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId(true));
+                uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId());
                 // xinef: little workaround, there are 2 spirit guides in same area
                 if (creature->IsWithinDist2d(5103.0f, 3461.5f, 5.0f))
                     graveyardId = BATTLEFIELD_WG_GY_WORKSHOP_NW;

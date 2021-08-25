@@ -286,18 +286,6 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_delayed_unit_relocation_timer = 0;
     m_delayed_unit_ai_notify_timer = 0;
     bRequestForcedVisibilityUpdate = false;
-    m_last_underwaterstate_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-    m_last_environment_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-    m_last_isinwater_status = false;
-    m_last_islittleabovewater_status = false;
-    m_last_isunderwater_status = false;
-    m_is_updating_environment = false;
-    m_last_area_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-    m_last_zone_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-    m_last_area_id = 0;
-    m_last_zone_id = 0;
-    m_last_outdoors_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-    m_last_outdoors_status = true; // true by default
 
     m_applyResilience = false;
     _instantCast = false;
@@ -530,7 +518,12 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     bool arrived = movespline->Finalized();
 
     if (arrived)
+    {
         DisableSpline();
+
+        if (movespline->HasAnimation() && GetTypeId() == TYPEID_UNIT && IsAlive())
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, movespline->GetAnimationType());
+    }
 
     // pussywizard: update always! not every 400ms, because movement generators need the actual position
     //m_movesplineTimer.Update(t_diff);
@@ -3638,230 +3631,48 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
     if (IsInWater())
         return IsUnderWater() ? c->CanEnterWater() : (c->CanEnterWater() || c->CanFly());
     else
-        return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater(true));
+        return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater());
 }
 
-void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
+void Unit::ProcessPositionDataChanged(PositionFullTerrainStatus const& data)
 {
-    if (m_is_updating_environment)
+    WorldObject::ProcessPositionDataChanged(data);
+    ProcessTerrainStatusUpdate();
+}
+
+void Unit::ProcessTerrainStatusUpdate()
+{
+    if (GetTypeId() == TYPEID_UNIT)
+        ToCreature()->UpdateMovementFlags();
+
+    if (IsFlying() || (!IsControlledByPlayer()))
         return;
 
-    if (GetTypeId() != TYPEID_UNIT || !IsAlive() || (!IsInWorld() && option != 3) || !FindMap() || IsDuringRemoveFromWorld() || !IsPositionValid())
-        return;
+    LiquidData const& liquidData = GetLiquidData();
 
-    if (option <= 2 && GetMotionMaster()->GetCleanFlags() != MMCF_NONE)
+    // remove appropriate auras if we are swimming/not swimming respectively
+    if (liquidData.Status & MAP_LIQUID_STATUS_SWIMMING)
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_ABOVEWATER);
+    else
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
+
+    // liquid aura handling
+    LiquidTypeEntry const* curLiquid = nullptr;
+    if ((liquidData.Status & MAP_LIQUID_STATUS_SWIMMING))
+        curLiquid = sLiquidTypeStore.LookupEntry(liquidData.Entry);
+
+    if (curLiquid != _lastLiquid)
     {
-        if (option == 2)
-            m_last_environment_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-        return;
+        if (_lastLiquid && _lastLiquid->SpellId)
+            RemoveAurasDueToSpell(_lastLiquid->SpellId);
+
+        // Set _lastLiquid before casting liquid spell to avoid infinite loops
+        _lastLiquid = curLiquid;
+
+        Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (curLiquid && curLiquid->SpellId && (!player || !player->IsGameMaster()))
+            CastSpell(this, curLiquid->SpellId, true);
     }
-
-    // run environment checks everytime the unit moves
-    // more than it's average radius
-    // TODO: find better solution here
-    float radiusWidth = GetCollisionRadius();
-    float radiusHeight = GetCollisionHeight() / 2;
-    float radiusAvg = (radiusWidth + radiusHeight) / 2;
-    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < radiusAvg * radiusAvg)
-        return;
-
-    m_last_environment_position.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
-    m_staticFloorZ = GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ());
-
-    m_is_updating_environment = true;
-
-    bool changed = false;
-    Map* baseMap = const_cast<Map*>(GetBaseMap());
-    Creature* c = this->ToCreature();
-    if (!c || !baseMap)
-    {
-        m_is_updating_environment = false;
-        return;
-    }
-
-    bool canChangeFlying = option == 3 || ((c->GetScriptId() == 0 || GetInstanceId() == 0) && GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE);
-    bool canFallGround = option == 0 && canChangeFlying && GetInstanceId() == 0 && !IsInCombat() && !GetVehicle() && !GetTransport() && !HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !c->IsTrigger() && !c->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && GetMotionMaster()->GetCurrentMovementGeneratorType() <= RANDOM_MOTION_TYPE && !HasUnitState(UNIT_STATE_EVADE) && !IsControlledByPlayer();
-    float x = GetPositionX(), y = GetPositionY(), z = GetPositionZ();
-    bool isInAir = true;
-    float ground_z = z;
-    LiquidData liquidData;
-    liquidData.level = INVALID_HEIGHT;
-    ZLiquidStatus liquidStatus = baseMap->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData);
-    // IsInWater
-    bool enoughWater = baseMap->HasEnoughWater(this, liquidData);
-    m_last_isinwater_status = (liquidStatus & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER)) && enoughWater;
-    m_last_islittleabovewater_status = (liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level <= z + 3.0f && liquidData.level > z - 1.0f);
-
-    // IsUnderWater
-    m_last_isunderwater_status = (liquidStatus & LIQUID_MAP_UNDER_WATER) && enoughWater;
-
-    // UpdateUnderwaterState
-    if (IsPet() || IsVehicle())
-    {
-        if (option == 1) // Unit::IsInWater, Unit::IsUnderwater, adding/removing auras can cause crashes (eg threat change while iterating threat table), so skip
-            m_last_environment_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-        else
-        {
-            if (!liquidStatus)
-            {
-                if (_lastLiquid && _lastLiquid->SpellId)
-                    RemoveAurasDueToSpell(_lastLiquid->SpellId);
-
-                RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
-                _lastLiquid = nullptr;
-            }
-            else if (uint32 liqEntry = liquidData.entry)
-            {
-                LiquidTypeEntry const* liquid = sLiquidTypeStore.LookupEntry(liqEntry);
-                if (_lastLiquid && _lastLiquid->SpellId && _lastLiquid->Id != liqEntry)
-                    RemoveAurasDueToSpell(_lastLiquid->SpellId);
-
-                if (liquid && liquid->SpellId)
-                {
-                    if (liquidStatus & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER))
-                    {
-                        if (!HasAura(liquid->SpellId))
-                            CastSpell(this, liquid->SpellId, true);
-                    }
-                    else
-                        RemoveAurasDueToSpell(liquid->SpellId);
-                }
-
-                RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_ABOVEWATER);
-                _lastLiquid = liquid;
-            }
-            else if (_lastLiquid && _lastLiquid->SpellId)
-            {
-                RemoveAurasDueToSpell(_lastLiquid->SpellId);
-                RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
-                _lastLiquid = nullptr;
-            }
-        }
-    }
-
-    bool canUpdateEnvironment = !HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-
-    bool flyingBarelyInWater = false;
-    // Refresh being in water
-    if (m_last_isinwater_status)
-    {
-        if (!c->CanFly() || enoughWater)
-        {
-            if (canUpdateEnvironment && c->CanSwim() && (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)))
-            {
-                SetSwim(true);
-                changed = true;
-            }
-            isInAir = false;
-        }
-        else
-        {
-            m_last_isinwater_status = false;
-            flyingBarelyInWater = true;
-        }
-    }
-
-    if (!m_last_isinwater_status)
-    {
-        if (canUpdateEnvironment && c->CanWalk() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
-        {
-            SetSwim(false);
-            changed = true;
-        }
-    }
-
-    // if not in water, check whether in air or not
-    if (isInAir)
-    {
-        if (GetMap()->GetGrid(x, y))
-        {
-            float temp = GetFloorZ();
-            if (temp > INVALID_HEIGHT)
-            {
-                ground_z = (c->CanSwim() && liquidData.level > INVALID_HEIGHT) ? liquidData.level : temp;
-                bool canHover = c->CanHover();
-                isInAir = flyingBarelyInWater || (G3D::fuzzyGt(GetPositionZ(), ground_z + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(GetPositionZ(), ground_z - GROUND_HEIGHT_TOLERANCE)); // Can be underground too, prevent the falling
-            }
-            else
-                isInAir = true;
-        }
-        else
-        {
-            m_is_updating_environment = false;
-            return;
-        }
-    }
-
-    if (canUpdateEnvironment && canChangeFlying)
-    {
-        // xinef: summoned vehicles are treated as always in air, fixes flying on such units
-        if (IsVehicle() && !c->GetSpawnId())
-            isInAir = true;
-
-        // xinef: triggers with inhabit type air are treated as always in air
-        if (c->IsTrigger() && c->CanFly())
-            isInAir = true;
-
-        if (c->GetOwnerGUID().IsPlayer() && c->CanFly() && IsVehicle() && !c->GetSpawnId()) // mainly for oculus drakes
-        {
-            if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
-            {
-                SetCanFly(true);
-                SetDisableGravity(true);
-                changed = true;
-            }
-        }
-        else if (c->CanFly() && isInAir && !c->IsFalling())
-        {
-            if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
-            {
-                SetCanFly(true);
-                SetDisableGravity(true);
-                changed = true;
-            }
-
-            if (IsHovering() && !HasAuraType(SPELL_AURA_HOVER))
-            {
-                SetHover(false);
-                changed = true;
-            }
-        }
-        else
-        {
-            if (HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || HasUnitMovementFlag(MOVEMENTFLAG_FLYING))
-            {
-                SetCanFly(false);
-                RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
-                changed = true;
-            }
-
-            if (!IsHovering() && IsAlive() && (c->CanHover() || HasAuraType(SPELL_AURA_HOVER)))
-            {
-                SetHover(true);
-                changed = true;
-            }
-
-            if (HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && !HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
-            {
-                SetDisableGravity(false);
-                changed = true;
-            }
-        }
-
-        if (isInAir && !c->CanFly() && option >= 2)
-            m_last_environment_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-    }
-
-    if (!isInAir && HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
-
-    if (changed)
-        propagateSpeedChange();
-
-    if (canUpdateEnvironment && canFallGround && !c->CanFly() && !c->IsFalling() && !m_last_isinwater_status && (c->GetUnitMovementFlags() & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_HOVER | MOVEMENTFLAG_SWIMMING)) == 0 && z - ground_z > 5.0f && z - ground_z < 80.0f)
-        GetMotionMaster()->MoveFall();
-
-    m_is_updating_environment = false;
 }
 
 SafeUnitPointer::~SafeUnitPointer()
@@ -3908,20 +3719,14 @@ void Unit::HandleSafeUnitPointersOnDelete(Unit* thisUnit)
     thisUnit->SafeUnitPointerSet.clear();
 }
 
-bool Unit::IsInWater(bool allowAbove) const
+bool Unit::IsInWater() const
 {
-    const_cast<Unit*>(this)->UpdateEnvironmentIfNeeded(1);
-    return m_last_isinwater_status || (allowAbove && m_last_islittleabovewater_status);
+    return (GetLiquidData().Status & MAP_LIQUID_STATUS_SWIMMING) != 0;
 }
 
 bool Unit::IsUnderWater() const
 {
-    const_cast<Unit*>(this)->UpdateEnvironmentIfNeeded(1);
-    return m_last_isunderwater_status;
-}
-
-void Unit::UpdateUnderwaterState(Map*  /*m*/, float  /*x*/, float  /*y*/, float  /*z*/)
-{
+    return GetLiquidData().Status == LIQUID_MAP_UNDER_WATER;
 }
 
 void Unit::DeMorph()
@@ -12998,8 +12803,6 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
     if (Creature* creature = ToCreature())
     {
-        creature->UpdateEnvironmentIfNeeded(2);
-
         // Set home position at place of engaging combat for escorted creatures
         if ((IsAIEnabled && creature->AI()->IsEscorted()) ||
                 GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE ||
@@ -19584,62 +19387,6 @@ bool ConflagrateAuraStateDelayEvent::Execute(uint64 /*e_time*/, uint32  /*p_time
             m_owner->ModifyAuraState(AURA_STATE_CONFLAGRATE, true);
 
     return true;
-}
-
-uint32 Unit::GetZoneId(bool forceRecalc) const
-{
-    // xinef: optimization, zone calculated every few yards
-    if (!forceRecalc && GetExactDistSq(&m_last_zone_position) < 4.0f * 4.0f)
-        return m_last_zone_id;
-    else
-    {
-        const_cast<Position*>(&m_last_zone_position)->Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
-        *(const_cast<uint32*>(&m_last_zone_id)) = WorldObject::GetZoneId();
-        return m_last_zone_id;
-    }
-}
-
-uint32 Unit::GetAreaId(bool forceRecalc) const
-{
-    // xinef: optimization, area calculated every few yards
-    if (!forceRecalc && GetExactDistSq(&m_last_area_position) < 4.0f * 4.0f)
-        return m_last_area_id;
-    else
-    {
-        const_cast<Position*>(&m_last_area_position)->Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
-        *(const_cast<uint32*>(&m_last_area_id)) = WorldObject::GetAreaId();
-        return m_last_area_id;
-    }
-}
-
-void Unit::GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc) const
-{
-    // xinef: optimization, zone and area calculated every few yards
-    if (!forceRecalc && GetExactDistSq(&m_last_area_position) < 4.0f * 4.0f && GetExactDistSq(&m_last_zone_position) < 4.0f * 4.0f)
-    {
-        zoneid = m_last_zone_id;
-        areaid = m_last_area_id;
-        return;
-    }
-
-    const_cast<Position*>(&m_last_zone_position)->Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
-    const_cast<Position*>(&m_last_area_position)->Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
-    WorldObject::GetZoneAndAreaId(zoneid, areaid);
-    *(const_cast<uint32*>(&m_last_zone_id)) = zoneid;
-    *(const_cast<uint32*>(&m_last_area_id)) = areaid;
-}
-
-bool Unit::IsOutdoors() const
-{
-    // xinef: optimization, outdoor status calculated every few yards
-    if (GetExactDistSq(&m_last_outdoors_position) < 4.0f * 4.0f)
-        return m_last_outdoors_status;
-    else
-    {
-        const_cast<Position*>(&m_last_outdoors_position)->Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
-        *(const_cast<bool*>(&m_last_outdoors_status)) = GetMap()->IsOutdoors(GetPositionX(), GetPositionY(), GetPositionZ());
-        return m_last_outdoors_status;
-    }
 }
 
 void Unit::ExecuteDelayedUnitRelocationEvent()
