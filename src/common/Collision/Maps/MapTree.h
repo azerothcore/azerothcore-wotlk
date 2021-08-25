@@ -23,6 +23,7 @@ namespace VMAP
         const ModelInstance* hitInstance{nullptr};
         const GroupModel* hitModel{nullptr};
         float ground_Z;
+        int32 rootId = -1;
     };
 
     class StaticMapTree

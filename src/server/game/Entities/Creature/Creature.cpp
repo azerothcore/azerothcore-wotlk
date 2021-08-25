@@ -519,8 +519,6 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         SetControlled(true, UNIT_STATE_ROOT);
     }
 
-    UpdateEnvironmentIfNeeded(3);
-
     SetDetectionDistance(cInfo->detection_range);
 
     LoadSpellTemplateImmunity();
@@ -959,15 +957,22 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
     //! returning correct zone id for selecting OutdoorPvP/Battlefield script
     Relocate(x, y, z, ang);
 
-    //oX = x;     oY = y;    dX = x;    dY = y;    m_moveTime = 0;    m_startMove = 0;
-    if (!CreateFromProto(guidlow, Entry, vehId, data))
-        return false;
-
     if (!IsPositionValid())
     {
         LOG_ERROR("entities.unit", "Creature::Create(): given coordinates for creature (guidlow %d, entry %d) are not valid (X: %f, Y: %f, Z: %f, O: %f)", guidlow, Entry, x, y, z, ang);
         return false;
     }
+
+    // area/zone id is needed immediately for ZoneScript::GetCreatureEntry hook before it is known which creature template to load (no model/scale available yet)
+    PositionFullTerrainStatus terrainData;
+    GetMap()->GetFullTerrainStatusForPosition(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ(), DEFAULT_COLLISION_HEIGHT, terrainData);
+    ProcessPositionDataChanged(terrainData);
+
+    //oX = x;     oY = y;    dX = x;    dY = y;    m_moveTime = 0;    m_startMove = 0;
+    if (!CreateFromProto(guidlow, Entry, vehId, data))
+        return false;
+
+    UpdateMovementFlags();
 
     switch (GetCreatureTemplate()->rank)
     {
@@ -1812,6 +1817,8 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
             RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
 
+        UpdateMovementFlags();
+
         SetUInt32Value(UNIT_NPC_FLAGS, cinfo->npcflag);
         ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
@@ -1822,8 +1829,6 @@ void Creature::setDeathState(DeathState s, bool despawn)
         LoadCreaturesAddon(true);
         if (GetCreatureData() && GetPhaseMask() != GetCreatureData()->phaseMask)
             SetPhaseMask(GetCreatureData()->phaseMask, false);
-
-        UpdateEnvironmentIfNeeded(3);
     }
 }
 
@@ -2866,16 +2871,13 @@ void Creature::applyInhabitFlags()
         if (IsLevitating())
         {
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
-            return;
         }
-
-        if (IsHovering())
+        else if (IsHovering())
         {
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
-            return;
         }
-
-        SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
+        else
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
     }
 }
 
@@ -3040,6 +3042,84 @@ float Creature::GetAggroRange(Unit const* target) const
         aggroRadius = minRange;
 
     return (aggroRadius * aggroRate);
+}
+
+void Creature::UpdateMovementFlags()
+{
+    // Do not update movement flags if creature is controlled by a player (charm/vehicle)
+    if (m_movedByPlayer)
+        return;
+
+    CreatureTemplate const* info = GetCreatureTemplate();
+    if (!info)
+        return;
+
+    // Creatures with CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE should control MovementFlags in your own scripts
+    if (info->flags_extra & CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE)
+        return;
+
+    float z = GetPositionZ();
+    float ground = GetFloorZ();
+
+    bool isInAir = false;
+    bool Swim = false;
+
+    bool canHover = CanHover();
+
+    LiquidData const& liquidData = GetLiquidData();
+    if (liquidData.Status == LIQUID_MAP_NO_WATER)
+    {
+        if (ground > INVALID_HEIGHT)
+            isInAir = G3D::fuzzyGt(z, ground + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(z, ground - GROUND_HEIGHT_TOLERANCE); // Can be underground too, prevent the falling
+        else
+            isInAir = true;
+    }
+    else
+    {
+        switch (liquidData.Status)
+        {
+            case LIQUID_MAP_ABOVE_WATER:
+                isInAir = true;
+                break;
+            case LIQUID_MAP_WATER_WALK:
+                isInAir = true;
+                [[fallthrough]];
+            case LIQUID_MAP_IN_WATER:
+                Swim = z - liquidData.DepthLevel > GetCollisionHeight() * 0.75f; // Shallow water at ~75% of collision height
+                break;
+            case LIQUID_MAP_UNDER_WATER:
+                Swim = true;
+                break;
+            default:
+                break;
+        }
+    }
+
+    SetSwim(CanSwim() && Swim);
+
+    if (info->InhabitType & INHABIT_AIR)
+    {
+        if (isInAir && !IsFalling())
+        {
+            if (info->InhabitType & INHABIT_GROUND)
+                SetCanFly(true);
+            else
+                SetDisableGravity(true);
+
+            if (!HasAuraType(SPELL_AURA_HOVER))
+                SetHover(false);
+        }
+        else
+        {
+            SetCanFly(false);
+            SetDisableGravity(false);
+
+            if (IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
+                SetHover(true);
+        }
+    }
+    else if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY) && IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
+        SetHover(true);
 }
 
 void Creature::SetObjectScale(float scale)
