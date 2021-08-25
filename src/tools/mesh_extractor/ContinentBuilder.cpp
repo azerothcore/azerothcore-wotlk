@@ -180,7 +180,7 @@ void ContinentBuilder::Build()
                     if ((*_th)->Free)
                     {
                         (*_th)->SetData(itr->X, itr->Y, MapId, Continent);
-                        (*_th)->activate();
+                        // (*_th)->activate(); //@todo: activate is not a member of BuilderThread, where did it come from? Not present in intial commit.
                         next = true;
                         break;
                     }
@@ -196,7 +196,7 @@ void ContinentBuilder::Build()
     // Free memory
     for (std::vector<BuilderThread*>::iterator _th = Threads.begin(); _th != Threads.end(); ++_th)
     {
-        (*_th)->wait();
+        // (*_th)->wait(); //@todo: wait is not a member of BuilderThread, where did it come from? Not present in intial commit.
         delete *_th;
     }
 }

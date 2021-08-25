@@ -13,6 +13,7 @@
 #include "Model.h"
 
 #include "Recast.h"
+#include "DetourExtended.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
 

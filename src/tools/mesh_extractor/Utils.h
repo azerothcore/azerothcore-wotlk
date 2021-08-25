@@ -7,21 +7,19 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "Constants.h"
+#include "Define.h"
+#include "DetourNavMesh.h"
+#include "Errors.h"
+#include "MapDefines.h"
+#include "G3D/Matrix4.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
 
-#include "G3D/Matrix4.h"
-#include "DetourNavMesh.h"
-
-#include "Define.h"
-#include "Constants.h"
-
 struct WorldModelDefinition;
 class DoodadDefinition;
 class DoodadInstance;
-
-#define ASSERT(assertion) { if (!(assertion)) {fprintf(stderr, "\n%s:%i in %s ASSERTION FAILED:\n  %s\n%s\n", __FILE__, __LINE__, __FUNCTION__, #assertion, st.c_str()); *((volatile int*)nullptr) = 0; } }
 
 struct Vector3
 {
@@ -336,18 +334,6 @@ public:
     Vector3 Position;
     Vector3 Rotation;
     virtual float Scale() const { return 1.0f; };
-};
-
-struct MmapTileHeader
-{
-    uint32 mmapMagic;
-    uint32 dtVersion;
-    uint32 mmapVersion;
-    uint32 size;
-    bool usesLiquids;
-
-    MmapTileHeader() : mmapMagic(MMAP_MAGIC), dtVersion(DT_NAVMESH_VERSION),
-        mmapVersion(MMAP_VERSION), size(0), usesLiquids(true) {}
 };
 
 class Utils
