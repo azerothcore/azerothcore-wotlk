@@ -7291,6 +7291,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
     });
 
+    // 16097 Shadow Hunter Vosh'gajin - Hex
+    ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->CastingTimeIndex = 16;
+    });
+
     // Sacred Cleansing
     ApplySpellFix({ 53659 }, [](SpellEntry* spellInfo)
     {
