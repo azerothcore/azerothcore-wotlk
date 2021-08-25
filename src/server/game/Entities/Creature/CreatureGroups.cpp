@@ -127,7 +127,7 @@ void FormationMgr::LoadCreatureFormations()
 
         group_member->point_1               = fields[5].GetUInt16();
         group_member->point_2               = fields[6].GetUInt16();
-    
+
         // check data correctness
         {
             if (!sObjectMgr->GetCreatureData(group_member->leaderGUID))
