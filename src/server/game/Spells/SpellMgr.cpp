@@ -7291,6 +7291,25 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
     });
 
+    // 16097 Shadow Hunter Vosh'gajin - Hex
+    ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->CastingTimeIndex = 16;
+    });
+
+    // Sacred Cleansing
+    ApplySpellFix({ 53659 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 5; // 40yd
+    });
+
+    // Ulduar: Kologarn Focused Eyebeam Summon Trigger
+    ApplySpellFix({ 63342 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
