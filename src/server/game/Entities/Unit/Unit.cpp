@@ -16528,7 +16528,7 @@ void Unit::SetContestedPvP(Player* attackedPlayer)
     if (!player || ((attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->opponent == attackedPlayer))) || player->InBattleground()))
         return;
 
-    // check if there any any guards that should give a fuck about the contested flag on player
+    // check if there any guards that should care about the contested flag on player
     std::list<Unit*> targets;
     Acore::NearestVisibleDetectableContestedGuardUnitCheck u_check(this);
     Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
