@@ -1117,7 +1117,7 @@ namespace Acore
             if (!u->IsContestedGuard())
             {
                 return false;
-            }                
+            }
 
             return true;
         }
