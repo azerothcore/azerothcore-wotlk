@@ -2788,20 +2788,25 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_AURA_OBS_MOD_HEALTH:
                 case SPELL_AURA_OBS_MOD_POWER:
                 case SPELL_AURA_POWER_BURN:
+                case SPELL_AURA_TRACK_CREATURES:
+                case SPELL_AURA_MOD_RANGED_HASTE:
+                case SPELL_AURA_MOD_POSSESS_PET:
+                case SPELL_AURA_MOD_INVISIBILITY_DETECT:
+                case SPELL_AURA_WATER_BREATHING:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
                     break;
             }
 
             switch (spellInfo->Effects[j].ApplyAuraName)
             {
-            case SPELL_AURA_MOD_POSSESS:
-            case SPELL_AURA_MOD_CONFUSE:
-            case SPELL_AURA_MOD_CHARM:
-            case SPELL_AURA_AOE_CHARM:
-            case SPELL_AURA_MOD_FEAR:
-            case SPELL_AURA_MOD_STUN:
-                spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-                break;
+                case SPELL_AURA_MOD_POSSESS:
+                case SPELL_AURA_MOD_CONFUSE:
+                case SPELL_AURA_MOD_CHARM:
+                case SPELL_AURA_AOE_CHARM:
+                case SPELL_AURA_MOD_FEAR:
+                case SPELL_AURA_MOD_STUN:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
+                    break;
             }
 
             switch (spellInfo->Effects[j].Effect)
@@ -2822,6 +2827,7 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_EFFECT_ENERGIZE_PCT:
                 case SPELL_EFFECT_ENERGIZE:
                 case SPELL_EFFECT_HEAL_MECHANICAL:
+                case SPELL_EFFECT_CREATE_ITEM:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
                     break;
                 case SPELL_EFFECT_CHARGE:
@@ -2937,18 +2943,23 @@ void SpellMgr::LoadSpellCustomAttr()
 
         switch (spellInfo->SpellFamilyName)
         {
-        case SPELLFAMILY_WARRIOR:
-            // Shout
-            if (spellInfo->SpellFamilyFlags[0] & 0x20000 || spellInfo->SpellFamilyFlags[1] & 0x20)
-                spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-            break;
-        case SPELLFAMILY_DRUID:
-            // Roar
-            if (spellInfo->SpellFamilyFlags[0] & 0x8)
-                spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-            break;
-        default:
-            break;
+            case SPELLFAMILY_WARRIOR:
+                // Shout
+                if (spellInfo->SpellFamilyFlags[0] & 0x20000 || spellInfo->SpellFamilyFlags[1] & 0x20)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
+                break;
+            case SPELLFAMILY_DRUID:
+                // Roar
+                if (spellInfo->SpellFamilyFlags[0] & 0x8)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
+                break;
+            case SPELLFAMILY_HUNTER:
+                // Aspects
+                if (spellInfo->GetCategory() == 47)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
+                break;
+            default:
+                break;
         }
 
         switch (spellInfo->Id)
@@ -3205,6 +3216,9 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 43138: // North Fleet Reservist Kill Credit
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_ALLOW_INFLIGHT_TARGET;
+                break;
+            case 6197: // Eagle Eye
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
                 break;
 
             // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
@@ -7275,6 +7289,25 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 53651 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+    });
+
+    // 16097 Shadow Hunter Vosh'gajin - Hex
+    ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->CastingTimeIndex = 16;
+    });
+
+    // Sacred Cleansing
+    ApplySpellFix({ 53659 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 5; // 40yd
+    });
+
+    // Ulduar: Kologarn Focused Eyebeam Summon Trigger
+    ApplySpellFix({ 63342 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
