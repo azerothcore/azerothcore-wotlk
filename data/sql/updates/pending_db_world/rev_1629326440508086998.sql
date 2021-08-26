@@ -16,7 +16,5 @@ UPDATE `skinning_loot_template` SET `Chance` = 72.8 WHERE `Entry` = 1713 AND `It
 UPDATE `skinning_loot_template` SET `Chance` = 3.3 WHERE `Entry` = 1713 AND `Item` = 4235;
 UPDATE `skinning_loot_template` SET `Chance` = 23.9 WHERE `Entry` = 1713 AND `Item` = 4304;
 
--- Adjust skinning drop rates for Yor <UNUSED>
-UPDATE `skinning_loot_template` SET `Chance` = 72 WHERE `Entry` = 10237 AND `Item` = 4234;
-UPDATE `skinning_loot_template` SET `Chance` = 4.7 WHERE `Entry` = 10237 AND `Item` = 4235;
-UPDATE `skinning_loot_template` SET `Chance` = 23.3 WHERE `Entry` = 10237 AND `Item` = 4304;
+UPDATE `creature_template` SET `skinloot` = 0 WHERE (`entry` = 10237);
+DELETE FROM `skinning_loot_template` WHERE `Entry` = 10237;
