@@ -798,7 +798,7 @@ public:
             speed_cstr = "1";
         }
 
-        uint32 mount = Acore::StringTo<uint32>(mount_cstr).value());
+        uint32 mount = Acore::StringTo<uint32>(mount_cstr).value();
         if (!sCreatureDisplayInfoStore.LookupEntry(mount))
         {
             handler->SendSysMessage(LANG_NO_MOUNT);
