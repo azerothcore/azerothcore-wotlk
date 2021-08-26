@@ -7,7 +7,7 @@
 #include "Errors.h"
 #include "MessageBuffer.h"
 #include "Log.h"
-#include "Util.h"
+#include "Timer.h"
 #include <utf8.h>
 #include <sstream>
 #include <ctime>

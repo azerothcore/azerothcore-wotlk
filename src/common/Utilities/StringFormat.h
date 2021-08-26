@@ -59,6 +59,8 @@ namespace Acore::String
 {
     template<class Str>
     Str Trim(const Str& s, const std::locale& loc = std::locale());
+
+    AC_COMMON_API std::string TrimRightInPlace(std::string& str);
 }
 
 #endif

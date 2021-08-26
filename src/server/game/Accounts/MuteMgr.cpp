@@ -56,7 +56,7 @@ void MuteMgr::MutePlayer(std::string const& targetName, Seconds notSpeakTime, st
 
     if (targetSession)
     {
-        ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(notSpeakTime.count()).c_str(), muteBy.c_str(), muteReason.c_str());
+        ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, Acore::Time::ToTimeString(notSpeakTime).c_str(), muteBy.c_str(), muteReason.c_str());
     }
 }
 

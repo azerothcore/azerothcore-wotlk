@@ -37,5 +37,19 @@ Str Acore::String::Trim(const Str& s, const std::locale& loc /*= std::locale()*/
     return s;
 }
 
+std::string Acore::String::TrimRightInPlace(std::string& str)
+{
+    int pos = int(str.size()) - 1;
+
+    while (pos >= 0 && std::isspace(str[pos]))
+    {
+        --pos;
+    }
+
+    str.resize(pos + 1);
+
+    return str;
+}
+
 // Template Trim
 template std::string Acore::String::Trim<std::string>(const std::string& s, const std::locale& loc /*= std::locale()*/);

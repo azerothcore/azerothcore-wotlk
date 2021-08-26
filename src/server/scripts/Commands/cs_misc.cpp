@@ -31,6 +31,7 @@
 #include "StringConvert.h"
 #include "TargetedMovementGenerator.h"
 #include "WeatherMgr.h"
+#include "Timer.h"
 
 class misc_commandscript : public CommandScript
 {
@@ -2264,7 +2265,7 @@ public:
             if (WorldSession* session = sWorld->FindSession(accountId))
                 target = session->GetPlayer();
 
-        auto notSpeakTime = TimeStringToSecs(delayStr);
+        auto notSpeakTime = Acore::StringTo<uint32>(delayStr);
 
         if (!notSpeakTime)
         {
@@ -2272,16 +2273,18 @@ public:
             return false;
         }
 
+        auto duration = Minutes(*notSpeakTime);
+
         // must have strong lesser security level
         if (handler->HasLowerSecurity(target, targetGuid, true))
             return false;
 
-        sMute->MutePlayer(targetName, Seconds(notSpeakTime), handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
+        sMute->MutePlayer(targetName, Minutes(*notSpeakTime), handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
 
         if (!sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
         {
             // You has disabled % s\'s chat for %s. Reason: %s.
-            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(targetName).c_str(), secsToTimeString(notSpeakTime).c_str(), muteReasonStr.c_str());
+            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(targetName).c_str(), Acore::Time::ToTimeString(duration).c_str(), muteReasonStr.c_str());
         }
 
         return true;

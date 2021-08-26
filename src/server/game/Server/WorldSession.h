@@ -382,7 +382,7 @@ public:
 
     void DoLootRelease(ObjectGuid lguid);
 
-    bool CanSpeak() const;
+    [[nodiscard]] bool CanSpeak() const;
 
     // Locales
     LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }

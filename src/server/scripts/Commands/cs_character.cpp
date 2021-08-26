@@ -13,12 +13,13 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "Chat.h"
-#include "Implementation/CharacterDatabase.h"
+#include "CharacterDatabase.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PlayerDump.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "Timer.h"
 
 class character_commandscript : public CommandScript
 {
@@ -163,7 +164,7 @@ public:
 
         for (DeletedInfoList::const_iterator itr = foundList.begin(); itr != foundList.end(); ++itr)
         {
-            std::string dateStr = TimeToTimestampStr(itr->deleteDate);
+            std::string dateStr = Acore::Time::TimeToTimestampStr(itr->deleteDate);
 
             if (!handler->GetSession())
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE,
