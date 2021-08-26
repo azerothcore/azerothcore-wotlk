@@ -5042,9 +5042,16 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if( m_caster->GetTypeId() == TYPEID_PLAYER )
             m_caster->ToPlayer()->SetFallInformation(time(nullptr), m_caster->GetPositionZ());
 
+        ObjectGuid targetGUID = ObjectGuid::Empty;
+        if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetTarget() == unitTarget->GetGUID())
+        {
+            targetGUID = unitTarget->GetGUID();
+        }
+
         if (m_pathFinder)
         {
-            m_caster->GetMotionMaster()->MoveCharge(m_pathFinder->GetEndPosition().x, m_pathFinder->GetEndPosition().y, m_pathFinder->GetEndPosition().z, 42.0f, EVENT_CHARGE, &m_pathFinder->GetPath());
+            m_caster->GetMotionMaster()->MoveCharge(m_pathFinder->GetEndPosition().x, m_pathFinder->GetEndPosition().y, m_pathFinder->GetEndPosition().z,
+                42.0f, EVENT_CHARGE, &m_pathFinder->GetPath(), false, 0.f, targetGUID);
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
@@ -5063,7 +5070,8 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
                 m_caster->GetFirstCollisionPosition(pos, dist, angle);
             }
 
-            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT);
+            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT, SPEED_CHARGE, EVENT_CHARGE,
+                nullptr, false, 0.f, targetGUID);
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
@@ -5072,19 +5080,9 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         }
     }
 
-    if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
+    if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET && m_caster->ToPlayer())
     {
-        if (!unitTarget)
-            return;
-
-        if (m_caster->ToPlayer())
-        {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
-        }
-
-        // not all charge effects used in negative spells
-        if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetTarget() == unitTarget->GetGUID())
-            m_caster->Attack(unitTarget, true);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
     }
 }
 
