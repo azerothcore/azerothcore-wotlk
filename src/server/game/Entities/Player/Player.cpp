@@ -591,6 +591,8 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     InitTalentForLevel();
     InitPrimaryProfessions();                               // to max set before any spell added
 
+    UpdatePositionData();
+
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
     UpdateMaxHealth();                                      // Update max Health (for add bonus from stamina)
     SetFullHealth();
@@ -885,7 +887,7 @@ void Player::HandleDrowning(uint32 time_diff)
     }
 
     // In dark water
-    if (m_MirrorTimerFlags & UNDERWARER_INDARKWATER)
+    if (m_MirrorTimerFlags & UNDERWATER_INDARKWATER)
     {
         // Fatigue timer not activated - activate it
         if (m_MirrorTimer[FATIGUE_TIMER] == DISABLED_MIRROR_TIMER)
@@ -908,7 +910,7 @@ void Player::HandleDrowning(uint32 time_diff)
                 else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
                     RepopAtGraveyard();
             }
-            else if (!(m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER))
+            else if (!(m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER))
                 SendMirrorTimer(FATIGUE_TIMER, getMaxTimer(FATIGUE_TIMER), m_MirrorTimer[FATIGUE_TIMER], -1);
         }
     }
@@ -918,7 +920,7 @@ void Player::HandleDrowning(uint32 time_diff)
         m_MirrorTimer[FATIGUE_TIMER] += 10 * time_diff;
         if (m_MirrorTimer[FATIGUE_TIMER] >= DarkWaterTime || !IsAlive())
             StopMirrorTimer(FATIGUE_TIMER);
-        else if (m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER)
+        else if (m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER)
             SendMirrorTimer(FATIGUE_TIMER, DarkWaterTime, m_MirrorTimer[FATIGUE_TIMER], 10);
     }
 
@@ -1595,7 +1597,10 @@ void Player::ProcessDelayedOperations()
         if (m_entryPointData.mountSpell)
         {
             // xinef: remove shapeshift auras
-            RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+            if (IsInDisallowedMountForm())
+            {
+                RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+            }
             AddAura(m_entryPointData.mountSpell, this);
             m_entryPointData.mountSpell = 0;
         }
@@ -2070,31 +2075,6 @@ GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTy
         }
     }
     return nullptr;
-}
-
-bool Player::IsInWater(bool allowAbove) const
-{
-    if (m_isInWater || !allowAbove)
-        return m_isInWater;
-
-    float distsq = GetExactDistSq(&m_last_environment_position);
-    if (distsq < 3.0f * 3.0f)
-        return m_last_islittleabovewater_status;
-    else
-    {
-        LiquidData liqData;
-        liqData.level = INVALID_HEIGHT;
-        const_cast<Position*>(&m_last_environment_position)->Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
-        bool inWater = GetBaseMap()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ(), &liqData);
-        *(const_cast<bool*>(&m_last_islittleabovewater_status)) = inWater || (liqData.level > INVALID_HEIGHT && liqData.level > liqData.depth_level && liqData.level <= GetPositionZ() + 3.0f && liqData.level > GetPositionZ() - 1.0f);
-        return m_last_islittleabovewater_status;
-    }
-}
-
-bool Player::IsUnderWater() const
-{
-    return IsInWater() &&
-           GetPositionZ() < GetBaseMap()->GetWaterLevel(GetPositionX(), GetPositionY()) - GetCollisionHeight();
 }
 
 bool Player::IsFalling() const
@@ -3187,7 +3167,7 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const
             (!form && spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_WHILE_NOT_SHAPESHIFTED)));
 }
 
-void Player::learnSpell(uint32 spellId)
+void Player::learnSpell(uint32 spellId, bool temporary)
 {
     // Xinef: don't allow to learn active spell once more
     if (HasActiveSpell(spellId))
@@ -3198,7 +3178,7 @@ void Player::learnSpell(uint32 spellId)
 
     uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
     bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
-    bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true);
+    bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true, temporary);
     if (added)
     {
         sScriptMgr->OnPlayerLearnSpell(this, spellId);
@@ -3215,7 +3195,7 @@ void Player::learnSpell(uint32 spellId)
         // pussywizard: next ranks must not be in current spec (otherwise no need to learn already learnt)
         PlayerSpellMap::iterator itr = m_spells.find(nextSpell);
         if (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && !itr->second->IsInSpec(m_activeSpec))
-            learnSpell(nextSpell);
+            learnSpell(nextSpell, temporary);
     }
 
     // xinef: if we learn new spell, check all spells requiring this spell, if we have such a spell, and it is not in current spec - learn it
@@ -3224,7 +3204,7 @@ void Player::learnSpell(uint32 spellId)
     {
         PlayerSpellMap::iterator itr2 = m_spells.find(itr->second);
         if (itr2 != m_spells.end() && itr2->second->State != PLAYERSPELL_REMOVED && !itr2->second->IsInSpec(m_activeSpec))
-            learnSpell(itr2->first);
+            learnSpell(itr2->first, temporary);
     }
 }
 
@@ -4361,7 +4341,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     // trigger update zone for alive state zone updates
     uint32 newzone, newarea;
-    GetZoneAndAreaId(newzone, newarea, true);
+    GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);
     sOutdoorPvPMgr->HandlePlayerResurrects(this, newzone);
 
@@ -4513,6 +4493,8 @@ Corpse* Player::CreateCorpse()
 
     // register for player, but not show
     GetMap()->AddCorpse(corpse);
+
+    UpdatePositionData();
 
     // we do not need to save corpses for BG/arenas
     if (!GetMap()->IsBattlegroundOrArena())
@@ -5569,7 +5551,7 @@ void Player::CheckAreaExploreAndOutdoor()
         return;
 
     bool isOutdoor = IsOutdoors();
-    uint32 areaId = GetBaseMap()->GetAreaId(GetPositionX(), GetPositionY(), GetPositionZ(), &isOutdoor);
+    uint32 areaId = GetAreaId();
     AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
 
     if (sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK) && !isOutdoor)
@@ -6165,7 +6147,7 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
         if (!sMapStore.LookupEntry(map))
             return 0;
 
-        zone = sMapMgr->GetZoneId(map, posx, posy, posz);
+        zone = sMapMgr->GetZoneId(PHASEMASK_NORMAL, map, posx, posy, posz);
 
         if (zone > 0)
         {
@@ -6188,36 +6170,6 @@ uint32 Player::GetLevelFromStorage(ObjectGuid::LowType guid)
         return playerData->level;
 
     return 0;
-}
-
-uint32 Player::GetZoneId(bool forceRecalc) const
-{
-    if (forceRecalc)
-        *(const_cast<uint32*>(&m_last_zone_id)) = WorldObject::GetZoneId();
-
-    return m_last_zone_id;
-}
-
-uint32 Player::GetAreaId(bool forceRecalc) const
-{
-    if (forceRecalc)
-        *(const_cast<uint32*>(&m_last_area_id)) = WorldObject::GetAreaId();
-
-    return m_last_area_id;
-}
-
-void Player::GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc) const
-{
-    if (forceRecalc)
-    {
-        WorldObject::GetZoneAndAreaId(zoneid, areaid);
-        *(const_cast<uint32*>(&m_last_zone_id)) = zoneid;
-        *(const_cast<uint32*>(&m_last_area_id)) = areaid;
-        return;
-    }
-
-    zoneid = m_last_zone_id;
-    areaid = m_last_area_id;
 }
 
 //If players are too far away from the duel flag... they lose the duel
@@ -6916,6 +6868,10 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         if (!spellData.SpellId)
             continue;
 
+        // Spells that should stay on the caster after removing the item.
+        constexpr std::array<uint32, 1> spellExceptions = { /*Electromagnetic Gigaflux Reactivator*/ 11826 };
+        const auto found = std::find(std::begin(spellExceptions), std::end(spellExceptions), spellData.SpellId);
+
         // wrong triggering type
         if (apply)
         {
@@ -6926,8 +6882,8 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         }
         else
         {
-            // Auras activated by use should not be removed on unequip (with no charges)
-            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && spellData.SpellCharges <= 0)
+            // If the spell is an exception do not remove it.
+            if (found != std::end(spellExceptions))
             {
                 continue;
             }
@@ -7565,7 +7521,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 if (groupRules)
                     group->UpdateLooterGuid(go, true);
 
-                loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false, go->GetLootMode());
+                loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false, go->GetLootMode(), go);
                 go->SetLootGenerationTime();
 
                 // get next RR player (for next loot)
@@ -9730,6 +9686,11 @@ void Player::ContinueTaxiFlight()
         return;
     }
 
+    if (IsInDisallowedMountForm())
+    {
+        RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+    }
+
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);
 }
 
@@ -9936,8 +9897,10 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         return false;
     }
 
-    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->Flags2 == ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId(true) == TEAM_HORDE)))
+    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId(true) == TEAM_HORDE)))
+    {
         return false;
+    }
 
     Creature* creature = GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
     if (!creature)
@@ -10846,7 +10809,7 @@ void Player::SendInitialPacketsAfterAddToMap()
 
     // update zone
     uint32 newzone, newarea;
-    GetZoneAndAreaId(newzone, newarea, true);
+    GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);                            // also call SendInitWorldStates();
 
     if (HasAuraType(SPELL_AURA_MOD_STUN))
@@ -11028,7 +10991,7 @@ void Player::LearnCustomSpells()
             GetName().c_str(), GetGUID().ToString().c_str(), uint32(getClass()), uint32(getRace()), tspell);
         if (!IsInWorld())                                   // will send in INITIAL_SPELLS in list anyway at map add
         {
-            addSpell(tspell, true, true);
+            addSpell(tspell, SPEC_MASK_ALL, true);
         }
         else                                               // but send in normal spell in game learn case
         {
@@ -11227,13 +11190,14 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
                     continue;
                 }
             }
+
             if (!IsInWorld())
             {
                 addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true, false);
             }
             else
             {
-                learnSpell(pAbility->Spell);
+                learnSpell(pAbility->Spell, true);
             }
         }
     }
@@ -11845,16 +11809,38 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
 
 bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
 {
-    if (!pRewardSource || !IsInMap(pRewardSource))
-        return false;
-    const WorldObject* player = GetCorpse();
+    WorldObject const* player = GetCorpse();
     if (!player || IsAlive())
+    {
         player = this;
+    }
+
+    if (!pRewardSource || !player->IsInMap(pRewardSource))
+    {
+        return false;
+    }
 
     if (pRewardSource->GetMap()->IsDungeon())
+    {
         return true;
+    }
 
     return pRewardSource->GetDistance(player) <= sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE);
+}
+
+bool Player::IsAtLootRewardDistance(WorldObject const* pRewardSource) const
+{
+    if (!IsAtGroupRewardDistance(pRewardSource))
+    {
+        return false;
+    }
+
+    if (HasPendingBind())
+    {
+        return false;
+    }
+
+    return pRewardSource->HasAllowedLooter(GetGUID());
 }
 
 bool Player::IsAtRecruitAFriendDistance(WorldObject const* pOther) const
@@ -13732,7 +13718,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setUInt16(index++, (uint16)m_ExtraFlags);
         stmt->setUInt8(index++,  m_stableSlots);
         stmt->setUInt16(index++, (uint16)m_atLoginFlags);
-        stmt->setUInt16(index++, GetZoneId(true));
+        stmt->setUInt16(index++, GetZoneId());
         stmt->setUInt32(index++, uint32(m_deathExpireTime));
 
         ss.str("");
@@ -13870,7 +13856,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setUInt16(index++, (uint16)m_ExtraFlags);
         stmt->setUInt8(index++,  m_stableSlots);
         stmt->setUInt16(index++, (uint16)m_atLoginFlags);
-        stmt->setUInt16(index++, GetZoneId(true));
+        stmt->setUInt16(index++, GetZoneId());
         stmt->setUInt32(index++, uint32(m_deathExpireTime));
 
         ss.str("");
@@ -14137,10 +14123,16 @@ void Player::ActivateSpec(uint8 spec)
 
         // pussywizard: was => isn't
         if (itr->second->IsInSpec(oldSpec) && !itr->second->IsInSpec(spec))
+        {
             SendLearnPacket(itr->first, false);
+            // We want to remove all auras of the unlearned spell
+            _removeTalentAurasAndSpells(itr->first);
+        }
         // pussywizard: wasn't => is
         else if (!itr->second->IsInSpec(oldSpec) && itr->second->IsInSpec(spec))
+        {
             SendLearnPacket(itr->first, true);
+        }
     }
 
     // xinef: apply glyphs from second spec

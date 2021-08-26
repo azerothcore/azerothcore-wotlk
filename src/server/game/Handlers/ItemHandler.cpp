@@ -884,11 +884,15 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
 
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
+    {
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+    }
 
     // Stop the npc if moving
     if (vendor->HasUnitState(UNIT_STATE_MOVING))
+    {
         vendor->StopMoving();
+    }
 
     SetCurrentVendor(vendorEntry);
 
@@ -921,16 +925,22 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(item->item))
             {
                 if (!(itemTemplate->AllowableClass & _player->getClassMask()) && itemTemplate->Bonding == BIND_WHEN_PICKED_UP && !_player->IsGameMaster())
+                {
                     continue;
+                }
                 // Only display items in vendor lists for the team the
                 // player is on. If GM on, display all items.
-                if (!_player->IsGameMaster() && ((itemTemplate->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && _player->GetTeamId() == TEAM_ALLIANCE) || (itemTemplate->Flags2 == ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && _player->GetTeamId() == TEAM_HORDE)))
+                if (!_player->IsGameMaster() && ((itemTemplate->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && _player->GetTeamId() == TEAM_ALLIANCE) || (itemTemplate->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && _player->GetTeamId() == TEAM_HORDE)))
+                {
                     continue;
+                }
 
                 // Items sold out are not displayed in list
                 uint32 leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
                 if (!_player->IsGameMaster() && !leftInStock)
+                {
                     continue;
+                }
 
                 ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), item->item);
                 if (!sConditionMgr->IsObjectMeetToConditions(_player, vendor, conditions))
@@ -952,7 +962,9 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
                 data << uint32(item->ExtendedCost);
 
                 if (++count >= MAX_VENDOR_ITEMS)
+                {
                     break;
+                }
             }
         }
     }

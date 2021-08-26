@@ -1327,9 +1327,9 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                 float ground = m_caster->GetMapHeight(x, y, z, true);
                 float liquidLevel = VMAP_INVALID_HEIGHT_VALUE;
-                LiquidData liquidData;
-                if (m_caster->GetMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData, m_caster->GetCollisionHeight()))
-                    liquidLevel = liquidData.level;
+                LiquidData const& liquidData = m_caster->GetMap()->GetLiquidData(m_caster->GetPhaseMask(), x, y, z, m_caster->GetCollisionHeight(), MAP_ALL_LIQUIDS);
+                if (liquidData.Status)
+                    liquidLevel = liquidData.Level;
 
                 if (liquidLevel <= ground) // When there is no liquid Map::GetWaterOrGroundLevel returns ground level
                 {
@@ -2411,6 +2411,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
     m_spellAura = nullptr; // Set aura to null for every target-make sure that pointer is not used for unit without aura applied
 
+    PrepareScriptHitHandlers();
+    CallScriptBeforeHitHandlers(missInfo);
+
     //Spells with this flag cannot trigger if effect is casted on self
     bool canEffectTrigger = !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_CASTER_PROCS) && unitTarget->CanProc() && (CanExecuteTriggersOnHit(mask) || missInfo == SPELL_MISS_IMMUNE2);
     bool reflectedSpell = missInfo == SPELL_MISS_REFLECT;
@@ -2677,8 +2680,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         }
     }
 
-    if (missInfo != SPELL_MISS_EVADE && effectUnit != m_caster && m_caster->IsFriendlyTo(effectUnit) && m_spellInfo->IsPositive() && effectUnit->IsInCombat())
+    if (missInfo != SPELL_MISS_EVADE && effectUnit != m_caster && m_caster->IsFriendlyTo(effectUnit) && m_spellInfo->IsPositive() &&
+        effectUnit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT))
+    {
         m_caster->SetInCombatWith(effectUnit);
+    }
 
     // Check for SPELL_ATTR7_CAN_CAUSE_INTERRUPT
     if (m_spellInfo->HasAttribute(SPELL_ATTR7_CAN_CAUSE_INTERRUPT) && effectUnit->GetTypeId() != TYPEID_PLAYER)
@@ -2745,9 +2751,6 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     if (!effectMask)
         return returnVal;
 
-    PrepareScriptHitHandlers();
-    CallScriptBeforeHitHandlers();
-
     if (unit->GetTypeId() == TYPEID_PLAYER)
     {
         unit->ToPlayer()->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, m_spellInfo->Id);
@@ -2796,10 +2799,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             // xinef: triggered spells should not prolong combat
             if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS) && !m_triggeredByAuraSpell)
             {
-                // xinef: start combat with hostile unit...
-                if (Unit* hostile = unit->getAttackerForHelper())
-                    m_caster->CombatStart(hostile, true);
-                //m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
+                m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
                 unit->getHostileRefManager().threatAssist(m_caster, 0.0f);
             }
         }
@@ -3044,7 +3044,7 @@ void Spell::DoAllEffectOnTarget(GOTargetInfo* target)
         return;
 
     PrepareScriptHitHandlers();
-    CallScriptBeforeHitHandlers();
+    CallScriptBeforeHitHandlers(SPELL_MISS_NONE);
 
     for (uint32 effectNumber = 0; effectNumber < MAX_SPELL_EFFECTS; ++effectNumber)
         if (effectMask & (1 << effectNumber))
@@ -3065,7 +3065,7 @@ void Spell::DoAllEffectOnTarget(ItemTargetInfo* target)
         return;
 
     PrepareScriptHitHandlers();
-    CallScriptBeforeHitHandlers();
+    CallScriptBeforeHitHandlers(SPELL_MISS_NONE);
 
     for (uint32 effectNumber = 0; effectNumber < MAX_SPELL_EFFECTS; ++effectNumber)
         if (effectMask & (1 << effectNumber))
@@ -5088,7 +5088,7 @@ void Spell::HandleThreatSpells()
 
         threat += threatEntry->flatMod;
     }
-    else if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NO_INITIAL_THREAT) == 0)
+    else if (!m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NO_INITIAL_THREAT))
         threat += m_spellInfo->SpellLevel;
 
     // past this point only multiplicative effects occur
@@ -5675,7 +5675,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                             m_caster->RemoveMovementImpairingAuras(true);
                     }
                     if (m_caster->HasUnitState(UNIT_STATE_ROOT))
-                        return SPELL_FAILED_ROOTED;
+                    {
+                        // Exception for Master's Call
+                        if (m_spellInfo->Id != 54216)
+                        {
+                            return SPELL_FAILED_ROOTED;
+                        }
+                    }
                     if (m_caster->GetTypeId() == TYPEID_PLAYER)
                         if (Unit* target = m_targets.GetUnitTarget())
                             if (!target->IsAlive())
@@ -7972,14 +7978,14 @@ bool Spell::CallScriptEffectHandlers(SpellEffIndex effIndex, SpellEffectHandleMo
     return preventDefault;
 }
 
-void Spell::CallScriptBeforeHitHandlers()
+void Spell::CallScriptBeforeHitHandlers(SpellMissInfo missInfo)
 {
     for (std::list<SpellScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
     {
         (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_BEFORE_HIT);
-        std::list<SpellScript::HitHandler>::iterator hookItrEnd = (*scritr)->BeforeHit.end(), hookItr = (*scritr)->BeforeHit.begin();
+        std::list<SpellScript::BeforeHitHandler>::iterator hookItrEnd = (*scritr)->BeforeHit.end(), hookItr = (*scritr)->BeforeHit.begin();
         for (; hookItr != hookItrEnd; ++hookItr)
-            (*hookItr).Call(*scritr);
+            (*hookItr).Call(*scritr, missInfo);
 
         (*scritr)->_FinishScriptCall();
     }
