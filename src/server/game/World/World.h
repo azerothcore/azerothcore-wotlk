@@ -486,6 +486,13 @@ private:
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;
+
+    /**
+     * @brief Executed when a World Session is being finalized. Be it from a normal login or via queue popping.
+     *
+     * @param session The World Session that we are finalizing.
+     */
+    inline void FinalizePlayerWorldSession(WorldSession* session);
 };
 
 std::unique_ptr<IWorld>& getWorldInstance();

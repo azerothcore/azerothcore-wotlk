@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 #include <sstream>
+#include "G3D/Vector3.h"
 
 #ifdef ELUNA
 class ElunaEventProcessor;
@@ -67,6 +68,8 @@ class Unit;
 class Transport;
 class StaticTransport;
 class MotionTransport;
+
+struct PositionFullTerrainStatus;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 typedef GuidUnorderedSet UpdatePlayerSet;
@@ -374,6 +377,11 @@ struct Position
     inline bool operator!=(Position const& a)
     {
         return !(operator==(a));
+    }
+
+    operator G3D::Vector3() const
+    {
+        return { m_positionX, m_positionY, m_positionZ };
     }
 
     void Relocate(float x, float y)
@@ -744,23 +752,16 @@ public:
 #endif
     void _Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask);
 
-    void RemoveFromWorld() override
-    {
-        if (!IsInWorld())
-            return;
-
-        DestroyForNearbyPlayers();
-
-        Object::RemoveFromWorld();
-    }
+    void AddToWorld() override;
+    void RemoveFromWorld() override;
 
 #ifdef ELUNA
     ElunaEventProcessor* elunaEvents;
 #endif
 
-    void GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance, float absAngle) const;
-    void GetNearPoint2D(float& x, float& y, float distance, float absAngle) const;
-    void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0) const;
+    void GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance, float absAngle, Position const* startPos = nullptr) const;
+    void GetNearPoint2D(float& x, float& y, float distance, float absAngle, Position const* startPos = nullptr) const;
+    void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0, Position const* startPos = nullptr) const;
     void GetTheClosestPoint(float& x, float& y, float& z, float rangecheck, float startedZ, float controlZ = 0) const;
     bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, const WorldObject* forWho = nullptr, bool force = false) const;
     void MovePosition(Position& pos, float dist, float angle);
@@ -811,9 +812,11 @@ public:
     bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
     [[nodiscard]] bool InSamePhase(uint32 phasemask) const { return m_useCombinedPhases ? GetPhaseMask() & phasemask : GetPhaseMask() == phasemask; }
 
-    [[nodiscard]] virtual uint32 GetZoneId(bool forceRecalc = false) const;
-    [[nodiscard]] virtual uint32 GetAreaId(bool forceRecalc = false) const;
-    virtual void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc = false) const;
+    [[nodiscard]] uint32 GetZoneId() const;
+    [[nodiscard]] uint32 GetAreaId() const;
+    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const;
+    [[nodiscard]] bool IsOutdoors() const;
+    LiquidData const& GetLiquidData() const;
 
     InstanceScript* GetInstanceScript();
 
@@ -942,9 +945,6 @@ public:
     [[nodiscard]] Map* FindMap() const { return m_currMap; }
     //used to check all object's GetMap() calls when object is not in world!
 
-    //this function should be removed in nearest time...
-    [[nodiscard]] Map const* GetBaseMap() const;
-
     void SetZoneScript();
     void ClearZoneScript();
     [[nodiscard]] ZoneScript* GetZoneScript() const { return m_zoneScript; }
@@ -977,6 +977,9 @@ public:
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
+
+    void SetPositionDataUpdate();
+    void UpdatePositionData();
 
     void AddToObjectUpdate() override;
     void RemoveFromObjectUpdate() override;
@@ -1041,6 +1044,12 @@ public:
     [[nodiscard]] virtual float GetCollisionWidth() const { return GetObjectSize(); }
     [[nodiscard]] virtual float GetCollisionRadius() const { return GetObjectSize() / 2; }
 
+    void AddAllowedLooter(ObjectGuid guid);
+    void ResetAllowedLooters();
+    void SetAllowedLooters(GuidUnorderedSet const looters);
+    [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
+    [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
+
 protected:
     std::string m_name;
     bool m_isActive;
@@ -1048,7 +1057,13 @@ protected:
     const bool m_isWorldObject;
     ZoneScript* m_zoneScript;
 
-    float m_staticFloorZ;
+    virtual void ProcessPositionDataChanged(PositionFullTerrainStatus const& data);
+    uint32 _zoneId;
+    uint32 _areaId;
+    float _floorZ;
+    bool _outdoors;
+    LiquidData _liquidData;
+    bool _updatePositionData;
 
     // transports
     Transport* m_transport;
@@ -1085,6 +1100,8 @@ private:
     bool CanDetectInvisibilityOf(WorldObject const* obj) const;
     //bool CanDetectStealthOf(WorldObject const* obj) const;
     bool CanDetectStealthOf(WorldObject const* obj, bool checkAlert = false) const;
+
+    GuidUnorderedSet _allowedLooters;
 };
 
 namespace Acore

@@ -132,11 +132,6 @@ void MotionMaster::UpdateMotion(uint32 diff)
     }
 
     _cleanFlag &= ~MMCF_INUSE;
-
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
-        _owner->UpdateUnderwaterState(_owner->GetMap(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
-    else
-        _owner->UpdateEnvironmentIfNeeded(0);
 }
 
 void MotionMaster::DirectClean(bool reset)
