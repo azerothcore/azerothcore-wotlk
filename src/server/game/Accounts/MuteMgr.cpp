@@ -166,7 +166,7 @@ std::string const MuteMgr::GetMuteTimeString(uint32 accountID)
 
 bool MuteMgr::CanSpeak(uint32 accountID)
 {
-    return GetMuteDate(accountID) <= time(nullptr);
+    return static_cast<time_t>(GetMuteDate(accountID)) <= time(nullptr);
 }
 
 void MuteMgr::LoginAccount(uint32 accountID)
