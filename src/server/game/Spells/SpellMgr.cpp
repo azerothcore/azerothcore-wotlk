@@ -2778,6 +2778,20 @@ void SpellMgr::LoadSpellCustomAttr()
         {
             switch (spellInfo->Effects[j].ApplyAuraName)
             {
+                case SPELL_AURA_MOD_INVISIBILITY:
+                {
+                    switch (spellInfo->Id)
+                    {
+                        // Exceptions
+                        case 44801: // Spectral Invisibility (Kalecgos, SWP)
+                        case 46021: // Spectral Realm (SWP)
+                            break;
+                        default:
+                            spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
+                            break;
+                    }
+                }
+                break;
                 case SPELL_AURA_PERIODIC_HEAL:
                 case SPELL_AURA_PERIODIC_DAMAGE:
                 case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
