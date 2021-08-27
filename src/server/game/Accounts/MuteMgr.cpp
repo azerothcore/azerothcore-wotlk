@@ -191,7 +191,6 @@ void MuteMgr::LoginAccount(uint32 accountID)
 
     Field* fields = result->Fetch();
     uint32 mutedate = fields[0].GetUInt32();
-    Seconds mutetime = Seconds(fields[1].GetInt32());
 
     if (!mutedate)
     {
@@ -199,10 +198,10 @@ void MuteMgr::LoginAccount(uint32 accountID)
         mutedate = time(nullptr);
     }
 
-    UpdateMuteAccount(accountID, mutedate, mutetime);
+    UpdateMuteAccount(accountID, mutedate);
 }
 
-void MuteMgr::UpdateMuteAccount(uint32 accountID, uint64 muteDate, Seconds muteTime)
+void MuteMgr::UpdateMuteAccount(uint32 accountID, uint64 muteDate)
 {
     // UPDATE `account_muted` SET `mutedate` = ? WHERE `accountid` = ?
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_MUTE_DATE);

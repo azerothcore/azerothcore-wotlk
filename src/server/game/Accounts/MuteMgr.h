@@ -19,7 +19,7 @@ public:
 
     void MutePlayer(std::string const& targetName, Seconds notSpeakTime, std::string const& muteBy, std::string const& muteReason);
     void UnMutePlayer(std::string const& targetName);
-    void UpdateMuteAccount(uint32 accountID, uint64 muteDate, Seconds muteTime);
+    void UpdateMuteAccount(uint32 accountID, uint64 muteDate);
     void SetMuteTime(uint32 accountID, uint64 muteDate);
     void AddMuteTime(uint32 accountID, Seconds muteTime);
     uint64 GetMuteDate(uint32 accountID);
