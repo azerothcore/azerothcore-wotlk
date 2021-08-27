@@ -38,7 +38,7 @@ void MuteMgr::MutePlayer(std::string const& targetName, Seconds notSpeakTime, st
         AddMuteTime(accountId, notSpeakTime);
     }
 
-    stmt->setUInt64(1, time(nullptr));
+    stmt->setUInt64(1, muteDate);
     stmt->setUInt32(2, notSpeakTime.count());
     stmt->setString(3, muteBy);
     stmt->setString(4, muteReason);
