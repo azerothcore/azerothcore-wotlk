@@ -307,6 +307,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
             {
                 ObjectGuid guid = player->GetTarget();
                 uint32 areaId = player->GetAreaId();
+                uint32 zoneId = player->GetZoneId();
                 std::string areaName = "Unknown";
                 std::string zoneName = "Unknown";
                 if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId))
@@ -317,12 +318,12 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                         zoneName = zone->area_name[locale];
                 }
 
-                LOG_GM(m_session->GetAccountId(), "Command: %s [Player: %s (%s) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%s)]",
+                LOG_GM(m_session->GetAccountId(), "Command: %s [Player: %s (%s) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %u (%s) Selected: %s (%s)]",
                                  fullcmd.c_str(), player->GetName().c_str(), player->GetGUID().ToString().c_str(),
                                  m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
                                  player->GetPositionZ(), player->GetMapId(),
                                  player->GetMap()->GetMapName(),
-                                 areaId, areaName.c_str(), zoneName.c_str(),
+                                 areaId, areaName.c_str(), zoneId, zoneName.c_str(),
                                  (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
                                  guid.ToString().c_str());
             }

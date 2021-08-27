@@ -678,7 +678,7 @@ protected:
     SpellCastResult CallScriptCheckCastHandlers();
     void PrepareScriptHitHandlers();
     bool CallScriptEffectHandlers(SpellEffIndex effIndex, SpellEffectHandleMode mode);
-    void CallScriptBeforeHitHandlers();
+    void CallScriptBeforeHitHandlers(SpellMissInfo missInfo);
     void CallScriptOnHitHandlers();
     void CallScriptAfterHitHandlers();
     void CallScriptObjectAreaTargetSelectHandlers(std::list<WorldObject*>& targets, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
