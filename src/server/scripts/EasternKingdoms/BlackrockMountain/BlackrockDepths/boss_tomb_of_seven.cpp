@@ -48,7 +48,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-            AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+                AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
                 SendGossipMenuFor(player, SAY_QUEST_COMPLETED_END, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+11:
