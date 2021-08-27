@@ -2397,7 +2397,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
                 break;
             case CLASS_ROGUE:
             case CLASS_DRUID:
-                subclassToCompare = ITEM_SUBCLASS_ARMOR_MAIL;
+                subclassToCompare = ITEM_SUBCLASS_ARMOR_LEATHER;
                 break;
             default:
                 break;
