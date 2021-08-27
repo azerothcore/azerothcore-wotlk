@@ -30,6 +30,7 @@ enum Gossip
 {
     GOSSIP_TEXT_CONTINUE                          = 1828, // Continue...
     GROOMREL_GOSSIP_OPTIONS                       = 1945, // Option 1 : Before quest(4083) accepted, option 0 after quest(4083) accepted
+    DOOMREL_START_COMBAT                          = 1947, // Your bondage is at an end, Doom'rel.  I challenge you!
     SAY_DOOMREL_HELLO                             = 2601, // Our fate is the doom of all who face the Great Fire.
     SAY_QUEST_ACCEPTED                            = 2604, // You wish to learn the old craft?  You wish to smelt dark iron?$B$BAppease me, $r.  Show me a sacrifice and I will consider it!
     SAY_QUEST_COMPLETED                           = 2605, // Your will is strong, and your intent is clear.$B$BPerhaps you are worthy...
@@ -131,7 +132,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, 1947, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, DOOMREL_START_COMBAT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, SAY_DOOMREL_HELLO, creature->GetGUID());
 
         return true;
