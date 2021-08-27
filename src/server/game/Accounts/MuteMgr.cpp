@@ -139,7 +139,7 @@ void MuteMgr::DeleteMuteTime(uint32 accountID, bool delFromDB /*= true*/)
 
 void MuteMgr::CheckMuteExpired(uint32 accountID)
 {
-    auto _muteTime = GetMuteDate(accountID);
+    time_t _muteTime = static_cast<time_t>(GetMuteDate(accountID));
     auto timeNow = time(nullptr);
 
     if (!_muteTime || _muteTime > timeNow)

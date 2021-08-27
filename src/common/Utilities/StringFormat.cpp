@@ -7,7 +7,7 @@
 #include <locale>
 
 template<class Str>
-Str Acore::String::Trim(const Str& s, const std::locale& loc /*= std::locale()*/)
+AC_COMMON_API Str Acore::String::Trim(const Str& s, const std::locale& loc /*= std::locale()*/)
 {
     typename Str::const_iterator first = s.begin();
     typename Str::const_iterator end = s.end();
@@ -52,4 +52,4 @@ std::string Acore::String::TrimRightInPlace(std::string& str)
 }
 
 // Template Trim
-template std::string Acore::String::Trim<std::string>(const std::string& s, const std::locale& loc /*= std::locale()*/);
+template AC_COMMON_API std::string Acore::String::Trim<std::string>(const std::string& s, const std::locale& loc /*= std::locale()*/);
