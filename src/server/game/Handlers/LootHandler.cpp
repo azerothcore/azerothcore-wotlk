@@ -172,7 +172,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
                 if (!member)
                     continue;
 
-                if (player->IsAtGroupRewardDistance(member))
+                if (player->IsAtLootRewardDistance(member))
                     playersNear.push_back(member);
             }
 

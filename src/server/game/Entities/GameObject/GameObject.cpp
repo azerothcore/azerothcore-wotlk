@@ -243,6 +243,8 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     SetPhaseMask(phaseMask, false);
 
+    UpdatePositionData();
+
     SetZoneScript();
     if (m_zoneScript)
     {
@@ -2328,29 +2330,60 @@ Group* GameObject::GetLootRecipientGroup() const
     return sGroupMgr->GetGroupByGUID(m_lootRecipientGroup);
 }
 
-void GameObject::SetLootRecipient(Unit* unit)
+void GameObject::SetLootRecipient(Creature* creature)
 {
     // set the player whose group should receive the right
     // to loot the creature after it dies
     // should be set to nullptr after the loot disappears
-
-    if (!unit)
+    if (!creature)
     {
         m_lootRecipient.Clear();
         m_lootRecipientGroup = 0;
+        ResetAllowedLooters();
         return;
     }
 
-    if (unit->GetTypeId() != TYPEID_PLAYER && !unit->IsVehicle())
-        return;
+    m_lootRecipient = creature->GetLootRecipientGUID();
+    m_lootRecipientGroup = creature->GetLootRecipientGroupGUID();
+    SetAllowedLooters(creature->GetAllowedLooters());
+}
 
-    Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself();
-    if (!player)                                             // normal creature, no player involved
-        return;
+void GameObject::SetLootRecipient(Map* map)
+{
+    Group* group = nullptr;
+    Map::PlayerList const& PlayerList = map->GetPlayers();
+    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+    {
+        if (Player* groupMember = i->GetSource())
+        {
+            if (groupMember->IsGameMaster() || groupMember->IsSpectator())
+            {
+                continue;
+            }
 
-    m_lootRecipient = player->GetGUID();
-    if (Group* group = player->GetGroup())
-        m_lootRecipientGroup = group->GetGUID().GetCounter();
+            if (!m_lootRecipient)
+            {
+                m_lootRecipient = groupMember->GetGUID();
+            }
+
+            Group* memberGroup = groupMember->GetGroup();
+            if (memberGroup && !group)
+            {
+                group = memberGroup;
+                m_lootRecipientGroup = group->GetGUID().GetCounter();
+            }
+
+            if (memberGroup == group)
+            {
+                AddAllowedLooter(groupMember->GetGUID());
+            }
+        }
+    }
+
+    if (!group)
+    {
+        AddAllowedLooter(m_lootRecipient);
+    }
 }
 
 bool GameObject::IsLootAllowedFor(Player const* player) const

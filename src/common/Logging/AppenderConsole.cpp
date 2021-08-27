@@ -10,7 +10,6 @@
 #include "StringFormat.h"
 #include "Tokenize.h"
 #include "Util.h"
-#include <sstream>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include <Windows.h>
