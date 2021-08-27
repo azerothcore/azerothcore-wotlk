@@ -3326,7 +3326,9 @@ void SpellMgr::LoadDbcDataCorrections()
         9910,   // Thorns (Rank 6)
         26992,  // Thorns (Rank 7)
         53307,  // Thorns (Rank 8)
-        53352   // Explosive Shot (trigger)
+        53352,  // Explosive Shot (trigger)
+        50783,  // Slam (Triggered spell)
+        20647   // Execute (Triggered spell)
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
@@ -7289,6 +7291,18 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 53651 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+    });
+
+    // 16097 Shadow Hunter Vosh'gajin - Hex
+    ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->CastingTimeIndex = 16;
+    });
+
+    // Sacred Cleansing
+    ApplySpellFix({ 53659 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 5; // 40yd
     });
 
     // Ulduar: Kologarn Focused Eyebeam Summon Trigger

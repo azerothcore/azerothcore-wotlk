@@ -197,8 +197,8 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     {
         bool buildShotrcut = false;
 
-        bool isUnderWaterStart = _source->GetMap()->IsUnderWater(startPos.x, startPos.y, startPos.z);
-        bool isUnderWaterEnd = _source->GetMap()->IsUnderWater(endPos.x, endPos.y, endPos.z);
+        bool isUnderWaterStart = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight());
+        bool isUnderWaterEnd = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight());
         bool isFarUnderWater = startFarFromPoly ? isUnderWaterStart : isUnderWaterEnd;
 
         Unit const* _sourceUnit = _source->ToUnit();
@@ -565,9 +565,9 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     uint32 newPointCount = 0;
     for (uint32 i = 0; i < pointCount; ++i) {
         G3D::Vector3 vector = G3D::Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
-        ZLiquidStatus status = _source->GetMap()->getLiquidStatus(vector.x, vector.y, vector.z, MAP_ALL_LIQUIDS, nullptr);
+        LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), vector.x, vector.y, vector.z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
         // One of the points is not in the water
-        if (status == LIQUID_MAP_UNDER_WATER)
+        if (liquidData.Status == LIQUID_MAP_UNDER_WATER)
         {
             // if the first point is under water
             // then set a proper z for it
@@ -699,11 +699,11 @@ void PathGenerator::UpdateFilter()
 NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
 {
     LiquidData data;
-    ZLiquidStatus liquidStatus = _source->GetMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &data);
-    if (liquidStatus == LIQUID_MAP_NO_WATER)
+    LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
+    if (liquidData.Status == LIQUID_MAP_NO_WATER)
         return NAV_GROUND;
 
-    switch (data.type_flags)
+    switch (data.Flags)
     {
         case MAP_LIQUID_TYPE_WATER:
         case MAP_LIQUID_TYPE_OCEAN:
@@ -1149,8 +1149,8 @@ bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool ch
 bool PathGenerator::IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim) const
 {
     Creature const* _sourceCreature = _source->ToCreature();
-    return   _source->GetMap()->IsInWater(x, y, z) &&
-        _source->GetMap()->IsInWater(destX, destY, destZ) &&
+    return _source->GetMap()->IsInWater(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight()) &&
+        _source->GetMap()->IsInWater(_source->GetPhaseMask(), destX, destY, destZ, _source->GetCollisionHeight()) &&
         (!checkSwim || !_sourceCreature || _sourceCreature->CanSwim());
 }
 
