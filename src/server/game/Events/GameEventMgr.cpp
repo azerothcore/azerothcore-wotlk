@@ -1767,6 +1767,8 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
         stageOffset += holiday->Duration[i] * HOUR;
     }
 
+    event.length += stageOffset / MINUTE;
+
     switch (holiday->CalendarFilterType)
     {
         case -1: // Yearly
