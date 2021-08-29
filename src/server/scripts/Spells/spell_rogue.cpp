@@ -241,8 +241,13 @@ public:
             return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCastItem();
         }
 
-        void HandleBeforeHit()
+        void HandleBeforeHit(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (Unit* target = GetHitUnit())
                 // Deadly Poison
                 if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x10000, 0x80000, 0, GetCaster()->GetGUID()))
@@ -305,7 +310,7 @@ public:
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_rog_deadly_poison_SpellScript::HandleBeforeHit);
+            BeforeHit += BeforeSpellHitFn(spell_rog_deadly_poison_SpellScript::HandleBeforeHit);
             AfterHit += SpellHitFn(spell_rog_deadly_poison_SpellScript::HandleAfterHit);
         }
 
@@ -398,7 +403,7 @@ public:
                 if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                 {
                     // xinef: target may be no longer valid
-                    if (!GetTarget()->IsValidAttackTarget(target))
+                    if (!GetTarget()->IsValidAttackTarget(target) || target->HasStealthAura() || target->HasInvisibilityAura())
                     {
                         _targets.remove(guid);
                         continue;

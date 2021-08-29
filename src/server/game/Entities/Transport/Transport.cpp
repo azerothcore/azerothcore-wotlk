@@ -91,6 +91,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
     m_model = CreateModel();
+
     return true;
 }
 
@@ -676,6 +677,8 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
 
     SetPhaseMask(phaseMask, false);
 
+    UpdatePositionData();
+
     SetZoneScript();
     if (m_zoneScript)
     {
@@ -929,7 +932,10 @@ void StaticTransport::UpdatePassengerPositions()
                 break;
             case TYPEID_PLAYER:
                 if (passenger->IsInWorld())
+                {
                     GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
+                    passenger->ToPlayer()->SetFallInformation(time(nullptr), z);
+                }
                 break;
             case TYPEID_GAMEOBJECT:
                 GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o);
