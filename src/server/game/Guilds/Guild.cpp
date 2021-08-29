@@ -2197,6 +2197,15 @@ bool Guild::AddMember(ObjectGuid guid, uint8 rankId)
     if (rankId == GUILD_RANK_NONE)
         rankId = _GetLowestRankId();
 
+    ObjectGuid::LowType guidLow = guid.GetCounter();
+
+    CharacterDatabasePreparedStatement* memberGuidQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_GUID);
+    memberGuidQuery->setUInt32(0, guidLow);
+    PreparedQueryResult memberGuidResult = CharacterDatabase.Query(memberGuidQuery);
+
+    if (memberGuidResult)
+        return false;
+    
     Member* member = new Member(m_id, guid, rankId);
     std::string name;
     if (player)
