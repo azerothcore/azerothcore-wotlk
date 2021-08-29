@@ -1672,15 +1672,20 @@ public:
     {
         PrepareSpellScript(spell_valanar_kinetic_bomb_knockback_SpellScript);
 
-        void KnockIntoAir()
+        void KnockIntoAir(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (Creature* target = GetHitCreature())
                 target->AI()->DoAction(ACTION_KINETIC_BOMB_JUMP);
         }
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_valanar_kinetic_bomb_knockback_SpellScript::KnockIntoAir);
+            BeforeHit += BeforeSpellHitFn(spell_valanar_kinetic_bomb_knockback_SpellScript::KnockIntoAir);
         }
     };
 
