@@ -392,6 +392,21 @@ public:
         npc_preciousAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
+        bool flaggedForDespawn;
+
+        void InitializeAI() override
+        {
+            flaggedForDespawn = false;
+        }
+
+        void JustReachedHome() override
+        {
+            if (flaggedForDespawn)
+            {
+                me->DespawnOrUnsummon(0);
+                flaggedForDespawn = false;
+            }
+        }
 
         void Reset() override
         {
@@ -415,6 +430,12 @@ public:
             ScriptedAI::AttackStart(target);
         }
 
+        void EnterCombat(Unit* /*victim*/) override
+        {
+            RevealForm();
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        }
+
         void UpdateAI(uint32 /*diff*/) override
         {
             if (UpdateVictim())
@@ -433,6 +454,11 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        void FlagForDespawn()
+        {
+            flaggedForDespawn = true;
         }
     };
 
@@ -533,6 +559,32 @@ public:
                 Precious()->Respawn();
             }
             Reset();
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (!Precious())
+            {
+                return;
+            }
+
+            if (Precious()->isDead())
+            {
+                // Make it so that Precious respawns after Simone
+                uint32 respawnTime = me->GetRespawnTime() - time(nullptr);
+                Precious()->SetRespawnTime(respawnTime);
+                return;
+            }
+
+            if (Precious()->IsInCombat())
+            {
+                // If master is dead but pet is In Combat set it to auto despawn on pet reaching home
+                PreciousAI()->FlagForDespawn();
+            }
+            else
+            {
+                Precious()->DespawnOrUnsummon(0);
+            }
         }
 
         void Reset() override
