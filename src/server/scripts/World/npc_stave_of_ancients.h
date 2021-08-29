@@ -47,15 +47,15 @@ enum NPCArtorius
 enum NPCSimone
 {
     SIMONE_EVENT_TALK                         = 6,
-    SIMONE_EVENT_CHAIN_LIGHTNING              = 7,
-    SIMONE_EVENT_TEMPTRESS_KISS               = 8,
+    SIMONE_EVENT_CHECK_PET_STATE              = 7,
+    SIMONE_EVENT_CHAIN_LIGHTNING              = 8,
+    SIMONE_EVENT_TEMPTRESS_KISS               = 9,
 
     SIMONE_GOSSIP_TEXT                        = 7041,   // npc_text.ID               "What a wonderful day to be alive! Look ..."
     SIMONE_GOSSIP_OPTION_TEXT                 = 14527,  // creature_text.CreatureID  "I am not fooled by your disguise, tempt..."
     SIMONE_EMOTE                              = 9759,   // broadcast_text.ID         "%s laughs at your foolish request."
     SIMONE_SAY                                = 9760,   // broadcast_text.ID         "As you wish, $c."
     SIMONE_WEAKNESS_EMOTE                     = 9762,   // broadcast_text.ID         "%s is silenced by the venomous sting."
-    PRECIOUS_GOSSIP_TEXT                      = 7042,   // npc_text.ID               "*GRRRR* *RUFF* *RUFF*"
 
     SIMONE_NORMAL_ENTRY                       = 14527,  // creature_template.entry
     SIMONE_EVIL_ENTRY                         = 14533,  // creature_template.entry
@@ -70,6 +70,14 @@ enum NPCSimone
     SPELL_FOOLS_PLIGHT                        = 23504
 };
 
+enum NPCPrecious
+{
+    PRECIOUS_GOSSIP_TEXT                      = 7042,   // npc_text.ID               "*GRRRR* *RUFF* *RUFF*"
+
+    PRECIOUS_NORMAL_ENTRY                     = 14528,
+    PRECIOUS_EVIL_ENTRY                       = 14538
+};
+
 struct NPCStaveQuestAI : public ScriptedAI
 {
     NPCStaveQuestAI(Creature *creature) : ScriptedAI(creature) { }
@@ -81,9 +89,11 @@ struct NPCStaveQuestAI : public ScriptedAI
 
     std::map<int, int> entryKeys = {
         { ARTORIUS_NORMAL_ENTRY, 1 },
-        { ARTORIUS_EVIL_ENTRY, 1 },
-        { SIMONE_NORMAL_ENTRY, 2 },
-        { SIMONE_EVIL_ENTRY, 2 }
+        { ARTORIUS_EVIL_ENTRY,   1 },
+        { SIMONE_NORMAL_ENTRY,   2 },
+        { SIMONE_EVIL_ENTRY,     2 },
+        { PRECIOUS_NORMAL_ENTRY, 3 },
+        { PRECIOUS_EVIL_ENTRY,   3 }
     };
     std::map<int, std::map<std::string, int>> entryList = {
         {
@@ -96,6 +106,12 @@ struct NPCStaveQuestAI : public ScriptedAI
             2, {
                 {"normal", SIMONE_NORMAL_ENTRY},
                 {"evil", SIMONE_EVIL_ENTRY}
+            }
+        },
+        {
+            3, {
+                {"normal", PRECIOUS_NORMAL_ENTRY},
+                {"evil", PRECIOUS_EVIL_ENTRY}
             }
         }
     };

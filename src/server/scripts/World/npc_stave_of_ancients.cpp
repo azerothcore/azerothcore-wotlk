@@ -4,6 +4,7 @@
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
+#include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -27,6 +28,7 @@ void NPCStaveQuestAI::RevealForm()
     if (encounterStarted && InNormalForm())
     {
         me->UpdateEntry(GetFormEntry("evil"));
+        me->SetFullHealth();
         me->DespawnOrUnsummon(900000);
     }
 }
@@ -390,6 +392,47 @@ public:
         npc_preciousAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
+
+        void Reset() override
+        {
+            encounterStarted = false;
+            playerGUID.Clear();
+
+            if (InNormalForm())
+            {
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+        }
+
+        void AttackStart(Unit* target) override
+        {
+            if (playerGUID.IsEmpty() && !InNormalForm())
+            {
+                StorePlayerGUID();
+            }
+
+            ScriptedAI::AttackStart(target);
+        }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (UpdateVictim())
+            {
+                // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
+                if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
+                {
+                    playerGUID.Clear();
+                    EnterEvadeMode();
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            DoMeleeAttackIfReady();
+        }
     };
 
     bool OnGossipHello(Player *player, Creature * creature) override
@@ -415,6 +458,81 @@ public:
         npc_simoneAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
+        bool petDespawned;
+        ObjectGuid preciousGUID;
+
+        void SetPreciousGUID()
+        {
+            if (CreatureGroup* formation = me->GetFormation())
+            {
+                const CreatureGroup::CreatureGroupMemberType& members = formation->GetMembers();
+                for (CreatureGroup::CreatureGroupMemberType::const_iterator itr = members.begin(); itr != members.end(); ++itr)
+                {
+                    if (itr->first && itr->first->GetOriginalEntry() == PRECIOUS_NORMAL_ENTRY)
+                    {
+                        preciousGUID = itr->first->GetGUID();
+                    }
+                }
+            }
+        }
+
+        Creature* Precious()
+        {
+            if (preciousGUID.IsEmpty())
+            {
+                SetPreciousGUID();
+            }
+
+            if (!preciousGUID.IsEmpty())
+            {
+                return ObjectAccessor::GetCreature(*me, preciousGUID);
+            }
+
+            return nullptr;
+        }
+
+        npc_precious::npc_preciousAI* PreciousAI()
+        {
+            if (Precious())
+            {
+                return CAST_AI(npc_precious::npc_preciousAI, Precious()->AI());
+            }
+
+            return nullptr;
+        }
+
+        void RespawnPet()
+        {
+            Position current;
+            me->GetNearPosition(current, -5.0f, 0.0f);
+            Precious()->RemoveCorpse(false, false);
+            Precious()->SetPosition(current);
+            Precious()->SetHomePosition(current);
+            Precious()->setDeathState(JUST_RESPAWNED);
+            Precious()->UpdateObjectVisibility(true);
+        }
+
+        void HandlePetRespawn()
+        {
+            if (Precious() && !preciousGUID.IsEmpty())
+            {
+                if (Precious()->isDead())
+                {
+                    RespawnPet();
+                }
+            }
+        }
+
+        void JustRespawned() override
+        {
+            // Using Respawn() instead of HandlePetRespawn because we want to respawn pet in
+            // normal entry form
+            if (Precious())
+            {
+                Precious()->Respawn();
+            }
+            Reset();
+        }
 
         void Reset() override
         {
@@ -426,6 +544,8 @@ public:
             {
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
+
+            events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 2000);
 
             if (me->HasAura(SIMONE_SPELL_SILENCE))
             {
@@ -479,10 +599,30 @@ public:
                     me->MonsterSay(SIMONE_SAY, LANG_UNIVERSAL, GetGossipPlayer());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    if (Precious())
+                    {
+                        Precious()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
                     events.ScheduleEvent(EVENT_REVEAL, 5000);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
+                    if (PreciousAI())
+                    {
+                        PreciousAI()->RevealForm();
+                    }
+                    break;
+                // Prevent hunters from figthing Simone alone
+                case SIMONE_EVENT_CHECK_PET_STATE:
+                    if (!me->IsInCombat() && !me->IsInEvadeMode())
+                    {
+                        if (Precious() && Precious()->isDead())
+                        {
+                            HandlePetRespawn();
+                        }
+
+                        events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 1000);
+                    }
                     break;
             }
 
@@ -525,10 +665,17 @@ public:
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
-                    if (!ValidThreatlist())
+                    if (!ValidThreatlist() || (PreciousAI() && !PreciousAI()->ValidThreatlist()))
                     {
                         SetHomePosition();
+                        PreciousAI()->SetHomePosition();
+
+                        petDespawned = true;
+                        Precious()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+
+                        Precious()->DespawnOrUnsummon(5000);
+
                         me->DespawnOrUnsummon(5000);
                         break;
                     }
@@ -562,6 +709,10 @@ public:
         void ScheduleEncounterStart(ObjectGuid playerGUID)
         {
             PrepareForEncounter();
+            if (PreciousAI())
+            {
+                PreciousAI()->PrepareForEncounter();
+            }
             gossipPlayerGUID = playerGUID;
             events.ScheduleEvent(EVENT_ENCOUNTER_START, 1000);
         }
