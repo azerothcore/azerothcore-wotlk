@@ -862,8 +862,13 @@ public:
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         }
 
-        void OnCast()
+        void OnCast(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (GetCaster()->GetTypeId() != TYPEID_PLAYER || GetCaster()->GetMapId() != 631)
                 return;
             InstanceScript* instance = GetCaster()->GetInstanceScript();
@@ -899,7 +904,7 @@ public:
         void Register() override
         {
             OnCheckCast += SpellCheckCastFn(spell_blood_queen_vampiric_bite_SpellScript::CheckTarget);
-            BeforeHit += SpellHitFn(spell_blood_queen_vampiric_bite_SpellScript::OnCast);
+            BeforeHit += BeforeSpellHitFn(spell_blood_queen_vampiric_bite_SpellScript::OnCast);
             OnEffectHitTarget += SpellEffectFn(spell_blood_queen_vampiric_bite_SpellScript::HandlePresence, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
         }
     };

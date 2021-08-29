@@ -2778,6 +2778,20 @@ void SpellMgr::LoadSpellCustomAttr()
         {
             switch (spellInfo->Effects[j].ApplyAuraName)
             {
+                case SPELL_AURA_MOD_INVISIBILITY:
+                {
+                    switch (spellInfo->Id)
+                    {
+                        // Exceptions
+                        case 44801: // Spectral Invisibility (Kalecgos, SWP)
+                        case 46021: // Spectral Realm (SWP)
+                            break;
+                        default:
+                            spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
+                            break;
+                    }
+                }
+                break;
                 case SPELL_AURA_PERIODIC_HEAL:
                 case SPELL_AURA_PERIODIC_DAMAGE:
                 case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
@@ -3326,7 +3340,9 @@ void SpellMgr::LoadDbcDataCorrections()
         9910,   // Thorns (Rank 6)
         26992,  // Thorns (Rank 7)
         53307,  // Thorns (Rank 8)
-        53352   // Explosive Shot (trigger)
+        53352,  // Explosive Shot (trigger)
+        50783,  // Slam (Triggered spell)
+        20647   // Execute (Triggered spell)
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
