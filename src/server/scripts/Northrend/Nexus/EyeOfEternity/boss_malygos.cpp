@@ -928,7 +928,9 @@ public:
                 float newy = CenterPos.GetPositionY() + VORTEX_RADIUS * sin(newangle);
                 float arcangle = me->GetAngle(newx, newy);
                 float dist = 2 * me->GetDistance2d(newx, newy);
-                if (me->GetVehicleKit()) if (Unit* pass = me->GetVehicleKit()->GetPassenger(0)) if (Player* plr = pass->ToPlayer())
+                if (me->GetVehicleKit())
+                    if (Unit* pass = me->GetVehicleKit()->GetPassenger(0))
+                        if (Player* plr = pass->ToPlayer())
                         {
                             if (!bUpdatedFlying && timer)
                             {

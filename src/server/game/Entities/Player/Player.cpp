@@ -14786,8 +14786,6 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
     if (!apply)
         ResetFallingData(GetPositionZ());
 
-    sScriptMgr->AnticheatSetCanFlybyServer(this, apply);
-
     WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
     data << GetPackGUID();
     data << uint32(0);          //! movement counter

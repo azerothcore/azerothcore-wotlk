@@ -2880,9 +2880,9 @@ void AuraEffect::HandleAuraWaterWalk(AuraApplication const* aurApp, uint8 mode, 
 
     Unit* target = aurApp->GetTarget();
 
-    if (Player* targetPlayer = target->ToPlayer())
+    if (target->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+        sScriptMgr->AnticheatSetUnderACKmount(target->m_movedByPlayer->ToPlayer());
     }
 
     if (!apply)
@@ -2902,9 +2902,9 @@ void AuraEffect::HandleAuraFeatherFall(AuraApplication const* aurApp, uint8 mode
 
     Unit* target = aurApp->GetTarget();
 
-    if (Player* targetPlayer = target->ToPlayer())
+    if (target->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+        sScriptMgr->AnticheatSetUnderACKmount(target->m_movedByPlayer->ToPlayer());
     }
 
     if (!apply)
@@ -2928,9 +2928,9 @@ void AuraEffect::HandleAuraHover(AuraApplication const* aurApp, uint8 mode, bool
 
     Unit* target = aurApp->GetTarget();
 
-    if (Player* targetPlayer = target->ToPlayer())
+    if (target->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
+        sScriptMgr->AnticheatSetUnderACKmount(target->m_movedByPlayer->ToPlayer());
     }
 
     if (!apply)
@@ -3248,10 +3248,10 @@ void AuraEffect::HandleAuraModIncreaseSpeed(AuraApplication const* aurApp, uint8
 
     target->UpdateSpeed(MOVE_RUN, true);
 
-    if (Player* targetPlayer = target->ToPlayer())
+    if (target->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
+        sScriptMgr->AnticheatSetUnderACKmount(target->m_movedByPlayer->ToPlayer());
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(target->m_movedByPlayer->ToPlayer(), true);
     }
 }
 
@@ -3294,10 +3294,10 @@ void AuraEffect::HandleAuraModIncreaseFlightSpeed(AuraApplication const* aurApp,
         }
     }
 
-    if (Player* targetPlayer = target->ToPlayer())
+    if (target->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
+        sScriptMgr->AnticheatSetUnderACKmount(target->m_movedByPlayer->ToPlayer());
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(target->m_movedByPlayer->ToPlayer(), true);
     }
 }
 
@@ -3310,10 +3310,10 @@ void AuraEffect::HandleAuraModIncreaseSwimSpeed(AuraApplication const* aurApp, u
 
     target->UpdateSpeed(MOVE_SWIM, true);
 
-    if (Player* targetPlayer = target->ToPlayer())
+    if (target->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
+        sScriptMgr->AnticheatSetUnderACKmount(target->m_movedByPlayer->ToPlayer());
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(target->m_movedByPlayer->ToPlayer(), true);
     }
 }
 
@@ -3332,10 +3332,10 @@ void AuraEffect::HandleAuraModDecreaseSpeed(AuraApplication const* aurApp, uint8
     target->UpdateSpeed(MOVE_SWIM_BACK, true);
     target->UpdateSpeed(MOVE_FLIGHT_BACK, true);
 
-    if (Player* targetPlayer = target->ToPlayer())
+    if (target->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
+        sScriptMgr->AnticheatSetUnderACKmount(target->m_movedByPlayer->ToPlayer());
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(target->m_movedByPlayer->ToPlayer(), true);
     }
 }
 
@@ -3350,10 +3350,10 @@ void AuraEffect::HandleAuraModUseNormalSpeed(AuraApplication const* aurApp, uint
     target->UpdateSpeed(MOVE_SWIM, true);
     target->UpdateSpeed(MOVE_FLIGHT,  true);
 
-    if (Player* targetPlayer = target->ToPlayer())
+    if (target->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(targetPlayer);
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(targetPlayer, true);
+        sScriptMgr->AnticheatSetUnderACKmount(target->m_movedByPlayer->ToPlayer());
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(target->m_movedByPlayer->ToPlayer(), true);
     }
 }
 

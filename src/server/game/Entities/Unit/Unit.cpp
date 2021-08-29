@@ -17059,9 +17059,9 @@ void Unit::SetControlled(bool apply, UnitState state)
                 break;
         }
 
-        if (GetTypeId() == TYPEID_PLAYER)
+        if (m_movedByPlayer)
         {
-            sScriptMgr->AnticheatSetRootACKUpd(ToPlayer());
+            sScriptMgr->AnticheatSetRootACKUpd(m_movedByPlayer->ToPlayer());
         }
     }
     else
@@ -17156,7 +17156,11 @@ void Unit::SetStunned(bool apply)
         else
         {
             SetStandState(UNIT_STAND_STATE_STAND);
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
+        }
+
+        if (m_movedByPlayer)
+        {
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_movedByPlayer->ToPlayer(), true);
         }
 
         CastStop();
@@ -17221,8 +17225,6 @@ void Unit::SetRooted(bool apply)
             data << GetPackGUID();
             data << m_rootTimes;
             SendMessageToSet(&data, true);
-
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
         }
         else
         {
@@ -17230,6 +17232,11 @@ void Unit::SetRooted(bool apply)
             data << GetPackGUID();
             SendMessageToSet(&data, true);
             StopMoving();
+        }
+
+        if (m_movedByPlayer)
+        {
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_movedByPlayer->ToPlayer(), true);
         }
     }
     else
@@ -17280,9 +17287,9 @@ void Unit::SetFeared(bool apply)
             caster = getAttackerForHelper();
         GetMotionMaster()->MoveFleeing(caster, fearAuras.empty() ? sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY) : 0);             // caster == nullptr processed in MoveFleeing
 
-        if (GetTypeId() == TYPEID_PLAYER)
+        if (m_movedByPlayer)
         {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_movedByPlayer->ToPlayer(), true);
         }
     }
     else
@@ -17317,9 +17324,9 @@ void Unit::SetConfused(bool apply)
         SetTarget();
         GetMotionMaster()->MoveConfused();
 
-        if (GetTypeId() == TYPEID_PLAYER)
+        if (m_movedByPlayer)
         {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
+            sScriptMgr->AnticheatSetSkipOnePacketForASH(m_movedByPlayer->ToPlayer(), true);
         }
     }
     else
@@ -19596,6 +19603,11 @@ bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
     else
     {
         RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_MASK_MOVING_FLY);
+    }
+
+    if (m_movedByPlayer)
+    {
+        sScriptMgr->AnticheatSetCanFlybyServer(m_movedByPlayer->ToPlayer(), enable);
     }
 
     return true;

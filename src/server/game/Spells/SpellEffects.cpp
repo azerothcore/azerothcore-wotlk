@@ -1094,9 +1094,9 @@ void Spell::EffectJump(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+        sScriptMgr->AnticheatSetUnderACKmount(m_caster->m_movedByPlayer->ToPlayer());
     }
 
     float speedXY, speedZ;
@@ -1122,9 +1122,9 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     if (!Acore::IsValidMapCoord(x, y, z) || z <= INVALID_HEIGHT)
         return;
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+        sScriptMgr->AnticheatSetUnderACKmount(m_caster->m_movedByPlayer->ToPlayer());
     }
 
     float speedXY, speedZ;
@@ -5037,9 +5037,9 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             m_caster->GetMotionMaster()->MoveCharge(m_pathFinder->GetEndPosition().x, m_pathFinder->GetEndPosition().y, m_pathFinder->GetEndPosition().z,
                 42.0f, EVENT_CHARGE, &m_pathFinder->GetPath(), false, 0.f, targetGUID);
 
-            if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            if (m_caster->m_movedByPlayer)
             {
-                sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+                sScriptMgr->AnticheatSetUnderACKmount(m_caster->m_movedByPlayer->ToPlayer());
             }
         }
         else
@@ -5057,16 +5057,16 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT, SPEED_CHARGE, EVENT_CHARGE,
                 nullptr, false, 0.f, targetGUID);
 
-            if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            if (m_caster->m_movedByPlayer)
             {
-                sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+                sScriptMgr->AnticheatSetUnderACKmount(m_caster->m_movedByPlayer->ToPlayer());
             }
         }
     }
 
-    if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET && m_caster->ToPlayer())
+    if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET && m_caster->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
+        sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->m_movedByPlayer->ToPlayer(), true);
     }
 }
 
@@ -5151,9 +5151,9 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+        sScriptMgr->AnticheatSetUnderACKmount(m_caster->m_movedByPlayer->ToPlayer());
     }
 
     float speedxy = m_spellInfo->Effects[effIndex].MiscValue / 10.0f;
@@ -5242,9 +5242,9 @@ void Spell::EffectPullTowards(SpellEffIndex effIndex)
         pos.Relocate(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 1.0f, m_caster->GetOrientation());
     }
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->m_movedByPlayer)
     {
-        sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+        sScriptMgr->AnticheatSetUnderACKmount(m_caster->m_movedByPlayer->ToPlayer());
     }
 
     float speedXY = float(m_spellInfo->Effects[effIndex].MiscValue) * 0.1f;
