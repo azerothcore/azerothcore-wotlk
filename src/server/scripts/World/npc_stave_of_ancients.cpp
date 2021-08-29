@@ -400,6 +400,7 @@ public:
 
             if (InNormalForm())
             {
+                me->m_Events.KillAllEvents(true);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
         }
@@ -542,6 +543,7 @@ public:
 
             if (InNormalForm())
             {
+                me->m_Events.KillAllEvents(true);
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
 
