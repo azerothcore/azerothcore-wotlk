@@ -5241,6 +5241,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetMap(map);
     StoreRaidMapDifficulty();
 
+    UpdatePositionData();
+
     SaveRecallPosition();
 
     time_t now = time(nullptr);
@@ -5772,7 +5774,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
 
     if (result)
     {
-        uint32 zoneId = GetZoneId(true);
+        uint32 zoneId = GetZoneId();
 
         std::map<ObjectGuid::LowType, Bag*> bagMap;                 // fast guid lookup for bags
         std::map<ObjectGuid::LowType, Item*> invalidBagMap;         // fast guid lookup for bags
