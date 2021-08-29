@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-DB_ERRORS_FILE="/home/travis/build/azerothcore/azerothcore-wotlk/env/dist/bin/DBErrors.log";
-#DB_ERRORS_FILE="./env/dist/bin/DBErrors.log";
+DB_ERRORS_FILE="./env/dist/bin/DBErrors.log";
 
 if [[ ! -f ${DB_ERRORS_FILE} ]]; then
     echo "File ${DB_ERRORS_FILE} not found!";

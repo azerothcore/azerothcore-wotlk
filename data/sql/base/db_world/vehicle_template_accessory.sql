@@ -6,18 +6,18 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `vehicle_template_accessory`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `vehicle_template_accessory` 
 (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `accessory_entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `seat_id` tinyint(4) NOT NULL DEFAULT '0',
-  `minion` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `accessory_entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `seat_id` TINYINT NOT NULL DEFAULT 0,
+  `minion` TINYINT unsigned NOT NULL DEFAULT 0,
   `description` text NOT NULL,
-  `summontype` tinyint(3) unsigned NOT NULL DEFAULT '6' COMMENT 'see enum TempSummonType',
-  `summontimer` int(10) unsigned NOT NULL DEFAULT '30000' COMMENT 'timer, only relevant for certain summontypes',
+  `summontype` TINYINT unsigned NOT NULL DEFAULT 6 COMMENT 'see enum TempSummonType',
+  `summontimer` INT unsigned NOT NULL DEFAULT 30000 COMMENT 'timer, only relevant for certain summontypes',
   PRIMARY KEY (`entry`,`seat_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `vehicle_template_accessory` WRITE;
@@ -33,6 +33,7 @@ INSERT INTO `vehicle_template_accessory` VALUES
 (25762,25760,5,1,'Kvaldir Raider',8,0),
 (25762,25760,6,1,'Kvaldir Raider',8,0),
 (25968,25801,0,0,'Nedar, Lord of Rhinos',6,30000),
+(27213,27206,0,0,'Onslaught Warhorse - Onslaught Knight',8,30000),
 (27241,27268,0,0,'Risen Gryphon',6,30000),
 (27587,27163,1,1,'7th Legion Siege Engineer Rides Alliance Steam Tank',5,0),
 (27587,27588,2,1,'7th Legion Elite Rides Alliance Steam Tank',5,0),

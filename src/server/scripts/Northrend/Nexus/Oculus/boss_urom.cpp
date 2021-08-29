@@ -2,9 +2,9 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "oculus.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum Spells
@@ -23,7 +23,7 @@ enum Spells
 };
 
 #define SPELL_EMPOWERED_ARCANE_EXPLOSION        DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H)
-#define SPELL_TIME_BOMB                         DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H)
+//#define SPELL_TIME_BOMB                         DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H)
 
 enum UromNPCs
 {
@@ -60,52 +60,54 @@ enum Yells
     SAY_PLAYER_KILL                               = 7
 };
 
-float summons[3][4] =   {
-                            {NPC_PHANTASMAL_AIR, NPC_PHANTASMAL_AIR, NPC_PHANTASMAL_WATER, NPC_PHANTASMAL_FIRE},
-                            {NPC_PHANTASMAL_OGRE, NPC_PHANTASMAL_OGRE, NPC_PHANTASMAL_NAGAL, NPC_PHANTASMAL_MURLOC},
-                            {NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_MAMMOTH, NPC_PHANTASMAL_WOLF}
-                        };
+float summons[3][4] =
+{
+    {NPC_PHANTASMAL_AIR, NPC_PHANTASMAL_AIR, NPC_PHANTASMAL_WATER, NPC_PHANTASMAL_FIRE},
+    {NPC_PHANTASMAL_OGRE, NPC_PHANTASMAL_OGRE, NPC_PHANTASMAL_NAGAL, NPC_PHANTASMAL_MURLOC},
+    {NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_MAMMOTH, NPC_PHANTASMAL_WOLF}
+};
 
-float cords[4][4] =     {
-                            {1177.47f, 937.722f, 527.405f, 2.21657f},
-                            {968.66f, 1042.53f, 527.32f, 0.077f},
-                            {1164.02f, 1170.85f, 527.321f, 3.66f},
-                            {1118.31f, 1080.377f, 508.361f, 4.25f}
-                        };
+float cords[4][4] =
+{
+    {1177.47f, 937.722f, 527.405f, 2.21657f},
+    {968.66f, 1042.53f, 527.32f, 0.077f},
+    {1164.02f, 1170.85f, 527.321f, 3.66f},
+    {1118.31f, 1080.377f, 508.361f, 4.25f}
+};
 
 class boss_urom : public CreatureScript
 {
 public:
     boss_urom() : CreatureScript("boss_urom") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_uromAI (pCreature);
+        return GetOculusAI<boss_uromAI>(pCreature);
     }
 
     struct boss_uromAI : public ScriptedAI
     {
-        boss_uromAI(Creature *c) : ScriptedAI(c)
+        boss_uromAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
-        
+
         InstanceScript* pInstance;
         EventMap events;
         bool lock;
-        float x,y,z;
+        float x, y, z;
         int32 releaseLockTimer;
 
         uint8 GetPhaseByCurrentPosition()
         {
-            for (uint8 i=0; i<4; ++i)
+            for (uint8 i = 0; i < 4; ++i)
                 if (me->GetDistance(cords[i][0], cords[i][1], cords[i][2]) < 20.0f)
                     return i;
 
             return 0;
         }
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
             {
@@ -126,7 +128,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_ID, 49838, true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if( lock )
                 return;
@@ -173,7 +175,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if( lock )
                 return;
@@ -182,7 +184,7 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void JustSummoned(Creature* pSummon)
+        void JustSummoned(Creature* pSummon) override
         {
             pSummon->SetInCombatWithZone();
             if( Unit* v = pSummon->SelectVictim() )
@@ -196,57 +198,61 @@ public:
             me->DeleteThreatList();
             me->CombatStop(true);
             me->LoadCreaturesAddon(true);
-            me->SetLootRecipient(NULL);
+            me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-
             if (pInstance)
+            {
                 pInstance->SetData(DATA_UROM, DONE);
+            }
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->NearTeleportTo(x, y, z, 0.0f);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_PLAYER_KILL);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             switch( spell->Id )
             {
                 case SPELL_SUMMON_MENAGERIE_1:
-                {
-                    for( uint8 i=0; i<4; ++i )
-						me->SummonCreature(summons[0][i], cords[0][0] + ((i%2) ? 4.0f : -4.0f), cords[0][1] + (i<2 ? 4.0f : -4.0f), cords[0][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                    {
+                        for( uint8 i = 0; i < 4; ++i )
+                            me->SummonCreature(summons[0][i], cords[0][0] + ((i % 2) ? 4.0f : -4.0f), cords[0][1] + (i < 2 ? 4.0f : -4.0f), cords[0][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
-						me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
-						me->DestroyForNearbyPlayers();
+                        me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
+                        me->DestroyForNearbyPlayers();
                         LeaveCombat();
-						me->CastSpell(me, SPELL_EVOCATION, true);
-						releaseLockTimer = 1;
-                }
-                break;
+                        me->CastSpell(me, SPELL_EVOCATION, true);
+                        releaseLockTimer = 1;
+                    }
+                    break;
                 case SPELL_SUMMON_MENAGERIE_2:
-                {
-                    for( uint8 i=0; i<4; ++i )
-						me->SummonCreature(summons[1][i], cords[1][0] + ((i%2) ? 4.0f : -4.0f), cords[1][1] + (i<2 ? 4.0f : -4.0f), cords[1][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                    {
+                        for( uint8 i = 0; i < 4; ++i )
+                            me->SummonCreature(summons[1][i], cords[1][0] + ((i % 2) ? 4.0f : -4.0f), cords[1][1] + (i < 2 ? 4.0f : -4.0f), cords[1][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
-						me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
-						me->DestroyForNearbyPlayers();
+                        me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
+                        me->DestroyForNearbyPlayers();
                         LeaveCombat();
-						me->CastSpell(me, SPELL_EVOCATION, true);
-						releaseLockTimer = 1;
-                }
-                break;                
+                        me->CastSpell(me, SPELL_EVOCATION, true);
+                        releaseLockTimer = 1;
+                    }
+                    break;
                 case SPELL_SUMMON_MENAGERIE_3:
                     {
-                        for( uint8 i=0; i<4; ++i )
-						me->SummonCreature(summons[2][i], cords[2][0] + ((i%2) ? 4.0f : -4.0f), cords[2][1] + (i<2 ? 4.0f : -4.0f), cords[2][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                        for( uint8 i = 0; i < 4; ++i )
+                            me->SummonCreature(summons[2][i], cords[2][0] + ((i % 2) ? 4.0f : -4.0f), cords[2][1] + (i < 2 ? 4.0f : -4.0f), cords[2][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
-                        me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
+                        me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
                         me->DestroyForNearbyPlayers();
                         LeaveCombat();
                         me->CastSpell(me, SPELL_EVOCATION, true);
@@ -262,20 +268,23 @@ public:
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
                     me->NearTeleportTo(1103.69f, 1048.76f, 512.279f, 1.16f);
-                    
+
                     Talk(SAY_ARCANE_EXPLOSION);
                     Talk(EMOTE_ARCANE_EXPLOSION);
 
+                    //At this point we are still in casting state so we need to clear it for DoCastAOE not to fail
+                    me->ClearUnitState(UNIT_STATE_CASTING);
                     DoCastAOE(DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H));
+                    me->AddUnitState(UNIT_STATE_CASTING);
                     events.RescheduleEvent(EVENT_TELE_BACK, DUNGEON_MODE(9000, 7000));
                 default:
                     break;
             }
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( releaseLockTimer )
             {
@@ -303,14 +312,14 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
                 case EVENT_FROSTBOMB:
                     if( Unit* v = me->GetVictim() )
                         me->CastSpell(v, SPELL_FROSTBOMB, false);
-                    events.RepeatEvent(urand(7000,11000));
+                    events.RepeatEvent(urand(7000, 11000));
                     break;
                 case EVENT_TIME_BOMB:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
@@ -322,7 +331,7 @@ public:
                     y = me->GetPositionY();
                     z = me->GetPositionZ();
                     me->CastSpell(me, SPELL_TELEPORT, false);
-                    events.RepeatEvent(urand(25000,30000));
+                    events.RepeatEvent(urand(25000, 30000));
                     events.DelayEvents(10000);
                     break;
                 case EVENT_TELE_BACK:
@@ -334,12 +343,11 @@ public:
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    events.PopEvent();
                     break;
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);

@@ -2,9 +2,9 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "oculus.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -67,22 +67,22 @@ class boss_varos : public CreatureScript
 public:
     boss_varos() : CreatureScript("boss_varos") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_varosAI (pCreature);
+        return GetOculusAI<boss_varosAI>(pCreature);
     }
     struct boss_varosAI : public ScriptedAI
     {
-        boss_varosAI(Creature *c) : ScriptedAI(c)
+        boss_varosAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
-        
+
         InstanceScript* pInstance;
         EventMap events;
         float ZapAngle;
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
             {
@@ -107,7 +107,7 @@ public:
             me->DisableRotate(false);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -121,7 +121,7 @@ public:
             events.RescheduleEvent(EVENT_ENERGIZE_CORES_THIN, 0);
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -132,17 +132,17 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void JustSummoned(Creature*  /*summon*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void JustSummoned(Creature*  /*summon*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -154,7 +154,7 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -172,7 +172,7 @@ public:
                     {
                         Talk(SAY_AZURE);
                         Talk(SAY_AZURE_EMOTE);
-                        switch( events.GetEvent() )
+                        switch( events.ExecuteEvent() )
                         {
                             case EVENT_CALL_AZURE_RING_CAPTAIN_1:
                                 me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_1, true);
@@ -201,7 +201,6 @@ public:
                                 trigger->CastSpell(me, SPELL_ARCANE_BEAM_PERIODIC_DAMAGE, true);
                             }
                         }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ENERGIZE_CORES_THIN:
@@ -210,7 +209,6 @@ public:
                         me->DisableRotate(false);
                         me->SetOrientation(ZapAngle);
                         me->CastSpell(me, SPELL_ENERGIZE_CORES_THIN, true);
-                        events.PopEvent();
                         events.ScheduleEvent(EVENT_ENERGIZE_CORES_DAMAGE, 4500);
                     }
                     break;
@@ -221,11 +219,10 @@ public:
                         me->DisableSpline();
                         me->SetFacingTo(ZapAngle);
                         me->SetControlled(true, UNIT_STATE_ROOT);
-                        me->CastSpell((Unit*)NULL, SPELL_ENERGIZE_CORES, false);
-                        ZapAngle += M_PI/2;
-                        if( ZapAngle >= 2*M_PI )
-                            ZapAngle -= 2*M_PI;
-                        events.PopEvent();
+                        me->CastSpell((Unit*)nullptr, SPELL_ENERGIZE_CORES, false);
+                        ZapAngle += M_PI / 2;
+                        if( ZapAngle >= 2 * M_PI )
+                            ZapAngle -= 2 * M_PI;
                         events.ScheduleEvent(EVENT_ENERGIZE_CORES_THIN, 2000);
                     }
                     break;

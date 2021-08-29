@@ -3,10 +3,10 @@
 */
 
 #include "Chat.h"
-#include "ScriptMgr.h"
 #include "Language.h"
 #include "Player.h"
 #include "PlayerCommand.h"
+#include "ScriptMgr.h"
 
 bool PlayerCommand::Learn(ChatHandler* handler, Player* targetPlayer, uint32 spell, char const* all)
 {
@@ -44,7 +44,7 @@ bool PlayerCommand::Learn(ChatHandler* handler, Player* targetPlayer, uint32 spe
 
     if (!allRanks && targetPlayer->HasSpell(spell))
     {
-        if (targetPlayer == handler->GetSession()->GetPlayer())
+        if (handler->GetSession() && targetPlayer == handler->GetSession()->GetPlayer())
             handler->SendSysMessage(LANG_YOU_KNOWN_SPELL);
         else
             handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());

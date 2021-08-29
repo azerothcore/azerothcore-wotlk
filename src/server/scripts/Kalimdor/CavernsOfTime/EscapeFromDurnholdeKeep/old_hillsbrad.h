@@ -5,6 +5,10 @@
 #ifndef DEF_OLD_HILLSBRAD_H
 #define DEF_OLD_HILLSBRAD_H
 
+#include "CreatureAIImpl.h"
+
+#define OldHillsbradScriptName "instance_old_hillsbrad"
+
 enum DataIds
 {
     DATA_ESCORT_PROGRESS    = 0,
@@ -36,9 +40,6 @@ enum NpcIds
 
     NPC_CAPTAIN_SKARLOC     = 17862,
     NPC_SKARLOC_MOUNT       = 18798,
-
-    NPC_LORDAERON_SENTRY    = 17815,
-    NPC_LORDAERON_WATCHMAN  = 17814,
 };
 
 enum GobjectIds
@@ -50,7 +51,6 @@ enum GobjectIds
 
 enum MiscIds
 {
-    QUEST_DIVERSION                 = 10283,
     WORLD_STATE_BARRELS_PLANTED     = 2436,
     SKARLOC_MOUNT_MODEL             = 18223,
 
@@ -72,8 +72,12 @@ enum MiscIds
 
     INSTANCE_POSITIONS_COUNT        = 3,
     THRALL_POSITIONS_COUNT          = 5
-
 };
 
-#endif
+template <class AI, class T>
+inline AI* GetOldHillsbradAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, OldHillsbradScriptName);
+}
 
+#endif

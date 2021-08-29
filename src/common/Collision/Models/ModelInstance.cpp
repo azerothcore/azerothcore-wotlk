@@ -1,23 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "ModelInstance.h"
-#include "WorldModel.h"
 #include "MapTree.h"
-#include "VMapDefinitions.h"
+#include "WorldModel.h"
 
 using G3D::Vector3;
 using G3D::Ray;
 
 namespace VMAP
 {
-    ModelInstance::ModelInstance(const ModelSpawn &spawn, WorldModel* model): ModelSpawn(spawn), iModel(model)
+    ModelInstance::ModelInstance(const ModelSpawn& spawn, WorldModel* model): ModelSpawn(spawn), iModel(model)
     {
-        iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi()*iRot.y/180.f, G3D::pi()*iRot.x/180.f, G3D::pi()*iRot.z/180.f).inverse();
-        iInvScale = 1.f/iScale;
+        iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi() * iRot.y / 180.f, G3D::pi() * iRot.x / 180.f, G3D::pi() * iRot.z / 180.f).inverse();
+        iInvScale = 1.f / iScale;
     }
 
     bool ModelInstance::intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const
@@ -30,16 +29,16 @@ namespace VMAP
         float time = pRay.intersectionTime(iBound);
         if (time == G3D::inf())
         {
-//            std::cout << "Ray does not hit '" << name << "'\n";
+            //            std::cout << "Ray does not hit '" << name << "'\n";
 
             return false;
         }
-//        std::cout << "Ray crosses bound of '" << name << "'\n";
-/*        std::cout << "ray from:" << pRay.origin().x << ", " << pRay.origin().y << ", " << pRay.origin().z
-                  << " dir:" << pRay.direction().x << ", " << pRay.direction().y << ", " << pRay.direction().z
-                  << " t/tmax:" << time << '/' << pMaxDist;
-        std::cout << "\nBound lo:" << iBound.low().x << ", " << iBound.low().y << ", " << iBound.low().z << " hi: "
-                  << iBound.high().x << ", " << iBound.high().y << ", " << iBound.high().z << std::endl; */
+        //        std::cout << "Ray crosses bound of '" << name << "'\n";
+        /*        std::cout << "ray from:" << pRay.origin().x << ", " << pRay.origin().y << ", " << pRay.origin().z
+                          << " dir:" << pRay.direction().x << ", " << pRay.direction().y << ", " << pRay.direction().z
+                          << " t/tmax:" << time << '/' << pMaxDist;
+                std::cout << "\nBound lo:" << iBound.low().x << ", " << iBound.low().y << ", " << iBound.low().z << " hi: "
+                          << iBound.high().x << ", " << iBound.high().y << ", " << iBound.high().z << std::endl; */
         // child bounds are defined in object space:
         Vector3 p = iInvRot * (pRay.origin() - iPos) * iInvScale;
         Ray modRay(p, iInvRot * pRay.direction());
@@ -53,7 +52,7 @@ namespace VMAP
         return hit;
     }
 
-    void ModelInstance::intersectPoint(const G3D::Vector3& p, AreaInfo &info) const
+    void ModelInstance::intersectPoint(const G3D::Vector3& p, AreaInfo& info) const
     {
         if (!iModel)
         {
@@ -65,9 +64,13 @@ namespace VMAP
 
         // M2 files don't contain area info, only WMO files
         if (flags & MOD_M2)
+        {
             return;
+        }
         if (!iBound.contains(p))
+        {
             return;
+        }
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
         Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
@@ -87,7 +90,7 @@ namespace VMAP
         }
     }
 
-    bool ModelInstance::GetLocationInfo(const G3D::Vector3& p, LocationInfo &info) const
+    bool ModelInstance::GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const
     {
         if (!iModel)
         {
@@ -99,9 +102,13 @@ namespace VMAP
 
         // M2 files don't contain area info, only WMO files
         if (flags & MOD_M2)
+        {
             return false;
+        }
         if (!iBound.contains(p))
+        {
             return false;
+        }
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
         Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
@@ -123,7 +130,7 @@ namespace VMAP
         return false;
     }
 
-    bool ModelInstance::GetLiquidLevel(const G3D::Vector3& p, LocationInfo &info, float &liqHeight) const
+    bool ModelInstance::GetLiquidLevel(const G3D::Vector3& p, LocationInfo& info, float& liqHeight) const
     {
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
@@ -139,7 +146,7 @@ namespace VMAP
         return false;
     }
 
-    bool ModelSpawn::readFromFile(FILE* rf, ModelSpawn &spawn)
+    bool ModelSpawn::readFromFile(FILE* rf, ModelSpawn& spawn)
     {
         uint32 check = 0, nameLen;
         check += fread(&spawn.flags, sizeof(uint32), 1, rf);
@@ -147,7 +154,9 @@ namespace VMAP
         if (!check)
         {
             if (ferror(rf))
+            {
                 std::cout << "Error reading ModelSpawn!\n";
+            }
             return false;
         }
         check += fread(&spawn.adtId, sizeof(uint16), 1, rf);
@@ -185,9 +194,9 @@ namespace VMAP
         return true;
     }
 
-    bool ModelSpawn::writeToFile(FILE* wf, const ModelSpawn &spawn)
+    bool ModelSpawn::writeToFile(FILE* wf, const ModelSpawn& spawn)
     {
-        uint32 check=0;
+        uint32 check = 0;
         check += fwrite(&spawn.flags, sizeof(uint32), 1, wf);
         check += fwrite(&spawn.adtId, sizeof(uint16), 1, wf);
         check += fwrite(&spawn.ID, sizeof(uint32), 1, wf);
@@ -202,9 +211,9 @@ namespace VMAP
         }
         uint32 nameLen = spawn.name.length();
         check += fwrite(&nameLen, sizeof(uint32), 1, wf);
-        if (check != uint32(has_bound ? 17 : 11)) return false;
+        if (check != uint32(has_bound ? 17 : 11)) { return false; }
         check = fwrite(spawn.name.c_str(), sizeof(char), nameLen, wf);
-        if (check != nameLen) return false;
+        if (check != nameLen) { return false; }
         return true;
     }
 

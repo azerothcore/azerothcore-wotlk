@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "sunwell_plateau.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "sunwell_plateau.h"
 #include "WorldSession.h"
 
 enum Yells
@@ -15,7 +15,6 @@ enum Yells
     SAY_SATH_DEATH                              = 2,
     SAY_SATH_SPELL1                             = 3,
     SAY_SATH_SPELL2                             = 4,
-
 
     SAY_EVIL_AGGRO                              = 0,
     SAY_EVIL_SLAY                               = 1,
@@ -27,7 +26,7 @@ enum Yells
     SAY_GOOD_AGGRO                              = 0,
     SAY_GOOD_NEAR_DEATH                         = 1,
     SAY_GOOD_NEAR_DEATH2                        = 2,
-    SAY_GOOD_MADRIGOSA                          = 3
+    SAY_GOOD_MADRIGOSA                          = 3 // Madrigosa deserved a far better fate. You did what had to be done, but this battle is far from over!
 };
 
 enum Spells
@@ -113,18 +112,18 @@ public:
         bool sathBanished;
         EventMap events2;
 
-        bool CanAIAttack(Unit const* target) const
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetPositionZ() > 50.0f;
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             BossAI::JustReachedHome();
             me->SetVisible(true);
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->SetHealth(me->GetMaxHealth());
@@ -145,7 +144,7 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SPECTRAL_REALM);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_ENRAGE || param == ACTION_ENRAGE_OTHER)
             {
@@ -174,7 +173,7 @@ public:
                 events.Reset();
                 events2.ScheduleEvent(EVENT_TALK_GOOD_1, 1000);
                 ClearPlayerAuras();
-                if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_SATHROVARR)))
+                if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
                 {
                     Sath->RemoveAllAuras();
                     Sath->GetMotionMaster()->MovementExpired();
@@ -184,12 +183,12 @@ public:
             }
         }
 
-        void JustDied(Unit* who)
+        void JustDied(Unit* who) override
         {
             BossAI::JustDied(who);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             events.ScheduleEvent(EVENT_ARCANE_BUFFET, 6000);
@@ -206,19 +205,19 @@ public:
             Talk(SAY_EVIL_AGGRO);
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() && attacker != me)
                 damage = 0;
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
                 Talk(SAY_EVIL_SLAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -233,7 +232,7 @@ public:
                     events2.ScheduleEvent(EVENT_TALK_GOOD_2, 1000);
                     break;
                 case EVENT_TALK_GOOD_2:
-                    if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_SATHROVARR)))
+                    if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
                     {
                         summons.Despawn(Sath);
                         Unit::Kill(me, Sath);
@@ -319,7 +318,7 @@ public:
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(10))
                     {
-                        if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_SATHROVARR)))
+                        if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
                             Sath->AI()->DoAction(ACTION_ENRAGE_OTHER);
                         DoAction(ACTION_ENRAGE);
                         break;
@@ -340,9 +339,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kalecgosAI>(creature);
+        return GetSunwellPlateauAI<boss_kalecgosAI>(creature);
     }
 };
 
@@ -361,9 +360,9 @@ class boss_kalec : public CreatureScript
 public:
     boss_kalec() : CreatureScript("boss_kalec") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kalecAI>(creature);
+        return GetSunwellPlateauAI<boss_kalecAI>(creature);
     }
 
     struct boss_kalecAI : public ScriptedAI
@@ -373,7 +372,7 @@ public:
         EventMap events;
         EventMap events2;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events2.Reset();
@@ -391,13 +390,13 @@ public:
                 me->CastSpell(me, SPELL_SPECTRAL_INVISIBILITY, true);
         }
 
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!who || who->GetEntry() != NPC_SATHROVARR)
                 damage = 0;
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
@@ -406,14 +405,14 @@ public:
             Talk(SAY_GOOD_AGGRO);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS)))
+                if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
                     kalecgos->AI()->DoAction(ACTION_KALEC_DIED);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -478,9 +477,9 @@ class boss_sathrovarr : public CreatureScript
 public:
     boss_sathrovarr() : CreatureScript("boss_sathrovarr") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_sathrovarrAI>(creature);
+        return GetSunwellPlateauAI<boss_sathrovarrAI>(creature);
     }
 
     struct boss_sathrovarrAI : public ScriptedAI
@@ -493,12 +492,12 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        bool CanAIAttack(Unit const* target) const
+        bool CanAIAttack(Unit const* target) const override
         {
             return target->GetPositionZ() < 50.0f;
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->CastSpell(me, SPELL_DEMONIC_VISUAL, true);
@@ -511,29 +510,29 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_SATH_AGGRO);
         }
 
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() && who != me)
                 damage = 0;
         }
 
-        void KilledUnit(Unit* target)
+        void KilledUnit(Unit* target) override
         {
             if (target->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SATH_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_SATH_DEATH);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_ENRAGE || param == ACTION_ENRAGE_OTHER)
             {
@@ -547,7 +546,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -577,9 +576,14 @@ public:
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(10))
                     {
-                        if (InstanceScript* instance = me->GetInstanceScript())
-                            if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS)))
+                        if (InstanceScript* instanceScript = me->GetInstanceScript())
+                        {
+                            if (Creature *kalecgos = ObjectAccessor::GetCreature(*me, instanceScript->GetGuidData(
+                                    NPC_KALECGOS)))
+                            {
                                 kalecgos->AI()->DoAction(ACTION_ENRAGE_OTHER);
+                            }
+                        }
                         DoAction(ACTION_ENRAGE);
                         break;
                     }
@@ -588,7 +592,7 @@ public:
                 case EVENT_CHECK_HEALTH2:
                     if (me->HealthBelowPct(1))
                     {
-                        if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS)))
+                        if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
                             kalecgos->AI()->DoAction(ACTION_SATH_BANISH);
                         DoAction(ACTION_BANISH);
                         break;
@@ -604,15 +608,15 @@ public:
 
 class SpectralBlastCheck
 {
-    public:
-        SpectralBlastCheck(Unit* victim) : _victim(victim) { }
+public:
+    SpectralBlastCheck(Unit* victim) : _victim(victim) { }
 
-        bool operator()(WorldObject* unit)
-        {
-            return unit->GetPositionZ() < 50.0f || unit->ToUnit()->HasAura(SPELL_SPECTRAL_EXHAUSTION) || unit->GetGUID() == _victim->GetGUID();
-        }
-    private:
-        Unit* _victim;
+    bool operator()(WorldObject* unit)
+    {
+        return unit->GetPositionZ() < 50.0f || unit->ToUnit()->HasAura(SPELL_SPECTRAL_EXHAUSTION) || unit->GetGUID() == _victim->GetGUID();
+    }
+private:
+    Unit* _victim;
 };
 
 class spell_kalecgos_spectral_blast_dummy : public SpellScriptLoader
@@ -627,9 +631,9 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(SpectralBlastCheck(GetCaster()->GetVictim()));
-            acore::Containers::RandomResizeList(targets, 1);
-        }           
-        
+            Acore::Containers::RandomResize(targets, 1);
+        }
+
         void HandleDummy(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
@@ -641,14 +645,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kalecgos_spectral_blast_dummy_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnEffectHitTarget += SpellEffectFn(spell_kalecgos_spectral_blast_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kalecgos_spectral_blast_dummy_SpellScript();
     }
@@ -656,100 +660,100 @@ public:
 
 class spell_kalecgos_curse_of_boundless_agony : public SpellScriptLoader
 {
-    public:
-        spell_kalecgos_curse_of_boundless_agony() : SpellScriptLoader("spell_kalecgos_curse_of_boundless_agony") { }
+public:
+    spell_kalecgos_curse_of_boundless_agony() : SpellScriptLoader("spell_kalecgos_curse_of_boundless_agony") { }
 
-        class spell_kalecgos_curse_of_boundless_agony_AuraScript : public AuraScript
+    class spell_kalecgos_curse_of_boundless_agony_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_kalecgos_curse_of_boundless_agony_AuraScript);
+
+        void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_kalecgos_curse_of_boundless_agony_AuraScript);
-
-            void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
-                    if (instance->IsEncounterInProgress())
-                        GetUnitOwner()->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR, SPELLVALUE_MAX_TARGETS, 1, GetUnitOwner(), true);
-            }
-
-            void OnPeriodic(AuraEffect const* aurEff)
-            {
-                if (aurEff->GetTickNumber() > 1 && aurEff->GetTickNumber()%5 == 1)
-                    GetAura()->GetEffect(aurEff->GetEffIndex())->SetAmount(aurEff->GetAmount()*2);
-            }
-
-            void Register()
-            {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_kalecgos_curse_of_boundless_agony_AuraScript();
+            if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
+                if (instance->IsEncounterInProgress())
+                    GetUnitOwner()->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR, SPELLVALUE_MAX_TARGETS, 1, GetUnitOwner(), true);
         }
+
+        void OnPeriodic(AuraEffect const* aurEff)
+        {
+            if (aurEff->GetTickNumber() > 1 && aurEff->GetTickNumber() % 5 == 1)
+                GetAura()->GetEffect(aurEff->GetEffIndex())->SetAmount(aurEff->GetAmount() * 2);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_kalecgos_curse_of_boundless_agony_AuraScript();
+    }
 };
 
 class spell_kalecgos_spectral_realm_dummy : public SpellScriptLoader
 {
-    public:
-        spell_kalecgos_spectral_realm_dummy() : SpellScriptLoader("spell_kalecgos_spectral_realm_dummy") { }
+public:
+    spell_kalecgos_spectral_realm_dummy() : SpellScriptLoader("spell_kalecgos_spectral_realm_dummy") { }
 
-        class spell_kalecgos_spectral_realm_dummy_SpellScript : public SpellScript
+    class spell_kalecgos_spectral_realm_dummy_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_kalecgos_spectral_realm_dummy_SpellScript);
+
+        SpellCastResult CheckCast()
         {
-            PrepareSpellScript(spell_kalecgos_spectral_realm_dummy_SpellScript);
+            if (GetCaster()->HasAura(SPELL_SPECTRAL_EXHAUSTION))
+                return SPELL_FAILED_CASTER_AURASTATE;
 
-            SpellCastResult CheckCast()
-            {
-                if (GetCaster()->HasAura(SPELL_SPECTRAL_EXHAUSTION))
-                    return SPELL_FAILED_CASTER_AURASTATE;
-
-                return SPELL_CAST_OK;
-            }
-
-            void HandleScriptEffect(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-                GetCaster()->CastSpell(GetCaster(), SPELL_TELEPORT_SPECTRAL, true);
-            }
-
-            void Register()
-            {
-                OnCheckCast += SpellCheckCastFn(spell_kalecgos_spectral_realm_dummy_SpellScript::CheckCast);
-                OnEffectHitTarget += SpellEffectFn(spell_kalecgos_spectral_realm_dummy_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_kalecgos_spectral_realm_dummy_SpellScript();
+            return SPELL_CAST_OK;
         }
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            GetCaster()->CastSpell(GetCaster(), SPELL_TELEPORT_SPECTRAL, true);
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_kalecgos_spectral_realm_dummy_SpellScript::CheckCast);
+            OnEffectHitTarget += SpellEffectFn(spell_kalecgos_spectral_realm_dummy_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_kalecgos_spectral_realm_dummy_SpellScript();
+    }
 };
 
 class spell_kalecgos_spectral_realm : public SpellScriptLoader
 {
-    public:
-        spell_kalecgos_spectral_realm() : SpellScriptLoader("spell_kalecgos_spectral_realm") { }
+public:
+    spell_kalecgos_spectral_realm() : SpellScriptLoader("spell_kalecgos_spectral_realm") { }
 
-        class spell_kalecgos_spectral_realm_AuraScript : public AuraScript
+    class spell_kalecgos_spectral_realm_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_kalecgos_spectral_realm_AuraScript);
+
+        void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_kalecgos_spectral_realm_AuraScript);
-
-            void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SPECTRAL_EXHAUSTION, true);
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_TELEPORT_NORMAL_REALM, true);
-            }
-
-            void Register()
-            {
-                OnEffectRemove += AuraEffectRemoveFn(spell_kalecgos_spectral_realm_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_kalecgos_spectral_realm_AuraScript();
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SPECTRAL_EXHAUSTION, true);
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_TELEPORT_NORMAL_REALM, true);
         }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_kalecgos_spectral_realm_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_kalecgos_spectral_realm_AuraScript();
+    }
 };
 
 void AddSC_boss_kalecgos()

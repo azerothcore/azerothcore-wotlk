@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "Chat.h"
-#include "Player.h"
 #include "Language.h"
+#include "Player.h"
 #include "ScriptMgr.h"
-#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 
- enum Spells
+enum Spells
 {
     LFG_SPELL_DUNGEON_DESERTER = 71041,
     BG_SPELL_DESERTER = 26013
@@ -55,7 +55,7 @@ public:
         if (!*args)
             return false;
 
-         Player* targetPlayer = handler->getSelectedPlayer();
+        Player* targetPlayer = handler->getSelectedPlayer();
         if (!targetPlayer)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -71,24 +71,24 @@ public:
         }
         uint32 time = atoi(timeStr);
 
-         if (!time)
-         {
+        if (!time)
+        {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
-         }
+        }
 
-         Aura* aura = targetPlayer->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, targetPlayer);
+        Aura* aura = targetPlayer->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, targetPlayer);
 
-         if (!aura)
-         {
+        if (!aura)
+        {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
-         }
+        }
         aura->SetDuration(time * IN_MILLISECONDS);
 
-         return true;
+        return true;
     }
 
     static bool HandleDeserterRemove(ChatHandler* handler, char const* /*args*/, bool isInstance)
@@ -101,9 +101,9 @@ public:
             return false;
         }
 
-         targetPlayer->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+        targetPlayer->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
 
-         return true;
+        return true;
     }
 
     static bool HandleDeserterInstanceAdd(ChatHandler* handler, char const* args)
@@ -127,7 +127,7 @@ public:
     }
 };
 
- void AddSC_deserter_commandscript()
+void AddSC_deserter_commandscript()
 {
     new deserter_commandscript();
 }

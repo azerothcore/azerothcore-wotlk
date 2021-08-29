@@ -1,15 +1,16 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
 #include "CharacterDatabaseCleaner.h"
-#include "World.h"
+#include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "SpellMgr.h"
 #include "DBCStores.h"
+#include "Log.h"
+#include "SpellMgr.h"
+#include "World.h"
 
 void CharacterDatabaseCleaner::CleanDatabase()
 {
@@ -17,7 +18,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     if (!sWorld->getBoolConfig(CONFIG_CLEAN_CHARACTER_DB))
         return;
 
-    sLog->outString("Cleaning character database...");
+    LOG_INFO("misc", "Cleaning character database...");
 
     uint32 oldMSTime = getMSTime();
 
@@ -51,8 +52,8 @@ void CharacterDatabaseCleaner::CleanDatabase()
 
     sWorld->SetCleaningFlags(flags);
 
-    sLog->outString(">> Cleaned character database in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server.loading", ">> Cleaned character database in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table, bool (*check)(uint32))
@@ -60,7 +61,7 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
     QueryResult result = CharacterDatabase.PQuery("SELECT DISTINCT %s FROM %s", column, table);
     if (!result)
     {
-        sLog->outString("Table %s is empty.", table);
+        LOG_INFO("sql.sql", "Table %s is empty.", table);
         return;
     }
 
@@ -84,8 +85,7 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
 
             ss << id;
         }
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     if (found)
     {
@@ -143,4 +143,3 @@ void CharacterDatabaseCleaner::CleanCharacterQuestStatus()
 {
     CharacterDatabase.DirectExecute("DELETE FROM character_queststatus WHERE status = 0");
 }
-

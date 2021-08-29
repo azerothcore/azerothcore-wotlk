@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,14 +12,14 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
 #include "Language.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "Player.h"
+#include "ObjectMgr.h"
 #include "Pet.h"
+#include "Player.h"
 #include "PlayerCommand.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
 
 class learn_commandscript : public CommandScript, public PlayerCommand
 {
@@ -118,7 +118,7 @@ public:
             if (!entry)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry->spellId);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry->Spell);
             if (!spellInfo)
                 continue;
 
@@ -248,7 +248,7 @@ public:
             // search highest talent rank
             uint32 spellId = 0;
 
-            for (int8 rank = MAX_TALENT_RANK-1; rank >= 0; --rank)
+            for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
             {
                 if (talentInfo->RankID[rank] != 0)
                 {
@@ -290,7 +290,8 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target))
             return false;
 
-        target->learnDefaultSpells();
+        target->LearnDefaultSkills();
+        target->LearnCustomSpells();
         target->learnQuestRewardedSpells();
 
         handler->PSendSysMessage(LANG_COMMAND_LEARN_ALL_DEFAULT_AND_QUEST, handler->GetNameLink(target).c_str());
@@ -306,7 +307,7 @@ public:
                 continue;
 
             if ((skillInfo->categoryId == SKILL_CATEGORY_PROFESSION || skillInfo->categoryId == SKILL_CATEGORY_SECONDARY) &&
-                skillInfo->canLink)                             // only prof. with recipes have
+                    skillInfo->canLink)                             // only prof. with recipes have
             {
                 HandleLearnSkillRecipesHelper(handler->GetSession()->GetPlayer(), skillInfo->id);
             }
@@ -349,8 +350,8 @@ public:
                 continue;
 
             if ((skillInfo->categoryId != SKILL_CATEGORY_PROFESSION &&
-                skillInfo->categoryId != SKILL_CATEGORY_SECONDARY) ||
-                !skillInfo->canLink)                            // only prof with recipes have set
+                    skillInfo->categoryId != SKILL_CATEGORY_SECONDARY) ||
+                    !skillInfo->canLink)                            // only prof with recipes have set
                 continue;
 
             int locale = handler->GetSessionDbcLocale();
@@ -404,26 +405,26 @@ public:
                 continue;
 
             // wrong skill
-            if (skillLine->skillId != skillId)
+            if (skillLine->SkillLine != skillId)
                 continue;
 
             // not high rank
-            if (skillLine->forward_spellid)
+            if (skillLine->SupercededBySpell)
                 continue;
 
             // skip racial skills
-            if (skillLine->racemask != 0)
+            if (skillLine->RaceMask != 0)
                 continue;
 
             // skip wrong class skills
-            if (skillLine->classmask && (skillLine->classmask & classmask) == 0)
+            if (skillLine->ClassMask && (skillLine->ClassMask & classmask) == 0)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(skillLine->spellId);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(skillLine->Spell);
             if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
                 continue;
 
-            player->learnSpell(skillLine->spellId);
+            player->learnSpell(skillLine->Spell);
         }
     }
 

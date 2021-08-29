@@ -1,30 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Chat.h"
 #include "Common.h"
-#include "TicketMgr.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "Log.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "TicketMgr.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Chat.h"
-#include "World.h"
-#include "Player.h"
-#include "Opcodes.h"
 
-inline float GetAge(uint64 t) { return float(time(NULL) - t) / DAY; }
+inline float GetAge(uint64 t) { return float(time(nullptr) - t) / DAY; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GM ticket
-GmTicket::GmTicket() : _id(0), _playerGuid(0), _type(TICKET_TYPE_OPEN), _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(0), _lastModifiedTime(0),
-                       _closedBy(0), _resolvedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false),
-                       _needResponse(false), _needMoreHelp(false) { }
+GmTicket::GmTicket() : _id(0), _type(TICKET_TYPE_OPEN), _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(0), _lastModifiedTime(0),
+    _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false), _needResponse(false), _needMoreHelp(false) { }
 
-GmTicket::GmTicket(Player* player) : _type(TICKET_TYPE_OPEN), _createTime(time(NULL)), _lastModifiedTime(time(NULL)), _closedBy(0), _resolvedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false), _needMoreHelp(false)
+GmTicket::GmTicket(Player* player) : _type(TICKET_TYPE_OPEN), _createTime(time(nullptr)), _lastModifiedTime(time(nullptr)),
+    _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false), _needMoreHelp(false)
 {
     _id = sTicketMgr->GenerateTicketId();
     _playerName = player->GetName();
@@ -40,7 +40,7 @@ bool GmTicket::LoadFromDB(Field* fields)
     uint8 index = 0;
     _id                 = fields[  index].GetUInt32();
     _type               = TicketType(fields[++index].GetUInt8());
-    _playerGuid         = MAKE_NEW_GUID(fields[++index].GetUInt32(), 0, HIGHGUID_PLAYER);
+    _playerGuid         = ObjectGuid::Create<HighGuid::Player>(fields[++index].GetUInt32());
     _playerName         = fields[++index].GetString();
     _message            = fields[++index].GetString();
     _createTime         = fields[++index].GetUInt32();
@@ -49,28 +49,28 @@ bool GmTicket::LoadFromDB(Field* fields)
     _posY               = fields[++index].GetFloat();
     _posZ               = fields[++index].GetFloat();
     _lastModifiedTime   = fields[++index].GetUInt32();
-    _closedBy           = fields[++index].GetInt32();
-    _assignedTo         = MAKE_NEW_GUID(fields[++index].GetUInt32(), 0, HIGHGUID_PLAYER);
+    _closedBy           = ObjectGuid::Create<HighGuid::Player>(fields[++index].GetInt32());
+    _assignedTo         = ObjectGuid::Create<HighGuid::Player>(fields[++index].GetUInt32());
     _comment            = fields[++index].GetString();
     _response           = fields[++index].GetString();
     _completed          = fields[++index].GetBool();
     _escalatedStatus    = GMTicketEscalationStatus(fields[++index].GetUInt8());
     _viewed             = fields[++index].GetBool();
     _needMoreHelp       = fields[++index].GetBool();
-    _resolvedBy         = fields[++index].GetInt32();
+    _resolvedBy         = ObjectGuid::Create<HighGuid::Player>(fields[++index].GetInt32());
 
     return true;
 }
 
-void GmTicket::SaveToDB(SQLTransaction& trans) const
+void GmTicket::SaveToDB(CharacterDatabaseTransaction trans) const
 {
     //  0    1       2         3          4          5        6     7     8     9           10           11          12        13        14        15         16        17         18          19
     // id, type, playerGuid, name, description, createTime, mapId, posX, posY, posZ, lastModifiedTime, closedBy, assignedTo, comment, response, completed, escalated, viewed, needMoreHelp, resolvedBy
     uint8 index = 0;
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_GM_TICKET);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_GM_TICKET);
     stmt->setUInt32(  index, _id);
     stmt->setUInt8 (++index, uint8(_type));
-    stmt->setUInt32(++index, GUID_LOPART(_playerGuid));
+    stmt->setUInt32(++index, _playerGuid.GetCounter());
     stmt->setString(++index, _playerName);
     stmt->setString(++index, _message);
     stmt->setUInt32(++index, uint32(_createTime));
@@ -79,22 +79,22 @@ void GmTicket::SaveToDB(SQLTransaction& trans) const
     stmt->setFloat (++index, _posY);
     stmt->setFloat (++index, _posZ);
     stmt->setUInt32(++index, uint32(_lastModifiedTime));
-    stmt->setInt32 (++index, GUID_LOPART(_closedBy));
-    stmt->setUInt32(++index, GUID_LOPART(_assignedTo));
+    stmt->setInt32 (++index, int32(_closedBy.GetCounter()));
+    stmt->setUInt32(++index, _assignedTo.GetCounter());
     stmt->setString(++index, _comment);
     stmt->setString(++index, _response);
     stmt->setBool  (++index, _completed);
     stmt->setUInt8 (++index, uint8(_escalatedStatus));
     stmt->setBool  (++index, _viewed);
     stmt->setBool  (++index, _needMoreHelp);
-    stmt->setInt32 (++index, GUID_LOPART(_resolvedBy));
+    stmt->setInt32 (++index, int32(_resolvedBy.GetCounter()));
 
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
 
 void GmTicket::DeleteFromDB()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GM_TICKET);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GM_TICKET);
     stmt->setUInt32(0, _id);
     CharacterDatabase.Execute(stmt);
 }
@@ -147,7 +147,7 @@ void GmTicket::SendResponse(WorldSession* session) const
 
 std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) const
 {
-    time_t curTime = time(NULL);
+    time_t curTime = time(nullptr);
 
     std::stringstream ss;
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTGUID, _id);
@@ -156,7 +156,7 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) c
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGE, (secsToTimeString(curTime - _lastModifiedTime, true)).c_str());
 
     std::string name;
-    if (sObjectMgr->GetPlayerNameByGUID(_assignedTo, name))
+    if (sObjectMgr->GetPlayerNameByGUID(_assignedTo.GetCounter(), name))
         ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTASSIGNEDTO, name.c_str());
 
     if (detailed)
@@ -188,11 +188,16 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, const char* szCl
 
 void GmTicket::SetUnassigned()
 {
-    _assignedTo = 0;
+    _assignedTo.Clear();
+
     switch (_escalatedStatus)
     {
-        case TICKET_ASSIGNED: _escalatedStatus = TICKET_UNASSIGNED; break;
-        case TICKET_ESCALATED_ASSIGNED: _escalatedStatus = TICKET_IN_ESCALATION_QUEUE; break;
+        case TICKET_ASSIGNED:
+            _escalatedStatus = TICKET_UNASSIGNED;
+            break;
+        case TICKET_ESCALATED_ASSIGNED:
+            _escalatedStatus = TICKET_IN_ESCALATION_QUEUE;
+            break;
         case TICKET_UNASSIGNED:
         case TICKET_IN_ESCALATION_QUEUE:
         default:
@@ -235,7 +240,7 @@ void GmTicket::SetChatLog(std::list<uint32> time, std::string const& log)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Ticket manager
-TicketMgr::TicketMgr() : _status(true), _lastTicketId(0), _lastSurveyId(0), _openTicketCount(0), _lastChange(time(NULL)) { }
+TicketMgr::TicketMgr() : _status(true), _lastTicketId(0), _lastSurveyId(0), _openTicketCount(0), _lastChange(time(nullptr)) { }
 
 TicketMgr::~TicketMgr()
 {
@@ -267,7 +272,7 @@ void TicketMgr::ResetTickets()
 
     _lastTicketId = 0;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ALL_GM_TICKETS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ALL_GM_TICKETS);
 
     CharacterDatabase.Execute(stmt);
 }
@@ -283,11 +288,11 @@ void TicketMgr::LoadTickets()
     _lastTicketId = 0;
     _openTicketCount = 0;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GM_TICKETS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GM_TICKETS);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
-        sLog->outString(">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
+        LOG_INFO("server.loading", ">> Loaded 0 GM tickets. DB table `gm_ticket` is empty!");
 
         return;
     }
@@ -314,8 +319,8 @@ void TicketMgr::LoadTickets()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u GM tickets in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-
+    LOG_INFO("server.loading", ">> Loaded %u GM tickets in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void TicketMgr::LoadSurveys()
@@ -327,8 +332,8 @@ void TicketMgr::LoadSurveys()
     if (QueryResult result = CharacterDatabase.Query("SELECT MAX(surveyId) FROM gm_survey"))
         _lastSurveyId = (*result)[0].GetUInt32();
 
-    sLog->outString(">> Loaded GM Survey count from database in %u ms", GetMSTimeDiffToNow(oldMSTime));
-
+    LOG_INFO("server.loading", ">> Loaded GM Survey count from database in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void TicketMgr::AddTicket(GmTicket* ticket)
@@ -336,15 +341,15 @@ void TicketMgr::AddTicket(GmTicket* ticket)
     _ticketList[ticket->GetId()] = ticket;
     if (!ticket->IsClosed())
         ++_openTicketCount;
-    SQLTransaction trans = SQLTransaction(NULL);
+    CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
     ticket->SaveToDB(trans);
 }
 
-void TicketMgr::CloseTicket(uint32 ticketId, int64 source)
+void TicketMgr::CloseTicket(uint32 ticketId, ObjectGuid source)
 {
     if (GmTicket* ticket = GetTicket(ticketId))
     {
-        SQLTransaction trans = SQLTransaction(NULL);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetClosedBy(source);
         if (source)
             --_openTicketCount;
@@ -362,11 +367,11 @@ void TicketMgr::RemoveTicket(uint32 ticketId)
     }
 }
 
-void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, int64 source)
+void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, ObjectGuid source)
 {
     if (GmTicket* ticket = GetTicket(ticketId))
     {
-        SQLTransaction trans = SQLTransaction(NULL);
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetClosedBy(source);
         ticket->SetResolvedBy(source);
         if (source)
@@ -374,7 +379,6 @@ void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, int64 source)
         ticket->SaveToDB(trans);
     }
 }
-
 
 void TicketMgr::ShowList(ChatHandler& handler, bool onlineOnly) const
 {

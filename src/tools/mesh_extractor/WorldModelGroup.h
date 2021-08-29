@@ -21,7 +21,7 @@ public:
 
     std::vector<uint8> TriangleFlags;
     std::vector<uint8> TriangleMaterials;
-    std::vector<Triangle<uint16> > Triangles;
+    std::vector<Triangle<uint16>> Triangles;
     std::vector<Vector3> Vertices;
     std::vector<Vector3> Normals;
     // @ToDo: Research.

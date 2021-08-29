@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -16,10 +16,10 @@ npc_deathstalker_erland
 pyrewood_ambush
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_deathstalker_erland
@@ -55,7 +55,7 @@ public:
     {
         npc_deathstalker_erlandAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -96,15 +96,15 @@ public:
             }
         }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO, who);
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_ESCORTING)
         {
@@ -117,7 +117,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_deathstalker_erlandAI(creature);
     }
@@ -144,9 +144,9 @@ static float PyrewoodSpawnPoints[3][4] =
     {-397.44f, 1511.09f, 18.67f, 0},
     */
     //door
-    {-396.17f, 1505.86f, 19.77f, 0},
-    {-396.91f, 1505.77f, 19.77f, 0},
-    {-397.94f, 1504.74f, 19.77f, 0},
+    {-397.018219f, 1510.208740f, 18.868748f, 4.731330f},
+    {-397.018219f, 1510.208740f, 18.868748f, 4.731330f},
+    {-397.018219f, 1510.208740f, 18.868748f, 4.731330f},
 };
 
 #define WAIT_SECS 6000
@@ -156,7 +156,7 @@ class pyrewood_ambush : public CreatureScript
 public:
     pyrewood_ambush() : CreatureScript("pyrewood_ambush") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest *quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_PYREWOOD_AMBUSH && !CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->QuestInProgress)
         {
@@ -169,7 +169,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new pyrewood_ambushAI(creature);
     }
@@ -178,18 +178,18 @@ public:
     {
         pyrewood_ambushAI(Creature* creature) : ScriptedAI(creature), Summons(me)
         {
-           QuestInProgress = false;
+            QuestInProgress = false;
         }
 
         uint32 Phase;
         int8 KillCount;
         uint32 WaitTimer;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
         SummonList Summons;
 
         bool QuestInProgress;
 
-        void Reset()
+        void Reset() override
         {
             WaitTimer = WAIT_SECS;
 
@@ -197,20 +197,20 @@ public:
             {
                 Phase = 0;
                 KillCount = 0;
-                PlayerGUID = 0;
+                PlayerGUID.Clear();
                 Summons.DespawnAll();
             }
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             Summons.Summon(summoned);
             ++KillCount;
         }
 
-        void SummonedCreatureDespawn(Creature* summoned)
+        void SummonedCreatureDespawn(Creature* summoned) override
         {
             Summons.Despawn(summoned);
             --KillCount;
@@ -220,7 +220,7 @@ public:
         {
             if (Creature* summoned = me->SummonCreature(creatureId, PyrewoodSpawnPoints[position][0], PyrewoodSpawnPoints[position][1], PyrewoodSpawnPoints[position][2], PyrewoodSpawnPoints[position][3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000))
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 if (PlayerGUID)
                     if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                         if (player->IsAlive() && RAND(0, 1))
@@ -229,13 +229,13 @@ public:
                 if (!target)
                     target = me;
 
-                summoned->setFaction(168);
+                summoned->setFaction(123);
                 summoned->AddThreat(target, 32.0f);
                 summoned->AI()->AttackStart(target);
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (PlayerGUID)
                 if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
@@ -243,7 +243,7 @@ public:
                         player->FailQuest(QUEST_PYREWOOD_AMBUSH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //TC_LOG_INFO("scripts", "DEBUG: p(%i) k(%i) d(%u) W(%i)", Phase, KillCount, diff, WaitTimer);
 
@@ -262,7 +262,8 @@ public:
             switch (Phase)
             {
                 case 0:
-                    if (WaitTimer == WAIT_SECS) {
+                    if (WaitTimer == WAIT_SECS)
+                    {
                         if (PlayerGUID)
                         {
                             if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
@@ -290,6 +291,7 @@ public:
                     SummonCreatureWithRandomTarget(2065, 0);
                     break;
                 case 4:
+                    SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2067, 0);
                     SummonCreatureWithRandomTarget(2068, 2);

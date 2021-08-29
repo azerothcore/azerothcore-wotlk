@@ -1,16 +1,16 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "ByteBuffer.h"
-#include "WorldPacket.h"
 #include "UpdateData.h"
+#include "ByteBuffer.h"
+#include "Errors.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "World.h"
+#include "WorldPacket.h"
 #include "zlib.h"
 
 UpdateData::UpdateData() : m_blockCount(0)
@@ -18,24 +18,24 @@ UpdateData::UpdateData() : m_blockCount(0)
     m_outOfRangeGUIDs.reserve(15);
 }
 
-void UpdateData::AddOutOfRangeGUID(uint64 guid)
+void UpdateData::AddOutOfRangeGUID(ObjectGuid guid)
 {
     m_outOfRangeGUIDs.push_back(guid);
 }
 
-void UpdateData::AddUpdateBlock(const ByteBuffer &block)
+void UpdateData::AddUpdateBlock(const ByteBuffer& block)
 {
     m_data.append(block);
     ++m_blockCount;
 }
 
-void UpdateData::AddUpdateBlock(const UpdateData &block)
+void UpdateData::AddUpdateBlock(const UpdateData& block)
 {
     m_data.append(block.m_data);
     m_blockCount += block.m_blockCount;
 }
 
-void UpdateData::Compress(void* dst, uint32 *dst_size, void* src, int src_size)
+void UpdateData::Compress(void* dst, uint32* dst_size, void* src, int src_size)
 {
     z_stream c_stream;
 
@@ -47,7 +47,7 @@ void UpdateData::Compress(void* dst, uint32 *dst_size, void* src, int src_size)
     int z_res = deflateInit(&c_stream, sWorld->getIntConfig(CONFIG_COMPRESSION));
     if (z_res != Z_OK)
     {
-        sLog->outError("Can't compress update packet (zlib: deflateInit) Error code: %i (%s)", z_res, zError(z_res));
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflateInit) Error code: %i (%s)", z_res, zError(z_res));
         *dst_size = 0;
         return;
     }
@@ -60,14 +60,14 @@ void UpdateData::Compress(void* dst, uint32 *dst_size, void* src, int src_size)
     z_res = deflate(&c_stream, Z_NO_FLUSH);
     if (z_res != Z_OK)
     {
-        sLog->outError("Can't compress update packet (zlib: deflate) Error code: %i (%s)", z_res, zError(z_res));
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflate) Error code: %i (%s)", z_res, zError(z_res));
         *dst_size = 0;
         return;
     }
 
     if (c_stream.avail_in != 0)
     {
-        sLog->outError("Can't compress update packet (zlib: deflate not greedy)");
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflate not greedy)");
         *dst_size = 0;
         return;
     }
@@ -75,7 +75,7 @@ void UpdateData::Compress(void* dst, uint32 *dst_size, void* src, int src_size)
     z_res = deflate(&c_stream, Z_FINISH);
     if (z_res != Z_STREAM_END)
     {
-        sLog->outError("Can't compress update packet (zlib: deflate should report Z_STREAM_END instead %i (%s)", z_res, zError(z_res));
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflate should report Z_STREAM_END instead %i (%s)", z_res, zError(z_res));
         *dst_size = 0;
         return;
     }
@@ -83,7 +83,7 @@ void UpdateData::Compress(void* dst, uint32 *dst_size, void* src, int src_size)
     z_res = deflateEnd(&c_stream);
     if (z_res != Z_OK)
     {
-        sLog->outError("Can't compress update packet (zlib: deflateEnd) Error code: %i (%s)", z_res, zError(z_res));
+        LOG_ERROR("entities.object", "Can't compress update packet (zlib: deflateEnd) Error code: %i (%s)", z_res, zError(z_res));
         *dst_size = 0;
         return;
     }
@@ -104,9 +104,9 @@ bool UpdateData::BuildPacket(WorldPacket* packet)
         buf << (uint8) UPDATETYPE_OUT_OF_RANGE_OBJECTS;
         buf << (uint32) m_outOfRangeGUIDs.size();
 
-        for (std::vector<uint64>::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
+        for (ObjectGuid const& guid : m_outOfRangeGUIDs)
         {
-            buf.appendPackGUID(*i);
+            buf << guid.WriteAsPacked();
         }
     }
 
@@ -142,4 +142,3 @@ void UpdateData::Clear()
     m_outOfRangeGUIDs.clear();
     m_blockCount = 0;
 }
-

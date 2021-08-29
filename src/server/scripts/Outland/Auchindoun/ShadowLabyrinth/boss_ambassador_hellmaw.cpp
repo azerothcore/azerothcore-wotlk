@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 #include "shadow_labyrinth.h"
 
 enum eEnums
@@ -30,9 +30,9 @@ class boss_ambassador_hellmaw : public CreatureScript
 public:
     boss_ambassador_hellmaw() : CreatureScript("boss_ambassador_hellmaw") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_ambassador_hellmawAI(creature);
+        return GetShadowLabyrinthAI<boss_ambassador_hellmawAI>(creature);
     }
 
     struct boss_ambassador_hellmawAI : public npc_escortAI
@@ -46,18 +46,18 @@ public:
         EventMap events;
         bool isBanished;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param != 1)
                 return;
 
             me->RemoveAurasDueToSpell(SPELL_BANISH);
             Talk(SAY_INTRO);
-            Start(true, false, 0, NULL, false, true);
+            Start(true, false, ObjectGuid::Empty, nullptr, false, true);
             isBanished = false;
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             isBanished = false;
@@ -70,11 +70,11 @@ public:
                     me->CastSpell(me, SPELL_BANISH, true);
                 }
                 else
-                    Start(true, false, 0, NULL, false, true);
+                    Start(true, false, ObjectGuid::Empty, nullptr, false, true);
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             if (isBanished)
                 return;
@@ -88,38 +88,38 @@ public:
                 instance->SetData(TYPE_HELLMAW, IN_PROGRESS);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (isBanished)
                 return;
             npc_escortAI::MoveInLineOfSight(who);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (isBanished)
                 return;
             npc_escortAI::AttackStart(who);
         }
 
-        void WaypointReached(uint32 /*waypointId*/)
+        void WaypointReached(uint32 /*waypointId*/) override
         {
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0,1))
+            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (instance)
                 instance->SetData(TYPE_HELLMAW, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -133,7 +133,7 @@ public:
             }
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_CORROSIVE:
                     me->CastSpell(me->GetVictim(), SPELL_CORROSIVE_ACID, false);
@@ -145,14 +145,12 @@ public:
                     break;
                 case EVENT_SPELL_ENRAGE:
                     me->CastSpell(me->GetVictim(), SPELL_ENRAGE, false);
-                    events.PopEvent();
                     break;
             }
-            
+
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_ambassador_hellmaw()

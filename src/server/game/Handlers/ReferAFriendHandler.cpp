@@ -1,25 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "WorldSession.h"
-#include "Player.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "Log.h"
+#include "Player.h"
+#include "WorldSession.h"
 
 void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GRANT_LEVEL");
-#endif
+    LOG_DEBUG("network", "WORLD: CMSG_GRANT_LEVEL");
 
-    uint64 guid;
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
-    Player* target = ObjectAccessor::GetObjectInWorld(guid, _player);
+    Player* target = ObjectAccessor::GetPlayer(*_player, guid);
 
     // check cheating
     uint8 levels = _player->GetGrantableLevels();
@@ -39,7 +36,8 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
     else if (target->GetGroup() != _player->GetGroup())
         error = ERR_REFER_A_FRIEND_NOT_IN_GROUP;
 
-    if (error) {
+    if (error)
+    {
         WorldPacket data(SMSG_REFER_A_FRIEND_FAILURE, 24);
         data << uint32(error);
         if (error == ERR_REFER_A_FRIEND_NOT_IN_GROUP)
@@ -50,20 +48,18 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
     }
 
     WorldPacket data2(SMSG_PROPOSE_LEVEL_GRANT, 8);
-    data2.append(_player->GetPackGUID());
+    data2 << _player->GetPackGUID();
     target->GetSession()->SendPacket(&data2);
 }
 
 void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
-#endif
+    LOG_DEBUG("network", "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
 
-    uint64 guid;
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
-    Player* other = ObjectAccessor::GetObjectInWorld(guid, _player);
+    Player* other = ObjectAccessor::GetPlayer(*_player, guid);
     if (!other)
         return;
 

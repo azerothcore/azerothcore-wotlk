@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,8 @@ SDComment: Teleport not included, spell reflect not effecting dots (Core problem
 SDCategory: Azshara
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Say
 {
@@ -35,7 +35,7 @@ class boss_azuregos : public CreatureScript
 public:
     boss_azuregos() : CreatureScript("boss_azuregos") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_azuregosAI(creature);
     }
@@ -54,7 +54,7 @@ public:
         uint32 EnrageTimer;
         bool Enraged;
 
-        void Reset()
+        void Reset() override
         {
             MarkOfFrostTimer = 35000;
             ManaStormTimer = urand(5000, 17000);
@@ -67,9 +67,9 @@ public:
             Enraged = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -79,19 +79,19 @@ public:
             {
                 Talk(SAY_TELEPORT);
                 ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
-                ThreatContainer::StorageType::const_iterator i = threatlist.begin();
-                for (i = threatlist.begin(); i != threatlist.end(); ++i)
+                for (auto i = threatlist.begin(); i != threatlist.end(); ++i)
                 {
                     Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
                     if (unit && (unit->GetTypeId() == TYPEID_PLAYER))
                     {
-                        DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+3, unit->GetOrientation());
+                        DoTeleportPlayer(unit, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 3, unit->GetOrientation());
                     }
                 }
 
                 DoResetThreat();
                 TeleportTimer = 30000;
-            } else TeleportTimer -= diff;
+            }
+            else TeleportTimer -= diff;
 
             //        //MarkOfFrostTimer
             //        if (MarkOfFrostTimer <= diff)
@@ -105,14 +105,16 @@ public:
             {
                 DoCastVictim(SPELL_CHILL);
                 ChillTimer = urand(13000, 25000);
-            } else ChillTimer -= diff;
+            }
+            else ChillTimer -= diff;
 
             //BreathTimer
             if (BreathTimer <= diff)
             {
                 DoCastVictim(SPELL_FROSTBREATH);
                 BreathTimer = urand(10000, 15000);
-            } else BreathTimer -= diff;
+            }
+            else BreathTimer -= diff;
 
             //ManaStormTimer
             if (ManaStormTimer <= diff)
@@ -120,21 +122,24 @@ public:
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     DoCast(target, SPELL_MANASTORM);
                 ManaStormTimer = urand(7500, 12500);
-            } else ManaStormTimer -= diff;
+            }
+            else ManaStormTimer -= diff;
 
             //ReflectTimer
             if (ReflectTimer <= diff)
             {
                 DoCast(me, SPELL_REFLECT);
                 ReflectTimer = urand(20000, 35000);
-            } else ReflectTimer -= diff;
+            }
+            else ReflectTimer -= diff;
 
             //CleaveTimer
             if (CleaveTimer <= diff)
             {
                 DoCastVictim(SPELL_CLEAVE);
                 CleaveTimer = 7000;
-            } else CleaveTimer -= diff;
+            }
+            else CleaveTimer -= diff;
 
             //EnrageTimer
             if (HealthBelowPct(26) && !Enraged)

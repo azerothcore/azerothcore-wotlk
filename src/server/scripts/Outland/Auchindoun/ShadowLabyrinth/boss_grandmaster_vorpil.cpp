@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "shadow_labyrinth.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "shadow_labyrinth.h"
 
 enum GrandmasterVorpil
 {
@@ -53,9 +53,9 @@ class boss_grandmaster_vorpil : public CreatureScript
 public:
     boss_grandmaster_vorpil() : CreatureScript("boss_grandmaster_vorpil") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_grandmaster_vorpilAI (creature);
+        return GetShadowLabyrinthAI<boss_grandmaster_vorpilAI>(creature);
     }
 
     struct boss_grandmaster_vorpilAI : public ScriptedAI
@@ -72,7 +72,7 @@ public:
 
         bool sayIntro, sayHelp;
 
-        void Reset()
+        void Reset() override
         {
             sayHelp = false;
             events.Reset();
@@ -99,7 +99,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_VOID_TRAVELER)
@@ -108,13 +108,13 @@ public:
                 summon->CastSpell(summon, SPELL_VOID_PORTAL_VISUAL, false);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             summons.DespawnAll();
@@ -123,7 +123,7 @@ public:
                 instance->SetData(DATA_GRANDMASTERVORPILEVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             summonPortals();
@@ -138,7 +138,7 @@ public:
                 instance->SetData(DATA_GRANDMASTERVORPILEVENT, IN_PROGRESS);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             ScriptedAI::MoveInLineOfSight(who);
 
@@ -149,13 +149,13 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SHADOWBOLT:
                     me->CastSpell(me, SPELL_SHADOWBOLT_VOLLEY, false);
@@ -168,25 +168,25 @@ public:
                     break;
                 case EVENT_SUMMON_TRAVELER:
                     spawnVoidTraveler();
-                    events.RepeatEvent(HealthBelowPct(20) ? 5000: 10000);
+                    events.RepeatEvent(HealthBelowPct(20) ? 5000 : 10000);
                     break;
                 case EVENT_SPELL_DRAWSHADOWS:
-                {
-                    Map* map = me->GetMap();
-                    Map::PlayerList const &PlayerList = map->GetPlayers();
-                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                        if (Player* player = i->GetSource())
-                            if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
-                                player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
+                    {
+                        Map* map = me->GetMap();
+                        Map::PlayerList const& PlayerList = map->GetPlayers();
+                        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                            if (Player* player = i->GetSource())
+                                if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
+                                    player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
 
-                    me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
-                    me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
-                    me->CastSpell(me, SPELL_RAIN_OF_FIRE_N);
+                        me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
+                        me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
+                        me->CastSpell(me, SPELL_RAIN_OF_FIRE_N);
 
-                    events.RepeatEvent(24000);
-                    events.DelayEvents(6000);
-                    break;
-                }
+                        events.RepeatEvent(24000);
+                        events.DelayEvents(6000);
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -199,30 +199,29 @@ class npc_voidtraveler : public CreatureScript
 public:
     npc_voidtraveler() : CreatureScript("npc_voidtraveler") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_voidtravelerAI (creature);
+        return GetShadowLabyrinthAI<npc_voidtravelerAI>(creature);
     }
 
     struct npc_voidtravelerAI : public ScriptedAI
     {
         npc_voidtravelerAI(Creature* creature) : ScriptedAI(creature)
         {
-            VorpilGUID = 0;
             moveTimer = 1000;
             sacrificed = false;
         }
 
-        uint64 VorpilGUID;
+        ObjectGuid VorpilGUID;
         uint32 moveTimer;
         bool sacrificed;
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(ObjectGuid guid, int32) override
         {
             VorpilGUID = guid;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             moveTimer += diff;
             if (moveTimer >= 1000)

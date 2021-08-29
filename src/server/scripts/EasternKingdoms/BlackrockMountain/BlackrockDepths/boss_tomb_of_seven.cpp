@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "blackrock_depths.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -53,7 +53,7 @@ public:
                 if (InstanceScript* instance = creature->GetInstanceScript())
                 {
                     //are 5 minutes expected? go template may have data to despawn when used at quest
-                    instance->DoRespawnGameObject(instance->GetData64(DATA_GO_CHALICE), MINUTE*5);
+                    instance->DoRespawnGameObject(instance->GetGuidData(DATA_GO_CHALICE), MINUTE * 5);
                 }
                 break;
         }
@@ -110,7 +110,7 @@ public:
                 // Start encounter
                 InstanceScript* instance = creature->GetInstanceScript();
                 if (instance)
-                    instance->SetData64(DATA_EVENSTARTER, player->GetGUID());
+                    instance->SetGuidData(DATA_EVENSTARTER, player->GetGUID());
                 break;
         }
         return true;
@@ -126,7 +126,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_doomrelAI>(creature);
+        return GetBlackrockDepthsAI<boss_doomrelAI>(creature);
     }
 
     struct boss_doomrelAI : public ScriptedAI
@@ -175,7 +175,7 @@ public:
             if (me->IsAlive())
                 me->GetMotionMaster()->MoveTargetedHome();
             me->SetLootRecipient(nullptr);
-            instance->SetData64(DATA_EVENSTARTER, 0);
+            instance->SetGuidData(DATA_EVENSTARTER, ObjectGuid::Empty);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -189,7 +189,7 @@ public:
                 return;
 
             _events.Update(diff);
-            
+
             switch(_events.ExecuteEvent())
             {
                 case EVENT_SPELL_SHADOWBOLTVOLLEY:
@@ -199,8 +199,8 @@ public:
                 case EVENT_SPELL_IMMOLATE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                     {
-                       DoCast(target, SPELL_IMMOLATE);
-                       _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 25000);
+                        DoCast(target, SPELL_IMMOLATE);
+                        _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 25000);
                     }
                     // Didn't get a target, try again in 1s
                     _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 1000);

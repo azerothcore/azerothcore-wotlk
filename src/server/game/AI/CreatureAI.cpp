@@ -1,19 +1,18 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
 
+#include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "Creature.h"
-#include "World.h"
-#include "SpellMgr.h"
-#include "Vehicle.h"
+#include "CreatureTextMgr.h"
 #include "Log.h"
 #include "MapReference.h"
 #include "Player.h"
-#include "CreatureTextMgr.h"
+#include "SpellMgr.h"
+#include "Vehicle.h"
 
 //Disable CreatureAI when charmed
 void CreatureAI::OnCharmed(bool /*apply*/)
@@ -26,12 +25,12 @@ void CreatureAI::OnCharmed(bool /*apply*/)
 AISpellInfoType* UnitAI::AISpellInfo;
 AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; }
 
-void CreatureAI::Talk(uint8 id, WorldObject const* whisperTarget /*= NULL*/)
+void CreatureAI::Talk(uint8 id, WorldObject const* whisperTarget /*= nullptr*/)
 {
     sCreatureTextMgr->SendChat(me, id, whisperTarget);
 }
 
-void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToNearestTarget /* = 50.0f*/)
+void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRangeToNearestTarget /* = 50.0f*/)
 {
     if (!creature)
         creature = me;
@@ -42,7 +41,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToN
     Map* map = creature->GetMap();
     if (!map->IsDungeon())                                  //use IsDungeon instead of Instanceable, in case battlegrounds will be instantiated
     {
-        sLog->outError("DoZoneInCombat call for map that isn't an instance (creature entry = %d)", creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
+        LOG_ERROR("entities.unit.ai", "DoZoneInCombat call for map that isn't an instance (creature entry = %d)", creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
         return;
     }
 
@@ -65,7 +64,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToN
 
     if (!creature->HasReactState(REACT_PASSIVE) && !creature->GetVictim())
     {
-        sLog->outError("DoZoneInCombat called for creature that has empty threat list (creature entry = %u)", creature->GetEntry());
+        LOG_ERROR("entities.unit.ai", "DoZoneInCombat called for creature that has empty threat list (creature entry = %u)", creature->GetEntry());
         return;
     }
 
@@ -103,8 +102,10 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToN
 // MoveInLineOfSight can be called inside another MoveInLineOfSight and cause stack overflow
 void CreatureAI::MoveInLineOfSight_Safe(Unit* who)
 {
-    if (m_MoveInLineOfSight_locked == true)
+    if (m_MoveInLineOfSight_locked)
+    {
         return;
+    }
     m_MoveInLineOfSight_locked = true;
     MoveInLineOfSight(who);
     m_MoveInLineOfSight_locked = false;
@@ -118,8 +119,8 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
     // pussywizard: civilian, non-combat pet or any other NOT HOSTILE TO ANYONE (!)
     if (me->IsMoveInLineOfSightDisabled())
         if (me->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET ||      // nothing more to do, return
-            !who->IsInCombat() ||                                         // if not in combat, nothing more to do
-            !me->IsWithinDist(who, ATTACK_DISTANCE))                      // if in combat and in dist - neutral to all can actually assist other creatures
+                !who->IsInCombat() ||                                         // if not in combat, nothing more to do
+                !me->IsWithinDist(who, ATTACK_DISTANCE, true, false))                      // if in combat and in dist - neutral to all can actually assist other creatures
             return;
 
     if (me->CanStartAttack(who))
@@ -151,9 +152,7 @@ void CreatureAI::EnterEvadeMode()
     if (!_EnterEvadeMode())
         return;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_UNITS, "Creature %u enters evade mode.", me->GetEntry());
-#endif
+    LOG_DEBUG("entities.unit", "Creature %u enters evade mode.", me->GetEntry());
 
     if (!me->GetVehicle()) // otherwise me will be in evade mode forever
     {
@@ -246,14 +245,49 @@ bool CreatureAI::_EnterEvadeMode()
     me->DeleteThreatList();
     me->CombatStop(true);
     me->LoadCreaturesAddon(true);
-    me->SetLootRecipient(NULL);
+    me->SetLootRecipient(nullptr);
     me->ResetPlayerDamageReq();
     me->SetLastDamagedTime(0);
+    me->SetCannotReachTarget(false);
 
     if (me->IsInEvadeMode())
         return false;
 
     return true;
+}
+
+void CreatureAI::MoveCircleChecks()
+{
+    Unit *victim = me->GetVictim();
+
+    if (
+        !victim ||
+        !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
+        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim() ||
+        (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())  // only player & pets to save CPU
+    )
+    {
+        return;
+    }
+
+    me->GetMotionMaster()->MoveCircleTarget(me->GetVictim());
+}
+
+void CreatureAI::MoveBackwardsChecks() {
+    Unit *victim = me->GetVictim();
+
+    if (
+        !victim ||
+        !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
+        (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())
+    )
+    {
+        return;
+    }
+
+    float moveDist = me->GetMeleeRange(victim) / 2;
+
+    me->GetMotionMaster()->MoveBackwards(victim, moveDist);
 }
 
 Creature* CreatureAI::DoSummon(uint32 entry, const Position& pos, uint32 despawnTime, TempSummonType summonType)

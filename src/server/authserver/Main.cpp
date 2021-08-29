@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,69 +12,57 @@
 * authentication server
 */
 
-#include <ace/Dev_Poll_Reactor.h>
-#include <ace/TP_Reactor.h>
-#include <ace/ACE.h>
-#include <ace/Sig_Handler.h>
-#include <openssl/opensslv.h>
-#include <openssl/crypto.h>
-
+#include "AppenderDB.h"
+#include "AuthSocketMgr.h"
+#include "Banner.h"
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
-#include "Configuration/Config.h"
-#include "Log.h"
+#include "Config.h"
+#include "DatabaseEnv.h"
+#include "DatabaseLoader.h"
+#include "DeadlineTimer.h"
 #include "GitRevision.h"
-#include "Util.h"
-#include "SignalHandler.h"
+#include "IPLocation.h"
+#include "Log.h"
+#include "IoContext.h"
+#include "MySQLThreading.h"
+#include "ProcessPriority.h"
 #include "RealmList.h"
-#include "RealmAcceptor.h"
-
-#ifdef __linux__
-#include <sched.h>
-#include <sys/resource.h>
-#define PROCESS_HIGH_PRIORITY -15 // [-20, 19], default is 0
-#endif
+#include "SecretMgr.h"
+#include "SharedDefines.h"
+#include "Util.h"
+#include <boost/asio/signal_set.hpp>
+#include <boost/version.hpp>
+#include <csignal>
+#include <openssl/crypto.h>
+#include <openssl/opensslv.h>
 
 #ifndef _ACORE_REALM_CONFIG
-# define _ACORE_REALM_CONFIG  "authserver.conf"
+#define _ACORE_REALM_CONFIG "authserver.conf"
 #endif
+
+using boost::asio::ip::tcp;
 
 bool StartDB();
 void StopDB();
-
-bool stopEvent = false;                                     // Setting it to true stops the server
-
-LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the authserver database
-
-/// Handle authserver's termination signals
-class AuthServerSignalHandler : public acore::SignalHandler
-{
-public:
-    virtual void HandleSignal(int sigNum)
-    {
-        switch (sigNum)
-        {
-        case SIGINT:
-        case SIGTERM:
-            stopEvent = true;
-            break;
-        }
-    }
-};
+void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error, int signalNumber);
+void KeepDatabaseAliveHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error);
+void BanExpiryHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error);
 
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
-    sLog->outString("Usage: \n %s [<options>]\n"
-        "    -c config_file           use config_file as configuration file\n\r",
-        prog);
+    LOG_INFO("server.authserver", "Usage: \n %s [<options>]\n"
+        "    -c config_file           use config_file as configuration file\n\r", prog);
 }
 
 /// Launch the auth server
-extern int main(int argc, char** argv)
+int main(int argc, char** argv)
 {
+    Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
+    signal(SIGABRT, &Acore::AbortHandler);
+
     // Command line parsing to get the configuration file name
-    char const* configFile = _ACORE_REALM_CONFIG;
+    std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
     int count = 1;
     while (count < argc)
     {
@@ -92,59 +80,37 @@ extern int main(int argc, char** argv)
         ++count;
     }
 
-    std::string cfg_def_file=_ACORE_REALM_CONFIG;
-    cfg_def_file += ".dist";
+    // Add file and args in config
+    sConfigMgr->Configure(configFile, std::vector<std::string>(argv, argv + argc));
 
-    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
-        printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
+    if (!sConfigMgr->LoadAppConfigs())
         return 1;
-    }
 
-    if (!sConfigMgr->LoadMore(configFile))
-    {
-        printf("WARNING: Invalid or missing configuration file : %s\n", configFile);
-        printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
-    }
+    // Init logging
+    sLog->RegisterAppender<AppenderDB>();
+    sLog->Initialize();
 
-    sLog->outString("%s (authserver)", GitRevision::GetFullVersion());
-    sLog->outString("<Ctrl-C> to stop.\n");
-
-    sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
-    sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
-    sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
-    sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
-    sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
-    sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
-    sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
-    sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
-    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");  
-    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");  
-    sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
-    sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
-
-    sLog->outString("  	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
-
-    sLog->outString("Using configuration file %s.", configFile);
-
-    sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-
-#if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-    ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
-#else
-    ACE_Reactor::instance(new ACE_Reactor(new ACE_TP_Reactor(), true), true);
-#endif
-
-    sLog->outBasic("Max allowed open files is %d", ACE::max_handles());
+    Acore::Banner::Show("authserver",
+        [](std::string_view text)
+        {
+            FMT_LOG_INFO("server.authserver", text);
+        },
+        []()
+        {
+            FMT_LOG_INFO("server.authserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
+            FMT_LOG_INFO("server.authserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            FMT_LOG_INFO("server.authserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+        });
 
     // authserver PID file creation
-    std::string pidFile = sConfigMgr->GetStringDefault("PidFile", "");
+    std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            sLog->outError("Daemon PID: %u\n", pid); // outError for red color in console
+            LOG_INFO("server.authserver", "Daemon PID: %u\n", pid); // outError for red color in console
         else
         {
-            sLog->outError("Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
+            LOG_ERROR("server.authserver", "Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
             return 1;
         }
     }
@@ -153,148 +119,75 @@ extern int main(int argc, char** argv)
     if (!StartDB())
         return 1;
 
-    // Initialize the log database
-    sLog->SetLogDB(false);
-    sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (authserver realmid)
+    sSecretMgr->Initialize();
+
+    // Load IP Location Database
+    sIPLocation->Load();
+
+    std::shared_ptr<void> dbHandle(nullptr, [](void*) { StopDB(); });
+
+    std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 
     // Get the list of realms for the server
-    sRealmList->Initialize(sConfigMgr->GetIntDefault("RealmsStateUpdateDelay", 20));
-    if (sRealmList->size() == 0)
+    sRealmList->Initialize(*ioContext, sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
+
+    std::shared_ptr<void> sRealmListHandle(nullptr, [](void*) { sRealmList->Close(); });
+
+    if (sRealmList->GetRealms().empty())
     {
-        sLog->outError("No valid realms specified.");
+        LOG_ERROR("server.authserver", "No valid realms specified.");
         return 1;
     }
 
-    // Launch the listening network socket
-    RealmAcceptor acceptor;
-
-    int32 rmport = sConfigMgr->GetIntDefault("RealmServerPort", 3724);
-    if (rmport < 0 || rmport > 0xFFFF)
+    // Start the listening port (acceptor) for auth connections
+    int32 port = sConfigMgr->GetOption<int32>("RealmServerPort", 3724);
+    if (port < 0 || port > 0xFFFF)
     {
-        sLog->outError("The specified RealmServerPort (%d) is out of the allowed range (1-65535)", rmport);
+        LOG_ERROR("server.authserver", "Specified port out of allowed range (1-65535)");
         return 1;
     }
 
-    std::string bind_ip = sConfigMgr->GetStringDefault("BindIP", "0.0.0.0");
+    std::string bindIp = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
 
-    ACE_INET_Addr bind_addr(uint16(rmport), bind_ip.c_str());
-
-    if (acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
+    if (!sAuthSocketMgr.StartNetwork(*ioContext, bindIp, port))
     {
-        sLog->outError("Auth server can not bind to %s:%d (possible error: port already in use)", bind_ip.c_str(), rmport);
+        LOG_ERROR("server.authserver", "Failed to initialize network");
         return 1;
     }
 
-    sLog->outString("Authserver listening to %s:%d", bind_ip.c_str(), rmport);
+    std::shared_ptr<void> sAuthSocketMgrHandle(nullptr, [](void*) { sAuthSocketMgr.StopNetwork(); });
 
-    // Initialize the signal handlers
-    AuthServerSignalHandler SignalINT, SignalTERM;
-
-    // Register authservers's signal handlers
-    ACE_Sig_Handler Handler;
-    Handler.register_handler(SIGINT, &SignalINT);
-    Handler.register_handler(SIGTERM, &SignalTERM);
-
-#if defined(_WIN32) || defined(__linux__)
-
-    ///- Handle affinity for multiple processors and process priority
-    uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
-    bool highPriority = sConfigMgr->GetBoolDefault("ProcessPriority", false);
-
-#ifdef _WIN32 // Windows
-
-    HANDLE hProcess = GetCurrentProcess();
-    if (affinity > 0)
-    {
-        ULONG_PTR appAff;
-        ULONG_PTR sysAff;
-
-        if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
-        {
-            // remove non accessible processors
-            ULONG_PTR currentAffinity = affinity & appAff;
-
-            if (!currentAffinity)
-                sLog->outError("server.authserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the authserver. Accessible processors bitmask (hex): %x", affinity, appAff);
-            else if (SetProcessAffinityMask(hProcess, currentAffinity))
-                sLog->outString("server.authserver", "Using processors (bitmask, hex): %x", currentAffinity);
-            else
-                sLog->outError("server.authserver", "Can't set used processors (hex): %x", currentAffinity);
-        }
-    }
-
-    if (highPriority)
-    {
-        if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
-            sLog->outString("server.authserver", "authserver process priority class set to HIGH");
-        else
-            sLog->outError("server.authserver", "Can't set authserver process priority class.");
-    }
-
-#else // Linux
-
-    if (affinity > 0)
-    {
-        cpu_set_t mask;
-        CPU_ZERO(&mask);
-
-        for (unsigned int i = 0; i < sizeof(affinity) * 8; ++i)
-            if (affinity & (1 << i))
-                CPU_SET(i, &mask);
-
-        if (sched_setaffinity(0, sizeof(mask), &mask))
-            sLog->outError("Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
-        else
-        {
-            CPU_ZERO(&mask);
-            sched_getaffinity(0, sizeof(mask), &mask);
-            sLog->outString("Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
-        }
-    }
-
-    if (highPriority)
-    {
-        if (setpriority(PRIO_PROCESS, 0, PROCESS_HIGH_PRIORITY))
-            sLog->outError("Can't set authserver process priority class, error: %s", strerror(errno));
-        else
-            sLog->outString("authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
-    }
-
+    // Set signal handlers
+    boost::asio::signal_set signals(*ioContext, SIGINT, SIGTERM);
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+    signals.add(SIGBREAK);
 #endif
-#endif
+    signals.async_wait(std::bind(&SignalHandler, std::weak_ptr<Acore::Asio::IoContext>(ioContext), std::placeholders::_1, std::placeholders::_2));
 
-    // maximum counter for next ping
-    uint32 numLoops = (sConfigMgr->GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
-    uint32 loopCounter = 0;
+    // Set process priority according to configuration settings
+    SetProcessPriority("server.authserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
-    // possibly enable db logging; avoid massive startup spam by doing it here.
-    if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
-    {
-        sLog->outString("Enabling database logging...");
-        sLog->SetLogDB(true);
-    }
+    // Enabled a timed callback for handling the database keep alive ping
+    int32 dbPingInterval = sConfigMgr->GetOption<int32>("MaxPingTime", 30);
+    std::shared_ptr<Acore::Asio::DeadlineTimer> dbPingTimer = std::make_shared<Acore::Asio::DeadlineTimer>(*ioContext);
+    dbPingTimer->expires_from_now(boost::posix_time::minutes(dbPingInterval));
+    dbPingTimer->async_wait(std::bind(&KeepDatabaseAliveHandler, std::weak_ptr<Acore::Asio::DeadlineTimer>(dbPingTimer), dbPingInterval, std::placeholders::_1));
 
-    // Wait for termination signal
-    while (!stopEvent)
-    {
-        // dont move this outside the loop, the reactor will modify it
-        ACE_Time_Value interval(0, 100000);
+    int32 banExpiryCheckInterval = sConfigMgr->GetOption<int32>("BanExpiryCheckInterval", 60);
+    std::shared_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimer = std::make_shared<Acore::Asio::DeadlineTimer>(*ioContext);
+    banExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(banExpiryCheckInterval));
+    banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, std::weak_ptr<Acore::Asio::DeadlineTimer>(banExpiryCheckTimer), banExpiryCheckInterval, std::placeholders::_1));
 
-        if (ACE_Reactor::instance()->run_reactor_event_loop(interval) == -1)
-            break;
+    // Start the io service worker loop
+    ioContext->run();
 
-        if ((++loopCounter) == numLoops)
-        {
-            loopCounter = 0;
-            sLog->outDetail("Ping MySQL to keep connection alive");
-            LoginDatabase.KeepAlive();
-        }
-    }
+    banExpiryCheckTimer->cancel();
+    dbPingTimer->cancel();
 
-    // Close the Database Pool and library
-    StopDB();
+    LOG_INFO("server.authserver", "Halting process...");
 
-    sLog->outString("Halting process...");
+    signals.cancel();
+
     return 0;
 }
 
@@ -303,35 +196,18 @@ bool StartDB()
 {
     MySQL::Library_Init();
 
-    std::string dbstring = sConfigMgr->GetStringDefault("LoginDatabaseInfo", "");
-    if (dbstring.empty())
-    {
-        sLog->outError("Database not specified");
+    // Load databases
+    // NOTE: While authserver is singlethreaded you should keep synch_threads == 1.
+    // Increasing it is just silly since only 1 will be used ever.
+    DatabaseLoader loader("server.authserver");
+    loader
+        .AddDatabase(LoginDatabase, "Login");
+
+    if (!loader.Load())
         return false;
-    }
 
-    int32 worker_threads = sConfigMgr->GetIntDefault("LoginDatabase.WorkerThreads", 1);
-    if (worker_threads < 1 || worker_threads > 32)
-    {
-        sLog->outError("Improper value specified for LoginDatabase.WorkerThreads, defaulting to 1.");
-        worker_threads = 1;
-    }
-
-    int32 synch_threads = sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1);
-    if (synch_threads < 1 || synch_threads > 32)
-    {
-        sLog->outError("Improper value specified for LoginDatabase.SynchThreads, defaulting to 1.");
-        synch_threads = 1;
-    }
-
-    // NOTE: While authserver is singlethreaded you should keep synch_threads == 1. Increasing it is just silly since only 1 will be used ever.
-    if (!LoginDatabase.Open(dbstring.c_str(), uint8(worker_threads), uint8(synch_threads)))
-    {
-        sLog->outError("Cannot connect to database");
-        return false;
-    }
-
-    sLog->outString("Started auth database connection pool.");
+    LOG_INFO("server.authserver", "Started auth database connection pool.");
+    sLog->SetRealmId(0); // Enables DB appenders when realm is set.
     return true;
 }
 
@@ -340,4 +216,45 @@ void StopDB()
 {
     LoginDatabase.Close();
     MySQL::Library_End();
+}
+
+void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error, int /*signalNumber*/)
+{
+    if (!error)
+    {
+        if (std::shared_ptr<Acore::Asio::IoContext> ioContext = ioContextRef.lock())
+        {
+            ioContext->stop();
+        }
+    }
+}
+
+void KeepDatabaseAliveHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error)
+{
+    if (!error)
+    {
+        if (std::shared_ptr<Acore::Asio::DeadlineTimer> dbPingTimer = dbPingTimerRef.lock())
+        {
+            LOG_INFO("server.authserver", "Ping MySQL to keep connection alive");
+            LoginDatabase.KeepAlive();
+
+            dbPingTimer->expires_from_now(boost::posix_time::minutes(dbPingInterval));
+            dbPingTimer->async_wait(std::bind(&KeepDatabaseAliveHandler, dbPingTimerRef, dbPingInterval, std::placeholders::_1));
+        }
+    }
+}
+
+void BanExpiryHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error)
+{
+    if (!error)
+    {
+        if (std::shared_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimer = banExpiryCheckTimerRef.lock())
+        {
+            LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS));
+            LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPIRED_ACCOUNT_BANS));
+
+            banExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(banExpiryCheckInterval));
+            banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, banExpiryCheckTimerRef, banExpiryCheckInterval, std::placeholders::_1));
+        }
+    }
 }

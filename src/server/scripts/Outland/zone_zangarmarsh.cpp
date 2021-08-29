@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -20,11 +20,11 @@ npc_kayra_longmane
 npc_timothy_daniels
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 // Ours
@@ -54,12 +54,12 @@ public:
         if (creature->AI()->GetData(1))
         {
             creature->CastSpell(player, SPELL_MARK_OF_BITE, true);
-            player->KilledMonsterCredit(creature->GetEntry(), 0);
+            player->KilledMonsterCredit(creature->GetEntry());
             creature->DespawnOrUnsummon(1000);
         }
         else
         {
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             Creature* cr;
             if ((cr = creature->SummonCreature(17957, -186, -790, 43.8f, 4.2f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                 cr->AI()->AttackStart(creature);
@@ -96,13 +96,13 @@ public:
         }
 
         void EnterCombat(Unit*) override
-        { 
-            _spoken = 2; 
+        {
+            _spoken = 2;
         }
 
-        uint32 GetData(uint32) const override 
-        { 
-            return _spoken == 2; 
+        uint32 GetData(uint32) const override
+        {
+            return _spoken == 2;
         }
     };
 
@@ -111,7 +111,6 @@ public:
         return new npc_natrualist_biteAI (creature);
     }
 };
-
 
 // Theirs
 /*######
@@ -149,10 +148,10 @@ public:
         if (player->GetReputationRank(942) > REP_NEUTRAL)
         {
             if (creature->GetEntry() == NPC_ASHYEN)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BLESS_ASH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BLESS_ASH, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             if (creature->GetEntry() == NPC_KELETH)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BLESS_KEL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BLESS_KEL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -162,7 +161,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             creature->setPowerType(POWER_MANA);
             creature->SetMaxPower(POWER_MANA, 200);             //set a "fake" mana value, we can't depend on database doing it in this case
@@ -172,7 +171,8 @@ public:
             {
                 uint32 spell = 0;
                 switch (player->GetReputationRank(942))
-                {                                               //mark of lore
+                {
+                    //mark of lore
                     case REP_FRIENDLY:
                         spell = SPELL_BLESS_ASH_FRI;
                         break;
@@ -276,7 +276,8 @@ public:
             {
                 DoCastVictim(SPELL_LIGHTNING_BOLT);
                 LightningBolt_Timer = 5000;
-            } else LightningBolt_Timer -= diff;
+            }
+            else LightningBolt_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -346,22 +347,22 @@ public:
                 SendGossipMenuFor(player, 9229, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-            {
-                if (!player->HasItemCount(24573))
                 {
-                    ItemPosCountVec dest;
-                    uint32 itemId = 24573;
-                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, NULL);
-                    if (msg == EQUIP_ERR_OK)
+                    if (!player->HasItemCount(24573))
                     {
-                        player->StoreNewItem(dest, itemId, true);
+                        ItemPosCountVec dest;
+                        uint32 itemId = 24573;
+                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, nullptr);
+                        if (msg == EQUIP_ERR_OK)
+                        {
+                            player->StoreNewItem(dest, itemId, true);
+                        }
+                        else
+                            player->SendEquipError(msg, nullptr, nullptr, itemId);
                     }
-                    else
-                        player->SendEquipError(msg, NULL, NULL, itemId);
+                    SendGossipMenuFor(player, 9231, creature->GetGUID());
+                    break;
                 }
-                SendGossipMenuFor(player, 9231, creature->GetGUID());
-                break;
-            }
         }
         return true;
     }
@@ -419,9 +420,9 @@ public:
     {
         npc_kayra_longmaneAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -454,7 +455,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_ESCAPE_FROM)
         {
@@ -466,7 +467,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_kayra_longmaneAI(creature);
     }

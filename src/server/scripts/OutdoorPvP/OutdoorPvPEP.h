@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -27,13 +27,13 @@ const uint32 EP_PWT_CM = 17698;
 
 const uint32 EPBuffZones[EPBuffZonesNum] = {139, 2017, 2057};
 
-enum EP_TaxiNodes
-{
-    EP_CGT_Taxi = 87,
-    EP_EWT_Taxi = 86,
-    EP_NPT_Taxi = 85,
-    EP_PWT_Taxi = 84
-};
+//enum EP_TaxiNodes
+//{
+//    EP_CGT_Taxi = 87,
+//    EP_EWT_Taxi = 86,
+//    EP_NPT_Taxi = 85,
+//    EP_PWT_Taxi = 84
+//};
 
 enum EP_EastwallTowerWorldStates
 {
@@ -125,9 +125,9 @@ const go_type EPTowerFlags[EP_TOWER_NUM] =
     {182106, 0, 1838.42f, -3703.56f, 167.713f, 0.890118f, 0.0f, 0.0f, 0.430511f, 0.902585f}
 };
 
-const uint32 EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691, 10699, 10701, 10705};
+//const uint32 EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691, 10699, 10701, 10705};
 
-const uint32 EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692, 10698, 10700, 10704};
+//const uint32 EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692, 10698, 10700, 10704};
 
 const uint8 EP_NUM_CREATURES = 6;
 const uint8 EP_EWT_NUM_CREATURES = 5;
@@ -173,148 +173,134 @@ class OutdoorPvPEP;
 
 class OPvPCapturePointEP_EWT : public OPvPCapturePoint
 {
-    public:
+public:
+    OPvPCapturePointEP_EWT(OutdoorPvP* pvp);
 
-        OPvPCapturePointEP_EWT(OutdoorPvP* pvp);
+    void ChangeState() override;
 
-        void ChangeState();
+    void SendChangePhase() override;
 
-        void SendChangePhase();
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket & data);
+    // used when player is activated/inactivated in the area
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
-        // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* player);
-        void HandlePlayerLeave(Player* player);
+protected:
+    void SummonSupportUnitAtNorthpassTower(TeamId teamId);
 
-    protected:
+    void UpdateTowerState();
 
-        void SummonSupportUnitAtNorthpassTower(TeamId teamId);
+protected:
+    uint32 m_TowerState;
 
-        void UpdateTowerState();
-
-    protected:
-
-        uint32 m_TowerState;
-
-        TeamId m_UnitsSummonedSideId;
+    TeamId m_UnitsSummonedSideId;
 };
 
 class OPvPCapturePointEP_NPT : public OPvPCapturePoint
 {
-    public:
+public:
+    OPvPCapturePointEP_NPT(OutdoorPvP* pvp);
 
-        OPvPCapturePointEP_NPT(OutdoorPvP* pvp);
+    void ChangeState() override;
 
-        void ChangeState();
+    void SendChangePhase() override;
 
-        void SendChangePhase();
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket & data);
+    // used when player is activated/inactivated in the area
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
-        // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* player);
-        void HandlePlayerLeave(Player* player);
+protected:
+    void SummonGO(TeamId teamId);
 
-    protected:
+    void UpdateTowerState();
 
-        void SummonGO(TeamId teamId);
+protected:
+    uint32 m_TowerState;
 
-        void UpdateTowerState();
-
-    protected:
-
-        uint32 m_TowerState;
-
-        TeamId m_SummonedGOSideId;
+    TeamId m_SummonedGOSideId;
 };
 
 class OPvPCapturePointEP_CGT : public OPvPCapturePoint
 {
-    public:
+public:
+    OPvPCapturePointEP_CGT(OutdoorPvP* pvp);
 
-        OPvPCapturePointEP_CGT(OutdoorPvP* pvp);
+    void ChangeState() override;
 
-        void ChangeState();
+    void SendChangePhase() override;
 
-        void SendChangePhase();
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket & data);
+    // used when player is activated/inactivated in the area
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
-        // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* player);
-        void HandlePlayerLeave(Player* player);
+protected:
+    void LinkGraveyard(TeamId teamId);
 
-    protected:
+    void UpdateTowerState();
 
-        void LinkGraveyard(TeamId teamId);
+protected:
+    uint32 m_TowerState;
 
-        void UpdateTowerState();
-
-    protected:
-
-        uint32 m_TowerState;
-
-        TeamId m_GraveyardSide;
+    TeamId m_GraveyardSide;
 };
 
 class OPvPCapturePointEP_PWT : public OPvPCapturePoint
 {
-    public:
+public:
+    OPvPCapturePointEP_PWT(OutdoorPvP* pvp);
 
-        OPvPCapturePointEP_PWT(OutdoorPvP* pvp);
+    void ChangeState() override;
 
-        void ChangeState();
+    void SendChangePhase() override;
 
-        void SendChangePhase();
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket & data);
+    // used when player is activated/inactivated in the area
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
-        // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* player);
-        void HandlePlayerLeave(Player* player);
+protected:
+    void SummonFlightMaster(TeamId teamId);
 
-    protected:
+    void UpdateTowerState();
 
-        void SummonFlightMaster(TeamId teamId);
+protected:
+    TeamId m_FlightMasterSpawnedId;
 
-        void UpdateTowerState();
-
-    protected:
-
-        TeamId m_FlightMasterSpawnedId;
-
-        uint32 m_TowerState;
+    uint32 m_TowerState;
 };
 
 class OutdoorPvPEP : public OutdoorPvP
 {
-    public:
+public:
+    OutdoorPvPEP();
 
-        OutdoorPvPEP();
+    bool SetupOutdoorPvP() override;
 
-        bool SetupOutdoorPvP();
+    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
+    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
 
-        void HandlePlayerEnterZone(Player* player, uint32 zone);
-        void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    bool Update(uint32 diff) override;
 
-        bool Update(uint32 diff);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void FillInitialWorldStates(WorldPacket &data);
+    void SendRemoveWorldStates(Player* player) override;
 
-        void SendRemoveWorldStates(Player* player);
+    void BuffTeams();
 
-        void BuffTeams();
+    void SetControlledState(uint32 index, TeamId teamId);
 
-        void SetControlledState(uint32 index, TeamId teamId);
+private:
+    // how many towers are controlled
+    TeamId EP_ControlsId[EP_TOWER_NUM];
 
-    private:
-
-        // how many towers are controlled
-        TeamId EP_ControlsId[EP_TOWER_NUM];
-
-        uint32 m_AllianceTowersControlled;
-        uint32 m_HordeTowersControlled;
+    uint32 m_AllianceTowersControlled;
+    uint32 m_HordeTowersControlled;
 };
 
 #endif

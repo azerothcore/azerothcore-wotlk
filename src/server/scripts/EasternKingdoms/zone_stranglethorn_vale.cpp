@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,9 +15,9 @@ EndScriptData */
 npc_yenniku
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*######
@@ -29,7 +29,7 @@ class npc_yenniku : public CreatureScript
 public:
     npc_yenniku() : CreatureScript("npc_yenniku") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_yennikuAI(creature);
     }
@@ -44,13 +44,13 @@ public:
         uint32 Reset_Timer;
         bool bReset;
 
-        void Reset()
+        void Reset() override
         {
             Reset_Timer = 0;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (bReset || spell->Id != 3607)
                 return;
@@ -70,9 +70,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (bReset)
             {
@@ -97,7 +97,7 @@ public:
                         }
                     }
                 }
-             }
+            }
 
             //Return since we have no target
             if (!UpdateVictim())

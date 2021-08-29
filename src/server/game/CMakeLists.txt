@@ -37,7 +37,7 @@ target_include_directories(game-interface
 
 target_link_libraries(game-interface
   INTERFACE
-    common)
+    shared)
 
 add_library(game STATIC
   ${PRIVATE_SOURCES}
@@ -51,8 +51,9 @@ target_include_directories(game
 
 target_link_libraries(game
   PRIVATE
-    game-interface
-    scripts-interface)
+    acore-core-interface
+  PUBLIC
+    game-interface)
 
 set_target_properties(game
   PROPERTIES

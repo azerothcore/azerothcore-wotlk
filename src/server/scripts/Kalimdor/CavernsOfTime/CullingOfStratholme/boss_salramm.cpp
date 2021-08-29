@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "culling_of_stratholme.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
 
 enum Spells
@@ -45,9 +45,9 @@ class boss_salramm : public CreatureScript
 public:
     boss_salramm() : CreatureScript("boss_salramm") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_salrammAI (creature);
+        return GetCullingOfStratholmeAI<boss_salrammAI>(creature);
     }
 
     struct boss_salrammAI : public ScriptedAI
@@ -59,15 +59,15 @@ public:
 
         EventMap events;
         SummonList summons;
-        void Reset() 
-        { 
+        void Reset() override
+        {
             events.Reset();
             summons.DespawnAll();
         }
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 7000);
@@ -78,15 +78,15 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_CURSE, 25000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
-            if (!urand(0,1))
+            if (!urand(0, 1))
                 return;
 
             Talk(SAY_SLAY);
@@ -103,7 +103,7 @@ public:
                     }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -112,26 +112,26 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_SPELL_STEAL_FLESH:
-                    if (!urand(0,2))
+                    if (!urand(0, 2))
                         Talk(SAY_STEAL_FLESH);
                     me->CastSpell(me->GetVictim(), SPELL_STEAL_FLESH_CHANNEL, false);
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_SPELL_SUMMON_GHOULS:
-                    if (!urand(0,2))
+                    if (!urand(0, 2))
                         Talk(SAY_SUMMON_GHOULS);
                     me->CastSpell(me, SPELL_SUMMON_GHOULS, false);
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_EXPLODE_GHOUL:
-                    if (!urand(0,2))
+                    if (!urand(0, 2))
                         Talk(SAY_EXPLODE_GHOUL);
                     ExplodeGhoul();
                     events.RepeatEvent(15000);
@@ -145,39 +145,38 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class spell_boss_salramm_steal_flesh : public SpellScriptLoader
 {
-    public:
-        spell_boss_salramm_steal_flesh() : SpellScriptLoader("spell_boss_salramm_steal_flesh") { }
+public:
+    spell_boss_salramm_steal_flesh() : SpellScriptLoader("spell_boss_salramm_steal_flesh") { }
 
-        class spell_boss_salramm_steal_flesh_AuraScript : public AuraScript
+    class spell_boss_salramm_steal_flesh_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_boss_salramm_steal_flesh_AuraScript);
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_boss_salramm_steal_flesh_AuraScript);
-
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            Unit* caster = GetCaster();
+            Unit* target = GetUnitOwner();
+            if (caster)
             {
-                Unit* caster = GetCaster();
-                Unit* target = GetUnitOwner();
-                if (caster)
-                {
-                    caster->CastSpell(caster, SPELL_STEAL_FLESH_CASTER, true);
-                    caster->CastSpell(target, SPELL_STEAL_FLESH_TARGET, true);
-                }
+                caster->CastSpell(caster, SPELL_STEAL_FLESH_CASTER, true);
+                caster->CastSpell(target, SPELL_STEAL_FLESH_TARGET, true);
             }
-
-            void Register()
-            {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_boss_salramm_steal_flesh_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_boss_salramm_steal_flesh_AuraScript();
         }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_boss_salramm_steal_flesh_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_boss_salramm_steal_flesh_AuraScript();
+    }
 };
 
 void AddSC_boss_salramm()

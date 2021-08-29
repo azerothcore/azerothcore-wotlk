@@ -1,22 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "Vehicle.h"
-#include "ObjectMgr.h"
-#include "ScriptedEscortAI.h"
 #include "CombatAI.h"
+#include "CreatureTextMgr.h"
+#include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "CreatureTextMgr.h"
-#include "PetAI.h"
 #include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum eyeOfAcherus
@@ -28,6 +27,9 @@ enum eyeOfAcherus
 
     EYE_TEXT_LAUNCH                 = 0,
     EYE_TEXT_CONTROL                = 1,
+
+    EYE_POINT_DESTINATION_1         = 0,
+    EYE_POINT_DESTINATION_2         = 1,
 
     SPELL_EYE_OF_ACHERUS_VISUAL     = 51892,
 };
@@ -51,6 +53,7 @@ public:
         void InitializeAI() override
         {
             events.Reset();
+
             events.ScheduleEvent(EVENT_REMOVE_CONTROL, 500);
             events.ScheduleEvent(EVENT_SPEAK_1, 4000);
             events.ScheduleEvent(EVENT_LAUNCH, 7000);
@@ -60,14 +63,16 @@ public:
 
         void MovementInform(uint32 type, uint32 point) override
         {
-            if (type == ESCORT_MOTION_TYPE || point !=0)
+            if (type == POINT_MOTION_TYPE && point == EYE_POINT_DESTINATION_2)
+            {
                 events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
+            }
         }
 
         void SetControl(Player* player, bool on)
         {
-            WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size()+1);
-            data.append(me->GetPackGUID());
+            WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size() + 1);
+            data << me->GetPackGUID();
             data << uint8(on ? 1 : 0);
             player->GetSession()->SendPacket(&data);
         }
@@ -85,23 +90,31 @@ public:
             {
                 case EVENT_REMOVE_CONTROL:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    {
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
                         SetControl(player, false);
+                    }
                     break;
                 case EVENT_SPEAK_1:
                     Talk(EYE_TEXT_LAUNCH, me->GetCharmerOrOwnerPlayerOrPlayerItself());
                     break;
                 case EVENT_LAUNCH:
-                {
-                    Movement::PointsArray path;
-                    path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                    path.push_back(G3D::Vector3(me->GetPositionX()-40.0f, me->GetPositionY(), me->GetPositionZ()+10.0f));
-                    path.push_back(G3D::Vector3(1768.0f, -5876.0f, 153.0f));
-                    me->GetMotionMaster()->MoveSplinePath(&path);
-                    break;
-                }
+                    {
+                        me->SetSpeed(MOVE_FLIGHT, 5.0f, true);
+
+                        const Position EYE_DESTINATION_1 = { me->GetPositionX() - 40.0f, me->GetPositionY(), me->GetPositionZ() + 10.0f, 0.0f };
+                        const Position EYE_DESTINATION_2 = { 1768.0f, -5876.0f, 153.0f, 0.0f };
+
+                        me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_1);
+                        me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_2);
+                        break;
+                    }
                 case EVENT_REGAIN_CONTROL:
                     if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->SetSpeed(MOVE_FLIGHT, 3.3f, true);
+
                         SetControl(player, true);
                         Talk(EYE_TEXT_CONTROL, player);
                     }
@@ -113,30 +126,30 @@ public:
 
 class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScriptLoader
 {
-    public:
-        spell_q12641_death_comes_from_on_high_summon_ghouls() : SpellScriptLoader("spell_q12641_death_comes_from_on_high_summon_ghouls") { }
+public:
+    spell_q12641_death_comes_from_on_high_summon_ghouls() : SpellScriptLoader("spell_q12641_death_comes_from_on_high_summon_ghouls") { }
 
-        class spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript : public SpellScript
+    class spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript);
-
-            void HandleScriptEffect(SpellEffIndex effIndex)
-            {
-                PreventHitEffect(effIndex);
-                if (Unit* target = GetHitUnit())
-                    GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript();
+            PreventHitEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+                GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript();
+    }
 };
 
 enum deathsChallenge
@@ -176,7 +189,7 @@ public:
                 return true;
 
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_15);
+            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
 
             player->CastSpell(creature, SPELL_DUEL, false);
             player->CastSpell(player, SPELL_DUEL_FLAG, true);
@@ -194,7 +207,7 @@ public:
             if (player->IsInCombat() || creature->IsInCombat())
                 return true;
 
-            if (!creature->AI()->GetData(player->GetGUIDLow()))
+            if (!creature->AI()->GetGUID(player->GetGUID().GetCounter()))
                 AddGossipItemFor(player, 9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
@@ -212,7 +225,7 @@ public:
         npc_death_knight_initiateAI(Creature* creature) : CombatAI(creature) { }
 
         bool _duelInProgress;
-        uint64 _duelGUID;
+        ObjectGuid _duelGUID;
         EventMap events;
         std::set<uint32> playerGUIDs;
         uint32 timer = 0;
@@ -228,18 +241,18 @@ public:
         void Reset() override
         {
             _duelInProgress = false;
-            _duelGUID = 0;
+            _duelGUID.Clear();
             me->RestoreFaction();
             CombatAI::Reset();
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_15);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
         }
 
         void SpellHit(Unit* caster, const SpellInfo* pSpell) override
         {
             if (!_duelInProgress && pSpell->Id == SPELL_DUEL)
             {
-                playerGUIDs.insert(caster->GetGUIDLow());
+                playerGUIDs.insert(caster->GetGUID().GetCounter());
                 _duelGUID = caster->GetGUID();
                 _duelInProgress = true;
 
@@ -247,11 +260,11 @@ public:
                 me->GetMotionMaster()->MoveFollow(caster, 2.0f, 0.0f);
 
                 events.ScheduleEvent(EVENT_SPEAK, 3000);
-                events.ScheduleEvent(EVENT_SPEAK+1, 7000);
-                events.ScheduleEvent(EVENT_SPEAK+2, 8000);
-                events.ScheduleEvent(EVENT_SPEAK+3, 9000);
-                events.ScheduleEvent(EVENT_SPEAK+4, 10000);
-                events.ScheduleEvent(EVENT_SPEAK+5, 11000);
+                events.ScheduleEvent(EVENT_SPEAK + 1, 7000);
+                events.ScheduleEvent(EVENT_SPEAK + 2, 8000);
+                events.ScheduleEvent(EVENT_SPEAK + 3, 9000);
+                events.ScheduleEvent(EVENT_SPEAK + 4, 10000);
+                events.ScheduleEvent(EVENT_SPEAK + 5, 11000);
             }
         }
 
@@ -265,8 +278,8 @@ public:
                 {
                     damage = 0;
                     events.ScheduleEvent(EVENT_DUEL_LOST, 2000);
-                    events.ScheduleEvent(EVENT_DUEL_LOST+1, 6000);
-                    _duelGUID = 0;
+                    events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6000);
+                    _duelGUID.Clear();
                     _duelInProgress = 0;
 
                     attacker->RemoveGameObject(SPELL_DUEL_FLAG, true);
@@ -301,16 +314,16 @@ public:
                     Talk(SAY_DUEL, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+1:
-                    Talk(SAY_DUEL+1, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    Talk(SAY_DUEL + 1, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+2:
-                    Talk(SAY_DUEL+2, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    Talk(SAY_DUEL + 2, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+3:
-                    Talk(SAY_DUEL+3, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    Talk(SAY_DUEL + 3, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+4:
-                    Talk(SAY_DUEL+4, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    Talk(SAY_DUEL + 4, ObjectAccessor::GetPlayer(*me, _duelGUID));
                     break;
                 case EVENT_SPEAK+5:
                     me->setFaction(FACTION_HOSTILE);
@@ -363,63 +376,63 @@ enum GiftOfTheHarvester
 
 class spell_item_gift_of_the_harvester : public SpellScriptLoader
 {
-    public:
-        spell_item_gift_of_the_harvester() : SpellScriptLoader("spell_item_gift_of_the_harvester") { }
+public:
+    spell_item_gift_of_the_harvester() : SpellScriptLoader("spell_item_gift_of_the_harvester") { }
 
-        class spell_item_gift_of_the_harvester_SpellScript : public SpellScript
+    class spell_item_gift_of_the_harvester_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_gift_of_the_harvester_SpellScript);
+
+        SpellCastResult CheckRequirement()
         {
-            PrepareSpellScript(spell_item_gift_of_the_harvester_SpellScript);
-
-            SpellCastResult CheckRequirement()
+            std::list<Creature*> ghouls;
+            GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
+            if (ghouls.size() >= MAX_GHOULS)
             {
-                std::list<Creature*> ghouls;
-                GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
-                if (ghouls.size() >= MAX_GHOULS)
-                {
-                    SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
-                    return SPELL_FAILED_CUSTOM_ERROR;
-                }
-
-                return SPELL_CAST_OK;
+                SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
+                return SPELL_FAILED_CUSTOM_ERROR;
             }
 
-            void Register() override
-            {
-                OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester_SpellScript::CheckRequirement);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_item_gift_of_the_harvester_SpellScript();
+            return SPELL_CAST_OK;
         }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester_SpellScript::CheckRequirement);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_gift_of_the_harvester_SpellScript();
+    }
 };
 
 class spell_q12698_the_gift_that_keeps_on_giving : public SpellScriptLoader
 {
-    public:
-        spell_q12698_the_gift_that_keeps_on_giving() : SpellScriptLoader("spell_q12698_the_gift_that_keeps_on_giving") { }
+public:
+    spell_q12698_the_gift_that_keeps_on_giving() : SpellScriptLoader("spell_q12698_the_gift_that_keeps_on_giving") { }
 
-        class spell_q12698_the_gift_that_keeps_on_giving_SpellScript : public SpellScript
+    class spell_q12698_the_gift_that_keeps_on_giving_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q12698_the_gift_that_keeps_on_giving_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_q12698_the_gift_that_keeps_on_giving_SpellScript);
-
-            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-            {
-                if (GetOriginalCaster() && GetHitUnit())
-                    GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_q12698_the_gift_that_keeps_on_giving_SpellScript();
+            if (GetOriginalCaster() && GetHitUnit())
+                GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
         }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_q12698_the_gift_that_keeps_on_giving_SpellScript();
+    }
 };
 
 class npc_scarlet_ghoul : public CreatureScript
@@ -439,11 +452,10 @@ public:
         }
 
         EventMap events;
-        uint64 gothikGUID;
+        ObjectGuid gothikGUID;
 
         void InitializeAI() override
         {
-            gothikGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             ScriptedAI::InitializeAI();
             me->SetReactState(REACT_PASSIVE);
@@ -458,7 +470,7 @@ public:
                 AttackStart(attacker);
         }
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             gothikGUID = guid;
             events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
@@ -477,24 +489,21 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_GHOUL_MOVE_TO_PIT:
                     me->GetMotionMaster()->MovePoint(1, 2364.77f, -5776.14f, 151.36f);
                     if (Creature* gothik = ObjectAccessor::GetCreature(*me, gothikGUID))
                         gothik->AI()->DoAction(SAY_GOTHIK_PIT);
-                    events.PopEvent();
                     break;
                 case EVENT_GHOUL_EMOTE:
                     me->CastSpell(me, SPELL_GHOUL_EMERGE, true);
-                    events.PopEvent();
                     break;
                 case EVENT_GHOUL_RESTORE_STATE:
                     me->SetReactState(REACT_DEFENSIVE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                     if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, frand(0.0f, 2*M_PI));
-                    events.PopEvent();
+                        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, frand(0.0f, 2 * M_PI));
                     events.ScheduleEvent(EVENT_GHOUL_CHECK_COMBAT, 1000);
                     return;
                 case EVENT_GHOUL_CHECK_COMBAT:
@@ -553,7 +562,7 @@ public:
                             creature->CastSpell(owner, 52517, true);
 
                         creature->AI()->SetGUID(me->GetGUID());
-                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     }
         }
 
@@ -597,7 +606,7 @@ public:
                 if (summonAttackers >= 15000)
                 {
                     for (uint8 i = 0; i < 15; ++i)
-                        if (Creature* summon = me->SummonCreature(28834 /*NPC_SCARLET_FLEET_DEFENDER*/, 2192.56f+irand(-10, 10), -6147.90f+irand(-10, 10), 5.2f, 4.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 45000))
+                        if (Creature* summon = me->SummonCreature(28834 /*NPC_SCARLET_FLEET_DEFENDER*/, 2192.56f + irand(-10, 10), -6147.90f + irand(-10, 10), 5.2f, 4.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 45000))
                         {
                             summon->SetHomePosition(me->GetHomePosition());
                             summon->AI()->AttackStart(me);
@@ -609,7 +618,6 @@ public:
         }
     };
 };
-
 
 // Theirs
 /*######
@@ -663,14 +671,14 @@ uint32 acherus_soul_prison[12] =
     191590
 };
 
-uint32 acherus_unworthy_initiate[5] =
-{
-    29519,
-    29520,
-    29565,
-    29566,
-    29567
-};
+//uint32 acherus_unworthy_initiate[5] =
+//{
+//    29519,
+//    29520,
+//    29565,
+//    29566,
+//    29567
+//};
 
 class npc_unworthy_initiate : public CreatureScript
 {
@@ -691,17 +699,17 @@ public:
                 me->SetCurrentEquipmentId(me->GetOriginalEquipmentId());
         }
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         UnworthyInitiatePhase phase;
         uint32 wait_timer;
         float anchorX, anchorY;
-        uint64 anchorGUID;
+        ObjectGuid anchorGUID;
 
         EventMap events;
 
         void Reset() override
         {
-            anchorGUID = 0;
+            anchorGUID.Clear();
             phase = PHASE_CHAINED;
             events.Reset();
             me->setFaction(7);
@@ -756,103 +764,103 @@ public:
         {
             switch (phase)
             {
-            case PHASE_CHAINED:
-                if (!anchorGUID)
-                {
-                    if (Creature* anchor = me->FindNearestCreature(29521, 30))
+                case PHASE_CHAINED:
+                    if (!anchorGUID)
                     {
-                        anchor->AI()->SetGUID(me->GetGUID());
-                        anchor->CastSpell(me, SPELL_SOUL_PRISON_CHAIN, true);
-                        anchorGUID = anchor->GetGUID();
-                    }
-
-                    float dist = 99.0f;
-                    GameObject* prison = nullptr;
-
-                    for (uint8 i = 0; i < 12; ++i)
-                    {
-                        if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 100))
+                        if (Creature* anchor = me->FindNearestCreature(29521, 30))
                         {
-                            if (temp_prison && me->IsWithinDist(temp_prison, dist, false))
+                            anchor->AI()->SetGUID(me->GetGUID());
+                            anchor->CastSpell(me, SPELL_SOUL_PRISON_CHAIN, true);
+                            anchorGUID = anchor->GetGUID();
+                        }
+
+                        float dist = 99.0f;
+                        GameObject* prison = nullptr;
+
+                        for (uint8 i = 0; i < 12; ++i)
+                        {
+                            if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 100))
                             {
-                                dist = me->GetDistance2d(temp_prison);
-                                prison = temp_prison;
+                                if (me->IsWithinDist(temp_prison, dist, false))
+                                {
+                                    dist = me->GetDistance2d(temp_prison);
+                                    prison = temp_prison;
+                                }
                             }
+                        }
+
+                        if (prison)
+                            prison->ResetDoorOrButton();
+                    }
+                    break;
+                case PHASE_TO_EQUIP:
+                    if (wait_timer)
+                    {
+                        if (wait_timer > diff)
+                            wait_timer -= diff;
+                        else
+                        {
+                            me->GetMotionMaster()->MovePoint(1, anchorX, anchorY, me->GetPositionZ());
+                            //LOG_DEBUG("scripts.ai", "npc_unworthy_initiateAI: move to %f %f %f", anchorX, anchorY, me->GetPositionZ());
+                            phase = PHASE_EQUIPING;
+                            wait_timer = 0;
+                        }
+                    }
+                    break;
+                case PHASE_TO_ATTACK:
+                    if (wait_timer)
+                    {
+                        if (wait_timer > diff)
+                            wait_timer -= diff;
+                        else
+                        {
+                            me->setFaction(14);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            phase = PHASE_ATTACKING;
+
+                            if (Player* target = ObjectAccessor::GetPlayer(*me, playerGUID))
+                                AttackStart(target);
+                            wait_timer = 0;
+                        }
+                    }
+                    break;
+                case PHASE_ATTACKING:
+                    if (!UpdateVictim())
+                        return;
+
+                    events.Update(diff);
+
+                    while (uint32 eventId = events.ExecuteEvent())
+                    {
+                        switch (eventId)
+                        {
+                            case EVENT_ICY_TOUCH:
+                                DoCastVictim(SPELL_ICY_TOUCH);
+                                events.DelayEvents(1000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_ICY_TOUCH, 5000, GCD_CAST);
+                                break;
+                            case EVENT_PLAGUE_STRIKE:
+                                DoCastVictim(SPELL_PLAGUE_STRIKE);
+                                events.DelayEvents(1000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5000, GCD_CAST);
+                                break;
+                            case EVENT_BLOOD_STRIKE:
+                                DoCastVictim(SPELL_BLOOD_STRIKE);
+                                events.DelayEvents(1000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5000, GCD_CAST);
+                                break;
+                            case EVENT_DEATH_COIL:
+                                DoCastVictim(SPELL_DEATH_COIL);
+                                events.DelayEvents(1000, GCD_CAST);
+                                events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
+                                break;
                         }
                     }
 
-                    if (prison)
-                        prison->ResetDoorOrButton();
-                }
-                break;
-            case PHASE_TO_EQUIP:
-                if (wait_timer)
-                {
-                    if (wait_timer > diff)
-                        wait_timer -= diff;
-                    else
-                    {
-                        me->GetMotionMaster()->MovePoint(1, anchorX, anchorY, me->GetPositionZ());
-                        //sLog->outDebug(LOG_FILTER_TSCR, "npc_unworthy_initiateAI: move to %f %f %f", anchorX, anchorY, me->GetPositionZ());
-                        phase = PHASE_EQUIPING;
-                        wait_timer = 0;
-                    }
-                }
-                break;
-            case PHASE_TO_ATTACK:
-                if (wait_timer)
-                {
-                    if (wait_timer > diff)
-                        wait_timer -= diff;
-                    else
-                    {
-                        me->setFaction(14);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        phase = PHASE_ATTACKING;
-
-                        if (Player* target = ObjectAccessor::GetPlayer(*me, playerGUID))
-                            AttackStart(target);
-                        wait_timer = 0;
-                    }
-                }
-                break;
-            case PHASE_ATTACKING:
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                    case EVENT_ICY_TOUCH:
-                        DoCastVictim(SPELL_ICY_TOUCH);
-                        events.DelayEvents(1000, GCD_CAST);
-                        events.ScheduleEvent(EVENT_ICY_TOUCH, 5000, GCD_CAST);
-                        break;
-                    case EVENT_PLAGUE_STRIKE:
-                        DoCastVictim(SPELL_PLAGUE_STRIKE);
-                        events.DelayEvents(1000, GCD_CAST);
-                        events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5000, GCD_CAST);
-                        break;
-                    case EVENT_BLOOD_STRIKE:
-                        DoCastVictim(SPELL_BLOOD_STRIKE);
-                        events.DelayEvents(1000, GCD_CAST);
-                        events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5000, GCD_CAST);
-                        break;
-                    case EVENT_DEATH_COIL:
-                        DoCastVictim(SPELL_DEATH_COIL);
-                        events.DelayEvents(1000, GCD_CAST);
-                        events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
-                        break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-                break;
-            default:
-                break;
+                    DoMeleeAttackIfReady();
+                    break;
+                default:
+                    break;
             }
         }
     };
@@ -870,17 +878,17 @@ public:
 
     struct npc_unworthy_initiate_anchorAI : public PassiveAI
     {
-        npc_unworthy_initiate_anchorAI(Creature* creature) : PassiveAI(creature), prisonerGUID(0) {}
+        npc_unworthy_initiate_anchorAI(Creature* creature) : PassiveAI(creature) {}
 
-        uint64 prisonerGUID;
+        ObjectGuid prisonerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
                 prisonerGUID = guid;
         }
 
-        uint64 GetGUID(int32 /*id*/) const override
+        ObjectGuid GetGUID(int32 /*id*/) const override
         {
             return prisonerGUID;
         }
@@ -895,13 +903,12 @@ public:
     bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (Creature* anchor = go->FindNearestCreature(29521, 15))
-            if (uint64 prisonerGUID = anchor->AI()->GetGUID())
+            if (ObjectGuid prisonerGUID = anchor->AI()->GetGUID())
                 if (Creature* prisoner = ObjectAccessor::GetCreature(*player, prisonerGUID))
                     CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
 
         return false;
     }
-
 };
 
 /*####
@@ -926,16 +933,16 @@ public:
 
     struct npc_scarlet_miner_cartAI : public PassiveAI
     {
-        npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature), minerGUID(0)
+        npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
         {
-            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->setFaction(35);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
 
-        uint64 minerGUID;
+        ObjectGuid minerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid guid, int32 /*id*/) override
         {
             minerGUID = guid;
         }
@@ -951,7 +958,7 @@ public:
                 me->SetSpeed(MOVE_RUN, 1.25f);
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
-                me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 me->setFaction(35);
             }
         }
@@ -964,7 +971,6 @@ public:
                     miner->DisappearAndDie();
         }
     };
-
 };
 
 /*####
@@ -996,11 +1002,11 @@ public:
 
         uint32 IntroTimer;
         uint32 IntroPhase;
-        uint64 carGUID;
+        ObjectGuid carGUID;
 
         void Reset() override
         {
-            carGUID = 0;
+            carGUID.Clear();
             IntroTimer = 0;
             IntroPhase = 0;
         }
@@ -1062,7 +1068,7 @@ public:
                     {
                         me->SetFacingToObject(car);
                         // xinef: add some flags
-                        car->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                        car->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         car->setFaction(35);
                     }
                     Talk(SAY_SCARLET_MINER_0);
@@ -1104,12 +1110,12 @@ public:
                             car->AI()->DoAction(0);
                         IntroPhase = 0;
                     }
-                } else IntroTimer-=diff;
+                }
+                else IntroTimer -= diff;
             }
             npc_escortAI::UpdateAI(diff);
         }
     };
-
 };
 
 /*######
@@ -1144,10 +1150,9 @@ public:
                 }
             }
         }
-        
+
         return true;
     }
-
 };
 
 void AddSC_the_scarlet_enclave_c1()

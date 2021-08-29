@@ -12,29 +12,16 @@
 #include <vector>
 
 #ifndef _WIN32
-    #include <stddef.h>
-    #include <dirent.h>
+#include <cstddef>
+#include <cstring>
+#include <dirent.h>
+#else
+#include <Windows.h>
 #endif
 
-#ifdef __linux__
-    #include <errno.h>
+#ifndef _WIN32
+#include <cerrno>
 #endif
-
-#include "Database/DatabaseEnv.h"
-
-enum NavTerrain
-{
-    NAV_EMPTY   = 0x00,
-    NAV_GROUND  = 0x01,
-    NAV_MAGMA   = 0x02,
-    NAV_SLIME   = 0x04,
-    NAV_WATER   = 0x08,
-    NAV_UNUSED1 = 0x10,
-    NAV_UNUSED2 = 0x20,
-    NAV_UNUSED3 = 0x40,
-    NAV_UNUSED4 = 0x80
-    // we only have 8 bits
-};
 
 namespace MMAP
 {
@@ -76,9 +63,9 @@ namespace MMAP
         LISTFILE_OK = 1
     };
 
-    inline ListFilesResult getDirContents(std::vector<std::string> &fileList, std::string dirpath = ".", std::string filter = "*")
+    inline ListFilesResult getDirContents(std::vector<std::string>& fileList, std::string dirpath = ".", std::string filter = "*")
     {
-    #ifdef WIN32
+#ifdef WIN32
         HANDLE hFind;
         WIN32_FIND_DATA findFileInfo;
         std::string directory;
@@ -93,23 +80,22 @@ namespace MMAP
         {
             if ((findFileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
                 fileList.push_back(std::string(findFileInfo.cFileName));
-        }
-        while (FindNextFile(hFind, &findFileInfo));
+        } while (FindNextFile(hFind, &findFileInfo));
 
         FindClose(hFind);
 
-    #else
-        const char *p = dirpath.c_str();
-        DIR * dirp = opendir(p);
-        struct dirent * dp;
+#else
+        const char* p = dirpath.c_str();
+        DIR* dirp = opendir(p);
+        struct dirent* dp;
 
         while (dirp)
         {
             errno = 0;
-            if ((dp = readdir(dirp)) != NULL)
+            if ((dp = readdir(dirp)) != nullptr)
             {
                 if (matchWildcardFilter(filter.c_str(), dp->d_name))
-                    fileList.push_back(std::string(dp->d_name));
+                    fileList.emplace_back(dp->d_name);
             }
             else
                 break;
@@ -119,7 +105,7 @@ namespace MMAP
             closedir(dirp);
         else
             return LISTFILE_DIRECTORY_NOT_FOUND;
-    #endif
+#endif
 
         return LISTFILE_OK;
     }

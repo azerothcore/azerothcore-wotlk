@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
 #ifndef _BAN_MANAGER_H
@@ -7,7 +7,7 @@
 
 #include "Common.h"
 
- /// Ban function return codes
+/// Ban function return codes
 enum BanReturn
 {
     BAN_SUCCESS,
@@ -19,7 +19,6 @@ enum BanReturn
 class BanManager
 {
 public:
-
     static BanManager* instance();
 
     BanReturn BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author);

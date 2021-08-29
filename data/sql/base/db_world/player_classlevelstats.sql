@@ -6,15 +6,15 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `player_classlevelstats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `player_classlevelstats` 
 (
-  `class` tinyint(3) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
-  `basehp` smallint(5) unsigned NOT NULL,
-  `basemana` smallint(5) unsigned NOT NULL,
+  `class` TINYINT unsigned NOT NULL,
+  `level` TINYINT unsigned NOT NULL,
+  `basehp` SMALLINT unsigned NOT NULL,
+  `basemana` SMALLINT unsigned NOT NULL,
   PRIMARY KEY (`class`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores levels stats.';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `player_classlevelstats` WRITE;

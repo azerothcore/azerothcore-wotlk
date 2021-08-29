@@ -6,14 +6,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spell_group_stack_rules`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_group_stack_rules` 
 (
-  `group_id` int(11) unsigned NOT NULL DEFAULT '0',
-  `stack_rule` tinyint(3) NOT NULL DEFAULT '0',
+  `group_id` INT unsigned NOT NULL DEFAULT 0,
+  `stack_rule` TINYINT NOT NULL DEFAULT 0,
   `description` varchar(150) NOT NULL DEFAULT '',
   PRIMARY KEY (`group_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spell_group_stack_rules` WRITE;
@@ -53,7 +53,8 @@ INSERT INTO `spell_group_stack_rules` VALUES
 (1031,16,'Group of Death Wish and DK Hysteria, effect exclusive'),
 (1032,17,'Group of Spell Haste Auras'),
 (1033,1,'Group of Howling Rage'),
-(1034,1,'Group of Thorns');
+(1034,1,'Group of Thorns'),
+(1112,8,'');
 /*!40000 ALTER TABLE `spell_group_stack_rules` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "magisters_terrace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Yells
 {
@@ -33,7 +33,7 @@ enum Misc
     MAX_HELPERS_COUNT       = 8
 };
 
-const Position helpersLocations[MAX_ACTIVE_HELPERS]=
+const Position helpersLocations[MAX_ACTIVE_HELPERS] =
 {
     {123.77f, 17.6007f, -19.921f, 4.98f},
     {131.731f, 15.0827f, -19.921f, 4.98f},
@@ -69,9 +69,9 @@ class boss_priestess_delrissa : public CreatureScript
 public:
     boss_priestess_delrissa() : CreatureScript("boss_priestess_delrissa") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_priestess_delrissaAI(creature);
+        return GetMagistersTerraceAI<boss_priestess_delrissaAI>(creature);
     }
 
     struct boss_priestess_delrissaAI : public ScriptedAI
@@ -88,7 +88,7 @@ public:
         uint8 PlayersKilled;
         uint8 HelpersKilled;
 
-        void Reset()
+        void Reset() override
         {
             PlayersKilled = SAY_PLAYER_KILLED;
             HelpersKilled = SAY_HELPER_DIED;
@@ -98,25 +98,25 @@ public:
             me->SetLootMode(0);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             std::list<uint32> helpersList;
             for (uint8 i = 0; i < MAX_HELPERS_COUNT; ++i)
                 helpersList.push_back(helpersEntries[i]);
-            acore::Containers::RandomResizeList(helpersList, MAX_ACTIVE_HELPERS);
+            Acore::Containers::RandomResize(helpersList, MAX_ACTIVE_HELPERS);
 
             uint8 j = 0;
             for (std::list<uint32>::const_iterator itr = helpersList.begin(); itr != helpersList.end(); ++itr, ++j)
                 me->SummonCreature(*itr, helpersLocations[j], TEMPSUMMON_MANUAL_DESPAWN, 0);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature*  /*summon*/, Unit*)
+        void SummonedCreatureDies(Creature*  /*summon*/, Unit*) override
         {
             if (me->IsAlive() && HelpersKilled < SAY_PLAYER_KILLED)
             {
@@ -127,14 +127,14 @@ public:
             else if (HelpersKilled == MAX_ACTIVE_HELPERS)
             {
                 me->loot.clear();
-                me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1);
+                me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1, me);
                 instance->SetData(DATA_DELRISSA_EVENT, DONE);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
             ++HelpersKilled;
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
             summons.DoZoneInCombat();
@@ -150,7 +150,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_IMMUNITY, 4000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -159,15 +159,15 @@ public:
                 Talk(PlayersKilled++);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
 
-            if (HelpersKilled == MAX_ACTIVE_HELPERS+1)
+            if (HelpersKilled == MAX_ACTIVE_HELPERS + 1)
                 instance->SetData(DATA_DELRISSA_EVENT, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -197,28 +197,34 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_RENEW, 7000);
                     break;
                 case EVENT_SPELL_PW_SHIELD:
-                {
-                    std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H));
-                    if (Unit* target = acore::Containers::SelectRandomContainerElement(cList))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H), false);
-                    events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 10000);
-                    break;
-                }
-                case EVENT_SPELL_DISPEL:
-                {
-                    Unit* target = NULL;
-                    switch (urand(0, 2))
                     {
-                        case 0: target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true); break;
-                        case 1: target = me; break;
-                        case 2: target = ObjectAccessor::GetCreature(*me, acore::Containers::SelectRandomContainerElement(summons)); break;
+                        std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H));
+                        if (Unit* target = Acore::Containers::SelectRandomContainerElement(cList))
+                            me->CastSpell(target, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H), false);
+                        events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 10000);
+                        break;
                     }
+                case EVENT_SPELL_DISPEL:
+                    {
+                        Unit* target = nullptr;
+                        switch (urand(0, 2))
+                        {
+                            case 0:
+                                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true);
+                                break;
+                            case 1:
+                                target = me;
+                                break;
+                            case 2:
+                                target = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(summons));
+                                break;
+                        }
 
-                    if (target)
-                        me->CastSpell(target, SPELL_DISPEL_MAGIC, false);
-                    events.ScheduleEvent(EVENT_SPELL_DISPEL, 12000);
-                    break;
-                }
+                        if (target)
+                            me->CastSpell(target, SPELL_DISPEL_MAGIC, false);
+                        events.ScheduleEvent(EVENT_SPELL_DISPEL, 12000);
+                        break;
+                    }
                 case EVENT_SPELL_IMMUNITY:
                     if (me->HasUnitState(UNIT_STATE_LOST_CONTROL))
                     {
@@ -269,11 +275,12 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
     float GetThreatMod(float dist, float  /*armor*/, uint32 health, uint32 /*maxhealth*/, Unit* target)
     {
         float unimportant_dist = (aiType == AI_TYPE_MELEE ? 5.0f : 25.0f);
-        if (dist > unimportant_dist) dist -= unimportant_dist; else dist = 0.0f;
+        if (dist > unimportant_dist) dist -= unimportant_dist;
+        else dist = 0.0f;
         const float dist_factor = (aiType == AI_TYPE_MELEE ? 15.0f : 25.0f);
-        float mod_dist = dist_factor/(dist_factor + dist); // 0.2 .. 1.0
-        float mod_health = health > 20000 ? 2.0f : (40000-health)/10000.0f; // 2.0 .. 4.0
-        float mod_armor = aiType == AI_TYPE_MELEE ? Unit::CalcArmorReducedDamage(me, target, 10000, NULL)/10000.0f : 1.0f;
+        float mod_dist = dist_factor / (dist_factor + dist); // 0.2 .. 1.0
+        float mod_health = health > 20000 ? 2.0f : (40000 - health) / 10000.0f; // 2.0 .. 4.0
+        float mod_armor = aiType == AI_TYPE_MELEE ? Unit::CalcArmorReducedDamage(me, target, 10000, nullptr) / 10000.0f : 1.0f;
         return mod_dist * mod_health * mod_armor;
     }
 
@@ -293,21 +300,21 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
         events.Reset();
         summons.DespawnAll();
         actualEventId = 0;
     }
-    
-    void JustSummoned(Creature* summon)
+
+    void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
-        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_DELRISSA)))
+        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
             if (!delrissa->IsAlive())
             {
                 delrissa->Respawn();
@@ -316,9 +323,9 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode();
     }
 
-    void EnterCombat(Unit* who)
+    void EnterCombat(Unit* who) override
     {
-        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_DELRISSA)))
+        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
             if (delrissa->IsAlive() && !delrissa->IsInCombat())
                 delrissa->AI()->AttackStart(who);
 
@@ -330,24 +337,24 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         RecalculateThreat();
     }
 
-    void JustDied(Unit* /*killer*/)
+    void JustDied(Unit* /*killer*/) override
     {
         summons.DespawnAll();
     }
 
-    void KilledUnit(Unit* victim)
+    void KilledUnit(Unit* victim) override
     {
-        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_DELRISSA)))
+        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
             delrissa->AI()->KilledUnit(victim);
     }
 
-    void AttackStart(Unit* victim)
+    void AttackStart(Unit* victim) override
     {
         if (victim && me->Attack(victim, true))
             me->GetMotionMaster()->MoveChase(victim, aiType == AI_TYPE_MELEE ? 0.0f : 20.0f);
     }
 
-    void UpdateAI(uint32 diff)
+    void UpdateAI(uint32 diff) override
     {
         actualEventId = 0;
         events.Update(diff);
@@ -378,7 +385,6 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
                 RecalculateThreat();
                 events.ScheduleEvent(EVENT_HELPER_RESET_THREAT, urand(8000, 10000));
                 break;
-
         }
     }
 };
@@ -406,16 +412,16 @@ class boss_kagani_nightstrike : public CreatureScript
 public:
     boss_kagani_nightstrike() : CreatureScript("boss_kagani_nightstrike") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_kagani_nightstrikeAI(creature);
+        return GetMagistersTerraceAI<boss_kagani_nightstrikeAI>(creature);
     }
 
     struct boss_kagani_nightstrikeAI : public boss_priestess_lackey_commonAI
     {
         boss_kagani_nightstrikeAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -426,13 +432,13 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BACKSTAB, 4000);
         }
 
-        void MovementInform(uint32 type, uint32  /*point*/)
+        void MovementInform(uint32 type, uint32  /*point*/) override
         {
             if (type == CHASE_MOTION_TYPE && me->HasAura(SPELL_VANISH) && me->GetVictim())
                 me->CastSpell(me->GetVictim(), SPELL_KIDNEY_SHOT, false);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -496,7 +502,7 @@ enum WarlockEnum
 
     EVENT_SPELL_IMMOLATE        = 1,
     EVENT_SPELL_SHADOW_BOLT     = 2,
-    EVENT_SPELL_SEED_OF_CORRUPTION= 3,
+    EVENT_SPELL_SEED_OF_CORRUPTION = 3,
     EVENT_SPELL_CURSE_OF_AGONY  = 4,
     EVENT_SPELL_FEAR            = 5,
 };
@@ -506,17 +512,16 @@ class boss_ellris_duskhallow : public CreatureScript
 public:
     boss_ellris_duskhallow() : CreatureScript("boss_ellris_duskhallow") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_ellris_duskhallowAI(creature);
+        return GetMagistersTerraceAI<boss_ellris_duskhallowAI>(creature);
     }
 
     struct boss_ellris_duskhallowAI : public boss_priestess_lackey_commonAI
     {
-
         boss_ellris_duskhallowAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             me->CastSpell(me, SPELL_SUMMON_IMP, false);
             boss_priestess_lackey_commonAI::EnterCombat(who);
@@ -528,7 +533,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FEAR, 15000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -585,16 +590,16 @@ class boss_eramas_brightblaze : public CreatureScript
 public:
     boss_eramas_brightblaze() : CreatureScript("boss_eramas_brightblaze") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_eramas_brightblazeAI(creature);
+        return GetMagistersTerraceAI<boss_eramas_brightblazeAI>(creature);
     }
 
     struct boss_eramas_brightblazeAI : public boss_priestess_lackey_commonAI
     {
         boss_eramas_brightblazeAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -603,7 +608,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FISTS, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -659,16 +664,16 @@ class boss_yazzai : public CreatureScript
 public:
     boss_yazzai() : CreatureScript("boss_yazzai") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_yazzaiAI(creature);
+        return GetMagistersTerraceAI<boss_yazzaiAI>(creature);
     }
 
     struct boss_yazzaiAI : public boss_priestess_lackey_commonAI
     {
         boss_yazzaiAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -681,7 +686,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BLINK, 5000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -721,22 +726,22 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, 8000);
                     break;
                 case EVENT_SPELL_BLINK:
-                {
-                    bool InMeleeRange = false;
-                    ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
-                    for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
-                        if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                            if (target->IsWithinMeleeRange(me))
-                            {
-                                InMeleeRange = true;
-                                break;
-                            }
+                    {
+                        bool InMeleeRange = false;
+                        ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
+                        for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+                            if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+                                if (target->IsWithinMeleeRange(me))
+                                {
+                                    InMeleeRange = true;
+                                    break;
+                                }
 
-                    if (InMeleeRange)
-                        me->CastSpell(me, SPELL_BLINK, false);
-                    events.ScheduleEvent(EVENT_SPELL_BLINK, 15000);
-                    break;
-                }
+                        if (InMeleeRange)
+                            me->CastSpell(me, SPELL_BLINK, false);
+                        events.ScheduleEvent(EVENT_SPELL_BLINK, 15000);
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
@@ -767,16 +772,16 @@ class boss_warlord_salaris : public CreatureScript
 public:
     boss_warlord_salaris() : CreatureScript("boss_warlord_salaris") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_warlord_salarisAI(creature);
+        return GetMagistersTerraceAI<boss_warlord_salarisAI>(creature);
     }
 
     struct boss_warlord_salarisAI : public boss_priestess_lackey_commonAI
     {
         boss_warlord_salarisAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
             me->CastSpell(me, SPELL_BATTLE_SHOUT, false);
@@ -789,7 +794,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_INTERCEPT, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -853,22 +858,22 @@ class boss_garaxxas : public CreatureScript
 public:
     boss_garaxxas() : CreatureScript("boss_garaxxas") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_garaxxasAI(creature);
+        return GetMagistersTerraceAI<boss_garaxxasAI>(creature);
     }
 
     struct boss_garaxxasAI : public boss_priestess_lackey_commonAI
     {
         boss_garaxxasAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) {}
 
-        void Reset()
+        void Reset() override
         {
             boss_priestess_lackey_commonAI::Reset();
             me->SummonCreature(NPC_SLIVER, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
             me->CastSpell(me, SPELL_FREEZING_TRAP, true);
@@ -880,7 +885,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_WING_CLIP, 4000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -942,23 +947,23 @@ class boss_apoko : public CreatureScript
 public:
     boss_apoko() : CreatureScript("boss_apoko") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_apokoAI(creature);
+        return GetMagistersTerraceAI<boss_apokoAI>(creature);
     }
 
     struct boss_apokoAI : public boss_priestess_lackey_commonAI
     {
         boss_apokoAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        uint32 Totem_Timer;
+//        uint32 Totem_Timer;
         uint8  Totem_Amount;
         uint32 War_Stomp_Timer;
-        uint32 Purge_Timer;
+//        uint32 Purge_Timer;
         uint32 Healing_Wave_Timer;
-        uint32 Frost_Shock_Timer;
+//        uint32 Frost_Shock_Timer;
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -971,7 +976,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FROST_SHOCK, 8000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1040,16 +1045,16 @@ class boss_zelfan : public CreatureScript
 public:
     boss_zelfan() : CreatureScript("boss_zelfan") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_zelfanAI(creature);
+        return GetMagistersTerraceAI<boss_zelfanAI>(creature);
     }
 
     struct boss_zelfanAI : public boss_priestess_lackey_commonAI
     {
         boss_zelfanAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_priestess_lackey_commonAI::EnterCombat(who);
 
@@ -1060,7 +1065,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_IRON_BOMB, 5000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1083,17 +1088,17 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_IRON_BOMB, 20000);
                     break;
                 case EVENT_SPELL_RECOMBOBULATE:
-                {
-                    std::list<Creature*> cList = DoFindFriendlyMissingBuff(30.0f, SPELL_RECOMBOBULATE);
-                    for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
-                        if ((*itr)->IsPolymorphed())
-                        {
-                            me->CastSpell(*itr, SPELL_RECOMBOBULATE, false);
-                            break;
-                        }
-                    events.ScheduleEvent(EVENT_SPELL_RECOMBOBULATE, 10000);
-                    break;
-                }
+                    {
+                        std::list<Creature*> cList = DoFindFriendlyMissingBuff(30.0f, SPELL_RECOMBOBULATE);
+                        for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
+                            if ((*itr)->IsPolymorphed())
+                            {
+                                me->CastSpell(*itr, SPELL_RECOMBOBULATE, false);
+                                break;
+                            }
+                        events.ScheduleEvent(EVENT_SPELL_RECOMBOBULATE, 10000);
+                        break;
+                    }
                 case EVENT_SPELL_EXPLOSIVE_SHEEP:
                     me->CastSpell(me, SPELL_HIGH_EXPLOSIVE_SHEEP, false);
                     events.ScheduleEvent(EVENT_SPELL_EXPLOSIVE_SHEEP, 60000);

@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
+
 #include "SavingSystem.h"
 #include "World.h"
 
@@ -5,7 +9,7 @@ uint32 SavingSystemMgr::m_savingCurrentValue = 0;
 uint32 SavingSystemMgr::m_savingMaxValueAssigned = 0;
 uint32 SavingSystemMgr::m_savingDiffSum = 0;
 std::list<uint32> SavingSystemMgr::m_savingSkipList;
-ACE_Thread_Mutex SavingSystemMgr::_savingLock;
+std::mutex SavingSystemMgr::_savingLock;
 
 void SavingSystemMgr::Update(uint32 diff)
 {
@@ -24,8 +28,8 @@ void SavingSystemMgr::Update(uint32 diff)
             return;
         }
 
-        if (GetSavingMaxValue()-GetSavingCurrentValue() > playerCount+m_savingSkipList.size()) // this should not happen, but just in case
-            m_savingMaxValueAssigned = m_savingCurrentValue+playerCount+m_savingSkipList.size();
+        if (GetSavingMaxValue() - GetSavingCurrentValue() > playerCount + m_savingSkipList.size()) // this should not happen, but just in case
+            m_savingMaxValueAssigned = m_savingCurrentValue + playerCount + m_savingSkipList.size();
 
         if (playerCount <= 1500) // every 2min
             multiplicator = 1000.0f / playerCount;
@@ -41,7 +45,7 @@ void SavingSystemMgr::Update(uint32 diff)
             multiplicator = 4000.0f / playerCount;
 
         m_savingDiffSum += diff;
-        while (m_savingDiffSum >= (uint32)(step*multiplicator))
+        while (m_savingDiffSum >= (uint32)(step * multiplicator))
         {
             IncreaseSavingCurrentValue(1);
 
@@ -51,7 +55,7 @@ void SavingSystemMgr::Update(uint32 diff)
                 m_savingSkipList.pop_front();
             }
 
-            m_savingDiffSum -= (uint32)(step*multiplicator);
+            m_savingDiffSum -= (uint32)(step * multiplicator);
 
             if (GetSavingCurrentValue() > GetSavingMaxValue())
             {

@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "CombatAI.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "Vehicle.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Vehicle.h"
 
 /////////////////
 // AggressorAI
@@ -38,7 +38,7 @@ void AggressorAI::UpdateAI(uint32 /*diff*/)
 
 void CombatAI::InitializeAI()
 {
-    for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
         if (me->m_spells[i] && sSpellMgr->GetSpellInfo(me->m_spells[i]))
             spells.push_back(me->m_spells[i]);
 
@@ -64,7 +64,7 @@ void CombatAI::EnterCombat(Unit* who)
         if (AISpellInfo[*i].condition == AICOND_AGGRO)
             me->CastSpell(who, *i, false);
         else if (AISpellInfo[*i].condition == AICOND_COMBAT)
-            events.ScheduleEvent(*i, AISpellInfo[*i].cooldown + rand()%AISpellInfo[*i].cooldown);
+            events.ScheduleEvent(*i, AISpellInfo[*i].cooldown + rand() % AISpellInfo[*i].cooldown);
     }
 }
 
@@ -81,7 +81,7 @@ void CombatAI::UpdateAI(uint32 diff)
     if (uint32 spellId = events.ExecuteEvent())
     {
         DoCast(spellId);
-        events.ScheduleEvent(spellId, AISpellInfo[spellId].cooldown + rand()%AISpellInfo[spellId].cooldown);
+        events.ScheduleEvent(spellId, AISpellInfo[spellId].cooldown + rand() % AISpellInfo[spellId].cooldown);
     }
     else
         DoMeleeAttackIfReady();
@@ -108,7 +108,7 @@ void CasterAI::EnterCombat(Unit* who)
     if (spells.empty())
         return;
 
-    uint32 spell = rand()%spells.size();
+    uint32 spell = rand() % spells.size();
     uint32 count = 0;
     for (SpellVct::iterator itr = spells.begin(); itr != spells.end(); ++itr, ++count)
     {
@@ -158,7 +158,7 @@ void CasterAI::UpdateAI(uint32 diff)
 ArcherAI::ArcherAI(Creature* c) : CreatureAI(c)
 {
     if (!me->m_spells[0])
-        sLog->outError("ArcherAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "ArcherAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->m_spells[0]);
     m_minRange = spellInfo ? spellInfo->GetMinRange(false) : 0;
@@ -207,7 +207,7 @@ void ArcherAI::UpdateAI(uint32 /*diff*/)
 TurretAI::TurretAI(Creature* c) : CreatureAI(c)
 {
     if (!me->m_spells[0])
-        sLog->outError("TurretAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "TurretAI set for creature (entry = %u) with spell1=0. AI will do nothing", me->GetEntry());
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->m_spells[0]);
     m_minRange = spellInfo ? spellInfo->GetMinRange(false) : 0;
@@ -219,7 +219,7 @@ bool TurretAI::CanAIAttack(const Unit* /*who*/) const
 {
     // TODO: use one function to replace it
     if (!me->IsWithinCombatRange(me->GetVictim(), me->m_CombatDistance)
-        || (m_minRange && me->IsWithinCombatRange(me->GetVictim(), m_minRange)))
+            || (m_minRange && me->IsWithinCombatRange(me->GetVictim(), m_minRange)))
         return false;
     return true;
 }
@@ -280,10 +280,8 @@ void VehicleAI::OnCharmed(bool apply)
 void VehicleAI::LoadConditions()
 {
     conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE, me->GetEntry());
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     if (!conditions.empty())
-        sLog->outDebug(LOG_FILTER_CONDITIONSYS, "VehicleAI::LoadConditions: loaded %u conditions", uint32(conditions.size()));
-#endif
+        LOG_DEBUG("condition", "VehicleAI::LoadConditions: loaded %u conditions", uint32(conditions.size()));
 }
 
 void VehicleAI::CheckConditions(uint32 diff)

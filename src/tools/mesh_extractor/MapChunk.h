@@ -24,7 +24,7 @@ public:
     Chunk* Source;
     MapChunkHeader Header;
     std::vector<Vector3> Vertices;
-    std::vector<Triangle<uint8> > Triangles;
+    std::vector<Triangle<uint8>> Triangles;
     int32 Index;
 };
 #endif

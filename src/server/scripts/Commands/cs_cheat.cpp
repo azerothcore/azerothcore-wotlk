@@ -14,7 +14,6 @@ public:
 
     std::vector<ChatCommand> GetCommands() const override
     {
-
         static std::vector<ChatCommand> cheatCommandTable =
         {
             { "god",            SEC_GAMEMASTER,     false, &HandleGodModeCheatCommand,         "" },
@@ -24,13 +23,12 @@ public:
             { "waterwalk",      SEC_GAMEMASTER,     false, &HandleWaterwalkCheatCommand,       "" },
             { "status",         SEC_GAMEMASTER,     false, &HandleCheatStatusCommand,          "" },
             { "taxi",           SEC_GAMEMASTER,     false, &HandleTaxiCheatCommand,            "" },
-
+            { "explore",        SEC_GAMEMASTER,     false, &HandleExploreCheatCommand,         "" },
         };
 
         static std::vector<ChatCommand> commandTable =
         {
             { "cheat",          SEC_GAMEMASTER,     false, nullptr,                  "", cheatCommandTable },
-
         };
         return commandTable;
     }
@@ -141,7 +139,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(player, 0))
+        if (handler->HasLowerSecurity(player))
             return false;
 
         if (strncmp(args, "on", 3) == 0)
@@ -184,7 +182,6 @@ public:
         return true;
     }
 
-    
     static bool HandleTaxiCheatCommand(ChatHandler* handler, char const* args)
     {
         std::string argStr = (char*)args;
@@ -193,7 +190,7 @@ public:
 
         if (!chr)
             chr = handler->GetSession()->GetPlayer();
-        else if (handler->HasLowerSecurity(chr, 0)) // check online security
+        else if (handler->HasLowerSecurity(chr)) // check online security
             return false;
 
         if (!*args)
@@ -221,6 +218,39 @@ public:
         handler->SetSentErrorMessage(true);
 
         return false;
+    }
+
+    static bool HandleExploreCheatCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        int flag = atoi((char*)args);
+
+        Player* target = handler->getSelectedPlayerOrSelf();
+
+        for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
+        {
+            if (flag != 0)
+                target->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
+            else
+                target->RemoveFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
+        }
+
+        if (flag != 0)
+        {
+            handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_ALL, handler->GetNameLink(target).c_str());
+            if (handler->needReportToTarget(target))
+                ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL, handler->GetNameLink().c_str());
+        }
+        else
+        {
+            handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_NOTHING, handler->GetNameLink(target).c_str());
+            if (handler->needReportToTarget(target))
+                ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING, handler->GetNameLink().c_str());
+        }
+
+        return true;
     }
 };
 

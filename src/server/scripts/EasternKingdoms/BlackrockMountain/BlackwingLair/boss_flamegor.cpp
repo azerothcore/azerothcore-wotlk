@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "blackwing_lair.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Emotes
 {
@@ -34,23 +34,18 @@ public:
 
     struct boss_flamegorAI : public BossAI
     {
-        boss_flamegorAI(Creature* creature) : BossAI(creature, BOSS_FLAMEGOR) { }
+        boss_flamegorAI(Creature* creature) : BossAI(creature, DATA_FLAMEGOR) { }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* victim) override
         {
-            if (instance->GetBossState(BOSS_BROODLORD) != DONE)
-            {
-                EnterEvadeMode();
-                return;
-            }
-            _EnterCombat();
+            BossAI::EnterCombat(victim);
 
-            events.ScheduleEvent(EVENT_SHADOWFLAME, urand(10000, 20000));
+            events.ScheduleEvent(EVENT_SHADOWFLAME, 10000, 20000);
             events.ScheduleEvent(EVENT_WINGBUFFET, 30000);
             events.ScheduleEvent(EVENT_FRENZY, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -66,7 +61,7 @@ public:
                 {
                     case EVENT_SHADOWFLAME:
                         DoCastVictim(SPELL_SHADOWFLAME);
-                        events.ScheduleEvent(EVENT_SHADOWFLAME, urand(10000, 20000));
+                        events.ScheduleEvent(EVENT_SHADOWFLAME, 10000, 20000);
                         break;
                     case EVENT_WINGBUFFET:
                         DoCastVictim(SPELL_WINGBUFFET);
@@ -77,18 +72,21 @@ public:
                     case EVENT_FRENZY:
                         Talk(EMOTE_FRENZY);
                         DoCast(me, SPELL_FRENZY);
-                        events.ScheduleEvent(EVENT_FRENZY, urand(8000, 10000));
+                        events.ScheduleEvent(EVENT_FRENZY, 8000, 10000);
                         break;
                 }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
             }
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_flamegorAI>(creature);
+        return GetBlackwingLairAI<boss_flamegorAI>(creature);
     }
 };
 

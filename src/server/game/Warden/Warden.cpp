@@ -1,27 +1,27 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "ByteBuffer.h"
-#include <openssl/md5.h>
-#include <openssl/sha.h>
-#include "World.h"
-#include "Player.h"
-#include "Util.h"
-#include "Warden.h"
 #include "AccountMgr.h"
 #include "BanManager.h"
+#include "ByteBuffer.h"
+#include "Common.h"
+#include "Log.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "SharedDefines.h"
+#include "Util.h"
+#include "Warden.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
+#include <openssl/sha.h>
 
-Warden::Warden() : _session(NULL), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
-                   _dataSent(false), _previousTimestamp(0), _module(NULL), _initialized(false)
-{ 
+Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
+    _dataSent(false), _module(nullptr), _initialized(false)
+{
     memset(_inputKey, 0, sizeof(_inputKey));
     memset(_outputKey, 0, sizeof(_outputKey));
     memset(_seed, 0, sizeof(_seed));
@@ -31,15 +31,13 @@ Warden::~Warden()
 {
     delete[] _module->CompressedData;
     delete _module;
-    _module = NULL;
+    _module = nullptr;
     _initialized = false;
 }
 
 void Warden::SendModuleToClient()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Send module to client");
-#endif
+    LOG_DEBUG("warden", "Send module to client");
 
     // Create packet structure
     WardenModuleTransfer packet;
@@ -65,9 +63,7 @@ void Warden::SendModuleToClient()
 
 void Warden::RequestModule()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Request module");
-#endif
+    LOG_DEBUG("warden", "Request module");
 
     // Create packet structure
     WardenModuleUse request;
@@ -77,6 +73,8 @@ void Warden::RequestModule()
     memcpy(request.ModuleKey, _module->Key, 16);
     request.Size = _module->CompressedSize;
 
+    EndianConvert(request.Size);
+
     // Encrypt with warden RC4 key.
     EncryptData((uint8*)&request, sizeof(WardenModuleUse));
 
@@ -85,43 +83,49 @@ void Warden::RequestModule()
     _session->SendPacket(&pkt);
 }
 
-void Warden::Update()
+void Warden::Update(uint32 const diff)
 {
-    if (_initialized)
+    if (!_initialized)
     {
-        uint32 currentTimestamp = World::GetGameTimeMS();
-        uint32 diff = getMSTimeDiff(_previousTimestamp, currentTimestamp);
-        _previousTimestamp = currentTimestamp;
+        return;
+    }
 
-        if (_dataSent)
+    if (_dataSent)
+    {
+        uint32 maxClientResponseDelay = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_RESPONSE_DELAY);
+        if (maxClientResponseDelay > 0)
         {
-            uint32 maxClientResponseDelay = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_RESPONSE_DELAY);
-            if (maxClientResponseDelay > 0)
+            if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
             {
-                if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
-                    _session->KickPlayer("clientResponseTimer > maxClientResponseDelay");
-                else
-                    _clientResponseTimer += diff;
+                _session->KickPlayer("Warden: clientResponseTimer > maxClientResponseDelay (Warden::Update)");
             }
+            else
+            {
+                _clientResponseTimer += diff;
+            }
+        }
+    }
+    else
+    {
+        if (diff >= _checkTimer)
+        {
+            RequestChecks();
         }
         else
         {
-            if (diff >= _checkTimer)
-                RequestData();
-            else
-                _checkTimer -= diff;
+            _checkTimer -= diff;
         }
     }
 }
 
 void Warden::DecryptData(uint8* buffer, uint32 length)
 {
-    _inputCrypto.UpdateData(length, buffer);
+    _inputCrypto.UpdateData(buffer, length);
 }
 
 void Warden::EncryptData(uint8* buffer, uint32 length)
 {
-    _outputCrypto.UpdateData(length, buffer);
+    _outputCrypto.UpdateData(buffer, length);
 }
 
 bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 length)
@@ -130,21 +134,18 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
 
     if (checksum != newChecksum)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_WARDEN, "CHECKSUM IS NOT VALID");
-#endif
+        LOG_DEBUG("warden", "CHECKSUM IS NOT VALID");
         return false;
     }
     else
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_WARDEN, "CHECKSUM IS VALID");
-#endif
+        LOG_DEBUG("warden", "CHECKSUM IS VALID");
         return true;
     }
 }
 
-struct keyData {
+struct keyData
+{
     union
     {
         struct
@@ -165,77 +166,142 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
     SHA1(data, length, hash.bytes.bytes);
     uint32 checkSum = 0;
     for (uint8 i = 0; i < 5; ++i)
+    {
         checkSum = checkSum ^ hash.ints.ints[i];
+    }
 
     return checkSum;
 }
 
-std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*= 0*/)
+static std::string GetWardenActionStr(uint32 action)
 {
-    WardenActions action;
-
-    if (check)
-        action = check->Action;
-    else
-        action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
-
-    std::string banReason = "Anticheat violation";
-    bool longBan = false; // 14d = 1209600s
-    if (checkFailed)
-        switch (checkFailed)
-        {
-            case 47: banReason += " (FrameXML Signature Check)"; break;
-            case 51: banReason += " (Lua DoString)"; break;
-            case 59: banReason += " (Lua Protection Patch)"; break;
-            case 72: banReason += " (Movement State related)"; break;
-            case 118: banReason += " (Wall Climb)"; break;
-            case 121: banReason += " (No Fall Damage Patch)"; break;
-            case 193: banReason += " (Follow Unit Check)"; break;
-            case 209: banReason += " (WoWEmuHacker Injection)"; longBan = true; break;
-            case 237: banReason += " (AddChatMessage)"; break;
-            case 246: banReason += " (Language Patch)"; break;
-            case 260: banReason += " (Jump Momentum)"; break;
-            case 288: banReason += " (Language Patch)"; break;
-            case 308: banReason += " (SendChatMessage)"; break;
-            case 312: banReason += " (Jump Physics)"; break;
-            case 314: banReason += " (GetCharacterInfo)"; break;
-            case 329: banReason += " (Wall Climb)"; break;
-            case 343: banReason += " (Login Password Pointer)"; break;
-            case 349: banReason += " (Language Patch)"; break;
-            case 712: banReason += " (WS2_32.Send)"; break;
-            case 780: banReason += " (Lua Protection Remover)"; break;
-            case 781: banReason += " (Walk on Water Patch)"; break;
-            case 782: banReason += " (Collision M2 Special)"; longBan = true; break;
-            case 783: banReason += " (Collision M2 Regular)"; longBan = true; break;
-            case 784: banReason += " (Collision WMD)"; longBan = true; break;
-            case 785: banReason += " (Multi-Jump Patch)"; break;
-            case 786: banReason += " (WPE PRO)"; longBan = true; break;
-            case 787: banReason += " (rEdoX Packet Editor)"; break;
-        }
-
     switch (action)
     {
     case WARDEN_ACTION_LOG:
-        return "None";
-        break;
+        return "WARDEN_ACTION_LOG";
     case WARDEN_ACTION_KICK:
-        _session->KickPlayer("WARDEN_ACTION_KICK");
-        return "Kick";
-        break;
+        return "WARDEN_ACTION_KICK";
     case WARDEN_ACTION_BAN:
+        return "WARDEN_ACTION_BAN";
+    }
+
+    return "UNHANDLED ACTION";
+}
+
+void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
+{
+    WardenCheck const* checkData = sWardenCheckMgr->GetWardenDataById(checkId);
+
+    uint32 action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
+    std::string causeMsg;
+    if (checkId && checkData)
+    {
+        action = checkData->Action;
+
+        if (checkData->Comment.empty())
+        {
+            causeMsg = "Warden id " + std::to_string(checkId) + " violation";
+        }
+        else
+        {
+            causeMsg = "Warden: " + checkData->Comment;
+        }
+    }
+    else
+    {
+        // if its not warden check id based, reason must be always provided
+        ASSERT(!reason.empty());
+        causeMsg = reason;
+    }
+
+    switch (action)
+    {
+        case WARDEN_ACTION_LOG:
+            break;
+        case WARDEN_ACTION_KICK:
+        {
+            _session->KickPlayer(causeMsg.find("Warden") != std::string::npos ? causeMsg : "Warden: " + causeMsg);
+            break;
+        }
+        case WARDEN_ACTION_BAN:
         {
             std::stringstream duration;
             duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
             std::string accountName;
             AccountMgr::GetName(_session->GetAccountId(), accountName);
-            sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
-
-            return "Ban";
+            sBan->BanAccount(accountName, duration.str(), causeMsg, "Server");
+            break;
         }
-    default:
-        break;
     }
-    return "Undefined";
+
+    std::string reportMsg;
+    if (checkId)
+    {
+        if (Player const* plr = _session->GetPlayer())
+        {
+            std::string const reportFormat = "Player %s (guid %u, account id: %u) failed warden %u check (%s). Action: %s";
+            reportMsg = Acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(),
+                                           checkId, ((checkData && !checkData->Comment.empty()) ? checkData->Comment.c_str() : "<warden comment is not set>"),
+                                           GetWardenActionStr(action).c_str());
+        }
+        else
+        {
+            std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
+            reportMsg = Acore::StringFormat(reportFormat, _session->GetAccountId(), checkId, GetWardenActionStr(action).c_str());
+        }
+    }
+    else
+    {
+        if (Player const* plr = _session->GetPlayer())
+        {
+            std::string const reportFormat = "Player %s (guid %u, account id: %u) triggered warden penalty by reason: %s. Action: %s";
+            reportMsg = Acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUID().GetCounter(), _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+        }
+        else
+        {
+            std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
+            reportMsg = Acore::StringFormat(reportFormat, _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+        }
+    }
+
+    reportMsg = "Warden: " + reportMsg;
+    LOG_INFO("warden", "> Warden: %s", reportMsg.c_str());
+}
+
+bool Warden::ProcessLuaCheckResponse(std::string const& msg)
+{
+    static constexpr char WARDEN_TOKEN[] = "_TW\t";
+    // if msg starts with WARDEN_TOKEN
+    if (msg.rfind(WARDEN_TOKEN, 0) != 0)
+    {
+        return false;
+    }
+
+    uint16 id = 0;
+
+    {
+        std::stringstream msg2(msg);
+        std::string temp;
+        while (msg2 >> temp)
+        {
+            // Found check id - stop loop
+            if (std::stringstream(temp) >> id)
+                break;
+        }
+    }
+
+    if (id < sWardenCheckMgr->GetMaxValidCheckId())
+    {
+        WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
+        if (check && check->Type == LUA_EVAL_CHECK)
+        {
+            ApplyPenalty(id, "");
+            return true;
+        }
+    }
+
+    ApplyPenalty(0, "Sent bogus Lua check response for Warden");
+    return true;
 }
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
@@ -246,9 +312,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
     _warden->DecryptData(recvData.contents(), recvData.size());
     uint8 opcode;
     recvData >> opcode;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
-#endif
+    LOG_DEBUG("warden", "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
     recvData.hexlike();
 
     switch (opcode)
@@ -263,23 +327,17 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             _warden->HandleData(recvData);
             break;
         case WARDEN_CMSG_MEM_CHECKS_RESULT:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_WARDEN, "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
-#endif
+            LOG_DEBUG("warden", "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
             break;
         case WARDEN_CMSG_HASH_RESULT:
             _warden->HandleHashResult(recvData);
             _warden->InitializeModule();
             break;
         case WARDEN_CMSG_MODULE_FAILED:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_WARDEN, "NYI WARDEN_CMSG_MODULE_FAILED received!");
-#endif
+            LOG_DEBUG("warden", "NYI WARDEN_CMSG_MODULE_FAILED received!");
             break;
         default:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_WARDEN, "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
-#endif
+            LOG_DEBUG("warden", "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
             break;
     }
 }
