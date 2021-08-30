@@ -2697,8 +2697,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
         // if target is fallged for pvp also flag caster if a player
         // xinef: do not flag spells with aura bind sight (no special attribute)
-        if (effectUnit->IsPvP() && effectUnit != m_caster && m_caster->GetTypeId() == TYPEID_PLAYER && !m_spellInfo->HasAura(SPELL_AURA_BIND_SIGHT))
+        if (effectUnit->IsPvP() && effectUnit != m_caster && effectUnit->GetOwnerGUID() != m_caster->GetGUID() &&
+            m_caster->GetTypeId() == TYPEID_PLAYER && !m_spellInfo->HasAura(SPELL_AURA_BIND_SIGHT))
+        {
             m_caster->ToPlayer()->UpdatePvP(true);
+        }
 
         CallScriptAfterHitHandlers();
     }
