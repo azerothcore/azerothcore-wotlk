@@ -9902,8 +9902,10 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         return false;
     }
 
-    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->Flags2 == ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId(true) == TEAM_HORDE)))
+    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId(true) == TEAM_HORDE)))
+    {
         return false;
+    }
 
     Creature* creature = GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
     if (!creature)
@@ -14146,10 +14148,16 @@ void Player::ActivateSpec(uint8 spec)
 
         // pussywizard: was => isn't
         if (itr->second->IsInSpec(oldSpec) && !itr->second->IsInSpec(spec))
+        {
             SendLearnPacket(itr->first, false);
+            // We want to remove all auras of the unlearned spell
+            _removeTalentAurasAndSpells(itr->first);
+        }
         // pussywizard: wasn't => is
         else if (!itr->second->IsInSpec(oldSpec) && itr->second->IsInSpec(spec))
+        {
             SendLearnPacket(itr->first, true);
+        }
     }
 
     // xinef: apply glyphs from second spec

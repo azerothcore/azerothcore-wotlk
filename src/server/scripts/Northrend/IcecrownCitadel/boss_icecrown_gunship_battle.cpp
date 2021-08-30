@@ -2626,15 +2626,20 @@ public:
     {
         PrepareSpellScript(spell_igb_below_zero_SpellScript);
 
-        void RemovePassengers()
+        void RemovePassengers(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             GetHitUnit()->SetPower(POWER_ENERGY, 0);
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
         }
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
+            BeforeHit += BeforeSpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
         }
     };
 

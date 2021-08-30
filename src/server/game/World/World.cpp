@@ -1306,6 +1306,7 @@ void World::LoadConfigSettings(bool reload)
 
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 3);
+    m_int_configs[CONFIG_LFG_DUNGEON_FINDER_EXPANSION] = sConfigMgr->GetOption<int32>("DungeonFinder.Expansion", 2);
 
     // Max instances per hour
     m_int_configs[CONFIG_MAX_INSTANCES_PER_HOUR] = sConfigMgr->GetOption<int32>("AccountInstancesPerHour", 5);
