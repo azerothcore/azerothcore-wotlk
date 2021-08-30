@@ -576,9 +576,26 @@ public:
                 return;
             }
 
+            Position petResetPos;
+            me->GetNearPosition(petResetPos, -5.0f, 0.0f);
+
+            if (petResetPos.IsPositionValid())
+            {
+                Precious()->SetHomePosition(petResetPos);
+            }
+        }
+
+        void CorpseRemoved(uint32& /*respawnDelay*/) override
+        {
+            if (!Precious())
+            {
+                return;
+            }
+
             if (Precious()->IsInCombat())
             {
-                // If master is dead but pet is In Combat set it to auto despawn on pet reaching home
+                // If Simone corpse is removed but pet is InCombat, EnterEvadeMode and auto despawn on pet reaching home
+                PreciousAI()->EnterEvadeMode();
                 PreciousAI()->FlagForDespawn();
             }
             else
