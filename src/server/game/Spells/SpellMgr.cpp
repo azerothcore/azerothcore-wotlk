@@ -3903,7 +3903,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 3411 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     // Roar of Sacrifice
@@ -4008,7 +4008,7 @@ void SpellMgr::LoadDbcDataCorrections()
         1725    // Distract
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     // Envenom
@@ -4076,7 +4076,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 50526 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     // Dancing Rune Weapon
@@ -4345,7 +4345,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Living Bomb
     ApplySpellFix({ 44461, 55361, 55362 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
         spellInfo->AttributesEx4 |= SPELL_ATTR4_REACTIVE_DAMAGE_PROC;
     });
 
@@ -4572,7 +4572,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Feral Charge - Cat
     ApplySpellFix({ 49376, 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     // Glyph of Barkskin
@@ -5462,7 +5462,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Oculus, Drake spell Stop Time
     ApplySpellFix({ 49838 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
         spellInfo->ExcludeTargetAuraSpell = 51162; // exclude planar shift
         spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_150_YARDS;
     });
@@ -5549,7 +5549,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->Attributes |= SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT;
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     // Trial of the Crusader, Lich King Intro spell
@@ -5585,7 +5585,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->Attributes |= SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT;
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+       spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     ApplySpellFix({ 66318 }, [](SpellEntry* spellInfo)
@@ -5595,7 +5595,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Speed = 14.0f;
         spellInfo->Attributes |= SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT;
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     ApplySpellFix({ 66320, 67472, 67473, 67475 }, [](SpellEntry* spellInfo)
@@ -6178,7 +6178,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Lock Players and Tap Chest
     ApplySpellFix({ 72347 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx3 &= ~SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 &= ~SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     // Award Reputation - Boss Kill
@@ -6735,7 +6735,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // A Tangled Skein
     ApplySpellFix({ 51165, 51173 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     ApplySpellFix({
@@ -6991,13 +6991,13 @@ void SpellMgr::LoadDbcDataCorrections()
     // Frankly,  It Makes No Sense... (10672)
     ApplySpellFix({ 37851 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     // Honor Challenge (12939)
     ApplySpellFix({ 21855 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_INITIAL_THREAT;
     });
 
     // Convocation at Zol'Heb (12730)
