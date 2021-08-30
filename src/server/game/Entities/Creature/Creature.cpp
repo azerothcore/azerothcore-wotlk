@@ -3335,5 +3335,8 @@ bool Creature::CanPeriodicallyCallForAssistance() const
     if (!CanHaveThreatList())
         return false;
 
+    if (IsSummon())
+        return false;
+
     return true;
 }
