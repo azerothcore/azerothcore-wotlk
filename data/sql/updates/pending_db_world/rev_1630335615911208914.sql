@@ -6,7 +6,7 @@ UPDATE `creature_template` SET `InhabitType` = 4 WHERE (`entry` = 10415);
 -- Added one spawn points to Masophet the Black (16249) in the left Ziggurat
 DELETE FROM `creature` WHERE (`id` = 16249) AND (`guid` IN (152293));
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(152293, 16249, 530, 0, 0, 1, 1, 0, 1, 6311.317, -6250.117, 86.2826, 2, 300, 0, 0, 486, 1202, 0, 0, 0, 0, '', 0);
+(152293, 16249, 530, 0, 0, 1, 1, 0, 1, 6311.317, -6250.117, 80.81, 2, 300, 0, 0, 486, 1202, 0, 0, 0, 0, '', 0);
 
 -- Add the new spawn to the same spawn pool so he can only be spawned once at a time
 DELETE FROM `pool_template` WHERE `entry` = 373;
