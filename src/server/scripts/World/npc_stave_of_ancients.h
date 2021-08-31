@@ -61,6 +61,7 @@ struct NPCStaveQuestAI : public ScriptedAI
             }
         }
     };
+    std::vector<uint64> attackerGuids;
 
     uint32 GetFormEntry(std::string /*type*/);
     bool InNormalForm();
@@ -71,6 +72,9 @@ struct NPCStaveQuestAI : public ScriptedAI
     bool ValidThreatlist();
     void SetHomePosition();
     void PrepareForEncounter();
+    void ClearLootIfUnfair(Unit* killer);
+    bool PlayerEligibleForReward(Unit* killer);
+    void StoreAttackerGuidValue(Unit* attacker);
 };
 
 #endif

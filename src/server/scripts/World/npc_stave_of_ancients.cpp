@@ -128,6 +128,53 @@ void NPCStaveQuestAI::PrepareForEncounter()
     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 }
 
+void NPCStaveQuestAI::ClearLootIfUnfair(Unit* killer)
+{
+    // Remove loot if there is more than 1 attacker or Player doesn't have the quest
+    // this should prevent party kills and looting the quest item without putting any effort
+    if (attackerGuids.size() > 1 || !PlayerEligibleForReward(killer))
+    {
+        me->loot.clear();
+        return;
+    }
+}
+
+bool NPCStaveQuestAI::PlayerEligibleForReward(Unit* killer)
+{
+    if (!killer)
+    {
+        return true;
+    }
+
+    if (Player* player = killer->ToPlayer())
+    {
+        if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) != QUEST_STATUS_INCOMPLETE)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void NPCStaveQuestAI::StoreAttackerGuidValue(Unit* attacker)
+{
+    if (!attacker)
+    {
+        return;
+    }
+
+    uint64 guidValue = attacker->GetGUID().GetRawValue();
+    bool isGUIDPresent = std::find(attackerGuids.begin(), attackerGuids.end(), guidValue) != attackerGuids.end();
+
+    // don't store snaketrap's snakes and trap triggers
+    if(isGUIDPresent || (IsAllowedEntry(attacker->GetEntry()) && attacker->GetTypeId() != TYPEID_PLAYER)) {
+        return;
+    } else {
+        attackerGuids.push_back(guidValue);
+    }
+}
+
 class npc_artorius : public CreatureScript
 {
 public:
@@ -144,10 +191,17 @@ public:
 
         EventMap events;
 
+        void JustDied(Unit* killer) override
+        {
+            // Prevent looting if killer doesn't have the quest
+            ClearLootIfUnfair(killer);
+        }
+
         void Reset() override
         {
             encounterStarted = false;
             playerGUID.Clear();
+            attackerGuids.clear();
             events.Reset();
 
             if (InNormalForm())
@@ -271,6 +325,11 @@ public:
                     me->MonsterTextEmote(ARTORIUS_WEAKNESS_EMOTE, 0);
                 }
             }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            StoreAttackerGuidValue(attacker);
         }
 
         void DoAction(int32 action) override
