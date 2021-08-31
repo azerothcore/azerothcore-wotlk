@@ -3328,14 +3328,13 @@ bool Creature::CanPeriodicallyCallForAssistance() const
     if (!IsInCombat())
         return false;
 
-    // Unable to call for assistance
     if (HasUnitState(UNIT_STATE_DIED | UNIT_STATE_POSSESSED))
         return false;
 
     if (!CanHaveThreatList())
         return false;
 
-    if (IsSummon())
+    if (IsSummon() && GetMap()->Instanceable())
         return false;
 
     return true;
