@@ -6480,6 +6480,14 @@ SpellCastResult Spell::CheckRange(bool strict)
             return SPELL_FAILED_TOO_CLOSE;
     }
 
+    if (GameObject* goTarget = m_targets.GetGOTarget())
+    {
+        if (!goTarget->IsAtInteractDistance(m_caster->ToPlayer(), m_spellInfo))
+        {
+            return SPELL_FAILED_OUT_OF_RANGE;
+        }
+    }
+
     if (m_targets.HasDst() && !m_targets.HasTraj())
     {
         if (!m_caster->IsWithinDist3d(m_targets.GetDstPos(), max_range))
@@ -7766,6 +7774,15 @@ SpellCastResult Spell::CanOpenLock(uint32 effIndex, uint32 lockId, SkillType& sk
                     }
 
                     return SPELL_CAST_OK;
+                }
+            case LOCK_KEY_SPELL:
+                {
+                    if (m_spellInfo->Id == lockInfo->Index[j])
+                    {
+                        return SPELL_CAST_OK;
+                    }
+                    reqKey = true;
+                    break;
                 }
         }
     }
