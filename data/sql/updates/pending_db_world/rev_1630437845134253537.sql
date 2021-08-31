@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1630437845134253537');
 
--- Set 5 rep until honored for Desert Rumbler, Dust Stormer, Greater Obsidian Elemental
-UPDATE `creature_onkill_reputation` SET `MaxStanding1` = 4, `RewOnKillRepValue1` = 5 WHERE `creature_id` IN (11746, 11744, 7032);
+-- Set 5 rep until honored for Desert Rumbler, Dust Stormer, Greater Obsidian Elemental, Cyclone Warrior
+UPDATE `creature_onkill_reputation` SET `MaxStanding1` = 4, `RewOnKillRepValue1` = 5 WHERE `creature_id` IN (11746, 11744, 7032, 11745);
 
 -- Set 15 rep until revered for Lord Incendius
 UPDATE `creature_onkill_reputation` SET `MaxStanding1` = 5, `RewOnKillRepValue1` = 15 WHERE (`creature_id` = 9017);
