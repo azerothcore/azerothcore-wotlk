@@ -561,8 +561,11 @@ public:
             Reset();
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* killer) override
         {
+            // Prevent looting if recipient doesn't have the quest
+            ClearLootIfUnfair(killer);
+
             if (!Precious())
             {
                 return;
@@ -608,6 +611,7 @@ public:
         {
             encounterStarted = false;
             playerGUID.Clear();
+            attackerGuids.clear();
             events.Reset();
 
             if (InNormalForm())
@@ -650,6 +654,11 @@ public:
                 events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
                 events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
             }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            StoreAttackerGuidValue(attacker);
         }
 
         void UpdateAI(uint32 diff) override
