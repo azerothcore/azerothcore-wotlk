@@ -1,3 +1,19 @@
+-- DB update 2021_09_01_00 -> 2021_09_01_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_09_01_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_09_01_00 2021_09_01_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1629918642442912200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1629918642442912200');
 
 SET @NPC := 10825; -- ID: 10825 - Gish the Unmoving
@@ -55,3 +71,13 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH, 38, 2394.29, -4904.28, 77.2246, 0),
 (@PATH, 39, 2409.14, -4968.48, 76.5356, 0),
 (@PATH, 40, 2436.96, -5029.48, 79.2512, 0);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_09_01_01' WHERE sql_rev = '1629918642442912200';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
