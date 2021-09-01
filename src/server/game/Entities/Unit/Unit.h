@@ -2244,7 +2244,7 @@ public:
     void ModifyAuraState(AuraStateType flag, bool apply);
     uint32 BuildAuraStateUpdateForTarget(Unit* target) const;
     bool HasAuraState(AuraStateType flag, SpellInfo const* spellProto = nullptr, Unit const* Caster = nullptr) const;
-    void UnsummonAllTotems();
+    void UnsummonAllTotems(bool onDeath = false);
     Unit* GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
     Unit* GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo = nullptr);
 

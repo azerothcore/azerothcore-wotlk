@@ -10494,16 +10494,25 @@ void Unit::RemoveCharmAuras()
     RemoveAurasByType(SPELL_AURA_AOE_CHARM);
 }
 
-void Unit::UnsummonAllTotems()
+void Unit::UnsummonAllTotems(bool onDeath /*= false*/)
 {
     for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
     {
         if (!m_SummonSlot[i])
+        {
             continue;
+        }
 
         if (Creature* OldTotem = GetMap()->GetCreature(m_SummonSlot[i]))
+        {
             if (OldTotem->IsSummon())
-                OldTotem->ToTempSummon()->UnSummon();
+            {
+                if (!(onDeath && !IsPlayer() && OldTotem->IsGuardian()))
+                {
+                    OldTotem->ToTempSummon()->UnSummon();
+                }
+            }
+        }
     }
 }
 
@@ -13589,7 +13598,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         if (IsNonMeleeSpellCast(false))
             InterruptNonMeleeSpells(false);
 
-        UnsummonAllTotems();
+        UnsummonAllTotems(true);
         RemoveAllControlled(true);
         RemoveAllAurasOnDeath();
     }
