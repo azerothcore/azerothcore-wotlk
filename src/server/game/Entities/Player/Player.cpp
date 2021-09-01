@@ -1277,7 +1277,7 @@ void Player::SendTeleportAckPacket()
     GetSession()->SendPacket(&data);
 }
 
-bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/)
+bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/, bool newInstance /*= false*/)
 {
     // for except kick by antispeedhack
     sScriptMgr->AnticheatSetSkipOnePacketForASH(this, true);
@@ -1378,7 +1378,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (!sScriptMgr->OnBeforePlayerTeleport(this, mapid, x, y, z, orientation, options, target))
         return false;
 
-    if (GetMapId() == mapid)
+    if (GetMapId() == mapid && !newInstance)
     {
         //lets reset far teleport flag if it wasn't reset during chained teleports
         SetSemaphoreTeleportFar(0);
@@ -1547,9 +1547,15 @@ bool Player::TeleportToEntryPoint()
     ScheduleDelayedOperation(DELAYED_BG_TAXI_RESTORE);
     ScheduleDelayedOperation(DELAYED_BG_GROUP_RESTORE);
 
-    if (m_entryPointData.joinPos.m_mapId == MAPID_INVALID)
+    WorldLocation loc = m_entryPointData.joinPos;
+    m_entryPointData.joinPos.m_mapId = MAPID_INVALID;
+
+    if (loc.m_mapId == MAPID_INVALID)
+    {
         return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
-    return TeleportTo(m_entryPointData.joinPos);
+    }
+
+    return TeleportTo(loc);
 }
 
 void Player::ProcessDelayedOperations()
