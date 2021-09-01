@@ -308,6 +308,52 @@ bool ItemTemplate::HasStat(ItemModType stat) const
     return false;
 }
 
+bool ItemTemplate::HasSpellPowerStat() const
+{
+    bool invalid = false;
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        _Spell const& spellData = Spells[i];
+        if (!spellData.SpellId)
+        {
+            continue;
+        }
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
+        if (!spellInfo)
+        {
+            continue;
+        }
+
+        for (uint8 j = EFFECT_0; j <= EFFECT_2; ++i)
+        {
+            switch (spellInfo->Effects[j].ApplyAuraName)
+            {
+                case SPELL_AURA_MOD_HEALING_DONE:
+                case SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT:
+                case SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER:
+                case SPELL_AURA_MOD_HEALING:
+                    invalid = true;
+                    break;
+                case SPELL_AURA_MOD_DAMAGE_DONE:
+                case SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT:
+                case SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER:
+                case SPELL_AURA_MOD_DAMAGE_TAKEN:
+                    if (!(spellInfo->Effects[j].MiscValue & SPELL_SCHOOL_MASK_SPELL))
+                    {
+                        return false;
+                    }
+                    invalid = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    return invalid;
+}
+
 void ItemTemplate::InitializeQueryData()
 {
     queryData.Initialize(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 1);

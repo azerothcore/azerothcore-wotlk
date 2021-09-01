@@ -2387,12 +2387,12 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         switch (_class)
         {
             case CLASS_WARRIOR:
-            case CLASS_DEATH_KNIGHT:
-                if (proto->HasStat(ITEM_MOD_SPELL_POWER))
+                if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
                 {
                     return EQUIP_ERR_CANT_DO_RIGHT_NOW;
                 }
                 [[fallthrough]];
+            case CLASS_DEATH_KNIGHT:
             case CLASS_PALADIN:
                 subclassToCompare = ITEM_SUBCLASS_ARMOR_PLATE;
                 break;
@@ -2401,7 +2401,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
                 subclassToCompare = ITEM_SUBCLASS_ARMOR_MAIL;
                 break;
             case CLASS_ROGUE:
-                if (proto->HasStat(ITEM_MOD_SPELL_POWER))
+                if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
                 {
                     return EQUIP_ERR_CANT_DO_RIGHT_NOW;
                 }

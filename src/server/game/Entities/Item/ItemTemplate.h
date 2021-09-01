@@ -818,6 +818,7 @@ struct ItemTemplate
     [[nodiscard]] bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
 
     [[nodiscard]] bool HasStat(ItemModType stat) const;
+    [[nodiscard]] bool HasSpellPowerStat() const;
 
     void InitializeQueryData();
 };
