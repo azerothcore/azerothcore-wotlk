@@ -1634,10 +1634,7 @@ namespace lfg
                 if (player->GetMapId() == uint32(dungeon->map))
                 {
                     // Remove bind to that map
-                    if (!sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty()))
-                    {
-                        sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
-                    }
+                    sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
                 }
 
                 // Add the cooldown spell if queued for a random dungeon
