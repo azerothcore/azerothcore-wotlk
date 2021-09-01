@@ -1,3 +1,19 @@
+-- DB update 2021_09_01_26 -> 2021_09_01_27
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_09_01_26';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_09_01_26 2021_09_01_27 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1630344741636829281'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1630344741636829281');
 
 -- Add text to Tell me more about the history of Remulos and Zaetar option.
@@ -26,3 +42,13 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (5349, 1, 0, 'Please tell me more about Zaetar.', 8940, 1, 1, 5354, 0, 0, 0, '', 0, 0),
 (5349, 2, 0, 'Tell me more about the history of Remulos and Zaetar.', 8961, 1, 1, 5148, 0, 0, 0, '', 0, 0);
 
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_09_01_27' WHERE sql_rev = '1630344741636829281';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
