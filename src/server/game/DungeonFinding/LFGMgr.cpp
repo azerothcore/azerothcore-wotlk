@@ -1651,11 +1651,15 @@ namespace lfg
                 if (player->GetMapId() == uint32(dungeon->map))
                 {
                     // check instance id with leader
-                    if (InstancePlayerBind* ilb = sInstanceSaveMgr->PlayerGetBoundInstance(grp->GetLeaderGUID(), dungeon->map, player->GetDungeonDifficulty()))
+                    if (!leaderTeleportIncluded)
                     {
-                        if (player->GetInstanceId() == ilb->save->GetInstanceId())
+                        if (InstancePlayerBind* ilb = sInstanceSaveMgr->PlayerGetBoundInstance(grp->GetLeaderGUID(), dungeon->map, player->GetDungeonDifficulty()))
                         {
-                            continue;
+                            if (player->GetInstanceId() == ilb->save->GetInstanceId())
+                            {
+                                // Do not teleport if in the same map and instance as leader
+                                continue;
+                            }
                         }
                     }
 
