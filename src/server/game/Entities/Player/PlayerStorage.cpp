@@ -2381,7 +2381,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
 
     if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass > ITEM_SUBCLASS_ARMOR_MISC && proto->SubClass < ITEM_SUBCLASS_ARMOR_BUCKLER &&
-        proto->InventoryType != INVTYPE_CLOAK && proto->ItemLevel > 70)
+        proto->InventoryType != INVTYPE_CLOAK)
     {
         uint32 subclassToCompare = ITEM_SUBCLASS_ARMOR_CLOTH;
         switch (_class)
@@ -2403,8 +2403,17 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
                 break;
         }
 
-        if (proto->SubClass != subclassToCompare)
+        if (proto->SubClass > subclassToCompare)
+        {
             return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+        }
+        else if (proto->ItemLevel > 70)
+        {
+            if (proto->SubClass < subclassToCompare)
+            {
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+            }
+        }
     }
 
     return EQUIP_ERR_OK;
