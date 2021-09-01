@@ -3108,7 +3108,10 @@ void Creature::UpdateMovementFlags()
         if (isInAir && !IsFalling())
         {
             if (info->InhabitType & INHABIT_GROUND)
+            {
                 SetCanFly(true);
+                SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
+            }
             else
                 SetDisableGravity(true);
 
@@ -3119,6 +3122,11 @@ void Creature::UpdateMovementFlags()
         {
             SetCanFly(false);
             SetDisableGravity(false);
+
+            if (info->InhabitType & INHABIT_GROUND)
+            {
+                SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
+            }
 
             if (IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
                 SetHover(true);
