@@ -1253,6 +1253,16 @@ DeletedCharacterTicketTrace = 0
 DungeonFinder.OptionsMask = 1
 
 #
+#     DungeonFinder.Expansion
+#        Description: Allow setting which expansion can be used in LFG
+#           2 - Wotlk (Default)
+#           1 - TBC
+#           0 - Classic
+#        Default:     2
+
+DungeonFinder.Expansion = 2
+
+#
 #   AccountInstancesPerHour
 #        Description: Controls the max amount of different instances player can enter within hour
 #        Default:     5
