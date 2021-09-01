@@ -817,6 +817,8 @@ struct ItemTemplate
     [[nodiscard]] bool IsArmorVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT; }
     [[nodiscard]] bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
 
+    [[nodiscard]] bool HasStat(ItemModType stat) const;
+
     void InitializeQueryData();
 };
 

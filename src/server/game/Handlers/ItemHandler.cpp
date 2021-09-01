@@ -290,6 +290,24 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
         _player->DestroyItem(bag, slot, true);
 }
 
+bool ItemTemplate::HasStat(ItemModType stat) const
+{
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+    {
+        if (i >= StatsCount)
+        {
+            break;
+        }
+
+        if (ItemStat[i].ItemStatType == stat)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void ItemTemplate::InitializeQueryData()
 {
     queryData.Initialize(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 1);
