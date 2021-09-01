@@ -157,13 +157,15 @@ struct is_compiled_string : std::is_base_of<compiled_string, S> {};
   \endrst
  */
 #ifdef __cpp_if_constexpr
-#  define FMT_COMPILE(s) FMT_STRING_IMPL(s, fmt::detail::compiled_string)
+#  define FMT_COMPILE(s) \
+    FMT_STRING_IMPL(s, fmt::detail::compiled_string, explicit)
 #else
 #  define FMT_COMPILE(s) FMT_STRING(s)
 #endif
 
 #if FMT_USE_NONTYPE_TEMPLATE_PARAMETERS
-template <typename Char, size_t N, fixed_string<Char, N> Str>
+template <typename Char, size_t N,
+          fmt::detail_exported::fixed_string<Char, N> Str>
 struct udl_compiled_string : compiled_string {
   using char_type = Char;
   constexpr operator basic_string_view<char_type>() const {
@@ -382,24 +384,22 @@ constexpr parse_specs_result<T, Char> parse_specs(basic_string_view<Char> str,
 }
 
 template <typename Char> struct arg_id_handler {
-  constexpr void on_error(const char* message) { throw format_error(message); }
+  arg_ref<Char> arg_id;
 
-  constexpr int on_arg_id() {
+  constexpr int operator()() {
     FMT_ASSERT(false, "handler cannot be used with automatic indexing");
     return 0;
   }
-
-  constexpr int on_arg_id(int id) {
+  constexpr int operator()(int id) {
+    arg_id = arg_ref<Char>(id);
+    return 0;
+  }
+  constexpr int operator()(basic_string_view<Char> id) {
     arg_id = arg_ref<Char>(id);
     return 0;
   }
 
-  constexpr int on_arg_id(basic_string_view<Char> id) {
-    arg_id = arg_ref<Char>(id);
-    return 0;
-  }
-
-  arg_ref<Char> arg_id;
+  constexpr void on_error(const char* message) { throw format_error(message); }
 };
 
 template <typename Char> struct parse_arg_id_result {
@@ -410,8 +410,7 @@ template <typename Char> struct parse_arg_id_result {
 template <int ID, typename Char>
 constexpr auto parse_arg_id(const Char* begin, const Char* end) {
   auto handler = arg_id_handler<Char>{arg_ref<Char>{}};
-  auto adapter = id_adapter<arg_id_handler<Char>, Char>{handler, 0};
-  auto arg_id_end = parse_arg_id(begin, end, adapter);
+  auto arg_id_end = parse_arg_id(begin, end, handler);
   return parse_arg_id_result<Char>{handler.arg_id, arg_id_end};
 }
 
@@ -428,7 +427,7 @@ template <typename T, typename Args, size_t END_POS, int ARG_INDEX, int NEXT_ID,
           typename S>
 constexpr auto parse_replacement_field_then_tail(S format_str) {
   using char_type = typename S::char_type;
-  constexpr basic_string_view<char_type> str = format_str;
+  constexpr auto str = basic_string_view<char_type>(format_str);
   constexpr char_type c = END_POS != str.size() ? str[END_POS] : char_type();
   if constexpr (c == '}') {
     return parse_tail<Args, END_POS + 1, NEXT_ID>(
@@ -449,7 +448,7 @@ constexpr auto parse_replacement_field_then_tail(S format_str) {
 template <typename Args, size_t POS, int ID, typename S>
 constexpr auto compile_format_string(S format_str) {
   using char_type = typename S::char_type;
-  constexpr basic_string_view<char_type> str = format_str;
+  constexpr auto str = basic_string_view<char_type>(format_str);
   if constexpr (str[POS] == '{') {
     if constexpr (POS + 1 == str.size())
       throw format_error("unmatched '{' in format string");
@@ -518,7 +517,7 @@ constexpr auto compile_format_string(S format_str) {
 template <typename... Args, typename S,
           FMT_ENABLE_IF(detail::is_compiled_string<S>::value)>
 constexpr auto compile(S format_str) {
-  constexpr basic_string_view<typename S::char_type> str = format_str;
+  constexpr auto str = basic_string_view<typename S::char_type>(format_str);
   if constexpr (str.size() == 0) {
     return detail::make_text(str, 0, 0);
   } else {
@@ -557,7 +556,7 @@ template <typename S, typename... Args,
 FMT_INLINE std::basic_string<typename S::char_type> format(const S&,
                                                            Args&&... args) {
   if constexpr (std::is_same<typename S::char_type, char>::value) {
-    constexpr basic_string_view<typename S::char_type> str = S();
+    constexpr auto str = basic_string_view<typename S::char_type>(S());
     if constexpr (str.size() == 2 && str[0] == '{' && str[1] == '}') {
       const auto& first = detail::first(args...);
       if constexpr (detail::is_named_arg<
@@ -608,9 +607,23 @@ size_t formatted_size(const S& format_str, const Args&... args) {
   return format_to(detail::counting_iterator(), format_str, args...).count();
 }
 
+template <typename S, typename... Args,
+          FMT_ENABLE_IF(detail::is_compiled_string<S>::value)>
+void print(std::FILE* f, const S& format_str, const Args&... args) {
+  memory_buffer buffer;
+  format_to(std::back_inserter(buffer), format_str, args...);
+  detail::print(f, {buffer.data(), buffer.size()});
+}
+
+template <typename S, typename... Args,
+          FMT_ENABLE_IF(detail::is_compiled_string<S>::value)>
+void print(const S& format_str, const Args&... args) {
+  print(stdout, format_str, args...);
+}
+
 #if FMT_USE_NONTYPE_TEMPLATE_PARAMETERS
 inline namespace literals {
-template <detail::fixed_string Str>
+template <detail_exported::fixed_string Str>
 constexpr detail::udl_compiled_string<
     remove_cvref_t<decltype(Str.data[0])>,
     sizeof(Str.data) / sizeof(decltype(Str.data[0])), Str>

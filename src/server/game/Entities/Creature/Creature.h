@@ -151,6 +151,8 @@ public:
 
     [[nodiscard]] bool HasSpell(uint32 spellID) const override;
 
+    void UpdateMovementFlags();
+
     bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true );
     bool UpdateStats(Stats stat) override;
     bool UpdateAllStats() override;
@@ -176,6 +178,7 @@ public:
 
     [[nodiscard]] CreatureTemplate const* GetCreatureTemplate() const { return m_creatureInfo; }
     [[nodiscard]] CreatureData const* GetCreatureData() const { return m_creatureData; }
+    void SetDetectionDistance(float dist){ m_detectionDistance = dist; }
     [[nodiscard]] CreatureAddon const* GetCreatureAddon() const;
 
     [[nodiscard]] std::string GetAIName() const;
@@ -197,6 +200,7 @@ public:
     Loot loot;
     [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
     [[nodiscard]] Player* GetLootRecipient() const;
+    [[nodiscard]] ObjectGuid::LowType GetLootRecipientGroupGUID() const { return m_lootRecipientGroup; }
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     bool isTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
@@ -224,6 +228,7 @@ public:
     bool CanStartAttack(Unit const* u) const;
     float GetAggroRange(Unit const* target) const;
     float GetAttackDistance(Unit const* player) const;
+    [[nodiscard]] float GetDetectionRange() const { return m_detectionDistance; }
 
     void SendAIReaction(AiReaction reactionType);
 
@@ -318,7 +323,7 @@ public:
 
     void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
     [[nodiscard]] bool IsReputationGainDisabled() const { return DisableReputationGain; }
-    [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const { return m_PlayerDamageReq == 0; }
+    [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const { return (m_creatureInfo->flags_extra & CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (m_PlayerDamageReq == 0); }
     void LowerPlayerDamageReq(uint32 unDamage)
     {
         if (m_PlayerDamageReq)
@@ -372,7 +377,7 @@ protected:
     static float _GetHealthMod(int32 Rank);
 
     ObjectGuid m_lootRecipient;
-    uint32 m_lootRecipientGroup;
+    ObjectGuid::LowType m_lootRecipientGroup;
 
     /// Timers
     time_t m_corpseRemoveTime;                          // (msecs)timer for death or corpse disappearance
@@ -413,6 +418,7 @@ protected:
     CreatureTemplate const* m_creatureInfo;                 // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
     CreatureData const* m_creatureData;
 
+    float m_detectionDistance;
     uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
 
     [[nodiscard]] bool IsInvisibleDueToDespawn() const override;

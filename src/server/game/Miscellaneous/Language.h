@@ -1175,7 +1175,9 @@ enum AcoreStrings
     LANG_COMMAND_MUTEHISTORY_EMPTY      = 5060,
     LANG_COMMAND_MUTEHISTORY_OUTPUT     = 5061,
 
-    // Room for more Trinity strings    5062-9999
+    LANG_NPCINFO_SPELL_SCHOOL_IMMUNE    = 5062,
+
+    // Room for more strings    5063-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

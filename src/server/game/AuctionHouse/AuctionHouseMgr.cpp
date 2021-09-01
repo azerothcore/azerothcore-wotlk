@@ -12,7 +12,6 @@
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "Item.h"
-#include "Language.h"
 #include "Logging/Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -22,10 +21,7 @@
 #include "WorldSession.h"
 #include <vector>
 
-enum eAuctionHouse
-{
-    AH_MINIMUM_DEPOSIT = 100,
-};
+constexpr auto AH_MINIMUM_DEPOSIT = 100;
 
 AuctionHouseMgr::AuctionHouseMgr()
 {
@@ -563,7 +559,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 
     for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
     {
-        if (AsyncAuctionListingMgr::IsAuctionListingAllowed() == false) // pussywizard: World::Update is waiting for us...
+        if (!AsyncAuctionListingMgr::IsAuctionListingAllowed()) // pussywizard: World::Update is waiting for us...
             if ((itrcounter++) % 100 == 0) // check condition every 100 iterations
                 if (avgDiffTracker.getAverage() >= 30 || getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) >= 10) // pussywizard: stop immediately if diff is high or waiting too long
                     return false;
@@ -592,7 +588,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 continue;
         }
 
-        if (quality != 0xffffffff && proto->Quality != quality)
+        if (quality != 0xffffffff && proto->Quality < quality)
             continue;
 
         if (levelmin != 0x00 && (proto->RequiredLevel < levelmin || (levelmax != 0x00 && proto->RequiredLevel > levelmax)))

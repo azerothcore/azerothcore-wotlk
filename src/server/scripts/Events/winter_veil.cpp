@@ -1,4 +1,6 @@
-// Scripted by Xinef
+/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
 #include "GameEventMgr.h"
 #include "Player.h"
@@ -18,6 +20,7 @@ enum Mistletoe
     SPELL_CREATE_SNOWFLAKES         = 45036
 };
 
+// 26218 - Mistletoe
 class spell_winter_veil_mistletoe : public SpellScriptLoader
 {
 public:
@@ -66,6 +69,7 @@ enum winterWondervoltTrap
     SPELL_WINTER_WONDERVOLT_RED_MAN         = 26273,
 };
 
+// 26275 - PX-238 Winter Wondervolt TRAP
 class spell_winter_wondervolt_trap : public SpellScriptLoader
 {
 public:
@@ -83,11 +87,9 @@ public:
                 if (target->HasAuraType(SPELL_AURA_TRANSFORM))
                     return;
 
-                uint32 spellId = 0;
-                if (target->getGender() == GENDER_MALE)
-                    spellId = RAND(SPELL_WINTER_WONDERVOLT_RED_MAN, SPELL_WINTER_WONDERVOLT_GREEN_MAN);
-                else
-                    spellId = RAND(SPELL_WINTER_WONDERVOLT_RED_WOMEN, SPELL_WINTER_WONDERVOLT_GREEN_WOMEN);
+                uint32 spellId = target->getGender() == GENDER_MALE
+                        ? RAND(SPELL_WINTER_WONDERVOLT_RED_MAN, SPELL_WINTER_WONDERVOLT_GREEN_MAN)
+                        : RAND(SPELL_WINTER_WONDERVOLT_RED_WOMEN, SPELL_WINTER_WONDERVOLT_GREEN_WOMEN);
 
                 // cast
                 target->CastSpell(target, spellId, true);
@@ -123,6 +125,7 @@ enum crashinTrashin
     RACER_ACHI_CRITERIA                 = 4090,
 };
 
+// 49297 - Racer Rocket Slam
 class spell_winter_veil_racer_rocket_slam : public SpellScriptLoader
 {
 public:
@@ -189,6 +192,7 @@ public:
     }
 };
 
+// 49325 - Racer Slam, resolve
 class spell_winter_veil_racer_slam_hit : public SpellScriptLoader
 {
 public:
@@ -238,6 +242,8 @@ enum airRifle
     SPELL_AIR_RIFLE_PELTED_DAMAGE           = 67531,
 };
 
+/* 65576 - Pelted!
+   67533 - Shoot Air Rifle */
 class spell_winter_veil_shoot_air_rifle : public SpellScriptLoader
 {
 public:

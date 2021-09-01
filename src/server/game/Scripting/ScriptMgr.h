@@ -144,11 +144,11 @@ public:
     virtual void OnNetworkStop() { }
 
     // Called when a remote socket establishes a connection to the server. Do not store the socket object.
-    virtual void OnSocketOpen(WorldSocket* /*socket*/) { }
+    virtual void OnSocketOpen(std::shared_ptr<WorldSocket> /*socket*/) { }
 
     // Called when a socket is closed. Do not store the socket object, and do not rely on the connection
     // being open; it is not.
-    virtual void OnSocketClose(WorldSocket* /*socket*/, bool /*wasNew*/) { }
+    virtual void OnSocketClose(std::shared_ptr<WorldSocket> /*socket*/) { }
 
     // Called when a packet is sent to a client. The packet object is a copy of the original packet, so reading
     // and modifying it is safe.
@@ -194,6 +194,13 @@ public:
 
     // Called when the world is actually shut down.
     virtual void OnShutdown() { }
+
+    /**
+     * @brief This hook runs before finalizing the player world session. Can be also used to mutate the cache version of the Client.
+     *
+     * @param version The cache version that we will be sending to the Client.
+     */
+    virtual void OnBeforeFinalizePlayerWorldSession(uint32& /*cacheVersion*/) {}
 };
 
 class FormulaScript : public ScriptObject
@@ -1456,8 +1463,8 @@ public: /* SpellScriptLoader */
 public: /* ServerScript */
     void OnNetworkStart();
     void OnNetworkStop();
-    void OnSocketOpen(WorldSocket* socket);
-    void OnSocketClose(WorldSocket* socket, bool wasNew);
+    void OnSocketOpen(std::shared_ptr<WorldSocket> socket);
+    void OnSocketClose(std::shared_ptr<WorldSocket> socket);
     void OnPacketReceive(WorldSession* session, WorldPacket const& packet);
     void OnPacketSend(WorldSession* session, WorldPacket const& packet);
 
@@ -1466,6 +1473,7 @@ public: /* WorldScript */
     void OnOpenStateChange(bool open);
     void OnBeforeConfigLoad(bool reload);
     void OnAfterConfigLoad(bool reload);
+    void OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion);
     void OnMotdChange(std::string& newMotd);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
     void OnShutdownCancel();

@@ -1135,7 +1135,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     pCurrChar->CleanupChannels();
     pCurrChar->SendInitialPacketsAfterAddToMap();
     uint32 currZone, currArea;
-    pCurrChar->GetZoneAndAreaId(currZone, currArea, false);
+    pCurrChar->GetZoneAndAreaId(currZone, currArea);
     pCurrChar->SendInitWorldStates(currZone, currArea);
     pCurrChar->SetInGameTime(World::GetGameTimeMS());
 
@@ -1548,6 +1548,7 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
         if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph))
         {
             _player->RemoveAurasDueToSpell(glyphEntry->SpellId);
+            _player->SendLearnPacket(glyphEntry->SpellId, false); // Send packet to properly handle client-side spell tooltips
             _player->SetGlyph(slot, 0, true);
             _player->SendTalentsInfoData(false);
         }

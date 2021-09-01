@@ -198,6 +198,19 @@ SourceDirectory = ""
 MySQLExecutable = ""
 
 #
+#    ThreadPool
+#        Description: Number of threads to be used for the global thread pool
+#                     The thread pool is currently used for:
+#                      - Signal handling
+#                      - Remote access
+#                      - Database keep-alive ping
+#                      - Core freeze check
+#                      - World socket networking
+#        Default:     2
+
+ThreadPool = 2
+
+#
 #    IPLocationFile
 #        Description: The path to your IP2Location database CSV file.
 #        Example:     "C:/acore/IP2LOCATION-LITE-DB1.CSV"
@@ -206,6 +219,15 @@ MySQLExecutable = ""
 #
 
 IPLocationFile = ""
+
+#
+#    AllowLoggingIPAddressesInDatabase
+#        Description: Specifies if IP addresses can be logged to the database
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+
+AllowLoggingIPAddressesInDatabase = 1
 
 #
 ###################################################################################################
@@ -1229,6 +1251,16 @@ DeletedCharacterTicketTrace = 0
 #        Default:     1
 
 DungeonFinder.OptionsMask = 1
+
+#
+#     DungeonFinder.Expansion
+#        Description: Allow setting which expansion can be used in LFG
+#           2 - Wotlk (Default)
+#           1 - TBC
+#           0 - Classic
+#        Default:     2
+
+DungeonFinder.Expansion = 2
 
 #
 #   AccountInstancesPerHour
@@ -2672,11 +2704,25 @@ Battleground.RewardLoserHonorLast   = 5
 Battleground.PlayerRespawn = 30
 
 #
-#    Battleground.BuffRespawn
-#        Description: Battleground buff respawn time (in seconds).
-#        Default:     180 (Recommended 10+)
+#    Battleground.RestorationBuffRespawn
+#        Description: Battleground restoration buff respawn time (in seconds).
+#        Default:     20 (Recommended 10+)
 
-Battleground.BuffRespawn = 180
+Battleground.RestorationBuffRespawn = 20
+
+#
+#    Battleground.BerserkingBuffRespawn
+#        Description: Battleground berserking buff respawn time (in seconds).
+#        Default:     120 (Recommended 10+)
+
+Battleground.BerserkingBuffRespawn = 120
+
+#
+#    Battleground.SpeedBuffRespawn
+#        Description: Battleground speed buff respawn time (in seconds).
+#        Default:     150 (Recommended 10+)
+
+Battleground.SpeedBuffRespawn = 150
 
 #
 ###################################################################################################
@@ -3597,7 +3643,6 @@ Logger.scripts.hotswap=4,Console Server
 Logger.server=4,Console Server
 Logger.sql.sql=2,Console DBErrors
 Logger.sql=4,Console Server
-Logger.mmaps=4,Server
 
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server
