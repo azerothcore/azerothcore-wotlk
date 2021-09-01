@@ -58,7 +58,6 @@ public:
             { "anim",           SEC_ADMINISTRATOR,  false, &HandleDebugAnimCommand,            "" },
             { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "" },
             { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "" },
-            { "lfg",            SEC_ADMINISTRATOR,  false, &HandleDebugDungeonFinderCommand,   "" },
             { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "" },
             { "lootrecipient",  SEC_ADMINISTRATOR,  false, &HandleDebugGetLootRecipientCommand, "" },
             { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "" },
@@ -76,6 +75,7 @@ public:
             { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "" },
             { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "" },
             { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "" },
+            { "lfg",            SEC_ADMINISTRATOR,  false, &HandleDebugDungeonFinderCommand,   "" },
             { "los",            SEC_ADMINISTRATOR,  false, &HandleDebugLoSCommand,             "" },
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
             { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" }

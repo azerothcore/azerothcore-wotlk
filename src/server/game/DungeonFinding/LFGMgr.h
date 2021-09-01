@@ -554,7 +554,7 @@ namespace lfg
         // debug lfg command
         void ToggleTesting();
         /// For 1 player queue testing
-        [[nodiscard]] bool isTesting() const { return m_Testing; }
+        [[nodiscard]] bool IsTesting() const { return m_Testing; }
 
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
 

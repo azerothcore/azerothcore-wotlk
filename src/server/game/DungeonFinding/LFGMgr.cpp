@@ -1652,7 +1652,8 @@ namespace lfg
                 {
                     randomDungeon = true;
                     // if player is debugging, don't add dungeon cooldown
-                    if (!m_Testing) {
+                    if (!m_Testing)
+                    {
                         player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
                     }
                 }
