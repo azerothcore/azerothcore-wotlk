@@ -2861,6 +2861,20 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
 
     applyInhabitFlags();
 
+    if (m_movedByPlayer)
+    {
+        WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
+        data << GetPackGUID();
+        data << uint32(0); //! movement counter
+        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+        data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+        return true;
+    }
+
     if (!movespline->Initialized())
         return true;
 
@@ -2943,6 +2957,25 @@ bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
     if (!Unit::SetCanFly(enable))
         return false;
 
+    if (m_movedByPlayer)
+    {
+        sScriptMgr->AnticheatSetCanFlybyServer(m_movedByPlayer->ToPlayer(), enable);
+
+        if (!enable)
+            m_movedByPlayer->ToPlayer()->SetFallInformation(time(nullptr), m_movedByPlayer->ToPlayer()->GetPositionZ());
+
+        WorldPacket data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
+        data << GetPackGUID();
+        data << uint32(0); //! movement counter
+        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+        data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+        return true;
+    }
+
     if (!movespline->Initialized())
         return true;
 
@@ -2965,6 +2998,20 @@ bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
     if (!packetOnly && !Unit::SetWaterWalking(enable))
         return false;
 
+    if (m_movedByPlayer)
+    {
+        WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
+        data << GetPackGUID();
+        data << uint32(0); //! movement counter
+        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+        data.Initialize(MSG_MOVE_WATER_WALK, 64);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+        return true;
+    }
+
     if (!movespline->Initialized())
         return true;
 
@@ -2978,6 +3025,20 @@ bool Creature::SetFeatherFall(bool enable, bool packetOnly /* = false */)
 {
     if (!packetOnly && !Unit::SetFeatherFall(enable))
         return false;
+
+    if (m_movedByPlayer)
+    {
+        WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
+        data << GetPackGUID();
+        data << uint32(0); //! movement counter
+        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+        data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+        return true;
+    }
 
     if (!movespline->Initialized())
         return true;
@@ -2994,6 +3055,20 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/)
         return false;
 
    applyInhabitFlags();
+
+   if (m_movedByPlayer)
+   {
+       WorldPacket data(enable ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
+       data << GetPackGUID();
+       data << uint32(0); //! movement counter
+       m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+       data.Initialize(MSG_MOVE_HOVER, 64);
+       data << GetPackGUID();
+       BuildMovementPacket(&data);
+       m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+       return true;
+   }
 
     if (!movespline->Initialized())
         return true;
@@ -3108,7 +3183,10 @@ void Creature::UpdateMovementFlags()
         if (isInAir && !IsFalling())
         {
             if (info->InhabitType & INHABIT_GROUND)
+            {
                 SetCanFly(true);
+                SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
+            }
             else
                 SetDisableGravity(true);
 
@@ -3119,6 +3197,11 @@ void Creature::UpdateMovementFlags()
         {
             SetCanFly(false);
             SetDisableGravity(false);
+
+            if (info->InhabitType & INHABIT_GROUND)
+            {
+                SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
+            }
 
             if (IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
                 SetHover(true);
