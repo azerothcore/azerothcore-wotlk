@@ -2361,6 +2361,13 @@ Rate.MoveSpeed = 1
 Rate.InstanceResetTime = 1
 
 #
+#    Rate.Flightpaths.Cost
+#        Description: Price multiplier for taking a flight at a flightmaster
+#        Default:     1
+
+Rate.Flightpaths.Cost = 1
+
+#
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
 #       The lower the rate the less experience is required.

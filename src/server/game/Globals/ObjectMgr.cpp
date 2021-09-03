@@ -6058,7 +6058,7 @@ void ObjectMgr::GetTaxiPath(uint32 source, uint32 destination, uint32& path, uin
         return;
     }
 
-    cost = dest_i->second.price;
+    cost = uint32(dest_i->second.price * sWorld->getRate(RATE_FLIGHT_PATH_COST));
     path = dest_i->second.ID;
 }
 

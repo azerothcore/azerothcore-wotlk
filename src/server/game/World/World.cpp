@@ -1405,6 +1405,13 @@ void World::LoadConfigSettings(bool reload)
     // Specifies if IP addresses can be logged to the database
     m_bool_configs[CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE] = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true);
 
+    rate_values[RATE_FLIGHT_PATH_COST]  = sConfigMgr->GetOption<float>("Rate.Flightpaths.Cost", 1.0f);
+    if (rate_values[RATE_FLIGHT_PATH_COST] < 0.0f)
+    {
+        sLog->outError("Rate.Flightpaths.Cost (%f) must be >=0. Using 0.0 instead.", rate_values[RATE_FLIGHT_PATH_COST]);
+        rate_values[RATE_FLIGHT_PATH_COST] = 0.0f;
+    }
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
