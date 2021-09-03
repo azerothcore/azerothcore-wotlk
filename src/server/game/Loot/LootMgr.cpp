@@ -1072,34 +1072,52 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             LootItem& item = l.quest_items[qi->index];
             if (!qi->is_looted && !item.is_looted)
             {
-                b << uint8(l.items.size() + (qi - q_list->begin()));
-                b << item;
-                if (item.follow_loot_rules)
+                bool showInLoot = true;
+                bool hasQuestForItem = lv.viewer->HasQuestForItem(item.itemid, 0, false, &showInLoot);
+                if (!hasQuestForItem)
                 {
-                    switch (lv.permission)
+                    if (!showInLoot)
                     {
-                        case MASTER_PERMISSION:
-                            b << uint8(LOOT_SLOT_TYPE_MASTER);
-                            break;
-                        case RESTRICTED_PERMISSION:
-                            b << (item.is_blocked ? uint8(LOOT_SLOT_TYPE_LOCKED) : uint8(slotType));
-                            break;
-                        case GROUP_PERMISSION:
-                        case ROUND_ROBIN_PERMISSION:
-                            if (!item.is_blocked)
-                                b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
-                            else
-                                b << uint8(LOOT_SLOT_TYPE_ROLL_ONGOING);
-                            break;
-                        default:
-                            b << uint8(slotType);
-                            break;
+                        continue;
                     }
+
+                    b << uint8(l.items.size() + (qi - q_list->begin()));
+                    b << item;
+                    b << uint8(lv.permission == MASTER_PERMISSION ? LOOT_SLOT_TYPE_MASTER : LOOT_SLOT_TYPE_LOCKED);
                 }
-                else if (!item.freeforall)
-                    b << uint8(partySlotType);
                 else
-                    b << uint8(slotType);
+                {
+                    b << uint8(l.items.size() + (qi - q_list->begin()));
+                    b << item;
+
+                    if (item.follow_loot_rules)
+                    {
+                        switch (lv.permission)
+                        {
+                            case MASTER_PERMISSION:
+                                b << uint8(LOOT_SLOT_TYPE_MASTER);
+                                break;
+                            case RESTRICTED_PERMISSION:
+                                b << (item.is_blocked ? uint8(LOOT_SLOT_TYPE_LOCKED) : uint8(slotType));
+                                break;
+                            case GROUP_PERMISSION:
+                            case ROUND_ROBIN_PERMISSION:
+                                if (!item.is_blocked)
+                                    b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
+                                else
+                                    b << uint8(LOOT_SLOT_TYPE_ROLL_ONGOING);
+                                break;
+                            default:
+                                b << uint8(slotType);
+                                break;
+                        }
+                    }
+                    else if (!item.freeforall)
+                        b << uint8(partySlotType);
+                    else
+                        b << uint8(slotType);
+                }
+
                 ++itemsShown;
             }
         }
