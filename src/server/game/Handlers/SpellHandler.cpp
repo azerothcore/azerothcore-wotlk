@@ -328,6 +328,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     uint32 spellId;
     uint8  castCount, castFlags;
     recvPacket >> castCount >> spellId >> castFlags;
+    TriggerCastFlags triggerFlag = TRIGGERED_NONE;
 
     uint32 oldSpellId = spellId;
 
@@ -350,14 +351,40 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    // client provided targets
+    SpellCastTargets targets;
+    targets.Read(recvPacket, mover);
+    HandleClientCastFlags(recvPacket, castFlags, targets);
+
+    // not have spell in spellbook
     if (mover->GetTypeId() == TYPEID_PLAYER)
     {
         // not have spell in spellbook or spell passive and not casted by client
         if( !(spellInfo->Targets & TARGET_FLAG_GAMEOBJECT_ITEM) && (!mover->ToPlayer()->HasActiveSpell(spellId) || spellInfo->IsPassive()) )
         {
-            //cheater? kick? ban?
-            recvPacket.rfinish(); // prevent spam at ignore packet
-            return;
+            bool allow = false;
+
+            // allow casting of unknown spells for special lock cases
+            if (GameObject* go = targets.GetGOTarget())
+            {
+                if (go->GetSpellForLock(mover->ToPlayer()) == spellInfo)
+                {
+                    allow = true;
+                }
+            }
+
+            // TODO: Preparation for #23204
+            // allow casting of spells triggered by clientside periodic trigger auras
+            /*
+             if (caster->HasAuraTypeWithTriggerSpell(SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT, spellId))
+            {
+                allow = true;
+                triggerFlag = TRIGGERED_FULL_MASK;
+            }
+            */
+
+            if (!allow)
+                return;
         }
     }
     else
@@ -407,14 +434,8 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     // can't use our own spells when we're in possession of another unit,
     if (_player->isPossessing())
     {
-        recvPacket.rfinish(); // prevent spam at ignore packet
         return;
     }
-
-    // client provided targets
-    SpellCastTargets targets;
-    targets.Read(recvPacket, mover);
-    HandleClientCastFlags(recvPacket, castFlags, targets);
 
     // pussywizard: HandleClientCastFlags calls HandleMovementOpcodes, which can result in pretty much anything. Caster not in map will crash at GetMap() for spell difficulty in Spell constructor.
     if (!mover->FindMap())
@@ -433,7 +454,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             spellInfo = actualSpellInfo;
     }
 
-    Spell* spell = new Spell(mover, spellInfo, TRIGGERED_NONE, ObjectGuid::Empty, false);
+    Spell* spell = new Spell(mover, spellInfo, triggerFlag, ObjectGuid::Empty, false);
 
     sScriptMgr->ValidateSpellAtCastSpellResult(_player, mover, spell, oldSpellId, spellId);
 
