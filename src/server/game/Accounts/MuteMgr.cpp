@@ -230,7 +230,7 @@ Optional<std::tuple<uint32, Seconds, std::string, std::string>> MuteMgr::GetMute
 
 void MuteMgr::CheckSpeakTime(uint32 accountID, time_t muteDate)
 {
-    if (GetMuteDate(accountID) < muteDate)
+    if (static_cast<time_t>(GetMuteDate(accountID)) < muteDate)
     {
         SetMuteTime(accountID, muteDate);
     }
