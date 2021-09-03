@@ -10496,10 +10496,6 @@ void Unit::UnsummonAllTotems(bool onDeath /*= false*/)
                 {
                     OldTotem->ToTempSummon()->UnSummon();
                 }
-                else
-                {
-                    showErrors = false;
-                }
             }
         }
     }
