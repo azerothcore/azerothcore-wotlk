@@ -1078,6 +1078,11 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                 {
                     if (!showInLoot)
                     {
+                        const_cast<QuestItem*>(&(*qi))->is_looted = true;
+                        if (!item.freeforall)
+                        {
+                            item.is_looted = true;
+                        }
                         continue;
                     }
 
