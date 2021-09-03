@@ -2118,7 +2118,7 @@ uint32 Map::GetAreaId(uint32 phaseMask, float x, float y, float z) const
 {
     uint32 mogpFlags;
     int32 adtId, rootId, groupId;
-    float vmapZ = 0.f;
+    float vmapZ = z;
     bool hasVmapArea = GetAreaInfo(phaseMask, x, y, vmapZ, mogpFlags, adtId, rootId, groupId);
 
     uint32 gridAreaId    = 0;
