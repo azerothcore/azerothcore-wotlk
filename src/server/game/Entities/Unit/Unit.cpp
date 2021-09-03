@@ -10394,11 +10394,6 @@ void Unit::RemoveAllControlled(bool onDeath /*= false*/)
 
     if (showErrors)
     {
-        if (GetPetGUID())
-        {
-            LOG_FATAL("entities.unit", "Unit %u is not able to release its pet %s", GetEntry(), GetPetGUID().ToString().c_str());
-        }
-
         if (GetMinionGUID())
         {
             LOG_FATAL("entities.unit", "Unit %u is not able to release its minion %s", GetEntry(), GetMinionGUID().ToString().c_str());
@@ -10504,6 +10499,7 @@ void Unit::RemoveCharmAuras()
 
 void Unit::UnsummonAllTotems(bool onDeath /*= false*/)
 {
+    bool showErrors = true;
     for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
     {
         if (!m_SummonSlot[i])
@@ -10519,7 +10515,19 @@ void Unit::UnsummonAllTotems(bool onDeath /*= false*/)
                 {
                     OldTotem->ToTempSummon()->UnSummon();
                 }
+                else
+                {
+                    showErrors = false;
+                }
             }
+        }
+    }
+
+    if (showErrors)
+    {
+        if (GetPetGUID())
+        {
+            LOG_FATAL("entities.unit", "Unit %u is not able to release its pet %s", GetEntry(), GetPetGUID().ToString().c_str());
         }
     }
 }
