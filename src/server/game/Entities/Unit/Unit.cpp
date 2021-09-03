@@ -10366,6 +10366,7 @@ void Unit::RemoveAllControlled(bool onDeath /*= false*/)
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->StopCastingCharm();
 
+    bool showErrors = true;
     while (!m_Controlled.empty())
     {
         Unit* target = *m_Controlled.begin();
@@ -10380,6 +10381,10 @@ void Unit::RemoveAllControlled(bool onDeath /*= false*/)
             {
                 target->ToTempSummon()->UnSummon();
             }
+            else
+            {
+                showErrors = false;
+            }
         }
         else
         {
@@ -10387,19 +10392,22 @@ void Unit::RemoveAllControlled(bool onDeath /*= false*/)
         }
     }
 
-    if (GetPetGUID())
+    if (showErrors)
     {
-        LOG_FATAL("entities.unit", "Unit %u is not able to release its pet %s", GetEntry(), GetPetGUID().ToString().c_str());
-    }
+        if (GetPetGUID())
+        {
+            LOG_FATAL("entities.unit", "Unit %u is not able to release its pet %s", GetEntry(), GetPetGUID().ToString().c_str());
+        }
 
-    if (GetMinionGUID())
-    {
-        LOG_FATAL("entities.unit", "Unit %u is not able to release its minion %s", GetEntry(), GetMinionGUID().ToString().c_str());
-    }
+        if (GetMinionGUID())
+        {
+            LOG_FATAL("entities.unit", "Unit %u is not able to release its minion %s", GetEntry(), GetMinionGUID().ToString().c_str());
+        }
 
-    if (GetCharmGUID())
-    {
-        LOG_FATAL("entities.unit", "Unit %u is not able to release its charm %s", GetEntry(), GetCharmGUID().ToString().c_str());
+        if (GetCharmGUID())
+        {
+            LOG_FATAL("entities.unit", "Unit %u is not able to release its charm %s", GetEntry(), GetCharmGUID().ToString().c_str());
+        }
     }
 }
 
