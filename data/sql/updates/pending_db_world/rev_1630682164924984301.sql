@@ -13,3 +13,8 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (6246, 374, 0, 'Razormaw Matriach''s Nest spawn 2'),
 (6247, 374, 0, 'Razormaw Matriach''s Nest spawn 3'),
 (6248, 374, 0, 'Razormaw Matriach''s Nest spawns 4');
+
+-- Removing the pool and spawn of the guid 14999
+DELETE FROM` pool_gameobject` WHERE `guid` = 14999;
+DELETE FROM `pool_template` WHERE `entry` = 202482;
+
