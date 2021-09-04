@@ -1,3 +1,19 @@
+-- DB update 2021_09_04_00 -> 2021_09_04_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_09_04_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_09_04_00 2021_09_04_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1627589501720548700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1627589501720548700');
 
 UPDATE `creature_template` SET `speed_walk` = 1.55556 WHERE (`entry` = 92); -- It was 1.05
@@ -1139,3 +1155,13 @@ UPDATE `creature_template` SET `speed_run` = 1.71429 WHERE (`entry` = 15936); --
 UPDATE `creature_template` SET `speed_run` = 1.71429 WHERE (`entry` = 15953); -- It was 1.14286
 UPDATE `creature_template` SET `speed_run` = 1.42857 WHERE (`entry` = 15962); -- It was 1.14286
 UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 15964); -- It was 1.5
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_09_04_01' WHERE sql_rev = '1627589501720548700';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
