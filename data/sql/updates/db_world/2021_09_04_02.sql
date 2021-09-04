@@ -1,3 +1,19 @@
+-- DB update 2021_09_04_01 -> 2021_09_04_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_09_04_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_09_04_01 2021_09_04_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1629752061588917431'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1629752061588917431');
 
 UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 3  WHERE `id` = 5229 AND (`guid` IN (50173, 50175, 50176, 50177, 50179, 50180));
@@ -20,3 +36,13 @@ UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 3  WHERE `id` = 22
 UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 4  WHERE `id` = 22144 AND (`guid` IN (91719 ,91728));
 
 UPDATE `creature_template` SET `MovementType` = 1 WHERE (`entry` IN (5229,5231,5232,5234,5236,5237,5238,5239,5240,5241,22143,22144,22148,23022));
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_09_04_02' WHERE sql_rev = '1629752061588917431';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
