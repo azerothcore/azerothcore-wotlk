@@ -2525,6 +2525,8 @@ public:
 
     float GetSightRange(const WorldObject* target = nullptr) const override;
 
+    std::string GetPlayerName();
+
  protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
