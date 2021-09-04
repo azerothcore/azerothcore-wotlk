@@ -5017,7 +5017,7 @@ ON
 	(`gameobject`.`guid` = `tempObject`.`guid`)
 SET
 	`gameobject`.`zoneId` = `tempObject`.`zoneId`,
-    `gameobject`.`areaId` = `tempObject`.`zoneId`,
+    `gameobject`.`areaId` = `tempObject`.`areaId`,
 	`gameobject`.`map` = `tempObject`.`mapId`;
     
 DROP TABLE `tempObject`;
