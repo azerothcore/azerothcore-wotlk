@@ -85,7 +85,7 @@ enum PlayerUnderwaterState
     UNDERWATER_INWATER                  = 0x01,             // terrain type is water and player is afflicted by it
     UNDERWATER_INLAVA                   = 0x02,             // terrain type is lava and player is afflicted by it
     UNDERWATER_INSLIME                  = 0x04,             // terrain type is lava and player is afflicted by it
-    UNDERWARER_INDARKWATER              = 0x08,             // terrain type is dark water and player is afflicted by it
+    UNDERWATER_INDARKWATER              = 0x08,             // terrain type is dark water and player is afflicted by it
 
     UNDERWATER_EXIST_TIMERS             = 0x10
 };
@@ -992,7 +992,7 @@ public:
         return GetSession()->GetSessionDbLocaleIndex() == LOCALE_esES || GetSession()->GetSessionDbLocaleIndex() == LOCALE_esMX;
     }
 
-    bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr);
+    bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr, bool newInstance = false);
     bool TeleportTo(WorldLocation const& loc, uint32 options = 0, Unit* target = nullptr)
     {
         return TeleportTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation(), options, target);
@@ -1021,8 +1021,7 @@ public:
 
     void SetInWater(bool apply);
 
-    [[nodiscard]] bool IsInWater(bool allowAbove = false) const override;
-    [[nodiscard]] bool IsUnderWater() const override;
+    [[nodiscard]] bool IsInWater() const override { return m_isInWater; }
     [[nodiscard]] bool IsFalling() const;
     bool IsInAreaTriggerRadius(const AreaTrigger* trigger) const;
 
@@ -1574,7 +1573,7 @@ public:
     void SendLearnPacket(uint32 spellId, bool learn);
     bool addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary = false, bool learnFromSkill = false);
     bool _addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill = false);
-    void learnSpell(uint32 spellId);
+    void learnSpell(uint32 spellId, bool temporary = false);
     void removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporary);
     void resetSpells();
     void LearnCustomSpells();
@@ -1736,10 +1735,6 @@ public:
     void UpdatePvP(bool state, bool _override = false);
     void UpdateZone(uint32 newZone, uint32 newArea);
     void UpdateArea(uint32 newArea);
-
-    [[nodiscard]] uint32 GetZoneId(bool forceRecalc = false) const override;
-    [[nodiscard]] uint32 GetAreaId(bool forceRecalc = false) const override;
-    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc = false) const override;
 
     void UpdateZoneDependentAuras(uint32 zone_id);    // zones
     void UpdateAreaDependentAuras(uint32 area_id);    // subzones
@@ -1905,7 +1900,8 @@ public:
 
     bool UpdatePosition(float x, float y, float z, float orientation, bool teleport = false) override;
     bool UpdatePosition(const Position& pos, bool teleport = false) { return UpdatePosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), teleport); }
-    void UpdateUnderwaterState(Map* m, float x, float y, float z) override;
+
+    void ProcessTerrainStatusUpdate() override;
 
     void SendMessageToSet(WorldPacket* data, bool self) override { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
     void SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr) override; // pussywizard!
@@ -1955,8 +1951,8 @@ public:
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
-    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType);
-    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence);
+    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* item = nullptr);
+    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item = nullptr);
 
     void SetSkill(uint16 id, uint16 step, uint16 currVal, uint16 maxVal);
     [[nodiscard]] uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus + temp bonus
@@ -1996,6 +1992,7 @@ public:
     void InitDisplayIds();
 
     bool IsAtGroupRewardDistance(WorldObject const* pRewardSource) const;
+    bool IsAtLootRewardDistance(WorldObject const* pRewardSource) const;
     bool IsAtRecruitAFriendDistance(WorldObject const* pOther) const;
     void RewardPlayerAndGroupAtKill(Unit* victim, bool isBattleGround);
     void RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewardSource);

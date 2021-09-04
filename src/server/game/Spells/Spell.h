@@ -490,6 +490,7 @@ public:
 
     SpellInfo const* m_spellInfo;
     Item* m_CastItem;
+    Item* m_weaponItem;
     ObjectGuid m_castItemGUID;
     uint8 m_cast_count;
     uint32 m_glyphIndex;
@@ -677,7 +678,7 @@ protected:
     SpellCastResult CallScriptCheckCastHandlers();
     void PrepareScriptHitHandlers();
     bool CallScriptEffectHandlers(SpellEffIndex effIndex, SpellEffectHandleMode mode);
-    void CallScriptBeforeHitHandlers();
+    void CallScriptBeforeHitHandlers(SpellMissInfo missInfo);
     void CallScriptOnHitHandlers();
     void CallScriptAfterHitHandlers();
     void CallScriptObjectAreaTargetSelectHandlers(std::list<WorldObject*>& targets, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
@@ -715,6 +716,7 @@ protected:
     // we can't store original aura link to prevent access to deleted auras
     // and in same time need aura data and after aura deleting.
     SpellInfo const* m_triggeredByAuraSpell;
+    int8 m_triggeredByAuraEffectIndex;
 
     bool m_skipCheck;
     uint8 m_auraScaleMask;

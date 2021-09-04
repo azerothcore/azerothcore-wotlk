@@ -6,7 +6,6 @@
 
 #include "ModelInstance.h"
 #include "MapTree.h"
-#include "VMapDefinitions.h"
 #include "WorldModel.h"
 
 using G3D::Vector3;
