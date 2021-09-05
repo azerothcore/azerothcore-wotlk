@@ -500,11 +500,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ(), plrMover->GetCollisionHeight()));
     }
 
-    bool jumpopcode = false;
     if (opcode == MSG_MOVE_JUMP)
     {
-        jumpopcode = true;
-        if (!sScriptMgr->AnticheatHandleDoubleJump(_player, mover))
+        if (!sScriptMgr->AnticheatHandleDoubleJump(_player, mover, movementInfo))
         {
             KickPlayer();
             return;
@@ -512,7 +510,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     /* start some hack detection */
-    if (!sScriptMgr->AnticheatCheckMovementInfo(_player, movementInfo, mover, jumpopcode))
+    if (!sScriptMgr->AnticheatCheckMovementInfo(_player, movementInfo, mover, opcode))
     {
         KickPlayer();
         return;

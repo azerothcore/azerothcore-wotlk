@@ -1035,8 +1035,8 @@ public:
     virtual void AnticheatSetRootACKUpd(Player* /*player*/) { }
     virtual void AnticheatSetJumpingbyOpcode(Player* /*player*/, bool /*jump*/) { }
     virtual void AnticheatUpdateMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/) { }
-    [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/) { return true; }
-    [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, bool /*jump*/) { return true; }
+    [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/, MovementInfo const& /*movementInfo*/) { return true; }
+    [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, uint16 /*opcode*/) { return true; }
     virtual void AnticheatResetFallingData(Player* /*player*/) { }
     virtual bool AnticheatNoFallingDamage(Player* /*player*/, uint16 /*opcode*/) { return true; }
     virtual void AnticheatHandleNoFallingDamage(Player* /*player*/, uint16 /*opcode*/) { }
@@ -1734,8 +1734,8 @@ public: /* PlayerScript */
     void AnticheatSetRootACKUpd(Player* player);
     void AnticheatUpdateMovementInfo(Player* player, MovementInfo const& movementInfo);
     void AnticheatSetJumpingbyOpcode(Player* player, bool jump);
-    bool AnticheatHandleDoubleJump(Player* player, Unit* mover);
-    bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
+    bool AnticheatHandleDoubleJump(Player* player, Unit* mover, MovementInfo const& movementInfo);
+    bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, uint16 opcode);
     void AnticheatResetFallingData(Player* player);
     bool AnticheatNoFallingDamage(Player* player, uint16 opcode);
     void AnticheatHandleNoFallingDamage(Player* player, uint16 opcode);

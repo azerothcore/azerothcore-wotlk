@@ -2678,23 +2678,23 @@ void ScriptMgr::AnticheatUpdateMovementInfo(Player* player, MovementInfo const& 
     FOREACH_SCRIPT(PlayerScript)->AnticheatUpdateMovementInfo(player, movementInfo);
 }
 
-bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
+bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover, MovementInfo const& movementInfo)
 {
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->AnticheatHandleDoubleJump(player, mover))
+        if (!itr->second->AnticheatHandleDoubleJump(player, mover, movementInfo))
             ret = false; // we change ret value only when scripts return true
 
     return ret;
 }
 
-bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump)
+bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, uint16 opcode)
 {
     bool ret = true;
 
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
-        if (!itr->second->AnticheatCheckMovementInfo(player, movementInfo, mover, jump))
+        if (!itr->second->AnticheatCheckMovementInfo(player, movementInfo, mover, opcode))
             ret = false; // we change ret value only when scripts return true
 
     return ret;

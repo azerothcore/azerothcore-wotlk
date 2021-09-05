@@ -11916,7 +11916,17 @@ void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= 
         SetViewpoint(target, allowMove);
 
     if (allowMove)
+    {
         SetMover(target);
+        if (target != this && target->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY))
+        {
+            sScriptMgr->AnticheatSetCanFlybyServer(this, true);
+        }
+    }
+    else if (!CanFly() && target != this)
+    {
+        sScriptMgr->AnticheatSetCanFlybyServer(this, false);
+    }
 
     // Xinef: disable moving if target has disable move flag
     if (target->GetTypeId() != TYPEID_UNIT)
