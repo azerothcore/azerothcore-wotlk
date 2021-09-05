@@ -467,7 +467,7 @@ void Pet::Update(uint32 diff)
                                 GetCharmInfo()->SetIsReturning(false);
                                 GetCharmInfo()->SaveStayPosition(true);
 
-                                CastSpell(tempspellTarget, tempspell, true);
+                                CastSpell(tempspellTarget, tempspell, false);
                                 m_tempspell = 0;
                                 m_tempspellTarget = nullptr;
 
@@ -666,6 +666,8 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 
     SetDisplayId(creature->GetDisplayId());
 
+    UpdatePositionData();
+
     if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family))
         SetName(cFamily->Name[sWorld->GetDefaultDbcLocale()]);
     else
@@ -683,6 +685,8 @@ bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
         SetName(cFamily->Name[sWorld->GetDefaultDbcLocale()]);
 
     Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());
+
+    UpdatePositionData();
 
     return true;
 }
