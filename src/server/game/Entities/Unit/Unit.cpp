@@ -10360,7 +10360,7 @@ Unit* Unit::GetFirstControlled() const
     return unit;
 }
 
-void Unit::RemoveAllControlled()
+void Unit::RemoveAllControlled(bool onDeath /*= false*/)
 {
     // possessed pet and vehicle
     if (GetTypeId() == TYPEID_PLAYER)
@@ -10371,18 +10371,21 @@ void Unit::RemoveAllControlled()
         Unit* target = *m_Controlled.begin();
         m_Controlled.erase(m_Controlled.begin());
         if (target->GetCharmerGUID() == GetGUID())
+        {
             target->RemoveCharmAuras();
+        }
         else if (target->GetOwnerGUID() == GetGUID() && target->IsSummon())
-            target->ToTempSummon()->UnSummon();
+        {
+            if (!(onDeath && !IsPlayer() && target->IsGuardian()))
+            {
+                target->ToTempSummon()->UnSummon();
+            }
+        }
         else
+        {
             LOG_ERROR("entities.unit", "Unit %u is trying to release unit %u which is neither charmed nor owned by it", GetEntry(), target->GetEntry());
+        }
     }
-    if (GetPetGUID())
-        LOG_FATAL("entities.unit", "Unit %u is not able to release its pet %s", GetEntry(), GetPetGUID().ToString().c_str());
-    if (GetMinionGUID())
-        LOG_FATAL("entities.unit", "Unit %u is not able to release its minion %s", GetEntry(), GetMinionGUID().ToString().c_str());
-    if (GetCharmGUID())
-        LOG_FATAL("entities.unit", "Unit %u is not able to release its charm %s", GetEntry(), GetCharmGUID().ToString().c_str());
 }
 
 Unit* Unit::GetNextRandomRaidMemberOrPet(float radius)
@@ -10476,16 +10479,25 @@ void Unit::RemoveCharmAuras()
     RemoveAurasByType(SPELL_AURA_AOE_CHARM);
 }
 
-void Unit::UnsummonAllTotems()
+void Unit::UnsummonAllTotems(bool onDeath /*= false*/)
 {
     for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
     {
         if (!m_SummonSlot[i])
+        {
             continue;
+        }
 
         if (Creature* OldTotem = GetMap()->GetCreature(m_SummonSlot[i]))
+        {
             if (OldTotem->IsSummon())
-                OldTotem->ToTempSummon()->UnSummon();
+            {
+                if (!(onDeath && !IsPlayer() && OldTotem->IsGuardian()))
+                {
+                    OldTotem->ToTempSummon()->UnSummon();
+                }
+            }
+        }
     }
 }
 
@@ -13571,8 +13583,8 @@ void Unit::setDeathState(DeathState s, bool despawn)
         if (IsNonMeleeSpellCast(false))
             InterruptNonMeleeSpells(false);
 
-        UnsummonAllTotems();
-        RemoveAllControlled();
+        UnsummonAllTotems(true);
+        RemoveAllControlled(true);
         RemoveAllAurasOnDeath();
     }
 
