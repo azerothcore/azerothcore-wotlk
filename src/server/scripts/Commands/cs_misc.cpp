@@ -3396,10 +3396,12 @@ public:
         Player* player = handler->getSelectedPlayerOrSelf();
 
         if (!player)
+        {
             return false;
+        }
 
         handler->PSendSysMessage("Character: %s", player->GetPlayerName().c_str());
-        handler->PSendSysMessage("Current equipment average item level: |cff00ffff%u|r", (int)player->GetAverageItemLevel());
+        handler->PSendSysMessage("Current equipment average item level: |cff00ffff%u|r", (int16)player->GetAverageItemLevel());
 
         if (sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE))
         {
