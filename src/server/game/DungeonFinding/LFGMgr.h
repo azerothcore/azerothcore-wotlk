@@ -18,6 +18,7 @@
 class Group;
 class Player;
 class Quest;
+class WorldLocation;
 
 namespace lfg
 {
@@ -500,7 +501,7 @@ namespace lfg
         /// Returns all random and seasonal dungeons for given level and expansion
         LfgDungeonSet GetRandomAndSeasonalDungeons(uint8 level, uint8 expansion);
         /// Teleport a player to/from selected dungeon
-        void TeleportPlayer(Player* player, bool out, bool fromOpcode = false);
+        void TeleportPlayer(Player* player, bool out, WorldLocation const* teleportLocation = nullptr);
         /// Inits new proposal to boot a player
         void InitBoot(ObjectGuid gguid, ObjectGuid kicker, ObjectGuid victim, std::string const& reason);
         /// Updates player boot proposal with new player answer
@@ -551,11 +552,12 @@ namespace lfg
         /// Sends queue status to player
         static void SendLfgQueueStatus(ObjectGuid guid, LfgQueueStatusData const& data);
 
+        void SetDungeon(ObjectGuid guid, uint32 dungeon);
+
     private:
         TeamId GetTeam(ObjectGuid guid);
         void RestoreState(ObjectGuid guid, char const* debugMsg);
         void ClearState(ObjectGuid guid, char const* debugMsg);
-        void SetDungeon(ObjectGuid guid, uint32 dungeon);
         void SetSelectedDungeons(ObjectGuid guid, LfgDungeonSet const& dungeons);
         void SetLockedDungeons(ObjectGuid guid, LfgLockMap const& lock);
         void DecreaseKicksLeft(ObjectGuid guid);
