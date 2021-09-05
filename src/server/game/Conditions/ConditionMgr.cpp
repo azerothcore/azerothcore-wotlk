@@ -21,7 +21,13 @@
 // Can have CONDITION_SOURCE_TYPE_NONE && !mReferenceId if called from a special event (ie: eventAI)
 bool Condition::Meets(ConditionSourceInfo& sourceInfo)
 {
-    ASSERT(ConditionTarget < MAX_CONDITION_TARGETS);
+    // ASSERT(ConditionTarget < MAX_CONDITION_TARGETS);
+    if (ConditionTarget >= MAX_CONDITION_TARGETS)
+    {
+        LOG_DEBUG("condition", "ConditionTarget is greater or equal than MAX_CONDITION_TARGETS");
+        return false;
+    }
+
     WorldObject* object = sourceInfo.mConditionTargets[ConditionTarget];
     // object not present, return false
     if (!object)
