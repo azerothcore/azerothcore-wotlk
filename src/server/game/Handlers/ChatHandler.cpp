@@ -47,6 +47,37 @@ inline bool isNasty(uint8 c)
     return false;
 }
 
+static void StripInvisibleChars(std::string& str)
+{
+    static std::string const invChars = " \t\7\n";
+
+    size_t wpos = 0;
+
+    bool space = false;
+    for (size_t pos = 0; pos < str.size(); ++pos)
+    {
+        if (invChars.find(str[pos]) != std::string::npos)
+        {
+            if (!space)
+            {
+                str[wpos++] = ' ';
+                space = true;
+            }
+        }
+        else
+        {
+            if (wpos != pos)
+                str[wpos++] = str[pos];
+            else
+                ++wpos;
+            space = false;
+        }
+    }
+
+    if (wpos < str.size())
+        str.erase(wpos, str.size());
+}
+
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
     uint32 type;
@@ -237,7 +268,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
 
     std::string to, channel, msg;
-    bool ignoreChecks = false;
     switch (type)
     {
         case CHAT_MSG_SAY:
@@ -252,6 +282,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_RAID_WARNING:
         case CHAT_MSG_BATTLEGROUND:
         case CHAT_MSG_BATTLEGROUND_LEADER:
+        case CHAT_MSG_AFK:
+        case CHAT_MSG_DND:
             msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
         case CHAT_MSG_WHISPER:
@@ -262,11 +294,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             recvData >> channel;
             msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
-        case CHAT_MSG_AFK:
-        case CHAT_MSG_DND:
-            msg = recvData.ReadCString(lang != LANG_ADDON);
-            ignoreChecks = true;
-            break;
     }
 
     // Our Warden module also uses SendAddonMessage as a way to communicate Lua check results to the server, see if this is that
@@ -275,11 +302,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         return;
     }
 
-    // pussywizard:
-    if (msg.length() > 255 || (lang != LANG_ADDON && msg.find("|0") != std::string::npos))
+    if (msg.size() > 255)
         return;
 
-    if (!ignoreChecks)
+    // no chat commands in AFK/DND autoreply, and it can be empty
+    if (!(type == CHAT_MSG_AFK || type == CHAT_MSG_DND))
     {
         if (msg.empty())
             return;
@@ -293,21 +320,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
             return;
         }
-
-        if (lang != LANG_ADDON)
-        {
-            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
-            {
-                //LOG_ERROR("network.opcode", "Player %s (%s) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
-                //    GetPlayer()->GetGUID().ToString().c_str(), msg.c_str());
-
-                if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
-                    KickPlayer("CONFIG_CHAT_STRICT_LINK_CHECKING_KICK");
-
-                return;
-            }
-        }
     }
+
+    if ((lang != LANG_ADDON) && !ValidateHyperlinksAndMaybeKick(msg))
+        return;
+
+    // Strip invisible characters for non-addon messages
+    if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
+        StripInvisibleChars(msg);
+
+    // pussywizard:
+    if (msg.length() > 255 || (lang != LANG_ADDON && msg.find("|0") != std::string::npos))
+        return;
 
     // do message validity checks
     if (lang != LANG_ADDON)
@@ -341,6 +365,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             auto end = std::unique(msg.begin(), msg.end(), [](char c1, char c2) { return (c1 == ' ') && (c2 == ' '); });
             msg.erase(end, msg.end());
         }
+
+        // validate hyperlinks
+        if (!ValidateHyperlinksAndMaybeKick(msg))
+            return;
     }
 
     // exploit

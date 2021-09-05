@@ -97,47 +97,6 @@ time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime)
     return hourLocal;
 }
 
-void stripLineInvisibleChars(std::string& str)
-{
-    static std::string const invChars = " \t\7\n";
-
-    size_t wpos = 0;
-
-    bool space = false;
-    for (size_t pos = 0; pos < str.size(); ++pos)
-    {
-        if (invChars.find(str[pos]) != std::string::npos)
-        {
-            if (!space)
-            {
-                str[wpos++] = ' ';
-                space = true;
-            }
-        }
-        else
-        {
-            if (wpos != pos)
-            {
-                str[wpos++] = str[pos];
-            }
-            else
-            {
-                ++wpos;
-            }
-            space = false;
-        }
-    }
-
-    if (wpos < str.size())
-    {
-        str.erase(wpos, str.size());
-    }
-    if (str.find("|TInterface") != std::string::npos)
-    {
-        str.clear();
-    }
-}
-
 std::string secsToTimeString(uint64 timeInSecs, bool shortText)
 {
     uint64 secs    = timeInSecs % MINUTE;

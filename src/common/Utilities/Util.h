@@ -64,8 +64,6 @@ time_t LocalTimeToUTCTime(time_t time);
 time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime = true);
 tm TimeBreakdown(time_t t);
 
-void stripLineInvisibleChars(std::string& src);
-
 int32 MoneyStringToMoney(const std::string& moneyString);
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText = false);

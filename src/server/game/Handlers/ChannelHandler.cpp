@@ -35,6 +35,9 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     if (isdigit(channelName[0]))
         return;
 
+    if (!DisallowHyperlinksAndMaybeKick(channelName))
+        return;
+
     // pussywizard: restrict allowed characters in channel name to avoid |0 and possibly other exploits
     //if (!ObjectMgr::IsValidChannelName(channelName))
     if (channelName.find("|") != std::string::npos || channelName.size() >= 100)
