@@ -16,6 +16,8 @@
 namespace VMAP
 {
     class WorldModel;
+    struct AreaInfo;
+    struct LocationInfo;
 }
 
 class GameObject;
@@ -37,7 +39,7 @@ public:
 
 class GameObjectModel
 {
-    GameObjectModel() : phasemask(0), iInvScale(0), iScale(0), iModel(nullptr) { }
+    GameObjectModel() : phasemask(0), iInvScale(0), iScale(0), iModel(nullptr), isWmo(false) { }
 
 public:
     std::string name;
@@ -53,8 +55,12 @@ public:
     void enable(uint32 ph_mask) { phasemask = ph_mask; }
 
     [[nodiscard]] bool isEnabled() const { return phasemask != 0; }
+    [[nodiscard]] bool IsMapObject() const { return isWmo; }
 
     bool intersectRay(const G3D::Ray& Ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask) const;
+    void IntersectPoint(G3D::Vector3 const& point, VMAP::AreaInfo& info, uint32 ph_mask) const;
+    bool GetLocationInfo(G3D::Vector3 const& point, VMAP::LocationInfo& info, uint32 ph_mask) const;
+    bool GetLiquidLevel(G3D::Vector3 const& point, VMAP::LocationInfo& info, float& liqHeight) const;
 
     static GameObjectModel* Create(std::unique_ptr<GameObjectModelOwnerBase> modelOwner, std::string const& dataPath);
 
@@ -71,6 +77,7 @@ private:
     float iScale;
     VMAP::WorldModel* iModel;
     std::unique_ptr<GameObjectModelOwnerBase> owner;
+    bool isWmo;
 };
 
 void LoadGameObjectModelList(std::string const& dataPath);

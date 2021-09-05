@@ -290,6 +290,70 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
         _player->DestroyItem(bag, slot, true);
 }
 
+bool ItemTemplate::HasStat(ItemModType stat) const
+{
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+    {
+        if (i >= StatsCount)
+        {
+            break;
+        }
+
+        if (ItemStat[i].ItemStatType == stat)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool ItemTemplate::HasSpellPowerStat() const
+{
+    bool invalid = false;
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        _Spell const& spellData = Spells[i];
+        if (!spellData.SpellId)
+        {
+            continue;
+        }
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
+        if (!spellInfo)
+        {
+            continue;
+        }
+
+        for (uint8 j = EFFECT_0; j <= EFFECT_2; ++j)
+        {
+            switch (spellInfo->Effects[j].ApplyAuraName)
+            {
+                case SPELL_AURA_MOD_HEALING_DONE:
+                case SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT:
+                case SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER:
+                case SPELL_AURA_MOD_HEALING:
+                    invalid = true;
+                    break;
+                case SPELL_AURA_MOD_DAMAGE_DONE:
+                case SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT:
+                case SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER:
+                case SPELL_AURA_MOD_DAMAGE_TAKEN:
+                    if (!(spellInfo->Effects[j].MiscValue & SPELL_SCHOOL_MASK_SPELL))
+                    {
+                        return false;
+                    }
+                    invalid = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    return invalid;
+}
+
 void ItemTemplate::InitializeQueryData()
 {
     queryData.Initialize(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 1);
@@ -884,11 +948,15 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
 
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
+    {
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+    }
 
     // Stop the npc if moving
     if (vendor->HasUnitState(UNIT_STATE_MOVING))
+    {
         vendor->StopMoving();
+    }
 
     SetCurrentVendor(vendorEntry);
 
@@ -921,16 +989,22 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(item->item))
             {
                 if (!(itemTemplate->AllowableClass & _player->getClassMask()) && itemTemplate->Bonding == BIND_WHEN_PICKED_UP && !_player->IsGameMaster())
+                {
                     continue;
+                }
                 // Only display items in vendor lists for the team the
                 // player is on. If GM on, display all items.
-                if (!_player->IsGameMaster() && ((itemTemplate->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && _player->GetTeamId() == TEAM_ALLIANCE) || (itemTemplate->Flags2 == ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && _player->GetTeamId() == TEAM_HORDE)))
+                if (!_player->IsGameMaster() && ((itemTemplate->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && _player->GetTeamId() == TEAM_ALLIANCE) || (itemTemplate->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && _player->GetTeamId() == TEAM_HORDE)))
+                {
                     continue;
+                }
 
                 // Items sold out are not displayed in list
                 uint32 leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
                 if (!_player->IsGameMaster() && !leftInStock)
+                {
                     continue;
+                }
 
                 ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), item->item);
                 if (!sConditionMgr->IsObjectMeetToConditions(_player, vendor, conditions))
@@ -952,7 +1026,9 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
                 data << uint32(item->ExtendedCost);
 
                 if (++count >= MAX_VENDOR_ITEMS)
+                {
                     break;
+                }
             }
         }
     }
