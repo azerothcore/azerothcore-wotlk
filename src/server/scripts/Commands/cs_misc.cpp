@@ -5,7 +5,6 @@
  */
 
 #include "AccountMgr.h"
-#include "ace/INET_Addr.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
@@ -132,10 +131,10 @@ public:
             return false;
         }
 
-        Tokenizer::const_iterator i = tokens.begin();
+        Tokenizer::const_iterator tokensItr = tokens.begin();
 
         std::set<BattlegroundTypeId> allowedArenas;
-        std::string arenasStr = *(i++);
+        std::string arenasStr = *(tokensItr++);
         std::string tmpStr;
         Tokenizer arenaTokens(arenasStr, ',');
         for (Tokenizer::const_iterator itr = arenaTokens.begin(); itr != arenaTokens.end(); ++itr)
@@ -176,9 +175,9 @@ public:
         BattlegroundTypeId randomizedArenaBgTypeId = Acore::Containers::SelectRandomContainerElement(allowedArenas);
 
         uint8 count = 0;
-        if (i != tokens.end())
+        if (tokensItr != tokens.end())
         {
-            std::string mode = *(i++);
+            std::string mode = *(tokensItr++);
             if (mode == "1v1") count = 2;
             else if (mode == "2v2") count = 4;
             else if (mode == "3v3") count = 6;
@@ -205,9 +204,9 @@ public:
         Player* plr = nullptr;
         Player* players[10] = {nullptr};
         uint8 cnt = 0;
-        for (; i != tokens.end(); ++i)
+        for (; tokensItr != tokens.end(); ++tokensItr)
         {
-            last_name = std::string(*i);
+            last_name = std::string(*tokensItr);
             plr = ObjectAccessor::FindPlayerByName(last_name, false);
             if (!plr) { error = 1; break; }
             if (!plr->IsInWorld() || !plr->FindMap() || plr->IsBeingTeleported()) { error = 2; break; }
@@ -235,13 +234,17 @@ public:
         }
 
         for (uint8 i = 0; i < cnt && !error; ++i)
+        {
             for (uint8 j = i + 1; j < cnt; ++j)
+            {
                 if (players[i]->GetGUID() == players[j]->GetGUID())
                 {
                     last_name = players[i]->GetName();
                     error = 13;
                     break;
                 }
+            }
+        }
 
         switch (error)
         {
@@ -441,9 +444,8 @@ public:
 
         Map2ZoneCoordinates(zoneX, zoneY, zoneId);
 
-        Map const* map = object->GetMap();
-        float groundZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
-        float floorZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
+        float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
+        float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
 
         GridCoord gridCoord = Acore::ComputeGridCoord(object->GetPositionX(), object->GetPositionY());
 
@@ -456,7 +458,7 @@ public:
 
         if (haveVMap)
         {
-            if (map->IsOutdoors(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ()))
+            if (object->IsOutdoors())
                 handler->PSendSysMessage("You are outdoors");
             else
                 handler->PSendSysMessage("You are indoors");
@@ -473,11 +475,11 @@ public:
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap);
 
-        LiquidData liquidStatus;
-        ZLiquidStatus status = map->getLiquidStatus(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), MAP_ALL_LIQUIDS, &liquidStatus);
+        LiquidData const& liquidData = object->GetLiquidData();
 
-        if (status)
-            handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, liquidStatus.type_flags, status);
+        if (liquidData.Status)
+            handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidData.Level, liquidData.DepthLevel, liquidData.Entry, liquidData.Flags, liquidData.Status);
+
         if (object->GetTransport())
             handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
 
@@ -831,7 +833,7 @@ public:
 
             std::string plNameLink = handler->GetNameLink(player);
 
-            if (player->IsBeingTeleported() == true)
+            if (player->IsBeingTeleported())
             {
                 handler->PSendSysMessage(LANG_IS_TELEPORTED, plNameLink.c_str());
                 handler->SetSentErrorMessage(true);
@@ -955,6 +957,8 @@ public:
 
         player->Dismount();
         player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+        player->SetSpeed(MOVE_RUN, 1, true);
+        player->SetSpeed(MOVE_FLIGHT, 1, true);
         return true;
     }
 
@@ -2003,12 +2007,12 @@ public:
                 PreparedQueryResult guildInfoResult = CharacterDatabase.Query(guildQuery);
                 if (guildInfoResult)
                 {
-                    Field* fields  = guildInfoResult->Fetch();
-                    guildId        = fields[0].GetUInt32();
-                    guildName      = fields[1].GetString();
-                    guildRank      = fields[2].GetString();
-                    note           = fields[3].GetString();
-                    officeNote     = fields[4].GetString();
+                    Field* guildInfoFields  = guildInfoResult->Fetch();
+                    guildId        = guildInfoFields[0].GetUInt32();
+                    guildName      = guildInfoFields[1].GetString();
+                    guildRank      = guildInfoFields[2].GetString();
+                    note           = guildInfoFields[3].GetString();
+                    officeNote     = guildInfoFields[4].GetString();
                 }
             }
         }

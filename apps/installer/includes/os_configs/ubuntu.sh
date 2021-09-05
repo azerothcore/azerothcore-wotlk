@@ -7,7 +7,7 @@ UBUNTU_VERSION=$(lsb_release -sr);
 sudo apt update
 
 # shared deps
-sudo apt-get -y install ccache clang cmake curl google-perftools libace-dev libmysqlclient-dev make unzip
+sudo apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip
 
 if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get -y install build-essential cmake-data  \
@@ -17,13 +17,13 @@ else
   case $UBUNTU_VERSION in
      "20.04")
        sudo apt-get install -y g++ gdb gdbserver gcc git \
-       libace-6.* libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-       libssl-dev mysql-server 
+       libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
+       libssl-dev mysql-server
        ;;
      *)
        sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get install -y g++ gdb gdbserver gcc git \
-       libace-6.* libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-       libssl-dev mysql-server 
+       libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
+       libssl-dev mysql-server
        ;;
   esac
 fi

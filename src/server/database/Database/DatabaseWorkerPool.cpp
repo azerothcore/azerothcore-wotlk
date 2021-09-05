@@ -14,7 +14,7 @@
 #include "MySQLPreparedStatement.h"
 #include "MySQLWorkaround.h"
 #include "PreparedStatement.h"
-#include "ProducerConsumerQueue.h"
+#include "PCQueue.h"
 #include "QueryCallback.h"
 #include "QueryHolder.h"
 #include "QueryResult.h"
@@ -27,8 +27,13 @@
 #include <sstream>
 #endif
 
+#if MARIADB_VERSION_ID >= 100600
+#define MIN_MYSQL_SERVER_VERSION 100200u
+#define MIN_MYSQL_CLIENT_VERSION 30203u
+#else
 #define MIN_MYSQL_SERVER_VERSION 50700u
 #define MIN_MYSQL_CLIENT_VERSION 50700u
+#endif
 
 class PingOperation : public SQLOperation
 {
@@ -46,9 +51,18 @@ DatabaseWorkerPool<T>::DatabaseWorkerPool()
       _async_threads(0), _synch_threads(0)
 {
     WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
-    WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.7.\nSearch the wiki for ACE00043 in Common Errors (https://www.azerothcore.org/wiki/common-errors).");
-    WPFatal(mysql_get_client_version() == MYSQL_VERSION_ID, "Used MySQL library version (%s id %lu) does not match the version id used to compile AzerothCore (id %u).\nSearch the wiki for ACE00046 in Common Errors (https://www.azerothcore.org/wiki/common-errors).",
-        mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
+
+#if !defined(MARIADB_VERSION_ID) || MARIADB_VERSION_ID < 100600
+    bool isSupportClientDB = mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION;
+    bool isSameClientDB = mysql_get_client_version() == MYSQL_VERSION_ID;
+#else // MariaDB 10.6+
+    bool isSupportClientDB = mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION;
+    bool isSameClientDB    = true; // Client version 3.2.3?
+#endif
+
+    WPFatal(isSupportClientDB, "AzerothCore does not support MySQL versions below 5.7 and MariaDB 10.2\nSearch the wiki for ACE00043 in Common Errors (https://www.azerothcore.org/wiki/common-errors).");
+    WPFatal(isSameClientDB, "Used MySQL library version (%s id %lu) does not match the version id used to compile AzerothCore (id %u).\nSearch the wiki for ACE00046 in Common Errors (https://www.azerothcore.org/wiki/common-errors).",
+        mysql_get_client_info(), mysql_get_client_version(), MIN_MYSQL_CLIENT_VERSION);
 }
 
 template <class T>

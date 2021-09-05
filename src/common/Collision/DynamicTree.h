@@ -15,6 +15,11 @@ namespace G3D
     class Vector3;
 }
 
+namespace VMAP
+{
+    struct AreaAndLiquidData;
+}
+
 class GameObjectModel;
 struct DynTreeImpl;
 
@@ -31,6 +36,9 @@ public:
 
     bool GetIntersectionTime(uint32 phasemask, const G3D::Ray& ray,
                              const G3D::Vector3& endPos, float& maxDist) const;
+
+    bool GetAreaInfo(float x, float y, float& z, uint32 phasemask, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
+    void GetAreaAndLiquidData(float x, float y, float z, uint32 phasemask, uint8 reqLiquidType, VMAP::AreaAndLiquidData& data) const;
 
     bool GetObjectHitPos(uint32 phasemask, const G3D::Vector3& pPos1,
                          const G3D::Vector3& pPos2, G3D::Vector3& pResultHitPos,

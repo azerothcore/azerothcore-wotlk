@@ -21,7 +21,6 @@ EndContentData */
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -1620,9 +1619,7 @@ public:
 
         void StoreTargets()
         {
-            uint8 creaturecount;
-
-            creaturecount = 0;
+            uint8 creturesCount = 0;
 
             for (uint8 ii = 0; ii < 3; ++ii)
             {
@@ -1630,10 +1627,10 @@ public:
                 GetCreatureListWithEntryInGrid(creatureList, me, AudienceMobs[ii], 15.0f);
                 for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
                 {
-                    if (Creature* creatureList = *itr)
+                    if (Creature* creature = *itr)
                     {
-                        audienceList[creaturecount] = creatureList->GetGUID();
-                        ++creaturecount;
+                        audienceList[creturesCount] = creature->GetGUID();
+                        ++creturesCount;
                     }
                 }
             }

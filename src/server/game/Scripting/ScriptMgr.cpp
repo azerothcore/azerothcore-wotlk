@@ -345,18 +345,18 @@ void ScriptMgr::OnNetworkStop()
     FOREACH_SCRIPT(ServerScript)->OnNetworkStop();
 }
 
-void ScriptMgr::OnSocketOpen(WorldSocket* socket)
+void ScriptMgr::OnSocketOpen(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
     FOREACH_SCRIPT(ServerScript)->OnSocketOpen(socket);
 }
 
-void ScriptMgr::OnSocketClose(WorldSocket* socket, bool wasNew)
+void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
-    FOREACH_SCRIPT(ServerScript)->OnSocketClose(socket, wasNew);
+    FOREACH_SCRIPT(ServerScript)->OnSocketClose(socket);
 }
 
 void ScriptMgr::OnPacketReceive(WorldSession* session, WorldPacket const& packet)
@@ -406,6 +406,11 @@ void ScriptMgr::OnAfterConfigLoad(bool reload)
     sEluna->OnConfigLoad(reload, false);
 #endif
     FOREACH_SCRIPT(WorldScript)->OnAfterConfigLoad(reload);
+}
+
+void ScriptMgr::OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion)
+{
+    FOREACH_SCRIPT(WorldScript)->OnBeforeFinalizePlayerWorldSession(cacheVersion);
 }
 
 void ScriptMgr::OnMotdChange(std::string& newMotd)

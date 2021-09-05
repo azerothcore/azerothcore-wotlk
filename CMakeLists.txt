@@ -78,8 +78,8 @@ ENDFOREACH()
 CU_RUN_HOOK("AFTER_LOAD_CONF")
 
 # build in Release-mode by default if not explicitly set
-if( NOT CMAKE_BUILD_TYPE )
-    set(CMAKE_BUILD_TYPE "Release")
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
 # turn off PCH totally if enabled (hidden setting, mainly for devs)
@@ -100,10 +100,6 @@ CU_RUN_HOOK("AFTER_LOAD_CMAKE_MODULES")
 set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
-find_package(ACE REQUIRED)
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    add_definitions(-DACE_LACKS_AUTO_PTR=1)
-endif()
 find_package(MySQL REQUIRED)
 
 if(UNIX AND WITH_PERFTOOLS)

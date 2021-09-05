@@ -143,6 +143,7 @@ typedef GuidSet AllowedLooterSet;
 struct LootItem
 {
     uint32  itemid;
+    uint32  itemIndex;
     uint32  randomSuffix;
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition
@@ -361,7 +362,7 @@ struct Loot
     void RemoveLooter(ObjectGuid GUID) { PlayersLooting.erase(GUID); }
 
     void generateMoneyLoot(uint32 minAmount, uint32 maxAmount);
-    bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT);
+    bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT, WorldObject* lootSource = nullptr);
 
     // Inserts the item into the loot (called by LootTemplate processors)
     void AddItem(LootStoreItem const& item);
@@ -371,12 +372,12 @@ struct Loot
     bool hasItemForAll() const;
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
-    void FillNotNormalLootFor(Player* player, bool presentAtLooting);
+    void FillNotNormalLootFor(Player* player);
 
 private:
     QuestItemList* FillFFALoot(Player* player);
     QuestItemList* FillQuestLoot(Player* player);
-    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting);
+    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player);
 
     typedef GuidSet PlayersLootingSet;
     PlayersLootingSet PlayersLooting;

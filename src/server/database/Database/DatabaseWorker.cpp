@@ -4,7 +4,7 @@
  */
 
 #include "DatabaseWorker.h"
-#include "ProducerConsumerQueue.h"
+#include "PCQueue.h"
 #include "SQLOperation.h"
 
 DatabaseWorker::DatabaseWorker(ProducerConsumerQueue<SQLOperation*>* newQueue, MySQLConnection* connection)

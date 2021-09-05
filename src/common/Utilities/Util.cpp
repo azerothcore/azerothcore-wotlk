@@ -7,9 +7,8 @@
 #include "Util.h"
 #include "Common.h"
 #include "Containers.h"
-#include "StringConvert.h"
+#include "IpAddress.h"
 #include "StringFormat.h"
-#include <ace/Default_Constants.h>
 #include <algorithm>
 #include <cctype>
 #include <cstdarg>
@@ -18,7 +17,6 @@
 #include <sstream>
 #include <string>
 #include <utf8.h>
-// #include "IpAddress.h"
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
 {
@@ -295,26 +293,9 @@ bool IsIPAddress(char const* ipaddress)
         return false;
     }
 
-    // Let the big boys do it.
-    // Drawback: all valid ip address formats are recognized e.g.: 12.23, 121234, 0xABCD)
-    return inet_addr(ipaddress) != INADDR_NONE;
-}
-
-std::string GetAddressString(ACE_INET_Addr const& addr)
-{
-    char buf[ACE_MAX_FULLY_QUALIFIED_NAME_LEN + 16];
-    addr.addr_to_string(buf, ACE_MAX_FULLY_QUALIFIED_NAME_LEN + 16);
-    return buf;
-}
-
-bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_INET_Addr const& subnetMask)
-{
-    uint32 mask = subnetMask.get_ip_address();
-    if ((net.get_ip_address() & mask) == (addr.get_ip_address() & mask))
-    {
-        return true;
-    }
-    return false;
+    boost::system::error_code error;
+    Acore::Net::make_address(ipaddress, error);
+    return !error;
 }
 
 /// create PID file
@@ -533,7 +514,7 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
     {
         std::wstring const& ending = **itr;
         std::size_t const endLen = ending.length();
-        if (!(endLen <= thisLen))
+        if (endLen > thisLen)
         {
             continue;
         }
