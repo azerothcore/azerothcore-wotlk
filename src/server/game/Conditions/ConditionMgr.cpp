@@ -24,7 +24,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     // ASSERT(ConditionTarget < MAX_CONDITION_TARGETS);
     if (ConditionTarget >= MAX_CONDITION_TARGETS)
     {
-        LOG_DEBUG("condition", "ConditionTarget is greater or equal than MAX_CONDITION_TARGETS");
+        LOG_ERROR("condition", "ConditionTarget %d for for condition (Entry: %u Type: %u Group: %u) is greater or equal than MAX_CONDITION_TARGETS", ConditionTarget, SourceEntry, SourceType, SourceGroup);
         return false;
     }
 
