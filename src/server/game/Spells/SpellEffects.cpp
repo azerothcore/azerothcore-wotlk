@@ -5304,8 +5304,16 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
         if (!aura->GetApplicationOfTarget(unitTarget->GetGUID()))
             continue;
         if (roll_chance_i(aura->CalcDispelChance(unitTarget, !unitTarget->IsFriendlyTo(m_caster))))
+        {
             if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << mechanic)))
+            {
                 dispel_list.push(std::make_pair(aura->GetId(), aura->GetCasterGUID()));
+
+                // spell only removes 1 bleed effect do not continue
+                if (m_spellInfo->Effects[effIndex].BasePoints == 1)
+                    break;
+            }
+        }
     }
 
     for (; dispel_list.size(); dispel_list.pop())
