@@ -6,4 +6,4 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14, 7434, 9039, 0, 0, 9, 0, 9663, 0, 0, 0, 0, 0, '', 'Show gossip text 9039 if player has quest 9663');
 
-UPDATE `gossip_menu` SET `MenuID` = 7434 WHERE `MenuID` = 7983 AND `TextID` = 9039;`
+UPDATE `gossip_menu` SET `MenuID` = 7434 WHERE `MenuID` = 7983 AND `TextID` = 9039;
