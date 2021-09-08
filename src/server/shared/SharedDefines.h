@@ -3124,11 +3124,11 @@ enum AiReaction
 };
 
 // Diminishing Returns Types
-enum DiminishingReturnsType
+enum class DiminishingReturnsType : uint8
 {
-    DRTYPE_NONE         = 0,                                // this spell is not diminished, but may have limited it's duration to 10s
-    DRTYPE_PLAYER       = 1,                                // this spell is diminished only when applied on players
-    DRTYPE_ALL          = 2                                 // this spell is diminished in every case
+    None         = 0,                                // this spell is not diminished, but may have limited it's duration to 10s
+    Player       = 1,                                // this spell is diminished only when applied on players
+    All          = 2                                 // this spell is diminished in every case
 };
 
 // Diminishing Return Groups

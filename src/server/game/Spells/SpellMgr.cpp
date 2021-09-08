@@ -242,12 +242,12 @@ DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group)
         case DIMINISHING_OPENING_STUN:
         case DIMINISHING_CYCLONE:
         case DIMINISHING_CHARGE:
-            return DRTYPE_ALL;
+            return DiminishingReturnsType::All;
         case DIMINISHING_LIMITONLY:
         case DIMINISHING_NONE:
-            return DRTYPE_NONE;
+            return DiminishingReturnsType::None;
         default:
-            return DRTYPE_PLAYER;
+            return DiminishingReturnsType::Player;
     }
 }
 

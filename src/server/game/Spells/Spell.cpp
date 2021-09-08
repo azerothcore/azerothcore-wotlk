@@ -2819,9 +2819,9 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         uint32 flagsExtra = unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature()->GetCreatureTemplate()->flags_extra : 0;
 
         // Increase Diminishing on unit, current informations for actually casts will use values above
-        if ((type == DRTYPE_PLAYER && (
+        if ((type == DiminishingReturnsType::Player && (
                     unit->GetCharmerOrOwnerPlayerOrPlayerItself() || flagsExtra & CREATURE_FLAG_EXTRA_ALL_DIMINISH || (m_diminishGroup == DIMINISHING_TAUNT && (flagsExtra & CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS))
-                )) || type == DRTYPE_ALL)
+                )) || type == DiminishingReturnsType::All)
             unit->IncrDiminishing(m_diminishGroup);
     }
 

@@ -14119,10 +14119,10 @@ float Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, 
         }
     }
     // Some diminishings applies to mobs too (for example, Stun)
-    else if ((GetDiminishingReturnsGroupType(group) == DRTYPE_PLAYER
+    else if ((GetDiminishingReturnsGroupType(group) == DiminishingReturnsType::Player
               && ((targetOwner ? (targetOwner->GetTypeId() == TYPEID_PLAYER) : (GetTypeId() == TYPEID_PLAYER))
                   || (GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_ALL_DIMINISH)))
-             || GetDiminishingReturnsGroupType(group) == DRTYPE_ALL)
+             || GetDiminishingReturnsGroupType(group) == DiminishingReturnsType::All)
     {
         DiminishingLevels diminish = Level;
         switch (diminish)
