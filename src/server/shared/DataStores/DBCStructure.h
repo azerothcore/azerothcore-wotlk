@@ -935,7 +935,7 @@ struct FactionTemplateEntry
                 return false;
         return hostileMask == 0 && friendlyMask == 0;
     }
-    [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
+    [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS) != 0; }
 };
 
 struct GameObjectDisplayInfoEntry
@@ -2004,6 +2004,7 @@ struct VehicleSeatEntry
                                 VEHICLE_SEAT_FLAG_B_USABLE_FORCED_3 | VEHICLE_SEAT_FLAG_B_USABLE_FORCED_4)));
     }
     [[nodiscard]] bool IsEjectable() const { return m_flagsB & VEHICLE_SEAT_FLAG_B_EJECTABLE; }
+    [[nodiscard]] bool CanControl() const { return (m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL) != 0; }
 };
 
 struct WMOAreaTableEntry

@@ -1772,10 +1772,8 @@ public:
     bool IsValidAssistTarget(Unit const* target) const;
     bool _IsValidAssistTarget(Unit const* target, SpellInfo const* bySpell) const;
 
-    void UpdateEnvironmentIfNeeded(const uint8 option);
-    [[nodiscard]] virtual bool IsInWater(bool allowAbove = false) const;
+    [[nodiscard]] virtual bool IsInWater() const;
     [[nodiscard]] virtual bool IsUnderWater() const;
-    virtual void UpdateUnderwaterState(Map* m, float x, float y, float z);
     bool isInAccessiblePlaceFor(Creature const* c) const;
 
     void SendHealSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, uint32 OverHeal, uint32 Absorb, bool critical = false);
@@ -1920,7 +1918,7 @@ public:
 
     ControlSet m_Controlled;
     [[nodiscard]] Unit* GetFirstControlled() const;
-    void RemoveAllControlled();
+    void RemoveAllControlled(bool onDeath = false);
 
     [[nodiscard]] bool IsCharmed() const { return GetCharmerGUID(); }
     [[nodiscard]] bool isPossessed() const { return HasUnitState(UNIT_STATE_POSSESSED); }
@@ -2246,7 +2244,7 @@ public:
     void ModifyAuraState(AuraStateType flag, bool apply);
     uint32 BuildAuraStateUpdateForTarget(Unit* target) const;
     bool HasAuraState(AuraStateType flag, SpellInfo const* spellProto = nullptr, Unit const* Caster = nullptr) const;
-    void UnsummonAllTotems();
+    void UnsummonAllTotems(bool onDeath = false);
     Unit* GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
     Unit* GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo = nullptr);
 
@@ -2454,25 +2452,6 @@ public:
     bool bRequestForcedVisibilityUpdate;
     void ExecuteDelayedUnitRelocationEvent();
     void ExecuteDelayedUnitAINotifyEvent();
-    // IsInWater, UpdateUnderwaterState, etc. optimizations
-    Position m_last_underwaterstate_position;
-    Position m_last_environment_position;
-    bool m_last_isinwater_status;
-    bool m_last_islittleabovewater_status;
-    bool m_last_isunderwater_status;
-    bool m_is_updating_environment;
-    // GetZone / GetArea optimization
-    Position m_last_area_position;
-    Position m_last_zone_position;
-    uint32 m_last_area_id;
-    uint32 m_last_zone_id;
-    Position m_last_outdoors_position;
-    bool m_last_outdoors_status;
-    [[nodiscard]] bool IsOutdoors() const;
-
-    [[nodiscard]] uint32 GetZoneId(bool forceRecalc = false) const override;
-    [[nodiscard]] uint32 GetAreaId(bool forceRecalc = false) const override;
-    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc = false) const override;
 
     // cooldowns
     [[nodiscard]] virtual bool HasSpellCooldown(uint32 /*spell_id*/) const { return false; }
@@ -2502,6 +2481,9 @@ public:
     [[nodiscard]] float GetCollisionHeight() const override;
     [[nodiscard]] float GetCollisionWidth() const override;
     [[nodiscard]] float GetCollisionRadius() const override;
+
+    void ProcessPositionDataChanged(PositionFullTerrainStatus const& data) override;
+    virtual void ProcessTerrainStatusUpdate();
 
 protected:
     explicit Unit (bool isWorldObject);

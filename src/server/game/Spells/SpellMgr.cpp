@@ -671,14 +671,24 @@ SpellGroupStackFlags SpellMgr::CheckSpellGroupStackRules(SpellInfo const* spellI
 {
     uint32 spellid_1 = spellInfo1->GetFirstRankSpell()->Id;
     uint32 spellid_2 = spellInfo2->GetFirstRankSpell()->Id;
-    // xinef: dunno why i added this
-    if (spellid_1 == spellid_2 && remove && !areaAura)
-        return SPELL_GROUP_STACK_FLAG_NONE;
 
     uint32 groupId = GetSpellGroup(spellid_1);
+
+    SpellGroupSpecialFlags flag1 = GetSpellGroupSpecialFlags(spellid_1);
+
+    // xinef: dunno why i added this
+    if (spellid_1 == spellid_2 && remove && !areaAura)
+    {
+        if (flag1 & SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK)
+        {
+            return SPELL_GROUP_STACK_FLAG_EXCLUSIVE;
+        }
+
+        return SPELL_GROUP_STACK_FLAG_NONE;
+    }
+
     if (groupId > 0 && groupId == GetSpellGroup(spellid_2))
     {
-        SpellGroupSpecialFlags flag1 = GetSpellGroupSpecialFlags(spellid_1);
         SpellGroupSpecialFlags flag2 = GetSpellGroupSpecialFlags(spellid_2);
         SpellGroupStackFlags additionFlag = SPELL_GROUP_STACK_FLAG_NONE;
         // xinef: first flags are used for elixir stacking rules
@@ -2778,6 +2788,20 @@ void SpellMgr::LoadSpellCustomAttr()
         {
             switch (spellInfo->Effects[j].ApplyAuraName)
             {
+                case SPELL_AURA_MOD_INVISIBILITY:
+                {
+                    switch (spellInfo->Id)
+                    {
+                        // Exceptions
+                        case 44801: // Spectral Invisibility (Kalecgos, SWP)
+                        case 46021: // Spectral Realm (SWP)
+                            break;
+                        default:
+                            spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
+                            break;
+                    }
+                }
+                break;
                 case SPELL_AURA_PERIODIC_HEAL:
                 case SPELL_AURA_PERIODIC_DAMAGE:
                 case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
@@ -3326,7 +3350,9 @@ void SpellMgr::LoadDbcDataCorrections()
         9910,   // Thorns (Rank 6)
         26992,  // Thorns (Rank 7)
         53307,  // Thorns (Rank 8)
-        53352   // Explosive Shot (trigger)
+        53352,  // Explosive Shot (trigger)
+        50783,  // Slam (Triggered spell)
+        20647   // Execute (Triggered spell)
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
@@ -7289,6 +7315,18 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 53651 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+    });
+
+    // 16097 Shadow Hunter Vosh'gajin - Hex
+    ApplySpellFix({ 16097 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->CastingTimeIndex = 16;
+    });
+
+    // Sacred Cleansing
+    ApplySpellFix({ 53659 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 5; // 40yd
     });
 
     // Ulduar: Kologarn Focused Eyebeam Summon Trigger

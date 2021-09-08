@@ -181,6 +181,7 @@ namespace lfg
 
         bool isLFG = group->isLFGGroup();
         LfgState state = sLFGMgr->GetState(gguid);
+        uint32 dungeonId = sLFGMgr->GetDungeon(gguid, false);
 
         // If group is being formed after proposal success do nothing more
         if (state == LFG_STATE_PROPOSAL && method == GROUP_REMOVEMETHOD_DEFAULT)
@@ -205,6 +206,15 @@ namespace lfg
         if (!isLFG)
             return;
 
+        if (state != LFG_STATE_FINISHED_DUNGEON && group) // Need more players to finish the dungeon
+        {
+            if (Player* leader = ObjectAccessor::FindConnectedPlayer(sLFGMgr->GetLeader(gguid)))
+            {
+                sLFGMgr->SetDungeon(gguid, dungeonId);
+                leader->GetSession()->SendLfgOfferContinue(sLFGMgr->GetDungeon(gguid, false));
+            }
+        }
+
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
         {
             // xinef: fixed dungeon deserter
@@ -224,10 +234,6 @@ namespace lfg
                     player->TeleportToEntryPoint();
             }
         }
-
-        if (state != LFG_STATE_FINISHED_DUNGEON) // Need more players to finish the dungeon
-            if (Player* leader = ObjectAccessor::FindConnectedPlayer(sLFGMgr->GetLeader(gguid)))
-                leader->GetSession()->SendLfgOfferContinue(sLFGMgr->GetDungeon(gguid, false));
     }
 
     void LFGGroupScript::OnDisband(Group* group)
