@@ -2573,7 +2573,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         // Xinef: override with forced crit, only visual result
         if (GetSpellValue()->ForcedCritResult)
         {
-            damageInfo.HitInfo |= SPELL_HIT_TYPE_CRIT;
+            damageInfo.HitInfo |= static_cast<uint32>(SpellHitType::Crit);
         }
 
         Unit::DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);

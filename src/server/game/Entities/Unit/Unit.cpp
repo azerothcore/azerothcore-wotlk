@@ -1189,7 +1189,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
 
                 if (crit)
                 {
-                    damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+                    damageInfo->HitInfo |= static_cast<uint32>(SpellHitType::Crit);
 
                     // Calculate crit bonus
                     uint32 crit_bonus = damage;
@@ -1243,7 +1243,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 // If crit add critical bonus
                 if (crit)
                 {
-                    damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+                    damageInfo->HitInfo |= static_cast<uint32>(SpellHitType::Crit);
                     damage = Unit::SpellCriticalDamageBonus(this, spellInfo, damage, victim);
                 }
 
@@ -5667,9 +5667,9 @@ void Unit::SendSpellNonMeleeDamageLog(Unit* target, uint32 SpellID, uint32 Damag
     log.resist = Resist;
     log.physicalLog = PhysicalDamage;
     log.blocked = Blocked;
-    log.HitInfo = SPELL_HIT_TYPE_UNK1 | SPELL_HIT_TYPE_UNK3 | SPELL_HIT_TYPE_UNK6;
+    log.HitInfo = static_cast<uint32>(SpellHitType::CritDebug) | static_cast<uint32>(SpellHitType::HitDebug) | static_cast<uint32>(SpellHitType::AttackTableDebug);
     if (CriticalHit)
-        log.HitInfo |= SPELL_HIT_TYPE_CRIT;
+        log.HitInfo |= static_cast<uint32>(SpellHitType::Crit);
     SendSpellNonMeleeDamageLog(&log);
 }
 
@@ -15273,7 +15273,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
         if (damageInfo->absorb)
             procEx |= PROC_EX_ABSORB;
         // On crit
-        if (damageInfo->HitInfo & SPELL_HIT_TYPE_CRIT)
+        if (damageInfo->HitInfo & static_cast<uint32>(SpellHitType::Crit))
             procEx |= PROC_EX_CRITICAL_HIT;
         else
             procEx |= PROC_EX_NORMAL_HIT;
