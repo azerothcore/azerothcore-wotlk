@@ -460,7 +460,7 @@ Player::~Player()
 void Player::CleanupsBeforeDelete(bool finalCleanup)
 {
     TradeCancel(false);
-    DuelComplete(DUEL_INTERRUPTED);
+    DuelComplete(DuelCompleteType::Interrupted);
 
     Unit::CleanupsBeforeDelete(finalCleanup);
 }
@@ -1373,7 +1373,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // We have to perform this check before the teleport, otherwise the
     // ObjectAccessor won't find the flag.
     if (duel && GetMapId() != mapid && GetMap()->GetGameObject(GetGuidValue(PLAYER_DUEL_ARBITER)))
-        DuelComplete(DUEL_FLED);
+        DuelComplete(DuelCompleteType::Fled);
 
     if (!sScriptMgr->OnBeforePlayerTeleport(this, mapid, x, y, z, orientation, options, target))
         return false;
@@ -6202,7 +6202,7 @@ void Player::CheckDuelDistance(time_t currTime)
             GetSession()->SendPacket(&data);
         }
         else if (currTime >= (duel->outOfBound + 10))
-            DuelComplete(DUEL_FLED);
+            DuelComplete(DuelCompleteType::Fled);
     }
 }
 
@@ -6220,15 +6220,15 @@ void Player::DuelComplete(DuelCompleteType type)
     LOG_DEBUG("entities.unit", "Duel Complete %s %s", GetName().c_str(), duel->opponent->GetName().c_str());
 
     WorldPacket data(SMSG_DUEL_COMPLETE, (1));
-    data << (uint8)((type != DUEL_INTERRUPTED) ? 1 : 0);
+    data << (uint8)((type != DuelCompleteType::Interrupted) ? 1 : 0);
     GetSession()->SendPacket(&data);
 
     duel->opponent->GetSession()->SendPacket(&data);
 
-    if (type != DUEL_INTERRUPTED)
+    if (type != DuelCompleteType::Interrupted)
     {
         data.Initialize(SMSG_DUEL_WINNER, (1 + 20));        // we guess size
-        data << uint8(type == DUEL_WON ? 0 : 1);            // 0 = just won; 1 = fled
+        data << uint8(type == DuelCompleteType::Won ? 0 : 1);            // 0 = just won; 1 = fled
         data << duel->opponent->GetName();
         data << GetName();
         SendMessageToSet(&data, true);
@@ -6238,7 +6238,7 @@ void Player::DuelComplete(DuelCompleteType type)
 
     switch (type)
     {
-        case DUEL_FLED:
+        case DuelCompleteType::Fled:
             // if initiator and opponent are on the same team
             // or initiator and opponent are not PvP enabled, forcibly stop attacking
             if (duel->initiator->GetTeamId() == duel->opponent->GetTeamId())
@@ -6254,7 +6254,7 @@ void Player::DuelComplete(DuelCompleteType type)
                     duel->opponent->AttackStop();
             }
             break;
-        case DUEL_WON:
+        case DuelCompleteType::Won:
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL, 1);
             duel->opponent->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL, 1);
 
@@ -6272,7 +6272,7 @@ void Player::DuelComplete(DuelCompleteType type)
     }
 
     // Victory emote spell
-    if (type != DUEL_INTERRUPTED && duel->opponent)
+    if (type != DuelCompleteType::Interrupted && duel->opponent)
         duel->opponent->CastSpell(duel->opponent, 52852, true);
 
     //Remove Duel Flag object

@@ -3442,11 +3442,11 @@ enum ActivateTaxiReply
     ERR_TAXINOTSTANDING             = 12
 };
 
-enum DuelCompleteType
+enum class DuelCompleteType : uint8
 {
-    DUEL_INTERRUPTED = 0,
-    DUEL_WON         = 1,
-    DUEL_FLED        = 2
+    Interrupted = 0,
+    Won         = 1,
+    Fled        = 2
 };
 
 // handle the queue types and bg types separately to enable joining queue for different sized arenas at the same time

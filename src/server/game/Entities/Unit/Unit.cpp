@@ -1013,7 +1013,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             he->CombatStopWithPets(true);
 
             he->CastSpell(he, 7267, true);                  // beg
-            he->DuelComplete(DUEL_WON);
+            he->DuelComplete(DuelCompleteType::Won);
         }
     }
 
@@ -16938,7 +16938,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         {
             plrVictim->duel->opponent->CombatStopWithPets(true);
             plrVictim->CombatStopWithPets(true);
-            plrVictim->DuelComplete(DUEL_INTERRUPTED);
+            plrVictim->DuelComplete(DuelCompleteType::Interrupted);
         }
     }
     else                                                // creature died
@@ -18740,7 +18740,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
     // If player is on mouted duel and exits the mount should immediatly lose the duel
     if (player && player->duel && player->duel->isMounted)
-        player->DuelComplete(DUEL_FLED);
+        player->DuelComplete(DuelCompleteType::Fled);
 
     // This should be done before dismiss, because there may be some aura removal
     Vehicle* vehicle = m_vehicle;
