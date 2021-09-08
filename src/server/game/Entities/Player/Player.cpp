@@ -2219,8 +2219,6 @@ void Player::SetGMVisible(bool on)
         m_ExtraFlags |= PLAYER_EXTRA_GM_INVISIBLE;          //add flag
 
         SetAcceptWhispers(false);
-
-        SetAcceptMail(false);
         SetGameMaster(true);
 
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
