@@ -243,7 +243,7 @@ public:
 
         void HandleBeforeHit(SpellMissInfo missInfo)
         {
-            if (missInfo != SPELL_MISS_NONE)
+            if (missInfo != SpellMissInfo::None)
             {
                 return;
             }

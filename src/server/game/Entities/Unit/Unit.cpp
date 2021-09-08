@@ -1597,8 +1597,9 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         for (AuraEffectList::const_iterator dmgShieldItr = vDamageShieldsCopy.begin(); dmgShieldItr != vDamageShieldsCopy.end(); ++dmgShieldItr)
         {
             SpellInfo const* i_spellProto = (*dmgShieldItr)->GetSpellInfo();
+            SpellMissInfo missInfo = victim->SpellHitResult(this, i_spellProto, false);
             // Damage shield can be resisted...
-            if (SpellMissInfo missInfo = victim->SpellHitResult(this, i_spellProto, false))
+            if (static_cast<bool>(missInfo))
             {
                 victim->SendSpellMiss(this, i_spellProto->Id, missInfo);
                 continue;
@@ -2689,7 +2690,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
     // Spells with SPELL_ATTR3_ALWAYS_HIT will additionally fully ignore
     // resist and deflect chances
     if (spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
-        return SPELL_MISS_NONE;
+        return SpellMissInfo::None;
 
     WeaponAttackType attType = BASE_ATTACK;
 
@@ -2714,7 +2715,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
     // Roll miss
     uint32 tmp = missChance;
     if (roll < tmp)
-        return SPELL_MISS_MISS;
+        return SpellMissInfo::Miss;
 
     bool canDodge = !spellInfo->HasAttribute(SPELL_ATTR7_NO_ATTACK_DODGE);
     bool canParry = !spellInfo->HasAttribute(SPELL_ATTR7_NO_ATTACK_PARRY);
@@ -2722,13 +2723,13 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
     // Same spells cannot be parry/dodge
     if (spellInfo->HasAttribute(SPELL_ATTR0_NO_ACTIVE_DEFENSE))
-        return SPELL_MISS_NONE;
+        return SpellMissInfo::None;
 
     // Chance resist mechanic
     int32 resist_chance = victim->GetMechanicResistChance(spellInfo) * 100;
     tmp += resist_chance;
     if (roll < tmp)
-        return SPELL_MISS_RESIST;
+        return SpellMissInfo::Resist;
 
     // Ranged attacks can only miss, resist and deflect
     if (attType == RANGED_ATTACK)
@@ -2739,7 +2740,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
             int32 deflect_chance = victim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS) * 100;
             tmp += deflect_chance;
             if (roll < tmp)
-                return SPELL_MISS_DEFLECT;
+                return SpellMissInfo::Deflect;
         }
 
         canDodge = false;
@@ -2816,7 +2817,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
         tmp += dodgeChance;
         if (roll < tmp)
-            return SPELL_MISS_DODGE;
+            return SpellMissInfo::Dodge;
     }
 
     if (canParry)
@@ -2835,7 +2836,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
         tmp += parryChance;
         if (roll < tmp)
-            return SPELL_MISS_PARRY;
+            return SpellMissInfo::Parry;
     }
 
     if (canBlock)
@@ -2848,31 +2849,31 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
         tmp += blockChance;
         if (roll < tmp)
-            return SPELL_MISS_BLOCK;
+            return SpellMissInfo::Block;
     }
 
-    return SPELL_MISS_NONE;
+    return SpellMissInfo::None;
 }
 
 SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo)
 {
     // Can`t miss on dead target (on skinning for example)
     if (!victim->IsAlive() && victim->GetTypeId() != TYPEID_PLAYER)
-        return SPELL_MISS_NONE;
+        return SpellMissInfo::None;
 
     // vehicles cant miss
     if (IsVehicle())
-        return SPELL_MISS_NONE;
+        return SpellMissInfo::None;
 
     // Spells with SPELL_ATTR3_ALWAYS_HIT will additionally fully ignore
     // resist and deflect chances
     // xinef: skip all calculations, proof: Toxic Tolerance quest
     if (spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
-        return SPELL_MISS_NONE;
+        return SpellMissInfo::None;
 
     if (spellInfo->HasAttribute(SPELL_ATTR7_NO_ATTACK_MISS))
     {
-        return SPELL_MISS_NONE;
+        return SpellMissInfo::None;
     }
 
     SpellSchoolMask schoolMask = spellInfo->GetSchoolMask();
@@ -2933,7 +2934,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
     int32 rand = irand(1, 10000); // Needs to be  1 to 10000 to avoid the 1/10000 chance to miss on 100% hit rating
 
     if (rand < tmp)
-        return SPELL_MISS_MISS;
+        return SpellMissInfo::Miss;
 
     // Chance resist mechanic (select max value from every mechanic spell effect)
     int32 resist_chance = victim->GetMechanicResistChance(spellInfo) * 100;
@@ -2966,7 +2967,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
     // Roll chance
     if (rand < tmp)
-        return SPELL_MISS_RESIST;
+        return SpellMissInfo::Resist;
 
     // cast by caster in front of victim
     if (!victim->HasUnitState(UNIT_STATE_STUNNED) && (victim->HasInArc(M_PI, this) || victim->HasAuraType(SPELL_AURA_IGNORE_HIT_DIRECTION)))
@@ -2974,10 +2975,10 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
         int32 deflect_chance = victim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS) * 100;
         tmp += deflect_chance;
         if (rand < tmp)
-            return SPELL_MISS_DEFLECT;
+            return SpellMissInfo::Deflect;
     }
 
-    return SPELL_MISS_NONE;
+    return SpellMissInfo::None;
 }
 
 // Calculate spell hit result can be:
@@ -2992,25 +2993,25 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
 {
     // Check for immune
     if (victim->IsImmunedToSpell(spell))
-        return SPELL_MISS_IMMUNE;
+        return SpellMissInfo::Immune;
 
     // All positive spells can`t miss
     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
     if ((spell->IsPositive() || spell->HasEffect(SPELL_EFFECT_DISPEL))
             && (!IsHostileTo(victim))) // prevent from affecting enemy by "positive" spell
-        return SPELL_MISS_NONE;
+        return SpellMissInfo::None;
 
     // Check for immune
     // xinef: check for school immunity only
     if (victim->IsImmunedToSchool(spell))
-        return SPELL_MISS_IMMUNE;
+        return SpellMissInfo::Immune;
 
     if (this == victim)
-        return SPELL_MISS_NONE;
+        return SpellMissInfo::None;
 
     // Return evade for units in evade mode
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks() && !spell->HasAura(SPELL_AURA_CONTROL_VEHICLE))
-        return SPELL_MISS_EVADE;
+        return SpellMissInfo::Evade;
 
     // Try victim reflect spell
     if (CanReflect)
@@ -3024,7 +3025,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         {
             // Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
             //ProcDamageAndSpell(victim, PROC_FLAG_NONE, PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_EX_REFLECT, 1, BASE_ATTACK, spell);
-            return SPELL_MISS_REFLECT;
+            return SpellMissInfo::Reflect;
         }
     }
 
@@ -3037,19 +3038,19 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
             {
                 if (spell->SpellFamilyName)
                 {
-                    return SPELL_MISS_NONE;
+                    return SpellMissInfo::None;
                 }
                 // Xinef: apply DAMAGE_CLASS_MAGIC conditions to damaging DAMAGE_CLASS_NONE spells
                 for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
                     if (spell->Effects[i].Effect && spell->Effects[i].Effect != SPELL_EFFECT_SCHOOL_DAMAGE)
                         if (spell->Effects[i].ApplyAuraName != SPELL_AURA_PERIODIC_DAMAGE)
-                            return SPELL_MISS_NONE;
+                            return SpellMissInfo::None;
                 [[fallthrough]];
             }
         case SPELL_DAMAGE_CLASS_MAGIC:
             return MagicSpellHitResult(victim, spell);
     }
-    return SPELL_MISS_NONE;
+    return SpellMissInfo::None;
 }
 
 uint32 Unit::GetDefenseSkillValue(Unit const* target) const
@@ -15225,40 +15226,41 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
 {
     uint32 procEx = PROC_EX_NONE;
     // Check victim state
-    if (missCondition != SPELL_MISS_NONE)
+    if (missCondition != SpellMissInfo::None)
         switch (missCondition)
         {
-            case SPELL_MISS_MISS:
+            // using enum SpellMissInfo; // For c++20
+            case SpellMissInfo::Miss:
                 procEx |= PROC_EX_MISS;
                 break;
-            case SPELL_MISS_RESIST:
+            case SpellMissInfo::Resist:
                 procEx |= PROC_EX_RESIST;
                 break;
-            case SPELL_MISS_DODGE:
+            case SpellMissInfo::Dodge:
                 procEx |= PROC_EX_DODGE;
                 break;
-            case SPELL_MISS_PARRY:
+            case SpellMissInfo::Parry:
                 procEx |= PROC_EX_PARRY;
                 break;
-            case SPELL_MISS_BLOCK:
+            case SpellMissInfo::Block:
                 procEx |= PROC_EX_BLOCK;
                 break;
-            case SPELL_MISS_EVADE:
+            case SpellMissInfo::Evade:
                 procEx |= PROC_EX_EVADE;
                 break;
-            case SPELL_MISS_IMMUNE:
+            case SpellMissInfo::Immune:
                 procEx |= PROC_EX_IMMUNE;
                 break;
-            case SPELL_MISS_IMMUNE2:
+            case SpellMissInfo::Immune2:
                 procEx |= PROC_EX_IMMUNE;
                 break;
-            case SPELL_MISS_DEFLECT:
+            case SpellMissInfo::Deflect:
                 procEx |= PROC_EX_DEFLECT;
                 break;
-            case SPELL_MISS_ABSORB:
+            case SpellMissInfo::Absorb:
                 procEx |= PROC_EX_ABSORB;
                 break;
-            case SPELL_MISS_REFLECT:
+            case SpellMissInfo::Reflect:
                 procEx |= PROC_EX_REFLECT;
                 break;
             default:

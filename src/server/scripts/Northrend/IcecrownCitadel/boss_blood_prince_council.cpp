@@ -1674,7 +1674,7 @@ public:
 
         void KnockIntoAir(SpellMissInfo missInfo)
         {
-            if (missInfo != SPELL_MISS_NONE)
+            if (missInfo != SpellMissInfo::None)
             {
                 return;
             }

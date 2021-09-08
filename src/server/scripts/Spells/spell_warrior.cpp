@@ -398,7 +398,7 @@ public:
 
         void SendMiss(SpellMissInfo missInfo)
         {
-            if (missInfo != SPELL_MISS_NONE)
+            if (missInfo != SpellMissInfo::None)
             {
                 if (Unit* caster = GetCaster())
                 {
@@ -482,7 +482,7 @@ public:
 
         void SendMiss(SpellMissInfo missInfo)
         {
-            if (missInfo != SPELL_MISS_NONE)
+            if (missInfo != SpellMissInfo::None)
             {
                 if (Unit* caster = GetCaster())
                 {

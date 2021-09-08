@@ -6220,7 +6220,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
 
     // Consecrate ticks can miss and will not show up in the combat log
     if (caster && GetSpellInfo()->Effects[GetEffIndex()].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA &&
-            caster->SpellHitResult(target, GetSpellInfo(), false) != SPELL_MISS_NONE)
+            caster->SpellHitResult(target, GetSpellInfo(), false) != SpellMissInfo::None)
         return;
 
     // some auras remove at specific health level or more
@@ -6366,7 +6366,7 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     }
 
     if (caster && GetSpellInfo()->Effects[GetEffIndex()].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA &&
-            caster->SpellHitResult(target, GetSpellInfo(), false) != SPELL_MISS_NONE)
+            caster->SpellHitResult(target, GetSpellInfo(), false) != SpellMissInfo::None)
         return;
 
     uint32 absorb = 0;
@@ -6621,7 +6621,7 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
     }
 
     if (GetSpellInfo()->Effects[GetEffIndex()].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA &&
-            caster->SpellHitResult(target, GetSpellInfo(), false) != SPELL_MISS_NONE)
+            caster->SpellHitResult(target, GetSpellInfo(), false) != SpellMissInfo::None)
         return;
 
     // ignore negative values (can be result apply spellmods to aura damage
@@ -6785,7 +6785,7 @@ void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) con
     // Set trigger flag
     uint32 procAttacker = PROC_FLAG_DONE_PERIODIC;
     uint32 procVictim   = PROC_FLAG_TAKEN_PERIODIC;
-    uint32 procEx       = createProcExtendMask(&damageInfo, SPELL_MISS_NONE) | PROC_EX_INTERNAL_DOT;
+    uint32 procEx       = createProcExtendMask(&damageInfo, SpellMissInfo::None) | PROC_EX_INTERNAL_DOT;
     if (damageInfo.damage)
         procVictim |= PROC_FLAG_TAKEN_DAMAGE;
 

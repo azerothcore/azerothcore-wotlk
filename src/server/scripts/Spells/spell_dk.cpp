@@ -435,7 +435,7 @@ public:
             {
                 std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
                 for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
-                    if (ihit->missCondition == SPELL_MISS_NONE && ihit->targetGUID == target->GetGUID())
+                    if (ihit->missCondition == SpellMissInfo::None && ihit->targetGUID == target->GetGUID())
                         GetCaster()->CastSpell(target, 55095 /*SPELL_FROST_FEVER*/, true);
             }
         }

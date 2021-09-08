@@ -1397,20 +1397,20 @@ enum Targets
     TOTAL_SPELL_TARGETS
 };
 
-enum SpellMissInfo
+enum class SpellMissInfo : uint32
 {
-    SPELL_MISS_NONE                    = 0,
-    SPELL_MISS_MISS                    = 1,
-    SPELL_MISS_RESIST                  = 2,
-    SPELL_MISS_DODGE                   = 3,
-    SPELL_MISS_PARRY                   = 4,
-    SPELL_MISS_BLOCK                   = 5,
-    SPELL_MISS_EVADE                   = 6,
-    SPELL_MISS_IMMUNE                  = 7,
-    SPELL_MISS_IMMUNE2                 = 8, // one of these 2 is MISS_TEMPIMMUNE
-    SPELL_MISS_DEFLECT                 = 9,
-    SPELL_MISS_ABSORB                  = 10,
-    SPELL_MISS_REFLECT                 = 11
+    None                    = 0,
+    Miss                    = 1,
+    Resist                  = 2,
+    Dodge                   = 3,
+    Parry                   = 4,
+    Block                   = 5,
+    Evade                   = 6,
+    Immune                  = 7,
+    Immune2                 = 8, // one of these 2 is MISS_TEMPIMMUNE
+    Deflect                 = 9,
+    Absorb                  = 10,
+    Reflect                 = 11
 };
 
 enum class SpellHitType : uint32
