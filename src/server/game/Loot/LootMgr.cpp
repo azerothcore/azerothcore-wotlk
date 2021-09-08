@@ -393,7 +393,9 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
 {
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
     if (!pProto)
+    {
         return false;
+    }
 
     bool isMasterLooter = player->GetGroup() && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID();
 
@@ -414,10 +416,14 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
 
     // not show loot for not own team
     if ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId(true) != TEAM_HORDE)
+    {
         return false;
+    }
 
     if ((pProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && player->GetTeamId(true) != TEAM_ALLIANCE)
+    {
         return false;
+    }
 
     // Master looter can see all items even if the character can't loot them
     if (!isGivenByMasterLooter && isMasterLooter && allowQuestLoot)
@@ -427,15 +433,21 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
 
     // Don't allow loot for players without profession or those who already know the recipe
     if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) && (!player->HasSkill(pProto->RequiredSkill) || player->HasSpell(pProto->Spells[1].SpellId)))
+    {
         return false;
+    }
 
     // Don't allow to loot soulbound recipes that the player has already learned
     if (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0 && player->HasSpell(pProto->Spells[1].SpellId))
+    {
         return false;
+    }
 
     // check quest requirements
     if (!(pProto->FlagsCu & ITEM_FLAGS_CU_IGNORE_QUEST_STATUS) && ((needs_quest || (pProto->StartQuest && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE)) && !player->HasQuestForItem(itemid)))
+    {
         return false;
+    }
 
     return true;
 }
@@ -510,7 +522,7 @@ void Loot::AddItem(LootStoreItem const& item)
 }
 
 // Calls processor of corresponding LootTemplate (which handles everything including references)
-bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode /*= LOOT_MODE_DEFAULT*/)
+bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode /*= LOOT_MODE_DEFAULT*/, WorldObject* lootSource /*= nullptr*/)
 {
     // Must be provided
     if (!lootOwner)
@@ -541,9 +553,15 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
         roundRobinPlayer = lootOwner->GetGUID();
 
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-            if (Player* player = itr->GetSource())   // should actually be looted object instead of lootOwner but looter has to be really close so doesnt really matter
-                if (player->IsInMap(lootOwner)) // pussywizard: multithreading crashfix
-                    FillNotNormalLootFor(player, player->IsAtGroupRewardDistance(lootOwner));
+        {
+            if (Player* player = itr->GetSource()) // should actually be looted object instead of lootOwner but looter has to be really close so doesnt really matter
+            {
+                if (player->IsAtLootRewardDistance(lootSource ? lootSource : lootOwner))
+                {
+                    FillNotNormalLootFor(player);
+                }
+            }
+        }
 
         for (uint8 i = 0; i < items.size(); ++i)
         {
@@ -554,12 +572,12 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     }
     // ... for personal loot
     else
-        FillNotNormalLootFor(lootOwner, true);
+        FillNotNormalLootFor(lootOwner);
 
     return true;
 }
 
-void Loot::FillNotNormalLootFor(Player* player, bool presentAtLooting)
+void Loot::FillNotNormalLootFor(Player* player)
 {
     ObjectGuid playerGuid = player->GetGUID();
 
@@ -573,11 +591,7 @@ void Loot::FillNotNormalLootFor(Player* player, bool presentAtLooting)
 
     qmapitr = PlayerNonQuestNonFFAConditionalItems.find(playerGuid);
     if (qmapitr == PlayerNonQuestNonFFAConditionalItems.end())
-        FillNonQuestNonFFAConditionalLoot(player, presentAtLooting);
-
-    // if not auto-processed player will have to come and pick it up manually
-    if (!presentAtLooting)
-        return;
+        FillNonQuestNonFFAConditionalLoot(player);
 
     // Process currency items
     uint32 max_slot = GetMaxSlotInLootFor(player);
@@ -658,7 +672,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     return ql;
 }
 
-QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting)
+QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
 {
     QuestItemList* ql = new QuestItemList();
 
@@ -667,8 +681,8 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player, bool pres
         LootItem& item = items[i];
         if (!item.is_looted && !item.freeforall && (item.AllowedForPlayer(player) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT ))))
         {
-            if (presentAtLooting)
-                item.AddAllowedLooter(player);
+            item.AddAllowedLooter(player);
+
             if (!item.conditions.empty())
             {
                 ql->push_back(QuestItem(i));
@@ -1058,34 +1072,57 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             LootItem& item = l.quest_items[qi->index];
             if (!qi->is_looted && !item.is_looted)
             {
-                b << uint8(l.items.size() + (qi - q_list->begin()));
-                b << item;
-                if (item.follow_loot_rules)
+                bool showInLoot = true;
+                bool hasQuestForItem = lv.viewer->HasQuestForItem(item.itemid, 0, false, &showInLoot);
+                if (!hasQuestForItem)
                 {
-                    switch (lv.permission)
+                    if (!showInLoot)
                     {
-                        case MASTER_PERMISSION:
-                            b << uint8(LOOT_SLOT_TYPE_MASTER);
-                            break;
-                        case RESTRICTED_PERMISSION:
-                            b << (item.is_blocked ? uint8(LOOT_SLOT_TYPE_LOCKED) : uint8(slotType));
-                            break;
-                        case GROUP_PERMISSION:
-                        case ROUND_ROBIN_PERMISSION:
-                            if (!item.is_blocked)
-                                b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
-                            else
-                                b << uint8(LOOT_SLOT_TYPE_ROLL_ONGOING);
-                            break;
-                        default:
-                            b << uint8(slotType);
-                            break;
+                        const_cast<QuestItem*>(&(*qi))->is_looted = true;
+                        if (!item.freeforall)
+                        {
+                            item.is_looted = true;
+                        }
+                        continue;
                     }
+
+                    b << uint8(l.items.size() + (qi - q_list->begin()));
+                    b << item;
+                    b << uint8(lv.permission == MASTER_PERMISSION ? LOOT_SLOT_TYPE_MASTER : LOOT_SLOT_TYPE_LOCKED);
                 }
-                else if (!item.freeforall)
-                    b << uint8(partySlotType);
                 else
-                    b << uint8(slotType);
+                {
+                    b << uint8(l.items.size() + (qi - q_list->begin()));
+                    b << item;
+
+                    if (item.follow_loot_rules)
+                    {
+                        switch (lv.permission)
+                        {
+                            case MASTER_PERMISSION:
+                                b << uint8(LOOT_SLOT_TYPE_MASTER);
+                                break;
+                            case RESTRICTED_PERMISSION:
+                                b << (item.is_blocked ? uint8(LOOT_SLOT_TYPE_LOCKED) : uint8(slotType));
+                                break;
+                            case GROUP_PERMISSION:
+                            case ROUND_ROBIN_PERMISSION:
+                                if (!item.is_blocked)
+                                    b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
+                                else
+                                    b << uint8(LOOT_SLOT_TYPE_ROLL_ONGOING);
+                                break;
+                            default:
+                                b << uint8(slotType);
+                                break;
+                        }
+                    }
+                    else if (!item.freeforall)
+                        b << uint8(partySlotType);
+                    else
+                        b << uint8(slotType);
+                }
+
                 ++itemsShown;
             }
         }
