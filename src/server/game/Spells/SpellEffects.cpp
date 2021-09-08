@@ -862,7 +862,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             // Cloak of Shadows
             case 35729:
                 {
-                    uint32 dispelMask = SpellInfo::GetDispelMask(DISPEL_ALL);
+                    uint32 dispelMask = SpellInfo::GetDispelMask(DispelType::ALL);
                     Unit::AuraApplicationMap& Auras = unitTarget->GetAppliedAuras();
                     for (Unit::AuraApplicationMap::iterator iter = Auras.begin(); iter != Auras.end();)
                     {
@@ -3388,7 +3388,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         Unit::AuraApplicationMap const& auras = unitTarget->GetAppliedAuras();
                         for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                         {
-                            if (itr->second->GetBase()->GetSpellInfo()->Dispel == DISPEL_POISON)
+                            if (itr->second->GetBase()->GetSpellInfo()->Dispel == static_cast<uint32>(DispelType::POISON))
                             {
                                 found = true;
                                 break;

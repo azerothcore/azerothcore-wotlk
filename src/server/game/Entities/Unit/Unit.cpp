@@ -4953,8 +4953,8 @@ Aura* Unit::GetAuraOfRankedSpell(uint32 spellId, ObjectGuid casterGUID, ObjectGu
 void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList)
 {
     // we should not be able to dispel diseases if the target is affected by unholy blight
-    if (dispelMask & (1 << DISPEL_DISEASE) && HasAura(50536))
-        dispelMask &= ~(1 << DISPEL_DISEASE);
+    if (dispelMask & (1 << static_cast<uint32>(DispelType::DISEASE)) && HasAura(50536))
+        dispelMask &= ~(1 << static_cast<uint32>(DispelType::DISEASE));
 
     ReputationRank rank = GetReactionTo(caster);
     bool positive = rank >= REP_FRIENDLY;
@@ -4988,7 +4988,7 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
 
         if (aura->GetSpellInfo()->GetDispelMask() & dispelMask)
         {
-            if (aura->GetSpellInfo()->Dispel == DISPEL_MAGIC)
+            if (aura->GetSpellInfo()->Dispel == static_cast<uint32>(DispelType::MAGIC))
             {
                 // do not remove positive auras if friendly target
                 //               negative auras if non-friendly target
@@ -5167,7 +5167,7 @@ uint32 Unit::GetDiseasesByCaster(ObjectGuid casterGUID, uint8 mode)
         for (AuraEffectList::iterator i = m_modAuras[diseaseAuraTypes[index]].begin(); i != m_modAuras[diseaseAuraTypes[index]].end();)
         {
             // Get auras with disease dispel type by caster
-            if ((*i)->GetSpellInfo()->Dispel == DISPEL_DISEASE
+            if ((*i)->GetSpellInfo()->Dispel == static_cast<uint32>(DispelType::DISEASE)
                     && ((*i)->GetCasterGUID() == casterGUID || (*i)->GetCasterGUID() == drwGUID)) // if its caster or his dancing rune weapon
             {
                 ++diseases;
@@ -12170,7 +12170,7 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
             AuraEffectList const& immuneAuraApply = GetAuraEffectsByType(SPELL_AURA_MOD_IMMUNE_AURA_APPLY_SCHOOL);
             for (AuraEffectList::const_iterator iter = immuneAuraApply.begin(); iter != immuneAuraApply.end(); ++iter)
             {
-                if (/*(spellInfo->Dispel == DISPEL_MAGIC || spellInfo->Dispel == DISPEL_CURSE || spellInfo->Dispel == DISPEL_DISEASE) &&*/ // Magic debuff, xinef: all kinds?
+                if (/*(spellInfo->Dispel == DispelType::MAGIC || spellInfo->Dispel == DispelType::CURSE || spellInfo->Dispel == DispelType::DISEASE) &&*/ // Magic debuff, xinef: all kinds?
                     ((*iter)->GetMiscValue() & spellInfo->GetSchoolMask()) &&  // Check school
                     !spellInfo->IsPositiveEffect(index) &&                                  // Harmful
                     spellInfo->Effects[index].Effect != SPELL_EFFECT_PERSISTENT_AREA_AURA)  // Not Persistent area auras
@@ -12529,7 +12529,7 @@ void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, 
 
 void Unit::ApplySpellDispelImmunity(const SpellInfo* spellProto, DispelType type, bool apply)
 {
-    ApplySpellImmune(spellProto->Id, IMMUNITY_DISPEL, type, apply);
+    ApplySpellImmune(spellProto->Id, IMMUNITY_DISPEL, static_cast<uint32>(type), apply);
 
     if (apply && spellProto->HasAttribute(SPELL_ATTR1_IMMUNITY_PURGES_EFFECT))
     {

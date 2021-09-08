@@ -678,7 +678,7 @@ public:
         void HandleProc(ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if (eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetDamageInfo()->GetSpellInfo() || eventInfo.GetDamageInfo()->GetSpellInfo()->Dispel != DISPEL_DISEASE))
+            if (eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetDamageInfo()->GetSpellInfo() || eventInfo.GetDamageInfo()->GetSpellInfo()->Dispel != static_cast<uint32>(DispelType::DISEASE)))
                 SetDuration(0);
         }
 

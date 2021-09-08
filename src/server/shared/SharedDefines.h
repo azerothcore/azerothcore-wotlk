@@ -1250,23 +1250,23 @@ enum Mechanics
     (1<<MECHANIC_SAPPED))
 
 // Spell dispel type
-enum DispelType
+enum class DispelType : uint32
 {
-    DISPEL_NONE         = 0,
-    DISPEL_MAGIC        = 1,
-    DISPEL_CURSE        = 2,
-    DISPEL_DISEASE      = 3,
-    DISPEL_POISON       = 4,
-    DISPEL_STEALTH      = 5,
-    DISPEL_INVISIBILITY = 6,
-    DISPEL_ALL          = 7,
-    DISPEL_SPE_NPC_ONLY = 8,
-    DISPEL_ENRAGE       = 9,
-    DISPEL_ZG_TICKET    = 10,
-    DESPEL_OLD_UNUSED   = 11
+    NONE         = 0,
+    MAGIC        = 1,
+    CURSE        = 2,
+    DISEASE      = 3,
+    POISON       = 4,
+    STEALTH      = 5,
+    INVISIBILITY = 6,
+    ALL          = 7,
+    SPE_NPC_ONLY = 8,
+    ENRAGE       = 9,
+    ZG_TICKET    = 10,
+    OLD_UNUSED   = 11
 };
 
-#define DISPEL_ALL_MASK ((1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE) | (1<<DISPEL_DISEASE) | (1<<DISPEL_POISON))
+constexpr uint32 DISPEL_ALL_MASK = ((1 << static_cast<uint32>(DispelType::MAGIC)) | (1 << static_cast<uint32>(DispelType::CURSE)) | (1 << static_cast<uint32>(DispelType::DISEASE)) | (1 << static_cast<uint32>(DispelType::POISON)));
 
 //To all Immune system, if target has immunes,
 //some spell that related to ImmuneToDispel or ImmuneToSchool or ImmuneToDamage type can't cast to it,
@@ -1278,7 +1278,7 @@ enum SpellImmunity
     IMMUNITY_STATE                 = 1,                     // enum AuraType
     IMMUNITY_SCHOOL                = 2,                     // enum SpellSchoolMask
     IMMUNITY_DAMAGE                = 3,                     // enum SpellSchoolMask
-    IMMUNITY_DISPEL                = 4,                     // enum DispelType
+    IMMUNITY_DISPEL                = 4,                     // enum class DispelType
     IMMUNITY_MECHANIC              = 5,                     // enum Mechanics
     IMMUNITY_ID                    = 6,
     IMMUNITY_ALLOW_ID              = 7                      // xinef: special type of immunity, npc is immune to everything except for those spells id

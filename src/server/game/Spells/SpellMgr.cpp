@@ -4024,7 +4024,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Envenom
     ApplySpellFix({ 32645, 32684, 57992, 57993 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Dispel = DISPEL_NONE;
+        spellInfo->Dispel = static_cast<uint32>(DispelType::NONE);
     });
 
     //////////////////////////////////////////
@@ -4343,7 +4343,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Combustion, make this passive
     ApplySpellFix({ 11129 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Dispel = DISPEL_NONE;
+        spellInfo->Dispel = static_cast<uint32>(DispelType::NONE);
     });
 
     // Magic Absorption
@@ -4426,7 +4426,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Fingers of Frost
     ApplySpellFix({ 44544 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Dispel = DISPEL_NONE;
+        spellInfo->Dispel = static_cast<uint32>(DispelType::NONE);
         spellInfo->AttributesEx4 |= SPELL_ATTR4_CANNOT_BE_STOLEN;
         spellInfo->EffectSpellClassMask[0] = flag96(685904631, 1151040, 32);
     });
@@ -5303,7 +5303,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Sentinel Blast
     ApplySpellFix({ 64389, 64678 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->Dispel = DISPEL_MAGIC;
+        spellInfo->Dispel = static_cast<uint32>(DispelType::MAGIC);
     });
 
     // Potent Pheromones

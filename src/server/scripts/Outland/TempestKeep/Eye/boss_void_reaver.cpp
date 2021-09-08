@@ -33,7 +33,7 @@ public:
     {
         boss_void_reaverAI(Creature* creature) : BossAI(creature, DATA_REAVER)
         {
-            me->ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
+            me->ApplySpellImmune(0, IMMUNITY_DISPEL, static_cast<uint32>(DispelType::POISON), true);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEALTH_LEECH, true);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_POWER_DRAIN, true);
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_LEECH, true);

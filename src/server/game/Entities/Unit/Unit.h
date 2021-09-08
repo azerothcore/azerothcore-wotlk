@@ -17,6 +17,8 @@
 #include "ThreatManager.h"
 #include <functional>
 
+enum class DispelType : uint32;
+
 #define WORLD_TRIGGER   12999
 
 enum SpellInterruptFlags

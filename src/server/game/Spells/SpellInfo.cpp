@@ -1997,10 +1997,10 @@ uint32 SpellInfo::GetDispelMask() const
 uint32 SpellInfo::GetDispelMask(DispelType type)
 {
     // If dispel all
-    if (type == DISPEL_ALL)
+    if (type == DispelType::ALL)
         return DISPEL_ALL_MASK;
     else
-        return uint32(1 << type);
+        return uint32(1 << static_cast<uint32>(type));
 }
 
 uint32 SpellInfo::GetExplicitTargetMask() const
@@ -2048,7 +2048,7 @@ AuraStateType SpellInfo::LoadAuraState() const
         return AURA_STATE_DEADLY_POISON;
 
     // Enrage aura state
-    if (Dispel == DISPEL_ENRAGE)
+    if (Dispel == static_cast<uint32>(DispelType::ENRAGE))
         return AURA_STATE_ENRAGE;
 
     // Bleeding aura state
@@ -2162,7 +2162,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
         case SPELLFAMILY_WARLOCK:
             {
                 // only warlock curses have this
-                if (Dispel == DISPEL_CURSE)
+                if (Dispel == static_cast<uint32>(DispelType::CURSE))
                     return SPELL_SPECIFIC_CURSE;
 
                 // Warlock (Demon Armor | Demon Skin | Fel Armor)
@@ -2185,7 +2185,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
         case SPELLFAMILY_HUNTER:
             {
                 // only hunter stings have this
-                if (Dispel == DISPEL_POISON)
+                if (Dispel == static_cast<uint32>(DispelType::POISON))
                     return SPELL_SPECIFIC_STING;
 
                 // only hunter aspects have this (but not all aspects in hunter family)
