@@ -1918,7 +1918,7 @@ public:
 
     ControlSet m_Controlled;
     [[nodiscard]] Unit* GetFirstControlled() const;
-    void RemoveAllControlled();
+    void RemoveAllControlled(bool onDeath = false);
 
     [[nodiscard]] bool IsCharmed() const { return GetCharmerGUID(); }
     [[nodiscard]] bool isPossessed() const { return HasUnitState(UNIT_STATE_POSSESSED); }
@@ -2244,7 +2244,7 @@ public:
     void ModifyAuraState(AuraStateType flag, bool apply);
     uint32 BuildAuraStateUpdateForTarget(Unit* target) const;
     bool HasAuraState(AuraStateType flag, SpellInfo const* spellProto = nullptr, Unit const* Caster = nullptr) const;
-    void UnsummonAllTotems();
+    void UnsummonAllTotems(bool onDeath = false);
     Unit* GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
     Unit* GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo = nullptr);
 

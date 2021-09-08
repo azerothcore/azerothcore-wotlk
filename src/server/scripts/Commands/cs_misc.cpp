@@ -957,6 +957,8 @@ public:
 
         player->Dismount();
         player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+        player->SetSpeed(MOVE_RUN, 1, true);
+        player->SetSpeed(MOVE_FLIGHT, 1, true);
         return true;
     }
 
