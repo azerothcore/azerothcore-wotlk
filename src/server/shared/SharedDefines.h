@@ -2494,10 +2494,10 @@ enum LockType
 
 enum TrainerType                                            // this is important type for npcs!
 {
-    TRAINER_TYPE_CLASS             = 0,
-    TRAINER_TYPE_MOUNTS            = 1,                     // on blizz it's 2
-    TRAINER_TYPE_TRADESKILLS       = 2,
-    TRAINER_TYPE_PETS              = 3
+    Class             = 0,
+    Mounts            = 1,                     // on blizz it's 2
+    Tradeskills       = 2,
+    Pets              = 3
 };
 
 #define MAX_TRAINER_TYPE 4
