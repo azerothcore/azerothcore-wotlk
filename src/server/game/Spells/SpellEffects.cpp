@@ -5311,7 +5311,9 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
 
                 // spell only removes 1 bleed effect do not continue
                 if (m_spellInfo->Effects[effIndex].BasePoints == 1)
+                {
                     break;
+                }
             }
         }
     }
