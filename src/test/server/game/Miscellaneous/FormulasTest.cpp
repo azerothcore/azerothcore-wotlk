@@ -34,16 +34,16 @@ TEST(FormulasTest, GetGrayLevel)
 
 TEST(FormulasTest, GetColorCode)
 {
-    EXPECT_EQ(GetColorCode(60, 80), XP_RED);
-    EXPECT_EQ(GetColorCode(60, 65), XP_RED);
-    EXPECT_EQ(GetColorCode(60, 64), XP_ORANGE);
-    EXPECT_EQ(GetColorCode(60, 63), XP_ORANGE);
-    EXPECT_EQ(GetColorCode(60, 62), XP_YELLOW);
-    EXPECT_EQ(GetColorCode(60, 58), XP_YELLOW);
-    EXPECT_EQ(GetColorCode(60, 57), XP_GREEN);
-    EXPECT_EQ(GetColorCode(60, 52), XP_GREEN);
-    EXPECT_EQ(GetColorCode(60, 51), XP_GRAY);
-    EXPECT_EQ(GetColorCode(60, 1), XP_GRAY);
+    EXPECT_EQ(GetColorCode(60, 80), XPColorChar::Red);
+    EXPECT_EQ(GetColorCode(60, 65), XPColorChar::Red);
+    EXPECT_EQ(GetColorCode(60, 64), XPColorChar::Orange);
+    EXPECT_EQ(GetColorCode(60, 63), XPColorChar::Orange);
+    EXPECT_EQ(GetColorCode(60, 62), XPColorChar::Yellow);
+    EXPECT_EQ(GetColorCode(60, 58), XPColorChar::Yellow);
+    EXPECT_EQ(GetColorCode(60, 57), XPColorChar::Green);
+    EXPECT_EQ(GetColorCode(60, 52), XPColorChar::Green);
+    EXPECT_EQ(GetColorCode(60, 51), XPColorChar::Gray);
+    EXPECT_EQ(GetColorCode(60, 1), XPColorChar::Gray);
 }
 
 TEST(FormulasTest, GetZeroDifference)

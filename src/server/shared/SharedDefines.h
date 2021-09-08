@@ -3408,13 +3408,13 @@ enum TradeStatus
     TRADE_STATUS_NOT_ELIGIBLE   = 23                        // Related to trading soulbound loot items
 };
 
-enum XPColorChar
+enum class XPColorChar : uint8
 {
-    XP_RED,
-    XP_ORANGE,
-    XP_YELLOW,
-    XP_GREEN,
-    XP_GRAY
+    Red    = 0,
+    Orange = 1,
+    Yellow = 2,
+    Green  = 3,
+    Gray   = 4
 };
 
 enum RemoveMethod

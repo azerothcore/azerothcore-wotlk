@@ -49,15 +49,15 @@ namespace Acore::XP
         XPColorChar color;
 
         if (mob_level >= pl_level + 5)
-            color = XP_RED;
+            color = XPColorChar::Red;
         else if (mob_level >= pl_level + 3)
-            color = XP_ORANGE;
+            color = XPColorChar::Orange;
         else if (mob_level >= pl_level - 2)
-            color = XP_YELLOW;
+            color = XPColorChar::Yellow;
         else if (mob_level > GetGrayLevel(pl_level))
-            color = XP_GREEN;
+            color = XPColorChar::Green;
         else
-            color = XP_GRAY;
+            color = XPColorChar::Gray;
 
         //sScriptMgr->OnColorCodeCalculation(color, pl_level, mob_level); // pussywizard: optimization
         return color;
