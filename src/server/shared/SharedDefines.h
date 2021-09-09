@@ -183,15 +183,15 @@ enum Powers
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
 
-enum SpellSchools
+enum class SpellSchool : uint8
 {
-    SPELL_SCHOOL_NORMAL                 = 0,
-    SPELL_SCHOOL_HOLY                   = 1,
-    SPELL_SCHOOL_FIRE                   = 2,
-    SPELL_SCHOOL_NATURE                 = 3,
-    SPELL_SCHOOL_FROST                  = 4,
-    SPELL_SCHOOL_SHADOW                 = 5,
-    SPELL_SCHOOL_ARCANE                 = 6
+    Normal                 = 0,
+    Holy                   = 1,
+    Fire                   = 2,
+    Nature                 = 3,
+    Frost                  = 4,
+    Shadow                 = 5,
+    Arcane                 = 6
 };
 
 constexpr auto MAX_SPELL_SCHOOL = 7;
@@ -199,13 +199,13 @@ constexpr auto MAX_SPELL_SCHOOL = 7;
 enum SpellSchoolMask
 {
     SPELL_SCHOOL_MASK_NONE    = 0x00,                       // not exist
-    SPELL_SCHOOL_MASK_NORMAL  = (1 << SPELL_SCHOOL_NORMAL), // PHYSICAL (Armor)
-    SPELL_SCHOOL_MASK_HOLY    = (1 << SPELL_SCHOOL_HOLY),
-    SPELL_SCHOOL_MASK_FIRE    = (1 << SPELL_SCHOOL_FIRE),
-    SPELL_SCHOOL_MASK_NATURE  = (1 << SPELL_SCHOOL_NATURE),
-    SPELL_SCHOOL_MASK_FROST   = (1 << SPELL_SCHOOL_FROST),
-    SPELL_SCHOOL_MASK_SHADOW  = (1 << SPELL_SCHOOL_SHADOW),
-    SPELL_SCHOOL_MASK_ARCANE  = (1 << SPELL_SCHOOL_ARCANE),
+    SPELL_SCHOOL_MASK_NORMAL  = (1 << static_cast<uint16>(SpellSchool::Normal)), // PHYSICAL (Armor)
+    SPELL_SCHOOL_MASK_HOLY    = (1 << static_cast<uint16>(SpellSchool::Holy)),
+    SPELL_SCHOOL_MASK_FIRE    = (1 << static_cast<uint16>(SpellSchool::Fire)),
+    SPELL_SCHOOL_MASK_NATURE  = (1 << static_cast<uint16>(SpellSchool::Nature)),
+    SPELL_SCHOOL_MASK_FROST   = (1 << static_cast<uint16>(SpellSchool::Frost)),
+    SPELL_SCHOOL_MASK_SHADOW  = (1 << static_cast<uint16>(SpellSchool::Shadow)),
+    SPELL_SCHOOL_MASK_ARCANE  = (1 << static_cast<uint16>(SpellSchool::Arcane)),
 
     // unions
 
@@ -220,13 +220,13 @@ enum SpellSchoolMask
     SPELL_SCHOOL_MASK_ALL     = (SPELL_SCHOOL_MASK_NORMAL | SPELL_SCHOOL_MASK_MAGIC)
 };
 
-inline SpellSchools GetFirstSchoolInMask(SpellSchoolMask mask)
+inline SpellSchool GetFirstSchoolInMask(SpellSchoolMask mask)
 {
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
         if (mask & (1 << i))
-            return SpellSchools(i);
+            return SpellSchool(i);
 
-    return SPELL_SCHOOL_NORMAL;
+    return SpellSchool::Normal;
 }
 
 enum ItemQualities

@@ -98,7 +98,7 @@ public:
         boss_amanitarAI(Creature *creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false)
         {
             creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
-            creature->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
+            creature->SetMeleeDamageSchool(SpellSchool::Nature);
         }
 
         void Reset() override

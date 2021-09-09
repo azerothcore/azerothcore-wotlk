@@ -111,7 +111,7 @@ public:
 
             if (corrupt)
             {
-                me->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
+                me->SetMeleeDamageSchool(SpellSchool::Nature);
                 me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, false);
                 me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
                 me->CastSpell(me, SPELL_CORRUPTION, true);
@@ -125,7 +125,7 @@ public:
             }
             else
             {
-                me->SetMeleeDamageSchool(SPELL_SCHOOL_FROST);
+                me->SetMeleeDamageSchool(SpellSchool::Frost);
                 me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                 me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, false);
                 me->RemoveAurasDueToSpell(SPELL_CORRUPTION);

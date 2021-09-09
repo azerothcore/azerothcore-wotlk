@@ -388,7 +388,7 @@ public:
                         Map::PlayerList const& pList = me->GetMap()->GetPlayers();
                         for (const auto& itr : pList)
                         {
-                            if (itr.GetSource()->GetResistance(SPELL_SCHOOL_FROST) > 100 && pInstance)
+                            if (itr.GetSource()->GetResistance(SpellSchool::Frost) > 100 && pInstance)
                             {
                                 pInstance->SetData(DATA_HUNDRED_CLUB, 0);
                                 return;

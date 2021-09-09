@@ -1692,8 +1692,8 @@ public:
 
             switch (GetFirstSchoolInMask(eventInfo.GetSchoolMask()))
             {
-                case SPELL_SCHOOL_NORMAL:
-                case SPELL_SCHOOL_HOLY:
+                case SpellSchool::Normal:
+                case SpellSchool::Holy:
                     return false;
                 default:
                     break;
@@ -1708,19 +1708,19 @@ public:
             uint32 spellId = 0;
             switch (GetFirstSchoolInMask(eventInfo.GetSchoolMask()))
             {
-                case SPELL_SCHOOL_FIRE:
+                case SpellSchool::Fire:
                     spellId = SPELL_GEN_ADAPTIVE_WARDING_FIRE;
                     break;
-                case SPELL_SCHOOL_NATURE:
+                case SpellSchool::Nature:
                     spellId = SPELL_GEN_ADAPTIVE_WARDING_NATURE;
                     break;
-                case SPELL_SCHOOL_FROST:
+                case SpellSchool::Frost:
                     spellId = SPELL_GEN_ADAPTIVE_WARDING_FROST;
                     break;
-                case SPELL_SCHOOL_SHADOW:
+                case SpellSchool::Shadow:
                     spellId = SPELL_GEN_ADAPTIVE_WARDING_SHADOW;
                     break;
-                case SPELL_SCHOOL_ARCANE:
+                case SpellSchool::Arcane:
                     spellId = SPELL_GEN_ADAPTIVE_WARDING_ARCANE;
                     break;
                 default:
@@ -2137,7 +2137,7 @@ public:
             if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
                 return false;
 
-            if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
+            if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SpellSchool::Normal)
                 return false;
 
             return true;
@@ -2150,22 +2150,22 @@ public:
             uint32 spellId = 0;
             switch (GetFirstSchoolInMask(eventInfo.GetSchoolMask()))
             {
-                case SPELL_SCHOOL_HOLY:
+                case SpellSchool::Holy:
                     spellId = SPELL_GEN_OBSIDIAN_ARMOR_HOLY;
                     break;
-                case SPELL_SCHOOL_FIRE:
+                case SpellSchool::Fire:
                     spellId = SPELL_GEN_OBSIDIAN_ARMOR_FIRE;
                     break;
-                case SPELL_SCHOOL_NATURE:
+                case SpellSchool::Nature:
                     spellId = SPELL_GEN_OBSIDIAN_ARMOR_NATURE;
                     break;
-                case SPELL_SCHOOL_FROST:
+                case SpellSchool::Frost:
                     spellId = SPELL_GEN_OBSIDIAN_ARMOR_FROST;
                     break;
-                case SPELL_SCHOOL_SHADOW:
+                case SpellSchool::Shadow:
                     spellId = SPELL_GEN_OBSIDIAN_ARMOR_SHADOW;
                     break;
-                case SPELL_SCHOOL_ARCANE:
+                case SpellSchool::Arcane:
                     spellId = SPELL_GEN_OBSIDIAN_ARMOR_ARCANE;
                     break;
                 default:

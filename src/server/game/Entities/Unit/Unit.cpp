@@ -8385,24 +8385,24 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             return false;
                         switch (GetFirstSchoolInMask(procSpell->GetSchoolMask()))
                         {
-                            case SPELL_SCHOOL_NORMAL:
+                            case SpellSchool::Normal:
                                 return false;                   // ignore
-                            case SPELL_SCHOOL_HOLY:
+                            case SpellSchool::Holy:
                                 trigger_spell_id = 54370;
                                 break;
-                            case SPELL_SCHOOL_FIRE:
+                            case SpellSchool::Fire:
                                 trigger_spell_id = 54371;
                                 break;
-                            case SPELL_SCHOOL_NATURE:
+                            case SpellSchool::Nature:
                                 trigger_spell_id = 54375;
                                 break;
-                            case SPELL_SCHOOL_FROST:
+                            case SpellSchool::Frost:
                                 trigger_spell_id = 54372;
                                 break;
-                            case SPELL_SCHOOL_SHADOW:
+                            case SpellSchool::Shadow:
                                 trigger_spell_id = 54374;
                                 break;
-                            case SPELL_SCHOOL_ARCANE:
+                            case SpellSchool::Arcane:
                                 trigger_spell_id = 54373;
                                 break;
                             default:
@@ -8689,24 +8689,24 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             return false;
                         switch (GetFirstSchoolInMask(procSpell->GetSchoolMask()))
                         {
-                            case SPELL_SCHOOL_NORMAL:
+                            case SpellSchool::Normal:
                                 return false;                   // ignore
-                            case SPELL_SCHOOL_HOLY:
+                            case SpellSchool::Holy:
                                 trigger_spell_id = 50490;
                                 break;
-                            case SPELL_SCHOOL_FIRE:
+                            case SpellSchool::Fire:
                                 trigger_spell_id = 50362;
                                 break;
-                            case SPELL_SCHOOL_NATURE:
+                            case SpellSchool::Nature:
                                 trigger_spell_id = 50488;
                                 break;
-                            case SPELL_SCHOOL_FROST:
+                            case SpellSchool::Frost:
                                 trigger_spell_id = 50485;
                                 break;
-                            case SPELL_SCHOOL_SHADOW:
+                            case SpellSchool::Shadow:
                                 trigger_spell_id = 50489;
                                 break;
-                            case SPELL_SCHOOL_ARCANE:
+                            case SpellSchool::Arcane:
                                 trigger_spell_id = 50486;
                                 break;
                             default:
@@ -11254,7 +11254,7 @@ float Unit::SpellDoneCritChance(Unit const* /*victim*/, SpellInfo const* spellPr
                     crit_chance = 0.0f;
                 // For other schools
                 else if (GetTypeId() == TYPEID_PLAYER)
-                    crit_chance = GetFloatValue(static_cast<uint16>(PLAYER_SPELL_CRIT_PERCENTAGE1) + GetFirstSchoolInMask(schoolMask));
+                    crit_chance = GetFloatValue(static_cast<uint16>(PLAYER_SPELL_CRIT_PERCENTAGE1) + static_cast<uint16>(GetFirstSchoolInMask(schoolMask)));
                 else
                 {
                     crit_chance = (float)m_baseSpellCritChance;
@@ -13663,9 +13663,9 @@ float Unit::ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask)
     if (!HasAuraType(SPELL_AURA_MOD_THREAT) || fThreat < 0)
         return fThreat;
 
-    SpellSchools school = GetFirstSchoolInMask(schoolMask);
+    SpellSchool school = GetFirstSchoolInMask(schoolMask);
 
-    return fThreat * m_threatModifier[school];
+    return fThreat * m_threatModifier[static_cast<uint8>(school)];
 }
 
 //======================================================================
@@ -14267,7 +14267,7 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         case UNIT_MOD_RESISTANCE_FROST:
         case UNIT_MOD_RESISTANCE_SHADOW:
         case UNIT_MOD_RESISTANCE_ARCANE:
-            UpdateResistances(GetSpellSchoolByAuraGroup(unitMod));
+            UpdateResistances(static_cast<uint32>(GetSpellSchoolByAuraGroup(unitMod)));
             break;
 
         case UNIT_MOD_ATTACK_POWER:
@@ -14351,29 +14351,29 @@ void Unit::ApplyStatPercentBuffMod(Stats stat, float val, bool apply)
     ApplyModSignedFloatValue((var > 0 ? static_cast<uint16>(UNIT_FIELD_POSSTAT0) + stat : static_cast<uint16>(UNIT_FIELD_NEGSTAT0) + stat), var, apply);
 }
 
-SpellSchools Unit::GetSpellSchoolByAuraGroup(UnitMods unitMod) const
+SpellSchool Unit::GetSpellSchoolByAuraGroup(UnitMods unitMod) const
 {
-    SpellSchools school = SPELL_SCHOOL_NORMAL;
+    SpellSchool school = SpellSchool::Normal;
 
     switch (unitMod)
     {
         case UNIT_MOD_RESISTANCE_HOLY:
-            school = SPELL_SCHOOL_HOLY;
+            school = SpellSchool::Holy;
             break;
         case UNIT_MOD_RESISTANCE_FIRE:
-            school = SPELL_SCHOOL_FIRE;
+            school = SpellSchool::Fire;
             break;
         case UNIT_MOD_RESISTANCE_NATURE:
-            school = SPELL_SCHOOL_NATURE;
+            school = SpellSchool::Nature;
             break;
         case UNIT_MOD_RESISTANCE_FROST:
-            school = SPELL_SCHOOL_FROST;
+            school = SpellSchool::Frost;
             break;
         case UNIT_MOD_RESISTANCE_SHADOW:
-            school = SPELL_SCHOOL_SHADOW;
+            school = SpellSchool::Shadow;
             break;
         case UNIT_MOD_RESISTANCE_ARCANE:
-            school = SPELL_SCHOOL_ARCANE;
+            school = SpellSchool::Arcane;
             break;
 
         default:
@@ -19232,9 +19232,9 @@ void Unit::SendClearTarget()
 uint32 Unit::GetResistance(SpellSchoolMask mask) const
 {
     int32 resist = -1;
-    for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
-        if (mask & (1 << i) && (resist < 0 || resist > int32(GetResistance(SpellSchools(i)))))
-            resist = int32(GetResistance(SpellSchools(i)));
+    for (int i = static_cast<int>(SpellSchool::Normal); i < MAX_SPELL_SCHOOL; ++i)
+        if (mask & (1 << i) && (resist < 0 || resist > int32(GetResistance(SpellSchool(i)))))
+            resist = int32(GetResistance(SpellSchool(i)));
 
     // resist value will never be negative here
     return uint32(resist);

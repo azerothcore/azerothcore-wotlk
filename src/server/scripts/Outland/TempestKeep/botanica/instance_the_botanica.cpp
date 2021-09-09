@@ -156,16 +156,16 @@ public:
                 uint32 form = 0;
                 switch (GetFirstSchoolInMask(spellInfo->GetSchoolMask()))
                 {
-                    case SPELL_SCHOOL_FIRE:
+                    case SpellSchool::Fire:
                         form = SPELL_FIRE_FORM;
                         break;
-                    case SPELL_SCHOOL_FROST:
+                    case SpellSchool::Frost:
                         form = SPELL_FROST_FORM;
                         break;
-                    case SPELL_SCHOOL_ARCANE:
+                    case SpellSchool::Arcane:
                         form = SPELL_ARCANE_FORM;
                         break;
-                    case SPELL_SCHOOL_SHADOW:
+                    case SpellSchool::Shadow:
                         form = SPELL_SHADOW_FORM;
                         break;
                     default:

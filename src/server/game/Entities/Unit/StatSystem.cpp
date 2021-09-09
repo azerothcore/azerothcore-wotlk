@@ -41,7 +41,7 @@ inline bool _ModifyUInt32(bool apply, uint32& baseValue, int32& amount)
 
 void Unit::UpdateAllResistances()
 {
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    for (uint8 i = static_cast<uint8>(SpellSchool::Normal); i < MAX_SPELL_SCHOOL; ++i)
         UpdateResistances(i);
 }
 
@@ -152,7 +152,7 @@ void Player::ApplySpellPowerBonus(int32 amount, bool apply)
 
     // For speed just update for client
     ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, amount, apply);
-    for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
+    for (int i = static_cast<uint8>(SpellSchool::Holy); i < MAX_SPELL_SCHOOL; ++i)
         ApplyModInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, amount, apply);
 }
 
@@ -163,7 +163,7 @@ void Player::UpdateSpellDamageAndHealingBonus()
     // Get healing bonus for all schools
     SetStatInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_ALL));
     // Get damage bonus for all schools
-    for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
+    for (int i = static_cast<uint8>(SpellSchool::Holy); i < MAX_SPELL_SCHOOL; ++i)
         SetStatInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, SpellBaseDamageBonusDone(SpellSchoolMask(1 << i)));
 }
 
@@ -206,7 +206,7 @@ void Player::ApplySpellPenetrationBonus(int32 amount, bool apply)
 
 void Player::UpdateResistances(uint32 school)
 {
-    if (school > SPELL_SCHOOL_NORMAL)
+    if (school > static_cast<uint32>(SpellSchool::Normal))
     {
         // cant use GetTotalAuraModValue because of total pct multiplier :P
         float value = 0.0f;
@@ -225,7 +225,7 @@ void Player::UpdateResistances(uint32 school)
 
         value *= GetModifierValue(unitMod, TOTAL_PCT);
 
-        SetResistance(SpellSchools(school), int32(value));
+        SetResistance(SpellSchool(school), int32(value));
     }
     else
         UpdateArmor();
@@ -774,7 +774,7 @@ void Player::UpdateDodgePercentage()
 void Player::UpdateSpellCritChance(uint32 school)
 {
     // For normal school set zero crit chance
-    if (school == SPELL_SCHOOL_NORMAL)
+    if (school == static_cast<uint32>(SpellSchool::Normal))
     {
         SetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1, 0.0f);
         return;
@@ -822,7 +822,7 @@ void Player::UpdateSpellHitChances()
 
 void Player::UpdateAllSpellCritChances()
 {
-    for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    for (int i = static_cast<int>(SpellSchool::Normal); i < MAX_SPELL_SCHOOL; ++i)
         UpdateSpellCritChance(i);
 }
 
@@ -979,10 +979,10 @@ bool Creature::UpdateAllStats()
 
 void Creature::UpdateResistances(uint32 school)
 {
-    if (school > SPELL_SCHOOL_NORMAL)
+    if (school > static_cast<uint32>(SpellSchool::Normal))
     {
         float value = GetTotalAuraModValue(UnitMods(UNIT_MOD_RESISTANCE_START + school));
-        SetResistance(SpellSchools(school), int32(value));
+        SetResistance(SpellSchool(school), int32(value));
     }
     else
         UpdateArmor();

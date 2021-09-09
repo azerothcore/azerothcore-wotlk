@@ -3873,7 +3873,7 @@ void AuraEffect::HandleAuraModResistanceExclusive(AuraApplication const* aurApp,
 
     Unit* target = aurApp->GetTarget();
 
-    for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; x++)
+    for (int8 x = static_cast<uint8>(SpellSchool::Normal); x < MAX_SPELL_SCHOOL; x++)
     {
         if (GetMiscValue() & int32(1 << x))
         {
@@ -3883,7 +3883,7 @@ void AuraEffect::HandleAuraModResistanceExclusive(AuraApplication const* aurApp,
                 float value = float(GetAmount() - amount);
                 target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), BASE_VALUE, value, apply);
                 if (target->GetTypeId() == TYPEID_PLAYER)
-                    target->ApplyResistanceBuffModsMod(SpellSchools(x), aurApp->IsPositive(), value, apply);
+                    target->ApplyResistanceBuffModsMod(SpellSchool(x), aurApp->IsPositive(), value, apply);
             }
         }
     }
@@ -3896,13 +3896,13 @@ void AuraEffect::HandleAuraModResistance(AuraApplication const* aurApp, uint8 mo
 
     Unit* target = aurApp->GetTarget();
 
-    for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; x++)
+    for (int8 x = static_cast<int8>(SpellSchool::Normal); x < MAX_SPELL_SCHOOL; x++)
     {
         if (GetMiscValue() & int32(1 << x))
         {
             target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), TOTAL_VALUE, float(GetAmount()), apply);
             if (target->GetTypeId() == TYPEID_PLAYER || target->IsPet())
-                target->ApplyResistanceBuffModsMod(SpellSchools(x), GetAmount() > 0, (float)GetAmount(), apply);
+                target->ApplyResistanceBuffModsMod(SpellSchool(x), GetAmount() > 0, (float)GetAmount(), apply);
         }
     }
 }
@@ -3923,7 +3923,7 @@ void AuraEffect::HandleAuraModBaseResistancePCT(AuraApplication const* aurApp, u
     }
     else
     {
-        for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; x++)
+        for (int8 x = static_cast<uint8>(SpellSchool::Normal); x < MAX_SPELL_SCHOOL; x++)
         {
             if (GetMiscValue() & int32(1 << x))
                 target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), BASE_PCT, float(GetAmount()), apply);
@@ -3938,15 +3938,15 @@ void AuraEffect::HandleModResistancePercent(AuraApplication const* aurApp, uint8
 
     Unit* target = aurApp->GetTarget();
 
-    for (int8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
+    for (int8 i = static_cast<uint8>(SpellSchool::Normal); i < MAX_SPELL_SCHOOL; i++)
     {
         if (GetMiscValue() & int32(1 << i))
         {
             target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + i), TOTAL_PCT, float(GetAmount()), apply);
             if (target->GetTypeId() == TYPEID_PLAYER || target->IsPet())
             {
-                target->ApplyResistanceBuffModsPercentMod(SpellSchools(i), true, (float)GetAmount(), apply);
-                target->ApplyResistanceBuffModsPercentMod(SpellSchools(i), false, (float)GetAmount(), apply);
+                target->ApplyResistanceBuffModsPercentMod(SpellSchool(i), true, (float)GetAmount(), apply);
+                target->ApplyResistanceBuffModsPercentMod(SpellSchool(i), false, (float)GetAmount(), apply);
             }
         }
     }
@@ -3968,7 +3968,7 @@ void AuraEffect::HandleModBaseResistance(AuraApplication const* aurApp, uint8 mo
     }
     else
     {
-        for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
+        for (int i = static_cast<uint8>(SpellSchool::Normal); i < MAX_SPELL_SCHOOL; i++)
             if (GetMiscValue() & (1 << i))
                 target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + i), TOTAL_VALUE, float(GetAmount()), apply);
     }
@@ -4512,7 +4512,7 @@ void AuraEffect::HandleModSpellCritChanceShool(AuraApplication const* aurApp, ui
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    for (int school = SPELL_SCHOOL_NORMAL; school < MAX_SPELL_SCHOOL; ++school)
+    for (int school = static_cast<uint8>(SpellSchool::Normal); school < MAX_SPELL_SCHOOL; ++school)
         if (GetMiscValue() & (1 << school))
             target->ToPlayer()->UpdateSpellCritChance(school);
 }
@@ -4813,7 +4813,7 @@ void AuraEffect::HandleModDamageDone(AuraApplication const* aurApp, uint8 mode, 
     {
         if (GetAmount() > 0)
         {
-            for (uint32 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; i++)
+            for (uint32 i = static_cast<uint8>(SpellSchool::Holy); i < MAX_SPELL_SCHOOL; i++)
             {
                 if ((GetMiscValue() & (1 << i)) != 0)
                     target->ApplyModInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, GetAmount(), apply);
@@ -4821,7 +4821,7 @@ void AuraEffect::HandleModDamageDone(AuraApplication const* aurApp, uint8 mode, 
         }
         else
         {
-            for (uint32 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; i++)
+            for (uint32 i = static_cast<uint8>(SpellSchool::Holy); i < MAX_SPELL_SCHOOL; i++)
             {
                 if ((GetMiscValue() & (1 << i)) != 0)
                     target->ApplyModInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + i, GetAmount(), apply);

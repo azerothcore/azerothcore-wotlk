@@ -111,13 +111,13 @@ struct SpellSchoolImmune
 
 SpellSchoolImmune const spellSchoolImmunes[MAX_SPELL_SCHOOL] =
 {
-    { SPELL_SCHOOL_NORMAL, "SPELL_SCHOOL_NORMAL" },
-    { SPELL_SCHOOL_HOLY,   "SPELL_SCHOOL_HOLY"   },
-    { SPELL_SCHOOL_FIRE,   "SPELL_SCHOOL_FIRE"   },
-    { SPELL_SCHOOL_NATURE, "SPELL_SCHOOL_NATURE" },
-    { SPELL_SCHOOL_FROST,  "SPELL_SCHOOL_FROST"  },
-    { SPELL_SCHOOL_SHADOW, "SPELL_SCHOOL_SHADOW" },
-    { SPELL_SCHOOL_ARCANE, "SPELL_SCHOOL_ARCANE" },
+    { static_cast<uint32>(SpellSchool::Normal), "SpellSchool::Normal" },
+    { static_cast<uint32>(SpellSchool::Holy),   "SpellSchool::Holy"   },
+    { static_cast<uint32>(SpellSchool::Fire),   "SpellSchool::Fire"   },
+    { static_cast<uint32>(SpellSchool::Nature), "SpellSchool::Nature" },
+    { static_cast<uint32>(SpellSchool::Frost),  "SpellSchool::Frost"  },
+    { static_cast<uint32>(SpellSchool::Shadow), "SpellSchool::Shadow" },
+    { static_cast<uint32>(SpellSchool::Arcane), "SpellSchool::Arcane" },
 };
 
 class npc_commandscript : public CommandScript

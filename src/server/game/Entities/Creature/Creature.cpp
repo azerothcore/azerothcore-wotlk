@@ -177,7 +177,7 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
     for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
         m_spells[i] = 0;
 
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    for (uint8 i = static_cast<uint8>(SpellSchool::Normal); i < MAX_SPELL_SCHOOL; ++i)
         m_ProhibitSchoolTime[i] = 0;
 
     m_CreatureSpellCooldowns.clear();
@@ -469,16 +469,16 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         }
     }
 
-    SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
+    SetMeleeDamageSchool(SpellSchool(cInfo->dmgschool));
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(getLevel(), cInfo->unit_class);
     float armor = (float)stats->GenerateArmor(cInfo); // TODO: Why is this treated as uint32 when it's a float?
     SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, armor);
-    SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FIRE]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_NATURE]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_FROST,  BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FROST]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_SHADOW]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_ARCANE]));
+    SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[static_cast<int32>(SpellSchool::Holy)]));
+    SetModifierValue(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(cInfo->resistance[static_cast<int32>(SpellSchool::Fire)]));
+    SetModifierValue(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(cInfo->resistance[static_cast<int32>(SpellSchool::Nature)]));
+    SetModifierValue(UNIT_MOD_RESISTANCE_FROST,  BASE_VALUE, float(cInfo->resistance[static_cast<int32>(SpellSchool::Frost)]));
+    SetModifierValue(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(cInfo->resistance[static_cast<int32>(SpellSchool::Shadow)]));
+    SetModifierValue(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(cInfo->resistance[static_cast<int32>(SpellSchool::Arcane)]));
 
     SetCanModifyStats(true);
     UpdateAllStats();
@@ -1821,7 +1821,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
 
         SetUInt32Value(UNIT_NPC_FLAGS, cinfo->npcflag);
         ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
-        SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+        SetMeleeDamageSchool(SpellSchool(cinfo->dmgschool));
 
         Unit::setDeathState(ALIVE, despawn);
 
@@ -1943,7 +1943,7 @@ void Creature::LoadSpellTemplateImmunity()
     static uint32 const placeholderSpellId = std::numeric_limits<uint32>::max();
 
     // unapply template immunities (in case we're updating entry)
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i <= SPELL_SCHOOL_ARCANE; ++i)
+    for (uint8 i = static_cast<uint8>(SpellSchool::Normal); i <= static_cast<uint8>(SpellSchool::Arcane); ++i)
     {
         ApplySpellImmune(placeholderSpellId, IMMUNITY_SCHOOL, i, false);
     }
@@ -1956,7 +1956,7 @@ void Creature::LoadSpellTemplateImmunity()
 
     if (uint8 mask = GetCreatureTemplate()->SpellSchoolImmuneMask)
     {
-        for (uint8 i = SPELL_SCHOOL_NORMAL; i <= SPELL_SCHOOL_ARCANE; ++i)
+        for (uint8 i = static_cast<uint8>(SpellSchool::Normal); i <= static_cast<uint8>(SpellSchool::Arcane); ++i)
         {
             if (mask & (1 << i))
             {
@@ -2528,7 +2528,7 @@ void Creature::SetInCombatWithZone()
 
 void Creature::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
 {
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    for (uint8 i = static_cast<uint8>(SpellSchool::Normal); i < MAX_SPELL_SCHOOL; ++i)
         if (idSchoolMask & (1 << i))
             m_ProhibitSchoolTime[i] = World::GetGameTimeMS() + unTimeMs;
 }
@@ -2539,7 +2539,7 @@ bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
     if (!(cinfo && cinfo->flags_extra & CREATURE_FLAG_EXTRA_ALL_DIMINISH) && (isWorldBoss() || IsDungeonBoss()))
         return false;
 
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+    for (uint8 i = static_cast<uint8>(SpellSchool::Normal); i < MAX_SPELL_SCHOOL; ++i)
         if (idSchoolMask & (1 << i))
             if (m_ProhibitSchoolTime[i] >= World::GetGameTimeMS())
                 return true;

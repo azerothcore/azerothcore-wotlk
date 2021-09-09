@@ -579,7 +579,7 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.pickpocketLootId  = fields[42].GetUInt32();
     creatureTemplate.SkinLootId        = fields[43].GetUInt32();
 
-    for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
+    for (uint8 i = static_cast<uint8>(SpellSchool::Holy); i < MAX_SPELL_SCHOOL; ++i)
     {
         creatureTemplate.resistance[i] = 0;
     }
@@ -633,7 +633,7 @@ void ObjectMgr::LoadCreatureTemplateResistances()
         uint32 creatureID = fields[0].GetUInt32();
         uint8 school = fields[1].GetUInt8();
 
-        if (school == SPELL_SCHOOL_NORMAL || school >= MAX_SPELL_SCHOOL)
+        if (school == static_cast<uint8>(SpellSchool::Normal) || school >= MAX_SPELL_SCHOOL)
         {
             LOG_ERROR("sql.sql", "creature_template_resistance has resistance definitions for creature %u but this school %u doesn't exist", creatureID, school);
             continue;
@@ -1009,7 +1009,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     if (cInfo->dmgschool >= MAX_SPELL_SCHOOL)
     {
         LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid spell school value (%u) in `dmgschool`.", cInfo->Entry, cInfo->dmgschool);
-        const_cast<CreatureTemplate*>(cInfo)->dmgschool = SPELL_SCHOOL_NORMAL;
+        const_cast<CreatureTemplate*>(cInfo)->dmgschool = static_cast<uint32>(SpellSchool::Normal);
     }
 
     if (cInfo->BaseAttackTime == 0)

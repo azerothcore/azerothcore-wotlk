@@ -140,7 +140,7 @@ public:
     }
 
     [[nodiscard]] SpellSchoolMask GetMeleeDamageSchoolMask() const override { return m_meleeDamageSchoolMask; }
-    void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
+    void SetMeleeDamageSchool(SpellSchool school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << static_cast<uint16>(school)); }
 
     void _AddCreatureSpellCooldown(uint32 spell_id, uint32 end_time);
     void AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
