@@ -1,3 +1,0 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1630757583266839900');
-
-UPDATE `quest_template` SET `QuestType`=0 WHERE `ID` IN (7946,1559,7881,7882,7883,7884,7885,7939,7941);
