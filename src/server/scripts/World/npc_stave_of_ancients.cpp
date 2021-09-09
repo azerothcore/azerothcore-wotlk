@@ -838,6 +838,35 @@ public:
         npc_nelsonAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+            uint32 eventId = events.ExecuteEvent();
+
+            // Out of combat events
+            switch (eventId)
+            {
+                case EVENT_ENCOUNTER_START:
+                    me->MonsterSay(NELSON_SAY, LANG_UNIVERSAL, 0);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    break;
+                case EVENT_REVEAL:
+                    RevealForm();
+                    break;
+            }
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == EVENT_ENCOUNTER_START)
+            {
+                PrepareForEncounter();
+                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
+            }
+        }
     };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override

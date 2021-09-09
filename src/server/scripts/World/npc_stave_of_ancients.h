@@ -84,6 +84,9 @@ enum NPCNelson
     NELSON_GOSSIP_OPTION_TEXT                 = 14536, // creature_text.CreatureID   "A gnome? How pathetic. Face me, demon!"
     NELSON_SAY                                = 9782,  // broadcast_text.ID          "You dare challenge me? Prepare for an e..."
 
+    NELSON_NORMAL_ENTRY                       = 14536,  // creature_template.entry
+    NELSON_EVIL_ENTRY                         = 14530,  // creature_template.entry
+
     NELSON_HEAD                               = 18954  // item_template.entry
 };
 
@@ -102,7 +105,9 @@ struct NPCStaveQuestAI : public ScriptedAI
         { SIMONE_NORMAL_ENTRY,   2 },
         { SIMONE_EVIL_ENTRY,     2 },
         { PRECIOUS_NORMAL_ENTRY, 3 },
-        { PRECIOUS_EVIL_ENTRY,   3 }
+        { PRECIOUS_EVIL_ENTRY,   3 },
+        { NELSON_NORMAL_ENTRY,   4 },
+        { NELSON_EVIL_ENTRY,     4 }
     };
     std::map<int, std::map<std::string, int>> entryList = {
         {
@@ -121,6 +126,12 @@ struct NPCStaveQuestAI : public ScriptedAI
             3, {
                 {"normal", PRECIOUS_NORMAL_ENTRY},
                 {"evil", PRECIOUS_EVIL_ENTRY}
+            }
+        },
+        {
+            4, {
+                {"normal", NELSON_NORMAL_ENTRY},
+                {"evil", NELSON_EVIL_ENTRY}
             }
         }
     };
