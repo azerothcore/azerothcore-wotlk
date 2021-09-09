@@ -352,28 +352,26 @@ public:
                         {
                             if (Creature* argelmachAdd = instance->GetCreature(*itr))
                             {
-                                switch (argelmachAdd->GetEntry())
+                                if (argelmachAdd->GetEntry() == NPC_WRATH_HAMMER_CONSTRUCT)
                                 {
-                                    case NPC_WRATH_HAMMER_CONSTRUCT:
+                                    argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
+                                    argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
+                                    itr = ArgelmachAdds.erase(itr);
+                                }
+                                else if (argelmachAdd->GetEntry() == NPC_RAGEREAVER_GOLEM)
+                                {
+                                    if (argelmachAdd->IsWithinDist2d(argelmach, 10.f))
                                     {
                                         argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
                                         argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
                                         itr = ArgelmachAdds.erase(itr);
-                                        break;
                                     }
-                                    case NPC_RAGEREAVER_GOLEM:
-                                        if (argelmachAdd->IsWithinDist2d(argelmach, 10.f))
-                                        {
-                                            argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
-                                            argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
-                                            itr = ArgelmachAdds.erase(itr);
-                                        }
-                                        break;
-                                    default:
-                                    {
+                                    else
                                         ++itr;
-                                        break;
-                                    }
+                                }
+                                else
+                                {
+                                    ++itr;
                                 }
                             }
                             else
