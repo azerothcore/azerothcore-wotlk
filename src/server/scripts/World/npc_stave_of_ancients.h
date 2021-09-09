@@ -80,14 +80,24 @@ enum NPCPrecious
 
 enum NPCNelson
 {
+    NELSON_EVENT_DREADFUL_FRIGHT              = 7,
+    NELSON_EVENT_CREEPING_DOOM                = 8,
+
     NELSON_GOSSIP_TEXT                        = 7044,  // npc_text.ID                "I come to Silithus every year around th..."
     NELSON_GOSSIP_OPTION_TEXT                 = 14536, // creature_text.CreatureID   "A gnome? How pathetic. Face me, demon!"
     NELSON_SAY                                = 9782,  // broadcast_text.ID          "You dare challenge me? Prepare for an e..."
+    NELSON_DESPAWN_SAY                        = 9815,
 
-    NELSON_NORMAL_ENTRY                       = 14536,  // creature_template.entry
-    NELSON_EVIL_ENTRY                         = 14530,  // creature_template.entry
+    NELSON_NORMAL_ENTRY                       = 14536, // creature_template.entry
+    NELSON_EVIL_ENTRY                         = 14530, // creature_template.entry
+    CREEPING_DOOM_ENTRY                       = 14761,
 
-    NELSON_HEAD                               = 18954  // item_template.entry
+    NELSON_HEAD                               = 18954, // item_template.entry
+
+    NELSON_SPELL_SOUL_FLAME                   = 23272,
+    NELSON_SPELL_DREADFUL_FRIGHT              = 23275,
+    NELSON_SPELL_CRIPPLING_CLIP               = 23279,
+    NELSON_SPELL_CREEPING_DOOM                = 23589
 };
 
 struct NPCStaveQuestAI : public ScriptedAI

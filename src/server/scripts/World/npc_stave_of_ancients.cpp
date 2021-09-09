@@ -839,6 +839,60 @@ public:
 
         EventMap events;
 
+        void JustSummoned(Creature* summon) override
+        {
+            if (!summon)
+            {
+                return;
+            }
+
+            // Workaround for increasing the Summoned Guardian damage by using the template modifier value
+            summon->Unit::UpdateDamagePhysical(BASE_ATTACK);
+
+            if (me->IsInCombat())
+            {
+                summon->AI()->AttackStart(me->GetVictim());
+            }
+        }
+
+        void Reset() override
+        {
+            encounterStarted = false;
+            playerGUID.Clear();
+            events.Reset();
+
+            me->RemoveAllMinionsByEntry(CREEPING_DOOM_ENTRY);
+
+            if (me->HasAura(NELSON_SPELL_CRIPPLING_CLIP))
+            {
+                me->RemoveAura(NELSON_SPELL_CRIPPLING_CLIP);
+            }
+        }
+
+        void AttackStart(Unit* target) override
+        {
+            if (playerGUID.IsEmpty() && !InNormalForm())
+            {
+                StorePlayerGUID();
+            }
+
+            ScriptedAI::AttackStart(target);
+        }
+
+        void EnterCombat(Unit* /*victim*/) override
+        {
+            RevealForm();
+
+            if (!InNormalForm())
+            {
+                me->CastSpell(me, NELSON_SPELL_SOUL_FLAME, true);
+                events.ScheduleEvent(NELSON_EVENT_CREEPING_DOOM, 5000);
+                events.ScheduleEvent(NELSON_EVENT_DREADFUL_FRIGHT, 10000);
+                events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
+                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
@@ -857,6 +911,66 @@ public:
                     RevealForm();
                     break;
             }
+
+            if (UpdateVictim())
+            {
+                // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
+                if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
+                {
+                    playerGUID.Clear();
+                    EnterEvadeMode();
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                events.RepeatEvent(1000);
+                return;
+            }
+
+            // In combat events
+            switch (eventId)
+            {
+                case EVENT_RANGE_CHECK:
+                    if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
+                    {
+                        EnterEvadeMode();
+                    }
+                    else
+                    {
+                        events.RepeatEvent(2000);
+                    }
+                    break;
+                case EVENT_UNFAIR_FIGHT:
+                    if (!ValidThreatlist())
+                    {
+                        SetHomePosition();
+                        me->RemoveAllMinionsByEntry(CREEPING_DOOM_ENTRY);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->CombatStop(true);
+                        me->MonsterSay(NELSON_DESPAWN_SAY, LANG_UNIVERSAL, 0);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                        me->DespawnOrUnsummon(5000);
+                        break;
+                    }
+                    events.RepeatEvent(2000);
+                    break;
+                case NELSON_EVENT_CREEPING_DOOM:
+                    me->CastSpell(me->GetVictim(), NELSON_SPELL_CREEPING_DOOM, false);
+                    events.RepeatEvent(urand(10000, 12000));
+                    break;
+                case NELSON_EVENT_DREADFUL_FRIGHT:
+                    me->CastSpell(me->GetVictim(), NELSON_SPELL_DREADFUL_FRIGHT, false);
+                    events.RepeatEvent(urand(12000, 19000));
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
         }
 
         void DoAction(int32 action) override
