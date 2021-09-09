@@ -78,6 +78,15 @@ enum NPCPrecious
     PRECIOUS_EVIL_ENTRY                       = 14538
 };
 
+enum NPCNelson
+{
+    NELSON_GOSSIP_TEXT                        = 7044,  // npc_text.ID                "I come to Silithus every year around th..."
+    NELSON_GOSSIP_OPTION_TEXT                 = 14536, // creature_text.CreatureID   "A gnome? How pathetic. Face me, demon!"
+    NELSON_SAY                                = 9782,  // broadcast_text.ID          "You dare challenge me? Prepare for an e..."
+
+    NELSON_HEAD                               = 18954  // item_template.entry
+};
+
 struct NPCStaveQuestAI : public ScriptedAI
 {
     NPCStaveQuestAI(Creature *creature) : ScriptedAI(creature) { }

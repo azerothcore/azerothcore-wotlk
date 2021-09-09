@@ -823,9 +823,49 @@ public:
     }
 };
 
+class npc_nelson : public CreatureScript
+{
+public:
+    npc_nelson() : CreatureScript("npc_nelson") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_nelsonAI(creature);
+    }
+
+    struct npc_nelsonAI : public NPCStaveQuestAI
+    {
+        npc_nelsonAI(Creature *creature) : NPCStaveQuestAI(creature) { }
+
+        EventMap events;
+    };
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        CloseGossipMenuFor(player);
+        creature->AI()->DoAction(EVENT_ENCOUNTER_START);
+
+        return true;
+    }
+
+    bool OnGossipHello(Player *player, Creature * creature) override
+    {
+        if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(NELSON_HEAD, 1, true))
+        {
+            std::string const& gossipOptionText = sCreatureTextMgr->GetLocalizedChatString(NELSON_GOSSIP_OPTION_TEXT, 0, 0, 0, LOCALE_enUS);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipOptionText, GOSSIP_SENDER_MAIN, 0);
+        }
+
+        SendGossipMenuFor(player, NELSON_GOSSIP_TEXT, creature->GetGUID());
+
+        return true;
+    }
+};
+
 void AddSC_npc_stave_of_ancients()
 {
     new npc_artorius();
     new npc_precious();
     new npc_simone();
+    new npc_nelson();
 }
