@@ -13,19 +13,25 @@
 
 enum Creatures
 {
-    NPC_EMPEROR             = 9019,
-    NPC_PHALANX             = 9502,
-    NPC_ANGERREL            = 9035,
-    NPC_DOPEREL             = 9040,
-    NPC_HATEREL             = 9034,
-    NPC_VILEREL             = 9036,
-    NPC_SEETHREL            = 9038,
-    NPC_GLOOMREL            = 9037,
-    NPC_DOOMREL             = 9039,
-    NPC_MAGMUS              = 9938,
-    NPC_MOIRA               = 8929,
+    NPC_EMPEROR                 = 9019,
+    NPC_PHALANX                 = 9502,
+    NPC_ANGERREL                = 9035,
+    NPC_DOPEREL                 = 9040,
+    NPC_HATEREL                 = 9034,
+    NPC_VILEREL                 = 9036,
+    NPC_SEETHREL                = 9038,
+    NPC_GLOOMREL                = 9037,
+    NPC_DOOMREL                 = 9039,
+    NPC_MAGMUS                  = 9938,
+    NPC_MOIRA                   = 8929,
 
-    NPC_WATCHMAN_DOOMGRIP   = 9476,
+    NPC_WATCHMAN_DOOMGRIP       = 9476,
+
+    NPC_WEAPON_TECHNICIAN       = 8920,
+    NPC_DOOMFORGE_ARCANASMITH   = 8900,
+    NPC_RAGEREAVER_GOLEM        = 8906,
+    NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
+    NPC_GOLEM_LORD_ARGELMACH    = 8983
 };
 
 enum GameObjects
@@ -105,6 +111,9 @@ public:
         uint32 TombEventCounter;
         uint32 OpenedCoofers;
 
+        GuidList ArgelmachAdds;
+        ObjectGuid ArgelmachGUID;
+
         void Initialize() override
         {
             memset(&encounter, 0, sizeof(encounter));
@@ -154,6 +163,20 @@ public:
                     MagmusGUID = creature->GetGUID();
                     if (!creature->IsAlive())
                         HandleGameObject(GetGuidData(DATA_THRONE_DOOR), true); // if Magmus is dead open door to last boss
+                    break;
+                case NPC_WEAPON_TECHNICIAN:
+                case NPC_DOOMFORGE_ARCANASMITH:
+                case NPC_RAGEREAVER_GOLEM:
+                case NPC_WRATH_HAMMER_CONSTRUCT:
+                    if (creature->IsAlive())
+                    {
+                        ArgelmachAdds.push_back(creature->GetGUID());
+                    }
+                    break;
+                case NPC_GOLEM_LORD_ARGELMACH:
+                    ArgelmachGUID = creature->GetGUID();
+                    break;
+                default:
                     break;
             }
         }
@@ -232,6 +255,21 @@ public:
             }
         }
 
+        void OnUnitDeath(Unit* unit) override
+        {
+            switch (unit->GetEntry())
+            {
+                case NPC_WEAPON_TECHNICIAN:
+                case NPC_DOOMFORGE_ARCANASMITH:
+                case NPC_RAGEREAVER_GOLEM:
+                case NPC_WRATH_HAMMER_CONSTRUCT:
+                    ArgelmachAdds.remove(unit->GetGUID());
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void SetGuidData(uint32 type, ObjectGuid data) override
         {
             switch (type)
@@ -284,6 +322,57 @@ public:
                         if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
                             summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
                     }
+                    break;
+                case DATA_GOLEM_LORD_ARGELMACH_INIT:
+                {
+                    if (!ArgelmachAdds.empty())
+                    {
+                        if (Creature* argelmach = instance->GetCreature(ArgelmachGUID))
+                        {
+                            argelmach->AI()->SetData(DATA_GOLEM_LORD_ARGELMACH_INIT, IN_PROGRESS);
+
+                            for (ObjectGuid const& argelmachAddGUID : ArgelmachAdds)
+                            {
+                                if (Creature* argelmachAdd = instance->GetCreature(argelmachAddGUID))
+                                {
+                                    switch (argelmachAdd->GetEntry())
+                                    {
+                                        case NPC_WRATH_HAMMER_CONSTRUCT:
+                                            argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
+                                            break;
+                                        case NPC_RAGEREAVER_GOLEM:
+                                            if (argelmachAdd->IsWithinDist2d(argelmach, 10.f))
+                                            {
+                                                argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+                case DATA_GOLEM_LORD_ARGELMACH_ADDS:
+                {
+                    if (Creature* argelmach = instance->GetCreature(ArgelmachGUID))
+                    {
+                        for (ObjectGuid const& argelmachAddGUID : ArgelmachAdds)
+                        {
+                            if (Creature* argelmachAdd = instance->GetCreature(argelmachAddGUID))
+                            {
+                                if (!argelmachAdd->IsInCombat())
+                                {
+                                    argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+                default:
                     break;
             }
 
