@@ -368,23 +368,6 @@ public:
             Talk(SAY_DEATH);
             if( pInstance )
                 pInstance->SetData(TYPE_ANUBARAK, DONE);
-
-            Player* plr = nullptr;
-            if( !pInstance->instance->GetPlayers().isEmpty() )
-                plr = pInstance->instance->GetPlayers().begin()->GetSource();
-
-            if( !plr )
-                return;
-
-            // remove loot for the other faction (items are invisible for players, done in conditions), so corpse can be skinned
-            for( std::vector<LootItem>::iterator itr = me->loot.items.begin(); itr != me->loot.items.end(); ++itr )
-                if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                    if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )
-                    {
-                        (*itr).count = 0;
-                        (*itr).is_looted = true;
-                        --me->loot.unlootedCount;
-                    }
         }
 
         void KilledUnit(Unit* who) override

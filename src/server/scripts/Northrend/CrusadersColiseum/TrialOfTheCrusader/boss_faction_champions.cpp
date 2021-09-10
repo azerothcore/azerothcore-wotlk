@@ -2429,34 +2429,6 @@ public:
     };
 };
 
-class go_toc_champions_cache : public GameObjectScript
-{
-public:
-    go_toc_champions_cache() : GameObjectScript("go_toc_champions_cache") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        if (player->IsGameMaster())
-            return false;
-
-        if (!go->loot.items.size())
-            return false;
-
-        for(std::vector<LootItem>::iterator itr = go->loot.items.begin(); itr != go->loot.items.end(); ++itr)
-            if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && player->GetTeamId() != TEAM_ALLIANCE) )
-                    if (!((*itr).is_looted))
-                    {
-                        (*itr).count = 0;
-                        (*itr).is_looted = true;
-                        if (go->loot.unlootedCount)
-                            --go->loot.unlootedCount;
-                    }
-
-        return false;
-    }
-};
-
 class spell_faction_champion_warl_unstable_affliction : public SpellScriptLoader
 {
 public:
@@ -2507,6 +2479,5 @@ void AddSC_boss_faction_champions()
     new npc_toc_retro_paladin();
     new npc_toc_pet_warlock();
     new npc_toc_pet_hunter();
-    new go_toc_champions_cache();
     new spell_faction_champion_warl_unstable_affliction();
 }
