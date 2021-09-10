@@ -26,6 +26,7 @@ enum CommonEvents
 enum NPCArtorius
 {
     ARTORIUS_EVENT_DEMONIC_DOOM               = 5,
+    ARTORIUS_EVENT_DEMONIC_ENRAGE             = 6,
 
     ARTORIUS_GOSSIP_TEXT                      = 7045,   // npc_text.ID               "How wonderful to see another person in..."
     ARTORIUS_GOSSIP_OPTION_TEXT               = 14531,  // creature_text.CreatureID  "I know you as Artorius the Doombringer..."
@@ -37,6 +38,7 @@ enum NPCArtorius
 
     ARTORIUS_HEAD                             = 18955,   // item_template.entry
 
+    ARTORIUS_SPELL_DEMONIC_ENRAGE             = 23257,
     ARTORIUS_SPELL_DEMONIC_DOOM               = 23298,
     ARTORIUS_SPELL_STINGING_TRAUMA            = 23299
 };

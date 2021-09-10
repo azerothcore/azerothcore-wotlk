@@ -234,6 +234,7 @@ public:
             if (!InNormalForm())
             {
                 events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_DOOM, urand(3000, 5000));
+                events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_ENRAGE, urand(6000, 8000));
                 events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
                 events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
             }
@@ -306,6 +307,10 @@ public:
                         me->CastSpell(me->GetVictim(), ARTORIUS_SPELL_DEMONIC_DOOM, false);
                     }
                     events.RepeatEvent(urand(5000, 10000));
+                    break;
+                case ARTORIUS_EVENT_DEMONIC_ENRAGE:
+                    me->CastSpell(me, ARTORIUS_SPELL_DEMONIC_ENRAGE, false);
+                    events.RepeatEvent(urand(22000, 39000));
                     break;
             }
 
