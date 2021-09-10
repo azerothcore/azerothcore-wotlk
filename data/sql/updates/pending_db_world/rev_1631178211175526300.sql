@@ -8,13 +8,14 @@ INSERT INTO `smart_scripts` VALUES
 (8983,0,6,0,61,0,100,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - On set 31 data - say 0'),
 (8983,0,7,8,0,2,100,1,100,100,0,0,0,22,3,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - IC - set phase mask to 4'),
 (8983,0,8,9,61,0,100,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - IC - set react passive'),
-(8983,0,9,0,61,0,100,0,0,0,0,0,0,69,1,0,0,0,0,0,8,0,0,0,0,809.1331,22.008,-53.658,0,'Golem Lord Argelmach - On set 31 data - move to pos 1'),
-(8983,0,10,11,34,0,100,0,8,1,0,0,0,34,32,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - On pos 1 - set instance data 32'),
-(8983,0,11,0,61,0,100,0,0,0,0,0,0,22,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - On pos 1 - reset phase mask'),
-(8983,0,12,13,25,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - On reset - set react aggressive'),
-(8983,0,13,0,61,0,100,0,0,0,0,0,0,22,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - On reset - reset phase mask');
+(8983,0,9,0,61,0,100,0,0,0,0,0,0,69,1,0,0,0,0,0,8,0,0,0,0,809.1331,22.008,-53.658,3.16,'Golem Lord Argelmach - On set 31 data - move to pos 1'),
+(8983,0,10,0,34,0,100,0,8,1,0,0,0,34,32,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - On pos 1 - set instance data 32'),
+(8983,0,11,12,25,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - On reset - set react aggressive'),
+(8983,0,12,0,61,0,100,0,0,0,0,0,0,22,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - On reset - reset phase mask'),
+(8983,0,13,0,38,0,100,0,31,3,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Golem Lord Argelmach - On set 31 data - set phase mask to 1');
 
-UPDATE `smart_scripts` SET `event_phase_mask`=1 WHERE `entryorguid`=8983 AND `id` BETWEEN 0 AND 2;
+UPDATE `smart_scripts` SET `event_phase_mask`=0 WHERE `entryorguid`=8983 AND `id`=0;
+UPDATE `smart_scripts` SET `event_phase_mask`=1 WHERE `entryorguid`=8983 AND `id` BETWEEN 1 AND 2;
 
 DELETE FROM `creature_text` WHERE `CreatureId`=8983;
 INSERT INTO `creature_text` VALUES

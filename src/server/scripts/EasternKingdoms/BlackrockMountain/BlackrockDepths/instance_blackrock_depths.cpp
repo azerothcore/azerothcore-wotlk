@@ -72,7 +72,14 @@ public:
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         _boss->SetReactState(REACT_AGGRESSIVE);
-        _boss->AI()->AttackStart(_boss->GetVictim());
+        _boss->AI()->SetData(DATA_GOLEM_LORD_ARGELMACH_INIT, DONE);
+
+        if (Unit* victim = _boss->GetVictim())
+        {
+            _boss->SetTarget(victim->GetGUID());
+            _boss->GetMotionMaster()->MoveChase(victim);
+        }
+
         return true;
     }
 
@@ -189,7 +196,7 @@ public:
                 case NPC_DOOMFORGE_ARCANASMITH:
                 case NPC_RAGEREAVER_GOLEM:
                 case NPC_WRATH_HAMMER_CONSTRUCT:
-                    if (creature->IsAlive())
+                    if (creature->IsAlive() && creature->GetPositionZ() < -51.5f && creature->GetPositionZ() > -55.f)
                     {
                         ArgelmachAdds.push_back(creature->GetGUID());
                     }
@@ -348,7 +355,8 @@ public:
                 {
                     if (Creature* argelmach = instance->GetCreature(ArgelmachGUID))
                     {
-                        for (GuidList::const_iterator itr = ArgelmachAdds.begin(); itr != ArgelmachAdds.end();)
+                        GuidList adds = ArgelmachAdds;
+                        for (GuidList::const_iterator itr = adds.begin(); itr != adds.end();)
                         {
                             if (Creature* argelmachAdd = instance->GetCreature(*itr))
                             {
@@ -356,7 +364,7 @@ public:
                                 {
                                     argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
                                     argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
-                                    itr = ArgelmachAdds.erase(itr);
+                                    itr = adds.erase(itr);
                                 }
                                 else if (argelmachAdd->GetEntry() == NPC_RAGEREAVER_GOLEM)
                                 {
@@ -364,7 +372,7 @@ public:
                                     {
                                         argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
                                         argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
-                                        itr = ArgelmachAdds.erase(itr);
+                                        itr = adds.erase(itr);
                                     }
                                     else
                                         ++itr;
@@ -380,9 +388,15 @@ public:
                             }
                         }
 
-                        if (!ArgelmachAdds.empty())
+                        if (!adds.empty())
                         {
+                            argelmach->SetReactState(REACT_PASSIVE);
+                            argelmach->SetTarget();
                             argelmach->AI()->SetData(DATA_GOLEM_LORD_ARGELMACH_INIT, IN_PROGRESS);
+                        }
+                        else
+                        {
+                            argelmach->AI()->SetData(DATA_GOLEM_LORD_ARGELMACH_INIT, DONE);
                         }
                     }
                     break;
@@ -392,7 +406,7 @@ public:
                     if (Creature* argelmach = instance->GetCreature(ArgelmachGUID))
                     {
                         argelmach->HandleEmoteCommand(EMOTE_ONESHOT_SHOUT);
-                        argelmach->m_Events.AddEvent(new RestoreAttack(argelmach), argelmach->m_Events.CalculateTime(1000));
+                        argelmach->m_Events.AddEvent(new RestoreAttack(argelmach), argelmach->m_Events.CalculateTime(3000));
 
                         for (ObjectGuid const& argelmachAddGUID : ArgelmachAdds)
                         {
