@@ -157,6 +157,7 @@ struct NPCStaveQuestAI : public ScriptedAI
     void StorePlayerGUID();
     Player* GetGossipPlayer();
     bool IsAllowedEntry(uint32 /*entry*/);
+    bool UnitIsUnfair(Unit* unit);
     bool IsFairFight();
     bool ValidThreatlist();
     void SetHomePosition();

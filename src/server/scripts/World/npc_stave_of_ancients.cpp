@@ -61,12 +61,42 @@ bool NPCStaveQuestAI::IsAllowedEntry(uint32 entry)
     return isAllowed;
 }
 
+bool NPCStaveQuestAI::UnitIsUnfair(Unit* unit)
+{
+    if (!unit || playerGUID.IsEmpty())
+    {
+        return false;
+    }
+
+    if (unit->IsPlayer())
+    {
+        if (playerGUID != unit->GetGUID())
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (unit->GetOwnerGUID() != playerGUID)
+        {
+            // if a creature attacking isn't owned by the player its unfair
+            return true;
+        }
+        else if (!IsAllowedEntry(unit->GetEntry()))
+        {
+            // if not in the whitelist its unfair
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool NPCStaveQuestAI::IsFairFight()
 {
     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
     {
         Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-        bool allowedEntry = IsAllowedEntry(unit->GetEntry());
 
         if (!(*itr)->getThreat())
         {
@@ -75,26 +105,9 @@ bool NPCStaveQuestAI::IsFairFight()
             continue;
         }
 
-        if (unit->IsPlayer())
+        if (UnitIsUnfair(unit))
         {
-            if (playerGUID != unit->GetGUID())
-            {
-                // if there is another player in the threatlist its unfair
-                return false;
-            }
-        }
-        else
-        {
-            if (!playerGUID.IsEmpty() && unit->GetOwnerGUID() != playerGUID)
-            {
-                // if a creature attacking isn't owned by the player its unfair
-                return false;
-            }
-            else if (!allowedEntry)
-            {
-                // if not in the whitelist its unfair
-                return false;
-            }
+            return false;
         }
     }
 
