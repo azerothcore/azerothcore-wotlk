@@ -2807,7 +2807,7 @@ Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
     return pos;
 }
 
-void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
+bool WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
 {
     angle += GetOrientation();
     float destx, desty, destz;
@@ -2816,10 +2816,12 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     destz = pos.m_positionZ;
 
     if (!GetMap()->CheckCollisionAndGetValidCoords(this, pos.m_positionX, pos.m_positionY, pos.m_positionZ, destx, desty, destz, false))
-        return;
+        return false;
 
     pos.SetOrientation(GetOrientation());
     pos.Relocate(destx, desty, destz);
+
+    return true;
 }
 
 void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)

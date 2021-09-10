@@ -1371,8 +1371,10 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                 Position pos = dest._position;
 
-                // fix Z if player be fallin => if MovePositionToFirstCollision finna fail player gonna get relocated to start position
-                if (unitCaster->IsFalling())
+                bool result = unitCaster->MovePositionToFirstCollision(pos, dist, angle);
+
+                // try to fix Z if player be fallin and MovePositionToFirstCollision failed
+                if (unitCaster->IsFalling() && !result)
                 {
                     float groundZ        = 0;
                     float groundOrWaterZ = 0;
@@ -1385,7 +1387,6 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     }
                 }
 
-                unitCaster->MovePositionToFirstCollision(pos, dist, angle);
                 dest.Relocate(pos);
                 break;
             }
