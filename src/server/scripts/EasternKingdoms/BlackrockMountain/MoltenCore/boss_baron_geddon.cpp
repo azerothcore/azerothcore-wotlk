@@ -43,6 +43,7 @@ public:
 
     struct boss_baron_geddonAI : public BossAI
     {
+        bool boom = true;
         boss_baron_geddonAI(Creature* creature) : BossAI(creature, BOSS_BARON_GEDDON)
         {
         }
@@ -53,6 +54,7 @@ public:
             events.ScheduleEvent(EVENT_INFERNO, 45000);
             events.ScheduleEvent(EVENT_IGNITE_MANA, 30000);
             events.ScheduleEvent(EVENT_LIVING_BOMB, 35000);
+            boom = true;
         }
 
         void UpdateAI(uint32 diff) override
@@ -63,11 +65,12 @@ public:
             events.Update(diff);
 
             // If we are <2% hp cast Armageddon
-            if (!HealthAbovePct(2))
+            if (!HealthAbovePct(2) && boom)
             {
                 me->InterruptNonMeleeSpells(true);
                 DoCast(me, SPELL_ARMAGEDDON);
                 Talk(EMOTE_SERVICE);
+                boom = false;
                 return;
             }
 

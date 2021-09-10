@@ -148,7 +148,7 @@ public:
 
         bool IsInRoom(Unit* who)
         {
-            if (who->GetPositionX() > 2826 || who->GetPositionX() < 2723 || who->GetPositionY() > -3641 || who->GetPositionY() < -3736)
+            if (who->GetPositionX() > 2814 || who->GetPositionX() < 2723 || who->GetPositionY() > -3641 || who->GetPositionY() < -3730)
             {
                 if (who->GetGUID() == me->GetGUID())
                     EnterEvadeMode();
