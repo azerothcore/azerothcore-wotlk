@@ -855,10 +855,17 @@ public:
             }
         }
 
+        void JustDied(Unit* killer) override
+        {
+            // Prevent looting if killer doesn't have the quest
+            ClearLootIfUnfair(killer);
+        }
+
         void Reset() override
         {
             encounterStarted = false;
             playerGUID.Clear();
+            attackerGuids.clear();
             events.Reset();
 
             if (InNormalForm())
@@ -1000,6 +1007,11 @@ public:
                 me->AddAura(NELSON_SPELL_CRIPPLING_CLIP, me);
                 me->MonsterTextEmote(NELSON_WEAKNESS_EMOTE, 0);
             }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            StoreAttackerGuidValue(attacker);
         }
 
         void DoAction(int32 action) override
