@@ -166,7 +166,8 @@ public:
                 for (uint8 j = 0; j < 8; ++j)
                 {
                     float angle = M_PI * 2 / 8 * j;
-                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    Creature* cr = me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    cr->SetReactState(REACT_DEFENSIVE);
                 }
             }
             for (uint8 i = 6; i < 12; ++i)
@@ -175,7 +176,8 @@ public:
                 {
                     float dist = j == 2 ? 0.0f : 8.0f; // second in middle
                     float angle = SummonGroups[i].GetOrientation() + M_PI * 2 / 4 * j;
-                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonGroups[i].GetPositionX() + dist * cos(angle), SummonGroups[i].GetPositionY() + dist * sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    Creature* cr = me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonGroups[i].GetPositionX() + dist * cos(angle), SummonGroups[i].GetPositionY() + dist * sin(angle), SummonGroups[i].GetPositionZ(), SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    cr->SetReactState(REACT_DEFENSIVE);
                 }
             }
             for (uint8 i = 6; i < 12; ++i)
@@ -183,7 +185,8 @@ public:
                 for (uint8 j = 0; j < 1; ++j)
                 {
                     float angle = SummonGroups[i].GetOrientation() + M_PI;
-                    me->SummonCreature(NPC_SOUL_WEAVER, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * sin(angle), SummonGroups[i].GetPositionZ() + 0.5f, SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    Creature* cr = me->SummonCreature(NPC_SOUL_WEAVER, SummonGroups[i].GetPositionX() + 6 * cos(angle), SummonGroups[i].GetPositionY() + 6 * sin(angle), SummonGroups[i].GetPositionZ() + 0.5f, SummonGroups[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    cr->SetReactState(REACT_DEFENSIVE);
                 }
             }
         }
@@ -325,8 +328,29 @@ public:
             }
         }
 
+        //检测是否在房间内
+        bool IsInRoom(Unit* who)
+        {
+            if (who->GetPositionX() > 3783 || who->GetPositionX() < 3631 || who->GetPositionY() > -5028 || who->GetPositionY() < -5185)
+            {
+                if (who->GetGUID() == me->GetGUID())
+                    EnterEvadeMode();
+
+                return false;
+            }
+            return true;
+        }
+        //检测是否在房间内
+
+
         void UpdateAI(uint32 diff) override
         {
+            //调用检测
+            if (!IsInRoom(me))
+                return;
+            //调用检测
+
+
             if (!UpdateVictim())
                 return;
 
@@ -534,7 +558,13 @@ public:
             }
             else if (param == ACTION_SECOND_PHASE)
             {
-                if (!me->IsInCombat())
+//                me->SetReactState(REACT_AGGRESSIVE);//第二阶段转换为攻击状态
+//                if (Unit* target = SelectTargetFromPlayerList(100.0f))
+//                {
+//                    me->AI()->AttackStart(target);
+//                }
+//                DoMeleeAttackIfReady();
+                if (!me->IsInCombat())//P2小怪消失
                 {
                     me->DespawnOrUnsummon(500);
                 }
@@ -646,7 +676,13 @@ public:
                     events.RepeatEvent(15000);
                     break;
             }
-            DoMeleeAttackIfReady();
+
+
+            if (!me->HasReactState(REACT_DEFENSIVE)) //检测标记
+            {
+                DoMeleeAttackIfReady();
+            }
+
         }
     };
 };
