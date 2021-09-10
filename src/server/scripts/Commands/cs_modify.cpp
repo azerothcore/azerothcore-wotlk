@@ -526,8 +526,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        //if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
-            //target = handler->GetSession()->GetPlayer();
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -576,8 +576,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        //if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
-            //target = handler->GetSession()->GetPlayer();
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -623,8 +623,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        //if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
-            //target = handler->GetSession()->GetPlayer();
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -670,8 +670,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        //if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
-            //target = handler->GetSession()->GetPlayer();
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -717,8 +717,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        //if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
-            //target = handler->GetSession()->GetPlayer();
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
