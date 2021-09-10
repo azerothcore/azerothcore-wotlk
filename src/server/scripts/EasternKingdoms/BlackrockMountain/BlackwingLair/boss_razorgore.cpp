@@ -98,7 +98,7 @@ public:
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!secondPhase)
-                return; // damage = 0;
+                damage = 0;
         }
 
         void UpdateAI(uint32 diff) override
