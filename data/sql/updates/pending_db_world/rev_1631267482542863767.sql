@@ -13,4 +13,3 @@ UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5905);
 UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5906);
 UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5907);
 UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5911);
-
