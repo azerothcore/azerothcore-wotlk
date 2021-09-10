@@ -91,3 +91,10 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 -- Correct Nelson evil entry(Solenor the Slayer) speed_walk
 UPDATE `creature_template` SET `speed_walk` = 1 WHERE (`entry` = 14530);
+
+-- Reduce Creeping Doom speed and increase the damage
+UPDATE `creature_template`
+SET `speed_run` = 0.33,
+    `speed_walk` = 0.33,
+    `DamageModifier` = 2.25
+WHERE `entry` = 14761;
