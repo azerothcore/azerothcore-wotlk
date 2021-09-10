@@ -861,6 +861,11 @@ public:
             playerGUID.Clear();
             events.Reset();
 
+            if (InNormalForm())
+            {
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+
             me->RemoveAllMinionsByEntry(CREEPING_DOOM_ENTRY);
 
             if (me->HasAura(NELSON_SPELL_CRIPPLING_CLIP))
@@ -882,6 +887,7 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             RevealForm();
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
             if (!InNormalForm())
             {
