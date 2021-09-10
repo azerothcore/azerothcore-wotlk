@@ -556,30 +556,74 @@ struct Position
 
 class WorldLocation : public Position
 {
-    public:
-        explicit WorldLocation(uint32 _mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
-            : Position(x, y, z, o), m_mapId(_mapId) { }
+public:
+    explicit WorldLocation(uint32 _mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+        : Position(x, y, z, o), m_mapId(_mapId) { }
 
-        WorldLocation(uint32 mapId, Position const& position)
-            : Position(position), m_mapId(mapId) { }
+    WorldLocation(uint32 mapId, Position const& position)
+        : Position(position), m_mapId(mapId) { }
 
-        void WorldRelocate(WorldLocation const& loc) { m_mapId = loc.GetMapId(); Relocate(loc); }
-        void WorldRelocate(WorldLocation const* loc) { m_mapId = loc->GetMapId(); Relocate(loc); }
-        void WorldRelocate(uint32 mapId, Position const& pos) { m_mapId = mapId; Relocate(pos); }
-        void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+    void WorldRelocate(const WorldLocation& loc)
+    {
+        m_mapId = loc.GetMapId();
+        Relocate(loc);
+    }
+
+    void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+    {
+        m_mapId = mapId;
+        Relocate(x, y, z, o);
+    }
+
+    void SetMapId(uint32 mapId)
+    {
+        m_mapId = mapId;
+    }
+
+    [[nodiscard]] uint32 GetMapId() const
+    {
+        return m_mapId;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+        z = m_positionZ;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z, float& o) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+        z = m_positionZ;
+        o = m_orientation;
+    }
+
+    void GetWorldLocation(WorldLocation* location) const
+    {
+        if (location)
         {
-            m_mapId = mapId;
-            Relocate(x, y, z, o);
+            location->Relocate(m_positionX, m_positionY, m_positionZ, m_orientation);
+            location->SetMapId(m_mapId);
         }
+    }
 
-        WorldLocation GetWorldLocation() const
-        {
-            return *this;
-        }
+    [[nodiscard]] WorldLocation GetWorldLocation() const
+    {
+        return *this;
+    }
 
-        uint32 GetMapId() const { return m_mapId; }
-
-        uint32 m_mapId;
+    uint32 m_mapId;
 };
 
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYStreamer const& streamer);
@@ -658,81 +702,6 @@ struct MovementInfo
 
     void OutDebug();
 };
-
-#define MAPID_INVALID 0xFFFFFFFF
-
-class WorldLocation : public Position
-{
-public:
-    explicit WorldLocation(uint32 _mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
-        : Position(x, y, z, o), m_mapId(_mapId) { }
-
-    WorldLocation(uint32 mapId, Position const& position)
-        : Position(position), m_mapId(mapId) { }
-
-    void WorldRelocate(const WorldLocation& loc)
-    {
-        m_mapId = loc.GetMapId();
-        Relocate(loc);
-    }
-
-    void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
-    {
-        m_mapId = mapId;
-        Relocate(x, y, z, o);
-    }
-
-    void SetMapId(uint32 mapId)
-    {
-        m_mapId = mapId;
-    }
-
-    [[nodiscard]] uint32 GetMapId() const
-    {
-        return m_mapId;
-    }
-
-    void GetWorldLocation(uint32& mapId, float& x, float& y) const
-    {
-        mapId = m_mapId;
-        x = m_positionX;
-        y = m_positionY;
-    }
-
-    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z) const
-    {
-        mapId = m_mapId;
-        x = m_positionX;
-        y = m_positionY;
-        z = m_positionZ;
-    }
-
-    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z, float& o) const
-    {
-        mapId = m_mapId;
-        x = m_positionX;
-        y = m_positionY;
-        z = m_positionZ;
-        o = m_orientation;
-    }
-
-    void GetWorldLocation(WorldLocation* location) const
-    {
-        if (location)
-        {
-            location->Relocate(m_positionX, m_positionY, m_positionZ, m_orientation);
-            location->SetMapId(m_mapId);
-        }
-    }
-
-    [[nodiscard]] WorldLocation GetWorldLocation() const
-    {
-        return *this;
-    }
-
-    uint32 m_mapId;
-};
-
 
 template<class T>
 class GridObject
