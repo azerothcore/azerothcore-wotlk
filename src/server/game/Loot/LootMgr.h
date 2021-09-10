@@ -117,7 +117,7 @@ struct Loot;
 struct LootStoreItem
 {
     uint32  itemid;                                         // id of the item
-    uint32  reference;                                      // referenced TemplateleId
+    int32   reference;                                      // referenced TemplateleId
     float   chance;                                         // chance to drop for both quest and non-quest items, chance to be used for refs
     bool    needs_quest : 1;                                // quest drop (quest is required for item to drop)
     uint16  lootmode;
@@ -128,7 +128,7 @@ struct LootStoreItem
 
     // Constructor
     // displayid is filled in IsValid() which must be called after
-    LootStoreItem(uint32 _itemid, uint32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
+    LootStoreItem(uint32 _itemid, int32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
         : itemid(_itemid), reference(_reference), chance(_chance), needs_quest(_needs_quest),
           lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount)
     {}
