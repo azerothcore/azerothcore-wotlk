@@ -214,7 +214,6 @@ public:
         bool bAchievCheese{ true };
         bool bAchievGettingCold{ true };
         bool bAchievCoolestFriends{ true };
-        bool bAchievrare{true};
         uint16 addSpawnTimer{ 0 };
 
         // Used to make Hodir disengage whenever he leaves his room
@@ -229,7 +228,6 @@ public:
             bAchievCheese = true;
             bAchievGettingCold = true;
             bAchievCoolestFriends = true;
-            bAchievrare = true;
             me->SetSheath(SHEATH_STATE_MELEE);
 
             // Reset the spells cast after wipe
@@ -289,8 +287,6 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                             events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3000);
-                            if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
-                                hodir->AI()->SetData(3, 1);
                         }
                         break;
                 }
@@ -415,8 +411,7 @@ public:
                 case EVENT_HARD_MODE_MISSED:
                     {
                         Talk(TEXT_HM_MISS);
-                        me->CastSpell(me->FindNearestGameObject(Is25ManRaid() ? GO_HODIR_CHEST_HARD_HERO : GO_HODIR_CHEST_HARD, 400.0f), SPELL_SHATTER_CHEST, false);
-                        DoAction(EVENT_FAIL_HM);
+                        me->CastSpell(me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 400.0f), SPELL_SHATTER_CHEST, false);
                     }
                     break;
                 case EVENT_DESPAWN_CHEST:
@@ -558,17 +553,15 @@ public:
             if (value)
                 switch (id)
                 {
-                case 1:
-                    bAchievCheese = false;
-                    break;
-                case 2:
-                    bAchievGettingCold = false;
-                    break;
-                case 3:
-                    bAchievrare = false;
-                case 4:
-                    bAchievCoolestFriends = false;
-                    break;
+                    case 1:
+                        bAchievCheese = false;
+                        break;
+                    case 2:
+                        bAchievGettingCold = false;
+                        break;
+                    case 4:
+                        bAchievCoolestFriends = false;
+                        break;
                 }
         }
 
@@ -576,14 +569,12 @@ public:
         {
             switch (id)
             {
-            case 1:
-                return (bAchievCheese ? 1 : 0);
-            case 2:
-                return (bAchievGettingCold ? 1 : 0);
-            case 3:
-                return (bAchievrare ? 1 : 0);
-            case 4:
-                return (bAchievCoolestFriends ? 1 : 0);
+                case 1:
+                    return (bAchievCheese ? 1 : 0);
+                case 2:
+                    return (bAchievGettingCold ? 1 : 0);
+                case 4:
+                    return (bAchievCoolestFriends ? 1 : 0);
             }
             return 0;
         }
@@ -1107,7 +1098,7 @@ public:
                     break;
                 case EVENT_MAGE_TOASTY_FIRE:
                     me->CastSpell(me, SPELL_MAGE_CONJURE_TOASTY_FIRE, false);
-                    events.RepeatEvent(9000);
+                    events.RepeatEvent(10000);
                     break;
                 case EVENT_MAGE_MELT_ICE:
                     {

@@ -37,13 +37,10 @@ enum ThorimSpells
     SPELL_SIF_TRANSFORM                     = 64778,
     SPELL_SIF_CHANNEL_HOLOGRAM              = 64324,
     SPELL_FROSTBOLT                         = 62601,
-    SPELL_FROSTBOLT_10                      = 62583,
     SPELL_FROSTBOLT_VALLEY                  = 62604,
-    SPELL_FROSTBOLT_VALLEY_10               = 62580,
     SPELL_BLIZZARD_10                       = 62577,
     SPELL_BLIZZARD_25                       = 62603,
     SPELL_FROST_NOVA                        = 62605,
-    SPELL_FROST_NOVA_10                     = 62597,
 
     // DARK RUNE ACOLYTE
     SPELL_GREATER_HEAL_10                   = 62334,
@@ -894,7 +891,7 @@ public:
                     events.ScheduleEvent(EVENT_SIF_BLIZZARD, 15000);
                     break;
                 case EVENT_SIF_FROSTBOLT_VALLEY:
-                    me->CastSpell(me, Is25ManRaid() ? SPELL_FROSTBOLT_VALLEY : SPELL_FROSTBOLT_VALLEY_10, false);
+                    me->CastSpell(me, SPELL_FROSTBOLT_VALLEY, false);
                     events.RepeatEvent(13000);
                     return;
                 case EVENT_SIF_BLIZZARD:
@@ -910,17 +907,17 @@ public:
                     return;
                 case EVENT_SIF_FROST_NOVA_CAST:
                     _allowCast = true;
-                    me->CastSpell(me, Is25ManRaid() ? SPELL_FROST_NOVA : SPELL_FROST_NOVA_10, false);
+                    me->CastSpell(me, SPELL_FROST_NOVA, false);
                     return;
-                }
+            }
 
-                // has casting check before event select (return in events)
-                if (_allowCast)
-                    if (Player* target = SelectTargetFromPlayerList(70))
-                    {
-                        me->CastSpell(target, Is25ManRaid() ? SPELL_FROSTBOLT : SPELL_FROSTBOLT_10, false);
-                        me->StopMoving();
-                    }
+            // has casting check before event select (return in events)
+            if (_allowCast)
+                if (Player* target = SelectTargetFromPlayerList(70))
+                {
+                    me->CastSpell(target, SPELL_FROSTBOLT, false);
+                    me->StopMoving();
+                }
         }
     };
 };

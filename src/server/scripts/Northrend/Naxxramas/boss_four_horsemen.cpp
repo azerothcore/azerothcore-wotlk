@@ -166,11 +166,6 @@ public:
         {
             if (me->GetExactDist(2535.1f, -2968.7f, 241.3f) > 100.0f)
             {
-                const Map::PlayerList& pl = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                    if (Player* p = itr->GetSource())
-                        if (p->IsAlive() && !p->IsGameMaster() && p->GetExactDist(2535.1f, -2968.7f, 241.3f) < 200.0f && !p->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
-                            Unit::Kill(me, p);//秒杀BUG玩家
                 EnterEvadeMode();
                 return false;
             }

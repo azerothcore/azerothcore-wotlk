@@ -1499,28 +1499,21 @@ public:
                     events.RepeatEvent(1750);
                     break;
                 case EVENT_SPELL_SPINNING_UP:
-                    events.RepeatEvent(45000); // 45000
+                    events.RepeatEvent(45000);
                     if (Player* p = SelectTargetFromPlayerList(80.0f))
                     {
                         float angle = me->GetAngle(p);
 
                         if (Unit* vehicle = me->GetVehicleBase())
                         {
-                            me->SetFacingToObject(p);
-                            // me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_SPELL_CAST_OMNI);
-                            // me->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST_OMNI);
-                            // vehicle->SendMeleeAttackStop();
-                            vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_SPELL_CAST_OMNI);
-                            vehicle->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST_OMNI);
-                            vehicle->SetOrientation(0); // fixP4 orient
-                            vehicle->CastSpell(vehicle, 14821, true);
+                            vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                            vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+                            angle -= vehicle->GetOrientation();
                         }
 
                         spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
-                        spinningUpTimer       = 1500;
-
-                        me->SetOrientation(angle);
-                        p->CastSpell(p, 34400, true);
+                        spinningUpTimer = 1500;
+                        me->SetFacingTo(angle);
                         me->CastSpell(p, SPELL_SPINNING_UP, true);
                         events.RescheduleEvent((Phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14500);
                     }
