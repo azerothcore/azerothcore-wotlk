@@ -851,6 +851,7 @@ public:
         npc_nelsonAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
+        bool shouldDespawn;
 
         void JustSummoned(Creature* summon) override
         {
@@ -874,9 +875,20 @@ public:
             ClearLootIfUnfair(killer);
         }
 
+        void SummonedCreatureDies(Creature* /*summon*/, Unit* killer) override
+        {
+            // This should trigger the despawn event when a another player or unit
+            // kills a creeping doom unit
+            if (UnitIsUnfair(killer))
+            {
+                shouldDespawn = true;
+            }
+        }
+
         void Reset() override
         {
             encounterStarted = false;
+            shouldDespawn = false;
             playerGUID.Clear();
             attackerGuids.clear();
             events.Reset();
@@ -977,7 +989,7 @@ public:
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
-                    if (!ValidThreatlist())
+                    if (!ValidThreatlist() || shouldDespawn)
                     {
                         SetHomePosition();
                         me->RemoveAllMinionsByEntry(CREEPING_DOOM_ENTRY);
