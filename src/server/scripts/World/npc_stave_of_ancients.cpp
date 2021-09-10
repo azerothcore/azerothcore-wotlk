@@ -885,7 +885,11 @@ public:
 
             if (!InNormalForm())
             {
-                me->CastSpell(me, NELSON_SPELL_SOUL_FLAME, true);
+                if (encounterStarted)
+                {
+                    me->CastSpell(me, NELSON_SPELL_SOUL_FLAME, true);
+                }
+
                 events.ScheduleEvent(NELSON_EVENT_CREEPING_DOOM, 5000);
                 events.ScheduleEvent(NELSON_EVENT_DREADFUL_FRIGHT, 10000);
                 events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
@@ -971,6 +975,25 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        {
+            if (InNormalForm())
+            {
+                return;
+            }
+
+            if (me->HasAura(NELSON_SPELL_SOUL_FLAME) && me->HasAura(NELSON_WEAKNESS_FROST_TRAP))
+            {
+                me->RemoveAura(NELSON_SPELL_SOUL_FLAME);
+            }
+
+            if (!me->HasAura(NELSON_SPELL_CRIPPLING_CLIP) && Spell->Id == NELSON_WEAKNESS_WING_CLIP)
+            {
+                me->AddAura(NELSON_SPELL_CRIPPLING_CLIP, me);
+                me->MonsterTextEmote(NELSON_WEAKNESS_EMOTE, 0);
+            }
         }
 
         void DoAction(int32 action) override

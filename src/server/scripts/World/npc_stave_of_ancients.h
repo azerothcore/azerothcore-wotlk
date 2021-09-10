@@ -86,13 +86,17 @@ enum NPCNelson
     NELSON_GOSSIP_TEXT                        = 7044,  // npc_text.ID                "I come to Silithus every year around th..."
     NELSON_GOSSIP_OPTION_TEXT                 = 14536, // creature_text.CreatureID   "A gnome? How pathetic. Face me, demon!"
     NELSON_SAY                                = 9782,  // broadcast_text.ID          "You dare challenge me? Prepare for an e..."
-    NELSON_DESPAWN_SAY                        = 9815,
+    NELSON_WEAKNESS_EMOTE                     = 9785,  // breadcast_text.ID          "%s is immobilized."
+    NELSON_DESPAWN_SAY                        = 9815,  // breadcast_text.ID          "Only a fool would remain in this battle..."
 
     NELSON_NORMAL_ENTRY                       = 14536, // creature_template.entry
     NELSON_EVIL_ENTRY                         = 14530, // creature_template.entry
     CREEPING_DOOM_ENTRY                       = 14761,
 
     NELSON_HEAD                               = 18954, // item_template.entry
+
+    NELSON_WEAKNESS_WING_CLIP                 = 2974,
+    NELSON_WEAKNESS_FROST_TRAP                = 13810,
 
     NELSON_SPELL_SOUL_FLAME                   = 23272,
     NELSON_SPELL_DREADFUL_FRIGHT              = 23275,
