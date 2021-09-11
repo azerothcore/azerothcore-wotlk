@@ -108,7 +108,10 @@ enum NPCFranklin
 {
     FRANKLIN_GOSSIP_TEXT                        = 7043,  // npc_text.ID                "Lava? Pay no mind to all of that, frien..."
     FRANKLIN_GOSSIP_OPTION_TEXT                 = 14529, // creature_text.CreatureID   "So you are Klinfran the Crazed? Sad, I ..."
-    FRANKLIN_SAY                                = 9772,  // broadcast_text.ID          "I shall enjoy this, hunter. I shall enj..."
+    FRANKLIN_SAY                                = 9772,  // broadcast_text.ID          "I shall enjoy this, $c."
+
+    FRANKLIN_NORMAL_ENTRY                       = 14529,
+    FRANKLIN_EVIL_ENTRY                         = 14534,
 
     FRANKLIN_HEAD                               = 18953  // item_template.entry
 };
@@ -130,7 +133,9 @@ struct NPCStaveQuestAI : public ScriptedAI
         { PRECIOUS_NORMAL_ENTRY, 3 },
         { PRECIOUS_EVIL_ENTRY,   3 },
         { NELSON_NORMAL_ENTRY,   4 },
-        { NELSON_EVIL_ENTRY,     4 }
+        { NELSON_EVIL_ENTRY,     4 },
+        { FRANKLIN_NORMAL_ENTRY, 5 },
+        { FRANKLIN_EVIL_ENTRY,   5 }
     };
     std::map<int, std::map<std::string, int>> entryList = {
         {
@@ -155,6 +160,12 @@ struct NPCStaveQuestAI : public ScriptedAI
             4, {
                 {"normal", NELSON_NORMAL_ENTRY},
                 {"evil", NELSON_EVIL_ENTRY}
+            }
+        },
+        {
+            5, {
+                {"normal", FRANKLIN_NORMAL_ENTRY},
+                {"evil", FRANKLIN_EVIL_ENTRY}
             }
         }
     };

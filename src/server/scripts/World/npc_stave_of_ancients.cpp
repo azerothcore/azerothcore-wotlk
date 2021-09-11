@@ -1088,10 +1088,31 @@ public:
 
         EventMap events;
 
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+            uint32 eventId = events.ExecuteEvent();
+
+            // Out of combat events
+            switch (eventId)
+            {
+                case EVENT_ENCOUNTER_START:
+                    me->MonsterSay(FRANKLIN_SAY, LANG_UNIVERSAL, GetGossipPlayer());
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    break;
+                case EVENT_REVEAL:
+                    RevealForm();
+                    break;
+            }
+        }
+
         void ScheduleEncounterStart(ObjectGuid playerGUID)
         {
             PrepareForEncounter();
             gossipPlayerGUID = playerGUID;
+            events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
         }
     };
 
