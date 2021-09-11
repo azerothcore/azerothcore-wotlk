@@ -83,7 +83,7 @@ public:
         {
             if (waypointId == 7)
             {
-                Unit* target = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_JAINAPROUDMOORE));
+                Unit* target = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_JAINAPROUDMOORE));
                 if (target && target->IsAlive())
                     me->AddThreat(target, 0.0f);
             }
@@ -121,12 +121,16 @@ public:
 
             //Return since we have no target
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             if (SwarmTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                {
                     DoCast(target, SPELL_CARRION_SWARM);
+                }
 
                 SwarmTimer = urand(45000, 60000);
                 Talk(SAY_SWARM);
@@ -178,12 +182,12 @@ public:
         npc_towering_infernalAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-            AnetheronGUID = instance->GetData64(DATA_ANETHERON);
+            AnetheronGUID = instance->GetGuidData(DATA_ANETHERON);
         }
 
         uint32 ImmolationTimer;
         uint32 CheckTimer;
-        uint64 AnetheronGUID;
+        ObjectGuid AnetheronGUID;
         InstanceScript* instance;
 
         void Reset() override
@@ -209,7 +213,9 @@ public:
 
         {
             if (me->IsWithinDist(who, 50) && !me->IsInCombat() && me->IsValidAttackTarget(who))
+            {
                 AttackStart(who);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -219,7 +225,7 @@ public:
                 if (AnetheronGUID)
                 {
                     Creature* boss = ObjectAccessor::GetCreature(*me, AnetheronGUID);
-                    if (!boss || (boss && boss->isDead()))
+                    if (!boss || boss->isDead())
                     {
                         me->setDeathState(JUST_DIED);
                         me->RemoveCorpse();
@@ -232,7 +238,9 @@ public:
 
             //Return since we have no target
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             if (ImmolationTimer <= diff)
             {

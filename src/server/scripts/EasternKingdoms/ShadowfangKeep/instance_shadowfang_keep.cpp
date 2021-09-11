@@ -7,13 +7,13 @@
 #include "shadowfang_keep.h"
 #include "TemporarySummon.h"
 
-enum Creatures
-{
-    NPC_ASH                 = 3850,
-    NPC_ADA                 = 3849,
-    NPC_ARCHMAGE_ARUGAL     = 4275,
-    NPC_ARUGAL_VOIDWALKER   = 4627
-};
+//enum Creatures
+//{
+//    NPC_ASH                 = 3850,
+//    NPC_ADA                 = 3849,
+//    NPC_ARCHMAGE_ARUGAL     = 4275,
+//    NPC_ARUGAL_VOIDWALKER   = 4627
+//};
 
 class instance_shadowfang_keep : public InstanceMapScript
 {
@@ -40,15 +40,15 @@ public:
             {
                 case GO_COURTYARD_DOOR:
                     if (_encounters[TYPE_COURTYARD] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
                 case GO_SORCERER_DOOR:
                     if (_encounters[TYPE_FENRUS_THE_DEVOURER] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
                 case GO_ARUGAL_DOOR:
                     if (_encounters[TYPE_WOLF_MASTER_NANDOS] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
             }
         }

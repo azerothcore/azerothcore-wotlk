@@ -99,13 +99,13 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void setphase(short phase)
+        void setphase(short newPhase)
         {
             Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummoner() : nullptr;
             if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            switch (phase)
+            switch (newPhase)
             {
                 case 1:
                     me->MonsterWhisper("You think that you can get rid of me through meditation?", summoner->ToPlayer());
@@ -258,11 +258,6 @@ public:
 ## npc_plaguehound_tracker
 ######*/
 
-enum Plaguehound
-{
-    QUEST_SNIFF_OUT_ENEMY        = 11253
-};
-
 class npc_plaguehound_tracker : public CreatureScript
 {
 public:
@@ -274,8 +269,7 @@ public:
 
         void Reset() override
         {
-            uint64 summonerGUID = 0;
-
+            ObjectGuid summonerGUID;
             if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if (summoner->GetTypeId() == TYPEID_PLAYER)

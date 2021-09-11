@@ -2,7 +2,6 @@
 * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-* Rescripted By Lee (Talamortis)
 */
 
 #include "karazhan.h"
@@ -87,11 +86,11 @@ public:
     struct netherspite_infernalAI : public ScriptedAI
     {
         netherspite_infernalAI(Creature* creature) : ScriptedAI(creature),
-            HellfireTimer(0), CleanupTimer(0), malchezaar(0), point(nullptr) { }
+            HellfireTimer(0), CleanupTimer(0), point(nullptr) { }
 
         uint32 HellfireTimer;
         uint32 CleanupTimer;
-        uint64 malchezaar;
+        ObjectGuid malchezaar;
         InfernalPoint* point;
 
         void Reset() override { }
@@ -176,9 +175,9 @@ public:
         uint32 InfernalCleanupTimer;
         uint32 phase;
         uint32 enfeeble_health[5];
-        uint64 enfeeble_targets[5];
+        ObjectGuid enfeeble_targets[5];
 
-        std::vector<uint64> infernals;
+        GuidVector infernals;
         std::vector<InfernalPoint*> positions;
 
         void Initialize()
@@ -194,7 +193,7 @@ public:
             phase = 1;
             clearweapons();
             positions.clear();
-            instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
         }
 
         void clearweapons()
@@ -216,7 +215,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-            instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
             if (Creature*  Axe = me->FindNearestCreature(MALCHEZARS_AXE, 100.0f))
             {
                 Axe->DespawnOrUnsummon();
@@ -227,7 +226,7 @@ public:
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
-            instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), false);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
         }
 
         void SummonAxes()
@@ -278,14 +277,13 @@ public:
                 Unit* target = ObjectAccessor::GetUnit(*me, enfeeble_targets[i]);
                 if (target && target->IsAlive())
                     target->SetHealth(enfeeble_health[i]);
-                enfeeble_targets[i] = 0;
+                enfeeble_targets[i].Clear();
                 enfeeble_health[i] = 0;
             }
         }
 
         void SummonInfernal()
         {
-            InfernalPoint* point = 0;
             Position pos;
 
             if ((me->GetMapId() == 532))
@@ -294,7 +292,7 @@ public:
             }
             else
             {
-                point = acore::Containers::SelectRandomContainerElement(positions);
+                InfernalPoint* point = Acore::Containers::SelectRandomContainerElement(positions);
                 pos.Relocate(point->x, point->y, INFERNAL_Z, frand(0.0f, float(M_PI * 2)));
             }
 
@@ -360,14 +358,16 @@ public:
             {
                 if (SWPainTimer <= diff)
                 {
-                    Unit* target = nullptr;
-                    if (phase == 1)
-                        target = me->GetVictim();                  // Target the Tank
-                    else                                          // anyone but the tank
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+
+                    // if phase == 1 target the tank, otherwise anyone but the tank
+                    Unit* target = phase == 1
+                            ? me->GetVictim()
+                            : SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
 
                     if (target)
+                    {
                         DoCast(target, SPELL_SW_PAIN);
+                    }
 
                     SWPainTimer = 20000;
                 }
@@ -411,8 +411,7 @@ public:
             {
                 if (AmplifyDamageTimer <= diff)
                 {
-                    Unit* target = nullptr;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
 
                     if (target)
                     {
@@ -421,7 +420,9 @@ public:
                     }
                 }
                 else
+                {
                     AmplifyDamageTimer -= diff;
+                }
             }
 
             if (phase != 3)
@@ -483,9 +484,11 @@ public:
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
             {
                 if (me->GetVictim())
+                {
                     DoModifyThreatPercent(me->GetVictim(), -100);
-                if (target)
-                    me->AddThreat(target, 1000000.0f);
+                }
+
+                me->AddThreat(target, 1000000.0f);
             }
         }
 

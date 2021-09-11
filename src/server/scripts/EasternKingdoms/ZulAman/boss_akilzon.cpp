@@ -46,14 +46,15 @@ enum Says
     SAY_DEATH                   = 5
 };
 
-enum Misc
-{
-    NPC_SOARING_EAGLE           = 24858,
-    SE_LOC_X_MAX                = 400,
-    SE_LOC_X_MIN                = 335,
-    SE_LOC_Y_MAX                = 1435,
-    SE_LOC_Y_MIN                = 1370
-};
+constexpr auto NPC_SOARING_EAGLE = 24858;
+
+//enum Misc
+//{
+//    SE_LOC_X_MAX                = 400,
+//    SE_LOC_X_MIN                = 335,
+//    SE_LOC_Y_MAX                = 1435,
+//    SE_LOC_Y_MIN                = 1370
+//};
 
 enum Events
 {
@@ -76,17 +77,19 @@ public:
     {
         boss_akilzonAI(Creature* creature) : BossAI(creature, DATA_AKILZONEVENT)
         {
-            memset(BirdGUIDs, 0, sizeof(BirdGUIDs));
         }
 
         void Reset() override
         {
             _Reset();
 
-            TargetGUID = 0;
-            CloudGUID = 0;
-            CycloneGUID = 0;
-            memset(BirdGUIDs, 0, sizeof(BirdGUIDs));
+            TargetGUID.Clear();
+            CloudGUID.Clear();
+            CycloneGUID.Clear();
+
+            for (uint8 i = 0; i < 8; ++i)
+                BirdGUIDs[i].Clear();
+
             StormCount = 0;
             isRaining = false;
 
@@ -147,22 +150,11 @@ public:
                 for (uint8 i = 2; i < StormCount; ++i)
                     bp0 *= 2;
 
-                CellCoord p(acore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
-                Cell cell(p);
-                cell.SetNoCreate();
-
                 std::list<Unit*> tempUnitMap;
 
-                {
-                    acore::AnyAoETargetUnitInObjectRangeCheck u_check(me, me, SIZE_OF_GRIDS);
-                    acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck> searcher(me, tempUnitMap, u_check);
-
-                    TypeContainerVisitor<acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
-                    TypeContainerVisitor<acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
-
-                    cell.Visit(p, world_unit_searcher, *me->GetMap(), *me, SIZE_OF_GRIDS);
-                    cell.Visit(p, grid_unit_searcher, *me->GetMap(), *me, SIZE_OF_GRIDS);
-                }
+                Acore::AnyAoETargetUnitInObjectRangeCheck u_check(me, me, SIZE_OF_GRIDS);
+                Acore::UnitListSearcher<Acore::AnyAoETargetUnitInObjectRangeCheck> searcher(me, tempUnitMap, u_check);
+                Cell::VisitAllObjects(me, searcher, SIZE_OF_GRIDS);
 
                 // deal damage
                 for (std::list<Unit*>::const_iterator i = tempUnitMap.begin(); i != tempUnitMap.end(); ++i)
@@ -200,7 +192,7 @@ public:
                 StormCount = 0; // finish
                 events.ScheduleEvent(EVENT_SUMMON_EAGLES, 5000);
                 me->InterruptNonMeleeSpells(false);
-                CloudGUID = 0;
+                CloudGUID.Clear();
                 if (Cloud)
                     Unit::DealDamage(Cloud, Cloud, Cloud->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 SetWeather(WEATHER_STATE_FINE, 0.0f);
@@ -353,10 +345,10 @@ public:
         }
 
     private:
-        uint64 BirdGUIDs[8];
-        uint64 TargetGUID;
-        uint64 CycloneGUID;
-        uint64 CloudGUID;
+        ObjectGuid BirdGUIDs[8];
+        ObjectGuid TargetGUID;
+        ObjectGuid CycloneGUID;
+        ObjectGuid CloudGUID;
         uint8  StormCount;
         bool   isRaining;
     };
@@ -378,13 +370,13 @@ public:
 
         uint32 EagleSwoop_Timer;
         bool arrived;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
 
         void Reset() override
         {
             EagleSwoop_Timer = urand(5000, 10000);
             arrived = true;
-            TargetGUID = 0;
+            TargetGUID.Clear();
             me->SetDisableGravity(true);
         }
 
@@ -402,7 +394,7 @@ public:
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, TargetGUID))
                     DoCast(target, SPELL_EAGLE_SWOOP, true);
-                TargetGUID = 0;
+                TargetGUID.Clear();
                 me->SetSpeed(MOVE_RUN, 1.2f);
                 EagleSwoop_Timer = urand(5000, 10000);
             }

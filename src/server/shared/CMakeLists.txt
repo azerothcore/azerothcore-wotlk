@@ -23,8 +23,10 @@ target_include_directories(shared
     ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(shared
+  PRIVATE
+    acore-core-interface
   PUBLIC
-    common)
+    database)
 
 set_target_properties(shared
   PROPERTIES

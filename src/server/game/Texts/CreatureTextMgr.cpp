@@ -76,13 +76,13 @@ void CreatureTextMgr::LoadCreatureTexts()
     mTextMap.clear(); // for reload case
     mTextRepeatMap.clear(); //reset all currently used temp texts
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEXT);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEXT);
     PreparedQueryResult result = WorldDatabase.Query(stmt);
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 ceature texts. DB table `creature_texts` is empty.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 ceature texts. DB table `creature_texts` is empty.");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -152,8 +152,8 @@ void CreatureTextMgr::LoadCreatureTexts()
         ++textCount;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u creature texts for %lu creatures in %u ms", textCount, mTextMap.size(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u creature texts for %lu creatures in %u ms", textCount, mTextMap.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void CreatureTextMgr::LoadCreatureTextLocales()
@@ -174,19 +174,17 @@ void CreatureTextMgr::LoadCreatureTextLocales()
         uint32 CreatureId           = fields[0].GetUInt32();
         uint32 GroupId              = fields[1].GetUInt8();
         uint32 ID                   = fields[2].GetUInt8();
-        std::string LocaleName      = fields[3].GetString();
-        std::string Text            = fields[4].GetString();
 
-        CreatureTextLocale& data = mLocaleTextMap[CreatureTextId(CreatureId, GroupId, ID)];
-        LocaleConstant locale = GetLocaleByName(LocaleName);
+        LocaleConstant locale = GetLocaleByName(fields[3].GetString());
         if (locale == LOCALE_enUS)
             continue;
 
-        ObjectMgr::AddLocaleString(Text, locale, data.Text);
+        CreatureTextLocale& data = mLocaleTextMap[CreatureTextId(CreatureId, GroupId, ID)];
+        ObjectMgr::AddLocaleString(fields[4].GetString(), locale, data.Text);
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u Creature Text Locale in %u ms", uint32(mLocaleTextMap.size()), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u Creature Text Locale in %u ms", uint32(mLocaleTextMap.size()), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject const* whisperTarget /*= nullptr*/, ChatMsg msgType /*= CHAT_MSG_ADDON*/, Language language /*= LANG_ADDON*/, CreatureTextRange range /*= TEXT_RANGE_NORMAL*/, uint32 sound /*= 0*/, TeamId teamId /*= TEAM_NEUTRAL*/, bool gmOnly /*= false*/, Player* srcPlr /*= nullptr*/)
@@ -205,7 +203,8 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject 
     CreatureTextHolder::const_iterator itr = textHolder.find(textGroup);
     if (itr == textHolder.end())
     {
-        LOG_ERROR("sql.sql", "CreatureTextMgr: Could not find TextGroup %u for Creature(%s) GuidLow %u Entry %u. Ignoring.", uint32(textGroup), source->GetName().c_str(), source->GetGUIDLow(), source->GetEntry());
+        LOG_ERROR("sql.sql", "CreatureTextMgr: Could not find TextGroup %u for Creature %s (%s). Ignoring.",
+            uint32(textGroup), source->GetName().c_str(), source->GetGUID().ToString().c_str());
         return 0;
     }
 
@@ -413,7 +412,8 @@ void CreatureTextMgr::SetRepeatId(Creature* source, uint8 textGroup, uint8 id)
     if (std::find(repeats.begin(), repeats.end(), id) == repeats.end())
         repeats.push_back(id);
     else
-        LOG_ERROR("sql.sql", "CreatureTextMgr: TextGroup %u for Creature(%s) GuidLow %u Entry %u, id %u already added", uint32(textGroup), source->GetName().c_str(), source->GetGUIDLow(), source->GetEntry(), uint32(id));
+        LOG_ERROR("sql.sql", "CreatureTextMgr: TextGroup %u for Creature %s (%s), id %u already added",
+            uint32(textGroup), source->GetName().c_str(), source->GetGUID().ToString().c_str(), uint32(id));
 }
 
 CreatureTextRepeatIds CreatureTextMgr::GetRepeatGroup(Creature* source, uint8 textGroup)
@@ -439,9 +439,7 @@ bool CreatureTextMgr::TextExist(uint32 sourceEntry, uint8 textGroup)
     CreatureTextMap::const_iterator sList = mTextMap.find(sourceEntry);
     if (sList == mTextMap.end())
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("entities.unit", "CreatureTextMgr::TextExist: Could not find Text for Creature (entry %u) in 'creature_text' table.", sourceEntry);
-#endif
         return false;
     }
 
@@ -449,9 +447,7 @@ bool CreatureTextMgr::TextExist(uint32 sourceEntry, uint8 textGroup)
     CreatureTextHolder::const_iterator itr = textHolder.find(textGroup);
     if (itr == textHolder.end())
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("entities.unit", "CreatureTextMgr::TextExist: Could not find TextGroup %u for Creature (entry %u).", uint32(textGroup), sourceEntry);
-#endif
         return false;
     }
 

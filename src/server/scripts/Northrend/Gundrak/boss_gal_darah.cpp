@@ -60,7 +60,7 @@ public:
         }
 
         uint8 phaseCounter;
-        std::set<uint64> impaledList;
+        GuidSet impaledList;
 
         void Reset() override
         {
@@ -265,7 +265,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* /*player*/, Unit* target) override
+    bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;

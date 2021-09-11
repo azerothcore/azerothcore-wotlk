@@ -7,11 +7,8 @@
 #include "Creature.h"
 #include "GameGraveyard.h"
 #include "Language.h"
-#include "Object.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
-#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -96,8 +93,16 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                             RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, 10, teamId);
                         if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
                         {
-                            SendMessageToAll(teamId == TEAM_ALLIANCE ? LANG_BG_AB_A_NEAR_VICTORY : LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-                            PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY);
+                            if (teamId == TEAM_ALLIANCE)
+                            {
+                                SendMessageToAll(LANG_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                                PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_ALLIANCE);
+                            }
+                            else
+                            {
+                                SendMessageToAll(LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                                PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_HORDE);
+                            }
                         }
 
                         UpdateWorldState(teamId == TEAM_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE, m_TeamScores[teamId]);
@@ -117,7 +122,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
 
 void BattlegroundAB::StartingEventCloseDoors()
 {
-    for (uint32 obj = BG_AB_OBJECT_BANNER_NEUTRAL; obj < BG_AB_DYNAMIC_NODES_COUNT * BG_AB_OBJECTS_PER_NODE; ++obj)
+    for (uint32 obj = BG_AB_OBJECT_BANNER_NEUTRAL; obj < static_cast<uint8>(BG_AB_DYNAMIC_NODES_COUNT) * BG_AB_OBJECTS_PER_NODE; ++obj)
         SpawnBGObject(obj, RESPAWN_ONE_DAY);
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT * 3; ++i)
         SpawnBGObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + i, RESPAWN_ONE_DAY);
@@ -294,9 +299,9 @@ void BattlegroundAB::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
 
     if (_capturePointInfo[node]._state == BG_AB_NODE_STATE_NEUTRAL)
     {
-        player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node, 0);
+        player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node);
         UpdatePlayerScore(player, SCORE_BASES_ASSAULTED, 1);
-        _capturePointInfo[node]._state = BG_AB_NODE_STATE_ALLY_CONTESTED + player->GetTeamId();
+        _capturePointInfo[node]._state = static_cast<uint8>(BG_AB_NODE_STATE_ALLY_CONTESTED) + player->GetTeamId();
         _capturePointInfo[node]._ownerTeamId = TEAM_NEUTRAL;
         _bgEvents.RescheduleEvent(BG_AB_EVENT_CAPTURE_STABLE + node, BG_AB_FLAG_CAPTURING_TIME);
         sound = BG_AB_SOUND_NODE_CLAIMED;
@@ -307,9 +312,9 @@ void BattlegroundAB::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     {
         if (!_capturePointInfo[node]._captured)
         {
-            player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node, 0);
+            player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node);
             UpdatePlayerScore(player, SCORE_BASES_ASSAULTED, 1);
-            _capturePointInfo[node]._state = BG_AB_NODE_STATE_ALLY_CONTESTED + player->GetTeamId();
+            _capturePointInfo[node]._state = static_cast<uint8>(BG_AB_NODE_STATE_ALLY_CONTESTED) + player->GetTeamId();
             _capturePointInfo[node]._ownerTeamId = TEAM_NEUTRAL;
             _bgEvents.RescheduleEvent(BG_AB_EVENT_CAPTURE_STABLE + node, BG_AB_FLAG_CAPTURING_TIME);
             message = LANG_BG_AB_NODE_ASSAULTED;
@@ -317,7 +322,7 @@ void BattlegroundAB::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
         else
         {
             UpdatePlayerScore(player, SCORE_BASES_DEFENDED, 1);
-            _capturePointInfo[node]._state = BG_AB_NODE_STATE_ALLY_OCCUPIED + player->GetTeamId();
+            _capturePointInfo[node]._state = static_cast<uint8>(BG_AB_NODE_STATE_ALLY_OCCUPIED) + player->GetTeamId();
             _capturePointInfo[node]._ownerTeamId = player->GetTeamId();
             _bgEvents.CancelEvent(BG_AB_EVENT_CAPTURE_STABLE + node);
             NodeOccupied(node); // after setting team owner
@@ -327,11 +332,11 @@ void BattlegroundAB::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     }
     else
     {
-        player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node, 0);
+        player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node);
         UpdatePlayerScore(player, SCORE_BASES_ASSAULTED, 1);
         NodeDeoccupied(node); // before setting team owner to neutral
 
-        _capturePointInfo[node]._state = BG_AB_NODE_STATE_ALLY_CONTESTED + player->GetTeamId();
+        _capturePointInfo[node]._state = static_cast<uint8>(BG_AB_NODE_STATE_ALLY_CONTESTED) + player->GetTeamId();
 
         ApplyPhaseMask();
         _bgEvents.RescheduleEvent(BG_AB_EVENT_CAPTURE_STABLE + node, BG_AB_FLAG_CAPTURING_TIME);
@@ -379,14 +384,14 @@ bool BattlegroundAB::SetupBattleground()
     AddSpiritGuide(BG_AB_SPIRIT_HORDE, BG_AB_SpiritGuidePos[BG_AB_SPIRIT_HORDE][0], BG_AB_SpiritGuidePos[BG_AB_SPIRIT_HORDE][1], BG_AB_SpiritGuidePos[BG_AB_SPIRIT_HORDE][2], BG_AB_SpiritGuidePos[BG_AB_SPIRIT_HORDE][3], TEAM_HORDE);
 
     for (uint32 i = BG_AB_OBJECT_BANNER_NEUTRAL; i < BG_AB_OBJECT_MAX; ++i)
-        if (BgObjects[i] == 0)
+        if (!BgObjects[i])
         {
             LOG_ERROR("sql.sql", "BatteGroundAB: Failed to spawn some object Battleground not created!");
             return false;
         }
 
     for (uint32 i = BG_AB_SPIRIT_ALIANCE; i <= BG_AB_SPIRIT_HORDE; ++i)
-        if (BgCreatures[i] == 0)
+        if (!BgCreatures[i])
         {
             LOG_ERROR("sql.sql", "BatteGroundAB: Failed to spawn spirit guides Battleground not created!");
             return false;
@@ -428,7 +433,7 @@ void BattlegroundAB::EndBattleground(TeamId winnerTeamId)
 
 GraveyardStruct const* BattlegroundAB::GetClosestGraveyard(Player* player)
 {
-    GraveyardStruct const* entry = sGraveyard->GetGraveyard(BG_AB_GraveyardIds[BG_AB_SPIRIT_ALIANCE + player->GetTeamId()]);
+    GraveyardStruct const* entry = sGraveyard->GetGraveyard(BG_AB_GraveyardIds[static_cast<uint8>(BG_AB_SPIRIT_ALIANCE) + player->GetTeamId()]);
     GraveyardStruct const* nearestEntry = entry;
 
     float pX = player->GetPositionX();

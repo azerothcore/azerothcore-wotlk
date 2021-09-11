@@ -14,11 +14,9 @@ Script Data End */
 
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
 #include "World.h"
-#include "WorldSession.h"
 
 // Ours
 class npc_steam_powered_auctioneer : public CreatureScript
@@ -136,7 +134,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _aquanosGUID = 0;
+            _aquanosGUID.Clear();
         }
 
         void SetData(uint32 type, uint32 /*data*/) override
@@ -221,7 +219,7 @@ public:
 
     private:
         EventMap _events;
-        uint64 _aquanosGUID;
+        ObjectGuid _aquanosGUID;
         uint8 _lCount;
         uint32 _lSource;
 
@@ -313,7 +311,7 @@ public:
         npc_archmage_landalockAI(Creature* creature) : ScriptedAI(creature)
         {
             _switchImageTimer = MINUTE * IN_MILLISECONDS;
-            _summonGUID = 0;
+            _summonGUID.Clear();
         }
 
         uint32 GetImageEntry(uint32 QuestId)
@@ -372,7 +370,7 @@ public:
                         continue;
 
                     uint32 newEntry = GetImageEntry(questId);
-                    if (GUID_ENPART(_summonGUID) != newEntry)
+                    if (_summonGUID.GetEntry() != newEntry)
                     {
                         if (Creature* image = ObjectAccessor::GetCreature(*me, _summonGUID))
                             image->DespawnOrUnsummon();
@@ -387,7 +385,7 @@ public:
         }
     private:
         uint32 _switchImageTimer;
-        uint64 _summonGUID;
+        ObjectGuid _summonGUID;
     };
 };
 
@@ -540,12 +538,12 @@ public:
 
             if (PlayerInDalaranList.empty())
                 return nullptr;
-            return acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
+            return Acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
         }
 
         void SendMailToPlayer(Player* player)
         {
-            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             int16 deliverDelay = irand(MAIL_DELIVER_DELAY_MIN, MAIL_DELIVER_DELAY_MAX);
             MailDraft(MAIL_MINIGOB_ENTRY, true).SendMailTo(trans, MailReceiver(player), MailSender(MAIL_CREATURE, me->GetEntry()), MAIL_CHECK_MASK_NONE, deliverDelay);
             CharacterDatabase.CommitTransaction(trans);

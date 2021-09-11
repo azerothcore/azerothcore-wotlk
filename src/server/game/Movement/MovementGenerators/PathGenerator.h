@@ -9,6 +9,7 @@
 
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
+#include "MapDefines.h"
 #include "MMapFactory.h"
 #include "MMapManager.h"
 #include "MoveSplineInitArgs.h"
@@ -58,7 +59,7 @@ class PathGenerator
         [[nodiscard]] bool IsWalkableClimb(float const* v1, float const* v2) const;
         [[nodiscard]] bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const;
         [[nodiscard]] static bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight);
-        [[nodiscard]] bool IsWaterPath(Movement::PointsArray _pathPoints) const;
+        [[nodiscard]] bool IsWaterPath(Movement::PointsArray pathPoints) const;
         [[nodiscard]] bool IsSwimmableSegment(float const* v1, float const* v2, bool checkSwim = true) const;
         [[nodiscard]] bool IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim = true) const;
         [[nodiscard]] static float GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight);
@@ -110,6 +111,12 @@ class PathGenerator
             return len;
         }
 
+        void Clear()
+        {
+            _polyLength = 0;
+            _pathPoints.clear();
+        }
+
     private:
         dtPolyRef _pathPolyRefs[MAX_PATH_LENGTH];   // array of detour polygon references
         uint32 _polyLength;                         // number of polygons in the path
@@ -137,12 +144,6 @@ class PathGenerator
         void SetEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; _endPosition = point; }
         void SetActualEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; }
         void NormalizePath();
-
-        void Clear()
-        {
-            _polyLength = 0;
-            _pathPoints.clear();
-        }
 
         bool InRange(G3D::Vector3 const& p1, G3D::Vector3 const& p2, float r, float h) const;
         float Dist3DSqr(G3D::Vector3 const& p1, G3D::Vector3 const& p2) const;

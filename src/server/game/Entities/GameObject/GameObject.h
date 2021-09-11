@@ -662,8 +662,8 @@ union GameObjectValue
 
 struct GameObjectLocale
 {
-    StringVector Name;
-    StringVector CastBarCaption;
+    std::vector<std::string> Name;
+    std::vector<std::string> CastBarCaption;
 };
 
 // `gameobject_addon` table
@@ -738,7 +738,7 @@ public:
     void RemoveFromWorld() override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
-    virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
+    virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
     void Update(uint32 p_time) override;
     [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
     [[nodiscard]] GameObjectTemplateAddon const* GetTemplateAddon() const;
@@ -748,24 +748,26 @@ public:
     [[nodiscard]] bool IsTransport() const;
     [[nodiscard]] bool IsDestructibleBuilding() const;
 
-    [[nodiscard]] uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+    [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
-    void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
-    void SetWorldRotation(G3D::Quat const& rot);
+    void SetLocalRotationAngles(float z_rot, float y_rot, float x_rot);
+    void SetLocalRotation(G3D::Quat const& rot);
     void SetTransportPathRotation(float qx, float qy, float qz, float qw);
-    [[nodiscard]] int64 GetPackedWorldRotation() const { return m_packedRotation; }
+    [[nodiscard]] G3D::Quat const& GetLocalRotation() const { return m_localRotation; }
+    [[nodiscard]] int64 GetPackedLocalRotation() const { return m_packedRotation; }
+    [[nodiscard]] G3D::Quat GetWorldRotation() const;
 
     // overwrite WorldObject function for proper name localization
     [[nodiscard]] std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
 
-    void SaveToDB();
-    void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
-    bool LoadFromDB(uint32 guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
-    bool LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap = true);
+    void SaveToDB(bool saveAddon = false);
+    void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool saveAddon = false);
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
+    bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true);
     void DeleteFromDB();
 
-    void SetOwnerGUID(uint64 owner)
+    void SetOwnerGUID(ObjectGuid owner)
     {
         // Owner already found and different than expected owner - remove object from old owner
         if (owner && GetOwnerGUID() && GetOwnerGUID() != owner)
@@ -773,9 +775,9 @@ public:
             ABORT();
         }
         m_spawnedByDefault = false;                     // all object with owner is despawned after delay
-        SetUInt64Value(OBJECT_FIELD_CREATED_BY, owner);
+        SetGuidValue(OBJECT_FIELD_CREATED_BY, owner);
     }
-    [[nodiscard]] uint64 GetOwnerGUID() const { return GetUInt64Value(OBJECT_FIELD_CREATED_BY); }
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
     [[nodiscard]] Unit* GetOwner() const;
 
     void SetSpellId(uint32 id)
@@ -812,8 +814,8 @@ public:
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
     void Refresh();
     void Delete();
-    void getFishLoot(Loot* loot, Player* loot_owner);
-    void getFishLootJunk(Loot* loot, Player* loot_owner);
+    void GetFishLoot(Loot* loot, Player* loot_owner);
+    void GetFishLootJunk(Loot* loot, Player* loot_owner);
     [[nodiscard]] GameobjectTypes GetGoType() const { return GameobjectTypes(GetByteValue(GAMEOBJECT_BYTES_1, 1)); }
     void SetGoType(GameobjectTypes type) { SetByteValue(GAMEOBJECT_BYTES_1, 1, type); }
     [[nodiscard]] GOState GetGoState() const { return GOState(GetByteValue(GAMEOBJECT_BYTES_1, 0)); }
@@ -822,7 +824,7 @@ public:
     void SetGoArtKit(uint8 artkit);
     [[nodiscard]] uint8 GetGoAnimProgress() const { return GetByteValue(GAMEOBJECT_BYTES_1, 3); }
     void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
-    static void SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid = 0);
+    static void SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType lowguid = 0);
 
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;
     void EnableCollision(bool enable);
@@ -840,11 +842,11 @@ public:
     void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
     void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-    void AddToSkillupList(uint32 PlayerGuidLow) { m_SkillupList.push_back(PlayerGuidLow); }
-    [[nodiscard]] bool IsInSkillupList(uint32 PlayerGuidLow) const
+    void AddToSkillupList(ObjectGuid playerGuid) { m_SkillupList.push_back(playerGuid); }
+    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const
     {
-        for (unsigned int i : m_SkillupList)
-            if (i == PlayerGuidLow)
+        for (ObjectGuid const& guid : m_SkillupList)
+            if (guid == playerGuid)
                 return true;
 
         return false;
@@ -863,7 +865,8 @@ public:
 
     [[nodiscard]] Player* GetLootRecipient() const;
     [[nodiscard]] Group* GetLootRecipientGroup() const;
-    void SetLootRecipient(Unit* unit);
+    void SetLootRecipient(Creature* creature);
+    void SetLootRecipient(Map* map);
     bool IsLootAllowedFor(Player const* player) const;
     [[nodiscard]] bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
@@ -945,14 +948,23 @@ public:
     [[nodiscard]] float GetStationaryZ() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
     [[nodiscard]] float GetStationaryO() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
 
-    float GetInteractionDistance();
+    [[nodiscard]] float GetInteractionDistance() const;
 
     void UpdateModelPosition();
+
+    [[nodiscard]] bool IsAtInteractDistance(Position const& pos, float radius) const;
+    [[nodiscard]] bool IsAtInteractDistance(Player const* player, SpellInfo const* spell = nullptr) const;
+
+    [[nodiscard]] bool IsWithinDistInMap(Player const* player) const;
+    using WorldObject::IsWithinDistInMap;
+
+    [[nodiscard]] SpellInfo const* GetSpellForLock(Player const* player) const;
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
 protected:
     bool AIM_Initialize();
+    GameObjectModel* CreateModel();
     void UpdateModel();                                 // updates model in case displayId were changed
     uint32      m_spellId;
     time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
@@ -961,27 +973,27 @@ protected:
     bool        m_spawnedByDefault;
     uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
     // For traps this: spell casting cooldown, for doors/buttons: reset time.
-    std::list<uint32> m_SkillupList;
+    GuidList m_SkillupList;
 
-    uint32 m_ritualOwnerGUIDLow;                              // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
-    std::set<uint64> m_unique_users;
+    ObjectGuid m_ritualOwnerGUID;                       // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
+    GuidSet m_unique_users;
     uint32 m_usetimes;
 
-    typedef std::map<uint32, uint64> ChairSlotAndUser;
+    typedef std::map<uint32, ObjectGuid> ChairSlotAndUser;
     ChairSlotAndUser ChairListSlots;
 
-    uint32 m_DBTableGuid;                               ///< For new or temporary gameobjects is 0 for saved it is lowguid
+    ObjectGuid::LowType m_spawnId;                            ///< For new or temporary gameobjects is 0 for saved it is lowguid
     GameObjectTemplate const* m_goInfo;
     GameObjectData const* m_goData;
     GameObjectValue m_goValue;
     bool m_allowModifyDestructibleBuilding;
 
     int64 m_packedRotation;
-    G3D::Quat m_worldRotation;
+    G3D::Quat m_localRotation;
     Position m_stationaryPosition;
 
-    uint64 m_lootRecipient;
-    uint32 m_lootRecipientGroup;
+    ObjectGuid m_lootRecipient;
+    ObjectGuid::LowType m_lootRecipientGroup;
     uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
     uint32 m_lootGenerationTime;
 private:
@@ -992,7 +1004,7 @@ private:
     void UpdatePackedRotation();
 
     //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
-    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const override
+    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/, bool /*useBoundingRadius = true*/) const override
     {
         //! Following check does check 3d distance
         dist2compare += obj->GetObjectSize();

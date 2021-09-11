@@ -26,7 +26,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
     float y = unit->GetPositionY();
     float z = unit->GetPositionZ();
 
-    Map const* map = unit->GetBaseMap();
+    Map const* map = unit->GetMap();
 
     bool is_water_ok, is_land_ok;
     _InitSpecific(unit, is_water_ok, is_land_ok);
@@ -37,10 +37,10 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
         float wanderY = y + (wander_distance * (float)rand_norm() - wander_distance / 2);
 
         // prevent invalid coordinates generation
-        acore::NormalizeMapCoord(wanderX);
-        acore::NormalizeMapCoord(wanderY);
+        Acore::NormalizeMapCoord(wanderX);
+        Acore::NormalizeMapCoord(wanderY);
 
-        float new_z = map->GetHeight(unit->GetPhaseMask(), wanderX, wanderY, z, true);
+        float new_z = unit->GetMapHeight(wanderX, wanderY, z);
         if (new_z <= INVALID_HEIGHT || fabs(z - new_z) > 3.0f) // pussywizard
         {
             i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx - 1][0] : x;
@@ -50,7 +50,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
         }
         else if (unit->IsWithinLOS(wanderX, wanderY, z))
         {
-            bool is_water = map->IsInWater(wanderX, wanderY, z);
+            bool is_water = map->IsInWater(unit->GetPhaseMask(), wanderX, wanderY, z, unit->GetCollisionHeight());
 
             if ((is_water && !is_water_ok) || (!is_water && !is_land_ok))
             {
@@ -138,7 +138,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
             float y = i_waypoints[i_nextMove][1];
             float z = i_waypoints[i_nextMove][2];
             Movement::MoveSplineInit init(unit);
-            init.MoveTo(x, y, z);
+            init.MoveTo(x, y, z, true);
             init.Launch();
         }
     }

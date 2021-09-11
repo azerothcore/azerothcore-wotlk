@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
+
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "GameGraveyard.h"
@@ -19,8 +23,8 @@ void Graveyard::LoadGraveyardFromDB()
     QueryResult result = WorldDatabase.Query("SELECT ID, Map, x, y, z, Comment FROM game_graveyard");
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 graveyard. Table `game_graveyard` is empty!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 graveyard. Table `game_graveyard` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -52,8 +56,8 @@ void Graveyard::LoadGraveyardFromDB()
         ++Count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %i graveyard in %u ms", Count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %i graveyard in %u ms", Count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 GraveyardStruct const* Graveyard::GetGraveyard(uint32 ID) const
@@ -79,13 +83,13 @@ GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
 GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId)
 {
     // search for zone associated closest graveyard
-    uint32 zoneId = sMapMgr->GetZoneId(MapId, x, y, z);
+    uint32 zoneId = sMapMgr->GetZoneId(PHASEMASK_NORMAL, MapId, x, y, z);
 
     if (!zoneId)
     {
         if (z > -500)
         {
-            LOG_ERROR("server", "ZoneId not found for map %u coords (%f, %f, %f)", MapId, x, y, z);
+            LOG_ERROR("sql.sql", "ZoneId not found for map %u coords (%f, %f, %f)", MapId, x, y, z);
             return GetDefaultGraveyard(teamId);
         }
     }
@@ -227,7 +231,7 @@ bool Graveyard::AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool p
     // add link to DB
     if (persist)
     {
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GRAVEYARD_ZONE);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GRAVEYARD_ZONE);
 
         stmt->setUInt32(0, id);
         stmt->setUInt32(1, zoneId);
@@ -245,7 +249,7 @@ void Graveyard::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
     GraveyardMapBoundsNonConst range = GraveyardStore.equal_range(zoneId);
     if (range.first == range.second)
     {
-        LOG_ERROR("server", "Table `graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, teamId);
+        LOG_ERROR("sql.sql", "Table `graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, teamId);
         return;
     }
 
@@ -278,7 +282,7 @@ void Graveyard::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
     // remove link from DB
     if (persist)
     {
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GRAVEYARD_ZONE);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GRAVEYARD_ZONE);
 
         stmt->setUInt32(0, id);
         stmt->setUInt32(1, zoneId);
@@ -300,8 +304,8 @@ void Graveyard::LoadGraveyardZones()
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 graveyard-zone links. DB table `graveyard_zone` is empty.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 graveyard-zone links. DB table `graveyard_zone` is empty.");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -348,8 +352,8 @@ void Graveyard::LoadGraveyardZones()
             LOG_ERROR("sql.sql", "Table `graveyard_zone` has a duplicate record for Graveyard (ID: %u) and Zone (ID: %u), skipped.", safeLocId, zoneId);
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u graveyard-zone links in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u graveyard-zone links in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
