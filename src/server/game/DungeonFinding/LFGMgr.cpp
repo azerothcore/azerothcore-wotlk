@@ -85,7 +85,7 @@ namespace lfg
         if (!guid.IsGroup())
             return;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_LFG_DATA);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_LFG_DATA);
         stmt->setUInt32(0, guid.GetCounter());
         stmt->setUInt32(1, GetDungeon(guid));
         stmt->setUInt32(2, GetState(guid));
@@ -106,7 +106,7 @@ namespace lfg
 
         if (!result)
         {
-            LOG_ERROR("server", ">> Loaded 0 lfg dungeon rewards. DB table `lfg_dungeon_rewards` is empty!");
+            LOG_ERROR("lfg", ">> Loaded 0 lfg dungeon rewards. DB table `lfg_dungeon_rewards` is empty!");
             return;
         }
 
@@ -123,25 +123,25 @@ namespace lfg
 
             if (!GetLFGDungeonEntry(dungeonId))
             {
-                LOG_ERROR("server", "Dungeon %u specified in table `lfg_dungeon_rewards` does not exist!", dungeonId);
+                LOG_ERROR("lfg", "Dungeon %u specified in table `lfg_dungeon_rewards` does not exist!", dungeonId);
                 continue;
             }
 
             if (!maxLevel || maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
             {
-                LOG_ERROR("server", "Level %u specified for dungeon %u in table `lfg_dungeon_rewards` can never be reached!", maxLevel, dungeonId);
+                LOG_ERROR("lfg", "Level %u specified for dungeon %u in table `lfg_dungeon_rewards` can never be reached!", maxLevel, dungeonId);
                 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
             }
 
             if (!firstQuestId || !sObjectMgr->GetQuestTemplate(firstQuestId))
             {
-                LOG_ERROR("server", "First quest %u specified for dungeon %u in table `lfg_dungeon_rewards` does not exist!", firstQuestId, dungeonId);
+                LOG_ERROR("lfg", "First quest %u specified for dungeon %u in table `lfg_dungeon_rewards` does not exist!", firstQuestId, dungeonId);
                 continue;
             }
 
             if (otherQuestId && !sObjectMgr->GetQuestTemplate(otherQuestId))
             {
-                LOG_ERROR("server", "Other quest %u specified for dungeon %u in table `lfg_dungeon_rewards` does not exist!", otherQuestId, dungeonId);
+                LOG_ERROR("lfg", "Other quest %u specified for dungeon %u in table `lfg_dungeon_rewards` does not exist!", otherQuestId, dungeonId);
                 otherQuestId = 0;
             }
 
@@ -149,8 +149,8 @@ namespace lfg
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server", ">> Loaded %u lfg dungeon rewards in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded %u lfg dungeon rewards in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", " ");
     }
 
     LFGDungeonData const* LFGMgr::GetLFGDungeon(uint32 id)
@@ -192,8 +192,8 @@ namespace lfg
 
         if (!result)
         {
-            LOG_ERROR("server", ">> Loaded 0 lfg entrance positions. DB table `lfg_dungeon_template` is empty!");
-            LOG_INFO("server", " ");
+            LOG_ERROR("lfg", ">> Loaded 0 lfg entrance positions. DB table `lfg_dungeon_template` is empty!");
+            LOG_INFO("server.loading", " ");
             return;
         }
 
@@ -206,7 +206,7 @@ namespace lfg
             LFGDungeonContainer::iterator dungeonItr = LfgDungeonStore.find(dungeonId);
             if (dungeonItr == LfgDungeonStore.end())
             {
-                LOG_ERROR("server", "table `lfg_dungeon_template` contains coordinates for wrong dungeon %u", dungeonId);
+                LOG_ERROR("lfg", "table `lfg_dungeon_template` contains coordinates for wrong dungeon %u", dungeonId);
                 continue;
             }
 
@@ -219,8 +219,8 @@ namespace lfg
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server", ">> Loaded %u lfg entrance positions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded %u lfg entrance positions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", " ");
 
         // Fill all other teleport coords from areatriggers
         for (LFGDungeonContainer::iterator itr = LfgDungeonStore.begin(); itr != LfgDungeonStore.end(); ++itr)
@@ -233,7 +233,7 @@ namespace lfg
                 AreaTriggerTeleport const* at = sObjectMgr->GetMapEntranceTrigger(dungeon.map);
                 if (!at)
                 {
-                    LOG_ERROR("server", "LFGMgr::LoadLFGDungeons: Failed to load dungeon %s, cant find areatrigger for map %u", dungeon.name.c_str(), dungeon.map);
+                    LOG_ERROR("lfg", "LFGMgr::LoadLFGDungeons: Failed to load dungeon %s, cant find areatrigger for map %u", dungeon.name.c_str(), dungeon.map);
                     continue;
                 }
 
@@ -394,7 +394,7 @@ namespace lfg
             DungeonProgressionRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty));
 
             uint32 lockData = 0;
-            if (dungeon->expansion > expansion)
+            if (dungeon->expansion > expansion || dungeon->expansion > sWorld->getIntConfig(CONFIG_LFG_DUNGEON_FINDER_EXPANSION))
                 lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
             else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, player))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
@@ -580,7 +580,7 @@ namespace lfg
                         isRaid = true;
                         break;
                     default:
-                        LOG_ERROR("server", "Wrong dungeon type %u for dungeon %u", type, *it);
+                        LOG_ERROR("lfg", "Wrong dungeon type %u for dungeon %u", type, *it);
                         joinData.result = LFG_JOIN_DUNGEON_INVALID;
                         break;
                 }
@@ -662,12 +662,18 @@ namespace lfg
         if (isRaid && grp && (grp->isLFGGroup() || guid != grp->GetLeaderGUID()))
             return;
 
+         // Do not allow to change dungeon in the middle of a current dungeon
+        if (!isRaid && isContinue && grp->GetMembersCount() == 5)
+        {
+            dungeons.clear();
+            dungeons.insert(GetDungeon(gguid));
+            joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
+        }
+
         // Can't join. Send result
         if (joinData.result != LFG_JOIN_OK)
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("lfg", "LFGMgr::Join: [%s] joining with %u members. result: %u", guid.ToString().c_str(), grp ? grp->GetMembersCount() : 1, joinData.result);
-#endif
             if (!dungeons.empty())                             // Only should show lockmap when have no dungeons available
                 joinData.lockmap.clear();
             player->GetSession()->SendLfgJoinResult(joinData);
@@ -758,9 +764,7 @@ namespace lfg
             std::ostringstream o;
             o << "LFGMgr::Join: [" << guid << "] joined (" << (grp ? "group" : "player") << ") Members: " << debugNames.c_str()
               << ". Dungeons (" << uint32(dungeons.size()) << "): " << ConcatenateDungeons(dungeons);
-        #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("lfg", "%s", o.str().c_str());
-        #endif
         }*/
     }
 
@@ -1008,10 +1012,10 @@ namespace lfg
 
                     currInternalInfoMap[sitr->first] = RBInternalInfo(guid, sitr->second.comment, !groupGuid.IsEmpty(), groupGuid, sitr->second.roles, encounterMask, instanceGuid,
                                                        1, p->getLevel(), p->getClass(), p->getRace(), p->GetAverageItemLevel(),
-                                                       talents, p->m_last_area_id, p->GetArmor(), (uint32)std::max<int32>(0, spellDamage), (uint32)std::max<int32>(0, spellHeal),
-                                                       p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_CRIT_MELEE), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_CRIT_RANGED), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_CRIT_SPELL), std::max<float>(0.0f, mp5), std::max<float>(0.0f, mp5combat),
+                                                       talents, p->GetAreaId(), p->GetArmor(), (uint32)std::max<int32>(0, spellDamage), (uint32)std::max<int32>(0, spellHeal),
+                                                       p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_MELEE)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_RANGED)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_SPELL)), std::max<float>(0.0f, mp5), std::max<float>(0.0f, mp5combat),
                                                        std::max<uint32>(baseAP, rangedAP), (uint32)p->GetStat(STAT_AGILITY), p->GetMaxHealth(), maxPower, p->GetDefenseSkillValue(),
-                                                       p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_DODGE), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_BLOCK), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_PARRY), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_SPELL), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_EXPERTISE));
+                                                       p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_DODGE)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_BLOCK)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_PARRY)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_HASTE_SPELL)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_EXPERTISE)));
 
                     if (!groupGuid)
                         continue;
@@ -1132,15 +1136,21 @@ namespace lfg
                 }
 
                 if (!deletedGroupsToErase.empty())
-                    for (ObjectGuid const guid : deletedGroupsToErase)
-                        deletedGroups.erase(guid);
+                {
+                    for (ObjectGuid const& toErase : deletedGroupsToErase)
+                    {
+                        deletedGroups.erase(toErase);
+                    }
+                }
 
                 if (!deletedGroups.empty())
-                    for (ObjectGuid const guid : deletedGroups)
+                {
+                    for (ObjectGuid const& deletedGroup : deletedGroups)
                     {
                         ++deletedCounter;
-                        buffer_deleted << guid;
+                        buffer_deleted << deletedGroup;
                     }
+                }
 
                 WorldPacket differencePacket(SMSG_UPDATE_LFG_LIST, 1000);
                 RBPacketBuildDifference(differencePacket, dungeonId, deletedCounter, buffer_deleted, groupCounter, buffer_groups, playerCounter, buffer_players);
@@ -1520,7 +1530,7 @@ namespace lfg
     void LFGMgr::MakeNewGroup(LfgProposal const& proposal)
     {
         LfgGuidList players;
-        LfgGuidList playersToTeleport;
+        GuidUnorderedSet playersToTeleport;
 
         for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
         {
@@ -1531,7 +1541,7 @@ namespace lfg
                 players.push_back(guid);
 
             if (proposal.isNew || GetGroup(guid) != proposal.group)
-                playersToTeleport.push_back(guid);
+                playersToTeleport.insert(guid);
         }
 
         // Set the dungeon difficulty
@@ -1601,13 +1611,35 @@ namespace lfg
 
         _SaveToDB(gguid);
 
+        // Select a player inside to be teleported to
+        WorldLocation const* teleportLocation = nullptr;
+        bool leaderTeleportIncluded = false;
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* plr = itr->GetSource();
+            if (plr)
+            {
+                if (grp->IsLeader(plr->GetGUID()) && playersToTeleport.find(plr->GetGUID()) != playersToTeleport.end())
+                {
+                    leaderTeleportIncluded = true;
+                }
+
+                if (plr->GetMapId() == uint32(dungeon->map) && !proposal.isNew)
+                {
+                    teleportLocation = plr;
+                    break;
+                }
+            }
+        }
+
         bool randomDungeon = false;
         // Teleport Player
-        for (LfgGuidList::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
+        for (GuidUnorderedSet::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
             if (Player* player = ObjectAccessor::FindPlayer(*it))
             {
                 if (player->GetGroup() != grp) // pussywizard: could not add because group was full (some shitness happened)
                     continue;
+
                 // Add the cooldown spell if queued for a random dungeon
                 // xinef: add aura
                 if ((randomDungeon || selectedRandomLfgDungeon(player->GetGUID())) && !player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN))
@@ -1615,7 +1647,27 @@ namespace lfg
                     randomDungeon = true;
                     player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
                 }
-                TeleportPlayer(player, false);
+
+                if (player->GetMapId() == uint32(dungeon->map))
+                {
+                    // check instance id with leader
+                    if (!leaderTeleportIncluded)
+                    {
+                        if (InstancePlayerBind* ilb = sInstanceSaveMgr->PlayerGetBoundInstance(grp->GetLeaderGUID(), dungeon->map, player->GetDungeonDifficulty()))
+                        {
+                            if (player->GetInstanceId() == ilb->save->GetInstanceId())
+                            {
+                                // Do not teleport if in the same map and instance as leader
+                                continue;
+                            }
+                        }
+                    }
+
+                    // Remove bind to that map
+                    sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
+                }
+
+                TeleportPlayer(player, false, teleportLocation);
             }
 
         if (randomDungeon)
@@ -1658,9 +1710,7 @@ namespace lfg
         LfgProposalPlayer& player = itProposalPlayer->second;
         player.accept = LfgAnswer(accept);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::UpdateProposal: Player [%s] of proposal %u selected: %u", guid.ToString().c_str(), proposalId, accept);
-#endif
         if (!accept)
         {
             RemoveProposal(itProposal, LFG_UPDATETYPE_PROPOSAL_DECLINED);
@@ -1751,9 +1801,7 @@ namespace lfg
         LfgProposal& proposal = itProposal->second;
         proposal.state = LFG_PROPOSAL_FAILED;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::RemoveProposal: Proposal %u, state FAILED, UpdateType %u", itProposal->first, type);
-#endif
         // Mark all people that didn't answered as no accept
         if (type == LFG_UPDATETYPE_PROPOSAL_FAILED)
             for (LfgProposalPlayerContainer::iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
@@ -1797,16 +1845,12 @@ namespace lfg
                 if (it->second.accept == LFG_ANSWER_DENY)
                 {
                     updateData.updateType = type;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                     LOG_DEBUG("lfg", "LFGMgr::RemoveProposal: [%s] didn't accept. Removing from queue and compatible cache", guid.ToString().c_str());
-#endif
                 }
                 else
                 {
                     updateData.updateType = LFG_UPDATETYPE_REMOVED_FROM_QUEUE;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                     LOG_DEBUG("lfg", "LFGMgr::RemoveProposal: [%s] in same group that someone that didn't accept. Removing from queue and compatible cache", guid.ToString().c_str());
-#endif
                 }
 
                 RestoreState(guid, "Proposal Fail (didn't accepted or in group with someone that didn't accept");
@@ -1820,9 +1864,7 @@ namespace lfg
             }
             else
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 LOG_DEBUG("lfg", "LFGMgr::RemoveProposal: Readding [%s] to queue.", guid.ToString().c_str());
-#endif
                 SetState(guid, LFG_STATE_QUEUED);
                 if (gguid != guid)
                 {
@@ -1960,7 +2002,7 @@ namespace lfg
        @param[in]     out Teleport out (true) or in (false)
        @param[in]     fromOpcode Function called from opcode handlers? (Default false)
     */
-    void LFGMgr::TeleportPlayer(Player* player, bool out, bool fromOpcode /*= false*/)
+    void LFGMgr::TeleportPlayer(Player* player, bool out, WorldLocation const* teleportLocation /*= nullptr*/)
     {
         LFGDungeonData const* dungeon = nullptr;
         Group* group = player->GetGroup();
@@ -1994,7 +2036,7 @@ namespace lfg
             error = LFG_TELEPORTERROR_IN_VEHICLE;
         else if (player->GetCharmGUID())
             error = LFG_TELEPORTERROR_CHARMING;
-        else if (player->GetMapId() != uint32(dungeon->map))  // Do not teleport players in dungeon to the entrance
+        else
         {
             uint32 mapid = dungeon->map;
             float x = dungeon->x;
@@ -2002,32 +2044,21 @@ namespace lfg
             float z = dungeon->z;
             float orientation = dungeon->o;
 
-            if (!fromOpcode)
+            if (teleportLocation)
             {
-                // Select a player inside to be teleported to
-                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                {
-                    Player* plrg = itr->GetSource();
-                    if (plrg && plrg != player && plrg->GetMapId() == uint32(dungeon->map))
-                    {
-                        mapid = plrg->GetMapId();
-                        x = plrg->GetPositionX();
-                        y = plrg->GetPositionY();
-                        z = plrg->GetPositionZ();
-                        orientation = plrg->GetOrientation();
-                        break;
-                    }
-                }
+                teleportLocation->GetWorldLocation(mapid, x, y, z, orientation);
             }
 
-            if (!player->GetMap()->IsDungeon())
+            if (!player->GetMap()->IsDungeon() || player->GetEntryPoint().GetMapId() == MAPID_INVALID)
+            {
                 player->SetEntryPoint();
+            }
 
-            if (!player->TeleportTo(mapid, x, y, z, orientation))
+            if (!player->TeleportTo(mapid, x, y, z, orientation, 0, nullptr, mapid == player->GetMapId()))
+            {
                 error = LFG_TELEPORTERROR_INVALID_LOCATION;
+            }
         }
-        else
-            error = LFG_TELEPORTERROR_INVALID_LOCATION;
 
         if (error != LFG_TELEPORTERROR_OK)
             player->GetSession()->SendLfgTeleportError(uint8(error));
@@ -2205,9 +2236,7 @@ namespace lfg
         else
             state = PlayersStore[guid].GetState();
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::GetState: [%s] = %u", guid.ToString().c_str(), state);
-#endif
         return state;
     }
 
@@ -2219,18 +2248,14 @@ namespace lfg
         else
             state = PlayersStore[guid].GetOldState();
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::GetOldState: [%s] = %u", guid.ToString().c_str(), state);
-#endif
         return state;
     }
 
     uint32 LFGMgr::GetDungeon(ObjectGuid guid, bool asId /*= true */)
     {
         uint32 dungeon = GroupsStore[guid].GetDungeon(asId);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::GetDungeon: [%s] asId: %u = %u", guid.ToString().c_str(), asId, dungeon);
-#endif
         return dungeon;
     }
 
@@ -2242,51 +2267,39 @@ namespace lfg
             if (LFGDungeonData const* dungeon = GetLFGDungeon(dungeonId))
                 mapId = dungeon->map;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::GetDungeonMapId: [%s] = %u (DungeonId = %u)", guid.ToString().c_str(), mapId, dungeonId);
-#endif
         return mapId;
     }
 
     uint8 LFGMgr::GetRoles(ObjectGuid guid)
     {
         uint8 roles = PlayersStore[guid].GetRoles();
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::GetRoles: [%s] = %u", guid.ToString().c_str(), roles);
-#endif
         return roles;
     }
 
     const std::string& LFGMgr::GetComment(ObjectGuid guid)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::GetComment: [%s] = %s", guid.ToString().c_str(), PlayersStore[guid].GetComment().c_str());
-#endif
         return PlayersStore[guid].GetComment();
     }
 
     LfgDungeonSet const& LFGMgr::GetSelectedDungeons(ObjectGuid guid)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::GetSelectedDungeons: [%s]", guid.ToString().c_str());
-#endif
         return PlayersStore[guid].GetSelectedDungeons();
     }
 
     LfgLockMap const& LFGMgr::GetLockedDungeons(ObjectGuid guid)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::GetLockedDungeons: [%s]", guid.ToString().c_str());
-#endif
         return PlayersStore[guid].GetLockedDungeons();
     }
 
     uint8 LFGMgr::GetKicksLeft(ObjectGuid guid)
     {
         uint8 kicks = GroupsStore[guid].GetKicksLeft();
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::GetKicksLeft: [%s] = %u", guid.ToString().c_str(), kicks);
-#endif
         return kicks;
     }
 
@@ -2348,25 +2361,19 @@ namespace lfg
 
     void LFGMgr::SetDungeon(ObjectGuid guid, uint32 dungeon)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::SetDungeon: [%s] dungeon %u", guid.ToString().c_str(), dungeon);
-#endif
         GroupsStore[guid].SetDungeon(dungeon);
     }
 
     void LFGMgr::SetRoles(ObjectGuid guid, uint8 roles)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::SetRoles: [%s] roles: %u", guid.ToString().c_str(), roles);
-#endif
         PlayersStore[guid].SetRoles(roles);
     }
 
     void LFGMgr::SetComment(ObjectGuid guid, std::string const& comment)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::SetComment: [%s] comment: %s", guid.ToString().c_str(), comment.c_str());
-#endif
         PlayersStore[guid].SetComment(comment);
     }
 
@@ -2385,33 +2392,25 @@ namespace lfg
 
     void LFGMgr::SetSelectedDungeons(ObjectGuid guid, LfgDungeonSet const& dungeons)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::SetLockedDungeons: [%s]", guid.ToString().c_str());
-#endif
         PlayersStore[guid].SetSelectedDungeons(dungeons);
     }
 
     void LFGMgr::SetLockedDungeons(ObjectGuid guid, LfgLockMap const& lock)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::SetLockedDungeons: [%s]", guid.ToString().c_str());
-#endif
         PlayersStore[guid].SetLockedDungeons(lock);
     }
 
     void LFGMgr::DecreaseKicksLeft(ObjectGuid guid)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::DecreaseKicksLeft: [%s]", guid.ToString().c_str());
-#endif
         GroupsStore[guid].DecreaseKicksLeft();
     }
 
     void LFGMgr::RemoveGroupData(ObjectGuid guid)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("lfg", "LFGMgr::RemoveGroupData: [%s]", guid.ToString().c_str());
-#endif
         LfgGroupDataContainer::iterator it = GroupsStore.find(guid);
         if (it == GroupsStore.end())
             return;
@@ -2419,14 +2418,14 @@ namespace lfg
         LfgState state = GetState(guid);
         // If group is being formed after proposal success do nothing more
         LfgGuidSet const& players = it->second.GetPlayers();
-        for (LfgGuidSet::const_iterator it = players.begin(); it != players.end(); ++it)
+        for (auto iterator = players.begin(); iterator != players.end(); ++iterator)
         {
-            ObjectGuid guid = (*it);
-            SetGroup(*it, ObjectGuid::Empty);
+            ObjectGuid objectGuid = (*iterator);
+            SetGroup(*iterator, ObjectGuid::Empty);
             if (state != LFG_STATE_PROPOSAL)
             {
-                SetState(*it, LFG_STATE_NONE);
-                SendLfgUpdateParty(guid, LfgUpdateData(LFG_UPDATETYPE_REMOVED_FROM_QUEUE));
+                SetState(*iterator, LFG_STATE_NONE);
+                SendLfgUpdateParty(objectGuid, LfgUpdateData(LFG_UPDATETYPE_REMOVED_FROM_QUEUE));
             }
         }
         GroupsStore.erase(it);

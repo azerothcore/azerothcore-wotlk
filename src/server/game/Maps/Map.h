@@ -48,7 +48,7 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 class PathGenerator;
-namespace acore
+namespace Acore
 {
     struct ObjectUpdater;
     struct LargeObjectUpdater;
@@ -76,6 +76,8 @@ struct map_fileheader
     uint32 heightMapSize;
     uint32 liquidMapOffset;
     uint32 liquidMapSize;
+    uint32 holesOffset;
+    uint32 holesSize;
 };
 
 #define MAP_AREA_NO_AREA      0x0001
@@ -115,7 +117,7 @@ struct map_liquidHeader
     float  liquidLevel;
 };
 
-enum ZLiquidStatus
+enum LiquidStatus
 {
     LIQUID_MAP_NO_WATER     = 0x00000000,
     LIQUID_MAP_ABOVE_WATER  = 0x00000001,
@@ -123,6 +125,9 @@ enum ZLiquidStatus
     LIQUID_MAP_IN_WATER     = 0x00000004,
     LIQUID_MAP_UNDER_WATER  = 0x00000008
 };
+
+#define MAP_LIQUID_STATUS_SWIMMING (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER)
+#define MAP_LIQUID_STATUS_IN_CONTACT (MAP_LIQUID_STATUS_SWIMMING | LIQUID_MAP_WATER_WALK)
 
 #define MAP_LIQUID_TYPE_NO_WATER    0x00
 #define MAP_LIQUID_TYPE_WATER       0x01
@@ -135,12 +140,30 @@ enum ZLiquidStatus
 #define MAP_LIQUID_TYPE_DARK_WATER  0x10
 #define MAP_LIQUID_TYPE_WMO_WATER   0x20
 
+#define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
+#define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
+#define MAX_FALL_DISTANCE     250000.0f                     // "unlimited fall" to find VMap ground if it is available, just larger than MAX_HEIGHT - INVALID_HEIGHT
+#define DEFAULT_HEIGHT_SEARCH     50.0f                     // default search distance to find height at nearby locations
+#define MIN_UNLOAD_DELAY      1                             // immediate unload
+
 struct LiquidData
 {
-    uint32 type_flags;
-    uint32 entry;
-    float  level;
-    float  depth_level;
+    LiquidData() : Entry(0), Flags(0), Level(INVALID_HEIGHT), DepthLevel(INVALID_HEIGHT), Status(LIQUID_MAP_NO_WATER) { }
+
+    uint32 Entry;
+    uint32 Flags;
+    float  Level;
+    float  DepthLevel;
+    LiquidStatus Status;
+};
+
+struct PositionFullTerrainStatus
+{
+    PositionFullTerrainStatus() : areaId(0), floorZ(INVALID_HEIGHT), outdoors(false) { }
+    uint32 areaId;
+    float floorZ;
+    bool outdoors;
+    LiquidData liquidInfo;
 };
 
 enum LineOfSightChecks
@@ -186,10 +209,13 @@ class GridMap
     uint8 _liquidOffY;
     uint8 _liquidWidth;
     uint8 _liquidHeight;
+    uint16* _holes;
 
     bool loadAreaData(FILE* in, uint32 offset, uint32 size);
     bool loadHeightData(FILE* in, uint32 offset, uint32 size);
     bool loadLiquidData(FILE* in, uint32 offset, uint32 size);
+    bool loadHolesData(FILE* in, uint32 offset, uint32 size);
+    bool isHole(int row, int col) const;
 
     // Get height functions and pointers
     typedef float (GridMap::*GetHeightPtr) (float x, float y) const;
@@ -209,8 +235,7 @@ public:
     [[nodiscard]] inline float getHeight(float x, float y) const {return (this->*_gridGetHeight)(x, y);}
     [[nodiscard]] float getMinHeight(float x, float y) const;
     [[nodiscard]] float getLiquidLevel(float x, float y) const;
-    [[nodiscard]] uint8 getTerrainType(float x, float y) const;
-    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, float collisionHeight, LiquidData* data = nullptr);
+    LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const;
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
@@ -248,12 +273,6 @@ struct ZoneDynamicInfo
 #else
 #pragma pack(pop)
 #endif
-
-#define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
-#define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
-#define MAX_FALL_DISTANCE     250000.0f                     // "unlimited fall" to find VMap ground if it is available, just larger than MAX_HEIGHT - INVALID_HEIGHT
-#define DEFAULT_HEIGHT_SEARCH     50.0f                     // default search distance to find height at nearby locations
-#define MIN_UNLOAD_DELAY      1                             // immediate unload
 
 typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHolderType;
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
@@ -293,14 +312,14 @@ public:
     template<class T> bool AddToMap(T*, bool checkTransport = false);
     template<class T> void RemoveFromMap(T*, bool);
 
-    void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                            TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                            TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
-    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                                  TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                                  TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                                  TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
 
     virtual void Update(const uint32, const uint32, bool thread = true);
 
@@ -318,13 +337,13 @@ public:
 
     [[nodiscard]] bool IsRemovalGrid(float x, float y) const
     {
-        GridCoord p = acore::ComputeGridCoord(x, y);
+        GridCoord p = Acore::ComputeGridCoord(x, y);
         return !getNGrid(p.x_coord, p.y_coord);
     }
 
     [[nodiscard]] bool IsGridLoaded(float x, float y) const
     {
-        return IsGridLoaded(acore::ComputeGridCoord(x, y));
+        return IsGridLoaded(Acore::ComputeGridCoord(x, y));
     }
 
     void LoadGrid(float x, float y);
@@ -352,22 +371,19 @@ public:
     [[nodiscard]] float GetMinHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
-    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
+    void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType = MAP_ALL_LIQUIDS);
+    LiquidData const GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, uint8 ReqLiquidType);
 
-    uint32 GetAreaId(float x, float y, float z, bool* isOutdoors) const;
-    bool GetAreaInfo(float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
-    [[nodiscard]] uint32 GetAreaId(float x, float y, float z) const;
-    [[nodiscard]] uint32 GetZoneId(float x, float y, float z) const;
-    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, float x, float y, float z) const;
+    [[nodiscard]] bool GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
+    [[nodiscard]] uint32 GetAreaId(uint32 phaseMask, float x, float y, float z) const;
+    [[nodiscard]] uint32 GetZoneId(uint32 phaseMask, float x, float y, float z) const;
+    void GetZoneAndAreaId(uint32 phaseMask, uint32& zoneid, uint32& areaid, float x, float y, float z) const;
 
-    [[nodiscard]] bool IsOutdoors(float x, float y, float z) const;
-
-    [[nodiscard]] uint8 GetTerrainType(float x, float y) const;
     [[nodiscard]] float GetWaterLevel(float x, float y) const;
-    bool IsInWater(float x, float y, float z, LiquidData* data = nullptr) const;
-    [[nodiscard]] bool IsUnderWater(float x, float y, float z) const;
+    bool IsInWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
+    [[nodiscard]] bool IsUnderWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const;
     [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const;
-    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, LiquidData liquidData) const;
+    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, LiquidData const& liquidData) const;
 
     void MoveAllCreaturesInMoveList();
     void MoveAllGameObjectsInMoveList();
@@ -377,7 +393,25 @@ public:
 
     [[nodiscard]] uint32 GetInstanceId() const { return i_InstanceId; }
     [[nodiscard]] uint8 GetSpawnMode() const { return (i_spawnMode); }
-    virtual bool CanEnter(Player* /*player*/, bool /*loginCheck = false*/) { return true; }
+
+    enum EnterState
+    {
+        CAN_ENTER = 0,
+        CANNOT_ENTER_ALREADY_IN_MAP = 1, // Player is already in the map
+        CANNOT_ENTER_NO_ENTRY, // No map entry was found for the target map ID
+        CANNOT_ENTER_UNINSTANCED_DUNGEON, // No instance template was found for dungeon map
+        CANNOT_ENTER_DIFFICULTY_UNAVAILABLE, // Requested instance difficulty is not available for target map
+        CANNOT_ENTER_NOT_IN_RAID, // Target instance is a raid instance and the player is not in a raid group
+        CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE, // Player is dead and their corpse is not in target instance
+        CANNOT_ENTER_INSTANCE_BIND_MISMATCH, // Player's permanent instance save is not compatible with their group's current instance bind
+        CANNOT_ENTER_TOO_MANY_INSTANCES, // Player has entered too many instances recently
+        CANNOT_ENTER_MAX_PLAYERS, // Target map already has the maximum number of players allowed
+        CANNOT_ENTER_ZONE_IN_COMBAT, // A boss encounter is currently in progress on the target map
+        CANNOT_ENTER_UNSPECIFIED_REASON
+    };
+
+    virtual EnterState CannotEnter(Player* /*player*/, bool /*loginCheck = false*/) { return CAN_ENTER; }
+
     [[nodiscard]] const char* GetMapName() const;
 
     // have meaning only for instanced map (that have set real difficulty)
@@ -405,9 +439,6 @@ public:
     void AddObjectToRemoveList(WorldObject* obj);
     void AddObjectToSwitchList(WorldObject* obj, bool on);
     virtual void DelayedUpdate(const uint32 diff);
-
-    void UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair);
-    void UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair);
 
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
@@ -440,10 +471,6 @@ public:
     void RemoveFromActive(T* obj);
 
     template<class T> void SwitchGridContainers(T* obj, bool on);
-    template<class NOTIFIER> void VisitAll(const float& x, const float& y, float radius, NOTIFIER& notifier);
-    template<class NOTIFIER> void VisitFirstFound(const float& x, const float& y, float radius, NOTIFIER& notifier);
-    template<class NOTIFIER> void VisitWorld(const float& x, const float& y, float radius, NOTIFIER& notifier);
-    template<class NOTIFIER> void VisitGrid(const float& x, const float& y, float radius, NOTIFIER& notifier);
     CreatureGroupHolderType CreatureGroupHolder;
 
     void UpdateIteratorBack(Player* player);
@@ -506,7 +533,7 @@ public:
     void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
     [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _dynamicTree.contains(model);}
     [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
-    bool getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
+    bool GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
     [[nodiscard]] float GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const
     {
         return _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
@@ -763,7 +790,7 @@ public:
     [[nodiscard]] InstanceScript const* GetInstanceScript() const { return instance_data; }
     void PermBindAllPlayers();
     void UnloadAll() override;
-    bool CanEnter(Player* player, bool loginCheck = false) override;
+    EnterState CannotEnter(Player* player, bool loginCheck = false) override;
     void SendResetWarnings(uint32 timeLeft) const;
 
     [[nodiscard]] uint32 GetMaxPlayers() const;
@@ -785,7 +812,7 @@ public:
 
     bool AddPlayerToMap(Player*) override;
     void RemovePlayerFromMap(Player*, bool) override;
-    bool CanEnter(Player* player, bool loginCheck = false) override;
+    EnterState CannotEnter(Player* player, bool loginCheck = false) override;
     void SetUnload();
     //void UnloadAll(bool pForce);
     void RemoveAllPlayers() override;
@@ -812,55 +839,4 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
     }
 }
 
-template<class NOTIFIER>
-inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, WorldTypeMapContainer> world_object_notifier(notifier);
-    cell.Visit(p, world_object_notifier, *this, radius, x, y);
-    TypeContainerVisitor<NOTIFIER, GridTypeMapContainer >  grid_object_notifier(notifier);
-    cell.Visit(p, grid_object_notifier, *this, radius, x, y);
-}
-
-// should be used with Searcher notifiers, tries to search world if nothing found in grid
-template<class NOTIFIER>
-inline void Map::VisitFirstFound(const float& x, const float& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, WorldTypeMapContainer> world_object_notifier(notifier);
-    cell.Visit(p, world_object_notifier, *this, radius, x, y);
-    if (!notifier.i_object)
-    {
-        TypeContainerVisitor<NOTIFIER, GridTypeMapContainer >  grid_object_notifier(notifier);
-        cell.Visit(p, grid_object_notifier, *this, radius, x, y);
-    }
-}
-
-template<class NOTIFIER>
-inline void Map::VisitWorld(const float& x, const float& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, WorldTypeMapContainer> world_object_notifier(notifier);
-    cell.Visit(p, world_object_notifier, *this, radius, x, y);
-}
-
-template<class NOTIFIER>
-inline void Map::VisitGrid(const float& x, const float& y, float radius, NOTIFIER& notifier)
-{
-    CellCoord p(acore::ComputeCellCoord(x, y));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    TypeContainerVisitor<NOTIFIER, GridTypeMapContainer >  grid_object_notifier(notifier);
-    cell.Visit(p, grid_object_notifier, *this, radius, x, y);
-}
 #endif

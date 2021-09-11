@@ -1,4 +1,6 @@
-// Scripted by Xinef
+/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
 #include "CellImpl.h"
 #include "GossipDef.h"
@@ -699,7 +701,7 @@ public:
                             if (counter > 12)
                             {
                                 bool failed = false;
-                                for (ObjectGuid const guid : unitList)
+                                for (ObjectGuid const& guid : unitList)
                                     if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                                         if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                                         {
@@ -753,7 +755,7 @@ public:
         Unit* getTrigger()
         {
             std::list<Unit*> tmpList;
-            for (ObjectGuid const guid : unitList)
+            for (ObjectGuid const& guid : unitList)
                 if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                     if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                         tmpList.push_back(c);
@@ -772,7 +774,7 @@ public:
             {
                 me->MonsterYell("Fire consumes! You've tried and failed. Let there be no doubt, justice prevailed!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(11967);
-                for (ObjectGuid const guid : unitList)
+                for (ObjectGuid const& guid : unitList)
                     if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                         c->RemoveAllAuras();
 
@@ -810,9 +812,9 @@ public:
         {
             float radius = 100.0f;
             std::list<Player*> players;
-            acore::AnyPlayerInObjectRangeCheck checker(me, radius);
-            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
-            me->VisitNearbyWorldObject(radius, searcher);
+            Acore::AnyPlayerInObjectRangeCheck checker(me, radius);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Cell::VisitWorldObjects(me, searcher, radius);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {

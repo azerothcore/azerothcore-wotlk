@@ -13,6 +13,7 @@
 #include "GameObject.h"
 #include "Object.h"
 #include "ObjectGridLoader.h"
+#include "Optional.h"
 #include "Player.h"
 #include "Spell.h"
 #include "Unit.h"
@@ -23,7 +24,7 @@
 class Player;
 //class Map;
 
-namespace acore
+namespace Acore
 {
     struct VisibleNotifier
     {
@@ -34,7 +35,8 @@ namespace acore
         bool i_largeOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) : i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
+        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) :
+            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
         {
             i_visibleNow.clear();
         }
@@ -57,7 +59,7 @@ namespace acore
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player& player, bool largeOnly) : VisibleNotifier(player, false, largeOnly) {}
+        PlayerRelocationNotifier(Player& player, bool largeOnly): VisibleNotifier(player, false, largeOnly) { }
 
         template<class T> void Visit(GridRefManager<T>& m) { VisibleNotifier::Visit(m); }
         void Visit(PlayerMapType&);
@@ -931,7 +933,7 @@ namespace acore
         bool operator()(Unit* u)
         {
             if (u->isTargetableForAttack(true, i_funit) && i_obj->IsWithinDistInMap(u, i_range) &&
-                    !i_funit->IsFriendlyTo(u) && i_funit->CanSeeOrDetect(u))
+                (i_funit->IsInCombatWith(u) || u->IsHostileTo(i_funit)) && i_obj->CanSeeOrDetect(u))
             {
                 i_range = i_obj->GetDistance(u);        // use found unit range as new range limit for next check
                 return true;
@@ -1060,7 +1062,7 @@ namespace acore
         }
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, true, false))
                 return false;
 
             if (!me->IsValidAttackTarget(u))
@@ -1086,7 +1088,7 @@ namespace acore
         explicit NearestHostileUnitInAttackDistanceCheck(Creature const* creature, float dist) : me(creature), m_range(dist) {}
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range))
+            if (!me->IsWithinDistInMap(u, m_range, true, false))
                 return false;
 
             if (!me->CanStartAttack(u))

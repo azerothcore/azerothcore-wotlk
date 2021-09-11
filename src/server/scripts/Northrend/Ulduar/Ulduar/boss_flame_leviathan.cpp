@@ -1178,25 +1178,6 @@ public:
     };
 };
 
-enum ScriptedTextNorgannonDellorah
-{
-    DELLORAH_SAY_1 = 0,
-    DELLORAH_SAY_2 = 1,
-    DELLORAH_SAY_3 = 2,
-    DELLORAH_SAY_4 = 3,
-    DELLORAH_SAY_5 = 4,
-    DELLORAH_SAY_6 = 5,
-    DELLORAH_SAY_7 = 6,
-
-    NORGANNON_SAY_1 = 0,
-    NORGANNON_SAY_2 = 1,
-    NORGANNON_SAY_3 = 2,
-    NORGANNON_SAY_4 = 3,
-    NORGANNON_SAY_5 = 4,
-
-    RHYDIAN_EMOTE = 0,
-};
-
 class npc_brann_radio : public CreatureScript
 {
 public:
@@ -1660,7 +1641,7 @@ public:
             else
             {
                 //! In the end, only one target should be selected
-                WorldObject* _target = acore::Containers::SelectRandomContainerElement(targets);
+                WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
                 targets.clear();
                 if (_target)
                     targets.push_back(_target);
@@ -1709,9 +1690,9 @@ public:
                 {
                     // use 99 because it is 3d search
                     std::list<WorldObject*> targetList;
-                    acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
-                    acore::WorldObjectListSearcher<acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
-                    GetCaster()->GetMap()->VisitAll(GetCaster()->m_positionX, GetCaster()->m_positionY, 99, searcher);
+                    Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
+                    Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
+                    Cell::VisitAllObjects(GetCaster(), searcher, 99.0f);
                     float minDist = 99 * 99;
                     Unit* target = nullptr;
                     for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
@@ -2076,7 +2057,7 @@ public:
     {
     }
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/, uint32 /*criteria_id*/) override
     {
         return target && _towerCount <= target->GetAI()->GetData(DATA_GET_TOWER_COUNT);
     }
@@ -2090,7 +2071,7 @@ class achievement_flame_leviathan_shutout : public AchievementCriteriaScript
 public:
     achievement_flame_leviathan_shutout() : AchievementCriteriaScript("achievement_flame_leviathan_shutout") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/, uint32 /*criteria_id*/) override
     {
         if (target)
             if (target->GetAI()->GetData(DATA_GET_SHUTDOWN))
@@ -2107,7 +2088,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (Vehicle* vehicle = player->GetVehicle())
             if (vehicle->GetCreatureEntry() == _entry1 || vehicle->GetCreatureEntry() == _entry2)
@@ -2125,7 +2106,7 @@ class achievement_flame_leviathan_unbroken : public AchievementCriteriaScript
 public:
     achievement_flame_leviathan_unbroken() : AchievementCriteriaScript("achievement_flame_leviathan_unbroken") {}
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (player->GetInstanceScript()->GetData(DATA_UNBROKEN_ACHIEVEMENT))

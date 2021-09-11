@@ -1459,8 +1459,10 @@ public:
             {
                 case EVENT_RC_RUNIC_SMASH_TRIGGER:
                     _nextTriggerPos += 16.0f;
-                    if (!(_nextTriggerPos > -260.0f))
+                    if (_nextTriggerPos <= -260.0f)
+                    {
                         events.RescheduleEvent(EVENT_RC_RUNIC_SMASH_TRIGGER, 500);
+                    }
 
                     RunRunicSmash(true);
                     break;
@@ -1802,7 +1804,7 @@ class achievement_thorim_stand_in_the_lightning : public AchievementCriteriaScri
 public:
     achievement_thorim_stand_in_the_lightning() : AchievementCriteriaScript("achievement_thorim_stand_in_the_lightning") {}
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
@@ -1817,7 +1819,7 @@ class achievement_thorim_lose_your_illusion : public AchievementCriteriaScript
 public:
     achievement_thorim_lose_your_illusion() : AchievementCriteriaScript("achievement_thorim_lose_your_illusion") {}
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))

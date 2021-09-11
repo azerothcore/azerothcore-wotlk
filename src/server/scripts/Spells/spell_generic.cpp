@@ -19,10 +19,8 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceScript.h"
-#include "LFGMgr.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -32,7 +30,42 @@
 #include "Vehicle.h"
 #include <array>
 
-// Ours
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+#include "GridNotifiersImpl.h"
+
+// 46642 - 5,000 Gold
+class spell_gen_5000_gold : public SpellScriptLoader
+{
+  public:
+    spell_gen_5000_gold() : SpellScriptLoader("spell_gen_5000_gold") {}
+
+    class spell_gen_5000_gold_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_5000_gold_SpellScript);
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            if (Player* target = GetHitPlayer())
+            {
+                target->ModifyMoney(5000 * GOLD);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_5000_gold_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gen_5000_gold_SpellScript();
+    }
+};
+
+// 24401 - Test Pet Passive
 class spell_gen_model_visible : public SpellScriptLoader
 {
 public:
@@ -90,6 +123,7 @@ public:
     }
 };
 
+// 51640 - Taunt Flag Targeting
 class spell_the_flag_of_ownership : public SpellScriptLoader
 {
 public:
@@ -162,6 +196,10 @@ public:
     }
 };
 
+/* 51060 - Have Withered Batwing
+   51068 - Have Muddy Mire Maggot
+   51088 - Have Amberseed
+   51094 - Have Chilled Serpent Mucus */
 class spell_gen_have_item_auras : public SpellScriptLoader
 {
 public:
@@ -210,6 +248,8 @@ public:
     }
 };
 
+/* 54355 - Detonation
+   57099 - Landmine Knockback Achievement Aura */
 class spell_gen_mine_sweeper : public SpellScriptLoader
 {
 public:
@@ -253,6 +293,9 @@ public:
     }
 };
 
+/* 20004 - Life Steal
+   20005 - Chilled
+   20007 - Holy Strength */
 class spell_gen_reduced_above_60 : public SpellScriptLoader
 {
 public:
@@ -308,6 +351,8 @@ public:
     }
 };
 
+/* 69664 - Aquanos Laundry                      (spell_q20438_q24556_aquantos_laundry)
+   38724 - Magic Sucker Device (Success Visual) (spell_q10838_demoniac_scryer_visual) */
 class spell_gen_relocaste_dest : public SpellScriptLoader
 {
 public:
@@ -343,6 +388,10 @@ private:
     float _x, _y, _z, _o;
 };
 
+/* 55640 - Lightweave Embroidery
+   67698 - Item - Coliseum 25 Normal Healer Trinket
+   67752 - Item - Coliseum 25 Heroic Healer Trinket
+   69762 - Unchained Magic */
 class spell_gen_allow_proc_from_spells_with_cost : public SpellScriptLoader
 {
 public:
@@ -382,6 +431,8 @@ public:
     }
 };
 
+/* 32727 - Arena Preparation
+   44521 - Preparation */
 class spell_gen_bg_preparation : public SpellScriptLoader
 {
 public:
@@ -435,6 +486,9 @@ public:
     }
 };
 
+/* 27867 - Freeze            (spell_gen_disabled_above_70)
+   59917 - Minor Mount Speed (spell_gen_disabled_above_70)
+   46629 - Deathfrost        (spell_gen_disabled_above_73) */
 class spell_gen_disabled_above_level : public SpellScriptLoader
 {
 public:
@@ -474,6 +528,8 @@ private:
     uint8 _level;
 };
 
+/* 61013 - Warlock Pet Scaling 05
+   61017 - Hunter Pet Scaling 04 */
 class spell_pet_hit_expertise_scalling : public SpellScriptLoader
 {
 public:
@@ -565,6 +621,7 @@ public:
     }
 };
 
+// 55475 - Grow Flower Patch
 class spell_gen_grow_flower_patch : public SpellScriptLoader
 {
 public:
@@ -594,6 +651,7 @@ public:
     }
 };
 
+// 22888 - Rallying Cry of the Dragonslayer
 class spell_gen_rallying_cry_of_the_dragonslayer : public SpellScriptLoader
 {
 public:
@@ -629,6 +687,7 @@ public:
     }
 };
 
+// 39953 - A'dal's Song of Battle
 class spell_gen_adals_song_of_battle : public SpellScriptLoader
 {
 public:
@@ -659,6 +718,8 @@ public:
     }
 };
 
+/* 15366 - Songflower Serenade
+   22888 - Rallying Cry of the Dragonslayer */
 class spell_gen_disabled_above_63 : public SpellScriptLoader
 {
 public:
@@ -689,6 +750,7 @@ public:
     }
 };
 
+// 59630 - Black Magic
 class spell_gen_black_magic_enchant : public SpellScriptLoader
 {
 public:
@@ -728,6 +790,7 @@ public:
     }
 };
 
+// 53642 - The Might of Mograine
 class spell_gen_area_aura_select_players : public SpellScriptLoader
 {
 public:
@@ -753,6 +816,26 @@ public:
     }
 };
 
+/* 29883 - Blink             (spell_gen_select_target_count_15_1)
+   38573 - Spore Drop Effect (spell_gen_select_target_count_15_1)
+   38633 - Arcane Volley     (spell_gen_select_target_count_15_1)
+   38650 - Rancid Mushroom   (spell_gen_select_target_count_15_1)
+   39672 - Curse of Agony    (spell_gen_select_target_count_15_1)
+   41081 - Find Target       (spell_gen_select_target_count_15_1)
+   41357 - L1 Arcane Charge  (spell_gen_select_target_count_15_1)
+   53457 - Impale            (spell_gen_select_target_count_15_1)
+   54847 - Mojo Volley       (spell_gen_select_target_count_15_2)
+   59452 - Mojo Volley       (spell_gen_select_target_count_15_2)
+   46008 - Negative Energy   (spell_gen_select_target_count_15_5)
+   38017 - Wave A - 1                 (spell_gen_select_target_count_7_1)
+   40851 - Disgruntled                (spell_gen_select_target_count_7_1)
+   45680 - Shadow Bolt                (spell_gen_select_target_count_7_1)
+   45976 - Open Portal                (spell_gen_select_target_count_7_1)
+   48425 - Shoot                      (spell_gen_select_target_count_7_1)
+   52438 - Summon Skittering Swarmer  (spell_gen_select_target_count_7_1)
+   52449 - Summon Skittering Infector (spell_gen_select_target_count_7_1)
+   41172 - Rapid Shot  (spell_gen_select_target_count_24_1)
+   74960 - Infrigidate (spell_gen_select_target_count_30_1) */
 class spell_gen_select_target_count : public SpellScriptLoader
 {
 public:
@@ -768,7 +851,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove(GetCaster());
-            acore::Containers::RandomResizeList(targets, _count);
+            Acore::Containers::RandomResize(targets, _count);
         }
 
         void Register() override
@@ -791,6 +874,7 @@ private:
     uint8 _count;
 };
 
+// 20631 - Furbolg Medicine Pouch
 class spell_gen_use_spell_base_level_check : public SpellScriptLoader
 {
 public:
@@ -819,6 +903,8 @@ public:
     }
 };
 
+/* -49004 - Scent of Blood
+   -12317 - Enrage */
 class spell_gen_proc_from_direct_damage : public SpellScriptLoader
 {
 public:
@@ -845,6 +931,8 @@ public:
     }
 };
 
+/* -51123 - Killing Machine
+   -49188 - Rime */
 class spell_gen_no_offhand_proc : public SpellScriptLoader
 {
 public:
@@ -871,6 +959,13 @@ public:
     }
 };
 
+/* 71602 - Item - Icecrown 25 Normal Caster Trinket 1 Base
+   71645 - Item - Icecrown 25 Heroic Caster Trinket 1 Base
+   71845 - Item - Icecrown 25 Normal Caster Weapon Proc
+   71846 - Item - Icecrown 25 Heroic Caster Weapon Proc
+   72419 - Item - Icecrown Reputation Ring Healer Trigger
+   75465 - Item - Chamber of Aspects 25 Nuker Trinket
+   75474 - Item - Chamber of Aspects 25 Heroic Nuker Trinket */
 class spell_gen_proc_once_per_cast : public SpellScriptLoader
 {
 public:
@@ -912,6 +1007,7 @@ public:
     }
 };
 
+// 70805 - Item - Rogue T10 2P Bonus
 class spell_gen_proc_on_self : public SpellScriptLoader
 {
 public:
@@ -938,6 +1034,7 @@ public:
     }
 };
 
+// 70803 - Item - Rogue T10 4P Bonus
 class spell_gen_proc_not_self : public SpellScriptLoader
 {
 public:
@@ -964,6 +1061,7 @@ public:
     }
 };
 
+// 24983 - Baby Murloc Passive
 class spell_gen_baby_murloc_passive : public SpellScriptLoader
 {
 public:
@@ -996,6 +1094,7 @@ public:
     }
 };
 
+// 24984 - Baby Murloc
 class spell_gen_baby_murloc : public SpellScriptLoader
 {
 public:
@@ -1028,6 +1127,7 @@ public:
     }
 };
 
+// 40414, 40892, 49026 - Fixate
 class spell_gen_fixate : public SpellScriptLoader
 {
 public:
@@ -1077,6 +1177,8 @@ public:
     }
 };
 
+/* 64440 - Blade Warding
+   64568 - Blood Reserve */
 class spell_gen_proc_above_75 : public SpellScriptLoader
 {
 public:
@@ -1103,6 +1205,7 @@ public:
     }
 };
 
+// 21737 - Periodic Knock Away
 class spell_gen_periodic_knock_away : public SpellScriptLoader
 {
 public:
@@ -1131,6 +1234,7 @@ public:
     }
 };
 
+// 10101, 18670, 18813, 18945, 19633, 20686, 25778, 31389, 32959 - Knock Away
 class spell_gen_knock_away : public SpellScriptLoader
 {
 public:
@@ -1160,6 +1264,8 @@ public:
     }
 };
 
+/* 74630, 75882, 75883, 75884 - Combustion
+   74802, 75874, 75875, 75876 - Consumption */
 class spell_gen_mod_radius_by_caster_scale : public SpellScriptLoader
 {
 public:
@@ -1186,6 +1292,7 @@ public:
     }
 };
 
+// 15600 - Hand of Justice
 class spell_gen_proc_reduced_above_60 : public SpellScriptLoader
 {
 public:
@@ -1217,6 +1324,11 @@ public:
     }
 };
 
+/* 21708 - Summon Noxxion's Spawns
+   30205 - Shadow Cage
+   52249 - Quetz'lun's Hex of Air
+   52278 - Quetz'lun's Hex of Fire
+   54894 - Icy Imprisonment */
 class spell_gen_visual_dummy_stun : public SpellScriptLoader
 {
 public:
@@ -1251,6 +1363,7 @@ public:
     }
 };
 
+// 21809 - Summon Theradrim Shardling
 class spell_gen_random_target32 : public SpellScriptLoader
 {
 public:
@@ -1282,6 +1395,7 @@ public:
     }
 };
 
+// 9204 - Serverside - Hate to Zero
 class spell_gen_hate_to_zero : public SpellScriptLoader
 {
 public:
@@ -1311,6 +1425,7 @@ public:
     }
 };
 
+// 36448, 36475 - Focused Bursts
 class spell_gen_focused_bursts : public SpellScriptLoader
 {
 public:
@@ -1349,6 +1464,7 @@ enum eFlurryOfClaws
     SPELL_FLURRY_OF_CLAWS_DAMAGE        = 53033
 };
 
+// 53032 - Flurry of Claws
 class spell_gen_flurry_of_claws : public SpellScriptLoader
 {
 public:
@@ -1381,6 +1497,7 @@ public:
     }
 };
 
+// 36500 - Glaive
 class spell_gen_throw_back : public SpellScriptLoader
 {
 public:
@@ -1414,6 +1531,7 @@ enum eHaunted
     NPC_SCOURGE_HAUNT = 29238
 };
 
+// 53768 - Haunted
 class spell_gen_haunted :  public SpellScriptLoader
 {
 public:
@@ -1495,7 +1613,8 @@ public:
     }
 };
 
-// Theirs
+/* 39228 - Argussian Compass
+   60218 - Essence of Gossamer */
 class spell_gen_absorb0_hitlimit1 : public SpellScriptLoader
 {
 public:
@@ -1531,7 +1650,6 @@ public:
     }
 };
 
-// 28764 - Adaptive Warding (Frostfire Regalia Set)
 enum AdaptiveWarding
 {
     SPELL_GEN_ADAPTIVE_WARDING_FIRE     = 28765,
@@ -1541,6 +1659,7 @@ enum AdaptiveWarding
     SPELL_GEN_ADAPTIVE_WARDING_ARCANE   = 28770
 };
 
+// 28764 - Adaptive Warding (Frostfire Regalia Set)
 class spell_gen_adaptive_warding : public SpellScriptLoader
 {
 public:
@@ -1623,6 +1742,13 @@ public:
     }
 };
 
+/* 45822 - Iceblood Warmaster
+   45823 - Tower Point Warmaster
+   45824 - West Frostwolf Warmaster
+   45826 - East Frostwolf Warmaster
+   45828 - Dun Baldar North Marshal
+   45829 - Dun Baldar South Marshal
+   45830 - Stonehearth Marshal */
 class spell_gen_av_drekthar_presence : public SpellScriptLoader
 {
 public:
@@ -1666,7 +1792,7 @@ public:
     }
 };
 
-// 46394 Brutallus Burn
+// 46394 - Brutallus Burn
 class spell_gen_burn_brutallus : public SpellScriptLoader
 {
 public:
@@ -1699,6 +1825,7 @@ enum CannibalizeSpells
     SPELL_CANNIBALIZE_TRIGGERED = 20578
 };
 
+// 20577 - Cannibalize
 class spell_gen_cannibalize : public SpellScriptLoader
 {
 public:
@@ -1719,11 +1846,17 @@ public:
             float max_range = GetSpellInfo()->GetMaxRange(false);
             WorldObject* result = nullptr;
             // search for nearby enemy corpse in range
-            acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
-            acore::WorldObjectSearcher<acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
-            caster->GetMap()->VisitFirstFound(caster->m_positionX, caster->m_positionY, max_range, searcher);
+            Acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
+            Acore::WorldObjectSearcher<Acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
+            Cell::VisitWorldObjects(caster, searcher, max_range);
             if (!result)
+            {
+                Cell::VisitGridObjects(caster, searcher, max_range);
+            }
+            if (!result)
+            {
                 return SPELL_FAILED_NO_EDIBLE_CORPSES;
+            }
             return SPELL_CAST_OK;
         }
 
@@ -1779,13 +1912,13 @@ public:
     }
 };
 
-// 63845 - Create Lance
 enum CreateLanceSpells
 {
     SPELL_CREATE_LANCE_ALLIANCE = 63914,
     SPELL_CREATE_LANCE_HORDE    = 63919
 };
 
+// 63845 - Create Lance
 class spell_gen_create_lance : public SpellScriptLoader
 {
 public:
@@ -1830,8 +1963,8 @@ enum MossCoveredFeet
     SPELL_FALL_DOWN = 6869
 };
 
-// 6870 Moss Covered Feet
-// 31399 Moss Covered Feet
+/* 6870 - Moss Covered Feet
+   31399 - Moss Covered Feet */
 class spell_gen_moss_covered_feet : public SpellScriptLoader
 {
 public:
@@ -2060,7 +2193,7 @@ enum ParachuteSpells
     SPELL_PARACHUTE_BUFF    = 44795,
 };
 
-// 45472 Parachute
+// 45472 - Parachute
 class spell_gen_parachute : public SpellScriptLoader
 {
 public:
@@ -2097,6 +2230,7 @@ public:
     }
 };
 
+// 6962 - Pet Summoned
 class spell_gen_pet_summoned : public SpellScriptLoader
 {
 public:
@@ -2130,6 +2264,7 @@ public:
     }
 };
 
+// 58601 - Remove Flight Auras
 class spell_gen_remove_flight_auras : public SpellScriptLoader
 {
 public:
@@ -2173,6 +2308,7 @@ enum EluneCandle
     SPELL_ELUNE_CANDLE_NORMAL      = 26636
 };
 
+// 26374 - Elune's Candle
 class spell_gen_elune_candle : public SpellScriptLoader
 {
 public:
@@ -2233,6 +2369,9 @@ public:
     }
 };
 
+/* 29266, 57685, 58951, 70592, 70628, 74490 - Permanent Feign Death
+   31261 - Permanent Feign Death (Root)
+   35356, 35357 - Spawn Feign Death */
 class spell_gen_creature_permanent_feign_death : public SpellScriptLoader
 {
 public:
@@ -2281,8 +2420,11 @@ enum PvPTrinketTriggeredSpells
 {
     SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER         = 72752,
     SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF    = 72757,
+    SPELL_PVP_TRINKET                                   = 42292,
 };
 
+/* 72752 - Will of the Forsaken Cooldown Trigger
+   72757 - Will of the Forsaken Cooldown Trigger (WOTF) */
 class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
 {
 public:
@@ -2299,7 +2441,10 @@ public:
 
         bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            return ValidateSpellInfo({ SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER, SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF });
+            return ValidateSpellInfo({
+                SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER,
+                SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF,
+                SPELL_PVP_TRINKET });
         }
 
         void HandleScript()
@@ -2331,7 +2476,7 @@ public:
                     player->GetSession()->SendPacket(&data);
 
                     WorldPacket data2;
-                    player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, 42292, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
+                    player->BuildCooldownPacket(data2, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, SPELL_PVP_TRINKET, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
                     player->GetSession()->SendPacket(&data2);
                 }
             }
@@ -2356,6 +2501,7 @@ enum AnimalBloodPoolSpell
     FACTION_DETHA_ATTACK    = 942
 };
 
+// 46221 - Animal Blood
 class spell_gen_animal_blood : public SpellScriptLoader
 {
 public:
@@ -2404,7 +2550,7 @@ enum DivineStormSpell
     SPELL_DIVINE_STORM      = 53385,
 };
 
-// 70769 Divine Storm!
+// 70769 - Divine Storm!
 class spell_gen_divine_storm_cd_reset : public SpellScriptLoader
 {
 public:
@@ -2443,6 +2589,10 @@ public:
     }
 };
 
+/* 60893 - Northrend Alchemy Research
+   61177 - Northrend Inscription Research
+   61288 - Minor Inscription Research
+   61756 - Northrend Inscription Research (FAST QA VERSION) */
 class spell_gen_profession_research : public SpellScriptLoader
 {
 public:
@@ -2493,6 +2643,12 @@ public:
     }
 };
 
+/* 45204 - Clone Me!
+   45785 - Sinister Reflection Clone
+   49889 - Mystery of the Infinite: Future You's Mirror Image Aura
+   50218 - The Cleansing: Your Inner Turmoil's Mirror Image Aura
+   51719 - Altar of Quetz'lun: Material You's Mirror Image Aura
+   57528 - Nightmare Figment Mirror Image */
 class spell_gen_clone : public SpellScriptLoader
 {
 public:
@@ -2533,6 +2689,11 @@ enum CloneWeaponSpells
     SPELL_COPY_RANGED_AURA       = 57594
 };
 
+/* 41055, 63416 - Copy Weapon
+   45206 - Copy Off-hand Weapon
+   57593 - Copy Ranged Weapon
+   69891 - Copy Weapon (No Threat)
+   69892 - Copy Off-hand Weapon (No Threat) */
 class spell_gen_clone_weapon : public SpellScriptLoader
 {
 public:
@@ -2560,6 +2721,11 @@ public:
     }
 };
 
+/* 41054, 63418 - Copy Weapon
+   45205 - Copy Offhand Weapon
+   57594 - Copy Ranged Weapon
+   69893 - Copy Weapon (No Threat)
+   69896 - Copy Offhand Weapon (No Threat) */
 class spell_gen_clone_weapon_aura : public SpellScriptLoader
 {
 public:
@@ -2688,6 +2854,7 @@ enum SeaforiumSpells
     SPELL_PLANT_CHARGES_CREDIT_ACHIEVEMENT  = 60937
 };
 
+// 52408 - Seaforium Blast
 class spell_gen_seaforium_blast : public SpellScriptLoader
 {
 public:
@@ -2734,6 +2901,7 @@ enum FriendOrFowl
     SPELL_TURKEY_VENGEANCE      = 25285
 };
 
+// 25281 - Turkey Marker
 class spell_gen_turkey_marker : public SpellScriptLoader
 {
 public:
@@ -2788,6 +2956,7 @@ public:
     }
 };
 
+// -55428 - Lifeblood
 class spell_gen_lifeblood : public SpellScriptLoader
 {
 public:
@@ -2822,6 +2991,7 @@ enum MagicRoosterSpells
     SPELL_MAGIC_ROOSTER_TAUREN_MALE     = 66124
 };
 
+// 65917 - Magic Rooster
 class spell_gen_magic_rooster : public SpellScriptLoader
 {
 public:
@@ -2875,6 +3045,11 @@ public:
     }
 };
 
+/* 4073 - Mechanical Dragonling
+   12749 - Mithril Mechanical Dragonling
+   13166 - Battle Chicken
+   13258 - Summon Goblin Bomb
+   19804 - Arcanite Dragonling */
 class spell_gen_allow_cast_from_item_only : public SpellScriptLoader
 {
 public:
@@ -2908,6 +3083,7 @@ enum VehicleScaling
     SPELL_GEAR_SCALING      = 66668
 };
 
+// 65266, 65635, 65636, 66666, 66667, 66668 - Gear Scaling
 class spell_gen_vehicle_scaling : public SpellScriptLoader
 {
 public:
@@ -2987,6 +3163,9 @@ public:
     }
 };
 
+/* 53475 - Set Oracle Faction Friendly
+   53487 - Set Wolvar Faction Honored
+   54015 - Set Oracle Faction Honored */
 class spell_gen_oracle_wolvar_reputation : public SpellScriptLoader
 {
 public:
@@ -3041,6 +3220,9 @@ enum DamageReductionAura
     SPELL_DAMAGE_REDUCTION_AURA         = 68066
 };
 
+/* 20911 - Blessing of Sanctuary
+   25899 - Greater Blessing of Sanctuary
+   63944 - Renewed Hope */
 class spell_gen_damage_reduction_aura : public SpellScriptLoader
 {
 public:
@@ -3092,6 +3274,7 @@ enum DummyTrigger
     SPELL_PERSISTANT_SHIELD                 = 26467
 };
 
+// 13567 - Dummy Trigger
 class spell_gen_dummy_trigger : public SpellScriptLoader
 {
 public:
@@ -3128,6 +3311,7 @@ public:
     }
 };
 
+// 17251 - Spirit Healer Res
 class spell_gen_spirit_healer_res : public SpellScriptLoader
 {
 public:
@@ -3172,6 +3356,7 @@ enum TransporterBackfires
     SPELL_TRANSPORTER_MALFUNCTION_MISS          = 36902
 };
 
+// 23448 - Transporter Arrival
 class spell_gen_gadgetzan_transporter_backfire : public SpellScriptLoader
 {
 public:
@@ -3221,6 +3406,7 @@ enum GnomishTransporter
     SPELL_TRANSPORTER_FAILURE                   = 23446
 };
 
+// 23453 - Gnomish Transporter
 class spell_gen_gnomish_transporter : public SpellScriptLoader
 {
 public:
@@ -3263,6 +3449,8 @@ enum DalaranDisguiseSpells
     SPELL_SILVER_COVENANT_DISGUISE_MALE    = 70972
 };
 
+/* 69673 - Silver Covenant Disguise (spell_gen_silver_covenant_disguise)
+   69672 - Sunreaver Disguise       (spell_gen_sunreaver_disguise) */
 class spell_gen_dalaran_disguise : public SpellScriptLoader
 {
 public:
@@ -3364,6 +3552,10 @@ enum BreakShieldSpells
     SPELL_BREAK_SHIELD_TRIGGER_SUNDERING_THURST  = 63825
 };
 
+/* 62575, 62626, 64342, 64590, 64595, 64686, 65147, 66480, 68504 - Shield-Breaker
+   63233 - Necrocution
+   63825 - Sundering Thrust
+   64507 - Shield-Breaker Counter */
 class spell_gen_break_shield: public SpellScriptLoader
 {
 public:
@@ -3491,6 +3683,7 @@ enum ChargeSpells
     SPELL_CHARGE_MISS_EFFECT            = 62977,
 };
 
+// 62563, 62874, 62960, 63003, 63010, 63661, 64591, 66481, 68282, 68284, 68321, 68498, 68501 - Charge
 class spell_gen_mounted_charge: public SpellScriptLoader
 {
 public:
@@ -3586,7 +3779,7 @@ public:
 
         void Register() override
         {
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(m_scriptSpellId);
+            SpellInfo const* spell = sSpellMgr->AssertSpellInfo(m_scriptSpellId);
 
             if (spell->HasEffect(SPELL_EFFECT_SCRIPT_EFFECT))
                 OnEffectHitTarget += SpellEffectFn(spell_gen_mounted_charge_SpellScript::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
@@ -3609,6 +3802,7 @@ enum DefendVisuals
     SPELL_VISUAL_SHIELD_3 = 63132
 };
 
+// 62552, 62719, 66482 - Defend
 class spell_gen_defend : public SpellScriptLoader
 {
 public:
@@ -3659,7 +3853,7 @@ public:
 
         void Register() override
         {
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(m_scriptSpellId);
+            SpellInfo const* spell = sSpellMgr->AssertSpellInfo(m_scriptSpellId);
 
             // Defend spells cast by NPCs (add visuals)
             if (spell->Effects[EFFECT_0].ApplyAuraName == SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN)
@@ -3721,6 +3915,7 @@ enum MountedDuelSpells
     SPELL_MOUNTED_DUEL        = 62875
 };
 
+// 62863 - Duel
 class spell_gen_tournament_duel : public SpellScriptLoader
 {
 public:
@@ -3769,6 +3964,19 @@ enum TournamentMountsSpells
     SPELL_LANCE_EQUIPPED     = 62853
 };
 
+/* 62774 - Summon Tournament Charger
+   62779 - Summon Tournament Ram
+   62780 - Summon Tournament Mechanostrider
+   62781 - Summon Tournament Elekk
+   62782 - Summon Tournament Nightsaber
+   62783 - Summon Tournament Wolf
+   62784 - Summon Tournament Raptor
+   62785 - Summon Tournament Kodo
+   62786 - Summon Tournament Hawkstrider
+   62787 - Summon Tournament Warhorse
+   63663 - Summon Tournament Argent Charger
+   63791 - Summon Tournament Hawkstrider (Aspirant)
+   63792 - Summon Tournament Steed (Aspirant) */
 class spell_gen_summon_tournament_mount : public SpellScriptLoader
 {
 public:
@@ -3904,6 +4112,7 @@ enum TournamentQuestsAchievements
     QUEST_A_VALIANT_OF_SILVERMOON           = 13696
 };
 
+// 63034 - Player On Tournament Mount
 class spell_gen_on_tournament_mount : public SpellScriptLoader
 {
 public:
@@ -4062,6 +4271,42 @@ public:
     }
 };
 
+/* 62594 - Stormwind Champion's Pennant
+   62595 - Stormwind Aspirant's Pennant
+   62596 - Stormwind Valiant's Pennant
+   63394 - Gnomeregan Aspirant's Pennant
+   63395 - Gnomeregan Valiant's Pennant
+   63396 - Gnomeregan Champion's Pennant
+   63397 - Sen'jin Aspirant's Pennant
+   63398 - Sen'jin Valiant's Pennant
+   63399 - Sen'jin Champion's Pennant
+   63401 - Silvermoon Aspirant's Pennant
+   63402 - Silvermoon Valiant's Pennant
+   63403 - Silvermoon Champion's Pennant
+   63404 - Darnassus Aspirant's Pennant
+   63405 - Darnassus Valiant's Pennant
+   63406 - Darnassus Champion's Pennant
+   63421 - Exodar Aspirant's Pennant
+   63422 - Exodar Valiant's Pennant
+   63423 - Exodar Champion's Pennant
+   63425 - Ironforge Aspirant's Pennant
+   63426 - Ironforge Valiant's Pennant
+   63427 - Ironforge Champion's Pennant
+   63428 - Undercity Aspirant's Pennant
+   63429 - Undercity Valiant's Pennant
+   63430 - Undercity Champion's Pennant
+   63431 - Orgrimmar Aspirant's Pennant
+   63432 - Orgrimmar Valiant's Pennant
+   63433 - Orgrimmar Champion's Pennant
+   63434 - Thunder Bluff Aspirant's Pennant
+   63435 - Thunder Bluff Valiant's Pennant
+   63436 - Thunder Bluff Champion's Pennant
+   63500 - Argent Crusade Valiant's Pennant
+   63501 - Argent Crusade Champion's Pennant
+   63606 - Argent Crusade Aspirant's Pennant
+   63607 - Ebon Blade Aspirant's Pennant
+   63608 - Ebon Blade Valiant's Pennant
+   63609 - Ebon Blade Champion's Pennant */
 class spell_gen_tournament_pennant : public SpellScriptLoader
 {
 public:
@@ -4095,6 +4340,7 @@ public:
     }
 };
 
+// 61698 - Serverside - Flush - Knockback effect
 class spell_gen_ds_flush_knockback : public SpellScriptLoader
 {
 public:
@@ -4132,6 +4378,20 @@ public:
     }
 };
 
+/* 20625 - Ritual of Doom Sacrifice (spell_gen_default_count_pct_from_max_hp)
+   29142 - Eyesore Blaster          (spell_gen_default_count_pct_from_max_hp)
+   35139 - Throw Boom's Doom        (spell_gen_default_count_pct_from_max_hp)
+   42393 - Brewfest - Attack Keg    (spell_gen_default_count_pct_from_max_hp)
+   49882 - Leviroth Self-Impale     (spell_gen_default_count_pct_from_max_hp)
+   55269 - Deathly Stare            (spell_gen_default_count_pct_from_max_hp)
+   56578 - Rapid-Fire Harpoon       (spell_gen_default_count_pct_from_max_hp)
+   56698 - Shadow Blast             (spell_gen_default_count_pct_from_max_hp)
+   59102 - Shadow Blast             (spell_gen_default_count_pct_from_max_hp)
+   60532 - Heart Explosion Effects  (spell_gen_default_count_pct_from_max_hp)
+   60864 - Jaws of Death            (spell_gen_default_count_pct_from_max_hp)
+   38441 - Cataclysmic Bolt                         (spell_gen_50pct_count_pct_from_max_hp)
+   66316, 67100, 67101, 67102 - Spinning Pain Spike (spell_gen_50pct_count_pct_from_max_hp)
+   41360 - L5 Arcane Charge                         (spell_gen_100pct_count_pct_from_max_hp) */
 class spell_gen_count_pct_from_max_hp : public SpellScriptLoader
 {
 public:
@@ -4170,6 +4430,14 @@ private:
     int32 _damagePct;
 };
 
+/* 15998 - Capture Worg Pup
+   25952 - Reindeer Dust Effect
+   29435 - Capture Female Kaliri Hatchling
+   42268 - Quest - Mindless Abomination Explosion FX Master
+   51592 - Pickup Primordial Hatchling
+   51910 - Kickin' Nass: Quest Completion
+   52267 - Despawn Horse
+   54420 - Deliver Gryphon */
 class spell_gen_despawn_self : public SpellScriptLoader
 {
 public:
@@ -4207,6 +4475,7 @@ enum GenericBandage
     SPELL_RECENTLY_BANDAGED     = 11196
 };
 
+// 23567, 23568, 23569, 23696, 24412, 24413, 24414 - First Aid
 class spell_gen_bandage : public SpellScriptLoader
 {
 public:
@@ -4292,12 +4561,12 @@ public:
     }
 };
 
-// Blade Warding - 64440
 enum BladeWarding
 {
     SPELL_GEN_BLADE_WARDING_TRIGGERED = 64442
 };
 
+// Blade Warding - 64440
 class spell_gen_blade_warding : public SpellScriptLoader
 {
 public:
@@ -4349,6 +4618,11 @@ enum GenericLifebloom
     SPELL_FACTION_CHAMPIONS_DRU_LIFEBLOOM_FINAL_HEAL    = 66094
 };
 
+/* 43421 - Lifebloom (spell_hexlord_lifebloom)
+   52551 - Lifebloom (spell_tur_ragepaw_lifebloom)
+   53608 - Lifebloom (spell_cenarion_scout_lifebloom)
+   57762, 59990 - Lifebloom (spell_twisted_visage_lifebloom)
+   66093, 67957, 67958, 67959 - Lifebloom (spell_faction_champion_dru_lifebloom) */
 class spell_gen_lifebloom : public SpellScriptLoader
 {
 public:
@@ -4400,6 +4674,8 @@ enum SummonElemental
     SPELL_SUMMON_EARTH_ELEMENTAL = 19704
 };
 
+/* 40133 - Summon Fire Elemental (spell_gen_summon_fire_elemental)
+   40132 - Summon Earth Elemental (spell_gen_summon_earth_elemental) */
 class spell_gen_summon_elemental : public SpellScriptLoader
 {
 public:
@@ -4508,6 +4784,15 @@ enum Mounts
     SPELL_BIG_BLIZZARD_BEAR_310         = 58999
 };
 
+/* 58983 - Big Blizzard Bear (spell_big_blizzard_bear)
+   47977 - Magic Broom (spell_magic_broom)
+   48025 - Headless Horseman's Mount (spell_headless_horseman_mount)
+   54729 - Winged Steed of the Ebon Blade (spell_winged_steed_of_the_ebon_blade)
+   71342 - Big Love Rocket (spell_big_love_rocket)
+   72286 - Invincible (spell_invincible)
+   74856 - Blazing Hippogryph (spell_blazing_hippogryph)
+   75614 - Celestial Steed (spell_celestial_steed)
+   75973 - X-53 Touring Rocket (spell_x53_touring_rocket) */
 class spell_gen_mount : public SpellScriptLoader
 {
 public:
@@ -4644,6 +4929,7 @@ enum FoamSword
     ITEM_FOAM_SWORD_YELLOW  = 45179
 };
 
+// 64142 - Upper Deck - Create Foam Sword
 class spell_gen_upper_deck_create_foam_sword : public SpellScriptLoader
 {
 public:
@@ -4688,6 +4974,7 @@ enum Bonked
     SPELL_ON_GUARD          = 62972
 };
 
+// 62991 - Bonked!
 class spell_gen_bonked : public SpellScriptLoader
 {
 public:
@@ -4703,15 +4990,19 @@ public:
             {
                 Aura const* aura = GetHitAura();
                 if (!(aura && aura->GetStackAmount() == 3))
+                {
                     return;
+                }
 
                 target->CastSpell(target, SPELL_FOAM_SWORD_DEFEAT, true);
                 target->RemoveAurasDueToSpell(SPELL_BONKED);
 
-                if (Aura const* aura = target->GetAura(SPELL_ON_GUARD))
+                if (Aura const* onGuardAura = target->GetAura(SPELL_ON_GUARD))
                 {
-                    if (Item* item = target->GetItemByGuid(aura->GetCastItemGUID()))
+                    if (Item* item = target->GetItemByGuid(onGuardAura->GetCastItemGUID()))
+                    {
                         target->DestroyItemCount(item->GetEntry(), 1, true);
+                    }
                 }
             }
         }
@@ -4728,6 +5019,7 @@ public:
     }
 };
 
+// 28880, 59542, 59543, 59544, 59545, 59547, 59548 - Gift of the Naaru
 class spell_gen_gift_of_naaru : public SpellScriptLoader
 {
 public:
@@ -4786,6 +5078,8 @@ enum Replenishment
     SPELL_INFINITE_REPLENISHMENT    = 61782
 };
 
+/* 57669 - Replenishment
+   61782 - Infinite Replenishment + Wisdom */
 class spell_gen_replenishment : public SpellScriptLoader
 {
 public:
@@ -4808,13 +5102,13 @@ public:
                 }
             }
 
-            targets.remove_if(acore::PowerCheck(POWER_MANA, false));
+            targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
 
             uint8 const maxTargets = 10;
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::PowerPctOrderPred(POWER_MANA));
+                targets.sort(Acore::PowerPctOrderPred(POWER_MANA));
                 targets.resize(maxTargets);
             }
         }
@@ -4875,6 +5169,7 @@ enum SpectatorCheerTrigger
 
 uint8 const EmoteArray[3] = { EMOTE_ONE_SHOT_CHEER, EMOTE_ONE_SHOT_EXCLAMATION, EMOTE_ONE_SHOT_APPLAUD };
 
+// 55945 - Spectator - Cheer Trigger
 class spell_gen_spectator_cheer_trigger : public SpellScriptLoader
 {
 public:
@@ -4907,6 +5202,7 @@ enum VendorBarkTrigger
     SAY_AMPHITHEATER_VENDOR     = 0
 };
 
+// 56096 - Vendor - Bark Trigger
 class spell_gen_vendor_bark_trigger : public SpellScriptLoader
 {
 public:
@@ -4940,6 +5236,7 @@ enum WhisperGulchYoggSaronWhisper
     SPELL_YOGG_SARON_WHISPER_DUMMY  = 29072
 };
 
+// 27769 - Whisper Gulch: Yogg-Saron Whisper
 class spell_gen_whisper_gulch_yogg_saron_whisper : public SpellScriptLoader
 {
 public:
@@ -4972,6 +5269,7 @@ public:
     }
 };
 
+// 50630, 68576 - Eject All Passengers
 class spell_gen_eject_all_passengers : public SpellScriptLoader
 {
 public:
@@ -5005,6 +5303,17 @@ public:
     }
 };
 
+/* 62539 - Eject Passenger 2
+   64614 - Eject Passenger 4
+   64629 - Eject Passenger 1
+   64630 - Eject Passenger 2
+   64631 - Eject Passenger 3
+   64632 - Eject Passenger 4
+   64633 - Eject Passenger 5
+   64634 - Eject Passenger 6
+   64635 - Eject Passenger 7
+   64636 - Eject Passenger 8
+   67393 - Eject Passenger */
 class spell_gen_eject_passenger : public SpellScriptLoader
 {
 public:
@@ -5042,7 +5351,21 @@ public:
     }
 };
 
-// Used for some spells cast by vehicles or charmed creatures that do not send a cooldown event on their own
+/* 37727 - Touch of Darkness
+   37851 - Tag Greater Felfire Diemetradon
+   37917 - Arcano-Cloak
+   37918 - Arcano-pince
+   37919 - Arcano-dismantle
+   47911 - EMP
+   48620 - Wing Buffet
+   51748 - Signal Hemet to Attack
+   51752 - Stampy's Stompy-Stomp
+   51756 - Charge
+   54996 - Ice Slick
+   54997 - Cast Net
+   56513 - Jormungar Strike
+   56524 - Acid Breath */
+// Used for some spells cast by vehicles or charmed creatures that do not send a cooldown event on their own.
 class spell_gen_charmed_unit_spell_cooldown : public SpellScriptLoader
 {
 public:
@@ -5075,6 +5398,7 @@ public:
     }
 };
 
+// 58984 - Shadowmeld
 class spell_gen_shadowmeld : public SpellScriptLoader
 {
 public:
@@ -5132,7 +5456,7 @@ public:
 
 void AddSC_generic_spell_scripts()
 {
-    // ours:
+    new spell_gen_5000_gold();
     new spell_gen_model_visible();
     new spell_the_flag_of_ownership();
     new spell_gen_have_item_auras();
@@ -5151,7 +5475,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_disabled_above_63();
     new spell_gen_black_magic_enchant();
     new spell_gen_area_aura_select_players();
-    new spell_gen_mount("spell_big_blizzard_bear", 0, SPELL_BIG_BLIZZARD_BEAR_60, SPELL_BIG_BLIZZARD_BEAR_100, SPELL_BIG_BLIZZARD_BEAR_150, SPELL_BIG_BLIZZARD_BEAR_280, SPELL_BIG_BLIZZARD_BEAR_310);
     new spell_gen_select_target_count("spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
     new spell_gen_select_target_count("spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2);
     new spell_gen_select_target_count("spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5);
@@ -5179,8 +5502,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_flurry_of_claws();
     new spell_gen_throw_back();
     new spell_gen_haunted();
-
-    // theirs:
     new spell_gen_absorb0_hitlimit1();
     new spell_gen_adaptive_warding();
     new spell_gen_av_drekthar_presence();
@@ -5242,6 +5563,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_lifebloom("spell_faction_champion_dru_lifebloom", SPELL_FACTION_CHAMPIONS_DRU_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_summon_elemental("spell_gen_summon_fire_elemental", SPELL_SUMMON_FIRE_ELEMENTAL);
     new spell_gen_summon_elemental("spell_gen_summon_earth_elemental", SPELL_SUMMON_EARTH_ELEMENTAL);
+    new spell_gen_mount("spell_big_blizzard_bear", 0, SPELL_BIG_BLIZZARD_BEAR_60, SPELL_BIG_BLIZZARD_BEAR_100, SPELL_BIG_BLIZZARD_BEAR_150, SPELL_BIG_BLIZZARD_BEAR_280, SPELL_BIG_BLIZZARD_BEAR_310);
     new spell_gen_mount("spell_magic_broom", 0, SPELL_MAGIC_BROOM_60, SPELL_MAGIC_BROOM_100, SPELL_MAGIC_BROOM_150, SPELL_MAGIC_BROOM_280);
     new spell_gen_mount("spell_headless_horseman_mount", 0, SPELL_HEADLESS_HORSEMAN_MOUNT_60, SPELL_HEADLESS_HORSEMAN_MOUNT_100, SPELL_HEADLESS_HORSEMAN_MOUNT_150, SPELL_HEADLESS_HORSEMAN_MOUNT_280);
     new spell_gen_mount("spell_winged_steed_of_the_ebon_blade", 0, 0, 0, SPELL_WINGED_STEED_150, SPELL_WINGED_STEED_280);

@@ -55,8 +55,10 @@ public:
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
-                if (Encounter[i] == IN_PROGRESS)
+                if (Encounter[i] == IN_PROGRESS && i != BRANN_BRONZEBEARD)
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -185,8 +187,8 @@ public:
 
             if (data == DONE)
             {
-                isMaidenOfGriefDead = (type == BOSS_MAIDEN_OF_GRIEF ? true : isMaidenOfGriefDead);
-                isKrystalusDead = (type == BOSS_KRYSTALLUS ? true : isKrystalusDead);
+                isMaidenOfGriefDead = type == BOSS_MAIDEN_OF_GRIEF || isMaidenOfGriefDead;
+                isKrystalusDead = type == BOSS_KRYSTALLUS || isKrystalusDead;
             }
 
             if (isMaidenOfGriefDead && isKrystalusDead)

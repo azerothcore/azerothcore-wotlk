@@ -1,25 +1,19 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #ifndef _SQLOPERATION_H
 #define _SQLOPERATION_H
 
-#include <ace/Method_Request.h>
-#include <ace/Activation_Queue.h>
-
-#include "QueryResult.h"
-
-//- Forward declare (don't include header to prevent circular includes)
-class PreparedStatement;
+#include "DatabaseEnvFwd.h"
+#include "Define.h"
 
 //- Union that holds element data
 union SQLElementUnion
 {
-    PreparedStatement* stmt;
-    const char* query;
+    PreparedStatementBase* stmt;
+    char const* query;
 };
 
 //- Type specifier of our element data
@@ -36,20 +30,15 @@ struct SQLElementData
     SQLElementDataType type;
 };
 
-//- For ambigious resultsets
-union SQLResultSetUnion
-{
-    PreparedResultSet* presult;
-    ResultSet* qresult;
-};
-
 class MySQLConnection;
 
-class SQLOperation : public ACE_Method_Request
+class AC_DATABASE_API SQLOperation
 {
 public:
     SQLOperation(): m_conn(nullptr) { }
-    int call() override
+    virtual ~SQLOperation() { }
+
+    virtual int call()
     {
         Execute();
         return 0;
@@ -58,6 +47,10 @@ public:
     virtual void SetConnection(MySQLConnection* con) { m_conn = con; }
 
     MySQLConnection* m_conn;
+
+private:
+    SQLOperation(SQLOperation const& right) = delete;
+    SQLOperation& operator=(SQLOperation const& right) = delete;
 };
 
 #endif

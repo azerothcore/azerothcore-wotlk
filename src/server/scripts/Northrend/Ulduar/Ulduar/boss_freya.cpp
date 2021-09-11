@@ -122,7 +122,7 @@ enum FreyaSpells
 #define SPELL_NATURE_FURY                       RAID_MODE(SPELL_NATURE_FURY_10, SPELL_NATURE_FURY_25)
 #define SPELL_HARDENED_BARK                     RAID_MODE(SPELL_HARDENED_BARK_10, SPELL_HARDENED_BARK_25)
 #define SPELL_DETONATE                          RAID_MODE(SPELL_DETONATE_10, SPELL_DETONATE_25)
-#define SPELL_NATURE_BOMB_DAMAGE                RAID_MODE(SPELL_NATURE_BOMB_DAMAGE_10, SPELL_NATURE_BOMB_DAMAGE_25)
+//#define SPELL_NATURE_BOMB_DAMAGE                RAID_MODE(SPELL_NATURE_BOMB_DAMAGE_10, SPELL_NATURE_BOMB_DAMAGE_25)
 #define SPELL_SUNBEAM                           RAID_MODE(SPELL_SUNBEAM_10, SPELL_SUNBEAM_25)
 #define SPELL_GROUND_TREMOR_FREYA               RAID_MODE(SPELL_GROUND_TREMOR_FREYA_10, SPELL_GROUND_TREMOR_FREYA_25)
 #define SPELL_IRON_ROOTS_FREYA                  RAID_MODE(SPELL_IRON_ROOTS_FREYA_10, SPELL_IRON_ROOTS_FREYA_25)
@@ -502,8 +502,7 @@ public:
                 m_pInstance->SetData(TYPE_FREYA, IN_PROGRESS);
 
             // HARD MODE CHECKS
-            Creature* elder = nullptr;
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_STONEBARK));
+            Creature* elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_STONEBARK));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -1294,7 +1293,7 @@ class achievement_freya_getting_back_to_nature : public AchievementCriteriaScrip
 public:
     achievement_freya_getting_back_to_nature() : AchievementCriteriaScript("achievement_freya_getting_back_to_nature") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/, uint32 /*criteria_id*/) override
     {
         if (target)
             if (target->GetAI()->GetData(DATA_BACK_TO_NATURE))
@@ -1311,7 +1310,7 @@ public:
     {
     }
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/, uint32 /*criteria_id*/) override
     {
         return target && _elderCount <= target->GetAI()->GetData(DATA_GET_ELDER_COUNT);
     }

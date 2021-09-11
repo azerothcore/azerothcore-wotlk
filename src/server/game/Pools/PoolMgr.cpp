@@ -141,34 +141,6 @@ bool PoolGroup<T>::CheckPool() const
     return true;
 }
 
-template <class T>
-PoolObject* PoolGroup<T>::RollOne(ActivePoolData& spawns, uint32 triggerFrom)
-{
-    if (!ExplicitlyChanced.empty())
-    {
-        float roll = (float)rand_chance();
-
-        for (uint32 i = 0; i < ExplicitlyChanced.size(); ++i)
-        {
-            roll -= ExplicitlyChanced[i].chance;
-            // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
-            // so this need explicit check for this case
-            if (roll < 0 && (ExplicitlyChanced[i].guid == triggerFrom || !spawns.IsActiveObject<T>(ExplicitlyChanced[i].guid)))
-                return &ExplicitlyChanced[i];
-        }
-    }
-    if (!EqualChanced.empty())
-    {
-        int32 index = irand(0, EqualChanced.size() - 1);
-        // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
-        // so this need explicit check for this case
-        if (EqualChanced[index].guid == triggerFrom || !spawns.IsActiveObject<T>(EqualChanced[index].guid))
-            return &EqualChanced[index];
-    }
-
-    return nullptr;
-}
-
 // Main method to despawn a creature or gameobject in a pool
 // If no guid is passed, the pool is just removed (event end case)
 // If guid is filled, cache will be used and no removal will occur, it just fill the cache
@@ -321,40 +293,70 @@ void PoolGroup<Pool>::RemoveOneRelation(uint32 child_pool_id)
 template <class T>
 void PoolGroup<T>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 triggerFrom)
 {
-    uint32 lastDespawned = 0;
     int count = limit - spawns.GetActiveObjectCount(poolId);
 
     // If triggered from some object respawn this object is still marked as spawned
     // and also counted into m_SpawnedPoolAmount so we need increase count to be
     // spawned by 1
     if (triggerFrom)
-        ++count;
-
-    // This will try to spawn the rest of pool, not guaranteed
-    for (int i = 0; i < count; ++i)
     {
-        PoolObject* obj = RollOne(spawns, triggerFrom);
-        if (!obj)
-            continue;
-        if (obj->guid == lastDespawned)
-            continue;
+        ++count;
+    }
 
-        if (obj->guid == triggerFrom)
-        {
-            ReSpawn1Object(obj);
-            triggerFrom = 0;
-            continue;
-        }
-        spawns.ActivateObject<T>(obj->guid, poolId);
-        Spawn1Object(obj);
+    if (count > 0)
+    {
+        PoolObjectList rolledObjects;
+        rolledObjects.reserve(count);
 
-        if (triggerFrom)
+        // roll objects to be spawned
+        if (!ExplicitlyChanced.empty())
         {
-            // One spawn one despawn no count increase
-            DespawnObject(spawns, triggerFrom);
-            lastDespawned = triggerFrom;
-            triggerFrom = 0;
+            float roll = (float)rand_chance();
+
+            for (PoolObject& obj : ExplicitlyChanced)
+            {
+                roll -= obj.chance;
+
+                // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
+                // so this need explicit check for this case
+                if (roll < 0 && (/*obj.guid == triggerFrom ||*/ !spawns.IsActiveObject<T>(obj.guid)))
+                {
+                    rolledObjects.push_back(obj);
+                    break;
+                }
+            }
         }
+
+        if (!EqualChanced.empty() && rolledObjects.empty())
+        {
+            std::copy_if(EqualChanced.begin(), EqualChanced.end(), std::back_inserter(rolledObjects), [/*triggerFrom, */&spawns](PoolObject const& object)
+            {
+                 return /*object.guid == triggerFrom ||*/ !spawns.IsActiveObject<T>(object.guid);
+            });
+
+            Acore::Containers::RandomResize(rolledObjects, count);
+        }
+
+        // try to spawn rolled objects
+        for (PoolObject& obj : rolledObjects)
+        {
+            if (obj.guid == triggerFrom)
+            {
+                ReSpawn1Object(&obj);
+                triggerFrom = 0;
+            }
+            else
+            {
+                spawns.ActivateObject<T>(obj.guid, poolId);
+                Spawn1Object(&obj);
+            }
+        }
+    }
+
+    // One spawn one despawn no count increase
+    if (triggerFrom)
+    {
+        DespawnObject(spawns, triggerFrom);
     }
 }
 
@@ -427,9 +429,7 @@ void PoolGroup<Quest>::Spawn1Object(PoolObject* obj)
     PooledQuestRelationBoundsNC qr = sPoolMgr->mQuestCreatureRelation.equal_range(obj->guid);
     for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("pool", "PoolGroup<Quest>: Adding quest %u to creature %u", itr->first, itr->second);
-#endif
         questMap->insert(QuestRelations::value_type(itr->second, itr->first));
     }
 
@@ -438,9 +438,7 @@ void PoolGroup<Quest>::Spawn1Object(PoolObject* obj)
     qr = sPoolMgr->mQuestGORelation.equal_range(obj->guid);
     for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("pool", "PoolGroup<Quest>: Adding quest %u to GO %u", itr->first, itr->second);
-#endif
         questMap->insert(QuestRelations::value_type(itr->second, itr->first));
     }
 }
@@ -448,13 +446,11 @@ void PoolGroup<Quest>::Spawn1Object(PoolObject* obj)
 template <>
 void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 triggerFrom)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("pool", "PoolGroup<Quest>: Spawning pool %u", poolId);
-#endif
     // load state from db
     if (!triggerFrom)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_POOL_QUEST_SAVE);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_POOL_QUEST_SAVE);
 
         stmt->setUInt32(0, poolId);
 
@@ -493,7 +489,7 @@ void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 
     {
         do
         {
-            uint32 questId = acore::Containers::SelectRandomContainerElement(currentQuests);
+            uint32 questId = Acore::Containers::SelectRandomContainerElement(currentQuests);
             newQuests.insert(questId);
             currentQuests.erase(questId);
         } while (newQuests.size() < limit && !currentQuests.empty()); // failsafe
@@ -505,7 +501,7 @@ void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 
     // activate <limit> random quests
     do
     {
-        uint32 questId = acore::Containers::SelectRandomContainerElement(newQuests);
+        uint32 questId = Acore::Containers::SelectRandomContainerElement(newQuests);
         spawns.ActivateObject<Quest>(questId, poolId);
         PoolObject tempObj(questId, 0.0f);
         Spawn1Object(&tempObj);
@@ -574,8 +570,8 @@ void PoolMgr::LoadFromDB()
         if (!result)
         {
             mPoolTemplate.clear();
-            LOG_INFO("server", ">> Loaded 0 object pools. DB table `pool_template` is empty.");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 object pools. DB table `pool_template` is empty.");
+            LOG_INFO("server.loading", " ");
             return;
         }
 
@@ -592,13 +588,13 @@ void PoolMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("server", ">> Loaded %u objects pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded %u objects pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server.loading", " ");
     }
 
     // Creatures
 
-    LOG_INFO("server", "Loading Creatures Pooling Data...");
+    LOG_INFO("server.loading", "Loading Creatures Pooling Data...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -607,8 +603,8 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 creatures in  pools. DB table `pool_creature` is empty.");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 creatures in  pools. DB table `pool_creature` is empty.");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -649,14 +645,14 @@ void PoolMgr::LoadFromDB()
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u creatures in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u creatures in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
     // Gameobjects
 
-    LOG_INFO("server", "Loading Gameobject Pooling Data...");
+    LOG_INFO("server.loading", "Loading Gameobject Pooling Data...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -665,8 +661,8 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 gameobjects in  pools. DB table `pool_gameobject` is empty.");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 gameobjects in  pools. DB table `pool_gameobject` is empty.");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -719,14 +715,14 @@ void PoolMgr::LoadFromDB()
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u gameobject in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u gameobject in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
     // Pool of pools
 
-    LOG_INFO("server", "Loading Mother Pooling Data...");
+    LOG_INFO("server.loading", "Loading Mother Pooling Data...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -735,8 +731,8 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 pools in pools");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 pools in pools");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -788,7 +784,7 @@ void PoolMgr::LoadFromDB()
 
             // Now check for circular reference
             // All pool_ids are in pool_template
-            for (auto const it : mPoolTemplate)
+            for (auto const& it : mPoolTemplate)
             {
                 std::set<uint32> checkedPools;
                 for (SearchMap::iterator poolItr = mPoolSearchMap.find(it.first); poolItr != mPoolSearchMap.end(); poolItr = mPoolSearchMap.find(poolItr->second))
@@ -811,22 +807,22 @@ void PoolMgr::LoadFromDB()
                 }
             }
 
-            LOG_INFO("server", ">> Loaded %u pools in mother pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u pools in mother pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
-    LOG_INFO("server", "Loading Quest Pooling Data...");
+    LOG_INFO("server.loading", "Loading Quest Pooling Data...");
     {
         uint32 oldMSTime = getMSTime();
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_QUEST_POOLS);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_QUEST_POOLS);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
 
         if (!result)
         {
-            LOG_INFO("server", ">> Loaded 0 quests in pools");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded 0 quests in pools");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -901,13 +897,13 @@ void PoolMgr::LoadFromDB()
                 ++count;
             } while (result->NextRow());
 
-            LOG_INFO("server", ">> Loaded %u quests in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Loaded %u quests in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 
     // The initialize method will spawn all pools not in an event and not in another pool, this is why there is 2 left joins with 2 null checks
-    LOG_INFO("server", "Starting objects pooling system...");
+    LOG_INFO("server.loading", "Starting objects pooling system...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -917,8 +913,8 @@ void PoolMgr::LoadFromDB()
 
         if (!result)
         {
-            LOG_INFO("server", ">> Pool handling system initialized, 0 pools spawned.");
-            LOG_INFO("server", " ");
+            LOG_INFO("server.loading", ">> Pool handling system initialized, 0 pools spawned.");
+            LOG_INFO("server.loading", " ");
         }
         else
         {
@@ -948,8 +944,8 @@ void PoolMgr::LoadFromDB()
                 }
             } while (result->NextRow());
 
-            LOG_INFO("server", "Pool handling system initialized, %u pools spawned in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", " ");
+            LOG_INFO("pool", "Pool handling system initialized, %u pools spawned in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", " ");
         }
     }
 }
@@ -960,7 +956,7 @@ void PoolMgr::LoadQuestPools()
 
 void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
 {
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     // pussywizard: mysql thread races, change only what is meant to be changed
     std::set<uint32> deletedPools;
@@ -977,7 +973,7 @@ void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
             if (!other && !quest->IsDaily() && !quest->IsWeekly())
                 continue;
         }
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_POOL_SAVE);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_POOL_SAVE);
         stmt->setUInt32(0, itr->second.GetPoolId());
         trans->Append(stmt);
         deletedPools.insert(itr->second.GetPoolId());
@@ -987,7 +983,7 @@ void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
         if (deletedPools.find(itr->second) != deletedPools.end())
             if (IsSpawnedObject<Quest>(itr->first))
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_POOL_SAVE);
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_POOL_SAVE);
                 stmt->setUInt32(0, itr->second);
                 stmt->setUInt32(1, itr->first);
                 trans->Append(stmt);

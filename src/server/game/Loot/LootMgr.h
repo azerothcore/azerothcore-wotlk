@@ -15,8 +15,8 @@
 #include "SharedDefines.h"
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <vector>
-
 
 enum RollType
 {
@@ -111,12 +111,13 @@ enum LootSlotType
 class Player;
 class LootStore;
 class ConditionMgr;
+class GameObject;
 struct Loot;
 
 struct LootStoreItem
 {
     uint32  itemid;                                         // id of the item
-    uint32  reference;                                      // referenced TemplateleId
+    int32   reference;                                      // referenced TemplateleId
     float   chance;                                         // chance to drop for both quest and non-quest items, chance to be used for refs
     bool    needs_quest : 1;                                // quest drop (quest is required for item to drop)
     uint16  lootmode;
@@ -127,7 +128,7 @@ struct LootStoreItem
 
     // Constructor
     // displayid is filled in IsValid() which must be called after
-    LootStoreItem(uint32 _itemid, uint32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
+    LootStoreItem(uint32 _itemid, int32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
         : itemid(_itemid), reference(_reference), chance(_chance), needs_quest(_needs_quest),
           lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount)
     {}
@@ -142,6 +143,7 @@ typedef GuidSet AllowedLooterSet;
 struct LootItem
 {
     uint32  itemid;
+    uint32  itemIndex;
     uint32  randomSuffix;
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition
@@ -242,7 +244,7 @@ public:
     // Rolls for every item in the template and adds the rolled items the the loot
     void Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId = 0) const;
     void CopyConditions(ConditionList conditions);
-    void CopyConditions(LootItem* li) const;
+    bool CopyConditions(LootItem* li, uint32 conditionLootId = 0) const;
 
     // True if template includes at least 1 quest drop entry
     [[nodiscard]] bool HasQuestDrop(LootTemplateMap const& store, uint8 groupId = 0) const;
@@ -309,10 +311,12 @@ struct Loot
     uint32 gold;
     uint8 unlootedCount{0};
     ObjectGuid roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
+    ObjectGuid lootOwnerGUID;
     LootType loot_type{LOOT_NONE};      // required for achievement system
 
     // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
     ObjectGuid containerGUID;
+    GameObject* sourceGameObject{nullptr};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
     ~Loot() { clear(); }
@@ -358,7 +362,7 @@ struct Loot
     void RemoveLooter(ObjectGuid GUID) { PlayersLooting.erase(GUID); }
 
     void generateMoneyLoot(uint32 minAmount, uint32 maxAmount);
-    bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT);
+    bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT, WorldObject* lootSource = nullptr);
 
     // Inserts the item into the loot (called by LootTemplate processors)
     void AddItem(LootStoreItem const& item);
@@ -368,12 +372,12 @@ struct Loot
     bool hasItemForAll() const;
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
+    void FillNotNormalLootFor(Player* player);
 
 private:
-    void FillNotNormalLootFor(Player* player, bool presentAtLooting);
     QuestItemList* FillFFALoot(Player* player);
     QuestItemList* FillQuestLoot(Player* player);
-    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting);
+    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player);
 
     typedef GuidSet PlayersLootingSet;
     PlayersLootingSet PlayersLooting;

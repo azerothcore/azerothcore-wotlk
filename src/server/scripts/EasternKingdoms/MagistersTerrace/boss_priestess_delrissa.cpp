@@ -104,7 +104,7 @@ public:
             std::list<uint32> helpersList;
             for (uint8 i = 0; i < MAX_HELPERS_COUNT; ++i)
                 helpersList.push_back(helpersEntries[i]);
-            acore::Containers::RandomResizeList(helpersList, MAX_ACTIVE_HELPERS);
+            Acore::Containers::RandomResize(helpersList, MAX_ACTIVE_HELPERS);
 
             uint8 j = 0;
             for (std::list<uint32>::const_iterator itr = helpersList.begin(); itr != helpersList.end(); ++itr, ++j)
@@ -127,7 +127,7 @@ public:
             else if (HelpersKilled == MAX_ACTIVE_HELPERS)
             {
                 me->loot.clear();
-                me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1);
+                me->loot.FillLoot(me->GetCreatureTemplate()->lootid, LootTemplates_Creature, me->GetLootRecipient(), false, false, 1, me);
                 instance->SetData(DATA_DELRISSA_EVENT, DONE);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
@@ -199,7 +199,7 @@ public:
                 case EVENT_SPELL_PW_SHIELD:
                     {
                         std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H));
-                        if (Unit* target = acore::Containers::SelectRandomContainerElement(cList))
+                        if (Unit* target = Acore::Containers::SelectRandomContainerElement(cList))
                             me->CastSpell(target, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H), false);
                         events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 10000);
                         break;
@@ -216,7 +216,7 @@ public:
                                 target = me;
                                 break;
                             case 2:
-                                target = ObjectAccessor::GetCreature(*me, acore::Containers::SelectRandomContainerElement(summons));
+                                target = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(summons));
                                 break;
                         }
 
@@ -956,12 +956,12 @@ public:
     {
         boss_apokoAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
 
-        uint32 Totem_Timer;
+//        uint32 Totem_Timer;
         uint8  Totem_Amount;
         uint32 War_Stomp_Timer;
-        uint32 Purge_Timer;
+//        uint32 Purge_Timer;
         uint32 Healing_Wave_Timer;
-        uint32 Frost_Shock_Timer;
+//        uint32 Frost_Shock_Timer;
 
         void EnterCombat(Unit* who) override
         {

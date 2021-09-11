@@ -2,7 +2,6 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "MoveSplineInit.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -30,15 +29,15 @@
 #define SPELL_CHAIN_3                       49683
 #define SPELL_CHAIN_4                       49684
 #define SPELL_LAUNCH_CHAIN                  62505
-#define SPELL_HARPOON_SHOT_BUFF             62509
-#define SPELL_HARPOON_FIRE_STATE            62696
+//#define SPELL_HARPOON_SHOT_BUFF             62509
+//#define SPELL_HARPOON_FIRE_STATE            62696
 #define REQ_CHAIN_COUNT                     RAID_MODE(2, 4)
 
 #define SPELL_DEVOURINGFLAME_SUMMON         63308
-#define SPELL_DEVOURINGFLAME_GROUNDAURA_10  64709
-#define SPELL_DEVOURINGFLAME_GROUNDAURA_25  64734
-#define S_DEVOURINGFLAME_GROUNDAURA         RAID_MODE(SPELL_DEVOURINGFLAME_GROUNDAURA_10, SPELL_DEVOURINGFLAME_GROUNDAURA_25)
-#define NPC_DEVOURINGFLAME                  34188
+//#define SPELL_DEVOURINGFLAME_GROUNDAURA_10  64709
+//#define SPELL_DEVOURINGFLAME_GROUNDAURA_25  64734
+//#define S_DEVOURINGFLAME_GROUNDAURA         RAID_MODE(SPELL_DEVOURINGFLAME_GROUNDAURA_10, SPELL_DEVOURINGFLAME_GROUNDAURA_25)
+//#define NPC_DEVOURINGFLAME                  34188
 #define SPELL_STORMSTRIKE                   51876
 #define SPELL_WHIRLWIND                     63808
 #define SPELL_LIGHTINGBOLT                  63809
@@ -49,10 +48,10 @@
 #define NPC_DARK_RUNE_WATCHER               33453
 #define NPC_EXPEDITION_ENGINEER             33287
 #define NPC_EXPEDITION_COMMANDER            33210
-#define NPC_EXPEDITION_DEFENDER             33816
-#define NPC_EXPEDITION_TRAPPER              33259
+//#define NPC_EXPEDITION_DEFENDER             33816
+//#define NPC_EXPEDITION_TRAPPER              33259
 #define NPC_RAZORSCALE                      33186
-#define NPC_HARPOON_FIRE_STATE              33282
+//#define NPC_HARPOON_FIRE_STATE              33282
 
 #define GO_DRILL                            195305
 #define GO_HARPOON_GUN_1                    194519
@@ -208,16 +207,22 @@ public:
             {
                 case SPELL_LAUNCH_CHAIN:
                     {
-                        uint32 spell = 0;
-                        if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1) )
-                            spell = SPELL_CHAIN_1;
-                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2) )
-                            spell = SPELL_CHAIN_2;
-                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3) )
-                            spell = SPELL_CHAIN_3;
-                        else
-                            spell = SPELL_CHAIN_4;
-                        caster->CastSpell(me, spell, true);
+                        uint32 spellId = SPELL_CHAIN_4;
+
+                        if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
+                        {
+                            spellId = SPELL_CHAIN_1;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
+                        {
+                            spellId = SPELL_CHAIN_2;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
+                        {
+                            spellId = SPELL_CHAIN_3;
+                        }
+
+                        caster->CastSpell(me, spellId, true);
                     }
                     break;
                 case SPELL_CHAIN_1:
@@ -1096,7 +1101,7 @@ class achievement_quick_shave : public AchievementCriteriaScript
 public:
     achievement_quick_shave() : AchievementCriteriaScript("achievement_quick_shave") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetTypeId() == TYPEID_UNIT && target->GetEntry() == NPC_RAZORSCALE && target->ToCreature()->AI()->GetData(1);
     }
@@ -1107,7 +1112,7 @@ class achievement_iron_dwarf_medium_rare : public AchievementCriteriaScript
 public:
     achievement_iron_dwarf_medium_rare() : AchievementCriteriaScript("achievement_iron_dwarf_medium_rare") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_RAZORSCALE;
     }

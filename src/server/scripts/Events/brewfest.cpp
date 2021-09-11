@@ -1,4 +1,6 @@
-// Scripted by Xinef
+/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
 #include "CellImpl.h"
 #include "GameEventMgr.h"
@@ -1107,9 +1109,9 @@ public:
             {
                 timer = 0;
                 Player* player = nullptr;
-                acore::AnyPlayerInObjectRangeCheck checker(me, 2.0f);
-                acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, checker);
-                me->VisitNearbyWorldObject(2.0f, searcher);
+                Acore::AnyPlayerInObjectRangeCheck checker(me, 2.0f);
+                Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, player, checker);
+                Cell::VisitWorldObjects(me, searcher, 2.0f);
                 if (player)
                 {
                     player->CastSpell(player, SPELL_DRUNKEN_MASTER, true);
@@ -1206,8 +1208,10 @@ public:
                         break;
                     }
                     // just walking, fatiuge handling
-                    if (Aura* aur = caster->GetAura(SPELL_RAM_FATIGUE))
-                        aur->ModStackAmount(-4);
+                    if (Aura* fatigueAura = caster->GetAura(SPELL_RAM_FATIGUE))
+                    {
+                        fatigueAura->ModStackAmount(-4);
+                    }
                     break;
                 case 1:
                     // One click to maintain speed, more to increase
@@ -1590,8 +1594,13 @@ public:
             targets.push_back(caster);
         }
 
-        void HandleBeforeHit()
+        void HandleBeforeHit(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (Unit* target = GetHitUnit())
             {
                 if (!GetCaster() || target->GetGUID() == GetCaster()->GetGUID())
@@ -1636,7 +1645,7 @@ public:
         {
             OnCheckCast += SpellCheckCastFn(spell_brewfest_toss_mug_SpellScript::CheckCast);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_brewfest_toss_mug_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            BeforeHit += SpellHitFn(spell_brewfest_toss_mug_SpellScript::HandleBeforeHit);
+            BeforeHit += BeforeSpellHitFn(spell_brewfest_toss_mug_SpellScript::HandleBeforeHit);
             OnEffectHitTarget += SpellEffectFn(spell_brewfest_toss_mug_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };

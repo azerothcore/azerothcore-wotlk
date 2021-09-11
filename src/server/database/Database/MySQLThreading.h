@@ -1,47 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #ifndef _MYSQLTHREADING_H
 #define _MYSQLTHREADING_H
 
-#include "Log.h"
+#include "Define.h"
 
-class MySQL
+namespace MySQL
 {
-public:
-    /*! Create a thread on the MySQL server to mirrior the calling thread,
-        initializes thread-specific variables and allows thread-specific
-        operations without concurrence from other threads.
-        This should only be called if multiple core threads are running
-        on the same MySQL connection. Seperate MySQL connections implicitly
-        create a mirror thread.
-    */
-    static void Thread_Init()
-    {
-        mysql_thread_init();
-    }
-
-    /*! Shuts down MySQL thread and frees resources, should only be called
-        when we terminate. MySQL threads and connections are not configurable
-        during runtime.
-    */
-    static void Thread_End()
-    {
-        mysql_thread_end();
-    }
-
-    static void Library_Init()
-    {
-        mysql_library_init(-1, nullptr, nullptr);
-    }
-
-    static void Library_End()
-    {
-        mysql_library_end();
-    }
-};
+    AC_DATABASE_API void Library_Init();
+    AC_DATABASE_API void Library_End();
+    AC_DATABASE_API uint32 GetLibraryVersion();
+}
 
 #endif

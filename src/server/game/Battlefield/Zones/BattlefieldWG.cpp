@@ -10,7 +10,6 @@
 
 #include "BattlefieldWG.h"
 #include "MapManager.h"
-#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"
@@ -220,7 +219,7 @@ void BattlefieldWG::OnBattleStart()
         m_titansRelic = go->GetGUID();
     }
     else
-        LOG_ERROR("server", "WG: Failed to spawn titan relic.");
+        LOG_ERROR("bg.battlefield", "WG: Failed to spawn titan relic.");
 
     // Update tower visibility and update faction
     for (GuidUnorderedSet::const_iterator itr = CanonList.begin(); itr != CanonList.end(); ++itr)
@@ -499,7 +498,7 @@ uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
         case AREA_THE_CHILLED_QUAGMIRE:
             return BATTLEFIELD_WG_GY_HORDE;
         default:
-            LOG_ERROR("server", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id %u", areaId);
+            LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id %u", areaId);
             break;
     }
 
@@ -532,7 +531,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
         case NPC_TAUNKA_SPIRIT_GUIDE:
             {
                 TeamId teamId = (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE);
-                uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId(true));
+                uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId());
                 // xinef: little workaround, there are 2 spirit guides in same area
                 if (creature->IsWithinDist2d(5103.0f, 3461.5f, 5.0f))
                     graveyardId = BATTLEFIELD_WG_GY_WORKSHOP_NW;
@@ -740,27 +739,31 @@ void BattlefieldWG::PromotePlayer(Player* killer)
     if (!m_isActive)
         return;
     // Updating rank of player
-    if (Aura* aur = killer->GetAura(SPELL_RECRUIT))
+    if (Aura* recruitAura = killer->GetAura(SPELL_RECRUIT))
     {
-        if (aur->GetStackAmount() >= 5)
+        if (recruitAura->GetStackAmount() >= 5)
         {
             killer->RemoveAura(SPELL_RECRUIT);
             killer->CastSpell(killer, SPELL_CORPORAL, true);
             SendWarningToPlayer(killer, BATTLEFIELD_WG_TEXT_FIRSTRANK);
         }
         else
+        {
             killer->CastSpell(killer, SPELL_RECRUIT, true);
+        }
     }
-    else if (Aura* aur = killer->GetAura(SPELL_CORPORAL))
+    else if (Aura* corporalAura = killer->GetAura(SPELL_CORPORAL))
     {
-        if (aur->GetStackAmount() >= 5)
+        if (corporalAura->GetStackAmount() >= 5)
         {
             killer->RemoveAura(SPELL_CORPORAL);
             killer->CastSpell(killer, SPELL_LIEUTENANT, true);
             SendWarningToPlayer(killer, BATTLEFIELD_WG_TEXT_SECONDRANK);
         }
         else
+        {
             killer->CastSpell(killer, SPELL_CORPORAL, true);
+        }
     }
 }
 
@@ -990,9 +993,13 @@ void BattlefieldWG::ProcessEvent(WorldObject* obj, uint32 eventId)
     if (go->GetEntry() == GO_WINTERGRASP_TITAN_S_RELIC)
     {
         if (CanInteractWithRelic())
+        {
             EndBattle(false);
-        else if (GameObject* go = GetRelic())
-            go->SetRespawnTime(RESPAWN_IMMEDIATELY);
+        }
+        else if (GameObject* relic = GetRelic())
+        {
+            relic->SetRespawnTime(RESPAWN_IMMEDIATELY);
+        }
     }
 
     // if destroy or damage event, search the wall/tower and update worldstate/send warning message

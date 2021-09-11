@@ -577,7 +577,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HealthBelowPct(30) && !(me->GetEntry() == DARK_SHADE_ENTRY))
+            if (me->HealthBelowPct(30) && me->GetEntry() != DARK_SHADE_ENTRY)
             {
                 events.Reset();
                 me->InterruptNonMeleeSpells(false);
@@ -628,7 +628,6 @@ public:
         return GetScholomanceAI<npc_scholomance_occultistAI>(creature);
     }
 };
-
 
 void AddSC_instance_scholomance()
 {
