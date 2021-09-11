@@ -1961,7 +1961,16 @@ public:
             auto const& [_muteDate, _muteTime, _reason, _author] = *muteInfo;
 
             muteTime = _muteTime;
-            muteLeft = secsToTimeString(static_cast<uint64>(_muteDate + muteTime.count()) - time(nullptr), true);
+
+            if (_muteDate)
+            {
+                muteLeft = Acore::Time::ToTimeString<Seconds>(_muteDate + muteTime.count() - time(nullptr));
+            }
+            else
+            {
+                muteLeft = Acore::Time::ToTimeString(muteTime);
+            }
+            
             muteReason = _reason;
             muteBy = _author;
         }
