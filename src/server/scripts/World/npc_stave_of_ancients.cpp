@@ -1201,6 +1201,19 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void SpellHit(Unit* /*Caster*/, const SpellInfo* Spell) override
+        {
+            if (InNormalForm())
+            {
+                return;
+            }
+
+            if (Spell->Id == FRANKLIN_WEAKNESS_SCORPID_STING)
+            {
+                me->CastSpell(me, FRANKLIN_SPELL_ENTROPIC_STING, false);
+            }
+        }
+
         void ScheduleEncounterStart(ObjectGuid playerGUID)
         {
             PrepareForEncounter();

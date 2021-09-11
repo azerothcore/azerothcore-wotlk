@@ -119,7 +119,10 @@ enum NPCFranklin
 
     FRANKLIN_HEAD                               = 18953, // item_template.entry
 
-    FRANKLIN_SPELL_DEMONIC_ENRAGE               = 23257
+    FRANKLIN_WEAKNESS_SCORPID_STING             = 3043,
+
+    FRANKLIN_SPELL_DEMONIC_ENRAGE               = 23257,
+    FRANKLIN_SPELL_ENTROPIC_STING               = 23260
 };
 
 struct NPCStaveQuestAI : public ScriptedAI
