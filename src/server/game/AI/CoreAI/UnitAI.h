@@ -172,7 +172,7 @@ public:
 
     virtual bool CanAIAttack(Unit const* /*target*/) const { return true; }
     virtual void AttackStart(Unit* /*target*/);
-    virtual void UpdateAI(uint32 diff) { };
+    virtual void UpdateAI(uint32 /*diff*/) = 0;
 
     virtual void InitializeAI() { if (!me->isDead()) Reset(); }
 

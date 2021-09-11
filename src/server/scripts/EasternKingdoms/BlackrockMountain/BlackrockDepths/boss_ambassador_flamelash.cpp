@@ -205,9 +205,9 @@ class npc_burning_spirit : public CreatureScript
 public:
     npc_burning_spirit() : CreatureScript("npc_burning_spirit") { }
 
-    struct npc_burning_spiritAI : public CreatureAI
+    struct npc_burning_spiritAI : public ScriptedAI
     {
-        npc_burning_spiritAI(Creature* creature) : CreatureAI(creature) { }
+        npc_burning_spiritAI(Creature* creature) : ScriptedAI(creature) {}
 
         void IsSummonedBy(Unit* summoner) override
         {
