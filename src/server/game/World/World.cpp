@@ -1233,6 +1233,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_FFA_PVP_TIMER] = sConfigMgr->GetOption<int32>("FFAPvPTimer", 30);
 
+    m_int_configs[CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION] = sConfigMgr->GetOption<int32>("LootNeedBeforeGreedILvlRestriction", 70);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
