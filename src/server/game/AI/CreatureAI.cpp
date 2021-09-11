@@ -14,9 +14,6 @@
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
-
 class PhasedReset : public BasicEvent
 {
 public:
@@ -24,8 +21,7 @@ public:
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
-        //_owner.SetVisible(true);
-        _owner.SetPhaseMask(1, true);
+        _owner.SetVisible(true);
         return true;
     }
 
@@ -33,10 +29,10 @@ private:
     Creature& _owner;
 };
 
-class PhasedDeath : public BasicEvent
+class PhasedRespawn : public BasicEvent
 {
 public:
-    PhasedDeath(Creature& owner) : BasicEvent(), _owner(owner) {}
+    PhasedRespawn(Creature& owner) : BasicEvent(), _owner(owner) {}
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -210,10 +206,9 @@ void CreatureAI::EnterEvadeMode()
     if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
         me->GetVehicleKit()->Reset(true);
 
-    //me->SetVisible(false);
-    me->SetPhaseMask(2, true);
-    me->m_Events.AddEvent(new PhasedDeath(*me), me->m_Events.CalculateTime(5000));
-    me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(10000));
+    me->SetVisible(false);
+    me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(10000));
+    me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(30000));
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
