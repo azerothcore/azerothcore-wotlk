@@ -104,6 +104,15 @@ enum NPCNelson
     NELSON_SPELL_CREEPING_DOOM                = 23589
 };
 
+enum NPCFranklin
+{
+    FRANKLIN_GOSSIP_TEXT                        = 7043,  // npc_text.ID                "Lava? Pay no mind to all of that, frien..."
+    FRANKLIN_GOSSIP_OPTION_TEXT                 = 14529, // creature_text.CreatureID   "So you are Klinfran the Crazed? Sad, I ..."
+    FRANKLIN_SAY                                = 9772,  // broadcast_text.ID          "I shall enjoy this, hunter. I shall enj..."
+
+    FRANKLIN_HEAD                               = 18953  // item_template.entry
+};
+
 struct NPCStaveQuestAI : public ScriptedAI
 {
     NPCStaveQuestAI(Creature *creature) : ScriptedAI(creature) { }

@@ -1072,10 +1072,59 @@ public:
     }
 };
 
+class npc_franklin : public CreatureScript
+{
+public:
+    npc_franklin() : CreatureScript("npc_franklin") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_franklinAI(creature);
+    }
+
+    struct npc_franklinAI : public NPCStaveQuestAI
+    {
+        npc_franklinAI(Creature *creature) : NPCStaveQuestAI(creature) { }
+
+        EventMap events;
+
+        void ScheduleEncounterStart(ObjectGuid playerGUID)
+        {
+            PrepareForEncounter();
+            gossipPlayerGUID = playerGUID;
+        }
+    };
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+    {
+        CloseGossipMenuFor(player);
+        if (creature->AI() && CAST_AI(npc_franklin::npc_franklinAI, creature->AI()))
+        {
+            CAST_AI(npc_franklin::npc_franklinAI, creature->AI())->ScheduleEncounterStart(player->GetGUID());
+        }
+
+        return true;
+    }
+
+    bool OnGossipHello(Player *player, Creature * creature) override
+    {
+        if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(FRANKLIN_HEAD, 1, true))
+        {
+            std::string const& gossipOptionText = sCreatureTextMgr->GetLocalizedChatString(FRANKLIN_GOSSIP_OPTION_TEXT, 0, 0, 0, LOCALE_enUS);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipOptionText, GOSSIP_SENDER_MAIN, 0);
+        }
+
+        SendGossipMenuFor(player, FRANKLIN_GOSSIP_TEXT, creature->GetGUID());
+
+        return true;
+    }
+};
+
 void AddSC_npc_stave_of_ancients()
 {
     new npc_artorius();
     new npc_precious();
     new npc_simone();
     new npc_nelson();
+    new npc_franklin();
 }
