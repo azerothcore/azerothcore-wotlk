@@ -1088,6 +1088,39 @@ public:
 
         EventMap events;
 
+        void Reset() override
+        {
+            encounterStarted = false;
+            playerGUID.Clear();
+            events.Reset();
+        }
+
+        void AttackStart(Unit* target) override
+        {
+            if (playerGUID.IsEmpty() && !InNormalForm())
+            {
+                StorePlayerGUID();
+            }
+
+            ScriptedAI::AttackStart(target);
+        }
+
+         void EnterCombat(Unit* /*victim*/) override
+        {
+            RevealForm();
+
+            if (InNormalForm())
+            {
+                events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
+            }
+            else
+            {
+                events.ScheduleEvent(FRANKLIN_EVENT_DEMONIC_ENRAGE, urand(9000, 13000));
+                events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
+                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
@@ -1106,6 +1139,66 @@ public:
                     RevealForm();
                     break;
             }
+
+            if (UpdateVictim())
+            {
+                // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
+                if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
+                {
+                    playerGUID.Clear();
+                    EnterEvadeMode();
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                events.RepeatEvent(1000);
+                return;
+            }
+
+            // In combat events
+            switch (eventId)
+            {
+                case EVENT_FOOLS_PLIGHT:
+                    me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
+                    events.RepeatEvent(urand(6000, 9000));
+                    break;
+                case EVENT_RANGE_CHECK:
+                    if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
+                    {
+                        EnterEvadeMode();
+                    }
+                    else
+                    {
+                        events.RepeatEvent(2000);
+                    }
+                    break;
+                case EVENT_UNFAIR_FIGHT:
+                    if (!ValidThreatlist())
+                    {
+                        SetHomePosition();
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                        me->CombatStop(true);
+                        me->MonsterSay(FRANKLIN_DESPAWN_SAY, LANG_UNIVERSAL, 0);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                        me->DespawnOrUnsummon(5000);
+                        break;
+                    }
+                    events.RepeatEvent(2000);
+                    break;
+                case FRANKLIN_EVENT_DEMONIC_ENRAGE:
+                    me->CastSpell(me, FRANKLIN_SPELL_DEMONIC_ENRAGE, false);
+                    me->MonsterTextEmote(FRANKLIN_ENRAGE_EMOTE, 0);
+                    events.RepeatEvent(urand(9000, 22000));
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
         }
 
         void ScheduleEncounterStart(ObjectGuid playerGUID)

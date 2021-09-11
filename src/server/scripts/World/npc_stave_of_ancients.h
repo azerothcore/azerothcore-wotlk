@@ -106,14 +106,20 @@ enum NPCNelson
 
 enum NPCFranklin
 {
+    FRANKLIN_EVENT_DEMONIC_ENRAGE               = 6,
+
     FRANKLIN_GOSSIP_TEXT                        = 7043,  // npc_text.ID                "Lava? Pay no mind to all of that, frien..."
     FRANKLIN_GOSSIP_OPTION_TEXT                 = 14529, // creature_text.CreatureID   "So you are Klinfran the Crazed? Sad, I ..."
     FRANKLIN_SAY                                = 9772,  // broadcast_text.ID          "I shall enjoy this, $c."
+    FRANKLIN_ENRAGE_EMOTE                       = 9764,  // broadcast_text.ID          "%s goes into a killing frenzy!"
+    FRANKLIN_DESPAWN_SAY                        = 9815,  // breadcast_text.ID          "Only a fool would remain in this battle..."
 
     FRANKLIN_NORMAL_ENTRY                       = 14529,
     FRANKLIN_EVIL_ENTRY                         = 14534,
 
-    FRANKLIN_HEAD                               = 18953  // item_template.entry
+    FRANKLIN_HEAD                               = 18953, // item_template.entry
+
+    FRANKLIN_SPELL_DEMONIC_ENRAGE               = 23257
 };
 
 struct NPCStaveQuestAI : public ScriptedAI
