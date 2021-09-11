@@ -6,15 +6,14 @@
 #include "Log.h"
 #include "AppenderConsole.h"
 #include "AppenderFile.h"
-#include "Common.h"
 #include "Config.h"
 #include "Errors.h"
-#include "Logger.h"
 #include "LogMessage.h"
 #include "LogOperation.h"
+#include "Logger.h"
 #include "StringConvert.h"
-#include "Util.h"
 #include "Tokenize.h"
+#include "Util.h"
 #include <chrono>
 #include <sstream>
 
@@ -39,7 +38,9 @@ Appender* Log::GetAppenderByName(std::string_view name)
 {
     auto it = appenders.begin();
     while (it != appenders.end() && it->second && it->second->getName() != name)
+    {
         ++it;
+    }
 
     return it == appenders.end() ? nullptr : it->second.get();
 }
@@ -47,14 +48,16 @@ Appender* Log::GetAppenderByName(std::string_view name)
 void Log::CreateAppenderFromConfig(std::string const& appenderName)
 {
     if (appenderName.empty())
+    {
         return;
+    }
 
     // Format = type, level, flags, optional1, optional2
     // if type = File. optional1 = file and option2 = mode
     // if type = Console. optional1 = Color
     std::string options = sConfigMgr->GetStringDefault(appenderName, "");
 
-    std::vector<std::string_view> tokens = acore::Tokenize(options, ',', true);
+    std::vector<std::string_view> tokens = Acore::Tokenize(options, ',', true);
 
     size_t const size = tokens.size();
     std::string name = appenderName.substr(9);
@@ -66,8 +69,8 @@ void Log::CreateAppenderFromConfig(std::string const& appenderName)
     }
 
     AppenderFlags flags = APPENDER_FLAGS_NONE;
-    AppenderType type = AppenderType(acore::StringTo<uint8>(tokens[0]).value_or(APPENDER_INVALID));
-    LogLevel level = LogLevel(acore::StringTo<uint8>(tokens[1]).value_or(LOG_LEVEL_INVALID));
+    AppenderType type = AppenderType(Acore::StringTo<uint8>(tokens[0]).value_or(APPENDER_INVALID));
+    LogLevel level = LogLevel(Acore::StringTo<uint8>(tokens[1]).value_or(LOG_LEVEL_INVALID));
 
     auto factoryFunction = appenderFactory.find(type);
     if (factoryFunction == appenderFactory.end())
@@ -84,8 +87,10 @@ void Log::CreateAppenderFromConfig(std::string const& appenderName)
 
     if (size > 2)
     {
-        if (Optional<uint8> flagsVal = acore::StringTo<uint8>(tokens[2]))
+        if (Optional<uint8> flagsVal = Acore::StringTo<uint8>(tokens[2]))
+        {
             flags = AppenderFlags(*flagsVal);
+        }
         else
         {
             fprintf(stderr, "Log::CreateAppenderFromConfig: Unknown flags '%s' for appender %s\n", std::string(tokens[2]).c_str(), name.c_str());
@@ -107,7 +112,9 @@ void Log::CreateAppenderFromConfig(std::string const& appenderName)
 void Log::CreateLoggerFromConfig(std::string const& appenderName)
 {
     if (appenderName.empty())
+    {
         return;
+    }
 
     LogLevel level = LOG_LEVEL_DISABLED;
 
@@ -120,7 +127,7 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
         return;
     }
 
-    std::vector<std::string_view> tokens = acore::Tokenize(options, ',', true);
+    std::vector<std::string_view> tokens = Acore::Tokenize(options, ',', true);
 
     if (tokens.size() != 2)
     {
@@ -135,7 +142,7 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
         return;
     }
 
-    level = LogLevel(acore::StringTo<uint8>(tokens[0]).value_or(LOG_LEVEL_INVALID));
+    level = LogLevel(Acore::StringTo<uint8>(tokens[0]).value_or(LOG_LEVEL_INVALID));
     if (level > NUM_ENABLED_LOG_LEVELS)
     {
         fprintf(stderr, "Log::CreateLoggerFromConfig: Wrong Log Level '%s' for logger %s\n", std::string(tokens[0]).c_str(), name.c_str());
@@ -143,20 +150,24 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
     }
 
     if (level > highestLogLevel)
+    {
         highestLogLevel = level;
+    }
 
     logger = std::make_unique<Logger>(name, level);
     //fprintf(stdout, "Log::CreateLoggerFromConfig: Created Logger %s, Level %u\n", name.c_str(), level);
 
-    for (std::string_view appenderName : acore::Tokenize(tokens[1], ' ', false))
+    for (std::string_view appendName : Acore::Tokenize(tokens[1], ' ', false))
     {
-        if (Appender* appender = GetAppenderByName(appenderName))
+        if (Appender* appender = GetAppenderByName(appendName))
         {
             logger->addAppender(appender->getId(), appender);
             //fprintf(stdout, "Log::CreateLoggerFromConfig: Added Appender %s to Logger %s\n", appender->getName().c_str(), name.c_str());
         }
         else
-            fprintf(stderr, "Error while configuring Appender %s in Logger %s. Appender does not exist\n", std::string(appenderName).c_str(), name.c_str());
+        {
+            fprintf(stderr, "Error while configuring Appender %s in Logger %s. Appender does not exist\n", std::string(appendName).c_str(), name.c_str());
+        }
     }
 }
 
@@ -164,14 +175,18 @@ void Log::ReadAppendersFromConfig()
 {
     std::vector<std::string> keys = sConfigMgr->GetKeysByString("Appender.");
     for (std::string const& appenderName : keys)
+    {
         CreateAppenderFromConfig(appenderName);
+    }
 }
 
 void Log::ReadLoggersFromConfig()
 {
     std::vector<std::string> keys = sConfigMgr->GetKeysByString("Logger.");
     for (std::string const& loggerName : keys)
+    {
         CreateLoggerFromConfig(loggerName);
+    }
 
     // Bad config configuration, creating default config
     if (loggers.find(LOGGER_ROOT) == loggers.end())
@@ -206,6 +221,11 @@ void Log::outMessage(std::string const& filter, LogLevel level, std::string&& me
     write(std::make_unique<LogMessage>(level, filter, std::move(message)));
 }
 
+void Log::_outMessageFmt(std::string const& filter, LogLevel level, std::string&& message)
+{
+    write(std::make_unique<LogMessage>(level, filter, std::move(message)));
+}
+
 void Log::outCommand(std::string&& message, std::string&& param1)
 {
     write(std::make_unique<LogMessage>(LOG_LEVEL_INFO, "commands.gm", std::move(message), std::move(param1)));
@@ -222,15 +242,21 @@ Logger const* Log::GetLoggerByType(std::string const& type) const
 {
     auto it = loggers.find(type);
     if (it != loggers.end())
+    {
         return it->second.get();
+    }
 
     if (type == LOGGER_ROOT)
+    {
         return nullptr;
+    }
 
     std::string parentLogger = LOGGER_ROOT;
     size_t found = type.find_last_of('.');
     if (found != std::string::npos)
+    {
         parentLogger = type.substr(0, found);
+    }
 
     return GetLoggerByType(parentLogger);
 }
@@ -248,14 +274,16 @@ std::string Log::GetTimestampStr()
     //       HH     hour (2 digits 00-23)
     //       MM     minutes (2 digits 00-59)
     //       SS     seconds (2 digits 00-59)
-    return acore::StringFormat("%04d-%02d-%02d_%02d-%02d-%02d",
+    return Acore::StringFormat("%04d-%02d-%02d_%02d-%02d-%02d",
         aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 }
 
 bool Log::SetLogLevel(std::string const& name, int32 newLeveli, bool isLogger /* = true */)
 {
     if (newLeveli < 0)
+    {
         return false;
+    }
 
     LogLevel newLevel = LogLevel(newLeveli);
 
@@ -263,21 +291,29 @@ bool Log::SetLogLevel(std::string const& name, int32 newLeveli, bool isLogger /*
     {
         auto it = loggers.begin();
         while (it != loggers.end() && it->second->getName() != name)
+        {
             ++it;
+        }
 
         if (it == loggers.end())
+        {
             return false;
+        }
 
         it->second->setLogLevel(newLevel);
 
         if (newLevel != LOG_LEVEL_DISABLED && newLevel > highestLogLevel)
+        {
             highestLogLevel = newLevel;
+        }
     }
     else
     {
         Appender* appender = GetAppenderByName(name);
         if (!appender)
+        {
             return false;
+        }
 
         appender->setLogLevel(newLevel);
     }
@@ -288,7 +324,9 @@ bool Log::SetLogLevel(std::string const& name, int32 newLeveli, bool isLogger /*
 void Log::outCharDump(char const* str, uint32 accountId, uint64 guid, char const* name)
 {
     if (!str || !ShouldLog("entities.player.dump", LOG_LEVEL_INFO))
+    {
         return;
+    }
 
     std::ostringstream ss;
     ss << "== START DUMP == (account: " << accountId << " guid: " << guid << " name: " << name
@@ -306,7 +344,9 @@ void Log::outCharDump(char const* str, uint32 accountId, uint64 guid, char const
 void Log::SetRealmId(uint32 id)
 {
     for (std::pair<uint8 const, std::unique_ptr<Appender>>& appender : appenders)
+    {
         appender.second->setRealmId(id);
+    }
 }
 
 void Log::Close()
@@ -323,11 +363,15 @@ bool Log::ShouldLog(std::string const& type, LogLevel level) const
 
     // Don't even look for a logger if the LogLevel is higher than the highest log levels across all loggers
     if (level > highestLogLevel)
+    {
         return false;
+    }
 
     Logger const* logger = GetLoggerByType(type);
     if (!logger)
+    {
         return false;
+    }
 
     LogLevel logLevel = logger->getLogLevel();
     return logLevel != LOG_LEVEL_DISABLED && logLevel >= level;
@@ -354,7 +398,9 @@ void Log::LoadFromConfig()
 
     if (!m_logsDir.empty())
         if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
+        {
             m_logsDir.push_back('/');
+        }
 
     ReadAppendersFromConfig();
     ReadLoggersFromConfig();

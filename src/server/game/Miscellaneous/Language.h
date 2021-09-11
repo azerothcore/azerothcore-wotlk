@@ -1,6 +1,5 @@
 /*
- * Copyright (C) MaNGOS, TrinityCore, AzerothCore
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -94,7 +93,17 @@ enum AcoreStrings
     LANG_RBAC_PERM_REVOKED_NOT_IN_LIST  = 79,
     LANG_PVPSTATS                       = 80,
     LANG_PVPSTATS_DISABLED              = 81,
-    // Free 82 - 95
+    // Free 82 - 86
+
+    LANG_UNKNOWN_ERROR                  = 87,
+    LANG_2FA_COMMANDS_NOT_SETUP         = 88,
+    LANG_2FA_ALREADY_SETUP              = 89,
+    LANG_2FA_INVALID_TOKEN              = 90,
+    LANG_2FA_SECRET_SUGGESTION          = 91,
+    LANG_2FA_SETUP_COMPLETE             = 92,
+    LANG_2FA_NOT_SETUP                  = 93,
+    LANG_2FA_REMOVE_NEED_TOKEN          = 94,
+    LANG_2FA_REMOVE_COMPLETE            = 95,
 
     LANG_GUILD_RENAME_ALREADY_EXISTS    = 96,
     LANG_GUILD_RENAME_DONE              = 97,
@@ -191,7 +200,11 @@ enum AcoreStrings
     LANG_GRID_POSITION                  = 178,
     // 179-185 used in other client versions
     LANG_TRANSPORT_POSITION             = 186,
-    // Room for more level 1              187-199 not used
+    // 187
+    LANG_2FA_SECRET_TOO_LONG            = 188,
+    LANG_2FA_SECRET_INVALID             = 189,
+    LANG_2FA_SECRET_SET_COMPLETE        = 190,
+    // free 191 - 199
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -686,9 +699,14 @@ enum AcoreStrings
     LANG_PLAYER_DND_DEFAULT             = 709,
     LANG_PLAYER_AFK_DEFAULT             = 710,
 
+    // BG announce
     LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
     LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
-    //                                      = 713, not used
+
+    // Arena announce
+    LANG_ARENA_QUEUE_ANNOUNCE_SELF      = 713,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD     = 726,
+
     //                                      = 714, see LANG_PINFO_MAP_ONLINE
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
     //                                      = 716, see LANG_PINFO_MAP_OFFLINE
@@ -702,7 +720,7 @@ enum AcoreStrings
     LANG_ARENA_NOT_ENOUGH_PLAYERS       = 723,              // "Your group does not have enough players to join this match."
     LANG_ARENA_GOLD_WINS                = 724,              // "The Gold Team wins!"
     LANG_ARENA_GREEN_WINS               = 725,              // "The Green Team wins!"
-    //                                      = 726, not used
+    // = 726, see LANG_ARENA_QUEUE_ANNOUNCE_WORLD
     LANG_BG_GROUP_OFFLINE_MEMBER        = 727,              // "Your group has an offline member. Please remove him before joining."
     LANG_BG_GROUP_MIXED_FACTION         = 728,              // "Your group has players from the opposing faction. You can't join the battleground as a group."
     LANG_BG_GROUP_MIXED_LEVELS          = 729,              // "Your group has players from different battleground brakets. You can't join as group."
@@ -1157,7 +1175,9 @@ enum AcoreStrings
     LANG_COMMAND_MUTEHISTORY_EMPTY      = 5060,
     LANG_COMMAND_MUTEHISTORY_OUTPUT     = 5061,
 
-    // Room for more Trinity strings    5062-9999
+    LANG_NPCINFO_SPELL_SCHOOL_IMMUNE    = 5062,
+
+    // Room for more strings    5063-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1176,6 +1196,9 @@ enum AcoreStrings
     LANG_GM_ANNOUNCE_COLOR               = 6615,
 
     LANG_GM_SILENCE                      = 6616,              // "Silence is ON for %s" - Spell 1852
+
+    // Used for .string command
+    LANG_NO_ACORE_STRING_FOUND           = 6617,
 
     LANG_WORLD_CLOSED                    = 7523,
     LANG_WORLD_OPENED                    = 7524,
@@ -1332,6 +1355,8 @@ enum AcoreStrings
     LANG_BG_READY_CHECK_ERROR                     = 30084,
 
     LANG_DEBUG_BG_CONF                            = 30085,
-    LANG_DEBUG_ARENA_CONF                         = 30086,
+    LANG_DEBUG_ARENA_CONF                         = 30086
+
+    // 30087-30095 reserved for passive anticheat
 };
 #endif

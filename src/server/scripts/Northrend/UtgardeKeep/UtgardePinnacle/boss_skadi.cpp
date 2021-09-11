@@ -113,14 +113,14 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
-        uint64 GraufGUID;
+        ObjectGuid GraufGUID;
         bool SecondPhase, EventStarted;
 
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            if (Creature* cr = me->SummonCreature(NPC_GRAUF, 341.741f, -516.955f, 104.669f, 3.12414f))
+            if (Creature* cr = me->SummonCreature(NPC_GRAUF, 341.741f, -516.955f, 116.669f, 3.12414f))
             {
                 GraufGUID = cr->GetGUID();
                 summons.Summon(cr);
@@ -239,7 +239,7 @@ public:
             if (m_pInstance)
             {
                 m_pInstance->SetData(DATA_SKADI_THE_RUTHLESS, DONE);
-                m_pInstance->HandleGameObject(m_pInstance->GetData64(SKADI_DOOR), true);
+                m_pInstance->HandleGameObject(m_pInstance->GetGuidData(SKADI_DOOR), true);
             }
         }
 
@@ -495,7 +495,7 @@ public:
                 uint8 count = m_pInstance->GetData(SKADI_HITS) + 1;
                 m_pInstance->SetData(SKADI_HITS, count);
 
-                if (Creature* grauf = ObjectAccessor::GetCreature(*pPlayer, m_pInstance->GetData64(DATA_GRAUF)))
+                if (Creature* grauf = ObjectAccessor::GetCreature(*pPlayer, m_pInstance->GetGuidData(DATA_GRAUF)))
                 {
                     if (count >= 3)
                     {

@@ -34,30 +34,30 @@ public:
         std::string str_data;
         EventMap events;
 
-        uint64 NPC_BarrettGUID;
-        uint64 NPC_TirionGUID;
-        uint64 NPC_FizzlebangGUID;
-        uint64 NPC_GarroshGUID;
-        uint64 NPC_VarianGUID;
+        ObjectGuid NPC_BarrettGUID;
+        ObjectGuid NPC_TirionGUID;
+        ObjectGuid NPC_FizzlebangGUID;
+        ObjectGuid NPC_GarroshGUID;
+        ObjectGuid NPC_VarianGUID;
 
-        uint64 NPC_GormokGUID;
-        uint64 NPC_DreadscaleGUID;
-        uint64 NPC_AcidmawGUID;
-        uint64 NPC_IcehowlGUID;
-        uint64 NPC_JaraxxusGUID;
-        std::vector<uint64> NPC_ChampionGUIDs;
-        uint64 NPC_LightbaneGUID;
-        uint64 NPC_DarkbaneGUID;
-        uint64 NPC_LichKingGUID;
-        uint64 NPC_AnubarakGUID;
+        ObjectGuid NPC_GormokGUID;
+        ObjectGuid NPC_DreadscaleGUID;
+        ObjectGuid NPC_AcidmawGUID;
+        ObjectGuid NPC_IcehowlGUID;
+        ObjectGuid NPC_JaraxxusGUID;
+        GuidVector NPC_ChampionGUIDs;
+        ObjectGuid NPC_LightbaneGUID;
+        ObjectGuid NPC_DarkbaneGUID;
+        ObjectGuid NPC_LichKingGUID;
+        ObjectGuid NPC_AnubarakGUID;
 
-        uint64 NPC_PurpleGroundGUID;
-        uint64 NPC_PortalGUID;
+        ObjectGuid NPC_PurpleGroundGUID;
+        ObjectGuid NPC_PortalGUID;
 
-        uint64 GO_MainGateGUID;
-        uint64 GO_EnterGateGUID;
-        uint64 GO_WebDoorGUID;
-        uint64 GO_FloorGUID;
+        ObjectGuid GO_MainGateGUID;
+        ObjectGuid GO_EnterGateGUID;
+        ObjectGuid GO_WebDoorGUID;
+        ObjectGuid GO_FloorGUID;
 
         void SpawnAnubArak()
         {
@@ -72,8 +72,8 @@ public:
                 }
 
                 // move corpses
-                const uint64 npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
-                for (const uint64 i : npcs)
+                const ObjectGuid npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
+                for (ObjectGuid const& i : npcs)
                 {
                     if (Creature* c = instance->GetCreature(i))
                     {
@@ -161,30 +161,7 @@ public:
             events.Reset();
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0);
 
-            NPC_BarrettGUID = 0;
-            NPC_TirionGUID = 0;
-            NPC_FizzlebangGUID = 0;
-            NPC_GarroshGUID = 0;
-            NPC_VarianGUID = 0;
-
-            NPC_GormokGUID = 0;
-            NPC_DreadscaleGUID = 0;
-            NPC_AcidmawGUID = 0;
-            NPC_IcehowlGUID = 0;
-            NPC_JaraxxusGUID = 0;
             NPC_ChampionGUIDs.clear();
-            NPC_LightbaneGUID = 0;
-            NPC_DarkbaneGUID = 0;
-            NPC_LichKingGUID = 0;
-            NPC_AnubarakGUID = 0;
-
-            NPC_PurpleGroundGUID = 0;
-            NPC_PortalGUID = 0;
-
-            GO_MainGateGUID = 0;
-            GO_EnterGateGUID = 0;
-            GO_WebDoorGUID = 0;
-            GO_FloorGUID = 0;
         }
 
         bool IsEncounterInProgress() const override
@@ -425,8 +402,8 @@ public:
                             InstanceProgress = INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD;
                             events.RescheduleEvent(EVENT_SCENE_FACTION_CHAMPIONS_DEAD, 2500);
 
-                            for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                                if( Creature* c = instance->GetCreature(*itr) )
+                            for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                                if (Creature* c = instance->GetCreature(guid))
                                     c->DespawnOrUnsummon(15000);
                             NPC_ChampionGUIDs.clear();
 
@@ -448,17 +425,10 @@ public:
                                         cacheEntry = GO_CRUSADERS_CACHE_25_H;
                                         break;
                                 }
+
                                 if (GameObject* go = c->SummonGameObject(cacheEntry, Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), Locs[LOC_CENTER].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 630000000))
                                 {
-                                    Map::PlayerList const& pl = instance->GetPlayers();
-                                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                        if (Player* plr = itr->GetSource())
-                                            if (Group* g = plr->GetGroup())
-                                                if (!plr->IsGameMaster() && g->GetLeaderGUID() == plr->GetGUID())
-                                                {
-                                                    go->SetLootRecipient(plr);
-                                                    break;
-                                                }
+                                    go->SetLootRecipient(instance);
                                 }
                             }
 
@@ -478,10 +448,10 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         AchievementTimer = 0;
-                        for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                            if( Creature* c = instance->GetCreature(*itr) )
-                                if( !c->IsInCombat() )
-                                    if( Unit* target = c->SelectNearestTarget(200.0f) )
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                            if (Creature* c = instance->GetCreature(guid))
+                                if (!c->IsInCombat())
+                                    if (Unit* target = c->SelectNearestTarget(200.0f))
                                         c->AI()->AttackStart(target);
                     }
                     break;
@@ -549,7 +519,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch( type )
             {
@@ -566,7 +536,8 @@ public:
                 case TYPE_ANUBARAK:
                     return NPC_AnubarakGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void Update(uint32 diff) override
@@ -866,10 +837,10 @@ public:
                             c->SetFacingTo(M_PI / 2);
                         if( Creature* c = instance->GetCreature(NPC_PurpleGroundGUID) )
                             c->DespawnOrUnsummon();
-                        NPC_PurpleGroundGUID = 0;
+                        NPC_PurpleGroundGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_PortalGUID) )
                             c->DespawnOrUnsummon();
-                        NPC_PortalGUID = 0;
+                        NPC_PortalGUID.Clear();
 
                         events.RescheduleEvent(EVENT_SCENE_106, 10000);
                         break;
@@ -1115,8 +1086,8 @@ public:
                     }
                 case EVENT_CHAMPIONS_ATTACK:
                     {
-                        for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                            if( Creature* c = instance->GetCreature(*itr) )
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                            if (Creature* c = instance->GetCreature(guid))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -1397,16 +1368,7 @@ public:
                                     if (GameObject* chest = c->SummonGameObject(tributeChest, 665.12f, 143.78f, 142.12f, 0.0f, 0, 0, 0, 0, 90000000))
                                     {
                                         chest->SetRespawnTime(chest->GetRespawnDelay());
-
-                                        Map::PlayerList const& pl = instance->GetPlayers();
-                                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                            if (Player* plr = itr->GetSource())
-                                                if (Group* g = plr->GetGroup())
-                                                    if (!plr->IsGameMaster() && g->GetLeaderGUID() == plr->GetGUID())
-                                                    {
-                                                        chest->SetLootRecipient(plr);
-                                                        break;
-                                                    }
+                                        chest->SetLootRecipient(instance);
                                     }
                                 }
                         }
@@ -1469,16 +1431,16 @@ public:
                         c->AI()->DoAction(-1); // despawn summons
                         c->DespawnOrUnsummon();
                     }
-                    NPC_GormokGUID = 0;
+                    NPC_GormokGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_AcidmawGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_AcidmawGUID = 0;
+                    NPC_AcidmawGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_DreadscaleGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_DreadscaleGUID = 0;
+                    NPC_DreadscaleGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_IcehowlGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_IcehowlGUID = 0;
+                    NPC_IcehowlGUID.Clear();
                     northrendBeastsMask = 0;
                     break;
                 case INSTANCE_PROGRESS_BEASTS_DEAD:
@@ -1486,16 +1448,16 @@ public:
                         c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     if( Creature* c = instance->GetCreature(NPC_FizzlebangGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_FizzlebangGUID = 0;
+                    NPC_FizzlebangGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_JaraxxusGUID = 0;
+                    NPC_JaraxxusGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_PurpleGroundGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_PurpleGroundGUID = 0;
+                    NPC_PurpleGroundGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_PortalGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_PortalGUID = 0;
+                    NPC_PortalGUID.Clear();
                     break;
                 case INSTANCE_PROGRESS_JARAXXUS_INTRO_DONE:
                     if( Creature* c = instance->GetCreature(NPC_JaraxxusGUID) )
@@ -1515,8 +1477,8 @@ public:
                 case INSTANCE_PROGRESS_JARAXXUS_DEAD:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                         c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                        if( Creature* c = instance->GetCreature(*itr) )
+                    for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                        if (Creature* c = instance->GetCreature(guid))
                             c->DespawnOrUnsummon();
                     NPC_ChampionGUIDs.clear();
                     break;
@@ -1528,13 +1490,13 @@ public:
                         c->AI()->DoAction(-1);
                         c->DespawnOrUnsummon();
                     }
-                    NPC_DarkbaneGUID = 0;
+                    NPC_DarkbaneGUID.Clear();
                     if( Creature* c = instance->GetCreature(NPC_LightbaneGUID) )
                     {
                         c->AI()->DoAction(-1);
                         c->DespawnOrUnsummon();
                     }
-                    NPC_LightbaneGUID = 0;
+                    NPC_LightbaneGUID.Clear();
                     break;
                 case INSTANCE_PROGRESS_VALKYR_DEAD:
                 case INSTANCE_PROGRESS_ANUB_ARAK:
@@ -1558,14 +1520,14 @@ public:
                     }
                     if( Creature* c = instance->GetCreature(NPC_LichKingGUID) )
                         c->DespawnOrUnsummon();
-                    NPC_LichKingGUID = 0;
+                    NPC_LichKingGUID.Clear();
 
                     if( Creature* c = instance->GetCreature(NPC_AnubarakGUID) )
                     {
                         c->AI()->DoAction(-1);
                         c->DespawnOrUnsummon();
                     }
-                    NPC_AnubarakGUID = 0;
+                    NPC_AnubarakGUID.Clear();
 
                     break;
                 case INSTANCE_PROGRESS_DONE:

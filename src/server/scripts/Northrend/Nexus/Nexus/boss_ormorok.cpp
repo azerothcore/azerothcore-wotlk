@@ -3,7 +3,6 @@
 */
 
 #include "nexus.h"
-#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
@@ -43,7 +42,7 @@ enum Events
 enum Misc
 {
     NPC_CRYSTAL_SPIKE                       = 27099,
-    NPC_CRYSTALLINE_TANGLER                 = 32665,
+//    NPC_CRYSTALLINE_TANGLER                 = 32665,
     GO_CRYSTAL_SPIKE                        = 188537
 };
 
@@ -184,7 +183,7 @@ public:
         }
 
         int32 _damageTimer;
-        uint64 _gameObjectGUID;
+        ObjectGuid _gameObjectGUID;
 
         void Reset() override
         {

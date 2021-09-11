@@ -271,7 +271,6 @@ enum TwiggyFlathead
     NPC_BIG_WILL                = 6238,
     NPC_AFFRAY_CHALLENGER       = 6240,
 
-    SAY_BIG_WILL_READY          = 0,
     SAY_TWIGGY_FLATHEAD_BEGIN   = 0,
     SAY_TWIGGY_FLATHEAD_FRAY    = 1,
     SAY_TWIGGY_FLATHEAD_DOWN    = 2,
@@ -309,9 +308,9 @@ public:
         uint8 Wave;
         uint32 WaveTimer;
         uint32 ChallengerChecker;
-        uint64 PlayerGUID;
-        uint64 AffrayChallenger[6];
-        uint64 BigWill;
+        ObjectGuid PlayerGUID;
+        ObjectGuid AffrayChallenger[6];
+        ObjectGuid BigWill;
 
         void Reset() override
         {
@@ -321,14 +320,15 @@ public:
             WaveTimer = 600000;
             ChallengerChecker = 0;
             Wave = 0;
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
 
             for (uint8 i = 0; i < 6; ++i)
             {
-                AffrayChallenger[i] = 0;
+                AffrayChallenger[i].Clear();
                 ChallengerDown[i] = false;
             }
-            BigWill = 0;
+
+            BigWill.Clear();
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -465,7 +465,7 @@ public:
                                 EnterEvadeMode();
                                 return;
                             }
-                            else if (creature) // Makes BIG WILL attackable.
+                            else // Makes BIG WILL attackable.
                             {
                                 creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);

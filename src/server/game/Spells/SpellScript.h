@@ -123,7 +123,23 @@ public:
     }
 
 private:
-    static bool _ValidateSpellInfo(uint32 const* begin, uint32 const* end);
+    template<typename Iterator>
+    static bool _ValidateSpellInfo(Iterator begin, Iterator end)
+    {
+        bool allValid = true;
+        while (begin != end)
+        {
+            if (!_ValidateSpellInfo(*begin))
+            {
+                allValid = false;
+            }
+
+            ++begin;
+        }
+        return allValid;
+    }
+
+    static bool _ValidateSpellInfo(uint32 spellId);
 };
 
 // SpellScript interface - enum used for runtime checks of script function calls
@@ -159,6 +175,7 @@ public:
 #define SPELLSCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) \
             typedef SpellCastResult(CLASSNAME::*SpellCheckCastFnType)(); \
             typedef void(CLASSNAME::*SpellEffectFnType)(SpellEffIndex); \
+            typedef void(CLASSNAME::*SpellBeforeHitFnType)(SpellMissInfo missInfo); \
             typedef void(CLASSNAME::*SpellHitFnType)(); \
             typedef void(CLASSNAME::*SpellCastFnType)(); \
             typedef void(CLASSNAME::*SpellObjectAreaTargetSelectFnType)(std::list<WorldObject*>&); \
@@ -194,6 +211,16 @@ public:
         void Call(SpellScript* spellScript, SpellEffIndex effIndex);
     private:
         SpellEffectFnType pEffectHandlerScript;
+    };
+
+    class BeforeHitHandler
+    {
+    public:
+        BeforeHitHandler(SpellBeforeHitFnType pBeforeHitHandlerScript);
+        void Call(SpellScript* spellScript, SpellMissInfo missInfo);
+
+    private:
+        SpellBeforeHitFnType _pBeforeHitHandlerScript;
     };
 
     class HitHandler
@@ -249,6 +276,7 @@ public:
         class CastHandlerFunction : public SpellScript::CastHandler { public: CastHandlerFunction(SpellCastFnType _pCastHandlerScript) : SpellScript::CastHandler((SpellScript::SpellCastFnType)_pCastHandlerScript) {} }; \
         class CheckCastHandlerFunction : public SpellScript::CheckCastHandler { public: CheckCastHandlerFunction(SpellCheckCastFnType _checkCastHandlerScript) : SpellScript::CheckCastHandler((SpellScript::SpellCheckCastFnType)_checkCastHandlerScript) {} }; \
         class EffectHandlerFunction : public SpellScript::EffectHandler { public: EffectHandlerFunction(SpellEffectFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName) : SpellScript::EffectHandler((SpellScript::SpellEffectFnType)_pEffectHandlerScript, _effIndex, _effName) {} }; \
+        class BeforeHitHandlerFunction : public SpellScript::BeforeHitHandler { public: explicit BeforeHitHandlerFunction(SpellBeforeHitFnType pBeforeHitHandlerScript) : SpellScript::BeforeHitHandler((SpellScript::SpellBeforeHitFnType)pBeforeHitHandlerScript) {} }; \
         class HitHandlerFunction : public SpellScript::HitHandler { public: HitHandlerFunction(SpellHitFnType _pHitHandlerScript) : SpellScript::HitHandler((SpellScript::SpellHitFnType)_pHitHandlerScript) {} }; \
         class ObjectAreaTargetSelectHandlerFunction : public SpellScript::ObjectAreaTargetSelectHandler { public: ObjectAreaTargetSelectHandlerFunction(SpellObjectAreaTargetSelectFnType _pObjectAreaTargetSelectHandlerScript, uint8 _effIndex, uint16 _targetType) : SpellScript::ObjectAreaTargetSelectHandler((SpellScript::SpellObjectAreaTargetSelectFnType)_pObjectAreaTargetSelectHandlerScript, _effIndex, _targetType) {} }; \
         class ObjectTargetSelectHandlerFunction : public SpellScript::ObjectTargetSelectHandler { public: ObjectTargetSelectHandlerFunction(SpellObjectTargetSelectFnType _pObjectTargetSelectHandlerScript, uint8 _effIndex, uint16 _targetType) : SpellScript::ObjectTargetSelectHandler((SpellScript::SpellObjectTargetSelectFnType)_pObjectTargetSelectHandlerScript, _effIndex, _targetType) { } }; \
@@ -297,8 +325,11 @@ public:
     HookList<EffectHandler> OnEffectHitTarget;
 #define SpellEffectFn(F, I, N) EffectHandlerFunction(&F, I, N)
 
-    // example: BeforeHit += SpellHitFn(class::function);
-    HookList<HitHandler> BeforeHit;
+    // example: BeforeHit += BeforeSpellHitFn(class::function);
+    // where function is void function(SpellMissInfo missInfo)
+    HookList<BeforeHitHandler> BeforeHit;
+#define BeforeSpellHitFn(F) BeforeHitHandlerFunction(&F)
+
     // example: OnHit += SpellHitFn(class::function);
     HookList<HitHandler> OnHit;
     // example: AfterHit += SpellHitFn(class::function);
@@ -801,7 +832,7 @@ public:
     uint32 GetId() const;
 
     // returns guid of object which casted the aura (m_originalCaster of the Spell class)
-    uint64 GetCasterGUID() const;
+    ObjectGuid GetCasterGUID() const;
     // returns unit which casted the aura or nullptr if not avalible (caster logged out for example)
     Unit* GetCaster() const;
     // returns object on which aura was casted, target for non-area auras, area aura source for area auras

@@ -17,15 +17,15 @@ class CreatureGroup;
 
 struct FormationInfo
 {
-    uint32 leaderGUID;
+    ObjectGuid::LowType leaderGUID;
     float follow_dist;
     float follow_angle;
     uint8 groupAI;
-    uint16 point_1;
-    uint16 point_2;
+    uint32 point_1;
+    uint32 point_2;
 };
 
-typedef std::unordered_map<uint32/*memberDBGUID*/, FormationInfo*>   CreatureGroupInfoType;
+typedef std::unordered_map<ObjectGuid::LowType/*memberDBGUID*/, FormationInfo*>   CreatureGroupInfoType;
 
 class FormationMgr
 {
@@ -59,7 +59,7 @@ public:
 
     void AddMember(Creature* member);
     void RemoveMember(Creature* member);
-    void FormationReset(bool dismiss);
+    void FormationReset(bool dismiss, bool initMotionMaster);
 
     void LeaderMoveTo(float x, float y, float z, bool run);
     void MemberAttackStart(Creature* member, Unit* target);

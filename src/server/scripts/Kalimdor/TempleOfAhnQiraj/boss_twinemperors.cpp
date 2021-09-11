@@ -89,7 +89,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     Creature* GetOtherBoss()
     {
-        return ObjectAccessor::GetCreature(*me, instance->GetData64(IAmVeklor() ? DATA_VEKNILASH : DATA_VEKLOR));
+        return ObjectAccessor::GetCreature(*me, instance->GetGuidData(IAmVeklor() ? DATA_VEKNILASH : DATA_VEKLOR));
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -280,7 +280,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         if (me->_CanDetectFeignDeathOf(who) && me->CanCreatureAttack(who))
         {
-            if (me->IsWithinDistInMap(who, PULL_RANGE) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
+            if (me->IsWithinDistInMap(who, PULL_RANGE, true, false) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
             {
                 //if (who->HasStealthAura())
                 //    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
@@ -475,7 +475,6 @@ public:
         uint32 Scorpions_Timer;
         int Rand;
         int RandX;
-        int RandY;
 
         Creature* Summoned;
 
@@ -526,10 +525,11 @@ public:
             //Blizzard_Timer
             if (Blizzard_Timer <= diff)
             {
-                Unit* target = nullptr;
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45, true);
+                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45, true);
                 if (target)
+                {
                     DoCast(target, SPELL_BLIZZARD);
+                }
                 Blizzard_Timer = 15000 + rand() % 15000;
             }
             else Blizzard_Timer -= diff;

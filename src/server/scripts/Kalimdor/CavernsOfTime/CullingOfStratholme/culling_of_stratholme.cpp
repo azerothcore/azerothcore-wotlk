@@ -303,7 +303,7 @@ public:
                     // After killing epoch
                     creature->AI()->DoAction(ACTION_START_SECRET_PASSAGE);
                     creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    creature->SetTarget(0);
+                    creature->SetTarget();
                     CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+5:
@@ -434,13 +434,18 @@ public:
                 SetEscortPaused(false);
                 SetRun(false);
 
-                Creature* cr = nullptr;
-                if ((cr = me->SummonCreature(NPC_CITY_MAN3, EventPos[EVENT_SRC_HALL_CITYMAN1])))
+                if (Creature* cr = me->SummonCreature(NPC_CITY_MAN3, EventPos[EVENT_SRC_HALL_CITYMAN1]))
+                {
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
-                if ((cr = me->SummonCreature(NPC_CITY_MAN4, EventPos[EVENT_SRC_HALL_CITYMAN2])))
+                }
+                if (Creature* cr = me->SummonCreature(NPC_CITY_MAN4, EventPos[EVENT_SRC_HALL_CITYMAN2]))
+                {
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
-                if ((cr = me->SummonCreature(NPC_CITY_MAN,  EventPos[EVENT_SRC_HALL_CITYMAN3])))
+                }
+                if (Creature* cr = me->SummonCreature(NPC_CITY_MAN,  EventPos[EVENT_SRC_HALL_CITYMAN3]))
+                {
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
+                }
             }
             else if (param == ACTION_START_SECRET_PASSAGE)
             {
@@ -604,7 +609,7 @@ public:
                 case 36:
                     SetRun(true);
                     if (pInstance)
-                        if (GameObject* pGate = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_SHKAF_GATE)))
+                        if (GameObject* pGate = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_SHKAF_GATE)))
                             pGate->SetGoState(GO_STATE_ACTIVE);
                     break;
                 // Behind secred passage
@@ -775,7 +780,7 @@ public:
                     case EVENT_ACTION_PHASE1+18:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                         {
-                            uther->SetTarget(0);
+                            uther->SetTarget();
                             uther->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             uther->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
@@ -784,7 +789,7 @@ public:
                     case EVENT_ACTION_PHASE1+19:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
                         {
-                            jaina->SetTarget(0);
+                            jaina->SetTarget();
                             jaina->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
@@ -812,13 +817,13 @@ public:
                     case EVENT_ACTION_PHASE1+22:
                         SetEscortPaused(false);
                         eventInRun = false;
-                        me->SetTarget(0);
+                        me->SetTarget();
                         // dont schedule next, do it in gossip select!
                         break;
                     //After Gossip 1 (waypoint 8)
                     case EVENT_ACTION_PHASE2:
                         summons.DespawnEntry(NPC_INVIS_TARGET); // remove trigger
-                        me->SetTarget(0);
+                        me->SetTarget();
                         SetEscortPaused(false);
                         eventInRun = false;
                         ScheduleNextEvent(currentEvent, 1000);
@@ -885,7 +890,7 @@ public:
                     case EVENT_ACTION_PHASE2+6:
                         if (Creature* malganis = GetEventNpc(NPC_MAL_GANIS))
                         {
-                            me->SetTarget(0);
+                            me->SetTarget();
                             me->SetFacingToObject(malganis);
                             malganis->SetVisible(false);
                         }
@@ -1132,7 +1137,7 @@ public:
                         if (pInstance)
                         {
                             pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED);
-                            if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_EXIT_GATE)))
+                            if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_EXIT_GATE)))
                                 go->SetGoState(GO_STATE_ACTIVE);
 
                             if (!me->GetMap()->GetPlayers().isEmpty())
@@ -1251,7 +1256,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
                 waveGroupId = 4;
                 SendNextWave(NPC_MEATHOOK);
             }
-            else if (data == COS_PROGRESS_KILLED_SALRAMM)
+            else // if (data == COS_PROGRESS_KILLED_SALRAMM)
             {
                 if (pInstance)
                     pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 10);
@@ -1278,7 +1283,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
 
     if (data >= COS_PROGRESS_KILLED_EPOCH)
         if (pInstance)
-            if (GameObject* pGate = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_SHKAF_GATE)))
+            if (GameObject* pGate = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_SHKAF_GATE)))
                 pGate->SetGoState(GO_STATE_READY);
 
     pInstance->SetData(DATA_SHOW_INFINITE_TIMER, 1);
@@ -1422,7 +1427,7 @@ public:
                 if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
                 {
                     pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
-                    if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetData64(DATA_ARTHAS)))
+                    if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetGuidData(DATA_ARTHAS)))
                         arthas->AI()->Reset();
                 }
                 player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());

@@ -115,7 +115,7 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
+                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
                     {
                         ignis->CastSpell(ignis, SPELL_STRENGTH_OF_THE_CREATOR, true);
                         AttackStart(ignis->GetVictim());
@@ -147,7 +147,7 @@ public:
                 Unit::Kill(attacker, me);
 
                 if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
+                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
                         ignis->AI()->SetData(1337, 0);
             }
         }
@@ -155,7 +155,7 @@ public:
         void JustDied(Unit*  /*killer*/) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
+                if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
                     ignis->RemoveAuraFromStack(SPELL_STRENGTH_OF_THE_CREATOR);
         }
 
@@ -385,7 +385,7 @@ public:
                         std::list<Creature*> icl;
                         me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
 
-                        std::vector<uint64> playerGUIDs;
+                        GuidVector playerGUIDs;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         Player* temp = nullptr;
 
@@ -397,12 +397,14 @@ public:
                             if( me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID() )
                                 continue;
                             bool found = false;
-                            for( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
-                                if( (*itr)->GetVictim() && (*itr)->GetVictim()->GetGUID() == temp->GetGUID() )
+                            for (std::list<Creature*>::iterator iterator = icl.begin(); iterator != icl.end(); ++iterator)
+                            {
+                                if ((*iterator)->GetVictim() && (*iterator)->GetVictim()->GetGUID() == temp->GetGUID())
                                 {
                                     found = true;
                                     break;
                                 }
+                            }
 
                             if( !found )
                                 playerGUIDs.push_back(temp->GetGUID());
@@ -551,7 +553,7 @@ class achievement_ignis_shattered : public AchievementCriteriaScript
 public:
     achievement_ignis_shattered() : AchievementCriteriaScript("achievement_ignis_shattered") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target || target->GetTypeId() != TYPEID_UNIT)
             return false;

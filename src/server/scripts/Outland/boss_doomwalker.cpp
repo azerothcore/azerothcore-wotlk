@@ -81,7 +81,7 @@ public:
         void MoveInLineOfSight(Unit* who) override
         {
             if (who && who->GetTypeId() == TYPEID_PLAYER && me->IsValidAttackTarget(who))
-                if (who->HasAura(SPELL_MARK_DEATH, 0) && !who->HasAura(27827)) // Spirit of Redemption
+                if (who->HasAura(SPELL_MARK_DEATH) && !who->HasAura(27827)) // Spirit of Redemption
                     who->CastSpell(who, SPELL_AURA_DEATH, 1);
         }
 

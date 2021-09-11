@@ -35,7 +35,6 @@ public:
             LoadDoorData(doorData);
             LoadMinionData(minionData);
 
-            _maulgarGUID = 0;
             _addsKilled = 0;
         }
 
@@ -160,7 +159,7 @@ public:
 
     protected:
         uint32 _addsKilled;
-        uint64 _maulgarGUID;
+        ObjectGuid _maulgarGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

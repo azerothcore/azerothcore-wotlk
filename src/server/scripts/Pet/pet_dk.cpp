@@ -13,7 +13,6 @@
 #include "CellImpl.h"
 #include "CombatAI.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
@@ -41,7 +40,7 @@ public:
             _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
             _despawning = false;
             _initialSelection = true;
-            _targetGUID = 0;
+            _targetGUID.Clear();
         }
 
         void MovementInform(uint32 type, uint32 point) override
@@ -62,10 +61,13 @@ public:
 
             // Xinef: Night of the Dead avoidance
             if (Aura* aur = me->GetAura(SPELL_DK_NIGHT_OF_THE_DEAD))
-                if (Unit* owner = me->GetOwner())
-                    if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2718, 0))
-                        if (aur->GetEffect(0))
-                            aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2718, 0))
+                {
+                    if (aur->GetEffect(0))
+                    {
+                        aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                    }
+                }
 
             me->SetCanFly(true);
             me->SetDisableGravity(true);
@@ -155,9 +157,9 @@ public:
                 _initialSelection = false;
                 // Find victim of Summon Gargoyle spell
                 std::list<Unit*> targets;
-                acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50);
-                acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-                me->VisitNearbyObject(50, searcher);
+                Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50);
+                Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+                Cell::VisitAllObjects(me, searcher, 50.0f);
                 for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                     if ((*iter)->GetAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID()))
                     {
@@ -199,7 +201,7 @@ public:
         }
 
     private:
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
         uint32 _despawnTimer;
         uint32 _selectionTimer;
         uint32 _initialCastTimer;

@@ -361,7 +361,7 @@ public:
         {
             if (me->GetEntry() == NPC_BRITTLE_GOLEM && param == ACTION_SHATTER)
             {
-                if (Creature* volkhan = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(TYPE_VOLKHAN)))
+                if (Creature* volkhan = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(TYPE_VOLKHAN)))
                     volkhan->AI()->DoAction(ACTION_DESTROYED);
 
                 me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_SHATTER_H : SPELL_SHATTER_N, true);
@@ -444,7 +444,7 @@ public:
     {
         npc_hol_monumentAI(Creature* creature) : ScriptedAI(creature)
         {
-            _attackGUID = 0;
+            _attackGUID.Clear();
             _isActive = urand(0, 1);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->CastSpell(me, SPELL_FREEZE_ANIM, true);
@@ -452,7 +452,7 @@ public:
 
         EventMap events;
         bool _isActive;
-        uint64 _attackGUID;
+        ObjectGuid _attackGUID;
 
         void Reset() override
         {

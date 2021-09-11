@@ -67,13 +67,6 @@ public:
         boss_netherspiteAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-
-            for (int i = 0; i < 3; ++i)
-            {
-                PortalGUID[i] = 0;
-                BeamTarget[i] = 0;
-                BeamerGUID[i] = 0;
-            }
         }
 
         InstanceScript* instance;
@@ -86,9 +79,9 @@ public:
         uint32 NetherbreathTimer;
         uint32 EmpowermentTimer;
         uint32 PortalTimer; // timer for beam checking
-        uint64 PortalGUID[3]; // guid's of portals
-        uint64 BeamerGUID[3]; // guid's of auxiliary beaming portals
-        uint64 BeamTarget[3]; // guid's of portals' current targets
+        ObjectGuid PortalGUID[3]; // guid's of portals
+        ObjectGuid BeamerGUID[3]; // guid's of auxiliary beaming portals
+        ObjectGuid BeamTarget[3]; // guid's of portals' current targets
 
         bool IsBetween(WorldObject* u1, WorldObject* target, WorldObject* u2) // the in-line checker
         {
@@ -150,8 +143,8 @@ public:
                     portal->DisappearAndDie();
                 if (Creature* portal = ObjectAccessor::GetCreature(*me, BeamerGUID[i]))
                     portal->DisappearAndDie();
-                PortalGUID[i] = 0;
-                BeamTarget[i] = 0;
+                PortalGUID[i].Clear();
+                BeamTarget[i].Clear();
             }
         }
 
@@ -175,9 +168,9 @@ public:
                             Player* p = i->GetSource();
                             if (p && p->IsAlive() // alive
                                     && (!target || target->GetDistance2d(portal) > p->GetDistance2d(portal)) // closer than current best
-                                    && !p->HasAura(PlayerDebuff[j], 0) // not exhausted
-                                    && !p->HasAura(PlayerBuff[(j + 1) % 3], 0) // not on another beam
-                                    && !p->HasAura(PlayerBuff[(j + 2) % 3], 0)
+                                    && !p->HasAura(PlayerDebuff[j]) // not exhausted
+                                    && !p->HasAura(PlayerBuff[(j + 1) % 3]) // not on another beam
+                                    && !p->HasAura(PlayerBuff[(j + 2) % 3])
                                     && IsBetween(me, p, portal)) // on the beam
                                 target = p;
                         }
@@ -197,7 +190,7 @@ public:
                         {
                             beamer->CastSpell(target, PortalBeam[j], false);
                             beamer->DisappearAndDie();
-                            BeamerGUID[j] = 0;
+                            BeamerGUID[j].Clear();
                         }
                         // create new one and start beaming on the target
                         if (Creature* beamer = portal->SummonCreature(PortalID[j], portal->GetPositionX(), portal->GetPositionY(), portal->GetPositionZ(), portal->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 60000))
@@ -241,7 +234,7 @@ public:
 
         void HandleDoors(bool open) // Massive Door switcher
         {
-            if (GameObject* Door = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_GO_MASSIVE_DOOR) ))
+            if (GameObject* Door = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_GO_MASSIVE_DOOR) ))
                 Door->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
         }
 

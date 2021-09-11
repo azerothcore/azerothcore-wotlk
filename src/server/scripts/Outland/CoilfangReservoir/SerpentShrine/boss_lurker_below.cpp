@@ -137,7 +137,7 @@ public:
                     me->CastSpell(me, SPELL_SPOUT_VISUAL, TRIGGERED_IGNORE_SET_FACING);
                     me->SetReactState(REACT_PASSIVE);
                     me->SetFacingToObject(me->GetVictim());
-                    me->SetTarget(0);
+                    me->SetTarget();
                     events.ScheduleEvent(EVENT_SPELL_SPOUT, 60000);
                     events.RescheduleEvent(EVENT_SPELL_WHIRL, 18000);
                     events.RescheduleEvent(EVENT_SPELL_GEYSER, 25000);
@@ -205,7 +205,7 @@ public:
             if (roll_chance_i(instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE ? 25 : 0) && !instance->IsEncounterInProgress())
             {
                 player->CastSpell(player, SPELL_LURKER_SPAWN_TRIGGER, true);
-                if (Creature* lurker = ObjectAccessor::GetCreature(*go, instance->GetData64(NPC_THE_LURKER_BELOW)))
+                if (Creature* lurker = ObjectAccessor::GetCreature(*go, instance->GetGuidData(NPC_THE_LURKER_BELOW)))
                     lurker->AI()->DoAction(ACTION_START_EVENT);
                 return true;
             }
