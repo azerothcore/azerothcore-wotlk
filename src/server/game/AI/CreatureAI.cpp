@@ -206,9 +206,39 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
-    me->SetVisible(false);
-    me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(29000));
-    me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(30000));
+    // despawn bosses at reset, only applied for verified tbc/woltk bosses with this behaviour
+    if (me->GetEntry() ==
+        /* dungeons */
+                             28684 /* Krik'thir the Gatewatcher */
+        || me->GetEntry() == 36502 /* Devourer of Souls */
+        || me->GetEntry() == 36658 /* Scourgelord Tyrannus */
+        /* raids */
+        || me->GetEntry() == 32871 /* Algalon */
+        || me->GetEntry() == 39863 /* Halion */
+        || me->GetEntry() == 33186 /* Razorscale */
+        || me->GetEntry() == 36626 /* Festergut */
+        || me->GetEntry() == 32867 /* Steelbreaker - Assembly of Iron */
+        || me->GetEntry() == 32927 /* Runemaster Molgeim - Assembly of Iron */
+        || me->GetEntry() == 32857 /* Stormcaller Brundir - Assembly of Iron */
+        || me->GetEntry() == 33350 /* Mimiron */
+        || me->GetEntry() == 16060 /* Gothik the Harvester */
+        || me->GetEntry() == 36678 /* Professor Putricide */
+        || me->GetEntry() == 15990 /* Kel'Thuzad */
+        || me->GetEntry() == 33993 /* Emalon the Storm Watcher */
+        || me->GetEntry() == 17257 /* Magtheridon */
+        || me->GetEntry() == 25315 /* Kil'jaeden */
+        || me->GetEntry() == 15928 /* Thaddius */
+        || me->GetEntry() == 32930 /* Kologarn */
+        || me->GetEntry() == 32906 /* Freya */
+        || me->GetEntry() == 36597 /* The Lich King */
+        || me->GetEntry() == 36853 /* Sindragosa */
+        || me->GetEntry() == 36855 /* Lady Deathwhisper */
+        )
+    {
+        me->SetVisible(false);
+        me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(19000));
+        me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(20000));
+    }
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
