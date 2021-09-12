@@ -551,45 +551,25 @@ public:
     {
         PrepareSpellScript(spell_warl_banish_SpellScript);
 
-        bool Load() override
-        {
-            _removed = false;
-            return true;
-        }
-
         void HandleBanish(SpellMissInfo missInfo)
         {
-            if (missInfo != SPELL_MISS_NONE)
+            if (missInfo != SPELL_MISS_IMMUNE)
             {
                 return;
             }
 
             if (Unit* target = GetHitUnit())
             {
-                if (target->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0, 0x08000000, 0))
-                {
-                    // No need to remove old aura since its removed due to not stack by current Banish aura
-                    PreventHitDefaultEffect(EFFECT_0);
-                    PreventHitDefaultEffect(EFFECT_1);
-                    PreventHitDefaultEffect(EFFECT_2);
-                    _removed = true;
-                }
+                // Casting Banish on a banished target will remove applied aura
+                if (Aura * banishAura = target->GetAura(GetSpellInfo()->Id, GetCaster()->GetGUID()))
+                    banishAura->Remove();
             }
-        }
-
-        void RemoveAura()
-        {
-            if (_removed)
-                PreventHitAura();
         }
 
         void Register() override
         {
             BeforeHit += BeforeSpellHitFn(spell_warl_banish_SpellScript::HandleBanish);
-            AfterHit += SpellHitFn(spell_warl_banish_SpellScript::RemoveAura);
         }
-
-        bool _removed;
     };
 
     SpellScript* GetSpellScript() const override
