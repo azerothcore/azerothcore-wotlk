@@ -239,6 +239,14 @@ void CreatureAI::EnterEvadeMode()
         me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(19000));
         me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(20000));
     }
+    else
+    {
+        Reset();
+        if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+        {
+            me->GetVehicleKit()->Reset(true);
+        }
+    }
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
