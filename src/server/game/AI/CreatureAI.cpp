@@ -13,8 +13,6 @@
 #include "Player.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
-#include <AI/ScriptedAI/ScriptedCreature.h>
-#include <AI/ScriptedAI/ScriptedCreature.cpp>
 
 class PhasedReset : public BasicEvent
 {
