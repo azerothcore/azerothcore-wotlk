@@ -561,8 +561,10 @@ public:
             if (Unit* target = GetHitUnit())
             {
                 // Casting Banish on a banished target will remove applied aura
-                if (Aura * banishAura = target->GetAura(GetSpellInfo()->Id, GetCaster()->GetGUID()))
+                if (Aura* banishAura = target->GetAura(GetSpellInfo()->Id, GetCaster()->GetGUID()))
+                {
                     banishAura->Remove();
+                }
             }
         }
 
