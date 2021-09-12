@@ -13,7 +13,6 @@
 #include "Player.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
-#include "ScriptedCreature.h"
 
 class PhasedReset : public BasicEvent
 {
