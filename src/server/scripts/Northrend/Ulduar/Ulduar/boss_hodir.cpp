@@ -252,7 +252,6 @@ public:
             // Reset helpers
             if (!summons.size())
                 SpawnHelpers();
-            
         }
 
         void EnterCombat(Unit*  /*pWho*/) override
