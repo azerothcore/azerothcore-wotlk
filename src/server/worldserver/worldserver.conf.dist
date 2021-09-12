@@ -3546,6 +3546,14 @@ Item.SetItemTradeable = 1
 FFAPvPTimer = 30
 
 #
+#     LootNeedBeforeGreedILvlRestriction
+#        Description: Specify level restriction for items below player's subclass in Need Before Greed loot mode in DF groups
+#        Default:     70
+#                     0 - Disabled
+
+LootNeedBeforeGreedILvlRestriction = 70
+
+#
 ###################################################################################################
 
 ###################################################################################################

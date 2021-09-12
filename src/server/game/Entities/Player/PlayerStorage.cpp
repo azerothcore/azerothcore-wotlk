@@ -2380,6 +2380,12 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
     if (proto->Class == ITEM_CLASS_WEAPON && GetSkillValue(item_weapon_skills[proto->SubClass]) == 0)
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
 
+    // check for shields
+    if ((proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD) && !(_class == CLASS_PALADIN || _class == CLASS_WARRIOR || _class == CLASS_SHAMAN))
+    {
+        return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
+    }
+
     if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass > ITEM_SUBCLASS_ARMOR_MISC && proto->SubClass < ITEM_SUBCLASS_ARMOR_BUCKLER &&
         proto->InventoryType != INVTYPE_CLOAK)
     {
@@ -2417,7 +2423,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         {
             return EQUIP_ERR_CANT_DO_RIGHT_NOW;
         }
-        else if (proto->ItemLevel > 70)
+        else if (sWorld->getIntConfig(CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION) && proto->ItemLevel > sWorld->getIntConfig(CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION))
         {
             if (proto->SubClass < subclassToCompare)
             {
