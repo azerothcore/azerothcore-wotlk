@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
+#include "ScriptedCreature.h"
 
 class PhasedReset : public BasicEvent
 {
@@ -22,6 +23,11 @@ public:
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         _owner.SetVisible(true);
+        _owner.AI()->Reset();
+        if (_owner.IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+        {
+            _owner.GetVehicleKit()->Reset(true);
+        }
         return true;
     }
 
@@ -201,13 +207,8 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
-    Reset();
-
-    if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
-        me->GetVehicleKit()->Reset(true);
-
     me->SetVisible(false);
-    me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(10000));
+    me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(29000));
     me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(30000));
 }
 
