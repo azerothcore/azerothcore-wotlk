@@ -1,15 +1,4 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631267482542863767');
 
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5874);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5876);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5878);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5879);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5883);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5899);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5901);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5902);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5904);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5905);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5906);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5907);
-UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` = 5911);
+UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` IN (5874,5876,5878,5879,5883,5899,5901,5902,5904,5905,5906,5907,5911));
+
