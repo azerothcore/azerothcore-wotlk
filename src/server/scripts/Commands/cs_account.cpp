@@ -60,7 +60,7 @@ public:
             { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,         "" },
         };
 
-        static std::vector<ChatCommand> accountRemoveCommandTable
+        static ChatCommandTable accountRemoveCommandTable
         {
             { "country",    SEC_ADMINISTRATOR,  true,  &HandleAccountRemoveLockCountryCommand,  "" }
         };
