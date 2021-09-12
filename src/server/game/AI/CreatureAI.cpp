@@ -21,28 +21,14 @@ public:
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
+        _owner.DespawnOrUnsummon();
+        _owner.Respawn();
         _owner.SetVisible(true);
         _owner.AI()->Reset();
         if (_owner.IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
         {
             _owner.GetVehicleKit()->Reset(true);
         }
-        return true;
-    }
-
-private:
-    Creature& _owner;
-};
-
-class PhasedRespawn : public BasicEvent
-{
-public:
-    PhasedRespawn(Creature& owner) : BasicEvent(), _owner(owner) {}
-
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
-    {
-        Unit::Kill(&_owner, &_owner);
-        _owner.Respawn();
         return true;
     }
 
@@ -206,7 +192,7 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
-    // despawn bosses at reset, only applied for verified tbc/woltk bosses with this behaviour
+    // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid)
     if (me->GetEntry() ==
         /* dungeons */
                              28684 /* Krik'thir the Gatewatcher */
@@ -236,10 +222,9 @@ void CreatureAI::EnterEvadeMode()
         )
     {
         me->SetVisible(false);
-        me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(19000));
         me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(20000));
     }
-    else
+    else // bosses will run back to the spawnpoint at reset
     {
         Reset();
         if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
