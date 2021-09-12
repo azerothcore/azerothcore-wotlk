@@ -207,35 +207,36 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
-    // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid)
-    if (me->GetEntry() ==
+    static constexpr std::array<uint32, 24> bosses = {
         /* dungeons */
-                             28684 /* Krik'thir the Gatewatcher */
-        || me->GetEntry() == 36502 /* Devourer of Souls */
-        || me->GetEntry() == 36658 /* Scourgelord Tyrannus */
+        28684, /* Krik'thir the Gatewatcher */
+        36502, /* Devourer of Souls */
+        36658, /* Scourgelord Tyrannus */
         /* raids */
-        || me->GetEntry() == 32871 /* Algalon */
-        || me->GetEntry() == 39863 /* Halion */
-        || me->GetEntry() == 33186 /* Razorscale */
-        || me->GetEntry() == 36626 /* Festergut */
-        || me->GetEntry() == 32867 /* Steelbreaker - Assembly of Iron */
-        || me->GetEntry() == 32927 /* Runemaster Molgeim - Assembly of Iron */
-        || me->GetEntry() == 32857 /* Stormcaller Brundir - Assembly of Iron */
-        || me->GetEntry() == 33350 /* Mimiron */
-        || me->GetEntry() == 16060 /* Gothik the Harvester */
-        || me->GetEntry() == 36678 /* Professor Putricide */
-        || me->GetEntry() == 15990 /* Kel'Thuzad */
-        || me->GetEntry() == 33993 /* Emalon the Storm Watcher */
-        || me->GetEntry() == 17257 /* Magtheridon */
-        || me->GetEntry() == 25315 /* Kil'jaeden */
-        || me->GetEntry() == 15928 /* Thaddius */
-        || me->GetEntry() == 32930 /* Kologarn */
-        || me->GetEntry() == 32906 /* Freya */
-        || me->GetEntry() == 36597 /* The Lich King */
-        || me->GetEntry() == 36853 /* Sindragosa */
-        || me->GetEntry() == 36855 /* Lady Deathwhisper */
-        || me->GetEntry() == 37955 /* Blood-Queen Lana'thel */
-        )
+        32871, /* Algalon */
+        39863, /* Halion */
+        33186, /* Razorscale */
+        36626, /* Festergut */
+        32867, /* Steelbreaker - Assembly of Iron */
+        32927, /* Runemaster Molgeim - Assembly of Iron */
+        32857, /* Stormcaller Brundir - Assembly of Iron */
+        33350, /* Mimiron */
+        16060, /* Gothik the Harvester */
+        36678, /* Professor Putricide */
+        15990, /* Kel'Thuzad */
+        33993, /* Emalon the Storm Watcher */
+        17257, /* Magtheridon */
+        25315, /* Kil'jaeden */
+        15928, /* Thaddius */
+        32930, /* Kologarn */
+        32906, /* Freya */
+        36597, /* The Lich King */
+        36853, /* Sindragosa */
+        36855, /* Lady Deathwhisper */
+        37955  /* Blood-Queen Lana'thel */
+    };
+
+    if (std::find(std::begin(bosses), std::end(bosses), me->GetEntry()) != std::end(bosses))
     {
         me->SetVisible(false);
         me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(1));
