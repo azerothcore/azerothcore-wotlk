@@ -486,7 +486,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     // checked and error show at loading templates
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction))
     {
-        if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP)
+        if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS)
             SetPvP(true);
         else
             SetPvP(false);

@@ -1398,7 +1398,7 @@ public:
     void MoneyChanged(uint32 value);
     void ReputationChanged(FactionEntry const* factionEntry);
     void ReputationChanged2(FactionEntry const* factionEntry);
-    [[nodiscard]] bool HasQuestForItem(uint32 itemId, uint32 excludeQuestId = 0, bool turnIn = false) const;
+    [[nodiscard]] bool HasQuestForItem(uint32 itemId, uint32 excludeQuestId = 0, bool turnIn = false, bool* showInLoot = nullptr) const;
     [[nodiscard]] bool HasQuestForGO(int32 GOId) const;
     void UpdateForQuestWorldObjects();
     [[nodiscard]] bool CanShareQuest(uint32 quest_id) const;
