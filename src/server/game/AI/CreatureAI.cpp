@@ -13,6 +13,8 @@
 #include "Player.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
+#include <AI/ScriptedAI/ScriptedCreature.h>
+#include <AI/ScriptedAI/ScriptedCreature.cpp>
 
 class PhasedReset : public BasicEvent
 {
@@ -23,12 +25,27 @@ public:
     {
         _owner.DespawnOrUnsummon();
         _owner.Respawn();
-        _owner.SetVisible(true);
-        _owner.AI()->Reset();
+        _owner.AI()->Reset(); // clear encounter/room
         if (_owner.IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
         {
             _owner.GetVehicleKit()->Reset(true);
         }
+        return true;
+    }
+
+private:
+    Creature& _owner;
+};
+
+class PhasedRespawn : public BasicEvent
+{
+public:
+    PhasedRespawn(Creature& owner) : BasicEvent(), _owner(owner) {}
+
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    {
+        _owner.SetVisible(true);
+        _owner.AI()->Reset(); // avoids issues with triggers/stalkers by visibility
         return true;
     }
 
@@ -219,10 +236,12 @@ void CreatureAI::EnterEvadeMode()
         || me->GetEntry() == 36597 /* The Lich King */
         || me->GetEntry() == 36853 /* Sindragosa */
         || me->GetEntry() == 36855 /* Lady Deathwhisper */
+        || me->GetEntry() == 37955 /* Blood-Queen Lana'thel */
         )
     {
         me->SetVisible(false);
-        me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(20000));
+        me->m_Events.AddEvent(new PhasedReset(*me), me->m_Events.CalculateTime(1));
+        me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
     }
     else // bosses will run back to the spawnpoint at reset
     {
