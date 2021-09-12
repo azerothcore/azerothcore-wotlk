@@ -207,6 +207,7 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
+    // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid) and increase array limit
     static constexpr std::array<uint32, 24> bosses = {
         /* dungeons */
         28684, /* Krik'thir the Gatewatcher */
