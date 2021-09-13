@@ -633,7 +633,7 @@ void ObjectMgr::LoadCreatureTemplateResistances()
         uint32 creatureID = fields[0].GetUInt32();
         SpellSchool school = SpellSchool(fields[1].GetUInt8());
 
-        if (school == SpellSchool::Normal || school >= SpellSchool::MaxSpellSchool)
+        if (school == SpellSchool::Normal || school >= SpellSchool(MAX_SPELL_SCHOOL))
         {
             LOG_ERROR("sql.sql", "creature_template_resistance has resistance definitions for creature %u but this school %u doesn't exist", creatureID, uint8(school));
             continue;
