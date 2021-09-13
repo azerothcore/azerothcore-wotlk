@@ -18,7 +18,7 @@ UPDATE `quest_template_locale` SET `CompletedText` = 'Retournez voir le Pilote C
 -- ruRU
 UPDATE `quest_template_locale` SET `CompletedText` = 'Вернитесь к Пилот Толстопуз в Сталегрилл в Дун Мороге.' WHERE `ID` = 317 AND `locale` = 'ruRU';
 -- zhCN
-UPDATE `quest_template_locale` SET `CompletedText` = '	把它们交给钢架补给站的驾驶员贝隆·风箱。' WHERE `ID` = 317 AND `locale` = 'zhCN';
+UPDATE `quest_template_locale` SET `CompletedText` = '把它们交给钢架补给站的驾驶员贝隆·风箱。' WHERE `ID` = 317 AND `locale` = 'zhCN';
 
 -- Ferocitas the dream eater
 
