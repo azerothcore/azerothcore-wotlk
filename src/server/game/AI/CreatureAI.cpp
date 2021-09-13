@@ -23,7 +23,6 @@ public:
     {
         _owner.DespawnOrUnsummon();
         _owner.Respawn();
-        _owner.AI()->Reset(); // clear encounter/room
         if (_owner.IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
         {
             _owner.GetVehicleKit()->Reset(true);
