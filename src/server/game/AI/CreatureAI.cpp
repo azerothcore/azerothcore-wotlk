@@ -241,6 +241,7 @@ bool CreatureAI::_EnterEvadeMode()
     // don't remove clone caster on evade (to be verified)
     me->RemoveEvadeAuras();
 
+    me->ClearComboPointHolders(); // Remove all combo points targeting this unit
     // sometimes bosses stuck in combat?
     me->DeleteThreatList();
     me->CombatStop(true);
