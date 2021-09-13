@@ -1,3 +1,19 @@
+-- DB update 2021_09_13_05 -> 2021_09_13_06
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_09_13_05';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_09_13_05 2021_09_13_06 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1631214624766636285'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631214624766636285');
 
 -- Pathing for Shadowsilk Poacher
@@ -114,3 +130,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (8442,0,0,0,8,0,100,0,12347,0,0,0,0,45,1,1,0,0,0,0,19,8441,0,0,0,0,0,0,"Shadowsilk Poacher - On Spellhit 'Raze Attack' - Set Data to Raze"),
 (8442,0,1,0,75,0,100,1,0,8441,15,0,0,45,2,2,0,0,0,0,19,8441,0,0,0,0,0,0,"Shadowsilk Poacher - On Creature 'Raze' in Range - Set Data to Raze");
 
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_09_13_06' WHERE sql_rev = '1631214624766636285';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
