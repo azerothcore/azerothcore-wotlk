@@ -1088,10 +1088,17 @@ public:
 
         EventMap events;
 
+        void JustDied(Unit* killer) override
+        {
+            // Prevent looting if killer doesn't have the quest
+            ClearLootIfUnfair(killer);
+        }
+
         void Reset() override
         {
             encounterStarted = false;
             playerGUID.Clear();
+            attackerGuids.clear();
             events.Reset();
 
             if (InNormalForm())
@@ -1218,6 +1225,11 @@ public:
             {
                 me->CastSpell(me, FRANKLIN_SPELL_ENTROPIC_STING, false);
             }
+        }
+
+        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            StoreAttackerGuidValue(attacker);
         }
 
         void ScheduleEncounterStart(ObjectGuid playerGUID)
