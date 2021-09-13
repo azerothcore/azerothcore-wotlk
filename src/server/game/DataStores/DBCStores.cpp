@@ -395,7 +395,7 @@ void LoadDBCStores(const std::string& dataPath)
 
     for (auto i : sSpellStore)
         if (i->Category)
-            sSpellsByCategoryStore[i->Category].insert(i->Id);
+            sSpellsByCategoryStore[i->Category].emplace(false, i->Id);
 
     for (SkillRaceClassInfoEntry const* entry : sSkillRaceClassInfoStore)
     {
