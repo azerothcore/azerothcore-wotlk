@@ -2423,7 +2423,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         {
             return EQUIP_ERR_CANT_DO_RIGHT_NOW;
         }
-        else if (proto->ItemLevel > 70)
+        else if (sWorld->getIntConfig(CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION) && proto->ItemLevel > sWorld->getIntConfig(CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION))
         {
             if (proto->SubClass < subclassToCompare)
             {
