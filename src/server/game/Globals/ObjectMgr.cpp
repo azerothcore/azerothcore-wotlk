@@ -1006,7 +1006,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         const_cast<CreatureTemplate*>(cInfo)->unit_class = UNIT_CLASS_WARRIOR;
     }
 
-    if (cInfo->dmgschool >= SpellSchool::MaxSpellSchool)
+    if (cInfo->dmgschool >= SpellSchool(MAX_SPELL_SCHOOL))
     {
         LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid spell school value (%u) in `dmgschool`.", cInfo->Entry, cInfo->dmgschool);
         const_cast<CreatureTemplate*>(cInfo)->dmgschool = SpellSchool::Normal;
