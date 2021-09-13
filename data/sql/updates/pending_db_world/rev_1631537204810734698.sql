@@ -6,5 +6,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3735, 0, 2, 0, 1, 0, 100, 1, 100, 1000, 0, 0, 0, 11, 12746, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Falthis - Out of Combat - Cast \'Summon Voidwalker\' (No Repeat)');
 
 -- Moves Apothecary Falthis slightly to correct position
-UPDATE `creature` SET `position_x` = 3845.8,  `position_y` = -217.3, `position_z` = 4.25, `orientation` = 1.67 WHERE `id` = 3735 AND `guid` = 32913;
+UPDATE `creature` SET `position_x` = 3845.6,  `position_y` = -213.6, `position_z` = 4.8, `orientation` = 1.67 WHERE `id` = 3735 AND `guid` = 32913;
 
