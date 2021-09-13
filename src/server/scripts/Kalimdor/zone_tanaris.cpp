@@ -7,7 +7,7 @@
 /* ScriptData
 SDName: Tanaris
 SD%Complete: 80
-SDComment: Quest support: 648, 1560, 2954, 4005, 10277, 10279(Special flight path). Noggenfogger vendor
+SDComment: Quest support: 1560, 2954, 4005, 10277, 10279(Special flight path). Noggenfogger vendor
 SDCategory: Tanaris
 EndScriptData */
 
@@ -16,7 +16,6 @@ npc_aquementas
 npc_custodian_of_time
 npc_steward_of_time
 npc_stone_watcher_of_norgannon
-npc_OOX17
 npc_tooga
 EndContentData */
 
@@ -378,96 +377,6 @@ public:
     }
 };
 
-/*######
-## npc_OOX17
-######*/
-
-enum Npc00X17
-{
-    SAY_OOX_START           = 0,
-    SAY_OOX_AGGRO           = 1,
-    SAY_OOX_AMBUSH          = 2,
-    SAY_OOX17_AMBUSH_REPLY  = 0,
-    SAY_OOX_END             = 3,
-
-    Q_OOX17                 = 648,
-    SPAWN_FIRST             = 7803,
-    SPAWN_SECOND_1          = 5617,
-    SPAWN_SECOND_2          = 7805
-};
-
-class npc_OOX17 : public CreatureScript
-{
-public:
-    npc_OOX17() : CreatureScript("npc_OOX17") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == Q_OOX17)
-        {
-            creature->setFaction(113);
-            creature->SetFullHealth();
-            creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-            creature->AI()->Talk(SAY_OOX_START);
-
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_OOX17::npc_OOX17AI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
-        }
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_OOX17AI(creature);
-    }
-
-    struct npc_OOX17AI : public npc_escortAI
-    {
-        npc_OOX17AI(Creature* creature) : npc_escortAI(creature) { }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-            if (Player* player = GetPlayerForEscort())
-            {
-                switch (waypointId)
-                {
-                    case 23:
-                        me->SummonCreature(SPAWN_FIRST, -8350.96f, -4445.79f, 10.10f, 6.20f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(SPAWN_FIRST, -8355.96f, -4447.79f, 10.10f, 6.27f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(SPAWN_FIRST, -8353.96f, -4442.79f, 10.10f, 6.08f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        Talk(SAY_OOX_AMBUSH);
-                        break;
-                    case 56:
-                        me->SummonCreature(SPAWN_SECOND_1, -7510.07f, -4795.50f, 9.35f, 6.06f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(SPAWN_SECOND_2, -7515.07f, -4797.50f, 9.35f, 6.22f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        me->SummonCreature(SPAWN_SECOND_2, -7518.07f, -4792.50f, 9.35f, 6.22f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                        Talk(SAY_OOX_AMBUSH);
-                        if (Creature* scoff = me->FindNearestCreature(SPAWN_SECOND_2, 30))
-                            scoff->AI()->Talk(SAY_OOX17_AMBUSH_REPLY);
-                        break;
-                    case 86:
-                        Talk(SAY_OOX_END);
-                        player->GroupEventHappens(Q_OOX17, me);
-                        break;
-                }
-            }
-        }
-
-        void Reset() override { }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            Talk(SAY_OOX_AGGRO);
-        }
-
-        void JustSummoned(Creature* summoned) override
-        {
-            summoned->AI()->AttackStart(me);
-        }
-    };
-};
-
 /*####
 # npc_tooga
 ####*/
@@ -636,6 +545,5 @@ void AddSC_tanaris()
     new npc_custodian_of_time();
     new npc_steward_of_time();
     new npc_stone_watcher_of_norgannon();
-    new npc_OOX17();
     new npc_tooga();
 }
