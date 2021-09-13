@@ -12746,17 +12746,19 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
             }
 
             // if unit has an owner, put owner in combat.
-            if (Unit* enemyOwner = target->GetOwner())
+            if (Unit* targetOwner = target->GetOwner())
             {
-                if (!(enemyOwner->IsInCombatWith(this)))
+                if (!(targetOwner->IsInCombatWith(this)))
                 {
                     /* warding off to not take over aggro for no reason
                     Using only AddThreat causes delay in attack */
-                    if(!enemyOwner->IsInCombat())
-                        enemyOwner->ToCreature()->AI()->AttackStart(this);
-                    enemyOwner->SetInCombatWith(this);
-                    SetInCombatWith(enemyOwner);
-                    enemyOwner->AddThreat(this, 0.0f);
+                    if (!targetOwner->IsInCombat())
+                    {
+                        targetOwner->ToCreature()->AI()->AttackStart(this);
+                    }
+                    targetOwner->SetInCombatWith(this);
+                    SetInCombatWith(targetOwner);
+                    targetOwner->AddThreat(this, 0.0f);
                 }
             }
         }
