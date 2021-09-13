@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
+#include <AI/ScriptedAI/ScriptedCreature.h>
 
 class PhasedReset : public BasicEvent
 {
@@ -207,6 +208,7 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
+    // @todo: Turn into a flags_extra in creature_template
     // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid) and increase array limit
     static constexpr std::array<uint32, 24> bosses = {
         /* dungeons */
