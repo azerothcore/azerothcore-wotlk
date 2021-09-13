@@ -302,7 +302,7 @@ public:
     bool Update(uint32 diff, PacketFilter& updater);
 
     /// Handle the authentication waiting queue (to be completed)
-    void SendAuthWaitQue(uint32 position);
+    void SendAuthWaitQueue(uint32 position);
 
     //void SendTestCreatureQueryOpcode(uint32 entry, ObjectGuid guid, uint32 testvalue);
     void SendNameQueryOpcode(ObjectGuid guid);
