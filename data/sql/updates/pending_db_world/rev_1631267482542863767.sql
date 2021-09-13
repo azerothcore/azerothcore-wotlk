@@ -1,4 +1,3 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631267482542863767');
 
 UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`guid` IN (5874,5876,5878,5879,5883,5899,5901,5902,5904,5905,5906,5907,5911));
-
