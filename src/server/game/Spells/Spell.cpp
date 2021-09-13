@@ -2707,8 +2707,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
         // if target is fallged for pvp also flag caster if a player
         // xinef: do not flag spells with aura bind sight (no special attribute)
-        if (effectUnit->IsPvP() && effectUnit != m_caster && m_caster->GetTypeId() == TYPEID_PLAYER && !m_spellInfo->HasAura(SPELL_AURA_BIND_SIGHT))
+        if (effectUnit->IsPvP() && effectUnit != m_caster && effectUnit->GetOwnerGUID() != m_caster->GetGUID() &&
+            m_caster->GetTypeId() == TYPEID_PLAYER && !m_spellInfo->HasAura(SPELL_AURA_BIND_SIGHT))
+        {
             m_caster->ToPlayer()->UpdatePvP(true);
+        }
 
         CallScriptAfterHitHandlers();
     }
@@ -4282,13 +4285,13 @@ void Spell::SendSpellStart()
 
     //LOG_DEBUG("spells.aura", "Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
-    uint32 castFlags = CAST_FLAG_UNKNOWN_2;
+    uint32 castFlags = CAST_FLAG_HAS_TRAJECTORY;
 
     if (((IsTriggered() && !m_spellInfo->IsAutoRepeatRangedSpell()) || m_triggeredByAuraSpell) && !m_spellInfo->IsChanneled())
         castFlags |= CAST_FLAG_PENDING;
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT))
-        castFlags |= CAST_FLAG_AMMO;
+        castFlags |= CAST_FLAG_PROJECTILE;
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
             (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
             && m_spellInfo->PowerType != POWER_HEALTH)
@@ -4314,7 +4317,7 @@ void Spell::SendSpellStart()
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
         data << uint32(m_caster->GetPower((Powers)m_spellInfo->PowerType));
 
-    if (castFlags & CAST_FLAG_AMMO)
+    if (castFlags & CAST_FLAG_PROJECTILE)
         WriteAmmoToPacket(&data);
 
     if (castFlags & CAST_FLAG_UNKNOWN_23)
@@ -4344,7 +4347,7 @@ void Spell::SendSpellGo()
         castFlags |= CAST_FLAG_PENDING;
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT))
-        castFlags |= CAST_FLAG_AMMO;                        // arrows/bullets visual
+        castFlags |= CAST_FLAG_PROJECTILE;                        // arrows/bullets visual
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
             (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
@@ -4417,7 +4420,7 @@ void Spell::SendSpellGo()
         data << uint32(m_delayTrajectory ? m_delayTrajectory : m_delayMoment);
     }
 
-    if (castFlags & CAST_FLAG_AMMO)
+    if (castFlags & CAST_FLAG_PROJECTILE)
         WriteAmmoToPacket(&data);
 
     if (castFlags & CAST_FLAG_VISUAL_CHAIN)
@@ -6487,6 +6490,14 @@ SpellCastResult Spell::CheckRange(bool strict)
             return SPELL_FAILED_TOO_CLOSE;
     }
 
+    if (GameObject* goTarget = m_targets.GetGOTarget())
+    {
+        if (!goTarget->IsAtInteractDistance(m_caster->ToPlayer(), m_spellInfo))
+        {
+            return SPELL_FAILED_OUT_OF_RANGE;
+        }
+    }
+
     if (m_targets.HasDst() && !m_targets.HasTraj())
     {
         if (!m_caster->IsWithinDist3d(m_targets.GetDstPos(), max_range))
@@ -7773,6 +7784,15 @@ SpellCastResult Spell::CanOpenLock(uint32 effIndex, uint32 lockId, SkillType& sk
                     }
 
                     return SPELL_CAST_OK;
+                }
+            case LOCK_KEY_SPELL:
+                {
+                    if (m_spellInfo->Id == lockInfo->Index[j])
+                    {
+                        return SPELL_CAST_OK;
+                    }
+                    reqKey = true;
+                    break;
                 }
         }
     }

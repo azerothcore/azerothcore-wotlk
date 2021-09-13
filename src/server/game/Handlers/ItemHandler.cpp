@@ -290,6 +290,70 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
         _player->DestroyItem(bag, slot, true);
 }
 
+bool ItemTemplate::HasStat(ItemModType stat) const
+{
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+    {
+        if (i >= StatsCount)
+        {
+            break;
+        }
+
+        if (ItemStat[i].ItemStatType == stat)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool ItemTemplate::HasSpellPowerStat() const
+{
+    bool invalid = false;
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        _Spell const& spellData = Spells[i];
+        if (!spellData.SpellId)
+        {
+            continue;
+        }
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
+        if (!spellInfo)
+        {
+            continue;
+        }
+
+        for (uint8 j = EFFECT_0; j <= EFFECT_2; ++j)
+        {
+            switch (spellInfo->Effects[j].ApplyAuraName)
+            {
+                case SPELL_AURA_MOD_HEALING_DONE:
+                case SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT:
+                case SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER:
+                case SPELL_AURA_MOD_HEALING:
+                    invalid = true;
+                    break;
+                case SPELL_AURA_MOD_DAMAGE_DONE:
+                case SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT:
+                case SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER:
+                case SPELL_AURA_MOD_DAMAGE_TAKEN:
+                    if (!(spellInfo->Effects[j].MiscValue & SPELL_SCHOOL_MASK_SPELL))
+                    {
+                        return false;
+                    }
+                    invalid = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    return invalid;
+}
+
 void ItemTemplate::InitializeQueryData()
 {
     queryData.Initialize(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 1);
@@ -362,7 +426,7 @@ void ItemTemplate::InitializeQueryData()
 
             queryData << Spells[s].SpellId;
             queryData << Spells[s].SpellTrigger;
-            queryData << uint32(-abs(Spells[s].SpellCharges));
+            queryData << int32(Spells[s].SpellCharges);
 
             if (db_data)
             {
@@ -513,7 +577,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recvData)
 
                 queryData << pProto->Spells[s].SpellId;
                 queryData << pProto->Spells[s].SpellTrigger;
-                queryData << uint32(-abs(pProto->Spells[s].SpellCharges));
+                queryData << int32(pProto->Spells[s].SpellCharges);
 
                 if (db_data)
                 {

@@ -114,7 +114,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (PositionOkay(owner, target, maxRange, angle) && !owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
         return true;
 
-    bool moveToward = !owner->IsInDist(target, maxRange);
+    float tarX, tarY, tarZ;
+    target->GetPosition(tarX, tarY, tarZ);
+
+    bool withinRange = owner->IsInDist(target, maxRange);
+    bool withinLOS   = owner->IsWithinLOS(tarX, tarY, tarZ);
+    bool moveToward  = !(withinRange && withinLOS);
+
     _mutualChase = mutualChase;
 
     if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
