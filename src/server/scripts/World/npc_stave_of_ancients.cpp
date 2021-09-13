@@ -1093,6 +1093,11 @@ public:
             encounterStarted = false;
             playerGUID.Clear();
             events.Reset();
+
+            if (InNormalForm())
+            {
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
         }
 
         void AttackStart(Unit* target) override
@@ -1108,6 +1113,7 @@ public:
          void EnterCombat(Unit* /*victim*/) override
         {
             RevealForm();
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
             if (InNormalForm())
             {
