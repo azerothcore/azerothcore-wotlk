@@ -25,7 +25,6 @@ enum AmbassadorEvents
 };
 
 const uint32 NPC_FIRE_SPIRIT = 9178;
-const uint32 NPC_AMBASSADOR_FLAMELASHER = 9156;
 
 const Position SummonPositions[7] =
 {
