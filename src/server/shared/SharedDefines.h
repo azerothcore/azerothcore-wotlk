@@ -192,7 +192,6 @@ enum class SpellSchool : uint8
     Frost                  = 4,
     Shadow                 = 5,
     Arcane                 = 6,
-    MaxSpellSchool         = 7
 };
 
 constexpr auto MAX_SPELL_SCHOOL = 7;
