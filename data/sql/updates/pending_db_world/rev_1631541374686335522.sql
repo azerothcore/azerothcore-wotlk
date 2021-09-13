@@ -3,7 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631541374686335522');
 -- Inserting lines for Magister Sylastor
 DELETE FROM `creature_text` WHERE `CreatureID` = 16237;
 INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`COMMENT`) VALUES
-(16237,0,0,'Look out... the night elves are back!',12,0,100,0,0,0,0,0,'Quest Deliver the Plans to An''telas completion');
+(16237,0,0,'Look out... the night elves are back!',12,0,100,0,0,0,12115,0,'Quest Deliver the Plans to An''telas completion');
 
 -- Inserting the 2 Night Elf Ambusher to the summon group table
 DELETE FROM `creature_summon_groups` WHERE `summonerId` = 16237;
