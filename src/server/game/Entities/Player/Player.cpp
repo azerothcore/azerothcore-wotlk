@@ -1277,7 +1277,7 @@ void Player::SendTeleportAckPacket()
     GetSession()->SendPacket(&data);
 }
 
-bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/)
+bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/, bool newInstance /*= false*/)
 {
     // for except kick by antispeedhack
     sScriptMgr->AnticheatSetSkipOnePacketForASH(this, true);
@@ -1378,7 +1378,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (!sScriptMgr->OnBeforePlayerTeleport(this, mapid, x, y, z, orientation, options, target))
         return false;
 
-    if (GetMapId() == mapid)
+    if (GetMapId() == mapid && !newInstance)
     {
         //lets reset far teleport flag if it wasn't reset during chained teleports
         SetSemaphoreTeleportFar(0);
@@ -1547,9 +1547,15 @@ bool Player::TeleportToEntryPoint()
     ScheduleDelayedOperation(DELAYED_BG_TAXI_RESTORE);
     ScheduleDelayedOperation(DELAYED_BG_GROUP_RESTORE);
 
-    if (m_entryPointData.joinPos.m_mapId == MAPID_INVALID)
+    WorldLocation loc = m_entryPointData.joinPos;
+    m_entryPointData.joinPos.m_mapId = MAPID_INVALID;
+
+    if (loc.m_mapId == MAPID_INVALID)
+    {
         return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
-    return TeleportTo(m_entryPointData.joinPos);
+    }
+
+    return TeleportTo(loc);
 }
 
 void Player::ProcessDelayedOperations()
@@ -15200,4 +15206,26 @@ float Player::GetSightRange(const WorldObject* target) const
     }
 
     return sightRange;
+}
+
+std::string Player::GetPlayerName()
+{
+    std::string name = GetName();
+    std::string color = "";
+
+    switch (getClass())
+    {
+        case CLASS_DEATH_KNIGHT: color = "|cffC41F3B"; break;
+        case CLASS_DRUID:        color = "|cffFF7D0A"; break;
+        case CLASS_HUNTER:       color = "|cffABD473"; break;
+        case CLASS_MAGE:         color = "|cff69CCF0"; break;
+        case CLASS_PALADIN:      color = "|cffF58CBA"; break;
+        case CLASS_PRIEST:       color = "|cffFFFFFF"; break;
+        case CLASS_ROGUE:        color = "|cffFFF569"; break;
+        case CLASS_SHAMAN:       color = "|cff0070DE"; break;
+        case CLASS_WARLOCK:      color = "|cff9482C9"; break;
+        case CLASS_WARRIOR:      color = "|cffC79C6E"; break;
+    }
+
+    return "|Hplayer:" + name + "|h" + color + name + "|h|r";
 }
