@@ -230,7 +230,7 @@ public:
             return ObjectGuid::Empty;
         }
 
-        virtual void Update(uint32 diff) override
+        void Update(uint32 diff) override
         {
             switch (PyramidPhase)
             {
