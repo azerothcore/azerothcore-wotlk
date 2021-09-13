@@ -176,6 +176,7 @@ public:
             if (unit->GetEntry() == NPC_BLY)
             {
                 PyramidPhase = PYRAMID_DONE;
+                SaveToDB();
             }
         }
 
