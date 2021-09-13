@@ -105,19 +105,19 @@ MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
 
 struct SpellSchoolImmune
 {
-    uint32 flag;
+    SpellSchool flag;
     char const* text;
 };
 
 SpellSchoolImmune const spellSchoolImmunes[MAX_SPELL_SCHOOL] =
 {
-    { static_cast<uint32>(SpellSchool::Normal), "SpellSchool::Normal" },
-    { static_cast<uint32>(SpellSchool::Holy),   "SpellSchool::Holy"   },
-    { static_cast<uint32>(SpellSchool::Fire),   "SpellSchool::Fire"   },
-    { static_cast<uint32>(SpellSchool::Nature), "SpellSchool::Nature" },
-    { static_cast<uint32>(SpellSchool::Frost),  "SpellSchool::Frost"  },
-    { static_cast<uint32>(SpellSchool::Shadow), "SpellSchool::Shadow" },
-    { static_cast<uint32>(SpellSchool::Arcane), "SpellSchool::Arcane" },
+    { SpellSchool::Normal, "SpellSchool::Normal" },
+    { SpellSchool::Holy,   "SpellSchool::Holy"   },
+    { SpellSchool::Fire,   "SpellSchool::Fire"   },
+    { SpellSchool::Nature, "SpellSchool::Nature" },
+    { SpellSchool::Frost,  "SpellSchool::Frost"  },
+    { SpellSchool::Shadow, "SpellSchool::Shadow" },
+    { SpellSchool::Arcane, "SpellSchool::Arcane" },
 };
 
 class npc_commandscript : public CommandScript
@@ -777,7 +777,7 @@ public:
         handler->PSendSysMessage(LANG_NPCINFO_SPELL_SCHOOL_IMMUNE, spellSchoolImmuneMask);
         for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
         {
-            if (spellSchoolImmuneMask & (1 << spellSchoolImmunes[i].flag))
+            if (spellSchoolImmuneMask & (1 << static_cast<uint8>(spellSchoolImmunes[i].flag)))
             {
                 handler->PSendSysMessage(spellSchoolImmunes[i].text, spellSchoolImmunes[i].flag);
             }

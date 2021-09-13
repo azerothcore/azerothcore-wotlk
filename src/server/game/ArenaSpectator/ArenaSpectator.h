@@ -86,7 +86,7 @@ namespace ArenaSpectator
     }
 
     template<class T>
-    inline void SendCommand_Aura(T* o, ObjectGuid targetGUID, const char* prefix, ObjectGuid caster, uint32 id, bool isDebuff, uint32 dispel, int32 dur, int32 maxdur, uint32 stack, bool remove)
+    inline void SendCommand_Aura(T* o, ObjectGuid targetGUID, const char* prefix, ObjectGuid caster, uint32 id, bool isDebuff, DispelType dispel, int32 dur, int32 maxdur, uint32 stack, bool remove)
     {
         if (!targetGUID.IsPlayer())
             return;

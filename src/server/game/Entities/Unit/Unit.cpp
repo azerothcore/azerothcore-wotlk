@@ -4989,7 +4989,7 @@ void Unit::GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelCharges
 
         if (aura->GetSpellInfo()->GetDispelMask() & dispelMask)
         {
-            if (aura->GetSpellInfo()->Dispel == static_cast<uint32>(DispelType::MAGIC))
+            if (aura->GetSpellInfo()->Dispel == DispelType::MAGIC)
             {
                 // do not remove positive auras if friendly target
                 //               negative auras if non-friendly target
@@ -5168,7 +5168,7 @@ uint32 Unit::GetDiseasesByCaster(ObjectGuid casterGUID, uint8 mode)
         for (AuraEffectList::iterator i = m_modAuras[diseaseAuraTypes[index]].begin(); i != m_modAuras[diseaseAuraTypes[index]].end();)
         {
             // Get auras with disease dispel type by caster
-            if ((*i)->GetSpellInfo()->Dispel == static_cast<uint32>(DispelType::DISEASE)
+            if ((*i)->GetSpellInfo()->Dispel == DispelType::DISEASE
                     && ((*i)->GetCasterGUID() == casterGUID || (*i)->GetCasterGUID() == drwGUID)) // if its caster or his dancing rune weapon
             {
                 ++diseases;
@@ -12074,11 +12074,11 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo)
     if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         return false;
 
-    if (spellInfo->Dispel)
+    if (spellInfo->Dispel != DispelType::NONE)
     {
         SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
         for (SpellImmuneList::const_iterator itr = dispelList.begin(); itr != dispelList.end(); ++itr)
-            if (itr->type == spellInfo->Dispel)
+            if (itr->type == static_cast<uint32>(spellInfo->Dispel))
                 return true;
     }
 
@@ -13944,8 +13944,8 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
             AddPct(duration, durationMod);
 
         // there are only negative mods currently
-        durationMod_always = target->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL, spellProto->Dispel);
-        durationMod_not_stack = target->GetMaxNegativeAuraModifierByMiscValue(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK, spellProto->Dispel);
+        durationMod_always = target->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL, static_cast<int32>(spellProto->Dispel));
+        durationMod_not_stack = target->GetMaxNegativeAuraModifierByMiscValue(SPELL_AURA_MOD_AURA_DURATION_BY_DISPEL_NOT_STACK, static_cast<int32>(spellProto->Dispel));
 
         durationMod = 0;
         if (durationMod_always > durationMod_not_stack)

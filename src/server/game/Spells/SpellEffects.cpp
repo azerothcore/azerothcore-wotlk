@@ -588,7 +588,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         Unit::AuraEffectList const& decSpeedList = unitTarget->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
                         for (Unit::AuraEffectList::const_iterator iter = decSpeedList.begin(); iter != decSpeedList.end(); ++iter)
                         {
-                            if ((*iter)->GetSpellInfo()->SpellIconID == 15 && (*iter)->GetSpellInfo()->Dispel == 0)
+                            if ((*iter)->GetSpellInfo()->SpellIconID == 15 && (*iter)->GetSpellInfo()->Dispel == DispelType::NONE)
                             {
                                 found = true;
                                 break;
@@ -3388,7 +3388,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         Unit::AuraApplicationMap const& auras = unitTarget->GetAppliedAuras();
                         for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                         {
-                            if (itr->second->GetBase()->GetSpellInfo()->Dispel == static_cast<uint32>(DispelType::POISON))
+                            if (itr->second->GetBase()->GetSpellInfo()->Dispel == DispelType::POISON)
                             {
                                 found = true;
                                 break;

@@ -2565,7 +2565,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (missInfo == SpellMissInfo::None && damageInfo.damage == 0)
         {
             //if (damageInfo.absorb > 0)
-            //  missInfo = static_cast<uint32>(SpellMissInfo::Absorb);
+            //  missInfo = SpellMissInfo::Absorb;
             if (damageInfo.blocked)
                 missInfo = SpellMissInfo::Block;
         }

@@ -884,7 +884,7 @@ public:
                 for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                 {
                     Aura* aura = itr->second;
-                    if (aura->GetSpellInfo()->SpellLevel > 35 || aura->GetSpellInfo()->Dispel != static_cast<uint32>(DispelType::POISON))
+                    if (aura->GetSpellInfo()->SpellLevel > 35 || aura->GetSpellInfo()->Dispel != DispelType::POISON)
                         continue;
 
                     removeList.push_back(aura->GetId());
@@ -926,7 +926,7 @@ public:
                 for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                 {
                     Aura* aura = itr->second;
-                    if (aura->GetSpellInfo()->SpellLevel > 25 || aura->GetSpellInfo()->Dispel != static_cast<uint32>(DispelType::POISON))
+                    if (aura->GetSpellInfo()->SpellLevel > 25 || aura->GetSpellInfo()->Dispel != DispelType::POISON)
                     {
                         continue;
                     }

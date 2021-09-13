@@ -52,7 +52,7 @@ public:
         {
             Unit::AuraApplicationMap const& auras = GetUnitOwner()->GetAppliedAuras();
             for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
-                if (itr->second->GetBase()->GetCasterGUID() == this->GetCasterGUID() && itr->second->GetBase()->GetSpellInfo()->Dispel == static_cast<uint32>(DispelType::POISON))
+                if (itr->second->GetBase()->GetCasterGUID() == this->GetCasterGUID() && itr->second->GetBase()->GetSpellInfo()->Dispel == DispelType::POISON)
                     return;
 
             SetDuration(0);
@@ -292,7 +292,7 @@ public:
                         }
 
                         // Proc only rogue poisons
-                        if (spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE || spellInfo->Dispel != static_cast<uint32>(DispelType::POISON))
+                        if (spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE || spellInfo->Dispel != DispelType::POISON)
                             continue;
 
                         // Do not reproc deadly

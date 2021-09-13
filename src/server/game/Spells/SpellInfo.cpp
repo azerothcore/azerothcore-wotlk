@@ -761,7 +761,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 {
     Id = spellEntry->Id;
     CategoryEntry = spellEntry->Category ? sSpellCategoryStore.LookupEntry(spellEntry->Category) : nullptr;
-    Dispel = spellEntry->Dispel;
+    Dispel = DispelType(spellEntry->Dispel);
     Mechanic = spellEntry->Mechanic;
     Attributes = spellEntry->Attributes;
     AttributesEx = spellEntry->AttributesEx;
@@ -2048,7 +2048,7 @@ AuraStateType SpellInfo::LoadAuraState() const
         return AURA_STATE_DEADLY_POISON;
 
     // Enrage aura state
-    if (Dispel == static_cast<uint32>(DispelType::ENRAGE))
+    if (Dispel == DispelType::ENRAGE)
         return AURA_STATE_ENRAGE;
 
     // Bleeding aura state
@@ -2162,7 +2162,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
         case SPELLFAMILY_WARLOCK:
             {
                 // only warlock curses have this
-                if (Dispel == static_cast<uint32>(DispelType::CURSE))
+                if (Dispel == DispelType::CURSE)
                     return SPELL_SPECIFIC_CURSE;
 
                 // Warlock (Demon Armor | Demon Skin | Fel Armor)
@@ -2185,7 +2185,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
         case SPELLFAMILY_HUNTER:
             {
                 // only hunter stings have this
-                if (Dispel == static_cast<uint32>(DispelType::POISON))
+                if (Dispel == DispelType::POISON)
                     return SPELL_SPECIFIC_STING;
 
                 // only hunter aspects have this (but not all aspects in hunter family)

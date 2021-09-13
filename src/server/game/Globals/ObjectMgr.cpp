@@ -558,7 +558,7 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.detection_range   = fields[21].GetFloat();
     creatureTemplate.scale             = fields[22].GetFloat();
     creatureTemplate.rank              = uint32(fields[23].GetUInt8());
-    creatureTemplate.dmgschool         = uint32(fields[24].GetInt8());
+    creatureTemplate.dmgschool         = SpellSchool(fields[24].GetInt8());
     creatureTemplate.DamageModifier    = fields[25].GetFloat();
     creatureTemplate.BaseAttackTime    = fields[26].GetUInt32();
     creatureTemplate.RangeAttackTime   = fields[27].GetUInt32();
@@ -569,7 +569,7 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.unit_flags2       = fields[32].GetUInt32();
     creatureTemplate.dynamicflags      = fields[33].GetUInt32();
     creatureTemplate.family            = uint32(fields[34].GetUInt8());
-    creatureTemplate.trainer_type      = uint32(fields[35].GetUInt8());
+    creatureTemplate.trainer_type      = TrainerType(fields[35].GetUInt8());
     creatureTemplate.trainer_spell     = fields[36].GetUInt32();
     creatureTemplate.trainer_class     = uint32(fields[37].GetUInt8());
     creatureTemplate.trainer_race      = uint32(fields[38].GetUInt8());
@@ -631,11 +631,11 @@ void ObjectMgr::LoadCreatureTemplateResistances()
         Field* fields = result->Fetch();
 
         uint32 creatureID = fields[0].GetUInt32();
-        uint8 school = fields[1].GetUInt8();
+        SpellSchool school = SpellSchool(fields[1].GetUInt8());
 
-        if (school == static_cast<uint8>(SpellSchool::Normal) || school >= MAX_SPELL_SCHOOL)
+        if (school == SpellSchool::Normal || school >= SpellSchool::MaxSpellSchool)
         {
-            LOG_ERROR("sql.sql", "creature_template_resistance has resistance definitions for creature %u but this school %u doesn't exist", creatureID, school);
+            LOG_ERROR("sql.sql", "creature_template_resistance has resistance definitions for creature %u but this school %u doesn't exist", creatureID, uint8(school));
             continue;
         }
 
@@ -647,7 +647,7 @@ void ObjectMgr::LoadCreatureTemplateResistances()
         }
 
         CreatureTemplate& creatureTemplate = itr->second;
-        creatureTemplate.resistance[school] = fields[2].GetInt16();
+        creatureTemplate.resistance[uint8(school)] = fields[2].GetInt16();
 
         ++count;
     } while (result->NextRow());
@@ -1006,10 +1006,10 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         const_cast<CreatureTemplate*>(cInfo)->unit_class = UNIT_CLASS_WARRIOR;
     }
 
-    if (cInfo->dmgschool >= MAX_SPELL_SCHOOL)
+    if (cInfo->dmgschool >= SpellSchool::MaxSpellSchool)
     {
         LOG_ERROR("sql.sql", "Creature (Entry: %u) has invalid spell school value (%u) in `dmgschool`.", cInfo->Entry, cInfo->dmgschool);
-        const_cast<CreatureTemplate*>(cInfo)->dmgschool = static_cast<uint32>(SpellSchool::Normal);
+        const_cast<CreatureTemplate*>(cInfo)->dmgschool = SpellSchool::Normal;
     }
 
     if (cInfo->BaseAttackTime == 0)
@@ -1018,7 +1018,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     if (cInfo->RangeAttackTime == 0)
         const_cast<CreatureTemplate*>(cInfo)->RangeAttackTime = BASE_ATTACK_TIME;
 
-    if ((cInfo->npcflag & UNIT_NPC_FLAG_TRAINER) && cInfo->trainer_type >= MAX_TRAINER_TYPE)
+    if ((cInfo->npcflag & UNIT_NPC_FLAG_TRAINER) && cInfo->trainer_type >= TrainerType::Max)
         LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong trainer type %u.", cInfo->Entry, cInfo->trainer_type);
 
     if (cInfo->speed_walk == 0.0f)

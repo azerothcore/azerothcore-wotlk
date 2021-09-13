@@ -191,7 +191,8 @@ enum class SpellSchool : uint8
     Nature                 = 3,
     Frost                  = 4,
     Shadow                 = 5,
-    Arcane                 = 6
+    Arcane                 = 6,
+    MaxSpellSchool         = 7
 };
 
 constexpr auto MAX_SPELL_SCHOOL = 7;
@@ -1397,7 +1398,7 @@ enum Targets
     TOTAL_SPELL_TARGETS
 };
 
-enum class SpellMissInfo : uint32
+enum class SpellMissInfo : uint8
 {
     None                    = 0,
     Miss                    = 1,
@@ -1413,7 +1414,7 @@ enum class SpellMissInfo : uint32
     Reflect                 = 11
 };
 
-enum class SpellHitType : uint32
+enum class SpellHitType : uint8
 {
     CritDebug        = 0x00001,
     Crit             = 0x00002,
@@ -2492,15 +2493,14 @@ enum LockType
     LOCKTYPE_OPEN_FROM_VEHICLE     = 21
 };
 
-enum TrainerType                                            // this is important type for npcs!
+enum class TrainerType : uint8                 // this is important type for npcs!
 {
     Class             = 0,
     Mounts            = 1,                     // on blizz it's 2
     Tradeskills       = 2,
-    Pets              = 3
+    Pets              = 3,
+    Max               = 4
 };
-
-#define MAX_TRAINER_TYPE 4
 
 // CreatureType.dbc
 enum CreatureType

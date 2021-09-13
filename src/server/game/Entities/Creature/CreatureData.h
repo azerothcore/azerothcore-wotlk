@@ -94,7 +94,7 @@ struct CreatureTemplate
     float   detection_range;                                // Detection Range for Line of Sight aggro
     float   scale;
     uint32  rank;
-    uint32  dmgschool;
+    SpellSchool dmgschool;
     float   DamageModifier;
     uint32  BaseAttackTime;
     uint32  RangeAttackTime;
@@ -105,7 +105,7 @@ struct CreatureTemplate
     uint32  unit_flags2;                                    // enum UnitFlags2 mask values
     uint32  dynamicflags;
     uint32  family;                                         // enum CreatureFamily values (optional)
-    uint32  trainer_type;
+    TrainerType trainer_type;
     uint32  trainer_spell;
     uint32  trainer_class;
     uint32  trainer_race;

@@ -299,7 +299,7 @@ class SpellInfo
 public:
     uint32 Id;
     SpellCategoryEntry const* CategoryEntry;
-    uint32 Dispel;
+    DispelType Dispel;
     uint32 Mechanic;
     uint32 Attributes;
     uint32 AttributesEx;
