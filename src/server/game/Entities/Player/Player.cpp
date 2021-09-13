@@ -15207,3 +15207,25 @@ float Player::GetSightRange(const WorldObject* target) const
 
     return sightRange;
 }
+
+std::string Player::GetPlayerName()
+{
+    std::string name = GetName();
+    std::string color = "";
+
+    switch (getClass())
+    {
+        case CLASS_DEATH_KNIGHT: color = "|cffC41F3B"; break;
+        case CLASS_DRUID:        color = "|cffFF7D0A"; break;
+        case CLASS_HUNTER:       color = "|cffABD473"; break;
+        case CLASS_MAGE:         color = "|cff69CCF0"; break;
+        case CLASS_PALADIN:      color = "|cffF58CBA"; break;
+        case CLASS_PRIEST:       color = "|cffFFFFFF"; break;
+        case CLASS_ROGUE:        color = "|cffFFF569"; break;
+        case CLASS_SHAMAN:       color = "|cff0070DE"; break;
+        case CLASS_WARLOCK:      color = "|cff9482C9"; break;
+        case CLASS_WARRIOR:      color = "|cffC79C6E"; break;
+    }
+
+    return "|Hplayer:" + name + "|h" + color + name + "|h|r";
+}
