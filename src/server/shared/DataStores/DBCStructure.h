@@ -13,6 +13,7 @@
 #include "Util.h"
 #include <set>
 #include <map>
+#include <unordered_map>
 
 // Structures using to access raw DBC data and required packing to portability
 
@@ -1658,8 +1659,8 @@ struct SpellEntry
     //uint32  SpellDifficultyId;                            // 233      3.3.0
 };
 
-typedef std::set<uint32> SpellCategorySet;
-typedef std::map<uint32, SpellCategorySet > SpellCategoryStore;
+typedef std::set<std::pair<bool, uint32>> SpellCategorySet;
+typedef std::unordered_map<uint32, SpellCategorySet> SpellCategoryStore;
 typedef std::set<uint32> PetFamilySpellsSet;
 typedef std::map<uint32, PetFamilySpellsSet > PetFamilySpellsStore;
 
@@ -1777,6 +1778,38 @@ struct SpellItemEnchantmentConditionEntry
     uint8   CompareColor[5];                                // 15-20    m_rt_operandType[5]
     uint32  Value[5];                                       // 21-25    m_rt_operand[5]
     //uint8   Logic[5]                                      // 25-30    m_logic[5]
+};
+
+struct SpellVisualEntry
+{
+    //uint32 Id;
+    //uint32 PrecastKit;
+    //uint32 CastingKit;
+    //uint32 ImpactKit;
+    //uint32 StateKit;
+    //uint32 StateDoneKit;
+    //uint32 ChannelKit;
+    uint32 HasMissile;
+    int32 MissileModel;
+    //uint32 MissilePathType;
+    //uint32 MissileDestinationAttachment;
+    //uint32 MissileSound;
+    //uint32 AnimEventSoundID;
+    //uint32 Flags;
+    //uint32 CasterImpactKit;
+    //uint32 TargetImpactKit;
+    //int32 MissileAttachment;
+    //uint32 MissileFollowGroundHeight;
+    //uint32 MissileFollowGroundDropSpeed;
+    //uint32 MissileFollowGroundApprach;
+    //uint32 MissileFollowGroundFlags;
+    //uint32 MissileMotionId;
+    //uint32 MissileTargetingKit;
+    //uint32 InstantAreaKit;
+    //uint32 ImpactAreaKit;
+    //uint32 PersistentAreaKit;
+    //DBCPosition3D MissileCastOffset;
+    //DBCPosition3D MissileImpactOffset;
 };
 
 struct StableSlotPricesEntry

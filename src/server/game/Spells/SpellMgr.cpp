@@ -2665,10 +2665,8 @@ void SpellMgr::LoadSpellInfoStore()
 void SpellMgr::UnloadSpellInfoStore()
 {
     for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)
-    {
-        if (mSpellInfoMap[i])
-            delete mSpellInfoMap[i];
-    }
+        delete mSpellInfoMap[i];
+
     mSpellInfoMap.clear();
 }
 
@@ -3282,6 +3280,21 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->Effects[EFFECT_0].MiscValue = 127;
                 break;
         }
+
+        if (spellInfo->Speed > 0.0f)
+        {
+            if (SpellVisualEntry const* spellVisual = sSpellVisualStore.LookupEntry(spellInfo->SpellVisual[0]))
+            {
+                if (spellVisual->HasMissile)
+                {
+                    if (spellVisual->MissileModel == -4 || spellVisual->MissileModel == -5)
+                    {
+                        spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEEDS_AMMO_DATA;
+                    }
+                }
+            }
+        }
+       spellInfo->_InitializeExplicitTargetMask();
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells
@@ -7334,6 +7347,12 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->MaxAffectedTargets = 1;
         spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
+    });
+
+    // Item: Luffa removes only 1 bleed effect
+    ApplySpellFix({ 23595 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[EFFECT_0] = 1;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
