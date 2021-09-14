@@ -17,7 +17,7 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2923) AND (`source_type` = 0)
 -- Add aura of Nature Channeling to Lady Anacondra
 UPDATE `creature_template_addon` SET `auras` = '13236' WHERE (`entry` = 3671);
 
--- Add aura of Nature Channeling to Bleakheart Satyr
+-- Add aura of Curse of the Bleakheart Proc to Bleakheart Satyr
 UPDATE `creature_template_addon` SET `auras` = '6947' WHERE (`entry` = 3765);
 
 -- Add aura of Thrash to Fardel Dabyrie and removed the casting of Thrash
