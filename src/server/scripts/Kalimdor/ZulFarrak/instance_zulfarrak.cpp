@@ -5,7 +5,6 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "InstanceScript.h"
-#include "Player.h"
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "zulfarrak.h"
@@ -87,6 +86,7 @@ public:
     };
 };
 
+// 10247 - Summon Zul'Farrak Zombies
 class spell_zulfarrak_summon_zulfarrak_zombies : public SpellScriptLoader
 {
 public:
@@ -126,6 +126,7 @@ public:
     }
 };
 
+// 10738 - Unlocking
 class spell_zulfarrak_unlocking : public SpellScriptLoader
 {
 public:

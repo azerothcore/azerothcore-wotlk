@@ -4,7 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/// \addtogroup Trinityd
+/// \addtogroup Acored
 /// @{
 /// \file
 
@@ -12,7 +12,7 @@
 #include "Chat.h"
 #include "CliRunnable.h"
 #include "Common.h"
-#include "Configuration/Config.h"
+#include "Config.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
@@ -124,7 +124,7 @@ int kb_hit_return()
 #endif
 
 /// %Thread start
-void CliRunnable::run()
+void CliThread()
 {
     ///- Display the list of available CLI functions then beep
     //TC_LOG_INFO("server.worldserver", "");

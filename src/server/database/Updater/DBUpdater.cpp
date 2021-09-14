@@ -2,6 +2,7 @@
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
+
 #include "DBUpdater.h"
 #include "BuiltInConfig.h"
 #include "Config.h"
@@ -12,7 +13,7 @@
 #include "QueryResult.h"
 #include "StartProcess.h"
 #include "UpdateFetcher.h"
-#include <boost/filesystem/operations.hpp>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -26,10 +27,10 @@ std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 
 bool DBUpdaterUtil::CheckExecutable()
 {
-    boost::filesystem::path exe(GetCorrectedMySQLExecutable());
+    std::filesystem::path exe(GetCorrectedMySQLExecutable());
     if (!is_regular_file(exe))
     {
-        exe = Warhead::SearchExecutableInPath("mysql");
+        exe = Acore::SearchExecutableInPath("mysql");
         if (!exe.empty() && is_regular_file(exe))
         {
             // Correct the path to the cli
@@ -80,7 +81,7 @@ bool DBUpdater<LoginDatabaseConnection>::IsEnabled(uint32 const updateMask)
 template<>
 std::string DBUpdater<LoginDatabaseConnection>::GetDBModuleName()
 {
-    return "db_auth";
+    return "db-auth";
 }
 
 // World Database
@@ -112,7 +113,7 @@ bool DBUpdater<WorldDatabaseConnection>::IsEnabled(uint32 const updateMask)
 template<>
 std::string DBUpdater<WorldDatabaseConnection>::GetDBModuleName()
 {
-    return "db_world";
+    return "db-world";
 }
 
 // Character Database
@@ -144,7 +145,7 @@ bool DBUpdater<CharacterDatabaseConnection>::IsEnabled(uint32 const updateMask)
 template<>
 std::string DBUpdater<CharacterDatabaseConnection>::GetDBModuleName()
 {
-    return "db_characters";
+    return "db-characters";
 }
 
 // All
@@ -162,7 +163,7 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 
     std::string answer;
     std::getline(std::cin, answer);
-    if (!sConfigMgr->isDryRun() && !answer.empty() && !(answer.substr(0, 1) == "y"))
+    if (!answer.empty() && !(answer.substr(0, 1) == "y"))
         return false;
 
     LOG_INFO("sql.updates", "Creating database \"%s\"...", pool.GetConnectionInfo()->database.c_str());
@@ -190,13 +191,13 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     catch (UpdateException&)
     {
         LOG_FATAL("sql.updates", "Failed to create database %s! Does the user (named in *.conf) have `CREATE`, `ALTER`, `DROP`, `INSERT` and `DELETE` privileges on the MySQL server?", pool.GetConnectionInfo()->database.c_str());
-        boost::filesystem::remove(temp);
+        std::filesystem::remove(temp);
         return false;
     }
 
     LOG_INFO("sql.updates", "Done.");
     LOG_INFO("sql.updates", " ");
-    boost::filesystem::remove(temp);
+    std::filesystem::remove(temp);
     return true;
 }
 
@@ -219,7 +220,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
 
     auto CheckUpdateTable = [&](std::string const& tableName)
     {
-        auto checkTable = DBUpdater<T>::Retrieve(pool, Warhead::StringFormat("SHOW TABLES LIKE '%s'", tableName.c_str()));
+        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '%s'", tableName.c_str()));
         if (!checkTable)
         {
             LOG_WARN("sql.updates", "> Table '%s' not exist! Try add based table", tableName.c_str());
@@ -253,17 +254,17 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool)
     try
     {
         result = updateFetcher.Update(
-                     sConfigMgr->GetBoolDefault("Updates.Redundancy", true),
-                     sConfigMgr->GetBoolDefault("Updates.AllowRehash", true),
-                     sConfigMgr->GetBoolDefault("Updates.ArchivedRedundancy", false),
-                     sConfigMgr->GetIntDefault("Updates.CleanDeadRefMaxCount", 3));
+                     sConfigMgr->GetOption<bool>("Updates.Redundancy", true),
+                     sConfigMgr->GetOption<bool>("Updates.AllowRehash", true),
+                     sConfigMgr->GetOption<bool>("Updates.ArchivedRedundancy", false),
+                     sConfigMgr->GetOption<int32>("Updates.CleanDeadRefMaxCount", 3));
     }
     catch (UpdateException&)
     {
         return false;
     }
 
-    std::string const info = Warhead::StringFormat("Containing " SZFMTD " new and " SZFMTD " archived updates.",
+    std::string const info = Acore::StringFormat("Containing " SZFMTD " new and " SZFMTD " archived updates.",
                              result.recent, result.archived);
 
     if (!result.updated)
@@ -293,7 +294,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
     std::string const DirPathStr = DBUpdater<T>::GetBaseFilesDirectory();
 
     Path const DirPath(DirPathStr);
-    if (!boost::filesystem::is_directory(DirPath))
+    if (!std::filesystem::is_directory(DirPath))
     {
         LOG_ERROR("sql.updates", ">> Directory \"%s\" not exist", DirPath.generic_string().c_str());
         return false;
@@ -305,10 +306,10 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    boost::filesystem::directory_iterator const DirItr;
+    std::filesystem::directory_iterator const DirItr;
     uint32 FilesCount = 0;
 
-    for (boost::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
+    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
     {
         if (itr->path().extension() == ".sql")
             FilesCount++;
@@ -320,7 +321,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    for (boost::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
+    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
     {
         if (itr->path().extension() != ".sql")
             continue;
@@ -412,7 +413,7 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
         args.emplace_back(database);
 
     // Invokes a mysql process which doesn't leak credentials to logs
-    int const ret = Warhead::StartProcess(DBUpdaterUtil::GetCorrectedMySQLExecutable(), args,
+    int const ret = Acore::StartProcess(DBUpdaterUtil::GetCorrectedMySQLExecutable(), args,
         "sql.updates", path.generic_string(), true);
 
     if (ret != EXIT_SUCCESS)
@@ -420,7 +421,7 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
         LOG_FATAL("sql.updates", "Applying of file \'%s\' to database \'%s\' failed!" \
             " If you are a user, please pull the latest revision from the repository. "
             "Also make sure you have not applied any of the databases with your sql client. "
-            "You cannot use auto-update system and import sql files from WarheadCore repository with your sql client. "
+            "You cannot use auto-update system and import sql files from AzerothCore repository with your sql client. "
             "If you are a developer, please fix your sql query.",
             path.generic_string().c_str(), pool.GetConnectionInfo()->database.c_str());
 

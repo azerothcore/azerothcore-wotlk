@@ -278,11 +278,35 @@ enum SpawnMask
     SPAWNMASK_RAID_ALL          = (SPAWNMASK_RAID_NORMAL_ALL | SPAWNMASK_RAID_HEROIC_ALL),
 };
 
+enum FactionFlags
+{
+    FACTION_FLAG_NONE               = 0x00,                 // no faction flag
+    FACTION_FLAG_VISIBLE            = 0x01,                 // makes visible in client (set or can be set at interaction with target of this faction)
+    FACTION_FLAG_AT_WAR             = 0x02,                 // enable AtWar-button in client. player controlled (except opposition team always war state), Flag only set on initial creation
+    FACTION_FLAG_HIDDEN             = 0x04,                 // hidden faction from reputation pane in client (player can gain reputation, but this update not sent to client)
+    FACTION_FLAG_INVISIBLE_FORCED   = 0x08,                 // always overwrite FACTION_FLAG_VISIBLE and hide faction in rep.list, used for hide opposite team factions
+    FACTION_FLAG_PEACE_FORCED       = 0x10,                 // always overwrite FACTION_FLAG_AT_WAR, used for prevent war with own team factions
+    FACTION_FLAG_INACTIVE           = 0x20,                 // player controlled, state stored in characters.data (CMSG_SET_FACTION_INACTIVE)
+    FACTION_FLAG_RIVAL              = 0x40,                 // flag for the two competing outland factions
+    FACTION_FLAG_SPECIAL            = 0x80                  // horde and alliance home cities and their northrend allies have this flag
+};
+
 enum FactionTemplateFlags
 {
-    FACTION_TEMPLATE_FLAG_PVP               = 0x00000800,   // flagged for PvP
-    FACTION_TEMPLATE_FLAG_CONTESTED_GUARD   = 0x00001000,   // faction will attack players that were involved in PvP combats
-    FACTION_TEMPLATE_FLAG_HOSTILE_BY_DEFAULT = 0x00002000,
+    FACTION_TEMPLATE_FLAG_RESPOND_TO_CALL_FOR_HELP           = 0x0001, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_LOW_PRIORITY  = 0x0002, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_MED_PRIORITY  = 0x0004, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_HIGH_PRIORITY = 0x0008, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_LOW_PRIORITY    = 0x0010, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_MED_PRIORITY    = 0x0020, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_HIGH_PRIORITY   = 0x0040, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_LOW_PRIORITY    = 0x0080, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_MED_PRIORITY    = 0x0100, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_HIGH_PRIORITY   = 0x0200, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_FLEE_FROM_CALL_FOR_HELP            = 0x0400, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS                     = 0x0800, // Old title: FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS, Old comment: flagged for PvP //@todo: Should see if this is implemented correctly.
+    FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS          = 0x1000, // Old title: FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS, Old comment: faction will attack players that were involved in PvP combats //@todo: Should see if this is implemented correctly.
+    FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS           = 0x2000, // Old title: FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS, Old comment: //@todo: Should see if this is implemented correctly.
 };
 
 enum FactionMasks

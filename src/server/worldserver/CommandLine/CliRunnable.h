@@ -4,21 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/// \addtogroup Trinityd
+/// \addtogroup Acored
 /// @{
 /// \file
 
 #ifndef __CLIRUNNABLE_H
 #define __CLIRUNNABLE_H
 
-#include "Threading.h"
-
 /// Command Line Interface handling thread
-class CliRunnable : public Acore::Runnable
-{
-public:
-    void run() override;
-};
+void CliThread();
 
 #endif
 

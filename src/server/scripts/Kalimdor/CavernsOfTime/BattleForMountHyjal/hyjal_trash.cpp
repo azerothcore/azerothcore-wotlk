@@ -6,7 +6,6 @@
 
 #include "hyjal_trash.h"
 #include "hyjal.h"
-#include "hyjalAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
@@ -20,9 +19,9 @@ enum Spells
     SPELL_DISEASE_CLOUD     = 31607,
     SPELL_KNOCKDOWN         = 31610,
     SPELL_FRENZY            = 31540,
-    SPELL_RAISE_DEAD_1      = 31617,
-    SPELL_RAISE_DEAD_2      = 31624,
-    SPELL_RAISE_DEAD_3      = 31625,
+//    SPELL_RAISE_DEAD_1      = 31617,
+//    SPELL_RAISE_DEAD_2      = 31624,
+//    SPELL_RAISE_DEAD_3      = 31625,
     SPELL_SHADOW_BOLT       = 31627,
     SPELL_BANSHEE_CURSE     = 31651,
     SPELL_BANSHEE_WAIL      = 38183,

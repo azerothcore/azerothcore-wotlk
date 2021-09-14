@@ -26,11 +26,16 @@ else()
   message("* Build world/authserver          : No")
 endif()
 
-if( SCRIPTS )
-  message("* Build with scripts              : Yes (default)")
-  add_definitions(-DSCRIPTS)
+if(SCRIPTS AND (NOT SCRIPTS STREQUAL "none"))
+  message("* Build with scripts              : Yes (${SCRIPTS})")
 else()
   message("* Build with scripts              : No")
+endif()
+
+if(MODULES  AND (NOT MODULES STREQUAL "none"))
+  message("* Build with modules              : Yes (${MODULES})")
+else()
+  message("* Build with modules              : No")
 endif()
 
 if( TOOLS )
@@ -113,25 +118,11 @@ endif()
 
 # Performance optimization options:
 
-if( ENABLE_EXTRAS )
-  message("* Enable extra features           : Yes (default)")
-  add_definitions(-DENABLE_EXTRAS)
-else()
-  message("* Enable extra features           : No")
-endif()
-
 if( ENABLE_VMAP_CHECKS )
   message("* Enable vmap DisableMgr checks   : Yes (default)")
   add_definitions(-DENABLE_VMAP_CHECKS)
 else()
   message("* Enable vmap DisableMgr checks   : No")
-endif()
-
-if( ENABLE_EXTRA_LOGS )
-  message("* Enable extra logging functions  : Yes")
-  add_definitions(-DENABLE_EXTRA_LOGS)
-else()
-  message("* Enable extra logging functions  : No (default)")
 endif()
 
 if(WIN32)
@@ -165,6 +156,12 @@ if(BUILD_SHARED_LIBS)
   add_definitions(-DACORE_API_USE_DYNAMIC_LINKING)
 
   WarnAboutSpacesInBuildPath()
+endif()
+
+if (USE_CPP_20)
+  message("")
+  message(" *** Enabled C++20 standart")
+  message(" *** Please note that this is an experimental feature!")
 endif()
 
 message("")
