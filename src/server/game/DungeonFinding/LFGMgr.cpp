@@ -1536,7 +1536,7 @@ namespace lfg
     void LFGMgr::MakeNewGroup(LfgProposal const& proposal)
     {
         LfgGuidList players;
-        LfgGuidList playersToTeleport;
+        GuidUnorderedSet playersToTeleport;
 
         for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
         {
@@ -1547,7 +1547,7 @@ namespace lfg
                 players.push_back(guid);
 
             if (proposal.isNew || GetGroup(guid) != proposal.group)
-                playersToTeleport.push_back(guid);
+                playersToTeleport.insert(guid);
         }
 
         // Set the dungeon difficulty
@@ -1619,32 +1619,32 @@ namespace lfg
 
         // Select a player inside to be teleported to
         WorldLocation const* teleportLocation = nullptr;
+        bool leaderTeleportIncluded = false;
         for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* plr = itr->GetSource();
-            if (plr && plr->GetMapId() == uint32(dungeon->map) && !proposal.isNew)
+            if (plr)
             {
-                teleportLocation = plr;
-                break;
+                if (grp->IsLeader(plr->GetGUID()) && playersToTeleport.find(plr->GetGUID()) != playersToTeleport.end())
+                {
+                    leaderTeleportIncluded = true;
+                }
+
+                if (plr->GetMapId() == uint32(dungeon->map) && !proposal.isNew)
+                {
+                    teleportLocation = plr;
+                    break;
+                }
             }
         }
 
         bool randomDungeon = false;
         // Teleport Player
-        for (LfgGuidList::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
+        for (GuidUnorderedSet::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
             if (Player* player = ObjectAccessor::FindPlayer(*it))
             {
                 if (player->GetGroup() != grp) // pussywizard: could not add because group was full (some shitness happened)
                     continue;
-
-                if (player->GetMapId() == uint32(dungeon->map))
-                {
-                    // Remove bind to that map
-                    if (!sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty()))
-                    {
-                        sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
-                    }
-                }
 
                 // Add the cooldown spell if queued for a random dungeon
                 // xinef: add aura
@@ -1656,6 +1656,25 @@ namespace lfg
                     {
                         player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
                     }
+                }
+
+                if (player->GetMapId() == uint32(dungeon->map))
+                {
+                    // check instance id with leader
+                    if (!leaderTeleportIncluded)
+                    {
+                        if (InstancePlayerBind* ilb = sInstanceSaveMgr->PlayerGetBoundInstance(grp->GetLeaderGUID(), dungeon->map, player->GetDungeonDifficulty()))
+                        {
+                            if (player->GetInstanceId() == ilb->save->GetInstanceId())
+                            {
+                                // Do not teleport if in the same map and instance as leader
+                                continue;
+                            }
+                        }
+                    }
+
+                    // Remove bind to that map
+                    sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
                 }
 
                 TeleportPlayer(player, false, teleportLocation);

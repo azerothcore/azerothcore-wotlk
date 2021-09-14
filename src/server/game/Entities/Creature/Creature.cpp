@@ -486,7 +486,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     // checked and error show at loading templates
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction))
     {
-        if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP)
+        if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS)
             SetPvP(true);
         else
             SetPvP(false);
@@ -2547,9 +2547,12 @@ bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
     return false;
 }
 
-void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint32 end_time)
+void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 end_time)
 {
-    m_CreatureSpellCooldowns[spell_id] = World::GetGameTimeMS() + end_time;
+    CreatureSpellCooldown spellCooldown;
+    spellCooldown.category = categoryId;
+    spellCooldown.end = World::GetGameTimeMS() + end_time;
+    m_CreatureSpellCooldowns[spell_id] = std::move(spellCooldown);
 }
 
 void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool /*needSendToClient*/, bool /*forceSendToSpectator*/)
@@ -2561,33 +2564,31 @@ void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_t
     // used in proc system, otherwise normal creature cooldown
     if (end_time)
     {
-        _AddCreatureSpellCooldown(spellInfo->Id, end_time);
+        _AddCreatureSpellCooldown(spellInfo->Id, 0, end_time);
         return;
     }
 
     uint32 spellcooldown = spellInfo->RecoveryTime;
-    uint32 categorycooldown = spellInfo->CategoryRecoveryTime;
-    if(Player* modOwner = GetSpellModOwner())
+    uint32 categoryId = spellInfo->GetCategory();
+    uint32 categorycooldown = categoryId ? spellInfo->CategoryRecoveryTime : 0;
+    if (Player* modOwner = GetSpellModOwner())
     {
         modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, spellcooldown);
         modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, categorycooldown);
     }
 
-    if (spellcooldown)
-        _AddCreatureSpellCooldown(spellInfo->Id, spellcooldown);
-
-    if (categorycooldown)
-        if (spellInfo->GetCategory())
+    SpellCategoryStore::const_iterator i_scstore = sSpellsByCategoryStore.find(categoryId);
+    if (categorycooldown && i_scstore != sSpellsByCategoryStore.end())
+    {
+        for (SpellCategorySet::const_iterator i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
         {
-            SpellCategoryStore::const_iterator i_scstore = sSpellsByCategoryStore.find(spellInfo->GetCategory());
-            if (i_scstore != sSpellsByCategoryStore.end())
-            {
-                uint32 cattime = categorycooldown;
-                for (SpellCategorySet::const_iterator i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
-                    if (GetSpellCooldown(*i_scset) < cattime)
-                        _AddCreatureSpellCooldown(*i_scset, cattime);
-            }
+            _AddCreatureSpellCooldown(i_scset->second, categoryId, categorycooldown);
         }
+    }
+    else if (spellcooldown)
+    {
+        _AddCreatureSpellCooldown(spellInfo->Id, 0, spellcooldown);
+    }
 }
 
 uint32 Creature::GetSpellCooldown(uint32 spell_id) const
@@ -2596,13 +2597,13 @@ uint32 Creature::GetSpellCooldown(uint32 spell_id) const
     if (itr == m_CreatureSpellCooldowns.end())
         return 0;
 
-    return itr->second > World::GetGameTimeMS() ? itr->second - World::GetGameTimeMS() : 0;
+    return itr->second.end > World::GetGameTimeMS() ? itr->second.end - World::GetGameTimeMS() : 0;
 }
 
 bool Creature::HasSpellCooldown(uint32 spell_id) const
 {
     CreatureSpellCooldowns::const_iterator itr = m_CreatureSpellCooldowns.find(spell_id);
-    return (itr != m_CreatureSpellCooldowns.end() && itr->second > World::GetGameTimeMS());
+    return (itr != m_CreatureSpellCooldowns.end() && itr->second.end > World::GetGameTimeMS());
 }
 
 bool Creature::HasSpell(uint32 spellID) const
@@ -2861,6 +2862,20 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
 
     applyInhabitFlags();
 
+    if (m_movedByPlayer)
+    {
+        WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
+        data << GetPackGUID();
+        data << uint32(0); //! movement counter
+        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+        data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+        return true;
+    }
+
     if (!movespline->Initialized())
         return true;
 
@@ -2943,6 +2958,25 @@ bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
     if (!Unit::SetCanFly(enable))
         return false;
 
+    if (m_movedByPlayer)
+    {
+        sScriptMgr->AnticheatSetCanFlybyServer(m_movedByPlayer->ToPlayer(), enable);
+
+        if (!enable)
+            m_movedByPlayer->ToPlayer()->SetFallInformation(time(nullptr), m_movedByPlayer->ToPlayer()->GetPositionZ());
+
+        WorldPacket data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
+        data << GetPackGUID();
+        data << uint32(0); //! movement counter
+        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+        data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+        return true;
+    }
+
     if (!movespline->Initialized())
         return true;
 
@@ -2965,6 +2999,20 @@ bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
     if (!packetOnly && !Unit::SetWaterWalking(enable))
         return false;
 
+    if (m_movedByPlayer)
+    {
+        WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
+        data << GetPackGUID();
+        data << uint32(0); //! movement counter
+        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+        data.Initialize(MSG_MOVE_WATER_WALK, 64);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+        return true;
+    }
+
     if (!movespline->Initialized())
         return true;
 
@@ -2978,6 +3026,20 @@ bool Creature::SetFeatherFall(bool enable, bool packetOnly /* = false */)
 {
     if (!packetOnly && !Unit::SetFeatherFall(enable))
         return false;
+
+    if (m_movedByPlayer)
+    {
+        WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
+        data << GetPackGUID();
+        data << uint32(0); //! movement counter
+        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+        data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
+        data << GetPackGUID();
+        BuildMovementPacket(&data);
+        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+        return true;
+    }
 
     if (!movespline->Initialized())
         return true;
@@ -2994,6 +3056,20 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/)
         return false;
 
    applyInhabitFlags();
+
+   if (m_movedByPlayer)
+   {
+       WorldPacket data(enable ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
+       data << GetPackGUID();
+       data << uint32(0); //! movement counter
+       m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+
+       data.Initialize(MSG_MOVE_HOVER, 64);
+       data << GetPackGUID();
+       BuildMovementPacket(&data);
+       m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
+       return true;
+   }
 
     if (!movespline->Initialized())
         return true;

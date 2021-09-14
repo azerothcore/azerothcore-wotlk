@@ -13,6 +13,7 @@
 #include "Util.h"
 #include <set>
 #include <map>
+#include <unordered_map>
 
 // Structures using to access raw DBC data and required packing to portability
 
@@ -935,7 +936,7 @@ struct FactionTemplateEntry
                 return false;
         return hostileMask == 0 && friendlyMask == 0;
     }
-    [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
+    [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS) != 0; }
 };
 
 struct GameObjectDisplayInfoEntry
@@ -1658,8 +1659,8 @@ struct SpellEntry
     //uint32  SpellDifficultyId;                            // 233      3.3.0
 };
 
-typedef std::set<uint32> SpellCategorySet;
-typedef std::map<uint32, SpellCategorySet > SpellCategoryStore;
+typedef std::set<std::pair<bool, uint32>> SpellCategorySet;
+typedef std::unordered_map<uint32, SpellCategorySet> SpellCategoryStore;
 typedef std::set<uint32> PetFamilySpellsSet;
 typedef std::map<uint32, PetFamilySpellsSet > PetFamilySpellsStore;
 

@@ -182,6 +182,7 @@ typedef GuidList WhisperListContainer;
 struct SpellCooldown
 {
     uint32 end;
+    uint16 category;
     uint32 itemid;
     uint32 maxduration;
     bool sendToSpectator: 1;
@@ -1398,7 +1399,7 @@ public:
     void MoneyChanged(uint32 value);
     void ReputationChanged(FactionEntry const* factionEntry);
     void ReputationChanged2(FactionEntry const* factionEntry);
-    [[nodiscard]] bool HasQuestForItem(uint32 itemId, uint32 excludeQuestId = 0, bool turnIn = false) const;
+    [[nodiscard]] bool HasQuestForItem(uint32 itemId, uint32 excludeQuestId = 0, bool turnIn = false, bool* showInLoot = nullptr) const;
     [[nodiscard]] bool HasQuestForGO(int32 GOId) const;
     void UpdateForQuestWorldObjects();
     [[nodiscard]] bool CanShareQuest(uint32 quest_id) const;
@@ -1655,8 +1656,6 @@ public:
     void DropModCharge(SpellModifier* mod, Spell* spell);
     void SetSpellModTakingSpell(Spell* spell, bool apply);
 
-    static uint32 const infinityCooldownDelay = 0x9A7EC800;  // used for set "infinity cooldowns" for spells and check, MONTH*IN_MILLISECONDS
-    static uint32 const infinityCooldownDelayCheck = 0x4D3F6400; //MONTH*IN_MILLISECONDS/2;
     [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override
     {
         SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
@@ -1674,6 +1673,7 @@ public:
     }
     void AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool infinityCooldown = false);
     void AddSpellCooldown(uint32 spell_id, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
+    void _AddSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false);
     void ModifySpellCooldown(uint32 spellId, int32 cooldown);
     void SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId = 0, Spell* spell = nullptr, bool setCooldown = true);
     void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
@@ -2524,6 +2524,8 @@ public:
     Optional<float> GetFarSightDistance() const;
 
     float GetSightRange(const WorldObject* target = nullptr) const override;
+
+    std::string GetPlayerName();
 
  protected:
     // Gamemaster whisper whitelist

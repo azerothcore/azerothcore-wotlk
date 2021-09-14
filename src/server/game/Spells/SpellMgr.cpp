@@ -671,14 +671,24 @@ SpellGroupStackFlags SpellMgr::CheckSpellGroupStackRules(SpellInfo const* spellI
 {
     uint32 spellid_1 = spellInfo1->GetFirstRankSpell()->Id;
     uint32 spellid_2 = spellInfo2->GetFirstRankSpell()->Id;
-    // xinef: dunno why i added this
-    if (spellid_1 == spellid_2 && remove && !areaAura)
-        return SPELL_GROUP_STACK_FLAG_NONE;
 
     uint32 groupId = GetSpellGroup(spellid_1);
+
+    SpellGroupSpecialFlags flag1 = GetSpellGroupSpecialFlags(spellid_1);
+
+    // xinef: dunno why i added this
+    if (spellid_1 == spellid_2 && remove && !areaAura)
+    {
+        if (flag1 & SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK)
+        {
+            return SPELL_GROUP_STACK_FLAG_EXCLUSIVE;
+        }
+
+        return SPELL_GROUP_STACK_FLAG_NONE;
+    }
+
     if (groupId > 0 && groupId == GetSpellGroup(spellid_2))
     {
-        SpellGroupSpecialFlags flag1 = GetSpellGroupSpecialFlags(spellid_1);
         SpellGroupSpecialFlags flag2 = GetSpellGroupSpecialFlags(spellid_2);
         SpellGroupStackFlags additionFlag = SPELL_GROUP_STACK_FLAG_NONE;
         // xinef: first flags are used for elixir stacking rules
@@ -7324,6 +7334,12 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->MaxAffectedTargets = 1;
         spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
+    });
+
+    // Item: Luffa removes only 1 bleed effect
+    ApplySpellFix({ 23595 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectBasePoints[EFFECT_0] = 1;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
