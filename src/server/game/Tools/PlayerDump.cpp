@@ -539,7 +539,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     playerClass = uint8(atol(getnth(line, 5).c_str()));
                     gender = uint8(atol(getnth(line, 6).c_str()));
                     level = uint8(atol(getnth(line, 7).c_str()));
-                    if (name == "")
+                    if (name.empty())
                     {
                         // check if the original name already exists
                         name = getnth(line, 3);
