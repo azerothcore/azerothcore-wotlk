@@ -184,7 +184,7 @@ public:
                     openedMenu[player->GetGUID()] = true;
                 }
 
-                if (openedMenu[player->GetGUID()] != true)
+                if (!openedMenu[player->GetGUID()])
                 {
                     AddGossipItemFor(player, 9708, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                     SendGossipMenuFor(player, GOSSIP_TEXTID_DRAKES, creature->GetGUID());

@@ -51,7 +51,7 @@ enum VezaxSpellData
 enum VezaxNpcs
 {
     // NPC_VEZAX                                = 33271,
-    NPC_VEZAX_BUNNY                             = 33500,
+    // NPC_VEZAX_BUNNY                          = 33500,
     NPC_SARONITE_ANIMUS                         = 33524,
 };
 
@@ -182,7 +182,7 @@ public:
                 case 1:
                     return (me->GetLootMode() == 3 ? 1 : 0);
                 case 2:
-                    return (bAchievShadowdodger == true ? 1 : 0);
+                    return (bAchievShadowdodger ? 1 : 0);
             }
             return 0;
         }
@@ -291,7 +291,7 @@ public:
                             events.RepeatEvent(30000);
                         else
                         {
-                            for (ObjectGuid guid : summons)
+                            for (ObjectGuid const& guid : summons)
                                 if (Creature* sv = ObjectAccessor::GetCreature(*me, guid))
                                 {
                                     sv->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);

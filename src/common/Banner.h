@@ -6,13 +6,11 @@
 #define AZEROTHCORE_BANNER_H
 
 #include "Define.h"
+#include <string_view>
 
-namespace Acore
+namespace Acore::Banner
 {
-    namespace Banner
-    {
-        void Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)());
-    }
+    AC_COMMON_API void Show(std::string_view applicationName, void(*log)(std::string_view text), void(*logExtraInfo)());
 }
 
 #endif // AZEROTHCORE_BANNER_H

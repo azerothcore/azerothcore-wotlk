@@ -2270,6 +2270,7 @@ public:
     };
 };
 
+// 63830, 63881 - Malady of the Mind
 class spell_yogg_saron_malady_of_the_mind : public SpellScriptLoader
 {
 public:
@@ -2303,6 +2304,7 @@ public:
     }
 };
 
+// 63802 - Brain Link
 class spell_yogg_saron_brain_link : public SpellScriptLoader
 {
 public:
@@ -2404,6 +2406,7 @@ public:
     }
 };
 
+// 64465 - Shadow Beacon
 class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
 {
     public:
@@ -2442,6 +2445,7 @@ class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
         }
 };
 
+// 65206 - Destabilization Matrix
 class spell_yogg_saron_destabilization_matrix : public SpellScriptLoader
 {
 public:
@@ -2486,6 +2490,7 @@ public:
     }
 };
 
+// 64172 - Titanic Storm
 class spell_yogg_saron_titanic_storm : public SpellScriptLoader
 {
 public:
@@ -2530,6 +2535,7 @@ public:
     }
 };
 
+// 64164, 64168 - Lunatic Gaze
 class spell_yogg_saron_lunatic_gaze : public SpellScriptLoader
 {
 public:
@@ -2563,7 +2569,7 @@ public:
     }
 };
 
-// Protective Gaze
+// 64174 - Protective Gaze
 class spell_yogg_saron_protective_gaze : public SpellScriptLoader
 {
 public:
@@ -2603,6 +2609,7 @@ public:
     }
 };
 
+// 64161 - Empowered
 class spell_yogg_saron_empowered : public SpellScriptLoader
 {
 public:
@@ -2641,6 +2648,7 @@ public:
     }
 };
 
+// 64555 - Insane Periodic
 class spell_yogg_saron_insane_periodic_trigger : public SpellScriptLoader
 {
 public:
@@ -2689,6 +2697,7 @@ public:
     }
 };
 
+// 63120 - Insane
 class spell_yogg_saron_insane : public SpellScriptLoader
 {
 public:
@@ -2715,6 +2724,7 @@ public:
     }
 };
 
+// 64169 - Sanity Well
 class spell_yogg_saron_sanity_well : public SpellScriptLoader
 {
 public:
@@ -2753,6 +2763,14 @@ public:
     }
 };
 
+/* 63881 - Malady of the Mind
+   63795 - Psychosis
+   63830 - Malady of the Mind
+   64164 - Lunatic Gaze
+   64059 - Induce Madness
+   63803 - Brain Link
+   65301 - Psychosis
+   64168 - Lunatic Gaze */
 class spell_yogg_saron_sanity_reduce : public SpellScriptLoader
 {
 public:
@@ -2823,6 +2841,7 @@ public:
     }
 };
 
+// 64467 - Empowering Shadows
 class spell_yogg_saron_empowering_shadows : public SpellScriptLoader
 {
 public:
@@ -2851,6 +2870,7 @@ public:
     }
 };
 
+// 64184 - In the Maws of the Old God
 class spell_yogg_saron_in_the_maws_of_the_old_god : public SpellScriptLoader
 {
 public:
@@ -2888,7 +2908,10 @@ public:
     }
 };
 
-class spell_yogg_saron_target_selectors : public SpellScriptLoader    // 63744, 63745, 63747, 65206
+/* 63744 - Sara's Anger
+   63747 - Sara's Fervor
+   63745 - Sara's Blessing */
+class spell_yogg_saron_target_selectors : public SpellScriptLoader
 {
 public:
     spell_yogg_saron_target_selectors() : SpellScriptLoader("spell_yogg_saron_target_selectors") { }
@@ -2918,7 +2941,8 @@ public:
     }
 };
 
-class spell_yogg_saron_grim_reprisal : public SpellScriptLoader     // 63305
+// 63305 - Grim Reprisal
+class spell_yogg_saron_grim_reprisal : public SpellScriptLoader
 {
 public:
     spell_yogg_saron_grim_reprisal() : SpellScriptLoader("spell_yogg_saron_grim_reprisal") { }

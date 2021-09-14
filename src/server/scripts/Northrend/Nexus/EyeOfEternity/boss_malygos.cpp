@@ -491,9 +491,9 @@ public:
                                             continue;
 
                                         Position plrpos;
-                                        float angle = CenterPos.GetAngle(pPlayer);
-                                        plrpos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 5.0f;
-                                        plrpos.m_positionY = CenterPos.GetPositionY() + sin(angle) * 5.0f;
+                                        float playerAngle = CenterPos.GetAngle(pPlayer);
+                                        plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
+                                        plrpos.m_positionY = CenterPos.GetPositionY() + sin(playerAngle) * 5.0f;
                                         plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
                                         plrpos.m_orientation = plrpos.GetAngle(&CenterPos);
 

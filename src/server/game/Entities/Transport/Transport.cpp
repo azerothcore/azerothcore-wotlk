@@ -86,11 +86,12 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     SetName(goinfo->name);
 
     // pussywizard: no WorldRotation for MotionTransports
-    SetWorldRotation(G3D::Quat());
+    SetLocalRotation(G3D::Quat());
     // pussywizard: no PathRotation for MotionTransports
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
     m_model = CreateModel();
+
     return true;
 }
 
@@ -676,6 +677,8 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
 
     SetPhaseMask(phaseMask, false);
 
+    UpdatePositionData();
+
     SetZoneScript();
     if (m_zoneScript)
     {
@@ -703,7 +706,7 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
 
     // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
     //SetWorldRotation( /*for StaticTransport we need 2 rotation Quats in db for World- and Path- Rotation*/ );
-    SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+    SetLocalRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
     // pussywizard: PathRotation for StaticTransport (only StaticTransports have PathRotation)
     SetTransportPathRotation(rotation.x, rotation.y, rotation.z, rotation.w);
 
@@ -731,7 +734,17 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     SetGoAnimProgress(animprogress);
     m_goValue.Transport.AnimationInfo = sTransportMgr->GetTransportAnimInfo(goinfo->entry);
     //ASSERT(m_goValue.Transport.AnimationInfo);
+    if (!m_goValue.Transport.AnimationInfo)
+    {
+        LOG_ERROR("vehicle", "StaticTransport::Create: No AnimationInfo was found for GameObject entry (%u)", goinfo->entry);
+        return false;
+    }
     //ASSERT(m_goValue.Transport.AnimationInfo->TotalTime > 0);
+    if (!m_goValue.Transport.AnimationInfo->TotalTime)
+    {
+        LOG_ERROR("vehicle", "StaticTransport::Create: AnimationInfo->TotalTime is 0 for GameObject entry (%u)", goinfo->entry);
+        return false;
+    }
     SetPauseTime(goinfo->transport.pauseAtTime);
     if (goinfo->transport.startOpen && goinfo->transport.pauseAtTime)
     {
@@ -919,7 +932,10 @@ void StaticTransport::UpdatePassengerPositions()
                 break;
             case TYPEID_PLAYER:
                 if (passenger->IsInWorld())
+                {
                     GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
+                    passenger->ToPlayer()->SetFallInformation(time(nullptr), z);
+                }
                 break;
             case TYPEID_GAMEOBJECT:
                 GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o);

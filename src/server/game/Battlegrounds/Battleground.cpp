@@ -328,7 +328,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
             for (std::map<ObjectGuid, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
             {
                 Creature* sh = nullptr;
-                for (ObjectGuid const guid : itr->second)
+                for (ObjectGuid const& guid : itr->second)
                 {
                     Player* player = ObjectAccessor::FindPlayer(guid);
                     if (!player)
@@ -360,7 +360,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
     }
     else if (m_LastResurrectTime > 500)    // Resurrect players only half a second later, to see spirit heal effect on NPC
     {
-        for (ObjectGuid const guid : m_ResurrectQueue)
+        for (ObjectGuid const& guid : m_ResurrectQueue)
         {
             Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)
@@ -1105,6 +1105,9 @@ void Battleground::RemovePlayerAtLeave(Player* player)
 
     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
+    // GetStatus might be changed in RemovePlayer - define it here
+    BattlegroundStatus status = GetStatus();
+
     // BG subclass specific code
     RemovePlayer(player);
 
@@ -1116,7 +1119,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
         player->ClearAfkReports();
 
         //left a rated match in progress, consider as loser
-        if (isArena() && isRated() && GetStatus() == STATUS_IN_PROGRESS && teamId != TEAM_NEUTRAL)
+        if (isArena() && isRated() && status == STATUS_IN_PROGRESS && teamId != TEAM_NEUTRAL)
         {
             ArenaTeam* winnerArenaTeam = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeamId(teamId)));
             ArenaTeam* loserArenaTeam = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(teamId));
@@ -1139,7 +1142,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
 
         // cast deserter
         if (isBattleground() && !player->IsGameMaster() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
-            if (GetStatus() == STATUS_IN_PROGRESS || GetStatus() == STATUS_WAIT_JOIN)
+            if (status == STATUS_IN_PROGRESS || status == STATUS_WAIT_JOIN)
                 player->ScheduleDelayedOperation(DELAYED_SPELL_CAST_DESERTER);
     }
 
@@ -1479,7 +1482,7 @@ void Battleground::RelocateDeadPlayers(ObjectGuid queueIndex)
     if (!ghostList.empty())
     {
         GraveyardStruct const* closestGrave = nullptr;
-        for (ObjectGuid const guid : ghostList)
+        for (ObjectGuid const& guid : ghostList)
         {
             Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)
@@ -1818,7 +1821,9 @@ void Battleground::HandleTriggerBuff(GameObject* gameObject)
     uint32 index = 0;
     for (; index < BgObjects.size() && BgObjects[index] != gameObject->GetGUID(); ++index);
     if (BgObjects[index] != gameObject->GetGUID())
+    {
         return;
+    }
 
     if (m_BuffChange)
     {
@@ -1835,7 +1840,26 @@ void Battleground::HandleTriggerBuff(GameObject* gameObject)
         }
     }
 
-    SpawnBGObject(index, BUFF_RESPAWN_TIME);
+    uint32 respawnTime = SPEED_BUFF_RESPAWN_TIME;
+    if (Map* map = FindBgMap())
+    {
+        if (GameObject* obj = map->GetGameObject(BgObjects[index]))
+        {
+            switch (obj->GetEntry())
+            {
+                case BG_OBJECTID_REGENBUFF_ENTRY:
+                    respawnTime = RESTORATION_BUFF_RESPAWN_TIME;
+                    break;
+                case BG_OBJECTID_BERSERKERBUFF_ENTRY:
+                    respawnTime = BERSERKING_BUFF_RESPAWN_TIME;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    SpawnBGObject(index, respawnTime);
 }
 
 void Battleground::HandleKillPlayer(Player* victim, Player* killer)

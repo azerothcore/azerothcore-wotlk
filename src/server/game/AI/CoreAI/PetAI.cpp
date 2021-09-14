@@ -265,7 +265,7 @@ void PetAI::UpdateAI(uint32 diff)
                 // No enemy, check friendly
                 if (!spellUsed)
                 {
-                    for (ObjectGuid const guid : m_AllySet)
+                    for (ObjectGuid const& guid : m_AllySet)
                     {
                         Unit* ally = ObjectAccessor::GetUnit(*me, guid);
 
@@ -328,11 +328,6 @@ void PetAI::UpdateAI(uint32 diff)
         for (TargetSpellList::const_iterator itr = targetSpellStore.begin(); itr != targetSpellStore.end(); ++itr)
             delete itr->second;
     }
-
-    // Update speed as needed to prevent dropping too far behind and despawning
-    me->UpdateSpeed(MOVE_RUN, true);
-    me->UpdateSpeed(MOVE_WALK, true);
-    me->UpdateSpeed(MOVE_FLIGHT, true);
 }
 
 void PetAI::UpdateAllies()

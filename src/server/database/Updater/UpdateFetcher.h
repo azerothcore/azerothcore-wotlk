@@ -12,11 +12,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-namespace boost::filesystem
-{
-    class path;
-}
+#include <filesystem>
 
 struct AC_DATABASE_API UpdateResult
 {
@@ -33,7 +29,7 @@ struct AC_DATABASE_API UpdateResult
 
 class AC_DATABASE_API UpdateFetcher
 {
-    typedef boost::filesystem::path Path;
+    typedef std::filesystem::path Path;
 
 public:
     UpdateFetcher(Path const& updateDirectory,
@@ -55,6 +51,7 @@ private:
     enum State
     {
         RELEASED,
+        CUSTOM,
         ARCHIVED
     };
 
@@ -64,21 +61,33 @@ private:
             : name(name_), hash(hash_), state(state_), timestamp(timestamp_) { }
 
         std::string const name;
-
         std::string const hash;
-
         State const state;
-
         uint64 const timestamp;
 
         static inline State StateConvert(std::string const& state)
         {
-            return (state == "RELEASED") ? RELEASED : ARCHIVED;
+            if (state == "RELEASED")
+                return RELEASED;
+            else if (state == "CUSTOM")
+                return CUSTOM;
+
+            return ARCHIVED;
         }
 
         static inline std::string StateConvert(State const state)
         {
-            return (state == RELEASED) ? "RELEASED" : "ARCHIVED";
+            switch (state)
+            {
+            case RELEASED:
+                return "RELEASED";
+            case CUSTOM:
+                return "CUSTOM";
+            case ARCHIVED:
+                return "ARCHIVED";
+            default:
+                return "";
+            }
         }
 
         std::string GetStateAsString() const

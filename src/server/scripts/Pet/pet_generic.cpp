@@ -12,7 +12,6 @@
 #include "CreatureTextMgr.h"
 #include "Group.h"
 #include "PassiveAI.h"
-#include "PetAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
@@ -462,7 +461,7 @@ public:
                 checkTimer = 0;
                 if (Unit* target = me->SelectNearestTarget(30.0f))
                 {
-                    me->GetMotionMaster()->MoveChase(target);
+                    me->GetMotionMaster()->MoveFollow(target, 0.f, 0.f);
                     if (me->GetDistance(target) < 3.0f)
                     {
                         me->CastSpell(me, bombSpellId, false);
