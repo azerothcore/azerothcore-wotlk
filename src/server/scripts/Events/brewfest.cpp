@@ -281,7 +281,7 @@ public:
         Creature* GetSummoner()
         {
             if (me->IsSummon())
-                if (Unit* coren = me->ToTempSummon()->GetSummoner())
+                if (Unit* coren = me->ToTempSummon()->GetSummonerUnit())
                     return coren->ToCreature();
 
             return nullptr;
