@@ -16,13 +16,39 @@ TempSummon::TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner
     Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
     m_timer(0), m_lifetime(0)
 {
-    m_summonerGUID = owner;
+    if (owner)
+    {
+        m_summonerGUID = owner;
+    }
+
     m_unitTypeMask |= UNIT_MASK_SUMMON;
 }
 
-Unit* TempSummon::GetSummoner() const
+WorldObject* TempSummon::GetSummoner() const
 {
-    return m_summonerGUID ? ObjectAccessor::GetUnit(*this, m_summonerGUID) : nullptr;
+    return m_summonerGUID ? ObjectAccessor::GetWorldObject(*this, m_summonerGUID) : nullptr;
+}
+
+Unit* TempSummon::GetSummonerUnit() const
+{
+    if (WorldObject* summoner = GetSummoner())
+    {
+        return summoner->ToUnit();
+    }
+
+    return nullptr;
+}
+
+Creature* TempSummon::GetSummonerCreatureBase() const
+{
+    return m_summonerGUID ? ObjectAccessor::GetCreature(*this, m_summonerGUID) : nullptr;
+}
+
+GameObject* TempSummon::GetSummonerGameObject() const
+{
+    if (WorldObject* summoner = GetSummoner())
+        return summoner->ToGameObject();
+    return nullptr;
 }
 
 void TempSummon::Update(uint32 diff)
@@ -147,7 +173,7 @@ void TempSummon::InitStats(uint32 duration)
 {
     ASSERT(!IsPet());
 
-    Unit* owner = GetSummoner();
+    Unit* owner = GetSummonerUnit();
     if (owner)
         if (Player* player = owner->ToPlayer())
             sScriptMgr->OnBeforeTempSummonInitStats(player, this, duration);
@@ -197,7 +223,7 @@ void TempSummon::InitStats(uint32 duration)
 
 void TempSummon::InitSummon()
 {
-    Unit* owner = GetSummoner();
+    Unit* owner = GetSummonerUnit();
     if (owner)
     {
         if (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled)
@@ -237,7 +263,7 @@ void TempSummon::UnSummon(uint32 msTime)
         return;
     }
 
-    Unit* owner = GetSummoner();
+    Unit* owner = GetSummonerUnit();
     if (owner && owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled)
         owner->ToCreature()->AI()->SummonedCreatureDespawn(this);
 
@@ -257,7 +283,7 @@ void TempSummon::RemoveFromWorld()
 
     if (m_Properties)
         if (uint32 slot = m_Properties->Slot)
-            if (Unit* owner = GetSummoner())
+            if (Unit* owner = GetSummonerUnit())
                 if (owner->m_SummonSlot[slot] == GetGUID())
                     owner->m_SummonSlot[slot].Clear();
 

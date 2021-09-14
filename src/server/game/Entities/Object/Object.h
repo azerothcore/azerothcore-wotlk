@@ -465,48 +465,33 @@ struct Position
 
     [[nodiscard]] bool IsPositionValid() const;
 
-    [[nodiscard]] float GetExactDist2dSq(float x, float y) const
+    [[nodiscard]] float GetExactDist2dSq(const float x, const float y) const
     {
-        float dx = m_positionX - x;
-        float dy = m_positionY - y;
-        return dx * dx + dy * dy;
-    }
-    [[nodiscard]] float GetExactDist2d(const float x, const float y) const
-    {
-        return sqrt(GetExactDist2dSq(x, y));
-    }
-    float GetExactDist2dSq(const Position* pos) const
-    {
-        float dx = m_positionX - pos->m_positionX;
-        float dy = m_positionY - pos->m_positionY;
-        return dx * dx + dy * dy;
-    }
-    float GetExactDist2d(const Position* pos) const
-    {
-        return sqrt(GetExactDist2dSq(pos));
-    }
-    [[nodiscard]] float GetExactDistSq(float x, float y, float z) const
-    {
-        float dz = m_positionZ - z;
-        return GetExactDist2dSq(x, y) + dz * dz;
-    }
-    [[nodiscard]] float GetExactDist(float x, float y, float z) const
-    {
-        return sqrt(GetExactDistSq(x, y, z));
-    }
-    float GetExactDistSq(const Position* pos) const
-    {
-        float dx = m_positionX - pos->m_positionX;
-        float dy = m_positionY - pos->m_positionY;
-        float dz = m_positionZ - pos->m_positionZ;
-        return dx * dx + dy * dy + dz * dz;
-    }
-    float GetExactDist(const Position* pos) const
-    {
-        return sqrt(GetExactDistSq(pos));
+        float dx = x - m_positionX;
+        float dy = y - m_positionY;
+        return dx*dx + dy*dy;
     }
 
+    float GetExactDist2dSq(Position const& pos) const { return GetExactDist2dSq(pos.m_positionX, pos.m_positionY); }
+    float GetExactDist2dSq(Position const* pos) const { return GetExactDist2dSq(*pos); }
+    float GetExactDist2d(const float x, const float y) const { return std::sqrt(GetExactDist2dSq(x, y)); }
+    float GetExactDist2d(Position const& pos) const { return GetExactDist2d(pos.m_positionX, pos.m_positionY); }
+    float GetExactDist2d(Position const* pos) const { return GetExactDist2d(*pos); }
+
+    float GetExactDistSq(float x, float y, float z) const
+    {
+        float dz = z - m_positionZ;
+        return GetExactDist2dSq(x, y) + dz*dz;
+    }
+
+    float GetExactDistSq(Position const& pos) const { return GetExactDistSq(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
+    float GetExactDistSq(Position const* pos) const { return GetExactDistSq(*pos); }
+    float GetExactDist(float x, float y, float z) const { return std::sqrt(GetExactDistSq(x, y, z)); }
+    float GetExactDist(Position const& pos) const { return GetExactDist(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
+    float GetExactDist(Position const* pos) const { return GetExactDist(*pos); }
+
     void GetPositionOffsetTo(const Position& endPos, Position& retOffset) const;
+    Position GetPositionWithOffset(Position const& offset) const;
 
     float GetAngle(const Position* pos) const;
     [[nodiscard]] float GetAngle(float x, float y) const;
@@ -566,6 +551,81 @@ struct Position
         return fmod(o, 2.0f * static_cast<float>(M_PI));
     }
 };
+
+#define MAPID_INVALID 0xFFFFFFFF
+
+class WorldLocation : public Position
+{
+public:
+    explicit WorldLocation(uint32 _mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+        : Position(x, y, z, o), m_mapId(_mapId) { }
+
+    WorldLocation(uint32 mapId, Position const& position)
+        : Position(position), m_mapId(mapId) { }
+
+    void WorldRelocate(const WorldLocation& loc)
+    {
+        m_mapId = loc.GetMapId();
+        Relocate(loc);
+    }
+
+    void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+    {
+        m_mapId = mapId;
+        Relocate(x, y, z, o);
+    }
+
+    void SetMapId(uint32 mapId)
+    {
+        m_mapId = mapId;
+    }
+
+    [[nodiscard]] uint32 GetMapId() const
+    {
+        return m_mapId;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+        z = m_positionZ;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z, float& o) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+        z = m_positionZ;
+        o = m_orientation;
+    }
+
+    void GetWorldLocation(WorldLocation* location) const
+    {
+        if (location)
+        {
+            location->Relocate(m_positionX, m_positionY, m_positionZ, m_orientation);
+            location->SetMapId(m_mapId);
+        }
+    }
+
+    [[nodiscard]] WorldLocation GetWorldLocation() const
+    {
+        return *this;
+    }
+
+    uint32 m_mapId;
+};
+
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYStreamer const& streamer);
 ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYStreamer const& streamer);
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZStreamer const& streamer);
@@ -641,80 +701,6 @@ struct MovementInfo
     void SetFallTime(uint32 newFallTime) { fallTime = newFallTime; }
 
     void OutDebug();
-};
-
-#define MAPID_INVALID 0xFFFFFFFF
-
-class WorldLocation : public Position
-{
-public:
-    explicit WorldLocation(uint32 _mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
-        : Position(x, y, z, o), m_mapId(_mapId) { }
-
-    WorldLocation(uint32 mapId, Position const& position)
-        : Position(position), m_mapId(mapId) { }
-
-    void WorldRelocate(const WorldLocation& loc)
-    {
-        m_mapId = loc.GetMapId();
-        Relocate(loc);
-    }
-
-    void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
-    {
-        m_mapId = mapId;
-        Relocate(x, y, z, o);
-    }
-
-    void SetMapId(uint32 mapId)
-    {
-        m_mapId = mapId;
-    }
-
-    [[nodiscard]] uint32 GetMapId() const
-    {
-        return m_mapId;
-    }
-
-    void GetWorldLocation(uint32& mapId, float& x, float& y) const
-    {
-        mapId = m_mapId;
-        x = m_positionX;
-        y = m_positionY;
-    }
-
-    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z) const
-    {
-        mapId = m_mapId;
-        x = m_positionX;
-        y = m_positionY;
-        z = m_positionZ;
-    }
-
-    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z, float& o) const
-    {
-        mapId = m_mapId;
-        x = m_positionX;
-        y = m_positionY;
-        z = m_positionZ;
-        o = m_orientation;
-    }
-
-    void GetWorldLocation(WorldLocation* location) const
-    {
-        if (location)
-        {
-            location->Relocate(m_positionX, m_positionY, m_positionZ, m_orientation);
-            location->SetMapId(m_mapId);
-        }
-    }
-
-    [[nodiscard]] WorldLocation GetWorldLocation() const
-    {
-        return *this;
-    }
-
-    uint32 m_mapId;
 };
 
 template<class T>

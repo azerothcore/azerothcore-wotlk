@@ -239,7 +239,7 @@ public:
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
             }
 
-            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 900.0f))
             {
                 go->SetGoState(GO_STATE_ACTIVE);
             }
@@ -375,8 +375,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoom(&ENTRANCE_DOOR, Axis::AXIS_Y, false) || !IsInRoom(&EXIT_DOOR, Axis::AXIS_Y, true))
+            if (me->GetPositionY() <= ENTRANCE_DOOR.GetPositionY() || me->GetPositionY() >= EXIT_DOOR.GetPositionY())
             {
+                boss_hodirAI::EnterEvadeMode();
                 return;
             }
 
@@ -662,7 +663,7 @@ public:
                 timer = 2500;
                 if (me->IsSummon())
                 {
-                    if (Unit* s = me->ToTempSummon()->GetSummoner())
+                    if (Unit* s = me->ToTempSummon()->GetSummonerUnit())
                     {
                         if ((s->GetTypeId() == TYPEID_PLAYER && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER)) || (s->GetTypeId() == TYPEID_UNIT && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC)))
                             me->DespawnOrUnsummon(2000);

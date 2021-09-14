@@ -216,7 +216,7 @@ public:
             events.Reset();
 
             if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                     if (summoner->GetEntry() == me->GetEntry())
                     {
                         me->CastSpell(me, RAND(SPELL_SUMMON_ANUBAR_CHAMPION, SPELL_SUMMON_ANUBAR_CRYPT_FIEND, SPELL_SUMMON_ANUBAR_NECROMANCER), true);
@@ -246,7 +246,7 @@ public:
         void EnterCombat(Unit*) override
         {
             if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                     if (summoner->GetEntry() != me->GetEntry())
                     {
                         summoner->GetAI()->DoAction(ACTION_START_EVENT);
