@@ -1,12 +1,3 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631616272860535120');
 
-UPDATE creature SET wander_distance = 5 WHERE guid = 56058;
-UPDATE creature SET wander_distance = 5 WHERE guid = 56059;
-UPDATE creature SET wander_distance = 5 WHERE guid = 56086;
-UPDATE creature SET wander_distance = 5 WHERE guid = 56127;
-UPDATE creature SET wander_distance = 5 WHERE guid = 56160;
-UPDATE creature SET wander_distance = 5 WHERE guid = 56162;
-UPDATE creature SET wander_distance = 5 WHERE guid = 56125;
-UPDATE creature SET wander_distance = 5 WHERE guid = 56123;
-UPDATE creature SET wander_distance = 5 WHERE guid = 56166;
-UPDATE creature SET wander_distance = 5 WHERE guid = 56150;
+UPDATE `creature` SET `wander_distance` = 5 WHERE `GUID` IN (56058, 56059, 56086, 56127, 56160, 56162, 56125, 56123, 56166, 56150); AND `id` IN (15654, 15656, 15658);
