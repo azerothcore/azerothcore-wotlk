@@ -75,6 +75,7 @@ public:
             { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "" },
             { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "" },
             { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "" },
+            { "lfg",            SEC_ADMINISTRATOR,  false, &HandleDebugDungeonFinderCommand,   "" },
             { "los",            SEC_ADMINISTRATOR,  false, &HandleDebugLoSCommand,             "" },
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
             { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" }
@@ -802,6 +803,12 @@ public:
                 handler->SendSysMessage("All OK!");
         }
 
+        return true;
+    }
+
+    static bool HandleDebugDungeonFinderCommand(ChatHandler* /*handler*/, char const* /*args*/)
+    {
+        sLFGMgr->ToggleTesting();
         return true;
     }
 
