@@ -237,7 +237,7 @@ public:
                     summon->CastSpell(summon, SPELL_METEOR_STRIKE_FIRE_AURA_2, true);
                     if (summons.GetEntryCount(NPC_METEOR_STRIKE_FLAME) <= 16)
                         summon->CastSpell(summon, SPELL_METEOR_STRIKE_SPREAD, true);
-                    if (Unit* summoner = summon->ToTempSummon()->GetSummoner())
+                    if (Unit* summoner = summon->ToTempSummon()->GetSummonerUnit())
                         summon->SetOrientation(summoner->GetAngle(summon));
                     break;
             }

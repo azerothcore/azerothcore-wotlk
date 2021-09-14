@@ -2405,7 +2405,7 @@ public:
                 case SPELL_WATER_SPRAY:
                     {
                         if (me->IsSummon())
-                            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                                 if (Creature* c = summoner->ToCreature())
                                     if (c->AI())
                                         CAST_AI(npc_ulduar_flames_initial::npc_ulduar_flames_initialAI, c->AI())->RemoveFlame(me->GetGUID());
