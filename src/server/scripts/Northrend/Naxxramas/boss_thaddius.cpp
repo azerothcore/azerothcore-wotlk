@@ -140,7 +140,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetControlled(false, UNIT_STATE_ROOT);
+            me->SetControlled(true, UNIT_STATE_ROOT);
             summonTimer = 0;
             reviveTimer = 0;
             resetTimer = 1;
@@ -337,7 +337,6 @@ public:
                     break;
                 case EVENT_ALLOW_BALL_LIGHTNING:
                     ballLightningEnabled = true;
-                    me->SetControlled(true, UNIT_STATE_ROOT);
                     break;
             }
 
