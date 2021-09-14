@@ -195,6 +195,20 @@ void NPCStaveQuestAI::StoreAttackerGuidValue(Unit* attacker)
     }
 }
 
+bool NPCStaveQuestAI::QuestIncomplete(Unit* unit, uint32 questItem)
+{
+    if (!unit || !unit->IsPlayer())
+    {
+        return true;
+    }
+
+    QuestStatus questStatus = unit->ToPlayer()->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS);
+    bool hasQuestItem = unit->ToPlayer()->HasItemCount(questItem, 1, true);
+    bool isIncomplete = questStatus == QUEST_STATUS_INCOMPLETE && !hasQuestItem;
+
+    return isIncomplete;
+}
+
 class npc_artorius : public CreatureScript
 {
 public:
@@ -246,18 +260,26 @@ public:
             ScriptedAI::AttackStart(target);
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void EnterCombat(Unit* victim) override
         {
             RevealForm();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-            if (!InNormalForm())
+            if (InNormalForm())
             {
-                events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_DOOM, urand(3000, 5000));
-                events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_ENRAGE, urand(6000, 8000));
-                events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
+                return;
             }
+
+            if (victim && (UnitIsUnfair(victim) || !QuestIncomplete(victim, ARTORIUS_HEAD)))
+            {
+                me->CastSpell(victim, SPELL_FOOLS_PLIGHT, true);
+            }
+
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
+            events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
+            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
+            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_DOOM, urand(3000, 5000));
+            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_ENRAGE, urand(6000, 8000));
         }
 
         void UpdateAI(uint32 diff) override
@@ -301,6 +323,13 @@ public:
             // In combat events
             switch (eventId)
             {
+                case EVENT_FOOLS_PLIGHT:
+                    if (UnitIsUnfair(me->GetVictim()) || !QuestIncomplete(me->GetVictim(), ARTORIUS_HEAD))
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
+                    }
+                    events.RepeatEvent(urand(3000, 6000));
+                    break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
                     {
@@ -651,22 +680,25 @@ public:
             ScriptedAI::AttackStart(target);
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void EnterCombat(Unit* victim) override
         {
             RevealForm();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-            if (InNormalForm())
+            if (!InNormalForm())
             {
-                events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
-            }
-            else
-            {
-                events.ScheduleEvent(SIMONE_EVENT_CHAIN_LIGHTNING, 3000);
-                events.ScheduleEvent(SIMONE_EVENT_TEMPTRESS_KISS, 1000);
+                if (victim && (UnitIsUnfair(victim) || !QuestIncomplete(victim, SIMONE_HEAD)))
+                {
+                    me->CastSpell(victim, SPELL_FOOLS_PLIGHT, true);
+                }
+
                 events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
                 events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
+                events.ScheduleEvent(SIMONE_EVENT_CHAIN_LIGHTNING, 3000);
+                events.ScheduleEvent(SIMONE_EVENT_TEMPTRESS_KISS, 1000);
             }
+
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
         }
 
         void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
@@ -744,8 +776,11 @@ public:
             switch (eventId)
             {
                 case EVENT_FOOLS_PLIGHT:
-                    me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
-                    events.RepeatEvent(urand(6000, 9000));
+                    if (InNormalForm() || UnitIsUnfair(me->GetVictim()) || !QuestIncomplete(me->GetVictim(), SIMONE_HEAD))
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
+                    }
+                    events.RepeatEvent(urand(3000, 6000));
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
@@ -917,23 +952,31 @@ public:
             ScriptedAI::AttackStart(target);
         }
 
-        void EnterCombat(Unit* /*victim*/) override
+        void EnterCombat(Unit* victim) override
         {
             RevealForm();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-            if (!InNormalForm())
+            if (InNormalForm())
             {
-                if (encounterStarted)
-                {
-                    me->CastSpell(me, NELSON_SPELL_SOUL_FLAME, true);
-                }
-
-                events.ScheduleEvent(NELSON_EVENT_CREEPING_DOOM, 5000);
-                events.ScheduleEvent(NELSON_EVENT_DREADFUL_FRIGHT, 10000);
-                events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
+                return;
             }
+
+            if (encounterStarted)
+            {
+                me->CastSpell(me, NELSON_SPELL_SOUL_FLAME, true);
+            }
+
+            if (victim && (UnitIsUnfair(victim) || !QuestIncomplete(victim, NELSON_HEAD)))
+            {
+                me->CastSpell(victim, SPELL_FOOLS_PLIGHT, true);
+            }
+
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
+            events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
+            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
+            events.ScheduleEvent(NELSON_EVENT_DREADFUL_FRIGHT, 10000);
+            events.ScheduleEvent(NELSON_EVENT_CREEPING_DOOM, 5000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -979,6 +1022,13 @@ public:
             // In combat events
             switch (eventId)
             {
+                case EVENT_FOOLS_PLIGHT:
+                    if (UnitIsUnfair(me->GetVictim()) || !QuestIncomplete(me->GetVictim(), NELSON_HEAD))
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
+                    }
+                    events.RepeatEvent(urand(3000, 6000));
+                    break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
                     {
@@ -1003,13 +1053,13 @@ public:
                     }
                     events.RepeatEvent(2000);
                     break;
-                case NELSON_EVENT_CREEPING_DOOM:
-                    me->CastSpell(me->GetVictim(), NELSON_SPELL_CREEPING_DOOM, false);
-                    events.RepeatEvent(urand(10000, 12000));
-                    break;
                 case NELSON_EVENT_DREADFUL_FRIGHT:
                     me->CastSpell(me->GetVictim(), NELSON_SPELL_DREADFUL_FRIGHT, false);
                     events.RepeatEvent(urand(12000, 19000));
+                    break;
+                case NELSON_EVENT_CREEPING_DOOM:
+                    me->CastSpell(me->GetVictim(), NELSON_SPELL_CREEPING_DOOM, false);
+                    events.RepeatEvent(urand(10000, 12000));
                     break;
             }
 
@@ -1118,21 +1168,24 @@ public:
             ScriptedAI::AttackStart(target);
         }
 
-         void EnterCombat(Unit* /*victim*/) override
+        void EnterCombat(Unit* victim) override
         {
             RevealForm();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-            if (InNormalForm())
+            if (!InNormalForm())
             {
-                events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
-            }
-            else
-            {
+                if (victim && (UnitIsUnfair(victim) || !QuestIncomplete(victim, FRANKLIN_HEAD)))
+                {
+                    me->CastSpell(victim, SPELL_FOOLS_PLIGHT, true);
+                }
+
                 events.ScheduleEvent(FRANKLIN_EVENT_DEMONIC_ENRAGE, urand(9000, 13000));
                 events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
                 events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
             }
+
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
         }
 
         void UpdateAI(uint32 diff) override
@@ -1179,8 +1232,11 @@ public:
             switch (eventId)
             {
                 case EVENT_FOOLS_PLIGHT:
-                    me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
-                    events.RepeatEvent(urand(6000, 9000));
+                    if (InNormalForm() || UnitIsUnfair(me->GetVictim()) || !QuestIncomplete(me->GetVictim(), FRANKLIN_HEAD))
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
+                    }
+                    events.RepeatEvent(urand(3000, 6000));
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))

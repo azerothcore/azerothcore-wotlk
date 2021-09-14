@@ -19,15 +19,15 @@ enum CommonEvents
 {
     EVENT_ENCOUNTER_START                     = 1,
     EVENT_REVEAL                              = 2,
-    EVENT_RANGE_CHECK                         = 3,
-    EVENT_UNFAIR_FIGHT                        = 4,
-    EVENT_FOOLS_PLIGHT                        = 5
+    EVENT_FOOLS_PLIGHT                        = 3,
+    EVENT_RANGE_CHECK                         = 4,
+    EVENT_UNFAIR_FIGHT                        = 5
 };
 
 enum NPCArtorius
 {
-    ARTORIUS_EVENT_DEMONIC_DOOM               = 5,
-    ARTORIUS_EVENT_DEMONIC_ENRAGE             = 6,
+    ARTORIUS_EVENT_DEMONIC_DOOM               = 6,
+    ARTORIUS_EVENT_DEMONIC_ENRAGE             = 7,
 
     ARTORIUS_GOSSIP_TEXT                      = 7045,   // npc_text.ID               "How wonderful to see another person in..."
     ARTORIUS_GOSSIP_OPTION_TEXT               = 14531,  // creature_text.CreatureID  "I know you as Artorius the Doombringer..."
@@ -80,8 +80,8 @@ enum NPCPrecious
 
 enum NPCNelson
 {
-    NELSON_EVENT_DREADFUL_FRIGHT              = 7,
-    NELSON_EVENT_CREEPING_DOOM                = 8,
+    NELSON_EVENT_DREADFUL_FRIGHT              = 6,
+    NELSON_EVENT_CREEPING_DOOM                = 7,
 
     NELSON_GOSSIP_TEXT                        = 7044,  // npc_text.ID                "I come to Silithus every year around th..."
     NELSON_GOSSIP_OPTION_TEXT                 = 14536, // creature_text.CreatureID   "A gnome? How pathetic. Face me, demon!"
@@ -194,6 +194,7 @@ struct NPCStaveQuestAI : public ScriptedAI
     void ClearLootIfUnfair(Unit* killer);
     bool PlayerEligibleForReward(Unit* killer);
     void StoreAttackerGuidValue(Unit* attacker);
+    bool QuestIncomplete(Unit* unit, uint32 questItem);
 };
 
 #endif
