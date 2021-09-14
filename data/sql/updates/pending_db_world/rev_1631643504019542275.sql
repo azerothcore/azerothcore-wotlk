@@ -4,9 +4,6 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631643504019542275');
 UPDATE `creature_template_addon` SET `auras` = '8601' WHERE (`entry` = 909);
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 909) AND (`source_type` = 0) AND (`id` IN (1));
 
--- Add aura of slowing poison to Defias Night Blade
-UPDATE `creature_template_addon` SET `auras` = '8601' WHERE (`entry` = 909);
-
 -- Add aura of Weak Poison Proc to Webwood Spider
 UPDATE `creature_template_addon` SET `auras` = '6752' WHERE (`entry` = 1986);
 
