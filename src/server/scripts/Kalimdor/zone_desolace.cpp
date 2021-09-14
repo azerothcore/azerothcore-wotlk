@@ -183,16 +183,19 @@ public:
             RemoveSummons();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
-            Creature* cr = nullptr;
-            if ((cr = me->SummonCreature(NPC_RIGGER_GIZELTON, *me)))
+            if (Creature* cr = me->SummonCreature(NPC_RIGGER_GIZELTON, *me))
             {
                 cr->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 summons[0] = cr->GetGUID();
             }
-            if ((cr = me->SummonCreature(NPC_CARAVAN_KODO, *me)))
+            if (Creature* cr = me->SummonCreature(NPC_CARAVAN_KODO, *me))
+            {
                 summons[1] = cr->GetGUID();
-            if ((cr = me->SummonCreature(NPC_CARAVAN_KODO, *me)))
+            }
+            if (Creature* cr = me->SummonCreature(NPC_CARAVAN_KODO, *me))
+            {
                 summons[2] = cr->GetGUID();
+            }
 
             SummonsFollow();
         }

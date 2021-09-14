@@ -1086,7 +1086,7 @@ public:
                     }
                 }
 
-                for (ObjectGuid const guid : allianceGuardsGUID)
+                for (ObjectGuid const& guid : allianceGuardsGUID)
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon(0s);
 
@@ -1103,15 +1103,15 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned) override
+        void JustSummoned(Creature* summonedCreature) override
         {
-            switch (summoned->GetEntry())
+            switch (summonedCreature->GetEntry())
             {
                 case NPC_GENERATOR:
-                    summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
-                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
-                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
+                    summonedCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
+                    summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
+                    summonedCreature->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
                     break;
                 default:
                     break;
@@ -2415,7 +2415,7 @@ public:
                     SaurfangGUID.Clear();
                 }
 
-                for (ObjectGuid const guid : hordeGuardsGUID)
+                for (ObjectGuid const& guid : hordeGuardsGUID)
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon(0s);
 

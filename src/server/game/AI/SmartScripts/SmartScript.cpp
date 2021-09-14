@@ -150,7 +150,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         case SMART_ACTION_TALK:
             {
                 ObjectList* targets = GetTargets(e, unit);
-                Creature* talker = e.target.type == 0 ? me : nullptr; // xinef: tc retardness fix
+                Creature* talker = e.target.type == 0 ? me : nullptr;
                 Unit* talkTarget = nullptr;
                 if (targets)
                 {
@@ -1875,7 +1875,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (TransportBase* trans = me->GetDirectTransport())
                             trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
 
-                    me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, dest.x, dest.y, dest.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                    me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, dest.x, dest.y, dest.z, true, true,
+                        isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE, e.target.o);
                 }
                 else // Xinef: we can use dest.x, dest.y, dest.z to make offset
                 {
@@ -3603,7 +3604,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                     l->assign(objectList->begin(), objectList->end());
                 }
 
-                // xinef: return l, retardness... what if list is empty? will return empty list instead of null pointer
+                // xinef: return l, what if list is empty? will return empty list instead of null pointer
                 break;
             }
         case SMART_TARGET_CLOSEST_CREATURE:

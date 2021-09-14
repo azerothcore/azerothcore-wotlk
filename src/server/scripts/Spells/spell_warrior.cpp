@@ -106,6 +106,7 @@ public:
         {
             if (Unit* player = GetCaster())
             {
+                player->ModifyAuraState(AURA_STATE_WARRIOR_VICTORY_RUSH, false);
                 if (Unit* victim = GetHitUnit())
                 {
                     if (victim->isDead())
@@ -395,6 +396,20 @@ public:
             return ValidateSpellInfo({ SPELL_WARRIOR_SLAM });
         }
 
+        void SendMiss(SpellMissInfo missInfo)
+        {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        caster->SendSpellMiss(target, SPELL_WARRIOR_SLAM, missInfo);
+                    }
+                }
+            }
+        }
+
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (GetHitUnit())
@@ -403,6 +418,7 @@ public:
 
         void Register() override
         {
+            BeforeHit += BeforeSpellHitFn(spell_warr_slam_SpellScript::SendMiss);
             OnEffectHitTarget += SpellEffectFn(spell_warr_slam_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
@@ -464,6 +480,20 @@ public:
             return ValidateSpellInfo({ SPELL_WARRIOR_EXECUTE, SPELL_WARRIOR_GLYPH_OF_EXECUTION });
         }
 
+        void SendMiss(SpellMissInfo missInfo)
+        {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        caster->SendSpellMiss(target, SPELL_WARRIOR_EXECUTE, missInfo);
+                    }
+                }
+            }
+        }
+
         void HandleEffect(SpellEffIndex effIndex)
         {
             Unit* caster = GetCaster();
@@ -492,6 +522,7 @@ public:
 
         void Register() override
         {
+            BeforeHit += BeforeSpellHitFn(spell_warr_execute_SpellScript::SendMiss);
             OnEffectHitTarget += SpellEffectFn(spell_warr_execute_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };

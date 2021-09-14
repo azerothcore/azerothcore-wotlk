@@ -79,7 +79,7 @@ public:
                     bDeepBreath = true;
                     if( uiData == NOT_STARTED )
                     {
-                        for (ObjectGuid guid : minions)
+                        for (ObjectGuid const& guid : minions)
                             if (Creature* c = instance->GetCreature(guid))
                                 c->DespawnOrUnsummon(0s);
                         minions.clear();

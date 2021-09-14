@@ -13,7 +13,7 @@
 #define SIZE_OF_GRIDS            533.3333f
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 11
+#define MMAP_VERSION 12
 
 struct MmapTileHeader
 {
@@ -22,7 +22,7 @@ struct MmapTileHeader
     uint32 mmapVersion{MMAP_VERSION};
     uint32 size{0};
     char usesLiquids{true};
-    char padding[3]{};
+    char padding[3] {};
 
     MmapTileHeader() : dtVersion(DT_NAVMESH_VERSION) { }
 };

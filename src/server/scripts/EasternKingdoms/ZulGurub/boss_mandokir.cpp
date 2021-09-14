@@ -105,14 +105,17 @@ public:
         {
             if (me->GetPositionZ() > 140.0f)
             {
-                killCount = 0;
                 events.ScheduleEvent(EVENT_CHECK_START, 1000);
                 if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VILEBRANCH_SPEAKER)))
                     if (!speaker->IsAlive())
                         speaker->Respawn(true);
             }
+
+            killCount = 0;
+            me->RemoveAurasDueToSpell(SPELL_FRENZY);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             summons.DespawnAll();
+            instance->SetBossState(DATA_OHGAN, NOT_STARTED);
             me->Mount(MODEL_OHGAN_MOUNT);
         }
 

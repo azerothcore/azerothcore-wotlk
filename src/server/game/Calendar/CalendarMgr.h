@@ -11,6 +11,7 @@
 #include "DatabaseEnv.h"
 #include "WorldPacket.h"
 #include "ObjectGuid.h"
+#include <unordered_map>
 
 enum CalendarMailAnswers
 {

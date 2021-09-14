@@ -60,7 +60,7 @@ public:
             }
 
             GuidSet eCopy = encounterNPCs;
-            for (ObjectGuid const guid : eCopy)
+            for (ObjectGuid const& guid : eCopy)
                 if (Creature* creature = instance->GetCreature(guid))
                     creature->DespawnOrUnsummon(0s);
         }
@@ -184,7 +184,7 @@ public:
 
                                 // Xinef: delete all spawns
                                 GuidSet eCopy = encounterNPCs;
-                                for (ObjectGuid guid : eCopy)
+                                for (ObjectGuid const& guid : eCopy)
                                     if (Creature* creature = instance->GetCreature(guid))
                                         creature->DespawnOrUnsummon(0s);
                             }
@@ -227,7 +227,7 @@ public:
         void SummonPortalKeeper()
         {
             Creature* rift = nullptr;
-            for (ObjectGuid const guid : encounterNPCs)
+            for (ObjectGuid const& guid : encounterNPCs)
                 if (Creature* summon = instance->GetCreature(guid))
                     if (summon->GetEntry() == NPC_TIME_RIFT)
                     {

@@ -8,20 +8,20 @@
 #define ACORE_DEFINE_H
 
 #include "CompilerDefs.h"
-#include <cstddef>
 #include <cinttypes>
 #include <climits>
+#include <cstddef>
 
 #define ACORE_LITTLEENDIAN 0
 #define ACORE_BIGENDIAN    1
 
 #if !defined(ACORE_ENDIAN)
-#  if defined (ACE_BIG_ENDIAN)
+#  if defined (BOOST_BIG_ENDIAN)
 #    define ACORE_ENDIAN ACORE_BIGENDIAN
-#  else //ACE_BYTE_ORDER != ACE_BIG_ENDIAN
+#  else
 #    define ACORE_ENDIAN ACORE_LITTLEENDIAN
-#  endif //ACE_BYTE_ORDER
-#endif //ACORE_ENDIAN
+#  endif
+#endif
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  define ACORE_PATH_MAX MAX_PATH

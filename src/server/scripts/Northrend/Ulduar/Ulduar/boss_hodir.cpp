@@ -239,7 +239,7 @@ public:
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
             }
 
-            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 900.0f))
             {
                 go->SetGoState(GO_STATE_ACTIVE);
             }
@@ -375,8 +375,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoom(&ENTRANCE_DOOR, Axis::AXIS_Y, false) || !IsInRoom(&EXIT_DOOR, Axis::AXIS_Y, true))
+            if (me->GetPositionY() <= ENTRANCE_DOOR.GetPositionY() || me->GetPositionY() >= EXIT_DOOR.GetPositionY())
             {
+                boss_hodirAI::EnterEvadeMode();
                 return;
             }
 
@@ -460,9 +461,13 @@ public:
                     break;
                 case EVENT_FREEZE:
                     if (Player* plr = SelectTargetFromPlayerList(50.0f, SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
+                    {
                         me->CastSpell(plr, SPELL_FREEZE, false);
-                    else if (Unit* plr = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
-                        me->CastSpell(plr, SPELL_FREEZE, false);
+                    }
+                    else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    {
+                        me->CastSpell(target, SPELL_FREEZE, false);
+                    }
                     events.RescheduleEvent(EVENT_FREEZE, urand(17000, 20000));
                     break;
             }
@@ -663,8 +668,8 @@ public:
                         if ((s->GetTypeId() == TYPEID_PLAYER && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER)) || (s->GetTypeId() == TYPEID_UNIT && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC)))
                             me->DespawnOrUnsummon(2000);
                         else if (s->GetTypeId() == TYPEID_PLAYER)
-                            if (InstanceScript* pInstance = me->GetInstanceScript())
-                                if (pInstance->GetData(TYPE_HODIR) == NOT_STARTED)
+                            if (InstanceScript* instanceScript = me->GetInstanceScript())
+                                if (instanceScript->GetData(TYPE_HODIR) == NOT_STARTED)
                                 {
                                     s->CastSpell(s, SPELL_FLASH_FREEZE_INSTAKILL, true);
                                     me->DespawnOrUnsummon(2000);
@@ -1337,9 +1342,13 @@ public:
 
                 if (Aura* aur = target->GetAura(target->GetTypeId() == TYPEID_PLAYER ? SPELL_FLASH_FREEZE_TRAPPED_PLAYER : SPELL_FLASH_FREEZE_TRAPPED_NPC))
                 {
-                    if (Unit* caster = aur->GetCaster())
-                        if (caster->GetTypeId() == TYPEID_UNIT)
-                            caster->ToCreature()->DespawnOrUnsummon(0s);
+                    if (Unit* caster2 = aur->GetCaster())
+                    {
+                        if (caster2->GetTypeId() == TYPEID_UNIT)
+                        {
+                            caster2->ToCreature()->DespawnOrUnsummon(0s);
+                        }
+                    }
                     target->CastSpell(target, SPELL_FLASH_FREEZE_INSTAKILL, true);
                     return;
                 }

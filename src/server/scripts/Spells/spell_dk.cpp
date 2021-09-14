@@ -21,7 +21,6 @@
 
 enum DeathKnightSpells
 {
-    // Ours
     SPELL_DK_DEATH_AND_DECAY_TRIGGER            = 52212,
     SPELL_DK_GLYPH_OF_SCOURGE_STRIKE            = 58642,
     SPELL_DK_WANDERING_PLAGUE_TRIGGER           = 50526,
@@ -29,8 +28,6 @@ enum DeathKnightSpells
     SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE        = 71904,
     SPELL_SHADOWMOURNE_SOUL_FRAGMENT            = 71905,
     SPELL_SHADOWMOURNE_CHAOS_BANE_BUFF          = 73422,
-
-    // Theirs
     SPELL_DK_ANTI_MAGIC_SHELL_TALENT            = 51052,
     SPELL_DK_BLACK_ICE_R1                       = 49140,
     SPELL_DK_BLOOD_BOIL_TRIGGERED               = 65658,
@@ -76,7 +73,7 @@ enum Misc
     NPC_DK_GHOUL                                = 26125
 };
 
-// Ours
+// 50526 - Wandering Plague
 class spell_dk_wandering_plague : public SpellScriptLoader
 {
 public:
@@ -138,6 +135,7 @@ public:
     }
 };
 
+// 61999 - Raise Ally
 class spell_dk_raise_ally : public SpellScriptLoader
 {
 public:
@@ -221,7 +219,7 @@ public:
                     ghoul->SetModifierValue(UNIT_MOD_HEALTH, TOTAL_VALUE, (ghoul->GetStat(STAT_STAMINA) - ghoul->GetCreateStat(STAT_STAMINA)) * 10.0f);
 
                     // Power Energy
-                    ghoul->SetModifierValue(UnitMods(UNIT_MOD_POWER_START + POWER_ENERGY), BASE_VALUE, ghoul->GetCreatePowers(POWER_ENERGY));
+                    ghoul->SetModifierValue(UnitMods(UNIT_MOD_POWER_START + static_cast<uint8>(POWER_ENERGY)), BASE_VALUE, ghoul->GetCreatePowers(POWER_ENERGY));
                     ghoul->UpdateAllStats();
                     ghoul->SetFullHealth();
 
@@ -248,6 +246,7 @@ public:
     }
 };
 
+// 46619 - Raise Ally
 class spell_dk_raise_ally_trigger : public SpellScriptLoader
 {
 public:
@@ -276,6 +275,7 @@ public:
     }
 };
 
+// 43263 - Ghoul Taunt
 class spell_dk_aotd_taunt : public SpellScriptLoader
 {
 public:
@@ -313,6 +313,7 @@ public:
     }
 };
 
+// -43265, 52212 - Death and Decay
 class spell_dk_death_and_decay : public SpellScriptLoader
 {
 public:
@@ -381,6 +382,7 @@ public:
     }
 };
 
+// 52143 - Master of Ghouls
 class spell_dk_master_of_ghouls : public SpellScriptLoader
 {
 public:
@@ -417,6 +419,7 @@ public:
     }
 };
 
+// 45524 - Chains of Ice
 class spell_dk_chains_of_ice : public SpellScriptLoader
 {
 public:
@@ -476,6 +479,7 @@ public:
     }
 };
 
+// 50452 - Bloodworm
 class spell_dk_bloodworms : public SpellScriptLoader
 {
 public:
@@ -502,6 +506,7 @@ public:
     }
 };
 
+// 49206 - Summon Gargoyle
 class spell_dk_summon_gargoyle : public SpellScriptLoader
 {
 public:
@@ -530,6 +535,7 @@ public:
     }
 };
 
+// 63611 - Improved Blood Presence
 class spell_dk_improved_blood_presence_proc : public SpellScriptLoader
 {
 public:
@@ -556,6 +562,7 @@ public:
     }
 };
 
+// 49217 - Wandering Plague
 class spell_dk_wandering_plague_aura : public SpellScriptLoader
 {
 public:
@@ -599,6 +606,7 @@ public:
     }
 };
 
+// 53365 - Unholy Strength
 class spell_dk_rune_of_the_fallen_crusader : public SpellScriptLoader
 {
 public:
@@ -628,6 +636,7 @@ public:
     }
 };
 
+// 49222 - Bone Shield
 class spell_dk_bone_shield : public SpellScriptLoader
 {
 public:
@@ -656,6 +665,7 @@ public:
     }
 };
 
+// 51209 - Hungering Cold
 class spell_dk_hungering_cold : public SpellScriptLoader
 {
 public:
@@ -684,6 +694,7 @@ public:
     }
 };
 
+// -49219 - Blood-Caked Blade
 class spell_dk_blood_caked_blade : public SpellScriptLoader
 {
 public:
@@ -733,6 +744,7 @@ public:
     }
 };
 
+// 49028 - Dancing Rune Weapon
 class spell_dk_dancing_rune_weapon : public SpellScriptLoader
 {
 public:
@@ -826,6 +838,7 @@ public:
     }
 };
 
+// 53160 - Dancing Rune Weapon Visual
 class spell_dk_dancing_rune_weapon_visual : public SpellScriptLoader
 {
 public:
@@ -858,6 +871,7 @@ public:
     }
 };
 
+// -49004 - Scent of Blood
 class spell_dk_scent_of_blood_trigger : public SpellScriptLoader
 {
 public:
@@ -884,6 +898,9 @@ public:
     }
 };
 
+/* 51996 - Death Knight Pet Scaling 02
+   54566 - Death Knight Pet Scaling 01
+   61697 - Death Knight Pet Scaling 03 */
 class spell_dk_pet_scaling : public SpellScriptLoader
 {
 public:
@@ -1033,8 +1050,7 @@ public:
     }
 };
 
-// Theirs
-// 50462 - Anti-Magic Shell (on raid member)
+// 50462 - Anti-Magic Zone (on raid member)
 class spell_dk_anti_magic_shell_raid : public SpellScriptLoader
 {
 public:
@@ -1169,14 +1185,21 @@ public:
             return ValidateSpellInfo({ SPELL_DK_ANTI_MAGIC_SHELL_TALENT });
         }
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
             SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
-            amount = talentSpell->Effects[EFFECT_0].CalcValue(GetCaster());
-            if (Unit* totem = GetCaster())
-                if (Unit* owner = totem->ToTotem()->GetSummoner())
-                    amount += int32(2 * owner->GetTotalAttackPowerValue(BASE_ATTACK));
-            canBeRecalculated = false;
+
+            Unit* owner = GetCaster()->GetOwner();
+            if (!owner)
+            {
+                return;
+            }
+
+            amount = talentSpell->Effects[EFFECT_0].CalcValue(owner);
+            if (Player* player = owner->ToPlayer())
+            {
+                amount += int32(2 * player->GetTotalAttackPowerValue(BASE_ATTACK));
+            }
         }
 
         void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
@@ -1197,7 +1220,7 @@ public:
     }
 };
 
-// 48721 - Blood Boil
+// -48721 - Blood Boil
 class spell_dk_blood_boil : public SpellScriptLoader
 {
 public:
@@ -1314,7 +1337,7 @@ private:
     bool _allowGhoul;
 };
 
-// 49158 - Corpse Explosion (51325, 51326, 51327, 51328)
+// -49158 - Corpse Explosion
 class spell_dk_corpse_explosion : public SpellScriptLoader
 {
 public:
@@ -1418,7 +1441,7 @@ public:
     }
 };
 
-// -47541, 52375, 59134, -62900 - Death Coil
+// -62900, -47541, 52375, 59134 - Death Coil
 class spell_dk_death_coil : public SpellScriptLoader
 {
 public:
@@ -1524,7 +1547,7 @@ public:
     }
 };
 
-// 49560 - Death Grip
+// 49560, 49576 - Death Grip
 class spell_dk_death_grip : public SpellScriptLoader
 {
 public:
@@ -1756,7 +1779,7 @@ public:
     }
 };
 
-// 47496 - Explode, Ghoul spell for Corpse Explosion
+// 47496 - Explode
 class spell_dk_ghoul_explode : public SpellScriptLoader
 {
 public:
@@ -2005,7 +2028,7 @@ public:
     }
 };
 
-// ID - 50842 Pestilence
+// 50842 - Pestilence
 class spell_dk_pestilence : public SpellScriptLoader
 {
 public:
@@ -2051,9 +2074,9 @@ public:
     }
 };
 
-// 48266 - Blood Presence
-// 48263 - Frost Presence
-// 48265 - Unholy Presence
+/* 48266 - Blood Presence
+   48263 - Frost Presence
+   48265 - Unholy Presence */
 class spell_dk_presence : public SpellScriptLoader
 {
 public:
@@ -2302,7 +2325,7 @@ public:
     }
 };
 
-// 59754 Rune Tap - Party
+// 59754 - Rune Tap
 class spell_dk_rune_tap_party : public SpellScriptLoader
 {
 public:
@@ -2363,7 +2386,7 @@ public:
     }
 };
 
-// 55090 - Scourge Strike (55265, 55270, 55271)
+// -55090 - Scourge Strike
 class spell_dk_scourge_strike : public SpellScriptLoader
 {
 public:
@@ -2443,7 +2466,7 @@ public:
     }
 };
 
-// 49145 - Spell Deflection
+// -49145 - Spell Deflection
 class spell_dk_spell_deflection : public SpellScriptLoader
 {
 public:
@@ -2588,7 +2611,6 @@ public:
 
 void AddSC_deathknight_spell_scripts()
 {
-    // Ours
     new spell_dk_wandering_plague();
     new spell_dk_raise_ally();
     new spell_dk_raise_ally_trigger();
@@ -2608,8 +2630,6 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_dancing_rune_weapon_visual();
     new spell_dk_scent_of_blood_trigger();
     new spell_dk_pet_scaling();
-
-    // Theirs
     new spell_dk_anti_magic_shell_raid();
     new spell_dk_anti_magic_shell_self();
     new spell_dk_anti_magic_zone();

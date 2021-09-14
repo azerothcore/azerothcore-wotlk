@@ -2171,7 +2171,7 @@ public:
             Position pos;
             caster->GetPosition(&pos);
             caster->GetNearPosition(pos, 5.0f, 0.0f);
-            pos.m_positionZ = caster->GetBaseMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true, 50.0f);
+            pos.m_positionZ = caster->GetMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true, 50.0f);
             pos.m_positionZ += 0.1f;
             caster->SendMeleeAttackStop(caster->GetVictim());
             caster->GetMotionMaster()->MoveLand(POINT_LAND, pos, 7.0f);

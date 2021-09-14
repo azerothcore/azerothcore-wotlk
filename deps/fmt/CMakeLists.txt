@@ -28,27 +28,34 @@ else()
   check_symbol_exists(strtod_l "${strtod_l_headers}" HAVE_STRTOD_L)
 endif()
 
-set(FMT_HEADERS
-  include/fmt/args.h
-  include/fmt/chrono.h
-  include/fmt/color.h
-  include/fmt/compile.h
-  include/fmt/core.h
-  include/fmt/format.h
-  include/fmt/format-inl.h
-  include/fmt/locale.h
-  include/fmt/os.h
-  include/fmt/ostream.h
-  include/fmt/printf.h
-  include/fmt/ranges.h)
+function(add_headers VAR)
+  set(headers ${${VAR}})
+  foreach (header ${ARGN})
+    set(headers ${headers} include/fmt/${header})
+  endforeach()
+  set(${VAR} ${headers} PARENT_SCOPE)
+endfunction()
+
+# Define the fmt library, its includes and the needed defines.
+add_headers(FMT_HEADERS
+  args.h
+  chrono.h
+  color.h
+  compile.h
+  core.h
+  format.h
+  format-inl.h
+  locale.h os.h
+  ostream.h
+  printf.h
+  ranges.h
+  xchar.h)
 
 set(FMT_SOURCES
   src/format.cc
   src/os.cc)
 
-add_library(fmt STATIC
-  ${FMT_SOURCES}
-  ${FMT_HEADERS})
+add_library(fmt STATIC ${FMT_SOURCES} ${FMT_HEADERS})
 
 if (HAVE_STRTOD_L)
   target_compile_definitions(fmt

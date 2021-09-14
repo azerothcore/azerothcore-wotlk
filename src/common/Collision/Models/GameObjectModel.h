@@ -8,14 +8,16 @@
 #define _GAMEOBJECT_MODEL_H
 
 #include "Define.h"
-#include <G3D/Matrix3.h>
-#include <G3D/Vector3.h>
 #include <G3D/AABox.h>
+#include <G3D/Matrix3.h>
 #include <G3D/Ray.h>
+#include <G3D/Vector3.h>
 
 namespace VMAP
 {
     class WorldModel;
+    struct AreaInfo;
+    struct LocationInfo;
 }
 
 class GameObject;
@@ -37,24 +39,28 @@ public:
 
 class GameObjectModel
 {
-    GameObjectModel() : phasemask(0), iInvScale(0), iScale(0), iModel(nullptr) { }
+    GameObjectModel() : phasemask(0), iInvScale(0), iScale(0), iModel(nullptr), isWmo(false) { }
 
 public:
     std::string name;
 
-    [[nodiscard]] const G3D::AABox& getBounds() const { return iBound; }
+    [[nodiscard]] const G3D::AABox& GetBounds() const { return iBound; }
 
     ~GameObjectModel();
 
-    [[nodiscard]] const G3D::Vector3& getPosition() const { return iPos; }
+    [[nodiscard]] const G3D::Vector3& GetPosition() const { return iPos; }
 
     /** Enables\disables collision. */
     void disable() { phasemask = 0; }
     void enable(uint32 ph_mask) { phasemask = ph_mask; }
 
     [[nodiscard]] bool isEnabled() const { return phasemask != 0; }
+    [[nodiscard]] bool IsMapObject() const { return isWmo; }
 
     bool intersectRay(const G3D::Ray& Ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask) const;
+    void IntersectPoint(G3D::Vector3 const& point, VMAP::AreaInfo& info, uint32 ph_mask) const;
+    bool GetLocationInfo(G3D::Vector3 const& point, VMAP::LocationInfo& info, uint32 ph_mask) const;
+    bool GetLiquidLevel(G3D::Vector3 const& point, VMAP::LocationInfo& info, float& liqHeight) const;
 
     static GameObjectModel* Create(std::unique_ptr<GameObjectModelOwnerBase> modelOwner, std::string const& dataPath);
 
@@ -71,6 +77,7 @@ private:
     float iScale;
     VMAP::WorldModel* iModel;
     std::unique_ptr<GameObjectModelOwnerBase> owner;
+    bool isWmo;
 };
 
 void LoadGameObjectModelList(std::string const& dataPath);
