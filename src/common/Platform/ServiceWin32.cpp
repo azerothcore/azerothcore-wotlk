@@ -35,7 +35,7 @@ typedef WINADVAPI BOOL (WINAPI* CSD_T)(SC_HANDLE, DWORD, LPCVOID);
 
 bool WinServiceInstall()
 {
-    SC_HANDLE serviceControlMgr = OpenSCMgr(0, 0, SC_MANAGER_CREATE_SERVICE);
+    SC_HANDLE serviceControlMgr = OpenSCManager(0, 0, SC_MANAGER_CREATE_SERVICE);
 
     if (serviceControlMgr)
     {
@@ -106,7 +106,7 @@ bool WinServiceInstall()
 
 bool WinServiceUninstall()
 {
-    SC_HANDLE serviceControlMgr = OpenSCMgr(0, 0, SC_MANAGER_CONNECT);
+    SC_HANDLE serviceControlMgr = OpenSCManager(0, 0, SC_MANAGER_CONNECT);
 
     if (serviceControlMgr)
     {
