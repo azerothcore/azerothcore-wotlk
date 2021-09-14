@@ -34,7 +34,7 @@ public:
 
         void InitializeAI() override
         {
-            if (Unit* owner = me->ToTempSummon()->GetSummoner())
+            if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
             {
                 uint32 hp = uint32(owner->GetMaxHealth() * 0.3f);
                 me->SetMaxHealth(hp);
@@ -75,7 +75,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (me->IsSummon())
-                if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                     if (owner->HasAura(SPELL_PRIEST_GLYPH_OF_SHADOWFIEND))
                         owner->CastSpell(owner, SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA, true);
         }
