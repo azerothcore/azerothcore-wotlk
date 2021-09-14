@@ -3638,8 +3638,8 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                     if (Unit* owner = ObjectAccessor::GetUnit(*me, me->GetCharmerOrOwnerGUID()))
                         l->push_back(owner);
                     // Xinef: dont add same unit twice
-                    else if (me->IsSummon() && me->ToTempSummon()->GetSummoner())
-                        l->push_back(me->ToTempSummon()->GetSummoner());
+                    else if (me->IsSummon() && me->ToTempSummon()->GetSummonerUnit())
+                        l->push_back(me->ToTempSummon()->GetSummonerUnit());
                 }
                 else if (go)
                 {
