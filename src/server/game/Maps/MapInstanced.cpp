@@ -266,8 +266,8 @@ bool MapInstanced::DestroyInstance(InstancedMaps::iterator& itr)
     return true;
 }
 
-bool MapInstanced::CanEnter(Player* /*player*/, bool /*loginCheck*/)
+Map::EnterState MapInstanced::CannotEnter(Player* /*player*/, bool /*loginCheck*/)
 {
     //ABORT();
-    return true;
+    return CAN_ENTER;
 }

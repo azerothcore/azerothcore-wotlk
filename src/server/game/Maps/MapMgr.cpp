@@ -122,18 +122,18 @@ Map* MapMgr::FindMap(uint32 mapid, uint32 instanceId) const
     return ((MapInstanced*)map)->FindInstanceMap(instanceId);
 }
 
-bool MapMgr::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
+Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool loginCheck)
 {
     MapEntry const* entry = sMapStore.LookupEntry(mapid);
     if (!entry)
-        return false;
+        return Map::CANNOT_ENTER_NO_ENTRY;
 
     if (!entry->IsDungeon())
-        return true;
+        return Map::CAN_ENTER;
 
     InstanceTemplate const* instance = sObjectMgr->GetInstanceTemplate(mapid);
     if (!instance)
-        return false;
+        return Map::CANNOT_ENTER_UNINSTANCED_DUNGEON;
 
     Difficulty targetDifficulty, requestedDifficulty;
     targetDifficulty = requestedDifficulty = player->GetDifficulty(entry->IsRaid());
@@ -142,17 +142,17 @@ bool MapMgr::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     if (!mapDiff)
     {
         player->SendTransferAborted(mapid, TRANSFER_ABORT_DIFFICULTY, requestedDifficulty);
-        return false;
+        return Map::CANNOT_ENTER_DIFFICULTY_UNAVAILABLE;
     }
 
     //Bypass checks for GMs
     if (player->IsGameMaster())
-        return true;
+        return Map::CAN_ENTER;
 
     char const* mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
 
     if (!sScriptMgr->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
-        return false;
+        return Map::CANNOT_ENTER_UNSPECIFIED_REASON;
 
     Group* group = player->GetGroup();
     if (entry->IsRaid())
@@ -164,7 +164,7 @@ bool MapMgr::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
             // TODO: this is not a good place to send the message
             player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetAcoreString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
             LOG_DEBUG("maps", "MAP: Player '%s' must be in a raid group to enter instance '%s'", player->GetName().c_str(), mapName);
-            return false;
+            return Map::CANNOT_ENTER_NOT_IN_RAID;
         }
     }
 
@@ -174,7 +174,7 @@ bool MapMgr::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
             if (!sLFGMgr->inLfgDungeonMap(group->GetGUID(), mapid, targetDifficulty))
             {
                 player->SendTransferAborted(mapid, TRANSFER_ABORT_MAP_NOT_ALLOWED);
-                return false;
+                return Map::CANNOT_ENTER_UNSPECIFIED_REASON;
             }
 
     if (!player->IsAlive())
@@ -197,13 +197,13 @@ bool MapMgr::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
                 WorldPacket data(SMSG_CORPSE_NOT_IN_INSTANCE, 0);
                 player->GetSession()->SendPacket(&data);
                 LOG_DEBUG("maps", "MAP: Player '%s' does not have a corpse in instance '%s' and cannot enter.", player->GetName().c_str(), mapName);
-                return false;
+                return Map::CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE;
             }
             LOG_DEBUG("maps", "MAP: Player '%s' has corpse in instance '%s' and can enter.", player->GetName().c_str(), mapName);
         }
         else
         {
-            LOG_DEBUG("maps", "Map::CanPlayerEnter - player '%s' is dead but does not have a corpse!", player->GetName().c_str());
+            LOG_DEBUG("maps", "Map::PlayerCannotEnter - player '%s' is dead but does not have a corpse!", player->GetName().c_str());
         }
     }
 
@@ -213,8 +213,8 @@ bool MapMgr::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         uint32 destInstId = sInstanceSaveMgr->PlayerGetDestinationInstanceId(player, mapid, targetDifficulty);
         if (destInstId)
             if (Map* boundMap = sMapMgr->FindMap(mapid, destInstId))
-                if (!boundMap->CanEnter(player, loginCheck))
-                    return false;
+                if (Map::EnterState denyReason = boundMap->CannotEnter(player, loginCheck))
+                    return denyReason;
     }
 
     // players are only allowed to enter 5 instances per hour
@@ -228,12 +228,12 @@ bool MapMgr::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         if (!player->CheckInstanceCount(instaceIdToCheck) && !player->isDead())
         {
             player->SendTransferAborted(mapid, TRANSFER_ABORT_TOO_MANY_INSTANCES);
-            return false;
+            return Map::CANNOT_ENTER_TOO_MANY_INSTANCES;
         }
     }
 
     //Other requirements
-    return player->Satisfy(sObjectMgr->GetAccessRequirement(mapid, targetDifficulty), mapid, true);
+    return player->Satisfy(sObjectMgr->GetAccessRequirement(mapid, targetDifficulty), mapid, true) ? Map::CAN_ENTER : Map::CANNOT_ENTER_UNSPECIFIED_REASON;
 }
 
 void MapMgr::Update(uint32 diff)

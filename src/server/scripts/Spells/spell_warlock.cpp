@@ -557,8 +557,13 @@ public:
             return true;
         }
 
-        void HandleBanish()
+        void HandleBanish(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (Unit* target = GetHitUnit())
             {
                 if (target->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0, 0x08000000, 0))
@@ -580,7 +585,7 @@ public:
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_warl_banish_SpellScript::HandleBanish);
+            BeforeHit += BeforeSpellHitFn(spell_warl_banish_SpellScript::HandleBanish);
             AfterHit += SpellHitFn(spell_warl_banish_SpellScript::RemoveAura);
         }
 

@@ -1,18 +1,5 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
 #ifndef _VMAPMANAGER2_H
@@ -56,7 +43,6 @@ namespace VMAP
         ManagedModel()  { }
         void setModel(WorldModel* model) { iModel = model; }
         WorldModel* getModel() { return iModel; }
-        void incRefCount() { ++iRefCount; }
         int decRefCount() { return --iRefCount; }
     protected:
         WorldModel* iModel{nullptr};
@@ -117,8 +103,9 @@ namespace VMAP
 
         bool processCommand(char* /*command*/) override { return false; } // for debug and extensions
 
-        bool GetAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
-        bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 reqLiquidType, float& level, float& floor, uint32& type) const override;
+        bool GetAreaInfo(uint32 pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
+        bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 reqLiquidType, float& level, float& floor, uint32& type, uint32& mogpFlags) const override;
+        void GetAreaAndLiquidData(uint32 mapId, float x, float y, float z, uint8 reqLiquidType, AreaAndLiquidData& data) const override;
 
         WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename);
         void releaseModelInstance(const std::string& filename);

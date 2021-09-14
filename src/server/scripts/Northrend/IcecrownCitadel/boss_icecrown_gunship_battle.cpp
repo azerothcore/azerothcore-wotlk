@@ -1451,7 +1451,7 @@ void TriggerBurningPitch(Creature* c)
     if (!c->HasSpellCooldown(spellId))
     {
         c->CastSpell((Unit*)nullptr, spellId, false);
-        c->_AddCreatureSpellCooldown(spellId, urand(3000, 4000));
+        c->_AddCreatureSpellCooldown(spellId, 0, urand(3000, 4000));
     }
 }
 
@@ -1917,7 +1917,7 @@ public:
                 return;
 
             me->CastSpell((Unit*)nullptr, spellId, true);
-            me->_AddCreatureSpellCooldown(spellId, 9000);
+            me->_AddCreatureSpellCooldown(spellId, 0, 9000);
         }
 
         bool CanAIAttack(const Unit*  /*target*/) const override
@@ -2626,15 +2626,20 @@ public:
     {
         PrepareSpellScript(spell_igb_below_zero_SpellScript);
 
-        void RemovePassengers()
+        void RemovePassengers(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             GetHitUnit()->SetPower(POWER_ENERGY, 0);
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
         }
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
+            BeforeHit += BeforeSpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
         }
     };
 

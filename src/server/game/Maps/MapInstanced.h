@@ -25,7 +25,7 @@ public:
     void DelayedUpdate(const uint32 diff) override;
     //void RelocationNotify();
     void UnloadAll() override;
-    bool CanEnter(Player* player, bool loginCheck = false) override;
+    EnterState CannotEnter(Player* player, bool loginCheck = false) override;
 
     Map* CreateInstanceForPlayer(const uint32 mapId, Player* player);
     Map* FindInstanceMap(uint32 instanceId) const

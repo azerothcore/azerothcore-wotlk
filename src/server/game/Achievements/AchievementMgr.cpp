@@ -248,6 +248,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
             }
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE:
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES:
             return true;                                    // not check correctness node indexes
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM:
             if (equipped_item.item_quality >= MAX_ITEM_QUALITY)
@@ -341,11 +342,11 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA:
             return source->HasAuraEffect(aura.spell_id, aura.effect_idx);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA:
-            {
-                uint32 zone_id, area_id;
-                source->GetZoneAndAreaId(zone_id, area_id);
-                return area.id == zone_id || area.id == area_id;
-            }
+        {
+            uint32 zone_id, area_id;
+            source->GetZoneAndAreaId(zone_id, area_id);
+            return area.id == zone_id || area.id == area_id;
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA:
             return target && target->HasAuraEffect(aura.spell_id, aura.effect_idx);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE:
@@ -361,89 +362,107 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT:
             return sScriptMgr->OnCriteriaCheck(ScriptId, const_cast<Player*>(source), const_cast<Unit*>(target), criteria_id);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY:
-            {
-                if (source->GetMap()->IsRaid())
-                    if (source->GetMap()->Is25ManRaid() != ((difficulty.difficulty & RAID_DIFFICULTY_MASK_25MAN) != 0))
-                        return false;
+        {
+            if (source->GetMap()->IsRaid())
+                if (source->GetMap()->Is25ManRaid() != ((difficulty.difficulty & RAID_DIFFICULTY_MASK_25MAN) != 0))
+                    return false;
 
-                AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(criteria_id);
-                uint8 spawnMode = source->GetMap()->GetSpawnMode();
-                // Dungeons completed on heroic mode count towards both in general achievement, but not in statistics.
-                return sAchievementMgr->IsStatisticCriteria(criteria) ? spawnMode == difficulty.difficulty : spawnMode >= difficulty.difficulty;
-            }
+            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(criteria_id);
+            uint8 spawnMode = source->GetMap()->GetSpawnMode();
+            // Dungeons completed on heroic mode count towards both in general achievement, but not in statistics.
+            return sAchievementMgr->IsStatisticCriteria(criteria) ? spawnMode == difficulty.difficulty : spawnMode >= difficulty.difficulty;
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT:
             return source->GetMap()->GetPlayersCountExceptGMs() <= map_players.maxcount;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM:
-            {
-                if (!target || target->GetTypeId() != TYPEID_PLAYER)
-                    return false;
+        {
+            if (!target || target->GetTypeId() != TYPEID_PLAYER)
+                return false;
 
-                // DB data compatibility...
-                uint32 teamOld = target->ToPlayer()->GetTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE;
-                return teamOld == team.team;
-            }
+            // DB data compatibility...
+            uint32 teamOld = target->ToPlayer()->GetTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE;
+            return teamOld == team.team;
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_DRUNK:
             return Player::GetDrunkenstateByValue(source->GetDrunkValue()) >= DrunkenState(drunk.state);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY:
             return IsHolidayActive(HolidayIds(holiday.id));
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE:
-            {
-                Battleground* bg = source->GetBattleground();
-                if (!bg)
-                    return false;
+        {
+            Battleground* bg = source->GetBattleground();
+            if (!bg)
+                return false;
 
-                uint32 score = bg->GetTeamScore(source->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
-                return score >= bg_loss_team_score.min_score && score <= bg_loss_team_score.max_score;
-            }
+            uint32 score = bg->GetTeamScore(source->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+            return score >= bg_loss_team_score.min_score && score <= bg_loss_team_score.max_score;
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT:
+        {
+            if (!source->IsInWorld())
+                return false;
+            Map* map = source->GetMap();
+            if (!map->IsDungeon())
             {
-                if (!source->IsInWorld())
-                    return false;
-                Map* map = source->GetMap();
-                if (!map->IsDungeon())
-                {
-                    LOG_ERROR("sql.sql", "Achievement system call ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT (%u) for achievement criteria %u for non-dungeon/non-raid map %u",
-                                     ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT, criteria_id, map->GetId());
-                    return false;
-                }
-                InstanceScript* instance = map->ToInstanceMap()->GetInstanceScript();
-                if (!instance)
-                {
-                    LOG_ERROR("sql.sql", "Achievement system call ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT (%u) for achievement criteria %u for map %u but map does not have a instance script",
-                                     ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT, criteria_id, map->GetId());
-                    return false;
-                }
-                return instance->CheckAchievementCriteriaMeet(criteria_id, source, target, miscvalue1);
+                LOG_ERROR("sql.sql", "Achievement system call ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT (%u) for achievement criteria %u for non-dungeon/non-raid map %u",
+                                    ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT, criteria_id, map->GetId());
+                return false;
             }
+            InstanceScript* instance = map->ToInstanceMap()->GetInstanceScript();
+            if (!instance)
+            {
+                LOG_ERROR("sql.sql", "Achievement system call ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT (%u) for achievement criteria %u for map %u but map does not have a instance script",
+                                    ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT, criteria_id, map->GetId());
+                return false;
+            }
+            return instance->CheckAchievementCriteriaMeet(criteria_id, source, target, miscvalue1);
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM:
-            {
-                ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(miscvalue1);
-                if (!pProto)
-                    return false;
-                return pProto->ItemLevel >= equipped_item.item_level && pProto->Quality >= equipped_item.item_quality;
-            }
+        {
+            ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(miscvalue1);
+            if (!pProto)
+                return false;
+            return pProto->ItemLevel >= equipped_item.item_level && pProto->Quality >= equipped_item.item_quality;
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID:
             return source->GetMapId() == map_id.mapId;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY:
-            {
-                time_t birthday_start = time_t(sWorld->getIntConfig(CONFIG_BIRTHDAY_TIME));
-                tm birthday_tm;
-                localtime_r(&birthday_start, &birthday_tm);
+        {
+            time_t birthday_start = time_t(sWorld->getIntConfig(CONFIG_BIRTHDAY_TIME));
+            tm birthday_tm;
+            localtime_r(&birthday_start, &birthday_tm);
 
-                // exactly N birthday
-                birthday_tm.tm_year += birthday_login.nth_birthday;
+            // exactly N birthday
+            birthday_tm.tm_year += birthday_login.nth_birthday;
 
-                time_t birthday = mktime(&birthday_tm);
-                time_t now = sWorld->GetGameTime();
-                return now <= birthday + DAY && now >= birthday;
-            }
+            time_t birthday = mktime(&birthday_tm);
+            time_t now = sWorld->GetGameTime();
+            return now <= birthday + DAY && now >= birthday;
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE:
-            {
-                if (CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(known_title.title_id))
-                    return source && source->HasTitle(titleInfo->bit_index);
+        {
+            if (CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(known_title.title_id))
+                return source && source->HasTitle(titleInfo->bit_index);
 
+            return false;
+        }
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES:
+        {
+            Battleground* bg = source->GetBattleground();
+            if (!bg)
+            {
                 return false;
             }
+
+            TeamId winnerTeam = bg->GetWinner();
+            if (winnerTeam == TEAM_NEUTRAL)
+            {
+                return false;
+            }
+
+            uint32 winnnerScore = bg->GetTeamScore(winnerTeam);
+            uint32 loserScore = bg->GetTeamScore(TeamId(!uint32(winnerTeam)));
+            return source->GetTeamId() == winnerTeam && winnnerScore == teams_scores.winner_score && loserScore == teams_scores.loser_score;
+        }
         default:
             break;
     }

@@ -19,10 +19,12 @@ void VisibleNotifier::Visit(GameObjectMapType& m)
 {
     for (GameObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        if (i_largeOnly != iter->GetSource()->IsVisibilityOverridden())
+        GameObject* go = iter->GetSource();
+        if (i_largeOnly != go->IsVisibilityOverridden())
             continue;
-        vis_guids.erase(iter->GetSource()->GetGUID());
-        i_player.UpdateVisibilityOf(iter->GetSource(), i_data, i_visibleNow);
+
+        vis_guids.erase(go->GetGUID());
+        i_player.UpdateVisibilityOf(go, i_data, i_visibleNow);
     }
 }
 
@@ -61,8 +63,10 @@ void VisibleNotifier::SendToSelf()
     for (GuidUnorderedSet::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
     {
         if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
+        {
             if (i_largeOnly != obj->IsVisibilityOverridden())
                 continue;
+        }
 
         // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
         if ((*it).IsTransport())
@@ -92,6 +96,7 @@ void VisibleNotifier::SendToSelf()
     {
         if (i_largeOnly != (*it)->IsVisibilityOverridden())
             continue;
+
         i_player.GetInitialVisiblePackets(*it);
     }
 }
