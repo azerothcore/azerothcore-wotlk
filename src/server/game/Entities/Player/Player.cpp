@@ -10118,6 +10118,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
     time_t recTime;
 
     bool needsCooldownPacket = false;
+    bool useSpellCooldown = false;
 
     // overwrite time for selected category
     if (infinityCooldown)
@@ -10137,7 +10138,12 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
         // Now we have cooldown data (if found any), time to apply mods
         if (rec > 0)
         {
+            int32 oldRec = rec;
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, rec, spell);
+            if (oldRec != rec)
+            {
+                useSpellCooldown = true;
+            }
         }
         else if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
         {
@@ -10150,6 +10156,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
             if (HasSpell(spellInfo->Id))
             {
                 needsCooldownPacket = true;
+                useSpellCooldown = true;
                 rec += cooldownMod * IN_MILLISECONDS;   // SPELL_AURA_MOD_COOLDOWN does not affect category cooldows, verified with shaman shocks
             }
         }
@@ -10169,11 +10176,11 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
     // category spells
     if (cat && catrec > 0)
     {
-        _AddSpellCooldown(spellInfo->Id, cat, itemId, catrecTime, true, true);
+        _AddSpellCooldown(spellInfo->Id, cat, itemId, useSpellCooldown? recTime : catrecTime, true, true);
         if (needsCooldownPacket)
         {
             WorldPacket data;
-            BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, catrecTime);
+            BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, useSpellCooldown ? recTime : catrecTime);
             SendDirectMessage(&data);
         }
 
