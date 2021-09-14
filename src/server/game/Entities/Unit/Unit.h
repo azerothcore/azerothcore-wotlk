@@ -2203,7 +2203,7 @@ public:
     void DeleteThreatList();
     void TauntApply(Unit* victim);
     void TauntFadeOut(Unit* taunter);
-    ThreatManager& getThreatManager() { return m_ThreatManager; }
+    ThreatMgr& getThreatMgr() { return m_ThreatMgr; }
     void addHatedBy(HostileReference* pHostileReference) { m_HostileRefMgr.insertFirst(pHostileReference); };
     void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
     HostileRefMgr& getHostileRefMgr() { return m_HostileRefMgr; }
@@ -2554,7 +2554,7 @@ protected:
     uint32 m_reactiveTimer[MAX_REACTIVE];
     int32 m_regenTimer;
 
-    ThreatManager m_ThreatManager;
+    ThreatMgr m_ThreatMgr;
     typedef std::map<ObjectGuid, float> CharmThreatMap;
     CharmThreatMap _charmThreatInfo;
 

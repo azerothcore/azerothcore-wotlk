@@ -11,13 +11,13 @@
 #include "RefMgr.h"
 
 class Unit;
-class ThreatManager;
+class ThreatMgr;
 class HostileReference;
 class SpellInfo;
 
 //=================================================
 
-class HostileRefMgr : public RefMgr<Unit, ThreatManager>
+class HostileRefMgr : public RefMgr<Unit, ThreatMgr>
 {
 private:
     Unit* iOwner;
@@ -46,7 +46,7 @@ public:
     // pussywizard: for combat bugs
     void deleteReferencesOutOfRange(float range);
 
-    HostileReference* getFirst() { return ((HostileReference*) RefMgr<Unit, ThreatManager>::getFirst()); }
+    HostileReference* getFirst() { return ((HostileReference*) RefMgr<Unit, ThreatMgr>::getFirst()); }
 
     void updateThreatTables();
 

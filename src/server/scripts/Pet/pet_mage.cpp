@@ -158,7 +158,7 @@ public:
 
                 if (selection)
                 {
-                    me->getThreatManager().resetAllAggro();
+                    me->getThreatMgr().resetAllAggro();
                     me->AddThreat(selection, 1000000.0f);
 
                     if (owner->IsInCombat())
