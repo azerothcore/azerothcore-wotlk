@@ -85,10 +85,10 @@ bool Map::ExistMap(uint32 mapid, int gx, int gy)
         map_fileheader header;
         if (fread(&header, sizeof(header), 1, pf) == 1)
         {
-            if (header.mapMagic.asUInt != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
+            if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
             {
-                LOG_ERROR("maps", "Map file '%s' is from an incompatible map version (%.*s v%u), %.*s v%u is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
-                    fileName, 4, header.mapMagic.asChar, header.versionMagic, 4, MapMagic.asChar, MapVersionMagic);
+                LOG_ERROR("maps", "Map file '%s' is from an incompatible map version (%.*u v%u), %.*u v%u is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
+                    tmp, 4, header.mapMagic, header.versionMagic, 4, MapMagic.asChar, MapVersionMagic);
             }
 
             else
