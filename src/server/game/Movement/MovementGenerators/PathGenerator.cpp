@@ -6,7 +6,6 @@
 
 #include "Creature.h"
 #include "DetourCommon.h"
-#include "DisableMgr.h"
 #include "Geometry.h"
 #include "Log.h"
 #include "Map.h"
@@ -48,7 +47,7 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
 
 bool PathGenerator::CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest)
 {
-    if (!acore::IsValidMapCoord(destX, destY, destZ) || !acore::IsValidMapCoord(x, y, z))
+    if (!Acore::IsValidMapCoord(destX, destY, destZ) || !Acore::IsValidMapCoord(x, y, z))
         return false;
 
     G3D::Vector3 dest(destX, destY, destZ);
@@ -198,8 +197,8 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     {
         bool buildShotrcut = false;
 
-        bool isUnderWaterStart = _source->GetMap()->IsUnderWater(startPos.x, startPos.y, startPos.z);
-        bool isUnderWaterEnd = _source->GetMap()->IsUnderWater(endPos.x, endPos.y, endPos.z);
+        bool isUnderWaterStart = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight());
+        bool isUnderWaterEnd = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight());
         bool isFarUnderWater = startFarFromPoly ? isUnderWaterStart : isUnderWaterEnd;
 
         Unit const* _sourceUnit = _source->ToUnit();
@@ -369,7 +368,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             // this is probably an error state, but we'll leave it
             // and hopefully recover on the next Update
             // we still need to copy our preffix
-            LOG_ERROR("server", "PathGenerator::BuildPolyPath: Path Build failed %s", _source->GetGUID().ToString().c_str());
+            LOG_ERROR("movement", "PathGenerator::BuildPolyPath: Path Build failed %s", _source->GetGUID().ToString().c_str());
         }
 
         // new path = prefix + suffix - overlap
@@ -470,7 +469,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         if (!_polyLength || dtStatusFailed(dtResult))
         {
             // only happens if we passed bad data to findPath(), or navmesh is messed up
-            LOG_ERROR("server", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
+            LOG_ERROR("movement", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
             BuildShortcut();
             _type = PATHFIND_NOPATH;
             return;
@@ -479,7 +478,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
     if (!_polyLength)
     {
-        LOG_ERROR("server", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
+        LOG_ERROR("movement", "PathGenerator::BuildPolyPath: %s Path Build failed: 0 length path", _source->GetGUID().ToString().c_str());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -509,7 +508,7 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     if (_useRaycast)
     {
         // _straightLine uses raycast and it currently doesn't support building a point path, only a 2-point path with start and hitpoint/end is returned
-        LOG_ERROR("server", "PathGenerator::BuildPointPath() called with _useRaycast for unit %s", _source->GetGUID().ToString().c_str());
+        LOG_ERROR("movement", "PathGenerator::BuildPointPath() called with _useRaycast for unit %s", _source->GetGUID().ToString().c_str());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -566,9 +565,9 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     uint32 newPointCount = 0;
     for (uint32 i = 0; i < pointCount; ++i) {
         G3D::Vector3 vector = G3D::Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
-        ZLiquidStatus status = _source->GetMap()->getLiquidStatus(vector.x, vector.y, vector.z, MAP_ALL_LIQUIDS, nullptr);
+        LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), vector.x, vector.y, vector.z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
         // One of the points is not in the water
-        if (status == LIQUID_MAP_UNDER_WATER)
+        if (liquidData.Status == LIQUID_MAP_UNDER_WATER)
         {
             // if the first point is under water
             // then set a proper z for it
@@ -700,11 +699,11 @@ void PathGenerator::UpdateFilter()
 NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
 {
     LiquidData data;
-    ZLiquidStatus liquidStatus = _source->GetMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &data);
-    if (liquidStatus == LIQUID_MAP_NO_WATER)
+    LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
+    if (liquidData.Status == LIQUID_MAP_NO_WATER)
         return NAV_GROUND;
 
-    switch (data.type_flags)
+    switch (data.Flags)
     {
         case MAP_LIQUID_TYPE_WATER:
         case MAP_LIQUID_TYPE_OCEAN:
@@ -1041,7 +1040,7 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
 {
     if (GetPathType() == PATHFIND_BLANK || _pathPoints.size() < 2)
     {
-        LOG_ERROR("server", "PathGenerator::ReducePathLengthByDist called before path was successfully built");
+        LOG_ERROR("movement", "PathGenerator::ReducePathLengthByDist called before path was successfully built");
         return;
     }
 
@@ -1150,18 +1149,18 @@ bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool ch
 bool PathGenerator::IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim) const
 {
     Creature const* _sourceCreature = _source->ToCreature();
-    return   _source->GetMap()->IsInWater(x, y, z) &&
-        _source->GetMap()->IsInWater(destX, destY, destZ) &&
+    return _source->GetMap()->IsInWater(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight()) &&
+        _source->GetMap()->IsInWater(_source->GetPhaseMask(), destX, destY, destZ, _source->GetCollisionHeight()) &&
         (!checkSwim || !_sourceCreature || _sourceCreature->CanSwim());
 }
 
-bool PathGenerator::IsWaterPath(Movement::PointsArray _pathPoints) const
+bool PathGenerator::IsWaterPath(Movement::PointsArray pathPoints) const
 {
     bool waterPath = true;
     // Check both start and end points, if they're both in water, then we can *safely* let the creature move
-    for (uint32 i = 0; i < _pathPoints.size(); ++i)
+    for (uint32 i = 0; i < pathPoints.size(); ++i)
     {
-        NavTerrain terrain = GetNavTerrain(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
+        NavTerrain terrain = GetNavTerrain(pathPoints[i].x, pathPoints[i].y, pathPoints[i].z);
         // One of the points is not in the water
         if (terrain != NAV_MAGMA && terrain != NAV_WATER)
         {

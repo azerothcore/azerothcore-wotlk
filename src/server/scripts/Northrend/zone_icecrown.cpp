@@ -171,7 +171,7 @@ public:
         void CheckSummons()
         {
             bool allow = true;
-            for (ObjectGuid guid : summons)
+            for (ObjectGuid const& guid : summons)
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     if (cr->IsAlive())
                         allow = false;
@@ -1258,7 +1258,7 @@ public:
         Unit* GetSummoner()
         {
             if (TempSummon* tempSummon = me->ToTempSummon())
-                return tempSummon->GetSummoner();
+                return tempSummon->GetSummonerUnit();
             return nullptr;
         }
 
@@ -1409,6 +1409,36 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_infra_green_bomber_genericAI(creature);
+    }
+};
+
+class spell_onslaught_or_call_bone_gryphon : public SpellScriptLoader
+{
+public:
+    spell_onslaught_or_call_bone_gryphon() : SpellScriptLoader("spell_onslaught_or_call_bone_gryphon") { }
+
+    class spell_onslaught_or_call_bone_gryphon_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_onslaught_or_call_bone_gryphon_SpellScript);
+
+        void ChangeSummonPos(SpellEffIndex /*effIndex*/)
+        {
+            WorldLocation summonPos = *GetExplTargetDest();
+            Position offset = { 0.0f, 0.0f, 3.0f, 0.0f };
+            summonPos.RelocateOffset(offset);
+            SetExplTargetDest(summonPos);
+            GetHitDest()->RelocateOffset(offset);
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_onslaught_or_call_bone_gryphon_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_onslaught_or_call_bone_gryphon_SpellScript();
     }
 };
 
@@ -2042,7 +2072,7 @@ public:
 
             if (id == POINT_GRAB_DECOY)
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* summoner = summon->GetSummoner())
+                    if (Unit* summoner = summon->GetSummonerUnit())
                         DoCast(summoner, SPELL_GRAB);
         }
 
@@ -2098,6 +2128,7 @@ void AddSC_icecrown()
     new spell_fight_fire_bomber();
     new spell_anti_air_rocket_bomber();
     new npc_infra_green_bomber_generic();
+    new spell_onslaught_or_call_bone_gryphon();
 
     // Theirs
     new npc_guardian_pavilion();

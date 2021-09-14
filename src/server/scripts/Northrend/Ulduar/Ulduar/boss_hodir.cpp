@@ -239,7 +239,7 @@ public:
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
             }
 
-            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
+            if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 900.0f))
             {
                 go->SetGoState(GO_STATE_ACTIVE);
             }
@@ -375,8 +375,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoom(&ENTRANCE_DOOR, Axis::AXIS_Y, false) || !IsInRoom(&EXIT_DOOR, Axis::AXIS_Y, true))
+            if (me->GetPositionY() <= ENTRANCE_DOOR.GetPositionY() || me->GetPositionY() >= EXIT_DOOR.GetPositionY())
             {
+                boss_hodirAI::EnterEvadeMode();
                 return;
             }
 
@@ -424,9 +425,9 @@ public:
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             targets.push_back(itr->GetSource());
-                        targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-                        targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-                        acore::Containers::RandomResize(targets, (RAID_MODE(2,3)));
+                        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+                        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+                        Acore::Containers::RandomResize(targets, (RAID_MODE(2,3)));
                         for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                         {
                             float prevZ = (*itr)->GetPositionZ();
@@ -460,9 +461,13 @@ public:
                     break;
                 case EVENT_FREEZE:
                     if (Player* plr = SelectTargetFromPlayerList(50.0f, SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
+                    {
                         me->CastSpell(plr, SPELL_FREEZE, false);
-                    else if (Unit* plr = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
-                        me->CastSpell(plr, SPELL_FREEZE, false);
+                    }
+                    else if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                    {
+                        me->CastSpell(target, SPELL_FREEZE, false);
+                    }
                     events.RescheduleEvent(EVENT_FREEZE, urand(17000, 20000));
                     break;
             }
@@ -658,13 +663,13 @@ public:
                 timer = 2500;
                 if (me->IsSummon())
                 {
-                    if (Unit* s = me->ToTempSummon()->GetSummoner())
+                    if (Unit* s = me->ToTempSummon()->GetSummonerUnit())
                     {
                         if ((s->GetTypeId() == TYPEID_PLAYER && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER)) || (s->GetTypeId() == TYPEID_UNIT && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC)))
                             me->DespawnOrUnsummon(2000);
                         else if (s->GetTypeId() == TYPEID_PLAYER)
-                            if (InstanceScript* pInstance = me->GetInstanceScript())
-                                if (pInstance->GetData(TYPE_HODIR) == NOT_STARTED)
+                            if (InstanceScript* instanceScript = me->GetInstanceScript())
+                                if (instanceScript->GetData(TYPE_HODIR) == NOT_STARTED)
                                 {
                                     s->CastSpell(s, SPELL_FLASH_FREEZE_INSTAKILL, true);
                                     me->DespawnOrUnsummon(2000);
@@ -1271,9 +1276,9 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-            acore::Containers::RandomResize(targets, 1);
+            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void Register() override
@@ -1337,9 +1342,13 @@ public:
 
                 if (Aura* aur = target->GetAura(target->GetTypeId() == TYPEID_PLAYER ? SPELL_FLASH_FREEZE_TRAPPED_PLAYER : SPELL_FLASH_FREEZE_TRAPPED_NPC))
                 {
-                    if (Unit* caster = aur->GetCaster())
-                        if (caster->GetTypeId() == TYPEID_UNIT)
-                            caster->ToCreature()->DespawnOrUnsummon();
+                    if (Unit* caster2 = aur->GetCaster())
+                    {
+                        if (caster2->GetTypeId() == TYPEID_UNIT)
+                        {
+                            caster2->ToCreature()->DespawnOrUnsummon();
+                        }
+                    }
                     target->CastSpell(target, SPELL_FLASH_FREEZE_INSTAKILL, true);
                     return;
                 }
@@ -1449,7 +1458,7 @@ class achievement_cheese_the_freeze : public AchievementCriteriaScript
 public:
     achievement_cheese_the_freeze() : AchievementCriteriaScript("achievement_cheese_the_freeze") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -1460,7 +1469,7 @@ class achievement_getting_cold_in_here : public AchievementCriteriaScript
 public:
     achievement_getting_cold_in_here() : AchievementCriteriaScript("achievement_getting_cold_in_here") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
     }
@@ -1471,7 +1480,7 @@ class achievement_i_could_say_that_this_cache_was_rare : public AchievementCrite
 public:
     achievement_i_could_say_that_this_cache_was_rare() : AchievementCriteriaScript("achievement_i_could_say_that_this_cache_was_rare") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(3);
     }
@@ -1482,7 +1491,7 @@ class achievement_i_have_the_coolest_friends : public AchievementCriteriaScript
 public:
     achievement_i_have_the_coolest_friends() : AchievementCriteriaScript("achievement_i_have_the_coolest_friends") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(4);
     }
@@ -1493,7 +1502,7 @@ class achievement_staying_buffed_all_winter_10 : public AchievementCriteriaScrip
 public:
     achievement_staying_buffed_all_winter_10() : AchievementCriteriaScript("achievement_staying_buffed_all_winter_10") {}
 
-    bool OnCheck(Player* player, Unit*  /*target*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/, uint32 /*criteria_id*/) override
     {
         return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_10);
     }
@@ -1504,7 +1513,7 @@ class achievement_staying_buffed_all_winter_25 : public AchievementCriteriaScrip
 public:
     achievement_staying_buffed_all_winter_25() : AchievementCriteriaScript("achievement_staying_buffed_all_winter_25") {}
 
-    bool OnCheck(Player* player, Unit*  /*target*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/, uint32 /*criteria_id*/) override
     {
         return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_25);
     }

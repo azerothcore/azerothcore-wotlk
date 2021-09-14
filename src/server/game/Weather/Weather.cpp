@@ -8,15 +8,12 @@
     \ingroup world
 */
 
-#include "Log.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Util.h"
 #include "Weather.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 /// Create the Weather object
 Weather::Weather(uint32 zone, WeatherData const* weatherChances)
@@ -26,9 +23,7 @@ Weather::Weather(uint32 zone, WeatherData const* weatherChances)
     m_type = WEATHER_TYPE_FINE;
     m_grade = 0;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (uint32)(m_timer.GetInterval() / (MINUTE * IN_MILLISECONDS)));
-#endif
+    LOG_DEBUG("weather", "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (uint32)(m_timer.GetInterval() / (MINUTE * IN_MILLISECONDS)));
 }
 
 /// Launch a weather update
@@ -87,10 +82,8 @@ bool Weather::ReGenerate()
     localtime_r(&gtime, &ltime);
     uint32 season = ((ltime.tm_yday - 78 + 365) / 91) % 4;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     static char const* seasonName[WEATHER_SEASONS] = { "spring", "summer", "fall", "winter" };
-    LOG_DEBUG("server", "Generating a change in %s weather for zone %u.", seasonName[season], m_zone);
-#endif
+    LOG_DEBUG("weather", "Generating a change in %s weather for zone %u.", seasonName[season], m_zone);
 
     if ((u < 60) && (m_grade < 0.33333334f))                // Get fair
     {
@@ -210,7 +203,6 @@ bool Weather::UpdateWeather()
     if (!sWorld->SendZoneMessage(m_zone, &data))
         return false;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     ///- Log the event
     char const* wthstr;
     switch (state)
@@ -257,8 +249,7 @@ bool Weather::UpdateWeather()
             break;
     }
 
-    LOG_DEBUG("server", "Change the weather of zone %u to %s.", m_zone, wthstr);
-#endif
+    LOG_DEBUG("weather", "Change the weather of zone %u to %s.", m_zone, wthstr);
     sScriptMgr->OnWeatherChange(this, state, m_grade);
     return true;
 }

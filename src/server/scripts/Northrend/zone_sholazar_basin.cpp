@@ -176,7 +176,7 @@ public:
                 if (action == ACTION_BIND_MINIONS)
                     me->CastSpell(me, SPELL_ARTRUIS_BINDING, true);
 
-                for (ObjectGuid const guid : summons)
+                for (ObjectGuid const& guid : summons)
                 {
                     Creature* minion = ObjectAccessor::GetCreature(*me, guid);
                     if (minion && minion->IsAlive())
@@ -277,9 +277,9 @@ quest Still At It (12644)
 #define MCM_TEXT_FAILED "You have FAILED!!!"
 #define ACTION_PRESSURE 1
 #define ACTION_HEAT 2
-#define ACTION_BANANA 3
-#define ACTION_ORANGE 4
-#define ACTION_PAPAYA 5
+//#define ACTION_BANANA 3
+//#define ACTION_ORANGE 4
+//#define ACTION_PAPAYA 5
 #define NPC_WANTS_BANANAS 28537
 
 class npc_still_at_it_trigger : public CreatureScript
@@ -680,7 +680,7 @@ public:
                 return;
 
             if (TempSummon* summ = me->ToTempSummon())
-                if (Unit* summoner = summ->GetSummoner())
+                if (Unit* summoner = summ->GetSummonerUnit())
                     me->GetMotionMaster()->MovePoint(0, summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ());
 
             Reset();

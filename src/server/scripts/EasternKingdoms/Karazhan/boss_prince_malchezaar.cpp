@@ -2,7 +2,6 @@
 * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-* Rescripted By Lee (Talamortis)
 */
 
 #include "karazhan.h"
@@ -285,7 +284,6 @@ public:
 
         void SummonInfernal()
         {
-            InfernalPoint* point = 0;
             Position pos;
 
             if ((me->GetMapId() == 532))
@@ -294,7 +292,7 @@ public:
             }
             else
             {
-                point = acore::Containers::SelectRandomContainerElement(positions);
+                InfernalPoint* point = Acore::Containers::SelectRandomContainerElement(positions);
                 pos.Relocate(point->x, point->y, INFERNAL_Z, frand(0.0f, float(M_PI * 2)));
             }
 
@@ -360,14 +358,16 @@ public:
             {
                 if (SWPainTimer <= diff)
                 {
-                    Unit* target = nullptr;
-                    if (phase == 1)
-                        target = me->GetVictim();                  // Target the Tank
-                    else                                          // anyone but the tank
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+
+                    // if phase == 1 target the tank, otherwise anyone but the tank
+                    Unit* target = phase == 1
+                            ? me->GetVictim()
+                            : SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
 
                     if (target)
+                    {
                         DoCast(target, SPELL_SW_PAIN);
+                    }
 
                     SWPainTimer = 20000;
                 }
@@ -411,8 +411,7 @@ public:
             {
                 if (AmplifyDamageTimer <= diff)
                 {
-                    Unit* target = nullptr;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
 
                     if (target)
                     {
@@ -421,7 +420,9 @@ public:
                     }
                 }
                 else
+                {
                     AmplifyDamageTimer -= diff;
+                }
             }
 
             if (phase != 3)
@@ -483,9 +484,11 @@ public:
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
             {
                 if (me->GetVictim())
+                {
                     DoModifyThreatPercent(me->GetVictim(), -100);
-                if (target)
-                    me->AddThreat(target, 1000000.0f);
+                }
+
+                me->AddThreat(target, 1000000.0f);
             }
         }
 

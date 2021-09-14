@@ -7,11 +7,13 @@
 #ifndef ACORE_DBCSTRUCTURE_H
 #define ACORE_DBCSTRUCTURE_H
 
-#include "Common.h"
-#include "DBCEnums.h"
 #include "Define.h"
+#include "DBCEnums.h"
 #include "SharedDefines.h"
 #include "Util.h"
+#include <set>
+#include <map>
+#include <unordered_map>
 
 // Structures using to access raw DBC data and required packing to portability
 
@@ -874,6 +876,11 @@ struct FactionEntry
     {
         return reputationListID >= 0;
     }
+
+    [[nodiscard]] bool CanBeSetAtWar() const
+    {
+        return reputationListID >= 0 && BaseRepRaceMask[0] == 1791;
+    }
 };
 
 #define MAX_FACTION_RELATIONS 4
@@ -929,7 +936,7 @@ struct FactionTemplateEntry
                 return false;
         return hostileMask == 0 && friendlyMask == 0;
     }
-    [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
+    [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS) != 0; }
 };
 
 struct GameObjectDisplayInfoEntry
@@ -1466,22 +1473,19 @@ struct ScalingStatValuesEntry
 //    uint32    displayOrder;                               // 19     m_sortIndex
 //};
 
-//struct SkillRaceClassInfoEntry{
-//    uint32    id;                                         // 0      m_ID
-//    uint32    skillId;                                    // 1      m_skillID
-//    uint32    raceMask;                                   // 2      m_raceMask
-//    uint32    classMask;                                  // 3      m_classMask
-//    uint32    flags;                                      // 4      m_flags
-//    uint32    reqLevel;                                   // 5      m_minLevel
-//    uint32    skillTierId;                                // 6      m_skillTierID
-//    uint32    skillCostID;                                // 7      m_skillCostIndex
-//};
+struct SkillRaceClassInfoEntry
+{
+    //uint32 ID;                                            // 0
+    uint32 SkillID;                                         // 1
+    uint32 RaceMask;                                        // 2
+    uint32 ClassMask;                                       // 3
+    uint32 Flags;                                           // 4
+    //uint32 MinLevel;                                      // 5
+    uint32 SkillTierID;                                     // 6
+    //uint32 SkillCostIndex;                                // 7
+};
 
-//struct SkillTiersEntry{
-//    uint32    id;                                         // 0      m_ID
-//    uint32    skillValue[16];                             // 1-17   m_cost
-//    uint32    maxSkillValue[16];                          // 18-32  m_valueMax
-//};
+#define MAX_SKILL_STEP 16
 
 struct SkillLineEntry
 {
@@ -1500,19 +1504,26 @@ struct SkillLineEntry
 
 struct SkillLineAbilityEntry
 {
-    uint32    id;                                           // 0        m_ID
-    uint32    skillId;                                      // 1        m_skillLine
-    uint32    spellId;                                      // 2        m_spell
-    uint32    racemask;                                     // 3        m_raceMask
-    uint32    classmask;                                    // 4        m_classMask
-    //uint32    racemaskNot;                                // 5        m_excludeRace
-    //uint32    classmaskNot;                               // 6        m_excludeClass
-    uint32    req_skill_value;                              // 7        m_minSkillLineRank
-    uint32    forward_spellid;                              // 8        m_supercededBySpell
-    uint32    learnOnGetSkill;                              // 9        m_acquireMethod
-    uint32    max_value;                                    // 10       m_trivialSkillLineRankHigh
-    uint32    min_value;                                    // 11       m_trivialSkillLineRankLow
-    //uint32    characterPoints[2];                         // 12-13    m_characterPoints[2]
+    uint32 ID;                                              // 0
+    uint32 SkillLine;                                       // 1
+    uint32 Spell;                                           // 2
+    uint32 RaceMask;                                        // 3
+    uint32 ClassMask;                                       // 4
+    //uint32 ExcludeRace;                                   // 5
+    //uint32 ExcludeClass;                                  // 6
+    uint32 MinSkillLineRank;                                // 7
+    uint32 SupercededBySpell;                               // 8
+    uint32 AcquireMethod;                                   // 9
+    uint32 TrivialSkillLineRankHigh;                        // 10
+    uint32 TrivialSkillLineRankLow;                         // 11
+    //uint32 CharacterPoints[2];                            // 12-13
+};
+
+struct SkillTiersEntry
+{
+    uint32 ID;                                              // 0
+    //uint32 Cost[MAX_SKILL_STEP];                          // 1-16
+    uint32 Value[MAX_SKILL_STEP];                           // 17-32
 };
 
 struct SoundEntriesEntry
@@ -1648,8 +1659,8 @@ struct SpellEntry
     //uint32  SpellDifficultyId;                            // 233      3.3.0
 };
 
-typedef std::set<uint32> SpellCategorySet;
-typedef std::map<uint32, SpellCategorySet > SpellCategoryStore;
+typedef std::set<std::pair<bool, uint32>> SpellCategorySet;
+typedef std::unordered_map<uint32, SpellCategorySet> SpellCategoryStore;
 typedef std::set<uint32> PetFamilySpellsSet;
 typedef std::map<uint32, PetFamilySpellsSet > PetFamilySpellsStore;
 
@@ -2026,6 +2037,7 @@ struct VehicleSeatEntry
                                 VEHICLE_SEAT_FLAG_B_USABLE_FORCED_3 | VEHICLE_SEAT_FLAG_B_USABLE_FORCED_4)));
     }
     [[nodiscard]] bool IsEjectable() const { return m_flagsB & VEHICLE_SEAT_FLAG_B_EJECTABLE; }
+    [[nodiscard]] bool CanControl() const { return (m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL) != 0; }
 };
 
 struct WMOAreaTableEntry

@@ -45,7 +45,7 @@ enum AuriayaSpells
 #define SPELL_RIP_FLESH                 RAID_MODE(SPELL_RIP_FLESH_10, SPELL_RIP_FLESH_25)
 #define SPELL_FERAL_POUNCE              RAID_MODE(SPELL_FERAL_POUNCE_10, SPELL_FERAL_POUNCE_25)
 #define SPELL_FERAL_RUSH                RAID_MODE(SPELL_FERAL_RUSH_10, SPELL_FERAL_RUSH_25)
-#define SPELL_SEEPING_FERAL_ESSENCE     RAID_MODE(SPELL_SEEPING_FERAL_ESSENCE_10, SPELL_SEEPING_FERAL_ESSENCE_25)
+//#define SPELL_SEEPING_FERAL_ESSENCE     RAID_MODE(SPELL_SEEPING_FERAL_ESSENCE_10, SPELL_SEEPING_FERAL_ESSENCE_25)
 
 enum AuriayaNPC
 {
@@ -460,7 +460,7 @@ class achievement_auriaya_crazy_cat_lady : public AchievementCriteriaScript
 public:
     achievement_auriaya_crazy_cat_lady() : AchievementCriteriaScript("achievement_auriaya_crazy_cat_lady") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
@@ -476,7 +476,7 @@ class achievement_auriaya_nine_lives : public AchievementCriteriaScript
 public:
     achievement_auriaya_nine_lives() : AchievementCriteriaScript("achievement_auriaya_nine_lives") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())

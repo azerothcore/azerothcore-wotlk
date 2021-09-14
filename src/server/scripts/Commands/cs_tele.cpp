@@ -121,7 +121,7 @@ public:
                 target->TeleportTo(target->m_homebindMapId, target->m_homebindX, target->m_homebindY, target->m_homebindZ, target->GetOrientation());
             else
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
                 stmt->setUInt32(0, target_guid.GetCounter());
                 PreparedQueryResult resultDB = CharacterDatabase.Query(stmt);
 
@@ -158,7 +158,7 @@ public:
 
             std::string chrNameLink = handler->playerLink(target_name);
 
-            if (target->IsBeingTeleported() == true)
+            if (target->IsBeingTeleported())
             {
                 handler->PSendSysMessage(LANG_IS_TELEPORTED, chrNameLink.c_str());
                 handler->SetSentErrorMessage(true);
@@ -191,7 +191,7 @@ public:
 
             handler->PSendSysMessage(LANG_TELEPORTING_TO, nameLink.c_str(), handler->GetAcoreString(LANG_OFFLINE), tele->name.c_str());
             Player::SavePositionInDB(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation,
-                                     sMapMgr->GetZoneId(tele->mapId, tele->position_x, tele->position_y, tele->position_z), target_guid);
+                                     sMapMgr->GetZoneId(PHASEMASK_NORMAL, tele->mapId, tele->position_x, tele->position_y, tele->position_z), target_guid);
         }
 
         return true;

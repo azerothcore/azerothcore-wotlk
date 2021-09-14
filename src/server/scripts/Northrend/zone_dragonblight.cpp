@@ -21,7 +21,6 @@ EndContentData */
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -311,7 +310,7 @@ public:
         void InitializeAI() override
         {
             if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
                     summonerGUID = summoner->GetGUID();
                     float x, y, z;
@@ -479,8 +478,8 @@ public:
 
         void Reset() override
         {
-            if (me->ToTempSummon() && me->ToTempSummon()->GetSummoner())
-                me->setFaction(me->ToTempSummon()->GetSummoner()->getFaction());
+            if (me->ToTempSummon() && me->ToTempSummon()->GetSummonerUnit())
+                me->setFaction(me->ToTempSummon()->GetSummonerUnit()->getFaction());
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -569,7 +568,7 @@ public:
                 me->RemoveAllAuras();
                 me->DespawnOrUnsummon(1000);
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* owner = summon->GetSummoner())
+                    if (Unit* owner = summon->GetSummonerUnit())
                         if (Player* player = owner->ToPlayer())
                             player->KilledMonsterCredit(me->GetEntry());
             }
@@ -773,8 +772,8 @@ public:
             if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_2, 150.0f))
                 go->Delete();
             WretchedGhoulCleaner cleaner;
-            acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
-            me->VisitNearbyGridObject(150.0f, worker);
+            Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+            Cell::VisitGridObjects(me, worker, 150.0f);
         }
 
         void Reset() override
@@ -987,8 +986,8 @@ public:
                 case 17: // kill vegard
                     {
                         WretchedGhoulCleaner cleaner;
-                        acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
-                        me->VisitNearbyGridObject(150.0f, worker);
+                        Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
+                        Cell::VisitGridObjects(me, worker, 150.0f);
 
                         if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
                             if (Creature* v = me->FindNearestCreature(NPC_SAC_VEGARD_1, 50.0f, true))
@@ -1193,7 +1192,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
-            acore::Containers::RandomResize(targets, 2);
+            Acore::Containers::RandomResize(targets, 2);
         }
 
         void HandleScript(SpellEffIndex effIndex)
@@ -1620,9 +1619,7 @@ public:
 
         void StoreTargets()
         {
-            uint8 creaturecount;
-
-            creaturecount = 0;
+            uint8 creturesCount = 0;
 
             for (uint8 ii = 0; ii < 3; ++ii)
             {
@@ -1630,10 +1627,10 @@ public:
                 GetCreatureListWithEntryInGrid(creatureList, me, AudienceMobs[ii], 15.0f);
                 for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
                 {
-                    if (Creature* creatureList = *itr)
+                    if (Creature* creature = *itr)
                     {
-                        audienceList[creaturecount] = creatureList->GetGUID();
-                        ++creaturecount;
+                        audienceList[creturesCount] = creature->GetGUID();
+                        ++creturesCount;
                     }
                 }
             }

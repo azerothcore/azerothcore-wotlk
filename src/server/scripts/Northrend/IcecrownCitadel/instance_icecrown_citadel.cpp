@@ -760,7 +760,7 @@ public:
                 case GO_CACHE_OF_THE_DREAMWALKER_10H:
                 case GO_CACHE_OF_THE_DREAMWALKER_25H:
                     if (Creature* valithria = instance->GetCreature(ValithriaDreamwalkerGUID))
-                        go->SetLootRecipient(valithria->GetLootRecipient());
+                        go->SetLootRecipient(valithria);
                     go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                     break;
                 case GO_SCOURGE_TRANSPORTER_LK:
@@ -1029,14 +1029,7 @@ public:
                     {
                         if (GameObject* loot = instance->GetGameObject(GunshipArmoryGUID))
                         {
-                            Map::PlayerList const& pl = instance->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                if (Player* p = itr->GetSource())
-                                    if (!p->IsGameMaster() && p->GetGroup() && p->GetGroup()->isRaidGroup())
-                                    {
-                                        loot->SetLootRecipient(p);
-                                        break;
-                                    }
+                            loot->SetLootRecipient(instance);
                             loot->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                         }
                     }
@@ -1050,7 +1043,7 @@ public:
                             if (GameObject* loot = instance->GetGameObject(DeathbringersCacheGUID))
                             {
                                 if (Creature* deathbringer = instance->GetCreature(DeathbringerSaurfangGUID))
-                                    loot->SetLootRecipient(deathbringer->GetLootRecipient());
+                                    loot->SetLootRecipient(deathbringer);
                                 loot->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                             }
                             [[fallthrough]];
@@ -1541,7 +1534,7 @@ public:
                     if (stalkers.empty())
                         return;
 
-                    stalkers.sort(acore::ObjectDistanceOrderPred(teleporter));
+                    stalkers.sort(Acore::ObjectDistanceOrderPred(teleporter));
                     stalkers.front()->CastSpell((Unit*)nullptr, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
                     stalkers.pop_front();
                     for (std::list<Creature*>::iterator itr = stalkers.begin(); itr != stalkers.end(); ++itr)
@@ -1774,7 +1767,7 @@ public:
                         GetCreatureListWithEntryInGrid(triggers, terenas, NPC_WORLD_TRIGGER_INFINITE_AOI, 100.0f);
                         if (!triggers.empty())
                         {
-                            triggers.sort(acore::ObjectDistanceOrderPred(terenas, false));
+                            triggers.sort(Acore::ObjectDistanceOrderPred(terenas, false));
                             Unit* visual = triggers.front();
                             visual->CastSpell(visual, SPELL_FROSTMOURNE_TELEPORT_VISUAL, true);
                         }
@@ -1845,7 +1838,7 @@ public:
                     return;
             }
 
-            go->Relocate(acore::Containers::SelectRandomContainerElement(trapPositions));
+            go->Relocate(Acore::Containers::SelectRandomContainerElement(trapPositions));
         }
 
     protected:

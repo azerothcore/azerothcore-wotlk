@@ -840,8 +840,9 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     SchoolMask = spellEntry->SchoolMask;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         Effects[i] = SpellEffectInfo(spellEntry, this, i);
-    ExplicitTargetMask = _GetExplicitTargetMask();
+
     ChainEntry = nullptr;
+    ExplicitTargetMask = 0;
 
     // Mine
     _isStackableWithRanks = false;
@@ -970,10 +971,10 @@ bool SpellInfo::IsAbilityLearnedWithProfession() const
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
         SkillLineAbilityEntry const* pAbility = _spell_idx->second;
-        if (!pAbility || pAbility->learnOnGetSkill != ABILITY_LEARNED_ON_GET_PROFESSION_SKILL)
+        if (!pAbility || pAbility->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
             continue;
 
-        if (pAbility->req_skill_value > 0)
+        if (pAbility->MinSkillLineRank > 0)
             return true;
     }
 
@@ -985,7 +986,7 @@ bool SpellInfo::IsAbilityOfSkillType(uint32 skillType) const
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(Id);
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
-        if (_spell_idx->second->skillId == uint32(skillType))
+        if (_spell_idx->second->SkillLine == uint32(skillType))
             return true;
 
     return false;
@@ -1075,14 +1076,14 @@ bool SpellInfo::IsSelfCast() const
 
 bool SpellInfo::IsPassive() const
 {
-    return Attributes & SPELL_ATTR0_PASSIVE;
+    return HasAttribute(SPELL_ATTR0_PASSIVE);
 }
 
 bool SpellInfo::IsAutocastable() const
 {
-    if (Attributes & SPELL_ATTR0_PASSIVE)
+    if (HasAttribute(SPELL_ATTR0_PASSIVE))
         return false;
-    if (AttributesEx & SPELL_ATTR1_NO_AUTOCAST_AI)
+    if (HasAttribute(SPELL_ATTR1_NO_AUTOCAST_AI))
         return false;
     return true;
 }
@@ -1189,7 +1190,7 @@ bool SpellInfo::IsMultiSlotAura() const
 
 bool SpellInfo::IsCooldownStartedOnEvent() const
 {
-    return Attributes & SPELL_ATTR0_COOLDOWN_ON_EVENT || (CategoryEntry && CategoryEntry->Flags & SPELL_CATEGORY_FLAG_COOLDOWN_STARTS_ON_EVENT);
+    return HasAttribute(SPELL_ATTR0_COOLDOWN_ON_EVENT) || (CategoryEntry && CategoryEntry->Flags & SPELL_CATEGORY_FLAG_COOLDOWN_STARTS_ON_EVENT);
 }
 
 bool SpellInfo::IsDeathPersistent() const
@@ -1209,7 +1210,7 @@ bool SpellInfo::IsAllowingDeadTarget() const
 
 bool SpellInfo::CanBeUsedInCombat() const
 {
-    return !(Attributes & SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL);
+    return !(HasAttribute(SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL));
 }
 
 bool SpellInfo::IsPositive() const
@@ -1255,7 +1256,7 @@ bool SpellInfo::IsRangedWeaponSpell() const
 {
     return (SpellFamilyName == SPELLFAMILY_HUNTER && !(SpellFamilyFlags[1] & 0x10000000)) // for 53352, cannot find better way
            || (EquippedItemSubClassMask & ITEM_SUBCLASS_MASK_WEAPON_RANGED)
-           || (Attributes & SPELL_ATTR0_USES_RANGED_SLOT); // Xinef: added
+           || (HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT)); // Xinef: added
 }
 
 bool SpellInfo::IsAutoRepeatRangedSpell() const
@@ -1289,15 +1290,27 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
 
 bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
 {
+    // aura can't be pierced
+    if (!aura || aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+    {
+        return false;
+    }
+
     // these spells pierce all avalible spells (Resurrection Sickness for example)
-    if (Attributes & SPELL_ATTR0_NO_IMMUNITIES)
+    if (HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
         return true;
 
     // these spells (Cyclone for example) can pierce all...
-    if ((AttributesEx & SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS)
-            // ...but not these (Divine shield for example)                                                                                 // xinef: banish exception, banish can override banish to cancel itself
-            && !(aura && (aura->Mechanic == MECHANIC_IMMUNE_SHIELD || aura->Mechanic == MECHANIC_INVULNERABILITY || (aura->Mechanic == MECHANIC_BANISH && (Mechanic != MECHANIC_BANISH || !(AttributesEx2 & SPELL_ATTR2_CANNOT_CAST_ON_TAPPED))))))
-        return true;
+    if (HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS) || HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
+    {
+        if (aura->Mechanic != MECHANIC_IMMUNE_SHIELD &&
+               aura->Mechanic != MECHANIC_INVULNERABILITY &&
+               aura->Mechanic != MECHANIC_BANISH)
+        {
+            return true;
+        }
+
+    }
 
     return false;
 }
@@ -1308,22 +1321,20 @@ bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
     if (aura->IsPassive())
         return false;
 
-    // Xinef: At frist we check non-player auras, that should be never dispellable
-    // Xinef: Eg. Mark of the Fallen Champion
-    if (aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && aura->SpellFamilyName == SPELLFAMILY_GENERIC)
+    // These auras (like Divine Shield) can't be dispelled
+    if (aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
         return false;
 
     // These spells (like Mass Dispel) can dispell all auras
     if (HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
         return true;
 
-    // These auras (like Divine Shield) can't be dispelled
-    if (aura->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
-        return false;
-
     // These auras (Cyclone for example) are not dispelable
-    if (aura->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
+    if ((aura->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS) && aura->Mechanic != MECHANIC_NONE)
+        || aura->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
+    {
         return false;
+    }
 
     return true;
 }
@@ -1419,7 +1430,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         shapeInfo = sSpellShapeshiftStore.LookupEntry(form);
         if (!shapeInfo)
         {
-            LOG_ERROR("server", "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
+            LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
             return SPELL_CAST_OK;
         }
         actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells
@@ -1427,7 +1438,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
 
     if (actAsShifted)
     {
-        if (Attributes & SPELL_ATTR0_NOT_SHAPESHIFTED) // not while shapeshifted
+        if (HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFTED)) // not while shapeshifted
             return SPELL_FAILED_NOT_SHAPESHIFT;
         else if (Stances != 0)                   // needs other shapeshift
             return SPELL_FAILED_ONLY_SHAPESHIFT;
@@ -1849,7 +1860,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     him, because it would be it's passenger, there's no such case where this gets to fail legitimacy, this problem
     cannot be solved from within the check in other way since target type cannot be called for the spell currently
     Spell examples: [ID - 52864 Devour Water, ID - 52862 Devour Wind, ID - 49370 Wyrmrest Defender: Destabilize Azure Dragonshrine Effect] */
-    if (!caster->IsVehicle() && !(caster->GetCharmerOrOwner() == target))
+    if (!caster->IsVehicle() && caster->GetCharmerOrOwner() != target)
     {
         if (TargetAuraState && !unitTarget->HasAuraState(AuraStateType(TargetAuraState), this, caster))
             return SPELL_FAILED_TARGET_AURASTATE;
@@ -2062,6 +2073,9 @@ AuraStateType SpellInfo::LoadAuraState() const
         case 35325: // Glowing Blood
         case 16498: // Faerie Fire
         case 6950:
+        case 20656:
+        case 25602:
+        case 32129:
             return AURA_STATE_FAERIE_FIRE;
         default:
             break;
@@ -2292,7 +2306,7 @@ uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
         return 0;
 
     int32 castTime = CastTimeEntry->CastTime;
-    if (Attributes & SPELL_ATTR0_USES_RANGED_SLOT && (!IsAutoRepeatRangedSpell()))
+    if (HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) && (!IsAutoRepeatRangedSpell()))
         castTime += 500;
 
     if (caster)
@@ -2344,7 +2358,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
         // Else drain all power
         if (PowerType < MAX_POWERS)
             return caster->GetPower(Powers(PowerType));
-        LOG_ERROR("server", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
+        LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
         return 0;
     }
 
@@ -2370,18 +2384,16 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
                 break;
             case POWER_RUNE:
             case POWER_RUNIC_POWER:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 LOG_DEBUG("spells.aura", "CalculateManaCost: Not implemented yet!");
-#endif
                 break;
             default:
-                LOG_ERROR("server", "CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
+                LOG_ERROR("spells", "CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
                 return 0;
         }
     }
     SpellSchools school = GetFirstSchoolInMask(schoolMask);
     // Flat mod from caster auras by spell school
-    powerCost += caster->GetInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + school);
+    powerCost += caster->GetInt32Value(static_cast<uint16>(UNIT_FIELD_POWER_COST_MODIFIER) + school);
 
     // Shiv - costs 20 + weaponSpeed*10 energy (apply only to non-triggered spell with energy cost)
     if (AttributesEx4 & SPELL_ATTR4_WEAPON_SPEED_COST_SCALING)
@@ -2407,7 +2419,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
 
     if (!caster->IsControlledByPlayer())
     {
-        if (Attributes & SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL)
+        if (HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
         {
             GtNPCManaCostScalerEntry const* spellScaler = sGtNPCManaCostScalerStore.LookupEntry(SpellLevel - 1);
             GtNPCManaCostScalerEntry const* casterScaler = sGtNPCManaCostScalerStore.LookupEntry(caster->getLevel() - 1);
@@ -2417,7 +2429,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
     }
 
     // PCT mod from user auras by school
-    powerCost = int32(powerCost * (1.0f + caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + school)));
+    powerCost = int32(powerCost * (1.0f + caster->GetFloatValue(static_cast<uint16>(UNIT_FIELD_POWER_COST_MULTIPLIER) + school)));
     if (powerCost < 0)
         powerCost = 0;
     return powerCost;
@@ -2526,7 +2538,7 @@ bool SpellInfo::IsHighRankOf(SpellInfo const* spellInfo) const
     return false;
 }
 
-uint32 SpellInfo::_GetExplicitTargetMask() const
+void SpellInfo::_InitializeExplicitTargetMask()
 {
     bool srcSet = false;
     bool dstSet = false;
@@ -2551,13 +2563,13 @@ uint32 SpellInfo::_GetExplicitTargetMask() const
             effectTargetMask &= ~(TARGET_FLAG_UNIT_MASK | TARGET_FLAG_GAMEOBJECT | TARGET_FLAG_CORPSE_MASK | TARGET_FLAG_DEST_LOCATION);
         targetMask |= effectTargetMask;
     }
-    return targetMask;
+    ExplicitTargetMask = targetMask;
 }
 
 bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
 {
     // not found a single positive spell with this attribute
-    if (Attributes & SPELL_ATTR0_AURA_IS_DEBUFF)
+    if (HasAttribute(SPELL_ATTR0_AURA_IS_DEBUFF))
         return false;
 
     switch (Mechanic)
@@ -2698,7 +2710,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                         if (Effects[effIndex].TargetA.GetTarget() != TARGET_UNIT_CASTER)
                             return false;
                         // but not this if this first effect (didn't find better check)
-                        if (Attributes & SPELL_ATTR0_AURA_IS_DEBUFF && effIndex == 0)
+                        if (HasAttribute(SPELL_ATTR0_AURA_IS_DEBUFF) && effIndex == 0)
                             return false;
                         break;
                     case SPELL_AURA_MECHANIC_IMMUNITY:

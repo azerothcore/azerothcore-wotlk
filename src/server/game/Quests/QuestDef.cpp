@@ -226,7 +226,7 @@ bool Quest::IsAutoAccept() const
 
 bool Quest::IsAutoComplete() const
 {
-    return sWorld->getBoolConfig(CONFIG_QUEST_IGNORE_AUTO_COMPLETE) ? false : (Method == 0 || HasFlag(QUEST_FLAGS_AUTOCOMPLETE));
+    return sWorld->getBoolConfig(CONFIG_QUEST_IGNORE_AUTO_COMPLETE) ? false : HasFlag(QUEST_FLAGS_AUTOCOMPLETE);
 }
 
 bool Quest::IsRaidQuest(Difficulty difficulty) const
@@ -270,7 +270,7 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
         honor = uint32(tc->value * GetRewHonorMultiplier() * 0.1000000014901161);
 
         // Xinef: exactly this is calculated above, however with higher precision...
-        //honor += acore::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
+        //honor += Acore::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
         honor += GetRewHonorAddition();
     }
 

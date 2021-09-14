@@ -8,7 +8,6 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "DisableMgr.h"
-#include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "WorldPacket.h"
 
@@ -30,8 +29,6 @@ void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner)
 
     if (!owner->HasSwimmingFlagOutOfCombat())
         owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
-
-    owner->UpdateEnvironmentIfNeeded(2);
 }
 
 void HomeMovementGenerator<Creature>::DoReset(Creature*)
