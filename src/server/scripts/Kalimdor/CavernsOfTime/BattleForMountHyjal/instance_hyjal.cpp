@@ -15,8 +15,6 @@ EndScriptData */
 #include "hyjal_trash.h"
 #include "InstanceScript.h"
 #include "Opcodes.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
 
@@ -29,7 +27,6 @@ EndScriptData */
 */
 
 #define YELL_EFFORTS        "All of your efforts have been in vain, for the draining of the World Tree has already begun. Soon the heart of your world will beat no more."
-#define YELL_EFFORTS_NAME   "Archimonde"
 
 class instance_hyjal : public InstanceMapScript
 {

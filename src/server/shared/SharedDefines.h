@@ -548,9 +548,9 @@ enum SpellAttr7
     SPELL_ATTR7_NO_CLIENT_FAIL_WHILE_STUNNED_FLEEING_CONFUSED = 0x00100000, // TITLE Unknown attribute 20@Attr7 DESCRIPTION Invulnerability related?
     SPELL_ATTR7_RETAIN_COOLDOWN_THROUGH_LOAD                  = 0x00200000, // TITLE Unknown attribute 21@Attr7
     SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT       = 0x00400000, // TITLE Ignore cold weather flying restriction DESCRIPTION Set for loaner mounts, allows them to be used despite lacking required flight skill
-    SPELL_ATTR7_NO_ATTACK_DODGE                               = 0x00800000, // TITLE Unknown attribute 23@Attr7 DESCRIPTION Motivate, Mutilate, Shattering Throw
-    SPELL_ATTR7_NO_ATTACK_PARRY                               = 0x01000000, // TITLE Unknown attribute 24@Attr7 DESCRIPTION Motivate, Mutilate, Perform Speech, Shattering Throw
-    SPELL_ATTR7_NO_ATTACK_MISS                                = 0x02000000, // TITLE Unknown attribute 25@Attr7
+    SPELL_ATTR7_NO_ATTACK_DODGE                               = 0x00800000, // TITLE Spell cannot be dodged 23@Attr7 DESCRIPTION Motivate, Mutilate, Shattering Throw
+    SPELL_ATTR7_NO_ATTACK_PARRY                               = 0x01000000, // TITLE Spell cannot be parried 24@Attr7 DESCRIPTION Motivate, Mutilate, Perform Speech, Shattering Throw
+    SPELL_ATTR7_NO_ATTACK_MISS                                = 0x02000000, // TITLE Spell cannot be missed 25@Attr7
     SPELL_ATTR7_TREAT_AS_NPC_AOE                              = 0x04000000, // TITLE Unknown attribute 26@Attr7
     SPELL_ATTR7_BYPASS_NO_RESSURECTION_AURA                   = 0x08000000, // TITLE Unknown attribute 27@Attr7
     SPELL_ATTR7_DO_NOT_COUNT_FOR_PVP_SCOREBOARD               = 0x10000000, // TITLE Consolidate in raid buff frame (client only)
@@ -2463,7 +2463,8 @@ enum LockKeyType
 {
     LOCK_KEY_NONE  = 0,
     LOCK_KEY_ITEM  = 1,
-    LOCK_KEY_SKILL = 2
+    LOCK_KEY_SKILL = 2,
+    LOCK_KEY_SPELL = 3
 };
 
 enum LockType
