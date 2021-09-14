@@ -21,12 +21,7 @@ public:
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
-        _owner.SetVisible(true);
-        _owner.AI()->Reset(); // avoids issues with triggers/stalkers by visibility
-        if (_owner.IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
-        {
-            _owner.GetVehicleKit()->Reset(true);
-        }
+        _owner.RespawnOnEvade();
         return true;
     }
 
@@ -223,20 +218,7 @@ void CreatureAI::EnterEvadeMode()
 
     if (std::find(std::begin(bosses), std::end(bosses), me->GetEntry()) != std::end(bosses))
     {
-        me->SetVisible(false);
-        me->DespawnOrUnsummon();
-        me->Respawn(true);
-
-        std::list<Creature*> SummonList;
-        me->GetCreatureListWithEntryInGrid(SummonList, 0 /* pending: find a way to apply to any-all */, 1000.0f);
-        if (!SummonList.empty())
-        {
-            for (std::list<Creature*>::iterator itr = SummonList.begin(); itr != SummonList.end(); itr++)
-            {
-                (*itr)->DespawnOrUnsummon();
-            }
-        }
-
+        me->DespawnOnEvade();
         me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
     }
     else // bosses will run back to the spawnpoint at reset
