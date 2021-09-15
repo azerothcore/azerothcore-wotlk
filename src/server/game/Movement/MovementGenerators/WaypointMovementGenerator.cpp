@@ -7,7 +7,7 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureGroups.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
@@ -310,7 +310,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
 
     if (player->m_taxi.empty())
     {
-        player->getHostileRefManager().setOnlineOfflineState(true);
+        player->getHostileRefMgr().setOnlineOfflineState(true);
         // update z position to ground and orientation for landing point
         // this prevent cheating with landing  point at lags
         // when client side flight end early in comparison server side
@@ -325,7 +325,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
 
 void FlightPathMovementGenerator::DoReset(Player* player)
 {
-    player->getHostileRefManager().setOnlineOfflineState(false);
+    player->getHostileRefMgr().setOnlineOfflineState(false);
     player->AddUnitState(UNIT_STATE_IN_FLIGHT);
     player->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
 
