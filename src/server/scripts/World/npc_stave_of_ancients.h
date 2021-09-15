@@ -10,18 +10,19 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-enum StaveOfAncients
-{
-    QUEST_STAVE_OF_THE_ANCIENTS               = 7636
-};
-
-enum CommonEvents
+enum Common
 {
     EVENT_ENCOUNTER_START                     = 1,
     EVENT_REVEAL                              = 2,
     EVENT_FOOLS_PLIGHT                        = 3,
     EVENT_RANGE_CHECK                         = 4,
-    EVENT_UNFAIR_FIGHT                        = 5
+    EVENT_UNFAIR_FIGHT                        = 5,
+
+    QUEST_STAVE_OF_THE_ANCIENTS               = 7636,
+
+    // Spells
+    SPELL_DEMONIC_ENRAGE                      = 23257,
+    SPELL_FOOLS_PLIGHT                        = 23504
 };
 
 enum NPCArtorius
@@ -39,7 +40,6 @@ enum NPCArtorius
 
     ARTORIUS_HEAD                             = 18955,  // item_template.entry
 
-    ARTORIUS_SPELL_DEMONIC_ENRAGE             = 23257,
     ARTORIUS_SPELL_DEMONIC_DOOM               = 23298,
     ARTORIUS_SPELL_STINGING_TRAUMA            = 23299
 };
@@ -66,8 +66,7 @@ enum NPCSimone
     SIMONE_SPELL_TEMPTRESS_KISS               = 23205,
     SIMONE_SPELL_CHAIN_LIGHTNING              = 23206,
     // Found 23207 using spell editor it matches the duration, it doesn't have animation and the id is close to the other simone spells
-    SIMONE_SPELL_SILENCE                      = 23207,
-    SPELL_FOOLS_PLIGHT                        = 23504
+    SIMONE_SPELL_SILENCE                      = 23207
 };
 
 enum NPCPrecious
@@ -121,7 +120,6 @@ enum NPCFranklin
 
     FRANKLIN_WEAKNESS_SCORPID_STING             = 3043,
 
-    FRANKLIN_SPELL_DEMONIC_ENRAGE               = 23257,
     FRANKLIN_SPELL_ENTROPIC_STING               = 23260
 };
 
@@ -195,6 +193,11 @@ struct NPCStaveQuestAI : public ScriptedAI
     bool PlayerEligibleForReward(Unit* killer);
     void StoreAttackerGuidValue(Unit* attacker);
     bool QuestIncomplete(Unit* unit, uint32 questItem);
+    void ResetState(uint32 /*aura*/);
+
+    virtual void AttackStart(Unit* /*target*/);
+    virtual void AttackedBy(Unit* /*attacker*/);
+    virtual void JustDied(Unit* /*killer*/);
 };
 
 #endif

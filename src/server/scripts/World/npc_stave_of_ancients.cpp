@@ -209,6 +209,45 @@ bool NPCStaveQuestAI::QuestIncomplete(Unit* unit, uint32 questItem)
     return isIncomplete;
 }
 
+void NPCStaveQuestAI::ResetState(uint32 aura = 0)
+{
+    encounterStarted = false;
+    playerGUID.Clear();
+    attackerGuids.clear();
+
+    if (InNormalForm())
+    {
+        me->m_Events.KillAllEvents(true);
+        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+    }
+
+    if (aura && me->HasAura(aura))
+    {
+        me->RemoveAura(aura);
+    }
+}
+
+void NPCStaveQuestAI::AttackStart(Unit* target)
+{
+    if (playerGUID.IsEmpty() && !InNormalForm())
+    {
+        StorePlayerGUID();
+    }
+
+    ScriptedAI::AttackStart(target);
+}
+
+void NPCStaveQuestAI::AttackedBy(Unit* attacker)
+{
+    StoreAttackerGuidValue(attacker);
+}
+
+void NPCStaveQuestAI::JustDied(Unit* killer)
+{
+    // Prevent looting if killer doesn't have the quest
+    ClearLootIfUnfair(killer);
+}
+
 class npc_artorius : public CreatureScript
 {
 public:
@@ -225,39 +264,10 @@ public:
 
         EventMap events;
 
-        void JustDied(Unit* killer) override
-        {
-            // Prevent looting if killer doesn't have the quest
-            ClearLootIfUnfair(killer);
-        }
-
         void Reset() override
         {
-            encounterStarted = false;
-            playerGUID.Clear();
-            attackerGuids.clear();
+            ResetState(ARTORIUS_SPELL_STINGING_TRAUMA);
             events.Reset();
-
-            if (InNormalForm())
-            {
-                me->m_Events.KillAllEvents(true);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-
-            if (me->HasAura(ARTORIUS_SPELL_STINGING_TRAUMA))
-            {
-                me->RemoveAura(ARTORIUS_SPELL_STINGING_TRAUMA);
-            }
-        }
-
-        void AttackStart(Unit* target) override
-        {
-            if (playerGUID.IsEmpty() && !InNormalForm())
-            {
-                StorePlayerGUID();
-            }
-
-            ScriptedAI::AttackStart(target);
         }
 
         void EnterCombat(Unit* victim) override
@@ -292,8 +302,9 @@ public:
             {
                 case EVENT_ENCOUNTER_START:
                     me->MonsterSay(ARTORIUS_SAY, LANG_UNIVERSAL, 0);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    events.ScheduleEvent(EVENT_REVEAL, 8000);
+                    events.ScheduleEvent(EVENT_REVEAL, 5000);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
@@ -305,7 +316,6 @@ public:
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
                 if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
                 {
-                    playerGUID.Clear();
                     EnterEvadeMode();
                     return;
                 }
@@ -358,7 +368,7 @@ public:
                     events.RepeatEvent(urand(5000, 10000));
                     break;
                 case ARTORIUS_EVENT_DEMONIC_ENRAGE:
-                    me->CastSpell(me, ARTORIUS_SPELL_DEMONIC_ENRAGE, false);
+                    me->CastSpell(me, SPELL_DEMONIC_ENRAGE, false);
                     events.RepeatEvent(urand(22000, 39000));
                     break;
             }
@@ -382,17 +392,12 @@ public:
             }
         }
 
-        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-        {
-            StoreAttackerGuidValue(attacker);
-        }
-
         void DoAction(int32 action) override
         {
             if (action == EVENT_ENCOUNTER_START)
             {
                 PrepareForEncounter();
-                events.ScheduleEvent(EVENT_ENCOUNTER_START, 2000);
+                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
             }
         }
     };
@@ -452,24 +457,7 @@ public:
 
         void Reset() override
         {
-            encounterStarted = false;
-            playerGUID.Clear();
-
-            if (InNormalForm())
-            {
-                me->m_Events.KillAllEvents(true);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-        }
-
-        void AttackStart(Unit* target) override
-        {
-            if (playerGUID.IsEmpty() && !InNormalForm())
-            {
-                StorePlayerGUID();
-            }
-
-            ScriptedAI::AttackStart(target);
+            ResetState();
         }
 
         void EnterCombat(Unit* /*victim*/) override
@@ -485,7 +473,6 @@ public:
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
                 if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
                 {
-                    playerGUID.Clear();
                     EnterEvadeMode();
                     return;
                 }
@@ -527,7 +514,6 @@ public:
         npc_simoneAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
-        bool petDespawned;
         ObjectGuid preciousGUID;
 
         void SetPreciousGUID()
@@ -605,8 +591,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            // Prevent looting if recipient doesn't have the quest
-            ClearLootIfUnfair(killer);
+            NPCStaveQuestAI::JustDied(killer);
 
             if (!Precious())
             {
@@ -651,33 +636,10 @@ public:
 
         void Reset() override
         {
-            encounterStarted = false;
-            playerGUID.Clear();
-            attackerGuids.clear();
+            ResetState(SIMONE_SPELL_SILENCE);
             events.Reset();
 
-            if (InNormalForm())
-            {
-                me->m_Events.KillAllEvents(true);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-
             events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 2000);
-
-            if (me->HasAura(SIMONE_SPELL_SILENCE))
-            {
-                me->RemoveAura(SIMONE_SPELL_SILENCE);
-            }
-        }
-
-        void AttackStart(Unit* target) override
-        {
-            if (playerGUID.IsEmpty() && !InNormalForm())
-            {
-                StorePlayerGUID();
-            }
-
-            ScriptedAI::AttackStart(target);
         }
 
         void EnterCombat(Unit* victim) override
@@ -699,11 +661,6 @@ public:
             }
 
             events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
-        }
-
-        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-        {
-            StoreAttackerGuidValue(attacker);
         }
 
         void UpdateAI(uint32 diff) override
@@ -756,7 +713,6 @@ public:
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
                 if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
                 {
-                    playerGUID.Clear();
                     EnterEvadeMode();
                     return;
                 }
@@ -798,7 +754,6 @@ public:
                         SetHomePosition();
                         PreciousAI()->SetHomePosition();
 
-                        petDespawned = true;
                         Precious()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
 
@@ -904,12 +859,6 @@ public:
             }
         }
 
-        void JustDied(Unit* killer) override
-        {
-            // Prevent looting if killer doesn't have the quest
-            ClearLootIfUnfair(killer);
-        }
-
         void SummonedCreatureDies(Creature* /*summon*/, Unit* killer) override
         {
             // This should trigger the despawn event when a another player or unit
@@ -922,34 +871,11 @@ public:
 
         void Reset() override
         {
-            encounterStarted = false;
+            ResetState(NELSON_SPELL_CRIPPLING_CLIP);
             shouldDespawn = false;
-            playerGUID.Clear();
-            attackerGuids.clear();
             events.Reset();
 
-            if (InNormalForm())
-            {
-                me->m_Events.KillAllEvents(true);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-
             me->RemoveAllMinionsByEntry(CREEPING_DOOM_ENTRY);
-
-            if (me->HasAura(NELSON_SPELL_CRIPPLING_CLIP))
-            {
-                me->RemoveAura(NELSON_SPELL_CRIPPLING_CLIP);
-            }
-        }
-
-        void AttackStart(Unit* target) override
-        {
-            if (playerGUID.IsEmpty() && !InNormalForm())
-            {
-                StorePlayerGUID();
-            }
-
-            ScriptedAI::AttackStart(target);
         }
 
         void EnterCombat(Unit* victim) override
@@ -1003,7 +929,6 @@ public:
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
                 if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
                 {
-                    playerGUID.Clear();
                     EnterEvadeMode();
                     return;
                 }
@@ -1085,11 +1010,6 @@ public:
             }
         }
 
-        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-        {
-            StoreAttackerGuidValue(attacker);
-        }
-
         void DoAction(int32 action) override
         {
             if (action == EVENT_ENCOUNTER_START)
@@ -1138,34 +1058,10 @@ public:
 
         EventMap events;
 
-        void JustDied(Unit* killer) override
-        {
-            // Prevent looting if killer doesn't have the quest
-            ClearLootIfUnfair(killer);
-        }
-
         void Reset() override
         {
-            encounterStarted = false;
-            playerGUID.Clear();
-            attackerGuids.clear();
+            ResetState();
             events.Reset();
-
-            if (InNormalForm())
-            {
-                me->m_Events.KillAllEvents(true);
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-        }
-
-        void AttackStart(Unit* target) override
-        {
-            if (playerGUID.IsEmpty() && !InNormalForm())
-            {
-                StorePlayerGUID();
-            }
-
-            ScriptedAI::AttackStart(target);
         }
 
         void EnterCombat(Unit* victim) override
@@ -1212,7 +1108,6 @@ public:
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
                 if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
                 {
-                    playerGUID.Clear();
                     EnterEvadeMode();
                     return;
                 }
@@ -1262,7 +1157,7 @@ public:
                     events.RepeatEvent(2000);
                     break;
                 case FRANKLIN_EVENT_DEMONIC_ENRAGE:
-                    me->CastSpell(me, FRANKLIN_SPELL_DEMONIC_ENRAGE, false);
+                    me->CastSpell(me, SPELL_DEMONIC_ENRAGE, false);
                     me->MonsterTextEmote(FRANKLIN_ENRAGE_EMOTE, 0);
                     events.RepeatEvent(urand(9000, 22000));
                     break;
@@ -1282,11 +1177,6 @@ public:
             {
                 me->CastSpell(me, FRANKLIN_SPELL_ENTROPIC_STING, false);
             }
-        }
-
-        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-        {
-            StoreAttackerGuidValue(attacker);
         }
 
         void ScheduleEncounterStart(ObjectGuid playerGUID)
