@@ -5,7 +5,7 @@
  */
 
 #include "GameEventMgr.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "OutdoorPvPGH.h"
 #include "OutdoorPvPMgr.h"
 #include "Player.h"

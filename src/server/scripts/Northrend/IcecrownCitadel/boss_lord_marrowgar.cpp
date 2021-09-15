@@ -3,7 +3,7 @@
 */
 
 #include "icecrown_citadel.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"

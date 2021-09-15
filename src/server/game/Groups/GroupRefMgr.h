@@ -7,16 +7,16 @@
 #ifndef _GROUPREFMANAGER
 #define _GROUPREFMANAGER
 
-#include "RefManager.h"
+#include "RefMgr.h"
 
 class Group;
 class Player;
 class GroupReference;
 
-class GroupRefManager : public RefManager<Group, Player>
+class GroupRefMgr : public RefMgr<Group, Player>
 {
 public:
-    GroupReference* getFirst() { return ((GroupReference*)RefManager<Group, Player>::getFirst()); }
-    GroupReference const* getFirst() const { return ((GroupReference const*)RefManager<Group, Player>::getFirst()); }
+    GroupReference* getFirst() { return ((GroupReference*)RefMgr<Group, Player>::getFirst()); }
+    GroupReference const* getFirst() const { return ((GroupReference const*)RefMgr<Group, Player>::getFirst()); }
 };
 #endif
