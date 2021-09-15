@@ -5,7 +5,7 @@
  */
 
 #include "AccountMgr.h"
-#include "BanManager.h"
+#include "BanMgr.h"
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "Log.h"

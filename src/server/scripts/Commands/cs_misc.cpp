@@ -18,7 +18,7 @@
 #include "IPLocation.h"
 #include "Language.h"
 #include "LFG.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -2620,7 +2620,7 @@ public:
             return false;
 
         target->CombatStop();
-        target->getHostileRefManager().deleteReferences();
+        target->getHostileRefMgr().deleteReferences();
         return true;
     }
 

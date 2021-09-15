@@ -12,7 +12,7 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "ThreatManager.h"
+#include "ThreatMgr.h"
 #include "Unit.h"
 #include "UnitEvents.h"
 
@@ -80,11 +80,11 @@ bool ThreatCalcHelper::isValidProcess(Unit* hatedUnit, Unit* hatingUnit, SpellIn
 //================= HostileReference ==========================
 //============================================================
 
-HostileReference::HostileReference(Unit* refUnit, ThreatManager* threatManager, float threat)
+HostileReference::HostileReference(Unit* refUnit, ThreatMgr* threatMgr, float threat)
 {
     iThreat = threat;
     iTempThreatModifier = 0.0f;
-    link(refUnit, threatManager);
+    link(refUnit, threatMgr);
     iUnitGuid = refUnit->GetGUID();
     iOnline = true;
 }
@@ -382,16 +382,16 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
 }
 
 //============================================================
-//=================== ThreatManager ==========================
+//=================== ThreatMgr ==========================
 //============================================================
 
-ThreatManager::ThreatManager(Unit* owner) : iCurrentVictim(nullptr), iOwner(owner), iUpdateTimer(THREAT_UPDATE_INTERVAL)
+ThreatMgr::ThreatMgr(Unit* owner) : iCurrentVictim(nullptr), iOwner(owner), iUpdateTimer(THREAT_UPDATE_INTERVAL)
 {
 }
 
 //============================================================
 
-void ThreatManager::clearReferences()
+void ThreatMgr::clearReferences()
 {
     iThreatContainer.clearReferences();
     iThreatOfflineContainer.clearReferences();
@@ -401,7 +401,7 @@ void ThreatManager::clearReferences()
 
 //============================================================
 
-void ThreatManager::addThreat(Unit* victim, float threat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
+void ThreatMgr::addThreat(Unit* victim, float threat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
 {
     if (!ThreatCalcHelper::isValidProcess(victim, GetOwner(), threatSpell))
         return;
@@ -409,7 +409,7 @@ void ThreatManager::addThreat(Unit* victim, float threat, SpellSchoolMask school
     doAddThreat(victim, ThreatCalcHelper::calcThreat(victim, iOwner, threat, schoolMask, threatSpell));
 }
 
-void ThreatManager::doAddThreat(Unit* victim, float threat)
+void ThreatMgr::doAddThreat(Unit* victim, float threat)
 {
     uint32 redirectThreadPct = victim->GetRedirectThreatPercent();
 
@@ -428,7 +428,7 @@ void ThreatManager::doAddThreat(Unit* victim, float threat)
     _addThreat(victim, threat);
 }
 
-void ThreatManager::_addThreat(Unit* victim, float threat)
+void ThreatMgr::_addThreat(Unit* victim, float threat)
 {
     HostileReference* ref = iThreatContainer.addThreat(victim, threat);
     // Ref is not in the online refs, search the offline refs next
@@ -448,14 +448,14 @@ void ThreatManager::_addThreat(Unit* victim, float threat)
 
 //============================================================
 
-void ThreatManager::modifyThreatPercent(Unit* victim, int32 percent)
+void ThreatMgr::modifyThreatPercent(Unit* victim, int32 percent)
 {
     iThreatContainer.modifyThreatPercent(victim, percent);
 }
 
 //============================================================
 
-Unit* ThreatManager::getHostilTarget()
+Unit* ThreatMgr::getHostilTarget()
 {
     iThreatContainer.update();
     HostileReference* nextVictim = iThreatContainer.selectNextVictim(GetOwner()->ToCreature(), getCurrentVictim());
@@ -465,7 +465,7 @@ Unit* ThreatManager::getHostilTarget()
 
 //============================================================
 
-float ThreatManager::getThreat(Unit* victim, bool alsoSearchOfflineList)
+float ThreatMgr::getThreat(Unit* victim, bool alsoSearchOfflineList)
 {
     float threat = 0.0f;
     HostileReference* ref = iThreatContainer.getReferenceByTarget(victim);
@@ -478,7 +478,7 @@ float ThreatManager::getThreat(Unit* victim, bool alsoSearchOfflineList)
 
 //============================================================
 
-float ThreatManager::getThreatWithoutTemp(Unit* victim, bool alsoSearchOfflineList)
+float ThreatMgr::getThreatWithoutTemp(Unit* victim, bool alsoSearchOfflineList)
 {
     float threat = 0.0f;
     HostileReference* ref = iThreatContainer.getReferenceByTarget(victim);
@@ -491,7 +491,7 @@ float ThreatManager::getThreatWithoutTemp(Unit* victim, bool alsoSearchOfflineLi
 
 //============================================================
 
-void ThreatManager::tauntApply(Unit* taunter)
+void ThreatMgr::tauntApply(Unit* taunter)
 {
     HostileReference* ref = iThreatContainer.getReferenceByTarget(taunter);
     if (getCurrentVictim() && ref && (ref->getThreat() < getCurrentVictim()->getThreat()))
@@ -503,7 +503,7 @@ void ThreatManager::tauntApply(Unit* taunter)
 
 //============================================================
 
-void ThreatManager::tauntFadeOut(Unit* taunter)
+void ThreatMgr::tauntFadeOut(Unit* taunter)
 {
     HostileReference* ref = iThreatContainer.getReferenceByTarget(taunter);
     if (ref)
@@ -512,7 +512,7 @@ void ThreatManager::tauntFadeOut(Unit* taunter)
 
 //============================================================
 
-void ThreatManager::setCurrentVictim(HostileReference* pHostileReference)
+void ThreatMgr::setCurrentVictim(HostileReference* pHostileReference)
 {
     if (pHostileReference && pHostileReference != iCurrentVictim)
     {
@@ -525,9 +525,9 @@ void ThreatManager::setCurrentVictim(HostileReference* pHostileReference)
 // The hated unit is gone, dead or deleted
 // return true, if the event is consumed
 
-void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent)
+void ThreatMgr::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent)
 {
-    threatRefStatusChangeEvent->setThreatManager(this);     // now we can set the threat manager
+    threatRefStatusChangeEvent->setThreatMgr(this);     // now we can set the threat manager
 
     HostileReference* hostilRef = threatRefStatusChangeEvent->getReference();
 
@@ -576,7 +576,7 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
     }
 }
 
-bool ThreatManager::isNeedUpdateToClient(uint32 time)
+bool ThreatMgr::isNeedUpdateToClient(uint32 time)
 {
     if (isThreatListEmpty())
         return false;
@@ -591,7 +591,7 @@ bool ThreatManager::isNeedUpdateToClient(uint32 time)
 }
 
 // Reset all aggro without modifying the threatlist.
-void ThreatManager::resetAllAggro()
+void ThreatMgr::resetAllAggro()
 {
     ThreatContainer::StorageType& threatList = iThreatContainer.iThreatList;
     if (threatList.empty())

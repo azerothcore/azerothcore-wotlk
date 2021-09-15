@@ -380,7 +380,7 @@ public:
         void HandleDummy(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetCaster()->getThreatManager().resetAllAggro();
+            GetCaster()->getThreatMgr().resetAllAggro();
             if (Unit* target = GetHitUnit())
                 GetCaster()->CastSpell(target, SPELL_BLINK, true);
         }
