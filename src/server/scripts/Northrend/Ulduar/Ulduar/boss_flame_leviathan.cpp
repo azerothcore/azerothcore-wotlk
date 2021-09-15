@@ -1655,7 +1655,7 @@ public:
             if (!target || !caster)
                 return;
 
-            caster->getThreatManager().resetAllAggro();
+            caster->getThreatMgr().resetAllAggro();
             caster->GetAI()->AttackStart(target);    // Chase target
             caster->AddThreat(target, 10000000.0f);
         }

@@ -2,7 +2,7 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -2405,7 +2405,7 @@ public:
                 case SPELL_WATER_SPRAY:
                     {
                         if (me->IsSummon())
-                            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                                 if (Creature* c = summoner->ToCreature())
                                     if (c->AI())
                                         CAST_AI(npc_ulduar_flames_initial::npc_ulduar_flames_initialAI, c->AI())->RemoveFlame(me->GetGUID());

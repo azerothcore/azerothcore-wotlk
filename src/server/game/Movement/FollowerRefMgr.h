@@ -7,12 +7,12 @@
 #ifndef _FOLLOWERREFMANAGER
 #define _FOLLOWERREFMANAGER
 
-#include "RefManager.h"
+#include "RefMgr.h"
 
 class Unit;
 class TargetedMovementGeneratorBase;
 
-class FollowerRefManager : public RefManager<Unit, TargetedMovementGeneratorBase>
+class FollowerRefMgr : public RefMgr<Unit, TargetedMovementGeneratorBase>
 {
 };
 #endif
