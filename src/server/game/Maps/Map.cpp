@@ -2809,7 +2809,7 @@ Map::EnterState InstanceMap::CannotEnter(Player* player, bool loginCheck)
     {
         LOG_ERROR("maps", "InstanceMap::CanEnter - player %s (%s) already in map %d, %d, %d!",
             player->GetName().c_str(), player->GetGUID().ToString().c_str(), GetId(), GetInstanceId(), GetSpawnMode());
-        ABORT();
+
         return CANNOT_ENTER_ALREADY_IN_MAP;
     }
 
