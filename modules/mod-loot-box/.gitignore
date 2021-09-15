@@ -1,0 +1,104 @@
+build
+!.gitignore
+
+#
+#Generic
+#
+
+.directory
+.mailmap
+*.orig
+*.rej
+*.*~
+.hg/
+*.kdev*
+.DS_Store
+CMakeLists.txt.user
+*.bak
+*.patch
+*.diff
+*.REMOTE.*
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+
+#
+# IDE & other softwares
+#
+/.settings/
+/.externalToolBuilders/*
+# exclude in all levels
+nbproject/
+.sync.ffs_db
+*.kate-swp
+
+#
+# Eclipse
+#
+*.pydevproject
+.metadata
+.gradle
+tmp/
+*.tmp
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.project
+.cproject
+
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,c++
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,c++
+
+### C++ ###
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
+
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,c++

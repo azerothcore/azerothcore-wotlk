@@ -1,0 +1,3 @@
+-- Put only sql data in this file (insert, update, replace into, delete etc...).
+-- If you don't use this database, then delete this file.
+-- If no data, just delete this file.

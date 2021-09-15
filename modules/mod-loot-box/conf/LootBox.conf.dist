@@ -1,0 +1,157 @@
+[worldserver]
+
+########################################
+# Loot box configuration
+########################################
+#
+#    LootBox.Enable
+#        Description: Enable the module and print a message on login.
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+
+LootBox.Enable = 1
+
+#
+#    LootBox.StackSize
+#        Description: Number of items obtained out of a loot box if they're stackable.
+#        Default:     5
+#
+
+LootBox.StackSize = 5
+
+#
+#    LootBox.FiveStarRate
+#        Description: Chance of getting an epic item out of a loot box.
+#        Default:     0.006 (0.6%)
+#
+
+LootBox.FiveStarRate = 0.006
+
+#
+#    LootBox.FourStarRate
+#        Description: Chance of getting a rare item out of a loot box.
+#        Default:     0.051 (5.1%)
+#
+
+LootBox.FourStarRate = 0.051
+
+#
+#    LootBox.PromotionalGuarantee
+#        Description: Number of epics before guaranteed a promotional event item.
+#        Default:     2 (50/50)
+#
+
+LootBox.PromotionalGuarantee = 2;
+
+#
+#    LootBox.FiveStarGuarantee
+#        Description: Number of loot boxes to guarantee a standard epic item.
+#        Default:     90
+#
+
+LootBox.FiveStarGuarantee = 90
+
+#
+#    LootBox.FeaturedGuarantee
+#        Description: Number of rares to guarantee a featured event item.
+#        Default:     2 (50/50)
+#
+
+LootBox.FeaturedGuarantee = 2;
+
+#
+#    LootBox.FourStarGuarantee
+#        Description: Number of loot boxes to guarantee a standard rare item.
+#        Default:     2
+#
+
+LootBox.FourStarGuarantee = 10
+
+#
+#    LootBox.NPC
+#        Description: The entry ID of the loot box NPC.
+#        Default:     5126979
+#
+
+LootBox.NPC = 5126979
+
+#
+#    LootBox.Box
+#        Description: The item ID of the loot box.
+#        Default:     5621798
+#
+
+LootBox.Box = 5621798
+
+#
+#    LootBox.Promotionals
+#        Description: The item IDs of the promotional event items.
+#        Default:     "45037"
+#
+
+LootBox.Promotions = "45037"
+
+#
+#    LootBox.Features
+#        Description: The item IDs of the featured event items.
+#        Default:     "19160,33223,32588"
+#
+
+LootBox.Features = "19160,33223,32588"
+
+#
+#    LootBox.FiveStars
+#        Description: The item IDs of the standard epic items.
+#        Default:     ""
+#
+
+LootBox.FiveStars = ""
+
+#
+#    LootBox.FourStars
+#        Description: The item IDs of the standard rare items.
+#        Default:     ""
+#
+
+LootBox.FourStars = ""
+
+#
+#    LootBox.ThreeStar
+#        Description: The item IDs of the common items.
+#        Default:     "46779,38577"
+#
+
+LootBox.ThreeStars = "46779,54455"
+
+#
+#    LootBox.CustomCurrency
+#        Description: ID of the custom currency
+#        Default:     37711
+#
+
+LootBox.CustomCurrency = 37711
+
+#
+#    LootBox.DailyReward
+#        Description: Daily reward in custom currency.
+#        Default:     90
+#
+
+LootBox.DailyReward = 90
+
+#
+#    LootBox.LevelReward
+#        Description: Reward for leveling up in custom currency.
+#        Default:     75
+#
+
+LootBox.LevelReward = 75
+
+#
+#    LootBox.KillReward
+#        Description: Reward for leveling up in custom currency.
+#        Default:     10
+#
+
+LootBox.KillReward = 10

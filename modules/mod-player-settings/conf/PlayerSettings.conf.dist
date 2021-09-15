@@ -1,0 +1,40 @@
+[worldserver]
+
+########################################
+# Player Settings configuration
+########################################
+#
+#    PlayerSettings.Enable
+#        Description: Enable scaling of mobs' health, damage, and XP to number of players
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+
+PlayerSettings.Enable = 1
+
+#
+#    PlayerSettings.HealthMultiplier
+#        Description: An additive multiplier to scale mob health to number of players
+#        Example: With 0.5 the mob gains +50% health for each player
+#        Default:     0.5
+#
+
+PlayerSettings.HealthMultiplier = 0.5
+
+#
+#    PlayerSettings.DamageMultiplier
+#        Description: An additive multiplier to scale mob damage to number of players
+#        Example: With 0.0625 the mob gains +6.25% damage for each player
+#        Default:     0.0625
+#
+
+PlayerSettings.DamageMultiplier = 0.0625
+
+#
+#    PlayerSettings.ExperienceMultiplier
+#        Description: An additive multiplier to grant more experience per player
+#        Example: With 0.5 the player gains +50% experience for each player
+#        Default:     0.5
+#
+
+PlayerSettings.ExperienceMultiplier = 0.5

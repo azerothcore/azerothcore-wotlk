@@ -1,0 +1,6 @@
+#ifndef _PLAYER_SETTINGS_MODULE_LOADER_H_
+#define _PLAYER_SETTINGS_MODULE_LOADER_H_
+
+void AddPlayerSettingsScripts();
+
+#endif // _PLAYER_SETTINGS_MODULE_LOADER_H_
