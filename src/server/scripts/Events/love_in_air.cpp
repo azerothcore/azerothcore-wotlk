@@ -261,7 +261,7 @@ public:
                 if (Talk(actionCounter))
                 {
                     if (me->ToTempSummon())
-                        if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                        if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                             me->CastSpell(owner, SPELL_SNIVEL_GUN, true);
 
                     me->DespawnOrUnsummon(1000);

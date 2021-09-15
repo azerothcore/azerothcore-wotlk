@@ -648,7 +648,7 @@ public:
             NullCreatureAI::InitializeAI();
 
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* owner = summon->GetSummoner())
+                if (Unit* owner = summon->GetSummonerUnit())
                     if (owner->GetTypeId() == TYPEID_PLAYER)
                     {
                         _ownerGUID = owner->GetGUID();
