@@ -12737,11 +12737,11 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
             {
                 target->ToCreature()->AI()->AttackStart(this);
                 // if the target is an NPC with a pet or minion, pet should react.
-                if (Unit* TargetControlledUnit = target->GetFirstControlled())
+                if (Unit* targetControlledUnit = target->GetFirstControlled())
                 {
-                    TargetControlledUnit->SetInCombatWith(this);
-                    SetInCombatWith(TargetControlledUnit);
-                    TargetControlledUnit->AddThreat(this, 0.0f);
+                    targetControlledUnit->SetInCombatWith(this);
+                    SetInCombatWith(targetControlledUnit);
+                    targetControlledUnit->AddThreat(this, 0.0f);
                 }
             }
 
