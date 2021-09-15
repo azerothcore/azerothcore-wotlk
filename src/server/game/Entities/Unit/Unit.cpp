@@ -12718,41 +12718,41 @@ void Unit::SetInCombatWith(Unit* enemy, uint32 duration)
     SetInCombatState(false, enemy, duration);
 }
 
-void Unit::CombatStart(Unit* vicitm, bool initialAggro)
+void Unit::CombatStart(Unit* victim, bool initialAggro)
 {
     // Xinef: Dont allow to start combat with triggers
-    if (vicitm->GetTypeId() == TYPEID_UNIT && vicitm->ToCreature()->IsTrigger())
+    if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsTrigger())
         return;
 
     if (initialAggro)
     {
-        // Make player vicitm stand up automatically
-        if (vicitm->getStandState() && vicitm->IsPlayer())
+        // Make player victim stand up automatically
+        if (victim->getStandState() && victim->IsPlayer())
         {
-            vicitm->SetStandState(UNIT_STAND_STATE_STAND);
+            victim->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        if (!vicitm->IsInCombat() && vicitm->GetTypeId() != TYPEID_PLAYER && !vicitm->ToCreature()->HasReactState(REACT_PASSIVE) && vicitm->ToCreature()->IsAIEnabled)
+        if (!victim->IsInCombat() && victim->GetTypeId() != TYPEID_PLAYER && !victim->ToCreature()->HasReactState(REACT_PASSIVE) && victim->ToCreature()->IsAIEnabled)
         {
-            if (vicitm->IsPet())
-                vicitm->ToCreature()->AI()->AttackedBy(this); // PetAI has special handler before AttackStart()
+            if (victim->IsPet())
+                victim->ToCreature()->AI()->AttackedBy(this); // PetAI has special handler before AttackStart()
             else
-                vicitm->ToCreature()->AI()->AttackStart(this);
+                victim->ToCreature()->AI()->AttackStart(this);
         }
 
-        SetInCombatWith(vicitm);
-        vicitm->SetInCombatWith(this);
-        vicitm->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+        SetInCombatWith(victim);
+        victim->SetInCombatWith(this);
+        victim->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
         // Xinef: If pet started combat - put owner in combat
         if (Unit* owner = GetOwner())
         {
-            owner->SetInCombatWith(vicitm);
-            vicitm->SetInCombatWith(owner);
+            owner->SetInCombatWith(victim);
+            victim->SetInCombatWith(owner);
         }
     }
 
-    Unit* who = vicitm->GetCharmerOrOwnerOrSelf();
+    Unit* who = victim->GetCharmerOrOwnerOrSelf();
     if (who->GetTypeId() == TYPEID_PLAYER)
         SetContestedPvP(who->ToPlayer());
 
