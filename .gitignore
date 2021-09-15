@@ -4,9 +4,6 @@
 
 /conf/*
 !/conf/dist
-/modules/*
-!/modules/*.md
-!/modules/*.sh
 /build*/
 /var/*
 !/var/build/.gitkeep
@@ -87,8 +84,29 @@ local.properties
 #
 #  put below your custom ignore rules
 #  for example , if you want to include a
-#  module directly in repositoryyou can do:
+#  module directly in repository you can do:
 #
 #  !modules/yourmodule
 #
 # ==================
+
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
+
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
