@@ -7,6 +7,8 @@ UPDATE `gameobject` SET `position_x`=-8338.47, `position_y`=509.136, `position_z
 UPDATE `gameobject` SET `position_x`=-8347.64, `position_y`=520.972, `position_z`=122.939, `orientation`=0, `rotation0`=-0.307199,
 `rotation1`=-0.636889, `rotation2`=-0.307198, `rotation3`=0.63689, `animprogress`=100 WHERE `id`=177202;
 
+DELETE FROM `game_event_gameobject` WHERE `guid`=31619;
+
 DELETE FROM `gameobject_addon` WHERE `guid` IN (20458,20459,31619);
 INSERT INTO `gameobject_addon` VALUES
 (20458,0,0),
