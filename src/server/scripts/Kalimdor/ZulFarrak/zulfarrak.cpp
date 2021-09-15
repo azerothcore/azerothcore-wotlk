@@ -102,14 +102,16 @@ public:
                             break;
                         case 3:
                             me->setFaction(14);
-                            if (Player* target = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+                            Player* target = ObjectAccessor::GetPlayer(*me, PlayerGUID);
+
+                            switchFactionIfAlive(NPC_RAVEN, target);
+                            switchFactionIfAlive(NPC_ORO, target);
+                            switchFactionIfAlive(NPC_MURTA, target);
+
+                            if (target)
                             {
                                 AttackStart(target);
                             }
-
-                            switchFactionIfAlive(NPC_RAVEN);
-                            switchFactionIfAlive(NPC_ORO);
-                            switchFactionIfAlive(NPC_MURTA);
                     }
 
                     postGossipStep++;
@@ -154,13 +156,18 @@ public:
             Text_Timer = 0;
         }
 
-        void switchFactionIfAlive(uint32 entry)
+        void switchFactionIfAlive(uint32 entry, Player* target)
         {
             if (Creature* crew = ObjectAccessor::GetCreature(*me, instance->GetGuidData(entry)))
             {
                 if (crew->IsAlive())
                 {
                     crew->setFaction(14);
+
+                    if (target)
+                    {
+                        crew->AI()->AttackStart(target);
+                    }
                 }
             }
         }
@@ -180,7 +187,7 @@ public:
 
         void sGossipHello(Player* player) override
         {
-            if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+            if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BLY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 1517, me->GetGUID());
@@ -342,13 +349,22 @@ public:
             }
         }
 
-        void MovementInform(uint32 /*type*/, uint32 /*id*/) override
+        void MovementInform(uint32 type, uint32 /*id*/) override
         {
+            if (type != POINT_MOTION_TYPE)
+            {
+                return;
+            }
+
             if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN)
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
                 me->SetHomePosition(1882.69f, 1272.28f, 41.87f, 0);
+            }
+            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+            {
+                instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
             }
             else
             {
@@ -369,6 +385,7 @@ public:
                 me->GetMotionMaster()->MovePoint(0, 1858.57f, 1146.35f, 14.745f);
                 me->SetHomePosition(1858.57f, 1146.35f, 14.745f, 3.85f); // in case he gets interrupted
                 Talk(SAY_WEEGLI_OK_I_GO);
+                instance->SetData(DATA_PYRAMID, PYRAMID_DESTROY_GATES);
                 destroyingDoor = true;
             }
         }
@@ -390,7 +407,7 @@ public:
         {
             switch (instance->GetData(DATA_PYRAMID))
             {
-                case PYRAMID_KILLED_ALL_TROLLS:
+                case PYRAMID_MOVED_DOWNSTAIRS:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WEEGLI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     SendGossipMenuFor(player, 1514, me->GetGUID());  //if event can proceed to end
                     break;

@@ -237,6 +237,9 @@ public:
             {
                 case PYRAMID_NOT_STARTED:
                 case PYRAMID_KILLED_ALL_TROLLS:
+                case PYRAMID_MOVED_DOWNSTAIRS:
+                case PYRAMID_DESTROY_GATES:
+                case PYRAMID_DONE:
                     break;
                 case PYRAMID_ARRIVED_AT_STAIR:
                     SpawnPyramidWave(1);
