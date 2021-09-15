@@ -12737,11 +12737,11 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
             {
                 target->ToCreature()->AI()->AttackStart(this);
                 // if the target is an NPC with a pet or minion, pet should react.
-                if (Unit* controlled = target->GetFirstControlled())
+                if (Unit* TargetControlledUnit = target->GetFirstControlled())
                 {
-                    controlled->SetInCombatWith(this);
-                    SetInCombatWith(controlled);
-                    controlled->AddThreat(this, 0.0f);
+                    TargetControlledUnit->SetInCombatWith(this);
+                    SetInCombatWith(TargetControlledUnit);
+                    TargetControlledUnit->AddThreat(this, 0.0f);
                 }
             }
 
@@ -12752,7 +12752,7 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
                 {
                     /* warding off to not take over aggro for no reason
                     Using only AddThreat causes delay in attack */
-                    if (!targetOwner->IsInCombat())
+                    if (!targetOwner->IsInCombat() && targetOwner->IsAIEnabled)
                     {
                         targetOwner->ToCreature()->AI()->AttackStart(this);
                     }
