@@ -157,10 +157,6 @@ void AutobroadcastMgr::Send()
             sendAsNotification(localeId, message.c_str());
             break;
         }
-    }
-
-    for (const auto& [locale, message] : msg)
-    {
-        LOG_DEBUG("server.worldserver", "AutoBroadcast: localeId: '%u', Msg: '%s'", locale, message.c_str());
+        LOG_DEBUG("server.worldserver", "AutoBroadcast: localeId: '%u', Msg: '%s'", localeId, message.c_str());
     }
 }
