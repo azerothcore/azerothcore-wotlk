@@ -13,7 +13,7 @@
 #include "RegularGrid.h"
 #include "Timer.h"
 #include "VMapFactory.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 #include "WorldModel.h"
 
 #include <G3D/AABox.h>
@@ -317,7 +317,7 @@ void DynamicMapTree::GetAreaAndLiquidData(float x, float y, float z, uint32 phas
         data.floorZ = intersectionCallBack.GetLocationInfo().ground_Z;
         uint32 liquidType = intersectionCallBack.GetLocationInfo().hitModel->GetLiquidType();
         float liquidLevel;
-        if (!reqLiquidType || (dynamic_cast<VMAP::VMapManager2*>(VMAP::VMapFactory::createOrGetVMapManager())->GetLiquidFlagsPtr(liquidType) & reqLiquidType))
+        if (!reqLiquidType || (dynamic_cast<VMAP::VMapMgr2*>(VMAP::VMapFactory::createOrGetVMapMgr())->GetLiquidFlagsPtr(liquidType) & reqLiquidType))
             if (intersectionCallBack.GetHitModel()->GetLiquidLevel(v, intersectionCallBack.GetLocationInfo(), liquidLevel))
                 data.liquidInfo.emplace(liquidType, liquidLevel);
 

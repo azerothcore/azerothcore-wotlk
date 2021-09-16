@@ -7,7 +7,7 @@
 #include "GameGraveyard.h"
 #include "GameObject.h"
 #include "Language.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPEP.h"

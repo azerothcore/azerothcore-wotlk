@@ -9,7 +9,7 @@
 #include "Common.h"
 #include "DBCStores.h"
 #include "GameObjectAI.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MapReference.h"
 #include "ObjectMgr.h"
 #include "Player.h"
