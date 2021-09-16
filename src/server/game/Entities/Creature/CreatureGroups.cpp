@@ -95,15 +95,15 @@ void FormationMgr::LoadCreatureFormations()
         group_member.point_1               = fields[5].GetUInt16();
         group_member.point_2               = fields[6].GetUInt16();
 
-        if (group_member.groupAI && !group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
-        {
-            LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
-            continue;
-        }
-
         //If creature is group leader we may skip loading of dist/angle
         if (group_member.leaderGUID != memberGUID)
         {
+            if (!group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
+            {
+                LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
+                continue;
+            }
+
             if (!group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)) && (follow_dist > 0.0f || follow_angle > 0.0f))
             {
                 LOG_ERROR("sql.sql", "creature_formations table member guid %u and leader guid %u cannot have follow distance or follow angle because don't have GROUP_AI_FLAG_FOLLOW_LEADER flag. Values are not gonna be used", memberGUID, group_member.leaderGUID);
@@ -118,6 +118,13 @@ void FormationMgr::LoadCreatureFormations()
         }
         else
         {
+            // Leader can have 0 AI flags - its allowed
+            if (group_member.groupAI && !group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
+            {
+                LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
+                continue;
+            }
+
             group_member.follow_dist       = 0.0f;
             group_member.follow_angle      = 0.0f;
             if ((group_member.leaderGUID == memberGUID || !group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER))) && (follow_dist > 0.0f || follow_angle > 0.0f))
