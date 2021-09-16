@@ -572,7 +572,7 @@ public:
             {
                 checkTimer = 3000;
                 me->SetInCombatWithZone();
-                ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
                 if (!threatList.empty())
                     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                         if (Unit* target = (*itr)->getTarget())

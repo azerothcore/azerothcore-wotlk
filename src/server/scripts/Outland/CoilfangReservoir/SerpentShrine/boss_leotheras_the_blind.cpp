@@ -342,7 +342,7 @@ public:
         void HandleScriptEffect(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetCaster()->getThreatManager().resetAllAggro();
+            GetCaster()->getThreatMgr().resetAllAggro();
 
             if (roll_chance_i(33))
                 if (Unit* target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))

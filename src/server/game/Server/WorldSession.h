@@ -14,7 +14,7 @@
 #include "AccountMgr.h"
 #include "AuthDefines.h"
 #include "AddonMgr.h"
-#include "BanManager.h"
+#include "BanMgr.h"
 #include "CircularBuffer.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
