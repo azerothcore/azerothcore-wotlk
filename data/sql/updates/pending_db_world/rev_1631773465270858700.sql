@@ -3,6 +3,15 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631773465270858700');
 SET @Entry = 35010;
 
 UPDATE 
+	`creature_loot_template`
+SET
+	`Chance` = 36
+WHERE
+	`Entry` IN (5712, 5713, 5714, 5715, 5716, 5717)
+AND
+	`Item` = @Entry;
+
+UPDATE 
 	`reference_loot_template` 
 SET 
 	`Chance` = 
