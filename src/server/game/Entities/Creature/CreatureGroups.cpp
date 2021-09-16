@@ -99,8 +99,9 @@ void FormationMgr::LoadCreatureFormations()
         FormationInfo* group_member         = new FormationInfo();
         group_member->leaderGUID            = fields[0].GetUInt32();
         ObjectGuid::LowType const memberGUID = fields[1].GetUInt32();
-        float const follow_dist       = fields[2].GetFloat();
-        float const follow_angle      = fields[3].GetFloat() * static_cast<float>(M_PI) / 180;
+        float const follow_dist             = fields[2].GetFloat();
+        float const follow_angle            = fields[3].GetFloat() * static_cast<float>(M_PI) / 180;
+        group_member->groupAI               = fields[4].GetUInt16();
 
         //If creature is group leader we may skip loading of dist/angle
         if (group_member->leaderGUID != memberGUID)
@@ -112,18 +113,17 @@ void FormationMgr::LoadCreatureFormations()
         {
             group_member->follow_dist       = 0.0f;
             group_member->follow_angle      = 0.0f;
-            if (follow_dist > 0.0f || follow_angle > 0.0f)
+            if ((group_member->leaderGUID == memberGUID || !group_member->HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER))) && (follow_dist > 0.0f || follow_angle > 0.0f))
             {
-                LOG_ERROR("sql.sql", "creature_formations table leader guid %u cannot have follow distance or follow angle. Values are not gonna be used", group_member->leaderGUID);
+                LOG_ERROR("sql.sql", "creature_formations table member guid %u cannot have follow distance or follow angle. Values are not gonna be used", group_member->leaderGUID);
             }
         }
-
-        group_member->groupAI               = fields[4].GetUInt16();
 
         if (!(group_member->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
         {
             LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u).", group_member->leaderGUID, memberGUID, group_member->groupAI);
         }
+
 
         group_member->point_1               = fields[5].GetUInt16();
         group_member->point_2               = fields[6].GetUInt16();
