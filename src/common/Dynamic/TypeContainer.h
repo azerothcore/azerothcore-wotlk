@@ -14,7 +14,7 @@
 
 #include "Define.h"
 #include "Dynamic/TypeList.h"
-#include "GridRefManager.h"
+#include "GridRefMgr.h"
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -28,7 +28,7 @@ template<class OBJECT>
 struct ContainerMapList
 {
     //std::map<OBJECT_HANDLE, OBJECT *> _element;
-    GridRefManager<OBJECT> _element;
+    GridRefMgr<OBJECT> _element;
 };
 
 template<>

@@ -425,7 +425,7 @@ public:
                 case EVENT_DETONATE_MANA:
                     {
                         std::vector<Unit*> unitList;
-                        ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
+                        ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
                         for (auto itr : threatList)
                         {
                             if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER

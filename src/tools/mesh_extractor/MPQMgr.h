@@ -14,11 +14,11 @@
 #include <map>
 
 class DBC;
-class MPQManager
+class MPQMgr
 {
 public:
-    MPQManager() {}
-    ~MPQManager() {}
+    MPQMgr() {}
+    ~MPQMgr() {}
 
     void Initialize();
     FILE* GetFile(const std::string& path);
@@ -39,5 +39,5 @@ private:
     std::mutex mutex;
 };
 
-extern MPQManager* MPQHandler;
+extern MPQMgr* MPQHandler;
 #endif

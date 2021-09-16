@@ -233,7 +233,7 @@ public:
         {
             PreventHitEffect(effIndex);
             if (Unit* target = GetHitUnit())
-                GetCaster()->getThreatManager().modifyThreatPercent(target, -20);
+                GetCaster()->getThreatMgr().modifyThreatPercent(target, -20);
         }
 
         void Register() override
