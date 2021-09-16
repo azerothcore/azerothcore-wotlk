@@ -9,6 +9,7 @@
 #include "CreatureGroups.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
+#include "Log.h"
 
 FormationMgr::~FormationMgr()
 {
@@ -251,19 +252,14 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         return;
     }
 
-    uint8 const groupAI = sFormationMgr->CreatureGroupMap[m_leader->GetSpawnId()]->groupAI;
-    if (!(groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
-    {
-        return;
-    }
-
     float pathDist = m_leader->GetExactDist(x, y, z);
     float pathAngle = m_leader->GetAngle(x, y);
 
     for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         Creature* member = itr->first;
-        if (member == m_leader || !member->IsAlive() || member->GetVictim())
+        FormationInfo const* pFormationInfo = itr->second;
+        if (member == m_leader || !member->IsAlive() || member->GetVictim() || !(pFormationInfo->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
         {
             continue;
         }
