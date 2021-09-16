@@ -327,10 +327,10 @@ void MessageDistDelivererToHostile::Visit(DynamicObjectMapType& m)
 }
 
 template<class T>
-void ObjectUpdater::Visit(GridRefManager<T>& m)
+void ObjectUpdater::Visit(GridRefMgr<T>& m)
 {
     T* obj;
-    for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); )
+    for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); )
     {
         obj = iter->GetSource();
         ++iter;

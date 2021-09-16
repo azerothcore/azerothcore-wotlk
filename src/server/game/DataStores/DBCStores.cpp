@@ -144,6 +144,7 @@ DBCStorage <SpellRadiusEntry> sSpellRadiusStore(SpellRadiusfmt);
 DBCStorage <SpellRangeEntry> sSpellRangeStore(SpellRangefmt);
 DBCStorage <SpellRuneCostEntry> sSpellRuneCostStore(SpellRuneCostfmt);
 DBCStorage <SpellShapeshiftEntry> sSpellShapeshiftStore(SpellShapeshiftfmt);
+DBCStorage <SpellVisualEntry> sSpellVisualStore(SpellVisualfmt);
 DBCStorage <StableSlotPricesEntry> sStableSlotPricesStore(StableSlotPricesfmt);
 DBCStorage <SummonPropertiesEntry> sSummonPropertiesStore(SummonPropertiesfmt);
 DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
@@ -342,6 +343,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sSpellRangeStore,                      "SpellRange.dbc",                       "spellrange_dbc");
     LOAD_DBC(sSpellRuneCostStore,                   "SpellRuneCost.dbc",                    "spellrunecost_dbc");
     LOAD_DBC(sSpellShapeshiftStore,                 "SpellShapeshiftForm.dbc",              "spellshapeshiftform_dbc");
+    LOAD_DBC(sSpellVisualStore,                     "SpellVisual.dbc",                      "spellvisual_dbc");
     LOAD_DBC(sStableSlotPricesStore,                "StableSlotPrices.dbc",                 "stableslotprices_dbc");
     LOAD_DBC(sSummonPropertiesStore,                "SummonProperties.dbc",                 "summonproperties_dbc");
     LOAD_DBC(sTalentStore,                          "Talent.dbc",                           "talent_dbc");
@@ -395,7 +397,7 @@ void LoadDBCStores(const std::string& dataPath)
 
     for (auto i : sSpellStore)
         if (i->Category)
-            sSpellsByCategoryStore[i->Category].insert(i->Id);
+            sSpellsByCategoryStore[i->Category].emplace(false, i->Id);
 
     for (SkillRaceClassInfoEntry const* entry : sSkillRaceClassInfoStore)
     {

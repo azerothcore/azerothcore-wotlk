@@ -10,7 +10,7 @@
 #include "GossipDef.h"
 #include "Language.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"

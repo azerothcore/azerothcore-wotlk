@@ -315,7 +315,7 @@ public:
                 return;
 
             // Now lets get archimode threat list
-            ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
 
             if (t_list.empty())
                 return;
@@ -425,7 +425,7 @@ public:
                 if (victim && me->IsWithinMeleeRange(victim))
                     return false;
 
-                ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
                 if (threatlist.empty())
                     return false;
 

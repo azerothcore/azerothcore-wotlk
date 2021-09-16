@@ -1142,7 +1142,7 @@ public:
                         }
                     }
                 _playerAttack = true;
-                me->getThreatManager().resetAllAggro();
+                me->getThreatMgr().resetAllAggro();
                 me->CallForHelp(40.0f);
                 AttackStart(who);
             }

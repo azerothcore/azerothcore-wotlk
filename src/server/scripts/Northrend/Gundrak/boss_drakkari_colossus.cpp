@@ -344,7 +344,7 @@ public:
             if (me->ToTempSummon())
             {
                 if (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer())
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                         summoner->GetAI()->DoAction(ACTION_INFORM);
                 return;
             }

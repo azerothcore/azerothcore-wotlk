@@ -6,7 +6,7 @@
 #include "DBCStores.h"
 #include "GameGraveyard.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 
 Graveyard* Graveyard::instance()
 {
@@ -83,7 +83,7 @@ GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
 GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId)
 {
     // search for zone associated closest graveyard
-    uint32 zoneId = sMapMgr->GetZoneId(MapId, x, y, z);
+    uint32 zoneId = sMapMgr->GetZoneId(PHASEMASK_NORMAL, MapId, x, y, z);
 
     if (!zoneId)
     {

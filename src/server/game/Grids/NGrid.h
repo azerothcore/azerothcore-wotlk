@@ -47,7 +47,7 @@ public:
     [[nodiscard]] int32 getX() const { return i_x; }
     [[nodiscard]] int32 getY() const { return i_y; }
 
-    void link(GridRefManager<NGrid<N, ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> >* pTo)
+    void link(GridRefMgr<NGrid<N, ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> >* pTo)
     {
         i_Reference.link(pTo, this);
     }

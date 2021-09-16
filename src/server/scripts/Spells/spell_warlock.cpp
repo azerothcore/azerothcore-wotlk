@@ -557,8 +557,13 @@ public:
             return true;
         }
 
-        void HandleBanish()
+        void HandleBanish(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (Unit* target = GetHitUnit())
             {
                 if (target->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0, 0x08000000, 0))
@@ -580,7 +585,7 @@ public:
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_warl_banish_SpellScript::HandleBanish);
+            BeforeHit += BeforeSpellHitFn(spell_warl_banish_SpellScript::HandleBanish);
             AfterHit += SpellHitFn(spell_warl_banish_SpellScript::RemoveAura);
         }
 
@@ -759,7 +764,7 @@ public:
                 // Refresh corruption on target
                 if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x2, 0, 0, GetCaster()->GetGUID()))
                 {
-                    aur->GetBase()->RefreshTimersWithMods();
+                    aur->GetBase()->RefreshTimers();
                     aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
                 }
         }
@@ -852,7 +857,7 @@ public:
             Unit* caster = GetCaster();
             if (Unit* target = GetHitUnit())
             {
-                if (target->CanHaveThreatList() && target->getThreatManager().getThreat(caster) > 0.0f)
+                if (target->CanHaveThreatList() && target->getThreatMgr().getThreat(caster) > 0.0f)
                     caster->CastSpell(target, SPELL_WARLOCK_SOULSHATTER, true);
             }
         }

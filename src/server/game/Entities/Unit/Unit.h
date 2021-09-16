@@ -9,12 +9,12 @@
 
 #include "EventProcessor.h"
 #include "FollowerReference.h"
-#include "FollowerRefManager.h"
-#include "HostileRefManager.h"
+#include "FollowerRefMgr.h"
+#include "HostileRefMgr.h"
 #include "MotionMaster.h"
 #include "Object.h"
 #include "SpellAuraDefines.h"
-#include "ThreatManager.h"
+#include "ThreatMgr.h"
 #include <functional>
 
 #define WORLD_TRIGGER   12999
@@ -248,6 +248,9 @@ enum UnitRename
 };
 
 static constexpr uint32 MAX_CREATURE_SPELLS = 8;
+static constexpr uint32 infinityCooldownDelay = 0x9A7EC800; // used for set "infinity cooldowns" for spells and check, MONTH*IN_MILLISECONDS
+static constexpr uint32 infinityCooldownDelayCheck = 0x4D3F6400; // MONTH*IN_MILLISECONDS/2;
+
 #define MAX_SPELL_CHARM         4
 #define MAX_SPELL_VEHICLE       6
 #define MAX_SPELL_POSSESS       8
@@ -1772,10 +1775,8 @@ public:
     bool IsValidAssistTarget(Unit const* target) const;
     bool _IsValidAssistTarget(Unit const* target, SpellInfo const* bySpell) const;
 
-    void UpdateEnvironmentIfNeeded(const uint8 option);
-    [[nodiscard]] virtual bool IsInWater(bool allowAbove = false) const;
+    [[nodiscard]] virtual bool IsInWater() const;
     [[nodiscard]] virtual bool IsUnderWater() const;
-    virtual void UpdateUnderwaterState(Map* m, float x, float y, float z);
     bool isInAccessiblePlaceFor(Creature const* c) const;
 
     void SendHealSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, uint32 OverHeal, uint32 Absorb, bool critical = false);
@@ -1920,7 +1921,7 @@ public:
 
     ControlSet m_Controlled;
     [[nodiscard]] Unit* GetFirstControlled() const;
-    void RemoveAllControlled();
+    void RemoveAllControlled(bool onDeath = false);
 
     [[nodiscard]] bool IsCharmed() const { return GetCharmerGUID(); }
     [[nodiscard]] bool isPossessed() const { return HasUnitState(UNIT_STATE_POSSESSED); }
@@ -2202,10 +2203,10 @@ public:
     void DeleteThreatList();
     void TauntApply(Unit* victim);
     void TauntFadeOut(Unit* taunter);
-    ThreatManager& getThreatManager() { return m_ThreatManager; }
-    void addHatedBy(HostileReference* pHostileReference) { m_HostileRefManager.insertFirst(pHostileReference); };
+    ThreatMgr& getThreatMgr() { return m_ThreatMgr; }
+    void addHatedBy(HostileReference* pHostileReference) { m_HostileRefMgr.insertFirst(pHostileReference); };
     void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
-    HostileRefManager& getHostileRefManager() { return m_HostileRefManager; }
+    HostileRefMgr& getHostileRefMgr() { return m_HostileRefMgr; }
 
     VisibleAuraMap const* GetVisibleAuras() { return &m_visibleAuras; }
     AuraApplication* GetVisibleAura(uint8 slot)
@@ -2246,7 +2247,7 @@ public:
     void ModifyAuraState(AuraStateType flag, bool apply);
     uint32 BuildAuraStateUpdateForTarget(Unit* target) const;
     bool HasAuraState(AuraStateType flag, SpellInfo const* spellProto = nullptr, Unit const* Caster = nullptr) const;
-    void UnsummonAllTotems();
+    void UnsummonAllTotems(bool onDeath = false);
     Unit* GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
     Unit* GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo = nullptr);
 
@@ -2311,7 +2312,7 @@ public:
     void  ModSpellCastTime(SpellInfo const* spellProto, int32& castTime, Spell* spell = nullptr);
     float CalculateLevelPenalty(SpellInfo const* spellProto) const;
 
-    void addFollower(FollowerReference* pRef) { m_FollowingRefManager.insertFirst(pRef); }
+    void addFollower(FollowerReference* pRef) { m_FollowingRefMgr.insertFirst(pRef); }
     void removeFollower(FollowerReference* /*pRef*/) { /* nothing to do yet */ }
 
     MotionMaster* GetMotionMaster() { return i_motionMaster; }
@@ -2454,25 +2455,6 @@ public:
     bool bRequestForcedVisibilityUpdate;
     void ExecuteDelayedUnitRelocationEvent();
     void ExecuteDelayedUnitAINotifyEvent();
-    // IsInWater, UpdateUnderwaterState, etc. optimizations
-    Position m_last_underwaterstate_position;
-    Position m_last_environment_position;
-    bool m_last_isinwater_status;
-    bool m_last_islittleabovewater_status;
-    bool m_last_isunderwater_status;
-    bool m_is_updating_environment;
-    // GetZone / GetArea optimization
-    Position m_last_area_position;
-    Position m_last_zone_position;
-    uint32 m_last_area_id;
-    uint32 m_last_zone_id;
-    Position m_last_outdoors_position;
-    bool m_last_outdoors_status;
-    [[nodiscard]] bool IsOutdoors() const;
-
-    [[nodiscard]] uint32 GetZoneId(bool forceRecalc = false) const override;
-    [[nodiscard]] uint32 GetAreaId(bool forceRecalc = false) const override;
-    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc = false) const override;
 
     // cooldowns
     [[nodiscard]] virtual bool HasSpellCooldown(uint32 /*spell_id*/) const { return false; }
@@ -2502,6 +2484,9 @@ public:
     [[nodiscard]] float GetCollisionHeight() const override;
     [[nodiscard]] float GetCollisionWidth() const override;
     [[nodiscard]] float GetCollisionRadius() const override;
+
+    void ProcessPositionDataChanged(PositionFullTerrainStatus const& data) override;
+    virtual void ProcessTerrainStatusUpdate();
 
 protected:
     explicit Unit (bool isWorldObject);
@@ -2569,7 +2554,7 @@ protected:
     uint32 m_reactiveTimer[MAX_REACTIVE];
     int32 m_regenTimer;
 
-    ThreatManager m_ThreatManager;
+    ThreatMgr m_ThreatMgr;
     typedef std::map<ObjectGuid, float> CharmThreatMap;
     CharmThreatMap _charmThreatInfo;
 
@@ -2615,9 +2600,9 @@ private:
 
     Diminishing m_Diminishing;
     // Manage all Units that are threatened by us
-    HostileRefManager m_HostileRefManager;
+    HostileRefMgr m_HostileRefMgr;
 
-    FollowerRefManager m_FollowingRefManager;
+    FollowerRefMgr m_FollowingRefMgr;
     Unit* m_comboTarget;
 
     ComboPointHolderSet m_ComboPointHolders;

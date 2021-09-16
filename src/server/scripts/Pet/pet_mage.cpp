@@ -91,7 +91,7 @@ public:
 
             // Xinef: Inherit Master's Threat List (not yet implemented)
             //owner->CastSpell((Unit*)nullptr, SPELL_MAGE_MASTERS_THREAT_LIST, true);
-            HostileReference* ref = owner->getHostileRefManager().getFirst();
+            HostileReference* ref = owner->getHostileRefMgr().getFirst();
             while (ref)
             {
                 if (Unit* unit = ref->GetSource()->GetOwner())
@@ -158,7 +158,7 @@ public:
 
                 if (selection)
                 {
-                    me->getThreatManager().resetAllAggro();
+                    me->getThreatMgr().resetAllAggro();
                     me->AddThreat(selection, 1000000.0f);
 
                     if (owner->IsInCombat())

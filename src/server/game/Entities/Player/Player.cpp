@@ -45,7 +45,7 @@
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "MapInstanced.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -591,6 +591,8 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     InitTalentForLevel();
     InitPrimaryProfessions();                               // to max set before any spell added
 
+    UpdatePositionData();
+
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
     UpdateMaxHealth();                                      // Update max Health (for add bonus from stamina)
     SetFullHealth();
@@ -876,7 +878,7 @@ void Player::HandleDrowning(uint32 time_diff)
     }
 
     // In dark water
-    if (m_MirrorTimerFlags & UNDERWARER_INDARKWATER)
+    if (m_MirrorTimerFlags & UNDERWATER_INDARKWATER)
     {
         // Fatigue timer not activated - activate it
         if (m_MirrorTimer[FATIGUE_TIMER] == DISABLED_MIRROR_TIMER)
@@ -899,7 +901,7 @@ void Player::HandleDrowning(uint32 time_diff)
                 else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))       // Teleport ghost to graveyard
                     RepopAtGraveyard();
             }
-            else if (!(m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER))
+            else if (!(m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER))
                 SendMirrorTimer(FATIGUE_TIMER, getMaxTimer(FATIGUE_TIMER), m_MirrorTimer[FATIGUE_TIMER], -1);
         }
     }
@@ -909,7 +911,7 @@ void Player::HandleDrowning(uint32 time_diff)
         m_MirrorTimer[FATIGUE_TIMER] += 10 * time_diff;
         if (m_MirrorTimer[FATIGUE_TIMER] >= DarkWaterTime || !IsAlive())
             StopMirrorTimer(FATIGUE_TIMER);
-        else if (m_MirrorTimerFlagsLast & UNDERWARER_INDARKWATER)
+        else if (m_MirrorTimerFlagsLast & UNDERWATER_INDARKWATER)
             SendMirrorTimer(FATIGUE_TIMER, DarkWaterTime, m_MirrorTimer[FATIGUE_TIMER], 10);
     }
 
@@ -1275,12 +1277,12 @@ void Player::SendTeleportAckPacket()
     GetSession()->SendPacket(&data);
 }
 
-bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/)
+bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/, bool newInstance /*= false*/)
 {
     // for except kick by antispeedhack
     sScriptMgr->AnticheatSetSkipOnePacketForASH(this, true);
 
-    if (!MapManager::IsValidMapCoord(mapid, x, y, z, orientation))
+    if (!MapMgr::IsValidMapCoord(mapid, x, y, z, orientation))
     {
         LOG_ERROR("entities.player", "TeleportTo: invalid map (%d) or invalid coordinates (X: %f, Y: %f, Z: %f, O: %f) given when teleporting player (%s, name: %s, map: %d, X: %f, Y: %f, Z: %f, O: %f).",
                        mapid, x, y, z, orientation, GetGUID().ToString().c_str(), GetName().c_str(), GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
@@ -1376,7 +1378,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (!sScriptMgr->OnBeforePlayerTeleport(this, mapid, x, y, z, orientation, options, target))
         return false;
 
-    if (GetMapId() == mapid)
+    if (GetMapId() == mapid && !newInstance)
     {
         //lets reset far teleport flag if it wasn't reset during chained teleports
         SetSemaphoreTeleportFar(0);
@@ -1545,9 +1547,15 @@ bool Player::TeleportToEntryPoint()
     ScheduleDelayedOperation(DELAYED_BG_TAXI_RESTORE);
     ScheduleDelayedOperation(DELAYED_BG_GROUP_RESTORE);
 
-    if (m_entryPointData.joinPos.m_mapId == MAPID_INVALID)
+    WorldLocation loc = m_entryPointData.joinPos;
+    m_entryPointData.joinPos.m_mapId = MAPID_INVALID;
+
+    if (loc.m_mapId == MAPID_INVALID)
+    {
         return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
-    return TeleportTo(m_entryPointData.joinPos);
+    }
+
+    return TeleportTo(loc);
 }
 
 void Player::ProcessDelayedOperations()
@@ -1586,7 +1594,10 @@ void Player::ProcessDelayedOperations()
         if (m_entryPointData.mountSpell)
         {
             // xinef: remove shapeshift auras
-            RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+            if (IsInDisallowedMountForm())
+            {
+                RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+            }
             AddAura(m_entryPointData.mountSpell, this);
             m_entryPointData.mountSpell = 0;
         }
@@ -2053,39 +2064,16 @@ GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTy
     {
         if (go->GetGoType() == type)
         {
-            if (go->IsWithinDistInMap(this, go->GetInteractionDistance()))
+            if (go->IsWithinDistInMap(this))
+            {
                 return go;
+            }
 
             LOG_DEBUG("maps", "IsGameObjectOfTypeInRange: GameObject '%s' [%s] is too far away from player %s [%s] to be used by him (distance=%f, maximal 10 is allowed)",
                 go->GetGOInfo()->name.c_str(), go->GetGUID().ToString().c_str(), GetName().c_str(), GetGUID().ToString().c_str(), go->GetDistance(this));
         }
     }
     return nullptr;
-}
-
-bool Player::IsInWater(bool allowAbove) const
-{
-    if (m_isInWater || !allowAbove)
-        return m_isInWater;
-
-    float distsq = GetExactDistSq(&m_last_environment_position);
-    if (distsq < 3.0f * 3.0f)
-        return m_last_islittleabovewater_status;
-    else
-    {
-        LiquidData liqData;
-        liqData.level = INVALID_HEIGHT;
-        const_cast<Position*>(&m_last_environment_position)->Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
-        bool inWater = GetBaseMap()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ(), &liqData);
-        *(const_cast<bool*>(&m_last_islittleabovewater_status)) = inWater || (liqData.level > INVALID_HEIGHT && liqData.level > liqData.depth_level && liqData.level <= GetPositionZ() + 3.0f && liqData.level > GetPositionZ() - 1.0f);
-        return m_last_islittleabovewater_status;
-    }
-}
-
-bool Player::IsUnderWater() const
-{
-    return IsInWater() &&
-           GetPositionZ() < GetBaseMap()->GetWaterLevel(GetPositionX(), GetPositionY()) - GetCollisionHeight();
 }
 
 bool Player::IsFalling() const
@@ -2109,7 +2097,7 @@ void Player::SetInWater(bool apply)
     // remove auras that need water/land
     RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
-    getHostileRefManager().updateThreatTables();
+    getHostileRefMgr().updateThreatTables();
 }
 
 bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
@@ -2150,13 +2138,13 @@ void Player::SetGameMaster(bool on)
         {
             if (AccountMgr::IsGMAccount(GetSession()->GetSecurity()))
                 pet->setFaction(35);
-            pet->getHostileRefManager().setOnlineOfflineState(false);
+            pet->getHostileRefMgr().setOnlineOfflineState(false);
         }
 
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
         ResetContestedPvP();
 
-        getHostileRefManager().setOnlineOfflineState(false);
+        getHostileRefMgr().setOnlineOfflineState(false);
         CombatStopWithPets();
 
         SetPhaseMask(uint32(PHASEMASK_ANYWHERE), false);    // see and visible in all phases
@@ -2180,7 +2168,7 @@ void Player::SetGameMaster(bool on)
         if (Pet* pet = GetPet())
         {
             pet->setFaction(getFaction());
-            pet->getHostileRefManager().setOnlineOfflineState(true);
+            pet->getHostileRefMgr().setOnlineOfflineState(true);
         }
 
         // restore FFA PvP Server state
@@ -2190,7 +2178,7 @@ void Player::SetGameMaster(bool on)
         // restore FFA PvP area state, remove not allowed for GM mounts
         UpdateArea(m_areaUpdateId);
 
-        getHostileRefManager().setOnlineOfflineState(true);
+        getHostileRefMgr().setOnlineOfflineState(true);
         m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
     }
 
@@ -2719,7 +2707,7 @@ void Player::SendInitialSpells()
         data << uint32(itr->first);
 
         data << uint16(itr->second.itemid);                 // cast item id
-        data << uint16(sEntry->GetCategory());              // spell category
+        data << uint16(itr->second.category);               // spell category
 
         // send infinity cooldown in special format
         if (itr->second.end >= infTime)
@@ -2730,17 +2718,8 @@ void Player::SendInitialSpells()
         }
 
         uint32 cooldown = itr->second.end > curTime ? itr->second.end - curTime : 0;
-
-        if (!sEntry->GetCategory() || (sEntry->CategoryRecoveryTime != sEntry->RecoveryTime && sEntry->RecoveryTime && sEntry->CategoryRecoveryTime))                          // may be wrong, but anyway better than nothing...
-        {
-            data << cooldown;                               // cooldown
-            data << uint32(0);                              // category cooldown
-        }
-        else
-        {
-            data << uint32(0);                              // cooldown
-            data << cooldown;                               // category cooldown
-        }
+        data << uint32(itr->second.category ? 0 : cooldown);    // cooldown
+        data << uint32(itr->second.category ? cooldown : 0);    // category cooldown
     }
 
     GetSession()->SendPacket(&data);
@@ -3418,13 +3397,12 @@ void Player::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
         SendClearCooldown(spell_id, this);
 }
 
-// I am not sure which one is more efficient
 void Player::RemoveCategoryCooldown(uint32 cat)
 {
     SpellCategoryStore::const_iterator i_scstore = sSpellsByCategoryStore.find(cat);
     if (i_scstore != sSpellsByCategoryStore.end())
         for (SpellCategorySet::const_iterator i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
-            RemoveSpellCooldown(*i_scset, true);
+            RemoveSpellCooldown(i_scset->second, true);
 }
 
 void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
@@ -3479,7 +3457,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
 {
     // some cooldowns can be already set at aura loading...
 
-    //QueryResult* result = CharacterDatabase.PQuery("SELECT spell, item, time FROM character_spell_cooldown WHERE guid = '%u'", GetGUID().GetCounter()());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT spell, category, item, time FROM character_spell_cooldown WHERE guid = '%u'", GetGUID().GetCounter()());
 
     if (result)
     {
@@ -3489,9 +3467,10 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
         {
             Field* fields = result->Fetch();
             uint32 spell_id = fields[0].GetUInt32();
-            uint32 item_id  = fields[1].GetUInt32();
-            uint32 db_time  = fields[2].GetUInt32();
-            bool needSend   = fields[3].GetBool();
+            uint16 category = fields[1].GetUInt16();
+            uint32 item_id  = fields[2].GetUInt32();
+            uint32 db_time  = fields[3].GetUInt32();
+            bool needSend   = fields[4].GetBool();
 
             if (!sSpellMgr->GetSpellInfo(spell_id))
             {
@@ -3503,7 +3482,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
             if (db_time <= curTime)
                 continue;
 
-            AddSpellCooldown(spell_id, item_id, (db_time - curTime)*IN_MILLISECONDS, needSend);
+            _AddSpellCooldown(spell_id, category, item_id, (db_time - curTime) * IN_MILLISECONDS, needSend);
 
             LOG_DEBUG("entities.player.loading", "Player (%s) spell %u, item %u cooldown loaded (%u secs).", GetGUID().ToString().c_str(), spell_id, item_id, uint32(db_time - curTime));
         } while (result->NextRow());
@@ -3539,7 +3518,7 @@ void Player::_SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout
         {
             if (first_round)
             {
-                ss << "INSERT INTO character_spell_cooldown (guid, spell, item, time, needSend) VALUES ";
+                ss << "INSERT INTO character_spell_cooldown (guid, spell, category, item, time, needSend) VALUES ";
                 first_round = false;
             }
             // next new/changed record prefix
@@ -3547,7 +3526,7 @@ void Player::_SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout
                 ss << ',';
 
             uint64 cooldown = uint64(((itr->second.end - curMSTime) / IN_MILLISECONDS) + curTime);
-            ss << '(' << GetGUID().GetCounter() << ',' << itr->first << ',' << itr->second.itemid << ',' << cooldown << ',' << (itr->second.needSendToClient ? '1' : '0') << ')';
+            ss << '(' << GetGUID().GetCounter() << ',' << itr->first << ',' << itr->second.category << "," << itr->second.itemid << ',' << cooldown << ',' << (itr->second.needSendToClient ? '1' : '0') << ')';
             ++itr;
         }
         else
@@ -4352,7 +4331,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     // trigger update zone for alive state zone updates
     uint32 newzone, newarea;
-    GetZoneAndAreaId(newzone, newarea, true);
+    GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);
     sOutdoorPvPMgr->HandlePlayerResurrects(this, newzone);
 
@@ -4504,6 +4483,8 @@ Corpse* Player::CreateCorpse()
 
     // register for player, but not show
     GetMap()->AddCorpse(corpse);
+
+    UpdatePositionData();
 
     // we do not need to save corpses for BG/arenas
     if (!GetMap()->IsBattlegroundOrArena())
@@ -5560,7 +5541,7 @@ void Player::CheckAreaExploreAndOutdoor()
         return;
 
     bool isOutdoor = IsOutdoors();
-    uint32 areaId = GetBaseMap()->GetAreaId(GetPositionX(), GetPositionY(), GetPositionZ(), &isOutdoor);
+    uint32 areaId = GetAreaId();
     AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
 
     if (sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK) && !isOutdoor)
@@ -6156,7 +6137,7 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
         if (!sMapStore.LookupEntry(map))
             return 0;
 
-        zone = sMapMgr->GetZoneId(map, posx, posy, posz);
+        zone = sMapMgr->GetZoneId(PHASEMASK_NORMAL, map, posx, posy, posz);
 
         if (zone > 0)
         {
@@ -6179,36 +6160,6 @@ uint32 Player::GetLevelFromStorage(ObjectGuid::LowType guid)
         return playerData->level;
 
     return 0;
-}
-
-uint32 Player::GetZoneId(bool forceRecalc) const
-{
-    if (forceRecalc)
-        *(const_cast<uint32*>(&m_last_zone_id)) = WorldObject::GetZoneId();
-
-    return m_last_zone_id;
-}
-
-uint32 Player::GetAreaId(bool forceRecalc) const
-{
-    if (forceRecalc)
-        *(const_cast<uint32*>(&m_last_area_id)) = WorldObject::GetAreaId();
-
-    return m_last_area_id;
-}
-
-void Player::GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc) const
-{
-    if (forceRecalc)
-    {
-        WorldObject::GetZoneAndAreaId(zoneid, areaid);
-        *(const_cast<uint32*>(&m_last_zone_id)) = zoneid;
-        *(const_cast<uint32*>(&m_last_area_id)) = areaid;
-        return;
-    }
-
-    zoneid = m_last_zone_id;
-    areaid = m_last_area_id;
 }
 
 //If players are too far away from the duel flag... they lose the duel
@@ -7520,7 +7471,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
         // not check distance for GO in case owned GO (fishing bobber case, for example)
         // And permit out of range GO with no owner in case fishing hole
-        if (!go || (loot_type != LOOT_FISHINGHOLE && ((loot_type != LOOT_FISHING && loot_type != LOOT_FISHING_JUNK) || go->GetOwnerGUID() != GetGUID()) && !go->IsWithinDistInMap(this, INTERACTION_DISTANCE)) || (loot_type == LOOT_CORPSE && go->GetRespawnTime() && go->isSpawnedByDefault()))
+        if (!go || (loot_type != LOOT_FISHINGHOLE && ((loot_type != LOOT_FISHING && loot_type != LOOT_FISHING_JUNK) || go->GetOwnerGUID() != GetGUID()) && !go->IsWithinDistInMap(this)) || (loot_type == LOOT_CORPSE && go->GetRespawnTime() && go->isSpawnedByDefault()))
         {
             go->ForceValuesUpdateAtIndex(GAMEOBJECT_BYTES_1);
             SendLootRelease(guid);
@@ -7560,7 +7511,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 if (groupRules)
                     group->UpdateLooterGuid(go, true);
 
-                loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false, go->GetLootMode());
+                loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false, go->GetLootMode(), go);
                 go->SetLootGenerationTime();
 
                 // get next RR player (for next loot)
@@ -8902,15 +8853,26 @@ void Player::PetSpellInitialize()
     data << uint8(cooldownsCount);
 
     uint32 curTime = World::GetGameTimeMS();
+    uint32 infTime = World::GetGameTimeMS() + infinityCooldownDelayCheck;
 
     for (CreatureSpellCooldowns::const_iterator itr = pet->m_CreatureSpellCooldowns.begin(); itr != pet->m_CreatureSpellCooldowns.end(); ++itr)
     {
-        uint32 cooldown = (itr->second > curTime) ? itr->second - curTime : 0;
+        uint16 category = itr->second.category;
+        uint32 cooldown = (itr->second.end > curTime) ? itr->second.end - curTime : 0;
 
         data << uint32(itr->first);                         // spellid
-        data << uint16(0);                                  // spell category?
-        data << uint32(cooldown);                           // cooldown
-        data << uint32(0);                                  // category cooldown
+        data << uint16(itr->second.category);               // spell category
+
+        // send infinity cooldown in special format
+        if (itr->second.end >= infTime)
+        {
+            data << uint32(1);                              // cooldown
+            data << uint32(0x80000000);                     // category cooldown
+            continue;
+        }
+
+        data << uint32(category ? 0 : cooldown);            // cooldown
+        data << uint32(category ? cooldown : 0);            // category cooldown
     }
 
     GetSession()->SendPacket(&data);
@@ -8994,14 +8956,26 @@ void Player::VehicleSpellInitialize()
     data << uint8(cooldownCount);
 
     uint32 curTime = World::GetGameTimeMS();
+    uint32 infTime = World::GetGameTimeMS() + infinityCooldownDelayCheck;
 
     for (CreatureSpellCooldowns::const_iterator itr = vehicle->m_CreatureSpellCooldowns.begin(); itr != vehicle->m_CreatureSpellCooldowns.end(); ++itr)
     {
-        uint32 cooldown = (itr->second > curTime) ? itr->second - curTime : 0;
-        data << uint32(itr->first); // SpellId
-        data << uint16(0);          // unk
-        data << uint32(cooldown);   // spell cooldown
-        data << uint32(0);          // category cooldown
+        uint16 category = itr->second.category;
+        uint32 cooldown = (itr->second.end > curTime) ? itr->second.end - curTime : 0;
+
+        data << uint32(itr->first);              // spellid
+        data << uint16(itr->second.category);    // spell category
+
+        // send infinity cooldown in special format
+        if (itr->second.end >= infTime)
+        {
+            data << uint32(1);                  // cooldown
+            data << uint32(0x80000000);         // category cooldown
+            continue;
+        }
+
+        data << uint32(category ? 0 : cooldown); // cooldown
+        data << uint32(category ? cooldown : 0); // category cooldown
     }
 
     GetSession()->SendPacket(&data);
@@ -9675,7 +9649,7 @@ void Player::CleanupAfterTaxiFlight()
     m_taxi.ClearTaxiDestinations();        // not destinations, clear source node
     Dismount();
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
-    getHostileRefManager().setOnlineOfflineState(true);
+    getHostileRefMgr().setOnlineOfflineState(true);
 }
 
 void Player::ContinueTaxiFlight()
@@ -9936,8 +9910,10 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         return false;
     }
 
-    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->Flags2 == ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId(true) == TEAM_HORDE)))
+    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId(true) == TEAM_HORDE)))
+    {
         return false;
+    }
 
     Creature* creature = GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
     if (!creature)
@@ -10160,10 +10136,13 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
 
         // Now we have cooldown data (if found any), time to apply mods
         if (rec > 0)
+        {
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, rec, spell);
-
-        if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
+        }
+        else if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
+        {
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, catrec, spell);
+        }
 
         if (int32 cooldownMod = GetTotalAuraModifier(SPELL_AURA_MOD_COOLDOWN))
         {
@@ -10187,59 +10166,79 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
         recTime    = rec ? rec : catrecTime;
     }
 
-    // self spell cooldown
-    if (recTime > 0)
-    {
-        AddSpellCooldown(spellInfo->Id, itemId, recTime, true, true);
-
-        if (needsCooldownPacket)
-        {
-            WorldPacket data;
-            BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, rec);
-            SendDirectMessage(&data);
-        }
-    }
-
     // category spells
     if (cat && catrec > 0)
     {
+        _AddSpellCooldown(spellInfo->Id, cat, itemId, catrecTime, true, true);
+        if (needsCooldownPacket)
+        {
+            WorldPacket data;
+            BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, catrecTime);
+            SendDirectMessage(&data);
+        }
+
         SpellCategoryStore::const_iterator i_scstore = sSpellsByCategoryStore.find(cat);
         if (i_scstore != sSpellsByCategoryStore.end())
         {
             for (SpellCategorySet::const_iterator i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
             {
-                if (*i_scset == spellInfo->Id)                    // skip main spell, already handled above
-                    continue;
-
-                // Only within the same spellfamily
-                SpellInfo const* categorySpellInfo = sSpellMgr->GetSpellInfo(*i_scset);
-                if (!categorySpellInfo || categorySpellInfo->SpellFamilyName != spellInfo->SpellFamilyName)
+                if (i_scset->second == spellInfo->Id) // skip main spell, already handled above
                 {
                     continue;
                 }
 
-                AddSpellCooldown(*i_scset, itemId, catrecTime, !spellInfo->IsCooldownStartedOnEvent() && spellInfo->CategoryRecoveryTime != spellInfo->RecoveryTime && spellInfo->RecoveryTime && spellInfo->CategoryRecoveryTime); // Xinef: send category cooldowns on login if category cooldown is different from base cooldown
+                // If spell category is applied by item, then other spells should be exists in item templates
+                if ((itemId > 0) != i_scset->first)
+                {
+                    continue;
+                }
+
+                _AddSpellCooldown(i_scset->second, cat, itemId, catrecTime, true);
+            }
+        }
+    }
+    else
+    {
+        // self spell cooldown
+        if (recTime > 0)
+        {
+            _AddSpellCooldown(spellInfo->Id, 0, itemId, recTime, true, true);
+
+            if (needsCooldownPacket)
+            {
+                WorldPacket data;
+                BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, rec);
+                SendDirectMessage(&data);
             }
         }
     }
 }
 
-void Player::AddSpellCooldown(uint32 spellid, uint32 itemid, uint32 end_time, bool needSendToClient, bool forceSendToSpectator)
+void Player::_AddSpellCooldown(uint32 spellid, uint16 categoryId, uint32 itemid, uint32 end_time, bool needSendToClient, bool forceSendToSpectator)
 {
     SpellCooldown sc;
     sc.end = World::GetGameTimeMS() + end_time;
+    sc.category = categoryId;
     sc.itemid = itemid;
     sc.maxduration = end_time;
     sc.sendToSpectator = false;
     sc.needSendToClient = needSendToClient;
 
     if (end_time >= SPECTATOR_COOLDOWN_MIN * IN_MILLISECONDS && end_time <= SPECTATOR_COOLDOWN_MAX * IN_MILLISECONDS)
+    {
         if (NeedSendSpectatorData() && forceSendToSpectator && (itemid || HasActiveSpell(spellid)))
         {
             sc.sendToSpectator = true;
             ArenaSpectator::SendCommand_Cooldown(FindMap(), GetGUID(), "ACD", spellid, end_time / IN_MILLISECONDS, end_time / IN_MILLISECONDS);
         }
-    m_spellCooldowns[spellid] = sc;
+    }
+
+    m_spellCooldowns[spellid] = std::move(sc);
+}
+
+void Player::AddSpellCooldown(uint32 spellid, uint32 itemid, uint32 end_time, bool needSendToClient, bool forceSendToSpectator)
+{
+    _AddSpellCooldown(spellid, 0, itemid, end_time, needSendToClient, forceSendToSpectator);
 }
 
 void Player::ModifySpellCooldown(uint32 spellId, int32 cooldown)
@@ -10846,7 +10845,7 @@ void Player::SendInitialPacketsAfterAddToMap()
 
     // update zone
     uint32 newzone, newarea;
-    GetZoneAndAreaId(newzone, newarea, true);
+    GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);                            // also call SendInitWorldStates();
 
     if (HasAuraType(SPELL_AURA_MOD_STUN))
@@ -11846,16 +11845,38 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
 
 bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
 {
-    if (!pRewardSource || !IsInMap(pRewardSource))
-        return false;
-    const WorldObject* player = GetCorpse();
+    WorldObject const* player = GetCorpse();
     if (!player || IsAlive())
+    {
         player = this;
+    }
+
+    if (!pRewardSource || !player->IsInMap(pRewardSource))
+    {
+        return false;
+    }
 
     if (pRewardSource->GetMap()->IsDungeon())
+    {
         return true;
+    }
 
     return pRewardSource->GetDistance(player) <= sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE);
+}
+
+bool Player::IsAtLootRewardDistance(WorldObject const* pRewardSource) const
+{
+    if (!IsAtGroupRewardDistance(pRewardSource))
+    {
+        return false;
+    }
+
+    if (HasPendingBind())
+    {
+        return false;
+    }
+
+    return pRewardSource->HasAllowedLooter(GetGUID());
 }
 
 bool Player::IsAtRecruitAFriendDistance(WorldObject const* pOther) const
@@ -13653,7 +13674,7 @@ void Player::ResetMap()
     // this may be called during Map::Update
     // after decrement+unlink, ++m_mapRefIter will continue correctly
     // when the first element of the list is being removed
-    // nocheck_prev will return the padding element of the RefManager
+    // nocheck_prev will return the padding element of the RefMgr
     // instead of nullptr in the case of prev
     GetMap()->UpdateIteratorBack(this);
     Unit::ResetMap();
@@ -13733,7 +13754,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setUInt16(index++, (uint16)m_ExtraFlags);
         stmt->setUInt8(index++,  m_stableSlots);
         stmt->setUInt16(index++, (uint16)m_atLoginFlags);
-        stmt->setUInt16(index++, GetZoneId(true));
+        stmt->setUInt16(index++, GetZoneId());
         stmt->setUInt32(index++, uint32(m_deathExpireTime));
 
         ss.str("");
@@ -13871,7 +13892,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setUInt16(index++, (uint16)m_ExtraFlags);
         stmt->setUInt8(index++,  m_stableSlots);
         stmt->setUInt16(index++, (uint16)m_atLoginFlags);
-        stmt->setUInt16(index++, GetZoneId(true));
+        stmt->setUInt16(index++, GetZoneId());
         stmt->setUInt32(index++, uint32(m_deathExpireTime));
 
         ss.str("");
@@ -14138,10 +14159,16 @@ void Player::ActivateSpec(uint8 spec)
 
         // pussywizard: was => isn't
         if (itr->second->IsInSpec(oldSpec) && !itr->second->IsInSpec(spec))
+        {
             SendLearnPacket(itr->first, false);
+            // We want to remove all auras of the unlearned spell
+            _removeTalentAurasAndSpells(itr->first);
+        }
         // pussywizard: wasn't => is
         else if (!itr->second->IsInSpec(oldSpec) && itr->second->IsInSpec(spec))
+        {
             SendLearnPacket(itr->first, true);
+        }
     }
 
     // xinef: apply glyphs from second spec
@@ -15213,4 +15240,26 @@ float Player::GetSightRange(const WorldObject* target) const
     }
 
     return sightRange;
+}
+
+std::string Player::GetPlayerName()
+{
+    std::string name = GetName();
+    std::string color = "";
+
+    switch (getClass())
+    {
+        case CLASS_DEATH_KNIGHT: color = "|cffC41F3B"; break;
+        case CLASS_DRUID:        color = "|cffFF7D0A"; break;
+        case CLASS_HUNTER:       color = "|cffABD473"; break;
+        case CLASS_MAGE:         color = "|cff69CCF0"; break;
+        case CLASS_PALADIN:      color = "|cffF58CBA"; break;
+        case CLASS_PRIEST:       color = "|cffFFFFFF"; break;
+        case CLASS_ROGUE:        color = "|cffFFF569"; break;
+        case CLASS_SHAMAN:       color = "|cff0070DE"; break;
+        case CLASS_WARLOCK:      color = "|cff9482C9"; break;
+        case CLASS_WARRIOR:      color = "|cffC79C6E"; break;
+    }
+
+    return "|Hplayer:" + name + "|h" + color + name + "|h|r";
 }

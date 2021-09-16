@@ -48,7 +48,7 @@
 #include "LootItemStorage.h"
 #include "LootMgr.h"
 #include "MMapFactory.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
@@ -68,7 +68,7 @@
 #include "TransportMgr.h"
 #include "Util.h"
 #include "VMapFactory.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 #include "Vehicle.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
@@ -1233,6 +1233,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_FFA_PVP_TIMER] = sConfigMgr->GetOption<int32>("FFAPvPTimer", 30);
 
+    m_int_configs[CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION] = sConfigMgr->GetOption<int32>("LootNeedBeforeGreedILvlRestriction", 70);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1267,8 +1269,8 @@ void World::LoadConfigSettings(bool reload)
     if (!enableHeight)
         LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
 
-    VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
-    VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
+    VMAP::VMapFactory::createOrGetVMapMgr()->setEnableLineOfSightCalc(enableLOS);
+    VMAP::VMapFactory::createOrGetVMapMgr()->setEnableHeightCalc(enableHeight);
     LOG_INFO("server.loading", "WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i PetLOS:%i", enableLOS, enableHeight, enableIndoor, enablePetLOS);
 
     m_bool_configs[CONFIG_PET_LOS]            = sConfigMgr->GetOption<bool>("vmap.petLOS", true);
@@ -1306,6 +1308,7 @@ void World::LoadConfigSettings(bool reload)
 
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 3);
+    m_int_configs[CONFIG_LFG_DUNGEON_FINDER_EXPANSION] = sConfigMgr->GetOption<int32>("DungeonFinder.Expansion", 2);
 
     // Max instances per hour
     m_int_configs[CONFIG_MAX_INSTANCES_PER_HOUR] = sConfigMgr->GetOption<int32>("AccountInstancesPerHour", 5);
@@ -1423,8 +1426,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initializing Scripts...");
     sScriptMgr->Initialize();
 
-    ///- Initialize VMapManager function pointers (to untangle game/collision circular deps)
-    VMAP::VMapManager2* vmmgr2 = VMAP::VMapFactory::createOrGetVMapManager();
+    ///- Initialize VMapMgr function pointers (to untangle game/collision circular deps)
+    VMAP::VMapMgr2* vmmgr2 = VMAP::VMapFactory::createOrGetVMapMgr();
     vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
     vmmgr2->IsVMAPDisabledForPtr = &DisableMgr::IsVMAPDisabledFor;
 
@@ -1440,15 +1443,15 @@ void World::SetInitialWorldSettings()
     if (!sConfigMgr->isDryRun())
     {
         ///- Check the existence of the map files for all starting areas.
-        if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
-                || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
-                || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
-                || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
-                || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
-                || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
+        if (!MapMgr::ExistMapAndVMap(0, -6240.32f, 331.033f)
+                || !MapMgr::ExistMapAndVMap(0, -8949.95f, -132.493f)
+                || !MapMgr::ExistMapAndVMap(1, -618.518f, -4251.67f)
+                || !MapMgr::ExistMapAndVMap(0, 1676.35f, 1677.45f)
+                || !MapMgr::ExistMapAndVMap(1, 10311.3f, 832.463f)
+                || !MapMgr::ExistMapAndVMap(1, -2917.58f, -257.98f)
                 || (m_int_configs[CONFIG_EXPANSION] && (
-                        !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-                        !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+                        !MapMgr::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
+                        !MapMgr::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
         {
             exit(1);
         }
@@ -1499,7 +1502,7 @@ void World::SetInitialWorldSettings()
 
     vmmgr2->InitializeThreadUnsafe(mapIds);
 
-    MMAP::MMapManager* mmmgr = MMAP::MMapFactory::createOrGetMMapManager();
+    MMAP::MMapMgr* mmmgr = MMAP::MMapFactory::createOrGetMMapMgr();
     mmmgr->InitializeThreadUnsafe(mapIds);
 
     LOG_INFO("server.loading", "Loading Game Graveyard...");
@@ -1957,7 +1960,7 @@ void World::SetInitialWorldSettings()
     ///- Initilize static helper structures
     AIRegistry::Initialize();
 
-    ///- Initialize MapManager
+    ///- Initialize MapMgr
     LOG_INFO("server.loading", "Starting Map System");
     LOG_INFO("server.loading", " ");
     sMapMgr->Initialize();
