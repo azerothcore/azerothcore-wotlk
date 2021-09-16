@@ -104,7 +104,7 @@ void FormationMgr::LoadCreatureFormations()
         {
             if (!group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)) && (follow_dist > 0.0f || follow_angle > 0.0f))
             {
-                LOG_ERROR("sql.sql", "creature_formations table member guid %u cannot have follow distance or follow angle because don't have GROUP_AI_FLAG_FOLLOW_LEADER flag. Values are not gonna be used", group_member.leaderGUID);
+                LOG_ERROR("sql.sql", "creature_formations table member guid %u and leader guid %u cannot have follow distance or follow angle because don't have GROUP_AI_FLAG_FOLLOW_LEADER flag. Values are not gonna be used", memberGUID, group_member.leaderGUID);
                 group_member.follow_dist       = 0.0f;
                 group_member.follow_angle      = 0.0f;
             }
@@ -120,26 +120,23 @@ void FormationMgr::LoadCreatureFormations()
             group_member.follow_angle      = 0.0f;
             if ((group_member.leaderGUID == memberGUID || !group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER))) && (follow_dist > 0.0f || follow_angle > 0.0f))
             {
-                LOG_ERROR("sql.sql", "creature_formations table member guid %u cannot have follow distance or follow angle. Values are not gonna be used", group_member.leaderGUID);
+                LOG_ERROR("sql.sql", "creature_formations table member guid %u and leader guid %u cannot have follow distance or follow angle. Values are not gonna be used", memberGUID, group_member.leaderGUID);
             }
         }
 
         group_member.point_1               = fields[5].GetUInt16();
         group_member.point_2               = fields[6].GetUInt16();
 
-        // check data correctness
+        if (!sObjectMgr->GetCreatureData(group_member.leaderGUID))
         {
-            if (!sObjectMgr->GetCreatureData(group_member.leaderGUID))
-            {
-                LOG_ERROR("sql.sql", "creature_formations table leader guid %u incorrect (not exist)", group_member.leaderGUID);
-                continue;
-            }
+            LOG_ERROR("sql.sql", "creature_formations table leader guid %u incorrect (does not exist). Skipped", group_member.leaderGUID);
+            continue;
+        }
 
-            if (!sObjectMgr->GetCreatureData(memberGUID))
-            {
-                LOG_ERROR("sql.sql", "creature_formations table member guid %u incorrect (not exist)", memberGUID);
-                continue;
-            }
+        if (!sObjectMgr->GetCreatureData(memberGUID))
+        {
+            LOG_ERROR("sql.sql", "creature_formations table member guid %u incorrect (does not exist). Skipped", memberGUID);
+            continue;
         }
 
         CreatureGroupMap[memberGUID] = group_member;
