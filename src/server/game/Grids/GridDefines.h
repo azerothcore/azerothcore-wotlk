@@ -47,11 +47,11 @@ typedef TYPELIST_5(GameObject, Player, Creature/*pets*/, Corpse/*resurrectable*/
 typedef TYPELIST_4(GameObject, Creature/*except pets*/, DynamicObject, Corpse/*Bones*/) AllGridObjectTypes;
 typedef TYPELIST_5(Creature, GameObject, DynamicObject, Pet, Corpse) AllMapStoredObjectTypes;
 
-typedef GridRefManager<Corpse>          CorpseMapType;
-typedef GridRefManager<Creature>        CreatureMapType;
-typedef GridRefManager<DynamicObject>   DynamicObjectMapType;
-typedef GridRefManager<GameObject>      GameObjectMapType;
-typedef GridRefManager<Player>          PlayerMapType;
+typedef GridRefMgr<Corpse>          CorpseMapType;
+typedef GridRefMgr<Creature>        CreatureMapType;
+typedef GridRefMgr<DynamicObject>   DynamicObjectMapType;
+typedef GridRefMgr<GameObject>      GameObjectMapType;
+typedef GridRefMgr<Player>          PlayerMapType;
 
 enum GridMapTypeMask
 {
