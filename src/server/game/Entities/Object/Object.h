@@ -708,7 +708,7 @@ class GridObject
 {
 public:
     [[nodiscard]] bool IsInGrid() const { return _gridRef.isValid(); }
-    void AddToGrid(GridRefManager<T>& m) { ASSERT(!IsInGrid()); _gridRef.link(&m, (T*)this); }
+    void AddToGrid(GridRefMgr<T>& m) { ASSERT(!IsInGrid()); _gridRef.link(&m, (T*)this); }
     void RemoveFromGrid() { ASSERT(IsInGrid()); _gridRef.unlink(); }
 private:
     GridReference<T> _gridRef;

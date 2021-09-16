@@ -55,16 +55,16 @@ namespace VMAP
     };
 
     //===========================================================
-    class IVMapManager
+    class IVMapMgr
     {
     private:
         bool iEnableLineOfSightCalc{true};
         bool iEnableHeightCalc{true};
 
     public:
-        IVMapManager()  { }
+        IVMapMgr()  { }
 
-        virtual ~IVMapManager() = default;
+        virtual ~IVMapMgr() = default;
 
         virtual int loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
 

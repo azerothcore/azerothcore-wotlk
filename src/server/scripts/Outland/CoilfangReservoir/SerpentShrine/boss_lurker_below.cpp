@@ -174,7 +174,7 @@ public:
                 target = me->GetVictim();
             else
             {
-                ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
                     if (Unit* threatTarget = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                         if (me->IsWithinMeleeRange(threatTarget))

@@ -6,7 +6,7 @@
 
 #include "Containers.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
 #include "Transport.h"
