@@ -63,6 +63,7 @@ public:
             me->setFaction(35);
             postGossipStep = 0;
             Text_Timer = 0;
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
 
         InstanceScript* instance;
@@ -77,6 +78,27 @@ public:
         {
             ShieldBash_Timer = 5000;
             Revenge_Timer = 8000;
+        }
+
+        void JustReachedHome() override
+        {
+            if (instance->GetData(DATA_PYRAMID) == PYRAMID_ARRIVED_AT_STAIR)
+            {
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 /*id*/) override
+        {
+            if (type != POINT_MOTION_TYPE)
+            {
+                return;
+            }
+
+            if (instance->GetData(DATA_PYRAMID) == PYRAMID_ARRIVED_AT_STAIR)
+            {
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -252,8 +274,8 @@ public:
             {
                 crew->SetReactState(REACT_AGGRESSIVE);
                 crew->SetWalk(true);
-                crew->SetHomePosition(x, y, z, 0);
-                crew->GetMotionMaster()->MovePoint(1, x, y, z);
+                crew->SetHomePosition(x, y, z, 4.78f);
+                crew->GetMotionMaster()->MovePoint(1, { x, y, z, 4.78f });
                 crew->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
             }
         }
@@ -280,7 +302,8 @@ enum weegliSpells
 enum weegliSays
 {
     SAY_WEEGLI_OHNO             = 0,
-    SAY_WEEGLI_OK_I_GO          = 1
+    SAY_WEEGLI_OK_I_GO          = 1,
+    SAY_WEEGLI_OUT_OF_HERE      = 2
 };
 
 #define GOSSIP_WEEGLI               "Will you blow up that door now?"
@@ -296,18 +319,27 @@ public:
         {
             instance = creature->GetInstanceScript();
             destroyingDoor = false;
-            Bomb_Timer = 10000;
-            LandMine_Timer = 30000;
+            outroTimer = 2000;
+            outroStage = 0;
         }
 
         uint32 Bomb_Timer;
         uint32 LandMine_Timer;
+        uint32 outroTimer;
+        uint8 outroStage;
         bool destroyingDoor;
         InstanceScript* instance;
 
+        void InitializeAI() override
+        {
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            Reset();
+        }
+
         void Reset() override
         {
-            /*instance->SetData(0, NOT_STARTED);*/
+            Bomb_Timer     = 10000;
+            LandMine_Timer = 30000;
         }
 
         void AttackStart(Unit* victim) override
@@ -315,15 +347,35 @@ public:
             AttackStartCaster(victim, 10);//keep back & toss bombs/shoot
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            /*instance->SetData(0, DONE);*/
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
+                if (destroyingDoor)
+                {
+                    if (outroTimer <= diff)
+                    {
+                        switch (outroStage)
+                        {
+                            case 0:
+                                DoCastSelf(SPELL_WEEGLIS_BARREL);
+                                outroTimer = 2000;
+                                ++outroStage;
+                                break;
+                            case 1:
+                                me->GetMotionMaster()->MovePoint(2, 1871.18f, 1100.f, 8.88f);
+                                Talk(SAY_WEEGLI_OUT_OF_HERE);
+                                me->DespawnOrUnsummon(8000);
+                                destroyingDoor = false;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        outroTimer -= diff;
+                    }
+                }
+
                 return;
             }
 
@@ -335,6 +387,16 @@ public:
             else
             {
                 Bomb_Timer -= diff;
+            }
+
+            if (LandMine_Timer <= diff)
+            {
+                DoCastSelf(SPELL_GOBLIN_LAND_MINE);
+                LandMine_Timer = 30000;
+            }
+            else
+            {
+                LandMine_Timer -= diff;
             }
 
             if (me->isAttackReady() && !me->IsWithinMeleeRange(me->GetVictim()))
@@ -349,6 +411,25 @@ public:
             }
         }
 
+        void JustReachedHome() override
+        {
+            if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN)
+            {
+                instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
+                Talk(SAY_WEEGLI_OHNO);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+            {
+                instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
+            {
+                destroyingDoor = true;
+            }
+        }
+
         void MovementInform(uint32 type, uint32 /*id*/) override
         {
             if (type != POINT_MOTION_TYPE)
@@ -360,20 +441,16 @@ public:
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
-                me->SetHomePosition(1882.69f, 1272.28f, 41.87f, 0);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
             else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
-            else
+            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
             {
-                if (destroyingDoor)
-                {
-                    instance->DoUseDoorOrButton(instance->GetGuidData(GO_END_DOOR));
-                    /// @todo leave the area...
-                    me->DespawnOrUnsummon();
-                }
+                destroyingDoor = true;
             }
         }
 
@@ -382,11 +459,15 @@ public:
             if (me->IsAlive())
             {
                 me->setFaction(35);
-                me->GetMotionMaster()->MovePoint(0, 1858.57f, 1146.35f, 14.745f);
-                me->SetHomePosition(1858.57f, 1146.35f, 14.745f, 3.85f); // in case he gets interrupted
+                me->SetWalk(false);
+                me->GetMotionMaster()->MovePoint(0, 1858.57f, 1146.35f, 14.745f, 3.85f);
+                me->SetHomePosition(1858.57f, 1146.35f, 14.745f, 3.85f);
                 Talk(SAY_WEEGLI_OK_I_GO);
                 instance->SetData(DATA_PYRAMID, PYRAMID_DESTROY_GATES);
-                destroyingDoor = true;
+                if (Creature* sergeantBly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
+                {
+                    sergeantBly->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                }
             }
         }
 

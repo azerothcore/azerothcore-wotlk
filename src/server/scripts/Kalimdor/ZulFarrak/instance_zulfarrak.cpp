@@ -12,7 +12,9 @@
 enum Misc
 {
     // Paths
-    PATH_ADDS           = 81553
+    PATH_ADDS           = 81553,
+
+    SAY_BLY_FORWARD     = 2
 };
 
 struct PyramidEventData
@@ -311,6 +313,10 @@ public:
                         MoveNPCIfAlive(NPC_RAVEN, 1883.68f, 1227.95f, 9.543f, 4.78f);
                         MoveNPCIfAlive(NPC_WEEGLI, 1878.02f, 1227.65f, 9.485f, 4.78f);
                         SetData(DATA_PYRAMID, PYRAMID_WAVE_3);
+                        if (Creature* sergeantBlye = instance->GetCreature(BlyGUID))
+                        {
+                            sergeantBlye->AI()->Talk(SAY_BLY_FORWARD);
+                        }
                     }
                     else
                     {
@@ -340,7 +346,7 @@ public:
                if (npc->IsAlive())
                {
                     npc->SetWalk(true);
-                    npc->GetMotionMaster()->MovePoint(1, x, y, z);
+                    npc->GetMotionMaster()->MovePoint(1, { x, y, z, o } );
                     npc->SetHomePosition(x, y, z, o);
                }
             }
@@ -352,11 +358,15 @@ public:
             {
                 if (pyramidSpawns[i].waveID == wave)
                 {
-                    Position pos = { pyramidSpawns[i].pos.GetPositionX(), pyramidSpawns[i].pos.GetPositionY(), 8.87f, 0.f };
+                    Position pos = { pyramidSpawns[i].pos.GetPositionX(), pyramidSpawns[i].pos.GetPositionY(), 8.87f, 4.78f };
                     if (TempSummon* ts = instance->SummonCreature(pyramidSpawns[i].creatureID, pos))
                     {
-                        ts->GetMotionMaster()->MoveRandom(10);
                         addsAtBase.push_back(ts->GetGUID());
+
+                        if (pyramidSpawns[i].creatureID != NPC_SHADOWPRIEST_SEZZZIZ && pyramidSpawns[i].creatureID != NPC_NEKRUM_GUTCHEWER)
+                        {
+                            ts->GetMotionMaster()->MoveRandom(10);
+                        }
                     }
                 }
             }
