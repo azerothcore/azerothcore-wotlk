@@ -13,7 +13,7 @@
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
 #include "GridNotifiers.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
@@ -239,7 +239,7 @@ public:
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
-                if (Unit* owner = target->ToTempSummon()->GetSummoner())
+                if (Unit* owner = target->ToTempSummon()->GetSummonerUnit())
                     if (owner->GetTypeId() == TYPEID_PLAYER)
                         owner->ToPlayer()->KilledMonsterCredit(23327); // Some trigger, just count
         }

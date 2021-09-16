@@ -9,7 +9,7 @@
 // TODO: Add proper implement of achievement
 
 #include "BattlefieldWG.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"
@@ -598,7 +598,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
                     if (!creature->IsSummon() || !creature->ToTempSummon()->GetSummonerGUID())
                         return;
 
-                    if (Unit* owner = creature->ToTempSummon()->GetSummoner())
+                    if (Unit* owner = creature->ToTempSummon()->GetSummonerUnit())
                         creature->setFaction(owner->getFaction());
                     break;
                 }

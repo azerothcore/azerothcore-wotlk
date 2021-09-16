@@ -18,7 +18,7 @@
 #include "IPLocation.h"
 #include "Language.h"
 #include "LFG.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -57,6 +57,11 @@ public:
             { "mail",               SEC_GAMEMASTER,         true,  &HandleSendMailCommand,              "" },
             { "message",            SEC_ADMINISTRATOR,      true,  &HandleSendMessageCommand,           "" },
             { "money",              SEC_GAMEMASTER,         true,  &HandleSendMoneyCommand,             "" }
+        };
+        static std::vector<ChatCommand> gearCommandTable =
+        {
+            { "repair",             SEC_GAMEMASTER,         false,  &HandleGearRepairCommand,              "" },
+            { "stats",              SEC_PLAYER,             false,  &HandleGearStatsCommand,               "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -102,10 +107,10 @@ public:
             { "damage",             SEC_GAMEMASTER,         false, &HandleDamageCommand,                "" },
             { "combatstop",         SEC_GAMEMASTER,         true,  &HandleCombatStopCommand,            "" },
             { "flusharenapoints",   SEC_ADMINISTRATOR,      false, &HandleFlushArenaPointsCommand,      "" },
-            { "repairitems",        SEC_GAMEMASTER,         true,  &HandleRepairitemsCommand,           "" },
             { "freeze",             SEC_GAMEMASTER,         false, &HandleFreezeCommand,                "" },
             { "unfreeze",           SEC_GAMEMASTER,         false, &HandleUnFreezeCommand,              "" },
             { "group",              SEC_GAMEMASTER,         false, nullptr,                             "", groupCommandTable },
+            { "gear",               SEC_PLAYER,             false, nullptr,                             "", gearCommandTable },
             { "possess",            SEC_GAMEMASTER,         false, HandlePossessCommand,                "" },
             { "unpossess",          SEC_GAMEMASTER,         false, HandleUnPossessCommand,              "" },
             { "bindsight",          SEC_ADMINISTRATOR,      false, HandleBindSightCommand,              "" },
@@ -2615,7 +2620,7 @@ public:
             return false;
 
         target->CombatStop();
-        target->getHostileRefManager().deleteReferences();
+        target->getHostileRefMgr().deleteReferences();
         return true;
     }
 
@@ -2625,7 +2630,7 @@ public:
         return true;
     }
 
-    static bool HandleRepairitemsCommand(ChatHandler* handler, char const* args)
+    static bool HandleGearRepairCommand(ChatHandler* handler, char const* args)
     {
         Player* target;
         if (!handler->extractPlayerTarget((char*)args, &target))
@@ -3384,6 +3389,49 @@ public:
             handler->SendSysMessage(str);
             return true;
         }
+    }
+
+    static bool HandleGearStatsCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* player = handler->getSelectedPlayerOrSelf();
+
+        if (!player)
+        {
+            return false;
+        }
+
+        handler->PSendSysMessage("Character: %s", player->GetPlayerName().c_str());
+        handler->PSendSysMessage("Current equipment average item level: |cff00ffff%u|r", (int16)player->GetAverageItemLevel());
+
+        if (sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE))
+        {
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_STATS);
+            stmt->setUInt32(0, player->GetGUID().GetCounter());
+            PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+            if (result)
+            {
+                Field* fields = result->Fetch();
+                uint32 MaxHealth = fields[0].GetUInt32();
+                uint32 Strength = fields[1].GetUInt32();
+                uint32 Agility = fields[2].GetUInt32();
+                uint32 Stamina = fields[3].GetUInt32();
+                uint32 Intellect = fields[4].GetUInt32();
+                uint32 Spirit = fields[5].GetUInt32();
+                uint32 Armor = fields[6].GetUInt32();
+                uint32 AttackPower = fields[7].GetUInt32();
+                uint32 SpellPower = fields[8].GetUInt32();
+                uint32 Resilience = fields[9].GetUInt32();
+
+                handler->PSendSysMessage("Health: |cff00ffff%u|r - Stamina: |cff00ffff%u|r", MaxHealth, Stamina);
+                handler->PSendSysMessage("Strength: |cff00ffff%u|r - Agility: |cff00ffff%u|r", Strength, Agility);
+                handler->PSendSysMessage("Intellect: |cff00ffff%u|r - Spirit: |cff00ffff%u|r", Intellect, Spirit);
+                handler->PSendSysMessage("AttackPower: |cff00ffff%u|r - SpellPower: |cff00ffff%u|r", AttackPower, SpellPower);
+                handler->PSendSysMessage("Armor: |cff00ffff%u|r - Resilience: |cff00ffff%u|r", Armor, Resilience);
+            }
+        }
+
+        return true;
     }
 };
 

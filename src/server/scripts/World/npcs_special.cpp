@@ -44,7 +44,7 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "SmartAI.h"
 #include "SpellAuras.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 #include "World.h"
 
 enum elderClearwater
@@ -1707,7 +1707,7 @@ public:
     {
         if (creature->IsSummon())
         {
-            if (player == creature->ToTempSummon()->GetSummoner())
+            if (player == creature->ToTempSummon()->GetSummonerUnit())
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ENGINEERING2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);

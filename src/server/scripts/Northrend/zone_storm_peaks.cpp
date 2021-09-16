@@ -13,7 +13,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 #include "WorldSession.h"
 
 // Ours
@@ -78,7 +78,7 @@ public:
                     break;
                 case 19:
                     me->MonsterTextEmote("The frosthound has located the thief's hiding place. Confront him!", 0, true);
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                         summoner->ToPlayer()->KilledMonsterCredit(29677);
                     break;
             }

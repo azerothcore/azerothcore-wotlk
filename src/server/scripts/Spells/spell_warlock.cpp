@@ -764,7 +764,7 @@ public:
                 // Refresh corruption on target
                 if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x2, 0, 0, GetCaster()->GetGUID()))
                 {
-                    aur->GetBase()->RefreshTimersWithMods();
+                    aur->GetBase()->RefreshTimers();
                     aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
                 }
         }
@@ -857,7 +857,7 @@ public:
             Unit* caster = GetCaster();
             if (Unit* target = GetHitUnit())
             {
-                if (target->CanHaveThreatList() && target->getThreatManager().getThreat(caster) > 0.0f)
+                if (target->CanHaveThreatList() && target->getThreatMgr().getThreat(caster) > 0.0f)
                     caster->CastSpell(target, SPELL_WARLOCK_SOULSHATTER, true);
             }
         }
