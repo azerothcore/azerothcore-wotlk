@@ -253,12 +253,12 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
     }
 
     float pathDist = m_leader->GetExactDist(x, y, z);
-    float pathAngle = m_leader->GetAngle(x, y);
+    float pathAngle = std::atan2(m_leader->GetPositionY() - y, m_leader->GetPositionX() - x);
 
-    for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+    for (auto const& itr : m_members)
     {
-        Creature* member = itr->first;
-        FormationInfo const* pFormationInfo = itr->second;
+        Creature* member = itr.first;
+        FormationInfo const* pFormationInfo = itr.second;
         if (member == m_leader || !member->IsAlive() || member->GetVictim() || !(pFormationInfo->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
         {
             continue;
@@ -271,17 +271,17 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         }
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle
+        float followAngle = pFormationInfo->follow_angle;
         if (static_cast<float>(M_PI) - fabs(fabs(m_leader->GetOrientation() - pathAngle) - static_cast<float>(M_PI)) > static_cast<float>(M_PI)* 0.50f)
         {
             // pussywizard: in both cases should be 2*M_PI - follow_angle
             // pussywizard: also, GetCurrentWaypointID() returns 0..n-1, while point_1 must be > 0, so +1
             // pussywizard: db table waypoint_data shouldn't have point id 0 and shouldn't have any gaps for this to work!
-            // if (m_leader->GetCurrentWaypointID()+1 == itr->second->point_1 || m_leader->GetCurrentWaypointID()+1 == itr->second->point_2)
-            itr->second->follow_angle = Position::NormalizeOrientation(itr->second->follow_angle + static_cast<float>(M_PI)); //(2 * M_PI) - itr->second->follow_angle;
+            // if (m_leader->GetCurrentWaypointID()+1 == pFormationInfo->point_1 || m_leader->GetCurrentWaypointID()+1 == itr->second->point_2)
+            followAngle = Position::NormalizeOrientation(pFormationInfo->follow_angle + static_cast<float>(M_PI)); //(2 * M_PI) - itr->second->follow_angle;
         }
 
-        float const followAngle = itr->second->follow_angle;
-        float const followDist = itr->second->follow_dist;
+        float const followDist = pFormationInfo->follow_dist;
 
         float dx = x + std::cos(followAngle + pathAngle) * followDist;
         float dy = y + std::sin(followAngle + pathAngle) * followDist;
