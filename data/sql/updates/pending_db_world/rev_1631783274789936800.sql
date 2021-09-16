@@ -14,3 +14,4 @@ update creature_formations set angle=0, dist=0 where leaderGUID=134944 and membe
 update creature_formations set angle=0, dist=0 where leaderGUID=134952 and memberGUID=134952;
 update creature_formations set groupAI = 1 | 2 where leaderGUID=85221 and memberGUID=85221;
 update creature_formations set groupAI = 1 | 2 where leaderGUID=114937 and memberGUID=114937;
+update creature_formations set groupAI=515 where leaderGUID = 248035 and memberGUID != 248035;
