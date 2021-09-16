@@ -278,7 +278,7 @@ void Creature::SearchFormation()
 
     CreatureGroupInfoType::iterator frmdata = sFormationMgr->CreatureGroupMap.find(spawnId);
     if (frmdata != sFormationMgr->CreatureGroupMap.end())
-        sFormationMgr->AddCreatureToGroup(frmdata->second->leaderGUID, this);
+        sFormationMgr->AddCreatureToGroup(frmdata->second.leaderGUID, this);
 }
 
 void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
