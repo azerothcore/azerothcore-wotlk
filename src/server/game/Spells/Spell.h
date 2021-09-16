@@ -20,7 +20,9 @@ class DynamicObject;
 class WorldObject;
 class Aura;
 class SpellScript;
+class SpellEvent;
 class ByteBuffer;
+class BasicEvent;
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 
@@ -28,11 +30,11 @@ enum SpellCastFlags
 {
     CAST_FLAG_NONE               = 0x00000000,
     CAST_FLAG_PENDING            = 0x00000001,              // aoe combat log?
-    CAST_FLAG_UNKNOWN_2          = 0x00000002,
+    CAST_FLAG_HAS_TRAJECTORY     = 0x00000002,
     CAST_FLAG_UNKNOWN_3          = 0x00000004,
     CAST_FLAG_UNKNOWN_4          = 0x00000008,              // ignore AOE visual
     CAST_FLAG_UNKNOWN_5          = 0x00000010,
-    CAST_FLAG_AMMO               = 0x00000020,              // Projectiles visual
+    CAST_FLAG_PROJECTILE         = 0x00000020,              // Projectiles visual
     CAST_FLAG_UNKNOWN_7          = 0x00000040,
     CAST_FLAG_UNKNOWN_8          = 0x00000080,
     CAST_FLAG_UNKNOWN_9          = 0x00000100,
@@ -57,8 +59,8 @@ enum SpellCastFlags
     CAST_FLAG_UNKNOWN_28         = 0x08000000,
     CAST_FLAG_UNKNOWN_29         = 0x10000000,
     CAST_FLAG_UNKNOWN_30         = 0x20000000,
-    CAST_FLAG_UNKNOWN_31         = 0x40000000,
-    CAST_FLAG_UNKNOWN_32         = 0x80000000,
+    CAST_FLAG_HEAL_PREDICTION    = 0x40000000,              //@todo: Unused on TC 3.3.5a. Defined from TC Master.
+    CAST_FLAG_UNKNOWN_32         = 0x80000000
 };
 
 //Spells casted on self should not be diminished.
@@ -521,6 +523,8 @@ public:
     uint64 GetDelayMoment() const { return m_delayMoment; }
     uint64 GetDelayTrajectory() const { return m_delayTrajectory; }
 
+    uint64 CalculateDelayMomentForDst() const;
+    void RecalculateDelayMomentForDst();
     bool IsNeedSendToClient(bool go) const;
 
     CurrentSpellTypes GetCurrentContainer() const;
@@ -678,7 +682,7 @@ protected:
     SpellCastResult CallScriptCheckCastHandlers();
     void PrepareScriptHitHandlers();
     bool CallScriptEffectHandlers(SpellEffIndex effIndex, SpellEffectHandleMode mode);
-    void CallScriptBeforeHitHandlers();
+    void CallScriptBeforeHitHandlers(SpellMissInfo missInfo);
     void CallScriptOnHitHandlers();
     void CallScriptAfterHitHandlers();
     void CallScriptObjectAreaTargetSelectHandlers(std::list<WorldObject*>& targets, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
@@ -710,6 +714,7 @@ protected:
     uint32 m_spellState;
     int32 m_timer;
 
+    SpellEvent* _spellEvent;
     TriggerCastFlags _triggeredCastFlags;
 
     // if need this can be replaced by Aura copy
@@ -788,29 +793,16 @@ namespace Acore
 
 typedef void(Spell::*pEffect)(SpellEffIndex effIndex);
 
-class SpellEvent : public BasicEvent
-{
-public:
-    SpellEvent(Spell* spell);
-    ~SpellEvent() override;
-
-    bool Execute(uint64 e_time, uint32 p_time) override;
-    void Abort(uint64 e_time) override;
-    bool IsDeletable() const override;
-protected:
-    Spell* m_Spell;
-};
-
 class ReflectEvent : public BasicEvent
 {
-public:
-    ReflectEvent(Unit* caster, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
-    bool Execute(uint64 e_time, uint32 p_time) override;
+    public:
+        ReflectEvent(Unit* caster, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
+        bool Execute(uint64 e_time, uint32 p_time) override;
 
-protected:
-    Unit* _caster;
-    ObjectGuid _targetGUID;
-    const SpellInfo* _spellInfo;
+    protected:
+        Unit* _caster;
+        ObjectGuid _targetGUID;
+        const SpellInfo* _spellInfo;
 };
 
 #endif

@@ -175,6 +175,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
 
     if (pet->IsCritter())
     {
+        pet->UpdatePositionData();
         map->AddToMap(pet->ToCreature(), true);
         pet->SetLoading(false); // xinef, mine
         return PET_LOAD_OK;
@@ -186,6 +187,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
         pet->GetCharmInfo()->SetPetNumber(pet_number, false);
 
     pet->SetDisplayId(fields[3].GetUInt32());
+    pet->UpdatePositionData();
     pet->SetNativeDisplayId(fields[3].GetUInt32());
     pet->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
     pet->SetName(fields[8].GetString());
@@ -731,7 +733,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                 if (result == SPELL_CAST_OK)
                 {
-                    pet->ToCreature()->AddSpellCooldown(spellid, 0, 0);
+                    pet->ToCreature()->AddSpellCooldown(spellid, 0, spellInfo->IsCooldownStartedOnEvent() ? infinityCooldownDelay : 0);
 
                     unit_target = spell->m_targets.GetUnitTarget();
 

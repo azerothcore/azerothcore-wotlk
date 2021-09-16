@@ -211,7 +211,7 @@ public:
                         c->SetLootMode(1);
                         c->loot.clear();
                         if (uint32 lootid = c->GetCreatureTemplate()->lootid)
-                            c->loot.FillLoot(lootid, LootTemplates_Creature, c->GetLootRecipient(), false, false, c->GetLootMode());
+                            c->loot.FillLoot(lootid, LootTemplates_Creature, c->GetLootRecipient(), false, false, c->GetLootMode(), c);
                         if (c->GetLootMode())
                             c->loot.generateMoneyLoot(c->GetCreatureTemplate()->mingold, c->GetCreatureTemplate()->maxgold);
                         c->DestroyForNearbyPlayers();
@@ -226,7 +226,7 @@ public:
                         c->SetLootMode(1);
                         c->loot.clear();
                         if (uint32 lootid = c->GetCreatureTemplate()->lootid)
-                            c->loot.FillLoot(lootid, LootTemplates_Creature, c->GetLootRecipient(), false, false, c->GetLootMode());
+                            c->loot.FillLoot(lootid, LootTemplates_Creature, c->GetLootRecipient(), false, false, c->GetLootMode(), c);
                         if (c->GetLootMode())
                             c->loot.generateMoneyLoot(c->GetCreatureTemplate()->mingold, c->GetCreatureTemplate()->maxgold);
                         c->DestroyForNearbyPlayers();

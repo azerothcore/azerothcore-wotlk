@@ -1761,15 +1761,15 @@ public:
                 me->GetPosition(&myPos);
                 me->NearTeleportTo(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), c->GetOrientation());
                 c->NearTeleportTo(myPos.GetPositionX(), myPos.GetPositionY(), myPos.GetPositionZ(), myPos.GetOrientation());
-                const ThreatContainer::StorageType me_tl = me->getThreatManager().getThreatList();
-                const ThreatContainer::StorageType target_tl = c->getThreatManager().getThreatList();
+                const ThreatContainer::StorageType me_tl = me->getThreatMgr().getThreatList();
+                const ThreatContainer::StorageType target_tl = c->getThreatMgr().getThreatList();
                 DoResetThreat();
                 for (ThreatContainer::StorageType::const_iterator iter = target_tl.begin(); iter != target_tl.end(); ++iter)
-                    me->getThreatManager().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    me->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
 
-                c->getThreatManager().resetAllAggro();
+                c->getThreatMgr().resetAllAggro();
                 for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
-                    c->getThreatManager().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    c->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
             }
         }
 
@@ -2171,7 +2171,7 @@ public:
             Position pos;
             caster->GetPosition(&pos);
             caster->GetNearPosition(pos, 5.0f, 0.0f);
-            pos.m_positionZ = caster->GetBaseMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true, 50.0f);
+            pos.m_positionZ = caster->GetMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true, 50.0f);
             pos.m_positionZ += 0.1f;
             caster->SendMeleeAttackStop(caster->GetVictim());
             caster->GetMotionMaster()->MoveLand(POINT_LAND, pos, 7.0f);

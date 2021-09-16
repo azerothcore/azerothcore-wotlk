@@ -5,7 +5,6 @@
  */
 
 #include <OpenSSLCrypto.h>
-#include <openssl/crypto.h>
 
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x1010000fL
 #include <vector>

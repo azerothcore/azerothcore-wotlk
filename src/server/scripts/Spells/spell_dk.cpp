@@ -851,7 +851,7 @@ public:
         void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             PreventDefaultAction();
-            if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummoner())
+            if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
             {
                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_16_ENTRYID));
                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_17_ENTRYID));
@@ -1185,14 +1185,21 @@ public:
             return ValidateSpellInfo({ SPELL_DK_ANTI_MAGIC_SHELL_TALENT });
         }
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
             SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
-            amount = talentSpell->Effects[EFFECT_0].CalcValue(GetCaster());
-            if (Unit* totem = GetCaster())
-                if (Unit* owner = totem->ToTotem()->GetSummoner())
-                    amount += int32(2 * owner->GetTotalAttackPowerValue(BASE_ATTACK));
-            canBeRecalculated = false;
+
+            Unit* owner = GetCaster()->GetOwner();
+            if (!owner)
+            {
+                return;
+            }
+
+            amount = talentSpell->Effects[EFFECT_0].CalcValue(owner);
+            if (Player* player = owner->ToPlayer())
+            {
+                amount += int32(2 * player->GetTotalAttackPowerValue(BASE_ATTACK));
+            }
         }
 
         void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)

@@ -6,7 +6,6 @@
 #include "Log.h"
 #include "AppenderConsole.h"
 #include "AppenderFile.h"
-#include "Common.h"
 #include "Config.h"
 #include "Errors.h"
 #include "LogMessage.h"
@@ -158,16 +157,16 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
     logger = std::make_unique<Logger>(name, level);
     //fprintf(stdout, "Log::CreateLoggerFromConfig: Created Logger %s, Level %u\n", name.c_str(), level);
 
-    for (std::string_view appenderName : Acore::Tokenize(tokens[1], ' ', false))
+    for (std::string_view appendName : Acore::Tokenize(tokens[1], ' ', false))
     {
-        if (Appender* appender = GetAppenderByName(appenderName))
+        if (Appender* appender = GetAppenderByName(appendName))
         {
             logger->addAppender(appender->getId(), appender);
             //fprintf(stdout, "Log::CreateLoggerFromConfig: Added Appender %s to Logger %s\n", appender->getName().c_str(), name.c_str());
         }
         else
         {
-            fprintf(stderr, "Error while configuring Appender %s in Logger %s. Appender does not exist\n", std::string(appenderName).c_str(), name.c_str());
+            fprintf(stderr, "Error while configuring Appender %s in Logger %s. Appender does not exist\n", std::string(appendName).c_str(), name.c_str());
         }
     }
 }

@@ -281,7 +281,7 @@ public:
         Creature* GetSummoner()
         {
             if (me->IsSummon())
-                if (Unit* coren = me->ToTempSummon()->GetSummoner())
+                if (Unit* coren = me->ToTempSummon()->GetSummonerUnit())
                     return coren->ToCreature();
 
             return nullptr;
@@ -1594,8 +1594,13 @@ public:
             targets.push_back(caster);
         }
 
-        void HandleBeforeHit()
+        void HandleBeforeHit(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (Unit* target = GetHitUnit())
             {
                 if (!GetCaster() || target->GetGUID() == GetCaster()->GetGUID())
@@ -1640,7 +1645,7 @@ public:
         {
             OnCheckCast += SpellCheckCastFn(spell_brewfest_toss_mug_SpellScript::CheckCast);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_brewfest_toss_mug_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            BeforeHit += SpellHitFn(spell_brewfest_toss_mug_SpellScript::HandleBeforeHit);
+            BeforeHit += BeforeSpellHitFn(spell_brewfest_toss_mug_SpellScript::HandleBeforeHit);
             OnEffectHitTarget += SpellEffectFn(spell_brewfest_toss_mug_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };

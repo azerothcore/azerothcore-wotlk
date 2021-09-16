@@ -1,3 +1,10 @@
+## 4.0.0-dev.11 | Commit: [d18545263fda54e19c875d22adfb28ae4072ec01
+](https://github.com/azerothcore/azerothcore-wotlk/commit/d18545263fda54e19c875d22adfb28ae4072ec01
+
+
+### Added
+
+- Added `OnBeforeFinalizePlayerWorldSession ` that can be used to modify the cache version that is sent to the client via modules.
 ## 4.0.0-dev.10 | Commit: [0897705a6814fc19007e5f88fbcb98b3689880c9
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/0897705a6814fc19007e5f88fbcb98b3689880c9
 

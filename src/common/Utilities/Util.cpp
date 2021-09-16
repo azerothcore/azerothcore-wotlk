@@ -8,7 +8,6 @@
 #include "Common.h"
 #include "Containers.h"
 #include "IpAddress.h"
-#include "StringConvert.h"
 #include "StringFormat.h"
 #include <algorithm>
 #include <cctype>
@@ -17,9 +16,6 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
-#include <cctype>
-#include <cstdarg>
-#include <ctime>
 #include <utf8.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
@@ -518,7 +514,7 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
     {
         std::wstring const& ending = **itr;
         std::size_t const endLen = ending.length();
-        if (!(endLen <= thisLen))
+        if (endLen > thisLen)
         {
             continue;
         }

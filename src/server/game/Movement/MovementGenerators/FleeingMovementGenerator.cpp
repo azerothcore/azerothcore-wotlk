@@ -7,7 +7,7 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "FleeingMovementGenerator.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
@@ -48,7 +48,7 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
     if (!owner)
         return false;
 
-    const Map* _map = owner->GetBaseMap();
+    const Map* _map = owner->GetMap();
 
     x = owner->GetPositionX();
     y = owner->GetPositionY();

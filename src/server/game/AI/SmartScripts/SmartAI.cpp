@@ -800,7 +800,8 @@ void SmartAI::AttackStart(Unit* who)
                 me->GetMotionMaster()->MovementExpired();
                 me->StopMoving();
             }
-            me->GetMotionMaster()->MoveChase(who, GetScript()->GetCasterActualDist() ? GetScript()->GetCasterActualDist() : GetScript()->GetActualCombatDist());
+            float range = GetScript()->GetCasterActualDist() > 0.f ? GetScript()->GetCasterActualDist() : GetScript()->GetActualCombatDist();
+            me->GetMotionMaster()->MoveChase(who, range > 0.f ? ChaseRange(range) : std::optional<ChaseRange>());
         }
     }
 }

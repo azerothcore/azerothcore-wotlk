@@ -132,11 +132,6 @@ void MotionMaster::UpdateMotion(uint32 diff)
     }
 
     _cleanFlag &= ~MMCF_INUSE;
-
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
-        _owner->UpdateUnderwaterState(_owner->GetMap(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
-    else
-        _owner->UpdateEnvironmentIfNeeded(0);
 }
 
 void MotionMaster::DirectClean(bool reset)
@@ -839,7 +834,7 @@ void MotionMaster::DirectDelete(_Ty curr)
 
 void MotionMaster::DelayedDelete(_Ty curr)
 {
-    LOG_FATAL("movement.motionmaster", "Unit (Entry %u) is trying to delete its updating MG (Type %u)!", _owner->GetEntry(), curr->GetMovementGeneratorType());
+    LOG_DEBUG("movement.motionmaster", "Unit (Entry %u) is trying to delete its updating MG (Type %u)!", _owner->GetEntry(), curr->GetMovementGeneratorType());
     if (isStatic(curr))
         return;
     if (!_expList)

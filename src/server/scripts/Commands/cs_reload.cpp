@@ -21,7 +21,7 @@ EndScriptData */
 #include "GameGraveyard.h"
 #include "Language.h"
 #include "LFGMgr.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
@@ -30,7 +30,7 @@ EndScriptData */
 #include "SpellMgr.h"
 #include "TicketMgr.h"
 #include "WardenCheckMgr.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
 
@@ -857,7 +857,7 @@ public:
         LOG_INFO("server.loading", "Re-Loading Page Texts...");
         sObjectMgr->LoadPageTexts();
         handler->SendGlobalGMSysMessage("DB table `page_texts` reloaded.");
-        handler->GetSession()->SendNotification("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
+        handler->SendGlobalGMSysMessage("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
         return true;
     }
 
@@ -1059,7 +1059,7 @@ public:
         LOG_INFO("server.loading", "Re-Loading Page Text Locale ... ");
         sObjectMgr->LoadPageTextLocales();
         handler->SendGlobalGMSysMessage("DB table `page_text_locale` reloaded.");
-        handler->GetSession()->SendNotification("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
+        handler->SendGlobalGMSysMessage("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
         return true;
     }
 

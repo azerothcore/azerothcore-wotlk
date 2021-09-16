@@ -1135,7 +1135,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     pCurrChar->CleanupChannels();
     pCurrChar->SendInitialPacketsAfterAddToMap();
     uint32 currZone, currArea;
-    pCurrChar->GetZoneAndAreaId(currZone, currArea, false);
+    pCurrChar->GetZoneAndAreaId(currZone, currArea);
     pCurrChar->SendInitWorldStates(currZone, currArea);
     pCurrChar->SetInGameTime(World::GetGameTimeMS());
 

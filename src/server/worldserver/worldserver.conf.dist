@@ -221,6 +221,15 @@ ThreadPool = 2
 IPLocationFile = ""
 
 #
+#    AllowLoggingIPAddressesInDatabase
+#        Description: Specifies if IP addresses can be logged to the database
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+
+AllowLoggingIPAddressesInDatabase = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -1242,6 +1251,16 @@ DeletedCharacterTicketTrace = 0
 #        Default:     1
 
 DungeonFinder.OptionsMask = 1
+
+#
+#     DungeonFinder.Expansion
+#        Description: Allow setting which expansion can be used in LFG
+#           2 - Wotlk (Default)
+#           1 - TBC
+#           0 - Classic
+#        Default:     2
+
+DungeonFinder.Expansion = 2
 
 #
 #   AccountInstancesPerHour
@@ -3521,6 +3540,14 @@ Item.SetItemTradeable = 1
 #        Default:     30 sec
 
 FFAPvPTimer = 30
+
+#
+#     LootNeedBeforeGreedILvlRestriction
+#        Description: Specify level restriction for items below player's subclass in Need Before Greed loot mode in DF groups
+#        Default:     70
+#                     0 - Disabled
+
+LootNeedBeforeGreedILvlRestriction = 70
 
 #
 ###################################################################################################

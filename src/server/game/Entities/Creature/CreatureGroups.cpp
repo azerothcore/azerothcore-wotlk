@@ -186,7 +186,7 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
     }
 }
 
-void CreatureGroup::FormationReset(bool dismiss)
+void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
 {
     if (m_members.size() && m_members.begin()->second->groupAI == 5)
         return;
@@ -195,11 +195,18 @@ void CreatureGroup::FormationReset(bool dismiss)
     {
         if (itr->first != m_leader && itr->first->IsAlive())
         {
-            if (dismiss)
-                itr->first->GetMotionMaster()->Initialize();
-            else
-                itr->first->GetMotionMaster()->MoveIdle();
-            LOG_DEBUG("entities.unit", "Set %s movement for member %s", dismiss ? "default" : "idle", itr->first->GetGUID().ToString().c_str());
+            if (initMotionMaster)
+            {
+                if (dismiss)
+                {
+                    itr->first->GetMotionMaster()->Initialize();
+                }
+                else
+                {
+                    itr->first->GetMotionMaster()->MoveIdle();
+                }
+                LOG_DEBUG("entities.unit", "Set %s movement for member %s", dismiss ? "default" : "idle", itr->first->GetGUID().ToString().c_str());
+            }
         }
     }
     m_Formed = !dismiss;
