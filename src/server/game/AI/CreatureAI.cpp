@@ -14,6 +14,21 @@
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
+class PhasedRespawn : public BasicEvent
+{
+public:
+    PhasedRespawn(Creature& owner) : BasicEvent(), _owner(owner) {}
+
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    {
+        _owner.RespawnOnEvade();
+        return true;
+    }
+
+private:
+    Creature& _owner;
+};
+
 //Disable CreatureAI when charmed
 void CreatureAI::OnCharmed(bool /*apply*/)
 {
@@ -54,8 +69,8 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
             if (Unit* summoner = creature->ToTempSummon()->GetSummonerUnit())
             {
                 Unit* target = summoner->getAttackerForHelper();
-                if (!target && summoner->CanHaveThreatList() && !summoner->getThreatManager().isThreatListEmpty())
-                    target = summoner->getThreatManager().getHostilTarget();
+                if (!target && summoner->CanHaveThreatList() && !summoner->getThreatMgr().isThreatListEmpty())
+                    target = summoner->getThreatMgr().getHostilTarget();
                 if (target && (creature->IsFriendlyTo(summoner) || creature->IsHostileTo(target)))
                     creature->AI()->AttackStart(target);
             }
@@ -170,10 +185,50 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
-    Reset();
+    // @todo: Turn into a flags_extra in creature_template
+    // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid) and increase array limit
+    static constexpr std::array<uint32, 24> bosses = {
+        /* dungeons */
+        28684, /* Krik'thir the Gatewatcher */
+        36502, /* Devourer of Souls */
+        36658, /* Scourgelord Tyrannus */
+        /* raids */
+        32871, /* Algalon */
+        39863, /* Halion */
+        33186, /* Razorscale */
+        36626, /* Festergut */
+        32867, /* Steelbreaker - Assembly of Iron */
+        32927, /* Runemaster Molgeim - Assembly of Iron */
+        32857, /* Stormcaller Brundir - Assembly of Iron */
+        33350, /* Mimiron */
+        16060, /* Gothik the Harvester */
+        36678, /* Professor Putricide */
+        15990, /* Kel'Thuzad */
+        33993, /* Emalon the Storm Watcher */
+        17257, /* Magtheridon */
+        25315, /* Kil'jaeden */
+        15928, /* Thaddius */
+        32930, /* Kologarn */
+        32906, /* Freya */
+        36597, /* The Lich King */
+        36853, /* Sindragosa */
+        36855, /* Lady Deathwhisper */
+        37955  /* Blood-Queen Lana'thel */
+    };
 
-    if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
-        me->GetVehicleKit()->Reset(true);
+    if (std::find(std::begin(bosses), std::end(bosses), me->GetEntry()) != std::end(bosses))
+    {
+        me->DespawnOnEvade();
+        me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
+    }
+    else // bosses will run back to the spawnpoint at reset
+    {
+        Reset();
+        if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+        {
+            me->GetVehicleKit()->Reset(true);
+        }
+    }
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
@@ -223,7 +278,7 @@ bool CreatureAI::UpdateVictim()
     // xinef: if we have any victim, just return true
     else if (me->GetVictim() && me->GetExactDist(me->GetVictim()) < 30.0f)
         return true;
-    else if (me->getThreatManager().isThreatListEmpty())
+    else if (me->getThreatMgr().isThreatListEmpty())
     {
         EnterEvadeMode();
         return false;
