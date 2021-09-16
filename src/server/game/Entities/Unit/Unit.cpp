@@ -12734,7 +12734,33 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
             if (target->IsPet())
                 target->ToCreature()->AI()->AttackedBy(this); // PetAI has special handler before AttackStart()
             else
+            {
                 target->ToCreature()->AI()->AttackStart(this);
+                // if the target is an NPC with a pet or minion, pet should react.
+                if (Unit* targetControlledUnit = target->GetFirstControlled())
+                {
+                    targetControlledUnit->SetInCombatWith(this);
+                    SetInCombatWith(targetControlledUnit);
+                    targetControlledUnit->AddThreat(this, 0.0f);
+                }
+            }
+
+            // if unit has an owner, put owner in combat.
+            if (Unit* targetOwner = target->GetOwner())
+            {
+                if (!(targetOwner->IsInCombatWith(this)))
+                {
+                    /* warding off to not take over aggro for no reason
+                    Using only AddThreat causes delay in attack */
+                    if (!targetOwner->IsInCombat() && targetOwner->IsAIEnabled)
+                    {
+                        targetOwner->ToCreature()->AI()->AttackStart(this);
+                    }
+                    targetOwner->SetInCombatWith(this);
+                    SetInCombatWith(targetOwner);
+                    targetOwner->AddThreat(this, 0.0f);
+                }
+            }
         }
 
         SetInCombatWith(target);
