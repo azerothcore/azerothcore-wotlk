@@ -103,7 +103,7 @@ void FormationMgr::LoadCreatureFormations()
         float const follow_angle            = fields[3].GetFloat() * static_cast<float>(M_PI) / 180;
         group_member->groupAI               = fields[4].GetUInt16();
 
-        if (!(group_member->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
+        if (!group_member->HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
         {
             LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u). Skipped", group_member->leaderGUID, memberGUID, group_member->groupAI);
             delete group_member;
