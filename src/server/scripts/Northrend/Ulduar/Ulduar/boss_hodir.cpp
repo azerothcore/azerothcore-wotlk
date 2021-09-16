@@ -663,7 +663,7 @@ public:
                 timer = 2500;
                 if (me->IsSummon())
                 {
-                    if (Unit* s = me->ToTempSummon()->GetSummoner())
+                    if (Unit* s = me->ToTempSummon()->GetSummonerUnit())
                     {
                         if ((s->GetTypeId() == TYPEID_PLAYER && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER)) || (s->GetTypeId() == TYPEID_UNIT && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC)))
                             me->DespawnOrUnsummon(2000);
