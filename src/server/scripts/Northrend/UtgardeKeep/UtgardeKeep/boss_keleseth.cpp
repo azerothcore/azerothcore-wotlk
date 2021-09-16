@@ -58,7 +58,7 @@ public:
         npc_frost_tombAI(Creature* c) : NullCreatureAI(c)
         {
             if (TempSummon* t = c->ToTempSummon())
-                if (Unit* s = t->GetSummoner())
+                if (Unit* s = t->GetSummonerUnit())
                 {
                     PrisonerGUID = s->GetGUID();
                     if( me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic() )

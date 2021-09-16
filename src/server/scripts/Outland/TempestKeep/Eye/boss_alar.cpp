@@ -6,7 +6,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "the_eye.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 
 enum Spells
 {
@@ -310,7 +310,7 @@ public:
                 else
                 {
                     me->resetAttackTimer();
-                    ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
+                    ThreatContainer::StorageType const& threatList = me->getThreatMgr().getThreatList();
                     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
                         if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                             if (me->IsWithinMeleeRange(unit))
