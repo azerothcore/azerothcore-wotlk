@@ -437,6 +437,13 @@ void Unit::Update(uint32 p_time)
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, HealthBelowPct(20));
         ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, HealthBelowPct(35));
         ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, HealthAbovePct(75));
+
+        // Increase frequency of updateSpeed for NPC so we can slow based on health.
+        if (IsInCombat() && GetTypeId() == TYPEID_UNIT)
+        {
+            UpdateSpeed(MOVE_RUN, false);
+            UpdateSpeed(MOVE_FLIGHT, false); // do we need this?
+        }
     }
 
     UpdateSplineMovement(p_time);
@@ -13443,15 +13450,19 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             break;
     }
 
-    // for creature case, we check explicit if mob searched for assistance
-    if (GetTypeId() == TYPEID_UNIT)
+    // added to fix azerothcore issue 5342
+    int32 slowFromHealth = 0;
+    if (GetTypeId() == TYPEID_UNIT && !IsPet())
     {
-        if (ToCreature()->HasSearchedAssistance())
-            speed *= 0.66f;                                 // best guessed value, so this will be 33% reduction. Based off initial speed, mob can then "run", "walk fast" or "walk".
+        // 1.6% for each % under 30.
+        // use min(0, health-30) so that we don't boost mobs above 30.
+        slowFromHealth = (int32) std::min(0.0f, (1.66f * (GetHealthPct() - 30.0f)));
     }
 
     // Apply strongest slow aura mod to speed
     int32 slow = GetMaxNegativeAuraModifier(SPELL_AURA_MOD_DECREASE_SPEED);
+    slow = std::min(slow, slowFromHealth);
+
     if (slow)
         AddPct(speed, slow);
 
