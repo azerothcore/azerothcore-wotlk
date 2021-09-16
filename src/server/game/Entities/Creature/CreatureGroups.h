@@ -34,6 +34,16 @@ enum class GroupAIFlags : uint16
 
 struct FormationInfo
 {
+    FormationInfo() :
+        leaderGUID(0),
+        follow_dist(0.0f),
+        follow_angle(0.0f),
+        groupAI(0),
+        point_1(0),
+        point_2(0)
+    {
+    }
+
     ObjectGuid::LowType leaderGUID;
     float follow_dist;
     float follow_angle;
