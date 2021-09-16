@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1629659877965039000');
 
-DELETE FROM `acore_string` WHERE `entry` IN (30099, 30100, 30101);
+DELETE FROM `acore_string` WHERE `entry` IN (30098, 30099, 30100);
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (30098, 'Accepting Mail: %s'),
 (30099, 'Accepting Mail: ON'),
