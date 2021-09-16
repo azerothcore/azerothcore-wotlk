@@ -327,27 +327,27 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
 
 void ScriptedAI::DoResetThreat()
 {
-    if (!me->CanHaveThreatList() || me->getThreatManager().isThreatListEmpty())
+    if (!me->CanHaveThreatList() || me->getThreatMgr().isThreatListEmpty())
     {
         LOG_ERROR("entities.unit.ai", "DoResetThreat called for creature that either cannot have threat list or has empty threat list (me entry = %d)", me->GetEntry());
         return;
     }
 
-    me->getThreatManager().resetAllAggro();
+    me->getThreatMgr().resetAllAggro();
 }
 
 float ScriptedAI::DoGetThreat(Unit* unit)
 {
     if (!unit)
         return 0.0f;
-    return me->getThreatManager().getThreat(unit);
+    return me->getThreatMgr().getThreat(unit);
 }
 
 void ScriptedAI::DoModifyThreatPercent(Unit* unit, int32 pct)
 {
     if (!unit)
         return;
-    me->getThreatManager().modifyThreatPercent(unit, pct);
+    me->getThreatMgr().modifyThreatPercent(unit, pct);
 }
 
 void ScriptedAI::DoTeleportPlayer(Unit* unit, float x, float y, float z, float o)
@@ -536,7 +536,7 @@ void BossAI::TeleportCheaters()
     float x, y, z;
     me->GetPosition(x, y, z);
 
-    ThreatContainer::StorageType threatList = me->getThreatManager().getThreatList();
+    ThreatContainer::StorageType threatList = me->getThreatMgr().getThreatList();
     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
         if (Unit* target = (*itr)->getTarget())
             if (target->GetTypeId() == TYPEID_PLAYER && !CheckBoundary(target))
