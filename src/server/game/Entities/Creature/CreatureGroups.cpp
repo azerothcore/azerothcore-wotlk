@@ -103,6 +103,13 @@ void FormationMgr::LoadCreatureFormations()
         float const follow_angle            = fields[3].GetFloat() * static_cast<float>(M_PI) / 180;
         group_member->groupAI               = fields[4].GetUInt16();
 
+        if (!(group_member->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
+        {
+            LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u). Skipped", group_member->leaderGUID, memberGUID, group_member->groupAI);
+            delete group_member;
+            continue;
+        }
+
         //If creature is group leader we may skip loading of dist/angle
         if (group_member->leaderGUID != memberGUID)
         {
@@ -118,12 +125,6 @@ void FormationMgr::LoadCreatureFormations()
                 LOG_ERROR("sql.sql", "creature_formations table member guid %u cannot have follow distance or follow angle. Values are not gonna be used", group_member->leaderGUID);
             }
         }
-
-        if (!(group_member->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
-        {
-            LOG_ERROR("sql.sql", "creature_formations table leader guid %u and member guid %u has unsupported GroupAI flag value (%u).", group_member->leaderGUID, memberGUID, group_member->groupAI);
-        }
-
 
         group_member->point_1               = fields[5].GetUInt16();
         group_member->point_2               = fields[6].GetUInt16();
