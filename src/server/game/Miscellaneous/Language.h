@@ -1364,5 +1364,5 @@ enum AcoreStrings
     LANG_COMMAND_ACCEPT_MAIL                      = 30098,
     LANG_COMMAND_ACCEPT_MAIL_ON                   = 30099,
     LANG_COMMAND_ACCEPT_MAIL_OFF                  = 30100,
-  };
+};
 #endif
