@@ -74,15 +74,15 @@ void FormationMgr::LoadCreatureFormations()
 {
     uint32 const oldMSTime = getMSTime();
 
-    for (CreatureGroupInfoType::iterator itr = CreatureGroupMap.begin(); itr != CreatureGroupMap.end(); ++itr) // for reload case
+    for (auto const& itr : CreatureGroupMap) // for reload case
     {
-        delete itr->second;
+        delete itr.second;
     }
+
     CreatureGroupMap.clear();
 
     //Get group data
     QueryResult result = WorldDatabase.Query("SELECT leaderGUID, memberGUID, dist, angle, groupAI, point_1, point_2 FROM creature_formations ORDER BY leaderGUID");
-
     if (!result)
     {
         LOG_ERROR("sql.sql", ">>  Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
@@ -91,7 +91,6 @@ void FormationMgr::LoadCreatureFormations()
     }
 
     uint32 count = 0;
-
     do
     {
         Field const* fields = result->Fetch();
@@ -115,7 +114,7 @@ void FormationMgr::LoadCreatureFormations()
             group_member->follow_angle      = 0.0f;
             if (follow_dist > 0.0f || follow_angle > 0.0f)
             {
-                LOG_ERROR("sql.sql", "creature_formations table leader guid %u cannot have follow distance or follow angle.", group_member->leaderGUID);
+                LOG_ERROR("sql.sql", "creature_formations table leader guid %u cannot have follow distance or follow angle. Values are not gonna be used", group_member->leaderGUID);
             }
         }
 
@@ -195,48 +194,50 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
         return;
     }
 
-    for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+    for (auto const& itr : m_members)
     {
+        Creature* pMember = itr.first;
         if (m_leader) // avoid crash if leader was killed and reset.
             LOG_DEBUG("entities.unit", "GROUP ATTACK: group instance id %u calls member instid %u", m_leader->GetInstanceId(), member->GetInstanceId());
 
         //Skip one check
-        if (itr->first == member)
+        if (pMember == member)
             continue;
 
-        if (!itr->first->IsAlive())
+        if (!pMember->IsAlive())
             continue;
 
-        if (itr->first->GetVictim())
+        if (pMember->GetVictim())
             continue;
 
-        if (itr->first->IsValidAttackTarget(target) && itr->first->AI())
-            itr->first->AI()->AttackStart(target);
+        if (pMember->IsValidAttackTarget(target) && pMember->AI())
+            pMember->AI()->AttackStart(target);
     }
 }
 
 void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
 {
-    if (m_members.size() && !(m_members.begin()->second->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
+    if (m_members.size() && !(m_members.begin()->second->HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER))))
     {
         return;
     }
 
-    for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+    for (auto const& itr : m_members)
     {
-        if (itr->first != m_leader && itr->first->IsAlive())
+        Creature* member = itr.first;
+        if (member && member != m_leader && member->IsAlive())
         {
             if (initMotionMaster)
             {
                 if (dismiss)
                 {
-                    itr->first->GetMotionMaster()->Initialize();
+                    member->GetMotionMaster()->Initialize();
                 }
                 else
                 {
-                    itr->first->GetMotionMaster()->MoveIdle();
+                    member->GetMotionMaster()->MoveIdle();
                 }
-                LOG_DEBUG("entities.unit", "Set %s movement for member %s", dismiss ? "default" : "idle", itr->first->GetGUID().ToString().c_str());
+                LOG_DEBUG("entities.unit", "Set %s movement for member %s", dismiss ? "default" : "idle", member->GetGUID().ToString().c_str());
             }
         }
     }
@@ -259,7 +260,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
     {
         Creature* member = itr.first;
         FormationInfo const* pFormationInfo = itr.second;
-        if (member == m_leader || !member->IsAlive() || member->GetVictim() || !(pFormationInfo->groupAI & std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
+        if (member == m_leader || !member->IsAlive() || member->GetVictim() || !pFormationInfo->HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
         {
             continue;
         }
@@ -272,7 +273,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle
         float followAngle = pFormationInfo->follow_angle;
-        if (static_cast<float>(M_PI) - fabs(fabs(m_leader->GetOrientation() - pathAngle) - static_cast<float>(M_PI)) > static_cast<float>(M_PI)* 0.50f)
+        if (static_cast<float>(M_PI) - fabs(fabs(m_leader->GetOrientation() - pathAngle) - static_cast<float>(M_PI)) > static_cast<float>(M_PI)* 0.5f)
         {
             // pussywizard: in both cases should be 2*M_PI - follow_angle
             // pussywizard: also, GetCurrentWaypointID() returns 0..n-1, while point_1 must be > 0, so +1

@@ -40,6 +40,8 @@ struct FormationInfo
     uint16 groupAI;
     uint32 point_1;
     uint32 point_2;
+
+    bool HasGroupFlag(uint16 flag) const { return !!(groupAI & flag); }
 };
 
 typedef std::unordered_map<ObjectGuid::LowType/*memberDBGUID*/, FormationInfo*>   CreatureGroupInfoType;
