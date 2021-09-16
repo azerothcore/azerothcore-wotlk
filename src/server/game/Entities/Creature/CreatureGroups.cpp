@@ -113,8 +113,17 @@ void FormationMgr::LoadCreatureFormations()
         //If creature is group leader we may skip loading of dist/angle
         if (group_member->leaderGUID != memberGUID)
         {
-            group_member->follow_dist       = follow_dist;
-            group_member->follow_angle      = follow_angle * static_cast<float>(M_PI) / 180;
+            if (!group_member->HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)) && (follow_dist > 0.0f || follow_angle > 0.0f))
+            {
+                LOG_ERROR("sql.sql", "creature_formations table member guid %u cannot have follow distance or follow angle because don't have GROUP_AI_FLAG_FOLLOW_LEADER flag. Values are not gonna be used", group_member->leaderGUID);
+                group_member->follow_dist       = 0.0f;
+                group_member->follow_angle      = 0.0f;
+            }
+            else
+            {
+                group_member->follow_dist       = follow_dist;
+                group_member->follow_angle      = follow_angle * static_cast<float>(M_PI) / 180;
+            }
         }
         else
         {
