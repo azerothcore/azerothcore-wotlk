@@ -733,7 +733,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                 if (result == SPELL_CAST_OK)
                 {
-                    pet->ToCreature()->AddSpellCooldown(spellid, 0, 0);
+                    pet->ToCreature()->AddSpellCooldown(spellid, 0, spellInfo->IsCooldownStartedOnEvent() ? infinityCooldownDelay : 0);
 
                     unit_target = spell->m_targets.GetUnitTarget();
 
