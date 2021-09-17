@@ -42,7 +42,7 @@ LootBox.FourStarRate = 0.051
 #        Default:     2 (50/50)
 #
 
-LootBox.PromotionalGuarantee = 2;
+LootBox.PromotionalGuarantee = 2
 
 #
 #    LootBox.FiveStarGuarantee
@@ -58,7 +58,7 @@ LootBox.FiveStarGuarantee = 90
 #        Default:     2 (50/50)
 #
 
-LootBox.FeaturedGuarantee = 2;
+LootBox.FeaturedGuarantee = 2
 
 #
 #    LootBox.FourStarGuarantee
