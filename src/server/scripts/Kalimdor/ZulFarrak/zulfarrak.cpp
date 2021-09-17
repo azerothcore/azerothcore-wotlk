@@ -80,27 +80,6 @@ public:
             Revenge_Timer = 8000;
         }
 
-        void JustReachedHome() override
-        {
-            if (instance->GetData(DATA_PYRAMID) == PYRAMID_ARRIVED_AT_STAIR)
-            {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-        }
-
-        void MovementInform(uint32 type, uint32 /*id*/) override
-        {
-            if (type != POINT_MOTION_TYPE)
-            {
-                return;
-            }
-
-            if (instance->GetData(DATA_PYRAMID) == PYRAMID_ARRIVED_AT_STAIR)
-            {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (postGossipStep > 0 && postGossipStep < 4)
@@ -277,6 +256,16 @@ public:
                 crew->SetHomePosition(x, y, z, 4.78f);
                 crew->GetMotionMaster()->MovePoint(1, { x, y, z, 4.78f });
                 crew->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+
+                switch (entry)
+                {
+                    case NPC_BLY:
+                    case NPC_WEEGLI:
+                        crew->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     };
@@ -366,6 +355,7 @@ public:
                                 me->GetMotionMaster()->MovePoint(2, 1871.18f, 1100.f, 8.88f);
                                 Talk(SAY_WEEGLI_OUT_OF_HERE);
                                 me->DespawnOrUnsummon(8000);
+                                instance->SetData(DATA_PYRAMID, PYRAMID_GATES_DESTROYED);
                                 destroyingDoor = false;
                                 break;
                         }
@@ -417,7 +407,6 @@ public:
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
             else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
             {
@@ -441,7 +430,6 @@ public:
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
             else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
             {
@@ -460,7 +448,7 @@ public:
             {
                 me->setFaction(35);
                 me->SetWalk(false);
-                me->GetMotionMaster()->MovePoint(0, 1858.57f, 1146.35f, 14.745f, 3.85f);
+                me->GetMotionMaster()->MovePoint(0, { 1858.57f, 1146.35f, 14.745f, 3.85f });
                 me->SetHomePosition(1858.57f, 1146.35f, 14.745f, 3.85f);
                 Talk(SAY_WEEGLI_OK_I_GO);
                 instance->SetData(DATA_PYRAMID, PYRAMID_DESTROY_GATES);
@@ -507,21 +495,156 @@ public:
     }
 };
 
-/*######
-## go_shallow_grave
-######*/
-
-enum ShallowGrave
+enum ShadowPriestSezzizEnum
 {
-    NPC_ZOMBIE          = 7286,
-    NPC_DEAD_HERO       = 7276,
-    CHANCE_ZOMBIE       = 65,
-    CHANCE_DEAD_HERO    = 10
+    SPELL_SHADOW_BOLT       = 15537,
+    SPELL_PSYCHIC_SCREEM    = 13704,
+    SPELL_RENEW             = 8362,
+    SPELL_HEAL              = 12039
+};
+
+std::array<std::vector<std::pair<uint32, Position>>, 4> shadowpriestSezzizAdds =
+{ {
+    { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f, 8.87f } } },
+    { { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.088f, 8.87f } } },
+    { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } } },
+    { { NPC_SANDFURY_ZEALOT, { 895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } } }
+} };
+
+class npc_shadowpriest_sezziz : public CreatureScript
+{
+public:
+    npc_shadowpriest_sezziz() : CreatureScript("npc_shadowpriest_sezziz") {}
+
+    struct npc_shadowpriest_sezzizAI : public ScriptedAI
+    {
+        npc_shadowpriest_sezzizAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            _shadowBoltTimer = urand(0, 1 * IN_MILLISECONDS);
+            _physicScreemTimer = urand(1 * IN_MILLISECONDS, 16 * IN_MILLISECONDS);
+            _missingHPForRenewTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
+            _missingHPForHealTimer = urand(7 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
+            _summonAddsTimer = 12 * IN_MILLISECONDS;
+            _summmonAddsCount = 0;
+        }
+
+        void AttackStart(Unit* victim) override
+        {
+            ScriptedAI::AttackStartCaster(victim, 40.f);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+            {
+                return;
+            }
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
+
+            if (_summonAddsTimer <= diff)
+            {
+                for (auto itr : shadowpriestSezzizAdds[_summmonAddsCount])
+                {
+                    if (Creature* add = me->SummonCreature(itr.first, itr.second, TEMPSUMMON_DEAD_DESPAWN, 10 * IN_MILLISECONDS))
+                    {
+                        add->AI()->AttackStart(me->GetVictim());
+                    }
+                }
+
+                if (++_summmonAddsCount >= 4)
+                {
+                    _summmonAddsCount = 0;
+                }
+
+                _summonAddsTimer = urand(10 * IN_MILLISECONDS, 14 * IN_MILLISECONDS);
+            }
+            else
+            {
+                _summonAddsTimer -= diff;
+            }
+
+            if (_missingHPForHealTimer <= diff)
+            {
+                Unit* unit = nullptr;
+                Acore::MostHPMissingInRange u_check(me, 40.f, 1500);
+                Acore::UnitLastSearcher<Acore::MostHPMissingInRange> searcher(me, unit, u_check);
+                Cell::VisitGridObjects(me, searcher, 40.f);
+                if (unit)
+                {
+                    DoCast(unit, SPELL_HEAL);
+                }
+
+                _missingHPForHealTimer = urand(7 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
+            }
+            else
+            {
+                _missingHPForHealTimer -= diff;
+            }
+
+            if (_missingHPForRenewTimer <= diff)
+            {
+                Unit* unit = nullptr;
+                Acore::MostHPMissingInRange u_check(me, 40.f, 700);
+                Acore::UnitLastSearcher<Acore::MostHPMissingInRange> searcher(me, unit, u_check);
+                Cell::VisitGridObjects(me, searcher, 40.f);
+                if (unit)
+                {
+                    DoCast(unit, SPELL_RENEW);
+                }
+
+                _missingHPForRenewTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
+            }
+            else
+            {
+                _missingHPForRenewTimer -= diff;
+            }
+
+            if (_physicScreemTimer <= diff)
+            {
+                DoCastVictim(SPELL_PSYCHIC_SCREEM);
+                _physicScreemTimer = urand(22 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
+            }
+            else
+            {
+                _physicScreemTimer -= diff;
+            }
+
+            if (_shadowBoltTimer <= diff)
+            {
+                DoCastVictim(SPELL_SHADOW_BOLT);
+                _shadowBoltTimer = urand(3 * IN_MILLISECONDS, 4 * IN_MILLISECONDS);
+            }
+            else
+            {
+                _shadowBoltTimer -= diff;
+            }
+        }
+
+    private:
+        uint32 _shadowBoltTimer;
+        uint32 _physicScreemTimer;
+        uint32 _missingHPForRenewTimer;
+        uint32 _missingHPForHealTimer;
+        uint32 _summonAddsTimer;
+        uint8 _summmonAddsCount;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetZulFarrakAI<npc_shadowpriest_sezzizAI>(creature);
+    }
 };
 
 void AddSC_zulfarrak()
 {
     new npc_sergeant_bly();
     new npc_weegli_blastfuse();
+    new npc_shadowpriest_sezziz();
     new go_troll_cage();
 }

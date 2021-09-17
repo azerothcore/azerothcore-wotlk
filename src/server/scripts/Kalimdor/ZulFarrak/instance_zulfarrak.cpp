@@ -82,8 +82,8 @@ static PyramidEventData pyramidSpawns[pyramidSpawnTotal] =
     { 3, NPC_SANDFURY_SLAVE,    { 1886.93f, 1221.40f } },
     { 3, NPC_SANDFURY_ACOLYTE,  { 1883.76f, 1222.30f } },
     { 3, NPC_SANDFURY_DRUDGE,   { 1889.94f, 1212.21f } },
-    { 3, NPC_SHADOWPRIEST_SEZZZIZ, { 1889.23f, 1207.72f } },
-    { 3, NPC_NEKRUM_GUTCHEWER,  { 1879.77f, 1207.96f } }
+    { 3, NPC_SHADOWPRIEST_SEZZZIZ, { 1886.30f, 1199.65f } },
+    { 3, NPC_NEKRUM_GUTCHEWER,  { 1881.06f, 1199.70f } }
 };
 
 class instance_zulfarrak : public InstanceMapScript
@@ -241,6 +241,7 @@ public:
                 case PYRAMID_KILLED_ALL_TROLLS:
                 case PYRAMID_MOVED_DOWNSTAIRS:
                 case PYRAMID_DESTROY_GATES:
+                case PYRAMID_GATES_DESTROYED:
                 case PYRAMID_DONE:
                     break;
                 case PYRAMID_ARRIVED_AT_STAIR:
@@ -358,7 +359,13 @@ public:
             {
                 if (pyramidSpawns[i].waveID == wave)
                 {
-                    Position pos = { pyramidSpawns[i].pos.GetPositionX(), pyramidSpawns[i].pos.GetPositionY(), 8.87f, 4.78f };
+                    float orientation = 4.78f;
+                    if (pyramidSpawns[i].creatureID == NPC_SHADOWPRIEST_SEZZZIZ || pyramidSpawns[i].creatureID == NPC_NEKRUM_GUTCHEWER)
+                    {
+                        orientation = 1.32f;
+                    }
+
+                    Position pos = { pyramidSpawns[i].pos.GetPositionX(), pyramidSpawns[i].pos.GetPositionY(), 8.87f, orientation };
                     if (TempSummon* ts = instance->SummonCreature(pyramidSpawns[i].creatureID, pos))
                     {
                         addsAtBase.push_back(ts->GetGUID());
