@@ -373,7 +373,7 @@ public:
                 DoResetThreat();
                 me->SetInCombatWithZone();
                 if (TempSummon* ts = me->ToTempSummon())
-                    if (Unit* summoner = ts->GetSummoner())
+                    if (Unit* summoner = ts->GetSummonerUnit())
                     {
                         me->AddThreat(summoner, 500000.0f);
                         AttackStart(summoner);

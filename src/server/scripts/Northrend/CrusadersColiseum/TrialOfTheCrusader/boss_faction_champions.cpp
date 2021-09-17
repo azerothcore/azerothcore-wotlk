@@ -89,16 +89,16 @@ struct boss_faction_championsAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
         for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
         {
             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatManager().getThreat(pUnit) )
+            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->getThreatMgr().getThreat(pUnit) )
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->getThreatManager().modifyThreatPercent(pUnit, -100);
-                //me->getThreatManager().doAddThreat(pUnit, 10000000.0f * threatMod);
-                if (HostileReference* ref = me->getThreatManager().getOnlineContainer().getReferenceByTarget(pUnit))
+                me->getThreatMgr().modifyThreatPercent(pUnit, -100);
+                //me->getThreatMgr().doAddThreat(pUnit, 10000000.0f * threatMod);
+                if (HostileReference* ref = me->getThreatMgr().getOnlineContainer().getReferenceByTarget(pUnit))
                     ref->addThreat(10000000.0f * threatMod);
             }
         }
@@ -164,7 +164,7 @@ struct boss_faction_championsAI : public ScriptedAI
 
     uint32 EnemiesInRange(float distance)
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
         uint32 count = 0;
         Unit* target;
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
@@ -178,7 +178,7 @@ struct boss_faction_championsAI : public ScriptedAI
 
     Unit* SelectEnemyCaster(bool casting, float range)
     {
-        ThreatContainer::StorageType const& tList = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& tList = me->getThreatMgr().getThreatList();
         Unit* target;
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
         {
@@ -2429,34 +2429,6 @@ public:
     };
 };
 
-class go_toc_champions_cache : public GameObjectScript
-{
-public:
-    go_toc_champions_cache() : GameObjectScript("go_toc_champions_cache") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        if (player->IsGameMaster())
-            return false;
-
-        if (!go->loot.items.size())
-            return false;
-
-        for(std::vector<LootItem>::iterator itr = go->loot.items.begin(); itr != go->loot.items.end(); ++itr)
-            if( ItemTemplate const* iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && player->GetTeamId() != TEAM_ALLIANCE) )
-                    if (!((*itr).is_looted))
-                    {
-                        (*itr).count = 0;
-                        (*itr).is_looted = true;
-                        if (go->loot.unlootedCount)
-                            --go->loot.unlootedCount;
-                    }
-
-        return false;
-    }
-};
-
 class spell_faction_champion_warl_unstable_affliction : public SpellScriptLoader
 {
 public:
@@ -2507,6 +2479,5 @@ void AddSC_boss_faction_champions()
     new npc_toc_retro_paladin();
     new npc_toc_pet_warlock();
     new npc_toc_pet_hunter();
-    new go_toc_champions_cache();
     new spell_faction_champion_warl_unstable_affliction();
 }
