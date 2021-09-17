@@ -16,18 +16,18 @@ protected:
     void targetObjectBuildLink() override
     {
         // called from link()
-        getTarget()->m_mapRefManager.insertFirst(this);
-        getTarget()->m_mapRefManager.incSize();
+        getTarget()->m_mapRefMgr.insertFirst(this);
+        getTarget()->m_mapRefMgr.incSize();
     }
     void targetObjectDestroyLink() override
     {
         // called from unlink()
-        if (isValid()) getTarget()->m_mapRefManager.decSize();
+        if (isValid()) getTarget()->m_mapRefMgr.decSize();
     }
     void sourceObjectDestroyLink() override
     {
         // called from invalidate()
-        getTarget()->m_mapRefManager.decSize();
+        getTarget()->m_mapRefMgr.decSize();
     }
 public:
     MapReference() : Reference<Map, Player>() {}

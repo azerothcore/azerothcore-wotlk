@@ -3,7 +3,7 @@
 */
 
 #include "GameObjectAI.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Player.h"
 #include "ruby_sanctum.h"
 #include "ScriptedCreature.h"
@@ -237,7 +237,7 @@ public:
                     summon->CastSpell(summon, SPELL_METEOR_STRIKE_FIRE_AURA_2, true);
                     if (summons.GetEntryCount(NPC_METEOR_STRIKE_FLAME) <= 16)
                         summon->CastSpell(summon, SPELL_METEOR_STRIKE_SPREAD, true);
-                    if (Unit* summoner = summon->ToTempSummon()->GetSummoner())
+                    if (Unit* summoner = summon->ToTempSummon()->GetSummonerUnit())
                         summon->SetOrientation(summoner->GetAngle(summon));
                     break;
             }
@@ -1145,7 +1145,7 @@ public:
             GetTarget()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->getThreatManager().clearReferences();
+            GetTarget()->getThreatMgr().clearReferences();
             GetTarget()->RemoveAllAttackers();
             GetTarget()->AttackStop();
         }
@@ -1155,7 +1155,7 @@ public:
             GetTarget()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
             GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->getThreatManager().clearReferences();
+            GetTarget()->getThreatMgr().clearReferences();
             GetTarget()->RemoveAllAttackers();
             GetTarget()->AttackStop();
         }
