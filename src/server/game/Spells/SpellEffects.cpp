@@ -23,7 +23,7 @@
 #include "InstanceScript.h"
 #include "Language.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -956,9 +956,10 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
     }
 
     // Remove spell cooldown (not category) if spell triggering spell with cooldown and same category
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->CategoryRecoveryTime && spellInfo->CategoryRecoveryTime
-            && m_spellInfo->GetCategory() == spellInfo->GetCategory())
+    if (m_caster->GetTypeId() == TYPEID_PLAYER && spellInfo->CategoryRecoveryTime && m_spellInfo->GetCategory() == spellInfo->GetCategory())
+    {
         m_caster->ToPlayer()->RemoveSpellCooldown(spellInfo->Id);
+    }
 
     // original caster guid only for GO cast
     m_caster->CastSpell(targets, spellInfo, &values, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_NO_PERIODIC_RESET), nullptr, nullptr, m_originalCasterGUID);
@@ -1009,9 +1010,10 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
     }
 
     // Remove spell cooldown (not category) if spell triggering spell with cooldown and same category
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->CategoryRecoveryTime && spellInfo->CategoryRecoveryTime
-            && m_spellInfo->GetCategory() == spellInfo->GetCategory())
+    if (m_caster->GetTypeId() == TYPEID_PLAYER && spellInfo->CategoryRecoveryTime && m_spellInfo->GetCategory() == spellInfo->GetCategory())
+    {
         m_caster->ToPlayer()->RemoveSpellCooldown(spellInfo->Id);
+    }
 
     // original caster guid only for GO cast
     m_caster->CastSpell(targets, spellInfo, &values, TRIGGERED_FULL_MASK, nullptr, nullptr, m_originalCasterGUID);
@@ -2633,7 +2635,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
 
     // put in combat
     if (unitTarget->IsFriendlyTo(m_caster))
-        unitTarget->getHostileRefManager().threatAssist(m_caster, 0.0f, m_spellInfo);
+        unitTarget->getHostileRefMgr().threatAssist(m_caster, 0.0f, m_spellInfo);
 
     if (success_list.empty())
         return;
@@ -3275,17 +3277,17 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         return;
     }
 
-    if (!unitTarget->getThreatManager().getOnlineContainer().empty())
+    if (!unitTarget->getThreatMgr().getOnlineContainer().empty())
     {
         // Also use this effect to set the taunter's threat to the taunted creature's highest value
-        float myThreat = unitTarget->getThreatManager().getThreat(m_caster);
-        float topThreat = unitTarget->getThreatManager().getOnlineContainer().getMostHated()->getThreat();
+        float myThreat = unitTarget->getThreatMgr().getThreat(m_caster);
+        float topThreat = unitTarget->getThreatMgr().getOnlineContainer().getMostHated()->getThreat();
         if (topThreat > myThreat)
-            unitTarget->getThreatManager().doAddThreat(m_caster, topThreat - myThreat);
+            unitTarget->getThreatMgr().doAddThreat(m_caster, topThreat - myThreat);
 
         //Set aggro victim to caster
-        if (HostileReference* forcedVictim = unitTarget->getThreatManager().getOnlineContainer().getReferenceByTarget(m_caster))
-            unitTarget->getThreatManager().setCurrentVictim(forcedVictim);
+        if (HostileReference* forcedVictim = unitTarget->getThreatMgr().getOnlineContainer().getReferenceByTarget(m_caster))
+            unitTarget->getThreatMgr().setCurrentVictim(forcedVictim);
     }
 
     if (unitTarget->ToCreature()->IsAIEnabled && !unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))
@@ -4235,21 +4237,21 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
 
     if (unitTarget->GetInstanceScript() && unitTarget->GetInstanceScript()->IsEncounterInProgress())
     {
-        unitTarget->getHostileRefManager().UpdateVisibility(true);
+        unitTarget->getHostileRefMgr().UpdateVisibility(true);
         // Xinef: replaced with CombatStop(false)
         unitTarget->AttackStop();
         unitTarget->RemoveAllAttackers();
 
         // Night Elf: Shadowmeld only resets threat temporarily
         if (m_spellInfo->Id != 59646)
-            unitTarget->getHostileRefManager().addThreatPercent(-100);
+            unitTarget->getHostileRefMgr().addThreatPercent(-100);
 
         if (unitTarget->GetTypeId() == TYPEID_PLAYER)
             unitTarget->ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
     }
     else
     {
-        unitTarget->getHostileRefManager().UpdateVisibility(m_spellInfo->Id == 59646); // Night Elf: Shadowmeld
+        unitTarget->getHostileRefMgr().UpdateVisibility(m_spellInfo->Id == 59646); // Night Elf: Shadowmeld
         unitTarget->CombatStop(true);
     }
 
@@ -5332,7 +5334,7 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
 
     // put in combat
     if (unitTarget->IsFriendlyTo(m_caster))
-        unitTarget->getHostileRefManager().threatAssist(m_caster, 0.0f, m_spellInfo);
+        unitTarget->getHostileRefMgr().threatAssist(m_caster, 0.0f, m_spellInfo);
 }
 
 void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
@@ -5472,7 +5474,7 @@ void Spell::EffectModifyThreatPercent(SpellEffIndex /*effIndex*/)
     if (!unitTarget)
         return;
 
-    unitTarget->getThreatManager().modifyThreatPercent(m_caster, damage);
+    unitTarget->getThreatMgr().modifyThreatPercent(m_caster, damage);
 }
 
 void Spell::EffectTransmitted(SpellEffIndex effIndex)
