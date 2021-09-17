@@ -44,7 +44,7 @@ EndContentData */
 #include "ScriptMgr.h"
 #include "SmartAI.h"
 #include "SpellAuras.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 #include "World.h"
 
 enum elderClearwater
