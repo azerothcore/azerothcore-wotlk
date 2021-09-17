@@ -1785,7 +1785,6 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (HasSearchedAssistance())
         {
             SetNoSearchAssistance(false);
-        //    UpdateSpeed(MOVE_RUN, false); removed AC 5342
         }
 
         //Dismiss group if is leader

@@ -9730,7 +9730,6 @@ bool Unit::AttackStop()
         if (creature->HasSearchedAssistance())
         {
             creature->SetNoSearchAssistance(false);
-        //    UpdateSpeed(MOVE_RUN, false); removed AC 5342
         }
     }
 
