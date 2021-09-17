@@ -418,6 +418,7 @@ public:
 
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
+    void SummonedCreatureDespawnAll() override;
 
     void UpdateAI(uint32 diff) override;
 
