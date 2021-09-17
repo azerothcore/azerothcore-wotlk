@@ -404,7 +404,7 @@ public:
         void CastSpellOnBug(Creature* target) override
         {
             target->setFaction(14);
-            target->AI()->AttackStart(me->getThreatManager().getHostilTarget());
+            target->AI()->AttackStart(me->getThreatMgr().getHostilTarget());
             target->AddAura(SPELL_MUTATE_BUG, target);
             target->SetFullHealth();
         }

@@ -7,20 +7,20 @@
 #ifndef _MAPREFMANAGER
 #define _MAPREFMANAGER
 
-#include "RefManager.h"
+#include "RefMgr.h"
 
 class MapReference;
 
-class MapRefManager : public RefManager<Map, Player>
+class MapRefMgr : public RefMgr<Map, Player>
 {
 public:
     typedef LinkedListHead::Iterator< MapReference > iterator;
     typedef LinkedListHead::Iterator< MapReference const > const_iterator;
 
-    MapReference* getFirst() { return (MapReference*)RefManager<Map, Player>::getFirst(); }
-    [[nodiscard]] MapReference const* getFirst() const { return (MapReference const*)RefManager<Map, Player>::getFirst(); }
-    MapReference* getLast() { return (MapReference*)RefManager<Map, Player>::getLast(); }
-    [[nodiscard]] MapReference const* getLast() const { return (MapReference const*)RefManager<Map, Player>::getLast(); }
+    MapReference* getFirst() { return (MapReference*)RefMgr<Map, Player>::getFirst(); }
+    [[nodiscard]] MapReference const* getFirst() const { return (MapReference const*)RefMgr<Map, Player>::getFirst(); }
+    MapReference* getLast() { return (MapReference*)RefMgr<Map, Player>::getLast(); }
+    [[nodiscard]] MapReference const* getLast() const { return (MapReference const*)RefMgr<Map, Player>::getLast(); }
 
     iterator begin() { return iterator(getFirst()); }
     iterator end() { return iterator(nullptr); }

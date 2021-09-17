@@ -24,7 +24,7 @@
 #include "InstanceScript.h"
 #include "Language.h"
 #include "Map.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"

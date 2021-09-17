@@ -146,7 +146,7 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            me->getHostileRefManager().setOnlineOfflineState(false);
+            me->getHostileRefMgr().setOnlineOfflineState(false);
         }
 
         void OnCharmed(bool apply) override
@@ -283,7 +283,7 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->getThreatManager().resetAllAggro();
+                                me->getThreatMgr().resetAllAggro();
                                 me->AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
@@ -736,7 +736,7 @@ public:
                             uint8 rnd = LIST.size() > 1 ? urand(0, LIST.size() - 1) : 0;
                             if( Unit* target = ObjectAccessor::GetUnit(*me, LIST.at(rnd)) )
                             {
-                                me->getThreatManager().resetAllAggro();
+                                me->getThreatMgr().resetAllAggro();
                                 me->AddThreat(target, 10000.0f);
                                 AttackStart(target);
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);

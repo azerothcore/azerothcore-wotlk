@@ -13,7 +13,7 @@
 
 class MapInstanced : public Map
 {
-    friend class MapManager;
+    friend class MapMgr;
 public:
     typedef std::unordered_map< uint32, Map*> InstancedMaps;
 
