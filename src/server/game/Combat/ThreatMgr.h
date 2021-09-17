@@ -17,7 +17,7 @@
 
 class Unit;
 class Creature;
-class ThreatManager;
+class ThreatMgr;
 class SpellInfo;
 
 #define THREAT_UPDATE_INTERVAL 2 * IN_MILLISECONDS    // Server should send threat update to client periodically each second
@@ -32,10 +32,10 @@ struct ThreatCalcHelper
 };
 
 //==============================================================
-class HostileReference : public Reference<Unit, ThreatManager>
+class HostileReference : public Reference<Unit, ThreatMgr>
 {
 public:
-    HostileReference(Unit* refUnit, ThreatManager* threatManager, float threat);
+    HostileReference(Unit* refUnit, ThreatMgr* threatMgr, float threat);
 
     //=================================================
     void addThreat(float modThreat);
@@ -93,7 +93,7 @@ public:
 
     //=================================================
 
-    HostileReference* next() { return ((HostileReference*) Reference<Unit, ThreatManager>::next()); }
+    HostileReference* next() { return ((HostileReference*) Reference<Unit, ThreatMgr>::next()); }
 
     //=================================================
 
@@ -118,11 +118,11 @@ private:
 };
 
 //==============================================================
-class ThreatManager;
+class ThreatMgr;
 
 class ThreatContainer
 {
-    friend class ThreatManager;
+    friend class ThreatMgr;
 
 public:
     typedef std::list<HostileReference*> StorageType;
@@ -177,14 +177,14 @@ private:
 
 //=================================================
 
-class ThreatManager
+class ThreatMgr
 {
 public:
     friend class HostileReference;
 
-    explicit ThreatManager(Unit* owner);
+    explicit ThreatMgr(Unit* owner);
 
-    ~ThreatManager() { clearReferences(); }
+    ~ThreatMgr() { clearReferences(); }
 
     void clearReferences();
 
