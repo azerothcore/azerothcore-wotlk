@@ -10,10 +10,10 @@
 #include "LinkedReference/Reference.h"
 
 template<class OBJECT>
-class GridRefManager;
+class GridRefMgr;
 
 template<class OBJECT>
-class GridReference : public Reference<GridRefManager<OBJECT>, OBJECT>
+class GridReference : public Reference<GridRefMgr<OBJECT>, OBJECT>
 {
 protected:
     void targetObjectBuildLink() override
@@ -33,8 +33,8 @@ protected:
         this->getTarget()->decSize();
     }
 public:
-    GridReference() : Reference<GridRefManager<OBJECT>, OBJECT>() {}
+    GridReference() : Reference<GridRefMgr<OBJECT>, OBJECT>() {}
     ~GridReference() override { this->unlink(); }
-    GridReference* next() { return (GridReference*)Reference<GridRefManager<OBJECT>, OBJECT>::next(); }
+    GridReference* next() { return (GridReference*)Reference<GridRefMgr<OBJECT>, OBJECT>::next(); }
 };
 #endif
