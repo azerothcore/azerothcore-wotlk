@@ -1,13 +1,11 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631634961417748000');
+
 -- sets for all, generic 20/100 and maxrep
 UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1` = 20, `MaxStanding1` = 5, `MaxStanding2` = 7, `RewOnKillRepValue2` = -100 WHERE (`RewOnKillRepFaction1` = 92 AND `RewOnKillRepFaction2` = 93);
 UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1` = 20, `MaxStanding1` = 5, `MaxStanding2` = 7, `RewOnKillRepValue2` = -100 WHERE (`RewOnKillRepFaction1` = 93 AND `RewOnKillRepFaction2` = 92);
 
-
 -- Warug bodyguard
 UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1` = 5, `RewOnKillRepValue2` = -25 WHERE (`creature_id` = 6068);
-
-
 
 -- khan shaka doesn't exist in current DB
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 5602);
