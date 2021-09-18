@@ -35,7 +35,7 @@ UPDATE `acore_string` SET `content_default` = 'Your chat has been muted for %s. 
 `locale_ruRU` = 'У вас отключен чат на %s. Отключил %s. Причина %s.' WHERE `entry` = 300;
 
 -- LANG_YOU_DISABLE_CHAT
-UPDATE `acore_string` SET `content_default` = 'You has disabled %s\'s chat for %u minutes. Reason: %s.',
+UPDATE `acore_string` SET `content_default` = 'You has muted %s\'s chat for %u minutes. Reason: %s.',
 `locale_koKR` = NULL,
 `locale_frFR` = NULL,
 `locale_deDE` = NULL,
