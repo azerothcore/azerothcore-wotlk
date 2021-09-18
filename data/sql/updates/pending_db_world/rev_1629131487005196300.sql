@@ -24,7 +24,7 @@ UPDATE `acore_string` SET `content_default` = '%s has muted %s\'s chat for %s, e
 `locale_ruRU` = '%s отключил чат %s на %s, действующий при следующем входе игрока в игру. Причина: %s.' WHERE `entry` = 283;
 
 -- LANG_YOUR_CHAT_DISABLED
-UPDATE `acore_string` SET `content_default` = 'Your chat has been disabled for %s. By: %s. Reason: %s.',
+UPDATE `acore_string` SET `content_default` = 'Your chat has been muted for %s. By: %s. Reason: %s.',
 `locale_koKR` = NULL,
 `locale_frFR` = NULL,
 `locale_deDE` = NULL,
