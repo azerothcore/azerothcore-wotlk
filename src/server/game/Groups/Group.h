@@ -8,7 +8,7 @@
 #define AZEROTHCORE_GROUP_H
 
 #include "DBCEnums.h"
-#include "GroupRefManager.h"
+#include "GroupRefMgr.h"
 #include "LootMgr.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
@@ -318,7 +318,7 @@ protected:
     void ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply);
 
     MemberSlotList      m_memberSlots;
-    GroupRefManager     m_memberMgr;
+    GroupRefMgr     m_memberMgr;
     InvitesList         m_invitees;
     ObjectGuid          m_leaderGuid;
     std::string         m_leaderName;

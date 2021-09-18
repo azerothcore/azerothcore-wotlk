@@ -310,7 +310,7 @@ public:
         void InitializeAI() override
         {
             if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
                     summonerGUID = summoner->GetGUID();
                     float x, y, z;
@@ -478,8 +478,8 @@ public:
 
         void Reset() override
         {
-            if (me->ToTempSummon() && me->ToTempSummon()->GetSummoner())
-                me->setFaction(me->ToTempSummon()->GetSummoner()->getFaction());
+            if (me->ToTempSummon() && me->ToTempSummon()->GetSummonerUnit())
+                me->setFaction(me->ToTempSummon()->GetSummonerUnit()->getFaction());
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -568,7 +568,7 @@ public:
                 me->RemoveAllAuras();
                 me->DespawnOrUnsummon(1000);
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* owner = summon->GetSummoner())
+                    if (Unit* owner = summon->GetSummonerUnit())
                         if (Player* player = owner->ToPlayer())
                             player->KilledMonsterCredit(me->GetEntry());
             }
