@@ -1975,7 +1975,7 @@ public:
             {
                 muteLeft = Acore::Time::ToTimeString(muteTime);
             }
-            
+
             muteReason = _reason;
             muteBy = _author;
         }
@@ -2280,21 +2280,21 @@ public:
             if (WorldSession* session = sWorld->FindSession(accountId))
                 target = session->GetPlayer();
 
-        auto notSpeakTime = Acore::StringTo<uint32>(delayStr);
+        auto muteTime = Acore::StringTo<uint32>(delayStr);
 
-        if (!notSpeakTime)
+        if (!muteTime)
         {
             // Bad value delayStr (not number)
             return false;
         }
 
-        auto duration = Minutes(*notSpeakTime);
+        auto duration = Minutes(*muteTime);
 
         // must have strong lesser security level
         if (handler->HasLowerSecurity(target, targetGuid, true))
             return false;
 
-        sMute->MutePlayer(targetName, Minutes(*notSpeakTime), handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
+        sMute->MutePlayer(targetName, Minutes(*muteTime), handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE), muteReasonStr);
 
         if (!sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
         {

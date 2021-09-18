@@ -18,7 +18,7 @@ MuteMgr* MuteMgr::instance()
     return &instance;
 }
 
-void MuteMgr::MutePlayer(std::string const& targetName, Seconds notSpeakTime, std::string const& muteBy, std::string const& muteReason)
+void MuteMgr::MutePlayer(std::string const& targetName, Seconds muteTime, std::string const& muteBy, std::string const& muteReason)
 {
     uint32 accountId = sObjectMgr->GetPlayerAccountIdByPlayerName(targetName);
     auto targetSession = sWorld->FindSession(accountId);
@@ -35,11 +35,11 @@ void MuteMgr::MutePlayer(std::string const& targetName, Seconds notSpeakTime, st
 
     if (targetSession)
     {
-        SetMuteTime(accountId, notSpeakTime);
+        SetMuteTime(accountId, muteTime);
     }
 
     stmt->setUInt64(1, muteDate);
-    stmt->setUInt32(2, notSpeakTime.count());
+    stmt->setUInt32(2, muteTime.count());
     stmt->setString(3, muteBy);
     stmt->setString(4, muteReason);
     LoginDatabase.Execute(stmt);
@@ -51,12 +51,12 @@ void MuteMgr::MutePlayer(std::string const& targetName, Seconds notSpeakTime, st
 
     if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
     {
-        sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), GetPlayerLink().c_str(), notSpeakTime.count(), muteReason.c_str());
+        sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), GetPlayerLink().c_str(), muteTime.count(), muteReason.c_str());
     }
 
     if (targetSession)
     {
-        ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, Acore::Time::ToTimeString(notSpeakTime).c_str(), muteBy.c_str(), muteReason.c_str());
+        ChatHandler(targetSession).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, Acore::Time::ToTimeString(muteTime).c_str(), muteBy.c_str(), muteReason.c_str());
     }
 }
 
