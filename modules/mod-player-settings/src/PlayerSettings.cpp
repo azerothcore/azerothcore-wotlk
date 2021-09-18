@@ -343,9 +343,11 @@ class PlayerSettingsCommandScript : public CommandScript
 
         std::vector<ChatCommand> GetCommands() const
         {
-            static std::vector<ChatCommand> commands = {{"players", SEC_PLAYER,
-            true, &HandlePlayersCommand, ""}, {"playersettings", SEC_GAMEMASTER,
-            true, &HandlePlayerSettingsCommand, ""}};
+            static std::vector<ChatCommand> commands =
+            {
+                {"players", SEC_PLAYER, false, &HandlePlayersCommand, ""},
+                {"playersettings", SEC_GAMEMASTER, false, &HandlePlayerSettingsCommand, ""}
+            };
 
             return commands;
         }

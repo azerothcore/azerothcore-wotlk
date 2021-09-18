@@ -18,12 +18,6 @@ const std::string SUBJECT = "Loot Box reward";
 const std::string BODY = "Congratulations, you got a reward but your inventory was full."
     "Please take your reward when you free space from your inventory";
 
-int randomId(std::vector<int> ids)
-{
-    std::random_shuffle(ids.begin(), ids.end());
-    return ids[0];
-}
-
 bool isBannerItem(float result, int pity, int guarantee)
 {
     return result <= 1 / (guarantee * (1 + std::min(pity, guarantee)));
@@ -59,6 +53,13 @@ bool isCommon()
 float LootBoxItem::roll()
 {
     return dis(gen);
+}
+
+int LootBoxItem::randomId(std::vector<int> ids)
+{
+    std::uniform_int_distribution<> dis(0, ids.size() - 1);
+    int i = dis(gen);
+    return ids[i];
 }
 
 bool LootBoxItem::sendRewardToPlayer(Player *player, uint32 itemId, enum Rarity rarity, enum Banner banner)
@@ -184,7 +185,7 @@ bool LootBoxItem::OnUse(Player *player, Item *box, SpellCastTargets const &/*tar
         player->GetGUID().GetCounter()
     );
 
-    struct Pity pity = { .promotional = 0, .epic = 0, .featured = 0, .rare = 0 };
+    struct Pity pity = { 0, 0, 0, 0 };
     if (rows) {
         do {
             Field *row = rows->Fetch();

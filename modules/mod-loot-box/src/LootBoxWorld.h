@@ -39,7 +39,6 @@ public:
 
     static int CustomCurrency;
     static int DailyReward;
-    static int ResetTimeHour;
     static int LevelReward;
     static int KillReward;
 };

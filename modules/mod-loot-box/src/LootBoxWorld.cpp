@@ -24,7 +24,6 @@ std::vector<int> LootBoxWorld::ThreeStars;
 
 int LootBoxWorld::CustomCurrency;
 int LootBoxWorld::DailyReward;
-int LootBoxWorld::ResetTimeHour;
 int LootBoxWorld::LevelReward;
 int LootBoxWorld::KillReward;
 
@@ -65,7 +64,6 @@ void LootBoxWorld::SetInitialWorldSettings()
 
     CustomCurrency = sConfigMgr->GetOption<int>("LootBox.CustomCurrency", 37711);
     DailyReward = sConfigMgr->GetOption<int>("LootBox.DailyReward", 90);
-    ResetTimeHour = sConfigMgr->GetOption<int>("Instance.ResetTimeHour", 4);
     LevelReward = sConfigMgr->GetOption<int>("LootBox.LevelReward", 75);
     KillReward = sConfigMgr->GetOption<int>("LootBox.KillReward", 10);
 }

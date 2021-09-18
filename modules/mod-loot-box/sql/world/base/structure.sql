@@ -1,2 +1,0 @@
--- Put only sql structure in this file (create table if exists, delete table, alter table etc...).
--- If you don't use this database, then delete this file.

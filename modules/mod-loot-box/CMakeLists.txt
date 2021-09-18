@@ -3,6 +3,7 @@
 #
 
 # Add scripts in project
+AC_ADD_SCRIPT("${CMAKE_CURRENT_DIST_DIR}/src/LootBoxCommand.cpp")
 AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/src/LootBoxWorld.cpp")
 AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/src/LootBoxPlayer.cpp")
 AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/src/LootBoxItem.cpp")

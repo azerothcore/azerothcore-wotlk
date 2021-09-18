@@ -4,12 +4,14 @@
 void AddLootBoxPlayerScripts();
 void AddLootBoxItemScripts();
 void AddLootBoxWorldScripts();
+void AddLootBoxCommandScripts();
 
 void AddLootBoxScripts()
 {
     AddLootBoxWorldScripts();
     AddLootBoxPlayerScripts();
     AddLootBoxItemScripts();
+    AddLootBoxCommandScripts();
 }
 
 #endif // _LOOT_BOX_LOADER_H_
