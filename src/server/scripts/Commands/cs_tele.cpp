@@ -104,7 +104,7 @@ public:
 
     static bool DoNameTeleport(ChatHandler* handler, PlayerIdentifier player, uint32 mapId, Position const& pos, std::string const& locationName)
     {
-        if (!MapManager::IsValidMapCoord(mapId, pos) || sObjectMgr->IsTransportMap(mapId))
+        if (!MapMgr::IsValidMapCoord(mapId, pos) || sObjectMgr->IsTransportMap(mapId))
         {
             handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), mapId);
             handler->SetSentErrorMessage(true);
@@ -151,7 +151,7 @@ public:
 
             handler->PSendSysMessage(LANG_TELEPORTING_TO, nameLink.c_str(), handler->GetAcoreString(LANG_OFFLINE), locationName.c_str());
 
-            Player::SavePositionInDB({ mapId, pos }, sMapMgr->GetZoneId({ mapId, pos }), player.GetGUID(), nullptr);
+            Player::SavePositionInDB({mapId, pos}, sMapMgr->GetZoneId(PHASEMASK_NORMAL, {mapId, pos}), player.GetGUID(), nullptr);
         }
 
         return true;
