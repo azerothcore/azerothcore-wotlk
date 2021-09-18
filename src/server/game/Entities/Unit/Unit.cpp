@@ -13458,10 +13458,13 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
         slowFromHealth = (int32) std::min(0.0f, (1.66f * (GetHealthPct() - 30.0f)));
     }
 
+    if (slowFromHealth)
+    {
+        AddPct(speed, slowFromHealth);
+    }
+
     // Apply strongest slow aura mod to speed
     int32 slow = GetMaxNegativeAuraModifier(SPELL_AURA_MOD_DECREASE_SPEED);
-    slow = std::min(slow, slowFromHealth);
-
     if (slow)
         AddPct(speed, slow);
 
@@ -14531,7 +14534,15 @@ void Unit::SetHealth(uint32 val)
             val = maxHealth;
     }
 
+    float prevHealthPct = GetHealthPct();
+
     SetUInt32Value(UNIT_FIELD_HEALTH, val);
+
+    // mobs that are now or were below 30% need to update their speed
+    if (GetTypeId() == TYPEID_UNIT && (prevHealthPct < 30.0 || HealthBelowPct(30)))
+    {
+        UpdateSpeed(MOVE_RUN, false);
+    }
 
     // group update
     if (GetTypeId() == TYPEID_PLAYER)
