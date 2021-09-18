@@ -60,6 +60,7 @@ public:
 
         void InitializeAI() override
         {
+            startedFight = false;
             me->setFaction(35);
             postGossipStep = 0;
             Text_Timer = 0;
@@ -68,6 +69,7 @@ public:
 
         InstanceScript* instance;
 
+        bool startedFight;
         uint32 postGossipStep;
         uint32 Text_Timer;
         uint32 ShieldBash_Timer;
@@ -205,8 +207,9 @@ public:
 
         void sGossipHello(Player* player) override
         {
-            if (instance->GetData(DATA_PYRAMID) >= PYRAMID_DESTROY_GATES)
+            if (instance->GetData(DATA_PYRAMID) >= PYRAMID_DESTROY_GATES && !startedFight)
             {
+                startedFight = true;
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BLY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 1517, me->GetGUID());
             }
