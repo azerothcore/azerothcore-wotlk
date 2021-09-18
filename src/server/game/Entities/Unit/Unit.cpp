@@ -9666,8 +9666,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // set position before any AI calls/assistance
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-
-    // decide w/e we finna get into combat: if we is a creature we go nut over the victim unless we controllable guardian. in this case we go in combat only if our owner is as well
+        
     if (creature && !IsControlledByPlayer())
     {
         // should not let player enter combat by right clicking target - doesn't helps
