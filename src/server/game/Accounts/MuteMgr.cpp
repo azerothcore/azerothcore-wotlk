@@ -202,7 +202,7 @@ void MuteMgr::UpdateMuteAccount(uint32 accountID, uint64 muteDate)
 
 Optional<std::tuple<uint64, Seconds, std::string, std::string>> MuteMgr::GetMuteInfo(uint32 accountID)
 {
-    // 
+    //
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE);
     stmt->setUInt32(0, accountID);
 
