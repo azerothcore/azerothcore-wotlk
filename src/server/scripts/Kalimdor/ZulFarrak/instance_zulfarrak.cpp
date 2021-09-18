@@ -106,6 +106,7 @@ public:
         ObjectGuid OroGUID;
         ObjectGuid RavenGUID;
         ObjectGuid MurtaGUID;
+        ObjectGuid ShadowpriestGUID;
 
         GuidList addsAtBase;
         GuidList movedadds;
@@ -151,6 +152,9 @@ public:
                 case NPC_MURTA:
                     MurtaGUID = creature->GetGUID();
                     creature->SetReactState(REACT_PASSIVE);// starts out passive (in a cage)
+                    break;
+                case NPC_SHADOWPRIEST_SEZZZIZ:
+                    ShadowpriestGUID = creature->GetGUID();
                     break;
                 default:
                     break;
@@ -226,6 +230,8 @@ public:
                     return WeegliGUID;
                 case NPC_MURTA:
                     return MurtaGUID;
+                case NPC_SHADOWPRIEST_SEZZZIZ:
+                    return ShadowpriestGUID;
                 case GO_END_DOOR:
                     return EndDoorGUID;
             }

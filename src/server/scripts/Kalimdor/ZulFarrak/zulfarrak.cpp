@@ -80,6 +80,23 @@ public:
             Revenge_Timer = 8000;
         }
 
+        void MovementInform(uint32 type, uint32 /*id*/) override
+        {
+            if (type != POINT_MOTION_TYPE)
+            {
+                return;
+            }
+
+            if (instance->GetData(DATA_PYRAMID) == PYRAMID_WAVE_3)
+            {
+                if (Creature* shadowpriest = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SHADOWPRIEST_SEZZZIZ)))
+                {
+                    AttackStart(shadowpriest);
+                    shadowpriest->CallAssistance();
+                }
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             if (postGossipStep > 0 && postGossipStep < 4)
@@ -188,7 +205,7 @@ public:
 
         void sGossipHello(Player* player) override
         {
-            if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
+            if (instance->GetData(DATA_PYRAMID) >= PYRAMID_DESTROY_GATES)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BLY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 1517, me->GetGUID());
