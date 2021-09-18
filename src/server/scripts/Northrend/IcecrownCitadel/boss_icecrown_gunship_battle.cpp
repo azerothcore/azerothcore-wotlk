@@ -1451,7 +1451,7 @@ void TriggerBurningPitch(Creature* c)
     if (!c->HasSpellCooldown(spellId))
     {
         c->CastSpell((Unit*)nullptr, spellId, false);
-        c->_AddCreatureSpellCooldown(spellId, urand(3000, 4000));
+        c->_AddCreatureSpellCooldown(spellId, 0, urand(3000, 4000));
     }
 }
 
@@ -1917,7 +1917,7 @@ public:
                 return;
 
             me->CastSpell((Unit*)nullptr, spellId, true);
-            me->_AddCreatureSpellCooldown(spellId, 9000);
+            me->_AddCreatureSpellCooldown(spellId, 0, 9000);
         }
 
         bool CanAIAttack(const Unit*  /*target*/) const override

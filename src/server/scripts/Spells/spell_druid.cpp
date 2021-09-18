@@ -224,7 +224,7 @@ public:
             // xinef: chance of success stores proper amount of damage increase
             // xinef: little hack because GetSpellModOwner will return nullptr pointer at this point (early summoning stage)
             if (GetUnitOwner()->IsSummon())
-                if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummoner())
+                if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
                     if (Player* player = owner->GetSpellModOwner())
                         player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
         }

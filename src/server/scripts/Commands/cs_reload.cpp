@@ -20,7 +20,7 @@ EndScriptData */
 #include "GameGraveyard.h"
 #include "Language.h"
 #include "LFGMgr.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
@@ -29,7 +29,7 @@ EndScriptData */
 #include "SpellMgr.h"
 #include "TicketMgr.h"
 #include "WardenCheckMgr.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
 

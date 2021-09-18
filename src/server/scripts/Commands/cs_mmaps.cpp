@@ -55,7 +55,7 @@ public:
 
     static bool HandleMmapPathCommand(ChatHandler* handler, char const* args)
     {
-        if (!MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()))
+        if (!MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()))
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
             return true;
@@ -130,8 +130,8 @@ public:
         handler->PSendSysMessage("gridloc [%i, %i]", gy, gx);
 
         // calculate navmesh tile location
-        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
-        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(handler->GetSession()->GetPlayer()->GetMapId(), player->GetInstanceId());
+        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
+        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMeshQuery(handler->GetSession()->GetPlayer()->GetMapId(), player->GetInstanceId());
         if (!navmesh || !navmeshquery)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
@@ -182,8 +182,8 @@ public:
     static bool HandleMmapLoadedTilesCommand(ChatHandler* handler, char const* /*args*/)
     {
         uint32 mapid = handler->GetSession()->GetPlayer()->GetMapId();
-        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(mapid);
-        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(mapid, handler->GetSession()->GetPlayer()->GetInstanceId());
+        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(mapid);
+        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMeshQuery(mapid, handler->GetSession()->GetPlayer()->GetInstanceId());
         if (!navmesh || !navmeshquery)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
@@ -209,7 +209,7 @@ public:
         handler->PSendSysMessage("mmap stats:");
         //handler->PSendSysMessage("  global mmap pathfinding is %sabled", DisableMgr::IsPathfindingEnabled(mapId) ? "en" : "dis");
 
-        MMAP::MMapManager* manager = MMAP::MMapFactory::createOrGetMMapManager();
+        MMAP::MMapMgr* manager = MMAP::MMapFactory::createOrGetMMapMgr();
         handler->PSendSysMessage(" %u maps loaded with %u tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
 
         dtNavMesh const* navmesh = manager->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
