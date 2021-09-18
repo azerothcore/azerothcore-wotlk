@@ -17,7 +17,7 @@ class AC_GAME_API MuteMgr
 public:
     static MuteMgr* instance();
 
-    void MutePlayer(std::string const& targetName, Seconds notSpeakTime, std::string const& muteBy, std::string const& muteReason);
+    void MutePlayer(std::string const& targetName, Seconds muteTime, std::string const& muteBy, std::string const& muteReason);
     void UnMutePlayer(std::string const& targetName);
     void UpdateMuteAccount(uint32 accountID, uint64 muteDate);
     void SetMuteTime(uint32 accountID, uint64 muteDate);
