@@ -178,7 +178,7 @@ public:
             if (switchTimer >= 10000)
             {
                 switchTimer = 0;
-                me->getThreatManager().resetAllAggro();
+                me->getThreatMgr().resetAllAggro();
                 if (Player* player = SelectTargetFromPlayerList(100.0f))
                     me->AddThreat(player, 100000.0f);
             }

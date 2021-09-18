@@ -181,7 +181,7 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER      = 0x00010000,
     SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET      = 0x00020000,
     SPELL_ATTR0_CU_ALLOW_INFLIGHT_TARGET         = 0x00040000,
-    SPELL_ATTR0_CU_NONE6                         = 0x00080000,   // UNUSED
+    SPELL_ATTR0_CU_NEEDS_AMMO_DATA               = 0x00080000,
     SPELL_ATTR0_CU_BINARY_SPELL                  = 0x00100000,
     SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS       = 0x00200000,
     SPELL_ATTR0_CU_SINGLE_AURA_STACK             = 0x00400000, // pussywizard
@@ -503,7 +503,7 @@ public:
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
 
     // loading helpers
-    uint32 _GetExplicitTargetMask() const;
+    void _InitializeExplicitTargetMask();
     bool _IsPositiveEffect(uint8 effIndex, bool deep) const;
     bool _IsPositiveSpell() const;
     static bool _IsPositiveTarget(uint32 targetA, uint32 targetB);
