@@ -9,7 +9,7 @@
 #include "Log.h"
 #include "ModelInstance.h"
 #include "VMapDefinitions.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 #include <iomanip>
 #include <limits>
 #include <sstream>
@@ -244,7 +244,7 @@ namespace VMAP
         {
             basePath.push_back('/');
         }
-        std::string fullname = basePath + VMapManager2::getMapFileName(mapID);
+        std::string fullname = basePath + VMapMgr2::getMapFileName(mapID);
         bool success = true;
         FILE* rf = fopen(fullname.c_str(), "rb");
         if (!rf)
@@ -282,7 +282,7 @@ namespace VMAP
 
     //=========================================================
 
-    bool StaticMapTree::InitMap(const std::string& fname, VMapManager2* vm)
+    bool StaticMapTree::InitMap(const std::string& fname, VMapMgr2* vm)
     {
         //VMAP_DEBUG_LOG(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : initializing StaticMapTree '%s'", fname.c_str());
         bool success = false;
@@ -335,7 +335,7 @@ namespace VMAP
 
     //=========================================================
 
-    void StaticMapTree::UnloadMap(VMapManager2* vm)
+    void StaticMapTree::UnloadMap(VMapMgr2* vm)
     {
         for (loadedSpawnMap::iterator i = iLoadedSpawns.begin(); i != iLoadedSpawns.end(); ++i)
         {
@@ -351,7 +351,7 @@ namespace VMAP
 
     //=========================================================
 
-    bool StaticMapTree::LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm)
+    bool StaticMapTree::LoadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm)
     {
         if (!iIsTiled)
         {
@@ -446,7 +446,7 @@ namespace VMAP
 
     //=========================================================
 
-    void StaticMapTree::UnloadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm)
+    void StaticMapTree::UnloadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm)
     {
         uint32 tileID = packTileID(tileX, tileY);
         loadedTileMap::iterator tile = iLoadedTiles.find(tileID);
