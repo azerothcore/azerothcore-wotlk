@@ -99,7 +99,7 @@ void UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
@@ -113,7 +113,7 @@ void UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+        ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
         for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
