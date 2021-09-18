@@ -304,8 +304,8 @@ public:
                 case EVENT_SPELL_ROAR:
                     Talk(EMOTE_ROAR);
 
-                    me->_AddCreatureSpellCooldown(SPELL_STAGGERING_ROAR, 0);
-                    me->_AddCreatureSpellCooldown(SPELL_DREADFUL_ROAR, 0);
+                    me->_AddCreatureSpellCooldown(SPELL_STAGGERING_ROAR, 0, 0);
+                    me->_AddCreatureSpellCooldown(SPELL_DREADFUL_ROAR, 0, 0);
 
                     if (me->GetDisplayId() == DISPLAYID_DEFAULT)
                         me->CastSpell((Unit*)nullptr, SPELL_STAGGERING_ROAR, false);

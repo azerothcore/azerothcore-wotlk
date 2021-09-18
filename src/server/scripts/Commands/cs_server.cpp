@@ -23,7 +23,7 @@ EndScriptData */
 #include "ServerMotd.h"
 #include "StringConvert.h"
 #include "VMapFactory.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 #include <filesystem>
 #include <boost/version.hpp>
 #include <openssl/crypto.h>
@@ -126,8 +126,8 @@ public:
         handler->PSendSysMessage("%s", dbPortOutput.c_str());
 
         bool vmapIndoorCheck = sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
-        bool vmapLOSCheck = VMAP::VMapFactory::createOrGetVMapManager()->isLineOfSightCalcEnabled();
-        bool vmapHeightCheck = VMAP::VMapFactory::createOrGetVMapManager()->isHeightCalcEnabled();
+        bool vmapLOSCheck = VMAP::VMapFactory::createOrGetVMapMgr()->isLineOfSightCalcEnabled();
+        bool vmapHeightCheck = VMAP::VMapFactory::createOrGetVMapMgr()->isHeightCalcEnabled();
 
         bool mmapEnabled = sWorld->getBoolConfig(CONFIG_ENABLE_MMAPS);
 
