@@ -1754,8 +1754,6 @@ public:
     void ClearInPetCombat();
     [[nodiscard]] uint32 GetCombatTimer() const { return m_CombatTimer; }
 
-    bool IsOwnerOfSummonInCombat();
-
     [[nodiscard]] bool HasAuraTypeWithFamilyFlags(AuraType auraType, uint32 familyName, uint32 familyFlags) const;
     [[nodiscard]] bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
     [[nodiscard]] bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura = 0) const;

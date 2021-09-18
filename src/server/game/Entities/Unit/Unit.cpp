@@ -9668,7 +9668,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
 
     // decide w/e we finna get into combat: if we is a creature we go nut over the victim unless we controllable guardian. in this case we go in combat only if our owner is as well
-    if ((creature && !IsControllableGuardian()) || (creature && IsControllableGuardian() && IsOwnerOfSummonInCombat()))
+    if (creature && !IsControlledByPlayer())
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);
@@ -12885,19 +12885,6 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
     if (Player* player = this->ToPlayer())
         sEluna->OnPlayerEnterCombat(player, enemy);
 #endif
-}
-
-bool Unit::IsOwnerOfSummonInCombat()
-{
-    if (IsSummon())
-    {
-        if (Unit* o = ToTempSummon()->GetOwner())
-        {
-            return o->IsInCombat();
-        }
-    }
-
-    return false;
 }
 
 void Unit::ClearInCombat()
