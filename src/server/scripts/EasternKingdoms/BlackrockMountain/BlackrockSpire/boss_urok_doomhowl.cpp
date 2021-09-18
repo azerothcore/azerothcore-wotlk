@@ -47,6 +47,11 @@ public:
         {
             me->CastSpell(me, SPELL_UROK_SPAWN, true);
             BossAI::InitializeAI();
+            Talk(SAY_SUMMON);
+            if (Unit* target = me->SelectNearestTarget(500))
+            {
+                me->AI()->AttackStart(target);
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -55,7 +60,6 @@ public:
             events.ScheduleEvent(SPELL_REND, urand(17000, 20000));
             events.ScheduleEvent(SPELL_STRIKE, urand(10000, 12000));
             events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, urand(25000, 30000));
-            Talk(SAY_SUMMON);
         }
 
         void JustDied(Unit* /*killer*/) override
