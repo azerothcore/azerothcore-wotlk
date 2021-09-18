@@ -2,7 +2,7 @@
 #include <vector>
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Player.h"
 #include "Unit.h"
 #include "Config.h"
