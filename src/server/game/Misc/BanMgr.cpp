@@ -3,7 +3,7 @@
  */
 
 #include "AccountMgr.h"
-#include "BanManager.h"
+#include "BanMgr.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
@@ -13,14 +13,14 @@
 #include "World.h"
 #include "WorldSession.h"
 
-BanManager* BanManager::instance()
+BanMgr* BanMgr::instance()
 {
-    static BanManager instance;
+    static BanMgr instance;
     return &instance;
 }
 
 /// Ban an account, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn BanManager::BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author)
+BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author)
 {
     if (AccountName.empty() || Duration.empty())
         return BAN_SYNTAX_ERROR;
@@ -82,7 +82,7 @@ BanReturn BanManager::BanAccount(std::string const& AccountName, std::string con
 }
 
 /// Ban an account by player name, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn BanManager::BanAccountByPlayerName(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author)
+BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author)
 {
     if (CharacterName.empty() || Duration.empty())
         return BAN_SYNTAX_ERROR;
@@ -148,7 +148,7 @@ BanReturn BanManager::BanAccountByPlayerName(std::string const& CharacterName, s
 }
 
 /// Ban an IP address, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn BanManager::BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author)
+BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std::string const& Reason, std::string const& Author)
 {
     if (IP.empty() || Duration.empty())
         return BAN_SYNTAX_ERROR;
@@ -206,7 +206,7 @@ BanReturn BanManager::BanIP(std::string const& IP, std::string const& Duration, 
 }
 
 /// Ban an character, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn BanManager::BanCharacter(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author)
+BanReturn BanMgr::BanCharacter(std::string const& CharacterName, std::string const& Duration, std::string const& Reason, std::string const& Author)
 {
     Player* target = ObjectAccessor::FindPlayerByName(CharacterName, false);
     uint32 DurationSecs = TimeStringToSecs(Duration);
@@ -254,7 +254,7 @@ BanReturn BanManager::BanCharacter(std::string const& CharacterName, std::string
 }
 
 /// Remove a ban from an account
-bool BanManager::RemoveBanAccount(std::string const& AccountName)
+bool BanMgr::RemoveBanAccount(std::string const& AccountName)
 {
     uint32 AccountID = AccountMgr::GetId(AccountName);
     if (!AccountID)
@@ -269,7 +269,7 @@ bool BanManager::RemoveBanAccount(std::string const& AccountName)
 }
 
 /// Remove a ban from an player name
-bool BanManager::RemoveBanAccountByPlayerName(std::string const& CharacterName)
+bool BanMgr::RemoveBanAccountByPlayerName(std::string const& CharacterName)
 {
     uint32 AccountID = sObjectMgr->GetPlayerAccountIdByPlayerName(CharacterName);
     if (!AccountID)
@@ -284,7 +284,7 @@ bool BanManager::RemoveBanAccountByPlayerName(std::string const& CharacterName)
 }
 
 /// Remove a ban from an account
-bool BanManager::RemoveBanIP(std::string const& IP)
+bool BanMgr::RemoveBanIP(std::string const& IP)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_IP_NOT_BANNED);
     stmt->setString(0, IP);
@@ -294,7 +294,7 @@ bool BanManager::RemoveBanIP(std::string const& IP)
 }
 
 /// Remove a ban from a character
-bool BanManager::RemoveBanCharacter(std::string const& CharacterName)
+bool BanMgr::RemoveBanCharacter(std::string const& CharacterName)
 {
     Player* pBanned = ObjectAccessor::FindPlayerByName(CharacterName, false);
     ObjectGuid guid;
