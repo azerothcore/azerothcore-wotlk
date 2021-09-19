@@ -75,6 +75,7 @@ public:
             { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "" },
             { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "" },
             { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "" },
+            { "lfg",            SEC_ADMINISTRATOR,  false, &HandleDebugDungeonFinderCommand,   "" },
             { "los",            SEC_ADMINISTRATOR,  false, &HandleDebugLoSCommand,             "" },
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
             { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" }
@@ -805,6 +806,12 @@ public:
         return true;
     }
 
+    static bool HandleDebugDungeonFinderCommand(ChatHandler* /*handler*/, char const* /*args*/)
+    {
+        sLFGMgr->ToggleTesting();
+        return true;
+    }
+
     static bool HandleDebugBattlegroundCommand(ChatHandler* /*handler*/, char const* /*args*/)
     {
         sBattlegroundMgr->ToggleTesting();
@@ -823,7 +830,7 @@ public:
         if (!target || target->IsTotem() || target->IsPet())
             return false;
 
-        ThreatContainer::StorageType const& threatList = target->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& threatList = target->getThreatMgr().getThreatList();
         ThreatContainer::StorageType::const_iterator itr;
         uint32 count = 0;
         handler->PSendSysMessage("Threat list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
@@ -837,7 +844,7 @@ public:
             }
             handler->PSendSysMessage("   %u.   %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
         }
-        ThreatContainer::StorageType const& threatList2 = target->getThreatManager().getOfflineThreatList();
+        ThreatContainer::StorageType const& threatList2 = target->getThreatMgr().getOfflineThreatList();
         for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
         {
             Unit* unit = (*itr)->getTarget();
@@ -858,7 +865,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
             target = handler->GetSession()->GetPlayer();
-        HostileReference* ref = target->getHostileRefManager().getFirst();
+        HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
         handler->PSendSysMessage("Hostil reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
         while (ref)
