@@ -12,7 +12,7 @@ INSERT INTO `acore_string` (`entry`,`content_default`) VALUES
 (194, 'Command \'%.*s\' is ambiguous:'),
 (195, '### USAGE: .%.*s ...'),
 (196, 'There is no detailed usage information associated with \'%.*s\'.
-This should never occur for stock WarheadCore commands - if it does, report this as a bug.
+This should never occur for stock AzerothCore commands - if it does, report this as a bug.
 If this is a custom command, use `acore_string` to specify it. Look at cs_achievement.cpp for example usage.'),
 (1500, 'Either:'),
 (1501, 'Or:    '),
