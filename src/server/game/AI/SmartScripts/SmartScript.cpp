@@ -619,12 +619,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (!me)
                     break;
 
-                ThreatContainer::StorageType threatList = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType threatList = me->getThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
                 {
                     if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                     {
-                        me->getThreatManager().modifyThreatPercent(target, e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
+                        me->getThreatMgr().modifyThreatPercent(target, e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_THREAT_ALL_PCT: Creature %s modify threat for unit %s, value %i",
                                        me->GetGUID().ToString().c_str(), target->GetGUID().ToString().c_str(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                     }
@@ -644,7 +644,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (IsUnit(*itr))
                     {
-                        me->getThreatManager().modifyThreatPercent((*itr)->ToUnit(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
+                        me->getThreatMgr().modifyThreatPercent((*itr)->ToUnit(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_THREAT_SINGLE_PCT: Creature %s modify threat for unit %s, value %i",
                                        me->GetGUID().ToString().c_str(), (*itr)->GetGUID().ToString().c_str(), e.action.threatPCT.threatINC ? (int32)e.action.threatPCT.threatINC : -(int32)e.action.threatPCT.threatDEC);
                     }
@@ -3662,7 +3662,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
             {
                 if (me)
                 {
-                    ThreatContainer::StorageType threatList = me->getThreatManager().getThreatList();
+                    ThreatContainer::StorageType threatList = me->getThreatMgr().getThreatList();
                     for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
                         if (Unit* temp = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                             // Xinef: added distance check
