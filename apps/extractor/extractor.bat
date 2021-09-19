@@ -25,7 +25,7 @@ ECHO 3 - Extract mmaps (needs vmaps to be extracted before you run this, may tak
 ECHO 4 - Extract all (may take hours)
 ECHO 5 - EXIT
 ECHO.
-SET /P M=Type 1, 2, 3, 4 or 5 then press ENTER: 
+SET /P M=Type 1, 2, 3, 4 or 5 then press ENTER:
 IF %M%==1 GOTO MAPS
 IF %M%==2 GOTO VMAPS
 IF %M%==3 GOTO MMAPS
@@ -38,7 +38,12 @@ GOTO MENU
 
 :VMAPS
 start /b /w vmap4extractor.exe
-if not exist vmaps md vmaps
+if exist vmaps\ (
+    echo folder found.
+) else (
+    echo creating folder "vmaps".
+    mkdir "vmaps"
+)
 start /b /w vmap4assembler.exe Buildings vmaps
 rmdir Buildings /s /q
 GOTO MENU
@@ -46,15 +51,30 @@ GOTO MENU
 :MMAPS
 ECHO This may take a few hours to complete. Please be patient.
 PAUSE
-if not exist mmaps md mmaps
+if exist mmaps\ (
+    echo folder found.
+) else (
+    echo creating folder "mmaps".
+    mkdir "mmaps"
+)
 start /b /w mmaps_generator.exe
 GOTO MENU
 
 :ALL
 ECHO This may take a few hours to complete. Please be patient.
 PAUSE
-if not exist vmaps md vmaps
-if not exist mmaps md mmaps
+if exist vmaps\ (
+    echo folder found.
+) else (
+    echo creating folder "vmaps".
+    mkdir "vmaps"
+)
+if exist mmaps\ (
+    echo folder found.
+) else (
+    echo creating folder "mmaps".
+    mkdir "mmaps"
+)
 start /b /w mapextractor.exe
 start /b /w vmap4extractor.exe
 start /b /w vmap4assembler.exe Buildings vmaps
