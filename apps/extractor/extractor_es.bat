@@ -33,7 +33,6 @@ IF %M%==5 GOTO :EOF
 
 :MAPS
 start /b /w mapextractor.exe
-cls
 GOTO MENU
 
 :VMAPS
@@ -41,21 +40,17 @@ start /b /w vmap4extractor.exe
 if not exist vmaps md vmaps
 start /b /w vmap4assembler.exe Buildings vmaps
 rmdir Buildings /s /q
-cls
 GOTO MENU
 
 :MMAPS
 ECHO Esto puede tardar unas horas en completarse. Por favor, tenga paciencia.
-ECHO Pulse una tecla para continuar.
 PAUSE
 if not exist mmaps md mmaps
 start /b /w mmaps_generator.exe
-cls
 GOTO MENU
 
 :ALL
 ECHO Esto puede tardar unas horas en completarse. Por favor, tenga paciencia.
-ECHO Pulse una tecla para continuar.
 PAUSE
 if not exist vmaps md vmaps
 if not exist mmaps md mmaps
@@ -64,5 +59,4 @@ start /b /w vmap4extractor.exe
 start /b /w vmap4assembler.exe Buildings vmaps
 rmdir Buildings /s /q
 start /b /w mmaps_generator.exe
-cls
 GOTO MENU
