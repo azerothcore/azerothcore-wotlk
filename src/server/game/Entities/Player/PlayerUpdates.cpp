@@ -397,7 +397,7 @@ void Player::Update(uint32 p_time)
     {
         m_hostileReferenceCheckTimer = 15000;
         if (!GetMap()->IsDungeon())
-            getHostileRefManager().deleteReferencesOutOfRange(
+            getHostileRefMgr().deleteReferencesOutOfRange(
                 GetVisibilityRange());
     }
     else

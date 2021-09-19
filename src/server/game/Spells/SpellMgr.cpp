@@ -12,7 +12,7 @@
 #include "DBCStores.h"
 #include "GameGraveyard.h"
 #include "InstanceScript.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SharedDefines.h"
@@ -7125,7 +7125,6 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Alchemist's Stone
