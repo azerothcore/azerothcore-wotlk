@@ -426,7 +426,7 @@ void ItemTemplate::InitializeQueryData()
 
             queryData << Spells[s].SpellId;
             queryData << Spells[s].SpellTrigger;
-            queryData << uint32(-abs(Spells[s].SpellCharges));
+            queryData << int32(Spells[s].SpellCharges);
 
             if (db_data)
             {
@@ -577,7 +577,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recvData)
 
                 queryData << pProto->Spells[s].SpellId;
                 queryData << pProto->Spells[s].SpellTrigger;
-                queryData << uint32(-abs(pProto->Spells[s].SpellCharges));
+                queryData << int32(pProto->Spells[s].SpellCharges);
 
                 if (db_data)
                 {

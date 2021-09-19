@@ -5,7 +5,7 @@
 #include "Creature.h"
 #include "CreatureGroups.h"
 #include "Map.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"

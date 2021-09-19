@@ -851,7 +851,7 @@ public:
         void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             PreventDefaultAction();
-            if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummoner())
+            if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
             {
                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_16_ENTRYID));
                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_17_ENTRYID));

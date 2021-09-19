@@ -1249,7 +1249,7 @@ public:
             PreventHitDefaultEffect(effIndex);
             if (Unit* target = GetHitUnit())
                 if (Creature* caster = GetCaster()->ToCreature())
-                    caster->getThreatManager().modifyThreatPercent(target, -25); // Xinef: amount confirmed by onyxia and void reaver notes
+                    caster->getThreatMgr().modifyThreatPercent(target, -25); // Xinef: amount confirmed by onyxia and void reaver notes
         }
 
         void Register() override
@@ -1410,7 +1410,7 @@ public:
             PreventHitDefaultEffect(effIndex);
             if (Unit* target = GetHitUnit())
                 if (Creature* caster = GetCaster()->ToCreature())
-                    caster->getThreatManager().modifyThreatPercent(target, -100);
+                    caster->getThreatMgr().modifyThreatPercent(target, -100);
         }
 
         void Register() override
@@ -3847,7 +3847,7 @@ public:
         {
             if (Unit* caster = GetCaster())
                 if (TempSummon* vehicle = caster->ToTempSummon())
-                    if (Unit* rider = vehicle->GetSummoner())
+                    if (Unit* rider = vehicle->GetSummonerUnit())
                         rider->RemoveAurasDueToSpell(GetId());
         }
 
@@ -5437,7 +5437,7 @@ public:
 
             if (instant_exit)
             {
-                caster->getHostileRefManager().deleteReferences();
+                caster->getHostileRefMgr().deleteReferences();
             }
             caster->CombatStop();
         }
