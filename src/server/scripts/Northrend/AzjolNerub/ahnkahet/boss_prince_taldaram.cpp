@@ -414,7 +414,7 @@ public:
                     {
                         //Count alive players
                         uint8 count = 0;
-                        std::list<HostileReference*> const t_list = me->getThreatManager().getThreatList();
+                        std::list<HostileReference*> const t_list = me->getThreatMgr().getThreatList();
                         if (!t_list.empty())
                         {
                             for (HostileReference const* reference : t_list)
