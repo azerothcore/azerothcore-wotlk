@@ -2488,6 +2488,22 @@ void World::SendGMText(uint32 string_id, ...)
     va_end(ap);
 }
 
+void World::SendGMText(uint32 textId, va_list* args)
+{
+    Acore::WorldWorldTextBuilder wt_builder(textId, args);
+    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
+    for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
+            continue;
+
+        if (AccountMgr::IsPlayerAccount(itr->second->GetSecurity()))
+            continue;
+
+        wt_do(itr->second->GetPlayer());
+    }
+}
+
 /// DEPRECATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
 void World::SendGlobalText(const char* text, WorldSession* self)
 {

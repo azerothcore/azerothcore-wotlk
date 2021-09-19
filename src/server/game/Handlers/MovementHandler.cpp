@@ -323,7 +323,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (!sScriptMgr->AnticheatNoFallingDamage(_player, opcode))
     {
-        plrMover->GetSession()->KickPlayer();
         recvData.rfinish();
         return;
     }
@@ -504,7 +503,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     {
         if (!sScriptMgr->AnticheatHandleDoubleJump(_player, mover, movementInfo))
         {
-            KickPlayer();
             return;
         }
     }
@@ -512,7 +510,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     /* start some hack detection */
     if (!sScriptMgr->AnticheatCheckMovementInfo(_player, movementInfo, mover, opcode))
     {
-        KickPlayer();
         return;
     }
 
