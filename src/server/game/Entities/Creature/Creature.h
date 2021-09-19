@@ -142,7 +142,7 @@ public:
     [[nodiscard]] SpellSchoolMask GetMeleeDamageSchoolMask() const override { return m_meleeDamageSchoolMask; }
     void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
 
-    void _AddCreatureSpellCooldown(uint32 spell_id, uint32 end_time);
+    void _AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 end_time);
     void AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
     [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
     [[nodiscard]] uint32 GetSpellCooldown(uint32 spell_id) const;
@@ -257,6 +257,8 @@ public:
     void RemoveCorpse(bool setSpawnTime = true, bool skipVisibility = false);
 
     void DespawnOrUnsummon(uint32 msTimeToDespawn = 0);
+    void DespawnOnEvade();
+    void RespawnOnEvade();
 
     [[nodiscard]] time_t const& GetRespawnTime() const { return m_respawnTime; }
     [[nodiscard]] time_t GetRespawnTimeEx() const;
