@@ -3242,13 +3242,13 @@ ShowKickInWorld = 0
 ShowMuteInWorld = 0
 
 #
-#     Mute.AddAfterLogin.Enable
+#     Mute.AddAfterLogin
 #        Description: Add mute time after login player.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
 
-Mute.AddAfterLogin.Enable = 1
+Mute.AddAfterLogin = 1
 
 #
 #     ShowBanInWorld

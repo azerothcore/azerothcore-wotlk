@@ -29,7 +29,7 @@ void MuteMgr::MutePlayer(std::string const& targetName, Seconds muteTime, std::s
 
     /*
      * Mute will be in effect right away.
-     * If Mute.AddAfterLogin.Enable mute will be in effect starting from the next login.
+     * If Mute.AddAfterLogin mute will be in effect starting from the next login.
      */
     uint64 muteDate = sWorld->getBoolConfig(CONFIG_MUTE_ADD_AFTER_LOGIN) && !targetSession ? 0 : time(nullptr);
 
