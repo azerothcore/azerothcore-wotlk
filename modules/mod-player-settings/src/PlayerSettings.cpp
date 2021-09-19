@@ -22,7 +22,7 @@ const float Offence10M = 1 / 7.0f, Defence10M = 1 / 3.0f;
 const float Offence25M = 1 / 18.5f, Defence25M = 1 / 6.5f;
 
 // 40 man: 4 tank, 28 dps, 8 healer = 30.0 offensive units and 10.0 defensive units.
-const float Offence40M = 1 / 30.0f, Defence40M = 10.0f;
+const float Offence40M = 1 / 30.0f, Defence40M = 1 / 10.0f;
 
 class PlayerSettingsCreatureInfo : public DataMap::Base
 {
@@ -104,7 +104,18 @@ class PlayerSettingsPlayerScript : public PlayerScript
                     uint32 maxPlayers = ((InstanceMap*)sMapMgr->FindMap(map->GetId(), map->GetInstanceId()))->GetMaxPlayers();
                     PlayerSettingsMapInfo *mapInfo = map->CustomData.GetDefault<PlayerSettingsMapInfo>("PlayerSettingsMapInfo");
                     uint32 nplayers = std::max(mapInfo->nplayers, mapInfo->veto);
-                    amount = amount * nplayers / maxPlayers * (1 + experienceMultiplier * (nplayers - 1));
+
+                    amount *= nplayers / maxPlayers * (1 + experienceMultiplier * (nplayers - 1));
+
+                    uint32 bonus_xp = 0;
+                    bool recruitAFriend = player->GetsRecruitAFriendBonus(true);
+
+                    if (recruitAFriend)
+                        bonus_xp = 2 * amount;
+                    else
+                        bonus_xp = victim ? player->GetXPRestBonus(amount) : 0;
+
+                    amount += bonus_xp;
                 }
             }
         }
