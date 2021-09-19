@@ -545,10 +545,20 @@ public:
             {
                 if (Creature* boss = instance->GetCreature(TombBossGUIDs[TombEventCounter]))
                 {
+                    ++TombEventCounter;
                     boss->setFaction(FACTION_HOSTILE);
                     boss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    if (Unit* target = boss->SelectNearestTarget(500))
-                        boss->AI()->AttackStart(target);
+
+                    // find suitable target here.
+                    Unit* target = boss->SelectNearbyTarget(nullptr, 500);
+                    if (target && target->isTargetableForAttack())
+                    {
+                            boss->AI()->AttackStart(target);
+                    }
+                    else // if we can't find anybody, there's nobody in the room, we can reset early.
+                    {
+                        TombOfSevenReset();
+                    }
                 }
             }
         }
@@ -573,11 +583,17 @@ public:
                         boss->SetLootRecipient(nullptr);
                     }
                     boss->setFaction(FACTION_FRIEND);
+                    if (i ==  6) // doomrel needs explicit reset
+                    {
+                        boss->AI()->Reset();
+                    }
                 }
             }
+
             GhostKillCount = 0;
             TombEventCounter = 0;
             TombTimer = TIMER_TOMBOFTHESEVEN;
+            TombEventStarterGUID.Clear();
             SetData(TYPE_TOMB_OF_SEVEN, NOT_STARTED);
         }
 
@@ -596,6 +612,7 @@ public:
             TombEventStarterGUID.Clear();
             SetData(TYPE_TOMB_OF_SEVEN, DONE);
         }
+
         void Update(uint32 diff) override
         {
             if (TombEventStarterGUID && GhostKillCount < 7)
@@ -604,7 +621,7 @@ public:
                 {
                     TombTimer = TIMER_TOMBOFTHESEVEN;
                     TombOfSevenEvent();
-                    ++TombEventCounter;
+
                     // Check Killed bosses
                     for (uint8 i = 0; i < 7; ++i)
                     {
