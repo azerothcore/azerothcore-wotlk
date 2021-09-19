@@ -106,7 +106,7 @@ public:
                         if (!(*itr)->IsSummon())
                             continue;
 
-                        if (Unit* summoner = (*itr)->ToTempSummon()->GetSummoner())
+                        if (Unit* summoner = (*itr)->ToTempSummon()->GetSummonerUnit())
                             if (!summoner->HasAura(SPELL_NO_SUMMON_AURA) && !summoner->HasAura(SPELL_SUMMON_ZENTABRA_TRIGGER)
                                     && !summoner->IsInCombat())
                             {
@@ -168,7 +168,7 @@ public:
             if (victim->GetTypeId() != TYPEID_UNIT || !victim->IsSummon())
                 return;
 
-            if (Unit* vehSummoner = victim->ToTempSummon()->GetSummoner())
+            if (Unit* vehSummoner = victim->ToTempSummon()->GetSummonerUnit())
             {
                 vehSummoner->RemoveAurasDueToSpell(SPELL_NO_SUMMON_AURA);
                 vehSummoner->RemoveAurasDueToSpell(SPELL_DETECT_INVIS);
@@ -187,7 +187,7 @@ public:
             {
                 damage = 0;
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                if (Unit* vehSummoner = attacker->ToTempSummon()->GetSummoner())
+                if (Unit* vehSummoner = attacker->ToTempSummon()->GetSummonerUnit())
                 {
                     vehSummoner->AddAura(SPELL_SUMMON_ZENTABRA_TRIGGER, vehSummoner);
                     vehSummoner->CastSpell(vehSummoner, SPELL_SUMMON_ZENTABRA, true);
@@ -224,7 +224,7 @@ public:
                         if (Unit* tiger = ObjectAccessor::GetUnit(*me, _tigerGuid))
                         {
                             if (tiger->IsSummon())
-                                if (Unit* vehSummoner = tiger->ToTempSummon()->GetSummoner())
+                                if (Unit* vehSummoner = tiger->ToTempSummon()->GetSummonerUnit())
                                     me->AddAura(SPELL_NO_SUMMON_AURA, vehSummoner);
                         }
                         _events.ScheduleEvent(EVENT_NOSUMMON, 50000);
