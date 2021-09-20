@@ -27,6 +27,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "zulfarrak.h"
+#include "GridNotifiers.h"
 
 /*######
 ## npc_sergeant_bly
