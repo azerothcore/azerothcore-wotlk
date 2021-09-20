@@ -20,7 +20,7 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "LootMgr.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
@@ -1919,6 +1919,36 @@ void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
         summon->UnSummon(msTimeToDespawn);
     else
         ForcedDespawn(msTimeToDespawn);
+}
+
+void Creature::DespawnOnEvade()
+{
+    SetVisible(false);
+    AI()->SummonedCreatureDespawnAll();
+    RemoveEvadeAuras();
+
+    float x, y, z, o;
+    GetRespawnPosition(x, y, z, &o);
+    SetHomePosition(x, y, z, o);
+    SetPosition(x, y, z, o);
+
+    if (IsFalling())
+    {
+        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    }
+    StopMoving();
+}
+
+void Creature::RespawnOnEvade()
+{
+    SetVisible(true);
+    UpdateMovementFlags();
+    AI()->Reset();
+    AI()->JustReachedHome();
+    if (IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+    {
+        GetVehicleKit()->Reset(true);
+    }
 }
 
 void Creature::InitializeReactState()
