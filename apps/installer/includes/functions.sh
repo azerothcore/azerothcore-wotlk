@@ -227,7 +227,7 @@ function inst_download_client_data {
 
     # first check if it's defined in env, otherwise use the default
     local path="${DATAPATH:-$AC_BINPATH_FULL}"
-    local zipPath="${DATAPATH_ZIP:-"$DATAPATH/data.zip"}"
+    local zipPath="${DATAPATH_ZIP:-"$path/data.zip"}"
 
     dataVersionFile="$path/data-version"
 
