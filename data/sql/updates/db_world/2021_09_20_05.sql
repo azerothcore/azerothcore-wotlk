@@ -1,3 +1,19 @@
+-- DB update 2021_09_20_04 -> 2021_09_20_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_09_20_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_09_20_04 2021_09_20_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1631708024134357951'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631708024134357951');
 
 -- Adds movement to Stonewing Slayer's
@@ -57,3 +73,13 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (824870, 33, 7273.13, -5973.39, 16.5934),
 (824870, 34, 7277.34, -5971.04, 16.1648),
 (824870, 35, 7282.69, -5967, 15.6897);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_09_20_05' WHERE sql_rev = '1631708024134357951';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
