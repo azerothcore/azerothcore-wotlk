@@ -553,7 +553,7 @@ public:
                     Unit* target = boss->SelectNearbyTarget(nullptr, 500);
                     if (target && target->isTargetableForAttack())
                     {
-                            boss->AI()->AttackStart(target);
+                        boss->AI()->AttackStart(target);
                     }
                     else // if we can't find anybody, there's nobody in the room, we can reset early.
                     {
