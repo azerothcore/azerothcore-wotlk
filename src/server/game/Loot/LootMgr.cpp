@@ -419,7 +419,8 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
 
     // Checking for unique or unique(XX) objects
     // master looter should still be able to see the loot to give to people.
-     if (!isMasterLooter && pProto->MaxCount > 0 && (player->GetItemCount(itemid, true) >= pProto->MaxCount))
+    // casting to avoid warnings, it's unlikely there's an item with unique but 2^31 items allowed.
+     if (!isMasterLooter && pProto->MaxCount > 0 && (int32)(player->GetItemCount(itemid, true) >= pProto->MaxCount))
     {
             return false;
     }
