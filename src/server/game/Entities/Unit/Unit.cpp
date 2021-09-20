@@ -12718,64 +12718,67 @@ void Unit::SetInCombatWith(Unit* enemy, uint32 duration)
     SetInCombatState(false, enemy, duration);
 }
 
-void Unit::CombatStart(Unit* target, bool initialAggro)
+void Unit::CombatStart(Unit* victim, bool initialAggro)
 {
     // Xinef: Dont allow to start combat with triggers
-    if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsTrigger())
+    if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsTrigger())
         return;
 
     if (initialAggro)
     {
-        if (!target->IsStandState())
-            target->SetStandState(UNIT_STAND_STATE_STAND);
-
-        if (!target->IsInCombat() && target->GetTypeId() != TYPEID_PLAYER && !target->ToCreature()->HasReactState(REACT_PASSIVE) && target->ToCreature()->IsAIEnabled)
+        // Make player victim stand up automatically
+        if (victim->getStandState() && victim->IsPlayer())
         {
-            if (target->IsPet())
-                target->ToCreature()->AI()->AttackedBy(this); // PetAI has special handler before AttackStart()
+            victim->SetStandState(UNIT_STAND_STATE_STAND);
+        }
+
+        if (!victim->IsInCombat() && victim->GetTypeId() != TYPEID_PLAYER && !victim->ToCreature()->HasReactState(REACT_PASSIVE) && victim->ToCreature()->IsAIEnabled)
+        {
+            if (victim->IsPet())
+                victim->ToCreature()->AI()->AttackedBy(this); // PetAI has special handler before AttackStart()
             else
             {
-                target->ToCreature()->AI()->AttackStart(this);
+                victim->ToCreature()->AI()->AttackStart(this);
                 // if the target is an NPC with a pet or minion, pet should react.
-                if (Unit* targetControlledUnit = target->GetFirstControlled())
+                if (Unit* victimControlledUnit = victim->GetFirstControlled())
                 {
-                    targetControlledUnit->SetInCombatWith(this);
-                    SetInCombatWith(targetControlledUnit);
-                    targetControlledUnit->AddThreat(this, 0.0f);
+                    victimControlledUnit->SetInCombatWith(this);
+                    SetInCombatWith(victimControlledUnit);
+                    victimControlledUnit->AddThreat(this, 0.0f);
                 }
             }
 
             // if unit has an owner, put owner in combat.
-            if (Unit* targetOwner = target->GetOwner())
+            if (Unit* victimOwner = victim->GetOwner())
             {
-                if (!(targetOwner->IsInCombatWith(this)))
+                if (!(victimOwner->IsInCombatWith(this)))
                 {
                     /* warding off to not take over aggro for no reason
                     Using only AddThreat causes delay in attack */
-                    if (!targetOwner->IsInCombat() && targetOwner->IsAIEnabled)
+                    if (!victimOwner->IsInCombat() && victimOwner->IsAIEnabled)
                     {
-                        targetOwner->ToCreature()->AI()->AttackStart(this);
+                        victimOwner->ToCreature()->AI()->AttackStart(this);
                     }
-                    targetOwner->SetInCombatWith(this);
-                    SetInCombatWith(targetOwner);
-                    targetOwner->AddThreat(this, 0.0f);
+                    victimOwner->SetInCombatWith(this);
+                    SetInCombatWith(victimOwner);
+                    victimOwner->AddThreat(this, 0.0f);
                 }
             }
         }
 
-        SetInCombatWith(target);
-        target->SetInCombatWith(this);
-        target->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+        SetInCombatWith(victim);
+        victim->SetInCombatWith(this);
+        victim->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
         // Xinef: If pet started combat - put owner in combat
         if (Unit* owner = GetOwner())
         {
-            owner->SetInCombatWith(target);
-            target->SetInCombatWith(owner);
+            owner->SetInCombatWith(victim);
+            victim->SetInCombatWith(owner);
         }
     }
 
-    Unit* who = target->GetCharmerOrOwnerOrSelf();
+    Unit* who = victim->GetCharmerOrOwnerOrSelf();
     if (who->GetTypeId() == TYPEID_PLAYER)
         SetContestedPvP(who->ToPlayer());
 
