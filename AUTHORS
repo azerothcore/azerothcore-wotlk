@@ -27,6 +27,8 @@ Authorship is assigned for each commit within the git history, which is stored i
 Unfortunately we have no detailed information of the history of the WoWD project;
 if somebody can provide information, please contact us, so that we can make this history available
 
+SunwellCore developed privately and has no git history.
+
 ## Exceptions with third party libraries
 The third party libraries have their own way of addressing authorship, and the authorship of commits importing/ updating
 a third party library reflects who did the importing instead of who wrote the code within the commit.
