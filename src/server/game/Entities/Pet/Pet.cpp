@@ -467,7 +467,7 @@ void Pet::Update(uint32 diff)
                                 GetCharmInfo()->SetIsReturning(false);
                                 GetCharmInfo()->SaveStayPosition(true);
 
-                                CastSpell(tempspellTarget, tempspell, true);
+                                CastSpell(tempspellTarget, tempspell, false);
                                 m_tempspell = 0;
                                 m_tempspellTarget = nullptr;
 
@@ -1147,7 +1147,8 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
             Field* fields = result->Fetch();
 
             uint32 spell_id = fields[0].GetUInt32();
-            time_t db_time  = time_t(fields[1].GetUInt32());
+            uint16 category = fields[1].GetUInt16();
+            time_t db_time  = time_t(fields[2].GetUInt32());
 
             if (!sSpellMgr->GetSpellInfo(spell_id))
             {
@@ -1161,7 +1162,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
 
             uint32 cooldown = (db_time - curTime) * IN_MILLISECONDS;
             cooldowns[spell_id] = cooldown;
-            _AddCreatureSpellCooldown(spell_id, cooldown);
+            _AddCreatureSpellCooldown(spell_id, category, cooldown);
 
             LOG_DEBUG("entities.pet", "Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time - curTime));
         } while (result->NextRow());
@@ -1181,7 +1182,8 @@ void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout)
     trans->Append(stmt);
 
     time_t curTime = time(nullptr);
-    uint32 checkTime = World::GetGameTimeMS() + 30 * IN_MILLISECONDS;
+    uint32 curMSTime = World::GetGameTimeMS();
+    uint32 infTime   = curMSTime + infinityCooldownDelayCheck;
 
     // remove oudated and save active
     CreatureSpellCooldowns::iterator itr, itr2;
@@ -1189,15 +1191,19 @@ void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout)
     {
         itr2 = itr;
         ++itr;
-        if (itr2->second <= World::GetGameTimeMS() + 1000)
-            m_CreatureSpellCooldowns.erase(itr2);
-        else if (logout || itr2->second > checkTime)
+
+        if (itr2->second.end <= curMSTime + 1000)
         {
-            uint32 cooldown = ((itr2->second - World::GetGameTimeMS()) / IN_MILLISECONDS) + curTime;
+            m_CreatureSpellCooldowns.erase(itr2);
+        }
+        else if (itr->second.end <= infTime && (logout || itr->second.end > (curMSTime + 30 * IN_MILLISECONDS)))
+        {
+            uint32 cooldown = ((itr2->second.end - curMSTime) / IN_MILLISECONDS) + curTime;
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL_COOLDOWN);
             stmt->setUInt32(0, m_charmInfo->GetPetNumber());
             stmt->setUInt32(1, itr2->first);
-            stmt->setUInt32(2, cooldown);
+            stmt->setUInt16(2, itr2->second.category);
+            stmt->setUInt32(3, cooldown);
             trans->Append(stmt);
         }
     }

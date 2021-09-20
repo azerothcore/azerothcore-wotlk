@@ -15,7 +15,7 @@ EndScriptData */
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "Language.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -406,7 +406,7 @@ public:
         Map* map = object->GetMap();
 
         object->Relocate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), oz);
-        object->SetWorldRotationAngles(oz, oy, ox);
+        object->SetLocalRotationAngles(oz, oy, ox);
 
         object->SaveToDB(true);
 
@@ -466,7 +466,7 @@ public:
             float y = (float)atof(toY);
             float z = (float)atof(toZ);
 
-            if (!MapManager::IsValidMapCoord(object->GetMapId(), x, y, z))
+            if (!MapMgr::IsValidMapCoord(object->GetMapId(), x, y, z))
             {
                 handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, x, y, object->GetMapId());
                 handler->SetSentErrorMessage(true);

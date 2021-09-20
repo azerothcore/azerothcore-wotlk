@@ -14,7 +14,7 @@
 #include "DynamicVisibility.h"
 #include "GridNotifiers.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MovementPacketBuilder.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
@@ -432,7 +432,9 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
     // 0x200
     if (flags & UPDATEFLAG_ROTATION)
-        *data << int64(ToGameObject()->GetPackedWorldRotation());
+    {
+        *data << int64(ToGameObject()->GetPackedLocalRotation());
+    }
 }
 
 void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
@@ -2994,7 +2996,7 @@ struct WorldObjectChangeAccumulator
         }
     }
 
-    template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
+    template<class SKIP> void Visit(GridRefMgr<SKIP>&) {}
 };
 
 void WorldObject::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set)

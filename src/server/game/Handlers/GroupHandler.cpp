@@ -119,8 +119,19 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
     }
 
     Group* group = GetPlayer()->GetGroup();
-    if (group && (group->isBGGroup() || group->isBFGroup()))
-        group = GetPlayer()->GetOriginalGroup();
+    if (group)
+    {
+        if (group->isLFGGroup() && group->IsLfgRandomInstance())
+        {
+            SendPartyResult(PARTY_OP_INVITE, membername, ERR_TARGET_NOT_IN_INSTANCE_S);
+            return;
+        }
+
+        if (group->isBGGroup() || group->isBFGroup())
+        {
+            group = GetPlayer()->GetOriginalGroup();
+        }
+    }
 
     Group* group2 = player->GetGroup();
     if (group2 && (group2->isBGGroup() || group2->isBFGroup()))
