@@ -240,7 +240,7 @@ public:
             if (!info)
                 return;
 
-            ThreatContainer::StorageType const& t_list = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& t_list = me->getThreatMgr().getThreatList();
             std::vector<Unit*> targets;
 
             if (t_list.empty())

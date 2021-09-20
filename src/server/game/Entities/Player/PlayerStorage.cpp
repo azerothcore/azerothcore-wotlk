@@ -36,7 +36,7 @@
 #include "LFGMgr.h"
 #include "Log.h"
 #include "LootItemStorage.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -2905,33 +2905,41 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
                     RemoveItemsSetItem(this, pProto);
 
                 _ApplyItemMods(pItem, slot, false);
-
-                // remove item dependent auras and casts (only weapon and armor slots)
-                if (slot < EQUIPMENT_SLOT_END)
-                {
-                    // Xinef: Ensure that this function is called for places with swap=true
-                    if (!swap)
-                        RemoveItemDependentAurasAndCasts(pItem);
-
-                    // remove held enchantments, update expertise
-                    if (slot == EQUIPMENT_SLOT_MAINHAND)
-                        UpdateExpertise(BASE_ATTACK);
-                    else if (slot == EQUIPMENT_SLOT_OFFHAND)
-                        UpdateExpertise(OFF_ATTACK);
-                    // update armor penetration - passive auras may need it
-                    switch (slot)
-                    {
-                        case EQUIPMENT_SLOT_MAINHAND:
-                        case EQUIPMENT_SLOT_OFFHAND:
-                        case EQUIPMENT_SLOT_RANGED:
-                            RecalculateRating(CR_ARMOR_PENETRATION);
-                        default:
-                            break;
-                    }
-                }
             }
 
             m_items[slot] = nullptr;
+
+            // remove item dependent auras and casts (only weapon and armor slots)
+            if (slot < INVENTORY_SLOT_BAG_END && slot < EQUIPMENT_SLOT_END)
+            {
+                // Xinef: Ensure that this function is called for places with swap=true
+                if (!swap)
+                {
+                    RemoveItemDependentAurasAndCasts(pItem);
+                }
+
+                // remove held enchantments, update expertise
+                if (slot == EQUIPMENT_SLOT_MAINHAND)
+                {
+                    UpdateExpertise(BASE_ATTACK);
+                }
+                else if (slot == EQUIPMENT_SLOT_OFFHAND)
+                {
+                    UpdateExpertise(OFF_ATTACK);
+                }
+
+                // update armor penetration - passive auras may need it
+                switch (slot)
+                {
+                    case EQUIPMENT_SLOT_MAINHAND:
+                    case EQUIPMENT_SLOT_OFFHAND:
+                    case EQUIPMENT_SLOT_RANGED:
+                        RecalculateRating(CR_ARMOR_PENETRATION);
+                    default:
+                        break;
+                }
+            }
+
             SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), ObjectGuid::Empty);
 
             if (slot < EQUIPMENT_SLOT_END)
@@ -7032,7 +7040,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         MapEntry const* bindMapEntry = sMapStore.LookupEntry(m_homebindMapId);
 
         // accept saved data only for valid position (and non instanceable), and accessable
-        if (MapManager::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ) &&
+        if (MapMgr::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ) &&
             !bindMapEntry->Instanceable() && GetSession()->Expansion() >= bindMapEntry->Expansion())
             ok = true;
         else

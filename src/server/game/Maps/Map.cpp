@@ -25,7 +25,7 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "VMapFactory.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -38,7 +38,7 @@ union u_map_magic
 };
 
 u_map_magic MapMagic        = { {'M', 'A', 'P', 'S'} };
-u_map_magic MapVersionMagic = { {'v', '1', '.', '8'} };
+uint32 MapVersionMagic      = 8;
 u_map_magic MapAreaMagic    = { {'A', 'R', 'E', 'A'} };
 u_map_magic MapHeightMagic  = { {'M', 'H', 'G', 'T'} };
 u_map_magic MapLiquidMagic  = { {'M', 'L', 'I', 'Q'} };
@@ -65,8 +65,8 @@ Map::~Map()
     if (!m_scriptSchedule.empty())
         sScriptMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
 
-    //MMAP::MMapFactory::createOrGetMMapManager()->unloadMap(GetId());
-    MMAP::MMapFactory::createOrGetMMapManager()->unloadMapInstance(GetId(), i_InstanceId);
+    //MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(GetId());
+    MMAP::MMapFactory::createOrGetMMapMgr()->unloadMapInstance(GetId(), i_InstanceId);
 }
 
 bool Map::ExistMap(uint32 mapid, int gx, int gy)
@@ -85,8 +85,12 @@ bool Map::ExistMap(uint32 mapid, int gx, int gy)
         map_fileheader header;
         if (fread(&header, sizeof(header), 1, pf) == 1)
         {
-            if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic.asUInt)
-                LOG_ERROR("maps", "Map file '%s' is from an incompatible clientversion. Please recreate using the mapextractor.", tmp);
+            if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
+            {
+                LOG_ERROR("maps", "Map file '%s' is from an incompatible map version (%.*u v%u), %.*s v%u is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
+                    tmp, 4, header.mapMagic, header.versionMagic, 4, MapMagic.asChar, MapVersionMagic);
+            }
+
             else
                 ret = true;
         }
@@ -98,7 +102,7 @@ bool Map::ExistMap(uint32 mapid, int gx, int gy)
 
 bool Map::ExistVMap(uint32 mapid, int gx, int gy)
 {
-    if (VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager())
+    if (VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr())
     {
         if (vmgr->isMapLoadingEnabled())
         {
@@ -120,7 +124,7 @@ void Map::LoadMMap(int gx, int gy)
     if (!DisableMgr::IsPathfindingEnabled(this)) // pussywizard
         return;
 
-    int mmapLoadResult = MMAP::MMapFactory::createOrGetMMapManager()->loadMap(GetId(), gx, gy);
+    int mmapLoadResult = MMAP::MMapFactory::createOrGetMMapMgr()->loadMap(GetId(), gx, gy);
     switch (mmapLoadResult)
     {
         case MMAP::MMAP_LOAD_RESULT_OK:
@@ -138,7 +142,7 @@ void Map::LoadMMap(int gx, int gy)
 void Map::LoadVMap(int gx, int gy)
 {
     // x and y are swapped !!
-    int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapManager()->loadMap((sWorld->GetDataPath() + "vmaps").c_str(), GetId(), gx, gy);
+    int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapMgr()->loadMap((sWorld->GetDataPath() + "vmaps").c_str(), GetId(), gx, gy);
     switch (vmapLoadResult)
     {
         case VMAP::VMAP_LOAD_RESULT_OK:
@@ -717,7 +721,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         _dynamicTree.update(t_diff);
 
     /// update worldsessions for existing players
-    for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
+    for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
     {
         Player* player = m_mapRefIter->GetSource();
         if (player && player->IsInWorld())
@@ -731,7 +735,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
     if (!t_diff)
     {
-        for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
+        for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
         {
             Player* player = m_mapRefIter->GetSource();
 
@@ -780,7 +784,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
     // the player iterator is stored in the map object
     // to make sure calls to Map::Remove don't invalidate it
-    for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
+    for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
     {
         Player* player = m_mapRefIter->GetSource();
 
@@ -811,7 +815,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
             updateList.clear();
             float rangeSq = player->GetGridActivationRange() - 1.0f;
             rangeSq = rangeSq * rangeSq;
-            HostileReference* ref = player->getHostileRefManager().getFirst();
+            HostileReference* ref = player->getHostileRefMgr().getFirst();
             while (ref)
             {
                 if (Unit* unit = ref->GetSource()->GetOwner())
@@ -866,19 +870,19 @@ void Map::HandleDelayedVisibility()
 
 struct ResetNotifier
 {
-    template<class T>inline void resetNotify(GridRefManager<T>& m)
+    template<class T>inline void resetNotify(GridRefMgr<T>& m)
     {
-        for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
+        for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
             iter->GetSource()->ResetAllNotifies();
     }
-    template<class T> void Visit(GridRefManager<T>&) {}
+    template<class T> void Visit(GridRefMgr<T>&) {}
     void Visit(CreatureMapType& m) { resetNotify<Creature>(m);}
     void Visit(PlayerMapType& m) { resetNotify<Player>(m);}
 };
 
 void Map::RemovePlayerFromMap(Player* player, bool remove)
 {
-    player->getHostileRefManager().deleteReferences(); // pussywizard: multithreading crashfix
+    player->getHostileRefMgr().deleteReferences(); // pussywizard: multithreading crashfix
 
     bool inWorld = player->IsInWorld();
     player->RemoveFromWorld();
@@ -1213,8 +1217,8 @@ bool Map::UnloadGrid(NGridType& ngrid)
             delete GridMaps[gx][gy];
         }
         // x and y are swapped
-        VMAP::VMapFactory::createOrGetVMapManager()->unloadMap(GetId(), gx, gy);
-        MMAP::MMapFactory::createOrGetMMapManager()->unloadMap(GetId(), gx, gy);
+        VMAP::VMapFactory::createOrGetVMapMgr()->unloadMap(GetId(), gx, gy);
+        MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(GetId(), gx, gy);
     }
 
     GridMaps[gx][gy] = nullptr;
@@ -1227,7 +1231,7 @@ void Map::RemoveAllPlayers()
 {
     if (HavePlayers())
     {
-        for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
         {
             Player* player = itr->GetSource();
             if (!player->IsBeingTeleportedFar())
@@ -1246,11 +1250,11 @@ void Map::UnloadAll()
     _creaturesToMove.clear();
     _gameObjectsToMove.clear();
 
-    for (GridRefManager<NGridType>::iterator i = GridRefManager<NGridType>::begin(); i != GridRefManager<NGridType>::end();)
+    for (GridRefMgr<NGridType>::iterator i = GridRefMgr<NGridType>::begin(); i != GridRefMgr<NGridType>::end();)
     {
         NGridType& grid(*i->GetSource());
         ++i;
-        UnloadGrid(grid); // deletes the grid and removes it from the GridRefManager
+        UnloadGrid(grid); // deletes the grid and removes it from the GridRefMgr
     }
 
     // pussywizard: crashfix, some npc can be left on transport (not a default passenger)
@@ -1335,7 +1339,7 @@ bool GridMap::loadData(char* filename)
         return false;
     }
 
-    if (header.mapMagic == MapMagic.asUInt && header.versionMagic == MapVersionMagic.asUInt)
+    if (header.mapMagic == MapMagic.asUInt && header.versionMagic == MapVersionMagic)
     {
         // loadup area data
         if (header.areaMapOffset && !loadAreaData(in, header.areaMapOffset, header.areaMapSize))
@@ -2018,7 +2022,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     float vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
     if (checkVMap)
     {
-        VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
+        VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
         vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);   // look from a bit higher pos to find the floor
     }
 
@@ -2070,7 +2074,7 @@ bool Map::GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& flags
     float vmap_z = z;
     float dynamic_z = z;
     float check_z = z;
-    VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
+    VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     uint32 vflags;
     int32 vadtId;
     int32 vrootId;
@@ -2172,7 +2176,7 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
 {
    LiquidData liquidData;
 
-    VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
+    VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     float liquid_level = INVALID_HEIGHT;
     float ground_level = INVALID_HEIGHT;
     uint32 liquid_type = 0;
@@ -2258,7 +2262,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, fl
 {
     GridMap* gmap = GetGrid(x, y);
 
-    VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
+    VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     VMAP::AreaAndLiquidData vmapData;
     VMAP::AreaAndLiquidData dynData;
     VMAP::AreaAndLiquidData* wmoData = nullptr;
@@ -2405,7 +2409,7 @@ float Map::GetWaterLevel(float x, float y) const
 
 bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const
 {
-    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2))
+    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2))
         return false;
 
     if (sWorld->getBoolConfig(CONFIG_CHECK_GOBJECT_LOS) && (checks & LINEOFSIGHT_CHECK_GOBJECT)
@@ -2673,7 +2677,7 @@ void Map::RemoveAllObjectsInRemoveList()
 uint32 Map::GetPlayersCountExceptGMs() const
 {
     uint32 count = 0;
-    for (MapRefManager::const_iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+    for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
         if (!itr->GetSource()->IsGameMaster())
             ++count;
     return count;
@@ -2681,7 +2685,7 @@ uint32 Map::GetPlayersCountExceptGMs() const
 
 void Map::SendToPlayers(WorldPacket const* data) const
 {
-    for (MapRefManager::const_iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+    for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
         itr->GetSource()->GetSession()->SendPacket(data);
 }
 
@@ -2809,7 +2813,7 @@ Map::EnterState InstanceMap::CannotEnter(Player* player, bool loginCheck)
     {
         LOG_ERROR("maps", "InstanceMap::CanEnter - player %s (%s) already in map %d, %d, %d!",
             player->GetName().c_str(), player->GetGUID().ToString().c_str(), GetId(), GetInstanceId(), GetSpawnMode());
-        ABORT();
+
         return CANNOT_ENTER_ALREADY_IN_MAP;
     }
 
@@ -2957,7 +2961,7 @@ void InstanceMap::Update(const uint32 t_diff, const uint32 s_diff, bool /*thread
 void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
 {
     // pussywizard: moved m_unloadTimer to InstanceMap::AfterPlayerUnlinkFromMap(), in this function if 2 players run out at the same time the instance won't close
-    //if (!m_unloadTimer && m_mapRefManager.getSize() == 1)
+    //if (!m_unloadTimer && m_mapRefMgr.getSize() == 1)
     //    m_unloadTimer = m_unloadWhenEmpty ? MIN_UNLOAD_DELAY : std::max(sWorld->getIntConfig(CONFIG_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);
     Map::RemovePlayerFromMap(player, remove);
     player->SetPendingBind(0, 0);
@@ -3020,7 +3024,7 @@ bool InstanceMap::Reset(uint8 method, GuidList* globalResetSkipList)
     if (method == INSTANCE_RESET_GLOBAL)
     {
         // pussywizard: teleport out immediately
-        for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
         {
             // teleport players that are no longer bound (can be still bound if extended id)
             if (!globalResetSkipList || std::find(globalResetSkipList->begin(), globalResetSkipList->end(), itr->GetSource()->GetGUID()) == globalResetSkipList->end())
@@ -3037,14 +3041,14 @@ bool InstanceMap::Reset(uint8 method, GuidList* globalResetSkipList)
             m_resetAfterUnload = true;
         }
 
-        return m_mapRefManager.isEmpty();
+        return m_mapRefMgr.isEmpty();
     }
 
     if (HavePlayers())
     {
         if (method == INSTANCE_RESET_ALL || method == INSTANCE_RESET_CHANGE_DIFFICULTY)
         {
-            for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+            for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
                 itr->GetSource()->SendResetFailedNotify(GetId());
         }
     }
@@ -3054,7 +3058,7 @@ bool InstanceMap::Reset(uint8 method, GuidList* globalResetSkipList)
         m_resetAfterUnload = true;
     }
 
-    return m_mapRefManager.isEmpty();
+    return m_mapRefMgr.isEmpty();
 }
 
 std::string const& InstanceMap::GetScriptName() const
@@ -3077,7 +3081,7 @@ void InstanceMap::PermBindAllPlayers()
     Player* player;
     Group* group;
     // group members outside the instance group don't get bound
-    for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+    for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
     {
         player = itr->GetSource();
         group = player->GetGroup();
@@ -3115,7 +3119,7 @@ void InstanceMap::UnloadAll()
 
 void InstanceMap::SendResetWarnings(uint32 timeLeft) const
 {
-    for (MapRefManager::const_iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+    for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
         itr->GetSource()->SendInstanceResetWarning(GetId(), itr->GetSource()->GetDifficulty(IsRaid()), timeLeft, false);
 }
 
@@ -3213,7 +3217,7 @@ void BattlegroundMap::SetUnload()
 void BattlegroundMap::RemoveAllPlayers()
 {
     if (HavePlayers())
-        for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
             if (Player* player = itr->GetSource())
                 if (!player->IsBeingTeleportedFar())
                     player->TeleportTo(player->GetEntryPoint());
@@ -3851,7 +3855,7 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     // Unit is not on the ground, check for potential collision via vmaps
     if (notOnGround)
     {
-        bool col = VMAP::VMapFactory::createOrGetVMapManager()->GetObjectHitPos(source->GetMapId(),
+        bool col = VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(source->GetMapId(),
             startX, startY, startZ + halfHeight,
             destX, destY, destZ + halfHeight,
             destX, destY, destZ, -CONTACT_DISTANCE);

@@ -8,7 +8,7 @@
 #include "PathCommon.h"
 #include "MapBuilder.h"
 #include "MapDefines.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 #include "MapTree.h"
 #include "ModelInstance.h"
 #include <vector>
@@ -69,7 +69,7 @@ struct map_liquidHeader
 namespace MMAP
 {
 
-    char const* MAP_VERSION_MAGIC = "v1.8";
+    uint32 const MAP_VERSION_MAGIC = 8;
 
     TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
     TerrainBuilder::~TerrainBuilder() = default;
@@ -131,7 +131,7 @@ namespace MMAP
 
         map_fileheader fheader;
         if (fread(&fheader, sizeof(map_fileheader), 1, mapFile) != 1 ||
-                fheader.versionMagic != *((uint32 const*)(MAP_VERSION_MAGIC)))
+                fheader.versionMagic != MAP_VERSION_MAGIC)
         {
             fclose(mapFile);
             printf("%s is the wrong version, please extract new .map files\n", mapFileName);
@@ -636,8 +636,8 @@ namespace MMAP
     /**************************************************************************/
     bool TerrainBuilder::loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
-        IVMapManager* vmapManager = new VMapManager2();
-        int result = vmapManager->loadMap("vmaps", mapID, tileX, tileY);
+        IVMapMgr* vmapMgr = new VMapMgr2();
+        int result = vmapMgr->loadMap("vmaps", mapID, tileX, tileY);
         bool retval = false;
 
         do
@@ -646,7 +646,7 @@ namespace MMAP
                 break;
 
             InstanceTreeMap instanceTrees;
-            ((VMapManager2*)vmapManager)->GetInstanceMapTree(instanceTrees);
+            ((VMapMgr2*)vmapMgr)->GetInstanceMapTree(instanceTrees);
 
             if (!instanceTrees[mapID])
                 break;
@@ -790,8 +790,8 @@ namespace MMAP
             }
         } while (false);
 
-        vmapManager->unloadMap(mapID, tileX, tileY);
-        delete vmapManager;
+        vmapMgr->unloadMap(mapID, tileX, tileY);
+        delete vmapMgr;
 
         return retval;
     }
