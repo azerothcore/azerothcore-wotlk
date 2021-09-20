@@ -14769,7 +14769,7 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
     CombatStop();
     ClearComboPointHolders();
     DeleteThreatList();
-    getHostileRefMgr().deleteReferences();
+    getHostileRefMgr().deleteReferences(true);
     GetMotionMaster()->Clear(false);                    // remove different non-standard movement generators.
 }
 
