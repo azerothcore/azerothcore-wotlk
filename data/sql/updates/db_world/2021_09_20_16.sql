@@ -1,3 +1,19 @@
+-- DB update 2021_09_20_15 -> 2021_09_20_16
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_09_20_15';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_09_20_15 2021_09_20_16 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1631873345336101246'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1631873345336101246');
 
 UPDATE `creature_template` SET `AIName`="SmartAI", `unit_class`=2 WHERE `entry`=4498;
@@ -32,3 +48,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (5772, 0, 0, "Who dares to seek me out?!", 14, 8, 100, 15, 0, 0, 2090, 0, "Lord Azrethoc's Image"),
 (5772, 1, 0, "Insects!", 14, 8, 100, 0, 0, 0, 2091, 0, "Lord Azrethoc's Image"),
 (5772, 2, 0, "Come! Come to your deaths--if you dare!", 14, 8, 100, 396, 0, 0, 2092, 0, "Lord Azrethoc's Image");
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_09_20_16' WHERE sql_rev = '1631873345336101246';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
