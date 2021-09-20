@@ -38,7 +38,7 @@ union u_map_magic
 };
 
 u_map_magic MapMagic        = { {'M', 'A', 'P', 'S'} };
-u_map_magic MapVersionMagic = { {'v', '1', '.', '8'} };
+uint32 MapVersionMagic      = 8;
 u_map_magic MapAreaMagic    = { {'A', 'R', 'E', 'A'} };
 u_map_magic MapHeightMagic  = { {'M', 'H', 'G', 'T'} };
 u_map_magic MapLiquidMagic  = { {'M', 'L', 'I', 'Q'} };
@@ -85,8 +85,12 @@ bool Map::ExistMap(uint32 mapid, int gx, int gy)
         map_fileheader header;
         if (fread(&header, sizeof(header), 1, pf) == 1)
         {
-            if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic.asUInt)
-                LOG_ERROR("maps", "Map file '%s' is from an incompatible clientversion. Please recreate using the mapextractor.", tmp);
+            if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
+            {
+                LOG_ERROR("maps", "Map file '%s' is from an incompatible map version (%.*u v%u), %.*s v%u is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
+                    tmp, 4, header.mapMagic, header.versionMagic, 4, MapMagic.asChar, MapVersionMagic);
+            }
+
             else
                 ret = true;
         }
@@ -1335,7 +1339,7 @@ bool GridMap::loadData(char* filename)
         return false;
     }
 
-    if (header.mapMagic == MapMagic.asUInt && header.versionMagic == MapVersionMagic.asUInt)
+    if (header.mapMagic == MapMagic.asUInt && header.versionMagic == MapVersionMagic)
     {
         // loadup area data
         if (header.areaMapOffset && !loadAreaData(in, header.areaMapOffset, header.areaMapSize))
@@ -2809,7 +2813,7 @@ Map::EnterState InstanceMap::CannotEnter(Player* player, bool loginCheck)
     {
         LOG_ERROR("maps", "InstanceMap::CanEnter - player %s (%s) already in map %d, %d, %d!",
             player->GetName().c_str(), player->GetGUID().ToString().c_str(), GetId(), GetInstanceId(), GetSpawnMode());
-        ABORT();
+
         return CANNOT_ENTER_ALREADY_IN_MAP;
     }
 
