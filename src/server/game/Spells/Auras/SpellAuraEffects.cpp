@@ -2818,6 +2818,7 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
         return;
 
     Unit* target = aurApp->GetTarget();
+    Unit* caster = GetCaster();
 
     if (apply)
     {
@@ -2830,6 +2831,19 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
                 creatureEntry = 24906;
             else
                 creatureEntry = 15665;
+        }
+
+        // Festive Brewfest Mount
+        if (!GetBase()->HasEffectType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && target->HasAura(66052))
+        {
+            if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+            {
+                creatureEntry = 27707;
+            }
+            else
+            {
+                creatureEntry = 30507;
+            }
         }
 
         CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(creatureEntry);
@@ -5362,6 +5376,34 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                     creatureEntry = 24906;
                                 else
                                     creatureEntry = 15665;
+                            }
+                            else
+                                creatureEntry = target->GetAuraEffectsByType(SPELL_AURA_MOUNTED).front()->GetMiscValue();
+
+                            if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
+                            {
+                                uint32 displayID = ObjectMgr::ChooseDisplayId(creatureInfo);
+                                sObjectMgr->GetCreatureModelRandomGender(&displayID);
+
+                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, displayID);
+                            }
+                        }
+                        break;
+                    case 66052: // Festive Brewfest Mount
+                        if (target->HasAuraType(SPELL_AURA_MOUNTED) && !target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+                        {
+                            uint32 creatureEntry = 0;
+
+                            if (apply)
+                            {
+                                if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+                                {
+                                    creatureEntry = 27707;
+                                }
+                                else
+                                {
+                                    creatureEntry = 30507;
+                                }
                             }
                             else
                                 creatureEntry = target->GetAuraEffectsByType(SPELL_AURA_MOUNTED).front()->GetMiscValue();
