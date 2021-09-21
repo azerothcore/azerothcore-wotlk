@@ -79,6 +79,15 @@ public:
                 SaveToDB();
         }
 
+        uint32 GetData(uint32 data) const override
+        {
+            if (data >= 0 && data < MAX_ENCOUNTERS)
+            {
+                return _encounters[data];
+            }
+            return 0;
+        }
+
         std::string GetSaveData() override
         {
             std::ostringstream saveStream;
@@ -214,7 +223,8 @@ public:
         void HandleSendEvent(SpellEffIndex  /*effIndex*/)
         {
             InstanceScript* instance = GetCaster()->GetInstanceScript();
-            if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS)
+
+            if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS || instance->GetData(DATA_ARCHAEDAS) == DONE)
                 return;
 
             instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS);
