@@ -81,7 +81,7 @@ public:
 
         uint32 GetData(uint32 data) const override
         {
-            if (data >= 0 && data < MAX_ENCOUNTERS)
+            if (data < MAX_ENCOUNTERS)
             {
                 return _encounters[data];
             }
