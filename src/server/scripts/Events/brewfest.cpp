@@ -626,6 +626,7 @@ enum darkIronAttack
     NPC_EVENT_GENERATOR                 = 23703,
     NPC_SUPER_BREW_TRIGGER              = 23808,
     NPC_DARK_IRON_HERALD                = 24536,
+    NPC_BREWFEST_REVELER                = 24484,
 
     // Events
     EVENT_CHECK_HOUR                    = 1,
@@ -667,9 +668,16 @@ public:
         SummonList summons;
         uint32 kegCounter, guzzlerCounter;
         uint8 thrown;
+        std::list<Creature*> revelers;
 
         void Reset() override
         {
+            for (Creature* reveler : revelers)
+            {
+                reveler->Respawn(true);
+            }
+            revelers.clear();
+
             summons.DespawnAll();
             events.Reset();
             events.ScheduleEvent(EVENT_CHECK_HOUR, 2000);
@@ -805,24 +813,54 @@ public:
 
         void PrepareEvent()
         {
+            GetCreatureListWithEntryInGrid(revelers, me, NPC_BREWFEST_REVELER, 100.f);
+            for (Creature* reveler : revelers)
+            {
+                reveler->AI()->SetData(0, me->GetMapId());
+            }
+
             Creature* cr;
             if (me->GetMapId() == 1) // Kalimdor
             {
                 if ((cr = me->SummonCreature(NPC_DROHN_KEG, 1183.69f, -4315.15f, 21.1875f, 0.750492f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelers.push_back(cr);
+                }
                 if ((cr = me->SummonCreature(NPC_VOODOO_KEG, 1182.42f, -4272.45f, 21.1182f, -1.02974f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelers.push_back(cr);
+                }
                 if ((cr = me->SummonCreature(NPC_GORDOK_KEG, 1223.78f, -4296.48f, 21.1707f, -2.86234f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelers.push_back(cr);
+                }
             }
             else if (me->GetMapId() == 0) // Eastern Kingdom
             {
                 if ((cr = me->SummonCreature(NPC_BARLEYBREW_KEG, -5187.23f, -599.779f, 397.176f, 0.017453f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelers.push_back(cr);
+                }
                 if ((cr = me->SummonCreature(NPC_THUNDERBREW_KEG, -5160.05f, -632.632f, 397.178f, 1.39626f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelers.push_back(cr);
+                }
                 if ((cr = me->SummonCreature(NPC_GORDOK_KEG, -5145.75f, -575.667f, 397.176f, -2.28638f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelers.push_back(cr);
+                }
             }
 
             if ((cr = me->SummonCreature(NPC_DARK_IRON_HERALD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000)))
@@ -948,10 +986,13 @@ public:
         npc_dark_iron_guzzlerAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
+            attacking = false;
         }
 
         uint32 timer;
         ObjectGuid targetGUID;
+        bool attacking;
+
         void EnterCombat(Unit*) override {}
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
@@ -959,6 +1000,21 @@ public:
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
+        }
+
+        void MovementInform(uint32 type, uint32 /*id*/) override
+        {
+            if (type != FOLLOW_MOTION_TYPE)
+            {
+                return;
+            }
+
+            if (Unit* target = GetTarget())
+            {
+                timer = 0;
+                attacking = true;
+                me->CastSpell(target, SPELL_ATTACK_KEG, false);
+            }
         }
 
         void FindNextKeg()
@@ -989,9 +1045,12 @@ public:
                 shuffled[index] = entry[i];
             }
 
+            attacking = false;
+
             for (uint8 i = 0; i < 3; ++i)
                 if (Creature* cr = me->FindNearestCreature(shuffled[i], 100.0f))
                 {
+                    cr->SetWalk(true);
                     me->GetMotionMaster()->MoveFollow(cr, 1.0f, cr->GetAngle(me));
                     targetGUID = cr->GetGUID();
                     return;
@@ -1063,10 +1122,18 @@ public:
             timer = 0;
             if (targetGUID)
             {
-                if (Unit* target = GetTarget())
-                    me->CastSpell(target, SPELL_ATTACK_KEG, false);
+                Unit* target = GetTarget();
+                if (target && target->IsAlive())
+                {
+                    if (attacking)
+                    {
+                        me->CastSpell(target, SPELL_ATTACK_KEG, false);
+                    }
+                }
                 else
+                {
                     FindNextKeg();
+                }
             }
         }
     };
