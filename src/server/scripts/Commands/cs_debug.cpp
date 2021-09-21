@@ -325,7 +325,7 @@ public:
             std::string type;
             parsedStream >> type;
 
-            if (type == "")
+            if (type.empty())
                 break;
 
             if (type == "uint8")
