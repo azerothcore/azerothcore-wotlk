@@ -3450,6 +3450,22 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[0] = 0;
     });
 
+    // Pursuit of Justice Rank 1
+    ApplySpellFix({ 26022 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_1] = 6;
+        spellInfo->EffectApplyAuraName[EFFECT_1] = SPELL_AURA_MOD_MOUNTED_AND_FLIGHT_SPEED_NOT_STACK;
+        spellInfo->EffectBasePoints[EFFECT_1] = 7;
+    });
+
+    // Pursuit of Justice Rank 2
+    ApplySpellFix({ 26023 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[EFFECT_1] = 6;
+        spellInfo->EffectApplyAuraName[EFFECT_1] = SPELL_AURA_MOD_MOUNTED_AND_FLIGHT_SPEED_NOT_STACK;
+        spellInfo->EffectBasePoints[EFFECT_1] = 14;
+    });
+
     // Howl of Azgalor
     ApplySpellFix({ 31344 }, [](SpellEntry* spellInfo)
     {

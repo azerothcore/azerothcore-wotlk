@@ -13341,7 +13341,8 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 {
                     main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED);
                     stack_bonus     = GetTotalAuraMultiplier(SPELL_AURA_MOD_MOUNTED_SPEED_ALWAYS);
-                    non_stack_bonus += GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK) / 100.0f;
+                    int32 auraMod   = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK) > GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MOUNTED_AND_FLIGHT_SPEED_NOT_STACK) ? GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK) : GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MOUNTED_AND_FLIGHT_SPEED_NOT_STACK);
+                    non_stack_bonus += auraMod / 100.0f;
                 }
                 else
                 {
@@ -13398,7 +13399,8 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 else             // Use not mount (shapeshift for example) auras (should stack)
                     main_speed_mod  = GetTotalAuraModifier(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) + GetTotalAuraModifier(SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED);
 
-                non_stack_bonus += GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK) / 100.0f;
+                int32 auraMod = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK) > GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MOUNTED_AND_FLIGHT_SPEED_NOT_STACK) ? GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK) : GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MOUNTED_AND_FLIGHT_SPEED_NOT_STACK);
+                non_stack_bonus += auraMod / 100.0f;
 
                 // Update speed for vehicle if available
                 if (GetTypeId() == TYPEID_PLAYER && GetVehicle())
