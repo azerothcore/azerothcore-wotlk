@@ -464,12 +464,12 @@ public:
             renew = false;
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             SelectRandomText(2);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             SelectRandomText(1);
 
@@ -477,7 +477,7 @@ public:
                 events.ScheduleEvent(EVENT_DISARM, 30 * IN_MILLISECONDS);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
 
             if (!UpdateVictim())
