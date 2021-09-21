@@ -82,14 +82,15 @@ GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
 
 GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId)
 {
-    // search for zone associated closest graveyard
+    uint32 areaId = sMapMgr->GetAreaId(PHASEMASK_NORMAL, MapId, x, y, z);
+
     uint32 zoneId = sMapMgr->GetZoneId(PHASEMASK_NORMAL, MapId, x, y, z);
 
-    if (!zoneId)
+    if (!zoneId && !areaId)
     {
         if (z > -500)
         {
-            LOG_ERROR("sql.sql", "ZoneId not found for map %u coords (%f, %f, %f)", MapId, x, y, z);
+            LOG_ERROR("sql.sql", "GetClosestGraveyard: unable to find zoneId and areaId for map %u coords (%f, %f, %f)", MapId, x, y, z);
             return GetDefaultGraveyard(teamId);
         }
     }
@@ -101,7 +102,14 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
     //     then check faction
     //   if mapId != graveyard.mapId (ghost in instance) and search any graveyard associated
     //     then check faction
-    GraveyardMapBounds range = GraveyardStore.equal_range(zoneId);
+
+    // Fetch the graveyards linked to the areaId first, presumably the closer ones.
+    GraveyardMapBounds range = GraveyardStore.equal_range(areaId);
+
+    // No graveyards linked to the areaId given, search zone.
+    if (range.first == range.second)
+        range = GraveyardStore.equal_range(zoneId);
+
     MapEntry const* map = sMapStore.LookupEntry(MapId);
 
     // not need to check validity of map object; MapId _MUST_ be valid here
@@ -333,12 +341,6 @@ void Graveyard::LoadGraveyardZones()
         if (!areaEntry)
         {
             LOG_ERROR("sql.sql", "Table `graveyard_zone` has a record for not existing zone id (%u), skipped.", zoneId);
-            continue;
-        }
-
-        if (areaEntry->zone != 0)
-        {
-            LOG_ERROR("sql.sql", "Table `graveyard_zone` has a record for subzone id (%u) instead of zone, skipped.", zoneId);
             continue;
         }
 
