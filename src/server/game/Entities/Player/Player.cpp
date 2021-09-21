@@ -5791,12 +5791,10 @@ void Player::RewardReputation(Quest const* quest)
             continue;
 
         int32 rep = 0;
-        bool noQuestBonus = false;
 
         if (quest->RewardFactionValueIdOverride[i])
         {
             rep = quest->RewardFactionValueIdOverride[i] / 100;
-            noQuestBonus = true;
         }
         else
         {
@@ -5812,15 +5810,25 @@ void Player::RewardReputation(Quest const* quest)
             continue;
 
         if (quest->IsDaily())
-            rep = CalculateReputationGain(REPUTATION_SOURCE_DAILY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], noQuestBonus);
+        {
+            rep = CalculateReputationGain(REPUTATION_SOURCE_DAILY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+        }
         else if (quest->IsWeekly())
-            rep = CalculateReputationGain(REPUTATION_SOURCE_WEEKLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], noQuestBonus);
+        {
+            rep = CalculateReputationGain(REPUTATION_SOURCE_WEEKLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+        }
         else if (quest->IsMonthly())
-            rep = CalculateReputationGain(REPUTATION_SOURCE_MONTHLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], noQuestBonus);
+        {
+            rep = CalculateReputationGain(REPUTATION_SOURCE_MONTHLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+        }
         else if (quest->IsRepeatable())
-            rep = CalculateReputationGain(REPUTATION_SOURCE_REPEATABLE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], noQuestBonus);
+        {
+            rep = CalculateReputationGain(REPUTATION_SOURCE_REPEATABLE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+        }
         else
-            rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], noQuestBonus);
+        {
+            rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+        }
 
         if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
             GetReputationMgr().ModifyReputation(factionEntry, rep);
@@ -9704,6 +9712,11 @@ void Player::ContinueTaxiFlight()
         RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
     }
 
+    if (IsMounted())
+    {
+        RemoveAurasByType(SPELL_AURA_MOUNTED);
+    }
+
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);
 }
 
@@ -10118,6 +10131,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
     time_t recTime;
 
     bool needsCooldownPacket = false;
+    bool useSpellCooldown = false;
 
     // overwrite time for selected category
     if (infinityCooldown)
@@ -10137,7 +10151,12 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
         // Now we have cooldown data (if found any), time to apply mods
         if (rec > 0)
         {
+            int32 oldRec = rec;
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, rec, spell);
+            if (oldRec != rec)
+            {
+                useSpellCooldown = true;
+            }
         }
         else if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
         {
@@ -10150,6 +10169,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
             if (HasSpell(spellInfo->Id))
             {
                 needsCooldownPacket = true;
+                useSpellCooldown = true;
                 rec += cooldownMod * IN_MILLISECONDS;   // SPELL_AURA_MOD_COOLDOWN does not affect category cooldows, verified with shaman shocks
             }
         }
@@ -10169,11 +10189,11 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
     // category spells
     if (cat && catrec > 0)
     {
-        _AddSpellCooldown(spellInfo->Id, cat, itemId, catrecTime, true, true);
+        _AddSpellCooldown(spellInfo->Id, cat, itemId, useSpellCooldown? recTime : catrecTime, true, true);
         if (needsCooldownPacket)
         {
             WorldPacket data;
-            BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, catrecTime);
+            BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, useSpellCooldown ? recTime : catrecTime);
             SendDirectMessage(&data);
         }
 
