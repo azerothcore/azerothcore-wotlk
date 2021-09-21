@@ -417,6 +417,15 @@ struct TrainerSpellData
     [[nodiscard]] TrainerSpell const* Find(uint32 spell_id) const;
 };
 
-typedef std::map<uint32, time_t> CreatureSpellCooldowns;
+struct CreatureSpellCooldown
+{
+    CreatureSpellCooldown() : category(0), end(0) { }
+    CreatureSpellCooldown(uint16 categoryId, uint32 endTime) : category(categoryId), end(endTime) { }
+
+    uint16 category;
+    uint32 end;
+};
+
+typedef std::map<uint32, CreatureSpellCooldown> CreatureSpellCooldowns;
 
 #endif // AZEROTHCORE_CREATUREDATA_H
