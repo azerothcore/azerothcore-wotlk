@@ -882,7 +882,7 @@ struct ResetNotifier
 
 void Map::RemovePlayerFromMap(Player* player, bool remove)
 {
-    player->getHostileRefMgr().deleteReferences(); // pussywizard: multithreading crashfix
+    player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     bool inWorld = player->IsInWorld();
     player->RemoveFromWorld();
@@ -2813,7 +2813,7 @@ Map::EnterState InstanceMap::CannotEnter(Player* player, bool loginCheck)
     {
         LOG_ERROR("maps", "InstanceMap::CanEnter - player %s (%s) already in map %d, %d, %d!",
             player->GetName().c_str(), player->GetGUID().ToString().c_str(), GetId(), GetInstanceId(), GetSpawnMode());
-        ABORT();
+
         return CANNOT_ENTER_ALREADY_IN_MAP;
     }
 
