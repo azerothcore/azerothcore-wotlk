@@ -643,16 +643,13 @@ public:
         SummonList summons;
         uint32 kegCounter, guzzlerCounter;
         uint8 thrown;
-        GuidVector revelers;
+        std::list<Creature*> revelers;
 
         void Reset() override
         {
-            for (ObjectGuid const& guid : revelers)
+            for (Creature* reveler : revelers)
             {
-                if (Creature* reveler = ObjectAccessor::GetCreature(*me, guid))
-                {
-                    reveler->Respawn(true);
-                }
+                reveler->Respawn(true);
             }
             revelers.clear();
 
