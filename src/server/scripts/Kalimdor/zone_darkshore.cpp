@@ -497,7 +497,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             if (me->HealthBelowPct(55) && !heal && me->GetEntry() == NPC_TWILIGHT_DISCIPLINE)
             {
