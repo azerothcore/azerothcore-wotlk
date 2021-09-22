@@ -35,16 +35,32 @@ public:
     void OnCreatureKill(Player *killer, Creature *killed) override
     {
         if (killed->IsDungeonBoss())
-            killer->AddItem(LootBoxWorld::CustomCurrency, LootBoxWorld::KillReward);
+            giveCurrency(killer);
     }
 
     void OnCreatureKilledByPet(Player* owner, Creature* killed) override
     {
         if (killed->IsDungeonBoss())
-            owner->AddItem(LootBoxWorld::CustomCurrency, LootBoxWorld::KillReward);
+            giveCurrency(owner);
     }
 
 private:
+    void giveCurrency(Player *killer)
+    {
+        Map *map = killer->GetMap();
+        if (map->GetEntry()->IsDungeon() && killer) {
+            Map::PlayerList const &players = map->GetPlayers();
+
+            if (!players.isEmpty()) {
+                for (Map::PlayerList::const_iterator iter = players.begin(); iter != players.end(); ++iter) {
+                    if (Player *player = iter->GetSource()) {
+                        player->AddItem(LootBoxWorld::CustomCurrency, LootBoxWorld::KillReward);
+                    }
+                }
+            }
+        }
+    }
+
     void sendDailyReward(Player *player)
     {
         ChatHandler(player->GetSession()).PSendSysMessage("Daily login reward!");
