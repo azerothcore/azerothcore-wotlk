@@ -235,7 +235,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
     else
     {
         *data << uint8(1);                                          // bg ended
-        *data << uint8(bg->GetWinner() == TEAM_ALLIANCE ? 1 : 0);   // who win
+        *data << uint8(bg->GetWinner() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE); // who win
     }
 
     size_t wpos = data->wpos();
