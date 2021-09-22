@@ -3764,6 +3764,8 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
             // xinef: this is wrong
             //ExecuteLogEffectSummonObject(effIndex, linkedGO);
 
+            pGameObj->SetLinkedTrap(linkedGO);
+
             // Wild object not have owner and check clickable by players
             map->AddToMap(linkedGO, true);
         }
@@ -5600,6 +5602,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
             // xinef: this is wrong
             //linkedGO->SetOwnerGUID(m_caster->GetGUID());
             //ExecuteLogEffectSummonObject(effIndex, linkedGO);
+            pGameObj->SetLinkedTrap(linkedGO);
 
             cMap->AddToMap(linkedGO, true);
         }
