@@ -247,7 +247,7 @@ public:
                     case EVENT_FINAL_TALK:
                         if (Creature* robckbiter = ObjectAccessor::GetCreature(*me, _rockbiterGUID))
                         {
-                            Talk(TALK_0, robckbiter);
+                            robckbiter->AI()->Talk(TALK_0, me);
                         }
                         me->DespawnOrUnsummon(10 * IN_MILLISECONDS);
                         break;
