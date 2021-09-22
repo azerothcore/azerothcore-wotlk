@@ -2834,15 +2834,15 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
         }
 
         // Festive Brewfest Mount
-        if (!GetBase()->HasEffectType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && target->HasAura(66052))
+        if (!GetBase()->HasEffectType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && target->HasAura(FRESH_BREWFEST_HOPS))
         {
             if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
             {
-                creatureEntry = 27707;
+                creatureEntry = GREAT_BREWFEST_KODO;
             }
             else
             {
-                creatureEntry = 30507;
+                creatureEntry = BREWFEST_KODO;
             }
         }
 
@@ -5398,11 +5398,11 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             {
                                 if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
                                 {
-                                    creatureEntry = 27707;
+                                    creatureEntry = GREAT_BREWFEST_KODO;
                                 }
                                 else
                                 {
-                                    creatureEntry = 30507;
+                                    creatureEntry = BREWFEST_KODO;
                                 }
                             }
                             else
