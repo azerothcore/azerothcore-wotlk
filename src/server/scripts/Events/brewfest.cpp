@@ -22,31 +22,6 @@
 ///////////////////////////////////////
 ////// NPCS
 ///////////////////////////////////////
-
-class npc_brewfest_reveler : public CreatureScript
-{
-public:
-    npc_brewfest_reveler() : CreatureScript("npc_brewfest_reveler") { }
-
-    struct npc_brewfest_revelerAI : public ScriptedAI
-    {
-        npc_brewfest_revelerAI(Creature* c) : ScriptedAI(c) {}
-        void ReceiveEmote(Player* player, uint32 emote) override
-        {
-            if (!IsHolidayActive(HOLIDAY_BREWFEST))
-                return;
-
-            if (emote == TEXT_EMOTE_DANCE)
-                me->CastSpell(player, 41586, false);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_brewfest_revelerAI(creature);
-    }
-};
-
 enum corenDirebrew
 {
     FACTION_HOSTILE                 = 754,
@@ -668,13 +643,16 @@ public:
         SummonList summons;
         uint32 kegCounter, guzzlerCounter;
         uint8 thrown;
-        std::list<Creature*> revelers;
+        GuidVector revelers;
 
         void Reset() override
         {
-            for (Creature* reveler : revelers)
+            for (ObjectGuid const& guid : revelers)
             {
-                reveler->Respawn(true);
+                if (Creature* reveler = ObjectAccessor::GetCreature(*me, guid))
+                {
+                    reveler->Respawn(true);
+                }
             }
             revelers.clear();
 
@@ -1828,7 +1806,6 @@ public:
 void AddSC_event_brewfest_scripts()
 {
     // Npcs
-    new npc_brewfest_reveler();
     new npc_coren_direbrew();
     new npc_coren_direbrew_sisters();
     new npc_brewfest_keg_thrower();
