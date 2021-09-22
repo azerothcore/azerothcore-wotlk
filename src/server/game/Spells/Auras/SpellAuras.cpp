@@ -1938,6 +1938,16 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
             return true;
     }
 
+    // Allow tracking of both herbs and minerals.
+    // Note: The following are client limitations:
+    //  * The minimap tracking icon will display whichever skill is activated second
+    //  * The minimap tracking list will only show a check mark next to the last
+    //    skill activated. Sometimes this bugs out and doesn't switch the check
+    //    mark. It has no effect on the actual tracking though.
+    //  * The minimap dots are yellow for both resources
+    if (m_spellInfo->HasAura(SPELL_AURA_TRACK_RESOURCES) && existingSpellInfo->HasAura(SPELL_AURA_TRACK_RESOURCES))
+        return true;
+
     // check spell specific stack rules
     if (m_spellInfo->IsAuraExclusiveBySpecificWith(existingSpellInfo)
             || (sameCaster && m_spellInfo->IsAuraExclusiveBySpecificPerCasterWith(existingSpellInfo)))

@@ -48,7 +48,7 @@ private:
     void giveCurrency(Player *killer)
     {
         Map *map = killer->GetMap();
-        if (map->GetEntry()->IsDungeon() && killer) {
+        if (map->GetEntry()->IsDungeon()) {
             Map::PlayerList const &players = map->GetPlayers();
 
             if (!players.isEmpty()) {
