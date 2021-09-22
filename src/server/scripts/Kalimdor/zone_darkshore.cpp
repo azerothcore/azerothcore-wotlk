@@ -429,7 +429,7 @@ enum TwilightCreatures
 
 enum TwilightDisciplineThugTalks
 {
-    TALK_ENGAGE = 1,
+    TALK_ENGAGE = 0,
     TALK_DEFEAT,
 };
 
@@ -466,12 +466,12 @@ public:
 
         void JustDied(Unit*) override
         {
-            SelectRandomText(2);
+            Talk(TALK_DEFEAT, NULL);
         }
 
         void EnterCombat(Unit*) override
         {
-            SelectRandomText(1);
+            Talk(TALK_ENGAGE, NULL);
 
             if (me->GetEntry() == NPC_TWILIGHT_THUG)
                 events.ScheduleEvent(EVENT_DISARM, 30 * IN_MILLISECONDS);
@@ -497,7 +497,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (me->HealthBelowPct(55) && !heal && me->GetEntry() == NPC_TWILIGHT_DISCIPLINE)
             {
@@ -509,57 +509,6 @@ public:
             {
                 renew = true;
                 me->CastSpell(me, SPELL_RENEW);
-            }
-        }
-
-        void SelectRandomText(uint32 selectedText = 0)
-        {
-            switch (selectedText)
-            {
-            case TALK_ENGAGE:
-            {
-                switch (urand(1, 4))
-                {
-                case 1:
-                    me->MonsterSay("Embrace the end!", LANG_UNIVERSAL, NULL);
-                    break;
-                case 2:
-                    me->MonsterSay("For our Masters!", LANG_UNIVERSAL, NULL);
-                    break;
-                case 3:
-                    me->MonsterSay("Glory and blood for the Old Gods!", LANG_UNIVERSAL, NULL);
-                    break;
-                case 4:
-                    me->MonsterSay("Intruders! Good, I was getting bored...", LANG_UNIVERSAL, NULL);
-                    break;
-                case 5:
-                    me->MonsterSay("Intruders! Slay them!", LANG_UNIVERSAL, NULL);
-                    break;
-                }
-                break;
-            }
-            case TALK_DEFEAT:
-            {
-                switch (urand(1,5))
-                {
-                case 1:
-                    me->MonsterSay("My death matters little... the Hammer will still fall !", LANG_UNIVERSAL, NULL);
-                    break;
-                case 2:
-                    me->MonsterSay("My lords! I come to thee!", LANG_UNIVERSAL, NULL);
-                    break;
-                case 3:
-                    me->MonsterSay("You will never defeat us!", LANG_UNIVERSAL, NULL);
-                    break;
-                case 4:
-                    me->MonsterSay("My life for my masters. Rejoice!", LANG_UNIVERSAL, NULL);
-                    break;
-                case 5:
-                    me->MonsterSay("Your victory here only speeds your doom!", LANG_UNIVERSAL, NULL);
-                    break;
-                }
-                break;
-            }
             }
         }
     };
