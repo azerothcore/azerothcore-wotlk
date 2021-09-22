@@ -649,7 +649,7 @@ public:
         {
             for (Creature* reveler : revelers)
             {
-                reveler->Respawn(true);
+                reveler->Respawn();
             }
             revelers.clear();
 
