@@ -643,15 +643,19 @@ public:
         SummonList summons;
         uint32 kegCounter, guzzlerCounter;
         uint8 thrown;
-        std::list<Creature*> revelers;
+        GuidVector revelerGUIDs;
 
         void Reset() override
         {
-            for (Creature* reveler : revelers)
+            for (ObjectGuid const& guid : revelerGUIDs)
             {
-                reveler->Respawn();
+                if (Creature* reveler = ObjectAccessor::GetCreature(*me, guid))
+                {
+                    reveler->SetRespawnDelay(5 * MINUTE);
+                    reveler->Respawn();
+                }
             }
-            revelers.clear();
+            revelerGUIDs.clear();
 
             summons.DespawnAll();
             events.Reset();
@@ -788,9 +792,12 @@ public:
 
         void PrepareEvent()
         {
+            std::list<Creature*> revelers;
             GetCreatureListWithEntryInGrid(revelers, me, NPC_BREWFEST_REVELER, 100.f);
             for (Creature* reveler : revelers)
             {
+                revelerGUIDs.push_back(reveler->GetGUID());
+                reveler->SetRespawnDelay(MONTH);
                 reveler->AI()->SetData(0, me->GetMapId());
             }
 
@@ -801,19 +808,19 @@ public:
                 {
                     cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
-                    revelers.push_back(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
                 }
                 if ((cr = me->SummonCreature(NPC_VOODOO_KEG, 1182.42f, -4272.45f, 21.1182f, -1.02974f)))
                 {
                     cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
-                    revelers.push_back(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
                 }
                 if ((cr = me->SummonCreature(NPC_GORDOK_KEG, 1223.78f, -4296.48f, 21.1707f, -2.86234f)))
                 {
                     cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
-                    revelers.push_back(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
                 }
             }
             else if (me->GetMapId() == 0) // Eastern Kingdom
@@ -822,19 +829,19 @@ public:
                 {
                     cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
-                    revelers.push_back(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
                 }
                 if ((cr = me->SummonCreature(NPC_THUNDERBREW_KEG, -5160.05f, -632.632f, 397.178f, 1.39626f)))
                 {
                     cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
-                    revelers.push_back(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
                 }
                 if ((cr = me->SummonCreature(NPC_GORDOK_KEG, -5145.75f, -575.667f, 397.176f, -2.28638f)))
                 {
                     cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
-                    revelers.push_back(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
                 }
             }
 
