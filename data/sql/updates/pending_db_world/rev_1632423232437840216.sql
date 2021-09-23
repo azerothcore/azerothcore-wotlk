@@ -35,3 +35,4 @@ DELETE FROM `creature_loot_template` WHERE (`Entry` = 435) AND (`Item` IN (24069
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 435) AND (`Item` IN (44012, 44012));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (435, 44012, 44012, 0.5, 0, 1, 1, 1, 1, 'Blackrock Champion - (ReferenceTable)');
+
