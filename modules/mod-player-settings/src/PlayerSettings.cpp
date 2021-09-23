@@ -105,7 +105,7 @@ class PlayerSettingsPlayerScript : public PlayerScript
                     PlayerSettingsMapInfo *mapInfo = map->CustomData.GetDefault<PlayerSettingsMapInfo>("PlayerSettingsMapInfo");
                     uint32 nplayers = std::max(mapInfo->nplayers, mapInfo->veto);
 
-                    amount *= nplayers / maxPlayers * (1 + experienceMultiplier * (nplayers - 1));
+                    amount = amount * nplayers / maxPlayers * (1 + experienceMultiplier * (nplayers - 1));
 
                     uint32 bonus_xp = 0;
                     bool recruitAFriend = player->GetsRecruitAFriendBonus(true);
