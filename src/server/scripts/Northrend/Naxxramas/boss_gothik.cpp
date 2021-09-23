@@ -374,24 +374,30 @@ public:
             switch (spellInfo->Id)
             {
                 case SPELL_INFORM_LIVING_TRAINEE:
-                    if(Creature* target = me->SummonCreature(NPC_DEAD_TRAINEE, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation()))
                     {
+                    if (Creature* target = me->SummonCreature(NPC_DEAD_TRAINEE, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation()))
+                        {
                         me->CastSpell(target, SPELL_INFORM_DEAD_TRAINEE, true);
+                        }
+                    break;
                     }
-                    break;
                 case SPELL_INFORM_LIVING_KNIGHT:
+                    {
                     if (Creature* target = me->SummonCreature(NPC_DEAD_KNIGHT, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation()))
-					{
+                        {
                         me->CastSpell(target, SPELL_INFORM_DEAD_KNIGHT, true);
-					}
+                        }
                     break;
+                    }
                 case SPELL_INFORM_LIVING_RIDER:
+                    {
                     if (Creature* target = me->SummonCreature(NPC_DEAD_RIDER, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation()))
-					{
+                        {
                         me->CastSpell(target, SPELL_INFORM_DEAD_RIDER, true);
-					}
+                        }
                     me->SummonCreature(NPC_DEAD_HORSE, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation());
                     break;
+                    }
             }
             me->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST);
         }
