@@ -508,6 +508,26 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
 
     // maybe should only remove one buff when there are multiple?
     _player->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
+
+    // If spell being removed is a resource tracker remove the other.
+    if (spellInfo->HasAura(SPELL_AURA_TRACK_RESOURCES))
+    {
+        Unit::AuraEffectList const& auraEffects = _player->GetAuraEffectsByType(SPELL_AURA_TRACK_RESOURCES);
+        if (!auraEffects.empty())
+        {
+            // Build list of spell IDs to cancel. Trying to cancel the aura
+            // while iterating over AuraEffectList caused "incompatible
+            // iterator" errors on second pass.
+            std::list<uint32> spellIDs;
+
+            for (Unit::AuraEffectList::const_iterator auraEffect = auraEffects.begin(); auraEffect != auraEffects.end(); ++auraEffect)
+                spellIDs.push_back((*auraEffect)->GetId());
+
+            // Remove all auras related to resource tracking (only herbs and minerals in 3.3.5a)
+            for (std::list<uint32>::iterator it = spellIDs.begin(); it != spellIDs.end(); ++it)
+                _player->RemoveOwnedAura(*it, _player->GetGUID(), 0, AURA_REMOVE_BY_CANCEL);
+        }
+    }
 }
 
 void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
