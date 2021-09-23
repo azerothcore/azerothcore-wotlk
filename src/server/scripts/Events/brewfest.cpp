@@ -131,6 +131,17 @@ public:
         SummonList summons;
         uint8 phase;
 
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_COREN_DIREBREW;
+        }
+
         void Reset() override
         {
             events.Reset();
@@ -190,7 +201,7 @@ public:
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource()->GetGroup())
-                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 287, me->FindMap());
+                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_COREN_DIREBREW, me->FindMap());
         }
 
         void SummonSister(uint32 entry)

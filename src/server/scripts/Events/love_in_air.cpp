@@ -332,6 +332,17 @@ public:
         EventMap events;
         uint32 speachTimer;
 
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO;
+        }
+
         void Reset() override
         {
             speachTimer = 0;
@@ -353,7 +364,7 @@ public:
             me->AI()->Talk(SAY_HUMMEL_5);
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
-                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 288, me->FindMap());
+                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_CROWN_CHEMICAL_CO, me->FindMap());
         }
 
         void JustSummoned(Creature* cr) override
