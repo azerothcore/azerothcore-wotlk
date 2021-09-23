@@ -78,9 +78,8 @@ public:
             if (TeleportTimer <= diff)
             {
                 Talk(SAY_TELEPORT);
-                ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
-                ThreatContainer::StorageType::const_iterator i = threatlist.begin();
-                for (i = threatlist.begin(); i != threatlist.end(); ++i)
+                ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
+                for (auto i = threatlist.begin(); i != threatlist.end(); ++i)
                 {
                     Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
                     if (unit && (unit->GetTypeId() == TYPEID_PLAYER))

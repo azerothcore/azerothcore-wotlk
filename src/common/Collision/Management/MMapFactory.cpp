@@ -5,21 +5,24 @@
  */
 
 #include "MMapFactory.h"
+#include <cstring>
 #include <set>
 
 namespace MMAP
 {
     // ######################## MMapFactory ########################
     // our global singleton copy
-    MMapManager* g_MMapManager = nullptr;
+    MMapMgr* g_MMapMgr = nullptr;
     bool MMapFactory::forbiddenMaps[1000] = {0};
 
-    MMapManager* MMapFactory::createOrGetMMapManager()
+    MMapMgr* MMapFactory::createOrGetMMapMgr()
     {
-        if (g_MMapManager == nullptr)
-            g_MMapManager = new MMapManager();
+        if (g_MMapMgr == nullptr)
+        {
+            g_MMapMgr = new MMapMgr();
+        }
 
-        return g_MMapManager;
+        return g_MMapMgr;
     }
 
     void MMapFactory::InitializeDisabledMaps()
@@ -28,15 +31,17 @@ namespace MMAP
         int32 f[] = {616 /*EoE*/, 649 /*ToC25*/, 650 /*ToC5*/, -1};
         uint32 i = 0;
         while (f[i] >= 0)
+        {
             forbiddenMaps[f[i++]] = true;
+        }
     }
 
     void MMapFactory::clear()
     {
-        if (g_MMapManager)
+        if (g_MMapMgr)
         {
-            delete g_MMapManager;
-            g_MMapManager = nullptr;
+            delete g_MMapMgr;
+            g_MMapMgr = nullptr;
         }
     }
 }

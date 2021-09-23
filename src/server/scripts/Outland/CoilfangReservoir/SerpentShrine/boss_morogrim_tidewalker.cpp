@@ -199,7 +199,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            acore::Containers::RandomResizeList(unitList, 1);
+            Acore::Containers::RandomResize(unitList, 1);
         }
 
         void HandleDummy(SpellEffIndex effIndex)
@@ -208,7 +208,7 @@ public:
 
             // Xinef: if we have target we currently follow, return
             if (Unit* target = GetCaster()->GetVictim())
-                if (GetCaster()->getThreatManager().getThreat(target) >= 100000.0f)
+                if (GetCaster()->getThreatMgr().getThreat(target) >= 100000.0f)
                     return;
 
             // Xinef: acquire new target

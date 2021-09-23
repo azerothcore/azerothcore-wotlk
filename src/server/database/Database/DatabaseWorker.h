@@ -1,30 +1,38 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #ifndef _WORKERTHREAD_H
 #define _WORKERTHREAD_H
 
-#include <ace/Task.h>
-#include <ace/Activation_Queue.h>
+#include "Define.h"
+#include <atomic>
+#include <thread>
+
+template <typename T>
+class ProducerConsumerQueue;
 
 class MySQLConnection;
+class SQLOperation;
 
-class DatabaseWorker : protected ACE_Task_Base
+class AC_DATABASE_API DatabaseWorker
 {
 public:
-    DatabaseWorker(ACE_Activation_Queue* new_queue, MySQLConnection* con);
-
-    ///- Inherited from ACE_Task_Base
-    int svc() override;
-    int wait() override { return ACE_Task_Base::wait(); }
+    DatabaseWorker(ProducerConsumerQueue<SQLOperation*>* newQueue, MySQLConnection* connection);
+    ~DatabaseWorker();
 
 private:
-    DatabaseWorker() : ACE_Task_Base() { }
-    ACE_Activation_Queue* m_queue;
-    MySQLConnection* m_conn;
+    ProducerConsumerQueue<SQLOperation*>* _queue;
+    MySQLConnection* _connection;
+
+    void WorkerThread();
+    std::thread _workerThread;
+
+    std::atomic<bool> _cancelationToken;
+
+    DatabaseWorker(DatabaseWorker const& right) = delete;
+    DatabaseWorker& operator=(DatabaseWorker const& right) = delete;
 };
 
 #endif

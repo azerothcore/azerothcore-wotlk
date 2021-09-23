@@ -10,7 +10,7 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 
-namespace acore::Honor
+namespace Acore::Honor
 {
     inline float hk_honor_at_level_f(uint8 level, float multiplier = 1.0f)
     {
@@ -25,7 +25,7 @@ namespace acore::Honor
     }
 }
 
-namespace acore::XP
+namespace Acore::XP
 {
     inline uint8 GetGrayLevel(uint8 pl_level)
     {

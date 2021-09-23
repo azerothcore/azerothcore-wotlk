@@ -31,15 +31,15 @@ void SystemMgr::LoadScriptWaypoints()
     if (result)
         uiCreatureCount = result->GetRowCount();
 
-    LOG_INFO("server", "TSCR: Loading Script Waypoints for " UI64FMTD " creature(s)...", uiCreatureCount);
+    LOG_INFO("server.loading", "TSCR: Loading Script Waypoints for " UI64FMTD " creature(s)...", uiCreatureCount);
 
     //                                     0       1         2           3           4           5
     result = WorldDatabase.Query("SELECT entry, pointid, location_x, location_y, location_z, waittime FROM script_waypoint ORDER BY pointid");
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 Script Waypoints. DB table `script_waypoint` is empty.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 Script Waypoints. DB table `script_waypoint` is empty.");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -73,5 +73,5 @@ void SystemMgr::LoadScriptWaypoints()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u Script Waypoint nodes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded %u Script Waypoint nodes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

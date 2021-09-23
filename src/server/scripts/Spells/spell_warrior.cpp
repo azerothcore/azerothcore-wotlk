@@ -93,6 +93,46 @@ public:
     }
 };
 
+enum VictoryRushEnum
+{
+    SPELL_VICTORIOUS    = 32216
+};
+
+class spell_warr_victory_rush : public SpellScriptLoader
+{
+public:
+    spell_warr_victory_rush() : SpellScriptLoader("spell_warr_victory_rush") { }
+
+    class spell_warr_victory_rush_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warr_victory_rush_SpellScript);
+
+        void VictoryRushHit()
+        {
+            if (Unit* player = GetCaster())
+            {
+                if (Unit* victim = GetHitUnit())
+                {
+                    if (victim->isDead())
+                    {
+                        player->CastSpell(player, SPELL_VICTORIOUS, true);
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_warr_victory_rush_SpellScript::VictoryRushHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_warr_victory_rush_SpellScript();
+    }
+};
+
 class spell_warr_intervene : public SpellScriptLoader
 {
 public:
@@ -168,7 +208,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
             GetCaster()->RemoveAurasDueToSpell(SPELL_WARRIOR_SPELL_REFLECTION);
-            unitList.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            unitList.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             while (unitList.size() > GetSpellValue()->MaxAffectedTargets)
                 unitList.pop_back();
         }
@@ -360,6 +400,20 @@ public:
             return ValidateSpellInfo({ SPELL_WARRIOR_SLAM });
         }
 
+        void SendMiss(SpellMissInfo missInfo)
+        {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        caster->SendSpellMiss(target, SPELL_WARRIOR_SLAM, missInfo);
+                    }
+                }
+            }
+        }
+
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (GetHitUnit())
@@ -368,6 +422,7 @@ public:
 
         void Register() override
         {
+            BeforeHit += BeforeSpellHitFn(spell_warr_slam_SpellScript::SendMiss);
             OnEffectHitTarget += SpellEffectFn(spell_warr_slam_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
@@ -429,6 +484,20 @@ public:
             return ValidateSpellInfo({ SPELL_WARRIOR_EXECUTE, SPELL_WARRIOR_GLYPH_OF_EXECUTION });
         }
 
+        void SendMiss(SpellMissInfo missInfo)
+        {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        caster->SendSpellMiss(target, SPELL_WARRIOR_EXECUTE, missInfo);
+                    }
+                }
+            }
+        }
+
         void HandleEffect(SpellEffIndex effIndex)
         {
             Unit* caster = GetCaster();
@@ -457,6 +526,7 @@ public:
 
         void Register() override
         {
+            BeforeHit += BeforeSpellHitFn(spell_warr_execute_SpellScript::SendMiss);
             OnEffectHitTarget += SpellEffectFn(spell_warr_execute_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
@@ -963,6 +1033,7 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_intervene();
     new spell_warr_improved_spell_reflection();
     new spell_warr_improved_spell_reflection_trigger();
+    new spell_warr_victory_rush();
 
     // Theirs
     new spell_warr_bloodthirst();

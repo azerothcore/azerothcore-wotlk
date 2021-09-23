@@ -124,7 +124,7 @@ public:
                     {
                         bool found = false;
                         if (pInstance)
-                            for (ObjectGuid guid : spheres)
+                            for (ObjectGuid const& guid : spheres)
                                 if (Creature* c = pInstance->instance->GetCreature(guid))
                                     if (me->GetDistance(c) < 3.0f)
                                     {

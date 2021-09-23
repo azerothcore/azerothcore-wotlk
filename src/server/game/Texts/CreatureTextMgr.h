@@ -40,7 +40,7 @@ struct CreatureTextEntry
 
 struct CreatureTextLocale
 {
-    StringVector Text;
+    std::vector<std::string> Text;
 };
 
 struct CreatureTextId
@@ -136,7 +136,6 @@ public:
         {
             messageTemplate = new WorldPacket();
             whisperGUIDpos = _builder(messageTemplate, loc_idx);
-            ASSERT(messageTemplate->GetOpcode() != MSG_NULL_ACTION);
             _packetCache[loc_idx] = new std::pair<WorldPacket*, size_t>(messageTemplate, whisperGUIDpos);
         }
         else
@@ -150,7 +149,7 @@ public:
         {
             case CHAT_MSG_MONSTER_WHISPER:
             case CHAT_MSG_RAID_BOSS_WHISPER:
-                data.put<ObjectGuid>(whisperGUIDpos, player->GetGUID());
+                data.put<uint64>(whisperGUIDpos, player->GetGUID().GetRawValue());
                 break;
             default:
                 break;
@@ -239,8 +238,8 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
     if (msgType == CHAT_MSG_RAID_BOSS_EMOTE && source->GetMap()->IsDungeon())
         dist = 250.0f;
 
-    acore::PlayerDistWorker<CreatureTextLocalizer<Builder> > worker(source, dist, localizer);
-    source->VisitNearbyWorldObject(dist, worker);
+    Acore::PlayerDistWorker<CreatureTextLocalizer<Builder> > worker(source, dist, localizer);
+    Cell::VisitWorldObjects(source, worker, dist);
 }
 
 #endif

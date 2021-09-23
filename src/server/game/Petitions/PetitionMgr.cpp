@@ -1,10 +1,11 @@
 /*
-Xinef
- */
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "PetitionMgr.h"
+#include "Player.h"
 #include "QueryResult.h"
 #include "Timer.h"
 
@@ -30,8 +31,8 @@ void PetitionMgr::LoadPetitions()
     QueryResult result = CharacterDatabase.Query("SELECT ownerguid, petitionguid, name, type FROM petition");
     if (!result)
     {
-        LOG_INFO("server", ">>  Loaded 0 Petitions!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">>  Loaded 0 Petitions!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -43,8 +44,8 @@ void PetitionMgr::LoadPetitions()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void PetitionMgr::LoadSignatures()
@@ -55,8 +56,8 @@ void PetitionMgr::LoadSignatures()
     QueryResult result = CharacterDatabase.Query("SELECT petitionguid, playerguid, player_account FROM petition_sign");
     if (!result)
     {
-        LOG_INFO("server", ">>  Loaded 0 Petition signs!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">>  Loaded 0 Petition signs!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -68,8 +69,8 @@ void PetitionMgr::LoadSignatures()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void PetitionMgr::AddPetition(ObjectGuid petitionGUID, ObjectGuid ownerGuid, std::string const& name, uint8 type)
@@ -99,6 +100,18 @@ void PetitionMgr::RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type)
     {
         if (itr->second.ownerGuid == ownerGuid && (!type || type == itr->second.petitionType))
         {
+            // Remove invalid charter item
+            if (type == itr->second.petitionType)
+            {
+                if (Player* owner = ObjectAccessor::FindConnectedPlayer(ownerGuid))
+                {
+                    if (Item* item = owner->GetItemByGuid(itr->first))
+                    {
+                        owner->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+                    }
+                }
+            }
+
             // remove signatures
             SignatureStore.erase(itr->first);
             PetitionStore.erase(itr++);

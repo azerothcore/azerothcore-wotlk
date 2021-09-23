@@ -15,7 +15,6 @@
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "World.h"
 
 // for loading world object at grid loading (Corpses)
 //TODO: to implement npc on transport, also need to load npcs at grid loading
@@ -28,7 +27,7 @@ public:
 
     void Visit(CorpseMapType& m);
 
-    template<class T> void Visit(GridRefManager<T>&) { }
+    template<class T> void Visit(GridRefMgr<T>&) { }
 
 private:
     Cell i_cell;
@@ -55,7 +54,7 @@ template<> void ObjectGridLoader::SetObjectCell(GameObject* obj, CellCoord const
 }
 
 template <class T>
-void AddObjectHelper(CellCoord& cell, GridRefManager<T>& m, uint32& count, Map* /*map*/, T* obj)
+void AddObjectHelper(CellCoord& cell, GridRefMgr<T>& m, uint32& count, Map* /*map*/, T* obj)
 {
     obj->AddToGrid(m);
     ObjectGridLoader::SetObjectCell(obj, cell);
@@ -88,13 +87,13 @@ void AddObjectHelper(CellCoord& cell, GameObjectMapType& m, uint32& count, Map* 
 }
 
 template <class T>
-void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefManager<T>& m, uint32& count, Map* map)
+void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<T>& m, uint32& count, Map* map)
 {
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
         T* obj = new T;
         ObjectGuid::LowType guid = *i_guid;
-        //LOG_INFO("server", "DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
+
         if (!obj->LoadFromDB(guid, map))
         {
             delete obj;
@@ -106,14 +105,14 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefManager<T>&
 }
 
 template <>
-void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefManager<GameObject>& m, uint32& count, Map* map)
+void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefMgr<GameObject>& m, uint32& count, Map* map)
 {
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
         ObjectGuid::LowType guid = *i_guid;
         GameObjectData const* data = sObjectMgr->GetGOData(guid);
         GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
-        //LOG_INFO("server", "DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
+
         if (!obj->LoadFromDB(guid, map))
         {
             delete obj;
@@ -184,13 +183,11 @@ void ObjectGridLoader::LoadN(void)
             }
         }
     }
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("maps", "%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
-#endif
 }
 
 template<class T>
-void ObjectGridUnloader::Visit(GridRefManager<T>& m)
+void ObjectGridUnloader::Visit(GridRefMgr<T>& m)
 {
     while (!m.isEmpty())
     {
@@ -209,9 +206,9 @@ void ObjectGridUnloader::Visit(GridRefManager<T>& m)
 }
 
 template<class T>
-void ObjectGridCleaner::Visit(GridRefManager<T>& m)
+void ObjectGridCleaner::Visit(GridRefMgr<T>& m)
 {
-    for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
         iter->GetSource()->CleanupsBeforeDelete();
 }
 

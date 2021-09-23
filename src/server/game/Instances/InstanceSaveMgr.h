@@ -11,6 +11,7 @@
 #include "DBCEnums.h"
 #include "Define.h"
 #include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include <list>
 #include <map>
 #include <mutex>
@@ -20,7 +21,7 @@ struct InstanceTemplate;
 struct MapEntry;
 class Player;
 class Group;
-class InstanceSaveManager;
+class InstanceSaveMgr;
 class InstanceSave;
 
 struct InstancePlayerBind
@@ -42,7 +43,7 @@ typedef std::unordered_map<ObjectGuid /*guid*/, BoundInstancesMapWrapper* > Play
 
 class InstanceSave
 {
-    friend class InstanceSaveManager;
+    friend class InstanceSaveMgr;
 public:
     InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, time_t extendedResetTime);
     ~InstanceSave();
@@ -73,7 +74,7 @@ public:
     MapEntry const* GetMapEntry();
 
     void AddPlayer(ObjectGuid guid);
-    bool RemovePlayer(ObjectGuid guid, InstanceSaveManager* ism);
+    bool RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism);
 
 private:
     GuidList m_playerList;
@@ -91,16 +92,16 @@ private:
 
 typedef std::unordered_map<uint32 /*PAIR32(map, difficulty)*/, time_t /*resetTime*/> ResetTimeByMapDifficultyMap;
 
-class InstanceSaveManager
+class InstanceSaveMgr
 {
     friend class InstanceSave;
 
 private:
-    InstanceSaveManager()  {};
-    ~InstanceSaveManager();
+    InstanceSaveMgr()  {};
+    ~InstanceSaveMgr();
 
 public:
-    static InstanceSaveManager* instance();
+    static InstanceSaveMgr* instance();
 
     typedef std::unordered_map<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
 
@@ -185,6 +186,6 @@ private:
     ResetTimeQueue m_resetTimeQueue;
 };
 
-#define sInstanceSaveMgr InstanceSaveManager::instance()
+#define sInstanceSaveMgr InstanceSaveMgr::instance()
 
 #endif

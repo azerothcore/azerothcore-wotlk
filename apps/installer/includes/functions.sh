@@ -219,7 +219,7 @@ function inst_simple_restarter {
 
 function inst_download_client_data {
     # change the following version when needed
-    local VERSION=v10
+    local VERSION=v12
 
     echo "#######################"
     echo "Client data downloader"

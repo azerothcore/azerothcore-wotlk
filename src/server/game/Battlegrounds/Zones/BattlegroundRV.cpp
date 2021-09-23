@@ -71,7 +71,7 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                 setTimer(BG_RV_CLOSE_FIRE_TIMER);
                 setState(BG_RV_STATE_CLOSE_FIRE);
 
-                for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+                for (auto itr = m_Players.begin(); itr != m_Players.end(); ++itr)
                     if (Player* player = itr->second)
                     {
                         // Demonic Circle Summon
@@ -90,16 +90,16 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                                     if (totem->GetPositionZ() < 28.0f)
                                         TeleportUnitToNewZ(totem, 28.28f, true);
 
-                        for (Unit::ControlSet::const_iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
+                        for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
                         {
-                            if ((*itr)->GetPositionZ() < 28.0f)
-                                TeleportUnitToNewZ((*itr), 28.28f, true);
+                            if ((*itr2)->GetPositionZ() < 28.0f)
+                                TeleportUnitToNewZ((*itr2), 28.28f, true);
 
                             // Xinef: override stay position
-                            if (CharmInfo* charmInfo = (*itr)->GetCharmInfo())
+                            if (CharmInfo* charmInfo = (*itr2)->GetCharmInfo())
                                 if (charmInfo->IsAtStay())
                                 {
-                                    (*itr)->StopMovingOnCurrentPos();
+                                    (*itr2)->StopMovingOnCurrentPos();
                                     charmInfo->SaveStayPosition(false);
                                 }
                         }

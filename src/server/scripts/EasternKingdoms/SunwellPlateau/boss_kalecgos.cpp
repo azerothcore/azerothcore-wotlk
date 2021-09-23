@@ -576,9 +576,14 @@ public:
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(10))
                     {
-                        if (InstanceScript* instance = me->GetInstanceScript())
-                            if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
+                        if (InstanceScript* instanceScript = me->GetInstanceScript())
+                        {
+                            if (Creature *kalecgos = ObjectAccessor::GetCreature(*me, instanceScript->GetGuidData(
+                                    NPC_KALECGOS)))
+                            {
                                 kalecgos->AI()->DoAction(ACTION_ENRAGE_OTHER);
+                            }
+                        }
                         DoAction(ACTION_ENRAGE);
                         break;
                     }
@@ -626,7 +631,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(SpectralBlastCheck(GetCaster()->GetVictim()));
-            acore::Containers::RandomResizeList(targets, 1);
+            Acore::Containers::RandomResize(targets, 1);
         }
 
         void HandleDummy(SpellEffIndex effIndex)

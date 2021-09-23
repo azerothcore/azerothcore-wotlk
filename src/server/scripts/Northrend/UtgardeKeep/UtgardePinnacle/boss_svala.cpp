@@ -46,9 +46,6 @@ enum Misc
     NPC_RITUAL_CHANNELER                    = 27281,
     NPC_ARTHAS                              = 29280,
     NPC_FLAME_BRAZIER                       = 27273,
-
-    // ACTIONS
-    ACTION_START_SORROWGRAVE                = 1,
 };
 
 enum Events

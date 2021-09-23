@@ -54,14 +54,13 @@ target_include_directories(worldserver
 
 target_link_libraries(worldserver
   PRIVATE
-    game-interface
+    acore-core-interface
   PUBLIC
-    game
-    shared
     scripts
+    game
     gsoap
     readline
-    ${GPERFTOOLS_LIBRARIES})
+    gperftools)
 
 set_target_properties(worldserver
   PROPERTIES

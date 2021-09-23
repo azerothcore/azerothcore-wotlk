@@ -103,7 +103,7 @@ public:
     bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
     {
         if (_owner.IsSummon())
-            if (Unit* summoner = _owner.ToTempSummon()->GetSummoner())
+            if (Unit* summoner = _owner.ToTempSummon()->GetSummonerUnit())
             {
                 summoner->GetAI()->DoAction(_action);
                 _owner.SetStandState(UNIT_STAND_STATE_SUBMERGED);
@@ -514,7 +514,7 @@ public:
         {
             Talk(ANGER_SAY_DEATH);
             if (me->IsSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                     Unit::Kill(summoner, summoner);
         }
 
@@ -613,7 +613,7 @@ public:
             if (targets.empty())
                 return;
 
-            targets.sort(acore::ObjectDistanceOrderPred(GetCaster()));
+            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
             WorldObject* target = targets.front();
             targets.clear();
             targets.push_back(target);

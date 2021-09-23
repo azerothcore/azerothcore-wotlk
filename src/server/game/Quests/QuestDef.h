@@ -165,14 +165,14 @@ struct QuestLocale
 {
     QuestLocale() { ObjectiveText.resize(QUEST_OBJECTIVES_COUNT); }
 
-    StringVector Title;
-    StringVector Details;
-    StringVector Objectives;
-    StringVector OfferRewardText;
-    StringVector RequestItemsText;
-    StringVector AreaDescription;
-    StringVector CompletedText;
-    std::vector< StringVector > ObjectiveText;
+    std::vector<std::string> Title;
+    std::vector<std::string> Details;
+    std::vector<std::string> Objectives;
+    std::vector<std::string> OfferRewardText;
+    std::vector<std::string> RequestItemsText;
+    std::vector<std::string> AreaDescription;
+    std::vector<std::string> CompletedText;
+    std::vector< std::vector<std::string> > ObjectiveText;
 };
 
 struct QuestRequestItemsLocale

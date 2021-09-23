@@ -8,7 +8,7 @@
 #include "PathCommon.h"
 #include "MapBuilder.h"
 #include "MapDefines.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 #include "MapTree.h"
 #include "ModelInstance.h"
 #include <vector>
@@ -69,7 +69,7 @@ struct map_liquidHeader
 namespace MMAP
 {
 
-    char const* MAP_VERSION_MAGIC = "v1.8";
+    uint32 const MAP_VERSION_MAGIC = 8;
 
     TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
     TerrainBuilder::~TerrainBuilder() = default;
@@ -131,7 +131,7 @@ namespace MMAP
 
         map_fileheader fheader;
         if (fread(&fheader, sizeof(map_fileheader), 1, mapFile) != 1 ||
-                fheader.versionMagic != *((uint32 const*)(MAP_VERSION_MAGIC)))
+                fheader.versionMagic != MAP_VERSION_MAGIC)
         {
             fclose(mapFile);
             printf("%s is the wrong version, please extract new .map files\n", mapFileName);
@@ -636,8 +636,8 @@ namespace MMAP
     /**************************************************************************/
     bool TerrainBuilder::loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
-        IVMapManager* vmapManager = new VMapManager2();
-        int result = vmapManager->loadMap("vmaps", mapID, tileX, tileY);
+        IVMapMgr* vmapMgr = new VMapMgr2();
+        int result = vmapMgr->loadMap("vmaps", mapID, tileX, tileY);
         bool retval = false;
 
         do
@@ -646,14 +646,14 @@ namespace MMAP
                 break;
 
             InstanceTreeMap instanceTrees;
-            ((VMapManager2*)vmapManager)->getInstanceMapTree(instanceTrees);
+            ((VMapMgr2*)vmapMgr)->GetInstanceMapTree(instanceTrees);
 
             if (!instanceTrees[mapID])
                 break;
 
             ModelInstance* models = nullptr;
             uint32 count = 0;
-            instanceTrees[mapID]->getModelInstances(models, count);
+            instanceTrees[mapID]->GetModelInstances(models, count);
 
             if (!models)
                 break;
@@ -671,7 +671,7 @@ namespace MMAP
                 retval = true;
 
                 std::vector<GroupModel> groupModels;
-                worldModel->getGroupModels(groupModels);
+                worldModel->GetGroupModels(groupModels);
 
                 // all M2s need to have triangle indices reversed
                 bool isM2 = instance.name.find(".m2") != std::string::npos || instance.name.find(".M2") != std::string::npos;
@@ -690,7 +690,7 @@ namespace MMAP
                     std::vector<MeshTriangle> tempTriangles;
                     WmoLiquid* liquid = nullptr;
 
-                    groupModel.getMeshData(tempVertices, tempTriangles, liquid);
+                    groupModel.GetMeshData(tempVertices, tempTriangles, liquid);
 
                     // first handle collision mesh
                     transform(tempVertices, transformedVertices, scale, rotation, position);
@@ -707,7 +707,7 @@ namespace MMAP
                         std::vector<int> liqTris;
                         uint32 tilesX, tilesY, vertsX, vertsY;
                         G3D::Vector3 corner;
-                        liquid->getPosInfo(tilesX, tilesY, corner);
+                        liquid->GetPosInfo(tilesX, tilesY, corner);
                         vertsX = tilesX + 1;
                         vertsY = tilesY + 1;
                         uint8* flags = liquid->GetFlagsStorage();
@@ -790,8 +790,8 @@ namespace MMAP
             }
         } while (false);
 
-        vmapManager->unloadMap(mapID, tileX, tileY);
-        delete vmapManager;
+        vmapMgr->unloadMap(mapID, tileX, tileY);
+        delete vmapMgr;
 
         return retval;
     }

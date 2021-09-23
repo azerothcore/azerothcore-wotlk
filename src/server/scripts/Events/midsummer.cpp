@@ -1,4 +1,6 @@
-// Scripted by Xinef
+/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+*/
 
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -387,15 +389,23 @@ public:
         bool handled;
         bool Load() override { handled = false; return true; }
 
+        SpellCastResult CheckCast()
+        {
+            GetCaster()->GetCreaturesWithEntryInRange(_crList, 100.0f, NPC_TORCH_TARGET);
+            if (_crList.empty())
+            {
+                return SPELL_FAILED_NOT_HERE;
+            }
+
+            return SPELL_CAST_OK;
+        }
+
         void ThrowNextTorch(Unit* caster)
         {
-            std::list<Creature*> crList;
-            caster->GetCreaturesWithEntryInRange(crList, 100.0f, NPC_TORCH_TARGET);
-
-            uint8 rand = urand(0, crList.size() - 1);
+            uint8 rand = urand(0, _crList.size() - 1);
             Position pos;
             pos.Relocate(0.0f, 0.0f, 0.0f);
-            for (std::list<Creature*>::const_iterator itr = crList.begin(); itr != crList.end(); ++itr, --rand)
+            for (std::list<Creature*>::const_iterator itr = _crList.begin(); itr != _crList.end(); ++itr, --rand)
             {
                 if (caster->GetDistance(*itr) < 5)
                 {
@@ -471,8 +481,14 @@ public:
         {
             AfterCast += SpellCastFn(spell_midsummer_fling_torch_SpellScript::HandleFinish);
             if (m_scriptSpellId == 45671)
+            {
+                OnCheckCast += SpellCheckCastFn(spell_midsummer_fling_torch_SpellScript::CheckCast);
                 OnEffectHitTarget += SpellEffectFn(spell_midsummer_fling_torch_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
         }
+
+    private:
+        std::list<Creature*> _crList;
     };
 
     SpellScript* GetSpellScript() const override

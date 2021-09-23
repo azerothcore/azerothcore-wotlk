@@ -11,11 +11,10 @@
 #ifndef _ACORE_GEOMETRY_H
 #define _ACORE_GEOMETRY_H
 
-#include <cmath>
-#include <iostream>
+#include "Define.h"
 #include <cstdlib>
-
-using namespace std;
+#include <iostream>
+#include <math.h>
 
 [[nodiscard]] inline float getAngle(float startX, float startY, float destX, float destY)
 {
@@ -29,7 +28,7 @@ using namespace std;
 
 [[nodiscard]] inline float getSlopeAngle(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
-    float floorDist = sqrt(pow(startY - destY, 2.0f) + pow(startX - destX,2.0f));
+    float floorDist = sqrt(pow(startY - destY, 2.0f) + pow(startX - destX, 2.0f));
     return atan(abs(destZ - startZ) / abs(floorDist));
 }
 

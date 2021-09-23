@@ -40,12 +40,14 @@ target_include_directories(database
     ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(database
-  # PRIVATE
-    # acore-core-interface
-    # mysql
+  PRIVATE
+    acore-core-interface
+    mysql
   PUBLIC
-    common
-    mysql)
+    common)
+
+# Add support auto update db for modules
+GetModuleList()
 
 set_target_properties(database
   PROPERTIES

@@ -137,7 +137,7 @@ public:
 
             if (!me->IsWithinMeleeRange(me->GetVictim()))
             {
-                ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType threatlist = me->getThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
                     if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
                         if (target->IsAlive() && me->IsWithinMeleeRange(target))
@@ -192,8 +192,8 @@ public:
 
         void SelectTarget(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
-            targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
+            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
         }
 
         void Register() override

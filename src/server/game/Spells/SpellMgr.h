@@ -10,6 +10,7 @@
 // For static or at-server-startup loaded spell data
 
 #include "Common.h"
+#include "Log.h"
 #include "SharedDefines.h"
 #include "Unit.h"
 
@@ -200,6 +201,7 @@ enum ProcFlagsExLegacy
     PROC_EX_ONLY_ACTIVE_SPELL   = 0x0040000,                 // Spell has to do damage/heal to proc
     PROC_EX_NO_OVERHEAL         = 0x0080000,                 // Proc if heal did some work
     PROC_EX_NO_AURA_REFRESH     = 0x0100000,                 // Proc if aura was not refreshed
+    PROC_EX_ONLY_FIRST_TICK     = 0x0200000,                 // Proc only on first tick (in case of periodic spells)
 
     // Flags for internal use - do not use these in db!
     PROC_EX_INTERNAL_CANT_PROC  = 0x0800000,
@@ -311,20 +313,21 @@ typedef std::unordered_map<uint32, SpellBonusEntry>     SpellBonusMap;
 
 enum SpellGroupSpecialFlags
 {
-    SPELL_GROUP_SPECIAL_FLAG_NONE               = 0x000,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE      = 0x001,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN    = 0x002,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE    = 0x004,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH   = 0x008,
-    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX = 0x00F,
-    SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST   = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
-    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK = 0x020,
-    SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK  = 0x040,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY1          = 0x100,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY2          = 0x200,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY3          = 0x400,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY4          = 0x800,
-    SPELL_GROUP_SPECIAL_FLAG_MAX                = 0x1000,
+    SPELL_GROUP_SPECIAL_FLAG_NONE                   = 0x000,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE          = 0x001,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN        = 0x002,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE        = 0x004,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH       = 0x008,
+    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX    = 0x00F,
+    SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST       = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
+    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK    = 0x020,
+    SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK      = 0x040,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY1              = 0x100,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY2              = 0x200,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY3              = 0x400,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY4              = 0x800,
+    SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK       = 0x1000,
+    SPELL_GROUP_SPECIAL_FLAG_MAX                    = 0x2000
 };
 
 enum SpellGroupStackFlags
@@ -648,7 +651,7 @@ public:
 
     // Spell proc event table
     [[nodiscard]] SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
-    bool IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active) const;
+    bool IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, ProcEventInfo const& eventInfo, bool active) const;
 
     // Spell proc table
     [[nodiscard]] SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;
@@ -684,6 +687,30 @@ public:
 
     // SpellInfo object management
     [[nodiscard]] SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : nullptr; }
+    // Use this only with 100% valid spellIds
+    SpellInfo const* AssertSpellInfo(uint32 spellId) const
+    {
+        ASSERT(spellId < GetSpellInfoStoreSize());
+        SpellInfo const* spellInfo = mSpellInfoMap[spellId];
+        ASSERT(spellInfo);
+        return spellInfo;
+    }
+    // use this instead of AssertSpellInfo to have the problem logged instead of crashing the server
+    SpellInfo const* CheckSpellInfo(uint32 spellId) const
+    {
+        if (spellId >= GetSpellInfoStoreSize())
+        {
+            LOG_ERROR("server", "spellId %u is not lower than GetSpellInfoStoreSize() (%u)", spellId, GetSpellInfoStoreSize());
+            return nullptr;
+        }
+        SpellInfo const* spellInfo = mSpellInfoMap[spellId];
+        if (!spellInfo)
+        {
+            LOG_ERROR("server", "spellId %u has invalid spellInfo", spellId);
+            return nullptr;
+        }
+        return spellInfo;
+    }
     [[nodiscard]] uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
     // Talent Additional Set

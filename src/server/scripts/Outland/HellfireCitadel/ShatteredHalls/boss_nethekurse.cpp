@@ -291,7 +291,7 @@ public:
                             playerList.push_back(player);
 
                 if (!playerList.empty())
-                    target = acore::Containers::SelectRandomContainerElement(playerList);
+                    target = Acore::Containers::SelectRandomContainerElement(playerList);
             }
         }
 

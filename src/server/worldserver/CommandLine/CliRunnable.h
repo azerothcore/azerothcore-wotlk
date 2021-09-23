@@ -4,7 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/// \addtogroup Trinityd
+/// \addtogroup Acored
 /// @{
 /// \file
 
@@ -12,11 +12,7 @@
 #define __CLIRUNNABLE_H
 
 /// Command Line Interface handling thread
-class CliRunnable : public acore::Runnable
-{
-public:
-    void run() override;
-};
+void CliThread();
 
 #endif
 

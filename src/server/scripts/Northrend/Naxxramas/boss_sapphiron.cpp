@@ -191,7 +191,7 @@ public:
 
         bool IsValidExplosionTarget(WorldObject* target)
         {
-            for (ObjectGuid const guid : blockList)
+            for (ObjectGuid const& guid : blockList)
             {
                 if (target->GetGUID() == guid)
                     return false;
@@ -308,8 +308,8 @@ public:
                         }
 
                         std::vector<Unit*> targets;
-                        auto i = me->getThreatManager().getThreatList().begin();
-                        for (; i != me->getThreatManager().getThreatList().end(); ++i)
+                        auto i = me->getThreatMgr().getThreatList().begin();
+                        for (; i != me->getThreatMgr().getThreatList().end(); ++i)
                         {
                             if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER)
                             {

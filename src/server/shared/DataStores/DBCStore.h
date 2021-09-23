@@ -12,6 +12,7 @@
 #include "Errors.h"
 #include <G3D/AABox.h>
 #include <G3D/Vector3.h>
+#include <cstring>
 #include <vector>
 
  // Structures for M4 file. Source: https://wowdev.wiki

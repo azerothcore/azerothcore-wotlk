@@ -118,7 +118,7 @@ public:
             {
                 if (state == IN_PROGRESS)
                 {
-                    for (ObjectGuid const guid : _wardersSet)
+                    for (ObjectGuid const& guid : _wardersSet)
                         if (Creature* warder = instance->GetCreature(guid))
                             if (warder->IsAlive())
                             {
@@ -128,7 +128,7 @@ public:
                 }
                 else
                 {
-                    for (ObjectGuid const guid : _cubesSet)
+                    for (ObjectGuid const& guid : _cubesSet)
                         if (GameObject* cube = instance->GetGameObject(guid))
                             cube->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
@@ -149,12 +149,12 @@ public:
                             magtheridon->SetInCombatWithZone();
                     break;
                 case DATA_ACTIVATE_CUBES:
-                    for (ObjectGuid const guid : _cubesSet)
+                    for (ObjectGuid const& guid : _cubesSet)
                         if (GameObject* cube = instance->GetGameObject(guid))
                             cube->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     break;
                 case DATA_COLLAPSE:
-                    for (ObjectGuid const guid : _columnSet)
+                    for (ObjectGuid const& guid : _columnSet)
                         if (GameObject* column = instance->GetGameObject(guid))
                             column->SetGoState(GOState(data));
                     break;

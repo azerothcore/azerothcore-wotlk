@@ -13,8 +13,8 @@
 
 namespace VMAP
 {
-    const char VMAP_MAGIC[] = "VMAP_4.5";
-    const char RAW_VMAP_MAGIC[] = "VMAP045";                // used in extracted vmap files with raw data
+    const char VMAP_MAGIC[] = "VMAP_4.6";
+    const char RAW_VMAP_MAGIC[] = "VMAP046";                // used in extracted vmap files with raw data
 }
 
 enum ModelFlags

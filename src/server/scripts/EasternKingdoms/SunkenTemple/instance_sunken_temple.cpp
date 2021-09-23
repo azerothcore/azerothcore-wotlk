@@ -96,7 +96,7 @@ public:
                     }
                     break;
                 case DATA_ERANIKUS_FIGHT:
-                    for (ObjectGuid const guid : _dragonkinList)
+                    for (ObjectGuid const& guid : _dragonkinList)
                     {
                         if (Creature* creature = instance->GetCreature(guid))
                             if (instance->IsGridLoaded(creature->GetPositionX(), creature->GetPositionY()))

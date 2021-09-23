@@ -71,11 +71,14 @@ public:
 
             switch (creature->GetEntry())
             {
+                case NPC_RAZORGORE:
+                    razorgoreGUID = creature->GetGUID();
+                    break;
                 case NPC_BLACKWING_DRAGON:
                 case NPC_BLACKWING_TASKMASTER:
                 case NPC_BLACKWING_LEGIONAIRE:
                 case NPC_BLACKWING_WARLOCK:
-                    if (Creature* razor = instance->GetCreature(GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
+                    if (Creature* razor = instance->GetCreature(razorgoreGUID))
                         if (CreatureAI* razorAI = razor->AI())
                             razorAI->JustSummoned(creature);
                     break;
@@ -140,12 +143,6 @@ public:
                     if (GetBossState(DATA_VAELASTRAZ_THE_CORRUPT) != DONE)
                         return false;
                     break;
-                case DATA_FIREMAW:
-                case DATA_EBONROC:
-                case DATA_FLAMEGOR:
-                    if (GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
-                        return false;
-                    break;
                 case DATA_CHROMAGGUS:
                     if (GetBossState(DATA_FIREMAW) != DONE
                         || GetBossState(DATA_EBONROC) != DONE
@@ -169,7 +166,7 @@ public:
                 case DATA_RAZORGORE_THE_UNTAMED:
                     if (state == DONE)
                     {
-                        for (ObjectGuid const guid : EggList)
+                        for (ObjectGuid const& guid : EggList)
                             if (GameObject* egg = instance->GetGameObject(guid))
                                 egg->SetPhaseMask(2, true);
                     }
@@ -213,7 +210,7 @@ public:
                     case SPECIAL:
                         if (++EggCount == 15)
                         {
-                            if (Creature* razor = instance->GetCreature(GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
+                            if (Creature* razor = instance->GetCreature(razorgoreGUID))
                             {
                                 SetData(DATA_EGG_EVENT, DONE);
                                 razor->RemoveAurasDueToSpell(42013); // MindControl
@@ -227,6 +224,19 @@ public:
                         break;
                 }
             }
+        }
+
+        ObjectGuid GetGuidData(uint32 type) const override
+        {
+            switch (type)
+            {
+                case DATA_RAZORGORE_THE_UNTAMED:
+                    return razorgoreGUID;
+                default:
+                    break;
+            }
+
+            return ObjectGuid::Empty;
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -255,7 +265,7 @@ public:
                         break;
                     case EVENT_RAZOR_PHASE_TWO:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
-                        if (Creature* razor = instance->GetCreature(GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
+                        if (Creature* razor = instance->GetCreature(razorgoreGUID))
                             razor->AI()->DoAction(ACTION_PHASE_TWO);
                         break;
                     case EVENT_RESPAWN_NEFARIUS:
@@ -276,6 +286,7 @@ public:
         EventMap _events;
 
         // Razorgore
+        ObjectGuid razorgoreGUID;
         uint8 EggCount;
         uint32 EggEvent;
         GuidList EggList;

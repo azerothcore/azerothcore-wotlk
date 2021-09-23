@@ -91,8 +91,7 @@ public:
             {
                 if (Ambush_Timer <= diff)
                 {
-                    Unit* target = nullptr;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
                     if (target)
                     {
                         me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
@@ -127,14 +126,17 @@ public:
             {
                 if (Aggro_Timer <= diff)
                 {
-                    Unit* target = nullptr;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
 
                     if (DoGetThreat(me->GetVictim()))
+                    {
                         DoModifyThreatPercent(me->GetVictim(), -50);
+                    }
 
                     if (target)
+                    {
                         AttackStart(target);
+                    }
 
                     Aggro_Timer = urand(7000, 20000);
                 }

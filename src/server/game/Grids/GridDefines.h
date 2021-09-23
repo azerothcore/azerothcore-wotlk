@@ -47,11 +47,11 @@ typedef TYPELIST_5(GameObject, Player, Creature/*pets*/, Corpse/*resurrectable*/
 typedef TYPELIST_4(GameObject, Creature/*except pets*/, DynamicObject, Corpse/*Bones*/) AllGridObjectTypes;
 typedef TYPELIST_5(Creature, GameObject, DynamicObject, Pet, Corpse) AllMapStoredObjectTypes;
 
-typedef GridRefManager<Corpse>          CorpseMapType;
-typedef GridRefManager<Creature>        CreatureMapType;
-typedef GridRefManager<DynamicObject>   DynamicObjectMapType;
-typedef GridRefManager<GameObject>      GameObjectMapType;
-typedef GridRefManager<Player>          PlayerMapType;
+typedef GridRefMgr<Corpse>          CorpseMapType;
+typedef GridRefMgr<Creature>        CreatureMapType;
+typedef GridRefMgr<DynamicObject>   DynamicObjectMapType;
+typedef GridRefMgr<GameObject>      GameObjectMapType;
+typedef GridRefMgr<Player>          PlayerMapType;
 
 enum GridMapTypeMask
 {
@@ -158,7 +158,7 @@ bool operator!=(const CoordPair<LIMIT>& p1, const CoordPair<LIMIT>& p2)
 typedef CoordPair<MAX_NUMBER_OF_GRIDS> GridCoord;
 typedef CoordPair<TOTAL_NUMBER_OF_CELLS_PER_MAP> CellCoord;
 
-namespace acore
+namespace Acore
 {
     template<class RET_TYPE, int CENTER_VAL>
     inline RET_TYPE Compute(float x, float y, float center_offset, float size)
@@ -204,7 +204,7 @@ namespace acore
 
     inline bool IsValidMapCoord(float c)
     {
-        return isfinite(c) && (std::fabs(c) <= MAP_HALFSIZE - 0.5f);
+        return std::isfinite(c) && (std::fabs(c) <= MAP_HALFSIZE - 0.5f);
     }
 
     inline bool IsValidMapCoord(float x, float y)
@@ -219,7 +219,7 @@ namespace acore
 
     inline bool IsValidMapCoord(float x, float y, float z, float o)
     {
-        return IsValidMapCoord(x, y, z) && isfinite(o);
+        return IsValidMapCoord(x, y, z) && std::isfinite(o);
     }
 }
 #endif

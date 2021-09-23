@@ -586,7 +586,7 @@ public:
                 }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -786,7 +786,7 @@ public:
             }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -853,6 +853,7 @@ public:
     };
 };
 
+// 62775 - Tympanic Tantrum
 class spell_xt002_tympanic_tantrum : public SpellScriptLoader
 {
 public:
@@ -886,6 +887,7 @@ public:
     }
 };
 
+// 64234, 63024 - Gravity Bomb
 class spell_xt002_gravity_bomb_aura : public SpellScriptLoader
 {
 public:
@@ -941,7 +943,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             if (Unit* victim = GetCaster()->GetVictim())
-                targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
         void Register() override
@@ -956,6 +958,7 @@ public:
     }
 };
 
+// 64233, 63025 - Gravity Bomb
 class spell_xt002_gravity_bomb_damage : public SpellScriptLoader
 {
 public:
@@ -988,6 +991,7 @@ public:
     }
 };
 
+// 63018, 65121 - Searing Light
 class spell_xt002_searing_light_spawn_life_spark : public SpellScriptLoader
 {
 public:
@@ -1023,7 +1027,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             if (Unit* victim = GetCaster()->GetVictim())
-                targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
         void Register() override
@@ -1043,7 +1047,7 @@ class achievement_xt002_nerf_engineering : public AchievementCriteriaScript
 public:
     achievement_xt002_nerf_engineering() : AchievementCriteriaScript("achievement_xt002_nerf_engineering") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
@@ -1059,7 +1063,7 @@ class achievement_xt002_nerf_gravity_bombs : public AchievementCriteriaScript
 public:
     achievement_xt002_nerf_gravity_bombs() : AchievementCriteriaScript("achievement_xt002_nerf_gravity_bombs") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())

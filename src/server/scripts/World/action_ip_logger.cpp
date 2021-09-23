@@ -128,7 +128,7 @@ public:
         {
             // As we can assume most account actions are NOT failed login, so this is the more accurate check.
             // For those, we need last_ip...
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
 
             stmt->setUInt32(0, playerGuid);
             stmt->setUInt32(1, characterGuid);
@@ -139,7 +139,7 @@ public:
         }
         else // ... but for failed login, we query last_attempt_ip from account table. Which we do with an unique query
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FACL_IP_LOGGING);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FACL_IP_LOGGING);
 
             stmt->setUInt32(0, playerGuid);
             stmt->setUInt32(1, characterGuid);
@@ -224,7 +224,7 @@ public:
         }
 
         // Once we have done everything, we can insert the new log.
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_CHAR_IP_LOGGING);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_CHAR_IP_LOGGING);
 
         stmt->setUInt32(0, playerGuid);
         stmt->setUInt32(1, characterGuid);
@@ -287,8 +287,7 @@ public:
         }
 
         // Once we have done everything, we can insert the new log.
-        PreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
-
+        LoginDatabasePreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
         stmt2->setUInt32(0, playerGuid);
         stmt2->setUInt32(1, characterGuid);
         stmt2->setUInt8(2, aType);

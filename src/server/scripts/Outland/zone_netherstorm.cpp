@@ -1097,7 +1097,7 @@ public:
         {
             if (!summons.empty())
             {
-                for (ObjectGuid guid : summons)
+                for (ObjectGuid const& guid : summons)
                     if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     {
                         float x, y, z, o;
@@ -1444,9 +1444,7 @@ public:
                 return true;
             }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("scripts.ai", "TSCR: npc_commander_dawnforge event already in progress, need to wait.");
-#endif
             return false;
         }
 
@@ -1744,7 +1742,7 @@ public:
             // some code to cast spell Mana Burn on random target which has mana
             if (ManaBurnTimer <= diff)
             {
-                std::list<HostileReference*> AggroList = me->getThreatManager().getThreatList();
+                std::list<HostileReference*> AggroList = me->getThreatMgr().getThreatList();
                 std::list<Unit*> UnitsWithMana;
 
                 for (std::list<HostileReference*>::const_iterator itr = AggroList.begin(); itr != AggroList.end(); ++itr)
@@ -1757,7 +1755,7 @@ public:
                 }
                 if (!UnitsWithMana.empty())
                 {
-                    DoCast(acore::Containers::SelectRandomContainerElement(UnitsWithMana), SPELL_MANA_BURN);
+                    DoCast(Acore::Containers::SelectRandomContainerElement(UnitsWithMana), SPELL_MANA_BURN);
                     ManaBurnTimer = 8000 + (rand() % 10 * 1000); // 8-18 sec cd
                 }
                 else

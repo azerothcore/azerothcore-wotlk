@@ -27,13 +27,13 @@ const uint32 EP_PWT_CM = 17698;
 
 const uint32 EPBuffZones[EPBuffZonesNum] = {139, 2017, 2057};
 
-enum EP_TaxiNodes
-{
-    EP_CGT_Taxi = 87,
-    EP_EWT_Taxi = 86,
-    EP_NPT_Taxi = 85,
-    EP_PWT_Taxi = 84
-};
+//enum EP_TaxiNodes
+//{
+//    EP_CGT_Taxi = 87,
+//    EP_EWT_Taxi = 86,
+//    EP_NPT_Taxi = 85,
+//    EP_PWT_Taxi = 84
+//};
 
 enum EP_EastwallTowerWorldStates
 {
@@ -125,9 +125,9 @@ const go_type EPTowerFlags[EP_TOWER_NUM] =
     {182106, 0, 1838.42f, -3703.56f, 167.713f, 0.890118f, 0.0f, 0.0f, 0.430511f, 0.902585f}
 };
 
-const uint32 EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691, 10699, 10701, 10705};
+//const uint32 EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691, 10699, 10701, 10705};
 
-const uint32 EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692, 10698, 10700, 10704};
+//const uint32 EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692, 10698, 10700, 10704};
 
 const uint8 EP_NUM_CREATURES = 6;
 const uint8 EP_EWT_NUM_CREATURES = 5;

@@ -11,7 +11,6 @@
 #include "CreatureAIImpl.h"
 
 #define HyjalScriptName "instance_hyjal"
-#define ERROR_INST_DATA     "TSCR: Instance data not set properly for Mount Hyjal. Encounters will be buggy."
 
 uint32 const EncounterCount     = 5;
 

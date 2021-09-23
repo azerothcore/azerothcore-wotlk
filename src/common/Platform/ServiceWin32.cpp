@@ -12,11 +12,6 @@
 #include <windows.h>
 #include <winsvc.h>
 
-// stupid ACE define
-#ifdef main
-#undef main
-#endif //main
-
 #if !defined(WINADVAPI)
 #if !defined(_ADVAPI32_)
 #define WINADVAPI DECLSPEC_IMPORT
@@ -40,16 +35,16 @@ typedef WINADVAPI BOOL (WINAPI* CSD_T)(SC_HANDLE, DWORD, LPCVOID);
 
 bool WinServiceInstall()
 {
-    SC_HANDLE serviceControlManager = OpenSCManager(0, 0, SC_MANAGER_CREATE_SERVICE);
+    SC_HANDLE serviceControlMgr = OpenSCManager(0, 0, SC_MANAGER_CREATE_SERVICE);
 
-    if (serviceControlManager)
+    if (serviceControlMgr)
     {
         char path[_MAX_PATH + 10];
         if (GetModuleFileName( 0, path, sizeof(path) / sizeof(path[0]) ) > 0)
         {
             SC_HANDLE service;
             std::strcat(path, " --service");
-            service = CreateService(serviceControlManager,
+            service = CreateService(serviceControlMgr,
                                     serviceName,                                // name of service
                                     serviceLongName,                            // service name to display
                                     SERVICE_ALL_ACCESS,                         // desired access
@@ -69,7 +64,7 @@ bool WinServiceInstall()
                 if (!advapi32)
                 {
                     CloseServiceHandle(service);
-                    CloseServiceHandle(serviceControlManager);
+                    CloseServiceHandle(serviceControlMgr);
                     return false;
                 }
 
@@ -77,7 +72,7 @@ bool WinServiceInstall()
                 if (!ChangeService_Config2)
                 {
                     CloseServiceHandle(service);
-                    CloseServiceHandle(serviceControlManager);
+                    CloseServiceHandle(serviceControlMgr);
                     return false;
                 }
 
@@ -104,18 +99,18 @@ bool WinServiceInstall()
                 CloseServiceHandle(service);
             }
         }
-        CloseServiceHandle(serviceControlManager);
+        CloseServiceHandle(serviceControlMgr);
     }
     return true;
 }
 
 bool WinServiceUninstall()
 {
-    SC_HANDLE serviceControlManager = OpenSCManager(0, 0, SC_MANAGER_CONNECT);
+    SC_HANDLE serviceControlMgr = OpenSCManager(0, 0, SC_MANAGER_CONNECT);
 
-    if (serviceControlManager)
+    if (serviceControlMgr)
     {
-        SC_HANDLE service = OpenService(serviceControlManager,
+        SC_HANDLE service = OpenService(serviceControlMgr,
                                         serviceName, SERVICE_QUERY_STATUS | DELETE);
         if (service)
         {
@@ -123,12 +118,14 @@ bool WinServiceUninstall()
             if (QueryServiceStatus(service, &serviceStatus2))
             {
                 if (serviceStatus2.dwCurrentState == SERVICE_STOPPED)
+                {
                     DeleteService(service);
+                }
             }
             CloseServiceHandle(service);
         }
 
-        CloseServiceHandle(serviceControlManager);
+        CloseServiceHandle(serviceControlMgr);
     }
     return true;
 }
@@ -163,10 +160,14 @@ void WINAPI ServiceControlHandler(DWORD controlCode)
         default:
             if ( controlCode >= 128 && controlCode <= 255 )
                 // user defined control code
+            {
                 break;
+            }
             else
                 // unrecognized control code
+            {
                 break;
+            }
     }
 
     SetServiceStatus(serviceStatusHandle, &serviceStatus);
@@ -194,7 +195,7 @@ void WINAPI ServiceMain(DWORD argc, char* argv[])
 
         for (i = 0; i < std::strlen(path); i++)
         {
-            if (path[i] == '\\') last_slash = i;
+            if (path[i] == '\\') { last_slash = i; }
         }
 
         path[last_slash] = 0;

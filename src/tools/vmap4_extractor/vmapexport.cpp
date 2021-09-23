@@ -15,7 +15,6 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#include <sys/stat.h>
 #include <direct.h>
 #define mkdir _mkdir
 #endif

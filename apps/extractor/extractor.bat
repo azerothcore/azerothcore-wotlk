@@ -53,7 +53,7 @@ ECHO This may take a few hours to complete. Please be patient.
 PAUSE
 start /b /w mapextractor.exe
 start /b /w vmap4extractor.exe
-start /b /w vmap4assembler.exe
+start /b /w vmap4assembler.exe Buildings vmaps
 rmdir Buildings /s /q
 start /b /w mmaps_generator.exe
 GOTO MENU

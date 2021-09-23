@@ -64,11 +64,17 @@ public:
             {
                 Player* player = nullptr;
                 if (me->IsSummon())
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                {
+                    if (Unit * summoner = me->ToTempSummon()->GetSummonerUnit())
+                    {
                         player = summoner->ToPlayer();
+                    }
+                }
 
                 if (!player)
+                {
                     phase = 3;
+                }
 
                 switch (phase)
                 {
@@ -78,17 +84,23 @@ public:
                         FlyBackTimer = 500;
                         break;
                     case 1:
-                        player->GetClosePoint(x, y, z, me->GetObjectSize());
+                        if (player)
+                        {
+                            player->GetClosePoint(x, y, z, me->GetObjectSize());
+                        }
                         z += 2.5f;
                         x -= 2.0f;
                         y -= 1.5f;
                         me->GetMotionMaster()->MovePoint(0, x, y, z);
-                        me->SetTarget(player->GetGUID());
+                        if (player)
+                        {
+                            me->SetTarget(player->GetGUID());
+                        }
                         me->SetVisible(true);
                         FlyBackTimer = 4500;
                         break;
                     case 2:
-                        if (!player->isResurrectRequested())
+                        if (player && !player->isResurrectRequested())
                         {
                             me->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_01);
                             DoCast(player, SPELL_REVIVE, true);

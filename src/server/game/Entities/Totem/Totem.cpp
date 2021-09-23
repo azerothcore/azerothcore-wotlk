@@ -5,7 +5,6 @@
  */
 
 #include "Group.h"
-#include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -89,7 +88,10 @@ void Totem::InitSummon()
         GetOwner()->CastSpell(this, 6277, true);
     }
 
-    this->GetMotionMaster()->MoveFall();
+    if (!IsInWater())
+    {
+        GetMotionMaster()->MoveFall();
+    }
 }
 
 void Totem::UnSummon(uint32 msTime)

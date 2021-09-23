@@ -34,17 +34,15 @@ void BattlefieldMgr::InitBattlefield()
     // respawn, init variables
     if (!pBf->SetupBattlefield())
     {
-        LOG_INFO("server", " ");
-        LOG_INFO("server", "Battlefield : Wintergrasp init failed.");
-        LOG_INFO("server", " ");
+        LOG_ERROR("server.loading", "Battlefield: Wintergrasp init failed.");
+        LOG_INFO("server.loading", " ");
         delete pBf;
     }
     else
     {
         m_BattlefieldSet.push_back(pBf);
-        LOG_INFO("server", " ");
-        LOG_INFO("server", "Battlefield : Wintergrasp successfully initiated.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", "Battlefield: Wintergrasp successfully initiated.");
+        LOG_INFO("server.loading", " ");
     }
 
     /* For Cataclysm: Tol Barad
@@ -52,17 +50,13 @@ void BattlefieldMgr::InitBattlefield()
        // respawn, init variables
        if(!pBf->SetupBattlefield())
        {
-    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
        LOG_DEBUG("bg.battlefield", "Battlefield : Tol Barad init failed.");
-    #endif
        delete pBf;
        }
        else
        {
        m_BattlefieldSet.push_back(pBf);
-    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
        LOG_DEBUG("bg.battlefield", "Battlefield : Tol Barad successfully initiated.");
-    #endif
        } */
 }
 
@@ -81,9 +75,7 @@ void BattlefieldMgr::HandlePlayerEnterZone(Player* player, uint32 zoneid)
         return;
 
     itr->second->HandlePlayerEnterZone(player, zoneid);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("bg.battlefield", "Player %s entered outdoorpvp id %u", player->GetGUID().ToString().c_str(), itr->second->GetTypeId());
-#endif
 }
 
 void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
@@ -96,9 +88,7 @@ void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
     if (!itr->second->HasPlayer(player))
         return;
     itr->second->HandlePlayerLeaveZone(player, zoneid);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("bg.battlefield", "Player %s left outdoorpvp id %u", player->GetGUID().ToString().c_str(), itr->second->GetTypeId());
-#endif
 }
 
 Battlefield* BattlefieldMgr::GetBattlefieldToZoneId(uint32 zoneid)

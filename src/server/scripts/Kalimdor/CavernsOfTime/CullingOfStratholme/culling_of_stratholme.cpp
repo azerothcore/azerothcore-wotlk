@@ -434,13 +434,18 @@ public:
                 SetEscortPaused(false);
                 SetRun(false);
 
-                Creature* cr = nullptr;
-                if ((cr = me->SummonCreature(NPC_CITY_MAN3, EventPos[EVENT_SRC_HALL_CITYMAN1])))
+                if (Creature* cr = me->SummonCreature(NPC_CITY_MAN3, EventPos[EVENT_SRC_HALL_CITYMAN1]))
+                {
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
-                if ((cr = me->SummonCreature(NPC_CITY_MAN4, EventPos[EVENT_SRC_HALL_CITYMAN2])))
+                }
+                if (Creature* cr = me->SummonCreature(NPC_CITY_MAN4, EventPos[EVENT_SRC_HALL_CITYMAN2]))
+                {
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
-                if ((cr = me->SummonCreature(NPC_CITY_MAN,  EventPos[EVENT_SRC_HALL_CITYMAN3])))
+                }
+                if (Creature* cr = me->SummonCreature(NPC_CITY_MAN,  EventPos[EVENT_SRC_HALL_CITYMAN3]))
+                {
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
+                }
             }
             else if (param == ACTION_START_SECRET_PASSAGE)
             {
@@ -1251,7 +1256,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
                 waveGroupId = 4;
                 SendNextWave(NPC_MEATHOOK);
             }
-            else if (data == COS_PROGRESS_KILLED_SALRAMM)
+            else // if (data == COS_PROGRESS_KILLED_SALRAMM)
             {
                 if (pInstance)
                     pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 10);

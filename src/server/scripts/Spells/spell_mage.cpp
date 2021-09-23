@@ -23,6 +23,7 @@ enum MageSpells
     // Ours
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
     SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED         = 12486,
+    SPELL_MAGE_COMBUSTION                        = 11129,
 
     // Theirs
     SPELL_MAGE_COLD_SNAP                         = 11958,
@@ -494,6 +495,37 @@ public:
     }
 };
 
+class spell_mage_combustion_proc : public SpellScriptLoader
+{
+public:
+    spell_mage_combustion_proc() : SpellScriptLoader("spell_mage_combustion_proc") {}
+
+    class spell_mage_combustion_proc_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_mage_combustion_proc_AuraScript);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION });
+    }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_COMBUSTION);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_mage_combustion_proc_AuraScript();
+    }
+};
+
 // Theirs
 // Incanter's Absorbtion
 class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
@@ -579,7 +611,7 @@ public:
             PlayerSpellMap const& spellMap = caster->GetSpellMap();
             for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
                 if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0)
                 {
                     SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
@@ -833,7 +865,7 @@ public:
         {
             PreventDefaultAction();
 
-            SpellInfo const* igniteDot = sSpellMgr->GetSpellInfo(SPELL_MAGE_IGNITE);
+            SpellInfo const* igniteDot = sSpellMgr->AssertSpellInfo(SPELL_MAGE_IGNITE);
             int32 pct = 8 * GetSpellInfo()->GetRank();
 
             int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks());
@@ -950,14 +982,43 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetSpellInfo(); // eventInfo.GetSpellInfo()
+            _spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            if (!_spellInfo)
+            {
+                return false;
+            }
+
+            bool selectCaster = false;
+            // Triggered spells cost no mana so we need triggering spellInfo
+            if (SpellInfo const* triggeredByAuraSpellInfo = eventInfo.GetTriggerAuraSpell())
+            {
+                _spellInfo = triggeredByAuraSpellInfo;
+                selectCaster = true;
+            }
+
+            // If spell is periodic, mana amount is divided by tick number
+            if (eventInfo.GetTriggerAuraEffectIndex() >= EFFECT_0)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (Unit* target = (selectCaster ? eventInfo.GetActor() : eventInfo.GetActionTarget()))
+                    {
+                        if (AuraEffect const* aurEff = target->GetAuraEffect(_spellInfo->Id, eventInfo.GetTriggerAuraEffectIndex(), caster->GetGUID()))
+                        {
+                            ticksModifier = aurEff->GetTotalTicks();
+                        }
+                    }
+                }
+            }
+
+            return _spellInfo; // eventInfo.GetSpellInfo()
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
-            int32 mana = int32(eventInfo.GetDamageInfo()->GetSpellInfo()->CalcPowerCost(GetTarget(), eventInfo.GetDamageInfo()->GetSchoolMask()));
+            int32 mana = int32(_spellInfo->CalcPowerCost(GetTarget(), eventInfo.GetDamageInfo()->GetSchoolMask()) / ticksModifier);
             mana = CalculatePct(mana, aurEff->GetAmount());
 
             if (mana > 0)
@@ -969,6 +1030,10 @@ public:
             DoCheckProc += AuraCheckProcFn(spell_mage_master_of_elements_AuraScript::CheckProc);
             OnEffectProc += AuraEffectProcFn(spell_mage_master_of_elements_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
         }
+
+    private:
+        SpellInfo const* _spellInfo = nullptr;
+        uint8 ticksModifier = 1;
     };
 
     AuraScript* GetAuraScript() const override
@@ -1102,6 +1167,7 @@ void AddSC_mage_spell_scripts()
     new spell_mage_pet_scaling();
     new spell_mage_brain_freeze();
     new spell_mage_glyph_of_eternal_water();
+    new spell_mage_combustion_proc();
 
     // Theirs
     new spell_mage_blast_wave();

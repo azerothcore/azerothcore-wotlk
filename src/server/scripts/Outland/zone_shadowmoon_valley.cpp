@@ -232,7 +232,7 @@ public:
                 return;
 
             if (summoner->ToCreature())
-                casterGUID = summoner->ToCreature()->GetGUID();;
+                casterGUID = summoner->ToCreature()->GetGUID();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -482,7 +482,7 @@ public:
                     AttackStart(Dragonmaw);
                 }
 
-                HostileReference* ref = me->getThreatManager().getOnlineContainer().getReferenceByTarget(caster);
+                HostileReference* ref = me->getThreatMgr().getOnlineContainer().getReferenceByTarget(caster);
                 if (ref)
                     ref->removeReference();
             }

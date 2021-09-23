@@ -113,9 +113,9 @@ public:
     void ClearCastWhenWillAvailable();
     void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
 
-    void _SaveSpellCooldowns(SQLTransaction& trans, bool logout);
-    void _SaveAuras(SQLTransaction& trans, bool logout);
-    void _SaveSpells(SQLTransaction& trans);
+    void _SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout);
+    void _SaveAuras(CharacterDatabaseTransaction trans, bool logout);
+    void _SaveSpells(CharacterDatabaseTransaction trans);
 
     void _LoadSpellCooldowns(PreparedQueryResult result);
     void _LoadAuras(PreparedQueryResult result, uint32 timediff);

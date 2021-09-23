@@ -5,7 +5,6 @@
  */
 
 #include <OpenSSLCrypto.h>
-#include <openssl/crypto.h>
 
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x1010000fL
 #include <vector>
@@ -15,9 +14,13 @@ std::vector<std::mutex*> cryptoLocks;
 static void lockingCallback(int mode, int type, char const* /*file*/, int /*line*/)
 {
     if (mode & CRYPTO_LOCK)
+    {
         cryptoLocks[type]->lock();
+    }
     else
+    {
         cryptoLocks[type]->unlock();
+    }
 }
 static void threadIdCallback(CRYPTO_THREADID* id)
 {

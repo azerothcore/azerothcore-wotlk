@@ -6,7 +6,6 @@
 
 #include "Creature.h"
 #include "GameGraveyard.h"
-#include "GossipDef.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"

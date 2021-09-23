@@ -103,7 +103,13 @@ public:
                 if (procSpell->IsAffectingArea())
                     targets = 1;
 
-            eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, eventInfo.GetActionTarget(), false, nullptr, aurEff);
+            if (Unit* target = eventInfo.GetActionTarget())
+            {
+                if (target->IsAlive())
+                {
+                    eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, target, false, nullptr, aurEff);
+                }
+            }
         }
 
         void Register() override
@@ -221,10 +227,14 @@ public:
                 // Xinef: removed divine guardian because it will affect triggered spell with increased amount
                 // Arena - Dampening
                 if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_ARENA_DAMPENING, EFFECT_0))
+                {
                     AddPct(amount, dampening->GetAmount());
+                }
                 // Battleground - Dampening
-                else if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_BATTLEGROUND_DAMPENING, EFFECT_0))
-                    AddPct(amount, dampening->GetAmount());
+                else if (AuraEffect const* dampening2 = caster->GetAuraEffect(SPELL_GENERIC_BATTLEGROUND_DAMPENING, EFFECT_0))
+                {
+                    AddPct(amount, dampening2->GetAmount());
+                }
             }
         }
 
@@ -652,7 +662,7 @@ public:
 
         void CountTargets(std::list<WorldObject*>& targetList)
         {
-            acore::Containers::RandomResizeList(targetList, GetSpellValue()->MaxAffectedTargets);
+            Acore::Containers::RandomResize(targetList, GetSpellValue()->MaxAffectedTargets);
             _targetCount = targetList.size();
         }
 
@@ -767,7 +777,7 @@ public:
 
             if (targets.size() > maxTargets)
             {
-                targets.sort(acore::HealthPctOrderPred());
+                targets.sort(Acore::HealthPctOrderPred());
                 targets.resize(maxTargets);
             }
         }
@@ -1253,8 +1263,10 @@ public:
             holy += eventInfo.GetProcTarget()->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_HOLY);
 
             // Xinef: Libram of Divine Purpose
-            if (AuraEffect* aurEff = GetTarget()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2025, EFFECT_0))
-                holy += aurEff->GetAmount();
+            if (AuraEffect* aurEffPaladin = GetTarget()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2025, EFFECT_0))
+            {
+                holy += aurEffPaladin->GetAmount();
+            }
 
             int32 bp = std::max<int32>(0, int32((ap * 0.022f + 0.044f * holy) * GetTarget()->GetAttackTime(BASE_ATTACK) / 1000));
             GetTarget()->CastCustomSpell(SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);

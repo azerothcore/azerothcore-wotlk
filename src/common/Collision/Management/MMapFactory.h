@@ -7,10 +7,10 @@
 #ifndef _MMAP_FACTORY_H
 #define _MMAP_FACTORY_H
 
-#include "MMapManager.h"
 #include "DetourAlloc.h"
-#include "DetourNavMesh.h"
 #include "DetourExtended.h"
+#include "DetourNavMesh.h"
+#include "MMapMgr.h"
 #include <unordered_map>
 
 namespace MMAP
@@ -24,11 +24,11 @@ namespace MMAP
 
     // static class
     // holds all mmap global data
-    // access point to MMapManager singleton
+    // access point to MMapMgr singleton
     class MMapFactory
     {
     public:
-        static MMapManager* createOrGetMMapManager();
+        static MMapMgr* createOrGetMMapMgr();
         static void clear();
         static void InitializeDisabledMaps();
         static bool forbiddenMaps[1000];

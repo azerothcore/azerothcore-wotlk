@@ -37,6 +37,8 @@ add_executable(authserver
 add_dependencies(authserver revision.h)
 
 target_link_libraries(authserver
+  PRIVATE
+    acore-core-interface
   PUBLIC
     shared)
 

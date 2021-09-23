@@ -18,7 +18,7 @@
 #include <map>
 #include <unordered_map>
 
-namespace acore
+namespace Acore
 {
     // Helpers
     // Insert helpers
@@ -63,9 +63,13 @@ namespace acore
     {
         auto i = elements._element.find(handle);
         if (i == elements._element.end())
+        {
             return nullptr;
+        }
         else
+        {
             return i->second;
+        }
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE>
@@ -112,6 +116,33 @@ namespace acore
     {
         bool ret = Remove(elements._elements, handle, (SPECIFIC_TYPE*)nullptr);
         return ret ? ret : Remove(elements._TailElements, handle, (SPECIFIC_TYPE*)nullptr);
+    }
+
+    // Count helpers
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    bool Size(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE> const& elements, std::size_t* size, SPECIFIC_TYPE* /*obj*/)
+    {
+        *size = elements._element.size();
+        return true;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    bool Size(ContainerUnorderedMap<TypeNull, KEY_TYPE> const& /*elements*/, std::size_t* /*size*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return false;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class T>
+    bool Size(ContainerUnorderedMap<T, KEY_TYPE> const& /*elements*/, std::size_t* /*size*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return false;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class H, class T>
+    bool Size(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE> const& elements, std::size_t* size, SPECIFIC_TYPE* /*obj*/)
+    {
+        bool ret = Size(elements._elements, size, (SPECIFIC_TYPE*)nullptr);
+        return ret ? ret : Size(elements._TailElements, size, (SPECIFIC_TYPE*)nullptr);
     }
 
     /* ContainerMapList Helpers */

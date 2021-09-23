@@ -375,7 +375,7 @@ public:
                     if (Player* player = itr->GetSource())
                     {
                         // should pet also trigger the trap? could not find any source for it
-                        if (player && !player->IsGameMaster() && player->IsWithinDist2d(aGateTrap[i].m_positionX, aGateTrap[i].m_positionY, 5.5f))
+                        if (!player->IsGameMaster() && player->IsWithinDist2d(aGateTrap[i].m_positionX, aGateTrap[i].m_positionY, 5.5f))
                         {
                             // Check if timer was not already set by another player/pet a few milliseconds before
                             if (_gateTrapsCooldown[i])

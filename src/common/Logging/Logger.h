@@ -8,8 +8,8 @@
 
 #include "Define.h"
 #include "LogCommon.h"
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 class Appender;
 struct LogMessage;

@@ -160,7 +160,7 @@ void BattlegroundDS::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        LOG_ERROR("server", "BattlegroundDS: Killer player not found");
+        LOG_ERROR("bg.battleground", "BattlegroundDS: Killer player not found");
         return;
     }
 

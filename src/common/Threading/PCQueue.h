@@ -7,10 +7,10 @@
 #ifndef _PCQ_H
 #define _PCQ_H
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
-#include <atomic>
 #include <type_traits>
 
 template <typename T>
@@ -45,7 +45,9 @@ public:
         std::lock_guard<std::mutex> lock(_queueLock);
 
         if (_queue.empty() || _shutdown)
+        {
             return false;
+        }
 
         value = _queue.front();
 
@@ -61,10 +63,14 @@ public:
         // we could be using .wait(lock, predicate) overload here but it is broken
         // https://connect.microsoft.com/VisualStudio/feedback/details/1098841
         while (_queue.empty() && !_shutdown)
+        {
             _condition.wait(lock);
+        }
 
         if (_queue.empty() || _shutdown)
+        {
             return;
+        }
 
         value = _queue.front();
 
@@ -94,7 +100,7 @@ private:
     typename std::enable_if<std::is_pointer<E>::value>::type DeleteQueuedObject(E& obj) { delete obj; }
 
     template<typename E = T>
-    typename std::enable_if < !std::is_pointer<E>::value >::type DeleteQueuedObject(E const& /*packet*/) { }
+    typename std::enable_if<!std::is_pointer<E>::value>::type DeleteQueuedObject(E const& /*packet*/) { }
 };
 
 #endif

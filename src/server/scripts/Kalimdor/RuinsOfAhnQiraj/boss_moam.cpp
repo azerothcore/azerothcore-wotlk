@@ -131,13 +131,13 @@ public:
                         {
                             std::list<Unit*> targetList;
                             {
-                                const std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
+                                const std::list<HostileReference*>& threatlist = me->getThreatMgr().getThreatList();
                                 for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                                     if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER && (*itr)->getTarget()->getPowerType() == POWER_MANA)
                                         targetList.push_back((*itr)->getTarget());
                             }
 
-                            acore::Containers::RandomResizeList(targetList, 5);
+                            Acore::Containers::RandomResize(targetList, 5);
 
                             for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                                 DoCast(*itr, SPELL_DRAIN_MANA);

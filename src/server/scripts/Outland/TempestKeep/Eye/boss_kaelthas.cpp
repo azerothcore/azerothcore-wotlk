@@ -833,7 +833,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             if (Unit* victim = GetCaster()->GetVictim())
-                targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
         void Register() override
@@ -984,7 +984,7 @@ public:
         {
             PreventHitEffect(effIndex);
 
-            ThreatContainer::StorageType const& ThreatList = GetCaster()-> getThreatManager().getThreatList();
+            ThreatContainer::StorageType const& ThreatList = GetCaster()-> getThreatMgr().getThreatList();
             std::list<Unit*> targetList;
             for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
             {
@@ -993,7 +993,7 @@ public:
                     targetList.push_back(target);
             }
 
-            acore::Containers::RandomResizeList(targetList, 5);
+            Acore::Containers::RandomResize(targetList, 5);
             for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                 GetCaster()->CastSpell(*itr, SPELL_NETHER_BEAM_DAMAGE, true);
         }

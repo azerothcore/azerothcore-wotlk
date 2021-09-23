@@ -7,15 +7,15 @@
 #ifndef _MAPTREE_H
 #define _MAPTREE_H
 
-#include "Define.h"
 #include "BoundingIntervalHierarchy.h"
+#include "Define.h"
 #include <unordered_map>
 
 namespace VMAP
 {
     class ModelInstance;
     class GroupModel;
-    class VMapManager2;
+    class VMapMgr2;
 
     struct LocationInfo
     {
@@ -23,6 +23,7 @@ namespace VMAP
         const ModelInstance* hitInstance{nullptr};
         const GroupModel* hitModel{nullptr};
         float ground_Z;
+        int32 rootId = -1;
     };
 
     class StaticMapTree
@@ -45,7 +46,7 @@ namespace VMAP
         std::string iBasePath;
 
     private:
-        bool getIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const;
+        bool GetIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const;
         //bool containsLoadedMapTile(unsigned int pTileIdent) const { return(iLoadedMapTiles.containsKey(pTileIdent)); }
     public:
         static std::string getTileFileName(uint32 mapID, uint32 tileX, uint32 tileY);
@@ -57,18 +58,18 @@ namespace VMAP
         ~StaticMapTree();
 
         [[nodiscard]] bool isInLineOfSight(const G3D::Vector3& pos1, const G3D::Vector3& pos2) const;
-        bool getObjectHitPos(const G3D::Vector3& pos1, const G3D::Vector3& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
+        bool GetObjectHitPos(const G3D::Vector3& pos1, const G3D::Vector3& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
         [[nodiscard]] float getHeight(const G3D::Vector3& pPos, float maxSearchDist) const;
-        bool getAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
+        bool GetAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
         bool GetLocationInfo(const G3D::Vector3& pos, LocationInfo& info) const;
 
-        bool InitMap(const std::string& fname, VMapManager2* vm);
-        void UnloadMap(VMapManager2* vm);
-        bool LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
-        void UnloadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
+        bool InitMap(const std::string& fname, VMapMgr2* vm);
+        void UnloadMap(VMapMgr2* vm);
+        bool LoadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm);
+        void UnloadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm);
         [[nodiscard]] bool isTiled() const { return iIsTiled; }
         [[nodiscard]] uint32 numLoadedTiles() const { return iLoadedTiles.size(); }
-        void getModelInstances(ModelInstance*& models, uint32& count);
+        void GetModelInstances(ModelInstance*& models, uint32& count);
     };
 
     struct AreaInfo

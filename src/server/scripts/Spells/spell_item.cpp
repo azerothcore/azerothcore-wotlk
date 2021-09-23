@@ -288,7 +288,7 @@ public:
             return true;
         }
 
-        uint16 getMountSpellId()
+        uint32 getMountSpellId()
         {
             switch (m_scriptSpellId)
             {
@@ -308,7 +308,7 @@ public:
             Unit* target = GetTarget();
             if (target->getLevel() <= 70)
             {
-                if (uint16 spellId = getMountSpellId())
+                if (auto spellId = getMountSpellId())
                 {
                     target->CastSpell(target, spellId, aurEff);
                 }
@@ -318,7 +318,7 @@ public:
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            if (uint16 spellId = getMountSpellId())
+            if (auto spellId = getMountSpellId())
             {
                 target->RemoveAurasDueToSpell(spellId);
             }
@@ -862,6 +862,52 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_item_gnomish_universal_remote_SpellScript();
+    }
+};
+
+class spell_item_poweful_anti_venom : public SpellScriptLoader
+{
+public:
+    spell_item_poweful_anti_venom() : SpellScriptLoader("spell_item_poweful_anti_venom") {}
+
+    class spell_item_powerful_anti_venom_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_powerful_anti_venom_SpellScript);
+
+        void HandleDummy(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+            {
+                std::list<uint32> removeList;
+                Unit::AuraMap const& auras = target->GetOwnedAuras();
+                for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                {
+                    Aura* aura = itr->second;
+                    if (aura->GetSpellInfo()->SpellLevel > 60 || aura->GetSpellInfo()->Dispel != DISPEL_POISON)
+                    {
+                        continue;
+                    }
+
+                    removeList.push_back(aura->GetId());
+                }
+
+                for (std::list<uint32>::const_iterator itr = removeList.begin(); itr != removeList.end(); ++itr)
+                {
+                    target->RemoveAurasDueToSpell(*itr);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_item_powerful_anti_venom_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_powerful_anti_venom_SpellScript();
     }
 };
 
@@ -1998,7 +2044,7 @@ public:
             if (targets.size() < 2)
                 return;
 
-            targets.sort(acore::HealthPctOrderPred());
+            targets.sort(Acore::HealthPctOrderPred());
 
             WorldObject* target = targets.front();
             targets.clear();
@@ -2126,8 +2172,7 @@ public:
 // 13280 Gnomish Death Ray
 enum GnomishDeathRay
 {
-    SPELL_GNOMISH_DEATH_RAY_SELF = 13493,
-    SPELL_GNOMISH_DEATH_RAY_TARGET = 13279,
+    SPELL_GNOMISH_DEATH_RAY_TARGET  = 13279,
 };
 
 class spell_item_gnomish_death_ray : public SpellScriptLoader
@@ -2141,18 +2186,17 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return ValidateSpellInfo({ SPELL_GNOMISH_DEATH_RAY_SELF, SPELL_GNOMISH_DEATH_RAY_TARGET });
+            return ValidateSpellInfo({ SPELL_GNOMISH_DEATH_RAY_TARGET });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            Unit* caster = GetCaster();
-            if (Unit* target = GetHitUnit())
+            if (Unit* caster = GetCaster())
             {
-                if (urand(0, 99) < 15)
-                    caster->CastSpell(caster, SPELL_GNOMISH_DEATH_RAY_SELF, true, nullptr);    // failure
-                else
-                    caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true, nullptr);
+                if (Unit* target = ObjectAccessor::GetUnit(*caster, caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT)))
+                {
+                    caster->CastSpell(target, SPELL_GNOMISH_DEATH_RAY_TARGET, true);
+                }
             }
         }
 
@@ -4290,6 +4334,46 @@ public:
     }
 };
 
+enum GoblinBomb
+{
+    SPELL_SUMMON_GOBLIN_BOMB = 13258,
+};
+
+// 23134 - Goblin Bomb
+class spell_item_goblin_bomb : public SpellScriptLoader
+{
+public:
+    spell_item_goblin_bomb() : SpellScriptLoader("spell_item_goblin_bomb") {}
+
+    class spell_item_goblin_bomb_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_goblin_bomb_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_SUMMON_GOBLIN_BOMB });
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->CastSpell(caster, SPELL_SUMMON_GOBLIN_BOMB, true, GetCastItem());
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_item_goblin_bomb_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_goblin_bomb_SpellScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // Ours
@@ -4313,6 +4397,7 @@ void AddSC_item_spell_scripts()
     new spell_item_skull_of_impeding_doom();
     new spell_item_feast();
     new spell_item_gnomish_universal_remote();
+    new spell_item_poweful_anti_venom();
     new spell_item_strong_anti_venom();
     new spell_item_anti_venom();
     new spell_item_gnomish_shrink_ray();
@@ -4397,4 +4482,5 @@ void AddSC_item_spell_scripts()
     new spell_item_muisek_vessel();
     new spell_item_greatmothers_soulcatcher();
     new spell_item_eggnog();
+    new spell_item_goblin_bomb();
 }

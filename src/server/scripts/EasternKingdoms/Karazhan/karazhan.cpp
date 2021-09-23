@@ -228,9 +228,7 @@ public:
 
         void PrepareEncounter()
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("scripts.ai", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
-#endif
             uint8 index = 0;
             uint8 count = 0;
 
@@ -476,9 +474,9 @@ public:
 
         void EnterCombat(Unit* /*who*/) override {}
 
-        uint32 NextStep(uint32 Step)
+        uint32 NextStep(uint32 nextStep)
         {
-            switch(Step)
+            switch(nextStep)
             {
                 case 1:
                     me->MonsterYell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL, 0);

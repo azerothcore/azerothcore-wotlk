@@ -17,10 +17,23 @@
 template<class T>
 void PointMovementGenerator<T>::DoInitialize(T* unit)
 {
+    if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    {
+        // the next line is to ensure that a new spline is created in DoUpdate() once the unit is no longer rooted/stunned
+        // todo: rename this flag to something more appropriate since it is set to true even without speed change now.
+        i_recalculateSpeed = true;
+        return;
+    }
+
     if (!unit->IsStopped())
         unit->StopMoving();
 
     unit->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    if (id == EVENT_CHARGE)
+    {
+        unit->AddUnitState(UNIT_STATE_CHARGING);
+    }
+
     i_recalculateSpeed = false;
     Movement::MoveSplineInit init(unit);
     if (m_precomputedPath.size() > 2) // pussywizard: for charge
@@ -123,6 +136,15 @@ template<class T>
 void PointMovementGenerator<T>::DoFinalize(T* unit)
 {
     unit->ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    if (id == EVENT_CHARGE)
+    {
+        unit->ClearUnitState(UNIT_STATE_CHARGING);
+
+        if (Unit* target = ObjectAccessor::GetUnit(*unit, _chargeTargetGUID))
+        {
+            unit->Attack(target, true);
+        }
+    }
 
     if (unit->movespline->Finalized())
         MovementInform(unit);
@@ -135,6 +157,10 @@ void PointMovementGenerator<T>::DoReset(T* unit)
         unit->StopMoving();
 
     unit->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    if (id == EVENT_CHARGE)
+    {
+        unit->AddUnitState(UNIT_STATE_CHARGING);
+    }
 }
 
 template<class T>

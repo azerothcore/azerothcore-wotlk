@@ -15,7 +15,6 @@
 #define GOSSIP_ITEM_3       "We dont have time for this right now, we have to keep going."
 #define GOSSIP_ITEM_4       "We're with you Brann! Open it!"
 #define TEXT_ID_START       13100
-#define YELL_AGGRO          "You be dead soon enough!"
 
 enum NPCs
 {

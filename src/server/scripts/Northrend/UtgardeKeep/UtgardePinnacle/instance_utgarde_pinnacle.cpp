@@ -34,7 +34,6 @@ public:
         ObjectGuid SkadiRuthlessDoor;
         ObjectGuid YmironDoor;
         ObjectGuid StatisGenerator;
-        uint32 FightStatus;
         uint32 Encounters[MAX_ENCOUNTERS];
         uint8 SkadiHits;
         uint8 SkadiInRange;
@@ -47,7 +46,6 @@ public:
         {
             SkadiHits        = 0;
             SkadiInRange     = 0;
-            FightStatus      = 0;
 
             svalaAchievement = false;
             skadiAchievement = false;

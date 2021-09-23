@@ -1,10 +1,6 @@
 # Platform-specfic options
 option(USE_MYSQL_SOURCES "Use included MySQL-sources to build libraries" 0)
 
-# Package overloads
-set(ACE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/deps/acelite)
-set(ACE_LIBRARY "ace")
-
 if( USE_MYSQL_SOURCES )
   set(MYSQL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/deps/mysqllite/include)
   set(MYSQL_LIBRARY "libmysql")

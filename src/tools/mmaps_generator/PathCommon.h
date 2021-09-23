@@ -13,11 +13,14 @@
 
 #ifndef _WIN32
 #include <cstddef>
+#include <cstring>
 #include <dirent.h>
+#else
+#include <Windows.h>
 #endif
 
-#ifdef __linux__
-#include <errno.h>
+#ifndef _WIN32
+#include <cerrno>
 #endif
 
 namespace MMAP

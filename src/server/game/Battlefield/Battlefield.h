@@ -44,10 +44,7 @@ enum BattlefieldSounds
     BF_START                                     = 3439
 };
 
-enum BattlefieldTimers
-{
-    BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL        = 1000
-};
+constexpr auto BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL = 1000;
 
 const uint32 BattlefieldFactions[BG_TEAMS_COUNT] =
 {

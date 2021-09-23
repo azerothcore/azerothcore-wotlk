@@ -286,7 +286,7 @@ public:
             if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_MANA))
             {
                 // reset threat
-                ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
+                ThreatContainer::StorageType const& threatlist = me->getThreatMgr().getThreatList();
                 for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
                 {
                     Unit* unit = ObjectAccessor::GetUnit((*me), (*itr)->getUnitGuid());
@@ -369,7 +369,7 @@ public:
                                     {
                                         // shouldn't be casted on any victim of summoned mobs
                                         bool valid = true;
-                                        for (ObjectGuid const guid : summons)
+                                        for (ObjectGuid const& guid : summons)
                                             if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                                                 if (c->IsAlive() && c->GetVictim() && c->GetVictim()->GetGUID() == plr->GetGUID())
                                                 {
@@ -618,7 +618,7 @@ public:
                 return;
 
             // select random cultist
-            Creature* cultist = acore::Containers::SelectRandomContainerElement(temp);
+            Creature* cultist = Acore::Containers::SelectRandomContainerElement(temp);
             if (!cultist)
                 return;
 
@@ -917,7 +917,7 @@ public:
             ScriptedAI::AttackStart(who);
             if (!targetGUID)
             {
-                me->getThreatManager().resetAllAggro();
+                me->getThreatMgr().resetAllAggro();
                 me->AddThreat(who, 1000000.0f);
                 targetGUID = who->GetGUID();
             }

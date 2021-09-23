@@ -110,6 +110,9 @@ namespace Movement
         [[nodiscard]] Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1, false) : Vector3(); }
         [[nodiscard]] int32 currentPathIdx() const;
 
+        [[nodiscard]] bool HasAnimation() const { return splineflags.animation; }
+        [[nodiscard]] uint8 GetAnimationType() const { return splineflags.animId; }
+
         bool onTransport;
         [[nodiscard]] std::string ToString() const;
         [[nodiscard]] bool HasStarted() const

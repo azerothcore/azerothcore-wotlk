@@ -399,7 +399,7 @@ class achievement_flu_shot_shortage : public AchievementCriteriaScript
 public:
     achievement_flu_shot_shortage() : AchievementCriteriaScript("achievement_flu_shot_shortage") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target && target->GetTypeId() == TYPEID_UNIT)
             return target->ToCreature()->AI()->GetData(DATA_INOCULATED_STACK) < 3;

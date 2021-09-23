@@ -298,7 +298,7 @@ void ReadLiquidTypeTableDBC()
 
 // Map file format data
 static char const* MAP_MAGIC         = "MAPS";
-static char const* MAP_VERSION_MAGIC = "v1.8";
+static uint32 const MAP_VERSION_MAGIC = 8;
 static char const* MAP_AREA_MAGIC    = "AREA";
 static char const* MAP_HEIGHT_MAGIC  = "MHGT";
 static char const* MAP_LIQUID_MAGIC  = "MLIQ";
@@ -415,7 +415,7 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
     // Prepare map header
     map_fileheader map;
     map.mapMagic = *reinterpret_cast<uint32 const*>(MAP_MAGIC);
-    map.versionMagic = *reinterpret_cast<uint32 const*>(MAP_VERSION_MAGIC);
+    map.versionMagic = MAP_VERSION_MAGIC;
     map.buildMagic = build;
 
     // Get area flags data
@@ -980,7 +980,7 @@ void ExtractMapsFromMpq(uint32 build)
     {
         printf("Extract %s (%d/%u)                  \n", map_ids[z].name, z + 1, map_count);
         // Loadup map grid data
-        mpqMapName = acore::StringFormat(R"(World\Maps\%s\%s.wdt)", map_ids[z].name, map_ids[z].name);
+        mpqMapName = Acore::StringFormat(R"(World\Maps\%s\%s.wdt)", map_ids[z].name, map_ids[z].name);
         WDT_file wdt;
         if (!wdt.loadFile(mpqMapName, false))
         {
@@ -994,8 +994,8 @@ void ExtractMapsFromMpq(uint32 build)
             {
                 if (!wdt.main->adt_list[y][x].exist)
                     continue;
-                mpqFileName = acore::StringFormat(R"(World\Maps\%s\%s_%u_%u.adt)", map_ids[z].name, map_ids[z].name, x, y);
-                outputFileName = acore::StringFormat("%s/maps/%03u%02u%02u.map", output_path, map_ids[z].id, y, x);
+                mpqFileName = Acore::StringFormat(R"(World\Maps\%s\%s_%u_%u.adt)", map_ids[z].name, map_ids[z].name, x, y);
+                outputFileName = Acore::StringFormat("%s/maps/%03u%02u%02u.map", output_path, map_ids[z].id, y, x);
                 ConvertADT(mpqFileName, outputFileName, y, x, build);
             }
             // draw progress bar

@@ -7,66 +7,62 @@
 #ifndef _REALMLIST_H
 #define _REALMLIST_H
 
-#include "Common.h"
-#include <ace/INET_Addr.h>
+#include "Define.h"
+#include "Realm.h"
+#include <array>
+#include <map>
+#include <unordered_set>
+#include <vector>
 
-enum RealmFlags
+struct RealmBuildInfo
 {
-    REALM_FLAG_NONE                              = 0x00,
-    REALM_FLAG_INVALID                           = 0x01,
-    REALM_FLAG_OFFLINE                           = 0x02,
-    REALM_FLAG_SPECIFYBUILD                      = 0x04,
-    REALM_FLAG_UNK1                              = 0x08,
-    REALM_FLAG_UNK2                              = 0x10,
-    REALM_FLAG_RECOMMENDED                       = 0x20,
-    REALM_FLAG_NEW                               = 0x40,
-    REALM_FLAG_FULL                              = 0x80
+    uint32 Build;
+    uint32 MajorVersion;
+    uint32 MinorVersion;
+    uint32 BugfixVersion;
+    std::array<char, 4> HotfixVersion;
+    std::array<uint8, 20> WindowsHash;
+    std::array<uint8, 20> MacHash;
 };
 
-// Storage object for a realm
-struct Realm
+namespace boost::system
 {
-    ACE_INET_Addr ExternalAddress;
-    ACE_INET_Addr LocalAddress;
-    ACE_INET_Addr LocalSubnetMask;
-    std::string name;
-    uint8 icon;
-    RealmFlags flag;
-    uint8 timezone;
-    uint32 m_ID;
-    AccountTypes allowedSecurityLevel;
-    float populationLevel;
-    uint32 gamebuild;
-};
+    class error_code;
+}
 
 /// Storage object for the list of realms on the server
-class RealmList
+class AC_SHARED_API RealmList
 {
 public:
-    typedef std::map<std::string, Realm> RealmMap;
+    typedef std::map<RealmHandle, Realm> RealmMap;
 
+    static RealmList* Instance();
+
+    void Initialize(Acore::Asio::IoContext& ioContext, uint32 updateInterval);
+    void Close();
+
+    RealmMap const& GetRealms() const { return _realms; }
+    Realm const* GetRealm(RealmHandle const& id) const;
+
+    RealmBuildInfo const* GetBuildInfo(uint32 build) const;
+
+private:
     RealmList();
     ~RealmList() = default;
 
-    static RealmList* instance();
+    void LoadBuildInfo();
+    void UpdateRealms(boost::system::error_code const& error);
+    void UpdateRealm(RealmHandle const& id, uint32 build, std::string const& name,
+        boost::asio::ip::address&& address, boost::asio::ip::address&& localAddr, boost::asio::ip::address&& localSubmask,
+        uint16 port, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel, float population);
 
-    void Initialize(uint32 updateInterval);
-    void UpdateIfNeed();
-    void AddRealm(const Realm& NewRealm) { m_realms[NewRealm.name] = NewRealm; }
-
-    [[nodiscard]] RealmMap::const_iterator begin() const { return m_realms.begin(); }
-    [[nodiscard]] RealmMap::const_iterator end() const { return m_realms.end(); }
-    [[nodiscard]] uint32 size() const { return m_realms.size(); }
-
-private:
-    void UpdateRealms(bool init = false);
-    void UpdateRealm(uint32 id, const std::string& name, ACE_INET_Addr const& address, ACE_INET_Addr const& localAddr, ACE_INET_Addr const& localSubmask, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, uint32 build);
-
-    RealmMap m_realms;
-    uint32   m_UpdateInterval{0};
-    time_t   m_NextUpdateTime;
+    std::vector<RealmBuildInfo> _builds;
+    RealmMap _realms;
+    uint32 _updateInterval;
+    std::unique_ptr<Acore::Asio::DeadlineTimer> _updateTimer;
+    std::unique_ptr<Acore::Asio::Resolver> _resolver;
 };
 
-#define sRealmList RealmList::instance()
+#define sRealmList RealmList::Instance()
 
 #endif
