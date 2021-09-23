@@ -831,9 +831,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_REPUTATION              = 7,
     PLAYER_LOGIN_QUERY_LOAD_INVENTORY               = 8,
     PLAYER_LOGIN_QUERY_LOAD_ACTIONS                 = 9,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT              = 10,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_UNREAD_COUNT       = 11,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE               = 12,
+    PLAYER_LOGIN_QUERY_LOAD_MAILS                   = 10,
+    PLAYER_LOGIN_QUERY_LOAD_MAIL_ITEMS              = 11,
     PLAYER_LOGIN_QUERY_LOAD_SOCIAL_LIST             = 13,
     PLAYER_LOGIN_QUERY_LOAD_HOME_BIND               = 14,
     PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS         = 15,
@@ -1564,12 +1563,11 @@ public:
 
     void RemoveMail(uint32 id);
 
-    void AddMail(Mail* mail) { totalMailCount++; m_mailCache.push_front(mail); }// for call from WorldSession::SendMailTo
-    uint32 GetMailSize() { return totalMailCount; }
-    uint32 GetMailCacheSize() { return m_mailCache.size();}
+    void AddMail(Mail* mail) { totalMailCount++; m_mail.push_front(mail); }// for call from WorldSession::SendMailTo
+    uint32 GetMailSize() { return m_mail.size();}
     Mail* GetMail(uint32 id);
 
-    PlayerMails const& GetMails() const { return m_mailCache; }
+    PlayerMails const& GetMails() const { return m_mail; }
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
@@ -2630,9 +2628,8 @@ public:
     void _LoadAuras(PreparedQueryResult result, uint32 timediff);
     void _LoadGlyphAuras();
     void _LoadInventory(PreparedQueryResult result, uint32 timeDiff);
-    void _LoadMailInit(PreparedQueryResult resultMailCount, PreparedQueryResult resultUnread, PreparedQueryResult resultDelivery);
-    void _LoadMail();
-    void _LoadMailedItems(Mail* mail);
+    void _LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mailItemsResult);
+    static Item* _LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint32 mailId, Mail* mail, Field* fields);
     void _LoadQuestStatus(PreparedQueryResult result);
     void _LoadQuestStatusRewarded(PreparedQueryResult result);
     void _LoadDailyQuestStatus(PreparedQueryResult result);
@@ -2729,7 +2726,7 @@ public:
     uint32 m_GuildIdInvited;
     uint32 m_ArenaTeamIdInvited;
 
-    PlayerMails m_mailCache;
+    PlayerMails m_mail;
     PlayerSpellMap m_spells;
     PlayerTalentMap m_talents;
     uint32 m_lastPotionId;                              // last used health/mana potion in combat, that block next potion use
