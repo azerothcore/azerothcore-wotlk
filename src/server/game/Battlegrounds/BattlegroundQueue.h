@@ -12,6 +12,7 @@
 #include "DBCEnums.h"
 #include "EventProcessor.h"
 #include <deque>
+#include <array>
 
 #define COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME 10
 
@@ -54,7 +55,7 @@ public:
     BattlegroundQueue();
     ~BattlegroundQueue();
 
-    void BattlegroundQueueUpdate(BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId);
+    void BattlegroundQueueUpdate(uint32 diff, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId);
     void UpdateEvents(uint32 diff);
 
     void FillPlayersToBG(Battleground* bg, int32 aliFree, int32 hordeFree, BattlegroundBracketId bracket_id);
@@ -123,6 +124,8 @@ private:
 
     // Event handler
     EventProcessor m_events;
+
+    std::array<int32, BG_BRACKET_ID_LAST> _queueAnnouncementTimer;
 };
 
 /*
