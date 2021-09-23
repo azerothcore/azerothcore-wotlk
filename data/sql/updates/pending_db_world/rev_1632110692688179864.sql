@@ -71,7 +71,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (8337, 0, 1,0, 4, 0,50,0, 0, 0,0,0, 1, 0, 0,0, 0, 0,0, 1, 0,0,0,0,0,0,0, 'Dark Iron Steelshifter - On aggro - Say Line 0'),
 (147516, 1, 0,0, 38, 0,100,0, 2, 2,0,0, 80,14751700, 0,0, 0, 0,0, 1, 0,0,0,0,0,0,0, 'Dark Iron - On data set - action list'),
 (147517, 1, 0,0, 38, 0,100,0, 2, 2,0,0, 80,14751700, 0,0, 0, 0,0, 1, 0,0,0,0,0,0,0, 'Dark Iron - On data set - action list'),
-(14751700,9, 0,0, 0, 0,100,0, 0, 0,0,0, 118, 2, 0,0, 0, 0,0, 1, 0,0,0,0,0,0,0, 'Dark Iron - Action List - set gob state'),
+(14751700,9, 0,0, 0, 0,100,0, 0, 0,0,0, 202, 2, 0,0, 0, 0,0, 1, 0,0,0,0,0,0,0, 'Dark Iron - Action List - set gob state'),
 (14751700,9, 1,0, 0, 0,100,0, 0, 0,0,0, 11, 12168, 0,0, 0, 0,0, 1, 0,0,0,0,0,0,0, 'Dark Iron - Action List - cast'),
 (14751700,9, 2,0, 0, 0,100,0, 1000, 1000,0,0, 41, 0, 0,0, 0, 0,0, 1, 0,0,0,0,0,0,0, 'Dark Iron - Action List - Despawn');
 
