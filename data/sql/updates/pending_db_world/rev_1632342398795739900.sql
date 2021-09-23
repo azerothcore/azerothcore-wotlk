@@ -18,7 +18,7 @@ UPDATE `creature_template` SET `unit_flags`=33024 WHERE `entry`=23795;
 UPDATE `creature_template` SET `ScriptName`='npc_direbrew_antagonist' WHERE `entry`=23795;
 UPDATE `creature_template` SET `ScriptName`='npc_direbrew_minion' WHERE `entry`=26776;
 UPDATE `creature_template` SET `ScriptName`='npc_coren_direbrew_sisters' WHERE `entry` IN(26764,26822);
-UPDATE `creature_template` SET `unit_flags`=256, `ScriptName`='boss_coren_direbrew' WHERE `entry`=23872;
+UPDATE `creature_template` SET `unit_flags`=256, `ScriptName`='npc_coren_direbrew' WHERE `entry`=23872;
 
 DELETE FROM `disables` WHERE `sourceType`=0 AND `entry`=50313;
 INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, `comment`) VALUES
