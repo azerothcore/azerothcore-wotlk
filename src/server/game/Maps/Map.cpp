@@ -882,7 +882,7 @@ struct ResetNotifier
 
 void Map::RemovePlayerFromMap(Player* player, bool remove)
 {
-    player->getHostileRefMgr().deleteReferences(); // pussywizard: multithreading crashfix
+    player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     bool inWorld = player->IsInWorld();
     player->RemoveFromWorld();
