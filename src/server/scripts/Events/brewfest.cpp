@@ -1807,6 +1807,65 @@ public:
     }
 };
 
+enum BrewfestRevelerEnum
+{
+    FACTION_ALLIANCE    = 1934,
+    FACTION_HORDE       = 1935,
+    FACTION_FRIENDLY    = 35,
+
+    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE    = 44003,
+    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE  = 44004,
+    SPELL_BREWFEST_REVELER_TRANSFORM_BE             = 43907,
+    SPELL_BREWFEST_REVELER_TRANSFORM_ORC            = 43914,
+    SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN         = 43915,
+    SPELL_BREWFEST_REVELER_TRANSFORM_TROLL          = 43916,
+    SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD         = 43917
+};
+
+class spell_brewfest_reveler_transform : public SpellScriptLoader
+{
+public:
+    spell_brewfest_reveler_transform() : SpellScriptLoader("spell_brewfest_reveler_transform") {}
+
+    class spell_brewfest_reveler_transform_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_brewfest_reveler_transform_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            uint32 factionId = FACTION_ALLIANCE;
+            switch (m_scriptSpellId)
+            {
+                case SPELL_BREWFEST_REVELER_TRANSFORM_BE:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_ORC:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_TROLL:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD:
+                    factionId = FACTION_HORDE;
+                    break;
+                case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE:
+                    factionId = FACTION_FRIENDLY;
+                    break;
+                default:
+                    break;
+            }
+
+            GetTarget()->setFaction(factionId);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_brewfest_reveler_transform_AuraScript::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_brewfest_reveler_transform_AuraScript();
+    }
+};
+
 void AddSC_event_brewfest_scripts()
 {
     // Npcs
@@ -1831,6 +1890,7 @@ void AddSC_event_brewfest_scripts()
     new spell_brewfest_unfill_keg();
     new spell_brewfest_toss_mug();
     new spell_brewfest_add_mug();
+    new spell_brewfest_reveler_transform();
 
     // beer effect
     new npc_brew_bubble();
