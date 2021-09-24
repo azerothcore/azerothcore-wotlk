@@ -386,7 +386,7 @@ public:
                     if (Creature* target = me->SummonCreature(NPC_DEAD_KNIGHT, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation()))
                         {
                         me->CastSpell(target, SPELL_INFORM_DEAD_KNIGHT, true);
-                        }
+                    }
                     break;
                     }
                 case SPELL_INFORM_LIVING_RIDER:
