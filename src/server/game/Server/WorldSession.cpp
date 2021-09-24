@@ -545,7 +545,7 @@ void WorldSession::LogoutPlayer(bool save)
         //FIXME: logout must be delayed in case lost connection with client in time of combat
         if (_player->GetDeathTimer())
         {
-            _player->getHostileRefMgr().deleteReferences();
+            _player->getHostileRefMgr().deleteReferences(true);
             _player->BuildPlayerRepop();
             _player->RepopAtGraveyard();
         }
@@ -800,7 +800,7 @@ void WorldSession::Handle_Deprecated(WorldPacket& recvPacket)
         GetOpcodeNameForLogging(static_cast<OpcodeClient>(recvPacket.GetOpcode())).c_str(), GetPlayerInfo().c_str());
 }
 
-void WorldSession::SendAuthWaitQue(uint32 position)
+void WorldSession::SendAuthWaitQueue(uint32 position)
 {
     if (position == 0)
     {

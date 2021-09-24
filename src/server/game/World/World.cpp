@@ -395,7 +395,7 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
         WorldSession* pop_sess = m_QueuedPlayer.front();
         pop_sess->SetInQueue(false);
         pop_sess->ResetTimeOutTime(false);
-        pop_sess->SendAuthWaitQue(0);
+        pop_sess->SendAuthWaitQueue(0);
         pop_sess->SendAccountDataTimes(GLOBAL_CACHE_MASK);
 
         FinalizePlayerWorldSession(pop_sess);
@@ -409,7 +409,7 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
 
     // update queue position from iter to end()
     for (; iter != m_QueuedPlayer.end(); ++iter, ++position)
-        (*iter)->SendAuthWaitQue(position);
+        (*iter)->SendAuthWaitQueue(position);
 
     return found;
 }
