@@ -953,7 +953,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundBracket
 
         if (_queueAnnouncementTimer[bracket_id] >= 0)
         {
-            if (_queueAnnouncementTimer[bracket_id] <= diff)
+            if (_queueAnnouncementTimer[bracket_id] <= static_cast<int32>(diff))
             {
                 _queueAnnouncementTimer[bracket_id] = -1;
 
@@ -967,7 +967,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundBracket
             }
             else
             {
-                _queueAnnouncementTimer[bracket_id] -= diff;
+                _queueAnnouncementTimer[bracket_id] -= static_cast<int32>(diff);
             }
         }
     }
@@ -1033,7 +1033,14 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
     }
     else // Show queue status to server (when joining battleground queue)
     {
-        if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qTotal))
+        if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED))
+        {
+            if (_queueAnnouncementTimer[bracketId] < 0)
+            {
+                _queueAnnouncementTimer[bracketId] = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER);
+            }
+        }
+        else if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qTotal))
         {
             return;
         }
@@ -1083,14 +1090,7 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
         }
         else
         {
-            if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED))
-            {
-                if (_queueAnnouncementTimer[bracketId] < 0)
-                {
-                    _queueAnnouncementTimer[bracketId] = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER);
-                }
-            }
-            else if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qPlayers))
+            if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qPlayers))
             {
                 return;
             }
