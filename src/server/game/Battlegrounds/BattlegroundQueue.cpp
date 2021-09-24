@@ -1040,12 +1040,15 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
                 _queueAnnouncementTimer[bracketId] = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER);
             }
         }
-        else if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qTotal))
+        else
         {
-            return;
-        }
+            if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qTotal))
+            {
+                return;
+            }
 
-        sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
+            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
+        }
     }
 }
 
