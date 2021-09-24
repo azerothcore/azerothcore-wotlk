@@ -4,7 +4,7 @@ SET @NPC := 37385;
 SET @PATH := @NPC * 10;
 
 UPDATE `creature` SET `MovementType`=2 WHERE `guid`=@NPC;
-DELETE FROM `creature` WHERE `guid` = 205803 AND `id` = @NPC;
+DELETE FROM `creature` WHERE `guid` = 205803 AND `id` = 2321;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (205803, 2321, 1, 0, 0, 1, 1, 1042, 0, 4520.04, 661.485, 24.6147, 4.93543, 275, 0, 0, 222, 0, 0, 0, 0, 0, '', 0);
 
