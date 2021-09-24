@@ -957,13 +957,12 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundBracket
             {
                 _queueAnnouncementTimer[bracket_id] = -1;
 
-                char const*        bgName      = bg_template->GetName();
-                std::string const& arenatype   = Acore::StringFormat("%uv%u", m_arenaType, m_arenaType);
-                uint32             playersNeed = ArenaTeam::GetReqPlayersForType(m_arenaType);
-                uint32             q_min_level = std::min(bracketEntry->minLevel, (uint32) 80);
-                uint32             q_max_level = std::min(bracketEntry->maxLevel, (uint32) 80);
+                char const* bgName = bg_template->GetName();
+                uint32 MaxPlayers = bg_template->GetMinPlayersPerTeam() * 2;
+                uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32) 80);
+                uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32) 80);
 
-                sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD, bgName, arenatype.c_str(), q_min_level, q_max_level, qPlayers, playersNeed);
+                sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qPlayers, MaxPlayers);
             }
             else
             {
