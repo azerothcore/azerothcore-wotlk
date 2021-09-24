@@ -90,7 +90,9 @@ bool Player::HasQuest(uint32 questId) const
     {
         uint32 questid = GetQuestSlotQuestId(i);
         if (questid == questId)
+        {
             return true;
+        }
     }
 
     return false;
