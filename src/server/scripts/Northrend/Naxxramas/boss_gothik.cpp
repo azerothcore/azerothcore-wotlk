@@ -397,7 +397,7 @@ public:
                     }
                     me->SummonCreature(NPC_DEAD_HORSE, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation());
                     break;
-                    }
+                }
             }
             me->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST);
         }
