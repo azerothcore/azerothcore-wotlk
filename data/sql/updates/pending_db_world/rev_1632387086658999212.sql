@@ -49,4 +49,4 @@ DELETE FROM `creature_formations` WHERE `leaderGUID`=@NPC;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (@NPC, @NPC, 0, 0, 2, 0, 0),
 (@NPC, 36692, 2, 120, 2, 0, 0),
-(@NPC, 205803, 2, 210, 2, 0, 0);
+(@NPC, 205803, 2, 210, 0, 0, 0);
