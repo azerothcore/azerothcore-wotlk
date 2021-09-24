@@ -545,7 +545,10 @@ public:
     // xinef: moved to public
     void LoadScripts();
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
-protected:
+
+    [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraTickNumber; }
+
+ protected:
     bool HasGlobalCooldown() const;
     void TriggerGlobalCooldown();
     void CancelGlobalCooldown();
@@ -722,6 +725,7 @@ protected:
     // and in same time need aura data and after aura deleting.
     SpellInfo const* m_triggeredByAuraSpell;
     int8 m_triggeredByAuraEffectIndex;
+    uint32 m_triggeredByAuraTickNumber;
 
     bool m_skipCheck;
     uint8 m_auraScaleMask;
