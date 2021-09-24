@@ -376,9 +376,9 @@ public:
                 case SPELL_INFORM_LIVING_TRAINEE:
                     {
                     if (Creature* target = me->SummonCreature(NPC_DEAD_TRAINEE, PosSummonDead[pos].GetPositionX(), PosSummonDead[pos].GetPositionY(), PosSummonDead[pos].GetPositionZ(), PosSummonDead[pos].GetOrientation()))
-                        {
+                    {
                         me->CastSpell(target, SPELL_INFORM_DEAD_TRAINEE, true);
-                        }
+                    }
                     break;
                     }
                 case SPELL_INFORM_LIVING_KNIGHT:
