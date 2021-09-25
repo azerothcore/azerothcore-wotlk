@@ -32,7 +32,9 @@ enum Creatures
     NPC_DOOMFORGE_ARCANASMITH   = 8900,
     NPC_RAGEREAVER_GOLEM        = 8906,
     NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
-    NPC_GOLEM_LORD_ARGELMACH    = 8983
+    NPC_GOLEM_LORD_ARGELMACH    = 8983,
+
+    NPC_IRONHAND_GUARDIAN       = 8982
 };
 
 enum GameObjects
@@ -110,6 +112,8 @@ public:
         ObjectGuid MagmusGUID;
         ObjectGuid MoiraGUID;
 
+        ObjectGuid IronhandGUID[6];
+
         ObjectGuid GoArena1GUID;
         ObjectGuid GoArena2GUID;
         ObjectGuid GoArena3GUID;
@@ -139,6 +143,7 @@ public:
         uint32 TombTimer;
         uint32 TombEventCounter;
         uint32 OpenedCoofers;
+        uint32 IronhandCounter;
 
         GuidList ArgelmachAdds;
         ObjectGuid ArgelmachGUID;
@@ -152,6 +157,7 @@ public:
             TombTimer = TIMER_TOMB_START;
             TombEventCounter = 0;
             OpenedCoofers = 0;
+            IronhandCounter  = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -191,7 +197,7 @@ public:
                 case NPC_MAGMUS:
                     MagmusGUID = creature->GetGUID();
                     if (!creature->IsAlive())
-                        HandleGameObject(GetGuidData(DATA_THRONE_DOOR), true); // if Magmus is dead open door to last boss
+                        HandleGameObject(GoThroneGUID, true); // if Magmus is dead open door to last boss
                     break;
                 case NPC_WEAPON_TECHNICIAN:
                 case NPC_DOOMFORGE_ARCANASMITH:
@@ -205,6 +211,10 @@ public:
                 case NPC_GOLEM_LORD_ARGELMACH:
                     ArgelmachGUID = creature->GetGUID();
                     break;
+                case NPC_IRONHAND_GUARDIAN:
+                    IronhandGUID[IronhandCounter] = creature->GetGUID();
+                    IronhandCounter++;
+                    LOG_FATAL("Entities:Unit", "ironhand %d, name: %s, AIName: %s ", IronhandCounter, creature->GetName(), creature->GetAIName());
                 default:
                     break;
             }
@@ -294,6 +304,8 @@ public:
                 case NPC_WRATH_HAMMER_CONSTRUCT:
                     ArgelmachAdds.remove(unit->GetGUID());
                     break;
+                case NPC_MAGMUS:
+                    SetData(TYPE_IRON_HALL, DONE);
                 default:
                     break;
             }
@@ -336,9 +348,46 @@ public:
                     break;
                 case TYPE_LYCEUM:
                     encounter[4] = data;
+                    if (data == DONE)
+                    {
+                        HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_N), true);
+                        HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_S), true);
+                        if (Creature* magmus = instance->GetCreature(MagmusGUID))
+                        {
+                            magmus->AI()->Talk(0);
+                        }
+                    }
                     break;
                 case TYPE_IRON_HALL:
                     encounter[5] = data;
+                    LOG_FATAL("Entities:Unit", "Setting ironhall (entry %d ) to value %d", TYPE_IRON_HALL, data);
+                    if (data == IN_PROGRESS)
+                    {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            
+                            if (Creature* ironhand = instance->GetCreature(IronhandGUID[i]))
+                            {
+                                LOG_FATAL("Entities:Unit", "Setting ironhand %d", i);
+                                ironhand->AI()->SetData(0, 1);
+                            }
+                        }
+
+                    }
+                    if (data == NOT_STARTED)
+                    {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            if (Creature* ironhand = instance->GetCreature(IronhandGUID[i]))
+                            {
+                                ironhand->AI()->SetData(0, 0);
+                            }
+                        }
+                    }
+                    if (data == DONE)
+                    {
+                        HandleGameObject(GetGuidData(DATA_THRONE_DOOR), true);
+                    }
                     break;
                 case DATA_GHOSTKILL:
                     GhostKillCount += data;
