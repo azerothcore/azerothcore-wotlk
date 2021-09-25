@@ -102,10 +102,6 @@ void Pet::RemoveFromWorld()
         Unit::RemoveFromWorld();
         GetMap()->GetObjectsStore().Remove<Pet>(GetGUID());
     }
-
-#ifdef ELUNA
-    sEluna->OnRemoveFromWorld(this);
-#endif
 }
 
 SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetType mandatoryPetType /*= MAX_PET_TYPE*/)
