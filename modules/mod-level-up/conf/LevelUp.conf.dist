@@ -1,0 +1,17 @@
+#
+# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+#
+
+[worldserver]
+
+########################################
+# Level Up configuration
+########################################
+#
+#    LevelUp.Enable
+#        Description: Enable the Level Up module and print a message at server start
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+
+LevelUp.Enable = 1
