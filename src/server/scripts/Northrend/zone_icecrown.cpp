@@ -185,7 +185,7 @@ public:
             {
                 uint32 quest = currentQuest;
                 if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                {                  
+                {
                     switch (quest)
                     {
                         case QUEST_BFV_FALLEN_HEROES:
