@@ -214,7 +214,6 @@ public:
                 case NPC_IRONHAND_GUARDIAN:
                     IronhandGUID[IronhandCounter] = creature->GetGUID();
                     IronhandCounter++;
-                    LOG_FATAL("Entities:Unit", "ironhand %d, name: %s, AIName: %s ", IronhandCounter, creature->GetName(), creature->GetAIName());
                 default:
                     break;
             }
@@ -360,15 +359,12 @@ public:
                     break;
                 case TYPE_IRON_HALL:
                     encounter[5] = data;
-                    LOG_FATAL("Entities:Unit", "Setting ironhall (entry %d ) to value %d", TYPE_IRON_HALL, data);
                     if (data == IN_PROGRESS)
                     {
                         for (int i = 0; i < 6; i++)
                         {
-                            
                             if (Creature* ironhand = instance->GetCreature(IronhandGUID[i]))
                             {
-                                LOG_FATAL("Entities:Unit", "Setting ironhand %d", i);
                                 ironhand->AI()->SetData(0, 1);
                             }
                         }

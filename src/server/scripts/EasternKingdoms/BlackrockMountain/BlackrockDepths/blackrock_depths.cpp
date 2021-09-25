@@ -73,7 +73,6 @@ public:
                 {
                     flames_enabled = (bool) (value);
                     events.ScheduleEvent(SPELL_GOUT_OF_FLAME, urand(1, N_IRONHAND_GROUPS) * TIMER_IRONHAND_FLAMES / N_IRONHAND_GROUPS);
-                    LOG_FATAL("entities:unit", "next fire in %d", (events.GetNextEventTime() - events.GetTimer()));
                 }
             }
         }
@@ -84,6 +83,9 @@ public:
 
             if (flames_enabled)
             {
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
                 while (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
@@ -91,7 +93,6 @@ public:
                     case SPELL_GOUT_OF_FLAME:
                         DoCast(SPELL_GOUT_OF_FLAME);
                         events.RescheduleEvent(SPELL_GOUT_OF_FLAME, urand(TIMER_IRONHAND_FLAMES - TIMER_IRONHAND_RAND_PART, TIMER_IRONHAND_FLAMES + TIMER_IRONHAND_RAND_PART));
-                        LOG_FATAL("entities:unit", "next fire in %d", events.GetNextEventTime() - events.GetTimer());
                         break;
                     default:
                         break;

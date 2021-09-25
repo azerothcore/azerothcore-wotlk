@@ -18,6 +18,15 @@ enum Spells
     SPELL_SMITE                                            = 10934
 };
 
+enum SpellTimers
+{
+    TIMER_HEAL           = 12000, // These times are probably wrong
+    TIMER_MINDBLAST = 16000,
+    TIMER_SHADOW_WORD = 2000,
+    TIMER_SMITE          = 8000
+
+};
+
 class boss_moira_bronzebeard : public CreatureScript
 {
 public:
@@ -28,54 +37,70 @@ public:
         return GetBlackrockDepthsAI<boss_moira_bronzebeardAI>(creature);
     }
 
-    struct boss_moira_bronzebeardAI : public ScriptedAI
+    struct boss_moira_bronzebeardAI : public BossAI
     {
-        boss_moira_bronzebeardAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_moira_bronzebeardAI(Creature* creature) : BossAI(creature, DATA_MOIRA) {}
 
-        uint32 Heal_Timer;
-        uint32 MindBlast_Timer;
-        uint32 ShadowWordPain_Timer;
-        uint32 Smite_Timer;
-
-        void Reset() override
+        void EnterCombat(Unit* /*who*/) override
         {
-            Heal_Timer = 12000;                                 //These times are probably wrong
-            MindBlast_Timer = 16000;
-            ShadowWordPain_Timer = 2000;
-            Smite_Timer = 8000;
+            _EnterCombat();
+            events.ScheduleEvent(SPELL_MINDBLAST, urand(17000, 20000));
+            events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(500, 1000));
+            events.ScheduleEvent(SPELL_HEAL, urand(8000, 10000));
+            events.ScheduleEvent(SPELL_SMITE, urand(8000, 10000));
+            events.ScheduleEvent(SPELL_SHIELD, urand(8000, 10000));
         }
-
-        void EnterCombat(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
-            //Return since we have no target
             if (!UpdateVictim())
                 return;
 
-            //MindBlast_Timer
-            if (MindBlast_Timer <= diff)
-            {
-                DoCastVictim(SPELL_MINDBLAST);
-                MindBlast_Timer = 14000;
-            }
-            else MindBlast_Timer -= diff;
+            events.Update(diff);
 
-            //ShadowWordPain_Timer
-            if (ShadowWordPain_Timer <= diff)
-            {
-                DoCastVictim(SPELL_SHADOWWORDPAIN);
-                ShadowWordPain_Timer = 18000;
-            }
-            else ShadowWordPain_Timer -= diff;
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-            //Smite_Timer
-            if (Smite_Timer <= diff)
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                DoCastVictim(SPELL_SMITE);
-                Smite_Timer = 10000;
+                switch (eventId)
+                {
+                case SPELL_MINDBLAST:
+                    DoCastVictim(SPELL_MINDBLAST);
+                    events.ScheduleEvent(SPELL_MINDBLAST, urand(8000, 10000));
+                    break;
+                case SPELL_SHADOWWORDPAIN:
+                    DoCastVictim(SPELL_SHADOWWORDPAIN);
+                    events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(8000, 10000));
+                    break;
+                case SPELL_HEAL:
+                    CastOnEmperorIfPossible(SPELL_HEAL);
+                    break;
+                case SPELL_SHIELD:
+                    CastOnEmperorIfPossible(SPELL_SHIELD);
+                    break;
+                case SPELL_RENEW:
+                    CastOnEmperorIfPossible(SPELL_RENEW);
+                default:
+                    break;
+                }
             }
-            else Smite_Timer -= diff;
+        }
+
+
+        void CastOnEmperorIfPossible(uint32 spell)
+        {
+            Creature* emperor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EMPEROR));
+            Creature* target  = nullptr;
+            if (emperor && emperor->HealthBelowPct(90))
+            {
+                DoCast(emperor, spell);
+            }
+            else if (HealthBelowPct(90))
+            {
+                DoCastSelf(spell);
+            }
+            events.ScheduleEvent(spell, urand(8000, 10000));
         }
     };
 };
