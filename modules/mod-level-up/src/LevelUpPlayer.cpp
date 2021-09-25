@@ -83,77 +83,7 @@ private:
     }
 };
 
-class LevelUpCommandScript : public CommandScript
-{
-public:
-    LevelUpCommandScript() : CommandScript("LevelUpCommandScript") {}
-
-    std::vector<ChatCommand> GetCommands() const
-    {
-        static std::vector<ChatCommand> commands = {{"retroactive", SEC_CONSOLE, true, &HandleLevelUpCommand, ""}};
-        return commands;
-    }
-
-    static bool HandleLevelUpCommand(ChatHandler *chatHandler, const char */*args*/)
-    {
-        QueryResult result = CharacterDatabase.Query("SELECT `guid`, `level` FROM `characters`");
-
-        if (!result) {
-            chatHandler->SendSysMessage("No results.");
-            return false;
-        }
-
-        if (result->GetRowCount() == 0) {
-            chatHandler->SendSysMessage("No results.");
-            return false;
-        }
-
-        do {
-            uint32 guid = result->Fetch()[0].GetUInt32();
-            uint32 level = result->Fetch()[1].GetUInt32();
-
-            if (level >= 10) {
-                sendReward(guid, 5621810);
-                chatHandler->PSendSysMessage("Sent level 10 gift box to %d", guid);
-            }
-
-            if (level >= 19) {
-                sendReward(guid, 5621819);
-                chatHandler->PSendSysMessage("Sent level 19 gift box to %d", guid);
-            }
-        } while (result->NextRow());
-
-        return true;
-    }
-
-private:
-    static void sendReward(uint32 guid, uint32 itemId)
-    {
-        ObjectGuid player(HighGuid::Player, guid);
-
-        ItemTemplate const *proto = sObjectMgr->GetItemTemplate(itemId);
-
-        if (!proto) {
-            sLog->outError("[LevelUp] Item ID is invalid: %u", itemId);
-            return;
-        }
-
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-        Item *item = Item::CreateItem(itemId, 1);
-        item->SaveToDB(trans);
-
-        MailSender sender(5126979);
-        MailDraft draft(SUBJECT, BODY);
-        draft.AddItem(item);
-        draft.SendMailTo(trans, MailReceiver(player.GetCounter()), sender);
-
-        CharacterDatabase.CommitTransaction(trans);
-    }
-};
-
 void AddLevelUpPlayerScripts()
 {
     new LevelUpPlayer();
-    new LevelUpCommandScript();
 }
