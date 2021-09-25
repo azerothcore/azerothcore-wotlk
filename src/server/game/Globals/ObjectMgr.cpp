@@ -5741,9 +5741,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             // read items from cache
             m->items.swap(itemsCache[m->messageID]);
 
-            // Don't return if: the sender is not a player, or it was sent to self, or already returned, or read and has no items.
-            // Only delete mails containing items when they were already returned before.
-            if (!m->IsSentByPlayer() || m->IsSentByGM() || m->receiver == m->sender || (m->IsCODPayment() || m->IsReturned()) || (m->IsRead() && !m->HasItems()))
+            // If it is mail from non-player, or if it's already return mail, it shouldn't be returned, but deleted
+            if (!m->IsSentByPlayer() || m->IsSentByGM() || (m->IsCODPayment() || m->IsReturnedMail()))
             {
                 for (MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
                 {

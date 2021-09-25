@@ -199,8 +199,7 @@ struct Mail
     [[nodiscard]] bool IsSentByPlayer() const { return messageType == MAIL_NORMAL; }
     [[nodiscard]] bool IsSentByGM() const { return stationery == MAIL_STATIONERY_GM; }
     [[nodiscard]] bool IsCODPayment() const { return checked & MAIL_CHECK_MASK_COD_PAYMENT; }
-    [[nodiscard]] bool IsReturned() const { return checked & MAIL_CHECK_MASK_RETURNED; }
-    [[nodiscard]] bool IsRead() const { return checked & MAIL_CHECK_MASK_READ; }
+    [[nodiscard]] bool IsReturnedMail() const { return checked & MAIL_CHECK_MASK_RETURNED; }
 };
 
 #endif
