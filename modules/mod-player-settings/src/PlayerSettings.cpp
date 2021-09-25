@@ -377,21 +377,27 @@ public:
             return true;
         }
 
-        if (player->IsInCombat()) {
-            handler->SendSysMessage("Only usable outside of combat.");
-            return true;
+        Map::PlayerList const &players = map->GetPlayers();
+        if (!players.isEmpty()) {
+            for (Map::PlayerList::const_iterator iter = players.begin(); iter != players.end(); ++iter) {
+                if (Player *player = iter->GetSource()) {
+                    if (player->IsInCombat()) {
+                        handler->SendSysMessage("Only usable outside of combat.");
+                        return true;
+                    }
+                }
+            }
         }
 
-
         if (x) {
-            uint32 n = strtol(x, nullptr, 10);
+            long int n = strtol(x, nullptr, 10);
 
             if (n < 1)
                 n = 1;
             else if (n > maxPlayers)
                 n = maxPlayers;
 
-            mapInfo->veto = n;
+            mapInfo->veto = (uint32)n;
         }
 
         handler->PSendSysMessage("Players set to %i.", std::max(mapInfo->nplayers, mapInfo->veto));
