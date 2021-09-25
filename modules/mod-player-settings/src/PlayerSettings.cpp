@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <algorithm>
 #include <vector>
 #include "ScriptMgr.h"
@@ -369,12 +370,29 @@ public:
         Player *player = handler->getSelectedPlayerOrSelf();
         Map *map = player->GetMap();
         PlayerSettingsMapInfo* mapInfo = map->CustomData.GetDefault<PlayerSettingsMapInfo>("PlayerSettingsMapInfo");
+        uint32 maxPlayers = ((InstanceMap*)sMapMgr->FindMap(map->GetId(), map->GetInstanceId()))->GetMaxPlayers();
 
-        if (!map->IsDungeon())
-            return false;
+        if (!map->IsDungeon()) {
+            handler->SendSysMessage("Only usable in dungeons.");
+            return true;
+        }
 
-        if (x)
-            mapInfo->veto = (uint32)atoi(x);
+        if (player->IsInCombat()) {
+            handler->SendSysMessage("Only usable outside of combat.");
+            return true;
+        }
+
+
+        if (x) {
+            uint32 n = strtol(x, nullptr, 10);
+
+            if (n < 1)
+                n = 1;
+            else if (n > maxPlayers)
+                n = maxPlayers;
+
+            mapInfo->veto = n;
+        }
 
         handler->PSendSysMessage("Players set to %i.", std::max(mapInfo->nplayers, mapInfo->veto));
 
