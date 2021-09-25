@@ -13,6 +13,7 @@
 #include "WorldSession.h"
 
 #define TIMER_IRONHAND_FLAMES 16000
+#define TIMER_IRONHAND_RAND_PART 3000
 #define N_IRONHAND_GROUPS 3
 #define SPELL_GOUT_OF_FLAME 15529
 
@@ -61,8 +62,8 @@ public:
    struct ironhand_guardianAI : public CreatureAI
     {
         ironhand_guardianAI(Creature* creature) : CreatureAI(creature) {}
-        uint32 flames_timer;
-        bool   flames_enabled = true;
+
+        bool flames_enabled = false;
 
         void SetData(uint32 id, uint32 value) override
         {
@@ -70,29 +71,40 @@ public:
             {
                 if (value == 0 || value == 1)
                 {
-                    flames_timer   = urand(1,3)*TIMER_IRONHAND_FLAMES/N_IRONHAND_GROUPS; // Makes random groups evenly staggered
                     flames_enabled = (bool) (value);
-                    LOG_FATAL("entities:unit", "setting data for an ironhand, flames timer : %d", flames_timer);
+                    events.ScheduleEvent(SPELL_GOUT_OF_FLAME, urand(1, N_IRONHAND_GROUPS) * TIMER_IRONHAND_FLAMES / N_IRONHAND_GROUPS);
+                    LOG_FATAL("entities:unit", "next fire in %d", (events.GetNextEventTime() - events.GetTimer()));
                 }
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            flames_timer += diff;
+            events.Update(diff);
 
-            if (flames_enabled && flames_timer > TIMER_IRONHAND_FLAMES)
+            if (flames_enabled)
             {
-                LOG_FATAL("entities:unit", "an ironhand tries to fire");
-                flames_timer = 0;
-                DoCast(SPELL_GOUT_OF_FLAME);
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                    case SPELL_GOUT_OF_FLAME:
+                        DoCast(SPELL_GOUT_OF_FLAME);
+                        events.RescheduleEvent(SPELL_GOUT_OF_FLAME, urand(TIMER_IRONHAND_FLAMES - TIMER_IRONHAND_RAND_PART, TIMER_IRONHAND_FLAMES + TIMER_IRONHAND_RAND_PART));
+                        LOG_FATAL("entities:unit", "next fire in %d", events.GetNextEventTime() - events.GetTimer());
+                        break;
+                    default:
+                        break;
+                    }
+                }
             }
         }
+        EventMap events;
     };
+
 
 private:
     bool isEnabled;
-
 
 };
 
