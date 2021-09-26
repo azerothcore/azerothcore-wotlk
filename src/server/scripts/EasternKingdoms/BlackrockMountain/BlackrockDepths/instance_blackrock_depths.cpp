@@ -12,17 +12,7 @@
 #define TIMER_TOMB_START        5000
 #define MAX_ENCOUNTER           6
 #define RADIUS_RING_OF_LAW      80.0f
-
-
-enum EmperorYellDistances
-{
-
-    EMPEROR_YELL_DIST_1 = 12500, // == .distance * 100, because no floats in enums
-    EMPEROR_YELL_DIST_2 = 7100,
-    EMPEROR_YELL_DIST_3 = 9850,
-    EMPEROR_YELL_DIST_4 = 4500,
-    EMPEROR_YELL_DIST_5 = 2620
-};
+#define DISTANCE_EMPEROR_ROOM 125
 
 enum Creatures
 {
@@ -173,6 +163,45 @@ public:
         std::vector<ObjectGuid> EmperorSenatorsVector;
         Position EmperorSpawnPos;
 
+        bool MoiraSaved = false;
+
+        void OnPlayerEnter(Player* player) override
+        {
+            Map::PlayerList const& lPlayers = instance->GetPlayers();
+            MoiraSaved = true;
+            if (!lPlayers.isEmpty())
+            {
+                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        bool hasSavedPrincess = (player->GetQuestStatus(4004) == QUEST_STATUS_REWARDED) || (player->GetQuestStatus(4363) == QUEST_STATUS_REWARDED);
+                        LOG_FATAL("Entities:Unit", "found player %s, has done quest %d", player->GetName(), hasSavedPrincess);
+                        if (!hasSavedPrincess)
+                        {
+                            MoiraSaved = false;
+                        }
+                    }
+                }
+            }
+            if (MoiraSaved)
+            {
+                ReplacePrincessWithPriestess();
+            }
+            LOG_FATAL("Entities:unit", "in BRD, this group has saved princess status %d, true to int is %d", MoiraSaved, true);
+        }
+
+        void ReplacePrincessWithPriestess()
+        {
+            LOG_FATAL("Entities:unit", "figuring out how to replace the princess here");
+            if (Creature* moira = instance->GetCreature(MoiraGUID))
+            {
+                moira->RemoveFromWorld();
+                Position  priestessPosition = Position(1385.30, -831.77, -87.5, 1.63);
+                Creature* priestess         = instance->SummonCreature(10076, priestessPosition);
+            }
+        }
+
         void Initialize() override
         {
             memset(&encounter, 0, sizeof(encounter));
@@ -190,7 +219,6 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            int toEmperorYell = -1; // used by case senator
             switch (creature->GetEntry())
             {
                 case NPC_EMPEROR:
@@ -252,59 +280,19 @@ public:
                     if (creature->GetDistance2d(CenterOfRingOfLaw.GetPositionX(), CenterOfRingOfLaw.GetPositionY()) < RADIUS_RING_OF_LAW)
                     {
                         ArenaSpectators.push_back(creature->GetGUID());
-                        LOG_FATAL("Entities:Unit", "adding a spectator at %f %f", creature->GetPositionX(), creature->GetPositionY());
                     }
                     break;
                 case NPC_SHADOWFORGE_SENATOR:
-                    // if I force distance here
-                    /*
-                    toEmperorYell = MapSenatorToEmperorYell(creature);
-                    if (toEmperorYell >= 0 && toEmperorYell < 5)
-                    {
-                        if (!EmperorSenators[toEmperorYell].IsCreature())
-                        {
-                            LOG_FATAL("ENtities:Unit", "Adding senator %d at position %f %f", toEmperorYell, creature->GetPositionX(), creature->GetPositionY());
-                            EmperorSenators[toEmperorYell] = creature->GetGUID();
-                        }
-                    }*/
-
-                    // proportional implementation here
-                    if (creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()) < EMPEROR_YELL_DIST_1)
+                    // keep track of Senators that are not too far from emperor. Can't really use emperor as creature due to him possibly not being spawned.
+                    // some senators spawn at ring of law
+                    if (creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()) < DISTANCE_EMPEROR_ROOM)
                     {
                         EmperorSenatorsVector.push_back(creature->GetGUID());
-                        LOG_FATAL("Entities:Unit", "adding a senator at %f %f %f", creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ());
                     }
                     break;
                 default:
                     break;
             }
-        }
-
-        int MapSenatorToEmperorYell(Creature* creature)
-        {
-            float dist = 100*(creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()));
-            if (dist < EMPEROR_YELL_DIST_5) // it's an array of 5, starts at 0
-            {
-                return 4;
-            }
-            else if (dist < EMPEROR_YELL_DIST_4)
-            {
-                return 3;
-            }
-            else if (dist < EMPEROR_YELL_DIST_2) // order is on purpose, the room is made that way.
-            {
-                return 1;
-            }
-            else if (dist < EMPEROR_YELL_DIST_3)
-            {
-                return 2;
-            }
-            else if (dist < EMPEROR_YELL_DIST_1)
-            {
-                return 0;
-            }
-            else // needed because some senators spawn in the ring of law
-                return -1;
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -396,20 +384,6 @@ public:
                     SetData(TYPE_IRON_HALL, DONE);
                     break;
                 case NPC_SHADOWFORGE_SENATOR:
-                    // range implementation here
-                    /*
-                    for (int i = 0; i < 5; i ++)
-                    {
-                        if (EmperorSenators[i]  == unit->GetGUID())
-                        {
-                            if (Creature* emperor = instance->GetCreature(EmperorGUID))
-                            {
-                                emperor->AI()->SetData(0, 1);
-                                LOG_FATAL("ENtities:Unit", "Sending yell for %d, at %f %f ", i, unit->GetPositionX(), unit->GetPositionY());
-                            }
-                        }
-                    }
-                    */
                     deadSenators = 1; //hacky, but we cannot count the unit that just died through its state because OnUnitDeath() is called before the state is set.
                     for (const auto &senatorGUID: EmperorSenatorsVector)
                     {
@@ -419,18 +393,12 @@ public:
                             {
                                 deadSenators++;
                             }
-                            /* else
-                            {
-                                LOG_FATAL("Entities:Unit", "senator at %f %f %f is not dead, status: %d", senator->GetPositionX(), senator->GetPositionY(), senator->GetPositionZ(), senator->getDeathState());
-                            }*/
                         }
                     }
 
                     if (Creature* emperor = instance->GetCreature(EmperorGUID))
                     {
-                        LOG_FATAL("Entities:Unit", "Found %d dead senators out of %d", deadSenators, EmperorSenatorsVector.size());
-                        emperor->AI()->SetData(1, (100 * deadSenators) / EmperorSenatorsVector.size());
-                        
+                        emperor->AI()->SetData(0, (100 * deadSenators) / EmperorSenatorsVector.size());
                     }
                     break;
                 default:

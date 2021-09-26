@@ -33,8 +33,6 @@ public:
         return GetBlackrockDepthsAI<boss_draganthaurissanAI>(creature);
     }
 
-
-
     struct boss_draganthaurissanAI : public ScriptedAI
     {
         boss_draganthaurissanAI(Creature* creature) : ScriptedAI(creature)
@@ -47,7 +45,6 @@ public:
         uint32 AvatarOfFlame_Timer;
         uint32          hasYelled = 0;
         uint32          SenatorYells[5] = {3, 4, 5, 6, 7};
-        uint32          hasYelledProportional = 0;
         //uint32 Counter;
 
         void Reset() override
@@ -59,7 +56,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            if (hasYelledProportional != 5)
+            if (hasYelled != 5)
             {
                 Talk(YELL_SENATORS_ALIVE);
             }
@@ -78,27 +75,16 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            if (type == SENATOR_DIED)
+            if (type == 0)
             {
-                if (data == 1)
+                if (data >= 20 * (hasYelled + 1))
                 {
                     if (hasYelled < 5)
                     {
                         Talk(SenatorYells[hasYelled]);
-                    }
-                    hasYelled++;
-                }
-            }
-            if (type == 1)
-            {
-                if (data >= 20*(hasYelledProportional+1))
-                {
-                    if (hasYelledProportional < 5)
-                    {
-                        Talk(SenatorYells[hasYelledProportional]);
                         LOG_FATAL("Entities:unit", "Yelling for hasYelled: %d, SenatorYells: %d after data %d", hasYelledProportional, SenatorYells[hasYelledProportional], data);
                     }
-                    hasYelledProportional++;
+                    hasYelled++;
                 }
             }
         }
@@ -125,7 +111,6 @@ public:
                     DoCast(target, SPELL_HANDOFTHAURISSAN);
 
                 HandOfThaurissan_Timer = 5000;
-
             }
             else HandOfThaurissan_Timer -= diff;
 

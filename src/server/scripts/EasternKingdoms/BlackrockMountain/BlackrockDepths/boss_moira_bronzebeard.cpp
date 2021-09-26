@@ -105,7 +105,96 @@ public:
     };
 };
 
+
+
+
+class boss_high_priestess_thaurissan : public CreatureScript
+{
+public:
+    boss_high_priestess_thaurissan() : CreatureScript("boss_high_priestess_thaurissan") {}
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetBlackrockDepthsAI<boss_high_priestess_thaurissanAI>(creature);
+    }
+
+    struct boss_high_priestess_thaurissanAI : public BossAI
+    {
+        boss_high_priestess_thaurissanAI(Creature* creature) : BossAI(creature, DATA_PRIESTESS) {}
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            _EnterCombat();
+            events.ScheduleEvent(SPELL_MINDBLAST, urand(17000, 20000));
+            events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(500, 1000));
+            events.ScheduleEvent(SPELL_HEAL, urand(8000, 10000));
+            events.ScheduleEvent(SPELL_SMITE, urand(8000, 10000));
+            events.ScheduleEvent(SPELL_SHIELD, urand(8000, 10000));
+
+            Talk(0);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case SPELL_MINDBLAST:
+                    DoCastVictim(SPELL_MINDBLAST);
+                    events.ScheduleEvent(SPELL_MINDBLAST, urand(8000, 10000));
+                    break;
+                case SPELL_SHADOWWORDPAIN:
+                    DoCastVictim(SPELL_SHADOWWORDPAIN);
+                    events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(8000, 10000));
+                    break;
+                case SPELL_HEAL:
+                    CastOnEmperorIfPossible(SPELL_HEAL);
+                    break;
+                case SPELL_SHIELD:
+                    CastOnEmperorIfPossible(SPELL_SHIELD);
+                    break;
+                case SPELL_RENEW:
+                    CastOnEmperorIfPossible(SPELL_RENEW);
+                default:
+                    break;
+                }
+            }
+        }
+
+        void CastOnEmperorIfPossible(uint32 spell)
+        {
+            Creature* emperor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EMPEROR));
+            Creature* target  = nullptr;
+            if (emperor && emperor->HealthBelowPct(90))
+            {
+                DoCast(emperor, spell);
+            }
+            else if (HealthBelowPct(90))
+            {
+                DoCastSelf(spell);
+            }
+            events.ScheduleEvent(spell, urand(8000, 10000));
+        }
+    };
+};
+
+
+
 void AddSC_boss_moira_bronzebeard()
 {
     new boss_moira_bronzebeard();
+}
+
+void AddSC_boss_high_priestess_thaurissan()
+{
+    new boss_high_priestess_thaurissan();
 }
