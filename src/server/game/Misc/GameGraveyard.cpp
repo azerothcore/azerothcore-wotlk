@@ -106,9 +106,21 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
     // Fetch the graveyards linked to the areaId first, presumably the closer ones.
     GraveyardMapBounds range = GraveyardStore.equal_range(areaId);
 
-    // No graveyards linked to the areaId given, search zone.
+    // No graveyards linked to the area, search zone.
     if (range.first == range.second)
+    {
         range = GraveyardStore.equal_range(zoneId);
+    }
+    else // Found a graveyard linked to the area, check if it's a valid one.
+    {
+        GraveyardData const& graveyardLink = range.first->second;
+
+        if (!graveyardLink.IsNeutralOrFriendlyToTeam(teamId))
+        {
+            // Not a friendly or neutral graveyard, search zone.
+            range = GraveyardStore.equal_range(zoneId);
+        }
+    }
 
     MapEntry const* map = sMapStore.LookupEntry(MapId);
 
@@ -136,17 +148,16 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
 
     for (; range.first != range.second; ++range.first)
     {
-        GraveyardData const& data = range.first->second;
-        GraveyardStruct const* entry = sGraveyard->GetGraveyard(data.safeLocId);
+        GraveyardData const& graveyardLink = range.first->second;
+        GraveyardStruct const* entry = sGraveyard->GetGraveyard(graveyardLink.safeLocId);
         if (!entry)
         {
-            LOG_ERROR("sql.sql", "Table `graveyard_zone` has record for not existing `game_graveyard` table %u, skipped.", data.safeLocId);
+            LOG_ERROR("sql.sql", "Table `graveyard_zone` has record for not existing `game_graveyard` table %u, skipped.", graveyardLink.safeLocId);
             continue;
         }
 
-        // skip enemy faction graveyard
-        // team == 0 case can be at call from .neargrave
-        if (data.teamId != TEAM_NEUTRAL && teamId != TEAM_NEUTRAL && data.teamId != teamId)
+        // Skip enemy faction graveyard.
+        if (!graveyardLink.IsNeutralOrFriendlyToTeam(teamId))
             continue;
 
         // find now nearest graveyard at other map
