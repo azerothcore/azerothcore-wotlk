@@ -21,7 +21,7 @@ enum Spells
     SPELL_AVATAROFFLAME                                    = 15636
 };
 
-#define SENATOR_DIED 0
+#define PERCENT_DEAD_SENATORS 0
 
 class boss_emperor_dagran_thaurissan : public CreatureScript
 {
@@ -35,11 +35,10 @@ public:
 
     struct boss_draganthaurissanAI : public BossAI
     {
-        boss_draganthaurissanAI(Creature* creature) : BossAI(creature, DATA_EMPEROR){}
-
-        uint32 hasYelled = 0;
+        uint32 hasYelled       = 0;
         uint32 SenatorYells[5] = {3, 4, 5, 6, 7}; // IDs in creature_text database
 
+        boss_draganthaurissanAI(Creature* creature) : BossAI(creature, DATA_EMPEROR){}
 
         void EnterCombat(Unit* /*who*/) override
         {
@@ -64,9 +63,9 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            if (type == 0)
+            if (type == PERCENT_DEAD_SENATORS)
             {
-                if (data >= 20 * (hasYelled + 1))
+                if (data >= 20 * (hasYelled + 1)) // map the 5 yells to %. Yell after 20,40,60,80,100%
                 {
                     if (hasYelled < 5)
                     {
@@ -110,9 +109,11 @@ public:
                 case SPELL_AVATAROFFLAME:
                     DoCastSelf(SPELL_AVATAROFFLAME);
                     events.ScheduleEvent(SPELL_AVATAROFFLAME, urand(23000, 27000));
+                    break;
+                default:
+                    break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };

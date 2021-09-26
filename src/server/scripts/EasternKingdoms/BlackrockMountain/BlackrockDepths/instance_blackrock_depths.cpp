@@ -12,7 +12,7 @@
 #define TIMER_TOMB_START        5000
 #define MAX_ENCOUNTER           6
 #define RADIUS_RING_OF_LAW      80.0f
-#define DISTANCE_EMPEROR_ROOM 125
+#define DISTANCE_EMPEROR_ROOM   125
 
 enum Creatures
 {
@@ -27,6 +27,7 @@ enum Creatures
     NPC_DOOMREL                 = 9039,
     NPC_MAGMUS                  = 9938,
     NPC_MOIRA                   = 8929,
+    NPC_PRIESTESS               = 10076,
 
     NPC_WATCHMAN_DOOMGRIP       = 9476,
 
@@ -43,6 +44,12 @@ enum Creatures
     NPC_SHADOWFORCE_CITIZEN     = 8902,
 
     NPC_SHADOWFORGE_SENATOR     = 8904
+};
+
+enum PrincessQuests
+{
+    PRINCESS_QUEST_HORDE        = 4004,
+    PRINCESS_QUEST_ALLIANCE     = 4363
 };
 
 enum GameObjects
@@ -119,6 +126,7 @@ public:
         ObjectGuid PhalanxGUID;
         ObjectGuid MagmusGUID;
         ObjectGuid MoiraGUID;
+        ObjectGuid PriestessGUID;
 
         ObjectGuid IronhandGUID[6];
 
@@ -167,6 +175,7 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
+            // search if all players have saved the princess, then replace.
             Map::PlayerList const& lPlayers = instance->GetPlayers();
             MoiraSaved = true;
             if (!lPlayers.isEmpty())
@@ -175,8 +184,8 @@ public:
                 {
                     if (Player* player = itr->GetSource())
                     {
-                        bool hasSavedPrincess = (player->GetQuestStatus(4004) == QUEST_STATUS_REWARDED) || (player->GetQuestStatus(4363) == QUEST_STATUS_REWARDED);
-                        LOG_FATAL("Entities:Unit", "found player %s, has done quest %d", player->GetName(), hasSavedPrincess);
+                        bool hasSavedPrincess = (player->GetQuestStatus(PRINCESS_QUEST_HORDE) == QUEST_STATUS_REWARDED)
+                                                    || (player->GetQuestStatus(PRINCESS_QUEST_ALLIANCE) == QUEST_STATUS_REWARDED);
                         if (!hasSavedPrincess)
                         {
                             MoiraSaved = false;
@@ -188,17 +197,16 @@ public:
             {
                 ReplacePrincessWithPriestess();
             }
-            LOG_FATAL("Entities:unit", "in BRD, this group has saved princess status %d, true to int is %d", MoiraSaved, true);
         }
 
         void ReplacePrincessWithPriestess()
         {
-            LOG_FATAL("Entities:unit", "figuring out how to replace the princess here");
             if (Creature* moira = instance->GetCreature(MoiraGUID))
             {
+                Position priestessPosition = moira->GetPosition();
                 moira->RemoveFromWorld();
-                Position  priestessPosition = Position(1385.30, -831.77, -87.5, 1.63);
-                Creature* priestess         = instance->SummonCreature(10076, priestessPosition);
+                Creature* priestess = instance->SummonCreature(NPC_PRIESTESS, priestessPosition);
+                PrincessGUID = priestess->GetGUID();
             }
         }
 
@@ -398,6 +406,7 @@ public:
 
                     if (Creature* emperor = instance->GetCreature(EmperorGUID))
                     {
+                        // send % of senators that died
                         emperor->AI()->SetData(0, (100 * deadSenators) / EmperorSenatorsVector.size());
                     }
                     break;
@@ -465,30 +474,23 @@ public:
                     break;
                 case TYPE_IRON_HALL:
                     encounter[5] = data;
-                    if (data == IN_PROGRESS)
+                    switch (data)
                     {
+                    case NOT_STARTED:
+                    case IN_PROGRESS: // use a fall-through from not_started, we set to true only if IN_PROGRESS
                         for (int i = 0; i < 6; i++)
                         {
                             if (Creature* ironhand = instance->GetCreature(IronhandGUID[i]))
                             {
-                                ironhand->AI()->SetData(0, 1);
+                                ironhand->AI()->SetData(0, data == IN_PROGRESS);
                             }
                         }
-
-                    }
-                    if (data == NOT_STARTED)
-                    {
-                        for (int i = 0; i < 6; i++)
-                        {
-                            if (Creature* ironhand = instance->GetCreature(IronhandGUID[i]))
-                            {
-                                ironhand->AI()->SetData(0, 0);
-                            }
-                        }
-                    }
-                    if (data == DONE)
-                    {
+                        break;
+                    case DONE:
                         HandleGameObject(GetGuidData(DATA_THRONE_DOOR), true);
+                        break;
+                    default:
+                        break;
                     }
                     break;
                 case DATA_GHOSTKILL:
