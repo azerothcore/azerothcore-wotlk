@@ -28,7 +28,6 @@ enum SpellTimers
     TIMER_RENEW       = 12000
 };
 
-
 struct boss_moira_bronzebeardAI : public BossAI
 {
     boss_moira_bronzebeardAI(Creature* creature) : BossAI(creature, DATA_MOIRA) {}
@@ -101,7 +100,6 @@ struct boss_moira_bronzebeardAI : public BossAI
     }
 };
 
-
 // high priestess should be identical to Moira except that she talks on combat start.
 // Running away when emperor dies is handled through GUID from emperor, therefore not relevant here.
 struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
@@ -115,7 +113,6 @@ struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
     }
 };
 
-
 class boss_moira_bronzebeard : public CreatureScript
 {
 public:
@@ -127,7 +124,6 @@ public:
     }
 };
 
-
 class boss_high_priestess_thaurissan : public CreatureScript
 {
 public:
@@ -138,7 +134,6 @@ public:
         return GetBlackrockDepthsAI<boss_high_priestess_thaurissanAI>(creature);
     }
 };
-
 
 void AddSC_boss_moira_bronzebeard()
 {

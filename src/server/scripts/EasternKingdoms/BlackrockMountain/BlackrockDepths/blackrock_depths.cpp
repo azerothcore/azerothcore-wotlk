@@ -19,7 +19,6 @@
 
 uint32 braziersUsed = 0;
 
-
 //go_shadowforge_brazier
 class go_shadowforge_brazier : public GameObjectScript
 {
@@ -47,7 +46,6 @@ public:
         return false;
     }
 };
-
 
 class ironhand_guardian : public CreatureScript
 {
