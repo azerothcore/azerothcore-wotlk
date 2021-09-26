@@ -174,7 +174,7 @@ public:
 
         bool MoiraSaved = false;
 
-        void OnPlayerEnter(Player* player) override
+        void OnPlayerEnter(Player* /* player */) override
         {
             // search if all players have saved the princess, then replace.
             Map::PlayerList const lPlayers = instance->GetPlayers();
