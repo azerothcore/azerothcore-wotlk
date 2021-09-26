@@ -102,11 +102,6 @@ public:
         }
         EventMap events;
     };
-
-
-private:
-    bool isEnabled;
-
 };
 
 enum eChallenge
@@ -191,7 +186,7 @@ public:
         npc_grimstoneAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
-            MobSpawnId = rand() % 6;
+            MobSpawnId = urand(0,5);
             eventPhase = 0;
             eventTimer = 1000;
             theldrenEvent = false;
@@ -277,7 +272,7 @@ public:
                     me->SummonCreature(theldrenTeam[i], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
             }
             else
-                me->SummonCreature(RingBoss[rand() % 6], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                me->SummonCreature(RingBoss[urand(0,5)], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
         }
 
         void UpdateEscortAI(uint32 diff) override

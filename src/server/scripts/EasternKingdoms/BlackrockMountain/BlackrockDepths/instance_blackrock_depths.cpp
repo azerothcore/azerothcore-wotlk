@@ -206,7 +206,7 @@ public:
                 Position priestessPosition = moira->GetPosition();
                 moira->RemoveFromWorld();
                 Creature* priestess = instance->SummonCreature(NPC_PRIESTESS, priestessPosition);
-                PrincessGUID = priestess->GetGUID();
+                PriestessGUID = priestess->GetGUID();
             }
         }
 
@@ -443,7 +443,7 @@ public:
                         {
                             if(Creature* spectator = instance->GetCreature(itr))
                             {
-                                spectator->setFaction(34);
+                                spectator->setFaction(FACTION_NEUTRAL);
                             }
                         }
                     }

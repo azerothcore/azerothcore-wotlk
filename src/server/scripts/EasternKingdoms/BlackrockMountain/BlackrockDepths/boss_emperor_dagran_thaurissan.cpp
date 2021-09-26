@@ -21,7 +21,7 @@ enum Spells
     SPELL_AVATAROFFLAME                                    = 15636
 };
 
-#define PERCENT_DEAD_SENATORS 0
+#define DATA_PERCENT_DEAD_SENATORS 0
 
 class boss_emperor_dagran_thaurissan : public CreatureScript
 {
@@ -63,7 +63,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            if (type == PERCENT_DEAD_SENATORS)
+            if (type == DATA_PERCENT_DEAD_SENATORS)
             {
                 if (data >= 20 * (hasYelled + 1)) // map the 5 yells to %. Yell after 20,40,60,80,100%
                 {

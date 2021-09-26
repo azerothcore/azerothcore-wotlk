@@ -12,7 +12,7 @@
 
 enum FactionIds
 {
-    FACTION_NEUTRAL            = 734,
+    FACTION_NEUTRAL            = 674,
     FACTION_HOSTILE            = 754,
     FACTION_FRIEND             = 35
 };

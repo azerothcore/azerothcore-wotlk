@@ -116,7 +116,6 @@ struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
 };
 
 
-
 class boss_moira_bronzebeard : public CreatureScript
 {
 public:
@@ -129,7 +128,6 @@ public:
 };
 
 
-
 class boss_high_priestess_thaurissan : public CreatureScript
 {
 public:
@@ -140,7 +138,6 @@ public:
         return GetBlackrockDepthsAI<boss_high_priestess_thaurissanAI>(creature);
     }
 };
-
 
 
 void AddSC_boss_moira_bronzebeard()
