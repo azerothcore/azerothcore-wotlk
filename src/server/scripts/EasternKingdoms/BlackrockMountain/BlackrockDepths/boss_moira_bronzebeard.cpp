@@ -28,6 +28,95 @@ enum SpellTimers
     TIMER_RENEW       = 12000
 };
 
+
+struct boss_moira_bronzebeardAI : public BossAI
+{
+    boss_moira_bronzebeardAI(Creature* creature) : BossAI(creature, DATA_MOIRA) {}
+    boss_moira_bronzebeardAI(Creature* creature, uint32 data) : BossAI(creature, data) {}
+    void EnterCombat(Unit* /*who*/) override
+    {
+        _EnterCombat();
+        events.ScheduleEvent(SPELL_MINDBLAST, urand(17000, 20000));
+        events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(1000, 1500));
+        events.ScheduleEvent(SPELL_HEAL, urand(2000, 5000));
+        events.ScheduleEvent(SPELL_SMITE, urand(4000, 8000));
+        events.ScheduleEvent(SPELL_SHIELD, urand(8000, 10000));
+        events.ScheduleEvent(SPELL_RENEW, urand(TIMER_RENEW, TIMER_RENEW));
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case SPELL_MINDBLAST:
+                DoCastVictim(SPELL_MINDBLAST);
+                events.ScheduleEvent(SPELL_MINDBLAST, urand(TIMER_MINDBLAST - 2000, TIMER_MINDBLAST + 2000));
+                break;
+            case SPELL_SHADOWWORDPAIN:
+                DoCastVictim(SPELL_SHADOWWORDPAIN);
+                events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(TIMER_SHADOW_WORD - 2000, TIMER_SHADOW_WORD + 2000));
+                break;
+            case SPELL_SMITE:
+                DoCastVictim(SPELL_SMITE);
+                events.ScheduleEvent(SPELL_SMITE, urand(TIMER_SMITE - 2000, TIMER_SMITE + 2000));
+                break;
+            case SPELL_HEAL:
+                CastOnEmperorIfPossible(SPELL_HEAL, TIMER_HEAL);
+                break;
+            case SPELL_SHIELD:
+                CastOnEmperorIfPossible(SPELL_SHIELD, TIMER_SHIELD);
+                break;
+            case SPELL_RENEW:
+                CastOnEmperorIfPossible(SPELL_RENEW, TIMER_RENEW);
+            default:
+                break;
+            }
+        }
+        DoMeleeAttackIfReady();
+    }
+
+    void CastOnEmperorIfPossible(uint32 spell, uint32 timer)
+    {
+        Creature* emperor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EMPEROR));
+        Creature* target  = nullptr;
+        if (emperor && emperor->HealthBelowPct(90))
+        {
+            DoCast(emperor, spell);
+        }
+        else if (HealthBelowPct(90))
+        {
+            DoCastSelf(spell);
+        }
+        events.ScheduleEvent(spell, urand(timer - 2000, timer + 2000));
+    }
+};
+
+
+// high priestess should be identical to Moira except that she talks on combat start.
+// Running away when emperor dies is handled through GUID from emperor, therefore not relevant here.
+struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
+{
+    boss_high_priestess_thaurissanAI(Creature* creature) : boss_moira_bronzebeardAI(creature, DATA_PRIESTESS) {}
+
+    void EnterCombat(Unit* /*who*/) override
+    {
+        boss_moira_bronzebeardAI::EnterCombat(nullptr);
+        Talk(0);
+    }
+};
+
+
+
 class boss_moira_bronzebeard : public CreatureScript
 {
 public:
@@ -37,83 +126,7 @@ public:
     {
         return GetBlackrockDepthsAI<boss_moira_bronzebeardAI>(creature);
     }
-
-    struct boss_moira_bronzebeardAI : public BossAI
-    {
-        boss_moira_bronzebeardAI(Creature* creature) : BossAI(creature, DATA_MOIRA) {}
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _EnterCombat();
-            events.ScheduleEvent(SPELL_MINDBLAST, urand(17000, 20000));
-            events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(500, 1000));
-            events.ScheduleEvent(SPELL_HEAL, urand(8000, 10000));
-            events.ScheduleEvent(SPELL_SMITE, urand(8000, 10000));
-            events.ScheduleEvent(SPELL_SHIELD, urand(8000, 10000));
-            events.ScheduleEvent(SPELL_RENEW, urand(TIMER_RENEW, TIMER_RENEW));
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case SPELL_MINDBLAST:
-                    DoCastVictim(SPELL_MINDBLAST);
-                    events.ScheduleEvent(SPELL_MINDBLAST, urand(TIMER_MINDBLAST-2000, TIMER_MINDBLAST+2000));
-                    break;
-                case SPELL_SHADOWWORDPAIN:
-                    DoCastVictim(SPELL_SHADOWWORDPAIN);
-                    events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(TIMER_SHADOW_WORD - 2000, TIMER_SHADOW_WORD+2000));
-                    break;
-                case SPELL_SMITE:
-                    DoCastVictim(SPELL_SMITE);
-                    events.ScheduleEvent(SPELL_SMITE, urand(TIMER_SMITE - 2000, TIMER_SMITE+2000));
-                    break;
-                case SPELL_HEAL:
-                    CastOnEmperorIfPossible(SPELL_HEAL, TIMER_HEAL);
-                    break;
-                case SPELL_SHIELD:
-                    CastOnEmperorIfPossible(SPELL_SHIELD, TIMER_SHIELD);
-                    break;
-                case SPELL_RENEW:
-                    CastOnEmperorIfPossible(SPELL_RENEW, TIMER_RENEW);
-                default:
-                    break;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-
-
-        void CastOnEmperorIfPossible(uint32 spell, uint32 timer)
-        {
-            Creature* emperor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EMPEROR));
-            Creature* target  = nullptr;
-            if (emperor && emperor->HealthBelowPct(90))
-            {
-                DoCast(emperor, spell);
-            }
-            else if (HealthBelowPct(90))
-            {
-                DoCastSelf(spell);
-            }
-            events.ScheduleEvent(spell, urand(timer-2000, timer+2000));
-        }
-    };
 };
-
-
-
 
 
 
@@ -126,80 +139,6 @@ public:
     {
         return GetBlackrockDepthsAI<boss_high_priestess_thaurissanAI>(creature);
     }
-
-    struct boss_high_priestess_thaurissanAI : public BossAI
-    {
-        boss_high_priestess_thaurissanAI(Creature* creature) : BossAI(creature, DATA_PRIESTESS) {}
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            _EnterCombat();
-            events.ScheduleEvent(SPELL_MINDBLAST, urand(17000, 20000));
-            events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(500, 1000));
-            events.ScheduleEvent(SPELL_HEAL, urand(8000, 10000));
-            events.ScheduleEvent(SPELL_SMITE, urand(8000, 10000));
-            events.ScheduleEvent(SPELL_SHIELD, urand(8000, 10000));
-            events.ScheduleEvent(SPELL_RENEW, urand(TIMER_RENEW, TIMER_RENEW));
-
-            Talk(0);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case SPELL_MINDBLAST:
-                    DoCastVictim(SPELL_MINDBLAST);
-                    events.ScheduleEvent(SPELL_MINDBLAST, urand(TIMER_MINDBLAST - 2000, TIMER_MINDBLAST + 2000));
-                    break;
-                case SPELL_SHADOWWORDPAIN:
-                    DoCastVictim(SPELL_SHADOWWORDPAIN);
-                    events.ScheduleEvent(SPELL_SHADOWWORDPAIN, urand(TIMER_SHADOW_WORD - 2000, TIMER_SHADOW_WORD + 2000));
-                    break;
-                case SPELL_SMITE:
-                    DoCastVictim(SPELL_SMITE);
-                    events.ScheduleEvent(SPELL_SMITE, urand(TIMER_SMITE - 2000, TIMER_SMITE + 2000));
-                    break;
-                case SPELL_HEAL:
-                    CastOnEmperorIfPossible(SPELL_HEAL, TIMER_HEAL);
-                    break;
-                case SPELL_SHIELD:
-                    CastOnEmperorIfPossible(SPELL_SHIELD, TIMER_SHIELD);
-                    break;
-                case SPELL_RENEW:
-                    CastOnEmperorIfPossible(SPELL_RENEW, TIMER_RENEW);
-                default:
-                    break;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-
-        void CastOnEmperorIfPossible(uint32 spell, uint32 timer)
-        {
-            Creature* emperor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EMPEROR));
-            Creature* target  = nullptr;
-            if (emperor && emperor->HealthBelowPct(90))
-            {
-                DoCast(emperor, spell);
-            }
-            else if (HealthBelowPct(90))
-            {
-                DoCastSelf(spell);
-            }
-            events.ScheduleEvent(spell, urand(timer - 2000, timer + 2000));
-        }
-    };
 };
 
 
