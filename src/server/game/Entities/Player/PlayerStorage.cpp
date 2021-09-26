@@ -6150,9 +6150,6 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
                     stmt2->setUInt32(0, m->messageID);
                     pendingAuctionsTrans->Append(stmt2);
 
-                    if (totalMailCount > 0)
-                        --totalMailCount;
-
                     if (unReadMails > 0 && (m->checked & MAIL_CHECK_MASK_READ) == 0)
                         --unReadMails;
 
@@ -6181,11 +6178,6 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
                     if (unReadMails > 0 && (mail->checked & MAIL_CHECK_MASK_READ) == 0)
                     {
                         --unReadMails;
-                    }
-
-                    if (totalMailCount > 0)
-                    {
-                        --totalMailCount;
                     }
 
                     m_mail.erase(std::remove(m_mail.begin(), m_mail.end(), mail));
@@ -7420,8 +7412,6 @@ void Player::_SaveMail(CharacterDatabaseTransaction trans)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
             stmt->setUInt32(0, m->messageID);
             trans->Append(stmt);
-            if (totalMailCount > 0)
-                totalMailCount--;
         }
     }
 

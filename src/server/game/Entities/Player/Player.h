@@ -1563,7 +1563,7 @@ public:
 
     void RemoveMail(uint32 id);
 
-    void AddMail(Mail* mail) { totalMailCount++; m_mail.push_front(mail); }// for call from WorldSession::SendMailTo
+    void AddMail(Mail* mail) { m_mail.push_front(mail); }// for call from WorldSession::SendMailTo
     uint32 GetMailSize() { return m_mail.size();}
     Mail* GetMail(uint32 id);
 
@@ -1574,7 +1574,6 @@ public:
     /*********************************************************/
 
     uint8 unReadMails;
-    uint32 totalMailCount;
     time_t m_nextMailDelivereTime;
 
     typedef std::unordered_map<ObjectGuid::LowType, Item*> ItemMap;
