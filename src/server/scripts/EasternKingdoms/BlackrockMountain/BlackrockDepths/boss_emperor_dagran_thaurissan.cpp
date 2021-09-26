@@ -33,26 +33,13 @@ public:
         return GetBlackrockDepthsAI<boss_draganthaurissanAI>(creature);
     }
 
-    struct boss_draganthaurissanAI : public ScriptedAI
+    struct boss_draganthaurissanAI : public BossAI
     {
-        boss_draganthaurissanAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = me->GetInstanceScript();
-        }
+        boss_draganthaurissanAI(Creature* creature) : BossAI(creature, DATA_EMPEROR){}
 
-        InstanceScript* instance;
-        uint32 HandOfThaurissan_Timer;
-        uint32 AvatarOfFlame_Timer;
-        uint32          hasYelled = 0;
-        uint32          SenatorYells[5] = {3, 4, 5, 6, 7};
-        //uint32 Counter;
+        uint32 hasYelled = 0;
+        uint32 SenatorYells[5] = {3, 4, 5, 6, 7}; // IDs in creature_text database
 
-        void Reset() override
-        {
-            HandOfThaurissan_Timer = 4000;
-            AvatarOfFlame_Timer = 25000;
-            //Counter= 0;
-        }
 
         void EnterCombat(Unit* /*who*/) override
         {
@@ -66,6 +53,8 @@ public:
             }
 
             me->CallForHelp(VISIBLE_RANGE);
+            events.ScheduleEvent(SPELL_HANDOFTHAURISSAN, urand(4000, 7000));
+            events.ScheduleEvent(SPELL_AVATAROFFLAME, urand(10000, 12000));
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -82,7 +71,6 @@ public:
                     if (hasYelled < 5)
                     {
                         Talk(SenatorYells[hasYelled]);
-                        LOG_FATAL("Entities:unit", "Yelling for hasYelled: %d, SenatorYells: %d after data %d", hasYelledProportional, SenatorYells[hasYelledProportional], data);
                     }
                     hasYelled++;
                 }
@@ -105,22 +93,25 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (HandOfThaurissan_Timer <= diff)
-            {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_HANDOFTHAURISSAN);
+            events.Update(diff);
 
-                HandOfThaurissan_Timer = 5000;
-            }
-            else HandOfThaurissan_Timer -= diff;
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-            //AvatarOfFlame_Timer
-            if (AvatarOfFlame_Timer <= diff)
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                DoCastVictim(SPELL_AVATAROFFLAME);
-                AvatarOfFlame_Timer = 18000;
+                switch (eventId)
+                {
+                case SPELL_HANDOFTHAURISSAN:
+                    DoCast(SelectTarget(SELECT_TARGET_RANDOM), SPELL_HANDOFTHAURISSAN);
+                    //DoCastVictim(SPELL_HANDOFTHAURISSAN);
+                    events.ScheduleEvent(SPELL_HANDOFTHAURISSAN, urand(4000, 7000));
+                    break;
+                case SPELL_AVATAROFFLAME:
+                    DoCastSelf(SPELL_AVATAROFFLAME);
+                    events.ScheduleEvent(SPELL_AVATAROFFLAME, urand(23000, 27000));
+                }
             }
-            else AvatarOfFlame_Timer -= diff;
 
             DoMeleeAttackIfReady();
         }
