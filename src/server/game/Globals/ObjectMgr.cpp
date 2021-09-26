@@ -5720,7 +5720,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         bool has_items    = fields[4].GetBool();
         m->expire_time    = time_t(fields[5].GetUInt32());
         m->deliver_time   = time_t(0);
-        m->stationery     = fields[6].GetUInt32();
+        m->stationery     = fields[6].GetUInt8();
         m->checked        = fields[7].GetUInt8();
         m->mailTemplateId = fields[8].GetInt16();
         m->auctionId      = fields[9].GetInt32();
