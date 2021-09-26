@@ -11,6 +11,18 @@
 #define TIMER_TOMBOFTHESEVEN    30000
 #define TIMER_TOMB_START        5000
 #define MAX_ENCOUNTER           6
+#define RADIUS_RING_OF_LAW      80.0f
+
+
+enum EmperorYellDistances
+{
+
+    EMPEROR_YELL_DIST_1 = 12500, // == .distance * 100, because no floats in enums
+    EMPEROR_YELL_DIST_2 = 7100,
+    EMPEROR_YELL_DIST_3 = 9850,
+    EMPEROR_YELL_DIST_4 = 4500,
+    EMPEROR_YELL_DIST_5 = 2620
+};
 
 enum Creatures
 {
@@ -34,7 +46,13 @@ enum Creatures
     NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
     NPC_GOLEM_LORD_ARGELMACH    = 8983,
 
-    NPC_IRONHAND_GUARDIAN       = 8982
+    NPC_IRONHAND_GUARDIAN       = 8982,
+
+    NPC_ARENA_SPECTATOR         = 8916,
+    NPC_SHADOWFORGE_PEASANT     = 8896,
+    NPC_SHADOWFORCE_CITIZEN     = 8902,
+
+    NPC_SHADOWFORGE_SENATOR     = 8904
 };
 
 enum GameObjects
@@ -148,6 +166,13 @@ public:
         GuidList ArgelmachAdds;
         ObjectGuid ArgelmachGUID;
 
+        std::vector<ObjectGuid> ArenaSpectators;
+        Position CenterOfRingOfLaw;
+
+        ObjectGuid EmperorSenators[5];
+        std::vector<ObjectGuid> EmperorSenatorsVector;
+        Position EmperorSpawnPos;
+
         void Initialize() override
         {
             memset(&encounter, 0, sizeof(encounter));
@@ -158,10 +183,14 @@ public:
             TombEventCounter = 0;
             OpenedCoofers = 0;
             IronhandCounter  = 0;
+            ArenaSpectators.clear();
+            CenterOfRingOfLaw = Position(595.289, -186.56);
+            EmperorSpawnPos   = Position(1380.52, -831, 115);
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
+            int toEmperorYell = -1; // used by case senator
             switch (creature->GetEntry())
             {
                 case NPC_EMPEROR:
@@ -214,9 +243,68 @@ public:
                 case NPC_IRONHAND_GUARDIAN:
                     IronhandGUID[IronhandCounter] = creature->GetGUID();
                     IronhandCounter++;
+                    break;
+                case NPC_ARENA_SPECTATOR:
+                    ArenaSpectators.push_back(creature->GetGUID());
+                    break;
+                case NPC_SHADOWFORGE_PEASANT:
+                case NPC_SHADOWFORCE_CITIZEN: // both do the same
+                    if (creature->GetDistance2d(CenterOfRingOfLaw.GetPositionX(), CenterOfRingOfLaw.GetPositionY()) < RADIUS_RING_OF_LAW)
+                    {
+                        ArenaSpectators.push_back(creature->GetGUID());
+                        LOG_FATAL("Entities:Unit", "adding a spectator at %f %f", creature->GetPositionX(), creature->GetPositionY());
+                    }
+                    break;
+                case NPC_SHADOWFORGE_SENATOR:
+                    // if I force distance here
+                    /*
+                    toEmperorYell = MapSenatorToEmperorYell(creature);
+                    if (toEmperorYell >= 0 && toEmperorYell < 5)
+                    {
+                        if (!EmperorSenators[toEmperorYell].IsCreature())
+                        {
+                            LOG_FATAL("ENtities:Unit", "Adding senator %d at position %f %f", toEmperorYell, creature->GetPositionX(), creature->GetPositionY());
+                            EmperorSenators[toEmperorYell] = creature->GetGUID();
+                        }
+                    }*/
+
+                    // proportional implementation here
+                    if (creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()) < EMPEROR_YELL_DIST_1)
+                    {
+                        EmperorSenatorsVector.push_back(creature->GetGUID());
+                        LOG_FATAL("Entities:Unit", "adding a senator at %f %f %f", creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ());
+                    }
+                    break;
                 default:
                     break;
             }
+        }
+
+        int MapSenatorToEmperorYell(Creature* creature)
+        {
+            float dist = 100*(creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()));
+            if (dist < EMPEROR_YELL_DIST_5) // it's an array of 5, starts at 0
+            {
+                return 4;
+            }
+            else if (dist < EMPEROR_YELL_DIST_4)
+            {
+                return 3;
+            }
+            else if (dist < EMPEROR_YELL_DIST_2) // order is on purpose, the room is made that way.
+            {
+                return 1;
+            }
+            else if (dist < EMPEROR_YELL_DIST_3)
+            {
+                return 2;
+            }
+            else if (dist < EMPEROR_YELL_DIST_1)
+            {
+                return 0;
+            }
+            else // needed because some senators spawn in the ring of law
+                return -1;
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -295,6 +383,7 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
+            uint32 deadSenators = 0;
             switch (unit->GetEntry())
             {
                 case NPC_WEAPON_TECHNICIAN:
@@ -305,6 +394,45 @@ public:
                     break;
                 case NPC_MAGMUS:
                     SetData(TYPE_IRON_HALL, DONE);
+                    break;
+                case NPC_SHADOWFORGE_SENATOR:
+                    // range implementation here
+                    /*
+                    for (int i = 0; i < 5; i ++)
+                    {
+                        if (EmperorSenators[i]  == unit->GetGUID())
+                        {
+                            if (Creature* emperor = instance->GetCreature(EmperorGUID))
+                            {
+                                emperor->AI()->SetData(0, 1);
+                                LOG_FATAL("ENtities:Unit", "Sending yell for %d, at %f %f ", i, unit->GetPositionX(), unit->GetPositionY());
+                            }
+                        }
+                    }
+                    */
+                    deadSenators = 1; //hacky, but we cannot count the unit that just died through its state because OnUnitDeath() is called before the state is set.
+                    for (const auto &senatorGUID: EmperorSenatorsVector)
+                    {
+                        if (Creature* senator = instance->GetCreature(senatorGUID))
+                        {
+                            if (!senator->IsAlive() || senator->isDying())
+                            {
+                                deadSenators++;
+                            }
+                            /* else
+                            {
+                                LOG_FATAL("Entities:Unit", "senator at %f %f %f is not dead, status: %d", senator->GetPositionX(), senator->GetPositionY(), senator->GetPositionZ(), senator->getDeathState());
+                            }*/
+                        }
+                    }
+
+                    if (Creature* emperor = instance->GetCreature(EmperorGUID))
+                    {
+                        LOG_FATAL("Entities:Unit", "Found %d dead senators out of %d", deadSenators, EmperorSenatorsVector.size());
+                        emperor->AI()->SetData(1, (100 * deadSenators) / EmperorSenatorsVector.size());
+                        
+                    }
+                    break;
                 default:
                     break;
             }
@@ -332,6 +460,16 @@ public:
             {
                 case TYPE_RING_OF_LAW:
                     encounter[0] = data;
+                    if (data == DONE)
+                    {
+                        for (const auto &itr : ArenaSpectators)
+                        {
+                            if(Creature* spectator = instance->GetCreature(itr))
+                            {
+                                spectator->setFaction(34);
+                            }
+                        }
+                    }
                     break;
                 case TYPE_VAULT:
                     encounter[1] = data;

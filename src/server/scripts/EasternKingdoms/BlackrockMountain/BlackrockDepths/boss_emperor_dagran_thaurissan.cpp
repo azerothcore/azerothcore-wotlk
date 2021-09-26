@@ -10,8 +10,9 @@
 
 enum Yells
 {
-    SAY_AGGRO                                              = 0,
-    SAY_SLAY                                               = 1
+    YELL_SENATORS_ALIVE = 0,
+    YELL_SENATORS_DEAD  = 1,
+    SAY_SLAY            = 2
 };
 
 enum Spells
@@ -19,6 +20,8 @@ enum Spells
     SPELL_HANDOFTHAURISSAN                                 = 17492,
     SPELL_AVATAROFFLAME                                    = 15636
 };
+
+#define SENATOR_DIED 0
 
 class boss_emperor_dagran_thaurissan : public CreatureScript
 {
@@ -30,6 +33,8 @@ public:
         return GetBlackrockDepthsAI<boss_draganthaurissanAI>(creature);
     }
 
+
+
     struct boss_draganthaurissanAI : public ScriptedAI
     {
         boss_draganthaurissanAI(Creature* creature) : ScriptedAI(creature)
@@ -40,6 +45,9 @@ public:
         InstanceScript* instance;
         uint32 HandOfThaurissan_Timer;
         uint32 AvatarOfFlame_Timer;
+        uint32          hasYelled = 0;
+        uint32          SenatorYells[5] = {3, 4, 5, 6, 7};
+        uint32          hasYelledProportional = 0;
         //uint32 Counter;
 
         void Reset() override
@@ -51,7 +59,15 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            Talk(SAY_AGGRO);
+            if (hasYelledProportional != 5)
+            {
+                Talk(YELL_SENATORS_ALIVE);
+            }
+            else
+            {
+                Talk(YELL_SENATORS_DEAD);
+            }
+
             me->CallForHelp(VISIBLE_RANGE);
         }
 
@@ -60,11 +76,39 @@ public:
             Talk(SAY_SLAY);
         }
 
+        void SetData(uint32 type, uint32 data) override
+        {
+            if (type == SENATOR_DIED)
+            {
+                if (data == 1)
+                {
+                    if (hasYelled < 5)
+                    {
+                        Talk(SenatorYells[hasYelled]);
+                    }
+                    hasYelled++;
+                }
+            }
+            if (type == 1)
+            {
+                if (data >= 20*(hasYelledProportional+1))
+                {
+                    if (hasYelledProportional < 5)
+                    {
+                        Talk(SenatorYells[hasYelledProportional]);
+                        LOG_FATAL("Entities:unit", "Yelling for hasYelled: %d, SenatorYells: %d after data %d", hasYelledProportional, SenatorYells[hasYelledProportional], data);
+                    }
+                    hasYelledProportional++;
+                }
+            }
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
             if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOIRA)))
             {
                 Moira->AI()->EnterEvadeMode();
+                Moira->AI()->Talk(0);
                 Moira->setFaction(35);
             }
         }
@@ -80,17 +124,8 @@ public:
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     DoCast(target, SPELL_HANDOFTHAURISSAN);
 
-                //3 Hands of Thaurissan will be cast
-                //if (Counter < 3)
-                //{
-                //    HandOfThaurissan_Timer = 1000;
-                //    ++Counter;
-                //}
-                //else
-                //{
                 HandOfThaurissan_Timer = 5000;
-                //Counter = 0;
-                //}
+
             }
             else HandOfThaurissan_Timer -= diff;
 
