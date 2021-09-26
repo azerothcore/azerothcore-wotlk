@@ -87,7 +87,6 @@ struct boss_moira_bronzebeardAI : public BossAI
     void CastOnEmperorIfPossible(uint32 spell, uint32 timer)
     {
         Creature* emperor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EMPEROR));
-        Creature* target  = nullptr;
         if (emperor && emperor->HealthBelowPct(90))
         {
             DoCast(emperor, spell);

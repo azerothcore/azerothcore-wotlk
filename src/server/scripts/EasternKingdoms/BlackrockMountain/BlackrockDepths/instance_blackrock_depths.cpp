@@ -7,6 +7,7 @@
 #include "blackrock_depths.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+#include "Player.h"
 
 #define TIMER_TOMBOFTHESEVEN    30000
 #define TIMER_TOMB_START        5000
@@ -176,7 +177,7 @@ public:
         void OnPlayerEnter(Player* player) override
         {
             // search if all players have saved the princess, then replace.
-            Map::PlayerList const& lPlayers = instance->GetPlayers();
+            Map::PlayerList const lPlayers = instance->GetPlayers();
             MoiraSaved = true;
             if (!lPlayers.isEmpty())
             {
