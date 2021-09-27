@@ -4262,7 +4262,7 @@ void Player::BuildPlayerRepop()
 
     // the player cannot have a corpse already on current map, only bones which are not returned by GetCorpse
     WorldLocation corpseLocation = GetCorpseLocation();
-    if (corpseLocation.GetMapId() == GetMapId())
+    if (GetCorpse() && corpseLocation.GetMapId() == GetMapId())
     {
         LOG_ERROR("entities.player", "BuildPlayerRepop: player %s (%s) already has a corpse", GetName().c_str(), GetGUID().ToString().c_str());
         return;
