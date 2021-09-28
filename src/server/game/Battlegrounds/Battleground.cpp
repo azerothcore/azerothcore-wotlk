@@ -365,8 +365,14 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
             Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)
                 continue;
+            Pet*  pet = player->GetPet();
+            float x, y, z;
+            player->GetPosition(x, y, z);
             player->ResurrectPlayer(1.0f);
-            player->CastSpell(player, 6962, true);
+            if (!pet)
+            {
+                player->SummonPet(0, x, y, z, player->GetOrientation(), HUNTER_PET, 0, 0, player->GetGUID(), PET_LOAD_BG_RESURRECT);
+            }
             player->CastSpell(player, SPELL_SPIRIT_HEAL_MANA, true);
             player->SpawnCorpseBones(false);
         }
