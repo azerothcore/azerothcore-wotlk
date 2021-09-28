@@ -175,10 +175,35 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     }
 
     // Check if a GM is blocking mail.
-    if (receive && AccountMgr::IsGMAccount(receive->GetSession()->GetSecurity()) && !receive->IsAcceptingMail())
+    if (receive)
     {
-        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
-        return;
+        if (receive->IsNotAcceptingMail())
+        {
+            player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
+            return;
+        }
+    }
+    else
+    {
+        QueryResult result = CharacterDatabase.Query("SELECT guid, extra_flags FROM characters WHERE extra_flags & 2048 = 2048"); // PLAYER_EXTRA_ACCEPT_MAIL
+        uint32 m_flagsExtra = 0;
+        uint32 m_recieveGuid = 0;
+
+        if (result)
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                m_recieveGuid = fields[0].GetUInt32();
+                m_flagsExtra  = fields[1].GetUInt32();
+
+                if (m_recieveGuid == rc.GetCounter())
+                {
+                    player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
+                    return;
+                }
+            } while (result->NextRow());
+        }
     }
 
     //do not allow to have more than 100 mails in mailbox.. mails count is in opcode uint8!!! - so max can be 255..

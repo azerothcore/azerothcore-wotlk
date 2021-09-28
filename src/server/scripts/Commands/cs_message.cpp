@@ -156,7 +156,7 @@ public:
 
         if (!*args)
         {
-            handler->PSendSysMessage(LANG_COMMAND_ACCEPT_MAIL, player->IsAcceptingMail() ? handler->GetAcoreString(LANG_ON) : handler->GetAcoreString(LANG_OFF));
+            handler->PSendSysMessage(LANG_COMMAND_ACCEPT_MAIL, player->IsNotAcceptingMail() ? handler->GetAcoreString(LANG_OFF) : handler->GetAcoreString(LANG_ON));
             return true;
         }
 
