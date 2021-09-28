@@ -5389,7 +5389,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             }
                         }
                         break;
-                    case 66052: // Festive Brewfest Mount
+                    case FRESH_BREWFEST_HOPS: // Festive Brewfest Mount
                         if (target->HasAuraType(SPELL_AURA_MOUNTED) && !target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
                         {
                             uint32 creatureEntry = 0;
