@@ -228,6 +228,9 @@ void Creature::AddToWorld()
             GetVehicleKit()->Install();
 #ifdef ELUNA
         sEluna->OnAddToWorld(this);
+
+    if (IsGuardian() && GetOwnerGUID().IsPlayer())
+        sEluna->OnPetAddedToWorld(GetOwner()->ToPlayer(), this);
 #endif
     }
 }
