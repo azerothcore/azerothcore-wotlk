@@ -287,8 +287,8 @@ namespace lfg
         if (numLfgGroups > 1)
             return LFG_INCOMPATIBLES_MULTIPLE_LFG_GROUPS;
 
-        // Group with less that MAXGROUPSIZE members always compatible
-        if (!sLFGMgr->IsTesting() && !sLFGMgr->IsSoloLFG() && numPlayers != MAXGROUPSIZE) //solo lfg
+        // Solo players are paired together.
+        if (!sLFGMgr->IsTesting() && numPlayers == 1)
         {
             LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(check.front());
             LfgRolesMap roles = itQueue->second.roles;
@@ -385,7 +385,7 @@ namespace lfg
         }
 
         // Enough players?
-        if (!sLFGMgr->IsTesting() && !sLFGMgr->IsSoloLFG() && numPlayers != MAXGROUPSIZE) //solo lfg
+        if (!sLFGMgr->IsTesting() && numPlayers == 1)
         {
             strGuids.addRoles(proposalRoles);
             for (uint8 i = 0; i < 5 && check.guids[i]; ++i)

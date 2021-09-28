@@ -1,9 +1,0 @@
-CU_SET_PATH("CMAKE_LFG_SOLO_DIR" "${CMAKE_CURRENT_LIST_DIR}")
-
-AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/src/Lfg_Solo.cpp")
-
-AC_ADD_SCRIPT_LOADER("LfgSolo"      "${CMAKE_CURRENT_LIST_DIR}/src/loader.h")
-
-AC_ADD_CONFIG_FILE("${CMAKE_CURRENT_LIST_DIR}/conf/SoloLfg.conf.dist")
-
-message("-- Solo LFG CONFIGURED --")
