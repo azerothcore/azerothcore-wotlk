@@ -22,31 +22,6 @@
 ///////////////////////////////////////
 ////// NPCS
 ///////////////////////////////////////
-
-class npc_brewfest_reveler : public CreatureScript
-{
-public:
-    npc_brewfest_reveler() : CreatureScript("npc_brewfest_reveler") { }
-
-    struct npc_brewfest_revelerAI : public ScriptedAI
-    {
-        npc_brewfest_revelerAI(Creature* c) : ScriptedAI(c) {}
-        void ReceiveEmote(Player* player, uint32 emote) override
-        {
-            if (!IsHolidayActive(HOLIDAY_BREWFEST))
-                return;
-
-            if (emote == TEXT_EMOTE_DANCE)
-                me->CastSpell(player, 41586, false);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_brewfest_revelerAI(creature);
-    }
-};
-
 enum corenDirebrew
 {
     FACTION_HOSTILE                 = 754,
@@ -626,6 +601,7 @@ enum darkIronAttack
     NPC_EVENT_GENERATOR                 = 23703,
     NPC_SUPER_BREW_TRIGGER              = 23808,
     NPC_DARK_IRON_HERALD                = 24536,
+    NPC_BREWFEST_REVELER                = 24484,
 
     // Events
     EVENT_CHECK_HOUR                    = 1,
@@ -667,9 +643,20 @@ public:
         SummonList summons;
         uint32 kegCounter, guzzlerCounter;
         uint8 thrown;
+        GuidVector revelerGUIDs;
 
         void Reset() override
         {
+            for (ObjectGuid const& guid : revelerGUIDs)
+            {
+                if (Creature* reveler = ObjectAccessor::GetCreature(*me, guid))
+                {
+                    reveler->SetRespawnDelay(5 * MINUTE);
+                    reveler->Respawn();
+                }
+            }
+            revelerGUIDs.clear();
+
             summons.DespawnAll();
             events.Reset();
             events.ScheduleEvent(EVENT_CHECK_HOUR, 2000);
@@ -805,24 +792,57 @@ public:
 
         void PrepareEvent()
         {
+            std::list<Creature*> revelers;
+            GetCreatureListWithEntryInGrid(revelers, me, NPC_BREWFEST_REVELER, 100.f);
+            for (Creature* reveler : revelers)
+            {
+                revelerGUIDs.push_back(reveler->GetGUID());
+                reveler->SetRespawnDelay(MONTH);
+                reveler->AI()->SetData(0, me->GetMapId());
+            }
+
             Creature* cr;
             if (me->GetMapId() == 1) // Kalimdor
             {
                 if ((cr = me->SummonCreature(NPC_DROHN_KEG, 1183.69f, -4315.15f, 21.1875f, 0.750492f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
+                }
                 if ((cr = me->SummonCreature(NPC_VOODOO_KEG, 1182.42f, -4272.45f, 21.1182f, -1.02974f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
+                }
                 if ((cr = me->SummonCreature(NPC_GORDOK_KEG, 1223.78f, -4296.48f, 21.1707f, -2.86234f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
+                }
             }
             else if (me->GetMapId() == 0) // Eastern Kingdom
             {
                 if ((cr = me->SummonCreature(NPC_BARLEYBREW_KEG, -5187.23f, -599.779f, 397.176f, 0.017453f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
+                }
                 if ((cr = me->SummonCreature(NPC_THUNDERBREW_KEG, -5160.05f, -632.632f, 397.178f, 1.39626f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
+                }
                 if ((cr = me->SummonCreature(NPC_GORDOK_KEG, -5145.75f, -575.667f, 397.176f, -2.28638f)))
+                {
+                    cr->SetReactState(REACT_PASSIVE);
                     summons.Summon(cr);
+                    revelerGUIDs.push_back(cr->GetGUID());
+                }
             }
 
             if ((cr = me->SummonCreature(NPC_DARK_IRON_HERALD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000)))
@@ -948,10 +968,13 @@ public:
         npc_dark_iron_guzzlerAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
+            attacking = false;
         }
 
         uint32 timer;
         ObjectGuid targetGUID;
+        bool attacking;
+
         void EnterCombat(Unit*) override {}
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
@@ -959,6 +982,21 @@ public:
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
+        }
+
+        void MovementInform(uint32 type, uint32 /*id*/) override
+        {
+            if (type != FOLLOW_MOTION_TYPE)
+            {
+                return;
+            }
+
+            if (Unit* target = GetTarget())
+            {
+                timer = 0;
+                attacking = true;
+                me->CastSpell(target, SPELL_ATTACK_KEG, false);
+            }
         }
 
         void FindNextKeg()
@@ -989,9 +1027,12 @@ public:
                 shuffled[index] = entry[i];
             }
 
+            attacking = false;
+
             for (uint8 i = 0; i < 3; ++i)
                 if (Creature* cr = me->FindNearestCreature(shuffled[i], 100.0f))
                 {
+                    cr->SetWalk(true);
                     me->GetMotionMaster()->MoveFollow(cr, 1.0f, cr->GetAngle(me));
                     targetGUID = cr->GetGUID();
                     return;
@@ -1063,10 +1104,18 @@ public:
             timer = 0;
             if (targetGUID)
             {
-                if (Unit* target = GetTarget())
-                    me->CastSpell(target, SPELL_ATTACK_KEG, false);
+                Unit* target = GetTarget();
+                if (target && target->IsAlive())
+                {
+                    if (attacking)
+                    {
+                        me->CastSpell(target, SPELL_ATTACK_KEG, false);
+                    }
+                }
                 else
+                {
                     FindNextKeg();
+                }
             }
         }
     };
@@ -1758,10 +1807,68 @@ public:
     }
 };
 
+enum BrewfestRevelerEnum
+{
+    FACTION_ALLIANCE    = 1934,
+    FACTION_HORDE       = 1935,
+    FACTION_FRIENDLY    = 35,
+
+    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE    = 44003,
+    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE  = 44004,
+    SPELL_BREWFEST_REVELER_TRANSFORM_BE             = 43907,
+    SPELL_BREWFEST_REVELER_TRANSFORM_ORC            = 43914,
+    SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN         = 43915,
+    SPELL_BREWFEST_REVELER_TRANSFORM_TROLL          = 43916,
+    SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD         = 43917
+};
+
+class spell_brewfest_reveler_transform : public SpellScriptLoader
+{
+public:
+    spell_brewfest_reveler_transform() : SpellScriptLoader("spell_brewfest_reveler_transform") {}
+
+    class spell_brewfest_reveler_transform_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_brewfest_reveler_transform_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            uint32 factionId = FACTION_ALLIANCE;
+            switch (m_scriptSpellId)
+            {
+                case SPELL_BREWFEST_REVELER_TRANSFORM_BE:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_ORC:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_TROLL:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD:
+                    factionId = FACTION_HORDE;
+                    break;
+                case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
+                case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE:
+                    factionId = FACTION_FRIENDLY;
+                    break;
+                default:
+                    break;
+            }
+
+            GetTarget()->setFaction(factionId);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_brewfest_reveler_transform_AuraScript::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_brewfest_reveler_transform_AuraScript();
+    }
+};
+
 void AddSC_event_brewfest_scripts()
 {
     // Npcs
-    new npc_brewfest_reveler();
     new npc_coren_direbrew();
     new npc_coren_direbrew_sisters();
     new npc_brewfest_keg_thrower();
@@ -1783,6 +1890,7 @@ void AddSC_event_brewfest_scripts()
     new spell_brewfest_unfill_keg();
     new spell_brewfest_toss_mug();
     new spell_brewfest_add_mug();
+    new spell_brewfest_reveler_transform();
 
     // beer effect
     new npc_brew_bubble();

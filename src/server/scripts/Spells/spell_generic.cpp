@@ -5454,6 +5454,42 @@ public:
     }
 };
 
+// 7102 Contagion of Rot
+class spell_contagion_of_rot : public SpellScriptLoader
+{
+public:
+    spell_contagion_of_rot() : SpellScriptLoader("spell_contagion_of_rot") {}
+
+    class spell_contagion_of_rot_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_contagion_of_rot_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            // 7103 => triggered spell that spreads to others
+            while (Aura* aur = GetUnitOwner()->GetOwnedAura(7103, ObjectGuid::Empty, ObjectGuid::Empty, 0, GetAura()))
+            {
+                GetUnitOwner()->RemoveOwnedAura(aur);
+            }
+            // 7102 => contagion of rot casted by mobs
+            while (Aura* aur = GetUnitOwner()->GetOwnedAura(7102, ObjectGuid::Empty, ObjectGuid::Empty, 0, GetAura()))
+            {
+                GetUnitOwner()->RemoveOwnedAura(aur);
+            }
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_contagion_of_rot_AuraScript::OnApply, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_contagion_of_rot_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_5000_gold();
@@ -5583,4 +5619,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_eject_passenger();
     new spell_gen_charmed_unit_spell_cooldown();
     new spell_gen_shadowmeld();
+    new spell_contagion_of_rot();
 }
