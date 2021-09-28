@@ -2985,7 +2985,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
     // xinef: send packet so client can properly recognize this new spell
     // xinef: ignore passive spells and spells with learn effect
     // xinef: send spells with no aura effects (ie dual wield)
-    if (IsInWorld() && !isBeingLoaded() && temporary && (learnFromSkill || !spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+    if (IsInWorld() && !isBeingLoaded() && temporary && !learnFromSkill && (!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
         SendLearnPacket(spellInfo->Id, true);
 
     // xinef: DO NOT allow to learn spell with effect learn spell!
@@ -3157,7 +3157,7 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const
             (!form && spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_WHILE_NOT_SHAPESHIFTED)));
 }
 
-void Player::learnSpell(uint32 spellId, bool temporary)
+void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFromSkill /*= false*/)
 {
     // Xinef: don't allow to learn active spell once more
     if (HasActiveSpell(spellId))
@@ -3168,7 +3168,7 @@ void Player::learnSpell(uint32 spellId, bool temporary)
 
     uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
     bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
-    bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true, temporary);
+    bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true, temporary, learnFromSkill);
     if (added)
     {
         sScriptMgr->OnPlayerLearnSpell(this, spellId);
@@ -11249,11 +11249,11 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
 
             if (!IsInWorld())
             {
-                addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true, false);
+                addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true);
             }
             else
             {
-                learnSpell(pAbility->Spell, true);
+                learnSpell(pAbility->Spell, true, true);
             }
         }
     }
@@ -13832,7 +13832,6 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setString(index++, ss.str());
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, 2));
         stmt->setUInt32(index++, m_grantableLevels);
-        stmt->setUInt32(index++, _innTriggerId);
     }
     else
     {
@@ -13971,7 +13970,6 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setString(index++, ss.str());
         stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, 2));
         stmt->setUInt32(index++, m_grantableLevels);
-        stmt->setUInt32(index++, _innTriggerId);
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
         // Index
