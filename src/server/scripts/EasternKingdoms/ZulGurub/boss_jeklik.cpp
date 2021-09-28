@@ -210,6 +210,7 @@ public:
         {
             Bomb_Timer = 2000;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->AddUnitState(UNIT_STATE_ROOT);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -221,16 +222,26 @@ public:
 
             if (Bomb_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                auto const& players = me->GetMap()->GetPlayers();
+                uint32 size = 0;
+                if (!players.isEmpty())
                 {
-                    DoCast(target, SPELL_BOMB);
-                    Bomb_Timer = 5000;
+                    size = players.getSize();
+                    if (size > 1)
+                        size = 1;
+
+                    for (auto const& itr : players)
+                    {
+                        if (auto player = itr.GetSource())
+                        {
+                            me->CastSpell(player, SPELL_BOMB);
+                            Bomb_Timer = 7000;
+                        }
+                    }
                 }
             }
             else
                 Bomb_Timer -= diff;
-
-            DoMeleeAttackIfReady();
         }
     };
 
