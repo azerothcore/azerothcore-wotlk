@@ -185,17 +185,14 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     }
     else
     {
-        QueryResult result = CharacterDatabase.Query("SELECT guid, extra_flags FROM characters WHERE extra_flags & 2048 = 2048"); // PLAYER_EXTRA_ACCEPT_MAIL
-        uint32 m_flagsExtra = 0;
-        uint32 m_recieveGuid = 0;
+        QueryResult result = CharacterDatabase.Query("SELECT guid FROM characters WHERE extra_flags & 2048 = 2048"); // PLAYER_EXTRA_ACCEPT_MAIL
 
         if (result)
         {
             do
             {
                 Field* fields = result->Fetch();
-                m_recieveGuid = fields[0].GetUInt32();
-                m_flagsExtra  = fields[1].GetUInt32();
+                uint32 m_recieveGuid = fields[0].GetUInt32();
 
                 if (m_recieveGuid == rc.GetCounter())
                 {
