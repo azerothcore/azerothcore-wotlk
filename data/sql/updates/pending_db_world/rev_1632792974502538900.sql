@@ -1,5 +1,14 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1632792974502538900');
 
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 17 AND `SourceEntry` = 15702;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(17, 0, 15702, 0, 0, 31, 1, 3, 6556, 0, 0, 0, 0, '', 'Filling Empty Jar can be used on Muculent Ooze'),
+(17, 0, 15702, 0, 1, 31, 1, 3, 6557, 0, 0, 0, 0, '', 'Filling Empty Jar can be used on Muculent Ooze'),
+(17, 0, 15702, 0, 2, 31, 1, 3, 6559, 0, 0, 0, 0, '', 'Filling Empty Jar can be used on Muculent Ooze'),
+(17, 0, 15702, 0, 0, 36, 1, 0, 0, 0, 1, 0, 0, '', 'Target must be dead'),
+(17, 0, 15702, 0, 1, 36, 1, 0, 0, 0, 1, 0, 0, '', 'Target must be dead'),
+(17, 0, 15702, 0, 2, 36, 1, 0, 0, 0, 1, 0, 0, '', 'Target must be dead');
+
 -- Muculent Ooze
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 6556 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
