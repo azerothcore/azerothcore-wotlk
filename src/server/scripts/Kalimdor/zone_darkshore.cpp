@@ -448,9 +448,7 @@ public:
 
     struct npc_twilight_discipline_thug_AI : public ScriptedAI
     {
-        npc_twilight_discipline_thug_AI(Creature* creature) : ScriptedAI(creature)
-        {
-        }
+        npc_twilight_discipline_thug_AI(Creature* creature) : ScriptedAI(creature) { }
 
         bool renew;
         bool heal;
