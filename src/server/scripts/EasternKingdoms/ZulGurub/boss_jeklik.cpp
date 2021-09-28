@@ -222,23 +222,14 @@ public:
 
             if (Bomb_Timer <= diff)
             {
-                auto const& players = me->GetMap()->GetPlayers();
-                uint32 size = 0;
-                if (!players.isEmpty())
-                {
-                    size = players.getSize();
-                    if (size > 1)
-                        size = 1;
+                std::list<Unit*> targets;
+                SelectTargetList(targets, 1, SELECT_TARGET_RANDOM, 500.0f, true);
+                if (!targets.empty())
+                    if (targets.size() > 1)
+                        targets.resize(1);
 
-                    for (auto const& itr : players)
-                    {
-                        if (auto player = itr.GetSource())
-                        {
-                            me->CastSpell(player, SPELL_BOMB);
-                            Bomb_Timer = 7000;
-                        }
-                    }
-                }
+                for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr) me->CastSpell((*itr), SPELL_BOMB);
+                Bomb_Timer = 7000;
             }
             else
                 Bomb_Timer -= diff;
