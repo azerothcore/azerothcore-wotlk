@@ -93,6 +93,11 @@ public:
     }
 };
 
+enum VictoryRushEnum
+{
+    SPELL_VICTORIOUS    = 32216
+};
+
 class spell_warr_victory_rush : public SpellScriptLoader
 {
 public:
@@ -106,12 +111,11 @@ public:
         {
             if (Unit* player = GetCaster())
             {
-                player->ModifyAuraState(AURA_STATE_WARRIOR_VICTORY_RUSH, false);
                 if (Unit* victim = GetHitUnit())
                 {
                     if (victim->isDead())
                     {
-                        player->ModifyAuraState(AURA_STATE_WARRIOR_VICTORY_RUSH, true);
+                        player->CastSpell(player, SPELL_VICTORIOUS, true);
                     }
                 }
             }
