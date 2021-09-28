@@ -5734,15 +5734,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (!target)
                             return SPELL_FAILED_BAD_TARGETS;
 
-                        Position pos;
-                        target->GetChargeContactPoint(m_caster, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-
                         if (m_caster->GetMapId() == 618) // pussywizard: 618 Ring of Valor
-                            pos.m_positionZ = std::max(pos.m_positionZ, 28.28f);
-
-                        float maxdist = m_caster->GetMeleeRange(target);
-                        if (!target->IsInDist(&pos, maxdist))
-                            return SPELL_FAILED_NOPATH;
+                            target->m_positionZ = std::max(target->m_positionZ, 28.28f);
 
                         if (m_caster->GetMapId() == 618) // pussywizard: 618 Ring of Valor
                         {
@@ -5752,7 +5745,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         }
                         else if (m_caster->GetMapId() == 572) // pussywizard: 572 Ruins of Lordaeron
                         {
-                            if (pos.GetPositionX() < 1275.0f || m_caster->GetPositionX() < 1275.0f) // special case (acid)
+                            if (target->GetPositionX() < 1275.0f || m_caster->GetPositionX() < 1275.0f) // special case (acid)
                                 break; // can't force path because the way is around and the path is too long
                         }
 
@@ -5762,10 +5755,12 @@ SpellCastResult Spell::CheckCast(bool strict)
                             break;
 
                         m_pathFinder = new PathGenerator(m_caster);
-                        m_pathFinder->CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.15f, false);
+                        m_pathFinder->CalculatePath(target->m_positionX, target->m_positionY, target->m_positionZ, false);
+                        
                         G3D::Vector3 endPos = m_pathFinder->GetEndPosition(); // also check distance between target and the point calculated by mmaps
-                        if (m_pathFinder->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE) || target->GetExactDistSq(endPos.x, endPos.y, endPos.z) > maxdist * maxdist || m_pathFinder->getPathLength() > (40.0f + (m_caster->HasAura(58097) ? 5.0f : 0.0f)))
+                        if (m_pathFinder->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE) || m_pathFinder->getPathLength() > (40.0f + (m_caster->HasAura(58097) ? 5.0f : 0.0f)))
                             return SPELL_FAILED_NOPATH;
+                        m_pathFinder->ShortenPathUntilDist(target->GetPosition(), m_caster->GetCombatReach());
                     }
                     break;
                 }
