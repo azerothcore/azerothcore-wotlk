@@ -229,8 +229,8 @@ void Creature::AddToWorld()
 #ifdef ELUNA
         sEluna->OnAddToWorld(this);
 
-    if (IsGuardian() && GetOwnerGUID().IsPlayer())
-        sEluna->OnPetAddedToWorld(GetOwner()->ToPlayer(), this);
+    if (IsGuardian() && ToTempSummon() && ToTempSummon()->GetSummonerGUID().IsPlayer())
+        sEluna->OnPetAddedToWorld(ToTempSummon()->GetSummonerUnit()->ToPlayer(), this);
 #endif
     }
 }
