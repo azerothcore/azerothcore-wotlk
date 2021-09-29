@@ -180,7 +180,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
         return;
     }
-    else if (QueryResult result = CharacterDatabase.Query("SELECT guid FROM characters WHERE extra_flags & 2048 = 2048");) // PLAYER_EXTRA_ACCEPT_MAIL
+    else if (QueryResult result = CharacterDatabase.Query("SELECT guid FROM characters WHERE extra_flags & 2048 = 2048")) // PLAYER_EXTRA_ACCEPT_MAIL
     {
         do
         {
