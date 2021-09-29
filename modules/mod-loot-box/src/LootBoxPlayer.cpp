@@ -34,13 +34,13 @@ public:
 
     void OnCreatureKill(Player *killer, Creature *killed) override
     {
-        if (killed->IsDungeonBoss())
+        if (killed && killed->IsDungeonBoss())
             giveCurrency(killer);
     }
 
     void OnCreatureKilledByPet(Player* owner, Creature* killed) override
     {
-        if (killed->IsDungeonBoss())
+        if (killed && killed->IsDungeonBoss())
             giveCurrency(owner);
     }
 
