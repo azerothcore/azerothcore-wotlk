@@ -1,9 +1,7 @@
-brew remove openssl@3
-
 ##########################################
 ## workaround to fix macos-10.15 configure os from failing
-brew reinstall openssl@1.1
-rm '/usr/local/bin/2to3'
+#brew reinstall openssl@1.1
+#rm '/usr/local/bin/2to3'
 ##########################################
 
 brew update
