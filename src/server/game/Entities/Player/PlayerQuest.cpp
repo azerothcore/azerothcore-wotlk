@@ -8,7 +8,7 @@
 #include "DisableMgr.h"
 #include "GameObjectAI.h"
 #include "Group.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
 #include "ReputationMgr.h"
@@ -82,6 +82,20 @@ void Player::PrepareQuestMenu(ObjectGuid guid)
         else if (GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
             qm.AddMenuItem(quest_id, 2);
     }
+}
+
+bool Player::HasQuest(uint32 questId) const
+{
+    for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (questid == questId)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Player::SendPreparedQuest(ObjectGuid guid)
