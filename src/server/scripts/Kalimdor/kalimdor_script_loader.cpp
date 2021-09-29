@@ -57,6 +57,7 @@ void AddSC_boss_ouro();
 void AddSC_npc_anubisath_sentinel();
 void AddSC_instance_temple_of_ahnqiraj();
 void AddSC_instance_wailing_caverns();       //Wailing caverns
+void AddSC_zulfarrak();
 void AddSC_instance_zulfarrak();             //Zul'Farrak instance script
 void AddSC_ashenvale();
 void AddSC_azshara();
@@ -137,6 +138,7 @@ void AddKalimdorScripts()
     AddSC_npc_anubisath_sentinel();
     AddSC_instance_temple_of_ahnqiraj();
     AddSC_instance_wailing_caverns();       //Wailing caverns
+    AddSC_zulfarrak();
     AddSC_instance_zulfarrak();             //Zul'Farrak instance script
     AddSC_ashenvale();
     AddSC_azshara();
