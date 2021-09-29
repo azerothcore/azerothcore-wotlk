@@ -708,8 +708,7 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
         if (CalendarInvite* invite = sCalendarMgr->GetInvite(inviteId))
         {
             invite->SetStatus((CalendarInviteStatus)status);
-            // not sure if we should set response time when moderator changes invite status
-            //invite->SetStatusTime(time(nullptr));
+            invite->SetStatusTime(time(nullptr));
 
             sCalendarMgr->UpdateInvite(invite);
             sCalendarMgr->SendCalendarEventStatus(*calendarEvent, *invite);
