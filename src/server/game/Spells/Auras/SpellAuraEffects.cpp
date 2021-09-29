@@ -5420,7 +5420,6 @@ void AuraEffect::HandleChannelDeathItem(AuraApplication const* aurApp, uint8 mod
         return;
 
     Player* plCaster = caster->ToPlayer();
-    Unit* target = aurApp->GetTarget();
 
     // Item amount
     if (GetAmount() <= 0)
