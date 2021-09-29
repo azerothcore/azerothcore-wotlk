@@ -1393,7 +1393,9 @@ public:
             Unit* victim = eventInfo.GetProcTarget();
 
             if (caster && victim)
+            {
                 return victim->GetAuraApplicationOfRankedSpell(SPELL_WARLOCK_DRAIN_SOUL_R1, caster->GetGUID()) != 0;
+            }
 
             return false;
         }
