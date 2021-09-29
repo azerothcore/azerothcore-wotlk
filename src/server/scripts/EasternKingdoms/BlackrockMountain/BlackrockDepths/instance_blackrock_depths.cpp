@@ -8,7 +8,8 @@
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 
-#define TIMER_TOMBOFTHESEVEN    15000
+#define TIMER_TOMBOFTHESEVEN    30000
+#define TIMER_TOMB_START        5000
 #define MAX_ENCOUNTER           6
 
 enum Creatures
@@ -148,7 +149,7 @@ public:
 
             BarAleCount = 0;
             GhostKillCount = 0;
-            TombTimer = TIMER_TOMBOFTHESEVEN;
+            TombTimer = TIMER_TOMB_START;
             TombEventCounter = 0;
             OpenedCoofers = 0;
         }
@@ -583,16 +584,15 @@ public:
                         boss->SetLootRecipient(nullptr);
                     }
                     boss->setFaction(FACTION_FRIEND);
-                    if (i ==  6) // doomrel needs explicit reset
+                    if (i == 6) // doomrel needs explicit reset
                     {
                         boss->AI()->Reset();
                     }
                 }
             }
-
             GhostKillCount = 0;
             TombEventCounter = 0;
-            TombTimer = TIMER_TOMBOFTHESEVEN;
+            TombTimer = TIMER_TOMB_START;
             TombEventStarterGUID.Clear();
             SetData(TYPE_TOMB_OF_SEVEN, NOT_STARTED);
         }
