@@ -273,15 +273,21 @@ void Creature::DisappearAndDie()
 void Creature::SearchFormation()
 {
     if (IsSummon())
+    {
         return;
+    }
 
     ObjectGuid::LowType spawnId = GetSpawnId();
     if (!spawnId)
+    {
         return;
+    }
 
-    CreatureGroupInfoType::iterator frmdata = sFormationMgr->CreatureGroupMap.find(spawnId);
+    CreatureGroupInfoType::const_iterator frmdata = sFormationMgr->CreatureGroupMap.find(spawnId);
     if (frmdata != sFormationMgr->CreatureGroupMap.end())
-        sFormationMgr->AddCreatureToGroup(frmdata->second->leaderGUID, this);
+    {
+        sFormationMgr->AddCreatureToGroup(frmdata->second.leaderGUID, this);
+    }
 }
 
 void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
