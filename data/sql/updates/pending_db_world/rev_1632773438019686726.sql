@@ -1,7 +1,5 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1632773438019686726');
-
-
 DELETE FROM `waypoint_data` WHERE `id`=2190;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
 (2190, 1, -5640.79, -501.86, 396.715, 0, 30000, 0, 0, 100, 0),
 (2190, 2, -5640.07, -497.906, 396.669, 0, 0, 0, 0, 100, 0),
 (2190, 3, -5635.95, -495.509, 396.678, 0, 0, 0, 0, 100, 0),
@@ -56,7 +54,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (18870, 41, -4654.31, -1281.54, 503.382, 0.959392, 75000, 0, 0, 100, 0);
 
 
-DELETE FROM `waypoint_data` WHERE `id`=188700;
+DELETE FROM `waypoint_scripts` WHERE `id` IN (188700, 188701);
 INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES 
 (188700, 2, 0, 2, 0, 4285, 0, 0, 0, 0, 902),
 (188700, 2, 1, 16, 0, 0, 0, 0, 0, 0, 903),
