@@ -34,6 +34,8 @@ BattlegroundQueue::BattlegroundQueue() : m_bgTypeId(BATTLEGROUND_TYPE_NONE), m_a
                 m_WaitTimes[i][j][k] = 0;
         }
     }
+
+    _queueAnnouncementTimer.fill(-1);
 }
 
 BattlegroundQueue::~BattlegroundQueue()
@@ -664,7 +666,7 @@ void BattlegroundQueue::UpdateEvents(uint32 diff)
 struct BgEmptinessComp { bool operator()(Battleground* const& bg1, Battleground* const& bg2) const { return ((float)bg1->GetMaxFreeSlots() / (float)bg1->GetMaxPlayersPerTeam()) > ((float)bg2->GetMaxFreeSlots() / (float)bg2->GetMaxPlayersPerTeam()); } };
 typedef std::set<Battleground*, BgEmptinessComp> BattlegroundNeedSet;
 
-void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId)
+void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId)
 {
     // if no players in queue - do nothing
     if (IsAllQueuesEmpty(bracket_id))
@@ -939,6 +941,35 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
             }
         }
     }
+
+    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED))
+    {
+        uint32 qPlayers = GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_HORDE) + GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_ALLIANCE);
+        if (!qPlayers)
+        {
+            _queueAnnouncementTimer[bracket_id] = -1;
+            return;
+        }
+
+        if (_queueAnnouncementTimer[bracket_id] >= 0)
+        {
+            if (_queueAnnouncementTimer[bracket_id] <= static_cast<int32>(diff))
+            {
+                _queueAnnouncementTimer[bracket_id] = -1;
+
+                char const* bgName = bg_template->GetName();
+                uint32 MaxPlayers = bg_template->GetMinPlayersPerTeam() * 2;
+                uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32) 80);
+                uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32) 80);
+
+                sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qPlayers, MaxPlayers);
+            }
+            else
+            {
+                _queueAnnouncementTimer[bracket_id] -= static_cast<int32>(diff);
+            }
+        }
+    }
 }
 
 uint32 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue)
@@ -1001,12 +1032,22 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
     }
     else // Show queue status to server (when joining battleground queue)
     {
-        if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qTotal))
+        if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED))
         {
-            return;
+            if (_queueAnnouncementTimer[bracketId] < 0)
+            {
+                _queueAnnouncementTimer[bracketId] = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER);
+            }
         }
+        else
+        {
+            if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qTotal))
+            {
+                return;
+            }
 
-        sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
+            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
+        }
     }
 }
 
