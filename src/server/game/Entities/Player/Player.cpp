@@ -10158,7 +10158,8 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
                 useSpellCooldown = true;
             }
         }
-        else if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
+
+        if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
         {
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, catrec, spell);
         }
