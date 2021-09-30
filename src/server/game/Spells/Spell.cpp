@@ -652,6 +652,7 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
     m_preCastSpell = 0;
     m_triggeredByAuraSpell  = nullptr;
     m_triggeredByAuraEffectIndex = -1;
+    m_triggeredByAuraTickNumber = 0;
     m_spellAura = nullptr;
     m_pathFinder = nullptr; // pussywizard
     _scriptsLoaded = false;
@@ -3249,6 +3250,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     {
         m_triggeredByAuraSpell  = triggeredByAura->GetSpellInfo();
         m_triggeredByAuraEffectIndex = triggeredByAura->GetEffIndex();
+        m_triggeredByAuraTickNumber = triggeredByAura->GetTickNumber();
     }
 
     // create and add update event for this spell

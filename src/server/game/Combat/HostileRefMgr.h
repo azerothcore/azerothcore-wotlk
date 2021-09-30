@@ -49,7 +49,7 @@ public:
 
     // The references are not needed anymore
     // tell the source to remove them from the list and free the mem
-    void deleteReferences();
+    void deleteReferences(bool removeFromMap = false);
 
     // Remove specific faction references
     void deleteReferencesForFaction(uint32 faction);

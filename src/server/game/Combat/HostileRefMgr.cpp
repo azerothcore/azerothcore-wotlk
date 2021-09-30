@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureAI.h"
 #include "HostileRefMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
@@ -110,13 +111,28 @@ void HostileRefMgr::updateThreatTables()
 // The references are not needed anymore
 // tell the source to remove them from the list and free the mem
 
-void HostileRefMgr::deleteReferences()
+void HostileRefMgr::deleteReferences(bool removeFromMap /*= false*/)
 {
     HostileReference* ref = getFirst();
     while (ref)
     {
         HostileReference* nextRef = ref->next();
         ref->removeReference();
+
+        if (removeFromMap)
+        {
+            if (ThreatMgr const* threatMgr = ref->GetSource())
+            {
+                if (threatMgr->areThreatListsEmpty())
+                {
+                    if (Creature* creature = threatMgr->GetOwner()->ToCreature())
+                    {
+                        creature->AI()->EnterEvadeMode();
+                    }
+                }
+            }
+        }
+
         delete ref;
         ref = nextRef;
     }

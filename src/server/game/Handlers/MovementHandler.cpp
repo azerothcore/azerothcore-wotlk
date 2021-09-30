@@ -127,7 +127,7 @@ void WorldSession::HandleMoveWorldportAck()
         }
 
     if (!_player->getHostileRefMgr().isEmpty())
-        _player->getHostileRefMgr().deleteReferences(); // pussywizard: multithreading crashfix
+        _player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     CellCoord pair(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell(pair);
