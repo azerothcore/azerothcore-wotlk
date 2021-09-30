@@ -20,7 +20,6 @@ enum IronhandData
     SPELL_GOUT_OF_FLAMES       = 15529
 };
 
-
 uint32 braziersUsed = 0;
 
 //go_shadowforge_brazier
@@ -64,7 +63,6 @@ public:
    struct ironhand_guardianAI : public CreatureAI
     {
         ironhand_guardianAI(Creature* creature) : CreatureAI(creature) {}
-
         bool flames_enabled = false;
 
         void SetData(uint32 id, uint32 value) override
