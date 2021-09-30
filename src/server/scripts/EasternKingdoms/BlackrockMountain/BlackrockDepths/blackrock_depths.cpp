@@ -12,10 +12,14 @@
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 
-#define TIMER_IRONHAND_FLAMES 16000
-#define TIMER_IRONHAND_RAND_PART 3000
-#define N_IRONHAND_GROUPS 3
-#define SPELL_GOUT_OF_FLAME 15529
+enum IronhandData
+{
+    IRONHAND_FLAMES_TIMER      = 16000,
+    IRONHAND_FLAMES_TIMER_RAND = 3000,
+    IRONHAND_N_GROUPS          = 3,
+    SPELL_GOUT_OF_FLAMES       = 15529
+};
+
 
 uint32 braziersUsed = 0;
 
@@ -70,7 +74,7 @@ public:
                 if (value == 0 || value == 1)
                 {
                     flames_enabled = (bool) (value);
-                    events.ScheduleEvent(SPELL_GOUT_OF_FLAME, urand(1, N_IRONHAND_GROUPS) * TIMER_IRONHAND_FLAMES / N_IRONHAND_GROUPS);
+                    events.ScheduleEvent(SPELL_GOUT_OF_FLAMES, urand(1, IRONHAND_N_GROUPS) * IRONHAND_FLAMES_TIMER / IRONHAND_N_GROUPS);
                 }
             }
         }
@@ -88,9 +92,9 @@ public:
                 {
                     switch (eventId)
                     {
-                    case SPELL_GOUT_OF_FLAME:
-                        DoCast(SPELL_GOUT_OF_FLAME);
-                        events.RescheduleEvent(SPELL_GOUT_OF_FLAME, urand(TIMER_IRONHAND_FLAMES - TIMER_IRONHAND_RAND_PART, TIMER_IRONHAND_FLAMES + TIMER_IRONHAND_RAND_PART));
+                    case SPELL_GOUT_OF_FLAMES:
+                        DoCast(SPELL_GOUT_OF_FLAMES);
+                        events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, urand(IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND));
                         break;
                     default:
                         break;

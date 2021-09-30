@@ -8,6 +8,7 @@
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 #include "Player.h"
+#include "Map.h"
 
 #define TIMER_TOMBOFTHESEVEN    30000
 #define TIMER_TOMB_START        5000
@@ -172,42 +173,49 @@ public:
         std::vector<ObjectGuid> EmperorSenatorsVector;
         Position EmperorSpawnPos;
 
-        bool MoiraSaved = false;
+        bool MoiraSaved = true;
 
-        void OnPlayerEnter(Player* /* player */) override
+        void OnPlayerEnter(Player*  player) override
         {
-            // search if all players have saved the princess, then replace.
-            Map::PlayerList const lPlayers = instance->GetPlayers();
-            MoiraSaved = true;
+            // In case a player joins the party during the run
+            ReplaceMoiraIfSaved();
+        }
+
+        void ReplaceMoiraIfSaved()
+        {
+            ObjectGuid* GUIDToReplace = &PriestessGUID; // default to having Moira
+            ObjectGuid* GUIDToSpawn   = &MoiraGUID;
+            uint32      NPCEntry      = NPC_MOIRA;
+            MoiraSaved                = true;
+
+            // check if all players saved her.
+            Map::PlayerList const& lPlayers = instance->GetPlayers();
             if (!lPlayers.isEmpty())
             {
                 for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
                 {
                     if (Player* player = itr->GetSource())
                     {
-                        bool hasSavedPrincess = (player->GetQuestStatus(PRINCESS_QUEST_HORDE) == QUEST_STATUS_REWARDED)
-                                                    || (player->GetQuestStatus(PRINCESS_QUEST_ALLIANCE) == QUEST_STATUS_REWARDED);
-                        if (!hasSavedPrincess)
-                        {
-                            MoiraSaved = false;
-                        }
+                        // set to false if this player hasn't saved her. Another player can't put it to true.
+                        MoiraSaved = MoiraSaved && ((player->GetQuestStatus(PRINCESS_QUEST_HORDE) == QUEST_STATUS_REWARDED)
+                                                    || (player->GetQuestStatus(PRINCESS_QUEST_ALLIANCE) == QUEST_STATUS_REWARDED));
                     }
                 }
             }
+
+            // assign correct GUIDs and spawn targets
             if (MoiraSaved)
             {
-                ReplacePrincessWithPriestess();
+                GUIDToReplace = &MoiraGUID;
+                GUIDToSpawn   = &PriestessGUID;
+                NPCEntry      = NPC_PRIESTESS;
             }
-        }
 
-        void ReplacePrincessWithPriestess()
-        {
-            if (Creature* moira = instance->GetCreature(MoiraGUID))
+            if (Creature* CreatureToReplace = instance->GetCreature(*GUIDToReplace))
             {
-                Position priestessPosition = moira->GetPosition();
-                moira->RemoveFromWorld();
-                Creature* priestess = instance->SummonCreature(NPC_PRIESTESS, priestessPosition);
-                PriestessGUID = priestess->GetGUID();
+                Creature* NewSpawn = instance->SummonCreature(NPCEntry, CreatureToReplace->GetPosition());
+                CreatureToReplace->RemoveFromWorld();
+                *GUIDToSpawn = NewSpawn->GetGUID();
             }
         }
 
@@ -471,6 +479,7 @@ public:
                         {
                             magmus->AI()->Talk(0);
                         }
+                        ReplaceMoiraIfSaved(); // Need to place the correct final boss, but we need her to be spawned first.
                     }
                     break;
                 case TYPE_IRON_HALL:
@@ -478,7 +487,7 @@ public:
                     switch (data)
                     {
                     case NOT_STARTED:
-                    case IN_PROGRESS: // use a fall-through from not_started, we set to true only if IN_PROGRESS
+                    case IN_PROGRESS:
                         for (int i = 0; i < 6; i++)
                         {
                             if (Creature* ironhand = instance->GetCreature(IronhandGUID[i]))
