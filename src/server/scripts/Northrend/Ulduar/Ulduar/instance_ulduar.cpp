@@ -137,7 +137,7 @@ public:
 
             // Flame Leviathan
             for (uint8 i = 0; i < 4; ++i)
-                m_leviathanTowers[i] = false;
+                m_leviathanTowers[i] = true; // change from false
 
             _leviathanVehicles.clear();
             m_unbrokenAchievement   = 1;
@@ -691,8 +691,8 @@ public:
                     break;
 
                 case TYPE_SPAWN_HODIR_CACHE:
-                    // Is the difficulty 10 man(0) ? return 10 man : return 25 man;
-                    SpawnHodirChests(m_difficulty == 0 ? 0 : 1);
+                    // Is the difficulty 10 man(0) ? return 10 man : return 25 man;  //wrong!!!!!!   0==25   1==10
+                    SpawnHodirChests(m_difficulty == 0 ? 1 : 0);
                     break;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
