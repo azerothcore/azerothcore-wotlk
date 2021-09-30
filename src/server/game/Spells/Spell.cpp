@@ -5756,7 +5756,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                         m_pathFinder = new PathGenerator(m_caster);
                         m_pathFinder->CalculatePath(target->m_positionX, target->m_positionY, target->m_positionZ, false);
-                        
+
                         G3D::Vector3 endPos = m_pathFinder->GetEndPosition(); // also check distance between target and the point calculated by mmaps
                         if (m_pathFinder->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE) || m_pathFinder->getPathLength() > (40.0f + (m_caster->HasAura(58097) ? 5.0f : 0.0f)))
                             return SPELL_FAILED_NOPATH;
