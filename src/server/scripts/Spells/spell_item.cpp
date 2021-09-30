@@ -4385,8 +4385,6 @@ public:
     }
 };
 
-
-
 enum LinkenBoomerang
 {
     SPELL_DISARM = 15752,
