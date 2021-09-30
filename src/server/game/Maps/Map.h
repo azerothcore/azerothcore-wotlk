@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_MAP_H
@@ -14,8 +25,8 @@
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
 #include "GridDefines.h"
-#include "GridRefManager.h"
-#include "MapRefManager.h"
+#include "GridRefMgr.h"
+#include "MapRefMgr.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
 #include "PathGenerator.h"
@@ -284,7 +295,7 @@ enum EncounterCreditType
     ENCOUNTER_CREDIT_CAST_SPELL     = 1,
 };
 
-class Map : public GridRefManager<NGridType>
+class Map : public GridRefMgr<NGridType>
 {
     friend class MapReference;
 public:
@@ -447,7 +458,7 @@ public:
     bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
     void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
-    [[nodiscard]] bool HavePlayers() const { return !m_mapRefManager.isEmpty(); }
+    [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.isEmpty(); }
     [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
 
     void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
@@ -455,8 +466,8 @@ public:
 
     void SendToPlayers(WorldPacket const* data) const;
 
-    typedef MapRefManager PlayerList;
-    [[nodiscard]] PlayerList const& GetPlayers() const { return m_mapRefManager; }
+    typedef MapRefMgr PlayerList;
+    [[nodiscard]] PlayerList const& GetPlayers() const { return m_mapRefMgr; }
 
     //per-map script storage
     void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
@@ -671,8 +682,8 @@ protected:
     DynamicMapTree _dynamicTree;
     time_t _instanceResetPeriod; // pussywizard
 
-    MapRefManager m_mapRefManager;
-    MapRefManager::iterator m_mapRefIter;
+    MapRefMgr m_mapRefMgr;
+    MapRefMgr::iterator m_mapRefIter;
 
     typedef std::set<WorldObject*> ActiveNonPlayers;
     ActiveNonPlayers m_activeNonPlayers;
