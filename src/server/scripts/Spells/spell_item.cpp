@@ -4387,8 +4387,9 @@ public:
 
 enum LinkenBoomerang
 {
-    SPELL_DISARM = 15752,
-    SPELL_STUN   = 15753
+    SPELL_DISARM  = 15752,
+    SPELL_STUN    = 15753,
+    CHANCE_TO_HIT = 3
 };
 
 class spell_item_linken_boomerang : public SpellScriptLoader
@@ -4400,7 +4401,7 @@ public:
     {
         PrepareSpellScript(spell_item_linken_boomerang_SpellScript)
 
-            void OnEffectHitTargetDisarm(SpellEffIndex effIndex)
+        void OnEffectHitTargetDisarm(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
         }
@@ -4414,7 +4415,7 @@ public:
         {
             PreventHitDefaultEffect(effIndex);
 
-            if (roll_chance_i(3)) // 3% from wiki n shit
+            if (roll_chance_i(CHANCE_TO_HIT)) // 3% from wiki
             {
                 GetCaster()->CastSpell(GetHitUnit(), SPELL_DISARM, true);
             }
@@ -4424,7 +4425,7 @@ public:
         {
             PreventHitDefaultEffect(effIndex);
 
-            if (roll_chance_i(3)) // 3% from wiki n shit
+            if (roll_chance_i(CHANCE_TO_HIT)) // 3% from wiki
             {
                 GetCaster()->CastSpell(GetHitUnit(), SPELL_STUN, true);
             }
