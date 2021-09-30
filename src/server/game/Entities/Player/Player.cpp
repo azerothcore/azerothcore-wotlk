@@ -10213,7 +10213,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
                     continue;
                 }
 
-                _AddSpellCooldown(i_scset->second, cat, itemId, catrecTime, true);
+                _AddSpellCooldown(i_scset->second, cat, itemId, catrecTime, !spellInfo->IsCooldownStartedOnEvent() && catrec && rec && catrec != rec);
             }
         }
     }
