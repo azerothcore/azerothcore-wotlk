@@ -21,8 +21,11 @@ Bash:
   - deps/**/*.sh
   - modules/**/*.sh
 
-Cmake:
+CMake:
   - ./*.cmake
 
 Workflow:
   - .github/workflows/*
+
+Batch:
+  - apps/**/*.bat
