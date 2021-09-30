@@ -175,7 +175,7 @@ public:
 
         bool MoiraSaved = true;
 
-        void OnPlayerEnter(Player*  player) override
+        void OnPlayerEnter(Player* /* player */) override
         {
             // In case a player joins the party during the run
             ReplaceMoiraIfSaved();
