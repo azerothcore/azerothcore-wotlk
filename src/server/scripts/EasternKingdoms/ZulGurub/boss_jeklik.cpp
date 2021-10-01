@@ -228,7 +228,11 @@ public:
                     if (targets.size() > 1)
                         targets.resize(1);
 
-                for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr) me->CastSpell((*itr), SPELL_BOMB);
+                for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                {
+                    me->CastSpell((*itr), SPELL_BOMB);
+                }
+
                 Bomb_Timer = 7000;
             }
             else
