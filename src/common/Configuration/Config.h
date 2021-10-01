@@ -39,7 +39,7 @@ public:
 
     bool Reload();
 
-    std::string const& GetFilename();
+    std::string const GetFilename();
     std::string const GetConfigPath();
     std::vector<std::string> const& GetArguments() const;
     std::vector<std::string> GetKeysByString(std::string const& name);

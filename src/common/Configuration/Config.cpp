@@ -32,6 +32,7 @@ namespace
     std::vector<std::string> _args;
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
     std::mutex _configLock;
+    bool _usingDistConfig = false;
 
     // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
@@ -321,10 +322,10 @@ std::vector<std::string> ConfigMgr::GetKeysByString(std::string const& name)
     return keys;
 }
 
-std::string const& ConfigMgr::GetFilename()
+std::string const ConfigMgr::GetFilename()
 {
     std::lock_guard<std::mutex> lock(_configLock);
-    return _filename;
+    return _usingDistConfig ? _filename + ".dist" : _filename;
 }
 
 std::vector<std::string> const& ConfigMgr::GetArguments() const
@@ -367,7 +368,10 @@ bool ConfigMgr::LoadAppConfigs()
     }
 
     // #2 - Load .conf file
-    LoadAdditionalFile(_filename, true);
+    if (!LoadAdditionalFile(_filename, true))
+    {
+        _usingDistConfig = true;
+    }
 
     return true;
 }
