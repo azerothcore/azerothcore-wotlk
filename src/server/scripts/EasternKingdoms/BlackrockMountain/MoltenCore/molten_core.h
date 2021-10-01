@@ -1,54 +1,39 @@
 /*
- * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
-
-#include "Player.h"
 
 #ifndef DEF_MOLTEN_CORE_H
 #define DEF_MOLTEN_CORE_H
 
-#include "CreatureAIImpl.h"
-
 #define MCScriptName "instance_molten_core"
 
-enum Encounters
+constexpr uint32 MAX_ENCOUNTER = 10;
+
+enum MCData
 {
-    BOSS_LUCIFRON                   = 0,
-    BOSS_MAGMADAR                   = 1,
-    BOSS_GEHENNAS                   = 2,
-    BOSS_GARR                       = 3,
-    BOSS_SHAZZRAH                   = 4,
-    BOSS_BARON_GEDDON               = 5,
-    BOSS_SULFURON_HARBINGER         = 6,
-    BOSS_GOLEMAGG_THE_INCINERATOR   = 7,
-    BOSS_MAJORDOMO_EXECUTUS         = 8,
-    BOSS_RAGNAROS                   = 9,
-    MAX_ENCOUNTER,
+    DATA_LUCIFRON                   = 0,
+    DATA_MAGMADAR                   = 1,
+    DATA_GEHENNAS                   = 2,
+    DATA_GARR                       = 3,
+    DATA_SHAZZRAH                   = 4,
+    DATA_BARON_GEDDON               = 5,
+    DATA_SULFURON_HARBINGER         = 6,
+    DATA_GOLEMAGG_THE_INCINERATOR   = 7,
+    DATA_MAJORDOMO_EXECUTUS         = 8,
+    DATA_RAGNAROS                   = 9,
 };
 
-enum Actions
+enum MCActions
 {
-    ACTION_START_RAGNAROS       = 0,
-    ACTION_START_RAGNAROS_ALT   = 1,
+    ACTION_START_RAGNAROS           = -1,
+    ACTION_START_RAGNAROS_ALT       = -2,
 };
 
 Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};
-Position const RagnarosSummonPos = {838.510f, -829.840f, -232.000f, 2.00000f};
 
-enum Creatures
+enum MCCreatures
 {
     NPC_LUCIFRON                    = 12118,
     NPC_MAGMADAR                    = 11982,
@@ -66,7 +51,7 @@ enum Creatures
     NPC_CORE_HOUND                  = 11671,
 };
 
-enum GameObjects
+enum MCGameObjects
 {
     GO_CACHE_OF_THE_FIRELORD        = 179703,
     GO_CIRCLE_SULFURON              = 178187,
@@ -76,11 +61,6 @@ enum GameObjects
     GO_CIRCLE_GARR                  = 178191,
     GO_CIRCLE_MAGMADAR              = 178192,
     GO_CIRCLE_GEHENNAS              = 178193,
-};
-
-enum Data
-{
-    DATA_RAGNAROS_ADDS  = 0,
 };
 
 template <class AI, class T>

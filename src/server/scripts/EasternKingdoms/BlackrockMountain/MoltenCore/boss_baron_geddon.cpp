@@ -1,18 +1,7 @@
 /*
- * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -22,10 +11,9 @@ SDComment:
 SDCategory: Molten Core
 EndScriptData */
 
-#include "molten_core.h"
-#include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "molten_core.h"
 
 enum Emotes
 {
@@ -43,8 +31,8 @@ enum Spells
 enum Events
 {
     EVENT_INFERNO       = 1,
-    EVENT_IGNITE_MANA   = 2,
-    EVENT_LIVING_BOMB   = 3,
+    EVENT_IGNITE_MANA,
+    EVENT_LIVING_BOMB,
 };
 
 class boss_baron_geddon : public CreatureScript
@@ -54,62 +42,93 @@ public:
 
     struct boss_baron_geddonAI : public BossAI
     {
-        boss_baron_geddonAI(Creature* creature) : BossAI(creature, BOSS_BARON_GEDDON)
+        boss_baron_geddonAI(Creature* creature) : BossAI(creature, DATA_BARON_GEDDON),
+            armageddonCasted(false)
         {
         }
 
-        void EnterCombat(Unit* victim) override
+        void Reset() override
         {
-            BossAI::EnterCombat(victim);
-            events.ScheduleEvent(EVENT_INFERNO, 45000);
-            events.ScheduleEvent(EVENT_IGNITE_MANA, 30000);
-            events.ScheduleEvent(EVENT_LIVING_BOMB, 35000);
+            _Reset();
+            armageddonCasted = false;
+        }
+
+        void EnterCombat(Unit* /*attacker*/) override
+        {
+            _EnterCombat();
+            events.ScheduleEvent(EVENT_INFERNO, urand(13000, 15000));
+            events.ScheduleEvent(EVENT_IGNITE_MANA, urand(7000, 19000));
+            events.ScheduleEvent(EVENT_LIVING_BOMB, urand(11000, 16000));
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
+        {
+            // If we are <2% hp cast Armageddon
+            if (!armageddonCasted && damage < me->GetHealth() && me->HealthBelowPctDamaged(2, damage))
+            {
+                me->InterruptNonMeleeSpells(true);
+                DoCastSelf(SPELL_ARMAGEDDON);
+                Talk(EMOTE_SERVICE);
+                armageddonCasted = true;
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            // If we are <2% hp cast Armageddon
-            if (!HealthAbovePct(2))
             {
-                me->InterruptNonMeleeSpells(true);
-                DoCast(me, SPELL_ARMAGEDDON);
-                Talk(EMOTE_SERVICE);
                 return;
             }
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
+            events.Update(diff);
 
-            while (uint32 eventId = events.ExecuteEvent())
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
+
+            while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
                     case EVENT_INFERNO:
-                        DoCast(me, SPELL_INFERNO);
-                        events.ScheduleEvent(EVENT_INFERNO, 45000);
+                    {
+                        DoCastSelf(SPELL_INFERNO);
+                        events.RepeatEvent(urand(21000, 26000));
                         break;
+                    }
                     case EVENT_IGNITE_MANA:
+                    {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_IGNITE_MANA))
+                        {
                             DoCast(target, SPELL_IGNITE_MANA);
-                        events.ScheduleEvent(EVENT_IGNITE_MANA, 30000);
+                        }
+
+                        events.RepeatEvent(urand(27000, 32000));
                         break;
+                    }
                     case EVENT_LIVING_BOMB:
+                    {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        {
                             DoCast(target, SPELL_LIVING_BOMB);
-                        events.ScheduleEvent(EVENT_LIVING_BOMB, 35000);
+                        }
+
+                        events.RepeatEvent(urand(11000, 16000));
                         break;
-                    default:
-                        break;
+                    }
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
                 }
             }
 
             DoMeleeAttackIfReady();
         }
+    private:
+        bool armageddonCasted;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
