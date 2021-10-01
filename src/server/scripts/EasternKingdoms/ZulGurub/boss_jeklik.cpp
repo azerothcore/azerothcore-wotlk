@@ -226,7 +226,9 @@ public:
                 SelectTargetList(targets, 1, SELECT_TARGET_RANDOM, 500.0f, true);
                 if (!targets.empty())
                     if (targets.size() > 1)
+                    {
                         targets.resize(1);
+                    }
 
                 for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                 {
