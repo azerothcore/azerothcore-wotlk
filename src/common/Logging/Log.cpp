@@ -67,7 +67,7 @@ void Log::CreateAppenderFromConfig(std::string const& appenderName)
     // Format = type, level, flags, optional1, optional2
     // if type = File. optional1 = file and option2 = mode
     // if type = Console. optional1 = Color
-    std::string options = sConfigMgr->GetStringDefault(appenderName, "");
+    std::string options = sConfigMgr->GetOption<std::string>(appenderName, "");
 
     std::vector<std::string_view> tokens = Acore::Tokenize(options, ',', true);
 
@@ -130,7 +130,7 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
 
     LogLevel level = LOG_LEVEL_DISABLED;
 
-    std::string options = sConfigMgr->GetStringDefault(appenderName, "");
+    std::string options = sConfigMgr->GetOption<std::string>(appenderName, "");
     std::string name = appenderName.substr(7);
 
     if (options.empty())
