@@ -60,7 +60,6 @@ public:
                     {
                         target->SetFullHealth();
                         target->AI()->SetData(1, 1);
-                        printf("TRIGGERED\n");
                     }
                     else
                     {
