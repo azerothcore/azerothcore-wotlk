@@ -572,7 +572,6 @@ namespace lfg
                         else
                         {
                             rDungeonId = (*dungeons.begin());
-//                            setRandomDungeonId(rDungeonId);
                             sScriptMgr->OnPlayerQueueRandomDungeon(player, rDungeonId);
                         }
                         // No break on purpose (Random can only be dungeon or heroic dungeon)
@@ -779,38 +778,6 @@ namespace lfg
               << ". Dungeons (" << uint32(dungeons.size()) << "): " << ConcatenateDungeons(dungeons);
             LOG_DEBUG("lfg", "%s", o.str().c_str());
         }*/
-    }
-
-    void LFGMgr::setRandomDungeonId(uint32 & rDungeonId) const
-    {
-        // values from LFGDungeons.dbc
-        constexpr const uint32 RDF_CLASSIC = 258;
-        constexpr const uint32 RDF_THE_BURNING_CRUSADE = 259;
-        constexpr const uint32 RDF_THE_BURNING_CRUSADE_HEROIC = 260;
-        constexpr const uint32 RDF_WRATH_OF_THE_LICH_KING = 261;
-        constexpr const uint32 RDF_WRATH_OF_THE_LICH_KING_HEROIC = 262;
-
-        switch (sWorld->getIntConfig(CONFIG_LFG_DUNGEON_FINDER_EXPANSION))
-        {
-            case EXPANSION_CLASSIC:
-                // always force classic RDF
-                rDungeonId = RDF_CLASSIC;
-                break;
-            case EXPANSION_THE_BURNING_CRUSADE:
-                // select at most RDF_THE_BURNING_CRUSADE_*
-                if (rDungeonId == RDF_WRATH_OF_THE_LICH_KING)
-                {
-                    rDungeonId = RDF_THE_BURNING_CRUSADE;
-                }
-                else if (rDungeonId == RDF_WRATH_OF_THE_LICH_KING_HEROIC)
-                {
-                    rDungeonId = RDF_THE_BURNING_CRUSADE_HEROIC;
-                }
-            case EXPANSION_WRATH_OF_THE_LICH_KING:
-            default:
-                // keep the original value
-                break;
-        }
     }
 
     void LFGMgr::ToggleTesting()
