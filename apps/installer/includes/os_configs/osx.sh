@@ -1,9 +1,3 @@
-##########################################
-## workaround to fix macos-10.15 configure os from failing
-brew reinstall openssl@1.1
-rm '/usr/local/bin/2to3'
-##########################################
-
 brew update
 
 ##########################################
@@ -13,4 +7,4 @@ if ! command -v cmake &>/dev/null ; then
 fi
 ##########################################
 
-brew install openssl readline boost bash-completion curl unzip mysql ccache
+brew install openssl@1.1 readline boost bash-completion curl unzip mysql ccache
