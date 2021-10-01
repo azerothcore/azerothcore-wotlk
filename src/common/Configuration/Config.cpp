@@ -238,8 +238,8 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing name %s in config, add \"%s = %s\"",
-                name.c_str(), name.c_str(), Acore::ToString(def).c_str());
+            FMT_LOG_ERROR("server.loading", "> Config: Missing name {} in config, add \"{} = {}\"",
+                name, name, Acore::ToString(def));
         }
 
         return def;
@@ -250,8 +250,8 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Bad value defined for name '%s', going to use '%s' instead",
-                name.c_str(), Acore::ToString(def).c_str());
+            FMT_LOG_ERROR("server.loading", "> Config: Bad value defined for name '{}', going to use '{}' instead",
+                name, Acore::ToString(def));
         }
 
         return def;
@@ -268,8 +268,8 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing name %s in config, add \"%s = %s\"",
-                name.c_str(), name.c_str(), def.c_str());
+            FMT_LOG_ERROR("server.loading", "> Config: Missing name {} in config, add \"{} = {}\"",
+                name, name, def);
         }
 
         return def;
@@ -294,8 +294,8 @@ bool ConfigMgr::GetOption<bool>(std::string const& name, bool const& def, bool s
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Bad value defined for name '%s', going to use '%s' instead",
-                name.c_str(), def ? "true" : "false");
+            FMT_LOG_ERROR("server.loading", "> Config: Bad value defined for name '{}', going to use '{}' instead",
+                name, def ? "true" : "false");
         }
 
         return def;
