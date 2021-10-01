@@ -1,3 +1,19 @@
+-- DB update 2021_10_01_00 -> 2021_10_01_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_10_01_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_10_01_00 2021_10_01_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1632117131528907274'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1632117131528907274');
 
 -- Credit for factions goes to vmangos, however with those factions their AI reaction is different from movies
@@ -80,3 +96,13 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 (7956,3,2,"Death to you, $n. How dare you come within a bow's shot of me!",12,0,100,0,0,0,4124,0,"Kindal Moonweaver"),
 (7956,3,3,"You dare touch me?!",12,0,100,0,0,0,4125,0,"Kindal Moonweaver"),
 (7956,4,0,"Oh, no! We've run out of time. ",12,0,100,0,0,0,5285,0,"Kindal Moonweaver");
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_10_01_01' WHERE sql_rev = '1632117131528907274';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
