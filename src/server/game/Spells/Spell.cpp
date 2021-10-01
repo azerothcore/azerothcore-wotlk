@@ -5828,6 +5828,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                             (!pTempItem || !pTempItem->GetTemplate()->LockID || !pTempItem->IsLocked()))
                         return SPELL_FAILED_BAD_TARGETS;
 
+                    // We must also ensure the gameobject we are opening is still closed by the time the spell finishes.
+                    if (GameObject* go = m_targets.GetGOTarget())
+                    {
+                        if (go->GetGoState() != GO_STATE_READY)
+                        {
+                            return SPELL_FAILED_BAD_TARGETS;
+                        }
+                    }
                     if (m_spellInfo->Id != 1842 || (m_targets.GetGOTarget() &&
                                                     m_targets.GetGOTarget()->GetGOInfo()->type != GAMEOBJECT_TYPE_TRAP))
                     {
