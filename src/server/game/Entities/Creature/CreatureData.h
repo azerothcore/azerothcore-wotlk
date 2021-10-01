@@ -166,7 +166,7 @@ struct CreatureTemplate
         return exotic || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_EXOTIC) == 0;
     }
 
-    [[nodiscard]] bool HasFlagsExtra (uint32 flag) { return (flags_extra & flag) != 0; }
+    [[nodiscard]] bool HasFlagsExtra (uint32 flag) const { return (flags_extra & flag) != 0; }
 
     void InitializeQueryData();
 };

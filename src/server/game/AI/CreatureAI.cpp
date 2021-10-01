@@ -186,8 +186,7 @@ void CreatureAI::EnterEvadeMode()
     }
 
     // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid) and increase array limit
-    uint32 entry = me->GetEntry();
-    CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry);
+    CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(me->GetEntry());
     if (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET))
     {
         me->DespawnOnEvade();
