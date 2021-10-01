@@ -572,7 +572,8 @@ namespace lfg
                         else
                         {
                             rDungeonId = (*dungeons.begin());
-                            setRandomDungeonId(rDungeonId);
+//                            setRandomDungeonId(rDungeonId);
+                            sScriptMgr->OnPlayerQueueRandomDungeon(player, rDungeonId);
                         }
                         // No break on purpose (Random can only be dungeon or heroic dungeon)
                         [[fallthrough]];
