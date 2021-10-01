@@ -8,3 +8,9 @@ fi
 ##########################################
 
 brew install openssl@1.1 readline boost bash-completion curl unzip mysql ccache
+
+##########################################
+## workaround to fix openssl in ci
+brew reinstall openssl@1.1
+#rm '/usr/local/bin/2to3'
+##########################################
