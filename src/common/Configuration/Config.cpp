@@ -58,7 +58,7 @@ namespace
         }
     }
 
-    void AddKey(std::string const& optionName, std::string const& optionKey, std::string_view fileName, bool isOptional, bool isReload)
+    void AddKey(std::string const& optionName, std::string const& optionKey, std::string_view fileName, bool isOptional, [[maybe_unused]] bool isReload)
     {
         auto const& itr = _configOptions.find(optionName);
 
