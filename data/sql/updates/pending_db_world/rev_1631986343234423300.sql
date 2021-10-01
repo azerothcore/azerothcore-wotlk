@@ -24,4 +24,4 @@ UPDATE `creature_template` SET `flags_extra`=`flags_extra`|0x80000000 WHERE `ent
 36597, /* The Lich King */
 36853, /* Sindragosa */
 36855, /* Lady Deathwhisper */
-37955);  /* Blood-Queen Lana'thel */
+37955 /* Blood-Queen Lana'thel */);
