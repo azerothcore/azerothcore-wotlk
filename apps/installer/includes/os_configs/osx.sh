@@ -7,7 +7,7 @@ if ! command -v cmake &>/dev/null ; then
 fi
 ##########################################
 
-brew install openssl@1.1 readline boost bash-completion curl unzip mysql ccache
+brew install openssl@1.1 readline boost bash-completion curl unzip mysql ccache pkg-config
 
 ##########################################
 ## workaround to fix openssl in ci
