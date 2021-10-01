@@ -20,6 +20,7 @@
 #include "StringConvert.h"
 #include "StringFormat.h"
 #include "Util.h"
+#include "Tokenize.h"
 #include <fstream>
 #include <mutex>
 #include <unordered_map>
@@ -35,60 +36,60 @@ namespace
     // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
     {
-        size_t found = fileName.find_first_of("authserver.conf");
-        if (found != std::string::npos)
-        {
-            return true;
-        }
+        size_t foundAuth = fileName.find("authserver.conf");
+        size_t foundWorld = fileName.find("worldserver.conf");
 
-        found = fileName.find_first_of("worldserver.conf");
-        if (found != std::string::npos)
-        {
-            return true;
-        }
-
-        return false;
+        return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos;
     }
 
     template<typename Format, typename... Args>
     inline void PrintError(std::string_view filename, Format&& fmt, Args&& ... args)
     {
-        std::string message = Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
+        std::string message = Acore::StringFormatFmt(std::forward<Format>(fmt), std::forward<Args>(args)...);
 
         if (IsAppConfig(filename))
         {
-            printf("%s\n", message.c_str());
+            fmt::print("{}\n", message);
         }
         else
         {
-            LOG_ERROR("server.loading", "%s", message.c_str());
+            FMT_LOG_ERROR("server.loading", message);
         }
     }
 
-    void AddKey(std::string const& optionName, std::string const& optionKey, bool replace = true)
+    void AddKey(std::string const& optionName, std::string const& optionKey, std::string_view fileName, bool isOptional = false)
     {
         auto const& itr = _configOptions.find(optionName);
+
+        // Check old option
+        if (isOptional && itr == _configOptions.end())
+        {
+            FMT_LOG_WARN("server.loading", "> Config::LoadFile: Found incorrect (old) option '{}' in config file '{}'. Skip", optionName, fileName);
+            return;
+        }
+
+        // Check exit option
         if (itr != _configOptions.end())
         {
-            if (!replace)
-            {
-                LOG_ERROR("server.loading", "> Config: Option '%s' is exist! Option key - '%s'", optionName.c_str(), itr->second.c_str());
-                return;
-            }
-
             _configOptions.erase(optionName);
         }
 
         _configOptions.emplace(optionName, optionKey);
     }
 
-    void ParseFile(std::string const& file)
+    bool ParseFile(std::string const& file, bool isOptional)
     {
         std::ifstream in(file);
 
         if (in.fail())
         {
-            throw ConfigException(Acore::StringFormat("Config::LoadFile: Failed open file '%s'", file.c_str()));
+            if (isOptional)
+            {
+                // No display erorr if file optional
+                return false;
+            }
+
+            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Failed open {}file '{}'", isOptional ? "optional " : "", file));
         }
 
         uint32 count = 0;
@@ -100,7 +101,7 @@ namespace
             auto const& itr = fileConfigs.find(confOption);
             if (itr != fileConfigs.end())
             {
-                PrintError(file, "> Config::LoadFile: Dublicate key name '%s' in config file '%s'", std::string(confOption).c_str(), file.c_str());
+                PrintError(file, "> Config::LoadFile: Dublicate key name '{}' in config file '{}'", confOption, file);
                 return true;
             }
 
@@ -116,7 +117,7 @@ namespace
             // read line error
             if (!in.good() && !in.eof())
             {
-                throw ConfigException(Acore::StringFormat("> Config::LoadFile: Failure to read line number %u in file '%s'", lineNumber, file.c_str()));
+                throw ConfigException(Acore::StringFormatFmt("> Config::LoadFile: Failure to read line number {} in file '{}'", lineNumber, file));
             }
 
             // remove whitespace in line
@@ -143,7 +144,7 @@ namespace
 
             if (equal_pos == std::string::npos || equal_pos == line.length())
             {
-                PrintError(file, "> Config::LoadFile: Failure to read line number %u in file '%s'. Skip this line", lineNumber, file.c_str());
+                PrintError(file, "> Config::LoadFile: Failure to read line number {} in file '{}'. Skip this line", lineNumber, file);
                 continue;
             }
 
@@ -166,26 +167,33 @@ namespace
         // No lines read
         if (!count)
         {
-            throw ConfigException(Acore::StringFormat("Config::LoadFile: Empty file '%s'", file.c_str()));
+            if (isOptional)
+            {
+                // No display erorr if file optional
+                return false;
+            }
+
+            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Empty file '{}'", file));
         }
 
         // Add correct keys if file load without errors
         for (auto const& [entry, key] : fileConfigs)
         {
-            AddKey(entry, key);
+            AddKey(entry, key, file, isOptional);
         }
+
+        return true;
     }
 
-    bool LoadFile(std::string const& file)
+    bool LoadFile(std::string const& file, bool isOptional)
     {
         try
         {
-            ParseFile(file);
-            return true;
+            return ParseFile(file, isOptional);
         }
         catch (const std::exception& e)
         {
-            PrintError(file, "> %s", e.what());
+            PrintError(file, "> {}", e.what());
         }
 
         return false;
@@ -196,13 +204,14 @@ bool ConfigMgr::LoadInitial(std::string const& file)
 {
     std::lock_guard<std::mutex> lock(_configLock);
     _configOptions.clear();
-    return LoadFile(file);
+    return LoadFile(file, false);
 }
 
-bool ConfigMgr::LoadAdditionalFile(std::string file)
+bool ConfigMgr::LoadAdditionalFile(std::string file, bool isOptional /*= false*/)
 {
     std::lock_guard<std::mutex> lock(_configLock);
-    return LoadFile(file);
+
+    return LoadFile(file, isOptional);
 }
 
 ConfigMgr* ConfigMgr::instance()
@@ -218,7 +227,7 @@ bool ConfigMgr::Reload()
         return false;
     }
 
-    return LoadModulesConfigs();
+    return LoadModulesConfigs(false);
 }
 
 template<class T>
@@ -302,10 +311,12 @@ std::vector<std::string> ConfigMgr::GetKeysByString(std::string const& name)
     std::vector<std::string> keys;
 
     for (auto const& [optionName, key] : _configOptions)
+    {
         if (!optionName.compare(0, name.length(), name))
         {
             keys.emplace_back(optionName);
         }
+    }
 
     return keys;
 }
@@ -340,10 +351,9 @@ void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::stri
     // Add modules config if exist
     if (!modulesConfigList.empty())
     {
-        Tokenizer configFileList(modulesConfigList, ',');
-        for (auto const& itr : configFileList)
+        for (auto const& itr : Acore::Tokenize(modulesConfigList, ',', false))
         {
-            _additonalFiles.emplace_back(std::string(itr));
+            _additonalFiles.emplace_back(itr);
         }
     }
 }
@@ -357,25 +367,27 @@ bool ConfigMgr::LoadAppConfigs()
     }
 
     // #2 - Load .conf file
-    if (!LoadAdditionalFile(_filename))
-    {
-        return false;
-    }
+    LoadAdditionalFile(_filename, true);
 
     return true;
 }
 
-bool ConfigMgr::LoadModulesConfigs()
+bool ConfigMgr::LoadModulesConfigs(bool isNeedPrintInfo /*= true*/)
 {
     if (_additonalFiles.empty())
     {
+        // Send successful load if no found files
         return true;
     }
+
+    FMT_LOG_INFO("server.loading", " ");
+    FMT_LOG_INFO("server.loading", "Loading modules configuration...");
 
     // Start loading module configs
     std::string const& moduleConfigPath = GetConfigPath() + "modules/";
     bool isExistDefaultConfig = true;
     bool isExistDistConfig = true;
+    bool isError = false;
 
     for (auto const& distFileName : _additonalFiles)
     {
@@ -387,16 +399,17 @@ bool ConfigMgr::LoadModulesConfigs()
         }
 
         // Load .conf.dist config
-        if (!LoadAdditionalFile(moduleConfigPath + distFileName))
+        isExistDistConfig = LoadAdditionalFile(moduleConfigPath + distFileName);
+
+        // Skip loading and send error load
+        if (!isExistDistConfig)
         {
-            isExistDistConfig = false;
+            isError = true;
+            break;
         }
 
         // Load .conf config
-        if (!LoadAdditionalFile(moduleConfigPath + defaultFileName))
-        {
-            isExistDefaultConfig = false;
-        }
+        isExistDefaultConfig = LoadAdditionalFile(moduleConfigPath + defaultFileName, true);
 
         if (isExistDefaultConfig && isExistDistConfig)
         {
@@ -408,27 +421,32 @@ bool ConfigMgr::LoadModulesConfigs()
         }
     }
 
-    // If module configs not exist - no load
-    return !_moduleConfigFiles.empty();
-}
-
-void ConfigMgr::PrintLoadedModulesConfigs()
-{
-    // Print modules configurations
-    LOG_INFO("server.loading", " ");
-    LOG_INFO("server.loading", "Using modules configuration:");
-
-    for (auto const& itr : _moduleConfigFiles)
+    if (isError)
     {
-        LOG_INFO("server.loading", "> %s", itr.c_str());
+        // One or more modules config file .conf.dist not loaded
+        return false;
     }
 
-    LOG_INFO("server.loading", " ");
-}
+    if (!_moduleConfigFiles.empty() && isNeedPrintInfo)
+    {
+        // Print modules configurations
+        FMT_LOG_INFO("server.loading", " ");
+        FMT_LOG_INFO("server.loading", "Using modules configuration:");
 
-/*
- * Deprecated geters. This geters will be deleted
- */
+        for (auto const& itr : _moduleConfigFiles)
+        {
+            FMT_LOG_INFO("server.loading", "> {}", itr);
+        }
+    }
+    else
+    {
+        FMT_LOG_INFO("server.loading", "> Not found modules config files");
+    }
+
+    FMT_LOG_INFO("server.loading", " ");
+
+    return true;
+}
 
 // @deprecated DO NOT USE - use GetOption<std::string> instead.
 std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def, bool showLogs /*= true*/)
@@ -453,10 +471,6 @@ float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool showLo
 {
     return GetOption<float>(name, def, showLogs);
 }
-
-/*
- * End deprecated geters
- */
 
 #define TEMPLATE_CONFIG_OPTION(__typename) \
     template __typename ConfigMgr::GetOption<__typename>(std::string const& name, __typename const& def, bool showLogs /*= true*/) const;

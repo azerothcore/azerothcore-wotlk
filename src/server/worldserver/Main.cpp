@@ -195,13 +195,10 @@ int main(int argc, char** argv)
     }
 
     // Add file and args in config
-    sConfigMgr->Configure(configFile, std::vector<std::string>(argv, argv + argc), CONFIG_FILE_LIST);
+    sConfigMgr->Configure(configFile, { argv, argv + argc }, CONFIG_FILE_LIST);
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
-
-    // Loading modules configs
-    sConfigMgr->LoadModulesConfigs();
 
     std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 
@@ -288,8 +285,8 @@ int main(int argc, char** argv)
 
     LoadRealmInfo(*ioContext);
 
-    // Loading modules configs
-    sConfigMgr->PrintLoadedModulesConfigs();
+    // Loading modules configs before scripts
+    sConfigMgr->LoadModulesConfigs();
 
     sScriptMgr->SetScriptLoader(AddScripts);
     std::shared_ptr<void> sScriptMgrHandle(nullptr, [](void*)
