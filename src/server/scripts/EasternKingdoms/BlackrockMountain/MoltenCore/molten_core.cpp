@@ -39,9 +39,9 @@ public:
                     if (!hounds.empty())
                     {
                         // Alive hound been found within 80 yards -> cancel suicide
-                        if (std::find_if(hounds.begin(), hounds.end(), [](Creature const* hound)
+                        if (std::find_if(hounds.begin(), hounds.end(), [this](Creature const* hound)
                         {
-                            return hound->IsAlive() && !hound->HasAura(SPELL_PLAY_DEAD);
+                            return hound->IsAlive() && !hound->HasAura(m_scriptSpellId);
                         }) != hounds.end())
                         {
                             shouldDie = false;
@@ -76,6 +76,5 @@ public:
 
 void AddSC_molten_core()
 {
-    new npc_mc_core_hound();
     new spell_mc_play_dead();
 }
