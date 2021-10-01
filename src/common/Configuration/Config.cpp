@@ -246,7 +246,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            FMT_LOG_ERROR("server.loading", "> Config: Missing option {}, add \"{} = {}\"",
+            FMT_LOG_ERROR("server.loading", "> Config: Missing property {} in all config files, at least the .dist file must contain: \"{} = {}\"",
                 name, name, Acore::ToString(def));
         }
 
