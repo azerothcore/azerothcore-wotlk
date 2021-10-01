@@ -70,36 +70,7 @@ public:
         {
             if (action == ACTION_HOUND_IGNITE && me->IsInCombat())
             {
-                bool shouldDie = true;
-                std::list<Creature*> hounds;
-                me->GetCreaturesWithEntryInRange(hounds, 80, NPC_CORE_HOUND);
-                if (!hounds.empty())
-                {
-                    // Alive hound been found within 80 yards -> cancel suicide
-                    if (std::find_if(hounds.begin(), hounds.end(), [](Creature const* hound)
-                    {
-                        return hound->IsAlive() && !hound->HasAura(SPELL_PLAY_DEAD);
-                    }) != hounds.end())
-                    {
-                        shouldDie = false;
-                    }
-                }
 
-                if (!shouldDie)
-                {
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->AI()->Talk(EMOTE_IGNITE);
-                    me->SetFullHealth();
-                }
-                else
-                {
-                    Unit* killer = ObjectAccessor::GetUnit(*me, killerGUID);
-                    Unit::Kill(killer ? killer : me, me);
-                    if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                    {
-                        AttackStart(victim);
-                    }
-                }
 
                 killerGUID.Clear();
             }
@@ -150,22 +121,54 @@ public:
     {
         PrepareAuraScript(spell_mc_play_dead_AuraScript);
 
-        bool Load() override
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            return GetTarget()->GetTypeId() == TYPEID_UNIT;
+            if (Creature* target = GetTarget()->ToCreature())
+            {
+                target->SetReactState(REACT_PASSIVE);
+            }
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if (Creature* target = GetTarget()->ToCreature())
+            Creature* target = GetTarget()->ToCreature();
+            if (target)
             {
-                target->AI()->DoAction(ACTION_HOUND_IGNITE);
-                return;
+                target->SetReactState(REACT_AGGRESSIVE);
+
+                if (target->IsInCombat())
+                {
+                    bool shouldDie = true;
+                    std::list<Creature*> hounds;
+                    target->GetCreaturesWithEntryInRange(hounds, 80, NPC_CORE_HOUND);
+                    if (!hounds.empty())
+                    {
+                        // Alive hound been found within 80 yards -> cancel suicide
+                        if (std::find_if(hounds.begin(), hounds.end(), [](Creature const* hound)
+                        {
+                            return hound->IsAlive() && !hound->HasAura(SPELL_PLAY_DEAD);
+                        }) != hounds.end())
+                        {
+                            shouldDie = false;
+                        }
+                    }
+
+                    if (!shouldDie)
+                    {
+                        target->AI()->DoAction(target->GetEntry() * 10);
+                        target->SetFullHealth();
+                    }
+                    else
+                    {
+                        Unit::Kill(target, target);
+                    }
+                }
             }
         }
 
         void Register() override
         {
+            AfterEffectApply += AuraEffectApplyFn(spell_mc_play_dead_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectApplyFn(spell_mc_play_dead_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_FEIGN_DEATH, AURA_EFFECT_HANDLE_REAL);
         }
     };
