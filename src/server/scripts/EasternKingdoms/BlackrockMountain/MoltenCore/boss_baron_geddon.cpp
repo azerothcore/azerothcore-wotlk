@@ -63,12 +63,15 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
-            // If we are <2% hp cast Armageddon
+            // If boss is below 2% hp - cast Armageddon
             if (!armageddonCasted && damage < me->GetHealth() && me->HealthBelowPctDamaged(2, damage))
             {
                 me->InterruptNonMeleeSpells(true);
-                DoCastSelf(SPELL_ARMAGEDDON);
-                Talk(EMOTE_SERVICE);
+                if (me->CastSpell(me, SPELL_ARMAGEDDON) == SPELL_CAST_OK)
+                {
+                    Talk(EMOTE_SERVICE);
+                }
+
                 armageddonCasted = true;
             }
         }
