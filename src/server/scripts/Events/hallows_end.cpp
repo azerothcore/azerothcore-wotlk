@@ -352,7 +352,7 @@ public:
         void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            target->SetObjectScale(0.5f);
+            target->SetObjectScale(1.0f);
             if (AuraEffect* aEff = GetEffect(EFFECT_0))
                 aEff->SetAmount(1);
         }
@@ -452,7 +452,7 @@ public:
                 GetInitXYZ(x, y, z, o, path);
                 if (Creature* cr = me->SummonCreature(NPC_SHADE_OF_HORSEMAN, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                 {
-                    cr->GetMotionMaster()->MovePath(path, false);
+                    cr->GetMotionMaster()->MovePath(path, true);
                     cr->AI()->DoAction(path);
                     horseGUID = cr->GetGUID();
                 }
@@ -472,7 +472,7 @@ public:
             if (eventStarted)
             {
                 eventStarted += diff;
-                if (eventStarted >= 5 * MINUTE * IN_MILLISECONDS)
+                if (eventStarted >= 400 * IN_MILLISECONDS)
                 {
                     allowQuest = false;
                     eventStarted = 0;
@@ -570,13 +570,19 @@ public:
                 me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
                 if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
                 {
-                    me->SetObjectScale(1.5f);
-                    aurEff->SetAmount(2);
+                    int32 amount = urand(1, 2);
+                    me->SetObjectScale(0.5f + 0.5f * amount);
+                    aurEff->SetAmount(amount);
                 }
             }
             else if (spellInfo->Id == SPELL_SPREAD_FIRE)
             {
                 me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
+                if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
+                {
+                    me->SetObjectScale(0.5f);
+                    aurEff->SetAmount(0);
+                }
             }
             else if (spellInfo->Id == SPELL_WATER_SPLASH)
             {
@@ -682,10 +688,9 @@ public:
                 unitList.push_back((*itr)->GetGUID());
 
             events.ScheduleEvent(1, 3000);
-            events.ScheduleEvent(2, 5000);
-            events.ScheduleEvent(2, 7000);
-            events.ScheduleEvent(2, 10000);
-            events.ScheduleEvent(3, 15000);
+            events.ScheduleEvent(2, 25000);
+            events.ScheduleEvent(2, 43000);
+            events.ScheduleEvent(3, 63000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -709,21 +714,18 @@ public:
                 case 3:
                     {
                         counter++;
-                        if (counter > 10)
+                        if (counter > 21)
                         {
-                            if (counter > 12)
-                            {
-                                bool failed = false;
-                                for (ObjectGuid const& guid : unitList)
-                                    if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
-                                        if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
-                                        {
-                                            failed = true;
-                                            break;
-                                        }
+                            bool failed = false;
+                            for (ObjectGuid const& guid : unitList)
+                                if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
+                                    if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                                    {
+                                        failed = true;
+                                        break;
+                                    }
 
-                                FinishEvent(failed);
-                            }
+                            FinishEvent(failed);
                             return;
                         }
                         if (counter == 5)
@@ -731,7 +733,7 @@ public:
                             me->MonsterYell("The sky is dark. The fire burns. You strive in vain as Fate's wheel turns.", LANG_UNIVERSAL, 0);
                             me->PlayDirectSound(12570);
                         }
-                        else if (counter == 10)
+                        else if (counter == 15)
                         {
                             me->MonsterYell("The town still burns. A cleansing fire! Time is short, I'll soon retire!", LANG_UNIVERSAL, 0);
                             me->PlayDirectSound(12571);
@@ -739,7 +741,7 @@ public:
 
                         if (Unit* trigger = getTrigger())
                             me->CastSpell(trigger, SPELL_START_FIRE, true);
-                        events.RepeatEvent(12000);
+                        events.RepeatEvent(15000);
                         break;
                     }
             }
@@ -829,12 +831,12 @@ public:
             Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
             Cell::VisitWorldObjects(me, searcher, radius);
 
-            for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            for (Player* player : players)
             {
-                (*itr)->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_H);
-                (*itr)->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_A);
-                (*itr)->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_H);
-                (*itr)->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_A);
+                player->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_H);
+                player->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_A);
+                player->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_H);
+                player->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_A);
             }
         }
     };

@@ -3491,6 +3491,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100 yards
     });
 
+    // Headless Horseman - Start Fire
+    ApplySpellFix({ 42132 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 6; // 100 yards
+    });
+
     //They Must Burn Bomb Aura (self)
     ApplySpellFix({ 36350 }, [](SpellEntry* spellInfo)
     {
