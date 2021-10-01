@@ -58,14 +58,22 @@ namespace
         }
     }
 
-    void AddKey(std::string const& optionName, std::string const& optionKey, std::string_view fileName, bool isOptional = false)
+    void AddKey(std::string const& optionName, std::string const& optionKey, std::string_view fileName, bool isOptional, bool isReload)
     {
         auto const& itr = _configOptions.find(optionName);
 
         // Check old option
         if (isOptional && itr == _configOptions.end())
         {
-            FMT_LOG_WARN("server.loading", "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
+            PrintError(fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
+
+#ifdef CONFIG_ABORT_INCORRECT_OPTIONS
+            if (!isReload)
+            {
+                ABORT_MSG("> Core can't start if found incorrect options");
+            }
+#endif
+
             return;
         }
 
@@ -78,7 +86,7 @@ namespace
         _configOptions.emplace(optionName, optionKey);
     }
 
-    bool ParseFile(std::string const& file, bool isOptional)
+    bool ParseFile(std::string const& file, bool isOptional, bool isReload)
     {
         std::ifstream in(file);
 
@@ -180,17 +188,17 @@ namespace
         // Add correct keys if file load without errors
         for (auto const& [entry, key] : fileConfigs)
         {
-            AddKey(entry, key, file, isOptional);
+            AddKey(entry, key, file, isOptional, isReload);
         }
 
         return true;
     }
 
-    bool LoadFile(std::string const& file, bool isOptional)
+    bool LoadFile(std::string const& file, bool isOptional, bool isReload)
     {
         try
         {
-            return ParseFile(file, isOptional);
+            return ParseFile(file, isOptional, isReload);
         }
         catch (const std::exception& e)
         {
@@ -201,18 +209,17 @@ namespace
     }
 }
 
-bool ConfigMgr::LoadInitial(std::string const& file)
+bool ConfigMgr::LoadInitial(std::string const& file, bool isReload /*= false*/)
 {
     std::lock_guard<std::mutex> lock(_configLock);
     _configOptions.clear();
-    return LoadFile(file, false);
+    return LoadFile(file, false, isReload);
 }
 
-bool ConfigMgr::LoadAdditionalFile(std::string file, bool isOptional /*= false*/)
+bool ConfigMgr::LoadAdditionalFile(std::string file, bool isOptional /*= false*/, bool isReload /*= false*/)
 {
     std::lock_guard<std::mutex> lock(_configLock);
-
-    return LoadFile(file, isOptional);
+    return LoadFile(file, isOptional, isReload);
 }
 
 ConfigMgr* ConfigMgr::instance()
@@ -223,12 +230,12 @@ ConfigMgr* ConfigMgr::instance()
 
 bool ConfigMgr::Reload()
 {
-    if (!LoadAppConfigs())
+    if (!LoadAppConfigs(true))
     {
         return false;
     }
 
-    return LoadModulesConfigs(false);
+    return LoadModulesConfigs(true, false);
 }
 
 template<class T>
@@ -239,7 +246,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            FMT_LOG_ERROR("server.loading", "> Config: Missing name {} in config, add \"{} = {}\"",
+            FMT_LOG_ERROR("server.loading", "> Config: Missing option {}, add \"{} = {}\"",
                 name, name, Acore::ToString(def));
         }
 
@@ -269,7 +276,7 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            FMT_LOG_ERROR("server.loading", "> Config: Missing name {} in config, add \"{} = {}\"",
+            FMT_LOG_ERROR("server.loading", "> Config: Missing option {}, add \"{} = {}\"",
                 name, name, def);
         }
 
@@ -359,16 +366,16 @@ void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::stri
     }
 }
 
-bool ConfigMgr::LoadAppConfigs()
+bool ConfigMgr::LoadAppConfigs(bool isReload /*= false*/)
 {
     // #1 - Load init config file .conf.dist
-    if (!LoadInitial(_filename + ".dist"))
+    if (!LoadInitial(_filename + ".dist", isReload))
     {
         return false;
     }
 
     // #2 - Load .conf file
-    if (!LoadAdditionalFile(_filename, true))
+    if (!LoadAdditionalFile(_filename, true, isReload))
     {
         _usingDistConfig = true;
     }
@@ -376,7 +383,7 @@ bool ConfigMgr::LoadAppConfigs()
     return true;
 }
 
-bool ConfigMgr::LoadModulesConfigs(bool isNeedPrintInfo /*= true*/)
+bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintInfo /*= true*/)
 {
     if (_additonalFiles.empty())
     {
@@ -403,7 +410,7 @@ bool ConfigMgr::LoadModulesConfigs(bool isNeedPrintInfo /*= true*/)
         }
 
         // Load .conf.dist config
-        isExistDistConfig = LoadAdditionalFile(moduleConfigPath + distFileName);
+        isExistDistConfig = LoadAdditionalFile(moduleConfigPath + distFileName, isReload);
 
         // Skip loading and send error load
         if (!isExistDistConfig)
@@ -413,7 +420,7 @@ bool ConfigMgr::LoadModulesConfigs(bool isNeedPrintInfo /*= true*/)
         }
 
         // Load .conf config
-        isExistDefaultConfig = LoadAdditionalFile(moduleConfigPath + defaultFileName, true);
+        isExistDefaultConfig = LoadAdditionalFile(moduleConfigPath + defaultFileName, true, isReload);
 
         if (isExistDefaultConfig && isExistDistConfig)
         {
