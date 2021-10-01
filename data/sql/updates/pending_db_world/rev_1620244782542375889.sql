@@ -98,10 +98,10 @@ update `creature_template` SET `ScriptName`='', `AIName`='SmartAI' WHERE `entry`
 DELETE FROM `smart_scripts` WHERE `entryorguid`=11671 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (11671, 0, 0, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 42, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - AI Init - Set invincibility hp pct to 1%'),
-(11671, 0, 1, 2, 2, 1, 100, 0, 1, 1, 0, 0, 0, 11, 19822, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - At 1% hp - cast Play Dead'),
+(11671, 0, 1, 2, 2, 1, 100, 0, 0, 2, 1000, 1000, 0, 11, 19822, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - At 1% hp - cast Play Dead'),
 (11671, 0, 2, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - At 1% hp - set event phase to 2'),
-(11671, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - At 1% hp - Say text'),
 (11671, 0, 3, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - On Agroo - set event phase to 1'),
 (11671, 0, 4, 0, 0, 1, 100, 0, 3000, 3000, 5000, 6000, 0, 11, 19771, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - IC - cast Serrated Bite'),
-(11671, 0, 5, 6, 38, 2, 100, 0, 11671, 1, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - On Data Set - Set event phase to 1'),
-(11671, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - On Data Set - Say text');
+(11671, 0, 5, 6, 38, 2, 100, 0, 1, 1, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - On Data Set - Set event phase to 1'),
+(11671, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - On Data Set - Say text'),
+(11671, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - At 1% hp - Say text');

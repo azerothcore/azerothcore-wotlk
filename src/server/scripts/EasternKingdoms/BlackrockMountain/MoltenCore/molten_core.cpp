@@ -20,15 +20,23 @@ public:
         {
             if (Creature* target = GetTarget()->ToCreature())
             {
+                target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                //target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                 target->SetReactState(REACT_PASSIVE);
+                target->SetControlled(true, UNIT_STATE_ROOT);
+                target->AttackStop();
             }
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            Creature* target = GetTarget()->ToCreature();
-            if (target)
+            if (Creature* target = GetTarget()->ToCreature())
             {
+                target->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                //target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                target->SetControlled(false, UNIT_STATE_ROOT);
                 target->SetReactState(REACT_AGGRESSIVE);
 
                 if (target->IsInCombat())
@@ -51,7 +59,8 @@ public:
                     if (!shouldDie)
                     {
                         target->SetFullHealth();
-                        target->AI()->SetData(target->GetEntry(), 1);
+                        target->AI()->SetData(1, 1);
+                        printf("TRIGGERED\n");
                     }
                     else
                     {
