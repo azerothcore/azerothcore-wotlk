@@ -983,56 +983,6 @@ void WorldSession::HandleFeatherFallAck(WorldPacket& recv_data)
     recv_data.rfinish();                       // prevent warnings spam
 }
 
-void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
-{
-    // no used
-    recv_data.rfinish();                       // prevent warnings spam
-    /*
-        ObjectGuid guid;
-        recv_data >> guid;
-
-        // now can skip not our packet
-        if (_player->GetGUID() != guid)
-        {
-            recv_data.rfinish();                   // prevent warnings spam
-            return;
-        }
-
-        LOG_DEBUG("network.opcode", "WORLD: CMSG_FORCE_MOVE_UNROOT_ACK");
-
-        recv_data.read_skip<uint32>();                          // unk
-
-        MovementInfo movementInfo;
-        movementInfo.guid = guid;
-        ReadMovementInfo(recv_data, &movementInfo);
-        recv_data.read_skip<float>();                           // unk2
-    */
-}
-
-void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
-{
-    // no used
-    recv_data.rfinish();                       // prevent warnings spam
-    /*
-        ObjectGuid guid;
-        recv_data >> guid;
-
-        // now can skip not our packet
-        if (_player->GetGUID() != guid)
-        {
-            recv_data.rfinish();                   // prevent warnings spam
-            return;
-        }
-
-        LOG_DEBUG("network.opcode", "WORLD: CMSG_FORCE_MOVE_ROOT_ACK");
-
-        recv_data.read_skip<uint32>();                          // unk
-
-        MovementInfo movementInfo;
-        ReadMovementInfo(recv_data, &movementInfo);
-    */
-}
-
 void WorldSession::HandleSetActionBarToggles(WorldPacket& recv_data)
 {
     uint8 ActionBar;
