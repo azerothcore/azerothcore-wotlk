@@ -620,6 +620,8 @@ namespace lfg
         LfgPlayerDataContainer PlayersStore;               ///< Player data
         LfgGroupDataContainer GroupsStore;                 ///< Group data
         bool m_Testing;
+
+        void setRandomDungeonId(uint32 & rDungeonId) const;
     };
 
 } // namespace lfg
