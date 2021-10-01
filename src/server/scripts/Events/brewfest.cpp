@@ -1675,7 +1675,6 @@ public:
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
-            Creature* cr = nullptr;
             Unit* caster = GetCaster();
             if (!caster)
                 return;
@@ -1683,23 +1682,49 @@ public:
             if (!GetHitUnit() || GetHitUnit()->GetGUID() != caster->GetGUID())
                 return;
 
+            std::vector<Creature*> bakers;
             if (caster->GetMapId() == 1) // Kalimdor
             {
-                if ((cr = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
             }
             else // EK
             {
-                if ((cr = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+            }
+
+            if (!bakers.empty())
+            {
+                std::sort(bakers.begin(), bakers.end(), Acore::ObjectDistanceOrderPred(caster));
+                if (Creature* creature = *bakers.begin())
+                {
+                    creature->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
+                }
             }
         }
 
