@@ -64,7 +64,7 @@ namespace
         // Check old option
         if (isOptional && itr == _configOptions.end())
         {
-            FMT_LOG_WARN("server.loading", "> Config::LoadFile: Found incorrect (old) option '{}' in config file '{}'. Skip", optionName, fileName);
+            FMT_LOG_WARN("server.loading", "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
             return;
         }
 
