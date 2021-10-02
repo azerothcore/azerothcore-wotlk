@@ -154,6 +154,10 @@ public:
         GuidList ArgelmachAdds;
         ObjectGuid ArgelmachGUID;
 
+        
+        TempSummon* TempSummonGrimstone = nullptr;
+        Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
+
         void Initialize() override
         {
             memset(&encounter, 0, sizeof(encounter));
@@ -332,6 +336,21 @@ public:
             {
                 case TYPE_RING_OF_LAW:
                     encounter[0] = data;
+                    switch(data)
+                    {
+                        case IN_PROGRESS:
+                            TempSummonGrimstone = instance->SummonCreature(NPC_GRIMSTONE, GrimstonePositon);
+                        break;
+                        case FAIL:
+                            if (TempSummonGrimstone)
+                            {
+                                TempSummonGrimstone->RemoveFromWorld();
+                                TempSummonGrimstone = nullptr;
+                            }
+                            SetData(TYPE_RING_OF_LAW, NOT_STARTED);
+                        default:
+                            break;
+                    }
                     break;
                 case TYPE_VAULT:
                     encounter[1] = data;

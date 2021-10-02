@@ -51,8 +51,6 @@ public:
     {
         boss_anubshiahAI(Creature* creature) :  BossAI(creature, DATA_ANUBSHIAH) { }
 
-
-
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
