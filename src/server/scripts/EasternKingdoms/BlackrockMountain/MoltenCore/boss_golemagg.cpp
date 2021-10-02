@@ -47,7 +47,7 @@ public:
 
     struct boss_golemaggAI : public BossAI
     {
-        boss_golemaggAI(Creature* creature) : BossAI(creature, DATA_GOLEMAGG_THE_INCINERATOR)
+        boss_golemaggAI(Creature* creature) : BossAI(creature, DATA_GOLEMAGG)
         {
         }
 
@@ -143,7 +143,7 @@ public:
             if (HealthAbovePct(50) || !instance)
                 return;
 
-            if (Creature* pGolemagg = instance->instance->GetCreature(instance->GetGuidData(DATA_GOLEMAGG_THE_INCINERATOR)))
+            if (Creature* pGolemagg = instance->instance->GetCreature(instance->GetGuidData(DATA_GOLEMAGG)))
             {
                 if (pGolemagg->IsAlive())
                 {

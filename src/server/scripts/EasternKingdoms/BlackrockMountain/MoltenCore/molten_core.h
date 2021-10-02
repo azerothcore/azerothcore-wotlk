@@ -18,9 +18,9 @@ enum MCData
     DATA_GEHENNAS                   = 2,
     DATA_GARR                       = 3,
     DATA_SHAZZRAH                   = 4,
-    DATA_BARON_GEDDON               = 5,
-    DATA_SULFURON_HARBINGER         = 6,
-    DATA_GOLEMAGG_THE_INCINERATOR   = 7,
+    DATA_GEDDON                     = 5,
+    DATA_SULFURON                   = 6,
+    DATA_GOLEMAGG                   = 7,
     DATA_MAJORDOMO_EXECUTUS         = 8,
     DATA_RAGNAROS                   = 9,
 };
@@ -56,7 +56,7 @@ enum MCGameObjects
 {
     GO_CACHE_OF_THE_FIRELORD        = 179703,
     GO_CIRCLE_SULFURON              = 178187,
-    GO_CIRCLE_BARON                 = 178188,
+    GO_CIRCLE_GEDDON                = 178188,
     GO_CIRCLE_SHAZZRAH              = 178189,
     GO_CIRCLE_GOLEMAGG              = 178190,
     GO_CIRCLE_GARR                  = 178191,

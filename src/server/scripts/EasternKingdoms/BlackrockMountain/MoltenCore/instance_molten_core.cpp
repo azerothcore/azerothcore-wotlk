@@ -95,39 +95,88 @@ public:
                     _cacheOfTheFirelordGUID = go->GetGUID();
                     break;
                 }
-                case GO_CIRCLE_BARON:
+                case GO_CIRCLE_GEDDON:
                 {
-                    _circlesGUIDs[5] = go->GetGUID();
+                    if (GetBossState(DATA_GEDDON) == DONE)
+                    {
+                        go->SetLootMode(GO_JUST_DEACTIVATED);
+                    }
+                    else
+                    {
+                        _circlesGUIDs[DATA_GEDDON] = go->GetGUID();
+                    }
                     break;
                 }
                 case GO_CIRCLE_GARR:
                 {
-                    _circlesGUIDs[3] = go->GetGUID();
+                    if (GetBossState(DATA_GARR) == DONE)
+                    {
+                        go->SetLootMode(GO_JUST_DEACTIVATED);
+                    }
+                    else
+                    {
+                        _circlesGUIDs[DATA_GARR] = go->GetGUID();
+                    }
                     break;
                 }
                 case GO_CIRCLE_GEHENNAS:
                 {
-                    _circlesGUIDs[2] = go->GetGUID();
+                    if (GetBossState(DATA_GEHENNAS) == DONE)
+                    {
+                        go->SetLootMode(GO_JUST_DEACTIVATED);
+                    }
+                    else
+                    {
+                        _circlesGUIDs[DATA_GEHENNAS] = go->GetGUID();
+                    }
                     break;
                 }
                 case GO_CIRCLE_GOLEMAGG:
                 {
-                    _circlesGUIDs[7] = go->GetGUID();
+                    if (GetBossState(DATA_GOLEMAGG) == DONE)
+                    {
+                        go->SetLootMode(GO_JUST_DEACTIVATED);
+                    }
+                    else
+                    {
+                        _circlesGUIDs[DATA_GOLEMAGG] = go->GetGUID();
+                    }
                     break;
                 }
                 case GO_CIRCLE_MAGMADAR:
                 {
-                    _circlesGUIDs[1] = go->GetGUID();
+                    if (GetBossState(DATA_MAGMADAR) == DONE)
+                    {
+                        go->SetLootMode(GO_JUST_DEACTIVATED);
+                    }
+                    else
+                    {
+                        _circlesGUIDs[DATA_MAGMADAR] = go->GetGUID();
+                    }
                     break;
                 }
                 case GO_CIRCLE_SHAZZRAH:
                 {
-                    _circlesGUIDs[4] = go->GetGUID();
+                    if (GetBossState(DATA_SHAZZRAH) == DONE)
+                    {
+                        go->SetLootMode(GO_JUST_DEACTIVATED);
+                    }
+                    else
+                    {
+                        _circlesGUIDs[DATA_SHAZZRAH] = go->GetGUID();
+                    }
                     break;
                 }
                 case GO_CIRCLE_SULFURON:
                 {
-                    _circlesGUIDs[6] = go->GetGUID();
+                    if (GetBossState(DATA_SULFURON) == DONE)
+                    {
+                        go->SetLootMode(GO_JUST_DEACTIVATED);
+                    }
+                    else
+                    {
+                        _circlesGUIDs[DATA_SULFURON] = go->GetGUID();
+                    }
                     break;
                 }
             }
@@ -138,7 +187,7 @@ public:
         {
             switch (type)
             {
-                case DATA_GOLEMAGG_THE_INCINERATOR:
+                case DATA_GOLEMAGG:
                     return _golemaggTheIncineratorGUID;
                 case DATA_MAJORDOMO_EXECUTUS:
                     return _majordomoExecutusGUID;
@@ -173,9 +222,18 @@ public:
                 }
             }
 
-            if (state == DONE && bossId < DATA_MAJORDOMO_EXECUTUS && CheckMajordomoExecutus())
+            if (state == DONE && bossId < DATA_MAJORDOMO_EXECUTUS)
             {
-                SummonMajordomoExecutus();
+                if (GameObject* circle = instance->GetGameObject(_circlesGUIDs[bossId]))
+                {
+                    circle->SetLootMode(GO_JUST_DEACTIVATED);
+                    _circlesGUIDs[bossId].Clear();
+                }
+
+                if (CheckMajordomoExecutus())
+                {
+                    SummonMajordomoExecutus();
+                }
             }
 
             if (bossId == DATA_MAJORDOMO_EXECUTUS && state == DONE)
@@ -275,7 +333,7 @@ public:
         }
 
     private:
-        std::unordered_map<uint8, ObjectGuid> _circlesGUIDs;
+        std::unordered_map<uint32/*bossid*/, ObjectGuid/*circleGUID*/> _circlesGUIDs;
         ObjectGuid _golemaggTheIncineratorGUID;
         ObjectGuid _majordomoExecutusGUID;
         ObjectGuid _cacheOfTheFirelordGUID;

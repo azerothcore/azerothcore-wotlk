@@ -42,7 +42,7 @@ public:
 
     struct boss_baron_geddonAI : public BossAI
     {
-        boss_baron_geddonAI(Creature* creature) : BossAI(creature, DATA_BARON_GEDDON),
+        boss_baron_geddonAI(Creature* creature) : BossAI(creature, DATA_GEDDON),
             armageddonCasted(false)
         {
         }
