@@ -59,7 +59,6 @@ public:
             events.ScheduleEvent(SPELL_CURSE_WEAKNESS, 0.2*TIMER_CURSE_WEAKNESS);
             events.ScheduleEvent(SPELL_DEMON_ARMOR, 500);
             events.ScheduleEvent(SPELL_ENVELOPING_WEB, 0.2*TIMER_ENVELOPING_WEB);
-            
         }
 
         void UpdateAI(uint32 diff) override
@@ -77,6 +76,8 @@ public:
                 switch (eventId)
                 {
                 case SPELL_SHADOWBOLT:
+                    DoCastVictim(SPELL_SHADOWBOLT);
+                    events.ScheduleEvent(SPELL_SHADOWBOLT, urand(TIMER_SHADOWBOLT - 2000, TIMER_SHADOWBOLT + 2000));
                     break;
                 case SPELL_CURSE_TONGUES:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))

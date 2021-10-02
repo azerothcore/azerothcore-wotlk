@@ -288,18 +288,19 @@ public:
                     me->SummonCreature(theldrenTeam[i], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
             }
             else
-                me->SummonCreature(RingBoss[4], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                me->SummonCreature(RingBoss[urand(0,5)], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
             resetTimer = 30000;
         }
 
         bool updateReset(uint32 diff)
         {
-            bool doReset = true;
+            bool doReset = false;
             if (resetTimer > 0)
             {
                 if (resetTimer <= diff)
                 {
                     resetTimer   = 30000;
+                    doReset    = true; // within timer, default to true. If any mob is in combat we set false.
                     for (const auto& sum : summons)
                     {
                         if (Creature* creature = ObjectAccessor::GetCreature(*me, sum))
