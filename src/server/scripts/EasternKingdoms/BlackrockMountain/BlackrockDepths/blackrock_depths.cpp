@@ -276,6 +276,14 @@ public:
             return doReset;
         }
 
+        void SpawnWave(uint32 mobId)
+        {
+            for (int i = 0; i < RingMobs[mobId].amount; i++)
+            {
+                me->SummonCreature(RingMobs[mobId].entry, 608.960f + 0.2f * i, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            }
+        }
+
         void UpdateEscortAI(uint32 diff) override
         {
             if (!instance)
@@ -319,17 +327,11 @@ public:
                         case 4:
                             SetEscortPaused(false);
                             me->SetVisible(false);
-                            for (int i = 0; i < RingMobs[MobSpawnId].amount; i++)
-                            {
-                                me->SummonCreature(RingMobs[MobSpawnId].entry, 608.960f+0.2f*i, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            }
+                            SpawnWave(MobSpawnId); // wave 1
                             eventTimer = 15000;
                             break;
                         case 5:
-                            for (int i = 0; i < RingMobs[MobSpawnId].amount; i++)
-                            {
-                                me->SummonCreature(RingMobs[MobSpawnId].entry, 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            }
+                            SpawnWave(MobSpawnId); // wave 2
                             eventTimer = 0; // will be set from SummonedCreatureDies
                             break;
                         case 6:
