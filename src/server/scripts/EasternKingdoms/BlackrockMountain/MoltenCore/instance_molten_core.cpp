@@ -35,8 +35,7 @@ public:
 
     struct instance_molten_core_InstanceMapScript : public InstanceScript
     {
-        instance_molten_core_InstanceMapScript(Map* map) : InstanceScript(map),
-            canSaveBossState(false)
+        instance_molten_core_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(MAX_ENCOUNTER);
             LoadMinionData(minionData);
@@ -184,10 +183,6 @@ public:
                 DoRespawnGameObject(_cacheOfTheFirelordGUID, 7 * DAY);
             }
 
-            if (canSaveBossState)
-            {
-                SaveToDB();
-            }
             return true;
         }
 
@@ -277,7 +272,6 @@ public:
             }
 
             OUT_LOAD_INST_DATA_COMPLETE;
-            canSaveBossState = true;
         }
 
     private:
@@ -287,7 +281,6 @@ public:
         ObjectGuid _cacheOfTheFirelordGUID;
         ObjectGuid _garrGUID;
         GuidSet _garrMinionsGUIDs;
-        bool canSaveBossState;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
