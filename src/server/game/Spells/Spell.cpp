@@ -5718,13 +5718,12 @@ SpellCastResult Spell::CheckCast(bool strict)
                     {
                         return SPELL_FAILED_DONT_REPORT;
                     }
+
                     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR)
                     {
                         // Warbringer - can't be handled in proc system - should be done before checkcast root check and charge effect process
                         if (strict && m_caster->IsScriptOverriden(m_spellInfo, 6953))
-                        {
                             m_caster->RemoveMovementImpairingAuras(true);
-                        }
                     }
                     if (m_caster->HasUnitState(UNIT_STATE_ROOT))
                     {
@@ -5734,44 +5733,42 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_ROOTED;
                         }
                     }
-
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        if (Unit* target = m_targets.GetUnitTarget())
+                            if (!target->IsAlive())
+                                return SPELL_FAILED_BAD_TARGETS;
                     // Xinef: Pass only explicit unit target spells
                     // pussywizard:
                     if (DisableMgr::IsPathfindingEnabled(m_caster->FindMap()) && m_spellInfo->NeedsExplicitUnitTarget())
                     {
                         Unit* target = m_targets.GetUnitTarget();
-                        if (!target || !target->IsAlive())
-                        {
+                        if (!target)
                             return SPELL_FAILED_BAD_TARGETS;
-                        } else if (m_caster->GetMapId() == 618) // pussywizard: 618 Ring of Valor
-                        {
+
+                        if (m_caster->GetMapId() == 618) // pussywizard: 618 Ring of Valor
                             target->m_positionZ = std::max(target->m_positionZ, 28.28f);
+
+                        if (m_caster->GetMapId() == 618) // pussywizard: 618 Ring of Valor
+                        {
                             if (!((target->GetPositionZ() > 32.0f) ^ (m_caster->GetPositionZ() > 32.0f)))
-                            {
                                 break;
-                            }
                             return SPELL_FAILED_NOPATH;
-                        } else if (m_caster->GetMapId() == 572) // pussywizard: 572 Ruins of Lordaeron
+                        }
+                        else if (m_caster->GetMapId() == 572) // pussywizard: 572 Ruins of Lordaeron
                         {
                             if (target->GetPositionX() < 1275.0f || m_caster->GetPositionX() < 1275.0f) // special case (acid)
-                            {
                                 break; // can't force path because the way is around and the path is too long
-                            }
-                                
-                        } else if (m_caster->GetTransport() != target->GetTransport())
-                        {
-                            return SPELL_FAILED_NOPATH;
-                        } else if (m_caster->GetTransport())
-                        {
-                            break;
                         }
+
+                        if (m_caster->GetTransport() != target->GetTransport())
+                            return SPELL_FAILED_NOPATH;
+                        if (m_caster->GetTransport())
+                            break;
 
                         m_pathFinder = new PathGenerator(m_caster);
                         m_pathFinder->CalculatePath(target->m_positionX, target->m_positionY, target->m_positionZ, false);
                         if (m_pathFinder->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE) || m_pathFinder->getPathLength() > (40.0f + (m_caster->HasAura(58097) ? 5.0f : 0.0f)))
-                        {
                             return SPELL_FAILED_NOPATH;
-                        }
                         m_pathFinder->ShortenPathUntilDist(target->GetPosition(), m_caster->GetCombatReach());
                     }
                     break;
