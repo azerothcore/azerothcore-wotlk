@@ -43,22 +43,15 @@ enum Events
     EVENT_MAGMA_SHACKLES,
 };
 
-enum Creatures
-{
-    NPC_FIRESWORN            = 12099,
-};
-
 class boss_garr : public CreatureScript
 {
 public:
-    boss_garr() : CreatureScript("boss_garr")
-    {
-    }
+    boss_garr() : CreatureScript("boss_garr") {}
 
     struct boss_garrAI : public BossAI
     {
         boss_garrAI(Creature* creature) : BossAI(creature, DATA_GARR),
-                                          massEruptionTimer(600000)
+            massEruptionTimer(600000)
         {
         }
 
@@ -66,19 +59,6 @@ public:
         {
             _Reset();
             massEruptionTimer = 600000;
-
-            std::list<Creature*> fireworns;
-            me->GetCreatureListWithEntryInGrid(fireworns, NPC_FIRESWORN, 240.0f);
-            if (!fireworns.empty())
-            {
-                for (auto fireworn : fireworns)
-                {
-                    if (fireworn && fireworn->isDead())
-                    {
-                        fireworn->Respawn(true);
-                    }
-                }
-            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -171,27 +151,24 @@ public:
 class npc_firesworn : public CreatureScript
 {
 public:
-    npc_firesworn() : CreatureScript("npc_firesworn")
-    {
-    }
+    npc_firesworn() : CreatureScript("npc_firesworn") {}
 
     struct npc_fireswornAI : public ScriptedAI
     {
         npc_fireswornAI(Creature* creature) : ScriptedAI(creature),
-                                              instance(creature->GetInstanceScript()),
-                                              anxietyTimer(10000),
-                                              canErrupt(true)
+            instance(creature->GetInstanceScript()),
+            anxietyTimer(10000),
+            canErrupt(true)
         {
         }
 
-        void EnterCombat(Unit* /*attacker*/) override
-        {
-        }
+        void EnterCombat(Unit* /*attacker*/) override {}
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
             if (canErrupt && damage >= me->GetHealth() && attacker->GetGUID() != me->GetGUID())
             {
+                canErrupt = false;
                 DoCastAOE(SPELL_ERUPTION, true);
                 Unit::Kill(attacker, me);
             }
@@ -227,7 +204,7 @@ public:
                 {
                     if (Creature const* garr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_GARR)))
                     {
-                        if (me->GetDistance2d(garr) > 45.0f)
+                        if (me->IsWithinDist(garr, 45.0f))
                         {
                             DoCastSelf(SPELL_SEPARATION_ANXIETY);
                         }

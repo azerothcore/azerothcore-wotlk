@@ -21,14 +21,22 @@ EndScriptData */
 #include "TemporarySummon.h"
 
 Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f};
+
+MinionData const minionData[] =
+{
+    { NPC_FIRESWORN, DATA_GARR },
+    { 0, 0 } // END
+};
+
 class instance_molten_core : public InstanceMapScript
 {
 public:
-    instance_molten_core() : InstanceMapScript(MCScriptName, 409) { }
+    instance_molten_core() : InstanceMapScript(MCScriptName, 409) {}
 
     struct instance_molten_core_InstanceMapScript : public InstanceScript
     {
-        instance_molten_core_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_molten_core_InstanceMapScript(Map* map) : InstanceScript(map),
+            canSaveBossState(false)
         {
             SetBossNumber(MAX_ENCOUNTER);
         }
@@ -237,6 +245,7 @@ public:
             }
 
             OUT_LOAD_INST_DATA_COMPLETE;
+            canSaveBossState = true;
         }
 
     private:
