@@ -926,3 +926,83 @@ void WorldSession::ComputeNewClockDelta()
         _timeSyncClockDelta = back.first;
     }
 }
+
+void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
+{
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
+
+    Unit* mover = _player->m_mover;
+    if (!mover || guid != mover->GetGUID())
+    {
+        recvData.rfinish(); // prevent warnings spam
+        return;
+    }
+
+    uint32 movementCounter;
+    recvData >> movementCounter;
+
+    MovementInfo movementInfo;
+    movementInfo.guid = guid;
+    ReadMovementInfo(recvData, &movementInfo);
+
+     /* process position-change */
+    int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
+    if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
+    {
+        LOG_INFO("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
+        movementInfo.time = getMSTime();
+    }
+    else
+    {
+        movementInfo.time = (uint32)movementTime;
+    }
+
+    movementInfo.guid = mover->GetGUID();
+    mover->m_movementInfo = movementInfo;
+    mover->UpdatePosition(movementInfo.pos);
+
+    WorldPacket data(MSG_MOVE_ROOT, 64);
+    WriteMovementInfo(&data, &movementInfo);
+    mover->SendMessageToSet(&data, _player);
+}
+
+void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
+{
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
+
+    Unit* mover = _player->m_mover;
+    if (!mover || guid != mover->GetGUID())
+    {
+        recvData.rfinish(); // prevent warnings spam
+        return;
+    }
+
+    uint32 movementCounter;
+    recvData >> movementCounter;
+
+    MovementInfo movementInfo;
+    movementInfo.guid = guid;
+    ReadMovementInfo(recvData, &movementInfo);
+
+     /* process position-change */
+    int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
+    if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
+    {
+        LOG_INFO("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
+        movementInfo.time = getMSTime();
+    }
+    else
+    {
+        movementInfo.time = (uint32)movementTime;
+    }
+
+    movementInfo.guid = mover->GetGUID();
+    mover->m_movementInfo = movementInfo;
+    mover->UpdatePosition(movementInfo.pos);
+
+    WorldPacket data(MSG_MOVE_UNROOT, 64);
+    WriteMovementInfo(&data, &movementInfo);
+    mover->SendMessageToSet(&data, _player);
+}
