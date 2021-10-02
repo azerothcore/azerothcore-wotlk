@@ -1,16 +1,15 @@
 @ECHO OFF
 CLS
-
 :MENU
 ECHO.
 ECHO ...............................................
 ECHO AzerothCore dbc, maps, vmaps, mmaps extractor
 ECHO ...............................................
-ECHO PRESS 1, 2, 3 OR 4 to select your task, or 5 to EXIT.
+ECHO PRESIONE 1, 2, 3 O 4 para seleccionar su tarea, o 5 para SALIR.
 ECHO ...............................................
 ECHO.
-ECHO WARNING! when extracting the vmaps extractor will
-ECHO output the text below, it's intended and not an error:
+ECHO ADVERTENCIA: al extraer los vmaps del extractor
+ECHO la salida del texto de abajo, es intencional y no un error:
 ECHO ..........................................
 ECHO Extracting World\Wmo\Band\Final_Stage.wmo
 ECHO No such file.
@@ -18,14 +17,14 @@ ECHO Couldn't open RootWmo!!!
 ECHO Done!
 ECHO ..........................................
 ECHO.
-ECHO Press 1, 2, 3 or 4 to start extracting or 5 to exit.
-ECHO 1 - Extract base files (NEEDED) and cameras.
-ECHO 2 - Extract vmaps (needs maps to be extracted before you run this) (OPTIONAL, highly recommended)
-ECHO 3 - Extract mmaps (needs vmaps to be extracted before you run this, may take hours) (OPTIONAL, highly recommended)
-ECHO 4 - Extract all (may take hours)
-ECHO 5 - EXIT
+ECHO Pulse 1, 2, 3 o 4 para iniciar la extraccion o 5 para salir.
+ECHO 1 - Extraer los archivos base (NECESARIOS) y las cámaras.
+ECHO 2 - Extraer vmaps (necesita que los mapas se extraigan antes de ejecutar esto) (OPCIONAL, muy recomendable)
+ECHO 3 - Extraer mmaps (necesita que los vmaps se extraigan antes de ejecutar esto, puede llevar horas) (OPCIONAL, muy recomendable)
+ECHO 4 - Extraer todo (puede llevar varias horas)
+ECHO 5 - SALIR
 ECHO.
-SET /P M=Type 1, 2, 3, 4 or 5 then press ENTER:
+SET /P M=Escriba 1, 2, 3, 4 o 5 y pulse ENTER: 
 IF %M%==1 GOTO MAPS
 IF %M%==2 GOTO VMAPS
 IF %M%==3 GOTO MMAPS
@@ -49,7 +48,7 @@ rmdir Buildings /s /q
 GOTO MENU
 
 :MMAPS
-ECHO This may take a few hours to complete. Please be patient.
+ECHO Esto puede tardar unas horas en completarse. Por favor, tenga paciencia.
 PAUSE
 if exist mmaps\ (
     echo folder found.
@@ -61,7 +60,7 @@ start /b /w mmaps_generator.exe
 GOTO MENU
 
 :ALL
-ECHO This may take a few hours to complete. Please be patient.
+ECHO Esto puede tardar unas horas en completarse. Por favor, tenga paciencia.
 PAUSE
 if exist vmaps\ (
     echo folder found.
