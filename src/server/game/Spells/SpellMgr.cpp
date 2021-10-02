@@ -3269,6 +3269,9 @@ void SpellMgr::LoadSpellCustomAttr()
             case 6197: // Eagle Eye
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
                 break;
+            case 14183: // Premeditation
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
+                break;
 
             // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
             // Envenom
