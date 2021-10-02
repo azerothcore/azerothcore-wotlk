@@ -64,7 +64,8 @@
         "typeinfo": "cpp",
         "codecvt": "cpp",
         "charconv": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "*.ipp": "cpp"
     },
     "deno.enable": true,
     "deno.path": "deps/deno/bin/deno",

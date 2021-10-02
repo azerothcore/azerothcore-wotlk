@@ -13,6 +13,8 @@ const env = {
   BUILDKIT_INLINE_CACHE: "1",
 };
 
+const DOCKER_COMPOSE_MIN_VERSION = "1.28";
+
 program
   .name("acore.sh docker")
   .description("Shell scripts for docker")
@@ -240,6 +242,31 @@ while (true) {
     await program.parseAsync(Deno.args);
     process.exit(0);
   }
+}
+
+async function dockerComposeCheckVersion() {
+  const res = Deno.run({
+    cmd: "docker-compose version --short".split(" "),
+    cwd: process.cwd(),
+    stdout: "piped",
+    stderr: "piped",
+  });
+
+  const output = await res.output(); // "piped" must be set
+
+  let services = new TextDecoder().decode(output).split("\n");
+
+  if (!services) {
+    console.error("No services available!");
+    return;
+  }
+
+  services.pop();
+  services = services.slice(2);
+
+  res.close(); // Don't forget to close it
+
+
 }
 
 /**

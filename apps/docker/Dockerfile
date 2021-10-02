@@ -56,17 +56,18 @@ RUN chown -R $DOCKER_USER:$DOCKER_USER /run
 RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
 RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
-USER $DOCKER_USER
-
 # copy everything so we can work directly within the container
 # using tools such as vscode dev-container
 # NOTE: this folder is different by the /azerothcore (which is binded instead)
 COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
-# Download deno and make sure the dashboard works
-RUN bash /azerothcore/acore.sh quit
 # Install node to allow working with Eluna-TS mainly
 RUN bash /azerothcore/bin/acore-install-node
+
+USER $DOCKER_USER
+
+# Download deno and make sure the dashboard works
+RUN bash /azerothcore/acore.sh quit
 
 WORKDIR /azerothcore
 
