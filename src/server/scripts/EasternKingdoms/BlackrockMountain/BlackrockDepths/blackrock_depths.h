@@ -23,7 +23,7 @@
 
 enum FactionIds
 {
-    FACTION_NEUTRAL            = 734,
+    FACTION_NEUTRAL            = 674,
     FACTION_HOSTILE            = 754,
     FACTION_FRIEND             = 35
 };
@@ -66,7 +66,7 @@ enum DataTypes
     DATA_SF_BRAZIER_N               = 25,
     DATA_SF_BRAZIER_S               = 26,
     DATA_MOIRA                      = 27,
-
+    DATA_PRIESTESS                  = 28,
     DATA_OPEN_COFFER_DOORS          = 30,
 
     DATA_GOLEM_LORD_ARGELMACH_INIT  = 31,

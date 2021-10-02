@@ -23,6 +23,14 @@
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 
+enum IronhandData
+{
+    IRONHAND_FLAMES_TIMER      = 16000,
+    IRONHAND_FLAMES_TIMER_RAND = 3000,
+    IRONHAND_N_GROUPS          = 3,
+    SPELL_GOUT_OF_FLAMES       = 15529
+};
+
 uint32 braziersUsed = 0;
 
 //go_shadowforge_brazier
@@ -35,40 +43,76 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (instance->GetData(TYPE_LYCEUM) == IN_PROGRESS)
-                instance->SetData(TYPE_LYCEUM, DONE);
-            else
-                instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
-            // If used brazier open linked doors (North or South)
-            if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_N))
+            if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_N) || go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_S))
             {
-                if (braziersUsed == 0)
+                braziersUsed++;
+                if (braziersUsed == 1)
                 {
-                    braziersUsed = 1;
+                    instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
                 }
-                else if(braziersUsed == 2)
+                if (braziersUsed == 2)
                 {
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);
-                    braziersUsed = 0;
-                }
-            }
-            else if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_S))
-            {
-                if (braziersUsed == 0)
-                {
-                    braziersUsed = 2;
-                }
-                else if (braziersUsed == 1)
-                {
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);
+                    instance->SetData(TYPE_LYCEUM, DONE);
                     braziersUsed = 0;
                 }
             }
         }
         return false;
     }
+};
+
+class ironhand_guardian : public CreatureScript
+{
+public:
+    ironhand_guardian() : CreatureScript("brd_ironhand_guardian") {}
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetBlackrockDepthsAI<ironhand_guardianAI>(creature);
+    }
+
+   struct ironhand_guardianAI : public CreatureAI
+    {
+        ironhand_guardianAI(Creature* creature) : CreatureAI(creature) {}
+        bool flames_enabled = false;
+
+        void SetData(uint32 id, uint32 value) override
+        {
+            if (id  == 0)
+            {
+                if (value == 0 || value == 1)
+                {
+                    flames_enabled = (bool) (value);
+                    events.ScheduleEvent(SPELL_GOUT_OF_FLAMES, urand(1, IRONHAND_N_GROUPS) * IRONHAND_FLAMES_TIMER / IRONHAND_N_GROUPS);
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            if (flames_enabled)
+            {
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                    case SPELL_GOUT_OF_FLAMES:
+                        DoCast(SPELL_GOUT_OF_FLAMES);
+                        events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, urand(IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND));
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+        }
+        EventMap events;
+    };
 };
 
 struct Wave
@@ -154,7 +198,7 @@ public:
         npc_grimstoneAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
-            MobSpawnId = rand() % 6;
+            MobSpawnId = urand(0,5);
             eventPhase = 0;
             eventTimer = 1000;
             resetTimer    = 0;
@@ -659,4 +703,5 @@ void AddSC_blackrock_depths()
     new npc_phalanx();
     new npc_lokhtos_darkbargainer();
     new npc_rocknot();
+    new ironhand_guardian();
 }
