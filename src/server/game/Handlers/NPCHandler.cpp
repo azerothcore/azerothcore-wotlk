@@ -423,7 +423,7 @@ void WorldSession::SendSpiritResurrect()
     GraveyardStruct const* corpseGrave = nullptr;
 
     // Search for any graveyards near the player's corpse.
-    corpseGrave = sGraveyard->GetClosestGraveyard(_player, _player->GetTeamId(), true);
+    corpseGrave = sGraveyard->GetClosestGraveyard(_player, _player->GetTeamId(), _player->HasCorpse());
 
     // now can spawn bones
     _player->SpawnCorpseBones();
