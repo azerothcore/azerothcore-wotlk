@@ -103,6 +103,7 @@ void Player::Update(uint32 p_time)
         }
     }
 
+    time_t lastTick = m_Last_tick;
     if (now > m_Last_tick)
     {
         // Update items that have just a limited lifetime
@@ -231,7 +232,7 @@ void Player::Update(uint32 p_time)
 
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
     {
-        if (now > m_Last_tick && _restTime > 0) // freeze update
+        if (now > lastTick && _restTime > 0) // freeze update
         {
             time_t currTime = time(nullptr);
             time_t timeDiff = currTime - _restTime;
