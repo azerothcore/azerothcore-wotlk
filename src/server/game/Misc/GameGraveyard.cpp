@@ -20,7 +20,6 @@
 #include "GameGraveyard.h"
 #include "Log.h"
 #include "MapMgr.h"
-#include "Player.h"
 
 Graveyard* Graveyard::instance()
 {

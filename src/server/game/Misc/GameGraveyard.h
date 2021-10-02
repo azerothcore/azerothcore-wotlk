@@ -19,6 +19,7 @@
 #define _GAMEGRAVEYARD_H_
 
 #include "Common.h"
+#include "Player.h"
 #include "SharedDefines.h"
 #include <map>
 #include <unordered_map>
