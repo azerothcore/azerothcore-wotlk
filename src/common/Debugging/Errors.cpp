@@ -6,10 +6,10 @@
 
 #include "Errors.h"
 #include "StringFormat.h"
+#include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 #include <thread>
-#include <cstdarg>
 
 /**
     @file Errors.cpp

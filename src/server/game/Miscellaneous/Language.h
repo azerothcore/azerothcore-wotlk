@@ -1,8 +1,18 @@
 /*
- * Copyright (C) MaNGOS, TrinityCore, AzerothCore
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __ACORE_LANGUAGE_H
@@ -700,9 +710,14 @@ enum AcoreStrings
     LANG_PLAYER_DND_DEFAULT             = 709,
     LANG_PLAYER_AFK_DEFAULT             = 710,
 
+    // BG announce
     LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
     LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
-    //                                      = 713, not used
+
+    // Arena announce
+    LANG_ARENA_QUEUE_ANNOUNCE_SELF      = 713,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD     = 726,
+
     //                                      = 714, see LANG_PINFO_MAP_ONLINE
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
     //                                      = 716, see LANG_PINFO_MAP_OFFLINE
@@ -716,7 +731,7 @@ enum AcoreStrings
     LANG_ARENA_NOT_ENOUGH_PLAYERS       = 723,              // "Your group does not have enough players to join this match."
     LANG_ARENA_GOLD_WINS                = 724,              // "The Gold Team wins!"
     LANG_ARENA_GREEN_WINS               = 725,              // "The Green Team wins!"
-    //                                      = 726, not used
+    // = 726, see LANG_ARENA_QUEUE_ANNOUNCE_WORLD
     LANG_BG_GROUP_OFFLINE_MEMBER        = 727,              // "Your group has an offline member. Please remove him before joining."
     LANG_BG_GROUP_MIXED_FACTION         = 728,              // "Your group has players from the opposing faction. You can't join the battleground as a group."
     LANG_BG_GROUP_MIXED_LEVELS          = 729,              // "Your group has players from different battleground brakets. You can't join as group."
@@ -1171,7 +1186,9 @@ enum AcoreStrings
     LANG_COMMAND_MUTEHISTORY_EMPTY      = 5060,
     LANG_COMMAND_MUTEHISTORY_OUTPUT     = 5061,
 
-    // Room for more Trinity strings    5062-9999
+    LANG_NPCINFO_SPELL_SCHOOL_IMMUNE    = 5062,
+
+    // Room for more strings    5063-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1190,6 +1207,9 @@ enum AcoreStrings
     LANG_GM_ANNOUNCE_COLOR               = 6615,
 
     LANG_GM_SILENCE                      = 6616,              // "Silence is ON for %s" - Spell 1852
+
+    // Used for .string command
+    LANG_NO_ACORE_STRING_FOUND           = 6617,
 
     LANG_WORLD_CLOSED                    = 7523,
     LANG_WORLD_OPENED                    = 7524,
@@ -1346,8 +1366,11 @@ enum AcoreStrings
     LANG_BG_READY_CHECK_ERROR                     = 30084,
 
     LANG_DEBUG_BG_CONF                            = 30085,
-    LANG_DEBUG_ARENA_CONF                         = 30086
+    LANG_DEBUG_ARENA_CONF                         = 30086,
 
     // 30087-30095 reserved for passive anticheat
+
+    LANG_DEBUG_LFG_ON                             = 30096,
+    LANG_DEBUG_LFG_OFF                            = 30097
 };
 #endif

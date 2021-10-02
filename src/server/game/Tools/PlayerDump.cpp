@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -9,7 +20,6 @@
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
 #include "PlayerDump.h"
-#include "UpdateFields.h"
 #include "World.h"
 
 #define DUMP_TABLE_COUNT 27
@@ -100,7 +110,7 @@ bool findnth(std::string& str, int n, std::string::size_type& s, std::string::si
 std::string gettablename(std::string& str)
 {
     std::string::size_type s = 13;
-    std::string::size_type e = str.find(_TABLE_SIM_, s);
+    std::string::size_type e = str.find("`", s);
     if (e == std::string::npos)
         return "";
 
@@ -188,7 +198,7 @@ std::string CreateDumpString(char const* tableName, QueryResult result)
 {
     if (!tableName || !result) return "";
     std::ostringstream ss;
-    ss << "INSERT INTO " << _TABLE_SIM_ << tableName << _TABLE_SIM_ << " VALUES (";
+    ss << "INSERT INTO `" << tableName << "` VALUES (";
     Field* fields = result->Fetch();
     for (uint32 i = 0; i < result->GetFieldCount(); ++i)
     {
@@ -328,7 +338,7 @@ bool PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const* tab
                 case DTT_CHARACTER:
                     {
                         if (result->GetFieldCount() <= 74)          // avoid crashes on next check
-                            LOG_FATAL("server", "PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
+                            LOG_FATAL("entities.player.dump", "PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
 
                         if (result->Fetch()[74].GetUInt32())        // characters.deleteInfos_Account - if filled error
                             return false;
@@ -417,7 +427,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     bool incHighest = true;
     if (guid != 0 && guid < sObjectMgr->GetGenerator<HighGuid::Player>().GetNextAfterMaxUsed())
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_GUID);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_GUID);
         stmt->setUInt32(0, guid);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -435,7 +445,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
     if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
         stmt->setString(0, name);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -465,7 +475,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     uint8 playerClass = 0;
     uint8 level = 1;
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     while (!feof(fin))
     {
         if (!fgets(buf, 32000, fin))
@@ -504,7 +514,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
         std::string tn = gettablename(line);
         if (tn.empty())
         {
-            LOG_ERROR("server", "LoadPlayerDump: Can't extract table name from line: '%s'!", line.c_str());
+            LOG_ERROR("entities.player.dump", "LoadPlayerDump: Can't extract table name from line: '%s'!", line.c_str());
             ROLLBACK(DUMP_FILE_BROKEN);
         }
 
@@ -521,7 +531,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
         if (i == DUMP_TABLE_COUNT)
         {
-            LOG_ERROR("server", "LoadPlayerDump: Unknown table: '%s'!", tn.c_str());
+            LOG_ERROR("entities.player.dump", "LoadPlayerDump: Unknown table: '%s'!", tn.c_str());
             ROLLBACK(DUMP_FILE_BROKEN);
         }
 
@@ -540,12 +550,12 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     playerClass = uint8(atol(getnth(line, 5).c_str()));
                     gender = uint8(atol(getnth(line, 6).c_str()));
                     level = uint8(atol(getnth(line, 7).c_str()));
-                    if (name == "")
+                    if (name.empty())
                     {
                         // check if the original name already exists
                         name = getnth(line, 3);
 
-                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+                        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
                         stmt->setString(0, name);
                         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -671,7 +681,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     break;
                 }
             default:
-                LOG_ERROR("server", "Unknown dump table type: %u", type);
+                LOG_ERROR("entities.player.dump", "Unknown dump table type: %u", type);
                 break;
         }
 

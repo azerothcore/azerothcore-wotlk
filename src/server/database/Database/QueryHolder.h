@@ -1,45 +1,88 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _QUERYHOLDER_H
 #define _QUERYHOLDER_H
 
-#include <ace/Future.h>
+#include "SQLOperation.h"
+#include <vector>
 
-class SQLQueryHolder
+class AC_DATABASE_API SQLQueryHolderBase
 {
-    friend class SQLQueryHolderTask;
+friend class SQLQueryHolderTask;
 private:
-    typedef std::pair<SQLElementData, SQLResultSetUnion> SQLResultPair;
-    std::vector<SQLResultPair> m_queries;
+    std::vector<std::pair<PreparedStatementBase*, PreparedQueryResult>> m_queries;
 public:
-    SQLQueryHolder() = default;
-    ~SQLQueryHolder();
-    bool SetQuery(size_t index, const char* sql);
-    bool SetPQuery(size_t index, const char* format, ...) ATTR_PRINTF(3, 4);
-    bool SetPreparedQuery(size_t index, PreparedStatement* stmt);
+    SQLQueryHolderBase() = default;
+    virtual ~SQLQueryHolderBase();
     void SetSize(size_t size);
-    QueryResult GetResult(size_t index);
-    PreparedQueryResult GetPreparedResult(size_t index);
-    void SetResult(size_t index, ResultSet* result);
+    PreparedQueryResult GetPreparedResult(size_t index) const;
     void SetPreparedResult(size_t index, PreparedResultSet* result);
+
+protected:
+    bool SetPreparedQueryImpl(size_t index, PreparedStatementBase* stmt);
 };
 
-typedef ACE_Future<SQLQueryHolder*> QueryResultHolderFuture;
+template<typename T>
+class SQLQueryHolder : public SQLQueryHolderBase
+{
+public:
+    bool SetPreparedQuery(size_t index, PreparedStatement<T>* stmt)
+    {
+        return SetPreparedQueryImpl(index, stmt);
+    }
+};
 
-class SQLQueryHolderTask : public SQLOperation
+class AC_DATABASE_API SQLQueryHolderTask : public SQLOperation
 {
 private:
-    SQLQueryHolder* m_holder;
-    QueryResultHolderFuture m_result;
+    std::shared_ptr<SQLQueryHolderBase> m_holder;
+    QueryResultHolderPromise m_result;
 
 public:
-    SQLQueryHolderTask(SQLQueryHolder* holder, QueryResultHolderFuture res)
-        : m_holder(holder), m_result(res) { };
+    explicit SQLQueryHolderTask(std::shared_ptr<SQLQueryHolderBase> holder)
+        : m_holder(std::move(holder)) { }
+
+    ~SQLQueryHolderTask();
+
     bool Execute() override;
+    QueryResultHolderFuture GetFuture() { return m_result.get_future(); }
+};
+
+class AC_DATABASE_API SQLQueryHolderCallback
+{
+public:
+    SQLQueryHolderCallback(std::shared_ptr<SQLQueryHolderBase>&& holder, QueryResultHolderFuture&& future)
+        : m_holder(std::move(holder)), m_future(std::move(future)) { }
+
+    SQLQueryHolderCallback(SQLQueryHolderCallback&&) = default;
+
+    SQLQueryHolderCallback& operator=(SQLQueryHolderCallback&&) = default;
+
+    void AfterComplete(std::function<void(SQLQueryHolderBase const&)> callback) &
+    {
+        m_callback = std::move(callback);
+    }
+
+    bool InvokeIfReady();
+
+    std::shared_ptr<SQLQueryHolderBase> m_holder;
+    QueryResultHolderFuture m_future;
+    std::function<void(SQLQueryHolderBase const&)> m_callback;
 };
 
 #endif

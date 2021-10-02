@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureAI.h"
 #include "Object.h"
@@ -1769,7 +1782,7 @@ public:
         void JustDied(Unit*) override
         {
             if (me->IsSummon())
-                if (Unit* sara = me->ToTempSummon()->GetSummoner())
+                if (Unit* sara = me->ToTempSummon()->GetSummonerUnit())
                     sara->GetAI()->DoAction(ACTION_INFLUENCE_TENTACLE_DIED);
         }
     };
@@ -2270,6 +2283,7 @@ public:
     };
 };
 
+// 63830, 63881 - Malady of the Mind
 class spell_yogg_saron_malady_of_the_mind : public SpellScriptLoader
 {
 public:
@@ -2303,6 +2317,7 @@ public:
     }
 };
 
+// 63802 - Brain Link
 class spell_yogg_saron_brain_link : public SpellScriptLoader
 {
 public:
@@ -2404,6 +2419,7 @@ public:
     }
 };
 
+// 64465 - Shadow Beacon
 class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
 {
     public:
@@ -2442,6 +2458,7 @@ class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
         }
 };
 
+// 65206 - Destabilization Matrix
 class spell_yogg_saron_destabilization_matrix : public SpellScriptLoader
 {
 public:
@@ -2486,6 +2503,7 @@ public:
     }
 };
 
+// 64172 - Titanic Storm
 class spell_yogg_saron_titanic_storm : public SpellScriptLoader
 {
 public:
@@ -2530,6 +2548,7 @@ public:
     }
 };
 
+// 64164, 64168 - Lunatic Gaze
 class spell_yogg_saron_lunatic_gaze : public SpellScriptLoader
 {
 public:
@@ -2563,7 +2582,7 @@ public:
     }
 };
 
-// Protective Gaze
+// 64174 - Protective Gaze
 class spell_yogg_saron_protective_gaze : public SpellScriptLoader
 {
 public:
@@ -2603,6 +2622,7 @@ public:
     }
 };
 
+// 64161 - Empowered
 class spell_yogg_saron_empowered : public SpellScriptLoader
 {
 public:
@@ -2641,6 +2661,7 @@ public:
     }
 };
 
+// 64555 - Insane Periodic
 class spell_yogg_saron_insane_periodic_trigger : public SpellScriptLoader
 {
 public:
@@ -2689,6 +2710,7 @@ public:
     }
 };
 
+// 63120 - Insane
 class spell_yogg_saron_insane : public SpellScriptLoader
 {
 public:
@@ -2715,6 +2737,7 @@ public:
     }
 };
 
+// 64169 - Sanity Well
 class spell_yogg_saron_sanity_well : public SpellScriptLoader
 {
 public:
@@ -2753,6 +2776,14 @@ public:
     }
 };
 
+/* 63881 - Malady of the Mind
+   63795 - Psychosis
+   63830 - Malady of the Mind
+   64164 - Lunatic Gaze
+   64059 - Induce Madness
+   63803 - Brain Link
+   65301 - Psychosis
+   64168 - Lunatic Gaze */
 class spell_yogg_saron_sanity_reduce : public SpellScriptLoader
 {
 public:
@@ -2823,6 +2854,7 @@ public:
     }
 };
 
+// 64467 - Empowering Shadows
 class spell_yogg_saron_empowering_shadows : public SpellScriptLoader
 {
 public:
@@ -2851,6 +2883,7 @@ public:
     }
 };
 
+// 64184 - In the Maws of the Old God
 class spell_yogg_saron_in_the_maws_of_the_old_god : public SpellScriptLoader
 {
 public:
@@ -2888,7 +2921,10 @@ public:
     }
 };
 
-class spell_yogg_saron_target_selectors : public SpellScriptLoader    // 63744, 63745, 63747, 65206
+/* 63744 - Sara's Anger
+   63747 - Sara's Fervor
+   63745 - Sara's Blessing */
+class spell_yogg_saron_target_selectors : public SpellScriptLoader
 {
 public:
     spell_yogg_saron_target_selectors() : SpellScriptLoader("spell_yogg_saron_target_selectors") { }
@@ -2918,7 +2954,8 @@ public:
     }
 };
 
-class spell_yogg_saron_grim_reprisal : public SpellScriptLoader     // 63305
+// 63305 - Grim Reprisal
+class spell_yogg_saron_grim_reprisal : public SpellScriptLoader
 {
 public:
     spell_yogg_saron_grim_reprisal() : SpellScriptLoader("spell_yogg_saron_grim_reprisal") { }
@@ -2955,7 +2992,7 @@ class achievement_yogg_saron_drive_me_crazy : public AchievementCriteriaScript
 public:
     achievement_yogg_saron_drive_me_crazy() : AchievementCriteriaScript("achievement_yogg_saron_drive_me_crazy") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target && target->GetAI()->GetData(DATA_GET_DRIVE_ME_CRAZY); // target = Yogg-Saron
     }
@@ -2969,7 +3006,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_SARA)))
@@ -2990,7 +3027,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
+    bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
             if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_BRAIN_OF_YOGG_SARON)))
@@ -3008,7 +3045,7 @@ class achievement_yogg_saron_kiss_and_make_up : public AchievementCriteriaScript
 public:
     achievement_yogg_saron_kiss_and_make_up() : AchievementCriteriaScript("achievement_yogg_saron_kiss_and_make_up") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Sara*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Sara*/, uint32 /*criteria_id*/) override
     {
         return target && target->GetEntry() == NPC_SARA && target->GetAI() && target->GetAI()->GetData(DATA_GET_SARA_PHASE);
     }

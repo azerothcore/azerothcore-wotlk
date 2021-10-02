@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "DatabaseEnv.h"
@@ -44,7 +55,7 @@ void LoadSkillDiscoveryTable()
     if (!result)
     {
         LOG_ERROR("sql.sql", ">> Loaded 0 skill discovery definitions. DB table `skill_discovery_template` is empty.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -111,7 +122,7 @@ void LoadSkillDiscoveryTable()
             }
 
             for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
-                SkillDiscoveryStore[-int32(_spell_idx->second->skillId)].push_back(SkillDiscoveryEntry(spellId, reqSkillValue, chance));
+                SkillDiscoveryStore[-int32(_spell_idx->second->SkillLine)].push_back(SkillDiscoveryEntry(spellId, reqSkillValue, chance));
         }
         else
         {
@@ -140,8 +151,8 @@ void LoadSkillDiscoveryTable()
             LOG_ERROR("sql.sql", "Spell (ID: %u) is 100%% chance random discovery ability but not have data in `skill_discovery_template` table", spell_id);
     }
 
-    LOG_INFO("server", ">> Loaded %u skill discovery definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u skill discovery definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 uint32 GetExplicitDiscoverySpell(uint32 spellId, Player* player)
@@ -153,7 +164,7 @@ uint32 GetExplicitDiscoverySpell(uint32 spellId, Player* player)
         return 0;
 
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
-    uint32 skillvalue = bounds.first != bounds.second ? player->GetSkillValue(bounds.first->second->skillId) : uint32(0);
+    uint32 skillvalue = bounds.first != bounds.second ? player->GetSkillValue(bounds.first->second->SkillLine) : uint32(0);
 
     float full_chance = 0;
     for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)

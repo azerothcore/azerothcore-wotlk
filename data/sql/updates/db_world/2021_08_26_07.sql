@@ -1,0 +1,30 @@
+-- DB update 2021_08_26_06 -> 2021_08_26_07
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_08_26_06';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_08_26_06 2021_08_26_07 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1629726120062356983'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1629726120062356983');
+
+-- adds movement to a few Mummified Headhunters
+UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 5 WHERE `id` = 16342 AND `guid` IN (82050, 82052, 82053, 82054, 82055, 82056, 82048, 82084);
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_08_26_07' WHERE sql_rev = '1629726120062356983';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

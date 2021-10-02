@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Cell.h"
 #include "CellImpl.h"
@@ -485,7 +498,7 @@ public:
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         _owner->SetReactState(REACT_AGGRESSIVE);
-        if (!_owner->getThreatManager().isThreatListEmpty())
+        if (!_owner->getThreatMgr().isThreatListEmpty())
             if (Unit* target = _owner->SelectVictim())
                 _owner->AI()->AttackStart(target);
         if (!_owner->GetVictim())
@@ -1973,8 +1986,13 @@ public:
             targets.resize(1);
         }
 
-        void CheckAura()
+        void CheckAura(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (GetHitUnit()->HasAura(GetSpellInfo()->Id))
                 _hadJumpingAura = true;
             else if (uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit()))
@@ -1998,7 +2016,7 @@ public:
         void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_necrotic_plague_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            BeforeHit += SpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::CheckAura);
+            BeforeHit += BeforeSpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::CheckAura);
             OnHit += SpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::AddMissingStack);
         }
 
@@ -2307,7 +2325,7 @@ public:
             bool valid = false;
             me->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL, true);
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* summoner = summon->GetSummoner())
+                if (Unit* summoner = summon->GetSummonerUnit())
                     if (summoner->GetTypeId() == TYPEID_PLAYER && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
                     {
                         valid = true;
@@ -2361,14 +2379,14 @@ public:
                     {
                         me->SetControlled(false, UNIT_STATE_ROOT);
 
-                        if (!me->getThreatManager().isThreatListEmpty())
+                        if (!me->getThreatMgr().isThreatListEmpty())
                             if (Unit* target = me->SelectVictim())
                                 AttackStart(target);
                         if (!me->GetVictim())
                         {
                             bool valid = false;
                             if (TempSummon* summon = me->ToTempSummon())
-                                if (Unit* summoner = summon->GetSummoner())
+                                if (Unit* summoner = summon->GetSummonerUnit())
                                     if (summoner->GetTypeId() == TYPEID_PLAYER && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
                                     {
                                         valid = true;
@@ -3033,7 +3051,7 @@ public:
                 return;
 
             if (TempSummon* summon = GetCaster()->ToTempSummon())
-                if (Unit* summoner = summon->GetSummoner())
+                if (Unit* summoner = summon->GetSummonerUnit())
                     summoner->GetAI()->SetData(DATA_VILE, 1);
 
             if (Creature* c = GetCaster()->ToCreature())
@@ -3149,7 +3167,7 @@ public:
 
             if (TempSummon* summ = me->ToTempSummon())
             {
-                if (Unit* summoner = summ->GetSummoner())
+                if (Unit* summoner = summ->GetSummonerUnit())
                 {
                     bool buff = _instance->GetBossState(DATA_THE_LICH_KING) == IN_PROGRESS && summoner->GetTypeId() == TYPEID_PLAYER && (!summoner->IsAlive() || summoner->ToPlayer()->IsBeingTeleported() || summoner->FindMap() != me->GetMap());
                     if (summoner->GetTypeId() == TYPEID_PLAYER && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
@@ -3186,7 +3204,7 @@ public:
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MoveIdle();
                     if (TempSummon* summ = me->ToTempSummon())
-                        if (Unit* summoner = summ->GetSummoner())
+                        if (Unit* summoner = summ->GetSummonerUnit())
                         {
                             if (summoner->IsAlive() && summoner->GetTypeId() == TYPEID_PLAYER)
                             {
@@ -3742,7 +3760,7 @@ class achievement_been_waiting_long_time : public AchievementCriteriaScript
 public:
     achievement_been_waiting_long_time() : AchievementCriteriaScript("achievement_been_waiting_long_time") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;
@@ -3756,7 +3774,7 @@ class achievement_neck_deep_in_vile : public AchievementCriteriaScript
 public:
     achievement_neck_deep_in_vile() : AchievementCriteriaScript("achievement_neck_deep_in_vile") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;

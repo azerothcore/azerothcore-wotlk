@@ -4,7 +4,6 @@
  */
 
 #include "TOTP.h"
-#include <cstring>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
@@ -18,7 +17,9 @@ static constexpr uint32 HMAC_RESULT_SIZE = 20;
     unsigned char challenge[8];
 
     for (int i = 8; i--; timestamp >>= 8)
+    {
         challenge[i] = timestamp;
+    }
 
     unsigned char digest[HMAC_RESULT_SIZE];
     uint32 digestSize = HMAC_RESULT_SIZE;

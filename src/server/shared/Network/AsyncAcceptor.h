@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __ASYNCACCEPT_H_
@@ -16,9 +28,9 @@
 using boost::asio::ip::tcp;
 
 #if BOOST_VERSION >= 106600
-#define WARHEAD_MAX_LISTEN_CONNECTIONS boost::asio::socket_base::max_listen_connections
+#define ACORE_MAX_LISTEN_CONNECTIONS boost::asio::socket_base::max_listen_connections
 #else
-#define WARHEAD_MAX_LISTEN_CONNECTIONS boost::asio::socket_base::max_connections
+#define ACORE_MAX_LISTEN_CONNECTIONS boost::asio::socket_base::max_connections
 #endif
 
 class AsyncAcceptor
@@ -72,7 +84,7 @@ public:
             return false;
         }
 
-#if WARHEAD_PLATFORM != WARHEAD_PLATFORM_WINDOWS
+#if AC_PLATFORM != AC_PLATFORM_WINDOWS
         _acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true), errorCode);
         if (errorCode)
         {
@@ -88,7 +100,7 @@ public:
             return false;
         }
 
-        _acceptor.listen(WARHEAD_MAX_LISTEN_CONNECTIONS, errorCode);
+        _acceptor.listen(ACORE_MAX_LISTEN_CONNECTIONS, errorCode);
         if (errorCode)
         {
             LOG_INFO("network", "Failed to start listening on %s:%u %s", _endpoint.address().to_string().c_str(), _endpoint.port(), errorCode.message().c_str());

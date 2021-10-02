@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /// \addtogroup world The World
@@ -11,8 +22,6 @@
 #ifndef __WORLD_H
 #define __WORLD_H
 
-#include "Callback.h"
-#include "Common.h"
 #include "IWorld.h"
 #include "LockedQueue.h"
 #include "ObjectGuid.h"
@@ -23,6 +32,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 class Object;
 class WorldPacket;
@@ -337,14 +347,7 @@ public:
     static float GetMaxVisibleDistanceInBGArenas()      { return m_MaxVisibleDistanceInBGArenas;   }
 
     // our: needed for arena spectator subscriptions
-    uint32 GetNextWhoListUpdateDelaySecs()
-    {
-        if (m_timers[WUPDATE_5_SECS].Passed())
-            return 1;
-        uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
-        t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
-        return uint32(ceil(t / 1000.0f));
-    }
+    uint32 GetNextWhoListUpdateDelaySecs();
 
     // xinef: Global Player Data Storage system
     void LoadGlobalPlayerDataStore();
@@ -493,7 +496,14 @@ private:
     AutobroadcastsWeightMap m_AutobroadcastsWeights;
 
     void ProcessQueryCallbacks();
-    ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
+    QueryCallbackProcessor _queryProcessor;
+
+    /**
+     * @brief Executed when a World Session is being finalized. Be it from a normal login or via queue popping.
+     *
+     * @param session The World Session that we are finalizing.
+     */
+    inline void FinalizePlayerWorldSession(WorldSession* session);
 };
 
 std::unique_ptr<IWorld>& getWorldInstance();

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Battlefield.h"
@@ -13,10 +24,8 @@
 #include "DynamicTree.h"
 #include "DynamicVisibility.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "Group.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MovementPacketBuilder.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
@@ -37,10 +46,13 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "VMapFactory.h"
-#include "WaypointMovementGenerator.h"
 #include "World.h"
 #include "WorldPacket.h"
+
+// TODO: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+#include "GridNotifiersImpl.h"
 
 #ifdef ELUNA
 #include "ElunaEventMgr.h"
@@ -74,7 +86,7 @@ WorldObject::~WorldObject()
     {
         if (GetTypeId() == TYPEID_CORPSE)
         {
-            LOG_FATAL("server", "Object::~Object Corpse %s, type=%d deleted but still in map!!", GetGUID().ToString().c_str(), ((Corpse*)this)->GetType());
+            LOG_FATAL("entities.object", "Object::~Object Corpse %s, type=%d deleted but still in map!!", GetGUID().ToString().c_str(), ((Corpse*)this)->GetType());
             ABORT();
         }
         ResetMap();
@@ -87,15 +99,15 @@ Object::~Object()
 
     if (IsInWorld())
     {
-        LOG_FATAL("server", "Object::~Object - %s deleted but still in world!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in world!!", GetGUID().ToString().c_str());
         if (isType(TYPEMASK_ITEM))
-            LOG_FATAL("server", "Item slot %u", ((Item*)this)->GetSlot());
+            LOG_FATAL("entities.object", "Item slot %u", ((Item*)this)->GetSlot());
         ABORT();
     }
 
     if (m_objectUpdated)
     {
-        LOG_FATAL("server", "Object::~Object - %s deleted but still in update list!!", GetGUID().ToString().c_str());
+        LOG_FATAL("entities.object", "Object::~Object - %s deleted but still in update list!!", GetGUID().ToString().c_str());
         ABORT();
     }
 
@@ -431,7 +443,9 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
     // 0x200
     if (flags & UPDATEFLAG_ROTATION)
-        *data << int64(ToGameObject()->GetPackedWorldRotation());
+    {
+        *data << int64(ToGameObject()->GetPackedLocalRotation());
+    }
 }
 
 void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
@@ -685,7 +699,7 @@ void Object::SetByteValue(uint16 index, uint8 offset, uint8 value)
 
     if (offset > 3)
     {
-        LOG_ERROR("server", "Object::SetByteValue: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteValue: wrong offset %u", offset);
         return;
     }
 
@@ -705,7 +719,7 @@ void Object::SetUInt16Value(uint16 index, uint8 offset, uint16 value)
 
     if (offset > 1)
     {
-        LOG_ERROR("server", "Object::SetUInt16Value: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetUInt16Value: wrong offset %u", offset);
         return;
     }
 
@@ -805,7 +819,7 @@ void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("server", "Object::SetByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::SetByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -824,7 +838,7 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
     if (offset > 3)
     {
-        LOG_ERROR("server", "Object::RemoveByteFlag: wrong offset %u", offset);
+        LOG_ERROR("entities.object", "Object::RemoveByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -839,13 +853,14 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
-    LOG_INFO("server", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u", (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
+    LOG_INFO("misc", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u",
+        (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
 
     // ASSERT must fail after function call
     return false;
 }
 
-bool Position::operator==(Position const& a)
+bool Position::operator==(Position const& a) const
 {
     return (G3D::fuzzyEq(a.m_positionX, m_positionX) &&
         G3D::fuzzyEq(a.m_positionY, m_positionY) &&
@@ -911,32 +926,36 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
 
 void MovementInfo::OutDebug()
 {
-    LOG_INFO("server", "MOVEMENT INFO");
-    LOG_INFO("server", "guid %s", guid.ToString().c_str());
-    LOG_INFO("server", "flags %u", flags);
-    LOG_INFO("server", "flags2 %u", flags2);
-    LOG_INFO("server", "time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
-    LOG_INFO("server", "position: `%s`", pos.ToString().c_str());
+    LOG_INFO("movement", "MOVEMENT INFO");
+    LOG_INFO("movement", "guid %s", guid.ToString().c_str());
+    LOG_INFO("movement", "flags %u", flags);
+    LOG_INFO("movement", "flags2 %u", flags2);
+    LOG_INFO("movement", "time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
+    LOG_INFO("movement", "position: `%s`", pos.ToString().c_str());
+
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
-        LOG_INFO("server", "TRANSPORT:");
-        LOG_INFO("server", "guid: %s", transport.guid.ToString().c_str());
-        LOG_INFO("server", "position: `%s`", transport.pos.ToString().c_str());
-        LOG_INFO("server", "seat: %i", transport.seat);
-        LOG_INFO("server", "time: %u", transport.time);
+        LOG_INFO("movement", "TRANSPORT:");
+        LOG_INFO("movement", "guid: %s", transport.guid.ToString().c_str());
+        LOG_INFO("movement", "position: `%s`", transport.pos.ToString().c_str());
+        LOG_INFO("movement", "seat: %i", transport.seat);
+        LOG_INFO("movement", "time: %u", transport.time);
+
         if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
-            LOG_INFO("server", "time2: %u", transport.time2);
+        {
+            LOG_INFO("movement", "time2: %u", transport.time2);
+        }
     }
 
     if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        LOG_INFO("server", "pitch: %f", pitch);
+        LOG_INFO("movement", "pitch: %f", pitch);
 
-    LOG_INFO("server", "fallTime: %u", fallTime);
+    LOG_INFO("movement", "fallTime: %u", fallTime);
     if (flags & MOVEMENTFLAG_FALLING)
-        LOG_INFO("server", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
+        LOG_INFO("movement", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
 
     if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
-        LOG_INFO("server", "splineElevation: %f", splineElevation);
+        LOG_INFO("movement", "splineElevation: %f", splineElevation);
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
@@ -944,8 +963,8 @@ WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
     elunaEvents(nullptr),
 #endif
     LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
-    m_staticFloorZ(INVALID_HEIGHT), m_transport(nullptr), m_currMap(nullptr), m_InstanceId(0),
-    m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
+    _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
+    m_currMap(nullptr), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -1034,19 +1053,51 @@ void WorldObject::_Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32
     SetPhaseMask(phaseMask, false);
 }
 
-uint32 WorldObject::GetZoneId(bool /*forceRecalc*/) const
+void WorldObject::SetPositionDataUpdate()
 {
-    return GetBaseMap()->GetZoneId(m_positionX, m_positionY, m_positionZ);
+    _updatePositionData = true;
+
+    // Calls immediately for charmed units
+    if (GetTypeId() == TYPEID_UNIT && ToUnit()->IsCharmedOwnedByPlayerOrPlayer())
+        UpdatePositionData();
 }
 
-uint32 WorldObject::GetAreaId(bool /*forceRecalc*/) const
+void WorldObject::UpdatePositionData()
 {
-    return GetBaseMap()->GetAreaId(m_positionX, m_positionY, m_positionZ);
+    _updatePositionData = false;
+
+    PositionFullTerrainStatus data;
+    GetMap()->GetFullTerrainStatusForPosition(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ(), GetCollisionHeight(), data);
+    ProcessPositionDataChanged(data);
 }
 
-void WorldObject::GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool /*forceRecalc*/) const
+void WorldObject::ProcessPositionDataChanged(PositionFullTerrainStatus const& data)
 {
-    GetBaseMap()->GetZoneAndAreaId(zoneid, areaid, m_positionX, m_positionY, m_positionZ);
+    _zoneId = _areaId = data.areaId;
+
+    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(_areaId))
+        if (area->zone)
+            _zoneId = area->zone;
+
+    _outdoors   = data.outdoors;
+    _floorZ     = data.floorZ;
+    _liquidData = data.liquidInfo;
+}
+
+void WorldObject::AddToWorld()
+{
+    Object::AddToWorld();
+    GetMap()->GetZoneAndAreaId(GetPhaseMask(), _zoneId, _areaId, GetPositionX(), GetPositionY(), GetPositionZ());
+}
+
+void WorldObject::RemoveFromWorld()
+{
+    if (!IsInWorld())
+        return;
+
+    DestroyForNearbyPlayers();
+
+    Object::RemoveFromWorld();
 }
 
 InstanceScript* WorldObject::GetInstanceScript()
@@ -1063,9 +1114,9 @@ float WorldObject::GetDistanceZ(const WorldObject* obj) const
     return (dist > 0 ? dist : 0);
 }
 
-bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const
+bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius) const
 {
-    float sizefactor = GetObjectSize() + obj->GetObjectSize();
+    float sizefactor = useBoundingRadius ? GetObjectSize() + obj->GetObjectSize() : 0.0f;
     float maxdist = dist2compare + sizefactor;
 
     if (m_transport && obj->GetTransport() &&  obj->GetTransport()->GetGUID() == m_transport->GetGUID())
@@ -1464,7 +1515,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
             if (max_z > INVALID_HEIGHT)
             {
-                if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - Z_OFFSET_FIND_HEIGHT))
+                if (canSwim && unit->GetMap()->IsInWater(unit->GetPhaseMask(), x, y, max_z - Z_OFFSET_FIND_HEIGHT, unit->GetCollisionHeight()))
                 {
                     // do not allow creatures to walk on
                     // water level while swimming
@@ -1664,6 +1715,11 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
             if (thisPlayer->GetViewpoint())
                 viewpoint = thisPlayer->GetViewpoint();
+
+            if (thisPlayer->GetFarSightDistance() && !thisPlayer->isInFront(obj))
+            {
+                return false;
+            }
         }
 
         // Xinef: check reversely obj vs viewpoint, object could be a gameObject which overrides _IsWithinDist function to include gameobject size
@@ -1919,7 +1975,7 @@ namespace Acore
                 ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, text, 0, "", loc_idx);
             }
             else
-                LOG_ERROR("server", "MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
+                LOG_ERROR("entities.object", "MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
         }
 
     private:
@@ -2091,7 +2147,7 @@ void WorldObject::SetMap(Map* map)
         return;
     if (m_currMap)
     {
-        LOG_FATAL("server", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
+        LOG_FATAL("entities.object", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
         ABORT();
     }
     m_currMap = map;
@@ -2126,12 +2182,6 @@ void WorldObject::ResetMap()
     //m_InstanceId = 0;
 }
 
-Map const* WorldObject::GetBaseMap() const
-{
-    ASSERT(m_currMap);
-    return m_currMap->GetParent();
-}
-
 void WorldObject::AddObjectToRemoveList()
 {
     ASSERT(m_uint32Values);
@@ -2139,7 +2189,7 @@ void WorldObject::AddObjectToRemoveList()
     Map* map = FindMap();
     if (!map)
     {
-        LOG_ERROR("server", "Object %s at attempt add to move list not have valid map (Id: %u).", GetGUID().ToString().c_str(), GetMapId());
+        LOG_ERROR("entities.object", "Object %s at attempt add to move list not have valid map (Id: %u).", GetGUID().ToString().c_str(), GetMapId());
         return;
     }
 
@@ -2296,7 +2346,7 @@ void WorldObject::SetZoneScript()
             m_zoneScript = (ZoneScript*)map->ToInstanceMap()->GetInstanceScript();
         else if (!map->IsBattlegroundOrArena())
         {
-            uint32 zoneId = GetZoneId(true);
+            uint32 zoneId = GetZoneId();
             if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(zoneId))
                 m_zoneScript = bf;
             else
@@ -2450,7 +2500,7 @@ void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureL
 {
     Acore::AllCreaturesOfEntryInRange check(this, entry, maxSearchRange);
     Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
-    Cell::VisitGridObjects(this, searcher, maxSearchRange);;
+    Cell::VisitGridObjects(this, searcher, maxSearchRange);
 }
 
 /*
@@ -2528,7 +2578,7 @@ namespace Acore
 
 //===================================================================================================
 
-void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance2d, float absAngle) const
+void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance2d, float absAngle, Position const* startPos) const
 {
     float effectiveReach = GetCombatReach();
 
@@ -2550,24 +2600,28 @@ void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y
         }
     }
 
-    x = GetPositionX() + (effectiveReach + distance2d) * std::cos(absAngle);
-    y = GetPositionY() + (effectiveReach + distance2d) * std::sin(absAngle);
+    float positionX = startPos ? startPos->GetPositionX() : GetPositionX();
+    float positionY = startPos ? startPos->GetPositionY() : GetPositionY();
+
+    x = positionX + (effectiveReach + distance2d) * std::cos(absAngle);
+    y = positionY + (effectiveReach + distance2d) * std::sin(absAngle);
 
     Acore::NormalizeMapCoord(x);
     Acore::NormalizeMapCoord(y);
 }
 
-void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle) const
+void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle, Position const* startPos) const
 {
-    GetNearPoint2D(nullptr, x, y, distance2d, absAngle);
+    GetNearPoint2D(nullptr, x, y, distance2d, absAngle, startPos);
 }
 
-void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ) const
+void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ, Position const* startPos) const
 {
-    GetNearPoint2D(x, y, distance2d + searcher_size, absAngle);
+    GetNearPoint2D(x, y, distance2d + searcher_size, absAngle, startPos);
     z = GetPositionZ();
 
-    if (searcher) {
+    if (searcher)
+    {
         if (Unit const* unit = searcher->ToUnit(); Unit const* target = ToUnit())
         {
             if (unit && target && unit->IsInWater() && target->IsInWater())
@@ -2603,7 +2657,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, 
     // loop in a circle to look for a point in LoS using small steps
     for (float angle = float(M_PI) / 8; angle < float(M_PI) * 2; angle += float(M_PI) / 8)
     {
-        GetNearPoint2D(x, y, distance2d + searcher_size, absAngle + angle);
+        GetNearPoint2D(x, y, distance2d + searcher_size, absAngle + angle, startPos);
         z = GetPositionZ();
         UpdateAllowedPositionZ(x, y, z);
         if (controlZ && fabsf(GetPositionZ() - z) > controlZ)
@@ -2692,7 +2746,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     // Prevent invalid coordinates here, position is unchanged
     if (!Acore::IsValidMapCoord(destx, desty))
     {
-        LOG_FATAL("server", "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
         return;
     }
 
@@ -2740,7 +2794,7 @@ Position WorldObject::GetFirstCollisionPosition(float startX, float startY, floa
 
     MovePositionToFirstCollision(pos, distance, ang);
     return pos;
-};
+}
 
 Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float destZ)
 {
@@ -2755,7 +2809,7 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
 
     MovePositionToFirstCollision(pos, distance, ang);
     return pos;
-};
+}
 
 Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
 {
@@ -2953,7 +3007,7 @@ struct WorldObjectChangeAccumulator
         }
     }
 
-    template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
+    template<class SKIP> void Visit(GridRefMgr<SKIP>&) {}
 };
 
 void WorldObject::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set)
@@ -3016,8 +3070,82 @@ float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* gr
 
 float WorldObject::GetFloorZ() const
 {
-    if (!IsInWorld())
-        return m_staticFloorZ;
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
 
-    return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT)));
+    if (!IsInWorld())
+        return _floorZ;
+
+    return std::max<float>(_floorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT)));
+}
+
+uint32 WorldObject::GetZoneId() const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    return _zoneId;
+}
+
+uint32 WorldObject::GetAreaId() const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    return _areaId;
+}
+
+void WorldObject::GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    zoneid = _zoneId;
+    areaid = _areaId;
+}
+
+bool WorldObject::IsOutdoors() const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    return _outdoors;
+}
+
+LiquidData const& WorldObject::GetLiquidData() const
+{
+    if (_updatePositionData)
+        const_cast<WorldObject*>(this)->UpdatePositionData();
+
+    return _liquidData;
+}
+
+void WorldObject::AddAllowedLooter(ObjectGuid guid)
+{
+    _allowedLooters.insert(guid);
+}
+
+void WorldObject::SetAllowedLooters(GuidUnorderedSet const looters)
+{
+    _allowedLooters = looters;
+}
+
+void WorldObject::ResetAllowedLooters()
+{
+    _allowedLooters.clear();
+}
+
+bool WorldObject::HasAllowedLooter(ObjectGuid guid) const
+{
+    if (_allowedLooters.empty())
+    {
+        return true;
+    }
+
+    return _allowedLooters.find(guid) != _allowedLooters.end();
+}
+
+GuidUnorderedSet const& WorldObject::GetAllowedLooters() const
+{
+    return _allowedLooters;
 }

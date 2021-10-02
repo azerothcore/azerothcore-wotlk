@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -41,7 +52,7 @@ std::vector<ChatCommand> const& ChatHandler::getCommandTable()
         std::vector<ChatCommand> cmds = sScriptMgr->GetChatCommands();
         commandTableCache.swap(cmds);
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_COMMANDS);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_COMMANDS);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (result)
         {
@@ -307,6 +318,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
             {
                 ObjectGuid guid = player->GetTarget();
                 uint32 areaId = player->GetAreaId();
+                uint32 zoneId = player->GetZoneId();
                 std::string areaName = "Unknown";
                 std::string zoneName = "Unknown";
                 if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId))
@@ -317,12 +329,12 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                         zoneName = zone->area_name[locale];
                 }
 
-                LOG_GM(m_session->GetAccountId(), "Command: %s [Player: %s (%s) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%s)]",
+                LOG_GM(m_session->GetAccountId(), "Command: %s [Player: %s (%s) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %u (%s) Selected: %s (%s)]",
                                  fullcmd.c_str(), player->GetName().c_str(), player->GetGUID().ToString().c_str(),
                                  m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
                                  player->GetPositionZ(), player->GetMapId(),
                                  player->GetMap()->GetMapName(),
-                                 areaId, areaName.c_str(), zoneName.c_str(),
+                                 areaId, areaName.c_str(), zoneId, zoneName.c_str(),
                                  (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
                                  guid.ToString().c_str());
             }
@@ -373,12 +385,9 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
         // expected subcommand by full name DB content
         else if (*text)
         {
-            LOG_ERROR("server", "Table `command` have unexpected subcommand '%s' in command '%s', skip.", text, fullcommand.c_str());
+            LOG_ERROR("sql.sql", "Table `command` have unexpected subcommand '%s' in command '%s', skip.", text, fullcommand.c_str());
             return false;
         }
-
-        //if (table[i].SecurityLevel != security)
-        //    LOG_DEBUG("server", "Table `command` overwrite for command '%s' default security (%u) by %u", fullcommand.c_str(), table[i].SecurityLevel, security);
 
         table[i].SecurityLevel = security;
         table[i].Help          = help;
@@ -389,9 +398,9 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
     if (!cmd.empty())
     {
         if (&table == &getCommandTable())
-            LOG_ERROR("server", "Table `command` have non-existing command '%s', skip.", cmd.c_str());
+            LOG_ERROR("sql.sql", "Table `command` have non-existing command '%s', skip.", cmd.c_str());
         else
-            LOG_ERROR("server", "Table `command` have non-existing subcommand '%s' in command '%s', skip.", cmd.c_str(), fullcommand.c_str());
+            LOG_ERROR("sql.sql", "Table `command` have non-existing subcommand '%s' in command '%s', skip.", cmd.c_str(), fullcommand.c_str());
     }
 
     return false;

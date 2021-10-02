@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CreatureTextMgr.h"
 #include "icecrown_citadel.h"
@@ -1451,7 +1464,7 @@ void TriggerBurningPitch(Creature* c)
     if (!c->HasSpellCooldown(spellId))
     {
         c->CastSpell((Unit*)nullptr, spellId, false);
-        c->_AddCreatureSpellCooldown(spellId, urand(3000, 4000));
+        c->_AddCreatureSpellCooldown(spellId, 0, urand(3000, 4000));
     }
 }
 
@@ -1917,7 +1930,7 @@ public:
                 return;
 
             me->CastSpell((Unit*)nullptr, spellId, true);
-            me->_AddCreatureSpellCooldown(spellId, 9000);
+            me->_AddCreatureSpellCooldown(spellId, 0, 9000);
         }
 
         bool CanAIAttack(const Unit*  /*target*/) const override
@@ -2626,15 +2639,20 @@ public:
     {
         PrepareSpellScript(spell_igb_below_zero_SpellScript);
 
-        void RemovePassengers()
+        void RemovePassengers(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             GetHitUnit()->SetPower(POWER_ENERGY, 0);
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
         }
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
+            BeforeHit += BeforeSpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
         }
     };
 
@@ -2694,7 +2712,7 @@ class achievement_im_on_a_boat : public AchievementCriteriaScript
 public:
     achievement_im_on_a_boat() : AchievementCriteriaScript("achievement_im_on_a_boat") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         return target->GetAI() && target->GetAI()->GetData(ACTION_SHIP_VISITS_ENEMY) == 1;
     }

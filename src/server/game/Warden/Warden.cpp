@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
-#include "BanManager.h"
+#include "BanMgr.h"
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "Log.h"
@@ -17,7 +28,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <openssl/md5.h>
 #include <openssl/sha.h>
 
 Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
@@ -38,9 +48,7 @@ Warden::~Warden()
 
 void Warden::SendModuleToClient()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Send module to client");
-#endif
 
     // Create packet structure
     WardenModuleTransfer packet;
@@ -66,9 +74,7 @@ void Warden::SendModuleToClient()
 
 void Warden::RequestModule()
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Request module");
-#endif
 
     // Create packet structure
     WardenModuleUse request;
@@ -139,16 +145,12 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
 
     if (checksum != newChecksum)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "CHECKSUM IS NOT VALID");
-#endif
         return false;
     }
     else
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("warden", "CHECKSUM IS VALID");
-#endif
         return true;
     }
 }
@@ -281,7 +283,7 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
 {
     static constexpr char WARDEN_TOKEN[] = "_TW\t";
     // if msg starts with WARDEN_TOKEN
-    if (!(msg.rfind(WARDEN_TOKEN, 0) == 0))
+    if (msg.rfind(WARDEN_TOKEN, 0) != 0)
     {
         return false;
     }
@@ -321,9 +323,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
     _warden->DecryptData(recvData.contents(), recvData.size());
     uint8 opcode;
     recvData >> opcode;
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
-#endif
     recvData.hexlike();
 
     switch (opcode)
@@ -338,23 +338,17 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             _warden->HandleData(recvData);
             break;
         case WARDEN_CMSG_MEM_CHECKS_RESULT:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("warden", "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
-#endif
             break;
         case WARDEN_CMSG_HASH_RESULT:
             _warden->HandleHashResult(recvData);
             _warden->InitializeModule();
             break;
         case WARDEN_CMSG_MODULE_FAILED:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("warden", "NYI WARDEN_CMSG_MODULE_FAILED received!");
-#endif
             break;
         default:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("warden", "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
-#endif
             break;
     }
 }

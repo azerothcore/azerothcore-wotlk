@@ -60,7 +60,7 @@ CDEBUG=OFF
 # * MinSizeRel: same as Release but optimizing for size rather than speed.
 CTYPE=${CTYPE:-Release}
 # compile scripts
-CSCRIPTS=${CSCRIPTS:-ON}
+CSCRIPTS=${CSCRIPTS:-static}
 # compile unit tests
 CBUILD_TESTING=OFF
 # compile server
@@ -70,15 +70,13 @@ CTOOLS=${CTOOLS:-OFF}
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=${CSCRIPTPCH:-ON}
 CCOREPCH=${CCOREPCH:-ON}
-# enable/disable extra logs
-CEXTRA_LOGS=0
 
 # Skip specific modules from compilation (cmake reconfigure needed)
 # use semicolon ; to separate modules
 CDISABLED_AC_MODULES=""
 
 # you can add your custom definitions here ( -D )
-# example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON -DENABLE_EXTRA_LOGS=ON"
+# example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON
 #
 CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
 

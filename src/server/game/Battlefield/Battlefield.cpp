@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Battlefield.h"
@@ -14,7 +25,7 @@
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Map.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
@@ -292,7 +303,7 @@ void Battlefield::InitStalker(uint32 entry, float x, float y, float z, float o)
     if (Creature* creature = SpawnCreature(entry, x, y, z, o, TEAM_NEUTRAL))
         StalkerGuid = creature->GetGUID();
     else
-        LOG_ERROR("server", "Battlefield::InitStalker: could not spawn Stalker (Creature entry %u), zone messeges will be un-available", entry);
+        LOG_ERROR("bg.battlefield", "Battlefield::InitStalker: could not spawn Stalker (Creature entry %u), zone messeges will be un-available", entry);
 }
 
 void Battlefield::KickAfkPlayers()
@@ -582,10 +593,10 @@ BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
         if (m_GraveyardList[id])
             return m_GraveyardList[id];
         else
-            LOG_ERROR("server", "Battlefield::GetGraveyardById Id:%u not existed", id);
+            LOG_ERROR("bg.battlefield", "Battlefield::GetGraveyardById Id:%u not existed", id);
     }
     else
-        LOG_ERROR("server", "Battlefield::GetGraveyardById Id:%u cant be found", id);
+        LOG_ERROR("bg.battlefield", "Battlefield::GetGraveyardById Id:%u cant be found", id);
 
     return nullptr;
 }
@@ -677,7 +688,7 @@ void BfGraveyard::SetSpirit(Creature* spirit, TeamId team)
 {
     if (!spirit)
     {
-        LOG_ERROR("server", "BfGraveyard::SetSpirit: Invalid Spirit.");
+        LOG_ERROR("bg.battlefield", "BfGraveyard::SetSpirit: Invalid Spirit.");
         return;
     }
 
@@ -784,7 +795,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
     Map* map = sMapMgr->CreateBaseMap(m_MapId);
     if (!map)
     {
-        LOG_ERROR("server", "Battlefield::SpawnCreature: Can't create creature entry: %u map not found", entry);
+        LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: %u map not found", entry);
         return nullptr;
     }
 
@@ -798,7 +809,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
     Creature* creature = new Creature(true);
     if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
     {
-        LOG_ERROR("server", "Battlefield::SpawnCreature: Can't create creature entry: %u", entry);
+        LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: %u", entry);
         delete creature;
         return nullptr;
     }
@@ -830,7 +841,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
     if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, PHASEMASK_NORMAL, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
     {
         LOG_ERROR("sql.sql", "Battlefield::SpawnGameObject: Gameobject template %u not found in database! Battlefield not created!", entry);
-        LOG_ERROR("server", "Battlefield::SpawnGameObject: Cannot create gameobject template %u! Battlefield not created!", entry);
+        LOG_ERROR("bg.battlefield", "Battlefield::SpawnGameObject: Cannot create gameobject template %u! Battlefield not created!", entry);
         delete go;
         return nullptr;
     }
@@ -923,9 +934,7 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
 {
     ASSERT(capturePoint);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("bg.battlefield", "Creating capture point %u", capturePoint->GetEntry());
-#endif
 
     m_capturePoint = capturePoint->GetGUID();
 
@@ -933,7 +942,7 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
     GameObjectTemplate const* goinfo = capturePoint->GetGOInfo();
     if (goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
-        LOG_ERROR("server", "OutdoorPvP: GO %u is not capture point!", capturePoint->GetEntry());
+        LOG_ERROR("bg.battlefield", "OutdoorPvP: GO %u is not capture point!", capturePoint->GetEntry());
         return false;
     }
 
@@ -1089,7 +1098,7 @@ bool BfCapturePoint::Update(uint32 diff)
 
     if (m_OldState != m_State)
     {
-        //LOG_ERROR("server", "%u->%u", m_OldState, m_State);
+        //LOG_ERROR("bg.battlefield", "%u->%u", m_OldState, m_State);
         if (oldTeam != m_team)
             ChangeTeam(oldTeam);
         return true;

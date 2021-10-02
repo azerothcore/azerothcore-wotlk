@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_CONTAINERS_H
@@ -55,7 +66,9 @@ namespace Acore
         void check() const
         {
             if (!(_buf < _end))
+            {
                 throw std::out_of_range("index");
+            }
         }
     };
 }
@@ -70,7 +83,9 @@ namespace Acore::Containers
         static_assert(std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<typename C::iterator>::iterator_category>::value, "Invalid container passed to Acore::Containers::RandomResize");
 
         if (std::size(container) <= requestedSize)
+        {
             return;
+        }
 
         auto keepIt = std::begin(container), curIt = std::begin(container);
         uint32 elementsToKeep = requestedSize, elementsToProcess = std::size(container);
@@ -81,7 +96,9 @@ namespace Acore::Containers
             if (urand(1, elementsToProcess) <= elementsToKeep)
             {
                 if (keepIt != curIt)
+                {
                     *keepIt = std::move(*curIt);
+                }
 
                 ++keepIt;
                 --elementsToKeep;
@@ -102,7 +119,9 @@ namespace Acore::Containers
         std::copy_if(std::begin(container), std::end(container), std::inserter(containerCopy, std::end(containerCopy)), predicate);
 
         if (requestedSize)
+        {
             RandomResize(containerCopy, requestedSize);
+        }
 
         container = std::move(containerCopy);
     }
@@ -160,7 +179,9 @@ namespace Acore::Containers
         }
 
         if (weightSum <= 0.0)
+        {
             weights.assign(std::size(container), 1.0);
+        }
 
         return SelectRandomWeightedContainerElement(container, weights);
     }
@@ -195,9 +216,13 @@ namespace Acore::Containers
         for (auto itr = range.first; itr != range.second;)
         {
             if (itr->second == value)
+            {
                 itr = multimap.erase(itr);
+            }
             else
+            {
                 ++itr;
+            }
         }
     }
 

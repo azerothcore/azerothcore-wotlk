@@ -1,13 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
-#include "Common.h"
-#include "GossipDef.h"
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
@@ -23,9 +32,7 @@
 
 void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_BUY");
-#endif
 
     ObjectGuid guidNPC;
     uint32 clientIndex;                                     // 1 for guild and arenaslot+1 for arenas in client
@@ -54,17 +61,13 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     recvData >> clientIndex;                               // index
     recvData.read_skip<uint32>();                          // 0
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Petitioner (%s) tried sell petition: name %s", guidNPC.ToString().c_str(), name.c_str());
-#endif
 
     // prevent cheating
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guidNPC, UNIT_NPC_FLAG_PETITIONER);
     if (!creature)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "WORLD: HandlePetitionBuyOpcode - Unit (%s) not found or you can't interact with him.", guidNPC.ToString().c_str());
-#endif
         return;
     }
 
@@ -113,9 +116,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
                 type = ARENA_TEAM_CHARTER_5v5_TYPE;
                 break;
             default:
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 LOG_DEBUG("network", "unknown selection at buy arena petition: %u", clientIndex);
-#endif
                 return;
         }
 
@@ -195,23 +196,22 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     Petition const* petition = sPetitionMgr->GetPetitionByOwnerWithType(_player->GetGUID(), type);
 
     CharacterDatabase.EscapeString(name);
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     if (petition)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "Invalid petition: %s", petition->petitionGuid.ToString().c_str());
-#endif
 
-        trans->PAppend("DELETE FROM petition WHERE petitionguid = %u", petition->petitionGuid);
-        trans->PAppend("DELETE FROM petition_sign WHERE petitionguid = %u", petition->petitionGuid);
+        trans->PAppend("DELETE FROM petition WHERE petitionguid = %u", petition->petitionGuid.GetCounter());
+        trans->PAppend("DELETE FROM petition_sign WHERE petitionguid = %u", petition->petitionGuid.GetCounter());
+
         // xinef: clear petition store
         sPetitionMgr->RemovePetition(petition->petitionGuid);
     }
 
     // xinef: petition pointer is invalid from now on
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION);
     stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt32(1, charter->GetGUID().GetCounter());
     stmt->setString(2, name);
@@ -226,9 +226,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
-#endif
 
     ObjectGuid petitionguid;
     recvData >> petitionguid;                              // petition guid
@@ -267,17 +265,13 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_QUERY");   // ok
-#endif
 
     ObjectGuid::LowType guildguid;
     ObjectGuid petitionguid;
     recvData >> guildguid;                                 // in Trinity always same as petition low guid
     recvData >> petitionguid;                              // petition guid
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "CMSG_PETITION_QUERY Petition (%s) Guild GUID %u", petitionguid.ToString().c_str(), guildguid);
-#endif
 
     SendPetitionQueryOpcode(petitionguid);
 }
@@ -287,9 +281,7 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
     Petition const* petition = sPetitionMgr->GetPetition(petitionguid);
     if (!petition)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "CMSG_PETITION_QUERY failed for petition (%s)", petitionguid.ToString().c_str());
-#endif
         return;
     }
 
@@ -333,9 +325,7 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
 
 void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Received opcode MSG_PETITION_RENAME");   // ok
-#endif
 
     ObjectGuid petitionGuid;
     std::string newName;
@@ -350,9 +340,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
     Petition const* petition = sPetitionMgr->GetPetition(petitionGuid);
     if (!petition)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "CMSG_PETITION_QUERY failed for petition (%s)", petitionGuid.ToString().c_str());
-#endif
         return;
     }
 
@@ -383,7 +371,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
         }
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PETITION_NAME);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PETITION_NAME);
 
     stmt->setString(0, newName);
     stmt->setUInt32(1, petitionGuid.GetCounter());
@@ -393,9 +381,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
     // xinef: update petition container
     const_cast<Petition*>(petition)->petitionName = newName;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Petition (%s) renamed to %s", petitionGuid.ToString().c_str(), newName.c_str());
-#endif
     WorldPacket data(MSG_PETITION_RENAME, (8 + newName.size() + 1));
     data << petitionGuid;
     data << newName;
@@ -404,9 +390,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_SIGN");    // ok
-#endif
 
     ObjectGuid petitionGuid;
     uint8 unk;
@@ -416,7 +400,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     Petition const* petition = sPetitionMgr->GetPetition(petitionGuid);
     if (!petition)
     {
-        LOG_ERROR("server", "Petition %s is not found for player %s (Name: %s)", petitionGuid.ToString().c_str(), GetPlayer()->GetGUID().ToString().c_str(), GetPlayer()->GetName().c_str());
+        LOG_ERROR("network.opcode", "Petition %s is not found for player %s (Name: %s)", petitionGuid.ToString().c_str(), GetPlayer()->GetGUID().ToString().c_str(), GetPlayer()->GetName().c_str());
         return;
     }
 
@@ -509,7 +493,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
         return;
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION_SIGNATURE);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION_SIGNATURE);
 
     stmt->setUInt32(0, petition->ownerGuid.GetCounter());
     stmt->setUInt32(1, petitionGuid.GetCounter());
@@ -521,9 +505,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     // xinef: fill petition store
     sPetitionMgr->AddSignature(petitionGuid, GetAccountId(), playerGuid);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "PETITION SIGN: %s by player: %s (%s, Account: %u)", petitionGuid.ToString().c_str(), _player->GetName().c_str(), playerGuid.ToString().c_str(), GetAccountId());
-#endif
 
     WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
     data << petitionGuid;
@@ -545,16 +527,12 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Received opcode MSG_PETITION_DECLINE");  // ok
-#endif
 
     ObjectGuid petitionguid;
     ObjectGuid ownerguid;
     recvData >> petitionguid;                              // petition guid
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Petition %s declined by %s", petitionguid.ToString().c_str(), _player->GetGUID().ToString().c_str());
-#endif
 
     Petition const* petition = sPetitionMgr->GetPetition(petitionguid);
     if (!petition)
@@ -570,9 +548,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Received opcode CMSG_OFFER_PETITION");   // ok
-#endif
 
     ObjectGuid petitionguid, plguid;
     uint32 junk;
@@ -660,9 +636,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Received opcode CMSG_TURN_IN_PETITION");
-#endif
 
     // Get petition guid from packet
     WorldPacket data;
@@ -675,14 +649,12 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
     if (!item)
         return;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Petition %s turned in by %s", petitionGuid.ToString().c_str(), _player->GetGUID().ToString().c_str());
-#endif
 
     Petition const* petition = sPetitionMgr->GetPetition(petitionGuid);
     if (!petition)
     {
-        LOG_ERROR("server", "Player %s (%s) tried to turn in petition (%s) that is not present in the database",
+        LOG_ERROR("network.opcode", "Player %s (%s) tried to turn in petition (%s) that is not present in the database",
             _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), petitionGuid.ToString().c_str());
         return;
     }
@@ -801,24 +773,20 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 
         // Register arena team
         sArenaTeamMgr->AddArenaTeam(arenaTeam);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "PetitonsHandler: Arena team (guid: %u) added to ObjectMgr", arenaTeam->GetId());
-#endif
 
         // Add members
         if (signs)
             for (SignatureMap::const_iterator itr = signatureCopy.begin(); itr != signatureCopy.end(); ++itr)
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 LOG_DEBUG("network", "PetitionsHandler: Adding arena team (guid: %u) member %s", arenaTeam->GetId(), itr->first.ToString().c_str());
-#endif
                 arenaTeam->AddMember(itr->first);
             }
     }
 
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_GUID);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_GUID);
     stmt->setUInt32(0, petitionGuid.GetCounter());
     trans->Append(stmt);
 
@@ -832,9 +800,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
     sPetitionMgr->RemovePetition(petitionGuid);
 
     // created
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "TURN IN PETITION %s", petitionGuid.ToString().c_str());
-#endif
 
     data.Initialize(SMSG_TURN_IN_PETITION_RESULTS, 4);
     data << (uint32)PETITION_TURN_OK;
@@ -843,9 +809,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Received CMSG_PETITION_SHOWLIST");
-#endif
 
     ObjectGuid guid;
     recvData >> guid;
@@ -858,9 +822,7 @@ void WorldSession::SendPetitionShowList(ObjectGuid guid)
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_PETITIONER);
     if (!creature)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("network", "WORLD: HandlePetitionShowListOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
-#endif
         return;
     }
 
@@ -931,7 +893,5 @@ void WorldSession::SendPetitionShowList(ObjectGuid guid)
     }
 
     SendPacket(&data);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "Sent SMSG_PETITION_SHOWLIST");
-#endif
 }

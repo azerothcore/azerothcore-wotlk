@@ -1,4 +1,19 @@
-// Scripted by Xinef
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CombatAI.h"
 #include "PassiveAI.h"
@@ -294,7 +309,7 @@ public:
                 case SPELL_VISUAL_THROW_CRANBERRY:
                 case SPELL_VISUAL_THROW_SWEET_POTATO:
                     if (TempSummon* ts = me->ToTempSummon())
-                        if (Unit* owner = ts->GetSummoner())
+                        if (Unit* owner = ts->GetSummonerUnit())
                             owner->ToCreature()->AI()->DoAction(spellInfo->Id);
                     break;
             }
@@ -374,7 +389,7 @@ public:
                 else
                 {
                     if (TempSummon* ts = target->ToTempSummon())
-                        if (Unit* owner = ts->GetSummoner())
+                        if (Unit* owner = ts->GetSummonerUnit())
                             if (owner->GetEntry() == GetCaster()->GetEntry())
                                 return;
 
@@ -671,7 +686,7 @@ class achievement_pb_pilgrims_peril : public AchievementCriteriaScript
 public:
     achievement_pb_pilgrims_peril() : AchievementCriteriaScript("achievement_pb_pilgrims_peril") { }
 
-    bool OnCheck(Player* source, Unit* /*target*/) override
+    bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         if (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_DRESS, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ROBE, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ATTIRE, 1))
             return true;
@@ -685,7 +700,7 @@ class achievement_pb_terokkar_turkey_time : public AchievementCriteriaScript
 public:
     achievement_pb_terokkar_turkey_time() : AchievementCriteriaScript("achievement_pb_terokkar_turkey_time") { }
 
-    bool OnCheck(Player* source, Unit* /*target*/) override
+    bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         if (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_HAT, 1) && (source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_DRESS, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ROBE, 1) || source->HasItemOrGemWithIdEquipped(ITEM_PILGRIMS_ATTIRE, 1)))
             return true;

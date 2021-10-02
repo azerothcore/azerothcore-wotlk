@@ -20,7 +20,9 @@
     );
 
     if (status == ARGON2_OK)
+    {
         return std::string(buf);
+    }
 
     return {};
 }
