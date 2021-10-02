@@ -5757,6 +5757,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             {
                                 break; // can't force path because the way is around and the path is too long
                             }
+                                
                         } else if (m_caster->GetTransport() != target->GetTransport())
                         {
                             return SPELL_FAILED_NOPATH;
