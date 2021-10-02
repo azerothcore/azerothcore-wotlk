@@ -60,10 +60,8 @@ public:
 
         void DamageTaken(Unit* /* doneBy */, uint32& /* damage */, DamageEffectType /* damagetype */, SpellSchoolMask damageSchoolMask) override
         {
-            LOG_FATAL("Entities:unit", "took damage of type %d, is it magic? mask: %d, result: %d ", damageSchoolMask, SPELL_SCHOOL_MASK_MAGIC, damageSchoolMask & SPELL_SCHOOL_MASK_MAGIC);
-            if (damageSchoolMask & SPELL_SCHOOL_MASK_MAGIC && SpellShieldReady)
+            if ((damageSchoolMask & SPELL_SCHOOL_MASK_MAGIC) && SpellShieldReady)
             {
-                LOG_FATAL("entities:unit", "casting spellshield");
                 DoCast(SPELL_SHIELD);
                 SpellShieldReady = false;
                 events.ScheduleEvent(SPELL_SHIELD, TIMER_SHIELD);
@@ -88,15 +86,12 @@ public:
                 case SPELL_SHADOWBOLT_VOLLEY:
                     DoCastVictim(SPELL_SHADOWBOLT_VOLLEY);
                     events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, urand(TIMER_SHADOWBOLT_VOLLEY - 2000, TIMER_SHADOWBOLT_VOLLEY + 2000));
-                    LOG_FATAL("entities:unit", "shadowbolt");
                     break;
                 case SPELL_REND:
-                    LOG_FATAL("entities:unit", "rend");
                     DoCastVictim(SPELL_REND);
                     events.ScheduleEvent(SPELL_REND, urand(TIMER_REND - 2000, TIMER_REND + 2000));
                     break;
                 case SPELL_SHIELD:
-                    LOG_FATAL("entities:unit", "spell shield ready");
                     SpellShieldReady = true;
                     break;
                 default:

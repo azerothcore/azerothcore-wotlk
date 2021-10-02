@@ -248,44 +248,50 @@ public:
             resetTimer = 30000;
         }
 
-        void UpdateEscortAI(uint32 diff) override
+        bool updateReset(uint32 diff)
         {
-            if (!instance)
-                return;
-
+            bool doReset = true;
             if (resetTimer > 0)
             {
                 if (resetTimer <= diff)
                 {
                     resetTimer   = 30000;
-                    bool doReset = true;
                     for (const auto& sum : summons)
                     {
                         if (Creature* creature = ObjectAccessor::GetCreature(*me, sum))
                         {
-                            if (creature->IsAlive())
+                            if (creature->IsAlive() && creature->GetVictim())
                             {
                                 LOG_FATAL("Entities:unit", "found a creature %s", creature->GetName());
-                                if (creature->GetVictim())
-                                {
-                                    doReset = false;
-                                }
+                                doReset = false;
                             }
                         }
                     }
-                    if (doReset)
-                    {
-                        summons.DespawnAll();
-                        HandleGameObject(DATA_ARENA4, true);
-                        HandleGameObject(DATA_ARENA3, false);
-                        HandleGameObject(DATA_ARENA2, false);
-                        HandleGameObject(DATA_ARENA1, false);
-                        instance->SetData(TYPE_RING_OF_LAW, FAIL);
-                    }
                 }
                 else
+                {
                     resetTimer -= diff;
+                }
             }
+            return doReset;
+        }
+
+        void UpdateEscortAI(uint32 diff) override
+        {
+            if (!instance)
+                return;
+
+            // reset if our mobs don't have a target.
+            if (updateReset(diff))
+            {
+                summons.DespawnAll();
+                HandleGameObject(DATA_ARENA4, true);
+                HandleGameObject(DATA_ARENA3, false);
+                HandleGameObject(DATA_ARENA2, false);
+                HandleGameObject(DATA_ARENA1, false);
+                instance->SetData(TYPE_RING_OF_LAW, FAIL);
+            }
+
 
             if (eventTimer)
             {
