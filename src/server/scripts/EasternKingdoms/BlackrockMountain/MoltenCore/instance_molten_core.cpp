@@ -39,6 +39,7 @@ public:
             canSaveBossState(false)
         {
             SetBossNumber(MAX_ENCOUNTER);
+            LoadMinionData(minionData);
         }
 
         void OnPlayerEnter(Player* /*player*/) override
@@ -68,6 +69,21 @@ public:
                     _garrGUID = creature->GetGUID();
                     break;
                 }
+                case NPC_FIRESWORN:
+                {
+                    AddMinion(creature, true);
+                    _garrMinionsGUIDs.insert(creature->GetGUID());
+                    break;
+                }
+            }
+        }
+
+        void OnCreatureRemove(Creature* creature) override
+        {
+            if (creature->GetEntry() == NPC_FIRESWORN)
+            {
+                AddMinion(creature, false);
+                _garrMinionsGUIDs.erase(creature->GetGUID());
             }
         }
 
@@ -140,6 +156,22 @@ public:
             if (!InstanceScript::SetBossState(bossId, state))
             {
                 return false;
+            }
+
+            if (bossId == DATA_GARR && state == DONE)
+            {
+                if (!_garrMinionsGUIDs.empty())
+                {
+                    for (ObjectGuid const& guid : _garrMinionsGUIDs)
+                    {
+                        if (Creature* minion = instance->GetCreature(guid))
+                        {
+                            minion->DespawnOrUnsummon();
+                        }
+                    }
+
+                    _garrMinionsGUIDs.clear();
+                }
             }
 
             if (state == DONE && bossId < DATA_MAJORDOMO_EXECUTUS && CheckMajordomoExecutus())
@@ -254,6 +286,7 @@ public:
         ObjectGuid _majordomoExecutusGUID;
         ObjectGuid _cacheOfTheFirelordGUID;
         ObjectGuid _garrGUID;
+        GuidSet _garrMinionsGUIDs;
         bool canSaveBossState;
     };
 

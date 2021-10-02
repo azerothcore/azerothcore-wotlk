@@ -20,21 +20,22 @@ EndScriptData */
 
 enum Texts
 {
-    EMOTE_MASS_ERRUPTION        = 0,
+    EMOTE_MASS_ERRUPTION                = 0,
 };
 
 enum Spells
 {
     // Garr
-    SPELL_ANTIMAGIC_PULSE       = 19492,
-    SPELL_MAGMA_SHACKLES        = 19496,
-    SPELL_ENRAGE                = 19516,
+    SPELL_ANTIMAGIC_PULSE               = 19492,
+    SPELL_MAGMA_SHACKLES                = 19496,
+    SPELL_ENRAGE                        = 19516,
+    //SPELL_SEPARATION_ANXIETY            = 23487,    // Aura cast on himself by Garr, if adds move out of range, they will cast spell 23492 on themselves
 
     // Fireworn
-    SPELL_SEPARATION_ANXIETY    = 23492,
-    SPELL_ERUPTION              = 19497,
-    SPELL_MASSIVE_ERUPTION      = 20483,
-    SPELL_ERUPTION_TRIGGER      = 20482,    // Removes banish auras and applied immunity to banish
+    SPELL_SEPARATION_ANXIETY_MINION     = 23492,
+    SPELL_ERUPTION                      = 19497,
+    SPELL_MASSIVE_ERUPTION              = 20483,
+    SPELL_ERUPTION_TRIGGER              = 20482,    // Removes banish auras and applied immunity to banish
 };
 
 enum Events
@@ -59,23 +60,6 @@ public:
         {
             _Reset();
             massEruptionTimer = 600000;
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            std::list<Creature*> fireworns;
-            me->GetCreatureListWithEntryInGrid(fireworns, NPC_FIRESWORN, 240.0f);
-            if (!fireworns.empty())
-            {
-                for (Creature* fireworn : fireworns)
-                {
-                    if (fireworn)
-                    {
-                        fireworn->DespawnOrUnsummon();
-                    }
-                }
-            }
         }
 
         void EnterCombat(Unit* /*attacker*/) override
@@ -200,13 +184,13 @@ public:
 
             if (anxietyTimer <= diff)
             {
-                if (!me->HasAura(SPELL_SEPARATION_ANXIETY))
+                if (!me->HasAura(SPELL_SEPARATION_ANXIETY_MINION))
                 {
                     if (Creature const* garr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_GARR)))
                     {
                         if (me->IsWithinDist(garr, 45.0f))
                         {
-                            DoCastSelf(SPELL_SEPARATION_ANXIETY);
+                            DoCastSelf(SPELL_SEPARATION_ANXIETY_MINION);
                         }
                     }
                 }
