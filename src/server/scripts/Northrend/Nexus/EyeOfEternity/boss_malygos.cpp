@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CombatAI.h"
 #include "eye_of_eternity.h"
@@ -491,9 +504,9 @@ public:
                                             continue;
 
                                         Position plrpos;
-                                        float angle = CenterPos.GetAngle(pPlayer);
-                                        plrpos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 5.0f;
-                                        plrpos.m_positionY = CenterPos.GetPositionY() + sin(angle) * 5.0f;
+                                        float playerAngle = CenterPos.GetAngle(pPlayer);
+                                        plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
+                                        plrpos.m_positionY = CenterPos.GetPositionY() + sin(playerAngle) * 5.0f;
                                         plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
                                         plrpos.m_orientation = plrpos.GetAngle(&CenterPos);
 
@@ -517,9 +530,15 @@ public:
 
                                             pPlayer->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
                                             pPlayer->SetDisableGravity(true, true);
+
+                                            sScriptMgr->AnticheatSetCanFlybyServer(pPlayer, true);
+
                                             WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
                                             data << pPlayer->GetPackGUID();
                                             pPlayer->SendMessageToSet(&data, true);
+
+                                            sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                            sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
 
                                             pPlayer->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
                                             c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -704,6 +723,9 @@ public:
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
+                                    sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                    sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
+
                                     if (!pPlayer->IsAlive() || pPlayer->IsGameMaster())
                                         continue;
 
@@ -884,6 +906,10 @@ public:
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
                 plr->SetDisableGravity(false, true);
                 plr->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
+
+                sScriptMgr->AnticheatSetCanFlybyServer(plr, false);
+                sScriptMgr->AnticheatSetUnderACKmount(plr);
+                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
             }
         }
 
@@ -921,6 +947,10 @@ public:
                             {
                                 bUpdatedFlying = true;
                                 plr->SetDisableGravity(true, true);
+
+                                sScriptMgr->AnticheatSetCanFlybyServer(plr, true);
+                                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
+                                sScriptMgr->AnticheatSetUnderACKmount(plr);
                             }
 
                             plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);

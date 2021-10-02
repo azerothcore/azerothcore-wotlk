@@ -1,7 +1,18 @@
 ﻿/*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -46,14 +57,15 @@ enum Says
     SAY_DEATH                   = 5
 };
 
-enum Misc
-{
-    NPC_SOARING_EAGLE           = 24858,
-    SE_LOC_X_MAX                = 400,
-    SE_LOC_X_MIN                = 335,
-    SE_LOC_Y_MAX                = 1435,
-    SE_LOC_Y_MIN                = 1370
-};
+constexpr auto NPC_SOARING_EAGLE = 24858;
+
+//enum Misc
+//{
+//    SE_LOC_X_MAX                = 400,
+//    SE_LOC_X_MIN                = 335,
+//    SE_LOC_Y_MAX                = 1435,
+//    SE_LOC_Y_MIN                = 1370
+//};
 
 enum Events
 {
@@ -149,22 +161,11 @@ public:
                 for (uint8 i = 2; i < StormCount; ++i)
                     bp0 *= 2;
 
-                CellCoord p(acore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
-                Cell cell(p);
-                cell.SetNoCreate();
-
                 std::list<Unit*> tempUnitMap;
 
-                {
-                    acore::AnyAoETargetUnitInObjectRangeCheck u_check(me, me, SIZE_OF_GRIDS);
-                    acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck> searcher(me, tempUnitMap, u_check);
-
-                    TypeContainerVisitor<acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
-                    TypeContainerVisitor<acore::UnitListSearcher<acore::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
-
-                    cell.Visit(p, world_unit_searcher, *me->GetMap(), *me, SIZE_OF_GRIDS);
-                    cell.Visit(p, grid_unit_searcher, *me->GetMap(), *me, SIZE_OF_GRIDS);
-                }
+                Acore::AnyAoETargetUnitInObjectRangeCheck u_check(me, me, SIZE_OF_GRIDS);
+                Acore::UnitListSearcher<Acore::AnyAoETargetUnitInObjectRangeCheck> searcher(me, tempUnitMap, u_check);
+                Cell::VisitAllObjects(me, searcher, SIZE_OF_GRIDS);
 
                 // deal damage
                 for (std::list<Unit*>::const_iterator i = tempUnitMap.begin(); i != tempUnitMap.end(); ++i)

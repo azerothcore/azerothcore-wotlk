@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Opcodes.h"
 #include "PassiveAI.h"
@@ -586,7 +599,7 @@ public:
                 }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -786,7 +799,7 @@ public:
             }
         }
 
-        // tc idiots, they use updateAI, while we have movementinform :)
+        // tc they use updateAI, while we have movementinform :)
         void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == POINT_MOTION_TYPE)
@@ -853,6 +866,7 @@ public:
     };
 };
 
+// 62775 - Tympanic Tantrum
 class spell_xt002_tympanic_tantrum : public SpellScriptLoader
 {
 public:
@@ -886,6 +900,7 @@ public:
     }
 };
 
+// 64234, 63024 - Gravity Bomb
 class spell_xt002_gravity_bomb_aura : public SpellScriptLoader
 {
 public:
@@ -941,7 +956,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             if (Unit* victim = GetCaster()->GetVictim())
-                targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
         void Register() override
@@ -956,6 +971,7 @@ public:
     }
 };
 
+// 64233, 63025 - Gravity Bomb
 class spell_xt002_gravity_bomb_damage : public SpellScriptLoader
 {
 public:
@@ -988,6 +1004,7 @@ public:
     }
 };
 
+// 63018, 65121 - Searing Light
 class spell_xt002_searing_light_spawn_life_spark : public SpellScriptLoader
 {
 public:
@@ -1023,7 +1040,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             if (Unit* victim = GetCaster()->GetVictim())
-                targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
         void Register() override
@@ -1043,7 +1060,7 @@ class achievement_xt002_nerf_engineering : public AchievementCriteriaScript
 public:
     achievement_xt002_nerf_engineering() : AchievementCriteriaScript("achievement_xt002_nerf_engineering") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
@@ -1059,7 +1076,7 @@ class achievement_xt002_nerf_gravity_bombs : public AchievementCriteriaScript
 public:
     achievement_xt002_nerf_gravity_bombs() : AchievementCriteriaScript("achievement_xt002_nerf_gravity_bombs") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target) override
+    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())

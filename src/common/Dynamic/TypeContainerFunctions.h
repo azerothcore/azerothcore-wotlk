@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TYPECONTAINER_FUNCTIONS_H
@@ -18,7 +29,7 @@
 #include <map>
 #include <unordered_map>
 
-namespace acore
+namespace Acore
 {
     // Helpers
     // Insert helpers
@@ -63,9 +74,13 @@ namespace acore
     {
         auto i = elements._element.find(handle);
         if (i == elements._element.end())
+        {
             return nullptr;
+        }
         else
+        {
             return i->second;
+        }
     }
 
     template<class SPECIFIC_TYPE, class KEY_TYPE>
@@ -112,6 +127,33 @@ namespace acore
     {
         bool ret = Remove(elements._elements, handle, (SPECIFIC_TYPE*)nullptr);
         return ret ? ret : Remove(elements._TailElements, handle, (SPECIFIC_TYPE*)nullptr);
+    }
+
+    // Count helpers
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    bool Size(ContainerUnorderedMap<SPECIFIC_TYPE, KEY_TYPE> const& elements, std::size_t* size, SPECIFIC_TYPE* /*obj*/)
+    {
+        *size = elements._element.size();
+        return true;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE>
+    bool Size(ContainerUnorderedMap<TypeNull, KEY_TYPE> const& /*elements*/, std::size_t* /*size*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return false;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class T>
+    bool Size(ContainerUnorderedMap<T, KEY_TYPE> const& /*elements*/, std::size_t* /*size*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return false;
+    }
+
+    template<class SPECIFIC_TYPE, class KEY_TYPE, class H, class T>
+    bool Size(ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE> const& elements, std::size_t* size, SPECIFIC_TYPE* /*obj*/)
+    {
+        bool ret = Size(elements._elements, size, (SPECIFIC_TYPE*)nullptr);
+        return ret ? ret : Size(elements._TailElements, size, (SPECIFIC_TYPE*)nullptr);
     }
 
     /* ContainerMapList Helpers */

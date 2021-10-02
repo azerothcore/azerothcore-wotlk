@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "obsidian_sanctum.h"
 #include "ScriptedCreature.h"
@@ -420,7 +433,7 @@ public:
                 summons.RemoveNotExisting();
                 if (!summons.empty())
                 {
-                    for (ObjectGuid const summonGuid : summons)
+                    for (ObjectGuid const& summonGuid : summons)
                     {
                         Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
                         if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE)
@@ -556,7 +569,7 @@ public:
                         uint8 iter = 0;
                         if (!summons.empty())
                         {
-                            for (ObjectGuid const summonGuid : summons)
+                            for (ObjectGuid const& summonGuid : summons)
                             {
                                 Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
                                 if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE && iter == rand)
@@ -636,7 +649,7 @@ public:
                 return;
             }
 
-            for (ObjectGuid const guid : summons)
+            for (ObjectGuid const& guid : summons)
             {
                 Creature* tsunami = ObjectAccessor::GetCreature(*me, guid);
                 if (!tsunami || tsunami->GetEntry() != NPC_FLAME_TSUNAMI)
@@ -1129,7 +1142,7 @@ public:
                 {
                     summons.RemoveNotExisting();
                     summons.DespawnEntry(NPC_TWILIGHT_WHELP);
-                    for (ObjectGuid const summonGuid : summons)
+                    for (ObjectGuid const& summonGuid : summons)
                     {
                         Creature const* summon = ObjectAccessor::GetCreature(*me, summonGuid);
                         if (!summon || !summon->IsAlive() || summon->GetEntry() != NPC_TWILIGHT_EGG)

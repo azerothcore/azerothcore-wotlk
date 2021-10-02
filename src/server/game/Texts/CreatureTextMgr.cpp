@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Cell.h"
@@ -76,13 +87,13 @@ void CreatureTextMgr::LoadCreatureTexts()
     mTextMap.clear(); // for reload case
     mTextRepeatMap.clear(); //reset all currently used temp texts
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEXT);
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEXT);
     PreparedQueryResult result = WorldDatabase.Query(stmt);
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 ceature texts. DB table `creature_texts` is empty.");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 ceature texts. DB table `creature_texts` is empty.");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -152,8 +163,8 @@ void CreatureTextMgr::LoadCreatureTexts()
         ++textCount;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u creature texts for %lu creatures in %u ms", textCount, mTextMap.size(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u creature texts for %lu creatures in %u ms", textCount, mTextMap.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void CreatureTextMgr::LoadCreatureTextLocales()
@@ -174,19 +185,17 @@ void CreatureTextMgr::LoadCreatureTextLocales()
         uint32 CreatureId           = fields[0].GetUInt32();
         uint32 GroupId              = fields[1].GetUInt8();
         uint32 ID                   = fields[2].GetUInt8();
-        std::string LocaleName      = fields[3].GetString();
-        std::string Text            = fields[4].GetString();
 
-        CreatureTextLocale& data = mLocaleTextMap[CreatureTextId(CreatureId, GroupId, ID)];
-        LocaleConstant locale = GetLocaleByName(LocaleName);
+        LocaleConstant locale = GetLocaleByName(fields[3].GetString());
         if (locale == LOCALE_enUS)
             continue;
 
-        ObjectMgr::AddLocaleString(Text, locale, data.Text);
+        CreatureTextLocale& data = mLocaleTextMap[CreatureTextId(CreatureId, GroupId, ID)];
+        ObjectMgr::AddLocaleString(fields[4].GetString(), locale, data.Text);
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u Creature Text Locale in %u ms", uint32(mLocaleTextMap.size()), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u Creature Text Locale in %u ms", uint32(mLocaleTextMap.size()), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject const* whisperTarget /*= nullptr*/, ChatMsg msgType /*= CHAT_MSG_ADDON*/, Language language /*= LANG_ADDON*/, CreatureTextRange range /*= TEXT_RANGE_NORMAL*/, uint32 sound /*= 0*/, TeamId teamId /*= TEAM_NEUTRAL*/, bool gmOnly /*= false*/, Player* srcPlr /*= nullptr*/)
@@ -441,9 +450,7 @@ bool CreatureTextMgr::TextExist(uint32 sourceEntry, uint8 textGroup)
     CreatureTextMap::const_iterator sList = mTextMap.find(sourceEntry);
     if (sList == mTextMap.end())
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("entities.unit", "CreatureTextMgr::TextExist: Could not find Text for Creature (entry %u) in 'creature_text' table.", sourceEntry);
-#endif
         return false;
     }
 
@@ -451,9 +458,7 @@ bool CreatureTextMgr::TextExist(uint32 sourceEntry, uint8 textGroup)
     CreatureTextHolder::const_iterator itr = textHolder.find(textGroup);
     if (itr == textHolder.end())
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("entities.unit", "CreatureTextMgr::TextExist: Could not find TextGroup %u for Creature (entry %u).", uint32(textGroup), sourceEntry);
-#endif
         return false;
     }
 

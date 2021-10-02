@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -65,7 +76,7 @@ struct MechanicImmune
     char const* text;
 };
 
-#define MAX_MECHANIC    32
+constexpr auto MAX_MECHANIC = 32;
 
 MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
 {
@@ -101,6 +112,23 @@ MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
     { MECHANIC_IMMUNE_SHIELD, "MECHANIC_IMMUNE_SHIELD"      },
     { MECHANIC_SAPPED, "MECHANIC_SAPPED"             },
     { MECHANIC_ENRAGED, "MECHANIC_ENRAGED"            },
+};
+
+struct SpellSchoolImmune
+{
+    uint32 flag;
+    char const* text;
+};
+
+SpellSchoolImmune const spellSchoolImmunes[MAX_SPELL_SCHOOL] =
+{
+    { SPELL_SCHOOL_NORMAL, "SPELL_SCHOOL_NORMAL" },
+    { SPELL_SCHOOL_HOLY,   "SPELL_SCHOOL_HOLY"   },
+    { SPELL_SCHOOL_FIRE,   "SPELL_SCHOOL_FIRE"   },
+    { SPELL_SCHOOL_NATURE, "SPELL_SCHOOL_NATURE" },
+    { SPELL_SCHOOL_FROST,  "SPELL_SCHOOL_FROST"  },
+    { SPELL_SCHOOL_SHADOW, "SPELL_SCHOOL_SHADOW" },
+    { SPELL_SCHOOL_ARCANE, "SPELL_SCHOOL_ARCANE" },
 };
 
 class npc_commandscript : public CommandScript
@@ -354,8 +382,7 @@ public:
             wait = 0;
 
         // Update movement type
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_MOVEMENT_TYPE);
-
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_MOVEMENT_TYPE);
         stmt->setUInt8(0, uint8(WAYPOINT_MOTION_TYPE));
         stmt->setUInt32(1, spawnId);
 
@@ -569,8 +596,7 @@ public:
         }
 
         // ..and DB
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_FACTION);
-
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_FACTION);
         stmt->setUInt16(0, uint16(factionId));
         stmt->setUInt32(1, creature->GetEntry());
 
@@ -639,8 +665,7 @@ public:
 
         creature->SetUInt32Value(UNIT_NPC_FLAGS, npcFlags);
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_NPCFLAG);
-
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_NPCFLAG);
         stmt->setUInt32(0, npcFlags);
         stmt->setUInt32(1, creature->GetEntry());
 
@@ -719,6 +744,7 @@ public:
         uint32 faction = target->getFaction();
         uint32 npcflags = target->GetUInt32Value(UNIT_NPC_FLAGS);
         uint32 mechanicImmuneMask = cInfo->MechanicImmuneMask;
+        uint32 spellSchoolImmuneMask = cInfo->SpellSchoolImmuneMask;
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
@@ -743,13 +769,30 @@ public:
         handler->PSendSysMessage(LANG_NPCINFO_AIINFO, target->GetAIName().c_str(), target->GetScriptName().c_str());
 
         for (uint8 i = 0; i < NPCFLAG_COUNT; i++)
+        {
             if (npcflags & npcFlagTexts[i].flag)
+            {
                 handler->PSendSysMessage(npcFlagTexts[i].text, npcFlagTexts[i].flag);
+            }
+        }
 
         handler->PSendSysMessage(LANG_NPCINFO_MECHANIC_IMMUNE, mechanicImmuneMask);
         for (uint8 i = 1; i < MAX_MECHANIC; ++i)
+        {
             if (mechanicImmuneMask & (1 << (mechanicImmunes[i].flag - 1)))
+            {
                 handler->PSendSysMessage(mechanicImmunes[i].text, mechanicImmunes[i].flag);
+            }
+        }
+
+        handler->PSendSysMessage(LANG_NPCINFO_SPELL_SCHOOL_IMMUNE, spellSchoolImmuneMask);
+        for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+        {
+            if (spellSchoolImmuneMask & (1 << spellSchoolImmunes[i].flag))
+            {
+                handler->PSendSysMessage(spellSchoolImmunes[i].text, spellSchoolImmunes[i].flag);
+            }
+        }
 
         return true;
     }
@@ -761,7 +804,7 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_NEAREST);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_NEAREST);
         stmt->setFloat(0, player->GetPositionX());
         stmt->setFloat(1, player->GetPositionY());
         stmt->setFloat(2, player->GetPositionZ());
@@ -771,8 +814,8 @@ public:
         stmt->setFloat(6, player->GetPositionZ());
         stmt->setFloat(7, distance * distance);
         stmt->setUInt32(8, player->GetPhaseMask());
-        PreparedQueryResult result = WorldDatabase.Query(stmt);
 
+        PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (result)
         {
             do
@@ -874,8 +917,7 @@ public:
             }
         }
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_POSITION);
-
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_POSITION);
         stmt->setFloat(0, x);
         stmt->setFloat(1, y);
         stmt->setFloat(2, z);
@@ -976,15 +1018,12 @@ public:
 
         if (dontdel_str)
         {
-            //LOG_ERROR("server", "DEBUG: All 3 params are set");
-
             // All 3 params are set
             // GUID
             // type
             // doNotDEL
             if (stricmp(dontdel_str, "NODEL") == 0)
             {
-                //LOG_ERROR("server", "DEBUG: doNotDelete = true;");
                 doNotDelete = true;
             }
         }
@@ -993,10 +1032,8 @@ public:
             // Only 2 params - but maybe NODEL is set
             if (type_str)
             {
-                LOG_ERROR("server", "DEBUG: Only 2 params ");
                 if (stricmp(type_str, "NODEL") == 0)
                 {
-                    //LOG_ERROR("server", "DEBUG: type_str, NODEL ");
                     doNotDelete = true;
                     type_str = nullptr;
                 }
@@ -1059,7 +1096,7 @@ public:
         if (creature)
         {
             // update movement type
-            if (doNotDelete == false)
+            if (!doNotDelete)
                 creature->LoadPath(0);
 
             creature->SetDefaultMovementType(move_type);
@@ -1071,7 +1108,7 @@ public:
             }
             creature->SaveToDB();
         }
-        if (doNotDelete == false)
+        if (!doNotDelete)
         {
             handler->PSendSysMessage(LANG_MOVE_TYPE_SET, type_str);
         }
@@ -1148,8 +1185,7 @@ public:
             creature->Respawn();
         }
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_WANDER_DISTANCE);
-
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_WANDER_DISTANCE);
         stmt->setFloat(0, option);
         stmt->setUInt8(1, uint8(mtype));
         stmt->setUInt32(2, guidLow);
@@ -1188,8 +1224,7 @@ public:
         else
             return false;
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
-
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
         stmt->setUInt32(0, uint32(spawnTime));
         stmt->setUInt32(1, guidLow);
 
@@ -1450,24 +1485,21 @@ public:
             return false;
 
         Player* chr = handler->GetSession()->GetPlayer();
-        FormationInfo* group_member;
-
-        group_member                 = new FormationInfo;
-        group_member->follow_angle   = (creature->GetAngle(chr) - chr->GetOrientation()) * 180 / M_PI;
-        group_member->follow_dist    = sqrtf(pow(chr->GetPositionX() - creature->GetPositionX(), int(2)) + pow(chr->GetPositionY() - creature->GetPositionY(), int(2)));
-        group_member->leaderGUID     = leaderGUID;
-        group_member->groupAI        = 0;
+        FormationInfo group_member;
+        group_member.follow_angle   = (creature->GetAngle(chr) - chr->GetOrientation()) * 180 / M_PI;
+        group_member.follow_dist    = sqrtf(pow(chr->GetPositionX() - creature->GetPositionX(), int(2)) + pow(chr->GetPositionY() - creature->GetPositionY(), int(2)));
+        group_member.leaderGUID     = leaderGUID;
+        group_member.groupAI        = 0;
 
         sFormationMgr->CreatureGroupMap[lowguid] = group_member;
         creature->SearchFormation();
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE_FORMATION);
-
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE_FORMATION);
         stmt->setUInt32(0, leaderGUID);
         stmt->setUInt32(1, lowguid);
-        stmt->setFloat(2, group_member->follow_dist);
-        stmt->setFloat(3, group_member->follow_angle);
-        stmt->setUInt32(4, uint32(group_member->groupAI));
+        stmt->setFloat(2, group_member.follow_dist);
+        stmt->setFloat(3, group_member.follow_angle);
+        stmt->setUInt32(4, uint32(group_member.groupAI));
 
         WorldDatabase.Execute(stmt);
 

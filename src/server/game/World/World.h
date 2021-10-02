@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /// \addtogroup world The World
@@ -11,9 +22,8 @@
 #ifndef __WORLD_H
 #define __WORLD_H
 
-#include "Callback.h"
-#include "Common.h"
 #include "IWorld.h"
+#include "LockedQueue.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
@@ -22,13 +32,16 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 class Object;
 class WorldPacket;
 class WorldSocket;
 class SystemMgr;
 
-extern uint32 realmID;
+struct Realm;
+
+AC_GAME_API extern Realm realm;
 
 enum ShutdownMask
 {
@@ -71,18 +84,6 @@ enum BillingPlanFlags
     SESSION_TIME_MIXTURE    = 0x20,
     SESSION_RESTRICTED      = 0x40,
     SESSION_ENABLE_CAIS     = 0x80,
-};
-
-/// Type of server, this is values from second column of Cfg_Configs.dbc
-enum RealmType
-{
-    REALM_TYPE_NORMAL = 0,
-    REALM_TYPE_PVP = 1,
-    REALM_TYPE_NORMAL2 = 4,
-    REALM_TYPE_RP = 6,
-    REALM_TYPE_RPPVP = 8,
-    REALM_TYPE_FFA_PVP = 16                                 // custom, free for all pvp mode like arena PvP in all zones except rest activated places and sanctuaries
-                         // replaced by REALM_PVP in realm list
 };
 
 enum RealmZone
@@ -334,8 +335,8 @@ public:
     void LoadWorldStates();
 
     /// Are we on a "Player versus Player" server?
-    bool IsPvPRealm() const { return (getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP || getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP); }
-    bool IsFFAPvPRealm() const { return getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP; }
+    [[nodiscard]] bool IsPvPRealm() const;
+    [[nodiscard]] bool IsFFAPvPRealm() const;
 
     void KickAll();
     void KickAllLess(AccountTypes sec);
@@ -346,14 +347,7 @@ public:
     static float GetMaxVisibleDistanceInBGArenas()      { return m_MaxVisibleDistanceInBGArenas;   }
 
     // our: needed for arena spectator subscriptions
-    uint32 GetNextWhoListUpdateDelaySecs()
-    {
-        if (m_timers[WUPDATE_5_SECS].Passed())
-            return 1;
-        uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
-        t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
-        return uint32(ceil(t / 1000.0f));
-    }
+    uint32 GetNextWhoListUpdateDelaySecs();
 
     // xinef: Global Player Data Storage system
     void LoadGlobalPlayerDataStore();
@@ -379,7 +373,11 @@ public:
 
     // used World DB version
     void LoadDBVersion();
+    void LoadDBRevision();
     char const* GetDBVersion() const { return m_DBVersion.c_str(); }
+    char const* GetWorldDBRevision() const { return m_WorldDBRevision.c_str(); }
+    char const* GetCharacterDBRevision() const { return m_CharacterDBRevision.c_str(); }
+    char const* GetAuthDBRevision() const { return m_AuthDBRevision.c_str(); }
 
     void LoadAutobroadcasts();
 
@@ -487,6 +485,9 @@ private:
 
     // used versions
     std::string m_DBVersion;
+    std::string m_WorldDBRevision;
+    std::string m_CharacterDBRevision;
+    std::string m_AuthDBRevision;
 
     typedef std::map<uint8, std::string> AutobroadcastsMap;
     AutobroadcastsMap m_Autobroadcasts;
@@ -495,7 +496,14 @@ private:
     AutobroadcastsWeightMap m_AutobroadcastsWeights;
 
     void ProcessQueryCallbacks();
-    ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
+    QueryCallbackProcessor _queryProcessor;
+
+    /**
+     * @brief Executed when a World Session is being finalized. Be it from a normal login or via queue popping.
+     *
+     * @param session The World Session that we are finalizing.
+     */
+    inline void FinalizePlayerWorldSession(WorldSession* session);
 };
 
 std::unique_ptr<IWorld>& getWorldInstance();

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -93,7 +104,7 @@ public:
     static bool GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::string searchString)
     {
         PreparedQueryResult result;
-        PreparedStatement* stmt;
+        CharacterDatabasePreparedStatement* stmt = nullptr;
         if (!searchString.empty())
         {
             // search by GUID
@@ -211,7 +222,7 @@ public:
             return;
         }
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_RESTORE_DELETE_INFO);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_RESTORE_DELETE_INFO);
         stmt->setString(0, delInfo.name);
         stmt->setUInt32(1, delInfo.accountId);
         stmt->setUInt32(2, delInfo.lowGuid);
@@ -244,7 +255,7 @@ public:
         else
         {
             // Update level and reset XP, everything else will be updated at login
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
             stmt->setUInt8(0, uint8(newLevel));
             stmt->setUInt32(1, playerGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
@@ -302,10 +313,20 @@ public:
     //rename characters
     static bool HandleCharacterRenameCommand(ChatHandler* handler, char const* args)
     {
+        char* nameStr = strtok((char*)args, " ");
+        char* reserveNameStr = strtok(nullptr, " ");
+
+        if (!reserveNameStr && nameStr && atoi(nameStr) == 1)
+        {
+            reserveNameStr = nameStr;
+            nameStr = nullptr;
+        }
+        bool reserveName = reserveNameStr != nullptr && atoi(reserveNameStr) == 1;
+
         Player* target;
         ObjectGuid targetGuid;
         std::string targetName;
-        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+        if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
             return false;
 
         if (target)
@@ -326,10 +347,15 @@ public:
             std::string oldNameLink = handler->playerLink(targetName);
             handler->PSendSysMessage(LANG_RENAME_PLAYER_GUID, oldNameLink.c_str(), targetGuid.GetCounter());
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->setUInt16(0, uint16(AT_LOGIN_RENAME));
             stmt->setUInt32(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
+        }
+
+        if (reserveName)
+        {
+            sObjectMgr->AddReservedPlayerName(targetName);
         }
 
         return true;
@@ -384,7 +410,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->setUInt16(0, uint16(AT_LOGIN_CUSTOMIZE));
         if (target)
         {
@@ -412,7 +438,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->setUInt16(0, uint16(AT_LOGIN_CHANGE_FACTION));
         if (target)
         {
@@ -439,7 +465,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->setUInt16(0, uint16(AT_LOGIN_CHANGE_RACE));
         if (target)
         {

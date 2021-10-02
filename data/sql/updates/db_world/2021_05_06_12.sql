@@ -1,0 +1,36 @@
+-- DB update 2021_05_06_11 -> 2021_05_06_12
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_06_11';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_06_11 2021_05_06_12 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1619974489991847400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619974489991847400');
+
+DELETE FROM `pool_creature` WHERE (`guid` IN (14616, 134014, 134015, 134016, 134017, 134018, 134019));
+INSERT INTO `pool_creature` VALUES
+(14616, 1003, 50, 'Or\'Kalar (2773) - Spawn 1'),
+(134014, 1003, 10, 'Or\'Kalar (2773) - Spawn 2'),
+(134015, 1003, 10, 'Or\'Kalar (2773) - Spawn 3'),
+(134016, 1003, 10, 'Or\'Kalar (2773) - Spawn 4'),
+(134017, 1003, 10, 'Or\'Kalar (2773) - Spawn 5'),
+(134018, 1003, 5, 'Or\'Kalar (2773) - Spawn 6'),
+(134019, 1003, 5, 'Or\'Kalar (2773) - Spawn 7');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

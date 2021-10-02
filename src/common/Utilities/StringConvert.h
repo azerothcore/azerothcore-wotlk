@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _ACORE_STRINGCONVERT_H_
@@ -16,11 +28,11 @@
 #include <string_view>
 #include <type_traits>
 
-namespace acore::Impl::StringConvertImpl
+namespace Acore::Impl::StringConvertImpl
 {
     template <typename T, typename = void> struct For
     {
-        static_assert(acore::dependant_false_v<T>, "Unsupported type used for ToString or StringTo");
+        static_assert(Acore::dependant_false_v<T>, "Unsupported type used for ToString or StringTo");
     };
 
     template <typename T>
@@ -41,10 +53,14 @@ namespace acore::Impl::StringConvertImpl
                     str.remove_prefix(2);
                 }
                 else
+                {
                     base = 10;
+                }
 
                 if (str.empty())
+                {
                     return std::nullopt;
+                }
             }
 
             char const* const start = str.data();
@@ -53,14 +69,18 @@ namespace acore::Impl::StringConvertImpl
             T val;
             std::from_chars_result const res = std::from_chars(start, end, val, base);
             if ((res.ptr == end) && (res.ec == std::errc()))
+            {
                 return val;
+            }
             else
+            {
                 return std::nullopt;
+            }
         }
 
         static std::string ToString(T val)
         {
-            std::string buf(20,'\0'); /* 2^64 is 20 decimal characters, -(2^63) is 20 including the sign */
+            std::string buf(20, '\0'); /* 2^64 is 20 decimal characters, -(2^63) is 20 including the sign */
             char* const start = buf.data();
             char* const end = (start + buf.length());
             std::to_chars_result const res = std::to_chars(start, end, val);
@@ -84,13 +104,17 @@ namespace acore::Impl::StringConvertImpl
         static Optional<uint64> FromString(std::string_view str, int base = 10)
         {
             if (str.empty())
+            {
                 return std::nullopt;
+            }
             try
             {
                 size_t n;
                 uint64 val = std::stoull(std::string(str), &n, base);
                 if (n != str.length())
+                {
                     return std::nullopt;
+                }
                 return val;
             }
             catch (...) { return std::nullopt; }
@@ -107,13 +131,18 @@ namespace acore::Impl::StringConvertImpl
     {
         static Optional<int64> FromString(std::string_view str, int base = 10)
         {
-            try {
+            try
+            {
                 if (str.empty())
+                {
                     return std::nullopt;
+                }
                 size_t n;
                 int64 val = std::stoll(std::string(str), &n, base);
                 if (n != str.length())
+                {
                     return std::nullopt;
+                }
                 return val;
             }
             catch (...) { return std::nullopt; }
@@ -134,17 +163,25 @@ namespace acore::Impl::StringConvertImpl
             if (strict)
             {
                 if (str == "1")
+                {
                     return true;
+                }
                 if (str == "0")
+                {
                     return false;
+                }
                 return std::nullopt;
             }
             else
             {
                 if ((str == "1") || StringEqualI(str, "y") || StringEqualI(str, "on") || StringEqualI(str, "yes") || StringEqualI(str, "true"))
+                {
                     return true;
+                }
                 if ((str == "0") || StringEqualI(str, "n") || StringEqualI(str, "off") || StringEqualI(str, "no") || StringEqualI(str, "false"))
+                {
                     return false;
+                }
                 return std::nullopt;
             }
         }
@@ -162,7 +199,9 @@ namespace acore::Impl::StringConvertImpl
         static Optional<T> FromString(std::string_view str, std::chars_format fmt = std::chars_format())
         {
             if (str.empty())
+            {
                 return std::nullopt;
+            }
 
             if (fmt == std::chars_format())
             {
@@ -172,10 +211,14 @@ namespace acore::Impl::StringConvertImpl
                     str.remove_prefix(2);
                 }
                 else
+                {
                     fmt = std::chars_format::general;
+                }
 
                 if (str.empty())
+                {
                     return std::nullopt;
+                }
             }
 
             char const* const start = str.data();
@@ -184,20 +227,30 @@ namespace acore::Impl::StringConvertImpl
             T val;
             std::from_chars_result const res = std::from_chars(start, end, val, fmt);
             if ((res.ptr == end) && (res.ec == std::errc()))
+            {
                 return val;
+            }
             else
+            {
                 return std::nullopt;
+            }
         }
 
         // this allows generic converters for all numeric types (easier templating!)
         static Optional<T> FromString(std::string_view str, int base)
         {
             if (base == 16)
+            {
                 return FromString(str, std::chars_format::hex);
+            }
             else if (base == 10)
+            {
                 return FromString(str, std::chars_format::general);
+            }
             else
+            {
                 return FromString(str, std::chars_format());
+            }
         }
 
         static std::string ToString(T val)
@@ -212,22 +265,31 @@ namespace acore::Impl::StringConvertImpl
     {
         static Optional<T> FromString(std::string_view str, int base = 0)
         {
-            try {
+            try
+            {
                 if (str.empty())
+                {
                     return std::nullopt;
+                }
 
                 if ((base == 10) && StringEqualI(str.substr(0, 2), "0x"))
+                {
                     return std::nullopt;
+                }
 
                 std::string tmp;
                 if (base == 16)
+                {
                     tmp.append("0x");
+                }
                 tmp.append(str);
 
                 size_t n;
                 T val = static_cast<T>(std::stold(tmp, &n));
                 if (n != tmp.length())
+                {
                     return std::nullopt;
+                }
                 return val;
             }
             catch (...) { return std::nullopt; }
@@ -241,18 +303,18 @@ namespace acore::Impl::StringConvertImpl
 #endif
 }
 
-namespace acore
+namespace Acore
 {
     template <typename Result, typename... Params>
     Optional<Result> StringTo(std::string_view str, Params&&... params)
     {
-        return acore::Impl::StringConvertImpl::For<Result>::FromString(str, std::forward<Params>(params)...);
+        return Acore::Impl::StringConvertImpl::For<Result>::FromString(str, std::forward<Params>(params)...);
     }
 
     template <typename Type, typename... Params>
     std::string ToString(Type&& val, Params&&... params)
     {
-        return acore::Impl::StringConvertImpl::For<std::decay_t<Type>>::ToString(std::forward<Type>(val), std::forward<Params>(params)...);
+        return Acore::Impl::StringConvertImpl::For<std::decay_t<Type>>::ToString(std::forward<Type>(val), std::forward<Params>(params)...);
     }
 }
 

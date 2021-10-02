@@ -1,72 +1,33 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Util.h"
 #include "Common.h"
-#include "utf8.h"
-#include "Log.h"
-#include "DatabaseWorker.h"
-#include "SQLOperation.h"
-#include "Errors.h"
-#include "TypeList.h"
-#include "SFMT.h"
-#include "Errors.h" // for ASSERT
-#include <ace/TSS_T.h>
-#include <array>
-#include <cwchar>
+#include "Containers.h"
+#include "IpAddress.h"
+#include "StringFormat.h"
+#include <algorithm>
+#include <cctype>
+#include <cstdarg>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 #include <string>
-#include <random>
-
-typedef ACE_TSS<SFMTRand> SFMTRandTSS;
-static SFMTRandTSS sfmtRand;
-static SFMTEngine engine;
-
-int32 irand(int32 min, int32 max)
-{
-    ASSERT(max >= min);
-    return int32(sfmtRand->IRandom(min, max));
-}
-
-uint32 urand(uint32 min, uint32 max)
-{
-    ASSERT(max >= min);
-    return sfmtRand->URandom(min, max);
-}
-
-float frand(float min, float max)
-{
-    ASSERT(max >= min);
-    return float(sfmtRand->Random() * (max - min) + min);
-}
-
-uint32 rand32()
-{
-    return int32(sfmtRand->BRandom());
-}
-
-double rand_norm()
-{
-    return sfmtRand->Random();
-}
-
-double rand_chance()
-{
-    return sfmtRand->Random() * 100.0;
-}
-
-uint32 urandweighted(size_t count, double const* chances)
-{
-    std::discrete_distribution<uint32> dd(chances, chances + count);
-    return dd(SFMTEngine::Instance());
-}
-
-SFMTEngine& SFMTEngine::Instance()
-{
-    return engine;
-}
+#include <utf8.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
 {
@@ -74,7 +35,9 @@ Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserv
     memcpy(m_str, src.c_str(), src.length() + 1);
 
     if (vectorReserve)
+    {
         m_storage.reserve(vectorReserve);
+    }
 
     char* posold = m_str;
     char* posnew = m_str;
@@ -93,7 +56,9 @@ Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserv
             // Hack like, but the old code accepted these kind of broken strings,
             // so changing it would break other things
             if (posold != posnew)
+            {
                 m_storage.push_back(posold);
+            }
 
             break;
         }
@@ -136,7 +101,9 @@ time_t GetLocalHourTimestamp(time_t time, uint8 hour, bool onlyAfterTime)
     time_t hourLocal = midnightLocal + hour * HOUR;
 
     if (onlyAfterTime && hourLocal <= time)
+    {
         hourLocal += DAY;
+    }
 
     return hourLocal;
 }
@@ -161,17 +128,25 @@ void stripLineInvisibleChars(std::string& str)
         else
         {
             if (wpos != pos)
+            {
                 str[wpos++] = str[pos];
+            }
             else
+            {
                 ++wpos;
+            }
             space = false;
         }
     }
 
     if (wpos < str.size())
+    {
         str.erase(wpos, str.size());
+    }
     if (str.find("|TInterface") != std::string::npos)
+    {
         str.clear();
+    }
 }
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText)
@@ -183,18 +158,28 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText)
 
     std::ostringstream ss;
     if (days)
+    {
         ss << days << (shortText ? "d" : " day(s) ");
+    }
     if (hours)
+    {
         ss << hours << (shortText ? "h" : " hour(s) ");
+    }
     if (minutes)
+    {
         ss << minutes << (shortText ? "m" : " minute(s) ");
+    }
     if (secs || (!days && !hours && !minutes) )
+    {
         ss << secs << (shortText ? "s" : " second(s) ");
+    }
 
     std::string str = ss.str();
 
     if (!shortText && !str.empty() && str[str.size() - 1] == ' ')
+    {
         str.resize(str.size() - 1);
+    }
 
     return str;
 }
@@ -206,7 +191,9 @@ int32 MoneyStringToMoney(const std::string& moneyString)
     if (!(std::count(moneyString.begin(), moneyString.end(), 'g') == 1 ||
             std::count(moneyString.begin(), moneyString.end(), 's') == 1 ||
             std::count(moneyString.begin(), moneyString.end(), 'c') == 1))
-        return 0; // Bad format
+    {
+        return 0;    // Bad format
+    }
 
     Tokenizer tokens(moneyString, ' ');
     for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
@@ -216,15 +203,23 @@ int32 MoneyStringToMoney(const std::string& moneyString)
         size_t sCount = std::count(tokenString.begin(), tokenString.end(), 's');
         size_t cCount = std::count(tokenString.begin(), tokenString.end(), 'c');
         if (gCount + sCount + cCount != 1)
+        {
             return 0;
+        }
 
         uint32 amount = atoi(*itr);
         if (gCount == 1)
+        {
             money += amount * 100 * 100;
+        }
         else if (sCount == 1)
+        {
             money += amount * 100;
+        }
         else if (cCount == 1)
+        {
             money += amount;
+        }
     }
 
     return money;
@@ -305,26 +300,13 @@ std::string TimeToHumanReadable(time_t t)
 bool IsIPAddress(char const* ipaddress)
 {
     if (!ipaddress)
+    {
         return false;
+    }
 
-    // Let the big boys do it.
-    // Drawback: all valid ip address formats are recognized e.g.: 12.23, 121234, 0xABCD)
-    return inet_addr(ipaddress) != INADDR_NONE;
-}
-
-std::string GetAddressString(ACE_INET_Addr const& addr)
-{
-    char buf[ACE_MAX_FULLY_QUALIFIED_NAME_LEN + 16];
-    addr.addr_to_string(buf, ACE_MAX_FULLY_QUALIFIED_NAME_LEN + 16);
-    return buf;
-}
-
-bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_INET_Addr const& subnetMask)
-{
-    uint32 mask = subnetMask.get_ip_address();
-    if ((net.get_ip_address() & mask) == (addr.get_ip_address() & mask))
-        return true;
-    return false;
+    boost::system::error_code error;
+    Acore::Net::make_address(ipaddress, error);
+    return !error;
 }
 
 /// create PID file
@@ -332,7 +314,9 @@ uint32 CreatePIDFile(std::string const& filename)
 {
     FILE* pid_file = fopen(filename.c_str(), "w");
     if (pid_file == nullptr)
+    {
         return 0;
+    }
 
     uint32 pid = GetPID();
 
@@ -372,7 +356,9 @@ void utf8truncate(std::string& utf8str, size_t len)
     {
         size_t wlen = utf8::distance(utf8str.c_str(), utf8str.c_str() + utf8str.size());
         if (wlen <= len)
+        {
             return;
+        }
 
         std::wstring wstr;
         wstr.resize(wlen);
@@ -391,7 +377,7 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
 {
     try
     {
-        acore::CheckedBufferOutputIterator<wchar_t> out(wstr, wsize);
+        Acore::CheckedBufferOutputIterator<wchar_t> out(wstr, wsize);
         out = utf8::utf8to16(utf8str, utf8str + csize, out);
         wsize -= out.remaining(); // remaining unused space
         wstr[wsize] = L'\0';
@@ -413,7 +399,9 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
             wsize = 0;
         }
         else
+        {
             wsize = 0;
+        }
 
         return false;
     }
@@ -499,7 +487,9 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
 {
     // supported only Cyrillic cases
     if (wname.empty() || !isCyrillicCharacter(wname[0]) || declension > 5)
+    {
         return wname;
+    }
 
     // Important: end length must be <= MAX_INTERNAL_PLAYER_NAME-MAX_PLAYER_NAME (3 currently)
     static std::wstring const a_End    = { wchar_t(0x0430), wchar_t(0x0000) };
@@ -535,11 +525,15 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
     {
         std::wstring const& ending = **itr;
         std::size_t const endLen = ending.length();
-        if (!(endLen <= thisLen))
+        if (endLen > thisLen)
+        {
             continue;
+        }
 
         if (wname.substr(thisLen - endLen, thisLen) == ending)
+        {
             return wname.substr(0, thisLen - endLen);
+        }
     }
 
     return wname;
@@ -550,7 +544,9 @@ bool utf8ToConsole(const std::string& utf8str, std::string& conStr)
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     std::wstring wstr;
     if (!Utf8toWStr(utf8str, wstr))
+    {
         return false;
+    }
 
     conStr.resize(wstr.size());
     CharToOemBuffW(&wstr[0], &conStr[0], wstr.size());
@@ -582,13 +578,17 @@ bool Utf8FitTo(const std::string& str, std::wstring const& search)
     std::wstring temp;
 
     if (!Utf8toWStr(str, temp))
+    {
         return false;
+    }
 
     // converting to lower case
     wstrToLower(temp);
 
     if (temp.find(search) == std::wstring::npos)
+    {
         return false;
+    }
 
     return true;
 }
@@ -610,7 +610,9 @@ void vutf8printf(FILE* out, const char* str, va_list* ap)
     size_t temp_len = vsnprintf(temp_buf, 32 * 1024, str, *ap);
     //vsnprintf returns -1 if the buffer is too small
     if (temp_len == size_t(-1))
+    {
         temp_len = 32 * 1024 - 1;
+    }
 
     size_t wtemp_len = 32 * 1024 - 1;
     Utf8toWStr(temp_buf, temp_len, wtemp_buf, wtemp_len);
@@ -626,14 +628,16 @@ bool Utf8ToUpperOnlyLatin(std::string& utf8String)
 {
     std::wstring wstr;
     if (!Utf8toWStr(utf8String, wstr))
+    {
         return false;
+    }
 
     std::transform(wstr.begin(), wstr.end(), wstr.begin(), wcharToUpperOnlyLatin);
 
     return WStrToUtf8(wstr, utf8String);
 }
 
-std::string acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, bool reverse /* = false */)
+std::string Acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, bool reverse /* = false */)
 {
     int32 init = 0;
     int32 end = arrayLen;
@@ -657,7 +661,7 @@ std::string acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, 
     return ss.str();
 }
 
-void acore::Impl::HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse /*= false*/)
+void Acore::Impl::HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse /*= false*/)
 {
     ASSERT(str.size() == (2 * outlen));
 

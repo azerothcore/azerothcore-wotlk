@@ -1,47 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _MYSQLTHREADING_H
 #define _MYSQLTHREADING_H
 
-#include "Log.h"
+#include "Define.h"
 
-class MySQL
+namespace MySQL
 {
-public:
-    /*! Create a thread on the MySQL server to mirrior the calling thread,
-        initializes thread-specific variables and allows thread-specific
-        operations without concurrence from other threads.
-        This should only be called if multiple core threads are running
-        on the same MySQL connection. Seperate MySQL connections implicitly
-        create a mirror thread.
-    */
-    static void Thread_Init()
-    {
-        mysql_thread_init();
-    }
-
-    /*! Shuts down MySQL thread and frees resources, should only be called
-        when we terminate. MySQL threads and connections are not configurable
-        during runtime.
-    */
-    static void Thread_End()
-    {
-        mysql_thread_end();
-    }
-
-    static void Library_Init()
-    {
-        mysql_library_init(-1, nullptr, nullptr);
-    }
-
-    static void Library_End()
-    {
-        mysql_library_end();
-    }
-};
+    AC_DATABASE_API void Library_Init();
+    AC_DATABASE_API void Library_End();
+    AC_DATABASE_API uint32 GetLibraryVersion();
+}
 
 #endif

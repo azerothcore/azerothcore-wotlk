@@ -1,11 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_IWORLD_H
 #define AZEROTHCORE_IWORLD_H
 
-#include "Callback.h"
+#include "AsyncCallbackProcessor.h"
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "QueryResult.h"
@@ -15,6 +28,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 class WorldPacket;
 class WorldSession;
@@ -81,7 +95,6 @@ enum WorldBoolConfigs
     CONFIG_INSTANCE_IGNORE_RAID,
     CONFIG_INSTANCE_GMSUMMON_PLAYER,
     CONFIG_INSTANCE_SHARED_ID,
-    CONFIG_GM_LOG_TRADE,
     CONFIG_ALLOW_GM_GROUP,
     CONFIG_ALLOW_GM_FRIEND,
     CONFIG_GM_LOWER_SECURITY,
@@ -107,14 +120,15 @@ enum WorldBoolConfigs
     CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG,
     CONFIG_BATTLEGROUND_CAST_DESERTER,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
-    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMITED_ENABLE,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED,
     CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE,
     CONFIG_BATTLEGROUND_TRACK_DESERTERS,
     CONFIG_BG_XP_FOR_KILL,
     CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS,
     CONFIG_ARENA_SEASON_IN_PROGRESS,
     CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE,
+    CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY,
     CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN,
     CONFIG_VMAP_INDOOR_CHECK,
     CONFIG_PET_LOS,
@@ -161,6 +175,7 @@ enum WorldBoolConfigs
     CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE,
     CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
     CONFIG_SET_BOP_ITEM_TRADEABLE,
+    CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -253,6 +268,7 @@ enum WorldIntConfigs
     CONFIG_CHATFLOOD_MUTE_TIME,
     CONFIG_EVENT_ANNOUNCE,
     CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY,
+    CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD,
     CONFIG_CREATURE_FAMILY_FLEE_DELAY,
     CONFIG_WORLD_BOSS_LEVEL_DIFF,
     CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF,
@@ -277,13 +293,18 @@ enum WorldIntConfigs
     CONFIG_INSTANT_LOGOUT,
     CONFIG_DISABLE_BREATHING,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
     CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH,
     CONFIG_BATTLEGROUND_REPORT_AFK_TIMER,
     CONFIG_BATTLEGROUND_REPORT_AFK,
     CONFIG_BATTLEGROUND_INVITATION_TYPE,
     CONFIG_BATTLEGROUND_PLAYER_RESPAWN,
-    CONFIG_BATTLEGROUND_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
     CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
@@ -374,6 +395,7 @@ enum WorldIntConfigs
     CONFIG_NPC_EVADE_IF_NOT_REACHABLE,
     CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID,
     CONFIG_FFA_PVP_TIMER,
+    CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -580,7 +602,11 @@ public:
     virtual void UpdateRealmCharCount(uint32 accid) = 0;
     virtual LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const = 0;
     virtual void LoadDBVersion() = 0;
+    virtual void LoadDBRevision() = 0;
     virtual char const* GetDBVersion() const = 0;
+    virtual char const* GetWorldDBRevision() const = 0;
+    virtual char const* GetCharacterDBRevision() const = 0;
+    virtual char const* GetAuthDBRevision() const = 0;
     virtual void LoadAutobroadcasts() = 0;
     virtual void UpdateAreaDependentAuras() = 0;
     virtual uint32 GetCleaningFlags() const = 0;

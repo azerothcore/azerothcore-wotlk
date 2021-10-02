@@ -1,17 +1,30 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_DBCSTRUCTURE_H
 #define ACORE_DBCSTRUCTURE_H
 
-#include "Common.h"
-#include "DBCEnums.h"
 #include "Define.h"
+#include "DBCEnums.h"
 #include "SharedDefines.h"
 #include "Util.h"
+#include <set>
+#include <map>
+#include <unordered_map>
 
 // Structures using to access raw DBC data and required packing to portability
 
@@ -874,6 +887,11 @@ struct FactionEntry
     {
         return reputationListID >= 0;
     }
+
+    [[nodiscard]] bool CanBeSetAtWar() const
+    {
+        return reputationListID >= 0 && BaseRepRaceMask[0] == 1791;
+    }
 };
 
 #define MAX_FACTION_RELATIONS 4
@@ -929,7 +947,7 @@ struct FactionTemplateEntry
                 return false;
         return hostileMask == 0 && friendlyMask == 0;
     }
-    [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
+    [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS) != 0; }
 };
 
 struct GameObjectDisplayInfoEntry
@@ -1466,22 +1484,19 @@ struct ScalingStatValuesEntry
 //    uint32    displayOrder;                               // 19     m_sortIndex
 //};
 
-//struct SkillRaceClassInfoEntry{
-//    uint32    id;                                         // 0      m_ID
-//    uint32    skillId;                                    // 1      m_skillID
-//    uint32    raceMask;                                   // 2      m_raceMask
-//    uint32    classMask;                                  // 3      m_classMask
-//    uint32    flags;                                      // 4      m_flags
-//    uint32    reqLevel;                                   // 5      m_minLevel
-//    uint32    skillTierId;                                // 6      m_skillTierID
-//    uint32    skillCostID;                                // 7      m_skillCostIndex
-//};
+struct SkillRaceClassInfoEntry
+{
+    //uint32 ID;                                            // 0
+    uint32 SkillID;                                         // 1
+    uint32 RaceMask;                                        // 2
+    uint32 ClassMask;                                       // 3
+    uint32 Flags;                                           // 4
+    //uint32 MinLevel;                                      // 5
+    uint32 SkillTierID;                                     // 6
+    //uint32 SkillCostIndex;                                // 7
+};
 
-//struct SkillTiersEntry{
-//    uint32    id;                                         // 0      m_ID
-//    uint32    skillValue[16];                             // 1-17   m_cost
-//    uint32    maxSkillValue[16];                          // 18-32  m_valueMax
-//};
+#define MAX_SKILL_STEP 16
 
 struct SkillLineEntry
 {
@@ -1500,19 +1515,26 @@ struct SkillLineEntry
 
 struct SkillLineAbilityEntry
 {
-    uint32    id;                                           // 0        m_ID
-    uint32    skillId;                                      // 1        m_skillLine
-    uint32    spellId;                                      // 2        m_spell
-    uint32    racemask;                                     // 3        m_raceMask
-    uint32    classmask;                                    // 4        m_classMask
-    //uint32    racemaskNot;                                // 5        m_excludeRace
-    //uint32    classmaskNot;                               // 6        m_excludeClass
-    uint32    req_skill_value;                              // 7        m_minSkillLineRank
-    uint32    forward_spellid;                              // 8        m_supercededBySpell
-    uint32    learnOnGetSkill;                              // 9        m_acquireMethod
-    uint32    max_value;                                    // 10       m_trivialSkillLineRankHigh
-    uint32    min_value;                                    // 11       m_trivialSkillLineRankLow
-    //uint32    characterPoints[2];                         // 12-13    m_characterPoints[2]
+    uint32 ID;                                              // 0
+    uint32 SkillLine;                                       // 1
+    uint32 Spell;                                           // 2
+    uint32 RaceMask;                                        // 3
+    uint32 ClassMask;                                       // 4
+    //uint32 ExcludeRace;                                   // 5
+    //uint32 ExcludeClass;                                  // 6
+    uint32 MinSkillLineRank;                                // 7
+    uint32 SupercededBySpell;                               // 8
+    uint32 AcquireMethod;                                   // 9
+    uint32 TrivialSkillLineRankHigh;                        // 10
+    uint32 TrivialSkillLineRankLow;                         // 11
+    //uint32 CharacterPoints[2];                            // 12-13
+};
+
+struct SkillTiersEntry
+{
+    uint32 ID;                                              // 0
+    //uint32 Cost[MAX_SKILL_STEP];                          // 1-16
+    uint32 Value[MAX_SKILL_STEP];                           // 17-32
 };
 
 struct SoundEntriesEntry
@@ -1648,8 +1670,8 @@ struct SpellEntry
     //uint32  SpellDifficultyId;                            // 233      3.3.0
 };
 
-typedef std::set<uint32> SpellCategorySet;
-typedef std::map<uint32, SpellCategorySet > SpellCategoryStore;
+typedef std::set<std::pair<bool, uint32>> SpellCategorySet;
+typedef std::unordered_map<uint32, SpellCategorySet> SpellCategoryStore;
 typedef std::set<uint32> PetFamilySpellsSet;
 typedef std::map<uint32, PetFamilySpellsSet > PetFamilySpellsStore;
 
@@ -1767,6 +1789,38 @@ struct SpellItemEnchantmentConditionEntry
     uint8   CompareColor[5];                                // 15-20    m_rt_operandType[5]
     uint32  Value[5];                                       // 21-25    m_rt_operand[5]
     //uint8   Logic[5]                                      // 25-30    m_logic[5]
+};
+
+struct SpellVisualEntry
+{
+    //uint32 Id;
+    //uint32 PrecastKit;
+    //uint32 CastingKit;
+    //uint32 ImpactKit;
+    //uint32 StateKit;
+    //uint32 StateDoneKit;
+    //uint32 ChannelKit;
+    uint32 HasMissile;
+    int32 MissileModel;
+    //uint32 MissilePathType;
+    //uint32 MissileDestinationAttachment;
+    //uint32 MissileSound;
+    //uint32 AnimEventSoundID;
+    //uint32 Flags;
+    //uint32 CasterImpactKit;
+    //uint32 TargetImpactKit;
+    //int32 MissileAttachment;
+    //uint32 MissileFollowGroundHeight;
+    //uint32 MissileFollowGroundDropSpeed;
+    //uint32 MissileFollowGroundApprach;
+    //uint32 MissileFollowGroundFlags;
+    //uint32 MissileMotionId;
+    //uint32 MissileTargetingKit;
+    //uint32 InstantAreaKit;
+    //uint32 ImpactAreaKit;
+    //uint32 PersistentAreaKit;
+    //DBCPosition3D MissileCastOffset;
+    //DBCPosition3D MissileImpactOffset;
 };
 
 struct StableSlotPricesEntry
@@ -1994,6 +2048,7 @@ struct VehicleSeatEntry
                                 VEHICLE_SEAT_FLAG_B_USABLE_FORCED_3 | VEHICLE_SEAT_FLAG_B_USABLE_FORCED_4)));
     }
     [[nodiscard]] bool IsEjectable() const { return m_flagsB & VEHICLE_SEAT_FLAG_B_EJECTABLE; }
+    [[nodiscard]] bool CanControl() const { return (m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL) != 0; }
 };
 
 struct WMOAreaTableEntry

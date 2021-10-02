@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GridNotifiers.h"
 #include "icecrown_citadel.h"
@@ -225,7 +238,7 @@ private:
     ObjectGuid _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public acore::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector : public Acore::unary_function<Unit*, bool>
 {
 public:
     LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }
@@ -908,10 +921,10 @@ public:
             uint32 maxSize = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
             healList.remove_if(UnchainedMagicTargetSelector(false));
             if (healList.size() > maxSize)
-                acore::Containers::RandomResizeList(healList, maxSize);
+                Acore::Containers::RandomResize(healList, maxSize);
             dpsList.remove_if(UnchainedMagicTargetSelector(true));
             if (dpsList.size() > maxSize)
-                acore::Containers::RandomResizeList(dpsList, maxSize);
+                Acore::Containers::RandomResize(dpsList, maxSize);
             unitList.splice(unitList.begin(), healList);
             unitList.splice(unitList.begin(), dpsList);
         }
@@ -1202,7 +1215,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
-            unitList.remove_if(acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+            unitList.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
             targetList.clear();
             targetList = unitList;
         }
@@ -1351,7 +1364,7 @@ class achievement_all_you_can_eat : public AchievementCriteriaScript
 public:
     achievement_all_you_can_eat() : AchievementCriteriaScript("achievement_all_you_can_eat") { }
 
-    bool OnCheck(Player* /*source*/, Unit* target) override
+    bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target || target->GetEntry() != NPC_SINDRAGOSA)
             return false;
@@ -1906,11 +1919,11 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
             if (targets.empty())
                 return;
 
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }
@@ -1927,7 +1940,7 @@ public:
             if (unitList.empty())
                 return;
 
-            acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+            Acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
         }
 
         void Register() override

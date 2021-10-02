@@ -6,16 +6,16 @@
 #ifndef _TASK_SCHEDULER_H_
 #define _TASK_SCHEDULER_H_
 
-#include <optional>
+#include "Util.h"
 #include <algorithm>
 #include <chrono>
 #include <functional>
-#include <vector>
-#include <queue>
 #include <memory>
+#include <optional>
+#include <queue>
 #include <set>
 #include <utility>
-#include "Util.h"
+#include <vector>
 
 class TaskContext;
 
@@ -292,7 +292,9 @@ public:
                 return true;
             }
             else
+            {
                 return false;
+            }
         });
         return *this;
     }
@@ -340,7 +342,9 @@ public:
                 return true;
             }
             else
+            {
                 return false;
+            }
         });
         return *this;
     }

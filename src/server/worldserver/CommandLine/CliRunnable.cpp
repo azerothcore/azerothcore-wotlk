@@ -1,10 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// \addtogroup Trinityd
+/// \addtogroup Acored
 /// @{
 /// \file
 
@@ -12,15 +23,22 @@
 #include "Chat.h"
 #include "CliRunnable.h"
 #include "Common.h"
-#include "Configuration/Config.h"
+#include "Config.h"
 #include "Language.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
 #include "World.h"
 #include "WorldSession.h"
+
+static constexpr char CLI_PREFIX[] = "AC> ";
+
+static inline void PrintCliPrefix()
+{
+    printf("%s", CLI_PREFIX);
+}
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
 #include <readline/readline.h>
@@ -97,7 +115,7 @@ void utf8print(void* /*arg*/, const char* str)
 
 void commandFinished(void*, bool /*success*/)
 {
-    printf("AC> ");
+    PrintCliPrefix();
     fflush(stdout);
 }
 
@@ -117,7 +135,7 @@ int kb_hit_return()
 #endif
 
 /// %Thread start
-void CliRunnable::run()
+void CliThread()
 {
     ///- Display the list of available CLI functions then beep
     //TC_LOG_INFO("server.worldserver", "");
@@ -131,7 +149,7 @@ void CliRunnable::run()
 
     // print this here the first time
     // later it will be printed after command queue updates
-    printf("AC>");
+    PrintCliPrefix();
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
@@ -144,7 +162,7 @@ void CliRunnable::run()
         char commandbuf[256];
         command_str = fgets(commandbuf, sizeof(commandbuf), stdin);
 #else
-        command_str = readline("AC>");
+        command_str = readline(CLI_PREFIX);
         rl_bind_key('\t', rl_complete);
 #endif
 
@@ -160,7 +178,7 @@ void CliRunnable::run()
             if (!*command_str)
             {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-                printf("AC>");
+                PrintCliPrefix();
 #else
                 free(command_str);
 #endif
@@ -171,7 +189,7 @@ void CliRunnable::run()
             if (!consoleToUtf8(command_str, command))         // convert from console encoding to utf8
             {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-                printf("AC>");
+                PrintCliPrefix();
 #else
                 free(command_str);
 #endif
