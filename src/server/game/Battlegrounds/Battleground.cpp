@@ -764,20 +764,18 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
     int32 winmsg_id = 0;
 
+    SetWinner(winnerTeamId);
+
     if (winnerTeamId == TEAM_ALLIANCE)
     {
-        SetWinner(TEAM_HORDE); // reversed in packet
         winmsg_id = isBattleground() ? LANG_BG_A_WINS : LANG_ARENA_GOLD_WINS;
         PlaySoundToAll(SOUND_ALLIANCE_WINS);                // alliance wins sound
     }
     else if (winnerTeamId == TEAM_HORDE)
     {
-        SetWinner(TEAM_ALLIANCE); // reversed in packet
         winmsg_id = isBattleground() ? LANG_BG_H_WINS : LANG_ARENA_GREEN_WINS;
         PlaySoundToAll(SOUND_HORDE_WINS);                   // horde wins sound
     }
-    else
-        SetWinner(TEAM_NEUTRAL);
 
     CharacterDatabasePreparedStatement* stmt = nullptr;
     uint64 battlegroundId = 1;
@@ -990,8 +988,6 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         uint32 loser_kills = player->GetRandomWinner() ? sWorld->getIntConfig(CONFIG_BG_REWARD_LOSER_HONOR_LAST) : sWorld->getIntConfig(CONFIG_BG_REWARD_LOSER_HONOR_FIRST);
         uint32 winner_arena = player->GetRandomWinner() ? sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_ARENA_LAST) : sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_ARENA_FIRST);
 
-        sScriptMgr->OnBattlegroundEndReward(this, player, winnerTeamId);
-
         // Reward winner team
         if (bgTeamId == winnerTeamId)
         {
@@ -1014,6 +1010,8 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
             if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)))
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(loser_kills));
         }
+
+        sScriptMgr->OnBattlegroundEndReward(this, player, winnerTeamId);
 
         player->ResetAllPowers();
         player->CombatStopWithPets(true);
