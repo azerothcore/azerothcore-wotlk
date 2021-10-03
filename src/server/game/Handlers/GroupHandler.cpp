@@ -404,7 +404,9 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recvData)
 
     Group* grp = GetPlayer()->GetGroup();
     if (!grp)
+    {
         return;
+    }
 
     PartyResult res = GetPlayer()->CanUninviteFromGroup(grp->GetMemberGUID(membername));
     if (res != ERR_PARTY_RESULT_OK)
