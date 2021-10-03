@@ -49,7 +49,8 @@ enum DataTypes
     DATA_HALL_RUNE_4                = 19,
     DATA_HALL_RUNE_5                = 20,
     DATA_HALL_RUNE_6                = 21,
-    DATA_HALL_RUNE_7                = 22
+    DATA_HALL_RUNE_7                = 22,
+    DATA_SOLAKAR_FLAMEWREATH        = 23
 };
 
 enum CreaturesIds
@@ -72,7 +73,10 @@ enum CreaturesIds
     NPC_BLACKHAND_SUMMONER          = 9818,
     NPC_BLACKHAND_VETERAN           = 9819,
     NPC_BLACKHAND_INCARCERATOR      = 10316,
-    NPC_LORD_VICTOR_NEFARIUS        = 10162
+    NPC_LORD_VICTOR_NEFARIUS        = 10162,
+    NPC_SOLAKAR                     = 10264,
+    NPC_ROOKERY_GUARDIAN            = 10258,
+    NPC_ROOKERY_HATCHER             = 10683
 };
 
 enum AdditionalData
