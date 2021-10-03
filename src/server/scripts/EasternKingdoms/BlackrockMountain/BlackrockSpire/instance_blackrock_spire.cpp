@@ -347,7 +347,7 @@ public:
 
         void SummonSolakarWave(uint8 number)
         {
-            if (number >= 0 && number < SolakarWaves)
+            if (number < SolakarWaves)
             {
                 Position PosLeft = Position(78, -280, 93, 3 * M_PI / 2.0);
                 Position PosRight = Position(84, -280, 93, 3 * M_PI / 2.0);

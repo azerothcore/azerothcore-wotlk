@@ -19,5 +19,5 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Emo
 UPDATE `creature_template` SET `ScriptName` = 'boss_solakar_flamewreath' WHERE (`entry` = 10264);
 
 -- father flame
-UPDATE `gameobject_template` SET `AIName` = 'go_father_flame' WHERE `entry` = 175245;
+UPDATE `gameobject_template` SET `ScriptName` = 'go_father_flame' WHERE `entry` = 175245;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 175245) AND (`source_type` = 1) AND (`id` IN (0));

@@ -137,7 +137,7 @@ public:
             if (Unit* target = me->SelectNearestTarget(500))
             {
                 me->AI()->AttackStart(target);
-            } 
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -166,7 +166,7 @@ public:
                 break;
             }
         }
-        
+
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
