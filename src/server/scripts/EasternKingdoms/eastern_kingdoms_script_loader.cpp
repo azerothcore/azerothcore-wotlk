@@ -176,7 +176,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_warmastervoone();
     AddSC_boss_pyroguard_emberseer();
     AddSC_boss_gyth();
-	AddSC_boss_solakar_flamewreath();
+    AddSC_boss_solakar_flamewreath();
     AddSC_boss_rend_blackhand();
     AddSC_boss_urok_doomhowl();
     AddSC_instance_blackrock_spire();
