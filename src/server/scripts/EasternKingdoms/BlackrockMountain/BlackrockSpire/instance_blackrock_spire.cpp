@@ -30,7 +30,6 @@ uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUM
 
 uint32 const SolakarWaves = 5;
 
-
 enum EventIds
 {
     EVENT_DARGONSPIRE_ROOM_STORE           = 1,
@@ -706,8 +705,6 @@ public:
         return false;
     }
 };
-
-
 
 class go_father_flame : public GameObjectScript
 {
