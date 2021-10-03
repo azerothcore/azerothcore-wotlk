@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlefieldMgr.h"
@@ -12,7 +23,7 @@
 #include "DBCStores.h"
 #include "GameGraveyard.h"
 #include "InstanceScript.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SharedDefines.h"
@@ -724,10 +735,14 @@ SpellProcEventEntry const* SpellMgr::GetSpellProcEvent(uint32 spellId) const
     return nullptr;
 }
 
-bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active) const
+bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, ProcEventInfo const& eventInfo, bool active) const
 {
     // No extra req need
     uint32 procEvent_procEx = PROC_EX_NONE;
+
+    uint32 procFlags = eventInfo.GetTypeMask();
+    uint32 procExtra = eventInfo.GetHitMask();
+    SpellInfo const* procSpellInfo = eventInfo.GetSpellInfo();
 
     // check prockFlags for condition
     if ((procFlags & EventProcFlag) == 0)
@@ -786,7 +801,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
         procEvent_procEx = spellProcEvent->procEx;
 
         // For melee triggers
-        if (procSpell == nullptr)
+        if (!procSpellInfo)
         {
             // Check (if set) for school (melee attack have Normal school)
             if (spellProcEvent->schoolMask && (spellProcEvent->schoolMask & SPELL_SCHOOL_MASK_NORMAL) == 0)
@@ -795,22 +810,34 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
         else // For spells need check school/spell family/family mask
         {
             // Check (if set) for school
-            if (spellProcEvent->schoolMask && (spellProcEvent->schoolMask & procSpell->SchoolMask) == 0)
+            if (spellProcEvent->schoolMask && (spellProcEvent->schoolMask & procSpellInfo->SchoolMask) == 0)
                 return false;
 
             // Check (if set) for spellFamilyName
-            if (spellProcEvent->spellFamilyName && (spellProcEvent->spellFamilyName != procSpell->SpellFamilyName))
+            if (spellProcEvent->spellFamilyName && (spellProcEvent->spellFamilyName != procSpellInfo->SpellFamilyName))
                 return false;
 
             // spellFamilyName is Ok need check for spellFamilyMask if present
             if (spellProcEvent->spellFamilyMask)
             {
-                if (!(spellProcEvent->spellFamilyMask & procSpell->SpellFamilyFlags))
+                if (!(spellProcEvent->spellFamilyMask & procSpellInfo->SpellFamilyFlags))
                     return false;
                 hasFamilyMask = true;
                 // Some spells are not considered as active even with have spellfamilyflags
                 if (!(procEvent_procEx & PROC_EX_ONLY_ACTIVE_SPELL))
                     active = true;
+            }
+
+            // Check tick numbers
+            if (procEvent_procEx & PROC_EX_ONLY_FIRST_TICK)
+            {
+                if (Spell const* procSpell = eventInfo.GetProcSpell())
+                {
+                    if (procSpell->GetTriggeredByAuraTickNumber() > 1)
+                    {
+                        return false;
+                    }
+                }
             }
         }
     }
@@ -2665,10 +2692,8 @@ void SpellMgr::LoadSpellInfoStore()
 void SpellMgr::UnloadSpellInfoStore()
 {
     for (uint32 i = 0; i < mSpellInfoMap.size(); ++i)
-    {
-        if (mSpellInfoMap[i])
-            delete mSpellInfoMap[i];
-    }
+        delete mSpellInfoMap[i];
+
     mSpellInfoMap.clear();
 }
 
@@ -2830,6 +2855,11 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_AURA_MOD_FEAR:
                 case SPELL_AURA_MOD_STUN:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
+                    break;
+                case SPELL_AURA_BIND_SIGHT:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                    break;
+                default:
                     break;
             }
 
@@ -3244,6 +3274,9 @@ void SpellMgr::LoadSpellCustomAttr()
             case 6197: // Eagle Eye
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
                 break;
+            case 50315: // Disco Ball
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                break;
 
             // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
             // Envenom
@@ -3282,6 +3315,21 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->Effects[EFFECT_0].MiscValue = 127;
                 break;
         }
+
+        if (spellInfo->Speed > 0.0f)
+        {
+            if (SpellVisualEntry const* spellVisual = sSpellVisualStore.LookupEntry(spellInfo->SpellVisual[0]))
+            {
+                if (spellVisual->HasMissile)
+                {
+                    if (spellVisual->MissileModel == -4 || spellVisual->MissileModel == -5)
+                    {
+                        spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEEDS_AMMO_DATA;
+                    }
+                }
+            }
+        }
+       spellInfo->_InitializeExplicitTargetMask();
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells
@@ -4579,8 +4627,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx &= ~SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
     });
 
+    ApplySpellFix({ 49376 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_3_YARDS; // 3yd
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
     // Feral Charge - Cat
-    ApplySpellFix({ 49376, 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
@@ -7112,7 +7166,6 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Alchemist's Stone
