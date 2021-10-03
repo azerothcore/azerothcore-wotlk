@@ -26,13 +26,10 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
-
-//uint32 const DragonspireRunes[7] = { GO_HALL_RUNE_1, GO_HALL_RUNE_2, GO_HALL_RUNE_3, GO_HALL_RUNE_4, GO_HALL_RUNE_5, GO_HALL_RUNE_6, GO_HALL_RUNE_7 };
-
 uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUMMONER, NPC_BLACKHAND_VETERAN };
 
 uint32 const SolakarWaves = 5;
-std::vector<TempSummon*> SolakarSummons;
+
 
 enum EventIds
 {
@@ -50,7 +47,7 @@ enum EventIds
 
 enum Timers
 {
-    TIMER_SOLAKAR_WAVE = 5000
+    TIMER_SOLAKAR_WAVE = 30000
 };
 
 class instance_blackrock_spire : public InstanceMapScript
@@ -62,6 +59,7 @@ public:
     {
         uint32 CurrentSolakarWave = 0;
         uint32 SolakarState       = NOT_STARTED; // there should be a global instance encounter state, where is it?
+        std::vector<TempSummon*> SolakarSummons;
 
         instance_blackrock_spireMapScript(InstanceMap* map) : InstanceScript(map)
         {
@@ -316,13 +314,11 @@ public:
                     }
                     break;
                 case DATA_SOLAKAR_FLAMEWREATH:
-                    LOG_FATAL("Entities:Unit", "setting data for solakar: %d", data);
                     SolakarState = data;
                     switch(data)
                     {
                     case IN_PROGRESS:
                         Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500);
-                        LOG_FATAL("entities:unit", "Solakar starting");
                         break;
                     case FAIL:
                         for (const auto& creature : SolakarSummons)
@@ -341,9 +337,16 @@ public:
             }
         }
 
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_SOLAKAR_FLAMEWREATH)
+                return SolakarState;
+            else
+                return InstanceScript::GetData(type);
+        }
+
         void SummonSolakarWave(uint8 number)
         {
-            LOG_FATAL("entities:unit", "spawning wave %d", number);
             if (number >= 0 && number < SolakarWaves)
             {
                 Position PosLeft = Position(78, -280, 93, 3 * M_PI / 2.0);
@@ -460,7 +463,6 @@ public:
                             Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
                         break;
                     case EVENT_SOLAKAR_WAVE:
-                        LOG_FATAL("Entities:unit", "solakar event, current wave: %d", CurrentSolakarWave);
                         SummonSolakarWave(CurrentSolakarWave);
                         if (CurrentSolakarWave < SolakarWaves)
                             Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, TIMER_SOLAKAR_WAVE);
@@ -712,19 +714,18 @@ class go_father_flame : public GameObjectScript
 public:
     go_father_flame() : GameObjectScript("go_father_flame") {}
 
-    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    void OnLootStateChanged(GameObject* go, uint32 state, Unit* /*unit*/) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            LOG_FATAL("entities:unit", "father flame object used");
-            if (instance->GetData(DATA_SOLAKAR_FLAMEWREATH) == IN_PROGRESS || instance->GetData(DATA_SOLAKAR_FLAMEWREATH) == DONE)
-                return false;
+            if (state == GO_ACTIVATED)
+            {
+                if (instance->GetData(DATA_SOLAKAR_FLAMEWREATH) == IN_PROGRESS || instance->GetData(DATA_SOLAKAR_FLAMEWREATH) == DONE)
+                    return;
 
-            instance->SetData(DATA_SOLAKAR_FLAMEWREATH, IN_PROGRESS);
-            return true;
+                instance->SetData(DATA_SOLAKAR_FLAMEWREATH, IN_PROGRESS);
+            }
         }
-
-        return false;
     }
 };
 
