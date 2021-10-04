@@ -3712,14 +3712,14 @@ void Map::SetZoneWeather(uint32 zoneId, uint32 weatherId, float weatherGrade)
     }
 }
 
-void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
+void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime)
 {
     if (_zoneDynamicInfo.find(zoneId) == _zoneDynamicInfo.end())
         _zoneDynamicInfo.insert(ZoneDynamicInfoMap::value_type(zoneId, ZoneDynamicInfo()));
 
     ZoneDynamicInfo& info = _zoneDynamicInfo[zoneId];
     info.OverrideLightId = lightId;
-    info.LightFadeInTime = fadeInTime;
+    info.LightFadeInTime = static_cast<uint32>(fadeInTime.count());
     Map::PlayerList const& players = GetPlayers();
 
     if (!players.isEmpty())
@@ -3727,7 +3727,7 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
         WorldPacket data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 4);
         data << uint32(_defaultLight);
         data << uint32(lightId);
-        data << uint32(fadeInTime);
+        data << uint32(static_cast<uint32>(fadeInTime.count()));
 
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (Player* player = itr->GetSource())
