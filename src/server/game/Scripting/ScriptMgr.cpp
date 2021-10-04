@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Chat.h"
@@ -345,18 +356,18 @@ void ScriptMgr::OnNetworkStop()
     FOREACH_SCRIPT(ServerScript)->OnNetworkStop();
 }
 
-void ScriptMgr::OnSocketOpen(WorldSocket* socket)
+void ScriptMgr::OnSocketOpen(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
     FOREACH_SCRIPT(ServerScript)->OnSocketOpen(socket);
 }
 
-void ScriptMgr::OnSocketClose(WorldSocket* socket, bool wasNew)
+void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
-    FOREACH_SCRIPT(ServerScript)->OnSocketClose(socket, wasNew);
+    FOREACH_SCRIPT(ServerScript)->OnSocketClose(socket);
 }
 
 void ScriptMgr::OnPacketReceive(WorldSession* session, WorldPacket const& packet)
@@ -406,6 +417,11 @@ void ScriptMgr::OnAfterConfigLoad(bool reload)
     sEluna->OnConfigLoad(reload, false);
 #endif
     FOREACH_SCRIPT(WorldScript)->OnAfterConfigLoad(reload);
+}
+
+void ScriptMgr::OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion)
+{
+    FOREACH_SCRIPT(WorldScript)->OnBeforeFinalizePlayerWorldSession(cacheVersion);
 }
 
 void ScriptMgr::OnMotdChange(std::string& newMotd)
@@ -1611,6 +1627,11 @@ void ScriptMgr::OnPlayerUpdateFaction(Player* player)
 void ScriptMgr::OnPlayerAddToBattleground(Player* player, Battleground* bg)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAddToBattleground(player, bg);
+}
+
+void ScriptMgr::OnPlayerQueueRandomDungeon(Player* player, uint32 & rDungeonId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnQueueRandomDungeon(player, rDungeonId);
 }
 
 void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)

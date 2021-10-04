@@ -1,13 +1,25 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /** \file
     \ingroup world
 */
 
+#include "World.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
@@ -28,8 +40,8 @@
 #include "CreatureAIRegistry.h"
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
 #include "GameEventMgr.h"
@@ -38,16 +50,16 @@
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
+#include "IPLocation.h"
 #include "InstanceSaveMgr.h"
 #include "ItemEnchantmentMgr.h"
-#include "IPLocation.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
-#include "MapManager.h"
 #include "MMapFactory.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
@@ -66,17 +78,18 @@
 #include "Transport.h"
 #include "TransportMgr.h"
 #include "Util.h"
-#include "Vehicle.h"
 #include "VMapFactory.h"
+#include "VMapMgr2.h"
+#include "Vehicle.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
 #include "WeatherMgr.h"
 #include "WhoListCache.h"
-#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <VMapManager2.h>
+#include <boost/asio/ip/address.hpp>
+#include <cmath>
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -310,9 +323,8 @@ void World::AddSession_(WorldSession* s)
     }
 
     s->SendAuthResponse(AUTH_OK, true);
-    s->SendAddonsInfo();
-    s->SendClientCacheVersion(sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION));
-    s->SendTutorialsData();
+
+    FinalizePlayerWorldSession(s);
 
     UpdateMaxSessionCounters();
 }
@@ -394,12 +406,10 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
         WorldSession* pop_sess = m_QueuedPlayer.front();
         pop_sess->SetInQueue(false);
         pop_sess->ResetTimeOutTime(false);
-        pop_sess->SendAuthWaitQue(0);
-        pop_sess->SendAddonsInfo();
-
-        pop_sess->SendClientCacheVersion(sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION));
+        pop_sess->SendAuthWaitQueue(0);
         pop_sess->SendAccountDataTimes(GLOBAL_CACHE_MASK);
-        pop_sess->SendTutorialsData();
+
+        FinalizePlayerWorldSession(pop_sess);
 
         m_QueuedPlayer.pop_front();
 
@@ -410,7 +420,7 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
 
     // update queue position from iter to end()
     for (; iter != m_QueuedPlayer.end(); ++iter, ++position)
-        (*iter)->SendAuthWaitQue(position);
+        (*iter)->SendAuthWaitQueue(position);
 
     return found;
 }
@@ -1099,6 +1109,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS]    = sConfigMgr->GetOption<uint32>("Battleground.QueueAnnouncer.Limit.MinPlayers", 3);
     m_int_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY]           = sConfigMgr->GetOption<uint32>("Battleground.QueueAnnouncer.SpamProtection.Delay", 30);
     m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY]          = sConfigMgr->GetOption<bool>("Battleground.QueueAnnouncer.PlayerOnly", false);
+    m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED]               = sConfigMgr->GetOption<bool>("Battleground.QueueAnnouncer.Timed", false);
+    m_int_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER]                = sConfigMgr->GetOption<uint32>("Battleground.QueueAnnouncer.Timer", 30000);
     m_bool_configs[CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE]             = sConfigMgr->GetOption<bool>("Battleground.StoreStatistics.Enable", false);
     m_bool_configs[CONFIG_BATTLEGROUND_TRACK_DESERTERS]                     = sConfigMgr->GetOption<bool>("Battleground.TrackDeserters.Enable", false);
     m_int_configs[CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER]               = sConfigMgr->GetOption<int32> ("Battleground.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
@@ -1123,11 +1135,23 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "Battleground.PlayerRespawn (%i) must be >2. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN]);
         m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] = 30;
     }
-    m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN]        = sConfigMgr->GetOption<int32>("Battleground.BuffRespawn", 180);
-    if (m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN] < 1)
+    m_int_configs[CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN]        = sConfigMgr->GetOption<int32>("Battleground.RestorationBuffRespawn", 20);
+    if (m_int_configs[CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN] < 1)
     {
-        LOG_ERROR("server.loading", "Battleground.BuffRespawn (%i) must be >0. Using 180 instead.", m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN]);
-        m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN] = 180;
+        LOG_ERROR("server.loading", "Battleground.RestorationBuffRespawn (%i) must be > 0. Using 20 instead.", m_int_configs[CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN]);
+        m_int_configs[CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN] = 20;
+    }
+    m_int_configs[CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN] = sConfigMgr->GetOption<int32>("Battleground.BerserkingBuffRespawn", 120);
+    if (m_int_configs[CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN] < 1)
+    {
+        LOG_ERROR("server.loading", "Battleground.BerserkingBuffRespawn (%i) must be > 0. Using 120 instead.", m_int_configs[CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN]);
+        m_int_configs[CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN] = 120;
+    }
+    m_int_configs[CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN] = sConfigMgr->GetOption<int32>("Battleground.SpeedBuffRespawn", 150);
+    if (m_int_configs[CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN] < 1)
+    {
+        LOG_ERROR("server.loading", "Battleground.SpeedBuffRespawn (%i) must be > 0. Using 150 instead.", m_int_configs[CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN]);
+        m_int_configs[CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN] = 150;
     }
 
     m_int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetOption<int32> ("Arena.MaxRatingDifference", 150);
@@ -1222,6 +1246,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_FFA_PVP_TIMER] = sConfigMgr->GetOption<int32>("FFAPvPTimer", 30);
 
+    m_int_configs[CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION] = sConfigMgr->GetOption<int32>("LootNeedBeforeGreedILvlRestriction", 70);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1256,8 +1282,8 @@ void World::LoadConfigSettings(bool reload)
     if (!enableHeight)
         LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
 
-    VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
-    VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
+    VMAP::VMapFactory::createOrGetVMapMgr()->setEnableLineOfSightCalc(enableLOS);
+    VMAP::VMapFactory::createOrGetVMapMgr()->setEnableHeightCalc(enableHeight);
     LOG_INFO("server.loading", "WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i PetLOS:%i", enableLOS, enableHeight, enableIndoor, enablePetLOS);
 
     m_bool_configs[CONFIG_PET_LOS]            = sConfigMgr->GetOption<bool>("vmap.petLOS", true);
@@ -1390,6 +1416,9 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_SET_BOP_ITEM_TRADEABLE] = sConfigMgr->GetOption<bool>("Item.SetItemTradeable", true);
 
+    // Specifies if IP addresses can be logged to the database
+    m_bool_configs[CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE] = sConfigMgr->GetOption<bool>("AllowLoggingIPAddressesInDatabase", true, true);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
@@ -1409,8 +1438,8 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initializing Scripts...");
     sScriptMgr->Initialize();
 
-    ///- Initialize VMapManager function pointers (to untangle game/collision circular deps)
-    VMAP::VMapManager2* vmmgr2 = VMAP::VMapFactory::createOrGetVMapManager();
+    ///- Initialize VMapMgr function pointers (to untangle game/collision circular deps)
+    VMAP::VMapMgr2* vmmgr2 = VMAP::VMapFactory::createOrGetVMapMgr();
     vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
     vmmgr2->IsVMAPDisabledForPtr = &DisableMgr::IsVMAPDisabledFor;
 
@@ -1426,15 +1455,15 @@ void World::SetInitialWorldSettings()
     if (!sConfigMgr->isDryRun())
     {
         ///- Check the existence of the map files for all starting areas.
-        if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
-                || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
-                || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
-                || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
-                || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
-                || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
+        if (!MapMgr::ExistMapAndVMap(0, -6240.32f, 331.033f)
+                || !MapMgr::ExistMapAndVMap(0, -8949.95f, -132.493f)
+                || !MapMgr::ExistMapAndVMap(1, -618.518f, -4251.67f)
+                || !MapMgr::ExistMapAndVMap(0, 1676.35f, 1677.45f)
+                || !MapMgr::ExistMapAndVMap(1, 10311.3f, 832.463f)
+                || !MapMgr::ExistMapAndVMap(1, -2917.58f, -257.98f)
                 || (m_int_configs[CONFIG_EXPANSION] && (
-                        !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-                        !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+                        !MapMgr::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
+                        !MapMgr::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
         {
             exit(1);
         }
@@ -1478,12 +1507,14 @@ void World::SetInitialWorldSettings()
     sIPLocation->Load();
 
     std::vector<uint32> mapIds;
-    for (auto const& map : sMapStore)
+    for (auto const map : sMapStore)
+    {
         mapIds.emplace_back(map->MapID);
+    }
 
     vmmgr2->InitializeThreadUnsafe(mapIds);
 
-    MMAP::MMapManager* mmmgr = MMAP::MMapFactory::createOrGetMMapManager();
+    MMAP::MMapMgr* mmmgr = MMAP::MMapFactory::createOrGetMMapMgr();
     mmmgr->InitializeThreadUnsafe(mapIds);
 
     LOG_INFO("server.loading", "Loading Game Graveyard...");
@@ -1941,7 +1972,7 @@ void World::SetInitialWorldSettings()
     ///- Initilize static helper structures
     AIRegistry::Initialize();
 
-    ///- Initialize MapManager
+    ///- Initialize MapMgr
     LOG_INFO("server.loading", "Starting Map System");
     LOG_INFO("server.loading", " ");
     sMapMgr->Initialize();
@@ -3460,4 +3491,14 @@ uint32 World::GetNextWhoListUpdateDelaySecs()
     t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
 
     return uint32(ceil(t / 1000.0f));
+}
+
+void World::FinalizePlayerWorldSession(WorldSession* session)
+{
+    uint32 cacheVersion = sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION);
+    sScriptMgr->OnBeforeFinalizePlayerWorldSession(cacheVersion);
+
+    session->SendAddonsInfo();
+    session->SendClientCacheVersion(cacheVersion);
+    session->SendTutorialsData();
 }

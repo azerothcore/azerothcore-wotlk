@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -181,6 +192,7 @@ namespace lfg
 
         bool isLFG = group->isLFGGroup();
         LfgState state = sLFGMgr->GetState(gguid);
+        uint32 dungeonId = sLFGMgr->GetDungeon(gguid, false);
 
         // If group is being formed after proposal success do nothing more
         if (state == LFG_STATE_PROPOSAL && method == GROUP_REMOVEMETHOD_DEFAULT)
@@ -205,6 +217,15 @@ namespace lfg
         if (!isLFG)
             return;
 
+        if (state != LFG_STATE_FINISHED_DUNGEON && group) // Need more players to finish the dungeon
+        {
+            if (Player* leader = ObjectAccessor::FindConnectedPlayer(sLFGMgr->GetLeader(gguid)))
+            {
+                sLFGMgr->SetDungeon(gguid, dungeonId);
+                leader->GetSession()->SendLfgOfferContinue(sLFGMgr->GetDungeon(gguid, false));
+            }
+        }
+
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
         {
             // xinef: fixed dungeon deserter
@@ -224,10 +245,6 @@ namespace lfg
                     player->TeleportToEntryPoint();
             }
         }
-
-        if (state != LFG_STATE_FINISHED_DUNGEON) // Need more players to finish the dungeon
-            if (Player* leader = ObjectAccessor::FindConnectedPlayer(sLFGMgr->GetLeader(gguid)))
-                leader->GetSession()->SendLfgOfferContinue(sLFGMgr->GetDungeon(gguid, false));
     }
 
     void LFGGroupScript::OnDisband(Group* group)

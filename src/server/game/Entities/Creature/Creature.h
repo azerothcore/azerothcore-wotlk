@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_CREATURE_H
@@ -142,7 +153,7 @@ public:
     [[nodiscard]] SpellSchoolMask GetMeleeDamageSchoolMask() const override { return m_meleeDamageSchoolMask; }
     void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
 
-    void _AddCreatureSpellCooldown(uint32 spell_id, uint32 end_time);
+    void _AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 end_time);
     void AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
     [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
     [[nodiscard]] uint32 GetSpellCooldown(uint32 spell_id) const;
@@ -150,6 +161,8 @@ public:
     [[nodiscard]] bool IsSpellProhibited(SpellSchoolMask idSchoolMask) const;
 
     [[nodiscard]] bool HasSpell(uint32 spellID) const override;
+
+    void UpdateMovementFlags();
 
     bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true );
     bool UpdateStats(Stats stat) override;
@@ -176,6 +189,7 @@ public:
 
     [[nodiscard]] CreatureTemplate const* GetCreatureTemplate() const { return m_creatureInfo; }
     [[nodiscard]] CreatureData const* GetCreatureData() const { return m_creatureData; }
+    void SetDetectionDistance(float dist){ m_detectionDistance = dist; }
     [[nodiscard]] CreatureAddon const* GetCreatureAddon() const;
 
     [[nodiscard]] std::string GetAIName() const;
@@ -197,6 +211,7 @@ public:
     Loot loot;
     [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
     [[nodiscard]] Player* GetLootRecipient() const;
+    [[nodiscard]] ObjectGuid::LowType GetLootRecipientGroupGUID() const { return m_lootRecipientGroup; }
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     bool isTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
@@ -224,6 +239,7 @@ public:
     bool CanStartAttack(Unit const* u) const;
     float GetAggroRange(Unit const* target) const;
     float GetAttackDistance(Unit const* player) const;
+    [[nodiscard]] float GetDetectionRange() const { return m_detectionDistance; }
 
     void SendAIReaction(AiReaction reactionType);
 
@@ -252,6 +268,8 @@ public:
     void RemoveCorpse(bool setSpawnTime = true, bool skipVisibility = false);
 
     void DespawnOrUnsummon(uint32 msTimeToDespawn = 0);
+    void DespawnOnEvade();
+    void RespawnOnEvade();
 
     [[nodiscard]] time_t const& GetRespawnTime() const { return m_respawnTime; }
     [[nodiscard]] time_t GetRespawnTimeEx() const;
@@ -318,7 +336,7 @@ public:
 
     void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
     [[nodiscard]] bool IsReputationGainDisabled() const { return DisableReputationGain; }
-    [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const { return m_PlayerDamageReq == 0; }
+    [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const { return (m_creatureInfo->flags_extra & CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (m_PlayerDamageReq == 0); }
     void LowerPlayerDamageReq(uint32 unDamage)
     {
         if (m_PlayerDamageReq)
@@ -372,7 +390,7 @@ protected:
     static float _GetHealthMod(int32 Rank);
 
     ObjectGuid m_lootRecipient;
-    uint32 m_lootRecipientGroup;
+    ObjectGuid::LowType m_lootRecipientGroup;
 
     /// Timers
     time_t m_corpseRemoveTime;                          // (msecs)timer for death or corpse disappearance
@@ -413,6 +431,7 @@ protected:
     CreatureTemplate const* m_creatureInfo;                 // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
     CreatureData const* m_creatureData;
 
+    float m_detectionDistance;
     uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
 
     [[nodiscard]] bool IsInvisibleDueToDespawn() const override;

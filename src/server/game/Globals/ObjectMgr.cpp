@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -18,7 +29,7 @@
 #include "Language.h"
 #include "LFGMgr.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "PoolMgr.h"
@@ -33,7 +44,7 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 #include "World.h"
 
 ScriptMapMap sSpellScripts;
@@ -250,7 +261,7 @@ bool SpellClickInfo::IsFitToRequirements(Unit const* clicker, Unit const* clicke
     Unit const* summoner = nullptr;
     // Check summoners for party
     if (clickee->IsSummon())
-        summoner = clickee->ToTempSummon()->GetSummoner();
+        summoner = clickee->ToTempSummon()->GetSummonerUnit();
     if (!summoner)
         summoner = clickee;
 
@@ -465,16 +476,16 @@ void ObjectMgr::LoadCreatureTemplates()
 
 //                                                   0      1                   2                   3                   4            5            6         7         8
     QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, modelid1, modelid2, modelid3, "
-//                        9         10    11       12        13              14        15        16   17       18       19          20
-                         "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, "
-//                        21      22     23         24              25              26               27            28             29          30          31
+//                        9         10    11       12        13              14        15        16   17       18       19          20          21
+                         "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, detection_range, "
+//                        22      23     24         25              26              27               28            29             30          31          32
                          "scale, `rank`, dmgschool, DamageModifier, BaseAttackTime, RangeAttackTime, BaseVariance, RangeVariance, unit_class, unit_flags, unit_flags2, "
-//                        32            33      34            35             36             37            38
+//                        33            34      35            36             37             38            39
                          "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, type, "
-//                        39          40      41              42        43              44         45       46       47      48
+//                        40          41      42              43        44              45         46       47       48      49
                          "type_flags, lootid, pickpocketloot, skinloot, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-//                        49           50           51              52            53             54            55          56           57                    58                        59           60
-                         "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
+//                        50           51           52              53            54             55                  56            57          58           59                    60                        61           62
+                         "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
                          "FROM creature_template;");
 
     if (!result)
@@ -555,28 +566,29 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.npcflag           = fields[18].GetUInt32();
     creatureTemplate.speed_walk        = fields[19].GetFloat();
     creatureTemplate.speed_run         = fields[20].GetFloat();
-    creatureTemplate.scale             = fields[21].GetFloat();
-    creatureTemplate.rank              = uint32(fields[22].GetUInt8());
-    creatureTemplate.dmgschool         = uint32(fields[23].GetInt8());
-    creatureTemplate.DamageModifier    = fields[24].GetFloat();
-    creatureTemplate.BaseAttackTime    = fields[25].GetUInt32();
-    creatureTemplate.RangeAttackTime   = fields[26].GetUInt32();
-    creatureTemplate.BaseVariance      = fields[27].GetFloat();
-    creatureTemplate.RangeVariance     = fields[28].GetFloat();
-    creatureTemplate.unit_class        = uint32(fields[29].GetUInt8());
-    creatureTemplate.unit_flags        = fields[30].GetUInt32();
-    creatureTemplate.unit_flags2       = fields[31].GetUInt32();
-    creatureTemplate.dynamicflags      = fields[32].GetUInt32();
-    creatureTemplate.family            = uint32(fields[33].GetUInt8());
-    creatureTemplate.trainer_type      = uint32(fields[34].GetUInt8());
-    creatureTemplate.trainer_spell     = fields[35].GetUInt32();
-    creatureTemplate.trainer_class     = uint32(fields[36].GetUInt8());
-    creatureTemplate.trainer_race      = uint32(fields[37].GetUInt8());
-    creatureTemplate.type              = uint32(fields[38].GetUInt8());
-    creatureTemplate.type_flags        = fields[39].GetUInt32();
-    creatureTemplate.lootid            = fields[40].GetUInt32();
-    creatureTemplate.pickpocketLootId  = fields[41].GetUInt32();
-    creatureTemplate.SkinLootId        = fields[42].GetUInt32();
+    creatureTemplate.detection_range   = fields[21].GetFloat();
+    creatureTemplate.scale             = fields[22].GetFloat();
+    creatureTemplate.rank              = uint32(fields[23].GetUInt8());
+    creatureTemplate.dmgschool         = uint32(fields[24].GetInt8());
+    creatureTemplate.DamageModifier    = fields[25].GetFloat();
+    creatureTemplate.BaseAttackTime    = fields[26].GetUInt32();
+    creatureTemplate.RangeAttackTime   = fields[27].GetUInt32();
+    creatureTemplate.BaseVariance      = fields[28].GetFloat();
+    creatureTemplate.RangeVariance     = fields[29].GetFloat();
+    creatureTemplate.unit_class        = uint32(fields[30].GetUInt8());
+    creatureTemplate.unit_flags        = fields[31].GetUInt32();
+    creatureTemplate.unit_flags2       = fields[32].GetUInt32();
+    creatureTemplate.dynamicflags      = fields[33].GetUInt32();
+    creatureTemplate.family            = uint32(fields[34].GetUInt8());
+    creatureTemplate.trainer_type      = uint32(fields[35].GetUInt8());
+    creatureTemplate.trainer_spell     = fields[36].GetUInt32();
+    creatureTemplate.trainer_class     = uint32(fields[37].GetUInt8());
+    creatureTemplate.trainer_race      = uint32(fields[38].GetUInt8());
+    creatureTemplate.type              = uint32(fields[39].GetUInt8());
+    creatureTemplate.type_flags        = fields[40].GetUInt32();
+    creatureTemplate.lootid            = fields[41].GetUInt32();
+    creatureTemplate.pickpocketLootId  = fields[42].GetUInt32();
+    creatureTemplate.SkinLootId        = fields[43].GetUInt32();
 
     for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
     {
@@ -588,24 +600,25 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
         creatureTemplate.spells[i] = 0;
     }
 
-    creatureTemplate.PetSpellDataId        = fields[43].GetUInt32();
-    creatureTemplate.VehicleId             = fields[44].GetUInt32();
-    creatureTemplate.mingold               = fields[45].GetUInt32();
-    creatureTemplate.maxgold               = fields[46].GetUInt32();
-    creatureTemplate.AIName                = fields[47].GetString();
-    creatureTemplate.MovementType          = uint32(fields[48].GetUInt8());
-    creatureTemplate.InhabitType           = uint32(fields[49].GetUInt8());
-    creatureTemplate.HoverHeight           = fields[50].GetFloat();
-    creatureTemplate.ModHealth             = fields[51].GetFloat();
-    creatureTemplate.ModMana               = fields[52].GetFloat();
-    creatureTemplate.ModArmor              = fields[53].GetFloat();
-    creatureTemplate.RacialLeader          = fields[54].GetBool();
-    creatureTemplate.movementId            = fields[55].GetUInt32();
-    creatureTemplate.RegenHealth           = fields[56].GetBool();
-    creatureTemplate.MechanicImmuneMask    = fields[57].GetUInt32();
-    creatureTemplate.SpellSchoolImmuneMask = fields[58].GetUInt8();
-    creatureTemplate.flags_extra           = fields[59].GetUInt32();
-    creatureTemplate.ScriptID              = GetScriptId(fields[60].GetCString());
+    creatureTemplate.PetSpellDataId        = fields[44].GetUInt32();
+    creatureTemplate.VehicleId             = fields[45].GetUInt32();
+    creatureTemplate.mingold               = fields[46].GetUInt32();
+    creatureTemplate.maxgold               = fields[47].GetUInt32();
+    creatureTemplate.AIName                = fields[48].GetString();
+    creatureTemplate.MovementType          = uint32(fields[49].GetUInt8());
+    creatureTemplate.InhabitType           = uint32(fields[50].GetUInt8());
+    creatureTemplate.HoverHeight           = fields[51].GetFloat();
+    creatureTemplate.ModHealth             = fields[52].GetFloat();
+    creatureTemplate.ModMana               = fields[53].GetFloat();
+    creatureTemplate.ModArmor              = fields[54].GetFloat();
+    creatureTemplate.ModExperience         = fields[55].GetFloat();
+    creatureTemplate.RacialLeader          = fields[56].GetBool();
+    creatureTemplate.movementId            = fields[57].GetUInt32();
+    creatureTemplate.RegenHealth           = fields[58].GetBool();
+    creatureTemplate.MechanicImmuneMask    = fields[59].GetUInt32();
+    creatureTemplate.SpellSchoolImmuneMask = fields[60].GetUInt8();
+    creatureTemplate.flags_extra           = fields[61].GetUInt32();
+    creatureTemplate.ScriptID              = GetScriptId(fields[62].GetCString());
 }
 
 void ObjectMgr::LoadCreatureTemplateResistances()
@@ -1953,8 +1966,8 @@ void ObjectMgr::LoadCreatures()
 
         if (sWorld->getBoolConfig(CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA))
         {
-            uint32 zoneId = sMapMgr->GetZoneId(data.mapid, data.posX, data.posY, data.posZ);
-            uint32 areaId = sMapMgr->GetAreaId(data.mapid, data.posX, data.posY, data.posZ);
+            uint32 zoneId = sMapMgr->GetZoneId(data.phaseMask, data.mapid, data.posX, data.posY, data.posZ);
+            uint32 areaId = sMapMgr->GetAreaId(data.phaseMask, data.mapid, data.posX, data.posY, data.posZ);
 
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_ZONE_AREA_DATA);
 
@@ -2240,7 +2253,7 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
-        if (!MapManager::IsValidMapCoord(data.mapid, data.posX, data.posY, data.posZ, data.orientation))
+        if (!MapMgr::IsValidMapCoord(data.mapid, data.posX, data.posY, data.posZ, data.orientation))
         {
             LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with invalid coordinates, skip", guid, data.id);
             continue;
@@ -2254,8 +2267,8 @@ void ObjectMgr::LoadGameobjects()
 
         if (sWorld->getBoolConfig(CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA))
         {
-            uint32 zoneId = sMapMgr->GetZoneId(data.mapid, data.posX, data.posY, data.posZ);
-            uint32 areaId = sMapMgr->GetAreaId(data.mapid, data.posX, data.posY, data.posZ);
+            uint32 zoneId = sMapMgr->GetZoneId(data.phaseMask, data.mapid, data.posX, data.posY, data.posZ);
+            uint32 areaId = sMapMgr->GetAreaId(data.phaseMask, data.mapid, data.posX, data.posY, data.posZ);
 
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_GAMEOBJECT_ZONE_AREA_DATA);
 
@@ -2911,15 +2924,13 @@ void ObjectMgr::LoadItemTemplates()
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
             if (itemTemplate.Spells[i].SpellId && itemTemplate.Spells[i].SpellCategory && itemTemplate.Spells[i].SpellCategoryCooldown)
             {
-                SpellCategoryStore::const_iterator ct = sSpellsByCategoryStore.find(itemTemplate.Spells[i].SpellCategory);
+                SpellCategoryStore::iterator ct = sSpellsByCategoryStore.find(itemTemplate.Spells[i].SpellCategory);
                 if (ct != sSpellsByCategoryStore.end())
                 {
-                    const SpellCategorySet& ct_set = ct->second;
-                    if (ct_set.find(itemTemplate.Spells[i].SpellId) == ct_set.end())
-                        sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
+                    ct->second.emplace(true, itemTemplate.Spells[i].SpellId);
                 }
                 else
-                    sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
+                    sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].emplace(true, itemTemplate.Spells[i].SpellId);
             }
 
         ++count;
@@ -3383,7 +3394,7 @@ void ObjectMgr::LoadPlayerInfo()
                 }
 
                 // accept DB data only for valid position (and non instanceable)
-                if (!MapManager::IsValidMapCoord(mapId, positionX, positionY, positionZ, orientation))
+                if (!MapMgr::IsValidMapCoord(mapId, positionX, positionY, positionZ, orientation))
                 {
                     LOG_ERROR("sql.sql", "Wrong home position for class %u race %u pair in `playercreateinfo` table, ignoring.", current_class, current_race);
                     continue;
@@ -3456,7 +3467,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                int32 amount   = fields[3].GetUInt16();
+                int32 amount = fields[3].GetInt32();
 
                 if (!amount)
                 {
@@ -5132,10 +5143,15 @@ void ObjectMgr::LoadSpellScripts()
             continue;
         }
 
-        uint8 i = (uint8)((uint32(itr->first) >> 24) & 0x000000FF);
+        SpellEffIndex i = SpellEffIndex((uint32(itr->first) >> 24) & 0x000000FF);
+        if (uint32(i) >= MAX_SPELL_EFFECTS)
+        {
+            LOG_ERROR("sql.sql", "Table `spell_scripts` has too high effect index %u for spell (Id: %u) as script id", uint32(i), spellId);
+        }
+
         //check for correct spellEffect
         if (!spellInfo->Effects[i].Effect || (spellInfo->Effects[i].Effect != SPELL_EFFECT_SCRIPT_EFFECT && spellInfo->Effects[i].Effect != SPELL_EFFECT_DUMMY))
-            LOG_ERROR("sql.sql", "Table `spell_scripts` - spell %u effect %u is not SPELL_EFFECT_SCRIPT_EFFECT or SPELL_EFFECT_DUMMY", spellId, i);
+            LOG_ERROR("sql.sql", "Table `spell_scripts` - spell %u effect %u is not SPELL_EFFECT_SCRIPT_EFFECT or SPELL_EFFECT_DUMMY", spellId, uint32(i));
     }
 }
 
@@ -5440,7 +5456,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
         uint16 mapID = fields[0].GetUInt16();
 
-        if (!MapManager::IsValidMAP(mapID, true))
+        if (!MapMgr::IsValidMAP(mapID, true))
         {
             LOG_ERROR("sql.sql", "ObjectMgr::LoadInstanceTemplate: bad mapid %d for template!", mapID);
             continue;
@@ -5715,7 +5731,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         bool has_items    = fields[4].GetBool();
         m->expire_time    = time_t(fields[5].GetUInt32());
         m->deliver_time   = time_t(0);
-        m->COD            = fields[6].GetUInt32();
+        m->stationery     = fields[6].GetUInt8();
         m->checked        = fields[7].GetUInt8();
         m->mailTemplateId = fields[8].GetInt16();
         m->auctionId      = fields[9].GetInt32();
@@ -5736,13 +5752,13 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             // read items from cache
             m->items.swap(itemsCache[m->messageID]);
 
-            // don't return if: is mail from non-player, or sent to self, or already returned, or read and isn't COD
-            if (m->messageType != MAIL_NORMAL || m->receiver == m->sender || (m->checked & (MAIL_CHECK_MASK_COD_PAYMENT | MAIL_CHECK_MASK_RETURNED)) || ((m->checked & MAIL_CHECK_MASK_READ) && !m->COD))
+            // If it is mail from non-player, or if it's already return mail, it shouldn't be returned, but deleted
+            if (!m->IsSentByPlayer() || m->IsSentByGM() || (m->IsCODPayment() || m->IsReturnedMail()))
             {
-                for (MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
+                for (auto const& mailedItem : m->items)
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                    stmt->setUInt32(0, itr2->item_guid);
+                    stmt->setUInt32(0, mailedItem.item_guid);
                     CharacterDatabase.Execute(stmt);
                 }
 
@@ -5761,17 +5777,17 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                 stmt->setUInt8 (4, uint8(MAIL_CHECK_MASK_RETURNED));
                 stmt->setUInt32(5, m->messageID);
                 CharacterDatabase.Execute(stmt);
-                for (MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
+                for (auto const& mailedItem : m->items)
                 {
                     // Update receiver in mail items for its proper delivery, and in instance_item for avoid lost item at sender delete
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_RECEIVER);
                     stmt->setUInt32(0, m->sender);
-                    stmt->setUInt32(1, itr2->item_guid);
+                    stmt->setUInt32(1, mailedItem.item_guid);
                     CharacterDatabase.Execute(stmt);
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
                     stmt->setUInt32(0, m->sender);
-                    stmt->setUInt32(1, itr2->item_guid);
+                    stmt->setUInt32(1, mailedItem.item_guid);
                     CharacterDatabase.Execute(stmt);
                 }
 
@@ -8079,7 +8095,7 @@ void ObjectMgr::LoadGameTele()
         gt.mapId          = fields[5].GetUInt16();
         gt.name           = fields[6].GetString();
 
-        if (!MapManager::IsValidMapCoord(gt.mapId, gt.position_x, gt.position_y, gt.position_z, gt.orientation))
+        if (!MapMgr::IsValidMapCoord(gt.mapId, gt.position_x, gt.position_y, gt.position_z, gt.orientation))
         {
             LOG_ERROR("sql.sql", "Wrong position for id %u (name: %s) in `game_tele` table, ignoring.", id, gt.name.c_str());
             continue;

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __ACORE_LANGUAGE_H
@@ -1175,7 +1186,9 @@ enum AcoreStrings
     LANG_COMMAND_MUTEHISTORY_EMPTY      = 5060,
     LANG_COMMAND_MUTEHISTORY_OUTPUT     = 5061,
 
-    // Room for more Trinity strings    5062-9999
+    LANG_NPCINFO_SPELL_SCHOOL_IMMUNE    = 5062,
+
+    // Room for more strings    5063-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1353,8 +1366,11 @@ enum AcoreStrings
     LANG_BG_READY_CHECK_ERROR                     = 30084,
 
     LANG_DEBUG_BG_CONF                            = 30085,
-    LANG_DEBUG_ARENA_CONF                         = 30086
+    LANG_DEBUG_ARENA_CONF                         = 30086,
 
     // 30087-30095 reserved for passive anticheat
+
+    LANG_DEBUG_LFG_ON                             = 30096,
+    LANG_DEBUG_LFG_OFF                            = 30097
 };
 #endif

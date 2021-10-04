@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "DBUpdater.h"
@@ -13,7 +25,7 @@
 #include "QueryResult.h"
 #include "StartProcess.h"
 #include "UpdateFetcher.h"
-#include <boost/filesystem/operations.hpp>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -27,7 +39,7 @@ std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 
 bool DBUpdaterUtil::CheckExecutable()
 {
-    boost::filesystem::path exe(GetCorrectedMySQLExecutable());
+    std::filesystem::path exe(GetCorrectedMySQLExecutable());
     if (!is_regular_file(exe))
     {
         exe = Acore::SearchExecutableInPath("mysql");
@@ -191,13 +203,13 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     catch (UpdateException&)
     {
         LOG_FATAL("sql.updates", "Failed to create database %s! Does the user (named in *.conf) have `CREATE`, `ALTER`, `DROP`, `INSERT` and `DELETE` privileges on the MySQL server?", pool.GetConnectionInfo()->database.c_str());
-        boost::filesystem::remove(temp);
+        std::filesystem::remove(temp);
         return false;
     }
 
     LOG_INFO("sql.updates", "Done.");
     LOG_INFO("sql.updates", " ");
-    boost::filesystem::remove(temp);
+    std::filesystem::remove(temp);
     return true;
 }
 
@@ -294,7 +306,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
     std::string const DirPathStr = DBUpdater<T>::GetBaseFilesDirectory();
 
     Path const DirPath(DirPathStr);
-    if (!boost::filesystem::is_directory(DirPath))
+    if (!std::filesystem::is_directory(DirPath))
     {
         LOG_ERROR("sql.updates", ">> Directory \"%s\" not exist", DirPath.generic_string().c_str());
         return false;
@@ -306,10 +318,10 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    boost::filesystem::directory_iterator const DirItr;
+    std::filesystem::directory_iterator const DirItr;
     uint32 FilesCount = 0;
 
-    for (boost::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
+    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
     {
         if (itr->path().extension() == ".sql")
             FilesCount++;
@@ -321,7 +333,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    for (boost::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
+    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
     {
         if (itr->path().extension() != ".sql")
             continue;

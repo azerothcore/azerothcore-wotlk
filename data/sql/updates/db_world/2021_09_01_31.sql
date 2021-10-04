@@ -1,0 +1,30 @@
+-- DB update 2021_09_01_30 -> 2021_09_01_31
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_09_01_30';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_09_01_30 2021_09_01_31 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1630408706945809100'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1630408706945809100');
+
+-- Corrected coords of Cavindra
+UPDATE `creature` SET `position_x` = -1458.87, `position_y` = 2797.62, `position_z` = 93.817, `orientation` = 1.96495 WHERE (`id` = 13697) AND (`guid` IN (29063));
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_09_01_31' WHERE sql_rev = '1630408706945809100';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

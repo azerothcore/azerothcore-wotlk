@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CombatAI.h"
 #include "GridNotifiers.h"
@@ -1178,25 +1191,6 @@ public:
     };
 };
 
-enum ScriptedTextNorgannonDellorah
-{
-    DELLORAH_SAY_1 = 0,
-    DELLORAH_SAY_2 = 1,
-    DELLORAH_SAY_3 = 2,
-    DELLORAH_SAY_4 = 3,
-    DELLORAH_SAY_5 = 4,
-    DELLORAH_SAY_6 = 5,
-    DELLORAH_SAY_7 = 6,
-
-    NORGANNON_SAY_1 = 0,
-    NORGANNON_SAY_2 = 1,
-    NORGANNON_SAY_3 = 2,
-    NORGANNON_SAY_4 = 3,
-    NORGANNON_SAY_5 = 4,
-
-    RHYDIAN_EMOTE = 0,
-};
-
 class npc_brann_radio : public CreatureScript
 {
 public:
@@ -1674,7 +1668,7 @@ public:
             if (!target || !caster)
                 return;
 
-            caster->getThreatManager().resetAllAggro();
+            caster->getThreatMgr().resetAllAggro();
             caster->GetAI()->AttackStart(target);    // Chase target
             caster->AddThreat(target, 10000000.0f);
         }
