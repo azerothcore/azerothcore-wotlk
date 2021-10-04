@@ -242,11 +242,11 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
     }
 
     if (bg->GetStatus() != STATUS_WAIT_LEAVE)
-        *data << uint8(0);                                     // bg not ended
+        *data << uint8(0);                                          // bg not ended
     else
     {
-        *data << uint8(1);                                     // bg ended
-        *data << uint8(bg->GetWinner());                       // who win
+        *data << uint8(1);                                          // bg ended
+        *data << uint8(bg->GetWinner() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE); // who win
     }
 
     size_t wpos = data->wpos();

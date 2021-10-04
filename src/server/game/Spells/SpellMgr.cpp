@@ -2856,6 +2856,11 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_AURA_MOD_STUN:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
                     break;
+                case SPELL_AURA_BIND_SIGHT:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                    break;
+                default:
+                    break;
             }
 
             switch (spellInfo->Effects[j].Effect)
@@ -3268,6 +3273,9 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 6197: // Eagle Eye
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
+                break;
+            case 50315: // Disco Ball
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
                 break;
 
             // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
@@ -4619,8 +4627,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx &= ~SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
     });
 
+    ApplySpellFix({ 49376 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_3_YARDS; // 3yd
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
     // Feral Charge - Cat
-    ApplySpellFix({ 49376, 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 61138, 61132, 50259 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
     });
