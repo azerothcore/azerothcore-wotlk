@@ -725,9 +725,9 @@ public:
         }
     }
 };
+/*
 
-
-class go_rookery_egg : public GameObjectScript, public AreaTriggerScript
+class go_rookery_egg : public GameObjectScript
 {
 public:
     go_rookery_egg() : GameObjectScript("go_rookery_egg"){}
@@ -736,12 +736,12 @@ public:
         
     }
 
-    void OnLootStateChanged(GameObject* go, uint32 state, Unit* /*unit*/) override
+    void OnLootStateChanged(GameObject* go, uint32 state, Unit* /*unit*//*) override
     {
     
     }
 };
-
+*/
 void AddSC_instance_blackrock_spire()
 {
     new instance_blackrock_spire();

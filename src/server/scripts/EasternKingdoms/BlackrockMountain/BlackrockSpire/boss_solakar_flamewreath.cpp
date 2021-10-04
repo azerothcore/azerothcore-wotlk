@@ -51,7 +51,7 @@ public:
 
         EventMap events;
         std::list<GameObject*> nearbyEggs;
-
+        GameObject*            targetEgg;
 
         void InitializeAI() override
         {
@@ -61,15 +61,22 @@ public:
                 me->AI()->AttackStart(target);
             }
             nearbyEggs.clear();
+            targetEgg = nullptr;
         }
 
         void EnterCombat(Unit* /*who*/) override
         {
-            events.ScheduleEvent(SPELL_HATCH_EGG, 1000);
+            events.ScheduleEvent(SPELL_HATCH_EGG, 100);
         }
 
         void UpdateAI(uint32 diff) override
         {
+            std::list<GameObject*> nearbyEggs;
+            float                  tempDist = 20;
+            float                  minDist  = 25;
+            
+        //    GameObject*            nearestEgg = nullptr;
+
             if (!UpdateVictim())
             {
                 return;
@@ -85,19 +92,40 @@ public:
                 switch (eventId)
                 {
                 case SPELL_HATCH_EGG:
-                    me->GetGameObjectListWithEntryInGrid(nearbyEggs, DB_ENTRY_ROOKERY_EGG, 20);
-                    for (const auto &egg : nearbyEggs)
+                    if (!targetEgg) // no target, try to find one
                     {
-
+                        LOG_FATAL("Entities:unit", "Looking for an egg");
+                        me->GetGameObjectListWithEntryInGrid(nearbyEggs, DB_ENTRY_ROOKERY_EGG, 20);
+                        LOG_FATAL("Entities:unit", "found %d eggs", nearbyEggs.size());
+                        for (const auto& egg : nearbyEggs)
+                        {
+                            if (egg->GetGoState() == GO_STATE_READY)
+                            {
+                                LOG_FATAL("Entities:unit", "found an egg ready");
+                                tempDist = me->GetDistance2d(egg);
+                                if (tempDist < minDist)
+                                {
+                                    LOG_FATAL("Entities:unit", "It's in range");
+                                    minDist   = tempDist;
+                                    targetEgg = egg;
+                                }
+                            }
+                            else
+                                LOG_FATAL("Entities:unit", "found an unready egg");
+                        }
                     }
-
-                    if (GameObject* egg = me->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_TRAP, 60))
+                     
+                   // if (nearestEgg)
+                    //if (GameObject* egg = me->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_TRAP, 60))
+                    if (targetEgg) //have a target, go to it and cast it
                     {
-                        me->GetMotionMaster()->MovePoint(0, egg->GetPosition());
-                        if (me->GetDistance2d(egg) < 5)
+                        me->GetMotionMaster()->MovePoint(0, targetEgg->GetPosition());
+                        if (me->GetDistance2d(targetEgg) < 5)
                         {
                             me->StopMovingOnCurrentPos();
                             DoCast(SPELL_HATCH_EGG);
+                    //        targetEgg->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                            targetEgg = nullptr;
                             events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
                         }
                     }
@@ -107,16 +135,17 @@ public:
                 }
             }
 
+            // cast takes 1.5second, during which we don't have a target
             if (me->HasUnitState(UNIT_STATE_CASTING))
             {
                 me->StopMovingOnCurrentPos();
             }
-            else
+            else if (!targetEgg)
             {
-                if (me->GetDistance2d(me->GetVictim()) > 10.0)
+                me->AI()->AttackStart(me->GetVictim());
+                if (me->GetDistance2d(me->GetVictim()) > 1.0)
                     me->GetMotionMaster()->MovePoint(0, me->GetVictim()->GetPosition()); // a bit hacky, but needed to start moving once we've summoned an egg
             }
-
             DoMeleeAttackIfReady();
         }
     };
