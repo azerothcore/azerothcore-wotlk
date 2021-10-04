@@ -32,13 +32,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 0, 5, 0, 0, 0, 100, 3, 3000, 3000, 0, 0, 11, 10870, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Time = 3 seconds - Self: Cast spell Summon Burning Servant (10870) on Self (flags: triggered)'),
 (@ENTRY, 0, 6, 0, 8, 0, 100, 0, 9798, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On spell Radiation (9798) hit - Self: Talk 0 to invoker');
 
--- Ghok Bashguud
-SET @ENTRY := 9718;
-DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @ENTRY AND `source_type` = 0;
-UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`= @ENTRY;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(@ENTRY, 0, 0, 0, 37, 0, 85, 0, 0, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On AI initialize - Self: Despawn in 0.5 s');
-
 DELETE FROM `pool_creature` WHERE guid IN (45763, 300742);
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
 (45763, 9718, 85, 'Ghok Bashguud add'),
