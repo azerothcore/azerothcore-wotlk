@@ -3719,6 +3719,14 @@ void Player::SwapItem(uint16 src, uint16 dst)
         }
     }
 
+    // Remove item enchantments for now and restore it later
+    // Needed for swap sanity checks
+    ApplyEnchantment(pSrcItem, false);
+    if (pDstItem)
+    {
+        ApplyEnchantment(pDstItem, false);
+    }
+
     // impossible merge/fill, do real swap
     InventoryResult msg = EQUIP_ERR_OK;
 
@@ -3738,6 +3746,13 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     if (msg != EQUIP_ERR_OK)
     {
+        // Restore enchantments
+        ApplyEnchantment(pSrcItem, true);
+        if (pDstItem)
+        {
+            ApplyEnchantment(pDstItem, true);
+        }
+
         SendEquipError(msg, pSrcItem, pDstItem);
         return;
     }
@@ -3758,8 +3773,22 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     if (msg != EQUIP_ERR_OK)
     {
+        // Restore enchantments
+        ApplyEnchantment(pSrcItem, true);
+        if (pDstItem)
+        {
+            ApplyEnchantment(pDstItem, true);
+        }
+
         SendEquipError(msg, pDstItem, pSrcItem);
         return;
+    }
+
+    // Restore enchantments
+    ApplyEnchantment(pSrcItem, true);
+    if (pDstItem)
+    {
+        ApplyEnchantment(pDstItem, true);
     }
 
     // Check bag swap with item exchange (one from empty in not bag possition (equipped (not possible in fact) or store)
