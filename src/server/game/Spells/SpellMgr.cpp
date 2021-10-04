@@ -2856,6 +2856,11 @@ void SpellMgr::LoadSpellCustomAttr()
                 case SPELL_AURA_MOD_STUN:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
                     break;
+                case SPELL_AURA_BIND_SIGHT:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                    break;
+                default:
+                    break;
             }
 
             switch (spellInfo->Effects[j].Effect)
@@ -3268,6 +3273,9 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 6197: // Eagle Eye
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
+                break;
+            case 50315: // Disco Ball
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
                 break;
 
             // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there

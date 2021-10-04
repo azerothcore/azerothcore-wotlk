@@ -2320,44 +2320,40 @@ void AchievementMgr::SendAllAchievementData() const
 
 void AchievementMgr::SendRespondInspectAchievements(Player* player) const
 {
-    WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9 + m_completedAchievements.size() * 8 + 4 + 4);
+    WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9 + m_completedAchievements.size() * 8 + 4 + m_criteriaProgress.size() * 38 + 4);
     data << GetPlayer()->GetPackGUID();
-    BuildAllDataPacket(&data, true);
+    BuildAllDataPacket(&data);
     player->GetSession()->SendPacket(&data);
 }
 
 /**
  * used by SMSG_RESPOND_INSPECT_ACHIEVEMENT and SMSG_ALL_ACHIEVEMENT_DATA
  */
-void AchievementMgr::BuildAllDataPacket(WorldPacket* data, bool inspect) const
+void AchievementMgr::BuildAllDataPacket(WorldPacket* data) const
 {
-    if (!m_completedAchievements.empty())
+    for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
     {
-        AchievementEntry const* achievement = nullptr;
-        for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
-        {
-            // Skip hidden achievements
-            achievement = sAchievementStore.LookupEntry(iter->first);
-            if (!achievement || achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
-                continue;
+        // Skip hidden achievements
+        AchievementEntry const* achievement = sAchievementStore.LookupEntry(iter->first);
+        if (!achievement || achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
+            continue;
 
-            *data << uint32(iter->first);
-            data->AppendPackedTime(iter->second.date);
-        }
+        *data << uint32(iter->first);
+        data->AppendPackedTime(iter->second.date);
     }
+
     *data << int32(-1);
 
-    if (!inspect && !m_criteriaProgress.empty())
-        for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
-        {
-            *data << uint32(iter->first);
-            data->appendPackGUID(iter->second.counter);
-            *data << GetPlayer()->GetPackGUID();
-            *data << uint32(0);
-            data->AppendPackedTime(iter->second.date);
-            *data << uint32(0);
-            *data << uint32(0);
-        }
+    for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
+    {
+        *data << uint32(iter->first);
+        data->appendPackGUID(iter->second.counter);
+        *data << GetPlayer()->GetPackGUID();
+        *data << uint32(0);
+        data->AppendPackedTime(iter->second.date);
+        *data << uint32(0);
+        *data << uint32(0);
+    }
 
     *data << int32(-1);
 }
