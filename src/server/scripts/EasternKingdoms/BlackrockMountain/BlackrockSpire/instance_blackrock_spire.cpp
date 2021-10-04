@@ -726,7 +726,7 @@ public:
     }
 };
 
-/*
+
 class go_rookery_egg : public GameObjectScript, public AreaTriggerScript
 {
 public:
@@ -740,7 +740,7 @@ public:
     {
     
     }
-};*/
+};
 
 void AddSC_instance_blackrock_spire()
 {

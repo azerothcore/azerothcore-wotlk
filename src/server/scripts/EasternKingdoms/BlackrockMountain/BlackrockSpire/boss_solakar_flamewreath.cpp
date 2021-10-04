@@ -50,6 +50,8 @@ public:
         npc_rookery_hatcherAI(Creature* creature) : CreatureAI(creature) {}
 
         EventMap events;
+        std::list<GameObject*> nearbyEggs;
+
 
         void InitializeAI() override
         {
@@ -58,6 +60,7 @@ public:
             {
                 me->AI()->AttackStart(target);
             }
+            nearbyEggs.clear();
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -82,6 +85,12 @@ public:
                 switch (eventId)
                 {
                 case SPELL_HATCH_EGG:
+                    me->GetGameObjectListWithEntryInGrid(nearbyEggs, DB_ENTRY_ROOKERY_EGG, 20);
+                    for (const auto &egg : nearbyEggs)
+                    {
+
+                    }
+
                     if (GameObject* egg = me->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_TRAP, 60))
                     {
                         me->GetMotionMaster()->MovePoint(0, egg->GetPosition());
