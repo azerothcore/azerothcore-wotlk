@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -21,8 +34,8 @@ public:
         {
             { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,                  "" },
             { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,                    "" },
-            { "spectate",       SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorSpectateCommand, "" },
-            { "watch",          SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorWatchCommand,    "" },
+            { "spectate",       SEC_CONSOLE,        false, &HandleSpectatorSpectateCommand,                 "" },
+            { "watch",          SEC_CONSOLE,        false, &HandleSpectatorWatchCommand,                    "" },
             { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,                    "" },
             { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,                         "" }
         };
@@ -69,6 +82,22 @@ public:
 
         //player->SetIsSpectator(false);
         player->TeleportToEntryPoint();
+        return true;
+    }
+
+    static bool HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args)
+    {
+        if (!ArenaSpectator::HandleSpectatorSpectateCommand(handler, args))
+            return false;
+
+        return true;
+    }
+
+    static bool HandleSpectatorWatchCommand(ChatHandler* handler, char const* args)
+    {
+        if (!ArenaSpectator::HandleSpectatorWatchCommand(handler, args))
+            return false;
+
         return true;
     }
 };

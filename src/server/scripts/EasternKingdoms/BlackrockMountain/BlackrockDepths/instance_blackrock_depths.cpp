@@ -1,32 +1,49 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "blackrock_depths.h"
 #include "InstanceScript.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
-#define TIMER_TOMBOFTHESEVEN    15000
+#define TIMER_TOMBOFTHESEVEN    30000
+#define TIMER_TOMB_START        5000
 #define MAX_ENCOUNTER           6
 
 enum Creatures
 {
-    NPC_EMPEROR             = 9019,
-    NPC_PHALANX             = 9502,
-    NPC_ANGERREL            = 9035,
-    NPC_DOPEREL             = 9040,
-    NPC_HATEREL             = 9034,
-    NPC_VILEREL             = 9036,
-    NPC_SEETHREL            = 9038,
-    NPC_GLOOMREL            = 9037,
-    NPC_DOOMREL             = 9039,
-    NPC_MAGMUS              = 9938,
-    NPC_MOIRA               = 8929,
+    NPC_EMPEROR                 = 9019,
+    NPC_PHALANX                 = 9502,
+    NPC_ANGERREL                = 9035,
+    NPC_DOPEREL                 = 9040,
+    NPC_HATEREL                 = 9034,
+    NPC_VILEREL                 = 9036,
+    NPC_SEETHREL                = 9038,
+    NPC_GLOOMREL                = 9037,
+    NPC_DOOMREL                 = 9039,
+    NPC_MAGMUS                  = 9938,
+    NPC_MOIRA                   = 8929,
 
-    NPC_WATCHMAN_DOOMGRIP   = 9476,
+    NPC_WATCHMAN_DOOMGRIP       = 9476,
+
+    NPC_WEAPON_TECHNICIAN       = 8920,
+    NPC_DOOMFORGE_ARCANASMITH   = 8900,
+    NPC_RAGEREAVER_GOLEM        = 8906,
+    NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
+    NPC_GOLEM_LORD_ARGELMACH    = 8983
 };
 
 enum GameObjects
@@ -52,6 +69,34 @@ enum GameObjects
     GO_THRONE_ROOM          = 170575, // Throne door
     GO_SPECTRAL_CHALICE     = 164869,
     GO_CHEST_SEVEN          = 169243,
+};
+
+enum MiscData
+{
+    SPELL_STONED    = 10255
+};
+
+class RestoreAttack : public BasicEvent
+{
+public:
+    RestoreAttack(Creature* boss) : _boss(boss) {}
+
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
+    {
+        _boss->SetReactState(REACT_AGGRESSIVE);
+        _boss->AI()->SetData(DATA_GOLEM_LORD_ARGELMACH_INIT, DONE);
+
+        if (Unit* victim = _boss->GetVictim())
+        {
+            _boss->SetTarget(victim->GetGUID());
+            _boss->GetMotionMaster()->MoveChase(victim);
+        }
+
+        return true;
+    }
+
+private:
+    Creature* _boss;
 };
 
 class instance_blackrock_depths : public InstanceMapScript
@@ -106,13 +151,16 @@ public:
         uint32 TombEventCounter;
         uint32 OpenedCoofers;
 
+        GuidList ArgelmachAdds;
+        ObjectGuid ArgelmachGUID;
+
         void Initialize() override
         {
             memset(&encounter, 0, sizeof(encounter));
 
             BarAleCount = 0;
             GhostKillCount = 0;
-            TombTimer = TIMER_TOMBOFTHESEVEN;
+            TombTimer = TIMER_TOMB_START;
             TombEventCounter = 0;
             OpenedCoofers = 0;
         }
@@ -155,6 +203,20 @@ public:
                     MagmusGUID = creature->GetGUID();
                     if (!creature->IsAlive())
                         HandleGameObject(GetGuidData(DATA_THRONE_DOOR), true); // if Magmus is dead open door to last boss
+                    break;
+                case NPC_WEAPON_TECHNICIAN:
+                case NPC_DOOMFORGE_ARCANASMITH:
+                case NPC_RAGEREAVER_GOLEM:
+                case NPC_WRATH_HAMMER_CONSTRUCT:
+                    if (creature->IsAlive() && creature->GetPositionZ() < -51.5f && creature->GetPositionZ() > -55.f)
+                    {
+                        ArgelmachAdds.push_back(creature->GetGUID());
+                    }
+                    break;
+                case NPC_GOLEM_LORD_ARGELMACH:
+                    ArgelmachGUID = creature->GetGUID();
+                    break;
+                default:
                     break;
             }
         }
@@ -233,6 +295,21 @@ public:
             }
         }
 
+        void OnUnitDeath(Unit* unit) override
+        {
+            switch (unit->GetEntry())
+            {
+                case NPC_WEAPON_TECHNICIAN:
+                case NPC_DOOMFORGE_ARCANASMITH:
+                case NPC_RAGEREAVER_GOLEM:
+                case NPC_WRATH_HAMMER_CONSTRUCT:
+                    ArgelmachAdds.remove(unit->GetGUID());
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void SetGuidData(uint32 type, ObjectGuid data) override
         {
             switch (type)
@@ -285,6 +362,79 @@ public:
                         if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
                             summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
                     }
+                    break;
+                case DATA_GOLEM_LORD_ARGELMACH_INIT:
+                {
+                    if (Creature* argelmach = instance->GetCreature(ArgelmachGUID))
+                    {
+                        GuidList adds = ArgelmachAdds;
+                        for (GuidList::const_iterator itr = adds.begin(); itr != adds.end();)
+                        {
+                            if (Creature* argelmachAdd = instance->GetCreature(*itr))
+                            {
+                                if (argelmachAdd->GetEntry() == NPC_WRATH_HAMMER_CONSTRUCT)
+                                {
+                                    argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
+                                    argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
+                                    itr = adds.erase(itr);
+                                }
+                                else if (argelmachAdd->GetEntry() == NPC_RAGEREAVER_GOLEM)
+                                {
+                                    if (argelmachAdd->IsWithinDist2d(argelmach, 10.f))
+                                    {
+                                        argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
+                                        argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
+                                        itr = adds.erase(itr);
+                                    }
+                                    else
+                                        ++itr;
+                                }
+                                else
+                                {
+                                    ++itr;
+                                }
+                            }
+                            else
+                            {
+                                ++itr;
+                            }
+                        }
+
+                        if (!adds.empty())
+                        {
+                            argelmach->SetReactState(REACT_PASSIVE);
+                            argelmach->SetTarget();
+                            argelmach->AI()->SetData(DATA_GOLEM_LORD_ARGELMACH_INIT, IN_PROGRESS);
+                        }
+                        else
+                        {
+                            argelmach->AI()->SetData(DATA_GOLEM_LORD_ARGELMACH_INIT, DONE);
+                        }
+                    }
+                    break;
+                }
+                case DATA_GOLEM_LORD_ARGELMACH_ADDS:
+                {
+                    if (Creature* argelmach = instance->GetCreature(ArgelmachGUID))
+                    {
+                        argelmach->HandleEmoteCommand(EMOTE_ONESHOT_SHOUT);
+                        argelmach->m_Events.AddEvent(new RestoreAttack(argelmach), argelmach->m_Events.CalculateTime(3000));
+
+                        for (ObjectGuid const& argelmachAddGUID : ArgelmachAdds)
+                        {
+                            if (Creature* argelmachAdd = instance->GetCreature(argelmachAddGUID))
+                            {
+                                if (!argelmachAdd->IsInCombat())
+                                {
+                                    argelmachAdd->RemoveAurasDueToSpell(SPELL_STONED);
+                                    argelmachAdd->AI()->AttackStart(argelmach->GetVictim());
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+                default:
                     break;
             }
 
@@ -439,7 +589,7 @@ public:
             }
             GhostKillCount = 0;
             TombEventCounter = 0;
-            TombTimer = TIMER_TOMBOFTHESEVEN;
+            TombTimer = TIMER_TOMB_START;
             SetData(TYPE_TOMB_OF_SEVEN, NOT_STARTED);
         }
 

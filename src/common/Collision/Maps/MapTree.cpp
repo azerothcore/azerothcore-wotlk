@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "MapTree.h"
@@ -9,7 +20,7 @@
 #include "Log.h"
 #include "ModelInstance.h"
 #include "VMapDefinitions.h"
-#include "VMapManager2.h"
+#include "VMapMgr2.h"
 #include <iomanip>
 #include <limits>
 #include <sstream>
@@ -86,7 +97,7 @@ namespace VMAP
         return tilefilename.str();
     }
 
-    bool StaticMapTree::getAreaInfo(Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
+    bool StaticMapTree::GetAreaInfo(Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
     {
         AreaInfoCallback intersectionCallBack(iTreeValues);
         iTree.intersectPoint(pos, intersectionCallBack);
@@ -131,7 +142,7 @@ namespace VMAP
     Else, pMaxDist is not modified and returns false;
     */
 
-    bool StaticMapTree::getIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const
+    bool StaticMapTree::GetIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const
     {
         float distance = pMaxDist;
         MapRayCallback intersectionCallBack(iTreeValues);
@@ -162,8 +173,10 @@ namespace VMAP
         }
         // direction with length of 1
         G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
-        if (getIntersectionTime(ray, maxDist, true))
+
+        if (GetIntersectionTime(ray, maxDist, true))
         {
+
             return false;
         }
 
@@ -175,7 +188,7 @@ namespace VMAP
     Return the hit pos or the original dest pos
     */
 
-    bool StaticMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, Vector3& pResultHitPos, float pModifyDist) const
+    bool StaticMapTree::GetObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, Vector3& pResultHitPos, float pModifyDist) const
     {
         bool result = false;
         float maxDist = (pPos2 - pPos1).magnitude();
@@ -190,7 +203,7 @@ namespace VMAP
         Vector3 dir = (pPos2 - pPos1) / maxDist;            // direction with length of 1
         G3D::Ray ray(pPos1, dir);
         float dist = maxDist;
-        if (getIntersectionTime(ray, dist, false))
+        if (GetIntersectionTime(ray, dist, false))
         {
             pResultHitPos = pPos1 + dir * dist;
             if (pModifyDist < 0)
@@ -226,7 +239,7 @@ namespace VMAP
         Vector3 dir = Vector3(0, 0, -1);
         G3D::Ray ray(pPos, dir);   // direction with length of 1
         float maxDist = maxSearchDist;
-        if (getIntersectionTime(ray, maxDist, false))
+        if (GetIntersectionTime(ray, maxDist, false))
         {
             height = pPos.z - maxDist;
         }
@@ -242,7 +255,7 @@ namespace VMAP
         {
             basePath.push_back('/');
         }
-        std::string fullname = basePath + VMapManager2::getMapFileName(mapID);
+        std::string fullname = basePath + VMapMgr2::getMapFileName(mapID);
         bool success = true;
         FILE* rf = fopen(fullname.c_str(), "rb");
         if (!rf)
@@ -280,7 +293,7 @@ namespace VMAP
 
     //=========================================================
 
-    bool StaticMapTree::InitMap(const std::string& fname, VMapManager2* vm)
+    bool StaticMapTree::InitMap(const std::string& fname, VMapMgr2* vm)
     {
         //VMAP_DEBUG_LOG(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : initializing StaticMapTree '%s'", fname.c_str());
         bool success = false;
@@ -333,7 +346,7 @@ namespace VMAP
 
     //=========================================================
 
-    void StaticMapTree::UnloadMap(VMapManager2* vm)
+    void StaticMapTree::UnloadMap(VMapMgr2* vm)
     {
         for (loadedSpawnMap::iterator i = iLoadedSpawns.begin(); i != iLoadedSpawns.end(); ++i)
         {
@@ -349,7 +362,7 @@ namespace VMAP
 
     //=========================================================
 
-    bool StaticMapTree::LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm)
+    bool StaticMapTree::LoadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm)
     {
         if (!iIsTiled)
         {
@@ -444,7 +457,7 @@ namespace VMAP
 
     //=========================================================
 
-    void StaticMapTree::UnloadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm)
+    void StaticMapTree::UnloadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm)
     {
         uint32 tileID = packTileID(tileX, tileY);
         loadedTileMap::iterator tile = iLoadedTiles.find(tileID);
@@ -507,7 +520,7 @@ namespace VMAP
         iLoadedTiles.erase(tile);
     }
 
-    void StaticMapTree::getModelInstances(ModelInstance*& models, uint32& count)
+    void StaticMapTree::GetModelInstances(ModelInstance*& models, uint32& count)
     {
         models = iTreeValues;
         count = iNTreeValues;

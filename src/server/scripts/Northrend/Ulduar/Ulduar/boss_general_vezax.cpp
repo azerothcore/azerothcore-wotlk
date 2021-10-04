@@ -1,9 +1,22 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "AccountMgr.h"
-#include "BanManager.h"
+#include "BanMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -51,7 +64,7 @@ enum VezaxSpellData
 enum VezaxNpcs
 {
     // NPC_VEZAX                                = 33271,
-    NPC_VEZAX_BUNNY                             = 33500,
+    // NPC_VEZAX_BUNNY                          = 33500,
     NPC_SARONITE_ANIMUS                         = 33524,
 };
 
@@ -182,7 +195,7 @@ public:
                 case 1:
                     return (me->GetLootMode() == 3 ? 1 : 0);
                 case 2:
-                    return (bAchievShadowdodger == true ? 1 : 0);
+                    return (bAchievShadowdodger ? 1 : 0);
             }
             return 0;
         }
@@ -291,7 +304,7 @@ public:
                             events.RepeatEvent(30000);
                         else
                         {
-                            for (ObjectGuid guid : summons)
+                            for (ObjectGuid const& guid : summons)
                                 if (Creature* sv = ObjectAccessor::GetCreature(*me, guid))
                                 {
                                     sv->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);

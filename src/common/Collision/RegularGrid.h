@@ -74,10 +74,10 @@ public:
     void insert(const T& value)
     {
         G3D::Vector3 pos[9];
-        pos[0] = value.getBounds().corner(0);
-        pos[1] = value.getBounds().corner(1);
-        pos[2] = value.getBounds().corner(2);
-        pos[3] = value.getBounds().corner(3);
+        pos[0] = value.GetBounds().corner(0);
+        pos[1] = value.GetBounds().corner(1);
+        pos[2] = value.GetBounds().corner(2);
+        pos[3] = value.GetBounds().corner(3);
         pos[4] = (pos[0] + pos[1]) / 2.0f;
         pos[5] = (pos[1] + pos[2]) / 2.0f;
         pos[6] = (pos[2] + pos[3]) / 2.0f;

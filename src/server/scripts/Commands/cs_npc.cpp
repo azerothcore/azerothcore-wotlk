@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -65,7 +76,7 @@ struct MechanicImmune
     char const* text;
 };
 
-#define MAX_MECHANIC    32
+constexpr auto MAX_MECHANIC = 32;
 
 MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
 {
@@ -101,6 +112,23 @@ MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
     { MECHANIC_IMMUNE_SHIELD, "MECHANIC_IMMUNE_SHIELD"      },
     { MECHANIC_SAPPED, "MECHANIC_SAPPED"             },
     { MECHANIC_ENRAGED, "MECHANIC_ENRAGED"            },
+};
+
+struct SpellSchoolImmune
+{
+    uint32 flag;
+    char const* text;
+};
+
+SpellSchoolImmune const spellSchoolImmunes[MAX_SPELL_SCHOOL] =
+{
+    { SPELL_SCHOOL_NORMAL, "SPELL_SCHOOL_NORMAL" },
+    { SPELL_SCHOOL_HOLY,   "SPELL_SCHOOL_HOLY"   },
+    { SPELL_SCHOOL_FIRE,   "SPELL_SCHOOL_FIRE"   },
+    { SPELL_SCHOOL_NATURE, "SPELL_SCHOOL_NATURE" },
+    { SPELL_SCHOOL_FROST,  "SPELL_SCHOOL_FROST"  },
+    { SPELL_SCHOOL_SHADOW, "SPELL_SCHOOL_SHADOW" },
+    { SPELL_SCHOOL_ARCANE, "SPELL_SCHOOL_ARCANE" },
 };
 
 class npc_commandscript : public CommandScript
@@ -716,6 +744,7 @@ public:
         uint32 faction = target->getFaction();
         uint32 npcflags = target->GetUInt32Value(UNIT_NPC_FLAGS);
         uint32 mechanicImmuneMask = cInfo->MechanicImmuneMask;
+        uint32 spellSchoolImmuneMask = cInfo->SpellSchoolImmuneMask;
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
@@ -740,13 +769,30 @@ public:
         handler->PSendSysMessage(LANG_NPCINFO_AIINFO, target->GetAIName().c_str(), target->GetScriptName().c_str());
 
         for (uint8 i = 0; i < NPCFLAG_COUNT; i++)
+        {
             if (npcflags & npcFlagTexts[i].flag)
+            {
                 handler->PSendSysMessage(npcFlagTexts[i].text, npcFlagTexts[i].flag);
+            }
+        }
 
         handler->PSendSysMessage(LANG_NPCINFO_MECHANIC_IMMUNE, mechanicImmuneMask);
         for (uint8 i = 1; i < MAX_MECHANIC; ++i)
+        {
             if (mechanicImmuneMask & (1 << (mechanicImmunes[i].flag - 1)))
+            {
                 handler->PSendSysMessage(mechanicImmunes[i].text, mechanicImmunes[i].flag);
+            }
+        }
+
+        handler->PSendSysMessage(LANG_NPCINFO_SPELL_SCHOOL_IMMUNE, spellSchoolImmuneMask);
+        for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+        {
+            if (spellSchoolImmuneMask & (1 << spellSchoolImmunes[i].flag))
+            {
+                handler->PSendSysMessage(spellSchoolImmunes[i].text, spellSchoolImmunes[i].flag);
+            }
+        }
 
         return true;
     }
@@ -1050,7 +1096,7 @@ public:
         if (creature)
         {
             // update movement type
-            if (doNotDelete == false)
+            if (!doNotDelete)
                 creature->LoadPath(0);
 
             creature->SetDefaultMovementType(move_type);
@@ -1062,7 +1108,7 @@ public:
             }
             creature->SaveToDB();
         }
-        if (doNotDelete == false)
+        if (!doNotDelete)
         {
             handler->PSendSysMessage(LANG_MOVE_TYPE_SET, type_str);
         }
@@ -1439,13 +1485,11 @@ public:
             return false;
 
         Player* chr = handler->GetSession()->GetPlayer();
-        FormationInfo* group_member;
-
-        group_member                 = new FormationInfo;
-        group_member->follow_angle   = (creature->GetAngle(chr) - chr->GetOrientation()) * 180 / M_PI;
-        group_member->follow_dist    = sqrtf(pow(chr->GetPositionX() - creature->GetPositionX(), int(2)) + pow(chr->GetPositionY() - creature->GetPositionY(), int(2)));
-        group_member->leaderGUID     = leaderGUID;
-        group_member->groupAI        = 0;
+        FormationInfo group_member;
+        group_member.follow_angle   = (creature->GetAngle(chr) - chr->GetOrientation()) * 180 / M_PI;
+        group_member.follow_dist    = sqrtf(pow(chr->GetPositionX() - creature->GetPositionX(), int(2)) + pow(chr->GetPositionY() - creature->GetPositionY(), int(2)));
+        group_member.leaderGUID     = leaderGUID;
+        group_member.groupAI        = 0;
 
         sFormationMgr->CreatureGroupMap[lowguid] = group_member;
         creature->SearchFormation();
@@ -1453,9 +1497,9 @@ public:
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE_FORMATION);
         stmt->setUInt32(0, leaderGUID);
         stmt->setUInt32(1, lowguid);
-        stmt->setFloat(2, group_member->follow_dist);
-        stmt->setFloat(3, group_member->follow_angle);
-        stmt->setUInt32(4, uint32(group_member->groupAI));
+        stmt->setFloat(2, group_member.follow_dist);
+        stmt->setFloat(3, group_member.follow_angle);
+        stmt->setUInt32(4, uint32(group_member.groupAI));
 
         WorldDatabase.Execute(stmt);
 

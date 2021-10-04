@@ -1,14 +1,25 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef Realm_h__
 #define Realm_h__
 
+#include "AsioHacksFwd.h"
 #include "Common.h"
-// #include "AsioHacksFwd.h"
-#include <ace/INET_Addr.h>
 
 enum RealmFlags
 {
@@ -56,9 +67,9 @@ struct AC_SHARED_API Realm
 {
     RealmHandle Id;
     uint32 Build;
-    std::unique_ptr<ACE_INET_Addr> ExternalAddress;
-    std::unique_ptr<ACE_INET_Addr> LocalAddress;
-    std::unique_ptr<ACE_INET_Addr> LocalSubnetMask;
+    std::unique_ptr<boost::asio::ip::address> ExternalAddress;
+    std::unique_ptr<boost::asio::ip::address> LocalAddress;
+    std::unique_ptr<boost::asio::ip::address> LocalSubnetMask;
     uint16 Port;
     std::string Name;
     uint8 Type;
@@ -67,7 +78,7 @@ struct AC_SHARED_API Realm
     AccountTypes AllowedSecurityLevel;
     float PopulationLevel;
 
-    // boost::asio::ip::tcp_endpoint GetAddressForClient(boost::asio::ip::address const& clientAddr) const;
+    boost::asio::ip::tcp_endpoint GetAddressForClient(boost::asio::ip::address const& clientAddr) const;
 };
 
 #endif // Realm_h__

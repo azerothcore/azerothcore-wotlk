@@ -1,8 +1,21 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -30,6 +43,7 @@ enum SpellData
     NPC_PROXIMITY_MINE                              = 34362,
     SPELL_MINE_EXPLOSION_25                         = 63009,
     SPELL_MINE_EXPLOSION_10                         = 66351,
+    SPELL_SUMMON_PROXIMITY_MINE                     = 65347,
 
     // PHASE 2:
     SPELL_HEAT_WAVE                                 = 64533,
@@ -454,12 +468,14 @@ public:
                             if( !pg.empty() )
                             {
                                 uint8 index = urand(0, pg.size() - 1);
-                                Player* p = pg[index];
+                                Player* player = pg[index];
                                 float angle = rand_norm() * 2 * M_PI;
                                 float z = 364.35f;
-                                if (!p->IsWithinLOS(p->GetPositionX() + cos(angle) * 5.0f, p->GetPositionY() + sin(angle) * 5.0f, z))
-                                    angle = p->GetAngle(2744.65f, 2569.46f);
-                                me->CastSpell(p->GetPositionX() + cos(angle) * 5.0f, p->GetPositionY() + sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
+                                if (!player->IsWithinLOS(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + sin(angle) * 5.0f, z))
+                                {
+                                    angle = player->GetAngle(2744.65f, 2569.46f);
+                                }
+                                me->CastSpell(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
                                 pg.erase(pg.begin() + index);
                             }
 
@@ -1158,20 +1174,9 @@ public:
                     events.ScheduleEvent(EVENT_PROXIMITY_MINES_1, 8000);
                     break;
                 case EVENT_PROXIMITY_MINES_1:
+                    for (uint8 i = 0; i < 10; ++i)
                     {
-                        float angle = rand_norm() * 2 * M_PI;
-                        float x, y, z;
-                        me->GetPosition(x, y, z);
-                        for( uint8 i = 0; i < 17; ++i )
-                        {
-                            if( i == 7 )
-                                continue;
-
-                            float v_xmin = 0.1f * cos( angle + i * M_PI / 9 );
-                            float v_ymin = 0.1f * sin( angle + i * M_PI / 9 );
-                            if( Creature* pmNPC = me->SummonCreature(NPC_PROXIMITY_MINE, x + v_xmin, y + v_ymin, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 40000) )
-                                pmNPC->KnockbackFrom(x, y, 6.0f, 25.0f);
-                        }
+                        me->CastSpell(me, SPELL_SUMMON_PROXIMITY_MINE, true);
                     }
                     break;
                 case EVENT_FLAME_SUPPRESSION_50000:
@@ -2321,7 +2326,7 @@ public:
 
         void RemoveAll()
         {
-            for (ObjectGuid guid : FlameList)
+            for (ObjectGuid const& guid : FlameList)
                 if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                     c->DespawnOrUnsummon();
             FlameList.clear();
@@ -2413,7 +2418,7 @@ public:
                 case SPELL_WATER_SPRAY:
                     {
                         if (me->IsSummon())
-                            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                                 if (Creature* c = summoner->ToCreature())
                                     if (c->AI())
                                         CAST_AI(npc_ulduar_flames_initial::npc_ulduar_flames_initialAI, c->AI())->RemoveFlame(me->GetGUID());

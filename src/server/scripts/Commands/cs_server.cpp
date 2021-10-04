@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -17,15 +28,14 @@ EndScriptData */
 #include "GitRevision.h"
 #include "Language.h"
 #include "MySQLThreading.h"
-#include "ObjectAccessor.h"
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "StringConvert.h"
 #include "VMapFactory.h"
-#include "VMapManager2.h"
-#include <boost/filesystem/operations.hpp>
+#include "VMapMgr2.h"
+#include <filesystem>
 #include <boost/version.hpp>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
@@ -117,7 +127,6 @@ public:
 
         handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
         handler->PSendSysMessage("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-        handler->PSendSysMessage("Using ACE version: %s", ACE_VERSION);
         handler->PSendSysMessage("Using Boost version: %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         handler->PSendSysMessage("Using MySQL version: %u", MySQL::GetLibraryVersion());
         handler->PSendSysMessage("Using CMake version: %s", GitRevision::GetCMakeVersion());
@@ -128,8 +137,8 @@ public:
         handler->PSendSysMessage("%s", dbPortOutput.c_str());
 
         bool vmapIndoorCheck = sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
-        bool vmapLOSCheck = VMAP::VMapFactory::createOrGetVMapManager()->isLineOfSightCalcEnabled();
-        bool vmapHeightCheck = VMAP::VMapFactory::createOrGetVMapManager()->isHeightCalcEnabled();
+        bool vmapLOSCheck = VMAP::VMapFactory::createOrGetVMapMgr()->isLineOfSightCalcEnabled();
+        bool vmapHeightCheck = VMAP::VMapFactory::createOrGetVMapMgr()->isHeightCalcEnabled();
 
         bool mmapEnabled = sWorld->getBoolConfig(CONFIG_ENABLE_MMAPS);
 
@@ -154,20 +163,20 @@ public:
 
         for (std::string const& subDir : subDirs)
         {
-            boost::filesystem::path mapPath(dataDir);
+            std::filesystem::path mapPath(dataDir);
             mapPath /= subDir;
 
-            if (!boost::filesystem::exists(mapPath))
+            if (!std::filesystem::exists(mapPath))
             {
                 handler->PSendSysMessage("%s directory doesn't exist!. Using path: %s", subDir.c_str(), mapPath.generic_string().c_str());
                 continue;
             }
 
-            auto end = boost::filesystem::directory_iterator();
-            std::size_t folderSize = std::accumulate(boost::filesystem::directory_iterator(mapPath), end, std::size_t(0), [](std::size_t val, boost::filesystem::path const& mapFile)
+            auto end = std::filesystem::directory_iterator();
+            std::size_t folderSize = std::accumulate(std::filesystem::directory_iterator(mapPath), end, std::size_t(0), [](std::size_t val, std::filesystem::path const& mapFile)
             {
-                if (boost::filesystem::is_regular_file(mapFile))
-                    val += boost::filesystem::file_size(mapFile);
+                if (std::filesystem::is_regular_file(mapFile))
+                    val += std::filesystem::file_size(mapFile);
                 return val;
             });
 

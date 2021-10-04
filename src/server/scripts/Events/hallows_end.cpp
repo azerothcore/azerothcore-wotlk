@@ -1,4 +1,19 @@
-// Scripted by Xinef
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "CellImpl.h"
 #include "GossipDef.h"
@@ -699,7 +714,7 @@ public:
                             if (counter > 12)
                             {
                                 bool failed = false;
-                                for (ObjectGuid const guid : unitList)
+                                for (ObjectGuid const& guid : unitList)
                                     if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                                         if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                                         {
@@ -753,7 +768,7 @@ public:
         Unit* getTrigger()
         {
             std::list<Unit*> tmpList;
-            for (ObjectGuid const guid : unitList)
+            for (ObjectGuid const& guid : unitList)
                 if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                     if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                         tmpList.push_back(c);
@@ -772,7 +787,7 @@ public:
             {
                 me->MonsterYell("Fire consumes! You've tried and failed. Let there be no doubt, justice prevailed!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(11967);
-                for (ObjectGuid const guid : unitList)
+                for (ObjectGuid const& guid : unitList)
                     if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                         c->RemoveAllAuras();
 
@@ -1272,7 +1287,7 @@ public:
         Unit* GetOwner()
         {
             if (me->ToTempSummon())
-                return me->ToTempSummon()->GetSummoner();
+                return me->ToTempSummon()->GetSummonerUnit();
 
             return nullptr;
         }

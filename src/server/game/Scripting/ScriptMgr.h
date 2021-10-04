@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SC_SCRIPTMGR_H
@@ -144,11 +155,11 @@ public:
     virtual void OnNetworkStop() { }
 
     // Called when a remote socket establishes a connection to the server. Do not store the socket object.
-    virtual void OnSocketOpen(WorldSocket* /*socket*/) { }
+    virtual void OnSocketOpen(std::shared_ptr<WorldSocket> /*socket*/) { }
 
     // Called when a socket is closed. Do not store the socket object, and do not rely on the connection
     // being open; it is not.
-    virtual void OnSocketClose(WorldSocket* /*socket*/, bool /*wasNew*/) { }
+    virtual void OnSocketClose(std::shared_ptr<WorldSocket> /*socket*/) { }
 
     // Called when a packet is sent to a client. The packet object is a copy of the original packet, so reading
     // and modifying it is safe.
@@ -194,6 +205,13 @@ public:
 
     // Called when the world is actually shut down.
     virtual void OnShutdown() { }
+
+    /**
+     * @brief This hook runs before finalizing the player world session. Can be also used to mutate the cache version of the Client.
+     *
+     * @param version The cache version that we will be sending to the Client.
+     */
+    virtual void OnBeforeFinalizePlayerWorldSession(uint32& /*cacheVersion*/) {}
 };
 
 class FormulaScript : public ScriptObject
@@ -823,6 +841,9 @@ public:
     // Called when a player is added to battleground
     virtual void OnAddToBattleground(Player* /*player*/, Battleground* /*bg*/) { }
 
+    // Called when a player queues a Random Dungeon using the RDF (Random Dungeon Finder)
+    virtual void OnQueueRandomDungeon(Player* /*player*/, uint32 & /*rDungeonId*/) { }
+
     // Called when a player is removed from battleground
     virtual void OnRemoveFromBattleground(Player* /*player*/, Battleground* /*bg*/) { }
 
@@ -1199,9 +1220,26 @@ public:
 
     [[nodiscard]] virtual bool CanSendMessageBGQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
 
-    [[nodiscard]] bool CanSendJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, GroupQueueInfo* /*ginfo*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isRated*/) { return true; }
+    /**
+     * @brief This hook runs before sending the join message during the arena queue, allowing you to run extra operations or disabling the join message
+     *
+     * @param queue Contains information about the Arena queue
+     * @param leader Contains information about the player leader
+     * @param ginfo Contains information about the group of the queue
+     * @param bracketEntry Contains information about the bracket
+     * @param isRated Contains information about rated arena or skirmish
+     * @return True if you want to continue sending the message, false if you want to disable the message
+     */
+    [[nodiscard]] virtual bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, GroupQueueInfo* /*ginfo*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isRated*/) { return true; }
 
-    [[nodiscard]] bool CanExitJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/) { return true; }
+    /**
+     * @brief This hook runs before sending the exit message during the arena queue, allowing you to run extra operations or disabling the exit message
+     *
+     * @param queue Contains information about the Arena queue
+     * @param ginfo Contains information about the group of the queue
+     * @return True if you want to continue sending the message, false if you want to disable the message
+     */
+    [[nodiscard]] virtual bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/) { return true; }
 };
 
 class ArenaTeamScript : public ScriptObject
@@ -1439,8 +1477,8 @@ public: /* SpellScriptLoader */
 public: /* ServerScript */
     void OnNetworkStart();
     void OnNetworkStop();
-    void OnSocketOpen(WorldSocket* socket);
-    void OnSocketClose(WorldSocket* socket, bool wasNew);
+    void OnSocketOpen(std::shared_ptr<WorldSocket> socket);
+    void OnSocketClose(std::shared_ptr<WorldSocket> socket);
     void OnPacketReceive(WorldSession* session, WorldPacket const& packet);
     void OnPacketSend(WorldSession* session, WorldPacket const& packet);
 
@@ -1449,6 +1487,7 @@ public: /* WorldScript */
     void OnOpenStateChange(bool open);
     void OnBeforeConfigLoad(bool reload);
     void OnAfterConfigLoad(bool reload);
+    void OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion);
     void OnMotdChange(std::string& newMotd);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
     void OnShutdownCancel();
@@ -1610,6 +1649,7 @@ public: /* PlayerScript */
     bool OnBeforePlayerTeleport(Player* player, uint32 mapid, float x, float y, float z, float orientation, uint32 options, Unit* target);
     void OnPlayerUpdateFaction(Player* player);
     void OnPlayerAddToBattleground(Player* player, Battleground* bg);
+    void OnPlayerQueueRandomDungeon(Player* player, uint32 & rDungeonId);
     void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
     void OnAchievementComplete(Player* player, AchievementEntry const* achievement);
     bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
@@ -1802,8 +1842,8 @@ public: /* BGScript */
                                         BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
     void OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers);
     bool CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
-    bool CanSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
-    bool CanExitJoinMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
+    bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
+    bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);

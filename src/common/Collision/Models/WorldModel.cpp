@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "WorldModel.h"
@@ -14,7 +25,7 @@ using G3D::Ray;
 
 template<> struct BoundsTrait<VMAP::GroupModel>
 {
-    static void getBounds(const VMAP::GroupModel& obj, G3D::AABox& out) { out = obj.GetBound(); }
+    static void GetBounds(const VMAP::GroupModel& obj, G3D::AABox& out) { out = obj.GetBound(); }
 };
 
 namespace VMAP
@@ -160,7 +171,7 @@ namespace VMAP
 
         // check if tile shall be used for liquid level
         // checking for 0x08 *might* be enough, but disabled tiles always are 0x?F:
-        if ((iFlags[tx + ty * iTilesX] & 0x0F) == 0x0F)
+        if (iFlags && (iFlags[tx + ty * iTilesX] & 0x0F) == 0x0F)
         {
             return false;
         }
@@ -181,6 +192,11 @@ namespace VMAP
             x---------x---> dx
           0           1
         */
+
+        if (!iHeight)
+        {
+            return false;
+        }
 
         const uint32 rowOffset = iTilesX + 1;
         if (dx > dy) // case (a)
@@ -257,7 +273,7 @@ namespace VMAP
         return result;
     }
 
-    void WmoLiquid::getPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const
+    void WmoLiquid::GetPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const
     {
         tilesX = iTilesX;
         tilesY = iTilesY;
@@ -289,7 +305,7 @@ namespace VMAP
         bool result = true;
         uint32 chunkSize, count;
 
-        if (result && fwrite(&iBound, sizeof(G3D::AABox), 1, wf) != 1) { result = false; }
+        if (fwrite(&iBound, sizeof(G3D::AABox), 1, wf) != 1) { result = false; }
         if (result && fwrite(&iMogpFlags, sizeof(uint32), 1, wf) != 1) { result = false; }
         if (result && fwrite(&iGroupWMOID, sizeof(uint32), 1, wf) != 1) { result = false; }
 
@@ -343,7 +359,7 @@ namespace VMAP
         delete iLiquid;
         iLiquid = nullptr;
 
-        if (result && fread(&iBound, sizeof(G3D::AABox), 1, rf) != 1) { result = false; }
+        if (fread(&iBound, sizeof(G3D::AABox), 1, rf) != 1) { result = false; }
         if (result && fread(&iMogpFlags, sizeof(uint32), 1, rf) != 1) { result = false; }
         if (result && fread(&iGroupWMOID, sizeof(uint32), 1, rf) != 1) { result = false; }
 
@@ -412,7 +428,6 @@ namespace VMAP
         {
             return false;
         }
-        GModelRayCallback callback(triangles, vertices);
         Vector3 rPos = pos - 0.1f * down;
         float dist = G3D::inf();
         G3D::Ray ray(rPos, down);
@@ -442,7 +457,7 @@ namespace VMAP
         return 0;
     }
 
-    void GroupModel::getMeshData(std::vector<G3D::Vector3>& outVertices, std::vector<MeshTriangle>& outTriangles, WmoLiquid*& liquid)
+    void GroupModel::GetMeshData(std::vector<G3D::Vector3>& outVertices, std::vector<MeshTriangle>& outTriangles, WmoLiquid*& liquid)
     {
         outVertices = vertices;
         outTriangles = triangles;
@@ -454,7 +469,7 @@ namespace VMAP
     void WorldModel::setGroupModels(std::vector<GroupModel>& models)
     {
         groupModels.swap(models);
-        groupTree.build(groupModels, BoundsTrait<GroupModel>::getBounds, 1);
+        groupTree.build(groupModels, BoundsTrait<GroupModel>::GetBounds, 1);
     }
 
     struct WModelRayCallBack
@@ -554,6 +569,7 @@ namespace VMAP
         groupTree.intersectPoint(p, callback);
         if (callback.hit != groupModels.end())
         {
+            info.rootId   = RootWMOID;
             info.hitModel = &(*callback.hit);
             dist = callback.zDist;
             return true;
@@ -621,7 +637,7 @@ namespace VMAP
         {
             //if (fread(&chunkSize, sizeof(uint32), 1, rf) != 1) result = false;
 
-            if (result && fread(&count, sizeof(uint32), 1, rf) != 1) { result = false; }
+            if (fread(&count, sizeof(uint32), 1, rf) != 1) { result = false; }
             if (result) { groupModels.resize(count); }
             //if (result && fread(&groupModels[0], sizeof(GroupModel), count, rf) != count) result = false;
             for (uint32 i = 0; i < count && result; ++i)
@@ -638,7 +654,7 @@ namespace VMAP
         return result;
     }
 
-    void WorldModel::getGroupModels(std::vector<GroupModel>& outGroupModels)
+    void WorldModel::GetGroupModels(std::vector<GroupModel>& outGroupModels)
     {
         outGroupModels = groupModels;
     }

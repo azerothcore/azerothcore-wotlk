@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ArenaTeam.h"
@@ -27,7 +38,7 @@
 #include "GameGraveyard.h"
 #include "Map.h"
 #include "MapInstanced.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -105,25 +116,25 @@ void BattlegroundMgr::Update(uint32 diff)
             uint32 arenaRatedTeamId = scheduled[i] >> 32;
             BattlegroundQueueTypeId bgQueueTypeId = BattlegroundQueueTypeId(scheduled[i] >> 16 & 255);
             BattlegroundBracketId bracket_id = BattlegroundBracketId(scheduled[i] & 255);
-            m_BattlegroundQueues[bgQueueTypeId].BattlegroundQueueUpdate(bracket_id, true, arenaRatedTeamId); // pussywizard: looking for opponents only for this team
+            m_BattlegroundQueues[bgQueueTypeId].BattlegroundQueueUpdate(diff, bracket_id, true, arenaRatedTeamId); // pussywizard: looking for opponents only for this team
         }
     }
 
     // periodic queue update
     if (m_NextPeriodicQueueUpdateTime < diff)
     {
+        m_NextPeriodicQueueUpdateTime = 5 * IN_MILLISECONDS;
+
         // for rated arenas
         for (uint32 qtype = BATTLEGROUND_QUEUE_2v2; qtype < MAX_BATTLEGROUND_QUEUE_TYPES; ++qtype)
             for (uint32 bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
-                m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(BattlegroundBracketId(bracket), true, 0); // pussywizard: 0 for rated means looking for opponents for every team
+                m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(m_NextPeriodicQueueUpdateTime, BattlegroundBracketId(bracket), true, 0); // pussywizard: 0 for rated means looking for opponents for every team
 
         // for battlegrounds and not rated arenas
         // in first loop try to fill already running battlegrounds, then in a second loop try to create new battlegrounds
         for (uint32 qtype = BATTLEGROUND_QUEUE_AV; qtype < MAX_BATTLEGROUND_QUEUE_TYPES; ++qtype)
             for (uint32 bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
-                m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(BattlegroundBracketId(bracket), false, 0);
-
-        m_NextPeriodicQueueUpdateTime = 5 * IN_MILLISECONDS;
+                m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(m_NextPeriodicQueueUpdateTime, BattlegroundBracketId(bracket), false, 0);
     }
     else
         m_NextPeriodicQueueUpdateTime -= diff;
@@ -231,11 +242,11 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
     }
 
     if (bg->GetStatus() != STATUS_WAIT_LEAVE)
-        *data << uint8(0);                                     // bg not ended
+        *data << uint8(0);                                          // bg not ended
     else
     {
-        *data << uint8(1);                                     // bg ended
-        *data << uint8(bg->GetWinner());                       // who win
+        *data << uint8(1);                                          // bg ended
+        *data << uint8(bg->GetWinner() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE); // who win
     }
 
     size_t wpos = data->wpos();

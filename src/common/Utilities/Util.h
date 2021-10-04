@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _UTIL_H
@@ -10,7 +21,6 @@
 #include "Containers.h"
 #include "Define.h"
 #include "Errors.h"
-#include <ace/INET_Addr.h>
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -18,6 +28,9 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <list>
+#include <map>
+#include <array>
 
 // Searcher for map of structs
 template<typename T, class S> struct Finder
@@ -382,12 +395,6 @@ void vutf8printf(FILE* out, const char* str, va_list* ap);
 bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 bool IsIPAddress(char const* ipaddress);
-
-/// Checks if address belongs to the a network with specified submask
-bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_INET_Addr const& subnetMask);
-
-/// Transforms ACE_INET_Addr address into string format "dotted_ip:port"
-std::string GetAddressString(ACE_INET_Addr const& addr);
 
 uint32 CreatePIDFile(const std::string& filename);
 uint32 GetPID();
