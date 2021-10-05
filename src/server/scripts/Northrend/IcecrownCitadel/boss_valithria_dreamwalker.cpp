@@ -363,7 +363,10 @@ public:
             }
             else if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
                 if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
+                {
                     trigger->AI()->DoAction(ACTION_ENTER_COMBAT);
+                    _instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, IN_PROGRESS);
+                }
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
