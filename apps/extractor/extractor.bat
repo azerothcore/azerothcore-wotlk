@@ -38,6 +38,12 @@ GOTO MENU
 
 :VMAPS
 start /b /w vmap4extractor.exe
+if exist vmaps\ (
+    echo folder found.
+) else (
+    echo creating folder "vmaps".
+    mkdir "vmaps"
+)
 start /b /w vmap4assembler.exe Buildings vmaps
 rmdir Buildings /s /q
 GOTO MENU
@@ -45,12 +51,30 @@ GOTO MENU
 :MMAPS
 ECHO This may take a few hours to complete. Please be patient.
 PAUSE
+if exist mmaps\ (
+    echo folder found.
+) else (
+    echo creating folder "mmaps".
+    mkdir "mmaps"
+)
 start /b /w mmaps_generator.exe
 GOTO MENU
 
 :ALL
 ECHO This may take a few hours to complete. Please be patient.
 PAUSE
+if exist vmaps\ (
+    echo folder found.
+) else (
+    echo creating folder "vmaps".
+    mkdir "vmaps"
+)
+if exist mmaps\ (
+    echo folder found.
+) else (
+    echo creating folder "mmaps".
+    mkdir "mmaps"
+)
 start /b /w mapextractor.exe
 start /b /w vmap4extractor.exe
 start /b /w vmap4assembler.exe Buildings vmaps
