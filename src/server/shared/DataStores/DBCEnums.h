@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef DBCENUMS_H
@@ -293,9 +304,20 @@ enum FactionFlags
 
 enum FactionTemplateFlags
 {
-    FACTION_TEMPLATE_FLAG_PVP               = 0x00000800,   // flagged for PvP
-    FACTION_TEMPLATE_FLAG_CONTESTED_GUARD   = 0x00001000,   // faction will attack players that were involved in PvP combats
-    FACTION_TEMPLATE_FLAG_HOSTILE_BY_DEFAULT = 0x00002000,
+    FACTION_TEMPLATE_FLAG_RESPOND_TO_CALL_FOR_HELP           = 0x0001, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_LOW_PRIORITY  = 0x0002, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_MED_PRIORITY  = 0x0004, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_BROADCAST_TO_ENEMIES_HIGH_PRIORITY = 0x0008, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_LOW_PRIORITY    = 0x0010, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_MED_PRIORITY    = 0x0020, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_ENEMIES_HIGH_PRIORITY   = 0x0040, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_LOW_PRIORITY    = 0x0080, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_MED_PRIORITY    = 0x0100, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_SEARCH_FOR_FRIENDS_HIGH_PRIORITY   = 0x0200, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_FLEE_FROM_CALL_FOR_HELP            = 0x0400, //@todo Not implemented.
+    FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS                     = 0x0800, // Old title: FACTION_TEMPLATE_FLAG_ASSIST_PLAYERS, Old comment: flagged for PvP //@todo: Should see if this is implemented correctly.
+    FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS          = 0x1000, // Old title: FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS, Old comment: faction will attack players that were involved in PvP combats //@todo: Should see if this is implemented correctly.
+    FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS           = 0x2000, // Old title: FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS, Old comment: //@todo: Should see if this is implemented correctly.
 };
 
 enum FactionMasks

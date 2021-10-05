@@ -1253,16 +1253,6 @@ DeletedCharacterTicketTrace = 0
 DungeonFinder.OptionsMask = 1
 
 #
-#     DungeonFinder.Expansion
-#        Description: Allow setting which expansion can be used in LFG
-#           2 - Wotlk (Default)
-#           1 - TBC
-#           0 - Classic
-#        Default:     2
-
-DungeonFinder.Expansion = 2
-
-#
 #   AccountInstancesPerHour
 #        Description: Controls the max amount of different instances player can enter within hour
 #        Default:     5
@@ -2843,6 +2833,23 @@ Arena.QueueAnnouncer.Enable = 0
 Arena.QueueAnnouncer.PlayerOnly = 0
 
 #
+#    Battleground.QueueAnnouncer.Timed
+#        Description: Enabled battleground queue announcements based on timer
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled - Set Arena.QueueAnnouncer.Timer)
+#
+
+Battleground.QueueAnnouncer.Timed = 0
+
+#
+#    Battleground.QueueAnnouncer.Timer
+#        Description: Set timer for queue announcements
+#        Default:     30000 (30 sec)
+#
+
+Battleground.QueueAnnouncer.Timer = 30000
+
+#
 #    Arena.ArenaSeason.ID
 #        Description: Current arena season id shown in clients.
 #        Default:     8
@@ -3540,6 +3547,14 @@ Item.SetItemTradeable = 1
 #        Default:     30 sec
 
 FFAPvPTimer = 30
+
+#
+#     LootNeedBeforeGreedILvlRestriction
+#        Description: Specify level restriction for items below player's subclass in Need Before Greed loot mode in DF groups
+#        Default:     70
+#                     0 - Disabled
+
+LootNeedBeforeGreedILvlRestriction = 70
 
 #
 ###################################################################################################

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _SPELLMGR_H
@@ -201,6 +212,7 @@ enum ProcFlagsExLegacy
     PROC_EX_ONLY_ACTIVE_SPELL   = 0x0040000,                 // Spell has to do damage/heal to proc
     PROC_EX_NO_OVERHEAL         = 0x0080000,                 // Proc if heal did some work
     PROC_EX_NO_AURA_REFRESH     = 0x0100000,                 // Proc if aura was not refreshed
+    PROC_EX_ONLY_FIRST_TICK     = 0x0200000,                 // Proc only on first tick (in case of periodic spells)
 
     // Flags for internal use - do not use these in db!
     PROC_EX_INTERNAL_CANT_PROC  = 0x0800000,
@@ -312,20 +324,21 @@ typedef std::unordered_map<uint32, SpellBonusEntry>     SpellBonusMap;
 
 enum SpellGroupSpecialFlags
 {
-    SPELL_GROUP_SPECIAL_FLAG_NONE               = 0x000,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE      = 0x001,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN    = 0x002,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE    = 0x004,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH   = 0x008,
-    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX = 0x00F,
-    SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST   = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
-    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK = 0x020,
-    SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK  = 0x040,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY1          = 0x100,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY2          = 0x200,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY3          = 0x400,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY4          = 0x800,
-    SPELL_GROUP_SPECIAL_FLAG_MAX                = 0x1000,
+    SPELL_GROUP_SPECIAL_FLAG_NONE                   = 0x000,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE          = 0x001,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN        = 0x002,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE        = 0x004,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH       = 0x008,
+    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX    = 0x00F,
+    SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST       = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
+    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK    = 0x020,
+    SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK      = 0x040,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY1              = 0x100,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY2              = 0x200,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY3              = 0x400,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY4              = 0x800,
+    SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK       = 0x1000,
+    SPELL_GROUP_SPECIAL_FLAG_MAX                    = 0x2000
 };
 
 enum SpellGroupStackFlags
@@ -649,7 +662,7 @@ public:
 
     // Spell proc event table
     [[nodiscard]] SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
-    bool IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellInfo const* procSpell, uint32 procFlags, uint32 procExtra, bool active) const;
+    bool IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, ProcEventInfo const& eventInfo, bool active) const;
 
     // Spell proc table
     [[nodiscard]] SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_LOOTMGR_H
@@ -11,7 +22,7 @@
 #include "ConditionMgr.h"
 #include "ItemEnchantmentMgr.h"
 #include "ObjectGuid.h"
-#include "RefManager.h"
+#include "RefMgr.h"
 #include "SharedDefines.h"
 #include <list>
 #include <map>
@@ -117,7 +128,7 @@ struct Loot;
 struct LootStoreItem
 {
     uint32  itemid;                                         // id of the item
-    uint32  reference;                                      // referenced TemplateleId
+    int32   reference;                                      // referenced TemplateleId
     float   chance;                                         // chance to drop for both quest and non-quest items, chance to be used for refs
     bool    needs_quest : 1;                                // quest drop (quest is required for item to drop)
     uint16  lootmode;
@@ -128,7 +139,7 @@ struct LootStoreItem
 
     // Constructor
     // displayid is filled in IsValid() which must be called after
-    LootStoreItem(uint32 _itemid, uint32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
+    LootStoreItem(uint32 _itemid, int32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
         : itemid(_itemid), reference(_reference), chance(_chance), needs_quest(_needs_quest),
           lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount)
     {}
@@ -278,13 +289,13 @@ public:
 
 //=====================================================
 
-class LootValidatorRefManager : public RefManager<Loot, LootValidatorRef>
+class LootValidatorRefMgr : public RefMgr<Loot, LootValidatorRef>
 {
 public:
     typedef LinkedListHead::Iterator< LootValidatorRef > iterator;
 
-    LootValidatorRef* getFirst() { return (LootValidatorRef*)RefManager<Loot, LootValidatorRef>::getFirst(); }
-    LootValidatorRef* getLast() { return (LootValidatorRef*)RefManager<Loot, LootValidatorRef>::getLast(); }
+    LootValidatorRef* getFirst() { return (LootValidatorRef*)RefMgr<Loot, LootValidatorRef>::getFirst(); }
+    LootValidatorRef* getLast() { return (LootValidatorRef*)RefMgr<Loot, LootValidatorRef>::getLast(); }
 
     iterator begin() { return iterator(getFirst()); }
     iterator end() { return iterator(nullptr); }
@@ -324,7 +335,7 @@ struct Loot
     // if loot becomes invalid this reference is used to inform the listener
     void addLootValidatorRef(LootValidatorRef* pLootValidatorRef)
     {
-        i_LootValidatorRefManager.insertFirst(pLootValidatorRef);
+        i_LootValidatorRefMgr.insertFirst(pLootValidatorRef);
     }
 
     // void clear();
@@ -348,7 +359,7 @@ struct Loot
         gold = 0;
         unlootedCount = 0;
         roundRobinPlayer.Clear();
-        i_LootValidatorRefManager.clearReferences();
+        i_LootValidatorRefMgr.clearReferences();
         loot_type = LOOT_NONE;
     }
 
@@ -386,7 +397,7 @@ private:
     QuestItemMap PlayerNonQuestNonFFAConditionalItems;
 
     // All rolls are registered here. They need to know, when the loot is not valid anymore
-    LootValidatorRefManager i_LootValidatorRefManager;
+    LootValidatorRefMgr i_LootValidatorRefMgr;
 };
 
 struct LootView

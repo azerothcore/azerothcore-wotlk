@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "AccountMgr.h"
 #include "Cell.h"
@@ -1761,15 +1774,15 @@ public:
                 me->GetPosition(&myPos);
                 me->NearTeleportTo(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), c->GetOrientation());
                 c->NearTeleportTo(myPos.GetPositionX(), myPos.GetPositionY(), myPos.GetPositionZ(), myPos.GetOrientation());
-                const ThreatContainer::StorageType me_tl = me->getThreatManager().getThreatList();
-                const ThreatContainer::StorageType target_tl = c->getThreatManager().getThreatList();
+                const ThreatContainer::StorageType me_tl = me->getThreatMgr().getThreatList();
+                const ThreatContainer::StorageType target_tl = c->getThreatMgr().getThreatList();
                 DoResetThreat();
                 for (ThreatContainer::StorageType::const_iterator iter = target_tl.begin(); iter != target_tl.end(); ++iter)
-                    me->getThreatManager().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    me->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
 
-                c->getThreatManager().resetAllAggro();
+                c->getThreatMgr().resetAllAggro();
                 for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
-                    c->getThreatManager().addThreat((*iter)->getTarget(), (*iter)->getThreat());
+                    c->getThreatMgr().addThreat((*iter)->getTarget(), (*iter)->getThreat());
             }
         }
 
