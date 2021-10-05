@@ -725,23 +725,33 @@ public:
         }
     }
 };
-/*
+
 
 class go_rookery_egg : public GameObjectScript
 {
 public:
     go_rookery_egg() : GameObjectScript("go_rookery_egg"){}
-
-    void OnStateChange() {
-        
-    }
-
-    void OnLootStateChanged(GameObject* go, uint32 state, Unit* /*unit*//*) override
+    enum STATES
     {
-    
+        READY = 0,
+        HATCHED = 1
+    };
+
+    void OnGameObjectStateChanged(GameObject* go, uint32 state)
+    {
+        switch (state)
+        {
+        case READY:
+            break;
+        case HATCHED:
+            go->CastSpell(go->SelectNearestPlayer(), 15746);
+            break;
+        default:
+            break;
+        }
     }
 };
-*/
+
 void AddSC_instance_blackrock_spire()
 {
     new instance_blackrock_spire();

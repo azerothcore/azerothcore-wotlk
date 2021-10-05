@@ -94,12 +94,14 @@ public:
                 case SPELL_HATCH_EGG:
                     if (!targetEgg) // no target, try to find one
                     {
+                        minDist = 50;
+                        tempDist = 50;
                         LOG_FATAL("Entities:unit", "Looking for an egg");
-                        me->GetGameObjectListWithEntryInGrid(nearbyEggs, DB_ENTRY_ROOKERY_EGG, 20);
+                        me->GetGameObjectListWithEntryInGrid(nearbyEggs, DB_ENTRY_ROOKERY_EGG, 40);
                         LOG_FATAL("Entities:unit", "found %d eggs", nearbyEggs.size());
                         for (const auto& egg : nearbyEggs)
                         {
-                            if (egg->GetGoState() == GO_STATE_READY)
+                            if (egg->getLootState() == GO_READY)
                             {
                                 LOG_FATAL("Entities:unit", "found an egg ready");
                                 tempDist = me->GetDistance2d(egg);
@@ -119,15 +121,18 @@ public:
                     //if (GameObject* egg = me->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_TRAP, 60))
                     if (targetEgg) //have a target, go to it and cast it
                     {
+                        LOG_FATAL("entities:unit", "trying to reach the egg at %f %f", targetEgg->GetPositionX(), targetEgg->GetPositionY());
                         me->GetMotionMaster()->MovePoint(0, targetEgg->GetPosition());
-                        if (me->GetDistance2d(targetEgg) < 5)
+                        /* if (me->GetDistance2d(targetEgg) < 2)
                         {
                             me->StopMovingOnCurrentPos();
                             DoCast(SPELL_HATCH_EGG);
+                            LOG_FATAL("Entities:unit", "Trying to set the egg to used. %d", targetEgg->getLootState());
+                            targetEgg->SetLootState(GO_JUST_DEACTIVATED);
                     //        targetEgg->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                             targetEgg = nullptr;
                             events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
-                        }
+                        }*/
                     }
                     break;
                 default:
@@ -136,15 +141,31 @@ public:
             }
 
             // cast takes 1.5second, during which we don't have a target
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+            if (targetEgg && targetEgg->getLootState() == GO_READY && me->GetDistance2d(targetEgg) < 5)
             {
                 me->StopMovingOnCurrentPos();
+                DoCast(SPELL_HATCH_EGG);
+                LOG_FATAL("Entities:unit", "Trying to set the egg to used. %d", targetEgg->getLootState());
+                targetEgg->SetLootState(GO_JUST_DEACTIVATED);
+                //        targetEgg->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                targetEgg = nullptr;
+                me->CallForHelp(10);
+                events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
+            }
+            else if(me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                me->StopMovingOnCurrentPos();
+                LOG_FATAL("entities:unit", "casting, I'm not moving");
             }
             else if (!targetEgg)
             {
+            //    LOG_FATAL("entities:unit", "trying to reach %s", me->GetVictim()->GetName());
                 me->AI()->AttackStart(me->GetVictim());
                 if (me->GetDistance2d(me->GetVictim()) > 1.0)
+                {
+              //      LOG_FATAL("entities:unit", "too far away, moving closer");
                     me->GetMotionMaster()->MovePoint(0, me->GetVictim()->GetPosition()); // a bit hacky, but needed to start moving once we've summoned an egg
+                }
             }
             DoMeleeAttackIfReady();
         }
