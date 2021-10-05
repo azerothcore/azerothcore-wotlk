@@ -4,6 +4,6 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633435634247708496');
 
 -- Increased the loot chance for Blue Pearl(4611) to 100%
 UPDATE `gameobject_loot_template` SET `Chance` = 100 WHERE (`Entry` = 2264) AND (`Item` = 4611);
--- Increased the loot chance for Giant Clam Meat(4655) to 35%
-UPDATE `gameobject_loot_template` SET `Chance` = 35 WHERE (`Entry` = 2264) AND (`Item` = 4655);
+-- Increased the loot chance for Giant Clam Meat(4655) to 35% and moved to another group id as the groupid 2 is always Blue Pearl
+UPDATE `gameobject_loot_template` SET `Chance` = 35, `GroupId` = 1 WHERE (`Entry` = 2264) AND (`Item` = 4655);
 
