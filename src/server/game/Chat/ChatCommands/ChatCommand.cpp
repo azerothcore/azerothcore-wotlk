@@ -6,14 +6,15 @@
 #include "ChatCommand.h"
 #include "AccountMgr.h"
 #include "Chat.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Log.h"
 #include "Map.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "WorldSession.h"
+#include "StringFormat.h"
 #include "Tokenize.h"
+#include "WorldSession.h"
 
 using ChatSubCommandMap = std::map<std::string_view, Acore::Impl::ChatCommands::ChatCommandNode, StringCompareLessI_T>;
 
@@ -148,26 +149,31 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
     Player* player = session.GetPlayer();
     ObjectGuid targetGuid = player->GetTarget();
     uint32 areaId = player->GetAreaId();
+    uint32 zoneId = player->GetZoneId();
     std::string areaName = "Unknown";
     std::string zoneName = "Unknown";
+    LocaleConstant locale = GetSessionDbcLocale();
 
     if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId))
     {
-        int locale = session.GetSessionDbcLocale();
         areaName = area->area_name[locale];
-
-        if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->zone))
-            zoneName = zone->area_name[locale];
     }
 
-    LOG_GM(session.GetAccountId(), "Command: " STRING_VIEW_FMT " [Player: %s (%s) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%s)]",
-        STRING_VIEW_FMT_ARG(cmdStr), player->GetName().c_str(), player->GetGUID().ToString().c_str(),
-        session.GetAccountId(), player->GetPositionX(), player->GetPositionY(),
-        player->GetPositionZ(), player->GetMapId(),
+    if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(zoneId))
+    {
+        zoneName = zone->area_name[locale];
+    }
+
+    std::string logMessage = Acore::StringFormatFmt("Command: {} [Player: {} ({}) (Account: {}) X: {} Y: {} Z: {} Map: {} ({}) Area: {} ({}) Zone: {} ({}) Selected: {} ({})]",
+        cmdStr, player->GetName(), player->GetGUID().ToString(),
+        session.GetAccountId(),
+        player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(),
         player->FindMap() ? player->FindMap()->GetMapName() : "Unknown",
-        areaId, areaName.c_str(), zoneName.c_str(),
-        (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
-        targetGuid.ToString().c_str());
+        areaId, areaName, zoneName,
+        (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName() : "",
+        targetGuid.ToString());
+
+    LOG_GM(session.GetAccountId(), logMessage);
 }
 
 void Acore::Impl::ChatCommands::ChatCommandNode::SendCommandHelp(ChatHandler& handler) const
@@ -187,15 +193,22 @@ void Acore::Impl::ChatCommands::ChatCommandNode::SendCommandHelp(ChatHandler& ha
     }
 
     bool header = false;
+
     for (auto it = _subCommands.begin(); it != _subCommands.end(); ++it)
     {
         bool const subCommandHasSubCommand = it->second.HasVisibleSubCommands(handler);
+
         if (!subCommandHasSubCommand && !it->second.IsInvokerVisible(handler))
+        {
             continue;
+        }
+
         if (!header)
         {
             if (!hasInvoker)
+            {
                 handler.PSendSysMessage(LANG_CMD_HELP_GENERIC, STRING_VIEW_FMT_ARG(_name));
+            }
 
             handler.SendSysMessage(LANG_SUBCMDS_LIST);
             header = true;
