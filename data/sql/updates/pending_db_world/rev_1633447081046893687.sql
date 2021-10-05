@@ -4,9 +4,9 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633447081046893687');
 UPDATE `creature_template` SET `gossip_menu_id`=1842 WHERE `entry`=9459;
 
 DELETE FROM `gossip_menu` WHERE `MenuID` IN (1842,1843,40060);
-INSERT INTO `gossip_menu` (`MenuID`, `TextID`, `VerifiedBuild`) VALUES
-(1842,2493,0),
-(1843,2494,0);
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(1842,2493),
+(1843,2494);
 
 DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (1842,1843,40060);
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
