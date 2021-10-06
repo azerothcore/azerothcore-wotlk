@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_DBCSTRUCTURE_H
@@ -1778,6 +1789,38 @@ struct SpellItemEnchantmentConditionEntry
     uint8   CompareColor[5];                                // 15-20    m_rt_operandType[5]
     uint32  Value[5];                                       // 21-25    m_rt_operand[5]
     //uint8   Logic[5]                                      // 25-30    m_logic[5]
+};
+
+struct SpellVisualEntry
+{
+    //uint32 Id;
+    //uint32 PrecastKit;
+    //uint32 CastingKit;
+    //uint32 ImpactKit;
+    //uint32 StateKit;
+    //uint32 StateDoneKit;
+    //uint32 ChannelKit;
+    uint32 HasMissile;
+    int32 MissileModel;
+    //uint32 MissilePathType;
+    //uint32 MissileDestinationAttachment;
+    //uint32 MissileSound;
+    //uint32 AnimEventSoundID;
+    //uint32 Flags;
+    //uint32 CasterImpactKit;
+    //uint32 TargetImpactKit;
+    //int32 MissileAttachment;
+    //uint32 MissileFollowGroundHeight;
+    //uint32 MissileFollowGroundDropSpeed;
+    //uint32 MissileFollowGroundApprach;
+    //uint32 MissileFollowGroundFlags;
+    //uint32 MissileMotionId;
+    //uint32 MissileTargetingKit;
+    //uint32 InstantAreaKit;
+    //uint32 ImpactAreaKit;
+    //uint32 PersistentAreaKit;
+    //DBCPosition3D MissileCastOffset;
+    //DBCPosition3D MissileImpactOffset;
 };
 
 struct StableSlotPricesEntry
