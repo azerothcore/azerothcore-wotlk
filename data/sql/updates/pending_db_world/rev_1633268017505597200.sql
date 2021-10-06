@@ -27,5 +27,5 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 175245) AND (`source_type` = 
 -- partial cleanup for the eggs
 DELETE FROM `gameobject_template` WHERE `entry` = 175622;
 DELETE FROM `gameobject_template_addon` WHERE `entry` = 175622;
-DELETE FROM `smart_scripts` WHERE entryorguid = 175622
+DELETE FROM `smart_scripts` WHERE entryorguid = 175622;
 
