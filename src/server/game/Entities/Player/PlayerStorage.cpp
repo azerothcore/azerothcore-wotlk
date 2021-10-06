@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -36,7 +47,7 @@
 #include "LFGMgr.h"
 #include "Log.h"
 #include "LootItemStorage.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -2353,13 +2364,13 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
     // Used by group, function NeedBeforeGreed, to know if a prototype can be used by a player
 
     const static uint32 item_weapon_skills[MAX_ITEM_SUBCLASS_WEAPON] =
-            {
-                    SKILL_AXES,     SKILL_2H_AXES,  SKILL_BOWS,          SKILL_GUNS,      SKILL_MACES,
-                    SKILL_2H_MACES, SKILL_POLEARMS, SKILL_SWORDS,        SKILL_2H_SWORDS, 0,
-                    SKILL_STAVES,   0,              0,                   SKILL_FIST_WEAPONS,   0,
-                    SKILL_DAGGERS,  SKILL_THROWN,   SKILL_ASSASSINATION, SKILL_CROSSBOWS, SKILL_WANDS,
-                    SKILL_FISHING
-            }; //Copy from function Item::GetSkill()
+    {
+        SKILL_AXES,     SKILL_2H_AXES,  SKILL_BOWS,          SKILL_GUNS,        SKILL_MACES,
+        SKILL_2H_MACES, SKILL_POLEARMS, SKILL_SWORDS,        SKILL_2H_SWORDS,   0,
+        SKILL_STAVES,   0,              0,                   SKILL_FIST_WEAPONS,0,
+        SKILL_DAGGERS,  SKILL_THROWN,   SKILL_ASSASSINATION, SKILL_CROSSBOWS,   SKILL_WANDS,
+        SKILL_FISHING
+    }; //Copy from function Item::GetSkill()
 
     if ((proto->AllowableClass & getClassMask()) == 0 || (proto->AllowableRace & getRaceMask()) == 0)
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
@@ -2380,36 +2391,83 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
     if (proto->Class == ITEM_CLASS_WEAPON && GetSkillValue(item_weapon_skills[proto->SubClass]) == 0)
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
 
-    if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass > ITEM_SUBCLASS_ARMOR_MISC && proto->SubClass < ITEM_SUBCLASS_ARMOR_BUCKLER && proto->InventoryType != INVTYPE_CLOAK)
+    if (proto->Class == ITEM_CLASS_ARMOR)
     {
-        if (_class == CLASS_WARRIOR || _class == CLASS_PALADIN || _class == CLASS_DEATH_KNIGHT)
+        // Check for shields
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD && !(_class == CLASS_PALADIN || _class == CLASS_WARRIOR || _class == CLASS_SHAMAN))
         {
-            if (getLevel() < 40)
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_ARMOR_MAIL)
-                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
-            }
-            else if (proto->SubClass != ITEM_SUBCLASS_ARMOR_PLATE)
-                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
-        }
-        else if (_class == CLASS_HUNTER || _class == CLASS_SHAMAN)
-        {
-            if (getLevel() < 40)
-            {
-                if (proto->SubClass != ITEM_SUBCLASS_ARMOR_LEATHER)
-                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
-            }
-            else if (proto->SubClass != ITEM_SUBCLASS_ARMOR_MAIL)
-                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+            return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
         }
 
-        if (_class == CLASS_ROGUE || _class == CLASS_DRUID)
-            if (proto->SubClass != ITEM_SUBCLASS_ARMOR_LEATHER)
-                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+        // Check for librams.
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && _class != CLASS_PALADIN)
+        {
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+        }
 
-        if (_class == CLASS_MAGE || _class == CLASS_PRIEST || _class == CLASS_WARLOCK)
-            if (proto->SubClass != ITEM_SUBCLASS_ARMOR_CLOTH)
+        // CHeck for idols.
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && _class != CLASS_DRUID)
+        {
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+        }
+
+        // Check for totems.
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && _class != CLASS_SHAMAN)
+        {
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+        }
+
+        // Check for sigils.
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && _class != CLASS_DEATH_KNIGHT)
+        {
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+        }
+    }
+
+    if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass > ITEM_SUBCLASS_ARMOR_MISC && proto->SubClass < ITEM_SUBCLASS_ARMOR_BUCKLER &&
+        proto->InventoryType != INVTYPE_CLOAK)
+    {
+        uint32 subclassToCompare = ITEM_SUBCLASS_ARMOR_CLOTH;
+        switch (_class)
+        {
+            case CLASS_WARRIOR:
+                if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
+                {
+                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+                }
+                [[fallthrough]];
+            case CLASS_DEATH_KNIGHT:
+            case CLASS_PALADIN:
+                subclassToCompare = ITEM_SUBCLASS_ARMOR_PLATE;
+                break;
+            case CLASS_HUNTER:
+            case CLASS_SHAMAN:
+                subclassToCompare = ITEM_SUBCLASS_ARMOR_MAIL;
+                break;
+            case CLASS_ROGUE:
+                if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
+                {
+                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+                }
+                [[fallthrough]];
+            case CLASS_DRUID:
+                subclassToCompare = ITEM_SUBCLASS_ARMOR_LEATHER;
+                break;
+            default:
+                break;
+        }
+
+        if (proto->SubClass > subclassToCompare)
+        {
+            return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+        }
+        else if (sWorld->getIntConfig(CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION) && proto->ItemLevel > sWorld->getIntConfig(CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION))
+        {
+            if (proto->SubClass < subclassToCompare)
+            {
                 return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+            }
+        }
     }
 
     return EQUIP_ERR_OK;
@@ -2885,33 +2943,41 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
                     RemoveItemsSetItem(this, pProto);
 
                 _ApplyItemMods(pItem, slot, false);
-
-                // remove item dependent auras and casts (only weapon and armor slots)
-                if (slot < EQUIPMENT_SLOT_END)
-                {
-                    // Xinef: Ensure that this function is called for places with swap=true
-                    if (!swap)
-                        RemoveItemDependentAurasAndCasts(pItem);
-
-                    // remove held enchantments, update expertise
-                    if (slot == EQUIPMENT_SLOT_MAINHAND)
-                        UpdateExpertise(BASE_ATTACK);
-                    else if (slot == EQUIPMENT_SLOT_OFFHAND)
-                        UpdateExpertise(OFF_ATTACK);
-                    // update armor penetration - passive auras may need it
-                    switch (slot)
-                    {
-                        case EQUIPMENT_SLOT_MAINHAND:
-                        case EQUIPMENT_SLOT_OFFHAND:
-                        case EQUIPMENT_SLOT_RANGED:
-                            RecalculateRating(CR_ARMOR_PENETRATION);
-                        default:
-                            break;
-                    }
-                }
             }
 
             m_items[slot] = nullptr;
+
+            // remove item dependent auras and casts (only weapon and armor slots)
+            if (slot < INVENTORY_SLOT_BAG_END && slot < EQUIPMENT_SLOT_END)
+            {
+                // Xinef: Ensure that this function is called for places with swap=true
+                if (!swap)
+                {
+                    RemoveItemDependentAurasAndCasts(pItem);
+                }
+
+                // remove held enchantments, update expertise
+                if (slot == EQUIPMENT_SLOT_MAINHAND)
+                {
+                    UpdateExpertise(BASE_ATTACK);
+                }
+                else if (slot == EQUIPMENT_SLOT_OFFHAND)
+                {
+                    UpdateExpertise(OFF_ATTACK);
+                }
+
+                // update armor penetration - passive auras may need it
+                switch (slot)
+                {
+                    case EQUIPMENT_SLOT_MAINHAND:
+                    case EQUIPMENT_SLOT_OFFHAND:
+                    case EQUIPMENT_SLOT_RANGED:
+                        RecalculateRating(CR_ARMOR_PENETRATION);
+                    default:
+                        break;
+                }
+            }
+
             SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), ObjectGuid::Empty);
 
             if (slot < EQUIPMENT_SLOT_END)
@@ -3680,6 +3746,14 @@ void Player::SwapItem(uint16 src, uint16 dst)
         }
     }
 
+    // Remove item enchantments for now and restore it later
+    // Needed for swap sanity checks
+    ApplyEnchantment(pSrcItem, false);
+    if (pDstItem)
+    {
+        ApplyEnchantment(pDstItem, false);
+    }
+
     // impossible merge/fill, do real swap
     InventoryResult msg = EQUIP_ERR_OK;
 
@@ -3699,6 +3773,13 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     if (msg != EQUIP_ERR_OK)
     {
+        // Restore enchantments
+        ApplyEnchantment(pSrcItem, true);
+        if (pDstItem)
+        {
+            ApplyEnchantment(pDstItem, true);
+        }
+
         SendEquipError(msg, pSrcItem, pDstItem);
         return;
     }
@@ -3719,8 +3800,22 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     if (msg != EQUIP_ERR_OK)
     {
+        // Restore enchantments
+        ApplyEnchantment(pSrcItem, true);
+        if (pDstItem)
+        {
+            ApplyEnchantment(pDstItem, true);
+        }
+
         SendEquipError(msg, pDstItem, pSrcItem);
         return;
+    }
+
+    // Restore enchantments
+    ApplyEnchantment(pSrcItem, true);
+    if (pDstItem)
+    {
+        ApplyEnchantment(pDstItem, true);
     }
 
     // Check bag swap with item exchange (one from empty in not bag possition (equipped (not possible in fact) or store)
@@ -4873,8 +4968,10 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, instance_mode_mask, "
     // 44           45                46                 47                    48          49          50              51           52               53              54
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, "
-    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69           70          71
-    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels FROM characters WHERE guid = '%u'", guid);
+    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69
+    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles,
+    // 70          71               72
+    //"actionBars, grantableLevels, innTriggerId FROM characters WHERE guid = '%u'", guid);
     PreparedQueryResult result = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
 
     if (!result)
@@ -5241,6 +5338,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetMap(map);
     StoreRaidMapDifficulty();
 
+    UpdatePositionData();
+
     SaveRecallPosition();
 
     time_t now = time(nullptr);
@@ -5339,11 +5438,17 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         float bubble0 = 0.031f;
         //speed collect rest bonus in offline, in logout, in tavern, city (section/in hour)
         float bubble1 = 0.125f;
-        float bubble = fields[28].GetUInt8() > 0
+        float bubble  = fields[28].GetUInt8() > 0
                        ? bubble1 * sWorld->getRate(RATE_REST_OFFLINE_IN_TAVERN_OR_CITY)
                        : bubble0 * sWorld->getRate(RATE_REST_OFFLINE_IN_WILDERNESS);
 
         SetRestBonus(GetRestBonus() + time_diff * ((float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) / 72000)*bubble);
+    }
+
+    uint32 innTriggerId = fields[72].GetUInt32();
+    if (innTriggerId)
+    {
+        SetRestFlag(REST_FLAG_IN_TAVERN, innTriggerId);
     }
 
     // load skills after InitStatsForLevel because it triggering aura apply also
@@ -5772,7 +5877,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
 
     if (result)
     {
-        uint32 zoneId = GetZoneId(true);
+        uint32 zoneId = GetZoneId();
 
         std::map<ObjectGuid::LowType, Bag*> bagMap;                 // fast guid lookup for bags
         std::map<ObjectGuid::LowType, Item*> invalidBagMap;         // fast guid lookup for bags
@@ -7010,7 +7115,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         MapEntry const* bindMapEntry = sMapStore.LookupEntry(m_homebindMapId);
 
         // accept saved data only for valid position (and non instanceable), and accessable
-        if (MapManager::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ) &&
+        if (MapMgr::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ) &&
             !bindMapEntry->Instanceable() && GetSession()->Expansion() >= bindMapEntry->Expansion())
             ok = true;
         else

@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "naxxramas.h"
 #include "Player.h"
@@ -140,7 +153,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetControlled(false, UNIT_STATE_ROOT);
+            me->SetControlled(true, UNIT_STATE_ROOT);
             summonTimer = 0;
             reviveTimer = 0;
             resetTimer = 1;
@@ -337,7 +350,6 @@ public:
                     break;
                 case EVENT_ALLOW_BALL_LIGHTNING:
                     ballLightningEnabled = true;
-                    me->SetControlled(true, UNIT_STATE_ROOT);
                     break;
             }
 
@@ -541,17 +553,17 @@ public:
                             if (!feugen->IsAlive() || !feugen->GetVictim() || !me->GetVictim())
                                 return;
 
-                            float threatFeugen = feugen->getThreatManager().getThreat(feugen->GetVictim());
-                            float threatStalagg = me->getThreatManager().getThreat(me->GetVictim());
+                            float threatFeugen = feugen->getThreatMgr().getThreat(feugen->GetVictim());
+                            float threatStalagg = me->getThreatMgr().getThreat(me->GetVictim());
                             Unit* tankFeugen = feugen->GetVictim();
                             Unit* tankStalagg = me->GetVictim();
 
-                            feugen->getThreatManager().modifyThreatPercent(tankFeugen, -100);
+                            feugen->getThreatMgr().modifyThreatPercent(tankFeugen, -100);
                             feugen->AddThreat(tankStalagg, threatFeugen);
                             feugen->CastSpell(tankStalagg, SPELL_MAGNETIC_PULL, true);
                             feugen->AI()->DoAction(ACTION_MAGNETIC_PULL);
 
-                            me->getThreatManager().modifyThreatPercent(tankStalagg, -100);
+                            me->getThreatMgr().modifyThreatPercent(tankStalagg, -100);
                             me->AddThreat(tankFeugen, threatStalagg);
                             me->CastSpell(tankFeugen, SPELL_MAGNETIC_PULL, true);
                             DoAction(ACTION_MAGNETIC_PULL);

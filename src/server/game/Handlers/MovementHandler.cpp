@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "ArenaSpectator.h"
@@ -14,7 +25,7 @@
 #include "InstanceSaveMgr.h"
 #include "Log.h"
 #include "MathUtil.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
@@ -47,9 +58,9 @@ void WorldSession::HandleMoveWorldportAck()
     WorldLocation const& loc = GetPlayer()->GetTeleportDest();
 
     // possible errors in the coordinate validity check
-    if (!MapManager::IsValidMapCoord(loc))
+    if (!MapMgr::IsValidMapCoord(loc))
     {
-        KickPlayer("!MapManager::IsValidMapCoord(loc)");
+        KickPlayer("!MapMgr::IsValidMapCoord(loc)");
         return;
     }
 
@@ -90,6 +101,8 @@ void WorldSession::HandleMoveWorldportAck()
     GetPlayer()->ResetMap();
     GetPlayer()->SetMap(newMap);
 
+    GetPlayer()->UpdatePositionData();
+
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     if (!GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer()))
     {
@@ -113,8 +126,8 @@ void WorldSession::HandleMoveWorldportAck()
             _player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
 
-    if (!_player->getHostileRefManager().isEmpty())
-        _player->getHostileRefManager().deleteReferences(); // pussywizard: multithreading crashfix
+    if (!_player->getHostileRefMgr().isEmpty())
+        _player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     CellCoord pair(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell(pair);
@@ -216,7 +229,7 @@ void WorldSession::HandleMoveWorldportAck()
 
     // update zone immediately, otherwise leave channel will cause crash in mtmap
     uint32 newzone, newarea;
-    GetPlayer()->GetZoneAndAreaId(newzone, newarea, true);
+    GetPlayer()->GetZoneAndAreaId(newzone, newarea);
     GetPlayer()->UpdateZone(newzone, newarea);
 
     // honorless target
@@ -273,7 +286,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
     if (oldPos.GetExactDist2d(plMover) > 100.0f)
     {
         uint32 newzone, newarea;
-        plMover->GetZoneAndAreaId(newzone, newarea, true);
+        plMover->GetZoneAndAreaId(newzone, newarea);
         plMover->UpdateZone(newzone, newarea);
 
         // new zone
@@ -482,7 +495,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
     {
         // now client not include swimming flag in case jumping under water
-        plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
+        plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetMap()->IsUnderWater(plrMover->GetPhaseMask(), movementInfo.pos.GetPositionX(),
+            movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ(), plrMover->GetCollisionHeight()));
     }
 
     bool jumpopcode = false;
@@ -911,4 +925,84 @@ void WorldSession::ComputeNewClockDelta()
         std::pair<int64, uint32> back = _timeSyncClockDeltaQueue.peak_back();
         _timeSyncClockDelta = back.first;
     }
+}
+
+void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
+{
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
+
+    Unit* mover = _player->m_mover;
+    if (!mover || guid != mover->GetGUID())
+    {
+        recvData.rfinish(); // prevent warnings spam
+        return;
+    }
+
+    uint32 movementCounter;
+    recvData >> movementCounter;
+
+    MovementInfo movementInfo;
+    movementInfo.guid = guid;
+    ReadMovementInfo(recvData, &movementInfo);
+
+     /* process position-change */
+    int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
+    if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
+    {
+        LOG_INFO("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
+        movementInfo.time = getMSTime();
+    }
+    else
+    {
+        movementInfo.time = (uint32)movementTime;
+    }
+
+    movementInfo.guid = mover->GetGUID();
+    mover->m_movementInfo = movementInfo;
+    mover->UpdatePosition(movementInfo.pos);
+
+    WorldPacket data(MSG_MOVE_ROOT, 64);
+    WriteMovementInfo(&data, &movementInfo);
+    mover->SendMessageToSet(&data, _player);
+}
+
+void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
+{
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
+
+    Unit* mover = _player->m_mover;
+    if (!mover || guid != mover->GetGUID())
+    {
+        recvData.rfinish(); // prevent warnings spam
+        return;
+    }
+
+    uint32 movementCounter;
+    recvData >> movementCounter;
+
+    MovementInfo movementInfo;
+    movementInfo.guid = guid;
+    ReadMovementInfo(recvData, &movementInfo);
+
+     /* process position-change */
+    int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
+    if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
+    {
+        LOG_INFO("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
+        movementInfo.time = getMSTime();
+    }
+    else
+    {
+        movementInfo.time = (uint32)movementTime;
+    }
+
+    movementInfo.guid = mover->GetGUID();
+    mover->m_movementInfo = movementInfo;
+    mover->UpdatePosition(movementInfo.pos);
+
+    WorldPacket data(MSG_MOVE_UNROOT, 64);
+    WriteMovementInfo(&data, &movementInfo);
+    mover->SendMessageToSet(&data, _player);
 }

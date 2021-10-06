@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -551,40 +562,27 @@ public:
     {
         PrepareSpellScript(spell_warl_banish_SpellScript);
 
-        bool Load() override
+        void HandleBanish(SpellMissInfo missInfo)
         {
-            _removed = false;
-            return true;
-        }
+            if (missInfo != SPELL_MISS_IMMUNE)
+            {
+                return;
+            }
 
-        void HandleBanish()
-        {
             if (Unit* target = GetHitUnit())
             {
-                if (target->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0, 0x08000000, 0))
+                // Casting Banish on a banished target will remove applied aura
+                if (Aura* banishAura = target->GetAura(GetSpellInfo()->Id, GetCaster()->GetGUID()))
                 {
-                    // No need to remove old aura since its removed due to not stack by current Banish aura
-                    PreventHitDefaultEffect(EFFECT_0);
-                    PreventHitDefaultEffect(EFFECT_1);
-                    PreventHitDefaultEffect(EFFECT_2);
-                    _removed = true;
+                    banishAura->Remove();
                 }
             }
         }
 
-        void RemoveAura()
-        {
-            if (_removed)
-                PreventHitAura();
-        }
-
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_warl_banish_SpellScript::HandleBanish);
-            AfterHit += SpellHitFn(spell_warl_banish_SpellScript::RemoveAura);
+            BeforeHit += BeforeSpellHitFn(spell_warl_banish_SpellScript::HandleBanish);
         }
-
-        bool _removed;
     };
 
     SpellScript* GetSpellScript() const override
@@ -759,7 +757,7 @@ public:
                 // Refresh corruption on target
                 if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x2, 0, 0, GetCaster()->GetGUID()))
                 {
-                    aur->GetBase()->RefreshTimersWithMods();
+                    aur->GetBase()->RefreshTimers();
                     aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
                 }
         }
@@ -852,7 +850,7 @@ public:
             Unit* caster = GetCaster();
             if (Unit* target = GetHitUnit())
             {
-                if (target->CanHaveThreatList() && target->getThreatManager().getThreat(caster) > 0.0f)
+                if (target->CanHaveThreatList() && target->getThreatMgr().getThreat(caster) > 0.0f)
                     caster->CastSpell(target, SPELL_WARLOCK_SOULSHATTER, true);
             }
         }

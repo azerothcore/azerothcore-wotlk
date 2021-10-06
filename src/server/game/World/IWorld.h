@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_IWORLD_H
@@ -108,6 +121,7 @@ enum WorldBoolConfigs
     CONFIG_BATTLEGROUND_CAST_DESERTER,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED,
     CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE,
     CONFIG_BATTLEGROUND_TRACK_DESERTERS,
     CONFIG_BG_XP_FOR_KILL,
@@ -279,6 +293,7 @@ enum WorldIntConfigs
     CONFIG_INSTANT_LOGOUT,
     CONFIG_DISABLE_BREATHING,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY,
+    CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
     CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH,
     CONFIG_BATTLEGROUND_REPORT_AFK_TIMER,
@@ -380,6 +395,7 @@ enum WorldIntConfigs
     CONFIG_NPC_EVADE_IF_NOT_REACHABLE,
     CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID,
     CONFIG_FFA_PVP_TIMER,
+    CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION,
     INT_CONFIG_VALUE_COUNT
 };
 

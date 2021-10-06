@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -49,7 +61,7 @@ public:
 
     static bool HandleMmapPathCommand(ChatHandler* handler, char const* args)
     {
-        if (!MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()))
+        if (!MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()))
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
             return true;
@@ -124,8 +136,8 @@ public:
         handler->PSendSysMessage("gridloc [%i, %i]", gy, gx);
 
         // calculate navmesh tile location
-        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
-        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(handler->GetSession()->GetPlayer()->GetMapId(), player->GetInstanceId());
+        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
+        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMeshQuery(handler->GetSession()->GetPlayer()->GetMapId(), player->GetInstanceId());
         if (!navmesh || !navmeshquery)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
@@ -176,8 +188,8 @@ public:
     static bool HandleMmapLoadedTilesCommand(ChatHandler* handler, char const* /*args*/)
     {
         uint32 mapid = handler->GetSession()->GetPlayer()->GetMapId();
-        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(mapid);
-        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(mapid, handler->GetSession()->GetPlayer()->GetInstanceId());
+        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(mapid);
+        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMeshQuery(mapid, handler->GetSession()->GetPlayer()->GetInstanceId());
         if (!navmesh || !navmeshquery)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
@@ -203,7 +215,7 @@ public:
         handler->PSendSysMessage("mmap stats:");
         //handler->PSendSysMessage("  global mmap pathfinding is %sabled", DisableMgr::IsPathfindingEnabled(mapId) ? "en" : "dis");
 
-        MMAP::MMapManager* manager = MMAP::MMapFactory::createOrGetMMapManager();
+        MMAP::MMapMgr* manager = MMAP::MMapFactory::createOrGetMMapMgr();
         handler->PSendSysMessage(" %u maps loaded with %u tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
 
         dtNavMesh const* navmesh = manager->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
