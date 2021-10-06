@@ -3201,7 +3201,6 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 64422: // Sonic Screech (Auriaya)
-            case 13877: // Blade Flurry (Rogue Spell) should ignore armor and share damage to 2nd mob
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
@@ -7455,6 +7454,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 if (spellInfo->SpellIconID == 2721 && spellInfo->SpellFamilyFlags[0] & 0x2)
                     spellInfo->SpellFamilyFlags[0] |= 0x40;
                 break;
+        }
+
+        // Recklessness/Shield Wall/Retaliation
+        if (spellInfo->Category == 132 && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR)
+        {
+            spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
         }
     }
 
