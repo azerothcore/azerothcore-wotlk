@@ -85,7 +85,7 @@ public:
             {
                 uint32                 maxPlayers = ((InstanceMap*) sMapMgr->FindMap(map->GetId(), map->GetInstanceId()))->GetMaxPlayers();
                 PlayerSettingsMapInfo* mapInfo    = map->CustomData.GetDefault<PlayerSettingsMapInfo>("PlayerSettingsMapInfo");
-                uint32                 nplayers   = std::max(mapInfo->nplayers, mapInfo->veto);
+                uint32                 nplayers   = std::min(std::max(mapInfo->nplayers, mapInfo->veto), maxPlayers);
 
                 amount = amount * nplayers / maxPlayers * (1 + 0.5f * (nplayers - 1));
 
@@ -353,7 +353,6 @@ public:
         Player*                player     = handler->getSelectedPlayerOrSelf();
         Map*                   map        = player->GetMap();
         PlayerSettingsMapInfo* mapInfo    = map->CustomData.GetDefault<PlayerSettingsMapInfo>("PlayerSettingsMapInfo");
-        uint32                 maxPlayers = ((InstanceMap*) sMapMgr->FindMap(map->GetId(), map->GetInstanceId()))->GetMaxPlayers();
 
         if (!map->IsDungeon())
         {
@@ -383,8 +382,6 @@ public:
 
             if (n < 1)
                 n = 1;
-            else if (n > maxPlayers)
-                n = maxPlayers;
 
             mapInfo->veto = (uint32) n;
         }
@@ -400,7 +397,8 @@ public:
         Player*                player   = handler->getSelectedPlayerOrSelf();
         Map*                   map      = player->GetMap();
         PlayerSettingsMapInfo* mapInfo  = map->CustomData.GetDefault<PlayerSettingsMapInfo>("PlayerSettingsMapInfo");
-        uint32                 nplayers = std::max(mapInfo->nplayers, mapInfo->veto);
+        uint32                 maxPlayers = ((InstanceMap*) sMapMgr->FindMap(map->GetId(), map->GetInstanceId()))->GetMaxPlayers();
+        uint32                 nplayers = std::min(std::max(mapInfo->nplayers, mapInfo->veto), maxPlayers);
 
         if (!map->IsDungeon())
             return false;
