@@ -414,7 +414,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 
