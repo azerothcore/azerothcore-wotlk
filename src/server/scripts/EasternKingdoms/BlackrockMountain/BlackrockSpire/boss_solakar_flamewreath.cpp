@@ -66,7 +66,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            events.ScheduleEvent(SPELL_HATCH_EGG, 100);
+            events.ScheduleEvent(SPELL_HATCH_EGG, 1000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -74,18 +74,26 @@ public:
             std::list<GameObject*> nearbyEggs;
             float                  tempDist = 20;
             float                  minDist  = 25;
-            
-        //    GameObject*            nearestEgg = nullptr;
+            std::list<Creature*>   nearbyWhelps;
 
             if (!UpdateVictim())
             {
                 return;
             }
 
+            GetCreatureListWithEntryInGrid(nearbyWhelps, me, 10161, 15.0);
+            for (const auto& whelp : nearbyWhelps)
+            {
+                if (!whelp->IsInCombat())
+                {
+                    whelp->SetInCombatWith(me->GetVictim());
+                    whelp->AI()->AttackStart(me->GetVictim());
+                }
+            }
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
             events.Update(diff);
-            me->CallForHelp(10); // else the whelp doesn't come... This is tedious, maybe use spell db and override the hatch?
 
             while (uint32 eventId = events.ExecuteEvent())
             {
@@ -101,7 +109,7 @@ public:
                         LOG_FATAL("Entities:unit", "found %d eggs", nearbyEggs.size());
                         for (const auto& egg : nearbyEggs)
                         {
-                            if (egg->getLootState() == GO_READY)
+                            if (egg->isSpawned() && egg->getLootState() == GO_READY)
                             {
                                 LOG_FATAL("Entities:unit", "found an egg ready");
                                 tempDist = me->GetDistance2d(egg);
@@ -116,23 +124,11 @@ public:
                                 LOG_FATAL("Entities:unit", "found an unready egg");
                         }
                     }
-                     
-                   // if (nearestEgg)
-                    //if (GameObject* egg = me->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_TRAP, 60))
+
                     if (targetEgg) //have a target, go to it and cast it
                     {
                         LOG_FATAL("entities:unit", "trying to reach the egg at %f %f", targetEgg->GetPositionX(), targetEgg->GetPositionY());
                         me->GetMotionMaster()->MovePoint(0, targetEgg->GetPosition());
-                        /* if (me->GetDistance2d(targetEgg) < 2)
-                        {
-                            me->StopMovingOnCurrentPos();
-                            DoCast(SPELL_HATCH_EGG);
-                            LOG_FATAL("Entities:unit", "Trying to set the egg to used. %d", targetEgg->getLootState());
-                            targetEgg->SetLootState(GO_JUST_DEACTIVATED);
-                    //        targetEgg->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                            targetEgg = nullptr;
-                            events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
-                        }*/
                     }
                     break;
                 default:
@@ -141,15 +137,13 @@ public:
             }
 
             // cast takes 1.5second, during which we don't have a target
-            if (targetEgg && targetEgg->getLootState() == GO_READY && me->GetDistance2d(targetEgg) < 5)
+            if (targetEgg && targetEgg->getLootState() == GO_READY && me->GetDistance2d(targetEgg) < 4)
             {
                 me->StopMovingOnCurrentPos();
                 DoCast(SPELL_HATCH_EGG);
                 LOG_FATAL("Entities:unit", "Trying to set the egg to used. %d", targetEgg->getLootState());
                 targetEgg->SetLootState(GO_JUST_DEACTIVATED);
-                //        targetEgg->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                 targetEgg = nullptr;
-                me->CallForHelp(10);
                 events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
             }
             else if(me->HasUnitState(UNIT_STATE_CASTING))
