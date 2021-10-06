@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('rev_1632773438019686726');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1632773438019686726');
 
 DELETE FROM `waypoint_data` WHERE `id`=2190;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
