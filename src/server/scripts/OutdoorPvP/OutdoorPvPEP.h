@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef OUTDOOR_PVP_EP_
@@ -27,13 +38,13 @@ const uint32 EP_PWT_CM = 17698;
 
 const uint32 EPBuffZones[EPBuffZonesNum] = {139, 2017, 2057};
 
-enum EP_TaxiNodes
-{
-    EP_CGT_Taxi = 87,
-    EP_EWT_Taxi = 86,
-    EP_NPT_Taxi = 85,
-    EP_PWT_Taxi = 84
-};
+//enum EP_TaxiNodes
+//{
+//    EP_CGT_Taxi = 87,
+//    EP_EWT_Taxi = 86,
+//    EP_NPT_Taxi = 85,
+//    EP_PWT_Taxi = 84
+//};
 
 enum EP_EastwallTowerWorldStates
 {
@@ -125,9 +136,9 @@ const go_type EPTowerFlags[EP_TOWER_NUM] =
     {182106, 0, 1838.42f, -3703.56f, 167.713f, 0.890118f, 0.0f, 0.0f, 0.430511f, 0.902585f}
 };
 
-const uint32 EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691, 10699, 10701, 10705};
+//const uint32 EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691, 10699, 10701, 10705};
 
-const uint32 EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692, 10698, 10700, 10704};
+//const uint32 EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692, 10698, 10700, 10704};
 
 const uint8 EP_NUM_CREATURES = 6;
 const uint8 EP_EWT_NUM_CREATURES = 5;

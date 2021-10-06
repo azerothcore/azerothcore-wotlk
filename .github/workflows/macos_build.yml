@@ -4,7 +4,6 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['labeled']
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -17,7 +16,7 @@ jobs:
       matrix:
         os:
           - macos-10.15
- #         - macos-11.0
+          - macos-11
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && ${{ github.event.label.name == 'run-build' }}

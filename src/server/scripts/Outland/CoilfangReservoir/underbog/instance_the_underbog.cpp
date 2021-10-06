@@ -16,10 +16,10 @@
  */
 
 /*
-This placeholder for the instance is needed for dungeon finding to be able
-to give credit after the boss defined in lastEncounterDungeon is killed.
-Without it, the party doing random dungeon won't get satchel of spoils and
-gets instead the deserter debuff.
+    This placeholder for the instance is needed for dungeon finding to be able
+    to give credit after the boss defined in lastEncounterDungeon is killed.
+    Without it, the party doing random dungeon won't get satchel of spoils and
+    gets instead the deserter debuff.
 */
 
 #include "InstanceScript.h"
