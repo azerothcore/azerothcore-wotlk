@@ -104,30 +104,28 @@ public:
                     {
                         minDist = 50;
                         tempDist = 50;
-                        LOG_FATAL("Entities:unit", "Looking for an egg");
+                    //    LOG_FATAL("Entities:unit", "Looking for an egg");
                         me->GetGameObjectListWithEntryInGrid(nearbyEggs, DB_ENTRY_ROOKERY_EGG, 40);
-                        LOG_FATAL("Entities:unit", "found %d eggs", nearbyEggs.size());
+                    //    LOG_FATAL("Entities:unit", "found %d eggs", nearbyEggs.size());
                         for (const auto& egg : nearbyEggs)
                         {
                             if (egg->isSpawned() && egg->getLootState() == GO_READY)
                             {
-                                LOG_FATAL("Entities:unit", "found an egg ready");
+                      //          LOG_FATAL("Entities:unit", "found an egg ready");
                                 tempDist = me->GetDistance2d(egg);
                                 if (tempDist < minDist)
                                 {
-                                    LOG_FATAL("Entities:unit", "It's in range");
+                         //           LOG_FATAL("Entities:unit", "It's in range");
                                     minDist   = tempDist;
                                     targetEgg = egg;
                                 }
                             }
-                            else
-                                LOG_FATAL("Entities:unit", "found an unready egg");
                         }
                     }
 
                     if (targetEgg) //have a target, go to it and cast it
                     {
-                        LOG_FATAL("entities:unit", "trying to reach the egg at %f %f", targetEgg->GetPositionX(), targetEgg->GetPositionY());
+                 //       LOG_FATAL("entities:unit", "trying to reach the egg at %f %f", targetEgg->GetPositionX(), targetEgg->GetPositionY());
                         me->GetMotionMaster()->MovePoint(0, targetEgg->GetPosition());
                     }
                     break;
@@ -141,7 +139,7 @@ public:
             {
                 me->StopMovingOnCurrentPos();
                 DoCast(SPELL_HATCH_EGG);
-                LOG_FATAL("Entities:unit", "Trying to set the egg to used. %d", targetEgg->getLootState());
+          //      LOG_FATAL("Entities:unit", "Trying to set the egg to used. %d", targetEgg->getLootState());
                 targetEgg->SetLootState(GO_JUST_DEACTIVATED);
                 targetEgg = nullptr;
                 events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
@@ -149,7 +147,7 @@ public:
             else if(me->HasUnitState(UNIT_STATE_CASTING))
             {
                 me->StopMovingOnCurrentPos();
-                LOG_FATAL("entities:unit", "casting, I'm not moving");
+        //        LOG_FATAL("entities:unit", "casting, I'm not moving");
             }
             else if (!targetEgg)
             {
