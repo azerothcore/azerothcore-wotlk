@@ -2571,6 +2571,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         else
             procEx |= PROC_EX_NORMAL_HIT;
 
+        HealInfo healInfo(caster, unitTarget, addhealth, m_spellInfo, m_spellInfo->GetSchoolMask());
+
         // Xinef: override with forced crit, only visual result
         if (GetSpellValue()->ForcedCritResult)
         {
@@ -2578,7 +2580,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             procEx |= PROC_EX_CRITICAL_HIT;
         }
 
-        int32 gain = caster->HealBySpell(unitTarget, m_spellInfo, addhealth, crit);
+        int32 gain = caster->HealBySpell(healInfo, crit);
         unitTarget->getHostileRefMgr().threatAssist(caster, float(gain) * 0.5f, m_spellInfo);
         m_healing = gain;
 
@@ -2588,13 +2590,14 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell, m_triggeredByAuraEffectIndex, this);
+            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell,
+                m_triggeredByAuraEffectIndex, this, nullptr, &healInfo);
     }
     // Do damage and triggers
     else if (m_damage > 0)
     {
         // Fill base damage struct (unitTarget - is real spell target)
-        SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, m_spellSchoolMask);
+        SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
 
         // Add bonuses and fill damageInfo struct
         // Dancing Rune Weapon...
@@ -2641,7 +2644,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
                 healthGain = m_caster->SpellHealingBonusDone(m_caster, m_spellInfo, healthGain, HEAL);
                 healthGain = m_caster->SpellHealingBonusTaken(m_caster, m_spellInfo, healthGain, HEAL);
 
-                m_caster->HealBySpell(m_caster, m_spellInfo, uint32(healthGain));
+                HealInfo healInfo(m_caster, m_caster, healthGain, m_spellInfo, m_spellInfo->GetSchoolMask());
+                m_caster->HealBySpell(healInfo);
             }
         }
 
@@ -2662,7 +2666,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
         {
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell, m_triggeredByAuraEffectIndex, this);
+            DamageInfo dmgInfo(damageInfo, SPELL_DIRECT_DAMAGE);
+            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell,
+                m_triggeredByAuraEffectIndex, this, &dmgInfo);
+
             if (caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
                     m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
                 caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim, procEx);
@@ -2674,12 +2681,15 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     else
     {
         // Fill base damage struct (unitTarget - is real spell target)
-        SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, m_spellSchoolMask);
+        SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
         procEx |= createProcExtendMask(&damageInfo, missInfo);
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
         {
-            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell, m_triggeredByAuraEffectIndex, this);
+            DamageInfo dmgInfo(damageInfo, NODAMAGE);
+            caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell,
+                m_triggeredByAuraEffectIndex, this, &dmgInfo);
+
             // Xinef: eg. rogue poisons can proc off cheap shot, etc. so this block should be here also
             // Xinef: ofc count only spells that HIT the target, little hack used to fool the system
             if ((procEx & PROC_EX_NORMAL_HIT || procEx & PROC_EX_CRITICAL_HIT) && caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
