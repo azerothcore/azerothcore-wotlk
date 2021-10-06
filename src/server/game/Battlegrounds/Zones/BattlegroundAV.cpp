@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlegroundAV.h"
@@ -19,7 +30,7 @@
 BattlegroundAV::BattlegroundAV()
 {
     BgObjects.resize(BG_AV_OBJECT_MAX);
-    BgCreatures.resize(AV_CPLACE_MAX + AV_STATICCPLACE_MAX);
+    BgCreatures.resize(static_cast<uint16>(AV_CPLACE_MAX) + AV_STATICCPLACE_MAX);
 
     for (uint8 i = 0; i < 2; i++)
     {
@@ -268,7 +279,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
 {
     bool isStatic = false;
     Creature* creature = nullptr;
-    ASSERT(type <= AV_CPLACE_MAX + AV_STATICCPLACE_MAX);
+    ASSERT(type <= static_cast<uint16>(AV_CPLACE_MAX) + AV_STATICCPLACE_MAX);
     if (type >= AV_CPLACE_MAX) //static
     {
         type -= AV_CPLACE_MAX;
@@ -597,8 +608,8 @@ void BattlegroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)
         RewardReputationToTeam(ownerId == TEAM_ALLIANCE ? 730 : 729, BG_AV_REP_TOWER, ownerId);
         RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_TOWER), ownerId);
 
-        SpawnBGObject(BG_AV_OBJECT_TAURA_A_DUNBALDAR_SOUTH + ownerId + (2 * tmp), RESPAWN_ONE_DAY);
-        SpawnBGObject(BG_AV_OBJECT_TFLAG_A_DUNBALDAR_SOUTH + ownerId + (2 * tmp), RESPAWN_ONE_DAY);
+        SpawnBGObject(static_cast<uint8>(BG_AV_OBJECT_TAURA_A_DUNBALDAR_SOUTH) + ownerId + (2 * tmp), RESPAWN_ONE_DAY);
+        SpawnBGObject(static_cast<uint8>(BG_AV_OBJECT_TFLAG_A_DUNBALDAR_SOUTH) + ownerId + (2 * tmp), RESPAWN_ONE_DAY);
     }
     else
     {
@@ -607,7 +618,7 @@ void BattlegroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)
         else
             SpawnBGObject(object + 11, RESPAWN_IMMEDIATELY);
         SpawnBGObject(BG_AV_OBJECT_AURA_N_FIRSTAID_STATION + 3 * node, RESPAWN_ONE_DAY);
-        SpawnBGObject(BG_AV_OBJECT_AURA_A_FIRSTAID_STATION + ownerId + 3 * node, RESPAWN_IMMEDIATELY);
+        SpawnBGObject(static_cast<uint8>(BG_AV_OBJECT_AURA_A_FIRSTAID_STATION) + ownerId + 3 * node, RESPAWN_IMMEDIATELY);
         PopulateNode(node);
         if (node == BG_AV_NODES_SNOWFALL_GRAVE) //snowfall eyecandy
         {
@@ -917,7 +928,7 @@ void BattlegroundAV::EventPlayerDefendsPoint(Player* player, uint32 object)
     if (!IsTower(node))
     {
         SpawnBGObject(BG_AV_OBJECT_AURA_N_FIRSTAID_STATION + 3 * node, RESPAWN_ONE_DAY);
-        SpawnBGObject(BG_AV_OBJECT_AURA_A_FIRSTAID_STATION + teamId + 3 * node, RESPAWN_IMMEDIATELY);
+        SpawnBGObject(static_cast<uint8>(BG_AV_OBJECT_AURA_A_FIRSTAID_STATION) + teamId + 3 * node, RESPAWN_IMMEDIATELY);
     }
     // despawn old go
     SpawnBGObject(object, RESPAWN_ONE_DAY);
@@ -1032,7 +1043,7 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
         {
             //spawning/despawning of aura
             SpawnBGObject(BG_AV_OBJECT_AURA_N_FIRSTAID_STATION + 3 * node, RESPAWN_IMMEDIATELY); //neutral aura spawn
-            SpawnBGObject(BG_AV_OBJECT_AURA_A_FIRSTAID_STATION + prevOwnerId + 3 * node, RESPAWN_ONE_DAY); //teeamaura despawn
+            SpawnBGObject(static_cast<uint8>(BG_AV_OBJECT_AURA_A_FIRSTAID_STATION) + prevOwnerId + 3 * node, RESPAWN_ONE_DAY); //teeamaura despawn
 
             RelocateDeadPlayers(BgCreatures[node]);
         }
@@ -1520,7 +1531,7 @@ void BattlegroundAV::ResetBGSubclass()
     InitNode(BG_AV_NODES_SNOWFALL_GRAVE, TEAM_NEUTRAL, false); //give snowfall neutral owner
 
     m_Mine_Timer = AV_MINE_TICK_TIMER;
-    for (uint16 i = 0; i < AV_CPLACE_MAX + AV_STATICCPLACE_MAX; i++)
+    for (uint16 i = 0; i < static_cast<uint16>(AV_CPLACE_MAX) + AV_STATICCPLACE_MAX; i++)
         if (BgCreatures[i])
             DelCreature(i);
 }

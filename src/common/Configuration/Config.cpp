@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Config.h"
@@ -153,7 +165,9 @@ namespace
 
         // No lines read
         if (!count)
+        {
             throw ConfigException(Acore::StringFormat("Config::LoadFile: Empty file '%s'", file.c_str()));
+        }
 
         // Add correct keys if file load without errors
         for (auto const& [entry, key] : fileConfigs)
@@ -200,7 +214,9 @@ ConfigMgr* ConfigMgr::instance()
 bool ConfigMgr::Reload()
 {
     if (!LoadAppConfigs())
+    {
         return false;
+    }
 
     return LoadModulesConfigs();
 }
@@ -287,7 +303,9 @@ std::vector<std::string> ConfigMgr::GetKeysByString(std::string const& name)
 
     for (auto const& [optionName, key] : _configOptions)
         if (!optionName.compare(0, name.length(), name))
+        {
             keys.emplace_back(optionName);
+        }
 
     return keys;
 }
@@ -324,7 +342,9 @@ void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::stri
     {
         Tokenizer configFileList(modulesConfigList, ',');
         for (auto const& itr : configFileList)
+        {
             _additonalFiles.emplace_back(std::string(itr));
+        }
     }
 }
 
@@ -332,11 +352,15 @@ bool ConfigMgr::LoadAppConfigs()
 {
     // #1 - Load init config file .conf.dist
     if (!LoadInitial(_filename + ".dist"))
+    {
         return false;
+    }
 
     // #2 - Load .conf file
     if (!LoadAdditionalFile(_filename))
+    {
         return false;
+    }
 
     return true;
 }
@@ -344,7 +368,9 @@ bool ConfigMgr::LoadAppConfigs()
 bool ConfigMgr::LoadModulesConfigs()
 {
     if (_additonalFiles.empty())
+    {
         return true;
+    }
 
     // Start loading module configs
     std::string const& moduleConfigPath = GetConfigPath() + "modules/";
@@ -356,20 +382,30 @@ bool ConfigMgr::LoadModulesConfigs()
         std::string defaultFileName = distFileName;
 
         if (!defaultFileName.empty())
+        {
             defaultFileName.erase(defaultFileName.end() - 5, defaultFileName.end());
+        }
 
         // Load .conf.dist config
         if (!LoadAdditionalFile(moduleConfigPath + distFileName))
+        {
             isExistDistConfig = false;
+        }
 
         // Load .conf config
         if (!LoadAdditionalFile(moduleConfigPath + defaultFileName))
+        {
             isExistDefaultConfig = false;
+        }
 
         if (isExistDefaultConfig && isExistDistConfig)
+        {
             _moduleConfigFiles.emplace_back(defaultFileName);
+        }
         else if (!isExistDefaultConfig && isExistDistConfig)
+        {
             _moduleConfigFiles.emplace_back(distFileName);
+        }
     }
 
     // If module configs not exist - no load
@@ -383,7 +419,9 @@ void ConfigMgr::PrintLoadedModulesConfigs()
     LOG_INFO("server.loading", "Using modules configuration:");
 
     for (auto const& itr : _moduleConfigFiles)
+    {
         LOG_INFO("server.loading", "> %s", itr.c_str());
+    }
 
     LOG_INFO("server.loading", " ");
 }

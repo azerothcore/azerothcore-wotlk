@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _LOG_H__
@@ -9,7 +21,6 @@
 #include "Define.h"
 #include "LogCommon.h"
 #include "StringFormat.h"
-
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -55,11 +66,19 @@ public:
         outMessage(filter, level, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
+    template<typename... Args>
+    inline void outMessageFmt(std::string const& filter, LogLevel const level, std::string_view fmt, Args&&... args)
+    {
+        _outMessageFmt(filter, level, fmt::format(fmt, std::forward<Args>(args)...));
+    }
+
     template<typename Format, typename... Args>
     void outCommand(uint32 account, Format&& fmt, Args&&... args)
     {
         if (!ShouldLog("commands.gm", LOG_LEVEL_INFO))
+        {
             return;
+        }
 
         outCommand(Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...), std::to_string(account));
     }
@@ -99,7 +118,9 @@ public:
     void outErrorDb(Format&& fmt, Args&& ... args)
     {
         if (!ShouldLog("sql.sql", LOG_LEVEL_ERROR))
+        {
             return;
+        }
 
         outMessage("sql.sql", LOG_LEVEL_ERROR, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
@@ -120,7 +141,9 @@ public:
     void outSQLDev(Format&& fmt, Args&& ... args)
     {
         if (!ShouldLog("sql.dev", LOG_LEVEL_INFO))
+        {
             return;
+        }
 
         outMessage("sql.dev", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
@@ -129,7 +152,9 @@ public:
     void outSQLDriver(Format&& fmt, Args&& ... args)
     {
         if (!ShouldLog("sql.driver", LOG_LEVEL_INFO))
+        {
             return;
+        }
 
         outMessage("sql.driver", LOG_LEVEL_INFO, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
@@ -144,10 +169,14 @@ public:
     void outDebug(DebugLogFilters filter, Format&& fmt, Args&& ... args)
     {
         if (!(_debugLogMask & filter))
+        {
             return;
+        }
 
         if (!ShouldLog("server", LOG_LEVEL_DEBUG))
+        {
             return;
+        }
 
         outMessage("server", LOG_LEVEL_DEBUG, Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
@@ -165,6 +194,7 @@ private:
     void ReadLoggersFromConfig();
     void RegisterAppender(uint8 index, AppenderCreatorFn appenderCreateFn);
     void outMessage(std::string const& filter, LogLevel level, std::string&& message);
+    void _outMessageFmt(std::string const& filter, LogLevel level, std::string&& message);
     void outCommand(std::string&& message, std::string&& param1);
 
     std::unordered_map<uint8, AppenderCreatorFn> appenderFactory;
@@ -252,5 +282,50 @@ void check_args(std::string const&, ...);
 
 #define LOG_GM(accountId__, ...) \
     sLog->outCommand(accountId__, __VA_ARGS__)
+
+// New format logging
+#define FMT_LOG_EXCEPTION_FREE(filterType__, level__, ...) \
+    { \
+        try \
+        { \
+            sLog->outMessageFmt(filterType__, level__, fmt::format(__VA_ARGS__)); \
+        } \
+        catch (const std::exception& e) \
+        { \
+            sLog->outMessageFmt("server", LogLevel::LOG_LEVEL_ERROR, "Wrong format occurred ({}) at '{}:{}'", \
+                e.what(), __FILE__, __LINE__); \
+        } \
+    }
+
+#define FMT_LOG_MESSAGE_BODY(filterType__, level__, ...) \
+    do \
+    { \
+        if (sLog->ShouldLog(filterType__, level__)) \
+            FMT_LOG_EXCEPTION_FREE(filterType__, level__, __VA_ARGS__); \
+    } while (0)
+
+// Fatal - 1
+#define FMT_LOG_FATAL(filterType__, ...) \
+    FMT_LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_FATAL, __VA_ARGS__)
+
+// Error - 2
+#define FMT_LOG_ERROR(filterType__, ...) \
+    FMT_LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_ERROR, __VA_ARGS__)
+
+// Warning - 3
+#define FMT_LOG_WARN(filterType__, ...)  \
+    FMT_LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_WARN, __VA_ARGS__)
+
+// Info - 4
+#define FMT_LOG_INFO(filterType__, ...)  \
+    FMT_LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_INFO, __VA_ARGS__)
+
+// Debug - 5
+#define FMT_LOG_DEBUG(filterType__, ...) \
+    FMT_LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_DEBUG, __VA_ARGS__)
+
+// Trace - 6
+#define FMT_LOG_TRACE(filterType__, ...) \
+    FMT_LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_TRACE, __VA_ARGS__)
 
 #endif // _LOG_H__

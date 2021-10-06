@@ -30,11 +30,15 @@ public:
     {
         static_assert(std::is_base_of<Base, T>::value, "T must derive from Base");
         if (Container.empty())
+        {
             return nullptr;
+        }
 
         auto it = Container.find(k);
         if (it != Container.end())
+        {
             return dynamic_cast<T*>(it->second.get());
+        }
         return nullptr;
     }
 
@@ -47,7 +51,9 @@ public:
     {
         static_assert(std::is_base_of<Base, T>::value, "T must derive from Base");
         if (T* v = Get<T>(k))
+        {
             return v;
+        }
         T* v = new T();
         Container.emplace(k, std::unique_ptr<T>(v));
         return v;

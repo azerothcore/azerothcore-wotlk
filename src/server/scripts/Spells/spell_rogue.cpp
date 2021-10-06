@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -12,7 +23,6 @@
 
 #include "CellImpl.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
@@ -136,9 +146,7 @@ public:
             Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
             if (procTarget && eventInfo.GetDamageInfo())
             {
-                int32 damage = eventInfo.GetDamageInfo()->GetDamage();
-                // Xinef: Include AOE Damage Reduction auras
-                damage = procTarget->CalculateAOEDamageReduction(damage, SPELL_SCHOOL_MASK_NORMAL, GetTarget());
+                int32 damage = eventInfo.GetDamageInfo()->GetUnmitigatedDamage();
 
                 CustomSpellValues values;
                 values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
@@ -242,8 +250,13 @@ public:
             return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCastItem();
         }
 
-        void HandleBeforeHit()
+        void HandleBeforeHit(SpellMissInfo missInfo)
         {
+            if (missInfo != SPELL_MISS_NONE)
+            {
+                return;
+            }
+
             if (Unit* target = GetHitUnit())
                 // Deadly Poison
                 if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x10000, 0x80000, 0, GetCaster()->GetGUID()))
@@ -306,7 +319,7 @@ public:
 
         void Register() override
         {
-            BeforeHit += SpellHitFn(spell_rog_deadly_poison_SpellScript::HandleBeforeHit);
+            BeforeHit += BeforeSpellHitFn(spell_rog_deadly_poison_SpellScript::HandleBeforeHit);
             AfterHit += SpellHitFn(spell_rog_deadly_poison_SpellScript::HandleAfterHit);
         }
 
@@ -399,7 +412,7 @@ public:
                 if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                 {
                     // xinef: target may be no longer valid
-                    if (!GetTarget()->IsValidAttackTarget(target))
+                    if (!GetTarget()->IsValidAttackTarget(target) || target->HasStealthAura() || target->HasInvisibilityAura())
                     {
                         _targets.remove(guid);
                         continue;

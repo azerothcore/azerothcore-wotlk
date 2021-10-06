@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -115,6 +126,11 @@ public:
 
         void Reset() override
         {
+            ResetData();
+        }
+
+        void ResetData()
+        {
             events.Reset();
             summons.DespawnAll();
             playerGUID.Clear();
@@ -135,27 +151,27 @@ public:
             switch(currentQuest)
             {
                 case QUEST_BFV_FALLEN_HEROES:
-                    me->SummonCreature(NPC_ELDRETH, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_GENESS, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_JHADRAS, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_MASUD, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_RITH, 8213.5f, 3478.5f, 626.79f, 1.56f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    me->SummonCreature(NPC_TALLA, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_ELDRETH, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_GENESS, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_JHADRAS, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_MASUD, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_RITH, 8213.5f, 3478.5f, 626.79f, 1.56f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                    me->SummonCreature(NPC_TALLA, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_DARK_MASTER:
-                    me->SummonCreature(NPC_DARK_MASTER, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_DARK_MASTER, 8184.97f, 3491.2f, 625.33f, 0.6f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_SIGRID:
-                    me->SummonCreature(NPC_SIGRID, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_SIGRID, 8238.30f, 3485.5f, 628.5f, 2.157f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_CARNAGE:
-                    me->SummonCreature(NPC_CARNAGE, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_CARNAGE, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_THANE:
-                    me->SummonCreature(NPC_THANE, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_THANE, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
                 case QUEST_BFV_FINAL:
-                    me->SummonCreature(NPC_PRINCE, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                    me->SummonCreature(NPC_PRINCE, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     break;
             }
         }
@@ -171,7 +187,7 @@ public:
         void CheckSummons()
         {
             bool allow = true;
-            for (ObjectGuid guid : summons)
+            for (ObjectGuid const& guid : summons)
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     if (cr->IsAlive())
                         allow = false;
@@ -202,13 +218,24 @@ public:
                             me->MonsterYell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
                             break;
                     }
-
                     player->GroupEventHappens(quest, player);
                 }
                 playerGUID2 = playerGUID;
                 EnterEvadeMode();
                 if (quest == QUEST_BFV_FINAL)
                     events.ScheduleEvent(EVENT_VALHALAS_THIRD, 7000);
+            }
+            else
+            {
+                uint32 quest = currentQuest;
+                if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                {
+                    if (!player->HasQuest(quest))
+                    {
+                        ResetData();
+                        return;
+                    }
+                }
             }
         }
 
@@ -310,8 +337,11 @@ public:
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
+        npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI());
+        vAI->ResetData();
+
         creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-        if (npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI()))
+        if (vAI)
             vAI->StartBattle(player->GetGUID(), quest->GetQuestId());
 
         switch (quest->GetQuestId())
@@ -1258,7 +1288,7 @@ public:
         Unit* GetSummoner()
         {
             if (TempSummon* tempSummon = me->ToTempSummon())
-                return tempSummon->GetSummoner();
+                return tempSummon->GetSummonerUnit();
             return nullptr;
         }
 
@@ -1409,6 +1439,36 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_infra_green_bomber_genericAI(creature);
+    }
+};
+
+class spell_onslaught_or_call_bone_gryphon : public SpellScriptLoader
+{
+public:
+    spell_onslaught_or_call_bone_gryphon() : SpellScriptLoader("spell_onslaught_or_call_bone_gryphon") { }
+
+    class spell_onslaught_or_call_bone_gryphon_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_onslaught_or_call_bone_gryphon_SpellScript);
+
+        void ChangeSummonPos(SpellEffIndex /*effIndex*/)
+        {
+            WorldLocation summonPos = *GetExplTargetDest();
+            Position offset = { 0.0f, 0.0f, 3.0f, 0.0f };
+            summonPos.RelocateOffset(offset);
+            SetExplTargetDest(summonPos);
+            GetHitDest()->RelocateOffset(offset);
+        }
+
+        void Register() override
+        {
+            OnEffectHit += SpellEffectFn(spell_onslaught_or_call_bone_gryphon_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_onslaught_or_call_bone_gryphon_SpellScript();
     }
 };
 
@@ -2042,7 +2102,7 @@ public:
 
             if (id == POINT_GRAB_DECOY)
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* summoner = summon->GetSummoner())
+                    if (Unit* summoner = summon->GetSummonerUnit())
                         DoCast(summoner, SPELL_GRAB);
         }
 
@@ -2098,6 +2158,7 @@ void AddSC_icecrown()
     new spell_fight_fire_bomber();
     new spell_anti_air_rocket_bomber();
     new npc_infra_green_bomber_generic();
+    new spell_onslaught_or_call_bone_gryphon();
 
     // Theirs
     new npc_guardian_pavilion();

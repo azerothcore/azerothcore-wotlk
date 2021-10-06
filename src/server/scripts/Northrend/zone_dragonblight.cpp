@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -21,7 +32,6 @@ EndContentData */
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -311,7 +321,7 @@ public:
         void InitializeAI() override
         {
             if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
                     summonerGUID = summoner->GetGUID();
                     float x, y, z;
@@ -479,8 +489,8 @@ public:
 
         void Reset() override
         {
-            if (me->ToTempSummon() && me->ToTempSummon()->GetSummoner())
-                me->setFaction(me->ToTempSummon()->GetSummoner()->getFaction());
+            if (me->ToTempSummon() && me->ToTempSummon()->GetSummonerUnit())
+                me->setFaction(me->ToTempSummon()->GetSummonerUnit()->getFaction());
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -569,7 +579,7 @@ public:
                 me->RemoveAllAuras();
                 me->DespawnOrUnsummon(1000);
                 if (TempSummon* summon = me->ToTempSummon())
-                    if (Unit* owner = summon->GetSummoner())
+                    if (Unit* owner = summon->GetSummonerUnit())
                         if (Player* player = owner->ToPlayer())
                             player->KilledMonsterCredit(me->GetEntry());
             }
@@ -1620,9 +1630,7 @@ public:
 
         void StoreTargets()
         {
-            uint8 creaturecount;
-
-            creaturecount = 0;
+            uint8 creturesCount = 0;
 
             for (uint8 ii = 0; ii < 3; ++ii)
             {
@@ -1630,10 +1638,10 @@ public:
                 GetCreatureListWithEntryInGrid(creatureList, me, AudienceMobs[ii], 15.0f);
                 for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
                 {
-                    if (Creature* creatureList = *itr)
+                    if (Creature* creature = *itr)
                     {
-                        audienceList[creaturecount] = creatureList->GetGUID();
-                        ++creaturecount;
+                        audienceList[creturesCount] = creature->GetGUID();
+                        ++creturesCount;
                     }
                 }
             }

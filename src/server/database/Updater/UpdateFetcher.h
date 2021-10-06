@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef UpdateFetcher_h__
@@ -12,11 +24,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-namespace boost::filesystem
-{
-    class path;
-}
+#include <filesystem>
 
 struct AC_DATABASE_API UpdateResult
 {
@@ -33,7 +41,7 @@ struct AC_DATABASE_API UpdateResult
 
 class AC_DATABASE_API UpdateFetcher
 {
-    typedef boost::filesystem::path Path;
+    typedef std::filesystem::path Path;
 
 public:
     UpdateFetcher(Path const& updateDirectory,
@@ -55,6 +63,7 @@ private:
     enum State
     {
         RELEASED,
+        CUSTOM,
         ARCHIVED
     };
 
@@ -64,21 +73,33 @@ private:
             : name(name_), hash(hash_), state(state_), timestamp(timestamp_) { }
 
         std::string const name;
-
         std::string const hash;
-
         State const state;
-
         uint64 const timestamp;
 
         static inline State StateConvert(std::string const& state)
         {
-            return (state == "RELEASED") ? RELEASED : ARCHIVED;
+            if (state == "RELEASED")
+                return RELEASED;
+            else if (state == "CUSTOM")
+                return CUSTOM;
+
+            return ARCHIVED;
         }
 
         static inline std::string StateConvert(State const state)
         {
-            return (state == RELEASED) ? "RELEASED" : "ARCHIVED";
+            switch (state)
+            {
+            case RELEASED:
+                return "RELEASED";
+            case CUSTOM:
+                return "CUSTOM";
+            case ARCHIVED:
+                return "ARCHIVED";
+            default:
+                return "";
+            }
         }
 
         std::string GetStateAsString() const
