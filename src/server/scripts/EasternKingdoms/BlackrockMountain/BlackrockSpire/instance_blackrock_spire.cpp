@@ -726,7 +726,6 @@ public:
     }
 };
 
-
 class go_rookery_egg : public GameObjectScript
 {
 public:
