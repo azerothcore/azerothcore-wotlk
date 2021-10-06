@@ -14,18 +14,14 @@ DELETE FROM `creature_text` WHERE `CreatureID` = 10683;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `Comment`) VALUES
 (10683, 0, 0, 'Intruders are destroying our eggs! Stop!!', 14, 0, 0, 0, 5538, 0, 'UBRS - Solakar event');
 
-
 -- solakar
 UPDATE `creature_template` SET `ScriptName` = 'boss_solakar_flamewreath' WHERE (`entry` = 10264);
-
 
 -- father flame
 UPDATE `gameobject_template` SET `ScriptName` = 'go_father_flame' WHERE `entry` = 175245;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 175245) AND (`source_type` = 1) AND (`id` IN (0));
 
-
 -- partial cleanup for the eggs
 DELETE FROM `gameobject_template` WHERE `entry` = 175622;
 DELETE FROM `gameobject_template_addon` WHERE `entry` = 175622;
 DELETE FROM `smart_scripts` WHERE entryorguid = 175622;
-
