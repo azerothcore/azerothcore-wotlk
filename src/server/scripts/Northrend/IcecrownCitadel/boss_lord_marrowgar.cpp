@@ -1,9 +1,22 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "icecrown_citadel.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -378,7 +391,7 @@ public:
                 return;
 
             if (TempSummon* summ = me->ToTempSummon())
-                if (Unit* trapped = summ->GetSummoner())
+                if (Unit* trapped = summ->GetSummonerUnit())
                 {
                     Position exitPos = {me->GetPositionX(), me->GetPositionY(), 60.0f, me->GetOrientation()};
                     trapped->UpdateAllowedPositionZ(exitPos.GetPositionX(), exitPos.GetPositionY(), exitPos.m_positionZ);
@@ -430,7 +443,7 @@ public:
 
             if (TempSummon* summ = me->ToTempSummon())
             {
-                if (Unit* trapped = summ->GetSummoner())
+                if (Unit* trapped = summ->GetSummonerUnit())
                 {
                     if (!trapped->IsOnVehicle(me) || !trapped->IsAlive() || !me->GetInstanceScript() || me->GetInstanceScript()->GetBossState(DATA_LORD_MARROWGAR) != IN_PROGRESS || trapped->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
                     {
