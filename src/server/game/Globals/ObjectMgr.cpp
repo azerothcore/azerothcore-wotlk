@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -18,7 +29,7 @@
 #include "Language.h"
 #include "LFGMgr.h"
 #include "Log.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "PoolMgr.h"
@@ -33,7 +44,7 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 #include "World.h"
 
 ScriptMapMap sSpellScripts;
@@ -250,7 +261,7 @@ bool SpellClickInfo::IsFitToRequirements(Unit const* clicker, Unit const* clicke
     Unit const* summoner = nullptr;
     // Check summoners for party
     if (clickee->IsSummon())
-        summoner = clickee->ToTempSummon()->GetSummoner();
+        summoner = clickee->ToTempSummon()->GetSummonerUnit();
     if (!summoner)
         summoner = clickee;
 
@@ -2242,7 +2253,7 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
-        if (!MapManager::IsValidMapCoord(data.mapid, data.posX, data.posY, data.posZ, data.orientation))
+        if (!MapMgr::IsValidMapCoord(data.mapid, data.posX, data.posY, data.posZ, data.orientation))
         {
             LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: %u Entry: %u) with invalid coordinates, skip", guid, data.id);
             continue;
@@ -2913,15 +2924,13 @@ void ObjectMgr::LoadItemTemplates()
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
             if (itemTemplate.Spells[i].SpellId && itemTemplate.Spells[i].SpellCategory && itemTemplate.Spells[i].SpellCategoryCooldown)
             {
-                SpellCategoryStore::const_iterator ct = sSpellsByCategoryStore.find(itemTemplate.Spells[i].SpellCategory);
+                SpellCategoryStore::iterator ct = sSpellsByCategoryStore.find(itemTemplate.Spells[i].SpellCategory);
                 if (ct != sSpellsByCategoryStore.end())
                 {
-                    const SpellCategorySet& ct_set = ct->second;
-                    if (ct_set.find(itemTemplate.Spells[i].SpellId) == ct_set.end())
-                        sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
+                    ct->second.emplace(true, itemTemplate.Spells[i].SpellId);
                 }
                 else
-                    sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
+                    sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].emplace(true, itemTemplate.Spells[i].SpellId);
             }
 
         ++count;
@@ -3385,7 +3394,7 @@ void ObjectMgr::LoadPlayerInfo()
                 }
 
                 // accept DB data only for valid position (and non instanceable)
-                if (!MapManager::IsValidMapCoord(mapId, positionX, positionY, positionZ, orientation))
+                if (!MapMgr::IsValidMapCoord(mapId, positionX, positionY, positionZ, orientation))
                 {
                     LOG_ERROR("sql.sql", "Wrong home position for class %u race %u pair in `playercreateinfo` table, ignoring.", current_class, current_race);
                     continue;
@@ -5134,10 +5143,15 @@ void ObjectMgr::LoadSpellScripts()
             continue;
         }
 
-        uint8 i = (uint8)((uint32(itr->first) >> 24) & 0x000000FF);
+        SpellEffIndex i = SpellEffIndex((uint32(itr->first) >> 24) & 0x000000FF);
+        if (uint32(i) >= MAX_SPELL_EFFECTS)
+        {
+            LOG_ERROR("sql.sql", "Table `spell_scripts` has too high effect index %u for spell (Id: %u) as script id", uint32(i), spellId);
+        }
+
         //check for correct spellEffect
         if (!spellInfo->Effects[i].Effect || (spellInfo->Effects[i].Effect != SPELL_EFFECT_SCRIPT_EFFECT && spellInfo->Effects[i].Effect != SPELL_EFFECT_DUMMY))
-            LOG_ERROR("sql.sql", "Table `spell_scripts` - spell %u effect %u is not SPELL_EFFECT_SCRIPT_EFFECT or SPELL_EFFECT_DUMMY", spellId, i);
+            LOG_ERROR("sql.sql", "Table `spell_scripts` - spell %u effect %u is not SPELL_EFFECT_SCRIPT_EFFECT or SPELL_EFFECT_DUMMY", spellId, uint32(i));
     }
 }
 
@@ -5442,7 +5456,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
         uint16 mapID = fields[0].GetUInt16();
 
-        if (!MapManager::IsValidMAP(mapID, true))
+        if (!MapMgr::IsValidMAP(mapID, true))
         {
             LOG_ERROR("sql.sql", "ObjectMgr::LoadInstanceTemplate: bad mapid %d for template!", mapID);
             continue;
@@ -5717,7 +5731,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         bool has_items    = fields[4].GetBool();
         m->expire_time    = time_t(fields[5].GetUInt32());
         m->deliver_time   = time_t(0);
-        m->COD            = fields[6].GetUInt32();
+        m->stationery     = fields[6].GetUInt8();
         m->checked        = fields[7].GetUInt8();
         m->mailTemplateId = fields[8].GetInt16();
         m->auctionId      = fields[9].GetInt32();
@@ -5738,13 +5752,13 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             // read items from cache
             m->items.swap(itemsCache[m->messageID]);
 
-            // don't return if: is mail from non-player, or sent to self, or already returned, or read and isn't COD
-            if (m->messageType != MAIL_NORMAL || m->receiver == m->sender || (m->checked & (MAIL_CHECK_MASK_COD_PAYMENT | MAIL_CHECK_MASK_RETURNED)) || ((m->checked & MAIL_CHECK_MASK_READ) && !m->COD))
+            // If it is mail from non-player, or if it's already return mail, it shouldn't be returned, but deleted
+            if (!m->IsSentByPlayer() || m->IsSentByGM() || (m->IsCODPayment() || m->IsReturnedMail()))
             {
-                for (MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
+                for (auto const& mailedItem : m->items)
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                    stmt->setUInt32(0, itr2->item_guid);
+                    stmt->setUInt32(0, mailedItem.item_guid);
                     CharacterDatabase.Execute(stmt);
                 }
 
@@ -5763,17 +5777,17 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                 stmt->setUInt8 (4, uint8(MAIL_CHECK_MASK_RETURNED));
                 stmt->setUInt32(5, m->messageID);
                 CharacterDatabase.Execute(stmt);
-                for (MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
+                for (auto const& mailedItem : m->items)
                 {
                     // Update receiver in mail items for its proper delivery, and in instance_item for avoid lost item at sender delete
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_RECEIVER);
                     stmt->setUInt32(0, m->sender);
-                    stmt->setUInt32(1, itr2->item_guid);
+                    stmt->setUInt32(1, mailedItem.item_guid);
                     CharacterDatabase.Execute(stmt);
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
                     stmt->setUInt32(0, m->sender);
-                    stmt->setUInt32(1, itr2->item_guid);
+                    stmt->setUInt32(1, mailedItem.item_guid);
                     CharacterDatabase.Execute(stmt);
                 }
 
@@ -8081,7 +8095,7 @@ void ObjectMgr::LoadGameTele()
         gt.mapId          = fields[5].GetUInt16();
         gt.name           = fields[6].GetString();
 
-        if (!MapManager::IsValidMapCoord(gt.mapId, gt.position_x, gt.position_y, gt.position_z, gt.orientation))
+        if (!MapMgr::IsValidMapCoord(gt.mapId, gt.position_x, gt.position_y, gt.position_z, gt.orientation))
         {
             LOG_ERROR("sql.sql", "Wrong position for id %u (name: %s) in `game_tele` table, ignoring.", id, gt.name.c_str());
             continue;

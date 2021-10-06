@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_GAMEOBJECT_H
@@ -751,10 +762,12 @@ public:
     [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
-    void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
-    void SetWorldRotation(G3D::Quat const& rot);
+    void SetLocalRotationAngles(float z_rot, float y_rot, float x_rot);
+    void SetLocalRotation(G3D::Quat const& rot);
     void SetTransportPathRotation(float qx, float qy, float qz, float qw);
-    [[nodiscard]] int64 GetPackedWorldRotation() const { return m_packedRotation; }
+    [[nodiscard]] G3D::Quat const& GetLocalRotation() const { return m_localRotation; }
+    [[nodiscard]] int64 GetPackedLocalRotation() const { return m_packedRotation; }
+    [[nodiscard]] G3D::Quat GetWorldRotation() const;
 
     // overwrite WorldObject function for proper name localization
     [[nodiscard]] std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
@@ -946,9 +959,17 @@ public:
     [[nodiscard]] float GetStationaryZ() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
     [[nodiscard]] float GetStationaryO() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
 
-    float GetInteractionDistance();
+    [[nodiscard]] float GetInteractionDistance() const;
 
     void UpdateModelPosition();
+
+    [[nodiscard]] bool IsAtInteractDistance(Position const& pos, float radius) const;
+    [[nodiscard]] bool IsAtInteractDistance(Player const* player, SpellInfo const* spell = nullptr) const;
+
+    [[nodiscard]] bool IsWithinDistInMap(Player const* player) const;
+    using WorldObject::IsWithinDistInMap;
+
+    [[nodiscard]] SpellInfo const* GetSpellForLock(Player const* player) const;
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
@@ -979,7 +1000,7 @@ protected:
     bool m_allowModifyDestructibleBuilding;
 
     int64 m_packedRotation;
-    G3D::Quat m_worldRotation;
+    G3D::Quat m_localRotation;
     Position m_stationaryPosition;
 
     ObjectGuid m_lootRecipient;
