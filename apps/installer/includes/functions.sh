@@ -219,7 +219,7 @@ function inst_simple_restarter {
 
 function inst_download_client_data {
     # change the following version when needed
-    local VERSION=v11
+    local VERSION=v12
 
     echo "#######################"
     echo "Client data downloader"
@@ -227,7 +227,7 @@ function inst_download_client_data {
 
     # first check if it's defined in env, otherwise use the default
     local path="${DATAPATH:-$AC_BINPATH_FULL}"
-    local zipPath="${DATAPATH_ZIP:-"$DATAPATH/data.zip"}"
+    local zipPath="${DATAPATH_ZIP:-"$path/data.zip"}"
 
     dataVersionFile="$path/data-version"
 
