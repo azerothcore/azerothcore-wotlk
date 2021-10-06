@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
@@ -1142,7 +1155,7 @@ public:
                         }
                     }
                 _playerAttack = true;
-                me->getThreatManager().resetAllAggro();
+                me->getThreatMgr().resetAllAggro();
                 me->CallForHelp(40.0f);
                 AttackStart(who);
             }
@@ -1459,8 +1472,10 @@ public:
             {
                 case EVENT_RC_RUNIC_SMASH_TRIGGER:
                     _nextTriggerPos += 16.0f;
-                    if (!(_nextTriggerPos > -260.0f))
+                    if (_nextTriggerPos <= -260.0f)
+                    {
                         events.RescheduleEvent(EVENT_RC_RUNIC_SMASH_TRIGGER, 500);
+                    }
 
                     RunRunicSmash(true);
                     break;
@@ -1802,7 +1817,7 @@ class achievement_thorim_stand_in_the_lightning : public AchievementCriteriaScri
 public:
     achievement_thorim_stand_in_the_lightning() : AchievementCriteriaScript("achievement_thorim_stand_in_the_lightning") {}
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
@@ -1817,7 +1832,7 @@ class achievement_thorim_lose_your_illusion : public AchievementCriteriaScript
 public:
     achievement_thorim_lose_your_illusion() : AchievementCriteriaScript("achievement_thorim_lose_your_illusion") {}
 
-    bool OnCheck(Player* player, Unit*) override
+    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))

@@ -1,21 +1,32 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _MAPTREE_H
 #define _MAPTREE_H
 
-#include "Define.h"
 #include "BoundingIntervalHierarchy.h"
+#include "Define.h"
 #include <unordered_map>
 
 namespace VMAP
 {
     class ModelInstance;
     class GroupModel;
-    class VMapManager2;
+    class VMapMgr2;
 
     struct LocationInfo
     {
@@ -23,6 +34,7 @@ namespace VMAP
         const ModelInstance* hitInstance{nullptr};
         const GroupModel* hitModel{nullptr};
         float ground_Z;
+        int32 rootId = -1;
     };
 
     class StaticMapTree
@@ -45,7 +57,7 @@ namespace VMAP
         std::string iBasePath;
 
     private:
-        bool getIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const;
+        bool GetIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit) const;
         //bool containsLoadedMapTile(unsigned int pTileIdent) const { return(iLoadedMapTiles.containsKey(pTileIdent)); }
     public:
         static std::string getTileFileName(uint32 mapID, uint32 tileX, uint32 tileY);
@@ -57,18 +69,18 @@ namespace VMAP
         ~StaticMapTree();
 
         [[nodiscard]] bool isInLineOfSight(const G3D::Vector3& pos1, const G3D::Vector3& pos2) const;
-        bool getObjectHitPos(const G3D::Vector3& pos1, const G3D::Vector3& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
+        bool GetObjectHitPos(const G3D::Vector3& pos1, const G3D::Vector3& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
         [[nodiscard]] float getHeight(const G3D::Vector3& pPos, float maxSearchDist) const;
-        bool getAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
+        bool GetAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
         bool GetLocationInfo(const G3D::Vector3& pos, LocationInfo& info) const;
 
-        bool InitMap(const std::string& fname, VMapManager2* vm);
-        void UnloadMap(VMapManager2* vm);
-        bool LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
-        void UnloadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
+        bool InitMap(const std::string& fname, VMapMgr2* vm);
+        void UnloadMap(VMapMgr2* vm);
+        bool LoadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm);
+        void UnloadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm);
         [[nodiscard]] bool isTiled() const { return iIsTiled; }
         [[nodiscard]] uint32 numLoadedTiles() const { return iLoadedTiles.size(); }
-        void getModelInstances(ModelInstance*& models, uint32& count);
+        void GetModelInstances(ModelInstance*& models, uint32& count);
     };
 
     struct AreaInfo

@@ -264,7 +264,7 @@ function shellCommandFactory(
         )
       }"\n`,
     )
-    .action(async (args: any[] | undefined) => {
+    .action(async (args: string[] | undefined) => {
       const { run } = Deno;
 
       for (const command of commands) {

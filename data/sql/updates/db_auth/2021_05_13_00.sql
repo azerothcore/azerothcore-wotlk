@@ -38,7 +38,7 @@ CREATE TEMPORARY TABLE `_temp_base32_lookup1`
     `c` char(1) not null,
     `v` tinyint unsigned not null,
     primary key (`c`)
-);
+)DEFAULT CHARSET=utf8mb4;
 INSERT INTO `_temp_base32_lookup1` (`c`,`v`) VALUES
 ('A',00),('B',01),('C',02),('D',03),('E',04),('F',05),('G',06),('H',07),
 ('I',08),('J',09),('K',10),('L',11),('M',12),('N',13),('O',14),('P',15),
@@ -73,7 +73,7 @@ CREATE TEMPORARY TABLE `_temp_totp_conversion`
     `totp_secret` varbinary(128) default null,
     primary key(`original_key`),
     index (`remaining_key`)
-);
+)DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `_temp_totp_conversion` (`original_key`) SELECT DISTINCT `token_key` FROM `account`;
 UPDATE `_temp_totp_conversion` SET `remaining_key`=TRIM(TRAILING '=' FROM `original_key`),`totp_secret`='' WHERE `original_key`!='';

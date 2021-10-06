@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef IpNetwork_h__
@@ -31,11 +43,17 @@ namespace Acore::Net
     inline boost::asio::ip::address_v4 GetDefaultNetmaskV4(boost::asio::ip::address_v4 const& networkAddress)
     {
         if ((address_to_uint(networkAddress) & 0x80000000) == 0)
+        {
             return boost::asio::ip::address_v4(0xFF000000);
+        }
         if ((address_to_uint(networkAddress) & 0xC0000000) == 0x80000000)
+        {
             return boost::asio::ip::address_v4(0xFFFF0000);
+        }
         if ((address_to_uint(networkAddress) & 0xE0000000) == 0xC0000000)
+        {
             return boost::asio::ip::address_v4(0xFFFFFF00);
+        }
         return boost::asio::ip::address_v4(0xFFFFFFFF);
     }
 

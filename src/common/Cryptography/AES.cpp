@@ -30,24 +30,34 @@ bool Acore::Crypto::AES::Process(IV const& iv, uint8* data, size_t length, Tag& 
     ASSERT(length <= static_cast<size_t>(std::numeric_limits<int>::max()));
     int len = static_cast<int>(length);
     if (!EVP_CipherInit_ex(_ctx, nullptr, nullptr, nullptr, iv.data(), -1))
+    {
         return false;
+    }
 
     int outLen;
     if (!EVP_CipherUpdate(_ctx, data, &outLen, data, len))
+    {
         return false;
+    }
 
     len -= outLen;
 
     if (!_encrypting && !EVP_CIPHER_CTX_ctrl(_ctx, EVP_CTRL_GCM_SET_TAG, sizeof(tag), tag))
+    {
         return false;
+    }
 
     if (!EVP_CipherFinal_ex(_ctx, data + outLen, &outLen))
+    {
         return false;
+    }
 
     ASSERT(len == outLen);
 
     if (_encrypting && !EVP_CIPHER_CTX_ctrl(_ctx, EVP_CTRL_GCM_GET_TAG, sizeof(tag), tag))
+    {
         return false;
+    }
 
     return true;
 }

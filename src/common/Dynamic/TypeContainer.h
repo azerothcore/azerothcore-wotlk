@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_TYPECONTAINER_H
@@ -12,12 +23,12 @@
  * types of object at the same time.
  */
 
+#include "Define.h"
+#include "Dynamic/TypeList.h"
+#include "GridRefMgr.h"
 #include <map>
 #include <unordered_map>
 #include <vector>
-#include "Define.h"
-#include "Dynamic/TypeList.h"
-#include "GridRefManager.h"
 
 /*
  * @class ContainerMapList is a mulit-type container for map elements
@@ -28,7 +39,7 @@ template<class OBJECT>
 struct ContainerMapList
 {
     //std::map<OBJECT_HANDLE, OBJECT *> _element;
-    GridRefManager<OBJECT> _element;
+    GridRefMgr<OBJECT> _element;
 };
 
 template<>
@@ -136,6 +147,14 @@ public:
     SPECIFIC_TYPE* Find(KEY_TYPE const& handle)
     {
         return Acore::Find(_elements, handle, (SPECIFIC_TYPE*)nullptr);
+    }
+
+    template<class SPECIFIC_TYPE>
+    std::size_t Size() const
+    {
+        std::size_t size = 0;
+        Acore::Size(_elements, &size, (SPECIFIC_TYPE*)nullptr);
+        return size;
     }
 
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& GetElements() { return _elements; }

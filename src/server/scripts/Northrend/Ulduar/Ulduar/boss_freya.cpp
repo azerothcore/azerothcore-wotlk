@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
@@ -122,7 +135,7 @@ enum FreyaSpells
 #define SPELL_NATURE_FURY                       RAID_MODE(SPELL_NATURE_FURY_10, SPELL_NATURE_FURY_25)
 #define SPELL_HARDENED_BARK                     RAID_MODE(SPELL_HARDENED_BARK_10, SPELL_HARDENED_BARK_25)
 #define SPELL_DETONATE                          RAID_MODE(SPELL_DETONATE_10, SPELL_DETONATE_25)
-#define SPELL_NATURE_BOMB_DAMAGE                RAID_MODE(SPELL_NATURE_BOMB_DAMAGE_10, SPELL_NATURE_BOMB_DAMAGE_25)
+//#define SPELL_NATURE_BOMB_DAMAGE                RAID_MODE(SPELL_NATURE_BOMB_DAMAGE_10, SPELL_NATURE_BOMB_DAMAGE_25)
 #define SPELL_SUNBEAM                           RAID_MODE(SPELL_SUNBEAM_10, SPELL_SUNBEAM_25)
 #define SPELL_GROUND_TREMOR_FREYA               RAID_MODE(SPELL_GROUND_TREMOR_FREYA_10, SPELL_GROUND_TREMOR_FREYA_25)
 #define SPELL_IRON_ROOTS_FREYA                  RAID_MODE(SPELL_IRON_ROOTS_FREYA_10, SPELL_IRON_ROOTS_FREYA_25)
@@ -502,8 +515,7 @@ public:
                 m_pInstance->SetData(TYPE_FREYA, IN_PROGRESS);
 
             // HARD MODE CHECKS
-            Creature* elder = nullptr;
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_STONEBARK));
+            Creature* elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_STONEBARK));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -1294,7 +1306,7 @@ class achievement_freya_getting_back_to_nature : public AchievementCriteriaScrip
 public:
     achievement_freya_getting_back_to_nature() : AchievementCriteriaScript("achievement_freya_getting_back_to_nature") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/, uint32 /*criteria_id*/) override
     {
         if (target)
             if (target->GetAI()->GetData(DATA_BACK_TO_NATURE))
@@ -1311,7 +1323,7 @@ public:
     {
     }
 
-    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/) override
+    bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/, uint32 /*criteria_id*/) override
     {
         return target && _elderCount <= target->GetAI()->GetData(DATA_GET_ELDER_COUNT);
     }

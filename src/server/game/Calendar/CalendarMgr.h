@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_CALENDARMGR_H
@@ -11,6 +22,7 @@
 #include "DatabaseEnv.h"
 #include "WorldPacket.h"
 #include "ObjectGuid.h"
+#include <unordered_map>
 
 enum CalendarMailAnswers
 {
@@ -307,11 +319,10 @@ public:
     void RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover);
     void UpdateEvent(CalendarEvent* calendarEvent);
 
-    void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite);
-    void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite, SQLTransaction& trans);
+    void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite, CharacterDatabaseTransaction trans = nullptr);
     void RemoveInvite(uint64 inviteId, uint64 eventId, ObjectGuid remover);
-    void UpdateInvite(CalendarInvite* invite);
-    void UpdateInvite(CalendarInvite* invite, SQLTransaction& trans);
+    void RemoveInvite(uint64 inviteId, uint64 eventId, uint64 remover);
+    void UpdateInvite(CalendarInvite* invite, CharacterDatabaseTransaction trans = nullptr);
 
     void RemoveAllPlayerEventsAndInvites(ObjectGuid guid);
     void RemovePlayerGuildEventsAndSignups(ObjectGuid guid, uint32 guildId);
