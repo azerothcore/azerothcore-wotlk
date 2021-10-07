@@ -2431,7 +2431,7 @@ public:
     [[nodiscard]] uint64 GetAuraUpdateMaskForRaid() const { return m_auraRaidUpdateMask; }
     void SetAuraUpdateMaskForRaid(uint8 slot) { m_auraRaidUpdateMask |= (uint64(1) << slot); }
     Player* GetNextRandomRaidMember(float radius);
-    [[nodiscard]] PartyResult CanUninviteFromGroup() const;
+    [[nodiscard]] PartyResult CanUninviteFromGroup(ObjectGuid targetPlayerGUID = ObjectGuid::Empty) const;
 
     // Battleground Group System
     void SetBattlegroundOrBattlefieldRaid(Group* group, int8 subgroup = -1);
