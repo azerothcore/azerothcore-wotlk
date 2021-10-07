@@ -1371,7 +1371,6 @@ public:
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
-            Creature* cr = nullptr;
             Unit* caster = GetCaster();
             if (!caster)
                 return;
@@ -1379,23 +1378,49 @@ public:
             if (!GetHitUnit() || GetHitUnit()->GetGUID() != caster->GetGUID())
                 return;
 
+            std::vector<Creature*> bakers;
             if (caster->GetMapId() == 1) // Kalimdor
             {
-                if ((cr = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
             }
             else // EK
             {
-                if ((cr = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+            }
+
+            if (!bakers.empty())
+            {
+                std::sort(bakers.begin(), bakers.end(), Acore::ObjectDistanceOrderPred(caster));
+                if (Creature* creature = *bakers.begin())
+                {
+                    creature->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
+                }
             }
         }
 
@@ -1575,6 +1600,46 @@ public:
     }
 };
 
+class spell_brewfest_relay_race_force_cast : public SpellScriptLoader
+{
+public:
+    spell_brewfest_relay_race_force_cast() : SpellScriptLoader("spell_brewfest_relay_race_force_cast") {}
+
+    class spell_brewfest_relay_race_force_cast_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_brewfest_relay_race_force_cast_SpellScript);
+
+        SpellCastResult CheckItem()
+        {
+            if (Unit* target = GetExplTargetUnit())
+            {
+                if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell))
+                {
+                    if (Player* player = target->ToPlayer())
+                    {
+                        if (player->HasItemCount(triggeredSpellInfo->Reagent[0]))
+                        {
+                            return SPELL_CAST_OK;
+                        }
+                    }
+                }
+            }
+
+            return SPELL_FAILED_DONT_REPORT;
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_brewfest_relay_race_force_cast_SpellScript::CheckItem);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_brewfest_relay_race_force_cast_SpellScript();
+    }
+};
+
 enum DirebrewSays
 {
     SAY_INTRO                   = 0,
@@ -1649,7 +1714,6 @@ enum DirebrewMisc
     GOSSIP_OPTION_APOLOGIZE             = 1,
     DATA_TARGET_GUID                    = 1,
     MAX_ANTAGONISTS                     = 3,
-    FACTION_FRIENDLY                    = 35,
     FACTION_GOBLIN_DARK_IRON_BAR_PATRON = 736,
     DATA_COREN                          = 33,
     GO_MACHINE_SUMMONER                 = 188508
@@ -2313,6 +2377,7 @@ void AddSC_event_brewfest_scripts()
     new spell_brewfest_toss_mug();
     new spell_brewfest_add_mug();
     new spell_brewfest_reveler_transform();
+    new spell_brewfest_relay_race_force_cast();
 
     // beer effect
     new npc_brew_bubble();
