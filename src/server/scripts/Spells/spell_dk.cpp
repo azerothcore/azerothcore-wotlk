@@ -1305,7 +1305,15 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 bp = int32(eventInfo.GetDamageInfo()->GetDamage() * 1.5f);
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 bp = static_cast<int32>(damageInfo->GetDamage() * 1.5f);
             GetTarget()->CastCustomSpell(SPELL_DK_BLOOD_GORGED_HEAL, SPELLVALUE_BASE_POINT0, bp, _procTarget, true, nullptr, aurEff);
         }
 

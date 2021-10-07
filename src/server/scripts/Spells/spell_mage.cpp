@@ -191,7 +191,14 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
+                return false;
+            }
+
+            const SpellInfo* spellInfo = damageInfo->GetSpellInfo();
             if (!spellInfo || (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK))
                 return true;
 
@@ -262,14 +269,21 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetSpellInfo(); // eventInfo.GetSpellInfo()
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
+                return false;
+            }
+
+            return true;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
-            int32 mana = int32(eventInfo.GetDamageInfo()->GetSpellInfo()->CalcPowerCost(GetTarget(), eventInfo.GetDamageInfo()->GetSchoolMask()));
+            int32 mana = eventInfo.GetDamageInfo()->GetSpellInfo()->CalcPowerCost(GetTarget(), eventInfo.GetDamageInfo()->GetSchoolMask());
             mana = CalculatePct(mana, aurEff->GetAmount());
 
             GetTarget()->CastCustomSpell(SPELL_MAGE_BURNOUT_TRIGGER, SPELLVALUE_BASE_POINT0, mana, GetTarget(), true, nullptr, aurEff);
@@ -864,8 +878,15 @@ public:
             if (!eventInfo.GetActor() || !eventInfo.GetProcTarget())
                 return false;
 
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
+                return false;
+            }
+
             // Molten Armor
-            if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (SpellInfo const* spellInfo = damageInfo->GetSpellInfo())
                 if (spellInfo->SpellFamilyFlags[1] & 0x8)
                     return false;
 
@@ -993,11 +1014,14 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            _spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
-            if (!_spellInfo)
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
             {
                 return false;
             }
+
+            _spellInfo = damageInfo->GetSpellInfo();
 
             bool selectCaster = false;
             // Triggered spells cost no mana so we need triggering spellInfo

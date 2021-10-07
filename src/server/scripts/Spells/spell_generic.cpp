@@ -1694,6 +1694,13 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
+                return false;
+            }
+
             if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
                 return false;
 
@@ -2145,8 +2152,12 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
                 return false;
+            }
 
             if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
                 return false;

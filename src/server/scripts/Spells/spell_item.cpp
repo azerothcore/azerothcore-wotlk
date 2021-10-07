@@ -668,9 +668,20 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
-            if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
+
+            DamageInfo const* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
                 return false;
+            }
+
+            SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
+
+            if (!spellInfo->HasEffect(SPELL_EFFECT_HEAL))
+            {
+                return false;
+            }
 
             return spellInfo->ManaCost > 0 || spellInfo->ManaCostPercentage > 0 || (spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && spellInfo->SpellIconID == 156);
         }
@@ -2418,7 +2429,15 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 bp = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 bp = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
             GetTarget()->CastCustomSpell(SPELL_ITEM_NECROTIC_TOUCH_PROC, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 

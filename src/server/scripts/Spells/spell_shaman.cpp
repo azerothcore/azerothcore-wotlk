@@ -1120,7 +1120,14 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
+                return false;
+            }
+
+            return true;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
