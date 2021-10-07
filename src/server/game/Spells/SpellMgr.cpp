@@ -3201,7 +3201,6 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 64422: // Sonic Screech (Auriaya)
-            case 13877: // Blade Flurry (Rogue Spell) should ignore armor and share damage to 2nd mob
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
@@ -3276,6 +3275,9 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 50315: // Disco Ball
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                break;
+            case 14183: // Premeditation
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
                 break;
 
             // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
@@ -7393,6 +7395,12 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 23595 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectBasePoints[EFFECT_0] = 1;
+    });
+
+    // Eye of Kilrogg Passive
+    ApplySpellFix({ 2585 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
