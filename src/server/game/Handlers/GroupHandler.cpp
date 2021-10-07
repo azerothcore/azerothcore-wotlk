@@ -331,10 +331,23 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     // Xinef: name is properly filled in packets
     sObjectMgr->GetPlayerNameByGUID(guid.GetCounter(), name);
 
-    PartyResult res = GetPlayer()->CanUninviteFromGroup();
+    PartyResult res = GetPlayer()->CanUninviteFromGroup(guid);
     if (res != ERR_PARTY_RESULT_OK)
     {
-        SendPartyResult(PARTY_OP_UNINVITE, name, res);
+        if (res == ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S)
+        {
+            if (Player* kickTarget = ObjectAccessor::FindConnectedPlayer(guid))
+            {
+                if (Aura* dungeonCooldownAura = kickTarget->GetAura(lfg::LFG_SPELL_DUNGEON_COOLDOWN))
+                {
+                    SendPartyResult(PARTY_OP_UNINVITE, name, res, dungeonCooldownAura->GetDuration() / 1000);
+                }
+            }
+        } else
+        {
+            SendPartyResult(PARTY_OP_UNINVITE, name, res);
+        }
+
         return;
     }
 
@@ -389,16 +402,18 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recvData)
         return;
     }
 
-    PartyResult res = GetPlayer()->CanUninviteFromGroup();
+    Group* grp = GetPlayer()->GetGroup();
+    if (!grp)
+    {
+        return;
+    }
+
+    PartyResult res = GetPlayer()->CanUninviteFromGroup(grp->GetMemberGUID(membername));
     if (res != ERR_PARTY_RESULT_OK)
     {
         SendPartyResult(PARTY_OP_UNINVITE, "", res);
         return;
     }
-
-    Group* grp = GetPlayer()->GetGroup();
-    if (!grp)
-        return;
 
     if (ObjectGuid guid = grp->GetMemberGUID(membername))
     {
