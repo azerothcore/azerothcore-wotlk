@@ -7394,6 +7394,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectBasePoints[EFFECT_0] = 1;
     });
 
+    // Eye of Kilrogg Passive
+    ApplySpellFix({ 2585 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
