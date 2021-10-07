@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -2380,10 +2391,37 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
     if (proto->Class == ITEM_CLASS_WEAPON && GetSkillValue(item_weapon_skills[proto->SubClass]) == 0)
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
 
-    // check for shields
-    if ((proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD) && !(_class == CLASS_PALADIN || _class == CLASS_WARRIOR || _class == CLASS_SHAMAN))
+    if (proto->Class == ITEM_CLASS_ARMOR)
     {
-        return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
+        // Check for shields
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD && !(_class == CLASS_PALADIN || _class == CLASS_WARRIOR || _class == CLASS_SHAMAN))
+        {
+            return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
+        }
+
+        // Check for librams.
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && _class != CLASS_PALADIN)
+        {
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+        }
+
+        // CHeck for idols.
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && _class != CLASS_DRUID)
+        {
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+        }
+
+        // Check for totems.
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && _class != CLASS_SHAMAN)
+        {
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+        }
+
+        // Check for sigils.
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && _class != CLASS_DEATH_KNIGHT)
+        {
+            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+        }
     }
 
     if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass > ITEM_SUBCLASS_ARMOR_MISC && proto->SubClass < ITEM_SUBCLASS_ARMOR_BUCKLER &&
@@ -3708,6 +3746,14 @@ void Player::SwapItem(uint16 src, uint16 dst)
         }
     }
 
+    // Remove item enchantments for now and restore it later
+    // Needed for swap sanity checks
+    ApplyEnchantment(pSrcItem, false);
+    if (pDstItem)
+    {
+        ApplyEnchantment(pDstItem, false);
+    }
+
     // impossible merge/fill, do real swap
     InventoryResult msg = EQUIP_ERR_OK;
 
@@ -3727,6 +3773,13 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     if (msg != EQUIP_ERR_OK)
     {
+        // Restore enchantments
+        ApplyEnchantment(pSrcItem, true);
+        if (pDstItem)
+        {
+            ApplyEnchantment(pDstItem, true);
+        }
+
         SendEquipError(msg, pSrcItem, pDstItem);
         return;
     }
@@ -3747,8 +3800,22 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     if (msg != EQUIP_ERR_OK)
     {
+        // Restore enchantments
+        ApplyEnchantment(pSrcItem, true);
+        if (pDstItem)
+        {
+            ApplyEnchantment(pDstItem, true);
+        }
+
         SendEquipError(msg, pDstItem, pSrcItem);
         return;
+    }
+
+    // Restore enchantments
+    ApplyEnchantment(pSrcItem, true);
+    if (pDstItem)
+    {
+        ApplyEnchantment(pDstItem, true);
     }
 
     // Check bag swap with item exchange (one from empty in not bag possition (equipped (not possible in fact) or store)
