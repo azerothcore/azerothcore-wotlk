@@ -2269,16 +2269,16 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
    return liquidData;
 }
 
-void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType)
+void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType)
 {
     GridMap* gmap = GetGrid(x, y);
 
     VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     VMAP::AreaAndLiquidData vmapData;
-    VMAP::AreaAndLiquidData dynData;
+    // VMAP::AreaAndLiquidData dynData;
     VMAP::AreaAndLiquidData* wmoData = nullptr;
     vmgr->GetAreaAndLiquidData(GetId(), x, y, z, reqLiquidType, vmapData);
-    _dynamicTree.GetAreaAndLiquidData(x, y, z, phaseMask, reqLiquidType, dynData);
+    // _dynamicTree.GetAreaAndLiquidData(x, y, z, phaseMask, reqLiquidType, dynData);
 
     uint32 gridAreaId = 0;
     float gridMapHeight = INVALID_HEIGHT;
@@ -2305,6 +2305,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, fl
     // NOTE: Objects will not detect a case when a wmo providing area/liquid despawns from under them
     // but this is fine as these kind of objects are not meant to be spawned and despawned a lot
     // example: Lich King platform
+    /*
     if (dynData.floorZ > VMAP_INVALID_HEIGHT && G3D::fuzzyGe(z, dynData.floorZ - GROUND_HEIGHT_TOLERANCE) &&
         (G3D::fuzzyLt(z, gridMapHeight - GROUND_HEIGHT_TOLERANCE) || dynData.floorZ > gridMapHeight) &&
         (G3D::fuzzyLt(z, vmapData.floorZ - GROUND_HEIGHT_TOLERANCE) || dynData.floorZ > vmapData.floorZ))
@@ -2312,6 +2313,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, fl
         data.floorZ = dynData.floorZ;
         wmoData = &dynData;
     }
+    */
 
     if (wmoData)
     {
