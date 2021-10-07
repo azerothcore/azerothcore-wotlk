@@ -596,7 +596,7 @@ public:
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
     void SetZoneWeather(uint32 zoneId, uint32 weatherId, float weatherGrade);
-    void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime);
+    void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime);
 
     // Checks encounter state at kill/spellcast, originally in InstanceScript however not every map has instance script :(
     void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
