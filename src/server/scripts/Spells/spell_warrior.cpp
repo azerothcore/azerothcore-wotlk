@@ -828,7 +828,7 @@ public:
             PreventDefaultAction();
             if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
             {
-                int32 damage = damageInfo->GetUnmitigatedDamage();  
+                int32 damage = damageInfo->GetUnmitigatedDamage();
                 GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, nullptr, aurEff);
             }
         }
