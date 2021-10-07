@@ -19,6 +19,7 @@
 #define _GAMEGRAVEYARD_H_
 
 #include "Common.h"
+#include "Player.h"
 #include "SharedDefines.h"
 #include <map>
 #include <unordered_map>
@@ -54,7 +55,7 @@ public:
     GraveyardStruct const* GetGraveyard(uint32 ID) const;
     GraveyardStruct const* GetGraveyard(const std::string& name) const;
     GraveyardStruct const* GetDefaultGraveyard(TeamId teamId);
-    GraveyardStruct const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId);
+    GraveyardStruct const* GetClosestGraveyard(Player* player, TeamId teamId, bool nearCorpse = false);
     GraveyardData const* FindGraveyardData(uint32 id, uint32 zone);
     GraveyardContainer const& GetGraveyardData() const { return _graveyardStore; }
     bool AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool persist = true);
