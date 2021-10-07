@@ -36,3 +36,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Remove the SAI that grants quest credit from the compound, it's handled by the NPC instead.
 DELETE FROM `smart_scripts` WHERE `entryorguid`  = 177672 AND `source_type` = 1;
 UPDATE `gameobject_template` SET `AIName` = '' WHERE `entry` = 177672;
+
+-- Set respawn timer for the Mark of Detonation GO to 3 minutes.
+UPDATE `gameobject` SET `spawntimesecs` = 180 WHERE `id` = 177668;
