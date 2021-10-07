@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 // This is where scripts' loading functions should be declared:
@@ -25,15 +37,12 @@ void AddSC_boss_drakkisath();                //Blackrock Spire
 void AddSC_boss_halycon();
 void AddSC_boss_highlordomokk();
 void AddSC_boss_overlordwyrmthalak();
-void AddSC_boss_shadowvosh();
 void AddSC_boss_thebeast();
 void AddSC_boss_warmastervoone();
-void AddSC_boss_quatermasterzigris();
 void AddSC_boss_pyroguard_emberseer();
 void AddSC_boss_gyth();
 void AddSC_boss_rend_blackhand();
 void AddSC_boss_urok_doomhowl();
-void AddSC_boss_gizrul_the_slavener();
 void AddSC_instance_blackrock_spire();
 void AddSC_boss_razorgore();                 //Blackwing lair
 void AddSC_boss_vaelastrasz();
@@ -162,15 +171,12 @@ void AddEasternKingdomsScripts()
     AddSC_boss_halycon();
     AddSC_boss_highlordomokk();
     AddSC_boss_overlordwyrmthalak();
-    AddSC_boss_shadowvosh();
     AddSC_boss_thebeast();
     AddSC_boss_warmastervoone();
-    AddSC_boss_quatermasterzigris();
     AddSC_boss_pyroguard_emberseer();
     AddSC_boss_gyth();
     AddSC_boss_rend_blackhand();
     AddSC_boss_urok_doomhowl();
-    AddSC_boss_gizrul_the_slavener();
     AddSC_instance_blackrock_spire();
     AddSC_boss_razorgore();                 //Blackwing lair
     AddSC_boss_vaelastrasz();
