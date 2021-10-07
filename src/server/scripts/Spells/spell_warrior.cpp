@@ -818,8 +818,11 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 damage = eventInfo.GetDamageInfo()->GetDamage();
-            GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, nullptr, aurEff);
+            if (eventInfo.GetDamageInfo())
+            {
+                int32 damage = eventInfo.GetDamageInfo()->GetUnmitigatedDamage();
+                GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, nullptr, aurEff);
+            }
         }
 
         void Register() override
