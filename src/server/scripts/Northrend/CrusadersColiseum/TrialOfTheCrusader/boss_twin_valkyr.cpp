@@ -850,10 +850,15 @@ public:
                             uint32 resist = 0;
                             CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
                             int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
+                            uint32 damage = dmg;
+                            int32 resilienceReduction = damage;
                             if (caster->CanApplyResilience())
                                 Unit::ApplyResilience(plr, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
-                            uint32 damage = dmg;
-                            Unit::CalcAbsorbResist(caster, plr, GetSpellInfo()->GetSchoolMask(), DOT, damage, &absorb, &resist, GetSpellInfo());
+                            resilienceReduction = damage - resilienceReduction;
+                            damage -= resilienceReduction;
+                            uint32 mitigated_damage = resilienceReduction;
+                            DamageInfo dmgInfo(caster, plr, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
+                            Unit::CalcAbsorbResist(dmgInfo);
                             Unit::DealDamageMods(plr, damage, &absorb);
                             int32 overkill = damage - plr->GetHealth();
                             if (overkill < 0)
