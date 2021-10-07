@@ -682,7 +682,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                         if (Player* player = (*itr)->ToUnit()->GetCharmerOrOwnerPlayerOrPlayerItself())
                         {
-                            player->GroupEventHappens(e.action.quest.quest, me);
+                            player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS: Player %s credited quest %u",
                                            (*itr)->GetGUID().ToString().c_str(), e.action.quest.quest);
                         }
