@@ -172,19 +172,47 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     if (!pSrcItem)
         return;                                             // only at cheat
 
-    uint16 dest;
-    InventoryResult msg = _player->CanEquipItem(NULL_SLOT, dest, pSrcItem, !pSrcItem->IsBag());
-    if (msg != EQUIP_ERR_OK)
+    ItemTemplate const* pProto = pSrcItem->GetTemplate();
+    if (!pProto)
     {
-        _player->SendEquipError(msg, pSrcItem, nullptr);
+        return;
+    }
+
+    uint8 eslot = _player->FindEquipSlot(pProto, NULL_SLOT, !pSrcItem->IsBag());
+    if (eslot == NULL_SLOT)
+    {
         return;
     }
 
     uint16 src = pSrcItem->GetPos();
-    if (dest == src)                                           // prevent equip in same slot, only at cheat
+    uint16 dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
+    if (dest == src) // prevent equip in same slot, only at cheat
+    {
         return;
+    }
 
     Item* pDstItem = _player->GetItemByPos(dest);
+
+    // Remove item enchantments for now and restore it later
+    // Needed for swap sanity checks
+    if (pDstItem)
+    {
+        _player->ApplyEnchantment(pDstItem, false);
+    }
+
+    InventoryResult msg = _player->CanEquipItem(NULL_SLOT, dest, pSrcItem, !pSrcItem->IsBag());
+    if (msg != EQUIP_ERR_OK)
+    {
+        // Restore enchantments
+        if (pDstItem)
+        {
+            _player->ApplyEnchantment(pDstItem, true);
+        }
+
+        _player->SendEquipError(msg, pSrcItem, nullptr);
+        return;
+    }
+
     if (!pDstItem)                                         // empty slot, simple case
     {
         _player->RemoveItem(srcbag, srcslot, true);
@@ -193,6 +221,9 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     }
     else                                                    // have currently equipped item, not simple case
     {
+        // Restore enchantments
+        _player->ApplyEnchantment(pDstItem, true);
+
         uint8 dstbag = pDstItem->GetBagSlot();
         uint8 dstslot = pDstItem->GetSlot();
 
