@@ -1207,7 +1207,7 @@ void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout)
         {
             m_CreatureSpellCooldowns.erase(itr2);
         }
-        else if (itr->second.end <= infTime && (logout || itr->second.end > (curMSTime + 30 * IN_MILLISECONDS)))
+        else if (itr2->second.end <= infTime && (logout || itr2->second.end > (curMSTime + 30 * IN_MILLISECONDS)))
         {
             uint32 cooldown = ((itr2->second.end - curMSTime) / IN_MILLISECONDS) + curTime;
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL_COOLDOWN);

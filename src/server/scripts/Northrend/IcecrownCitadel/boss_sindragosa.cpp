@@ -855,7 +855,7 @@ public:
 
             uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
 
-            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
+            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
             damageInfo.damage = damage;
             GetCaster()->SendSpellNonMeleeDamageLog(&damageInfo);
             GetCaster()->DealSpellDamage(&damageInfo, false);
