@@ -227,6 +227,15 @@ void NPCStaveQuestAI::ResetState(uint32 aura = 0)
     }
 }
 
+void NPCStaveQuestAI::EvadeOnFeignDeath()
+{
+    Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
+    if (player && player->HasAura(5384))
+    {
+        EnterEvadeMode();
+    }
+}
+
 void NPCStaveQuestAI::AttackStart(Unit* target)
 {
     if (playerGUID.IsEmpty() && !InNormalForm())
@@ -314,11 +323,7 @@ public:
             if (UpdateVictim())
             {
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
-                if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
-                {
-                    EnterEvadeMode();
-                    return;
-                }
+                EvadeOnFeignDeath();
             }
             else
             {
@@ -471,11 +476,7 @@ public:
             if (UpdateVictim())
             {
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
-                if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
-                {
-                    EnterEvadeMode();
-                    return;
-                }
+                EvadeOnFeignDeath();
             }
             else
             {
@@ -711,11 +712,7 @@ public:
             if (UpdateVictim())
             {
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
-                if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
-                {
-                    EnterEvadeMode();
-                    return;
-                }
+                EvadeOnFeignDeath();
             }
             else
             {
@@ -927,11 +924,7 @@ public:
             if (UpdateVictim())
             {
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
-                if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
-                {
-                    EnterEvadeMode();
-                    return;
-                }
+                EvadeOnFeignDeath();
             }
             else
             {
@@ -1106,11 +1099,7 @@ public:
             if (UpdateVictim())
             {
                 // This should prevent hunters from staying in combat when feign death is used and there is a bystander with 0 threat
-                if (!playerGUID.IsEmpty() && ObjectAccessor::GetPlayer(*me, playerGUID)->HasAura(5384))
-                {
-                    EnterEvadeMode();
-                    return;
-                }
+                EvadeOnFeignDeath();
             }
             else
             {

@@ -194,6 +194,7 @@ struct NPCStaveQuestAI : public ScriptedAI
     void StoreAttackerGuidValue(Unit* attacker);
     bool QuestIncomplete(Unit* unit, uint32 questItem);
     void ResetState(uint32 /*aura*/);
+    void EvadeOnFeignDeath();
 
     virtual void AttackStart(Unit* /*target*/);
     virtual void AttackedBy(Unit* /*attacker*/);
