@@ -34,7 +34,6 @@ enum Creatures
     NPC_SEETHREL                = 9038,
     NPC_GLOOMREL                = 9037,
     NPC_DOOMREL                 = 9039,
-    NPC_MAGMUS                  = 9938,
     NPC_MOIRA                   = 8929,
 
     NPC_WATCHMAN_DOOMGRIP       = 9476,
@@ -524,6 +523,10 @@ public:
                     return GoGolemSGUID;
                 case DATA_GO_CHALICE:
                     return GoSpectralChaliceGUID;
+                case DATA_MAGMUS:
+                {
+                    return MagmusGUID;
+                }
             }
 
             return ObjectGuid::Empty;

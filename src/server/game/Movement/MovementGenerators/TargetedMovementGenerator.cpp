@@ -450,7 +450,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             owner->UpdateAllowedPositionZ(x, y, z);
 
         bool success = i_path->CalculatePath(x, y, z, forceDest);
-        if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
+        if (!success || (i_path->GetPathType() & PATHFIND_NOPATH && !followingMaster))
         {
             if (!owner->IsStopped())
                 owner->StopMoving();
