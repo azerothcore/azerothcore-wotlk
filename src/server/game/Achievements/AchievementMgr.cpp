@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -23,7 +34,7 @@
 #include "InstanceScript.h"
 #include "Language.h"
 #include "Map.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
@@ -2309,44 +2320,40 @@ void AchievementMgr::SendAllAchievementData() const
 
 void AchievementMgr::SendRespondInspectAchievements(Player* player) const
 {
-    WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9 + m_completedAchievements.size() * 8 + 4 + 4);
+    WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9 + m_completedAchievements.size() * 8 + 4 + m_criteriaProgress.size() * 38 + 4);
     data << GetPlayer()->GetPackGUID();
-    BuildAllDataPacket(&data, true);
+    BuildAllDataPacket(&data);
     player->GetSession()->SendPacket(&data);
 }
 
 /**
  * used by SMSG_RESPOND_INSPECT_ACHIEVEMENT and SMSG_ALL_ACHIEVEMENT_DATA
  */
-void AchievementMgr::BuildAllDataPacket(WorldPacket* data, bool inspect) const
+void AchievementMgr::BuildAllDataPacket(WorldPacket* data) const
 {
-    if (!m_completedAchievements.empty())
+    for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
     {
-        AchievementEntry const* achievement = nullptr;
-        for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
-        {
-            // Skip hidden achievements
-            achievement = sAchievementStore.LookupEntry(iter->first);
-            if (!achievement || achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
-                continue;
+        // Skip hidden achievements
+        AchievementEntry const* achievement = sAchievementStore.LookupEntry(iter->first);
+        if (!achievement || achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
+            continue;
 
-            *data << uint32(iter->first);
-            data->AppendPackedTime(iter->second.date);
-        }
+        *data << uint32(iter->first);
+        data->AppendPackedTime(iter->second.date);
     }
+
     *data << int32(-1);
 
-    if (!inspect && !m_criteriaProgress.empty())
-        for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
-        {
-            *data << uint32(iter->first);
-            data->appendPackGUID(iter->second.counter);
-            *data << GetPlayer()->GetPackGUID();
-            *data << uint32(0);
-            data->AppendPackedTime(iter->second.date);
-            *data << uint32(0);
-            *data << uint32(0);
-        }
+    for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
+    {
+        *data << uint32(iter->first);
+        data->appendPackGUID(iter->second.counter);
+        *data << GetPlayer()->GetPackGUID();
+        *data << uint32(0);
+        data->AppendPackedTime(iter->second.date);
+        *data << uint32(0);
+        *data << uint32(0);
+    }
 
     *data << int32(-1);
 }
