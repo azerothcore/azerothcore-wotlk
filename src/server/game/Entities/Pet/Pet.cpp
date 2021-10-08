@@ -35,6 +35,10 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
 Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : ObjectGuid::Empty, true),
     m_usedTalentCount(0), m_removed(false), m_owner(owner),
     m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL), m_petType(type), m_duration(0),
@@ -93,6 +97,11 @@ void Pet::AddToWorld()
         GetCharmInfo()->SetIsFollowing(false);
         GetCharmInfo()->SetIsReturning(false);
     }
+
+#ifdef ELUNA
+    if (GetOwnerGUID().IsPlayer())
+        sEluna->OnPetAddedToWorld(GetOwner(), this);
+#endif
 }
 
 void Pet::RemoveFromWorld()
