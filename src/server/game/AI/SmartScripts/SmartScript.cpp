@@ -1309,9 +1309,11 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 {
-                    if (IsCreature(*itr))
-                        (*itr)->ToCreature()->DespawnOrUnsummon(e.action.forceDespawn.delay + 1);
-                    else if (IsGameObject(*itr))
+                    if (Creature* creature = (*itr)->ToCreature())
+                    {
+                        creature->DespawnOrUnsummon(e.action.forceDespawn.delay + 1);
+                    }
+                    else if (GameObject* go = (*itr)->ToGameObject())
                     {
                         Milliseconds despawnDelay(e.action.forceDespawn.delay);
 
@@ -1320,7 +1322,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         {
                             despawnDelay = 1ms;
                         }
-                        (*itr)->ToGameObject()->DespawnOrUnsummon(despawnDelay);
+                        go->DespawnOrUnsummon(despawnDelay);
                     }
                 }
 
