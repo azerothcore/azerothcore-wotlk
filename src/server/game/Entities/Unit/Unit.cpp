@@ -8409,28 +8409,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                 break;
             case SPELLFAMILY_WARLOCK:
                 {
-                    // Drain Soul
-                    if (auraSpellInfo->SpellFamilyFlags[0] & 0x4000)
-                    {
-                        // Improved Drain Soul
-                        Unit::AuraEffectList const& mAddFlatModifier = GetAuraEffectsByType(SPELL_AURA_DUMMY);
-                        for (Unit::AuraEffectList::const_iterator i = mAddFlatModifier.begin(); i != mAddFlatModifier.end(); ++i)
-                        {
-                            if ((*i)->GetMiscValue() == SPELLMOD_CHANCE_OF_SUCCESS && (*i)->GetSpellInfo()->SpellIconID == 113)
-                            {
-                                int32 value2 = CalculateSpellDamage(this, (*i)->GetSpellInfo(), 2);
-                                basepoints0 = int32(CalculatePct(GetMaxPower(POWER_MANA), value2));
-                                // Drain Soul
-                                CastCustomSpell(this, 18371, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
-                                break;
-                            }
-                        }
-                        // Not remove charge (aura removed on death in any cases)
-                        // Need for correct work Drain Soul SPELL_AURA_CHANNEL_DEATH_ITEM aura
-                        return false;
-                    }
                     // Nether Protection
-                    else if (auraSpellInfo->SpellIconID == 1985)
+                    if (auraSpellInfo->SpellIconID == 1985)
                     {
                         if (!procSpell)
                             return false;
