@@ -1,3 +1,19 @@
+-- DB update 2021_10_08_13 -> 2021_10_08_14
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_10_08_13';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_10_08_13 2021_10_08_14 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1633459397421584200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633459397421584200');
 
 -- Currently 2 nodes are spawning always. According to the sniffs, from 1 to 3 ores should spawn, but the pool_template max_limit field seems to not work properly.
@@ -20,3 +36,13 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (2135401, 11712, 0, 'Rich Thorium Vein - Dire Maul East node 3'),
 (2135402, 11712, 0, 'Rich Thorium Vein - Dire Maul East node 4'),
 (2135403, 11712, 0, 'Rich Thorium Vein - Dire Maul East node 5');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_10_08_14' WHERE sql_rev = '1633459397421584200';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
