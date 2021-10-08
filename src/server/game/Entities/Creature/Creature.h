@@ -275,7 +275,7 @@ public:
     [[nodiscard]] time_t GetRespawnTimeEx() const;
     void SetRespawnTime(uint32 respawn) { m_respawnTime = respawn ? time(nullptr) + respawn : 0; }
     void Respawn(bool force = false);
-    void SaveRespawnTime() override;
+    void SaveRespawnTime();
 
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelay; }
     void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }

@@ -1312,7 +1312,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsCreature(*itr))
                         (*itr)->ToCreature()->DespawnOrUnsummon(e.action.forceDespawn.delay + 1);
                     else if (IsGameObject(*itr))
-                        (*itr)->ToGameObject()->Delete();
+                    {
+                        Milliseconds despawnDelay(e.action.forceDespawn.delay);
+
+                        // Wait at least one world update tick before despawn, so it doesn't break linked actions.
+                        if (despawnDelay <= 0ms)
+                        {
+                            despawnDelay = 1ms;
+                        }
+                        (*itr)->ToGameObject()->DespawnOrUnsummon(despawnDelay);
+                    }
                 }
 
                 delete targets;
