@@ -398,13 +398,16 @@ void GameObject::Update(uint32 diff)
     if (m_despawnDelay)
     {
         if (m_despawnDelay > diff)
+        {
             m_despawnDelay -= diff;
+        }
         else
         {
             m_despawnDelay = 0;
             DespawnOrUnsummon(0ms, m_despawnRespawnTime);
         }
     }
+
     switch (m_lootState)
     {
         case GO_NOT_READY:
@@ -839,11 +842,15 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay, Seconds forceRespawnTime)
             SetGoState(GO_STATE_READY);
 
             if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+            {
                 SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+            }
 
             uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
             if (poolid)
+            {
                 sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+            }
         }
     }
 }
