@@ -25,7 +25,7 @@ DELETE FROM `smart_scripts` WHERE `entryorguid`=9459 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (9459,0,0,2,62,0,100,0,1843,0,0,0,0,12,9461,1,360000,0,0,0,8,0,0,0,-7656.94,-3009.47,133.206,4.83028,'Cyrus Therepentous - On Gossip Option Selected - Summon Creature Frenzied Black Drake'),
 (9459,0,1,2,62,0,100,0,1842,0,0,0,0,15,4022,0,0,0,0,0,7,0,0,0,0,0,0,0,'Cyrus Therepentous - On Gossip Option Selected - Summon Creature Frenzied Black Drake'),
-(9459,0,2,0,61,0,100,512,0,0,0,0,0,72,0,0,0,0,0,0,7,0,0,0,0,0,0,0,'Cyrus Therepentous - On Gossip Option Selected - Close Gossip');
+(9459,0,2,0,61,0,100,0,0,0,0,0,0,72,0,0,0,0,0,0,7,0,0,0,0,0,0,0,'Cyrus Therepentous - On Gossip Option Selected - Close Gossip');
 
 -- Quest "A Taste of Flame"
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=19 AND `SourceEntry` IN (4022,4023);
