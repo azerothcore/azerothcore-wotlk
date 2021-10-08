@@ -36,8 +36,6 @@ enum ShadowforgeBrazier
     SAY_MAGMUS_BRAZIER_LIT = 0
 };
 
-
-// go_shadowforge_brazier
 class go_shadowforge_brazier : public GameObjectScript
 {
 public:
@@ -55,34 +53,24 @@ public:
                 return false;
             }
 
+            LOG_FATAL("Entities:unit", "north brazier state %d, south brazier %d", northBrazier->GetGoState(), southBrazier->GetGoState());
+
+            // should only happen on first brazier
+            if (instance->GetData(TYPE_LYCEUM) == NOT_STARTED)
+            {
+                instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
+            }
+
             // Check if the opposite brazier is lit - if it is, open the gates.
             if ((go->GetGUID() == northBrazier->GetGUID() && southBrazier->GetGoState() == GO_STATE_ACTIVE) || (go->GetGUID() == southBrazier->GetGUID() && northBrazier->GetGoState() == GO_STATE_ACTIVE))
             {
-                if (instance->GetData(TYPE_LYCEUM) == IN_PROGRESS)
-                {
-                    instance->SetData(TYPE_LYCEUM, DONE);
-                }
-                else
-                {
-                    instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
-                }
-
-     /* if (Creature* magmus = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_MAGMUS)))
-                {
-                    if (magmus->IsAlive())
-                    {
-                        magmus->AI()->Talk(SAY_MAGMUS_BRAZIER_LIT);
-                    }
-                }
-
-                instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
-                instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);*/
+                LOG_FATAL("Entities:unit", "setting a brazier");
+                instance->SetData(TYPE_LYCEUM, DONE);
             }
         }
         return false;
     }
 };
-
 
 class ironhand_guardian : public CreatureScript
 {

@@ -183,8 +183,6 @@ public:
         std::vector<ObjectGuid> EmperorSenatorsVector;
         Position EmperorSpawnPos;
 
-        bool MoiraSaved = true;
-
         void OnPlayerEnter(Player* /* player */) override
         {
             // In case a player joins the party during the run
@@ -196,7 +194,7 @@ public:
             ObjectGuid* GUIDToReplace = &PriestessGUID; // default to having Moira
             ObjectGuid* GUIDToSpawn   = &MoiraGUID;
             uint32      NPCEntry      = NPC_MOIRA;
-            MoiraSaved                = true;
+            bool        MoiraSaved    = true;
 
             // check if all players saved her.
             Map::PlayerList const& lPlayers = instance->GetPlayers();
@@ -227,6 +225,7 @@ public:
                 CreatureToReplace->RemoveFromWorld();
                 *GUIDToSpawn = NewSpawn->GetGUID();
             }
+            LOG_FATAL("entities:unit", "done replacing Moira or priestess. New NPC is %d, Moira GUID %d", NPCEntry, MoiraGUID.GetRawValue());
         }
 
         void Initialize() override
@@ -483,6 +482,7 @@ public:
                     encounter[4] = data;
                     if (data == DONE)
                     {
+                        LOG_FATAL("entities:unit", "lyceum done");
                         HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_N), true);
                         HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_S), true);
                         if (Creature* magmus = instance->GetCreature(MagmusGUID))
