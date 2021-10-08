@@ -13468,9 +13468,14 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             break;
     }
 
-    // added to fix azerothcore issue 5342
     int32 slowFromHealth = 0;
-    if (GetTypeId() == TYPEID_UNIT && !IsPet())
+    Creature* creature = ToCreature();
+    Unit* owner    = GetOwner();
+    // ignore pets, player owned vehicles, and mobs immune to snare
+    if (GetTypeId() == TYPEID_UNIT
+        && !IsPet()
+        && !(owner && owner->IsPlayer() && IsVehicle())
+        && !(creature && creature->HasMechanicTemplateImmunity(MECHANIC_SNARE)))
     {
         // 1.6% for each % under 30.
         // use min(0, health-30) so that we don't boost mobs above 30.
