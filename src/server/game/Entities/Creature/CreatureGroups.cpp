@@ -101,7 +101,7 @@ void FormationMgr::LoadCreatureFormations()
         group_member.leaderGUID            = fields[0].GetUInt32();
         ObjectGuid::LowType const memberGUID = fields[1].GetUInt32();
         float const follow_dist             = fields[2].GetFloat();
-        float const follow_angle            = fields[3].GetFloat() * static_cast<float>(M_PI) / 180;
+        float const follow_angle            = fields[3].GetFloat() * (static_cast<float>(M_PI) / 180);
         group_member.groupAI               = fields[4].GetUInt16();
         group_member.point_1               = fields[5].GetUInt16();
         group_member.point_2               = fields[6].GetUInt16();
@@ -124,7 +124,7 @@ void FormationMgr::LoadCreatureFormations()
             else
             {
                 group_member.follow_dist       = follow_dist;
-                group_member.follow_angle      = follow_angle * static_cast<float>(M_PI) / 180;
+                group_member.follow_angle      = follow_angle;
             }
         }
         else
