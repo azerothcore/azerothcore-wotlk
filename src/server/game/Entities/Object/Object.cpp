@@ -1673,6 +1673,11 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         if (cObj->IsAIEnabled && this->ToPlayer() && !cObj->AI()->CanBeSeen(this->ToPlayer()))
             return false;
 
+    // Gameobject scripts
+    if (GameObject const* goObj = obj->ToGameObject())
+        if (this->ToPlayer() && !goObj->AI()->CanBeSeen(this->ToPlayer()))
+            return false;
+
     // pussywizard: arena spectator
     if (obj->GetTypeId() == TYPEID_PLAYER)
         if (((const Player*)obj)->IsSpectator() && ((const Player*)obj)->FindMap()->IsBattleArena())

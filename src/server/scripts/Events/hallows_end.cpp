@@ -16,6 +16,7 @@
  */
 
 #include "CellImpl.h"
+#include "GameObjectAI.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
 #include "Group.h"
@@ -975,17 +976,6 @@ public:
         uint8 phase;
         uint32 health;
 
-        bool CanBeSeen(Player const* player) override
-        {
-            if (player->IsGameMaster())
-            {
-                return true;
-            }
-
-            Group const* group = player->GetGroup();
-            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_HEADLESS_HORSEMAN;
-        }
-
         void JustDied(Unit*  /*killer*/) override
         {
             summons.DespawnAll();
@@ -1438,6 +1428,27 @@ public:
             horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
 
         return true;
+    }
+
+    struct go_loosely_turned_soilAI : public GameObjectAI
+    {
+        go_loosely_turned_soilAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
+
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_HEADLESS_HORSEMAN;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_loosely_turned_soilAI(go);
     }
 };
 
