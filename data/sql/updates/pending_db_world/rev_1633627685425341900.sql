@@ -17,14 +17,14 @@ UPDATE `conditions` SET `ConditionValue1`=3, `ConditionValue2`=17066  WHERE `Sou
 
 DELETE FROM `conditions` WHERE `SourceEntry` IN (30098) AND `SourceTypeOrReferenceId`=17;
 DELETE FROM `conditions` WHERE `SourceEntry` IN (30098) AND `SourceTypeOrReferenceId`=13;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId, SourceGroup, SourceEntry, SourceId, ElseGroup, ConditionTypeOrReference, ConditionTarget`, `ConditionValue1, ConditionValue2, ConditionValue3, NegativeCondition, ErrorType, ErrorTextId, ScriptName, COMMENT`) VALUES
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `COMMENT`) VALUES
 (13, 2, 30098, 0, 0, 31, 0, 3, 17253, 0, 0, 0, 0, "", ""),
 (13, 2, 30098, 0, 0, 29, 0, 17233, 20, 0, 1, 0, 0, "", ""),
 (13, 1, 30098, 0, 0, 31, 0, 5, 182483, 0, 0, 0, 0, "", ""),
 (13, 4, 30098, 0, 0, 31, 0, 5, 181653, 0, 0, 0, 0, "", "");
 
 DELETE FROM `conditions` WHERE `SourceEntry` IN (17233) AND `SourceTypeOrReferenceId`=22;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId, SourceGroup, SourceEntry, SourceId, ElseGroup, ConditionTypeOrReference, ConditionTarget`, `ConditionValue1, ConditionValue2, ConditionValue3, NegativeCondition, ErrorType, ErrorTextId, ScriptName, COMMENT`) VALUES
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `COMMENT`) VALUES
 (22, 1, 17233, 0, 0, 6, 0, 67, 0, 0, 1, 0, 0, "", "");
 
 UPDATE `event_scripts` SET `datalong2`=55000 WHERE `id`=10561;
