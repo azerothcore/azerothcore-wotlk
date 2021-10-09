@@ -126,23 +126,22 @@ struct Wave
 
 static Wave RingMobs[] = // different amounts based on the type
 {
-    {8925, 3},
-    {8926, 2},
-    {8927, 3},
-    {8928, 4},
-    {8933, 3},
-    {8932, 6}
-};
+    {NPC_DREDGE_WORM, 3},
+    {NPC_DEEP_STINGER, 3},
+    {NPC_DARK_SCREECHER, 3},
+    {NPC_THUNDERSNOUT, 2},
+    {NPC_CAVE_CREEPER, 3},
+    {NPC_BORER_BEETLE, 6}};
 
 
 uint32 RingBoss[] =
 {
-    9027,                                                   // Gorosh ok
-    9028,                                                   // Grizzle ok 
-    9029,                                                   // Eviscerator no
-    9030,                                                   // Ok'thor no 
-    9031,                                                   // Anub'shiah ok 
-    9032,                                                   // Hedrum no
+    NPC_GOROSH,
+    NPC_GRIZZLE,
+    NPC_EVISCERATOR,
+    NPC_OKTHOR,
+    NPC_ANUBSHIAH,
+    NPC_HEDRUM
 };
 
 class at_ring_of_law : public AreaTriggerScript
@@ -150,23 +149,21 @@ class at_ring_of_law : public AreaTriggerScript
 public:
     at_ring_of_law() : AreaTriggerScript("at_ring_of_law") { }
 
-    time_t startTime = 0;
-
     bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
             
-            time_t now = sWorld->GetGameTime();
-            LOG_FATAL("entities:unit", "called start of ring of law, time since last: %u ", now - startTime);
+            time_t now = time(nullptr);
+            LOG_FATAL("entities:unit", "called start of ring of law, last fail time %d, time since last: %u, ring of law state: %d ", instance->GetData(DATA_TIME_RING_FAIL), now - instance->GetData(DATA_TIME_RING_FAIL), instance->GetData(TYPE_RING_OF_LAW));
             if (instance->GetData(TYPE_RING_OF_LAW) == IN_PROGRESS || instance->GetData(TYPE_RING_OF_LAW) == DONE)
                 return false;
 
-            if (now - startTime < 4 * 60) // in case of wipe, so people can rez.
+            if (now - instance->GetData(DATA_TIME_RING_FAIL) < 2 * 60) // in case of wipe, so people can rez.
             {
                 return false;
             }
-            startTime = now;
+
             instance->SetData(TYPE_RING_OF_LAW, IN_PROGRESS);
 
             return false;
@@ -237,7 +234,10 @@ public:
             summons.Despawn(summon);
             // All Summons killed, next phase
             if (summons.empty())
+            {
+                resetTimer = 0;
                 eventTimer = 5000;
+            }
         }
 
         void WaypointReached(uint32 waypointId) override
@@ -297,28 +297,28 @@ public:
 
         bool updateReset(uint32 diff)
         {
+            // as long as the summoned creatures have someone to attack, we reset the timer.
+            // once they don't find anyone, the timer will count down until it is smaller than diff and reset.
             bool doReset = false;
             if (resetTimer > 0)
             {
-                if (resetTimer <= diff)
+                for (const auto& sum : summons)
                 {
-                    resetTimer   = 30000;
-                    doReset    = true; // within timer, default to true. If any mob is in combat we set false.
-                    for (const auto& sum : summons)
+                    if (Creature* creature = ObjectAccessor::GetCreature(*me, sum))
                     {
-                        if (Creature* creature = ObjectAccessor::GetCreature(*me, sum))
+                        if (creature->IsAlive() && creature->GetVictim())
                         {
-                            if (creature->IsAlive() && creature->GetVictim())
-                            {
-                                LOG_FATAL("Entities:unit", "found a creature %s", creature->GetName());
-                                doReset = false;
-                            }
+                            LOG_FATAL("Entities:unit", "found a creature %s", creature->GetName());
+                            resetTimer = 30000;
+                            break; // only need to find one.
                         }
                     }
                 }
-                else
+
+                resetTimer -= diff;
+                if (resetTimer <= diff)
                 {
-                    resetTimer -= diff;
+                    doReset = true;
                 }
             }
             return doReset;
@@ -328,8 +328,9 @@ public:
         {
             for (int i = 0; i < RingMobs[mobId].amount; i++)
             {
-                me->SummonCreature(RingMobs[mobId].entry, 608.960f + 0.2f * i, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                me->SummonCreature(RingMobs[mobId].entry, 608.960f + 0.4f * i, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
             }
+            resetTimer = 30000;
         }
 
         void UpdateEscortAI(uint32 diff) override

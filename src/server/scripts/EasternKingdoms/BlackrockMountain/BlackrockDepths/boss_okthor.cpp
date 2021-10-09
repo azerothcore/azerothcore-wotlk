@@ -49,6 +49,8 @@ public:
     {
         boss_okthorAI(Creature* creature) : BossAI(creature, DATA_OKTHOR) {}
 
+        uint32 nextArcaneExplosionTime;
+
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
@@ -83,8 +85,13 @@ public:
                     if (me->GetDistance2d(me->GetVictim()) < 50.0f)
                     {
                         DoCast(SPELL_ARCANE_EXPLOSION);
+                        nextArcaneExplosionTime = urand(TIMER_ARCANE_EXPLOSION - 2000, TIMER_ARCANE_EXPLOSION + 2000);
                     }
-                    events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, urand(TIMER_ARCANE_EXPLOSION - 2000, TIMER_ARCANE_EXPLOSION + 2000));
+                    else
+                    {
+                        nextArcaneExplosionTime = 0.3*urand(TIMER_ARCANE_EXPLOSION - 2000, TIMER_ARCANE_EXPLOSION + 2000);
+                    }
+                    events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, nextArcaneExplosionTime);
                     break;
                 case SPELL_POLYMORPH:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
@@ -95,7 +102,9 @@ public:
                     break;
                 case SPELL_SLOW:
                     if (me->GetDistance2d(me->GetVictim()) < 50.0f)
+                    {
                         DoCast(SPELL_SLOW);
+                    }
                     events.ScheduleEvent(SPELL_SLOW, TIMER_SLOW);
                     break;
 

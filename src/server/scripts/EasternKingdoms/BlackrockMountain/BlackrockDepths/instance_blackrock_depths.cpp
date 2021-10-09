@@ -27,41 +27,6 @@
 #define RADIUS_RING_OF_LAW      80.0f
 #define DISTANCE_EMPEROR_ROOM   125
 
-enum Creatures
-{
-    NPC_EMPEROR                 = 9019,
-    NPC_PHALANX                 = 9502,
-    NPC_ANGERREL                = 9035,
-    NPC_DOPEREL                 = 9040,
-    NPC_HATEREL                 = 9034,
-    NPC_VILEREL                 = 9036,
-    NPC_SEETHREL                = 9038,
-    NPC_GLOOMREL                = 9037,
-    NPC_DOOMREL                 = 9039,
-    NPC_MOIRA                   = 8929,
-    NPC_PRIESTESS               = 10076,
-
-    NPC_WATCHMAN_DOOMGRIP       = 9476,
-
-    NPC_WEAPON_TECHNICIAN       = 8920,
-    NPC_DOOMFORGE_ARCANASMITH   = 8900,
-    NPC_RAGEREAVER_GOLEM        = 8906,
-    NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
-    NPC_GOLEM_LORD_ARGELMACH    = 8983,
-
-    NPC_COREN_DIREBREW          = 23872,
-
-    NPC_IRONHAND_GUARDIAN       = 8982,
-
-    NPC_ARENA_SPECTATOR         = 8916,
-    NPC_SHADOWFORGE_PEASANT     = 8896,
-    NPC_SHADOWFORCE_CITIZEN     = 8902,
-
-    NPC_SHADOWFORGE_SENATOR     = 8904,
-
-    NPC_MAGMUS                  = 9938
-};
-
 enum PrincessQuests
 {
     PRINCESS_QUEST_HORDE        = 4004,
@@ -182,18 +147,19 @@ public:
         
         TempSummon* TempSummonGrimstone = nullptr;
         Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
+        time_t timeRingFail = 0;
 
         std::vector<ObjectGuid> ArenaSpectators;
-        Position CenterOfRingOfLaw;
+        Position CenterOfRingOfLaw = Position(595.289, -186.56);
 
         ObjectGuid EmperorSenators[5];
         std::vector<ObjectGuid> EmperorSenatorsVector;
-        Position EmperorSpawnPos;
+        Position EmperorSpawnPos = Position(1380.52, -831, 115);
 
         void OnPlayerEnter(Player* /* player */) override
         {
             ReplaceMoiraIfSaved(); // In case a player joins the party during the run
-            SetData(TYPE_RING_OF_LAW, DONE);
+         //   SetData(TYPE_RING_OF_LAW, DONE);
         }
 
         void ReplaceMoiraIfSaved()
@@ -246,8 +212,6 @@ public:
             OpenedCoofers = 0;
             IronhandCounter  = 0;
             ArenaSpectators.clear();
-            CenterOfRingOfLaw = Position(595.289, -186.56);
-            EmperorSpawnPos   = Position(1380.52, -831, 115);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -486,6 +450,7 @@ public:
                         {
                             TempSummonGrimstone->RemoveFromWorld();
                             TempSummonGrimstone = nullptr;
+                            timeRingFail        = time(nullptr);
                         }
                         SetData(TYPE_RING_OF_LAW, NOT_STARTED);
                         break;
@@ -673,6 +638,8 @@ public:
                     return encounter[5];
                 case DATA_GHOSTKILL:
                     return GhostKillCount;
+                case DATA_TIME_RING_FAIL:
+                    return timeRingFail;
             }
             return 0;
         }

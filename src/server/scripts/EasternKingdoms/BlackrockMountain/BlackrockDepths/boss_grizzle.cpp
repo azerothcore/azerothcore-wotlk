@@ -46,6 +46,8 @@ public:
     {
         boss_grizzleAI(Creature* creature) : BossAI(creature, DATA_GRIZZLE) {}
 
+        uint32 nextTremorTime;
+
         void EnterCombat(Unit* /*who*/) override {
 
             events.ScheduleEvent(SPELL_GROUNDTREMOR, 0.2 * TIMER_GROUNDTREMOR);
@@ -70,8 +72,13 @@ public:
                     if (me->GetDistance2d(me->GetVictim()) < 10.0f)
                     {
                         DoCastVictim(SPELL_GROUNDTREMOR);
+                        nextTremorTime = urand(TIMER_GROUNDTREMOR - 2000, TIMER_GROUNDTREMOR + 2000);
                     }
-                    events.ScheduleEvent(SPELL_GROUNDTREMOR, urand(TIMER_GROUNDTREMOR - 2000, TIMER_GROUNDTREMOR + 2000));
+                    else
+                    {
+                        nextTremorTime = 0.3*urand(TIMER_GROUNDTREMOR - 2000, TIMER_GROUNDTREMOR + 2000);
+                    }
+                    events.ScheduleEvent(SPELL_GROUNDTREMOR, nextTremorTime);
                     break;
                 case SPELL_FRENZY:
                     DoCastSelf(SPELL_FRENZY);
