@@ -614,9 +614,6 @@ public:
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        if (creature->IsTrainer())
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-
         uint32 creatureId = creature->GetEntry();
         //WEAPONSMITH & ARMORSMITH
         if (player->GetBaseSkillValue(SKILL_BLACKSMITHING) >= 225)
@@ -681,9 +678,6 @@ public:
         {
             case GOSSIP_ACTION_TRADE:
                 player->GetSession()->SendListInventory(creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature->GetGUID());
                 break;
             //Learn Armor/Weapon
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -945,9 +939,6 @@ public:
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        if (creature->IsTrainer())
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-
         // pussywizard: NO UNLEARNING! LEATHERWORKING SPECIALTY IS A PERMANENT DECISION AND CANNOT BE CHANGED IN ANY WAY!
         // pussywizard: CAN RE-LEARN ONLY THE ONE FOR WHICH QUEST IS COMPLETED!
 
@@ -983,9 +974,6 @@ public:
         {
             case GOSSIP_ACTION_TRADE:
                 player->GetSession()->SendListInventory(creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature->GetGUID());
                 break;
             // Learn Leather
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -1035,9 +1023,6 @@ public:
         if (creature->IsVendor())
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        if (creature->IsTrainer())
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-
         //TAILORING SPEC
         if (player->HasSkill(SKILL_TAILORING) && player->GetBaseSkillValue(SKILL_TAILORING) >= 350 && player->getLevel() > 59)
         {
@@ -1077,9 +1062,6 @@ public:
         {
             case GOSSIP_ACTION_TRADE:
                 player->GetSession()->SendListInventory(creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature->GetGUID());
                 break;
             //Learn Tailor
             case GOSSIP_ACTION_INFO_DEF + 1:
