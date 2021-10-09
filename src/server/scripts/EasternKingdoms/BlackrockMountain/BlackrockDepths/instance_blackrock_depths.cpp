@@ -21,11 +21,19 @@
 #include "Player.h"
 #include "Map.h"
 
-#define TIMER_TOMBOFTHESEVEN    30000
-#define TIMER_TOMB_START        5000
-#define MAX_ENCOUNTER           6
-#define RADIUS_RING_OF_LAW      80.0f
-#define DISTANCE_EMPEROR_ROOM   125
+#define MAX_ENCOUNTER 6
+
+enum Timers
+{
+    TIMER_TOMBOFTHESEVEN = 30000,
+    TIMER_TOMB_START     = 5000
+};
+
+enum Distances
+{
+    RADIUS_RING_OF_LAW      = 80,
+    DISTANCE_EMPEROR_ROOM   = 125
+};
 
 enum PrincessQuests
 {
