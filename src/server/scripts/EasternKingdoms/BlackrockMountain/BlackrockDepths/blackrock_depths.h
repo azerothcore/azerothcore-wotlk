@@ -72,7 +72,9 @@ enum DataTypes
     DATA_GOLEM_LORD_ARGELMACH_INIT  = 31,
     DATA_GOLEM_LORD_ARGELMACH_ADDS  = 32,
 
-    DATA_MAGMUS                     = 33
+    DATA_MAGMUS                     = 33,
+
+    DATA_COREN                      = 34
 };
 
 enum CreatureIds
