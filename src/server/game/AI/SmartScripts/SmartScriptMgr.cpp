@@ -1147,6 +1147,23 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 }
                 break;
             }
+        case SMART_ACTION_SET_INST_DATA:
+            {
+                if (e.action.setInstanceData.type == 1)
+                {
+                    if (e.action.setInstanceData.data >= EncounterState::TO_BE_DECIDED)
+                    {
+                        LOG_ERROR("sql.sql", "SmartScript: SMART_ACTION_SET_INST_DATA with type 1 (bossState) uses invalid encounter state %u. Source entry %u, type %u", e.action.setInstanceData.data, e.entryOrGuid, e.GetScriptType());
+                        return false;
+                    }
+                }
+                else if (e.action.setInstanceData.type > 1)
+                {
+                    LOG_ERROR("sql.sql", "SmartScript: SMART_ACTION_SET_INST_DATA uses unsupported data type %u. Source entry %u, type %u", e.action.setInstanceData.type, e.entryOrGuid, e.GetScriptType());
+                    return false;
+                }
+                break;
+            }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
         case SMART_ACTION_SET_ORIENTATION:
@@ -1163,7 +1180,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_ATTACK_START:
         case SMART_ACTION_THREAT_ALL_PCT:
         case SMART_ACTION_THREAT_SINGLE_PCT:
-        case SMART_ACTION_SET_INST_DATA:
         case SMART_ACTION_SET_INST_DATA64:
         case SMART_ACTION_AUTO_ATTACK:
         case SMART_ACTION_ALLOW_COMBAT_MOVEMENT:
