@@ -17,6 +17,7 @@
 
 #include "CellImpl.h"
 #include "GameEventMgr.h"
+#include "GameObjectAI.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
@@ -27,6 +28,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 
 ///////////////////////////////////////
 ////// GOS
@@ -35,312 +37,6 @@
 ///////////////////////////////////////
 ////// NPCS
 ///////////////////////////////////////
-enum corenDirebrew
-{
-    FACTION_HOSTILE                 = 754,
-    FACTION_FRIEND                  = 35,
-    ITEM_DARK_BREW                  = 36748,
-    ITEM_TREASURE_CHEST             = 54535,
-    QUEST_COREN_DIREBREW            = 25483,
-    ACTION_START_FIGHT              = 1,
-    ACTION_RELEASE_LOOT             = 2,
-
-    NPC_ILSA_DIREBREW               = 26764,
-    NPC_URSULA_DIREBREW             = 26822,
-    NPC_ANTAGONIST                  = 23795,
-
-    // COREN
-    SPELL_DIREBREW_DISARM           = 47310,
-    SPELL_DISARM_VISUAL             = 47407,
-
-    // SISTERS
-    SPELL_BARRELED                  = 51413,
-    SPELL_CHUCK_MUG                 = 50276,
-    SPELL_DARK_STUN                 = 47340,
-    SPELL_PURPLE_VISUAL             = 47651,
-
-    EVENT_DIREBREW_DISARM           = 1,
-    EVENT_DIREBREW_HEALTH           = 2,
-    EVENT_SISTERS_BARREL            = 3,
-    EVENT_SISTERS_CHUCK_MUG         = 4,
-    EVENT_DIREBREW_RESPAWN1         = 5,
-    EVENT_DIREBREW_RESPAWN2         = 6,
-};
-
-#define GOSSIP_ITEM_COREN1      "Insult Coren Direbrew's Brew."
-#define GOSSIP_ITEM_COREN2      "Insult."
-
-class npc_coren_direbrew : public CreatureScript
-{
-public:
-    npc_coren_direbrew() : CreatureScript("npc_coren_direbrew") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_coren_direbrewAI (creature);
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
-    {
-        ClearGossipMenuFor(player);
-        switch (uiAction)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_COREN2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 15859, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                CloseGossipMenuFor(player);
-                creature->AI()->DoAction(ACTION_START_FIGHT);
-                creature->MonsterSay("You'll pay for this insult, $C.", LANG_UNIVERSAL, player);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_COREN1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, 15858, creature->GetGUID());
-
-        return true;
-    }
-
-    struct npc_coren_direbrewAI : public ScriptedAI
-    {
-        npc_coren_direbrewAI(Creature* c) : ScriptedAI(c), summons(me)
-        {
-        }
-
-        EventMap events;
-        SummonList summons;
-        uint8 phase;
-
-        void Reset() override
-        {
-            events.Reset();
-            summons.DespawnAll();
-            me->setFaction(FACTION_FRIEND);
-            phase = 0;
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_START_FIGHT)
-            {
-                Creature* cr = nullptr;
-
-                for (int i = 0; i < 3; ++i)
-                {
-                    float o = rand_norm() * 2 * M_PI;
-                    if ((cr = me->SummonCreature(NPC_ANTAGONIST, me->GetPositionX() + 3 * cos(o), me->GetPositionY() + 3 * sin(o), me->GetPositionZ(), me->GetOrientation())))
-                    {
-                        if (i == 0)
-                            cr->MonsterSay("Time to die.", LANG_UNIVERSAL, 0);
-
-                        summons.Summon(cr);
-                        cr->SetInCombatWithZone();
-                    }
-                }
-
-                me->CastSpell(me, SPELL_PURPLE_VISUAL, true);
-                me->setFaction(FACTION_HOSTILE);
-                me->SetInCombatWithZone();
-                events.ScheduleEvent(EVENT_DIREBREW_DISARM, 10000);
-                events.ScheduleEvent(EVENT_DIREBREW_HEALTH, 1000);
-            }
-            else if (param == NPC_ILSA_DIREBREW)
-                events.ScheduleEvent(EVENT_DIREBREW_RESPAWN1, 10000);
-            else if (param == NPC_URSULA_DIREBREW)
-                events.ScheduleEvent(EVENT_DIREBREW_RESPAWN2, 10000);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            summons.DespawnAll();
-            summons.DoAction(ACTION_RELEASE_LOOT);
-
-            // HACK FIX FOR TREASURE CHEST
-            Quest const* qReward = sObjectMgr->GetQuestTemplate(QUEST_COREN_DIREBREW);
-            if (!qReward)
-                return;
-
-            Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                if (Player* player = itr->GetSource())
-                {
-                    if (player->CanRewardQuest(qReward, false))
-                        player->RewardQuest(qReward, 0, nullptr, false);
-                }
-
-            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            if (!players.isEmpty() && players.begin()->GetSource()->GetGroup())
-                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 287, me->FindMap());
-        }
-
-        void SummonSister(uint32 entry)
-        {
-            summons.DespawnEntry(entry);
-            float o = rand_norm() * 2 * M_PI;
-            if (Creature* cr = me->SummonCreature(entry, me->GetPositionX() + 3 * cos(o), me->GetPositionY() + 3 * sin(o), me->GetPositionZ(), me->GetOrientation()))
-            {
-                cr->CastSpell(cr, SPELL_PURPLE_VISUAL, true);
-                cr->SetInCombatWithZone();
-                summons.Summon(cr);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_DIREBREW_RESPAWN1:
-                    SummonSister(NPC_ILSA_DIREBREW);
-                    break;
-                case EVENT_DIREBREW_RESPAWN2:
-                    SummonSister(NPC_URSULA_DIREBREW);
-                    break;
-                case EVENT_DIREBREW_DISARM:
-                    me->CastSpell(me->GetVictim(), SPELL_DIREBREW_DISARM, false);
-                    me->CastSpell(me, SPELL_DISARM_VISUAL, true);
-                    events.RepeatEvent(20000);
-                    break;
-                case EVENT_DIREBREW_HEALTH:
-                    if (me->GetHealthPct() < 66 && phase == 0)
-                    {
-                        phase++;
-                        SummonSister(NPC_ILSA_DIREBREW);
-                    }
-                    if (me->GetHealthPct() < 35 && phase == 1)
-                    {
-                        SummonSister(NPC_URSULA_DIREBREW);
-                        return;
-                    }
-
-                    events.RepeatEvent(1000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-class npc_coren_direbrew_sisters : public CreatureScript
-{
-public:
-    npc_coren_direbrew_sisters() : CreatureScript("npc_coren_direbrew_sisters") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_coren_direbrew_sistersAI (creature);
-    }
-
-    struct npc_coren_direbrew_sistersAI : public ScriptedAI
-    {
-        npc_coren_direbrew_sistersAI(Creature* c) : ScriptedAI(c)
-        {
-        }
-
-        EventMap events;
-
-        void Reset() override
-        {
-            events.Reset();
-            me->setFaction(FACTION_HOSTILE);
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_RELEASE_LOOT && me->GetEntry() == NPC_ILSA_DIREBREW)
-                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-        }
-
-        Creature* GetSummoner()
-        {
-            if (me->IsSummon())
-                if (Unit* coren = me->ToTempSummon()->GetSummonerUnit())
-                    return coren->ToCreature();
-
-            return nullptr;
-        }
-
-        void JustDied(Unit*) override
-        {
-            if (Creature* coren = GetSummoner())
-            {
-                if (coren->IsAlive())
-                {
-                    coren->AI()->DoAction(me->GetEntry());
-                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-                }
-            }
-        }
-
-        void EnterCombat(Unit*  /*who*/) override
-        {
-            if (me->GetEntry() == NPC_URSULA_DIREBREW)
-                events.ScheduleEvent(EVENT_SISTERS_BARREL, 18000);
-
-            events.ScheduleEvent(EVENT_SISTERS_CHUCK_MUG, 12000);
-        }
-
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
-        {
-            if (spellInfo->Id == SPELL_CHUCK_MUG)
-                if (target->ToPlayer())
-                    target->ToPlayer()->AddItem(ITEM_DARK_BREW, 1);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SISTERS_BARREL:
-                    me->CastSpell(me->GetVictim(), SPELL_BARRELED, false);
-                    events.RepeatEvent(15000);
-                    break;
-                case EVENT_SISTERS_CHUCK_MUG:
-                    Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                    for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                    {
-                        if (Player* player = itr->GetSource())
-                            if (player->HasItemCount(ITEM_DARK_BREW))
-                            {
-                                me->CastSpell(player, SPELL_DARK_STUN, true);
-                                player->DestroyItemCount(ITEM_DARK_BREW, 1, true);
-                            }
-                    }
-
-                    if (Player* player = SelectTargetFromPlayerList(50.0f, SPELL_DARK_STUN))
-                        me->CastSpell(player, SPELL_CHUCK_MUG, false);
-
-                    events.RepeatEvent(18000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
 enum kegThrowers
 {
     QUEST_THERE_AND_BACK_AGAIN_A                = 11122,
@@ -1675,7 +1371,6 @@ public:
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
-            Creature* cr = nullptr;
             Unit* caster = GetCaster();
             if (!caster)
                 return;
@@ -1683,23 +1378,49 @@ public:
             if (!GetHitUnit() || GetHitUnit()->GetGUID() != caster->GetGUID())
                 return;
 
+            std::vector<Creature*> bakers;
             if (caster->GetMapId() == 1) // Kalimdor
             {
-                if ((cr = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
             }
             else // EK
             {
-                if ((cr = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
-                    cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+
+                if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                {
+                    bakers.push_back(creature);
+                }
+            }
+
+            if (!bakers.empty())
+            {
+                std::sort(bakers.begin(), bakers.end(), Acore::ObjectDistanceOrderPred(caster));
+                if (Creature* creature = *bakers.begin())
+                {
+                    creature->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
+                }
             }
         }
 
@@ -1879,11 +1600,763 @@ public:
     }
 };
 
+class spell_brewfest_relay_race_force_cast : public SpellScriptLoader
+{
+public:
+    spell_brewfest_relay_race_force_cast() : SpellScriptLoader("spell_brewfest_relay_race_force_cast") {}
+
+    class spell_brewfest_relay_race_force_cast_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_brewfest_relay_race_force_cast_SpellScript);
+
+        SpellCastResult CheckItem()
+        {
+            if (Unit* target = GetExplTargetUnit())
+            {
+                if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell))
+                {
+                    if (Player* player = target->ToPlayer())
+                    {
+                        if (player->HasItemCount(triggeredSpellInfo->Reagent[0]))
+                        {
+                            return SPELL_CAST_OK;
+                        }
+                    }
+                }
+            }
+
+            return SPELL_FAILED_DONT_REPORT;
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_brewfest_relay_race_force_cast_SpellScript::CheckItem);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_brewfest_relay_race_force_cast_SpellScript();
+    }
+};
+
+enum DirebrewSays
+{
+    SAY_INTRO                   = 0,
+    SAY_INTRO1                  = 1,
+    SAY_INTRO2                  = 2,
+    SAY_INSULT                  = 3,
+    SAY_ANTAGONIST_1            = 0,
+    SAY_ANTAGONIST_2            = 1,
+    SAY_ANTAGONIST_COMBAT       = 2
+};
+
+enum DirebrewActions
+{
+    ACTION_START_FIGHT          = -1,
+    ACTION_ANTAGONIST_SAY_1     = -2,
+    ACTION_ANTAGONIST_SAY_2     = -3,
+    ACTION_ANTAGONIST_HOSTILE   = -4
+};
+
+enum DirebrewNpcs
+{
+    NPC_ILSA_DIREBREW           = 26764,
+    NPC_URSULA_DIREBREW         = 26822,
+    NPC_ANTAGONIST              = 23795
+};
+
+enum DirebrewSpells
+{
+    SPELL_MOLE_MACHINE_EMERGE           = 50313,
+    SPELL_DIREBREW_DISARM_PRE_CAST      = 47407,
+    SPELL_MOLE_MACHINE_TARGET_PICKER    = 47691,
+    SPELL_MOLE_MACHINE_MINION_SUMMONER  = 47690,
+    SPELL_DIREBREW_DISARM_GROW          = 47409,
+    SPELL_DIREBREW_DISARM               = 47310,
+    SPELL_CHUCK_MUG                     = 50276,
+    SPELL_PORT_TO_COREN                 = 52850,
+    SPELL_SEND_MUG_CONTROL_AURA         = 47369,
+    SPELL_SEND_MUG_TARGET_PICKER        = 47370,
+    SPELL_SEND_FIRST_MUG                = 47333,
+    SPELL_SEND_SECOND_MUG               = 47339,
+    SPELL_REQUEST_SECOND_MUG            = 47344,
+    SPELL_HAS_DARK_BREWMAIDENS_BREW     = 47331,
+    SPELL_BARRELED_CONTROL_AURA         = 50278,
+    SPELL_BARRELED                      = 47442
+};
+
+enum DirebrewPhases
+{
+    PHASE_ALL = 1,
+    PHASE_INTRO,
+    PHASE_ONE,
+    PHASE_TWO,
+    PHASE_THREE
+};
+
+enum DirebrewEvents
+{
+    EVENT_INTRO_1 = 1,
+    EVENT_INTRO_2,
+    EVENT_INTRO_3,
+    EVENT_DIREBREW_DISARM,
+    EVENT_SUMMON_MOLE_MACHINE,
+    EVENT_RESPAWN_ILSA,
+    EVENT_RESPAWN_URSULA
+};
+
+enum DirebrewMisc
+{
+    GOSSIP_ID                           = 11388,
+    GO_MOLE_MACHINE_TRAP                = 188509,
+    GOSSIP_OPTION_FIGHT                 = 0,
+    GOSSIP_OPTION_APOLOGIZE             = 1,
+    DATA_TARGET_GUID                    = 1,
+    MAX_ANTAGONISTS                     = 3,
+    FACTION_GOBLIN_DARK_IRON_BAR_PATRON = 736,
+    DATA_COREN                          = 33,
+    GO_MACHINE_SUMMONER                 = 188508
+};
+
+Position const AntagonistPos[3] =
+{
+    { 895.3782f, -132.1722f, -49.66423f, 2.6529f   },
+    { 893.9837f, -133.2879f, -49.66541f, 2.583087f },
+    { 896.2667f, -130.483f,  -49.66249f, 2.600541f }
+};
+
+class npc_coren_direbrew : public CreatureScript
+{
+public:
+    npc_coren_direbrew() : CreatureScript("npc_coren_direbrew") {}
+
+    struct npc_coren_direbrewAI : public ScriptedAI
+    {
+        npc_coren_direbrewAI(Creature* creature) : ScriptedAI(creature), _summons(me) {}
+
+        void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
+        {
+            if (menuId != GOSSIP_ID)
+            {
+                return;
+            }
+
+            if (gossipListId == GOSSIP_OPTION_FIGHT)
+            {
+                Talk(SAY_INSULT, player);
+                DoAction(ACTION_START_FIGHT);
+            }
+            else if (gossipListId == GOSSIP_OPTION_APOLOGIZE)
+            {
+                CloseGossipMenuFor(player);
+            }
+        }
+
+        void Reset() override
+        {
+            _events.Reset();
+            _summons.DespawnAll();
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->setFaction(FACTION_FRIENDLY);
+            _events.SetPhase(PHASE_ALL);
+
+            for (uint8 i = 0; i < MAX_ANTAGONISTS; ++i)
+            {
+                me->SummonCreature(NPC_ANTAGONIST, AntagonistPos[i], TEMPSUMMON_DEAD_DESPAWN);
+            }
+
+            std::list<GameObject*> machines;
+            GetGameObjectListWithEntryInGrid(machines, me, GO_MACHINE_SUMMONER, 60.f);
+            for (GameObject* go : machines)
+            {
+                go->Delete();
+            }
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (!_events.IsInPhase(PHASE_ALL) || who->GetTypeId() != TYPEID_PLAYER)
+            {
+                return;
+            }
+
+            _events.SetPhase(PHASE_INTRO);
+            _events.ScheduleEvent(EVENT_INTRO_1, 6 * IN_MILLISECONDS, 0, PHASE_INTRO);
+            Talk(SAY_INTRO);
+        }
+
+        void JustSummoned(Creature* creature) override
+        {
+            _summons.Summon(creature);
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_START_FIGHT)
+            {
+                _events.SetPhase(PHASE_ONE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->setFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
+                DoZoneInCombat();
+
+                EntryCheckPredicate pred(NPC_ANTAGONIST);
+                _summons.DoAction(ACTION_ANTAGONIST_HOSTILE, pred);
+
+                _events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINE, 15 * IN_MILLISECONDS);
+                _events.ScheduleEvent(EVENT_DIREBREW_DISARM, 20 * IN_MILLISECONDS);
+            }
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            if (me->HealthBelowPctDamaged(66, damage) && _events.IsInPhase(PHASE_ONE))
+            {
+                _events.SetPhase(PHASE_TWO);
+                SummonSister(NPC_ILSA_DIREBREW);
+            }
+            else if (me->HealthBelowPctDamaged(33, damage) && _events.IsInPhase(PHASE_TWO))
+            {
+                _events.SetPhase(PHASE_THREE);
+                SummonSister(NPC_URSULA_DIREBREW);
+            }
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+        {
+            if (summon->GetEntry() == NPC_ILSA_DIREBREW)
+            {
+                _events.ScheduleEvent(EVENT_RESPAWN_ILSA, 1 * IN_MILLISECONDS);
+            }
+            else if (summon->GetEntry() == NPC_URSULA_DIREBREW)
+            {
+                _events.ScheduleEvent(EVENT_RESPAWN_URSULA, 1 * IN_MILLISECONDS);
+            }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _events.Reset();
+            _summons.DespawnAll();
+
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            if (!players.isEmpty())
+            {
+                if (Group* group = players.begin()->GetSource()->GetGroup())
+                {
+                    if (group->isLFGGroup())
+                    {
+                        sLFGMgr->FinishDungeon(group->GetGUID(), 287, me->GetMap());
+                    }
+                }
+            }
+        }
+
+        void SummonSister(uint32 entry)
+        {
+            if (Creature* sister = me->SummonCreature(entry, me->GetPosition(), TEMPSUMMON_DEAD_DESPAWN))
+            {
+                DoZoneInCombat(sister);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim() && !_events.IsInPhase(PHASE_INTRO))
+            {
+                return;
+            }
+
+            _events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_INTRO_1:
+                        Talk(SAY_INTRO1);
+                        _events.ScheduleEvent(EVENT_INTRO_2, 4 * IN_MILLISECONDS, 0, PHASE_INTRO);
+                        break;
+                    case EVENT_INTRO_2:
+                    {
+                        EntryCheckPredicate pred(NPC_ANTAGONIST);
+                        _summons.DoAction(ACTION_ANTAGONIST_SAY_1, pred);
+                        _events.ScheduleEvent(EVENT_INTRO_3, 3 * IN_MILLISECONDS, 0, PHASE_INTRO);
+                        break;
+                    }
+                    case EVENT_INTRO_3:
+                    {
+                        Talk(SAY_INTRO2);
+                        EntryCheckPredicate pred(NPC_ANTAGONIST);
+                        _summons.DoAction(ACTION_ANTAGONIST_SAY_2, pred);
+                        break;
+                    }
+                    case EVENT_RESPAWN_ILSA:
+                        SummonSister(NPC_ILSA_DIREBREW);
+                        break;
+                    case EVENT_RESPAWN_URSULA:
+                        SummonSister(NPC_URSULA_DIREBREW);
+                        break;
+                    case EVENT_SUMMON_MOLE_MACHINE:
+                    {
+                        me->CastCustomSpell(SPELL_MOLE_MACHINE_TARGET_PICKER, SPELLVALUE_MAX_TARGETS, 1, nullptr, true);
+                        _events.RepeatEvent(15 * IN_MILLISECONDS);
+                        break;
+                    }
+                    case EVENT_DIREBREW_DISARM:
+                        DoCastSelf(SPELL_DIREBREW_DISARM_PRE_CAST, true);
+                        _events.RepeatEvent(20 * IN_MILLISECONDS);
+                        break;
+                    default:
+                        break;
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        EventMap _events;
+        SummonList _summons;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_coren_direbrewAI(creature);
+    }
+};
+
+class npc_coren_direbrew_sisters : public CreatureScript
+{
+public:
+    npc_coren_direbrew_sisters() : CreatureScript("npc_coren_direbrew_sisters") {}
+
+    struct npc_coren_direbrew_sistersAI : public ScriptedAI
+    {
+        npc_coren_direbrew_sistersAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void SetGUID(ObjectGuid guid, int32 id) override
+        {
+            if (id == DATA_TARGET_GUID)
+            {
+                _targetGUID = guid;
+            }
+        }
+
+        ObjectGuid GetGUID(int32 data) const override
+        {
+            if (data == DATA_TARGET_GUID)
+            {
+                return _targetGUID;
+            }
+
+            return ObjectGuid::Empty;
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            DoCastSelf(SPELL_PORT_TO_COREN);
+
+            if (me->GetEntry() == NPC_URSULA_DIREBREW)
+            {
+                DoCastSelf(SPELL_BARRELED_CONTROL_AURA);
+            }
+            else
+            {
+                DoCastSelf(SPELL_SEND_MUG_CONTROL_AURA);
+            }
+
+            _scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            })
+            .Schedule(Seconds(2), [this](TaskContext mugChuck)
+            {
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, false, -SPELL_HAS_DARK_BREWMAIDENS_BREW))
+                {
+                    DoCast(target, SPELL_CHUCK_MUG);
+                }
+
+                mugChuck.Repeat(Seconds(4));
+            });
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _scheduler.Update(diff, [this]
+            {
+                DoMeleeAttackIfReady();
+            });
+        }
+
+    private:
+        ObjectGuid _targetGUID;
+        TaskScheduler _scheduler;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_coren_direbrew_sistersAI(creature);
+    }
+};
+
+class npc_direbrew_minion : public CreatureScript
+{
+public:
+    npc_direbrew_minion() : CreatureScript("npc_direbrew_minion") {}
+
+    struct npc_direbrew_minionAI : public ScriptedAI
+    {
+        npc_direbrew_minionAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
+
+        void Reset() override
+        {
+            me->setFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
+            DoZoneInCombat();
+        }
+
+        void IsSummonedBy(Unit* /*summoner*/) override
+        {
+            if (Creature* coren = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_COREN)))
+            {
+                coren->AI()->JustSummoned(me);
+            }
+        }
+
+    private:
+        InstanceScript* _instance;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_direbrew_minionAI(creature);
+    }
+};
+
+class npc_direbrew_antagonist : public CreatureScript
+{
+public:
+    npc_direbrew_antagonist() : CreatureScript("npc_direbrew_antagonist") {}
+
+    struct npc_direbrew_antagonistAI : public ScriptedAI
+    {
+        npc_direbrew_antagonistAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+                case ACTION_ANTAGONIST_SAY_1:
+                    Talk(SAY_ANTAGONIST_1);
+                    break;
+                case ACTION_ANTAGONIST_SAY_2:
+                    Talk(SAY_ANTAGONIST_2);
+                    break;
+                case ACTION_ANTAGONIST_HOSTILE:
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->setFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
+                    DoZoneInCombat();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void EnterCombat(Unit* who) override
+        {
+            Talk(SAY_ANTAGONIST_COMBAT, who);
+            ScriptedAI::EnterCombat(who);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_direbrew_antagonistAI(creature);
+    }
+};
+
+class go_direbrew_mole_machine : public GameObjectScript
+{
+public:
+    go_direbrew_mole_machine() : GameObjectScript("go_direbrew_mole_machine") { }
+
+    struct go_direbrew_mole_machineAI : public GameObjectAI
+    {
+        go_direbrew_mole_machineAI(GameObject* go) : GameObjectAI(go) { }
+
+        void Reset() override
+        {
+            go->SetLootState(GO_READY);
+
+            _scheduler.Schedule(Seconds(1), [this](TaskContext /*context*/)
+            {
+                go->UseDoorOrButton();
+                go->CastSpell(nullptr, SPELL_MOLE_MACHINE_EMERGE);
+            })
+            .Schedule(Seconds(4), [this](TaskContext /*context*/)
+            {
+                if (GameObject* trap = go->GetLinkedTrap())
+                {
+                    trap->UseDoorOrButton();
+                    trap->SetLootState(GO_READY);
+                }
+            });
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _scheduler.Update(diff);
+        }
+
+    private:
+        TaskScheduler _scheduler;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_direbrew_mole_machineAI(go);
+    }
+};
+
+// 47691 - Summon Mole Machine Target Picker
+class spell_direbrew_summon_mole_machine_target_picker : public SpellScriptLoader
+{
+public:
+    spell_direbrew_summon_mole_machine_target_picker() : SpellScriptLoader("spell_direbrew_summon_mole_machine_target_picker") {}
+
+    class spell_direbrew_summon_mole_machine_target_picker_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_direbrew_summon_mole_machine_target_picker_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_MOLE_MACHINE_MINION_SUMMONER });
+        }
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        {
+            GetCaster()->CastSpell(GetHitUnit(), SPELL_MOLE_MACHINE_MINION_SUMMONER, true);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_direbrew_summon_mole_machine_target_picker_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_direbrew_summon_mole_machine_target_picker_SpellScript();
+    };
+};
+
+// 47370 - Send Mug Target Picker
+class spell_send_mug_target_picker : public SpellScriptLoader
+{
+public:
+    spell_send_mug_target_picker() : SpellScriptLoader("spell_send_mug_target_picker") {}
+
+    class spell_send_mug_target_picker_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_send_mug_target_picker_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            Unit* caster = GetCaster();
+
+            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_HAS_DARK_BREWMAIDENS_BREW));
+
+            if (targets.size() > 1)
+            {
+                targets.remove_if([caster](WorldObject* obj)
+                {
+                    if (obj->GetGUID() == caster->GetAI()->GetGUID(DATA_TARGET_GUID))
+                    {
+                        return true;
+                    }
+
+                    return false;
+                });
+            }
+
+            if (targets.empty())
+            {
+                return;
+            }
+
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+            targets.clear();
+            targets.push_back(target);
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            caster->GetAI()->SetGUID(GetHitUnit()->GetGUID(), DATA_TARGET_GUID);
+            caster->CastSpell(GetHitUnit(), SPELL_SEND_FIRST_MUG, true);
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_send_mug_target_picker_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+            OnEffectHitTarget += SpellEffectFn(spell_send_mug_target_picker_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_send_mug_target_picker_SpellScript();
+    };
+};
+
+// 47344 - Request Second Mug
+class spell_request_second_mug : public SpellScriptLoader
+{
+public:
+    spell_request_second_mug() : SpellScriptLoader("spell_request_second_mug") {}
+
+    class spell_request_second_mug_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_request_second_mug_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_SEND_SECOND_MUG });
+        }
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        {
+            GetHitUnit()->CastSpell(GetCaster(), SPELL_SEND_SECOND_MUG, true);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_request_second_mug_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_request_second_mug_SpellScript();
+    };
+};
+
+// 47369 - Send Mug Control Aura
+class spell_send_mug_control_aura : public SpellScriptLoader
+{
+public:
+    spell_send_mug_control_aura() : SpellScriptLoader("spell_send_mug_control_aura") {}
+
+    class spell_send_mug_control_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_send_mug_control_aura_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_SEND_MUG_TARGET_PICKER });
+        }
+
+        void PeriodicTick(AuraEffect const* /*aurEff*/)
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_SEND_MUG_TARGET_PICKER, true);
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_send_mug_control_aura_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_send_mug_control_aura_AuraScript();
+    };
+};
+
+// 50278 - Barreled Control Aura
+class spell_barreled_control_aura : public SpellScriptLoader
+{
+public:
+    spell_barreled_control_aura() : SpellScriptLoader("spell_barreled_control_aura") {}
+
+    class spell_barreled_control_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_barreled_control_aura_AuraScript);
+
+        void PeriodicTick(AuraEffect const* /*aurEff*/)
+        {
+            PreventDefaultAction();
+            GetTarget()->CastSpell(nullptr, SPELL_BARRELED);
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_barreled_control_aura_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_barreled_control_aura_AuraScript();
+    };
+};
+
+// 47407 - Direbrew's Disarm (precast)
+class spell_direbrew_disarm : public SpellScriptLoader
+{
+public:
+    spell_direbrew_disarm() : SpellScriptLoader("spell_direbrew_disarm") {}
+
+    class spell_direbrew_disarm_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_direbrew_disarm_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_DIREBREW_DISARM, SPELL_DIREBREW_DISARM_GROW });
+        }
+
+        void PeriodicTick(AuraEffect const* /*aurEff*/)
+        {
+            if (Aura* aura = GetTarget()->GetAura(SPELL_DIREBREW_DISARM_GROW))
+            {
+                aura->SetStackAmount(aura->GetStackAmount() + 1);
+                aura->SetDuration(aura->GetDuration() - 1500);
+            }
+        }
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_DIREBREW_DISARM_GROW, true);
+            GetTarget()->CastSpell(GetTarget(), SPELL_DIREBREW_DISARM);
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_direbrew_disarm_AuraScript::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+            OnEffectApply += AuraEffectRemoveFn(spell_direbrew_disarm_AuraScript::OnApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_direbrew_disarm_AuraScript();
+    };
+};
+
 void AddSC_event_brewfest_scripts()
 {
     // Npcs
-    new npc_coren_direbrew();
-    new npc_coren_direbrew_sisters();
     new npc_brewfest_keg_thrower();
     new npc_brewfest_keg_reciver();
     new npc_brewfest_bark_trigger();
@@ -1904,7 +2377,21 @@ void AddSC_event_brewfest_scripts()
     new spell_brewfest_toss_mug();
     new spell_brewfest_add_mug();
     new spell_brewfest_reveler_transform();
+    new spell_brewfest_relay_race_force_cast();
 
     // beer effect
     new npc_brew_bubble();
+
+    // Coren Direbrew
+    new npc_coren_direbrew();
+    new npc_coren_direbrew_sisters();
+    new npc_direbrew_minion();
+    new npc_direbrew_antagonist();
+    new go_direbrew_mole_machine();
+    new spell_direbrew_summon_mole_machine_target_picker();
+    new spell_send_mug_target_picker();
+    new spell_request_second_mug();
+    new spell_send_mug_control_aura();
+    new spell_barreled_control_aura();
+    new spell_direbrew_disarm();
 }

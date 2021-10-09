@@ -23,6 +23,7 @@
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 
+
 enum IronhandData
 {
     IRONHAND_FLAMES_TIMER      = 16000,
@@ -31,9 +32,7 @@ enum IronhandData
     SPELL_GOUT_OF_FLAMES       = 15529
 };
 
-uint32 braziersUsed = 0;
 
-//go_shadowforge_brazier
 class go_shadowforge_brazier : public GameObjectScript
 {
 public:
@@ -43,22 +42,30 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_N) || go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_S))
+
+            GameObject* northBrazier = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(DATA_SF_BRAZIER_N));
+            GameObject* southBrazier = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(DATA_SF_BRAZIER_S));
+
+            if (!northBrazier || !southBrazier)
             {
-                braziersUsed++;
-                if (braziersUsed == 1)
+                return false;
+            }
+
+            // Check if the opposite brazier is lit - if it is, open the gates.
+            if ((go->GetGUID() == northBrazier->GetGUID() && southBrazier->GetGoState() == GO_STATE_ACTIVE) || (go->GetGUID() == southBrazier->GetGUID() && northBrazier->GetGoState() == GO_STATE_ACTIVE))
+            {
+                if (instance->GetData(TYPE_LYCEUM) == IN_PROGRESS)
+                {
+                    instance->SetData(TYPE_LYCEUM, DONE);
+                }
+                else
                 {
                     instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
                 }
-                if (braziersUsed == 2)
-                {
-                    instance->SetData(TYPE_LYCEUM, DONE);
-                    braziersUsed = 0;
-                }
             }
         }
-        return false;
-    }
+        EventMap events;
+    };
 };
 
 class ironhand_guardian : public CreatureScript

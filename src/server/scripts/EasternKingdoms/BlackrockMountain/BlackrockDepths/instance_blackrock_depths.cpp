@@ -38,7 +38,6 @@ enum Creatures
     NPC_SEETHREL                = 9038,
     NPC_GLOOMREL                = 9037,
     NPC_DOOMREL                 = 9039,
-    NPC_MAGMUS                  = 9938,
     NPC_MOIRA                   = 8929,
     NPC_PRIESTESS               = 10076,
 
@@ -50,13 +49,17 @@ enum Creatures
     NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
     NPC_GOLEM_LORD_ARGELMACH    = 8983,
 
+    NPC_COREN_DIREBREW          = 23872,
+
     NPC_IRONHAND_GUARDIAN       = 8982,
 
     NPC_ARENA_SPECTATOR         = 8916,
     NPC_SHADOWFORGE_PEASANT     = 8896,
     NPC_SHADOWFORCE_CITIZEN     = 8902,
 
-    NPC_SHADOWFORGE_SENATOR     = 8904
+    NPC_SHADOWFORGE_SENATOR     = 8904,
+
+    NPC_MAGMUS = 9938
 };
 
 enum PrincessQuests
@@ -140,8 +143,8 @@ public:
         ObjectGuid MagmusGUID;
         ObjectGuid MoiraGUID;
         ObjectGuid PriestessGUID;
-
         ObjectGuid IronhandGUID[6];
+        ObjectGuid CorenGUID;
 
         ObjectGuid GoArena1GUID;
         ObjectGuid GoArena2GUID;
@@ -260,6 +263,9 @@ public:
                     break;
                 case NPC_MOIRA:
                     MoiraGUID = creature->GetGUID();
+                    break;
+                case NPC_COREN_DIREBREW:
+                    CorenGUID = creature->GetGUID();
                     break;
                 case NPC_ANGERREL:
                     TombBossGUIDs[0] = creature->GetGUID();
@@ -681,6 +687,8 @@ public:
                     return PhalanxGUID;
                 case DATA_MOIRA:
                     return MoiraGUID;
+                case DATA_COREN:
+                    return CorenGUID;
                 case DATA_ARENA1:
                     return GoArena1GUID;
                 case DATA_ARENA2:
@@ -709,6 +717,10 @@ public:
                     return GoGolemSGUID;
                 case DATA_GO_CHALICE:
                     return GoSpectralChaliceGUID;
+                case DATA_MAGMUS:
+                {
+                    return MagmusGUID;
+                }
             }
 
             return ObjectGuid::Empty;

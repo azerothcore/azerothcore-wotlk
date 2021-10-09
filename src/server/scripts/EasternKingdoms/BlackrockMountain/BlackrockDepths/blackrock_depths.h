@@ -71,6 +71,9 @@ enum DataTypes
 
     DATA_GOLEM_LORD_ARGELMACH_INIT  = 31,
     DATA_GOLEM_LORD_ARGELMACH_ADDS  = 32,
+    DATA_MAGMUS                     = 33,
+
+    DATA_COREN                      = 34,
 
     DATA_ANUBSHIAH,
     DATA_EVISCERATOR,
@@ -90,6 +93,7 @@ enum eChallenge
     NPC_GRIMSTONE = 10096,
     NPC_THELDREN  = 16059,
 };
+
 
 const uint32 theldrenTeam[] = {16053, 16055, 16050, 16051, 16049, 16052, 16054, 16058};
 

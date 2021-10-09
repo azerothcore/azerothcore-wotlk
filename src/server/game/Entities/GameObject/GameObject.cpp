@@ -185,6 +185,12 @@ void GameObject::RemoveFromWorld()
         if (Transport* transport = GetTransport())
             transport->RemovePassenger(this, true);
 
+        // If linked trap exists, despawn it
+        if (GameObject* linkedTrap = GetLinkedTrap())
+        {
+            linkedTrap->Delete();
+        }
+
         WorldObject::RemoveFromWorld();
 
         if (m_spawnId)
@@ -711,6 +717,12 @@ void GameObject::Update(uint32 diff)
             }
         case GO_JUST_DEACTIVATED:
             {
+                // If nearby linked trap exists, despawn it
+                if (GameObject* linkedTrap = GetLinkedTrap())
+                {
+                    linkedTrap->Delete();
+                }
+
                 //if Gameobject should cast spell, then this, but some GOs (type = 10) should be destroyed
                 if (GetGoType() == GAMEOBJECT_TYPE_GOOBER)
                 {
@@ -1202,24 +1214,12 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
     if (range < 1.0f)
         range = 5.0f;
 
-    // search nearest linked GO
-    GameObject* trapGO = nullptr;
-    {
-        // using original GO distance
-        CellCoord p(Acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
-        Cell cell(p);
-
-        Acore::NearestGameObjectEntryInObjectRangeCheck go_check(*target, trapEntry, range);
-        Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck> checker(this, trapGO, go_check);
-
-        TypeContainerVisitor<Acore::GameObjectLastSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck>, GridTypeMapContainer > object_checker(checker);
-        cell.Visit(p, object_checker, *GetMap(), *target, range);
-    }
-
     // found correct GO
     // xinef: we should use the trap (checks for despawn type)
-    if (trapGO)
-        trapGO->Use(target); //trapGO->CastSpell(target, trapInfo->trap.spellId);
+    if (GameObject* trapGO = GetLinkedTrap())
+    {
+        trapGO->Use(target); // trapGO->CastSpell(target, trapInfo->trap.spellId);
+    }
 }
 
 GameObject* GameObject::LookupFishingHoleAround(float range)
@@ -1491,7 +1491,23 @@ void GameObject::Use(Unit* user)
                     if (Battleground* bg = player->GetBattleground())
                         bg->EventPlayerUsedGO(player, this);
 
-                    player->KillCreditGO(info->entry, GetGUID());
+                    if (Group* group = player->GetGroup())
+                    {
+                        for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                        {
+                            if (Player* member = itr->GetSource())
+                            {
+                                if (member->IsAtGroupRewardDistance(this))
+                                {
+                                    member->KillCreditGO(info->entry, GetGUID());
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        player->KillCreditGO(info->entry, GetGUID());
+                    }
                 }
 
                 if (uint32 trapEntry = info->goober.linkedTrapId)
@@ -2413,6 +2429,11 @@ bool GameObject::IsLootAllowedFor(Player const* player) const
         return false;                                           // if go doesnt have group bound it means it was solo killed by someone else
 
     return true;
+}
+
+GameObject* GameObject::GetLinkedTrap()
+{
+    return ObjectAccessor::GetGameObject(*this, m_linkedTrap);
 }
 
 void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
