@@ -766,14 +766,18 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         if (Creature* pCreature = attacker->ToCreature())
         {
             if (CreatureGroup* group = pCreature->GetFormation())
+            {
                 group->MemberAttackStart(pCreature, victim, true);
+            }
         }
 
         // Trigger victim unit formation
         if (Creature* pvictimCreat = victim->ToCreature())
         {
             if (CreatureGroup* group = pvictimCreat->GetFormation())
+            {
                 group->MemberAttackStart(pvictimCreat, attacker, true);
+            }
         }
     }
 
