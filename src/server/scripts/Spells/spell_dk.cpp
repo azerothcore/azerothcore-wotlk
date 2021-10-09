@@ -689,7 +689,7 @@ public:
         void HandleProc(ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if (eventInfo.GetSpellInfo() > 0 && (!eventInfo.GetSpellInfo() || eventInfo.GetSpellInfo()->Dispel != DISPEL_DISEASE))
+            if (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetSpellInfo() || eventInfo.GetSpellInfo()->Dispel != DISPEL_DISEASE))
                 SetDuration(0);
         }
 
