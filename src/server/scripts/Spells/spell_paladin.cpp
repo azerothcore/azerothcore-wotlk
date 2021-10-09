@@ -251,7 +251,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo()->GetDamage() > 0;
+            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
