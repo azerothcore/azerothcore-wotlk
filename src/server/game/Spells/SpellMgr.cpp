@@ -2746,7 +2746,7 @@ void SpellMgr::LoadSpellCustomAttr()
             uint32 const attributes = fields[1].GetUInt32();
             uint32 attributes1 = fields[1].GetUInt32()
 
-            SpellInfo* spellInfo = _GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = _GetSpellInfo(spellId);
             if (!spellInfo)
             {
                 LOG_INFO("sql.sql", "Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
@@ -2762,10 +2762,10 @@ void SpellMgr::LoadSpellCustomAttr()
                         continue;
                     }
 
-                    if ((attributesCu & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
+                    if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
                     {
                         LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", static_cast<uint32>(i), spellId, static_cast<uint32>(i));
-                        continue;
+                        attributes &= ~(SPELL_ATTR0_CU_NEGATIVE_EFF0 << i);
                     }
                 }
             }
@@ -2779,24 +2779,21 @@ void SpellMgr::LoadSpellCustomAttr()
                         continue;
                     }
 
-                    if ((attributesCu & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)) != 0)
+                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)) != 0)
                     {
                         LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
-                        continue;
+                        attributes &= ~(SPELL_ATTR0_CU_POSITIVE_EFF0 << i);
                     }
                 }
             }
 
             spellInfo->AttributesCu |= attributes;
 
-            // AttributesCu1 handling
+            // AttributesCu1 handling (should remain splitted checks)
             if ((attributes1 & SPELL_ATTR1_CU_FORCE_AURA_SAVING) && (attributes1 & SPELL_ATTR1_CU_REJECT_AURA_SAVING))
             {
-                if ((attributesCu & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
-                {
-                    LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR1_CU_REJECT_AURA_SAVING which cannot stack for spell %u", spellId);
-                    continue;
-                }
+                LOG_ERROR("sql.sql", "Table `spell_custom_attr` attribute1 field has attributes SPELL_ATTR1_CU_FORCE_AURA_SAVING and SPELL_ATTR1_CU_REJECT_AURA_SAVING which cannot stack for spell %u. Both attributes will get applied", spellId);
+                attributes1 &= ~SPELL_ATTR1_CU_FORCE_AURA_SAVING|SPELL_ATTR1_CU_REJECT_AURA_SAVING;
             }
 
             spellInfo->AttributesCu1 |= attributes1;
