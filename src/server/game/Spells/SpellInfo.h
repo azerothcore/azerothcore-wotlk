@@ -206,6 +206,12 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_POSITIVE                      = SPELL_ATTR0_CU_POSITIVE_EFF0 | SPELL_ATTR0_CU_POSITIVE_EFF1 | SPELL_ATTR0_CU_POSITIVE_EFF2,
 };
 
+enum SpellCustomAttributes1
+{
+    SPELL_ATTR1_CU_FORCE_AURA_SAVING             = 0x000000001,     // Attribute will force aura saving
+    SPELL_ATTR1_CU_REJECT_AURA_SAVING            = 0x000000002,     // Attribute will reject aura saving
+};
+
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType);
 
 class SpellImplicitTargetInfo
@@ -321,6 +327,7 @@ public:
     uint32 AttributesEx6;
     uint32 AttributesEx7;
     uint32 AttributesCu;
+    uint32 AttributesCu1;
     uint32 Stances;
     uint32 StancesNot;
     uint32 Targets;
@@ -410,6 +417,7 @@ public:
     inline bool HasAttribute(SpellAttr6 attribute) const { return AttributesEx6 & attribute; }
     inline bool HasAttribute(SpellAttr7 attribute) const { return AttributesEx7 & attribute; }
     inline bool HasAttribute(SpellCustomAttributes customAttribute) const { return AttributesCu & customAttribute; }
+    inline bool HasAttribute(SpellCustomAttributes1 customAttribute) const { return AttributesCu1 & customAttribute; }
 
     bool IsExplicitDiscovery() const;
     bool IsLootCrafting() const;

@@ -783,6 +783,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     AttributesEx6 = spellEntry->AttributesEx6;
     AttributesEx7 = spellEntry->AttributesEx7;
     AttributesCu = 0;
+    AttributesCu1 = 0;
     Stances = spellEntry->Stances;
     StancesNot = spellEntry->StancesNot;
     Targets = spellEntry->Targets;

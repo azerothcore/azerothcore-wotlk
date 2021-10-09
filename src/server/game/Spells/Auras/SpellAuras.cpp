@@ -1048,7 +1048,12 @@ bool Aura::IsRemovedOnShapeLost(Unit* target) const
 
 bool Aura::CanBeSaved() const
 {
-    if (IsPassive() || (GetSpellInfo()->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && GetSpellInfo()->Stances))
+    SpellInfo const* spellInfo = GetSpellInfo();
+    if (spellInfo->HasAttribute(SPELL_ATTR1_CU_AURA_CAN_BE_SAVED))
+    {
+        return true;
+    }
+    if (IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
         return false;
 
     // Xinef: do not save channel auras
