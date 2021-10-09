@@ -42,7 +42,9 @@ enum Creatures
     NPC_DOOMFORGE_ARCANASMITH   = 8900,
     NPC_RAGEREAVER_GOLEM        = 8906,
     NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
-    NPC_GOLEM_LORD_ARGELMACH    = 8983
+    NPC_GOLEM_LORD_ARGELMACH    = 8983,
+
+    NPC_COREN_DIREBREW          = 23872
 };
 
 enum GameObjects
@@ -119,6 +121,7 @@ public:
         ObjectGuid PhalanxGUID;
         ObjectGuid MagmusGUID;
         ObjectGuid MoiraGUID;
+        ObjectGuid CorenGUID;
 
         ObjectGuid GoArena1GUID;
         ObjectGuid GoArena2GUID;
@@ -176,6 +179,9 @@ public:
                     break;
                 case NPC_MOIRA:
                     MoiraGUID = creature->GetGUID();
+                    break;
+                case NPC_COREN_DIREBREW:
+                    CorenGUID = creature->GetGUID();
                     break;
                 case NPC_ANGERREL:
                     TombBossGUIDs[0] = creature->GetGUID();
@@ -487,6 +493,8 @@ public:
                     return PhalanxGUID;
                 case DATA_MOIRA:
                     return MoiraGUID;
+                case DATA_COREN:
+                    return CorenGUID;
                 case DATA_ARENA1:
                     return GoArena1GUID;
                 case DATA_ARENA2:
