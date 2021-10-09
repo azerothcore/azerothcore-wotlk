@@ -25,7 +25,7 @@ namespace lfg
 
     enum LfgGroupEnum
     {
-        LFG_GROUP_MAX_KICKS                           = 3,
+        LFG_GROUP_MAX_KICKS                           = 2,
     };
 
     /**
