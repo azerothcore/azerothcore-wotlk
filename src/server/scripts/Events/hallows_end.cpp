@@ -329,6 +329,17 @@ public:
     {
         PrepareAuraScript(spell_hallows_end_base_fire_AuraScript);
 
+        void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
+        {
+            if (Creature* creature = GetCaster()->ToCreature())
+            {
+                if (!(creature->AI()->GetData(0) % 3))
+                {
+                    amplitude = static_cast<int32>(amplitude * 1.5f);
+                }
+            }
+        }
+
         void HandleEffectPeriodicUpdate(AuraEffect* aurEff)
         {
             // can start from 0
@@ -359,6 +370,7 @@ public:
 
         void Register() override
         {
+            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_hallows_end_base_fire_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_hallows_end_base_fire_AuraScript::HandleEffectPeriodicUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectApply += AuraEffectApplyFn(spell_hallows_end_base_fire_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
@@ -563,14 +575,22 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_START_FIRE)
             {
                 me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
                 if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
                 {
-                    int32 amount = urand(1, 2);
+                    int32 amount = 1;
+                    if (Creature* creature = caster->ToCreature())
+                    {
+                        if ((creature->AI()->GetData(0) % 3) > 0)
+                        {
+                            amount = 2;
+                        }
+                    }
+
                     me->SetObjectScale(0.5f + 0.5f * amount);
                     aurEff->SetAmount(amount);
                 }
@@ -580,8 +600,17 @@ public:
                 me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
                 if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
                 {
-                    me->SetObjectScale(0.5f);
-                    aurEff->SetAmount(0);
+                    int32 amount = 0;
+                    if (Creature* creature = caster->ToCreature())
+                    {
+                        if ((creature->AI()->GetData(0) % 3) > 1)
+                        {
+                            amount = 1;
+                        }
+                    }
+
+                    me->SetObjectScale(0.5f + 0.5f * amount);
+                    aurEff->SetAmount(amount);
                 }
             }
             else if (spellInfo->Id == SPELL_WATER_SPLASH)
@@ -626,6 +655,7 @@ public:
 
         bool Unmount;
         EventMap events;
+        uint32 playerCount;
         uint32 counter;
         GuidList unitList;
         int32 pos;
@@ -681,16 +711,32 @@ public:
 
         void Reset() override
         {
+            playerCount = 0;
             unitList.clear();
             std::list<Creature*> temp;
             me->GetCreaturesWithEntryInRange(temp, 100.0f, NPC_FIRE_TRIGGER);
             for (std::list<Creature*>::const_iterator itr = temp.begin(); itr != temp.end(); ++itr)
+            {
                 unitList.push_back((*itr)->GetGUID());
+            }
 
             events.ScheduleEvent(1, 3000);
             events.ScheduleEvent(2, 25000);
             events.ScheduleEvent(2, 43000);
             events.ScheduleEvent(3, 63000);
+
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        }
+
+        void EnterEvadeMode() override
+        {
+            me->DespawnOrUnsummon(1);
+        }
+
+        uint32 GetData(uint32 /*type*/) const override
+        {
+            return playerCount;
         }
 
         void UpdateAI(uint32 diff) override
@@ -707,12 +753,26 @@ public:
                     break;
                 case 2:
                     {
-                        if (Unit* trigger = getTrigger())
-                            me->CastSpell(trigger, SPELL_START_FIRE, true);
+                        CastFires(true);
                         break;
                     }
                 case 3:
                     {
+                        bool checkBurningTriggers = false;
+                        for (ObjectGuid const& guid : unitList)
+                            if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
+                                if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                                {
+                                    checkBurningTriggers = true;
+                                    break;
+                                }
+
+                        if (!checkBurningTriggers)
+                        {
+                            FinishEvent(false);
+                            return;
+                        }
+
                         counter++;
                         if (counter > 21)
                         {
@@ -739,8 +799,7 @@ public:
                             me->PlayDirectSound(12571);
                         }
 
-                        if (Unit* trigger = getTrigger())
-                            me->CastSpell(trigger, SPELL_START_FIRE, true);
+                        CastFires(false);
                         events.RepeatEvent(15000);
                         break;
                     }
@@ -748,12 +807,15 @@ public:
 
             if (Unmount)
             {
+                Unmount = false;
                 me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
                 me->RemoveAllAuras();
                 me->Dismount();
+                me->SetReactState(REACT_AGGRESSIVE);
                 if (Unit* target = me->SelectNearestPlayer(30.0f))
                     AttackStart(target);
             }
+
             if (me->IsMounted())
                 return;
 
@@ -767,20 +829,56 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        Unit* getTrigger()
+        void CastFires(bool intial)
         {
-            std::list<Unit*> tmpList;
+            std::vector<Unit*> tmpList;
             for (ObjectGuid const& guid : unitList)
+            {
                 if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
+                {
                     if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                    {
                         tmpList.push_back(c);
+                    }
+                }
+            }
 
             if (tmpList.empty())
-                return nullptr;
+            {
+                return;
+            }
 
-            std::list<Unit*>::const_iterator it2 = tmpList.begin();
-            std::advance(it2, urand(0, tmpList.size() - 1));
-            return (*it2);
+            std::list<Player*> players;
+            Acore::AnyPlayerInObjectRangeCheck checker(me, 60.f);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Cell::VisitWorldObjects(me, searcher, 60.f);
+            if (players.empty())
+            {
+                return;
+            }
+
+            playerCount = static_cast<uint32>(players.size()) - 1;
+
+            if (!intial)
+            {
+                float playerRate = std::max(0.f, 0.5f - playerCount * 0.25f);
+
+                // If there are more burning triggers than players, do not cast next fire
+                if (tmpList.size() < unitList.size() * playerRate)
+                {
+                    return;
+                }
+            }
+
+            uint32 sizeCount = (playerCount / 3) + 1;
+            if (intial && playerCount > 0)
+            {
+                sizeCount += playerCount % 2;
+            }
+
+            Acore::Containers::RandomResize(tmpList, sizeCount);
+            for (Unit* trigger : tmpList)
+                me->CastSpell(trigger, SPELL_START_FIRE, true);
         }
 
         void FinishEvent(bool failed)
