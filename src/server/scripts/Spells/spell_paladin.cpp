@@ -100,7 +100,15 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo)
+            {
+                return false;
+            }
+
+            if (const SpellInfo* procSpell = damageInfo->GetSpellInfo())
                 if (procSpell->SpellIconID == 3025) // Righteous Vengeance, should not proc SoC
                     return false;
             return true;
@@ -110,7 +118,15 @@ public:
         {
             PreventDefaultAction();
             int32 targets = 3;
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo)
+            {
+                return;
+            }
+
+            if (const SpellInfo* procSpell = damageInfo->GetSpellInfo())
                 if (procSpell->IsAffectingArea())
                     targets = 1;
 
@@ -200,8 +216,16 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
+                return false;
+            }
+
             // xinef: skip divine storm self hit (dummy) and righteous vengeance (0x20000000=
-            return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
+            return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!damageInfo->GetSpellInfo() || !damageInfo>GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
         }
 
         void Register() override
@@ -251,7 +275,14 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo()->GetDamage() > 0;
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return false;
+            }
+
+            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && damageInfo->GetDamage() > 0;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -261,11 +292,25 @@ public:
             if (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS)
             {
                 Unit* caster = eventInfo.GetActor();
-                const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+
+                DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+                if (!damageInfo || !damageInfo->GetDamage())
+                {
+                    return;
+                }
+
+                const SpellInfo* procSpell = damageInfo->GetSpellInfo();
+
+                if (!procSpell)
+                {
+                    return;
+                }
+
                 if (caster && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
                         procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
                 {
-                    int32 basepoints = int32(float(eventInfo.GetDamageInfo()->GetDamage()) / 12.0f);
+                    int32 basepoints = int32(float(damageInfo->GetDamage()) / 12.0f);
                     // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
                     if (AuraEffect const* aurEffect = caster->GetAuraEffect(67191, EFFECT_0))
                         AddPct(basepoints, aurEffect->GetAmount());
@@ -1270,7 +1315,14 @@ public:
             if (!target)
                 return false;
 
-            return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() && (eventInfo.GetDamageInfo()->GetDamage() || (eventInfo.GetHitMask() & PROC_EX_ABSORB));
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return false;
+            }
+
+            return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() && (damageInfo->GetDamage() || (eventInfo.GetHitMask() & PROC_EX_ABSORB));
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
