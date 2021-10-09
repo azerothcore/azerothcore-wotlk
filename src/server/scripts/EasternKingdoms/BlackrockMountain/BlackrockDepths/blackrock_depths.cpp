@@ -31,11 +31,6 @@ enum IronhandData
     SPELL_GOUT_OF_FLAMES       = 15529
 };
 
-enum ShadowforgeBrazier
-{
-    SAY_MAGMUS_BRAZIER_LIT = 0
-};
-
 class go_shadowforge_brazier : public GameObjectScript
 {
 public:
@@ -53,8 +48,6 @@ public:
                 return false;
             }
 
-            LOG_FATAL("Entities:unit", "north brazier state %d, south brazier %d", northBrazier->GetGoState(), southBrazier->GetGoState());
-
             // should only happen on first brazier
             if (instance->GetData(TYPE_LYCEUM) == NOT_STARTED)
             {
@@ -64,12 +57,11 @@ public:
             // Check if the opposite brazier is lit - if it is, open the gates.
             if ((go->GetGUID() == northBrazier->GetGUID() && southBrazier->GetGoState() == GO_STATE_ACTIVE) || (go->GetGUID() == southBrazier->GetGUID() && northBrazier->GetGoState() == GO_STATE_ACTIVE))
             {
-                LOG_FATAL("Entities:unit", "setting a brazier");
                 instance->SetData(TYPE_LYCEUM, DONE);
             }
         }
-        return false;
-    }
+        EventMap events;
+    };
 };
 
 class ironhand_guardian : public CreatureScript
@@ -126,39 +118,31 @@ public:
     };
 };
 
-enum eChallenge
+struct Wave
 {
-    QUEST_THE_CHALLENGE                 = 9015,
-    GO_BANNER_OF_PROVOCATION            = 181058,
-    GO_ARENA_SPOILS                     = 181074,
-
-    NPC_GRIMSTONE                       = 10096,
-    NPC_THELDREN                        = 16059,
+    uint32 entry;
+    uint32 amount;
 };
 
-uint32 theldrenTeam[] =
+static Wave RingMobs[] = // different amounts based on the type
 {
-    16053, 16055, 16050, 16051, 16049, 16052, 16054, 16058
+    {8925, 3},
+    {8926, 2},
+    {8927, 3},
+    {8928, 4},
+    {8933, 3},
+    {8932, 6}
 };
 
-uint32 RingMob[] =
-{
-    8925,                                                   // Dredge Worm
-    8926,                                                   // Deep Stinger
-    8927,                                                   // Dark Screecher
-    8928,                                                   // Burrowing Thundersnout
-    8933,                                                   // Cave Creeper
-    8932,                                                   // Borer Beetle
-};
 
 uint32 RingBoss[] =
 {
-    9027,                                                   // Gorosh
-    9028,                                                   // Grizzle
-    9029,                                                   // Eviscerator
-    9030,                                                   // Ok'thor
-    9031,                                                   // Anub'shiah
-    9032,                                                   // Hedrum
+    9027,                                                   // Gorosh ok
+    9028,                                                   // Grizzle ok 
+    9029,                                                   // Eviscerator no
+    9030,                                                   // Ok'thor no 
+    9031,                                                   // Anub'shiah ok 
+    9032,                                                   // Hedrum no
 };
 
 class at_ring_of_law : public AreaTriggerScript
@@ -166,15 +150,24 @@ class at_ring_of_law : public AreaTriggerScript
 public:
     at_ring_of_law() : AreaTriggerScript("at_ring_of_law") { }
 
+    time_t startTime = 0;
+
     bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
+            
+            time_t now = sWorld->GetGameTime();
+            LOG_FATAL("entities:unit", "called start of ring of law, time since last: %u ", now - startTime);
             if (instance->GetData(TYPE_RING_OF_LAW) == IN_PROGRESS || instance->GetData(TYPE_RING_OF_LAW) == DONE)
                 return false;
 
+            if (now - startTime < 4 * 60) // in case of wipe, so people can rez.
+            {
+                return false;
+            }
+            startTime = now;
             instance->SetData(TYPE_RING_OF_LAW, IN_PROGRESS);
-            player->SummonCreature(NPC_GRIMSTONE, 625.559f, -205.618f, -52.735f, 2.609f, TEMPSUMMON_DEAD_DESPAWN, 0);
 
             return false;
         }
@@ -211,6 +204,7 @@ public:
             MobSpawnId = urand(0,5);
             eventPhase = 0;
             eventTimer = 1000;
+            resetTimer    = 0;
             theldrenEvent = false;
             summons.DespawnAll();
         }
@@ -220,12 +214,14 @@ public:
 
         uint8 eventPhase;
         uint32 eventTimer;
+        uint32 resetTimer;
         uint8 MobSpawnId;
         bool theldrenEvent;
 
         void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            LOG_FATAL("entities:unit", "called reset for grimstone");
         }
 
         void JustSummoned(Creature* summon) override
@@ -234,6 +230,7 @@ public:
             if (Unit* target = SelectTargetFromPlayerList(100.0f))
                 summon->AI()->AttackStart(target);
         }
+
 
         void SummonedCreatureDies(Creature* summon, Unit*) override
         {
@@ -295,12 +292,62 @@ public:
             }
             else
                 me->SummonCreature(RingBoss[urand(0,5)], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            resetTimer = 30000;
+        }
+
+        bool updateReset(uint32 diff)
+        {
+            bool doReset = false;
+            if (resetTimer > 0)
+            {
+                if (resetTimer <= diff)
+                {
+                    resetTimer   = 30000;
+                    doReset    = true; // within timer, default to true. If any mob is in combat we set false.
+                    for (const auto& sum : summons)
+                    {
+                        if (Creature* creature = ObjectAccessor::GetCreature(*me, sum))
+                        {
+                            if (creature->IsAlive() && creature->GetVictim())
+                            {
+                                LOG_FATAL("Entities:unit", "found a creature %s", creature->GetName());
+                                doReset = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    resetTimer -= diff;
+                }
+            }
+            return doReset;
+        }
+
+        void SpawnWave(uint32 mobId)
+        {
+            for (int i = 0; i < RingMobs[mobId].amount; i++)
+            {
+                me->SummonCreature(RingMobs[mobId].entry, 608.960f + 0.2f * i, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            }
         }
 
         void UpdateEscortAI(uint32 diff) override
         {
             if (!instance)
                 return;
+
+            // reset if our mobs don't have a target.
+            if (updateReset(diff))
+            {
+                summons.DespawnAll();
+                HandleGameObject(DATA_ARENA4, true);
+                HandleGameObject(DATA_ARENA3, false);
+                HandleGameObject(DATA_ARENA2, false);
+                HandleGameObject(DATA_ARENA1, false);
+                instance->SetData(TYPE_RING_OF_LAW, FAIL);
+            }
+
 
             if (eventTimer)
             {
@@ -328,35 +375,30 @@ public:
                         case 4:
                             SetEscortPaused(false);
                             me->SetVisible(false);
-                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            eventTimer = 8000;
+                            SpawnWave(MobSpawnId); // wave 1
+                            eventTimer = 15000;
                             break;
                         case 5:
-                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            eventTimer = 8000;
+                            SpawnWave(MobSpawnId); // wave 2
+                            eventTimer = 0; // will be set from SummonedCreatureDies
                             break;
                         case 6:
-                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                            eventTimer = 0;
-                            break;
-                        case 7:
                             me->SetVisible(true);
                             HandleGameObject(DATA_ARENA1, false);
                             Talk(SAY_TEXT6);
                             SetEscortPaused(false);
                             eventTimer = 0;
                             break;
-                        case 8:
+                        case 7:
                             HandleGameObject(DATA_ARENA2, true);
                             eventTimer = 5000;
                             break;
-                        case 9:
+                        case 8:
                             me->SetVisible(false);
                             SummonBoss();
                             eventTimer = 0;
                             break;
-                        case 10:
+                        case 9:
                             if (theldrenEvent)
                             {
                                 if (GameObject* go = me->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))

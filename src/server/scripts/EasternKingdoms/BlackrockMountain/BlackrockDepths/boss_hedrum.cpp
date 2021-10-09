@@ -21,44 +21,43 @@
 
 enum Spells
 {
-    SPELL_WHIRLWIND    = 13736,
-    SPELL_MORTALSTRIKE = 15708,
-    SPELL_BLOODLUST    = 21049
+    SPELL_PARALYZING    = 3609,
+    SPELL_BANEFUL       = 15475,
+    SPELL_WEB_EXPLOSION = 15474
 };
 
 enum Timers
 {
-    TIMER_WHIRLWIND = 12000,
-    TIMER_MORTAL = 22000,
-    TIMER_BLOODLUST = 30000
+    TIMER_PARALYZING     = 20000,
+    TIMER_BANEFUL        = 24000,
+    TIMER_WEB_EXPLOSION  = 20000
 };
 
-
-class boss_gorosh_the_dervish : public CreatureScript
+class boss_hedrum : public CreatureScript
 {
 public:
-    boss_gorosh_the_dervish() : CreatureScript("boss_gorosh_the_dervish") { }
+    boss_hedrum() : CreatureScript("boss_hedrum") {}
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetBlackrockDepthsAI<boss_gorosh_the_dervishAI>(creature);
+        return GetBlackrockDepthsAI<boss_hedrumAI>(creature);
     }
 
-    struct boss_gorosh_the_dervishAI : public BossAI
+    struct boss_hedrumAI : public BossAI
     {
-        boss_gorosh_the_dervishAI(Creature* creature) : BossAI(creature, DATA_GOROSH) { }
+        boss_hedrumAI(Creature* creature) : BossAI(creature, DATA_HEDRUM) {}
 
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(SPELL_WHIRLWIND, 0.2 * TIMER_WHIRLWIND);
-            events.ScheduleEvent(SPELL_MORTALSTRIKE, 0.2 * TIMER_MORTAL);
-            events.ScheduleEvent(SPELL_BLOODLUST, 0.2 * TIMER_BLOODLUST);
+            events.ScheduleEvent(SPELL_PARALYZING, 0.2 * TIMER_PARALYZING);
+            events.ScheduleEvent(SPELL_BANEFUL, 0.2 * TIMER_BANEFUL);
+            events.ScheduleEvent(SPELL_WEB_EXPLOSION, 0.2 * TIMER_WEB_EXPLOSION);            
         }
 
         void UpdateAI(uint32 diff) override
         {
-            // Return since we have no target
+            //Return since we have no target
             if (!UpdateVictim())
                 return;
 
@@ -71,20 +70,20 @@ public:
             {
                 switch (eventId)
                 {
-                case SPELL_WHIRLWIND:
-                    if (me->GetDistance2d(me->GetVictim()) < 10.0f)
+                case SPELL_PARALYZING:
+                    DoCastVictim(SPELL_PARALYZING);
+                    events.ScheduleEvent(SPELL_PARALYZING, urand(TIMER_PARALYZING - 2000, TIMER_PARALYZING + 2000));
+                    break;
+                case SPELL_BANEFUL:
+                    DoCastVictim(SPELL_BANEFUL);
+                    events.ScheduleEvent(SPELL_BANEFUL, urand(TIMER_BANEFUL - 2000, TIMER_BANEFUL + 2000));
+                    break;
+                case SPELL_WEB_EXPLOSION:
+                    if (me->GetDistance2d(me->GetVictim()) < 100.0f)
                     {
-                        DoCastVictim(SPELL_WHIRLWIND);
+                        DoCast(SPELL_WEB_EXPLOSION);
                     }
-                    events.ScheduleEvent(SPELL_WHIRLWIND, urand(TIMER_WHIRLWIND - 2000, TIMER_WHIRLWIND + 2000));
-                    break;
-                case SPELL_MORTALSTRIKE:
-                    DoCastVictim(SPELL_MORTALSTRIKE);
-                    events.ScheduleEvent(SPELL_MORTALSTRIKE, urand(TIMER_MORTAL - 2000, TIMER_MORTAL + 2000));
-                    break;
-                case SPELL_BLOODLUST:
-                    DoCastSelf(SPELL_BLOODLUST);
-                    events.ScheduleEvent(SPELL_BLOODLUST, urand(TIMER_BLOODLUST - 2000, TIMER_BLOODLUST + 2000));
+                    events.ScheduleEvent(SPELL_WEB_EXPLOSION, urand(TIMER_WEB_EXPLOSION - 2000, TIMER_WEB_EXPLOSION + 2000));
                     break;
                 default:
                     break;
@@ -95,7 +94,7 @@ public:
     };
 };
 
-void AddSC_boss_gorosh_the_dervish()
+void AddSC_boss_hedrum()
 {
-    new boss_gorosh_the_dervish();
+    new boss_hedrum();
 }

@@ -49,13 +49,17 @@ enum Creatures
     NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
     NPC_GOLEM_LORD_ARGELMACH    = 8983,
 
+    NPC_COREN_DIREBREW          = 23872,
+
     NPC_IRONHAND_GUARDIAN       = 8982,
 
     NPC_ARENA_SPECTATOR         = 8916,
     NPC_SHADOWFORGE_PEASANT     = 8896,
     NPC_SHADOWFORCE_CITIZEN     = 8902,
 
-    NPC_SHADOWFORGE_SENATOR     = 8904
+    NPC_SHADOWFORGE_SENATOR     = 8904,
+
+    NPC_MAGMUS                  = 9938
 };
 
 enum PrincessQuests
@@ -139,8 +143,8 @@ public:
         ObjectGuid MagmusGUID;
         ObjectGuid MoiraGUID;
         ObjectGuid PriestessGUID;
-
         ObjectGuid IronhandGUID[6];
+        ObjectGuid CorenGUID;
 
         ObjectGuid GoArena1GUID;
         ObjectGuid GoArena2GUID;
@@ -175,6 +179,9 @@ public:
 
         GuidList ArgelmachAdds;
         ObjectGuid ArgelmachGUID;
+        
+        TempSummon* TempSummonGrimstone = nullptr;
+        Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
 
         std::vector<ObjectGuid> ArenaSpectators;
         Position CenterOfRingOfLaw;
@@ -185,8 +192,8 @@ public:
 
         void OnPlayerEnter(Player* /* player */) override
         {
-            // In case a player joins the party during the run
-            ReplaceMoiraIfSaved();
+            ReplaceMoiraIfSaved(); // In case a player joins the party during the run
+            SetData(TYPE_RING_OF_LAW, DONE);
         }
 
         void ReplaceMoiraIfSaved()
@@ -256,6 +263,9 @@ public:
                 case NPC_MOIRA:
                     MoiraGUID = creature->GetGUID();
                     break;
+                case NPC_COREN_DIREBREW:
+                    CorenGUID = creature->GetGUID();
+                    break;
                 case NPC_ANGERREL:
                     TombBossGUIDs[0] = creature->GetGUID();
                     break;
@@ -300,12 +310,22 @@ public:
                     break;
                 case NPC_ARENA_SPECTATOR:
                     ArenaSpectators.push_back(creature->GetGUID());
+                    if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                    {
+                        creature->setFaction(FACTION_NEUTRAL);
+                        creature->SetReactState(REACT_DEFENSIVE);
+                    }
                     break;
                 case NPC_SHADOWFORGE_PEASANT:
                 case NPC_SHADOWFORCE_CITIZEN: // both do the same
                     if (creature->GetDistance2d(CenterOfRingOfLaw.GetPositionX(), CenterOfRingOfLaw.GetPositionY()) < RADIUS_RING_OF_LAW)
                     {
                         ArenaSpectators.push_back(creature->GetGUID());
+                    }
+                    if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                    {
+                        creature->setFaction(FACTION_NEUTRAL);
+                        creature->SetReactState(REACT_DEFENSIVE);
                     }
                     break;
                 case NPC_SHADOWFORGE_SENATOR:
@@ -455,15 +475,32 @@ public:
             {
                 case TYPE_RING_OF_LAW:
                     encounter[0] = data;
-                    if (data == DONE)
+                    LOG_FATAL("entities:unit", "set data ring of law with data %d", data);
+                    switch(data)
                     {
-                        for (const auto &itr : ArenaSpectators)
+                    case IN_PROGRESS:
+                        TempSummonGrimstone = instance->SummonCreature(NPC_GRIMSTONE, GrimstonePositon);
+                        break;
+                    case FAIL:
+                        if (TempSummonGrimstone)
                         {
-                            if(Creature* spectator = instance->GetCreature(itr))
+                            TempSummonGrimstone->RemoveFromWorld();
+                            TempSummonGrimstone = nullptr;
+                        }
+                        SetData(TYPE_RING_OF_LAW, NOT_STARTED);
+                        break;
+                    case DONE:
+                        for (const auto& itr : ArenaSpectators)
+                        {
+                            if (Creature* spectator = instance->GetCreature(itr))
                             {
                                 spectator->setFaction(FACTION_NEUTRAL);
+                                spectator->SetReactState(REACT_DEFENSIVE);
                             }
                         }
+                        break;
+                    default:
+                        break;
                     }
                     break;
                 case TYPE_VAULT:
@@ -650,6 +687,8 @@ public:
                     return PhalanxGUID;
                 case DATA_MOIRA:
                     return MoiraGUID;
+                case DATA_COREN:
+                    return CorenGUID;
                 case DATA_ARENA1:
                     return GoArena1GUID;
                 case DATA_ARENA2:
@@ -774,6 +813,7 @@ public:
             TombEventStarterGUID.Clear();
             SetData(TYPE_TOMB_OF_SEVEN, DONE);
         }
+
         void Update(uint32 diff) override
         {
             if (TombEventStarterGUID && GhostKillCount < 7)
