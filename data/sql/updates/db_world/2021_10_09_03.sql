@@ -1,3 +1,19 @@
+-- DB update 2021_10_09_02 -> 2021_10_09_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_10_09_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_10_09_02 2021_10_09_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1633358951858926600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633358951858926600');
 
  -- Baron Rivendare
@@ -33,3 +49,13 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 18, 10440, 0, 1, 30, 1, 175796, 4, 0, 0, 'There is gameobject Doodad_ZigguratDoor05 (175796) within range 4 yards to Object'),
 (22, 18, 10440, 0, 1, 30, 1, 176631, 13, 0, 1, 'There is no gameobject Menethils Gift (176631) within range 13 yards to Object');
 
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_10_09_03' WHERE sql_rev = '1633358951858926600';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
