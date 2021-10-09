@@ -3207,6 +3207,55 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 delete targets;
                 break;
             }
+        case SMART_ACTION_DO_ACTION:
+            {
+                int32 const actionId = e.action.doAction.isNegative ? -e.action.doAction.actionId : e.action.doAction.actionId;
+                if (!e.action.doAction.instanceTarget)
+                {
+                    ObjectList* targets = GetTargets(e, unit);
+                    if (!targets)
+                    {
+                        break;
+                    }
+
+                    for (WorldObject* objTarget : *targets)
+                    {
+                        if (Creature const* unitTarget = objTarget->ToCreature())
+                        {
+                            if (unitTarget->IsAIEnabled)
+                            {
+                                unitTarget->AI()->DoAction(actionId);
+                            }
+                        }
+                        else if (GameObject const* gobjTarget = objTarget->ToGameObject())
+                        {
+                            gobjTarget->AI()->DoAction(actionId);
+                        }
+                    }
+
+                    delete targets;
+                }
+                else
+                {
+                    InstanceScript* instanceScript = nullptr;
+                    if (WorldObject* baseObj = GetBaseObject())
+                    {
+                        instanceScript = baseObj->GetInstanceScript();
+                    }
+                    // Action is triggered by AreaTrigger
+                    else if (trigger && IsPlayer(unit))
+                    {
+                        instanceScript = unit->GetInstanceScript();
+                    }
+
+                    if (instanceScript)
+                    {
+                        instanceScript->DoAction(actionId);
+                    }
+                }
+                
+                break;
+            }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry %d SourceType %u, Event %u, Unhandled Action type %u", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
