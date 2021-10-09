@@ -503,6 +503,8 @@ struct GameObjectTemplate
     {
         switch (type)
         {
+            case GAMEOBJECT_TYPE_BUTTON:
+                return button.linkedTrap;
             case GAMEOBJECT_TYPE_CHEST:
                 return chest.linkedTrapId;
             case GAMEOBJECT_TYPE_SPELL_FOCUS:
@@ -885,6 +887,9 @@ public:
     void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
     [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
+    [[nodiscard]] GameObject* GetLinkedTrap();
+    void SetLinkedTrap(GameObject* linkedTrap) { m_linkedTrap = linkedTrap->GetGUID(); }
+
     [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id) const override;
     bool ActivateToQuest(Player* target) const;
@@ -1007,6 +1012,9 @@ protected:
     ObjectGuid::LowType m_lootRecipientGroup;
     uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
     uint32 m_lootGenerationTime;
+
+    ObjectGuid m_linkedTrap;
+
 private:
     void CheckRitualList();
     void ClearRitualList();
