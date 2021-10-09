@@ -3253,7 +3253,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         instanceScript->DoAction(actionId);
                     }
                 }
-                
                 break;
             }
         default:
