@@ -93,16 +93,28 @@ GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
     return sGraveyard->GetGraveyard(teamId == TEAM_HORDE ? HORDE_GRAVEYARD : ALLIANCE_GRAVEYARD);
 }
 
-GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId)
+GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId teamId, bool nearCorpse)
 {
+    WorldLocation loc = player->GetWorldLocation();
+
+    if (nearCorpse)
+    {
+        loc = player->GetCorpseLocation();
+    }
+
+    uint32 mapId = loc.GetMapId();
+    float  x     = loc.GetPositionX();
+    float  y     = loc.GetPositionY();
+    float  z     = loc.GetPositionZ();
+
     // search for zone associated closest graveyard
-    uint32 zoneId = sMapMgr->GetZoneId(PHASEMASK_NORMAL, MapId, x, y, z);
+    uint32 zoneId = player->GetZoneId();
 
     if (!zoneId)
     {
         if (z > -500)
         {
-            LOG_ERROR("sql.sql", "ZoneId not found for map %u coords (%f, %f, %f)", MapId, x, y, z);
+            LOG_ERROR("sql.sql", "ZoneId not found for map %u coords (%f, %f, %f)", mapId, x, y, z);
             return GetDefaultGraveyard(teamId);
         }
     }
@@ -115,7 +127,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
     //   if mapId != graveyard.mapId (ghost in instance) and search any graveyard associated
     //     then check faction
     GraveyardMapBounds range = GraveyardStore.equal_range(zoneId);
-    MapEntry const* map = sMapStore.LookupEntry(MapId);
+    MapEntry const* map = sMapStore.LookupEntry(mapId);
 
     // not need to check validity of map object; MapId _MUST_ be valid here
     if (range.first == range.second && !map->IsBattlegroundOrArena())
@@ -137,7 +149,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
     // some where other
     GraveyardStruct const* entryFar = nullptr;
 
-    MapEntry const* mapEntry = sMapStore.LookupEntry(MapId);
+    MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
 
     for (; range.first != range.second; ++range.first)
     {
@@ -154,8 +166,20 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
         if (data.teamId != TEAM_NEUTRAL && teamId != TEAM_NEUTRAL && data.teamId != teamId)
             continue;
 
+        // Skip Archerus graveyards if the player isn't a Death Knight.
+        enum DeathKnightGraveyards
+        {
+            GRAVEYARD_EBON_HOLD = 1369,
+            GRAVEYARD_ARCHERUS  = 1405
+        };
+
+        if (player->getClass() != CLASS_DEATH_KNIGHT && (data.safeLocId == GRAVEYARD_EBON_HOLD || data.safeLocId == GRAVEYARD_ARCHERUS))
+        {
+            continue;
+        }
+
         // find now nearest graveyard at other map
-        if (MapId != entry->Map)
+        if (mapId != entry->Map)
         {
             // if find graveyard at different map from where entrance placed (or no entrance data), use any first
             if (!mapEntry
