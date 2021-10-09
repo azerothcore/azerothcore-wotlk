@@ -2759,10 +2759,15 @@ void SpellMgr::LoadSpellCustomAttr()
                 {
                     if (spellInfo->Effects[i].IsEffect())
                     {
+                        if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) && (attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)))
+                        {
+                            LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u and SPELL_ATTR0_CU_POSITIVE_EFF%u attributes for spell %u which cannot stack together. Attributes will not get applied", static_cast<uint32>(i), static_cast<uint32>(i), spellId);
+                            attributes &= ~(SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)|(SPELL_ATTR0_CU_POSITIVE_EFF0 << i);
+                        }
                         continue;
                     }
 
-                    if ((attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i)) != 0)
+                    if (attributes & (SPELL_ATTR0_CU_NEGATIVE_EFF0 << i))
                     {
                         LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_NEGATIVE_EFF%u for spell %u with no EFFECT_%u", static_cast<uint32>(i), spellId, static_cast<uint32>(i));
                         attributes &= ~(SPELL_ATTR0_CU_NEGATIVE_EFF0 << i);
@@ -2779,7 +2784,7 @@ void SpellMgr::LoadSpellCustomAttr()
                         continue;
                     }
 
-                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)) != 0)
+                    if ((attributes & (SPELL_ATTR0_CU_POSITIVE_EFF0 << i)))
                     {
                         LOG_ERROR("sql.sql", "Table `spell_custom_attr` has attribute SPELL_ATTR0_CU_POSITIVE_EFF%u for spell %u with no EFFECT_%u", uint32(i), spellId, uint32(i));
                         attributes &= ~(SPELL_ATTR0_CU_POSITIVE_EFF0 << i);
