@@ -1049,10 +1049,17 @@ bool Aura::IsRemovedOnShapeLost(Unit* target) const
 bool Aura::CanBeSaved() const
 {
     SpellInfo const* spellInfo = GetSpellInfo();
-    if (spellInfo->HasAttribute(SPELL_ATTR1_CU_AURA_CAN_BE_SAVED))
+
+    if (spellInfo->HasAttribute(SPELL_ATTR1_CU_FORCE_AURA_SAVING))
     {
         return true;
     }
+
+    if (spellInfo->HasAttribute(SPELL_ATTR1_CU_REJECT_AURA_SAVING))
+    {
+        return false;
+    }
+
     if (IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
         return false;
 
