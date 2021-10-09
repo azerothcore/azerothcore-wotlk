@@ -2743,10 +2743,10 @@ void SpellMgr::LoadSpellCustomAttr()
             Field const* fields = result->Fetch();
 
             uint32 const spellId = fields[0].GetUInt32();
-            uint32 const attributes = fields[1].GetUInt32();
-            uint32 attributes1 = fields[1].GetUInt32()
+            uint32 attributes = fields[1].GetUInt32();
+            uint32 attributes1 = fields[2].GetUInt32();
 
-            SpellInfo const* spellInfo = _GetSpellInfo(spellId);
+            SpellInfo* spellInfo = _GetSpellInfo(spellId);
             if (!spellInfo)
             {
                 LOG_INFO("sql.sql", "Table `spell_custom_attr` has wrong spell (spell_id: %u), ignored.", spellId);
