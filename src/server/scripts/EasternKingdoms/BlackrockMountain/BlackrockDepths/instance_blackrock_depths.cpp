@@ -490,6 +490,7 @@ public:
                     break;
                 case TYPE_LYCEUM:
                     encounter[4] = data;
+                    LOG_FATAL("entities:unit", "lyceum set to %d", data);
                     if (data == DONE)
                     {
                         LOG_FATAL("entities:unit", "lyceum done");

@@ -59,8 +59,9 @@ public:
             {
                 instance->SetData(TYPE_LYCEUM, DONE);
             }
+            return false;
         }
-        EventMap events;
+        return false;
     };
 };
 
@@ -153,7 +154,6 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {
-            
             time_t now = time(nullptr);
             LOG_FATAL("entities:unit", "called start of ring of law, last fail time %d, time since last: %u, ring of law state: %d ", instance->GetData(DATA_TIME_RING_FAIL), now - instance->GetData(DATA_TIME_RING_FAIL), instance->GetData(TYPE_RING_OF_LAW));
             if (instance->GetData(TYPE_RING_OF_LAW) == IN_PROGRESS || instance->GetData(TYPE_RING_OF_LAW) == DONE)
@@ -166,7 +166,7 @@ public:
 
             instance->SetData(TYPE_RING_OF_LAW, IN_PROGRESS);
 
-            return false;
+            return true;
         }
         return false;
     }
