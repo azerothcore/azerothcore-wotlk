@@ -148,9 +148,15 @@ void HostileReference::addThreat(float modThreat)
 
     if (isValid() && modThreat >= 0.0f)
     {
-        Unit* victimOwner = getTarget()->GetCharmerOrOwner();
-        if (victimOwner && victimOwner->IsAlive())
-            GetSource()->addThreat(victimOwner, 0.0f);     // create a threat to the owner of a pet, if the pet attacks
+        Unit* target = getTarget();
+        if (target->GetEntry() != NPC_EYE_OF_KILROGG) // Excluded Eye of Kilrogg
+        {
+            Unit* victimOwner = target->GetCharmerOrOwner();
+            if (victimOwner && victimOwner->IsAlive())
+            {
+                GetSource()->addThreat(victimOwner, 0.0f); // create a threat to the owner of a pet, if the pet attacks
+            }
+        }
     }
 }
 

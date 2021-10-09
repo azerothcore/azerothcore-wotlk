@@ -108,6 +108,7 @@ enum NPCEntries
     NPC_SUCCUBUS                = 1863,
     NPC_DOOMGUARD               = 11859,
     NPC_FELGUARD                = 17252,
+    NPC_EYE_OF_KILROGG          = 4277,
 
     // Mage
     NPC_WATER_ELEMENTAL_TEMP    = 510,
