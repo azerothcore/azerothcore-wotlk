@@ -1653,8 +1653,10 @@ namespace lfg
         }
 
         bool randomDungeon = false;
+        std::vector<Player*> playersTeleported;
         // Teleport Player
         for (GuidUnorderedSet::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
+        {
             if (Player* player = ObjectAccessor::FindPlayer(*it))
             {
                 if (player->GetGroup() != grp) // pussywizard: could not add because group was full (some shitness happened)
@@ -1691,8 +1693,14 @@ namespace lfg
                     sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
                 }
 
-                TeleportPlayer(player, false, teleportLocation);
+                playersTeleported.push_back(player);
             }
+        }
+
+        for (Player* player : playersTeleported)
+        {
+            TeleportPlayer(player, false, teleportLocation);
+        }
 
         if (randomDungeon)
             grp->AddLfgRandomInstanceFlag();
