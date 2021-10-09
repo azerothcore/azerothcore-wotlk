@@ -146,9 +146,7 @@ public:
             Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
             if (procTarget && eventInfo.GetDamageInfo())
             {
-                int32 damage = eventInfo.GetDamageInfo()->GetDamage();
-                // Xinef: Include AOE Damage Reduction auras
-                damage = procTarget->CalculateAOEDamageReduction(damage, SPELL_SCHOOL_MASK_NORMAL, GetTarget());
+                int32 damage = eventInfo.GetDamageInfo()->GetUnmitigatedDamage();
 
                 CustomSpellValues values;
                 values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
