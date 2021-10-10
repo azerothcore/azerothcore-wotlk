@@ -302,14 +302,21 @@ void Spell::EffectEnvironmentalDMG(SpellEffIndex /*effIndex*/)
     if (!unitTarget || !unitTarget->IsAlive())
         return;
 
-    uint32 absorb = 0;
-    uint32 resist = 0;
-
-    Unit::CalcAbsorbResist(m_caster, unitTarget, m_spellInfo->GetSchoolMask(), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, m_spellInfo);
-
-    m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, damage + absorb + resist, m_spellInfo->GetSchoolMask(), absorb, resist, false, 0, false);
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    if (unitTarget->IsPlayer())
         unitTarget->ToPlayer()->EnvironmentalDamage(DAMAGE_FIRE, damage);
+    else
+    {
+        DamageInfo dmgInfo(m_caster, unitTarget, damage, m_spellInfo, m_spellInfo->GetSchoolMask(), SPELL_DIRECT_DAMAGE);
+
+        uint32 absorb = dmgInfo.GetAbsorb();
+        uint32 resist = dmgInfo.GetResist();
+        uint32 envDamage = dmgInfo.GetDamage();
+
+        Unit::DealDamageMods(unitTarget, envDamage, &absorb);
+        damage = envDamage;
+
+        m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo, damage, m_spellInfo->GetSchoolMask(), absorb, resist, false, 0, false);
+    }
 }
 
 void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
@@ -3793,6 +3800,8 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
             // xinef: this is wrong
             //ExecuteLogEffectSummonObject(effIndex, linkedGO);
 
+            pGameObj->SetLinkedTrap(linkedGO);
+
             // Wild object not have owner and check clickable by players
             map->AddToMap(linkedGO, true);
         }
@@ -5689,6 +5698,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
             // xinef: this is wrong
             //linkedGO->SetOwnerGUID(m_caster->GetGUID());
             //ExecuteLogEffectSummonObject(effIndex, linkedGO);
+            pGameObj->SetLinkedTrap(linkedGO);
 
             cMap->AddToMap(linkedGO, true);
         }
