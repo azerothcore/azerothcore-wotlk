@@ -70,7 +70,16 @@ enum DataTypes
     DATA_OPEN_COFFER_DOORS          = 30,
 
     DATA_GOLEM_LORD_ARGELMACH_INIT  = 31,
-    DATA_GOLEM_LORD_ARGELMACH_ADDS  = 32
+    DATA_GOLEM_LORD_ARGELMACH_ADDS  = 32,
+
+    DATA_MAGMUS                     = 33,
+
+    DATA_COREN                      = 34
+};
+
+enum CreatureIds
+{
+    NPC_MAGMUS = 9938
 };
 
 template <class AI, class T>
