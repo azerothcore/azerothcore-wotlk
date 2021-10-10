@@ -952,6 +952,7 @@ public:
 
     void SendObjectDeSpawnAnim(ObjectGuid guid);
 
+    virtual void SaveRespawnTime() {}
     void AddObjectToRemoveList();
 
     [[nodiscard]] float GetGridActivationRange() const;
