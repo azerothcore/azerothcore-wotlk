@@ -436,7 +436,7 @@ Player::~Player()
         delete itr->second;
 
     //all mailed items should be deleted, also all mail should be deallocated
-    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
     {
         delete *itr;
     }
@@ -2747,12 +2747,12 @@ void Player::SendInitialSpells()
 
 void Player::RemoveMail(uint32 id)
 {
-    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
     {
         if ((*itr)->messageID == id)
         {
             //do not delete item, because Player::removeMail() is called when returning mail to sender.
-            m_mailCache.erase(itr);
+            m_mail.erase(itr);
             return;
         }
     }
@@ -2784,7 +2784,8 @@ void Player::SendNewMail()
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
-    sWorld->UpdateGlobalPlayerMails(GetGUID().GetCounter(), totalMailCount, false);
+    sWorld->UpdateGlobalPlayerMails(GetGUID().GetCounter(), GetMailSize(), false);
+
     if (deliver_time <= time(nullptr))                      // ready now
     {
         ++unReadMails;
@@ -3693,7 +3694,7 @@ void Player::SetFreeTalentPoints(uint32 points)
 
 Mail* Player::GetMail(uint32 id)
 {
-    for (PlayerMails::iterator itr = m_mailCache.begin(); itr != m_mailCache.end(); ++itr)
+    for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
     {
         if ((*itr)->messageID == id)
         {
@@ -3912,6 +3913,25 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
 
                 if (resultMail)
                 {
+                    std::unordered_map<uint32, std::vector<Item*>> itemsByMail;
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
+                    stmt->setUInt32(0, lowGuid);
+                    PreparedQueryResult resultItems = CharacterDatabase.Query(stmt);
+
+                    if (resultItems)
+                    {
+                        do
+                        {
+                            Field* fields = resultItems->Fetch();
+                            uint32 mailId = fields[14].GetUInt32();
+                            if (Item* mailItem = _LoadMailedItem(playerGuid, nullptr, mailId, nullptr, fields))
+                            {
+                                itemsByMail[mailId].push_back(mailItem);
+                            }
+                        } while (resultItems->NextRow());
+                    }
+
                     do
                     {
                         Field* mailFields = resultMail->Fetch();
@@ -3947,40 +3967,16 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                         if (mailTemplateId)
                             draft = MailDraft(mailTemplateId, false);    // items are already included
 
-                        if (has_items)
+                        auto itemsItr = itemsByMail.find(mail_id);
+                        if (itemsItr != itemsByMail.end())
                         {
-                            // Data needs to be at first place for Item::LoadFromDB
-                            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
-                            stmt->setUInt32(0, mail_id);
-                            PreparedQueryResult resultItems = CharacterDatabase.Query(stmt);
-                            if (resultItems)
+                            for (Item* item : itemsItr->second)
                             {
-                                do
-                                {
-                                    Field* itemFields = resultItems->Fetch();
-                                    ObjectGuid::LowType item_guidlow = itemFields[11].GetUInt32();
-                                    uint32 item_template = itemFields[12].GetUInt32();
-
-                                    ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item_template);
-                                    if (!itemProto)
-                                    {
-                                        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                                        stmt->setUInt32(0, item_guidlow);
-                                        trans->Append(stmt);
-                                        continue;
-                                    }
-
-                                    Item* pItem = NewItemOrBag(itemProto);
-                                    if (!pItem->LoadFromDB(item_guidlow, playerGuid, itemFields, item_template))
-                                    {
-                                        pItem->FSetState(ITEM_REMOVED);
-                                        pItem->SaveToDB(trans);              // it also deletes item object!
-                                        continue;
-                                    }
-
-                                    draft.AddItem(pItem);
-                                } while (resultItems->NextRow());
+                                draft.AddItem(item);
                             }
+
+                            // MailDraft will take care of freeing memory.
+                            itemsByMail.erase(itemsItr);
                         }
 
                         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
