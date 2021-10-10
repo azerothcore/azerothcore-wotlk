@@ -156,6 +156,8 @@ public:
         TempSummon* TempSummonGrimstone = nullptr;
         Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
         time_t timeRingFail = 0;
+        uint8 arenaMobsToSpawn;
+        uint8 arenaBossToSpawn;
 
         std::vector<ObjectGuid> ArenaSpectators;
         Position CenterOfRingOfLaw = Position(595.289, -186.56);
@@ -219,6 +221,10 @@ public:
             OpenedCoofers = 0;
             IronhandCounter  = 0;
             ArenaSpectators.clear();
+
+            // these are linked to the dungeon and not how many times the arena started.
+            arenaMobsToSpawn = urand(0, 5);
+            arenaBossToSpawn = urand(0, 5);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -645,6 +651,10 @@ public:
                     return GhostKillCount;
                 case DATA_TIME_RING_FAIL:
                     return timeRingFail;
+                case DATA_ARENA_MOBS:
+                    return arenaMobsToSpawn;
+                case DATA_ARENA_BOSS:
+                    return arenaBossToSpawn;
             }
             return 0;
         }

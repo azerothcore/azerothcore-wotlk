@@ -198,10 +198,12 @@ public:
         npc_grimstoneAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
-            MobSpawnId = urand(0,5);
+
+            MobSpawnId    = instance ? instance->GetData(DATA_ARENA_MOBS) : urand(0, 5);
+            BossSpawnId   = instance ? instance->GetData(DATA_ARENA_BOSS) : urand(0, 5);
             eventPhase = 0;
             eventTimer = 1000;
-            resetTimer    = 0;
+            resetTimer = 0;
             theldrenEvent = false;
             summons.DespawnAll();
         }
@@ -213,6 +215,7 @@ public:
         uint32 eventTimer;
         uint32 resetTimer;
         uint8 MobSpawnId;
+        uint8  BossSpawnId;
         bool theldrenEvent;
 
         void Reset() override
@@ -226,7 +229,6 @@ public:
             if (Unit* target = SelectTargetFromPlayerList(100.0f))
                 summon->AI()->AttackStart(target);
         }
-
 
         void SummonedCreatureDies(Creature* summon, Unit*) override
         {
@@ -290,7 +292,7 @@ public:
                     me->SummonCreature(theldrenTeam[i], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
             }
             else
-                me->SummonCreature(RingBoss[urand(0,5)], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                me->SummonCreature(RingBoss[BossSpawnId], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
             resetTimer = 30000;
         }
 
