@@ -36,8 +36,9 @@ namespace lfg
 
     enum LfgOptions
     {
-        LFG_OPTION_ENABLE_DUNGEON_FINDER             = 0x01,
-        LFG_OPTION_ENABLE_RAID_BROWSER               = 0x02,
+        LFG_OPTION_ENABLE_DUNGEON_FINDER                = 0x01,
+        LFG_OPTION_ENABLE_RAID_BROWSER                  = 0x02,
+        LFG_OPTION_ENABLE_SEASONAL_BOSSES               = 0x04
     };
 
     enum LFGMgrEnum
