@@ -36,3 +36,8 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 
 -- moira and priestess are mages, not paladins.
 UPDATE `creature_template` SET `unit_class` = 8 WHERE `entry` IN (8929, 10076);
+
+-- scripts for bosses in arena
+UPDATE `creature_template` SET `ScriptName` = 'boss_eviscerator' WHERE (`entry` = 9029);
+UPDATE `creature_template` SET `ScriptName` = 'boss_okthor' WHERE (`entry` = 9030);
+UPDATE `creature_template` SET `ScriptName` = 'boss_hedrum' WHERE (`entry` = 9032);

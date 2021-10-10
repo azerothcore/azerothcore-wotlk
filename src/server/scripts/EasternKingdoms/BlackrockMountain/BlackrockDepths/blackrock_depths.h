@@ -84,7 +84,6 @@ enum DataTypes
     DATA_TIME_RING_FAIL,
     DATA_ARENA_MOBS,
     DATA_ARENA_BOSS
-
 };
 
 enum Creatures
@@ -144,7 +143,6 @@ enum eChallenge
     NPC_GRIMSTONE = 10096,
     NPC_THELDREN  = 16059,
 };
-
 
 const uint32 theldrenTeam[] = {16053, 16055, 16050, 16051, 16049, 16052, 16054, 16058};
 

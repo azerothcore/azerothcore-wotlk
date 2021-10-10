@@ -43,7 +43,6 @@ public:
         return GetBlackrockDepthsAI<boss_evisceratorAI>(creature);
     }
 
-
     struct boss_evisceratorAI : public BossAI
     {
         boss_evisceratorAI(Creature* creature) : BossAI(creature, DATA_EVISCERATOR) {}

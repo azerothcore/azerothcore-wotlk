@@ -33,7 +33,6 @@ enum Timers
     TIMER_BLOODLUST = 30000
 };
 
-
 class boss_gorosh_the_dervish : public CreatureScript
 {
 public:

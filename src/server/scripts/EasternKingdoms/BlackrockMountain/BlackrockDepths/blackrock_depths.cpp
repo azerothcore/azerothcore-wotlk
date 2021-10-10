@@ -134,7 +134,6 @@ static Wave RingMobs[] = // different amounts based on the type
     {NPC_CAVE_CREEPER, 3},
     {NPC_BORER_BEETLE, 6}};
 
-
 uint32 RingBoss[] =
 {
     NPC_GOROSH,
@@ -165,7 +164,6 @@ public:
             }
 
             instance->SetData(TYPE_RING_OF_LAW, IN_PROGRESS);
-
             return true;
         }
         return false;
@@ -198,7 +196,6 @@ public:
         npc_grimstoneAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
-
             MobSpawnId    = instance ? instance->GetData(DATA_ARENA_MOBS) : urand(0, 5);
             BossSpawnId   = instance ? instance->GetData(DATA_ARENA_BOSS) : urand(0, 5);
             eventPhase = 0;
@@ -348,7 +345,6 @@ public:
                 HandleGameObject(DATA_ARENA1, false);
                 instance->SetData(TYPE_RING_OF_LAW, FAIL);
             }
-
 
             if (eventTimer)
             {
