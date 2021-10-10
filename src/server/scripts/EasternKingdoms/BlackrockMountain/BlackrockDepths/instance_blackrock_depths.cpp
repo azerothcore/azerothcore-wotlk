@@ -152,7 +152,7 @@ public:
 
         GuidList ArgelmachAdds;
         ObjectGuid ArgelmachGUID;
-        
+
         TempSummon* TempSummonGrimstone = nullptr;
         Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
         time_t timeRingFail = 0;

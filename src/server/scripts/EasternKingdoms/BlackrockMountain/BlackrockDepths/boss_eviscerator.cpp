@@ -55,7 +55,7 @@ public:
             _EnterCombat();
             events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, 0.2 * TIMER_SHADOWBOLT_VOLLEY);
             events.ScheduleEvent(SPELL_REND, 0.2 * TIMER_REND);
-            events.ScheduleEvent(SPELL_SHIELD, 0.2 * TIMER_SHIELD);            
+            events.ScheduleEvent(SPELL_SHIELD, 0.2 * TIMER_SHIELD);
         }
 
         void DamageTaken(Unit* /* doneBy */, uint32& /* damage */, DamageEffectType /* damagetype */, SpellSchoolMask damageSchoolMask) override
@@ -66,7 +66,7 @@ public:
                 SpellShieldReady = false;
                 events.ScheduleEvent(SPELL_SHIELD, TIMER_SHIELD);
             }
-        } 
+        }
 
         void UpdateAI(uint32 diff) override
         {

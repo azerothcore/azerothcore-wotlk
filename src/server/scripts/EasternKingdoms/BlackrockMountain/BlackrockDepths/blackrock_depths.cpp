@@ -326,7 +326,7 @@ public:
 
         void SpawnWave(uint32 mobId)
         {
-            for (int i = 0; i < RingMobs[mobId].amount; i++)
+            for (uint32 i = 0; i < RingMobs[mobId].amount; i++)
             {
                 me->SummonCreature(RingMobs[mobId].entry, 608.960f + 0.4f * i, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
             }
