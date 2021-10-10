@@ -161,6 +161,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
         if (canTalk)
         {
+            // search in creature_broadcast_text and creature_broadcast_text_locale
             std::string strOptionText, strBoxText;
             BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextID);
             BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextID);
@@ -176,16 +177,17 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
             else
                 strBoxText = itr->second.BoxText;
 
+            // if the language is not default and the texts weren't found, maybe they're in creature_gossip_locale table
             if (locale != DEFAULT_LOCALE)
             {
-                if (!optionBroadcastText)
+                if (strOptionText == "")
                 {
                     /// Find localizations from database.
                     if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
                         ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
                 }
 
-                if (!boxBroadcastText)
+                if (strBoxText == "")
                 {
                     /// Find localizations from database.
                     if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
