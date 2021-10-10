@@ -6364,10 +6364,6 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
         return;
     }
 
-    Player* player = unitTarget->ToPlayer();
-    if (!player)
-        return;
-
     switch (m_spellInfo->Id)
     {
         case 58730: // Restricted Flight Area
