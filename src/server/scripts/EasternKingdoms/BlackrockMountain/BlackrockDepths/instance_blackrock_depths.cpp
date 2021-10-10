@@ -206,7 +206,6 @@ public:
                 CreatureToReplace->RemoveFromWorld();
                 *GUIDToSpawn = NewSpawn->GetGUID();
             }
-            LOG_FATAL("entities:unit", "done replacing Moira or priestess. New NPC is %d, Moira GUID %d", NPCEntry, MoiraGUID.GetRawValue());
         }
 
         void Initialize() override
@@ -447,7 +446,6 @@ public:
             {
                 case TYPE_RING_OF_LAW:
                     encounter[0] = data;
-                    LOG_FATAL("entities:unit", "set data ring of law with data %d", data);
                     switch(data)
                     {
                     case IN_PROGRESS:
@@ -458,7 +456,7 @@ public:
                         {
                             TempSummonGrimstone->RemoveFromWorld();
                             TempSummonGrimstone = nullptr;
-                            timeRingFail        = time(nullptr);
+                            timeRingFail = time(nullptr);
                         }
                         SetData(TYPE_RING_OF_LAW, NOT_STARTED);
                         break;
@@ -490,10 +488,8 @@ public:
                     break;
                 case TYPE_LYCEUM:
                     encounter[4] = data;
-                    LOG_FATAL("entities:unit", "lyceum set to %d", data);
                     if (data == DONE)
                     {
-                        LOG_FATAL("entities:unit", "lyceum done");
                         HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_N), true);
                         HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_S), true);
                         if (Creature* magmus = instance->GetCreature(MagmusGUID))

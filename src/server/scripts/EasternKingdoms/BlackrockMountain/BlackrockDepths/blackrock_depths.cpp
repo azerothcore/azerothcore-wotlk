@@ -155,10 +155,10 @@ public:
         if (InstanceScript* instance = player->GetInstanceScript())
         {
             time_t now = time(nullptr);
-            LOG_FATAL("entities:unit", "called start of ring of law, last fail time %d, time since last: %u, ring of law state: %d ", instance->GetData(DATA_TIME_RING_FAIL), now - instance->GetData(DATA_TIME_RING_FAIL), instance->GetData(TYPE_RING_OF_LAW));
             if (instance->GetData(TYPE_RING_OF_LAW) == IN_PROGRESS || instance->GetData(TYPE_RING_OF_LAW) == DONE)
+            {
                 return false;
-
+            }
             if (now - instance->GetData(DATA_TIME_RING_FAIL) < 2 * 60) // in case of wipe, so people can rez.
             {
                 return false;
@@ -218,7 +218,6 @@ public:
         void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            LOG_FATAL("entities:unit", "called reset for grimstone");
         }
 
         void JustSummoned(Creature* summon) override
@@ -308,7 +307,6 @@ public:
                     {
                         if (creature->IsAlive() && creature->GetVictim())
                         {
-                            LOG_FATAL("Entities:unit", "found a creature %s", creature->GetName());
                             resetTimer = 30000;
                             break; // only need to find one.
                         }
