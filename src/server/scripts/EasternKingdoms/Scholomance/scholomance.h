@@ -26,7 +26,8 @@ enum DataTypes
 {
     DATA_KIRTONOS_THE_HERALD            = 0,
     DATA_MINI_BOSSES                    = 1,
-    DATA_RAS_HUMAN                      = 2
+    DATA_RAS_HUMAN                      = 2,
+    DATA_DARKMASTER_GANDLING = 3
 };
 
 enum ModelIds
@@ -41,19 +42,39 @@ enum TalkGroupIds
 
 enum CreatureIds
 {
-    NPC_RISEN_GUARDIAN                  = 11598
+    NPC_RISEN_GUARDIAN                  = 11598,
+    NPC_DARKMASTER_GANDLING     = 1853
 };
 
 enum GameobjectIds
 {
     GO_GATE_KIRTONOS                    = 175570,
-    GO_GATE_RAVENIAN                    = 177372,
-    GO_GATE_THEOLEN                     = 177377,
-    GO_GATE_ILLUCIA                     = 177371,
-    GO_GATE_MALICIA                     = 177375,
-    GO_GATE_BAROV                       = 177373,
-    GO_GATE_POLKELT                     = 177376
+    
+    GO_GATE_GANDLING_ENTRANCE   = 177374,
+
+    GO_GATE_GANDLING_DOWN_NORTH = 177371,
+    GO_GATE_GANDLING_DOWN_EAST  = 177373,
+    GO_GATE_GANDLING_DOWN_SOUTH = 177372,
+    GO_GATE_GANDLING_UP_NORTH   = 177376,
+    GO_GATE_GANDLING_UP_EAST    = 177377,
+    GO_GATE_GANDLING_UP_SOUTH = 177375
 };
+
+// for gandling, we define the rooms by up/down + direction
+enum Floors 
+{
+    DOWN = 0,
+    UP = 3
+};
+
+enum Side
+{
+    NORTH = 0,
+    EAST = 1,
+    SOUTH = 2
+};
+
+extern const uint32 GandlingGateIds[];
 
 enum SpellIds
 {

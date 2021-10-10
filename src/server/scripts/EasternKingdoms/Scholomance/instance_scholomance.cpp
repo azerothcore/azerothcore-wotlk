@@ -24,6 +24,10 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
+const uint32 GandlingGateIds[] = {GO_GATE_GANDLING_DOWN_NORTH, GO_GATE_GANDLING_DOWN_EAST, GO_GATE_GANDLING_DOWN_SOUTH,
+                                    GO_GATE_GANDLING_UP_NORTH, GO_GATE_GANDLING_UP_EAST, GO_GATE_GANDLING_UP_SOUTH,
+                                    GO_GATE_GANDLING_ENTRANCE};
+
 class instance_scholomance : public InstanceMapScript
 {
 public:
@@ -36,11 +40,22 @@ public:
 
     struct instance_scholomance_InstanceMapScript : public InstanceScript
     {
-        instance_scholomance_InstanceMapScript(Map* map) : InstanceScript(map),
-            _kirtonosState   { 0 },
-            _miniBosses      { 0 },
-            _rasHuman        { 0 }
-        { }
+        instance_scholomance_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            _miniBosses = 0;
+            _kirtonosState = 0;
+            _rasHuman      = 0;
+        }
+
+        void OnCreatureCreate(Creature* cr) override
+        {
+            switch (cr->GetEntry())
+            {
+            case NPC_DARKMASTER_GANDLING:
+                GandlingGUID = cr->GetGUID();
+                break;
+            }
+        }
 
         void OnGameObjectCreate(GameObject* go) override
         {
@@ -49,23 +64,26 @@ public:
                 case GO_GATE_KIRTONOS:
                     GateKirtonosGUID = go->GetGUID();
                     break;
-                case GO_GATE_MALICIA:
-                    GateMiliciaGUID = go->GetGUID();
+                case GO_GATE_GANDLING_ENTRANCE:
+                    GandlingGatesGUID[6] = go->GetGUID();
                     break;
-                case GO_GATE_THEOLEN:
-                    GateTheolenGUID = go->GetGUID();
+                case GO_GATE_GANDLING_UP_NORTH:
+                    GandlingGatesGUID[UP + NORTH] = go->GetGUID();
                     break;
-                case GO_GATE_POLKELT:
-                    GatePolkeltGUID = go->GetGUID();
+                case GO_GATE_GANDLING_UP_EAST:
+                    GandlingGatesGUID[UP + EAST] = go->GetGUID();
                     break;
-                case GO_GATE_RAVENIAN:
-                    GateRavenianGUID = go->GetGUID();
+                case GO_GATE_GANDLING_UP_SOUTH:
+                    GandlingGatesGUID[UP + SOUTH] = go->GetGUID();
                     break;
-                case GO_GATE_BAROV:
-                    GateBarovGUID = go->GetGUID();
+                case GO_GATE_GANDLING_DOWN_NORTH:
+                    GandlingGatesGUID[DOWN + NORTH] = go->GetGUID();
                     break;
-                case GO_GATE_ILLUCIA:
-                    GateIlluciaGUID = go->GetGUID();
+                case GO_GATE_GANDLING_DOWN_EAST:
+                    GandlingGatesGUID[DOWN + EAST] = go->GetGUID();
+                    break;
+                case GO_GATE_GANDLING_DOWN_SOUTH:
+                    GandlingGatesGUID[DOWN + SOUTH] = go->GetGUID();
                     break;
             }
         }
@@ -76,20 +94,28 @@ public:
             {
                 case GO_GATE_KIRTONOS:
                     return GateKirtonosGUID;
-                case GO_GATE_MALICIA:
-                    return GateMiliciaGUID;
-                case GO_GATE_THEOLEN:
-                    return GateTheolenGUID;
-                case GO_GATE_POLKELT:
-                    return GatePolkeltGUID;
-                case GO_GATE_RAVENIAN:
-                    return GateRavenianGUID;
-                case GO_GATE_BAROV:
-                    return GateBarovGUID;
-                case GO_GATE_ILLUCIA:
-                    return GateIlluciaGUID;
+                case GO_GATE_GANDLING_ENTRANCE:
+                    return GandlingGatesGUID[6];
+                case GO_GATE_GANDLING_UP_NORTH:
+                    return GandlingGatesGUID[UP + NORTH];
+                    break;
+                case GO_GATE_GANDLING_UP_EAST:
+                    return GandlingGatesGUID[UP + EAST];
+                    break;
+                case GO_GATE_GANDLING_UP_SOUTH:
+                    return GandlingGatesGUID[UP + SOUTH];
+                    break;
+                case GO_GATE_GANDLING_DOWN_NORTH:
+                    return GandlingGatesGUID[DOWN + NORTH];
+                    break;
+                case GO_GATE_GANDLING_DOWN_EAST:
+                    return GandlingGatesGUID[DOWN + EAST];
+                    break;
+                case GO_GATE_GANDLING_DOWN_SOUTH:
+                    return GandlingGatesGUID[DOWN + SOUTH];
+                case NPC_DARKMASTER_GANDLING:
+                    return GandlingGUID;
             }
-
             return ObjectGuid::Empty;
         }
 
@@ -102,6 +128,24 @@ public:
                     break;
                 case DATA_MINI_BOSSES:
                     ++_miniBosses;
+                    if (_miniBosses == 6)
+                    {
+                        LOG_FATAL("Entities:unit", "should set darkmaster in combat here");
+                    }
+                    break;
+                case DATA_DARKMASTER_GANDLING:
+                    switch (data)
+                    {
+                        LOG_FATAL("Entities:unit", "darkmaster gandling set to: %d", data);
+                    case DONE:
+                    case NOT_STARTED:
+                    case FAIL:
+                        HandleGameObject(GandlingGatesGUID[6], true);
+                        break;
+                    case IN_PROGRESS:
+                        HandleGameObject(GandlingGatesGUID[6], false);
+                        break;
+                    }
                     break;
                 case DATA_RAS_HUMAN:
                     _rasHuman = data;
@@ -159,6 +203,9 @@ public:
         ObjectGuid GateRavenianGUID;
         ObjectGuid GateBarovGUID;
         ObjectGuid GateIlluciaGUID;
+
+        ObjectGuid GandlingGatesGUID[7]; // 6 is the entrance
+        ObjectGuid GandlingGUID; // boss
 
         uint32 _kirtonosState;
         uint32 _miniBosses;
@@ -295,39 +342,39 @@ public:
             {
                 switch (room)
                 {
-                    case ROOM_HALL_OF_SECRETS:
+                    case UP + NORTH:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_RAVENIAN)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[UP + NORTH])))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_HALLOFSECRETS;
                         break;
-                    case ROOM_HALL_OF_THE_DAMNED:
+                    case UP + EAST:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_THEOLEN)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[UP + EAST])))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_HALLOFTHEDAMNED;
                         break;
-                    case ROOM_THE_COVEN:
+                    case UP + SOUTH:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_MALICIA)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[UP + SOUTH])))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_THECOVEN;
                         break;
-                    case ROOM_THE_SHADOW_VAULT:
+                    case DOWN + NORTH:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_ILLUCIA)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[DOWN + NORTH])))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_THESHADOWVAULT;
                         break;
-                    case ROOM_BAROV_FAMILY_VAULT:
+                    case DOWN + EAST:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_BAROV)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[DOWN + EAST])))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT;
                         break;
-                    case ROOM_VAULT_OF_THE_RAVENIAN:
+                    case DOWN + SOUTH:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_POLKELT)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[DOWN + SOUTH])))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN;
                         break;
@@ -360,27 +407,27 @@ public:
 
 Position const SummonPos[3 * ROOM_MAX] =
 {
-    // Hall of Secrects
+    // Hall of Secrets // up north
     { 230.80f, 0.138f, 85.23f, 0.0f },
     { 241.23f, -6.979f, 85.23f, 0.0f },
     { 246.65f, 4.227f, 84.85f, 0.0f },
-    // The Hall of the damned
+    // The Hall of the damned // up east
     { 177.9624f, -68.23893f, 84.95197f, 3.228859f },
     { 183.7705f, -61.43489f, 84.92424f, 5.148721f },
     { 184.7035f, -77.74805f, 84.92424f, 4.660029f },
-    // The Coven
+    // The Coven // up south
     { 111.7203f, -1.105035f, 85.45985f, 3.961897f },
     { 118.0079f, 6.430664f, 85.31169f, 2.408554f },
     { 120.0276f, -7.496636f, 85.31169f, 2.984513f },
-    // The Shadow Vault
+    // The Shadow Vault // down north
     { 245.3716f, 0.628038f, 72.73877f, 0.01745329f },
     { 240.9920f, 3.405653f, 72.73877f, 6.143559f },
     { 240.9543f, -3.182943f, 72.73877f, 0.2268928f },
-    // Barov Family Vault
+    // Barov Family Vault // down east
     { 181.8245f, -42.58117f, 75.4812f, 4.660029f },
     { 177.7456f, -42.74745f, 75.4812f, 4.886922f },
     { 185.6157f, -42.91200f, 75.4812f, 4.45059f },
-    // Vault of the Ravenian
+    // Vault of the Ravenian // down south
     { 136.362f, 6.221f, 75.40f, 3.14f },
     { 130.79f, -0.91f, 75.40f, 3.14f },
     { 136.362f, -8.221f, 75.40f, 3.14f },
@@ -412,27 +459,27 @@ public:
             {
                 case SPELL_SHADOW_PORTAL_HALLOFSECRETS:
                     summonPos = ROOM_HALL_OF_SECRETS * 3;
-                    gateId = GO_GATE_POLKELT;
+                    gateId = UP + EAST;
                     break;
                 case SPELL_SHADOW_PORTAL_HALLOFTHEDAMNED:
                     summonPos = ROOM_HALL_OF_THE_DAMNED * 3;
-                    gateId = GO_GATE_THEOLEN;
+                    gateId    = UP + EAST;
                     break;
                 case SPELL_SHADOW_PORTAL_THECOVEN:
                     summonPos = ROOM_THE_COVEN * 3;
-                    gateId = GO_GATE_MALICIA;
+                    gateId    = UP + EAST;
                     break;
                 case SPELL_SHADOW_PORTAL_THESHADOWVAULT:
                     summonPos = ROOM_THE_SHADOW_VAULT * 3;
-                    gateId = GO_GATE_ILLUCIA;
+                    gateId    = UP + EAST;
                     break;
                 case SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT:
                     summonPos = ROOM_BAROV_FAMILY_VAULT * 3;
-                    gateId = GO_GATE_BAROV;
+                    gateId    = UP + EAST;
                     break;
                 case SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN:
                     summonPos = ROOM_VAULT_OF_THE_RAVENIAN * 3;
-                    gateId = GO_GATE_RAVENIAN;
+                    gateId    = UP + EAST;
                     break;
             }
 
