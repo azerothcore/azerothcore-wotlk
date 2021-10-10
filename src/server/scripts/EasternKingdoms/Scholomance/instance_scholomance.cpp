@@ -24,6 +24,9 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
+
+Position KirtonosSpawn = Position(315.028, 70.5385, 102.15, 0.385971);
+
 class instance_scholomance : public InstanceMapScript
 {
 public:
@@ -67,6 +70,9 @@ public:
                 case GO_GATE_ILLUCIA:
                     GateIlluciaGUID = go->GetGUID();
                     break;
+                case GO_BRAZIER_KIRTONOS:
+                    BrazierKirtonosGUID = go->GetGUID();
+                    break;
             }
         }
 
@@ -88,6 +94,8 @@ public:
                     return GateBarovGUID;
                 case GO_GATE_ILLUCIA:
                     return GateIlluciaGUID;
+                case GO_BRAZIER_KIRTONOS:
+                    return BrazierKirtonosGUID;
             }
 
             return ObjectGuid::Empty;
@@ -97,15 +105,54 @@ public:
         {
             switch (type)
             {
-                case DATA_KIRTONOS_THE_HERALD:
+            case DATA_KIRTONOS_THE_HERALD:
+                switch (data)
+                {
+                case IN_PROGRESS:
+                    // summon kirtonos and close door
+                    if (_kirtonosState == NOT_STARTED)
+                    {
+                        instance->SummonCreature(10506, KirtonosSpawn);
+                        if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
+                        {
+                            gate->SetGoState(GO_STATE_READY);
+                        }
+                    }
                     _kirtonosState = data;
                     break;
-                case DATA_MINI_BOSSES:
-                    ++_miniBosses;
+                case FAIL:
+                    // open door and reset brazier
+                    if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
+                    {
+                        gate->SetGoState(GO_STATE_ACTIVE);
+                    }
+
+                    if (GameObject* brazier = instance->GetGameObject(GetGuidData(GO_BRAZIER_KIRTONOS)))
+                    {
+                        brazier->SetGoState(GO_STATE_READY);
+                        brazier->SetLootState(GO_JUST_DEACTIVATED);
+                        brazier->Respawn();
+                    }
+                    _kirtonosState = NOT_STARTED;
                     break;
-                case DATA_RAS_HUMAN:
-                    _rasHuman = data;
+                case DONE:
+                    // open door
+                    if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
+                    {
+                        gate->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    [[fallthrough]];
+                default:
+                    _kirtonosState = data;
                     break;
+                }
+                break;
+            case DATA_MINI_BOSSES:
+                ++_miniBosses;
+                break;
+            case DATA_RAS_HUMAN:
+                _rasHuman = data;
+                break;
             }
 
             SaveToDB();
@@ -159,6 +206,7 @@ public:
         ObjectGuid GateRavenianGUID;
         ObjectGuid GateBarovGUID;
         ObjectGuid GateIlluciaGUID;
+        ObjectGuid BrazierKirtonosGUID;
 
         uint32 _kirtonosState;
         uint32 _miniBosses;

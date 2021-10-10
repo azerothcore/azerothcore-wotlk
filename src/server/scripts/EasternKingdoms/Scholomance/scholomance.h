@@ -52,7 +52,8 @@ enum GameobjectIds
     GO_GATE_ILLUCIA                     = 177371,
     GO_GATE_MALICIA                     = 177375,
     GO_GATE_BAROV                       = 177373,
-    GO_GATE_POLKELT                     = 177376
+    GO_GATE_POLKELT                     = 177376,
+    GO_BRAZIER_KIRTONOS                 = 175564
 };
 
 enum SpellIds
