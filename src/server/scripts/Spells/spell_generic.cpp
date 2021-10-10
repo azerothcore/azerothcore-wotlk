@@ -773,7 +773,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 
@@ -927,7 +927,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return !eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->IsTargetingArea();
+            return !eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea();
         }
 
         void Register() override
@@ -1694,14 +1694,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo || !damageInfo->GetSpellInfo())
-            {
-                return false;
-            }
-
-            if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
+            if (eventInfo.GetSpellInfo())
                 return false;
 
             // find Mage Armor
@@ -2152,9 +2145,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo || !damageInfo->GetSpellInfo())
+            if (eventInfo.GetSpellInfo())
             {
                 return false;
             }

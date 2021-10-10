@@ -668,17 +668,8 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-
-            DamageInfo const* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo || !damageInfo->GetSpellInfo())
-            {
-                return false;
-            }
-
-            SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
-
-            if (!spellInfo->HasEffect(SPELL_EFFECT_HEAL))
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+            if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
             {
                 return false;
             }
@@ -2887,7 +2878,7 @@ public:
             /*if (!GetTarget()->FindMap() || GetTarget()->FindMap()->IsBattlegroundOrArena())
                 return false;*/
 
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
                 if (!eventInfo.GetDamageInfo()->GetDamage())
                 {
                     if (procSpell->SpellFamilyName == SPELLFAMILY_WARRIOR)

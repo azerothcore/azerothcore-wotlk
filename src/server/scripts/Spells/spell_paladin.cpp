@@ -100,17 +100,14 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo)
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
             {
-                return false;
-            }
-
-            if (const SpellInfo* procSpell = damageInfo->GetSpellInfo())
                 if (procSpell->SpellIconID == 3025) // Righteous Vengeance, should not proc SoC
+                {
                     return false;
+                }
+            }
+            
             return true;
         }
 
@@ -118,17 +115,13 @@ public:
         {
             PreventDefaultAction();
             int32 targets = 3;
-
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo)
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
             {
-                return;
-            }
-
-            if (const SpellInfo* procSpell = damageInfo->GetSpellInfo())
                 if (procSpell->IsAffectingArea())
+                {
                     targets = 1;
+                }
+            }
 
             if (Unit* target = eventInfo.GetActionTarget())
             {
@@ -216,16 +209,8 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo || !damageInfo->GetSpellInfo())
-            {
-                return false;
-            }
-
             // xinef: skip divine storm self hit (dummy) and righteous vengeance (0x20000000=
-            return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!damageInfo->GetSpellInfo() || !damageInfo>GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
+            return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
         }
 
         void Register() override
@@ -275,14 +260,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo || !damageInfo->GetDamage())
-            {
-                return false;
-            }
-
-            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && damageInfo->GetDamage() > 0;
+            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -301,7 +279,6 @@ public:
                 }
 
                 const SpellInfo* procSpell = damageInfo->GetSpellInfo();
-
                 if (!procSpell)
                 {
                     return;
