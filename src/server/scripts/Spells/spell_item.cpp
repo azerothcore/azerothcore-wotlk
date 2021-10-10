@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -657,9 +668,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
+            {
                 return false;
+            }
 
             return spellInfo->ManaCost > 0 || spellInfo->ManaCostPercentage > 0 || (spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && spellInfo->SpellIconID == 156);
         }
@@ -862,6 +875,52 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_item_gnomish_universal_remote_SpellScript();
+    }
+};
+
+class spell_item_poweful_anti_venom : public SpellScriptLoader
+{
+public:
+    spell_item_poweful_anti_venom() : SpellScriptLoader("spell_item_poweful_anti_venom") {}
+
+    class spell_item_powerful_anti_venom_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_powerful_anti_venom_SpellScript);
+
+        void HandleDummy(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+            {
+                std::list<uint32> removeList;
+                Unit::AuraMap const& auras = target->GetOwnedAuras();
+                for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                {
+                    Aura* aura = itr->second;
+                    if (aura->GetSpellInfo()->SpellLevel > 60 || aura->GetSpellInfo()->Dispel != DISPEL_POISON)
+                    {
+                        continue;
+                    }
+
+                    removeList.push_back(aura->GetId());
+                }
+
+                for (std::list<uint32>::const_iterator itr = removeList.begin(); itr != removeList.end(); ++itr)
+                {
+                    target->RemoveAurasDueToSpell(*itr);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_item_powerful_anti_venom_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_powerful_anti_venom_SpellScript();
     }
 };
 
@@ -2361,7 +2420,15 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 bp = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 bp = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
             GetTarget()->CastCustomSpell(SPELL_ITEM_NECROTIC_TOUCH_PROC, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
@@ -2811,7 +2878,7 @@ public:
             /*if (!GetTarget()->FindMap() || GetTarget()->FindMap()->IsBattlegroundOrArena())
                 return false;*/
 
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
                 if (!eventInfo.GetDamageInfo()->GetDamage())
                 {
                     if (procSpell->SpellFamilyName == SPELLFAMILY_WARRIOR)
@@ -4351,6 +4418,7 @@ void AddSC_item_spell_scripts()
     new spell_item_skull_of_impeding_doom();
     new spell_item_feast();
     new spell_item_gnomish_universal_remote();
+    new spell_item_poweful_anti_venom();
     new spell_item_strong_anti_venom();
     new spell_item_anti_venom();
     new spell_item_gnomish_shrink_ray();
