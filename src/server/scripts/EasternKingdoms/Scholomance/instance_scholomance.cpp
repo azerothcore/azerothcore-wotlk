@@ -24,7 +24,6 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
-
 Position KirtonosSpawn = Position(315.028, 70.5385, 102.15, 0.385971);
 
 class instance_scholomance : public InstanceMapScript
