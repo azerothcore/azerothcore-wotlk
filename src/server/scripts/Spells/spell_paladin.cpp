@@ -100,7 +100,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
                 if (procSpell->SpellIconID == 3025) // Righteous Vengeance, should not proc SoC
                     return false;
             return true;
@@ -110,7 +110,7 @@ public:
         {
             PreventDefaultAction();
             int32 targets = 3;
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
                 if (procSpell->IsAffectingArea())
                     targets = 1;
 
@@ -201,7 +201,7 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             // xinef: skip divine storm self hit (dummy) and righteous vengeance (0x20000000=
-            return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
+            return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
         }
 
         void Register() override
@@ -251,7 +251,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo()->GetDamage() > 0;
+            return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -261,7 +261,7 @@ public:
             if (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS)
             {
                 Unit* caster = eventInfo.GetActor();
-                const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+                const SpellInfo* procSpell = eventInfo.GetSpellInfo();
                 if (caster && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
                         procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
                 {
