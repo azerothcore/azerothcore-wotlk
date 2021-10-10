@@ -26,6 +26,12 @@ enum Grizzle
     EMOTE_FRENZY_KILL       = 0
 };
 
+enum Timer
+{
+    TIMER_GROUNDTREMOR = 10000,
+    TIMER_FRENZY = 15000
+};
+
 class boss_grizzle : public CreatureScript
 {
 public:
@@ -36,48 +42,53 @@ public:
         return GetBlackrockDepthsAI<boss_grizzleAI>(creature);
     }
 
-    struct boss_grizzleAI : public ScriptedAI
+    struct boss_grizzleAI : public BossAI
     {
-        boss_grizzleAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_grizzleAI(Creature* creature) : BossAI(creature, DATA_GRIZZLE) {}
 
-        uint32 GroundTremor_Timer;
-        uint32 Frenzy_Timer;
+        uint32 nextTremorTime;
 
-        void Reset() override
-        {
-            GroundTremor_Timer = 12000;
-            Frenzy_Timer = 0;
+        void EnterCombat(Unit* /*who*/) override {
+
+            events.ScheduleEvent(SPELL_GROUNDTREMOR, 0.2 * TIMER_GROUNDTREMOR);
+            events.ScheduleEvent(SPELL_FRENZY, 0.2 * TIMER_FRENZY);
         }
-
-        void EnterCombat(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
                 return;
+            events.Update(diff);
 
-            //GroundTremor_Timer
-            if (GroundTremor_Timer <= diff)
-            {
-                DoCastVictim(SPELL_GROUNDTREMOR);
-                GroundTremor_Timer = 8000;
-            }
-            else GroundTremor_Timer -= diff;
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-            //Frenzy_Timer
-            if (HealthBelowPct(51))
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                if (Frenzy_Timer <= diff)
+                switch (eventId)
                 {
-                    DoCast(me, SPELL_FRENZY);
+                case SPELL_GROUNDTREMOR:
+                    if (me->GetDistance2d(me->GetVictim()) < 10.0f)
+                    {
+                        DoCastVictim(SPELL_GROUNDTREMOR);
+                        nextTremorTime = urand(TIMER_GROUNDTREMOR - 2000, TIMER_GROUNDTREMOR + 2000);
+                    }
+                    else
+                    {
+                        nextTremorTime = 0.3*urand(TIMER_GROUNDTREMOR - 2000, TIMER_GROUNDTREMOR + 2000);
+                    }
+                    events.ScheduleEvent(SPELL_GROUNDTREMOR, nextTremorTime);
+                    break;
+                case SPELL_FRENZY:
+                    DoCastSelf(SPELL_FRENZY);
+                    events.ScheduleEvent(SPELL_FRENZY, urand(TIMER_FRENZY - 2000, TIMER_FRENZY + 2000));
                     Talk(EMOTE_FRENZY_KILL);
-
-                    Frenzy_Timer = 15000;
+                    break;
+                default:
+                    break;
                 }
-                else Frenzy_Timer -= diff;
             }
-
             DoMeleeAttackIfReady();
         }
     };

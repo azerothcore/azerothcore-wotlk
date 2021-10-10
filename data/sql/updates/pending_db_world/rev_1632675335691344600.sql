@@ -39,3 +39,6 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 (47303, 1550, 0, "BRD Lyceum shadowforge flame keepers"),
 (91119, 1550, 0, "BRD Lyceum shadowforge flame keepers"),
 (91120, 1550, 0, "BRD Lyceum shadowforge flame keepers");
+
+-- moira and priestess are mages, not paladins.
+UPDATE `creature_template` SET `unit_class` = 8 WHERE `entry` IN (8929, 10076);

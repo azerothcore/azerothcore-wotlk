@@ -21,41 +21,18 @@
 #include "Player.h"
 #include "Map.h"
 
-#define TIMER_TOMBOFTHESEVEN    30000
-#define TIMER_TOMB_START        5000
-#define MAX_ENCOUNTER           6
-#define RADIUS_RING_OF_LAW      80.0f
-#define DISTANCE_EMPEROR_ROOM   125
+#define MAX_ENCOUNTER 6
 
-enum Creatures
+enum Timers
 {
-    NPC_EMPEROR                 = 9019,
-    NPC_PHALANX                 = 9502,
-    NPC_ANGERREL                = 9035,
-    NPC_DOPEREL                 = 9040,
-    NPC_HATEREL                 = 9034,
-    NPC_VILEREL                 = 9036,
-    NPC_SEETHREL                = 9038,
-    NPC_GLOOMREL                = 9037,
-    NPC_DOOMREL                 = 9039,
-    NPC_MOIRA                   = 8929,
-    NPC_PRIESTESS               = 10076,
+    TIMER_TOMBOFTHESEVEN = 30000,
+    TIMER_TOMB_START     = 5000
+};
 
-    NPC_WATCHMAN_DOOMGRIP       = 9476,
-
-    NPC_WEAPON_TECHNICIAN       = 8920,
-    NPC_DOOMFORGE_ARCANASMITH   = 8900,
-    NPC_RAGEREAVER_GOLEM        = 8906,
-    NPC_WRATH_HAMMER_CONSTRUCT  = 8907,
-    NPC_GOLEM_LORD_ARGELMACH    = 8983,
-
-    NPC_IRONHAND_GUARDIAN       = 8982,
-
-    NPC_ARENA_SPECTATOR         = 8916,
-    NPC_SHADOWFORGE_PEASANT     = 8896,
-    NPC_SHADOWFORCE_CITIZEN     = 8902,
-
-    NPC_SHADOWFORGE_SENATOR     = 8904
+enum Distances
+{
+    RADIUS_RING_OF_LAW      = 80,
+    DISTANCE_EMPEROR_ROOM   = 125
 };
 
 enum PrincessQuests
@@ -139,8 +116,8 @@ public:
         ObjectGuid MagmusGUID;
         ObjectGuid MoiraGUID;
         ObjectGuid PriestessGUID;
-
         ObjectGuid IronhandGUID[6];
+        ObjectGuid CorenGUID;
 
         ObjectGuid GoArena1GUID;
         ObjectGuid GoArena2GUID;
@@ -175,18 +152,24 @@ public:
 
         GuidList ArgelmachAdds;
         ObjectGuid ArgelmachGUID;
+        
+        TempSummon* TempSummonGrimstone = nullptr;
+        Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
+        time_t timeRingFail = 0;
+        uint8 arenaMobsToSpawn;
+        uint8 arenaBossToSpawn;
 
         std::vector<ObjectGuid> ArenaSpectators;
-        Position CenterOfRingOfLaw;
+        Position CenterOfRingOfLaw = Position(595.289, -186.56);
 
         ObjectGuid EmperorSenators[5];
         std::vector<ObjectGuid> EmperorSenatorsVector;
-        Position EmperorSpawnPos;
+        Position EmperorSpawnPos = Position(1380.52, -831, 115);
 
         void OnPlayerEnter(Player* /* player */) override
         {
-            // In case a player joins the party during the run
-            ReplaceMoiraIfSaved();
+            ReplaceMoiraIfSaved(); // In case a player joins the party during the run
+         //   SetData(TYPE_RING_OF_LAW, DONE);
         }
 
         void ReplaceMoiraIfSaved()
@@ -225,7 +208,6 @@ public:
                 CreatureToReplace->RemoveFromWorld();
                 *GUIDToSpawn = NewSpawn->GetGUID();
             }
-            LOG_FATAL("entities:unit", "done replacing Moira or priestess. New NPC is %d, Moira GUID %d", NPCEntry, MoiraGUID.GetRawValue());
         }
 
         void Initialize() override
@@ -239,8 +221,10 @@ public:
             OpenedCoofers = 0;
             IronhandCounter  = 0;
             ArenaSpectators.clear();
-            CenterOfRingOfLaw = Position(595.289, -186.56);
-            EmperorSpawnPos   = Position(1380.52, -831, 115);
+
+            // these are linked to the dungeon and not how many times the arena started.
+            arenaMobsToSpawn = urand(0, 5);
+            arenaBossToSpawn = urand(0, 5);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -255,6 +239,9 @@ public:
                     break;
                 case NPC_MOIRA:
                     MoiraGUID = creature->GetGUID();
+                    break;
+                case NPC_COREN_DIREBREW:
+                    CorenGUID = creature->GetGUID();
                     break;
                 case NPC_ANGERREL:
                     TombBossGUIDs[0] = creature->GetGUID();
@@ -300,12 +287,22 @@ public:
                     break;
                 case NPC_ARENA_SPECTATOR:
                     ArenaSpectators.push_back(creature->GetGUID());
+                    if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                    {
+                        creature->setFaction(FACTION_NEUTRAL);
+                        creature->SetReactState(REACT_DEFENSIVE);
+                    }
                     break;
                 case NPC_SHADOWFORGE_PEASANT:
                 case NPC_SHADOWFORCE_CITIZEN: // both do the same
                     if (creature->GetDistance2d(CenterOfRingOfLaw.GetPositionX(), CenterOfRingOfLaw.GetPositionY()) < RADIUS_RING_OF_LAW)
                     {
                         ArenaSpectators.push_back(creature->GetGUID());
+                    }
+                    if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                    {
+                        creature->setFaction(FACTION_NEUTRAL);
+                        creature->SetReactState(REACT_DEFENSIVE);
                     }
                     break;
                 case NPC_SHADOWFORGE_SENATOR:
@@ -455,15 +452,32 @@ public:
             {
                 case TYPE_RING_OF_LAW:
                     encounter[0] = data;
-                    if (data == DONE)
+                    switch(data)
                     {
-                        for (const auto &itr : ArenaSpectators)
+                    case IN_PROGRESS:
+                        TempSummonGrimstone = instance->SummonCreature(NPC_GRIMSTONE, GrimstonePositon);
+                        break;
+                    case FAIL:
+                        if (TempSummonGrimstone)
                         {
-                            if(Creature* spectator = instance->GetCreature(itr))
+                            TempSummonGrimstone->RemoveFromWorld();
+                            TempSummonGrimstone = nullptr;
+                            timeRingFail = time(nullptr);
+                        }
+                        SetData(TYPE_RING_OF_LAW, NOT_STARTED);
+                        break;
+                    case DONE:
+                        for (const auto& itr : ArenaSpectators)
+                        {
+                            if (Creature* spectator = instance->GetCreature(itr))
                             {
                                 spectator->setFaction(FACTION_NEUTRAL);
+                                spectator->SetReactState(REACT_DEFENSIVE);
                             }
                         }
+                        break;
+                    default:
+                        break;
                     }
                     break;
                 case TYPE_VAULT:
@@ -482,7 +496,6 @@ public:
                     encounter[4] = data;
                     if (data == DONE)
                     {
-                        LOG_FATAL("entities:unit", "lyceum done");
                         HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_N), true);
                         HandleGameObject(GetGuidData(DATA_GOLEM_DOOR_S), true);
                         if (Creature* magmus = instance->GetCreature(MagmusGUID))
@@ -636,6 +649,12 @@ public:
                     return encounter[5];
                 case DATA_GHOSTKILL:
                     return GhostKillCount;
+                case DATA_TIME_RING_FAIL:
+                    return timeRingFail;
+                case DATA_ARENA_MOBS:
+                    return arenaMobsToSpawn;
+                case DATA_ARENA_BOSS:
+                    return arenaBossToSpawn;
             }
             return 0;
         }
@@ -650,6 +669,8 @@ public:
                     return PhalanxGUID;
                 case DATA_MOIRA:
                     return MoiraGUID;
+                case DATA_COREN:
+                    return CorenGUID;
                 case DATA_ARENA1:
                     return GoArena1GUID;
                 case DATA_ARENA2:
@@ -774,6 +795,7 @@ public:
             TombEventStarterGUID.Clear();
             SetData(TYPE_TOMB_OF_SEVEN, DONE);
         }
+
         void Update(uint32 diff) override
         {
             if (TombEventStarterGUID && GhostKillCount < 7)
