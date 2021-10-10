@@ -262,7 +262,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetSpellInfo();
+            return eventInfo.GetSpellInfo() != nullptr;
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -864,10 +864,21 @@ public:
             if (!eventInfo.GetActor() || !eventInfo.GetProcTarget())
                 return false;
 
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
+                return false;
+            }
+
             // Molten Armor
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            {
                 if (spellInfo->SpellFamilyFlags[1] & 0x8)
+                {
                     return false;
+                }
+            }
 
             return true;
         }

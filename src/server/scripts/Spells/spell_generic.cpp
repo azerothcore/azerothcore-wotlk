@@ -2146,7 +2146,9 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             if (eventInfo.GetSpellInfo())
+            {
                 return false;
+            }
 
             if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
                 return false;
