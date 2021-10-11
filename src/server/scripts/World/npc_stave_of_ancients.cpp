@@ -203,7 +203,7 @@ void NPCStaveQuestAI::StoreAttackerGuidValue(Unit* attacker)
     {
         return;
     }
-    else 
+    else
     {
         attackerGuids.push_back(guidValue);
     }
