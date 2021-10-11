@@ -1,6 +1,19 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "PassiveAI.h"
 #include "Player.h"
@@ -133,6 +146,13 @@ public:
         bool startPath;
         uint8 flyTimes;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            me->setActive(true);
+            Reset();
+        }
+
         void Reset() override
         {
             events.Reset();
@@ -144,11 +164,6 @@ public:
             CommanderGUID.Clear();
             bGroundPhase = false;
             flyTimes = 0;
-
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->SendMovementFlagUpdate();
-            me->setActive(true);
 
             if( pInstance )
                 pInstance->SetData(TYPE_RAZORSCALE, NOT_STARTED);
@@ -289,7 +304,6 @@ public:
                 me->DisableRotate(true);
                 me->SetOrientation((float)(M_PI + 0.01) / 2);
                 me->SetFacingTo(M_PI / 2);
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->CastSpell(me, 62794, true);
                 events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30000);
@@ -502,9 +516,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
                         events.ScheduleEvent(EVENT_RESUME_FIXING, 22000);
                     }
@@ -578,6 +590,7 @@ public:
 
         void EnterEvadeMode() override
         {
+            me->SetDisableGravity(true);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();

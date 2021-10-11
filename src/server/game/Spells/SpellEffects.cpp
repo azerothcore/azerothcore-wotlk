@@ -1,7 +1,18 @@
     /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Battleground.h"
@@ -291,14 +302,21 @@ void Spell::EffectEnvironmentalDMG(SpellEffIndex /*effIndex*/)
     if (!unitTarget || !unitTarget->IsAlive())
         return;
 
-    uint32 absorb = 0;
-    uint32 resist = 0;
-
-    Unit::CalcAbsorbResist(m_caster, unitTarget, m_spellInfo->GetSchoolMask(), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, m_spellInfo);
-
-    m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, damage + absorb + resist, m_spellInfo->GetSchoolMask(), absorb, resist, false, 0, false);
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    if (unitTarget->IsPlayer())
         unitTarget->ToPlayer()->EnvironmentalDamage(DAMAGE_FIRE, damage);
+    else
+    {
+        DamageInfo dmgInfo(m_caster, unitTarget, damage, m_spellInfo, m_spellInfo->GetSchoolMask(), SPELL_DIRECT_DAMAGE);
+
+        uint32 absorb = dmgInfo.GetAbsorb();
+        uint32 resist = dmgInfo.GetResist();
+        uint32 envDamage = dmgInfo.GetDamage();
+
+        Unit::DealDamageMods(unitTarget, envDamage, &absorb);
+        damage = envDamage;
+
+        m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo, damage, m_spellInfo->GetSchoolMask(), absorb, resist, false, 0, false);
+    }
 }
 
 void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
@@ -3782,6 +3800,8 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
             // xinef: this is wrong
             //ExecuteLogEffectSummonObject(effIndex, linkedGO);
 
+            pGameObj->SetLinkedTrap(linkedGO);
+
             // Wild object not have owner and check clickable by players
             map->AddToMap(linkedGO, true);
         }
@@ -5678,6 +5698,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
             // xinef: this is wrong
             //linkedGO->SetOwnerGUID(m_caster->GetGUID());
             //ExecuteLogEffectSummonObject(effIndex, linkedGO);
+            pGameObj->SetLinkedTrap(linkedGO);
 
             cMap->AddToMap(linkedGO, true);
         }
