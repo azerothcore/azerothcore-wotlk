@@ -18,6 +18,7 @@
 #include "scholomance.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -139,7 +140,7 @@ public:
         }
 
         void SummonedCreatureDespawn(Creature* cr) override
-        {            
+        {
             int room = -1;
             // remove the mob from the list and keep track of which room he is in.
             for (uint8 i = 0; i < 6; i++)
