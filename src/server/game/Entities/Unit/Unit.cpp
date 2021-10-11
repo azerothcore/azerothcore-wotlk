@@ -1308,7 +1308,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
         Unit::CalcAbsorbResist(dmgInfo);
         damageInfo->absorb = dmgInfo.GetAbsorb();
         damageInfo->resist = dmgInfo.GetResist();
-        damage = dmgInfo.GetDamage();
+        damageInfo->damage = dmgInfo.GetDamage();
     }
     else
         damageInfo->damage = 0;
