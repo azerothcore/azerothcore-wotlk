@@ -1,5 +1,9 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633980818495484300');
 
+DELETE FROM `gossip_menu` WHERE `MenuID` = 5631 AND `TextID` = 6742;
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(5631, 6742);
+
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 5630;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (15, 5630, 0, 0, 0, 8, 0, 4148, 0, 0, 0, 0, 0, '', 'Show gossip option if quest \'Bloodpetal Zapper\' is rewarded'),
