@@ -18,35 +18,24 @@ enum Spells
     SPELL_PLAY_DEAD         = 19822,
 };
 
-enum Events
-{
-    EVENT_SERRATED_BITE     = 1,
-    EVENT_IGNITE,
-};
-
-enum Actions
-{
-    ACTION_HOUND_IGNITE     = 1,
-};
-
 // Serrated Bites timer may be wrong
-class npc_mc_core_hound : public CreatureScript
+class npc_mc_ancient_core_hound : public CreatureScript
 {
 public:
-    npc_mc_core_hound() : CreatureScript("npc_mc_core_hound") {}
+    npc_mc_ancient_core_hound() : CreatureScript("npc_mc_ancient_core_hound") {}
 
-    struct npc_mc_core_houndAI : public CreatureAI
+    struct npc_mc_ancient_core_houndAI : public CreatureAI
     {
-        npc_mc_core_houndAI(Creature* creature) : CreatureAI(creature) {}
+        npc_mc_ancient_core_houndAI(Creature* creature) :
+            CreatureAI(creature),
+            instance(creature->GetInstanceScript()),
+            serratedBiteTimer(3000)
+        {
+        }
 
         void Reset() override
         {
-            killerGUID.Clear();
-        }
-
-        void EnterCombat(Unit* /*victim*/) override
-        {
-            events.ScheduleEvent(EVENT_SERRATED_BITE, 3000);
+            serratedBiteTimer = 3000;
         }
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
@@ -57,57 +46,61 @@ public:
                 damage = 0;
                 return;
             }
-
-            if (me->HealthBelowPctDamaged(0, damage) && !me->HasAura(SPELL_PLAY_DEAD))
+            else if (me->GetHealth() <= damage)
             {
                 damage = 0;
-                killerGUID = attacker->GetGUID();
                 Talk(EMOTE_SMOLDERING);
+                DoCastSelf(SPELL_PLAY_DEAD);
             }
         }
 
         void DoAction(int32 action) override
         {
-            if (action == ACTION_HOUND_IGNITE && me->IsInCombat())
+            if (action == me->GetEntry()*10)
             {
-
-
-                killerGUID.Clear();
+                me->SetFullHealth();
+                Talk(EMOTE_IGNITE);
             }
+        }
+
+        bool CanRespawn() override
+        {
+            return instance->GetBossState(DATA_MAGMADAR) != DONE;
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() && !smoldering)
+            if (!UpdateVictim())
             {
                 return;
             }
 
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasAura(SPELL_PLAY_DEAD))
             {
                 return;
             }
 
-            if (events.ExecuteEvent() == EVENT_SERRATED_BITE)
+            if (serratedBiteTimer <= diff)
             {
                 DoCastVictim(SPELL_SERRATED_BITE);
-                events.RepeatEvent(urand(5000, 6000));
+                serratedBiteTimer = urand(5000, 6000);
+            }
+            else
+            {
+                serratedBiteTimer -= diff;
             }
 
             DoMeleeAttackIfReady();
         }
 
     private:
-        EventMap events;
-        ObjectGuid killerGUID;
-        bool smoldering;
+        InstanceScript* instance;
+        uint32 serratedBiteTimer;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetMoltenCoreAI<npc_mc_core_houndAI>(creature);
+        return GetMoltenCoreAI<npc_mc_ancient_core_houndAI>(creature);
     }
 };
 
@@ -123,57 +116,63 @@ public:
 
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if (Creature* target = GetTarget()->ToCreature())
+            Creature* creatureTarget = GetTarget()->ToCreature();
+            if (!creatureTarget)
             {
-                target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                //target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                target->SetReactState(REACT_PASSIVE);
-                target->SetControlled(true, UNIT_STATE_ROOT);
-                target->AttackStop();
+                return;
             }
+
+            creatureTarget->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+            creatureTarget->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+            //creatureTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            creatureTarget->SetReactState(REACT_PASSIVE);
+            creatureTarget->SetControlled(true, UNIT_STATE_ROOT);
+            creatureTarget->AttackStop();
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if (Creature* target = GetTarget()->ToCreature())
+            Creature* creatureTarget = GetTarget()->ToCreature();
+            if (!creatureTarget)
             {
-                target->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                //target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-                target->SetControlled(false, UNIT_STATE_ROOT);
-                target->SetReactState(REACT_AGGRESSIVE);
+                return;
+            }
 
-                if (target->IsInCombat())
+            creatureTarget->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+            creatureTarget->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+            //creatureTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            creatureTarget->SetControlled(false, UNIT_STATE_ROOT);
+            creatureTarget->SetReactState(REACT_AGGRESSIVE);
+
+            if (creatureTarget->IsInCombat())
+            {
+                bool shouldDie = true;
+                std::list<Creature*> hounds;
+                creatureTarget->GetCreaturesWithEntryInRange(hounds, 80, NPC_CORE_HOUND);
+
+                // Perform lambda based check to find if there is any nearby
+                if (!hounds.empty())
                 {
-                    bool shouldDie = true;
-                    std::list<Creature*> hounds;
-                    target->GetCreaturesWithEntryInRange(hounds, 80, NPC_CORE_HOUND);
-                    if (!hounds.empty())
+                    // Alive hound been found within 80 yards -> cancel suicide
+                    if (std::find_if(hounds.begin(), hounds.end(), [this, creatureTarget](Creature const* hound)
                     {
-                        // Alive hound been found within 80 yards -> cancel suicide
-                        if (std::find_if(hounds.begin(), hounds.end(), [this](Creature const* hound)
-                        {
-                            return hound->IsAlive() && !hound->HasAura(m_scriptSpellId);
-                        }) != hounds.end())
-                        {
-                            shouldDie = false;
-                        }
+                        return creatureTarget->IsWithinLOSInMap(hound) && hound->IsAlive() && !hound->HasAura(m_scriptSpellId);
+                    }) != hounds.end())
+                    {
+                        shouldDie = false;
                     }
+                }
 
-                    if (!shouldDie)
+                if (!shouldDie)
+                {
+                    if (CreatureAI* targetAI = creatureTarget->AI())
                     {
-                        target->AI()->DoAction(target->GetEntry() * 10);
-                        target->SetFullHealth();
-<<<<<<< HEAD
-                        target->AI()->SetData(1, 1);
-=======
->>>>>>> parent of 5f0d28ace (Scripts/MoltenCore: moved npc "Core Hound" script from C++ to SAI)
+                        targetAI->DoAction(creatureTarget->GetEntry() * 10);
                     }
-                    else
-                    {
-                        Unit::Kill(target, target);
-                    }
+                }
+                else
+                {
+                    Unit::Kill(creatureTarget, creatureTarget);
                 }
             }
         }
@@ -193,5 +192,9 @@ public:
 
 void AddSC_molten_core()
 {
+    // Creatures
+    new npc_mc_ancient_core_hound();
+
+    // Spells
     new spell_mc_play_dead();
 }
