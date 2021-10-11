@@ -1,9 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620244782542375889');
 
--- spell "Play Dead" aura script (used by core hounds)
-DELETE FROM `spell_script_names` WHERE `spell_id`=19822 AND `ScriptName`='spell_mc_play_dead';
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(19822, 'spell_mc_play_dead');
+-- Added missing aura for Magmadar
+UPDATE `creature_template_addon` SET `auras`='19449' WHERE `entry`=11982;
 
 -- 19411 Lava Bomb (used by Magmadar)
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (19411, 20474) AND `ScriptName`='spell_magmadar_lava_bomb';
@@ -11,8 +9,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (19411, 'spell_magmadar_lava_bomb'),
 (20474, 'spell_magmadar_lava_bomb');
 
--- Magmadar
-UPDATE `creature_template_addon` SET `auras`='19449' WHERE `entry`=11982;
+-- Renamed Core Hound script
+update `creature_template` SET `ScriptName`='npc_mc_core_hound' WHERE `entry`=11671;
 
 -- Timers update for NPC "Flamewaker Protector"
 UPDATE `smart_scripts` SET `event_param1`=5000, `event_param2`=5000, `event_param3`=6500, `event_param4`=6500 WHERE `entryorguid`=12119 AND `source_type`=0 AND `id`=0 AND `link`=0;
@@ -93,15 +91,7 @@ DELETE FROM `smart_scripts` WHERE `entryorguid`=11669 AND `source_type`=0 AND `i
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (11669, 0, 0, 0, 0, 0, 100, 0, 5000, 15000, 4000, 7000, 0, 11, 20602, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Flame Imp - IC - Cast Fire Nova');
 
--- Core Hound
-update `creature_template` SET `ScriptName`='', `AIName`='SmartAI' WHERE `entry`=11671;
-DELETE FROM `smart_scripts` WHERE `entryorguid`=11671 AND `source_type`=0;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(11671, 0, 0, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 42, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - AI Init - Set invincibility hp pct to 1%'),
-(11671, 0, 1, 2, 2, 1, 100, 0, 0, 2, 1000, 1000, 0, 11, 19822, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - At 1% hp - cast Play Dead'),
-(11671, 0, 2, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - At 1% hp - set event phase to 2'),
-(11671, 0, 3, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - On Agroo - set event phase to 1'),
-(11671, 0, 4, 0, 0, 1, 100, 0, 3000, 3000, 5000, 6000, 0, 11, 19771, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - IC - cast Serrated Bite'),
-(11671, 0, 5, 6, 38, 2, 100, 0, 1, 1, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - On Data Set - Set event phase to 1'),
-(11671, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - On Data Set - Say text'),
-(11671, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Core Hound - At 1% hp - Say text');
+-- spell "Play Dead" aura script (used by core hounds)
+DELETE FROM `spell_script_names` WHERE `spell_id`=19822 AND `ScriptName`='spell_mc_play_dead';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(19822, 'spell_mc_play_dead');
