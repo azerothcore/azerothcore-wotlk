@@ -1517,17 +1517,15 @@ public:
                     {
                         float angle = me->GetAngle(p);
 
-                        if (Unit* vehicle = me->GetVehicleBase())
-                        {
-                            vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                            vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
-                            angle -= vehicle->GetOrientation();
-                        }
-
                         spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
                         spinningUpTimer = 1500;
                         me->SetFacingTo(angle);
                         me->CastSpell(p, SPELL_SPINNING_UP, true);
+                        if (Unit* vehicle = me->GetVehicleBase())
+                        {
+                            vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                            vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+                        }
                         events.RescheduleEvent((Phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14500);
                     }
                     break;
