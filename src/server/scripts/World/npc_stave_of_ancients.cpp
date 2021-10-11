@@ -199,9 +199,12 @@ void NPCStaveQuestAI::StoreAttackerGuidValue(Unit* attacker)
     bool isGUIDPresent = std::find(attackerGuids.begin(), attackerGuids.end(), guidValue) != attackerGuids.end();
 
     // don't store snaketrap's snakes and trap triggers
-    if(isGUIDPresent || (IsAllowedEntry(attacker->GetEntry()) && attacker->GetTypeId() != TYPEID_PLAYER)) {
+    if (isGUIDPresent || (IsAllowedEntry(attacker->GetEntry()) && attacker->GetTypeId() != TYPEID_PLAYER))
+    {
         return;
-    } else {
+    }
+    else 
+    {
         attackerGuids.push_back(guidValue);
     }
 }
