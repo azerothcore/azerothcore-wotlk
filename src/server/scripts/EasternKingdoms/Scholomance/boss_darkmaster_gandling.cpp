@@ -101,7 +101,8 @@ public:
             if (portedPlayer)
             {
                 cr->AI()->AttackStart(portedPlayer);
-            }    
+            }
+            LOG_FATAL("Entities:unit", "just summoned someone");
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -170,14 +171,6 @@ public:
         }
     };
 };
-
-
-
-
-
-
-
-
 
 void AddSC_boss_darkmaster_gandling()
 {
