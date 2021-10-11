@@ -1,3 +1,14 @@
+## 4.0.0-dev.12 | Commit: [bcec4191e43de8a7b57a4219d6baaa7c5e3dfaf1
+](https://github.com/azerothcore/azerothcore-wotlk/commit/bcec4191e43de8a7b57a4219d6baaa7c5e3dfaf1
+
+
+
+### Added
+
+- Added `OnPlayerPVPFlagChange` hook, it will be executed after the pvp flag from a player gets changed.
+
+
+
 ## 4.0.0-dev.11 | Commit: [d18545263fda54e19c875d22adfb28ae4072ec01
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/d18545263fda54e19c875d22adfb28ae4072ec01
 
