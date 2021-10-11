@@ -27,7 +27,8 @@ enum DataTypes
     DATA_KIRTONOS_THE_HERALD            = 0,
     DATA_MINI_BOSSES                    = 1,
     DATA_RAS_HUMAN                      = 2,
-    DATA_DARKMASTER_GANDLING = 3
+    DATA_DARKMASTER_GANDLING = 3,
+    GANDLING_PORTAL_TO_CAST
 };
 
 enum ModelIds
@@ -86,14 +87,7 @@ enum SpellIds
     SPELL_SUMMON_BONE_MINION1                   = 27690,
     SPELL_SUMMON_BONE_MINION2                   = 27691,
     SPELL_SUMMON_BONE_MINION3                   = 27692,
-    SPELL_SUMMON_BONE_MINION4                   = 27693,
-
-    SPELL_SHADOW_PORTAL_HALLOFSECRETS           = 17863,
-    SPELL_SHADOW_PORTAL_HALLOFTHEDAMNED         = 17939,
-    SPELL_SHADOW_PORTAL_THECOVEN                = 17943,
-    SPELL_SHADOW_PORTAL_THESHADOWVAULT          = 17944,
-    SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT        = 17946,
-    SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN      = 17948
+    SPELL_SUMMON_BONE_MINION4                   = 27693
 };
 
 template <class AI, class T>

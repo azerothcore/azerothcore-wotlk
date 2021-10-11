@@ -24,6 +24,7 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
+  // don't change the order, due to the semi-smart way it's designed, the order matters a lot.
 const uint32 GandlingGateIds[] = {GO_GATE_GANDLING_DOWN_NORTH, GO_GATE_GANDLING_DOWN_EAST, GO_GATE_GANDLING_DOWN_SOUTH,
                                     GO_GATE_GANDLING_UP_NORTH, GO_GATE_GANDLING_UP_EAST, GO_GATE_GANDLING_UP_SOUTH,
                                     GO_GATE_GANDLING_ENTRANCE};
@@ -45,6 +46,7 @@ public:
             _miniBosses = 0;
             _kirtonosState = 0;
             _rasHuman      = 0;
+            _gandlingPortal = 0;
         }
 
         void OnCreatureCreate(Creature* cr) override
@@ -150,6 +152,9 @@ public:
                 case DATA_RAS_HUMAN:
                     _rasHuman = data;
                     break;
+                case GANDLING_PORTAL_TO_CAST:
+                    _gandlingPortal = data;
+                    break;
             }
 
             SaveToDB();
@@ -165,6 +170,8 @@ public:
                     return _miniBosses;
                 case DATA_RAS_HUMAN:
                     return _rasHuman;
+                case GANDLING_PORTAL_TO_CAST:
+                    return _gandlingPortal;
             }
             return 0;
         }
@@ -210,6 +217,7 @@ public:
         uint32 _kirtonosState;
         uint32 _miniBosses;
         uint32 _rasHuman;
+        uint32 _gandlingPortal;
     };
 };
 
@@ -303,215 +311,6 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_kormok_summon_bone_minionsSpellScript();
-    }
-};
-
-enum Rooms
-{
-    ROOM_HALL_OF_SECRETS        = 0,
-    ROOM_HALL_OF_THE_DAMNED     = 1,
-    ROOM_THE_COVEN              = 2,
-    ROOM_THE_SHADOW_VAULT       = 3,
-    ROOM_BAROV_FAMILY_VAULT     = 4,
-    ROOM_VAULT_OF_THE_RAVENIAN  = 5,
-    ROOM_MAX                    = 6
-};
-
-class spell_scholomance_shadow_portal : public SpellScriptLoader
-{
-public:
-    spell_scholomance_shadow_portal() : SpellScriptLoader("spell_scholomance_shadow_portal") { }
-
-    class spell_scholomance_shadow_portal_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_scholomance_shadow_portal_SpellScript);
-
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            Creature* caster = GetCaster()->ToCreature();
-            uint8 attempts = 0;
-            uint8 room = urand(ROOM_HALL_OF_SECRETS, ROOM_VAULT_OF_THE_RAVENIAN);
-            uint32 spellId = 0;
-
-            while (attempts < ROOM_MAX)
-            {
-                switch (room)
-                {
-                    case UP + NORTH:
-                        if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[UP + NORTH])))
-                                if (gate->GetGoState() == GO_STATE_ACTIVE)
-                                    spellId = SPELL_SHADOW_PORTAL_HALLOFSECRETS;
-                        break;
-                    case UP + EAST:
-                        if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[UP + EAST])))
-                                if (gate->GetGoState() == GO_STATE_ACTIVE)
-                                    spellId = SPELL_SHADOW_PORTAL_HALLOFTHEDAMNED;
-                        break;
-                    case UP + SOUTH:
-                        if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[UP + SOUTH])))
-                                if (gate->GetGoState() == GO_STATE_ACTIVE)
-                                    spellId = SPELL_SHADOW_PORTAL_THECOVEN;
-                        break;
-                    case DOWN + NORTH:
-                        if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[DOWN + NORTH])))
-                                if (gate->GetGoState() == GO_STATE_ACTIVE)
-                                    spellId = SPELL_SHADOW_PORTAL_THESHADOWVAULT;
-                        break;
-                    case DOWN + EAST:
-                        if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[DOWN + EAST])))
-                                if (gate->GetGoState() == GO_STATE_ACTIVE)
-                                    spellId = SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT;
-                        break;
-                    case DOWN + SOUTH:
-                        if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GandlingGateIds[DOWN + SOUTH])))
-                                if (gate->GetGoState() == GO_STATE_ACTIVE)
-                                    spellId = SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN;
-                        break;
-                }
-
-                if (spellId)
-                {
-                    caster->CastSpell(GetHitUnit(), spellId, true);
-                    break;
-                }
-                else
-                {
-                    room = (room + 1) % ROOM_MAX;
-                    ++attempts;
-                }
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_scholomance_shadow_portal_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_scholomance_shadow_portal_SpellScript();
-    }
-};
-
-Position const SummonPos[3 * ROOM_MAX] =
-{
-    // Hall of Secrets // up north
-    { 230.80f, 0.138f, 85.23f, 0.0f },
-    { 241.23f, -6.979f, 85.23f, 0.0f },
-    { 246.65f, 4.227f, 84.85f, 0.0f },
-    // The Hall of the damned // up east
-    { 177.9624f, -68.23893f, 84.95197f, 3.228859f },
-    { 183.7705f, -61.43489f, 84.92424f, 5.148721f },
-    { 184.7035f, -77.74805f, 84.92424f, 4.660029f },
-    // The Coven // up south
-    { 111.7203f, -1.105035f, 85.45985f, 3.961897f },
-    { 118.0079f, 6.430664f, 85.31169f, 2.408554f },
-    { 120.0276f, -7.496636f, 85.31169f, 2.984513f },
-    // The Shadow Vault // down north
-    { 245.3716f, 0.628038f, 72.73877f, 0.01745329f },
-    { 240.9920f, 3.405653f, 72.73877f, 6.143559f },
-    { 240.9543f, -3.182943f, 72.73877f, 0.2268928f },
-    // Barov Family Vault // down east
-    { 181.8245f, -42.58117f, 75.4812f, 4.660029f },
-    { 177.7456f, -42.74745f, 75.4812f, 4.886922f },
-    { 185.6157f, -42.91200f, 75.4812f, 4.45059f },
-    // Vault of the Ravenian // down south
-    { 136.362f, 6.221f, 75.40f, 3.14f },
-    { 130.79f, -0.91f, 75.40f, 3.14f },
-    { 136.362f, -8.221f, 75.40f, 3.14f },
-};
-
-class spell_scholomance_shadow_portal_rooms : public SpellScriptLoader
-{
-public:
-    spell_scholomance_shadow_portal_rooms() : SpellScriptLoader("spell_scholomance_shadow_portal_rooms") { }
-
-    class spell_scholomance_shadow_portal_rooms_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_scholomance_shadow_portal_rooms_SpellScript);
-
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleSendEvent(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            Creature* caster = GetCaster()->ToCreature();
-
-            uint8 summonPos = 0;
-            uint32 gateId = 0;
-
-            switch (GetSpellInfo()->Id)
-            {
-                case SPELL_SHADOW_PORTAL_HALLOFSECRETS:
-                    summonPos = ROOM_HALL_OF_SECRETS * 3;
-                    gateId = UP + EAST;
-                    break;
-                case SPELL_SHADOW_PORTAL_HALLOFTHEDAMNED:
-                    summonPos = ROOM_HALL_OF_THE_DAMNED * 3;
-                    gateId    = UP + EAST;
-                    break;
-                case SPELL_SHADOW_PORTAL_THECOVEN:
-                    summonPos = ROOM_THE_COVEN * 3;
-                    gateId    = UP + EAST;
-                    break;
-                case SPELL_SHADOW_PORTAL_THESHADOWVAULT:
-                    summonPos = ROOM_THE_SHADOW_VAULT * 3;
-                    gateId    = UP + EAST;
-                    break;
-                case SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT:
-                    summonPos = ROOM_BAROV_FAMILY_VAULT * 3;
-                    gateId    = UP + EAST;
-                    break;
-                case SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN:
-                    summonPos = ROOM_VAULT_OF_THE_RAVENIAN * 3;
-                    gateId    = UP + EAST;
-                    break;
-            }
-
-            if (gateId && (GetCaster()->GetMap()->GetId() == 289))
-            {
-                for (uint8 i = 0; i < 3; ++i)
-                {
-                    if (Creature* summon = GetCaster()->SummonCreature(NPC_RISEN_GUARDIAN, SummonPos[summonPos + i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000))
-                    {
-                        summon->GetMotionMaster()->MoveRandom(8.0f);
-                        summon->AI()->SetData(0, summonPos / 3 + 1);
-                    }
-                }
-
-                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(gateId)))
-                    {
-                        gate->SetGoState(GO_STATE_READY);
-                        gate->AI()->SetData(1, 1);
-                    }
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_scholomance_shadow_portal_rooms_SpellScript::HandleSendEvent, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_scholomance_shadow_portal_rooms_SpellScript();
     }
 };
 
@@ -695,8 +494,6 @@ void AddSC_instance_scholomance()
     new spell_scholomance_fixate();
     new spell_kormok_summon_bone_mages();
     new spell_kormok_summon_bone_minions();
-    new spell_scholomance_shadow_portal();
-    new spell_scholomance_shadow_portal_rooms();
     new spell_scholomance_boon_of_life();
     new npc_scholomance_occultist();
 }

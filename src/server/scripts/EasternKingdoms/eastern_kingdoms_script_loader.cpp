@@ -226,7 +226,7 @@ void AddEasternKingdomsScripts()
     AddSC_the_scarlet_enclave_c5();
     AddSC_instance_scarlet_monastery();     //Scarlet Monastery
     AddSC_boss_kirtonos_the_herald();
-	AddSC_boss_darkmaster_gandling();
+    AddSC_boss_darkmaster_gandling();
     AddSC_instance_scholomance();           //Scholomance
     AddSC_instance_shadowfang_keep();       //Shadowfang keep
     AddSC_instance_stratholme();            //Stratholme
