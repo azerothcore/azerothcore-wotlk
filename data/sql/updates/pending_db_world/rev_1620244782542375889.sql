@@ -10,7 +10,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (20474, 'spell_magmadar_lava_bomb');
 
 -- Renamed Core Hound script
-update `creature_template` SET `ScriptName`='npc_mc_ancient_core_hound' WHERE `entry`=11671;
+update `creature_template` SET `ScriptName`='npc_mc_core_hound' WHERE `entry`=11671;
 
 -- Timers update for NPC "Flamewaker Protector"
 UPDATE `smart_scripts` SET `event_param1`=5000, `event_param2`=5000, `event_param3`=6500, `event_param4`=6500 WHERE `entryorguid`=12119 AND `source_type`=0 AND `id`=0 AND `link`=0;
@@ -99,6 +99,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 -- Magmadar linked respawn data
 -- set @magmadarGUID := (SELECT `guid` from `creature` WHERE `id` = 11982 AND `map`=409);
 SET @magmadarGUID := 56683;
-DELETE FROM `linked_respawn` WHERE `guid` IN (SELECT `guid` from `creature` WHERE `id` = 11671 AND `map`=409);
+DELETE FROM `linked_respawn` WHERE `guid` IN (SELECT `guid` from `creature` WHERE `id` IN (11671, 11673) AND `map`=409);
 INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`)
-SELECT `guid`, CONCAT(@magmadarGUID), CONCAT(0) from `creature` WHERE `id` = 11671 AND `map`=409;
+SELECT `guid`, CONCAT(@magmadarGUID), CONCAT(0) from `creature` WHERE `id` IN (11671, 11673) AND `map`=409;
+
+

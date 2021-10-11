@@ -23,14 +23,14 @@ enum Spells
 };
 
 // Serrated Bites timer may be wrong
-class npc_mc_ancient_core_hound : public CreatureScript
+class npc_mc_core_hound : public CreatureScript
 {
 public:
-    npc_mc_ancient_core_hound() : CreatureScript("npc_mc_ancient_core_hound") {}
+    npc_mc_core_hound() : CreatureScript("npc_mc_core_hound") {}
 
-    struct npc_mc_ancient_core_houndAI : public CreatureAI
+    struct npc_mc_core_houndAI : public CreatureAI
     {
-        npc_mc_ancient_core_houndAI(Creature* creature) :
+        npc_mc_core_houndAI(Creature* creature) :
             CreatureAI(creature),
             instance(creature->GetInstanceScript()),
             serratedBiteTimer(3000)
@@ -90,7 +90,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetMoltenCoreAI<npc_mc_ancient_core_houndAI>(creature);
+        return GetMoltenCoreAI<npc_mc_core_houndAI>(creature);
     }
 };
 
@@ -149,7 +149,7 @@ public:
 
             bool shouldDie = true;
             std::list<Creature*> hounds;
-            creatureTarget->GetCreaturesWithEntryInRange(hounds, 80.0f, NPC_ANCIENT_CORE_HOUND);
+            creatureTarget->GetCreaturesWithEntryInRange(hounds, 80.0f, NPC_CORE_HOUND);
 
             // Perform lambda based check to find if there is any nearby
             if (!hounds.empty())
@@ -195,7 +195,7 @@ public:
 void AddSC_molten_core()
 {
     // Creatures
-    new npc_mc_ancient_core_hound();
+    new npc_mc_core_hound();
 
     // Spells
     new spell_mc_play_dead();
