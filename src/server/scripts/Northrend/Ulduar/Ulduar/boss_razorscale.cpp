@@ -1,8 +1,20 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "MoveSplineInit.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -11,7 +23,7 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "ulduar.h"
-#include "WaypointManager.h"
+#include "WaypointMgr.h"
 
 #define SPELL_FLAMEBUFFET_10                64016
 #define SPELL_FLAMEBUFFET_25                64023
@@ -30,15 +42,15 @@
 #define SPELL_CHAIN_3                       49683
 #define SPELL_CHAIN_4                       49684
 #define SPELL_LAUNCH_CHAIN                  62505
-#define SPELL_HARPOON_SHOT_BUFF             62509
-#define SPELL_HARPOON_FIRE_STATE            62696
+//#define SPELL_HARPOON_SHOT_BUFF             62509
+//#define SPELL_HARPOON_FIRE_STATE            62696
 #define REQ_CHAIN_COUNT                     RAID_MODE(2, 4)
 
 #define SPELL_DEVOURINGFLAME_SUMMON         63308
-#define SPELL_DEVOURINGFLAME_GROUNDAURA_10  64709
-#define SPELL_DEVOURINGFLAME_GROUNDAURA_25  64734
-#define S_DEVOURINGFLAME_GROUNDAURA         RAID_MODE(SPELL_DEVOURINGFLAME_GROUNDAURA_10, SPELL_DEVOURINGFLAME_GROUNDAURA_25)
-#define NPC_DEVOURINGFLAME                  34188
+//#define SPELL_DEVOURINGFLAME_GROUNDAURA_10  64709
+//#define SPELL_DEVOURINGFLAME_GROUNDAURA_25  64734
+//#define S_DEVOURINGFLAME_GROUNDAURA         RAID_MODE(SPELL_DEVOURINGFLAME_GROUNDAURA_10, SPELL_DEVOURINGFLAME_GROUNDAURA_25)
+//#define NPC_DEVOURINGFLAME                  34188
 #define SPELL_STORMSTRIKE                   51876
 #define SPELL_WHIRLWIND                     63808
 #define SPELL_LIGHTINGBOLT                  63809
@@ -49,10 +61,10 @@
 #define NPC_DARK_RUNE_WATCHER               33453
 #define NPC_EXPEDITION_ENGINEER             33287
 #define NPC_EXPEDITION_COMMANDER            33210
-#define NPC_EXPEDITION_DEFENDER             33816
-#define NPC_EXPEDITION_TRAPPER              33259
+//#define NPC_EXPEDITION_DEFENDER             33816
+//#define NPC_EXPEDITION_TRAPPER              33259
 #define NPC_RAZORSCALE                      33186
-#define NPC_HARPOON_FIRE_STATE              33282
+//#define NPC_HARPOON_FIRE_STATE              33282
 
 #define GO_DRILL                            195305
 #define GO_HARPOON_GUN_1                    194519
@@ -134,6 +146,13 @@ public:
         bool startPath;
         uint8 flyTimes;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            me->setActive(true);
+            Reset();
+        }
+
         void Reset() override
         {
             events.Reset();
@@ -145,11 +164,6 @@ public:
             CommanderGUID.Clear();
             bGroundPhase = false;
             flyTimes = 0;
-
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->SendMovementFlagUpdate();
-            me->setActive(true);
 
             if( pInstance )
                 pInstance->SetData(TYPE_RAZORSCALE, NOT_STARTED);
@@ -208,16 +222,22 @@ public:
             {
                 case SPELL_LAUNCH_CHAIN:
                     {
-                        uint32 spell = 0;
-                        if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1) )
-                            spell = SPELL_CHAIN_1;
-                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2) )
-                            spell = SPELL_CHAIN_2;
-                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3) )
-                            spell = SPELL_CHAIN_3;
-                        else
-                            spell = SPELL_CHAIN_4;
-                        caster->CastSpell(me, spell, true);
+                        uint32 spellId = SPELL_CHAIN_4;
+
+                        if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
+                        {
+                            spellId = SPELL_CHAIN_1;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
+                        {
+                            spellId = SPELL_CHAIN_2;
+                        }
+                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
+                        {
+                            spellId = SPELL_CHAIN_3;
+                        }
+
+                        caster->CastSpell(me, spellId, true);
                     }
                     break;
                 case SPELL_CHAIN_1:
@@ -284,7 +304,6 @@ public:
                 me->DisableRotate(true);
                 me->SetOrientation((float)(M_PI + 0.01) / 2);
                 me->SetFacingTo(M_PI / 2);
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->CastSpell(me, 62794, true);
                 events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30000);
@@ -497,9 +516,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
                         events.ScheduleEvent(EVENT_RESUME_FIXING, 22000);
                     }
@@ -573,6 +590,7 @@ public:
 
         void EnterEvadeMode() override
         {
+            me->SetDisableGravity(true);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();

@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -15,6 +26,7 @@
 #include "GridNotifiers.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
+#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
@@ -52,7 +64,10 @@ enum HunterSpells
     SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1            = 64418,
     SPELL_HUNTER_VICIOUS_VIPER                      = 61609,
     SPELL_HUNTER_VIPER_ATTACK_SPEED                 = 60144,
-    SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543
+    SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543,
+    SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT               = 61389,
+    SPELL_LOCK_AND_LOAD_TRIGGER                     = 56453,
+    SPELL_LOCK_AND_LOAD_MARKER                      = 67544
 };
 
 // Ours
@@ -429,7 +444,7 @@ public:
 
         bool CheckProc(ProcEventInfo& procInfo)
         {
-            SpellInfo const* spellInfo = procInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = procInfo.GetSpellInfo();
             // Xinef: cannot proc from volley damage
             if (spellInfo && (spellInfo->SpellFamilyFlags[0] & 0x2000) && spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
                 return false;
@@ -1229,6 +1244,202 @@ public:
     }
 };
 
+// 56841 - Glyph of Arcane Shot
+class spell_hun_glyph_of_arcane_shot : public SpellScriptLoader
+{
+public:
+    spell_hun_glyph_of_arcane_shot() : SpellScriptLoader("spell_hun_glyph_of_arcane_shot") {}
+
+    class spell_hun_glyph_of_arcane_shot_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hun_glyph_of_arcane_shot_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT });
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            if (Unit* procTarget = eventInfo.GetProcTarget())
+            {
+                // Find Serpent Sting, Viper Sting, Scorpid Sting, Wyvern Sting
+                const auto found = std::find_if(std::begin(procTarget->GetAppliedAuras()), std::end(procTarget->GetAppliedAuras()),
+                    [&](std::pair<uint32, AuraApplication*> pair)
+                    {
+                        Aura const* aura = pair.second->GetBase();
+                        return ((aura->GetCasterGUID() == GetTarget()->GetGUID())
+                            && aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_HUNTER
+                            && aura->GetSpellInfo()->SpellFamilyFlags.HasFlag(0xC000, 0x1080));
+                    });
+
+                if (found != std::end(procTarget->GetAppliedAuras()))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            if (!procSpell)
+            {
+                return;
+            }
+
+            int32 mana = procSpell->CalcPowerCost(GetTarget(), procSpell->GetSchoolMask());
+            ApplyPct(mana, aurEff->GetAmount());
+
+            GetTarget()->CastCustomSpell(SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT, SPELLVALUE_BASE_POINT0, mana, GetTarget());
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_hun_glyph_of_arcane_shot_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_hun_glyph_of_arcane_shot_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_glyph_of_arcane_shot_AuraScript();
+    }
+};
+
+// -42243 - Volley (Trigger one)
+class spell_hun_volley_trigger : public SpellScriptLoader
+{
+public:
+    spell_hun_volley_trigger() : SpellScriptLoader("spell_hun_volley_trigger") {}
+
+    class spell_hun_volley_trigger_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_volley_trigger_SpellScript);
+
+        void SelectTarget(std::list<WorldObject*>& targets)
+        {
+            // It's here because Volley is an AOE spell so there is no specific target to be attacked
+            // Let's select one of our targets
+            if (!targets.empty())
+            {
+                _target = *(targets.begin());
+            }
+        }
+
+        void HandleFinish()
+        {
+            if (!_target)
+            {
+                return;
+            }
+
+            Unit* caster = GetCaster();
+            if (!caster || !caster->IsPlayer())
+            {
+                return;
+            }
+
+            for (Unit::ControlSet::iterator itr = caster->m_Controlled.begin(); itr != caster->m_Controlled.end(); ++itr)
+            {
+                if (Unit* pet = *itr)
+                {
+                    if (pet->IsAlive() && pet->GetTypeId() == TYPEID_UNIT)
+                    {
+                        pet->ToCreature()->AI()->OwnerAttacked(_target->ToUnit());
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_volley_trigger_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+            AfterCast += SpellCastFn(spell_hun_volley_trigger_SpellScript::HandleFinish);
+        }
+
+    private:
+        WorldObject* _target = nullptr;
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_hun_volley_trigger_SpellScript();
+    }
+};
+
+// -56342 - Lock and Load
+class spell_hun_lock_and_load : public SpellScriptLoader
+{
+    public:
+        spell_hun_lock_and_load() : SpellScriptLoader("spell_hun_lock_and_load") { }
+
+        class spell_hun_lock_and_load_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_hun_lock_and_load_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                return ValidateSpellInfo({ SPELL_LOCK_AND_LOAD_TRIGGER, SPELL_LOCK_AND_LOAD_MARKER });
+            }
+
+            bool CheckTrapProc(ProcEventInfo& eventInfo)
+            {
+                // Do not proc on traps for immolation/explosive trap.
+                SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+                if (!spellInfo || !(spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST))
+                {
+                    return false;
+                }
+
+                return !eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER);
+            }
+
+            template <uint32 mask>
+            void HandleProcs(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+
+                if (!(eventInfo.GetTypeMask() & mask))
+                {
+                    return;
+                }
+
+                if (!roll_chance_i(aurEff->GetAmount()))
+                {
+                    return;
+                }
+
+                Unit* caster = eventInfo.GetActor();
+                caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_TRIGGER, true);
+            }
+
+            void ApplyMarker(ProcEventInfo& eventInfo)
+            {
+                Unit* caster = eventInfo.GetActor();
+                caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
+            }
+
+            void Register() override
+            {
+                DoCheckProc += AuraCheckProcFn(spell_hun_lock_and_load_AuraScript::CheckTrapProc);
+
+                OnEffectProc += AuraEffectProcFn(spell_hun_lock_and_load_AuraScript::HandleProcs<PROC_FLAG_DONE_TRAP_ACTIVATION>, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+                OnEffectProc += AuraEffectProcFn(spell_hun_lock_and_load_AuraScript::HandleProcs<PROC_FLAG_DONE_PERIODIC>, EFFECT_1, SPELL_AURA_DUMMY);
+
+                AfterProc += AuraProcFn(spell_hun_lock_and_load_AuraScript::ApplyMarker);
+            }
+
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_hun_lock_and_load_AuraScript();
+        }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     // Ours
@@ -1238,6 +1449,7 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_animal_handler();
     new spell_hun_generic_scaling();
     new spell_hun_taming_the_beast();
+    new spell_hun_glyph_of_arcane_shot();
 
     // Theirs
     new spell_hun_aspect_of_the_beast();
@@ -1257,4 +1469,6 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_sniper_training();
     new spell_hun_tame_beast();
     new spell_hun_viper_attack_speed();
+    new spell_hun_volley_trigger();
+    new spell_hun_lock_and_load();
 }

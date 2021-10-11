@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -21,7 +32,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "LootMgr.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -511,7 +522,7 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPacket& recv_data)
 
     // use server size data
     uint32 newzone, newarea;
-    GetPlayer()->GetZoneAndAreaId(newzone, newarea, true);
+    GetPlayer()->GetZoneAndAreaId(newzone, newarea);
     GetPlayer()->UpdateZone(newzone, newarea);
     //GetPlayer()->SendInitWorldStates(true, newZone);
 }
@@ -771,8 +782,36 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     bool teleported = false;
     if (player->GetMapId() != at->target_mapId)
     {
-        if (!sMapMgr->CanPlayerEnter(at->target_mapId, player, false))
+       if (Map::EnterState denyReason = sMapMgr->PlayerCannotEnter(at->target_mapId, player, false))
+        {
+            bool reviveAtTrigger = false; // should we revive the player if he is trying to enter the correct instance?
+            switch (denyReason)
+            {
+                case Map::CANNOT_ENTER_NOT_IN_RAID:
+                case Map::CANNOT_ENTER_INSTANCE_BIND_MISMATCH:
+                case Map::CANNOT_ENTER_TOO_MANY_INSTANCES:
+                case Map::CANNOT_ENTER_MAX_PLAYERS:
+                case Map::CANNOT_ENTER_ZONE_IN_COMBAT:
+                    reviveAtTrigger = true;
+                    break;
+                default:
+                    break;
+            }
+
+            if (reviveAtTrigger) // check if the player is touching the areatrigger leading to the map his corpse is on
+            {
+                if (!player->IsAlive() && player->HasCorpse())
+                {
+                    if (player->GetCorpseLocation().GetMapId() == at->target_mapId)
+                    {
+                        player->ResurrectPlayer(0.5f);
+                        player->SpawnCorpseBones();
+                    }
+                }
+            }
+
             return;
+        }
 
         if (Group* group = player->GetGroup())
             if (group->isLFGGroup() && player->GetMap()->IsDungeon())
@@ -942,56 +981,6 @@ void WorldSession::HandleFeatherFallAck(WorldPacket& recv_data)
 
     // no used
     recv_data.rfinish();                       // prevent warnings spam
-}
-
-void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
-{
-    // no used
-    recv_data.rfinish();                       // prevent warnings spam
-    /*
-        ObjectGuid guid;
-        recv_data >> guid;
-
-        // now can skip not our packet
-        if (_player->GetGUID() != guid)
-        {
-            recv_data.rfinish();                   // prevent warnings spam
-            return;
-        }
-
-        LOG_DEBUG("network.opcode", "WORLD: CMSG_FORCE_MOVE_UNROOT_ACK");
-
-        recv_data.read_skip<uint32>();                          // unk
-
-        MovementInfo movementInfo;
-        movementInfo.guid = guid;
-        ReadMovementInfo(recv_data, &movementInfo);
-        recv_data.read_skip<float>();                           // unk2
-    */
-}
-
-void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
-{
-    // no used
-    recv_data.rfinish();                       // prevent warnings spam
-    /*
-        ObjectGuid guid;
-        recv_data >> guid;
-
-        // now can skip not our packet
-        if (_player->GetGUID() != guid)
-        {
-            recv_data.rfinish();                   // prevent warnings spam
-            return;
-        }
-
-        LOG_DEBUG("network.opcode", "WORLD: CMSG_FORCE_MOVE_ROOT_ACK");
-
-        recv_data.read_skip<uint32>();                          // unk
-
-        MovementInfo movementInfo;
-        ReadMovementInfo(recv_data, &movementInfo);
-    */
 }
 
 void WorldSession::HandleSetActionBarToggles(WorldPacket& recv_data)

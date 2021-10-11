@@ -1,8 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+/// \addtogroup Acored Acore Daemon
+/// @{
+/// \file
 
 #include "ACSoap.h"
 #include "AppenderDB.h"
@@ -21,7 +36,7 @@
 #include "DeadlineTimer.h"
 #include "GitRevision.h"
 #include "IoContext.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "MySQLThreading.h"
 #include "ObjectAccessor.h"
 #include "OpenSSLCrypto.h"
@@ -195,17 +210,16 @@ int main(int argc, char** argv)
     sLog->Initialize();
 
     Acore::Banner::Show("worldserver-daemon",
-        [](char const* text)
+        [](std::string_view text)
         {
-            LOG_INFO("server.worldserver", "%s", text);
+            FMT_LOG_INFO("server.worldserver", text);
         },
         []()
         {
-            LOG_INFO("server.worldserver", "> Using configuration file:       %s", sConfigMgr->GetFilename().c_str());
-            LOG_INFO("server.worldserver", "> Using SSL version:              %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            LOG_INFO("server.worldserver", "> Using Boost version:            %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
-        }
-    );
+            FMT_LOG_INFO("server.worldserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
+            FMT_LOG_INFO("server.worldserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            FMT_LOG_INFO("server.worldserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+        });
 
     OpenSSLCrypto::threadsSetup();
 
@@ -293,7 +307,7 @@ int main(int argc, char** argv)
         // unload battleground templates before different singletons destroyed
         sBattlegroundMgr->DeleteAllBattlegrounds();
 
-        sOutdoorPvPMgr->Die();                     // unload it before MapManager
+        sOutdoorPvPMgr->Die();                     // unload it before MapMgr
         sMapMgr->UnloadAll();                      // unload all grids (including locked in memory)
 
 #ifdef ELUNA
