@@ -14,8 +14,12 @@ enum Texts
 
 enum Spells
 {
+    // Ancient Core Hound
     SPELL_SERRATED_BITE     = 19771,
     SPELL_PLAY_DEAD         = 19822,
+    SPELL_FULL_HEALTH       = 17683,
+    SPELL_FIRE_NOVA_VISUAL  = 19823,
+    SPELL_PLAY_DEAD_PACIFY  = 19951,    // Server side spell
 };
 
 // Serrated Bites timer may be wrong
@@ -58,7 +62,8 @@ public:
         {
             if (action == me->GetEntry()*10)
             {
-                me->SetFullHealth();
+                DoCastSelf(SPELL_FIRE_NOVA_VISUAL, true);
+                DoCastSelf(SPELL_FULL_HEALTH, true);
                 Talk(EMOTE_IGNITE);
             }
         }
@@ -122,11 +127,13 @@ public:
                 return;
             }
 
+            creatureTarget->CastSpell(creatureTarget, SPELL_PLAY_DEAD_PACIFY, true);
             creatureTarget->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             creatureTarget->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
             //creatureTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             creatureTarget->SetReactState(REACT_PASSIVE);
             creatureTarget->SetControlled(true, UNIT_STATE_ROOT);
+
             creatureTarget->AttackStop();
         }
 
@@ -138,6 +145,7 @@ public:
                 return;
             }
 
+            creatureTarget->RemoveAurasDueToSpell(SPELL_PLAY_DEAD_PACIFY);
             creatureTarget->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             creatureTarget->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
             //creatureTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
