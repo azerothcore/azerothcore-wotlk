@@ -23,6 +23,7 @@
 #include "Creature.h"
 #include "DynamicTree.h"
 #include "DynamicVisibility.h"
+#include "GameObjectAI.h"
 #include "GridNotifiers.h"
 #include "Log.h"
 #include "MapMgr.h"
