@@ -26,7 +26,8 @@ enum Spells
     SPELL_SHADOW_PORTAL = 17950
 };
 
-enum Timers
+// official timers
+/* enum Timers
 {
     TIMER_ARCANE_MIN = 8000,
     TIMER_ARCANE_MAX = 14000,
@@ -35,6 +36,18 @@ enum Timers
     TIMER_SHIELD_MIN = 30000,
     TIMER_SHIELD_MAX = 40000,
     TIMER_PORTAL = 25000
+};*/
+
+// temp debug timers
+ enum Timers
+{
+    TIMER_ARCANE_MIN = 8000,
+    TIMER_ARCANE_MAX = 14000,
+    TIMER_CURSE_MIN = 10000,
+    TIMER_CURSE_MAX = 15000,
+    TIMER_SHIELD_MIN = 20000,
+    TIMER_SHIELD_MAX = 25000,
+    TIMER_PORTAL = 40000
 };
 
 enum Rooms
@@ -96,10 +109,10 @@ public:
             DoZoneInCombat();
             instance->SetData(DATA_DARKMASTER_GANDLING, IN_PROGRESS);
             events.Reset();
-            events.ScheduleEvent(SPELL_ARCANE_MISSILES, 2000);
-            events.ScheduleEvent(SPELL_CURSE_DARKMASTER, 6000);
-            events.ScheduleEvent(SPELL_SHADOW_SHIELD, 20000);
-            events.ScheduleEvent(SPELL_SHADOW_PORTAL, 2000);
+            events.ScheduleEvent(SPELL_ARCANE_MISSILES, TIMER_ARCANE_MIN);
+            events.ScheduleEvent(SPELL_CURSE_DARKMASTER, TIMER_CURSE_MIN);
+            events.ScheduleEvent(SPELL_SHADOW_SHIELD, TIMER_SHIELD_MIN);
+            events.ScheduleEvent(SPELL_SHADOW_PORTAL, TIMER_PORTAL);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -124,6 +137,33 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
             {
                 return;
+            }
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case SPELL_ARCANE_MISSILES:
+                    DoCastVictim(SPELL_ARCANE_MISSILES);
+                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
+                    break;
+                case SPELL_CURSE_DARKMASTER:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(target, SPELL_CURSE_DARKMASTER);
+                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
+                    break;
+                case SPELL_SHADOW_SHIELD:
+                    DoCastSelf(SPELL_SHADOW_SHIELD);
+                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
+                    break;
+
+                case SPELL_SHADOW_PORTAL:
+                    LOG_FATAL("Entities:unit", "shadow portal goes here");
+                    events.ScheduleEvent(SPELL_SHADOW_PORTAL, TIMER_PORTAL);
+                    break;
+                default:
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
