@@ -1805,7 +1805,6 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
                     CompleteQuest(questid);
                 else
                     AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
-                return;
             }
         }
     }
@@ -1847,7 +1846,6 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
                     m_QuestStatusSave[questid] = true;
                     IncompleteQuest(questid);
                 }
-                return;
             }
         }
     }
