@@ -2419,3 +2419,19 @@ bool Player::HasPvPForcingQuest() const
 
     return false;
 }
+
+void Player::SendItemRetrievalMail(uint32 itemEntry, uint32 count)
+{
+    MailSender                   sender(MAIL_CREATURE, 34337 /* The Postmaster */);
+    MailDraft                    draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed."); // This is the text used in Cataclysm, it probably wasn't changed.
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    if (Item* item = Item::CreateItem(itemEntry, count, nullptr))
+    {
+        item->SaveToDB(trans);
+        draft.AddItem(item);
+    }
+
+    draft.SendMailTo(trans, MailReceiver(this, GetGUID().GetCounter()), sender);
+    CharacterDatabase.CommitTransaction(trans);
+}

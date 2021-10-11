@@ -3792,3 +3792,21 @@ Debug.Arena = 0
 
 #
 ###################################################################################################
+
+###################################################################################################
+#AOE Looting and Mail Excess to Player QOL#
+###########################################
+#
+#    AOE Looting and Mail Excess
+#        Enable this if you want to enable Area of effect with looting (MOP Feature)
+#        Excess items that is looted in will be mailed to the player
+#
+#    AOE.LOOT.enable
+#         Description: Enables Module
+#         Default:    0 - (Disabled)
+#                     1 - (Enabled)
+
+AOE.LOOT.enable = 0
+
+#
+###################################################################################################
