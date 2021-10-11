@@ -58,16 +58,6 @@ public:
             }
         }
 
-        void DoAction(int32 action) override
-        {
-            if (action == me->GetEntry()*10)
-            {
-                DoCastSelf(SPELL_FIRE_NOVA_VISUAL, true);
-                DoCastSelf(SPELL_FULL_HEALTH, true);
-                Talk(EMOTE_IGNITE);
-            }
-        }
-
         bool CanRespawn() override
         {
             return instance->GetBossState(DATA_MAGMADAR) != DONE;
@@ -119,6 +109,11 @@ public:
     {
         PrepareAuraScript(spell_mc_play_dead_AuraScript);
 
+        bool Load() override
+        {
+            return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        }
+
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Creature* creatureTarget = GetTarget()->ToCreature();
@@ -152,36 +147,40 @@ public:
             creatureTarget->SetControlled(false, UNIT_STATE_ROOT);
             creatureTarget->SetReactState(REACT_AGGRESSIVE);
 
-            if (creatureTarget->IsInCombat())
+            if (!creatureTarget->IsInCombat())
             {
-                bool shouldDie = true;
-                std::list<Creature*> hounds;
-                creatureTarget->GetCreaturesWithEntryInRange(hounds, 80.0f, NPC_CORE_HOUND);
+                return;
+            }
 
-                // Perform lambda based check to find if there is any nearby
-                if (!hounds.empty())
-                {
-                    // Alive hound been found within 80 yards -> cancel suicide
-                    if (std::find_if(hounds.begin(), hounds.end(), [this, creatureTarget](Creature const* hound)
-                    {
-                        return creatureTarget->IsWithinLOSInMap(hound) && hound->IsAlive() && hound->IsInCombat() && !hound->HasAura(m_scriptSpellId);
-                    }) != hounds.end())
-                    {
-                        shouldDie = false;
-                    }
-                }
+            bool shouldDie = true;
+            std::list<Creature*> hounds;
+            creatureTarget->GetCreaturesWithEntryInRange(hounds, 80.0f, NPC_CORE_HOUND);
 
-                if (!shouldDie)
+            // Perform lambda based check to find if there is any nearby
+            if (!hounds.empty())
+            {
+                // Alive hound been found within 80 yards -> cancel suicide
+                if (std::find_if(hounds.begin(), hounds.end(), [this, creatureTarget](Creature const* hound)
                 {
-                    if (CreatureAI* targetAI = creatureTarget->AI())
-                    {
-                        targetAI->DoAction(creatureTarget->GetEntry() * 10);
-                    }
-                }
-                else
+                    return creatureTarget->IsWithinLOSInMap(hound) && hound->IsAlive() && hound->IsInCombat() && !hound->HasAura(m_scriptSpellId);
+                }) != hounds.end())
                 {
-                    Unit::Kill(creatureTarget, creatureTarget);
+                    shouldDie = false;
                 }
+            }
+
+            if (!shouldDie)
+            {
+                if (CreatureAI* targetAI = creatureTarget->AI())
+                {
+                    targetAI->DoCastSelf(SPELL_FIRE_NOVA_VISUAL, true);
+                    targetAI->DoCastSelf(SPELL_FULL_HEALTH, true);
+                    targetAI->Talk(EMOTE_IGNITE);
+                }
+            }
+            else
+            {
+                Unit::Kill(creatureTarget, creatureTarget);
             }
         }
 
