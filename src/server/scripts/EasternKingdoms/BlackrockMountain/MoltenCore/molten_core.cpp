@@ -58,11 +58,6 @@ public:
             }
         }
 
-        bool CanRespawn() override
-        {
-            return instance->GetBossState(DATA_MAGMADAR) != DONE;
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -154,7 +149,7 @@ public:
 
             bool shouldDie = true;
             std::list<Creature*> hounds;
-            creatureTarget->GetCreaturesWithEntryInRange(hounds, 80.0f, NPC_CORE_HOUND);
+            creatureTarget->GetCreaturesWithEntryInRange(hounds, 80.0f, NPC_ANCIENT_CORE_HOUND);
 
             // Perform lambda based check to find if there is any nearby
             if (!hounds.empty())

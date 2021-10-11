@@ -95,3 +95,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `spell_script_names` WHERE `spell_id`=19822 AND `ScriptName`='spell_mc_play_dead';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (19822, 'spell_mc_play_dead');
+
+-- Magmadar linked respawn data
+-- set @magmadarGUID := (SELECT `guid` from `creature` WHERE `id` = 11982 AND `map`=409);
+SET @magmadarGUID := 56683;
+DELETE FROM `linked_respawn` WHERE `guid` IN (SELECT `guid` from `creature` WHERE `id` = 11671 AND `map`=409);
+INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`)
+SELECT `guid`, CONCAT(@magmadarGUID), CONCAT(0) from `creature` WHERE `id` = 11671 AND `map`=409;

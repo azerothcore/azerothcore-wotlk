@@ -48,7 +48,7 @@ enum MCCreatures
     NPC_FLAMEWAKER_HEALER           = 11663,
     NPC_FLAMEWAKER_ELITE            = 11664,
     NPC_CORE_RAGER                  = 11672,
-    NPC_CORE_HOUND                  = 11671,
+    NPC_ANCIENT_CORE_HOUND          = 11671,
     NPC_FIRESWORN                   = 12099,
 };
 
