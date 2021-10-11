@@ -27,7 +27,7 @@ enum DataTypes
     DATA_KIRTONOS_THE_HERALD            = 0,
     DATA_MINI_BOSSES                    = 1,
     DATA_RAS_HUMAN                      = 2,
-    DATA_DARKMASTER_GANDLING = 3,
+    DATA_DARKMASTER_GANDLING            = 3,
     GANDLING_PORTAL_TO_CAST
 };
 
