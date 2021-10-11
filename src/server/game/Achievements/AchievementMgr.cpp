@@ -37,6 +37,7 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
@@ -524,8 +525,8 @@ void AchievementMgr::Reset()
 
 void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete)
 {
-    // disable for gamemasters with GM-mode enabled
-    if (m_player->IsGameMaster())
+    // Disable for GameMasters with GM-mode enabled or for players that don't have the related RBAC permission
+    if (m_player->IsGameMaster() || m_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
         return;
 
     LOG_DEBUG("achievement", "AchievementMgr::ResetAchievementCriteria(%u, %u, %u)", condition, value, evenIfCriteriaComplete);
@@ -800,9 +801,11 @@ static const uint32 achievIdForDungeon[][4] =
  */
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= nullptr*/)
 {
-    // disable for gamemasters with GM-mode enabled
-    if (m_player->IsGameMaster())
+    // Disable for GameMasters with GM-mode enabled or for players that don't have the related RBAC permission
+    if (m_player->IsGameMaster() || m_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
+    {
         return;
+    }
 
     if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
     {
@@ -2202,7 +2205,7 @@ void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
     // disable for gamemasters with GM-mode enabled
-    if (m_player->IsGameMaster())
+    if (m_player->IsGameMaster() || m_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
     {
         LOG_INFO("achievement", "Not available in GM mode.");
         ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");
