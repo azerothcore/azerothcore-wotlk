@@ -33,24 +33,24 @@ enum DataTypes
 
 enum ModelIds
 {
-    MODEL_RAS_HUMAN                     = 3975
+    MODEL_RAS_HUMAN = 3975
 };
 
 enum TalkGroupIds
 {
-    TALK_RAS_HUMAN                      = 0
+    TALK_RAS_HUMAN = 0
 };
 
 enum CreatureIds
 {
-    NPC_RISEN_GUARDIAN                  = 11598,
+    NPC_RISEN_GUARDIAN          = 11598,
     NPC_DARKMASTER_GANDLING     = 1853
 };
 
 enum GameobjectIds
 {
-    GO_GATE_KIRTONOS                    = 175570,
-    
+    GO_GATE_KIRTONOS            = 175570,
+
     GO_GATE_GANDLING_ENTRANCE   = 177374,
 
     GO_GATE_GANDLING_DOWN_NORTH = 177371,
@@ -58,11 +58,11 @@ enum GameobjectIds
     GO_GATE_GANDLING_DOWN_SOUTH = 177372,
     GO_GATE_GANDLING_UP_NORTH   = 177376,
     GO_GATE_GANDLING_UP_EAST    = 177377,
-    GO_GATE_GANDLING_UP_SOUTH = 177375
+    GO_GATE_GANDLING_UP_SOUTH   = 177375
 };
 
 // for gandling, we define the rooms by up/down + direction
-enum Floors 
+enum Floors
 {
     DOWN = 0,
     UP = 3

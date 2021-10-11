@@ -17,6 +17,7 @@
 
 #include "scholomance.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -61,7 +62,8 @@ enum Spells
  };
 
  // don't change the rooms order, due to the semi-smart way it's designed, the order matters a lot.
- const uint32 GandlingPortalSpells[] = {SPELL_SHADOW_PORTAL_DOWN_NORTH, SPELL_SHADOW_PORTAL_DOWN_EAST, SPELL_SHADOW_PORTAL_DOWN_SOUTH, SPELL_SHADOW_PORTAL_UP_NORTH, SPELL_SHADOW_PORTAL_UP_EAST, SPELL_SHADOW_PORTAL_UP_SOUTH}; 
+ const uint32 GandlingPortalSpells[] = {SPELL_SHADOW_PORTAL_DOWN_NORTH, SPELL_SHADOW_PORTAL_DOWN_EAST, SPELL_SHADOW_PORTAL_DOWN_SOUTH,
+                                            SPELL_SHADOW_PORTAL_UP_NORTH, SPELL_SHADOW_PORTAL_UP_EAST, SPELL_SHADOW_PORTAL_UP_SOUTH};
 
   // don't change the order, due to the semi-smart way it's designed, the order matters a lot.
  Position const SummonPos[3 * 6] =
@@ -170,7 +172,7 @@ public:
         void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
-            
+
             // add mob to the room of the last portal, that's the only place we can have added mobs.
             uint32 room = instance->GetData(GANDLING_PORTAL_TO_CAST);
             if (room < 6)
@@ -185,7 +187,7 @@ public:
                     }
                 }
             }
-            // add GUID to list 
+            // add GUID to list
             LOG_FATAL("Entities:unit", "just summoned someone");
         }
 
@@ -323,7 +325,6 @@ public:
         {
             Creature* caster = GetCaster()->ToCreature();
             uint32 room = 0; // 6 rooms
- 
 
             if (InstanceScript* instance = caster->GetInstanceScript())
             {
