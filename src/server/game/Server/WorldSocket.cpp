@@ -26,6 +26,7 @@
 #include "Opcodes.h"
 #include "PacketLog.h"
 #include "Random.h"
+#include "RBAC.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "World.h"
@@ -615,7 +616,17 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     sWorld->AddSession(_worldSession);
 
+    _queryProcessor.AddCallback(_worldSession->LoadPermissionsAsync().WithPreparedCallback(std::bind(&WorldSocket::LoadSessionPermissionsCallback, this, std::placeholders::_1)));
+
     AsyncRead();
+}
+
+void WorldSocket::LoadSessionPermissionsCallback(PreparedQueryResult result)
+{
+    // RBAC must be loaded before adding session to check for skip queue permission
+    _worldSession->GetRBACData()->LoadFromDBCallback(result);
+
+    sWorld->AddSession(_worldSession);
 }
 
 void WorldSocket::SendAuthResponseError(uint8 code)
@@ -658,7 +669,7 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
             {
                 std::unique_lock<std::mutex> sessionGuard(_worldSessionLock);
 
-                if (_worldSession && AccountMgr::IsPlayerAccount(_worldSession->GetSecurity()))
+                if (_worldSession && !_worldSession->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_OVERSPEED_PING))
                 {
                     LOG_ERROR("network", "WorldSocket::HandlePing: %s kicked for over-speed pings (address: %s)",
                         _worldSession->GetPlayerInfo().c_str(), GetRemoteIpAddress().to_string().c_str());
