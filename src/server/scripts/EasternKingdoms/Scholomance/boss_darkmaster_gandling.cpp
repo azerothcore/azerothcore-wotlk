@@ -254,7 +254,7 @@ public:
                 if (target->GetGUID() == me->GetVictim()->GetGUID())
                 {
                     me->AddThreat(me->GetVictim(), -1000000); // drop current player, add a ton to second. This should guarantee that we don't end up with both 1 and 2 in a cage...
-                    if (Unit* newTarget = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 200.0f)) // search in whole rom
+                    if (Unit* newTarget = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 200.0f)) // search in whole room
                     {
                         me->AddThreat(newTarget, 1000000);
                     }
@@ -299,7 +299,6 @@ public:
                     {
                         room = FindRoom();
                         instance->SetData(GANDLING_PORTAL_TO_CAST, room);
-
                         DoCast(target, SPELL_SHADOW_PORTAL);
                     }
                     events.ScheduleEvent(SPELL_SHADOW_PORTAL, TIMER_PORTAL);
