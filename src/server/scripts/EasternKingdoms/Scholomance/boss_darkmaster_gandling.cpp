@@ -117,13 +117,11 @@ public:
 
         SummonList summons;
         Player* portedPlayer;
-
         Creature* Guardians[6][3]; // 6 rooms, 3 mobs, access through GuardiansList[NORTH+EAST][1]
 
         // Only the 6 gates that gandling plays with.
         void SetGate(uint8 gate, bool open)
         {
-            LOG_FATAL("entities:unit", "setting gate %d to %d", gate, open);
             if (gate < 6)
             {
                 instance->HandleGameObject(instance->GetGuidData(GandlingGateIds[gate]), open);
@@ -170,11 +168,10 @@ public:
             }
         }
 
+        // add mob to the room of the last portal, that's the only place we can have added mobs.
         void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
-
-            // add mob to the room of the last portal, that's the only place we can have added mobs.
             uint32 room = instance->GetData(GANDLING_PORTAL_TO_CAST);
             if (room < 6)
             {
@@ -183,13 +180,10 @@ public:
                     if (Guardians[room][i] == nullptr)
                     {
                         Guardians[room][i] = cr;
-                        LOG_FATAL("Entities:Unit", "Summoned a mob to room %d, entry %d at position %f %f %f", room, i, cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ());
                         break;
                     }
                 }
             }
-            // add GUID to list
-            LOG_FATAL("Entities:unit", "just summoned someone");
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -224,11 +218,10 @@ public:
             }
         }
 
+        // Finds a random room that is not in use
         uint32 FindRoom()
         {
             uint32 room = urand(0, 5);
-
-            // check if room is available
             do
             {
                 room = (room + 1) % 6;
@@ -237,6 +230,7 @@ public:
             return room;
         }
 
+        // spawns the 3 mobs in a given room.
         void SpawnMobsInRoom(uint32 room)
         {
             for (uint8 i = 0; i < 3; ++i)
@@ -244,6 +238,26 @@ public:
                 if (Creature* summon = me->SummonCreature(NPC_RISEN_GUARDIAN, SummonPos[room*3 + i], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000))
                 {
                     summon->GetMotionMaster()->MoveRandom(8.0f);
+                }
+            }
+        }
+
+        // once the spell has hit, close doors, spawn mobs and reset threat if needed.
+        void SpellHitTarget(Unit* target, const SpellInfo* spellinfo) override
+        {
+            uint32 room = 0;
+            if (spellinfo && spellinfo->Id == SPELL_SHADOW_PORTAL)
+            {
+                room = instance->GetData(GANDLING_PORTAL_TO_CAST);
+                SetGate(room, CLOSED);
+                SpawnMobsInRoom(room);
+                if (target->GetGUID() == me->GetVictim()->GetGUID())
+                {
+                    me->AddThreat(me->GetVictim(), -1000000); // drop current player, add a ton to second. This should guarantee that we don't end up with both 1 and 2 in a cage...
+                    if (Unit* newTarget = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 30.0f))
+                    {
+                        me->AddThreat(newTarget, 1000000);
+                    }
                 }
             }
         }
@@ -283,18 +297,10 @@ public:
                 case SPELL_SHADOW_PORTAL:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 15.0, true))
                     {
-
                         room = FindRoom();
                         instance->SetData(GANDLING_PORTAL_TO_CAST, room);
 
                         DoCast(target, SPELL_SHADOW_PORTAL);
-                        SetGate(room, CLOSED);
-                        SpawnMobsInRoom(room);
-                        if (target->GetGUID() == me->GetVictim()->GetGUID())
-                        {
-                            LOG_FATAL("Entities:unit", "need to shift aggro");
-                            me->AddThreat(me->GetVictim(), -1000000);
-                        }
                     }
                     events.ScheduleEvent(SPELL_SHADOW_PORTAL, TIMER_PORTAL);
                     break;
@@ -302,7 +308,6 @@ public:
                     break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };

@@ -132,13 +132,15 @@ public:
                     ++_miniBosses;
                     if (_miniBosses == 6)
                     {
-                        LOG_FATAL("Entities:unit", "should set darkmaster in combat here");
+                        if (Creature* Gandling = instance->GetCreature(GandlingGUID))
+                        {
+                            Gandling->AI()->Talk(0);
+                        }
                     }
                     break;
                 case DATA_DARKMASTER_GANDLING:
                     switch (data)
                     {
-                        LOG_FATAL("Entities:unit", "darkmaster gandling set to: %d", data);
                     case DONE:
                     case NOT_STARTED:
                     case FAIL:
