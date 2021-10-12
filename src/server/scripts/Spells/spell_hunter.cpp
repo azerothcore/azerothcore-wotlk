@@ -1370,6 +1370,11 @@ public:
     }
 };
 
+enum LocknLoadSpells 
+{
+    SPELL_FROST_TRAP_SLOW = 67035
+};
+
 // -56342 - Lock and Load
 class spell_hun_lock_and_load : public SpellScriptLoader
 {
@@ -1382,19 +1387,44 @@ class spell_hun_lock_and_load : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                return ValidateSpellInfo({ SPELL_LOCK_AND_LOAD_TRIGGER, SPELL_LOCK_AND_LOAD_MARKER });
+                return ValidateSpellInfo({ SPELL_LOCK_AND_LOAD_TRIGGER, SPELL_LOCK_AND_LOAD_MARKER, SPELL_FROST_TRAP_SLOW });
             }
 
             bool CheckTrapProc(ProcEventInfo& eventInfo)
             {
-                // Do not proc on traps for immolation/explosive trap.
+                // Do not proc on trap activation for immolation/explosive trap.
                 SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-                if (!spellInfo || !(spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST))
+                if (!spellInfo || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE))
                 {
                     return false;
                 }
 
-                return !eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER);
+                return IsTargetValid(spellInfo, eventInfo.GetProcTarget()) && !eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER);
+            }
+
+            bool IsTargetValid(SpellInfo const* spellInfo, Unit* target)
+            {
+                if (!spellInfo || !target)
+                {
+                    return false;
+                }
+
+                // HitMask for Frost Trap can't be checked correctly as it is.
+                // That's because the talent is triggered by the spell that fires the trap (63487)...
+                // ...and not the actual spell that applies the slow effect (67035).
+                // So the IMMUNE result is never sent by the spell that triggers this.
+                if (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
+                {
+                    if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW))
+                    {
+                        if (target->IsImmunedToSpell(triggerSpell))
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
             }
 
             template <uint32 mask>
@@ -1418,8 +1448,11 @@ class spell_hun_lock_and_load : public SpellScriptLoader
 
             void ApplyMarker(ProcEventInfo& eventInfo)
             {
-                Unit* caster = eventInfo.GetActor();
-                caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
+                if (IsTargetValid(eventInfo.GetSpellInfo(), eventInfo.GetProcTarget()))
+                {
+                    Unit* caster = eventInfo.GetActor();
+                    caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
+                }
             }
 
             void Register() override
