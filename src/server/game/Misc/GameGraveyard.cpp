@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "DatabaseEnv.h"
@@ -80,17 +93,29 @@ GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
     return sGraveyard->GetGraveyard(teamId == TEAM_HORDE ? HORDE_GRAVEYARD : ALLIANCE_GRAVEYARD);
 }
 
-GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId)
+GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId teamId, bool nearCorpse)
 {
-    uint32 areaId = sMapMgr->GetAreaId(PHASEMASK_NORMAL, MapId, x, y, z);
+    WorldLocation loc = player->GetWorldLocation();
 
-    uint32 zoneId = sMapMgr->GetZoneId(PHASEMASK_NORMAL, MapId, x, y, z);
+    if (nearCorpse)
+    {
+        loc = player->GetCorpseLocation();
+    }
+
+    uint32 mapId = loc.GetMapId();
+    float  x     = loc.GetPositionX();
+    float  y     = loc.GetPositionY();
+    float  z     = loc.GetPositionZ();
+
+    uint32 zoneId = 0;
+    uint32 areaId = 0;
+    player->GetZoneAndAreaId(zoneId, areaId);
 
     if (!zoneId && !areaId)
     {
         if (z > -500)
         {
-            LOG_ERROR("sql.sql", "GetClosestGraveyard: unable to find zoneId and areaId for map %u coords (%f, %f, %f)", MapId, x, y, z);
+            LOG_ERROR("sql.sql", "GetClosestGraveyard: unable to find zoneId and areaId for map %u coords (%f, %f, %f)", mapId, x, y, z);
             return GetDefaultGraveyard(teamId);
         }
     }
@@ -122,7 +147,8 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
         }
     }
 
-    MapEntry const* map = sMapStore.LookupEntry(MapId);
+    MapEntry const* map = sMapStore.LookupEntry(mapId);
+    GraveyardMapBounds range = GraveyardStore.equal_range(zoneId);
 
     // not need to check validity of map object; MapId _MUST_ be valid here
     if (range.first == range.second && !map->IsBattlegroundOrArena())
@@ -144,7 +170,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
     // some where other
     GraveyardStruct const* entryFar = nullptr;
 
-    MapEntry const* mapEntry = sMapStore.LookupEntry(MapId);
+    MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
 
     for (; range.first != range.second; ++range.first)
     {
@@ -160,8 +186,20 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
         if (!graveyardLink.IsNeutralOrFriendlyToTeam(teamId))
             continue;
 
+        // Skip Archerus graveyards if the player isn't a Death Knight.
+        enum DeathKnightGraveyards
+        {
+            GRAVEYARD_EBON_HOLD = 1369,
+            GRAVEYARD_ARCHERUS  = 1405
+        };
+
+        if (player->getClass() != CLASS_DEATH_KNIGHT && (graveyardLink.safeLocId == GRAVEYARD_EBON_HOLD || graveyardLink.safeLocId == GRAVEYARD_ARCHERUS))
+        {
+            continue;
+        }
+
         // find now nearest graveyard at other map
-        if (MapId != entry->Map)
+        if (mapId != entry->Map)
         {
             // if find graveyard at different map from where entrance placed (or no entrance data), use any first
             if (!mapEntry
