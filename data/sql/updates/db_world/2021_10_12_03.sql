@@ -1,3 +1,19 @@
+-- DB update 2021_10_12_02 -> 2021_10_12_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_10_12_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_10_12_02 2021_10_12_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1633547739738139191'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633547739738139191');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (3296) AND `source_type`=0;
@@ -9,3 +25,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3296,0,5,0,22,0,100,0,77,5000,5000,0,80,6804,0,0,0,0,0,1,0,0,0,0,0,0,0,"Orgrimmar Grunt - On Received Emote 'Rude' - Run Script"),
 (3296,0,7,0,22,0,100,0,17,5000,5000,0,80,6802,0,0,0,0,0,1,0,0,0,0,0,0,0,"Orgrimmar Grunt - On Received Emote 'Bow' - Run Script");
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE  `entry`=3296;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_10_12_03' WHERE sql_rev = '1633547739738139191';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
