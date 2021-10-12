@@ -30,7 +30,6 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "RBAC.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "SpellAuras.h"
@@ -394,7 +393,6 @@ namespace lfg
         uint8 expansion = player->GetSession()->Expansion();
         LfgDungeonSet const& dungeons = GetDungeonsByRandom(0);
         LfgLockMap lock;
-        bool denyJoin = !player->GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER);
 
         bool onlySeasonalBosses = m_options == LFG_OPTION_ENABLE_SEASONAL_BOSSES;
 
@@ -409,9 +407,7 @@ namespace lfg
             DungeonProgressionRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty));
 
             uint32 lockData = 0;
-            if (denyJoin)
-                lockData = LFG_LOCKSTATUS_RAID_LOCKED;
-            else if (dungeon->expansion > expansion || (onlySeasonalBosses && !dungeon->seasonal))
+            if (dungeon->expansion > expansion || (onlySeasonalBosses && !dungeon->seasonal))
                 lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
             else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, player))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
@@ -608,9 +604,7 @@ namespace lfg
         if (!isRaid && joinData.result == LFG_JOIN_OK)
         {
             // Check player or group member restrictions
-            if (!player->GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER))
-                joinData.result = LFG_JOIN_NOT_MEET_REQS;
-            else if (player->InBattleground() || player->InArena() || player->InBattlegroundQueue())
+            if (player->InBattleground() || player->InArena() || player->InBattlegroundQueue())
                 joinData.result = LFG_JOIN_USING_BG_SYSTEM;
             else if (player->HasAura(LFG_SPELL_DUNGEON_DESERTER))
                 joinData.result = LFG_JOIN_DESERTER;
@@ -627,9 +621,7 @@ namespace lfg
                     {
                         if (Player* plrg = itr->GetSource())
                         {
-                            if (!plrg->GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER))
-                                joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
-                            else if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER))
+                            if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER))
                                 joinData.result = LFG_JOIN_PARTY_DESERTER;
                             else if (plrg->InBattleground() || plrg->InArena() || plrg->InBattlegroundQueue())
                                 joinData.result = LFG_JOIN_USING_BG_SYSTEM;
