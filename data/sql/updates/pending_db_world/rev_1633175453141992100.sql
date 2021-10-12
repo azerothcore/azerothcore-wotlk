@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633175453141992100');
 
-DELETE FROM `creature` WHERE `id`=119;
+DELETE FROM `creature` WHERE `id`=119 AND `guid` IN (3110417, 3110419, 3110416, 3110421, 3110420, 3110418);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (3110417, 119, 0, 0, 0, 1, 1, 0, 0, -9768.05, 615.642, 35.228, 0.933077, 300, 0, 0, 198, 0, 0, 0, 0, 0, '', 0),
 (3110419, 119, 0, 0, 0, 1, 1, 0, 0, -9862.54, 715.2, 30.3827, 2.47246, 300, 0, 0, 198, 0, 0, 0, 0, 0, '', 0),
