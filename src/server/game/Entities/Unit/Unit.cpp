@@ -1308,7 +1308,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
         Unit::CalcAbsorbResist(dmgInfo);
         damageInfo->absorb = dmgInfo.GetAbsorb();
         damageInfo->resist = dmgInfo.GetResist();
-        damage = dmgInfo.GetDamage();
+        damageInfo->damage = dmgInfo.GetDamage();
     }
     else
         damageInfo->damage = 0;
@@ -2269,10 +2269,35 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
     if (attType != BASE_ATTACK && attType != OFF_ATTACK)
         return;                                             // ignore ranged case
 
+    bool meleeAttack = true;
+
     // melee attack spell casted at main hand attack only - no normal melee dmg dealt
     if (attType == BASE_ATTACK && m_currentSpells[CURRENT_MELEE_SPELL] && !extra)
-        m_currentSpells[CURRENT_MELEE_SPELL]->cast();
-    else
+    {
+        meleeAttack = false; // The melee attack is replaced by the melee spell
+
+        Spell* meleeSpell = m_currentSpells[CURRENT_MELEE_SPELL];
+        SpellCastResult castResult = meleeSpell->CheckCast(false);
+        if (castResult != SPELL_CAST_OK)
+        {
+            meleeSpell->SendCastResult(castResult);
+            meleeSpell->SendInterrupted(0);
+
+            meleeSpell->finish(false);
+            meleeSpell->SetExecutedCurrently(false);
+
+            if (castResult == SPELL_FAILED_NO_POWER)
+            {
+                // Not enough rage, do a regular melee attack instead
+                meleeAttack = true;
+            }
+        }
+        else
+        {
+            meleeSpell->cast(true);
+        }
+    }
+    if (meleeAttack)
     {
         // attack can be redirected to another target
         victim = GetMeleeHitRedirectTarget(victim);
@@ -8409,28 +8434,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                 break;
             case SPELLFAMILY_WARLOCK:
                 {
-                    // Drain Soul
-                    if (auraSpellInfo->SpellFamilyFlags[0] & 0x4000)
-                    {
-                        // Improved Drain Soul
-                        Unit::AuraEffectList const& mAddFlatModifier = GetAuraEffectsByType(SPELL_AURA_DUMMY);
-                        for (Unit::AuraEffectList::const_iterator i = mAddFlatModifier.begin(); i != mAddFlatModifier.end(); ++i)
-                        {
-                            if ((*i)->GetMiscValue() == SPELLMOD_CHANCE_OF_SUCCESS && (*i)->GetSpellInfo()->SpellIconID == 113)
-                            {
-                                int32 value2 = CalculateSpellDamage(this, (*i)->GetSpellInfo(), 2);
-                                basepoints0 = int32(CalculatePct(GetMaxPower(POWER_MANA), value2));
-                                // Drain Soul
-                                CastCustomSpell(this, 18371, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
-                                break;
-                            }
-                        }
-                        // Not remove charge (aura removed on death in any cases)
-                        // Need for correct work Drain Soul SPELL_AURA_CHANNEL_DEATH_ITEM aura
-                        return false;
-                    }
                     // Nether Protection
-                    else if (auraSpellInfo->SpellIconID == 1985)
+                    if (auraSpellInfo->SpellIconID == 1985)
                     {
                         if (!procSpell)
                             return false;
