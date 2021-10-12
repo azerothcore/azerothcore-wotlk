@@ -438,7 +438,7 @@ public:
                 room = instance->GetData(GANDLING_PORTAL_TO_CAST); // it's set just before my spawn
             }
         }
-        
+
         void KilledUnit(Unit* target)
         {
             if (gandling)
