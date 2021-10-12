@@ -1370,7 +1370,7 @@ public:
     }
 };
 
-enum LocknLoadSpells 
+enum LocknLoadSpells
 {
     SPELL_FROST_TRAP_SLOW = 67035
 };
