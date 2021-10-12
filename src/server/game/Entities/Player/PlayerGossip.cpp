@@ -180,14 +180,14 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
             // if the language is not default and the texts weren't found, maybe they're in gossip_menu_option_locale table
             if (locale != DEFAULT_LOCALE)
             {
-                if (strOptionText == "")
+                if (strOptionText.empty())
                 {
                     /// Find localizations from database.
                     if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
                         ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
                 }
 
-                if (strBoxText == "")
+                if (strBoxText.empty())
                 {
                     /// Find localizations from database.
                     if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
