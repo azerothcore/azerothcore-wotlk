@@ -1578,7 +1578,7 @@ public:
     void AddMail(Mail* mail) { m_mail.push_front(mail); }// for call from WorldSession::SendMailTo
     uint32 GetMailSize() { return m_mail.size();}
     Mail* GetMail(uint32 id);
-
+    void  SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337), used in multiple places.
     PlayerMails const& GetMails() const { return m_mail; }
 
     /*********************************************************/
