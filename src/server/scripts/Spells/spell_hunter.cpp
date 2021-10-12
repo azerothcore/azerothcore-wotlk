@@ -1400,7 +1400,7 @@ class spell_hun_lock_and_load : public SpellScriptLoader
 
                 // Black Arrow and Fire traps may trigger on periodic tick only.
                 if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
-                    && spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
+                    && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE))
                 {
                     return true;
                 }
@@ -1452,7 +1452,7 @@ class spell_hun_lock_and_load : public SpellScriptLoader
                 // Also check if the proc from the fire traps and black arrow actually comes from the periodic ticks here.
                 // Normally this wouldn't be required, but we are circumventing the current proc system limitations.
                 if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
-                    && spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE
+                    && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
                     && !(mask & PROC_FLAG_DONE_PERIODIC))
                 {
                     return;
