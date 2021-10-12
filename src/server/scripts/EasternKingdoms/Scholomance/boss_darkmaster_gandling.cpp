@@ -232,6 +232,16 @@ public:
         {
             _Reset();
             instance->SetData(DATA_DARKMASTER_GANDLING, NOT_STARTED);
+            if (instance->GetData(DATA_MINI_BOSSES) != 6)
+            {
+                me->SetVisible(false);
+                me->setFaction(35);
+            }
+            else
+            {
+                me->SetVisible(true);
+                me->setFaction(21);
+            }
             OpenAllGates();
             summons.DespawnAll();
             for (int i = 0; i < 6; i++)
@@ -425,11 +435,11 @@ public:
 
         InstanceScript* instance;
         int room;
-        Unit* gandling;
+        Unit* Gandling;
 
         void IsSummonedBy(Unit* summoner) override
         {
-            gandling = summoner;
+            Gandling = summoner;
             if (instance)
             {
                 room = instance->GetData(GANDLING_PORTAL_TO_CAST); // it's set just before my spawn
@@ -438,9 +448,9 @@ public:
 
         void KilledUnit(Unit* /* target */) override
         {
-            if (gandling)
+            if (Gandling)
             {
-                gandling->GetAI()->SetData(DATA_PLAYER_KILLED, room);
+                Gandling->GetAI()->SetData(DATA_PLAYER_KILLED, room);
             }
         }
 
