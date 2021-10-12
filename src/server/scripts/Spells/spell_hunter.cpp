@@ -1392,11 +1392,17 @@ class spell_hun_lock_and_load : public SpellScriptLoader
 
             bool CheckTrapProc(ProcEventInfo& eventInfo)
             {
-                // Do not proc on trap activation for immolation/explosive trap.
                 SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-                if (!spellInfo || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE))
+                if (!spellInfo)
                 {
                     return false;
+                }
+
+                // Black Arrow and Fire traps may trigger on periodic tick only.
+                if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
+                    && spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
+                {
+                    return true;
                 }
 
                 return IsTargetValid(spellInfo, eventInfo.GetProcTarget()) && !eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER);
