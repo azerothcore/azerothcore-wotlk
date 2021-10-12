@@ -442,6 +442,12 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     if (pet->GetTypeId() == TYPEID_PLAYER && flag != ACT_COMMAND && flag != ACT_REACTION)
         return;
 
+    // Do not follow itself vehicle
+    if (spellid == COMMAND_FOLLOW && _player->IsOnVehicle(pet))
+    {
+        return;
+    }
+
     if (GetPlayer()->m_Controlled.size() == 1)
         HandlePetActionHelper(pet, guid1, spellid, flag, guid2);
     else
