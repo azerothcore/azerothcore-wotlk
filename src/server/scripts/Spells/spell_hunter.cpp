@@ -1417,10 +1417,7 @@ class spell_hun_lock_and_load : public SpellScriptLoader
                 {
                     if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW))
                     {
-                        if (target->IsImmunedToSpell(triggerSpell))
-                        {
-                            return false;
-                        }
+                        return !target->IsImmunedToSpell(triggerSpell);
                     }
                 }
 
