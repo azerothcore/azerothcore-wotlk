@@ -148,7 +148,6 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
     }
 
     MapEntry const* map = sMapStore.LookupEntry(mapId);
-    GraveyardMapBounds range = GraveyardStore.equal_range(zoneId);
 
     // not need to check validity of map object; MapId _MUST_ be valid here
     if (range.first == range.second && !map->IsBattlegroundOrArena())
@@ -184,7 +183,9 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
 
         // Skip enemy faction graveyard.
         if (!graveyardLink.IsNeutralOrFriendlyToTeam(teamId))
+        {
             continue;
+        }
 
         // Skip Archerus graveyards if the player isn't a Death Knight.
         enum DeathKnightGraveyards
