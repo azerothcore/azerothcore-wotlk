@@ -1335,11 +1335,14 @@ namespace Acore
         bool operator()(Unit* unit) const
         {
             if (_reqAlive && unit->IsAlive())
+            {
                 return false;
+            }
 
             if (!_obj->IsWithinDistInMap(unit, _range))
+            {
                 return false;
-
+            }
             return true;
         }
 
