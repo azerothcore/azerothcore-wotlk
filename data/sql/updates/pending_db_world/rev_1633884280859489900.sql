@@ -4,7 +4,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633884280859489900');
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'boss_darkmaster_gandling' WHERE `entry` = 1853;
 
 -- risen guardians
-UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 11598;
+UPDATE `creature_template` SET `AIName` = '' , `ScriptName` = 'npc_risen_guardian' WHERE (`entry` = 11598);
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 11598) AND (`source_type` = 0);
 
 -- gates

@@ -19,6 +19,8 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "Map.h"
+#include "Player.h"
 
 enum Spells
 {
@@ -28,6 +30,10 @@ enum Spells
     SPELL_SHADOW_PORTAL = 17950
 };
 
+enum BossData
+{
+    DATA_PLAYER_KILLED
+};
 // official timers
 /* enum Timers
 {
@@ -118,6 +124,7 @@ public:
         SummonList summons;
         Player* portedPlayer;
         Creature* Guardians[6][3]; // 6 rooms, 3 mobs, access through GuardiansList[NORTH+EAST][1]
+        bool       playersAlive[5]; // 5 man dungeon. Needed to open the gates after someone dies if necessary.
 
         // Only the 6 gates that gandling plays with.
         void SetGate(uint8 gate, bool open)
@@ -201,6 +208,24 @@ public:
         {
             instance->SetData(DATA_DARKMASTER_GANDLING, DONE);
             OpenAllGates();
+        }
+
+        void SetData(uint32 type, uint32 data) override
+        {
+            switch (type)
+            {
+            case DATA_PLAYER_KILLED:
+                if (data < 6)
+                {
+                    SetGate(data, OPEN);
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (Guardians[data][i])
+                            Guardians[data][i]->SetInCombatWithZone();
+                    }
+                }
+                break;
+            }
         }
 
         void Reset() override
@@ -385,9 +410,55 @@ public:
     }
 };
 
+
+
+
+class npc_risen_guardian : public CreatureScript
+{
+public:
+    npc_risen_guardian() : CreatureScript("npc_risen_guardian") {}
+
+    struct npc_risen_guardianAI : public ScriptedAI
+    {
+        npc_risen_guardianAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = me->GetInstanceScript();
+            room = -1;
+        }
+
+        InstanceScript* instance;
+        int room;
+        Unit* gandling;
+
+        void IsSummonedBy(Unit* summoner) override
+        {
+            gandling = summoner;
+            if (instance)
+            {
+                room = instance->GetData(GANDLING_PORTAL_TO_CAST); // it's set just before my spawn
+            }
+        }
+        
+        void KilledUnit(Unit* target)
+        {
+            if (gandling)
+            {
+                gandling->GetAI()->SetData(DATA_PLAYER_KILLED, room);
+            }
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetScholomanceAI<npc_risen_guardianAI>(creature);
+    }
+};
+
 void AddSC_boss_darkmaster_gandling()
 {
     new boss_darkmaster_gandling();
     new spell_scholomance_shadow_portal();
     new spell_scholomance_shadow_portal_rooms();
+    new npc_risen_guardian();
 }

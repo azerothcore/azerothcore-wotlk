@@ -59,6 +59,7 @@ public:
             }
         }
 
+
         void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
