@@ -146,6 +146,13 @@ public:
         bool startPath;
         uint8 flyTimes;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            me->setActive(true);
+            Reset();
+        }
+
         void Reset() override
         {
             events.Reset();
@@ -157,11 +164,6 @@ public:
             CommanderGUID.Clear();
             bGroundPhase = false;
             flyTimes = 0;
-
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->SendMovementFlagUpdate();
-            me->setActive(true);
 
             if( pInstance )
                 pInstance->SetData(TYPE_RAZORSCALE, NOT_STARTED);
@@ -302,7 +304,6 @@ public:
                 me->DisableRotate(true);
                 me->SetOrientation((float)(M_PI + 0.01) / 2);
                 me->SetFacingTo(M_PI / 2);
-                me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->CastSpell(me, 62794, true);
                 events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30000);
@@ -515,9 +516,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
                         events.ScheduleEvent(EVENT_RESUME_FIXING, 22000);
                     }
@@ -591,6 +590,7 @@ public:
 
         void EnterEvadeMode() override
         {
+            me->SetDisableGravity(true);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();
