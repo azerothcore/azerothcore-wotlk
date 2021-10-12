@@ -219,6 +219,12 @@ public:
         uint8 IntroCounter;
         bool bLockHealthCheck;
 
+        void InitializeAI() override
+        {
+            me->SetDisableGravity(true);
+            Reset();
+        }
+
         void Reset() override
         {
             events.Reset();
@@ -233,9 +239,6 @@ public:
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->SendMovementFlagUpdate();
 
             if (pInstance)
             {
@@ -287,7 +290,6 @@ public:
                 switch (id)
                 {
                     case MI_POINT_INTRO_LAND:
-                        me->SetCanFly(false);
                         me->SetDisableGravity(false);
                         events.RescheduleEvent(EVENT_START_FIGHT, 0, 1);
                         break;
@@ -295,7 +297,6 @@ public:
                         events.RescheduleEvent(EVENT_VORTEX_FLY_TO_CENTER, 0, 1);
                         break;
                     case MI_POINT_VORTEX_LAND:
-                        me->SetCanFly(false);
                         me->SetDisableGravity(false);
                         events.RescheduleEvent(EVENT_VORTEX_LAND_1, 0, 1);
                         break;
@@ -466,9 +467,7 @@ public:
 
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
 
                         events.DelayEvents(25000, 1); // don't delay berserk (group 0)
@@ -492,7 +491,6 @@ public:
 
                         if (Creature* vp = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, pos, TEMPSUMMON_TIMED_DESPAWN, 14000))
                         {
-                            vp->SetCanFly(true);
                             vp->SetDisableGravity(true);
 
                             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
@@ -583,10 +581,7 @@ public:
                         me->SendMeleeAttackStop(me->GetVictim());
                         me->GetMotionMaster()->MoveIdle();
                         me->DisableSpline();
-                        me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        //me->SetHover(true);
-                        me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_CENTER_AIR_PH_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 32.0f, 7.0f);
                         events.RescheduleEvent(EVENT_START_PHASE_2_MOVE_TO_SIDE, 22500, 1);
                         break;
@@ -821,6 +816,7 @@ public:
 
         void EnterEvadeMode() override
         {
+            me->SetDisableGravity(true);
             me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_GET_DEFAULT_FOR_MAP, 1s);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             ScriptedAI::EnterEvadeMode();
