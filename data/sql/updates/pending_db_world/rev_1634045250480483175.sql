@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634045250480483175');
 
 -- Deletes Black Metal War Axe from the RLT 24068
-DELETE FROM `reference_loot_template` WHERE `Reference` = 24068 AND `item` = 2015;
+DELETE FROM `reference_loot_template` WHERE `Entry` = 24068 AND `item` = 2015;
 
 -- Adds Black Metal War Axe to Brain Eaters directly
 DELETE FROM `creature_loot_template` WHERE `Entry` = 570 AND `Item` = 2015;
