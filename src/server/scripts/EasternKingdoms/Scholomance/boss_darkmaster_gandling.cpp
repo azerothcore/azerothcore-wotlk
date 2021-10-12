@@ -410,9 +410,6 @@ public:
     }
 };
 
-
-
-
 class npc_risen_guardian : public CreatureScript
 {
 public:
