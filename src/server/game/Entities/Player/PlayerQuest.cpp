@@ -2419,7 +2419,7 @@ bool Player::HasPvPForcingQuest() const
 
     return false;
 }
-
+// mail retrieval part cherry-picked: TrinityCore/TrinityCore@9f606f7 by @nyreiah
 void Player::SendItemRetrievalMail(uint32 itemEntry, uint32 count)
 {
     MailSender                   sender(MAIL_CREATURE, 34337 /* The Postmaster */);
