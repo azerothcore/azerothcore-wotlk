@@ -25,6 +25,7 @@
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 
 ///////////////////////////////////////
 ////// ITEMS FIXES, BASIC STUFF
@@ -273,6 +274,9 @@ enum costumedOrphan
     SPELL_CREATE_BUCKET                     = 42349,
     SPELL_WATER_SPLASH                      = 42348,
     SPELL_SUMMON_LANTERN                    = 44255,
+    SPELL_HORSEMAN_CONFLAGRATION            = 42380,
+    SPELL_HORSEMAN_CONFLAGRATION_SOUND      = 48149,
+    SPELL_HORSEMAN_CLEAVE                   = 42587,
 
     // NPCs
     NPC_SHADE_OF_HORSEMAN                   = 23543,
@@ -650,16 +654,36 @@ public:
             unitList.clear();
             me->CastSpell(me, SPELL_HORSEMAN_MOUNT, true);
             me->SetSpeed(MOVE_WALK, 3.0f, true);
-            Unmount = false;
         }
 
-        bool Unmount;
         EventMap events;
         uint32 playerCount;
         uint32 counter;
         GuidList unitList;
         int32 pos;
-        void EnterCombat(Unit*) override {}
+        TaskScheduler scheduler;
+
+        void EnterCombat(Unit*) override
+        {
+            scheduler.Schedule(6s, [this](TaskContext context)
+            {
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.f, true))
+                {
+                    me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
+                    target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
+                    me->MonsterSay("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
+                }
+
+                context.Repeat(12s);
+            })
+            .Schedule(7s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_HORSEMAN_CLEAVE, true);
+
+                context.Repeat(8s);
+            });
+        }
+
         void MoveInLineOfSight(Unit*  /*who*/) override {}
 
         void DoAction(int32 param) override
@@ -805,28 +829,13 @@ public:
                     }
             }
 
-            if (Unmount)
-            {
-                Unmount = false;
-                me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
-                me->RemoveAllAuras();
-                me->Dismount();
-                me->SetReactState(REACT_AGGRESSIVE);
-                if (Unit* target = me->SelectNearestPlayer(30.0f))
-                    AttackStart(target);
-            }
-
-            if (me->IsMounted())
-                return;
-
             if (!UpdateVictim())
                 return;
 
-            // cleave
-            if (!urand(0, 29))
-                me->CastSpell(me->GetVictim(), 15496, false);
-
-            DoMeleeAttackIfReady();
+            scheduler.Update(diff, [this]
+            {
+                DoMeleeAttackIfReady();
+            });
         }
 
         void CastFires(bool intial)
@@ -869,6 +878,8 @@ public:
                     return;
                 }
             }
+            else
+                playerCount += 1;
 
             uint32 sizeCount = (playerCount / 3) + 1;
             if (intial && playerCount > 0)
@@ -907,7 +918,12 @@ public:
         {
             if (type == POINT_MOTION_TYPE && point == 8)
             {
-                Unmount = true;
+                me->SetDisableGravity(false);
+                me->RemoveAllAuras();
+                me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                me->SetReactState(REACT_AGGRESSIVE);
+                if (Unit* target = me->SelectNearestPlayer(30.0f))
+                    AttackStart(target);
             }
         }
 
@@ -1013,7 +1029,6 @@ enum headlessHorseman
     SPELL_SUMMONING_RHYME_TARGET                    = 42878,
     SPELL_HEAD_VISUAL                               = 42413,
     SPELL_EARTH_EXPLOSION                           = 42427,
-    SPELL_HORSEMAN_CLEAVE                           = 42587,
     SPELL_HORSEMAN_BODY_REGEN                       = 42403,
     SPELL_HORSEMAN_BODY_REGEN_CONFUSE               = 43105,
     SPELL_HORSEMAN_IMMUNITY                         = 42556,
@@ -1025,7 +1040,6 @@ enum headlessHorseman
     SPELL_HORSEMAN_BODY_PHASE                       = 42547,
     SPELL_HORSEMAN_SPEAKS                           = 43129,
     SPELL_HORSEMAN_WHIRLWIND                        = 43116,
-    SPELL_HORSEMAN_CONFLAGRATION                    = 42380,
     SPELL_SUMMON_PUMPKIN                            = 42552,
     SPELL_PUMPKIN_VISUAL                            = 42280,
     SPELL_SQUASH_SOUL                               = 42514,
@@ -1290,7 +1304,11 @@ public:
                 case EVENT_HORSEMAN_CONFLAGRATION:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        {
                             me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
+                            target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
+                            me->MonsterSay("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
+                        }
 
                         events.RepeatEvent(12500);
                         break;

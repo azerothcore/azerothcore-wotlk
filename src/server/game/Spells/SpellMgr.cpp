@@ -7409,6 +7409,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
     });
 
+    // Conflagration, Horseman's Cleave
+    ApplySpellFix({ 42380, 42587 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
