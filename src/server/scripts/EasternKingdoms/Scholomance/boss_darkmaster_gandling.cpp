@@ -436,7 +436,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* target)
+        void KilledUnit(Unit* target) override
         {
             if (gandling)
             {
