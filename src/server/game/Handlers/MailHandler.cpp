@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "AccountMgr.h"
@@ -109,11 +120,11 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    ObjectGuid rc;
+    ObjectGuid receiverGuid;
     if (normalizePlayerName(receiver))
-        rc = sObjectMgr->GetPlayerGUIDByName(receiver);
+        receiverGuid = sObjectMgr->GetPlayerGUIDByName(receiver);
 
-    if (!rc)
+    if (!receiverGuid)
     {
         LOG_DEBUG("network.opcode", "Player %s is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
             player->GetGUID().ToString().c_str(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
@@ -122,9 +133,9 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     }
 
     LOG_DEBUG("network.opcode", "Player %s is sending mail to %s (%s) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
-        player->GetGUID().ToString().c_str(), receiver.c_str(), rc.ToString().c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
+        player->GetGUID().ToString().c_str(), receiver.c_str(), receiverGuid.ToString().c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
 
-    if (player->GetGUID() == rc)
+    if (player->GetGUID() == receiverGuid)
     {
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_CANNOT_SEND_TO_SELF);
         return;
@@ -154,7 +165,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    Player* receive = ObjectAccessor::FindConnectedPlayer(rc);
+    Player* receive = ObjectAccessor::FindConnectedPlayer(receiverGuid);
 
     uint32 rc_teamId = TEAM_NEUTRAL;
     uint16 mails_count = 0;                                  //do not allow to send to one player more than 100 mails
@@ -167,7 +178,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     else
     {
         // xinef: get data from global storage
-        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(rc.GetCounter()))
+        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(receiverGuid.GetCounter()))
         {
             rc_teamId = Player::TeamIdForRace(playerData->race);
             mails_count = playerData->mailCount;
@@ -196,7 +207,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         }
     }*/
 
-    uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(rc.GetCounter());
+    uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(receiverGuid.GetCounter());
 
     if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
     {
@@ -253,8 +264,10 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             return;
         }
 
-        if (!sScriptMgr->CanSendMail(player, rc, mailbox, subject, body, money, COD, item))
+        if (!sScriptMgr->CanSendMail(player, receiverGuid, mailbox, subject, body, money, COD, item))
+        {
             return;
+        }
 
         items[i] = item;
     }
@@ -284,7 +297,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
                 item->DeleteFromInventoryDB(trans);     // deletes item from character's inventory
                 if (item->GetState() == ITEM_UNCHANGED)
                     item->FSetState(ITEM_CHANGED);      // pussywizard: so the item will be saved and owner will be updated in database
-                item->SetOwnerGUID(rc);
+                item->SetOwnerGUID(receiverGuid);
                 item->SaveToDB(trans);                  // recursive and not have transaction guard into self, item not in inventory and can be save standalone
 
                 draft.AddItem(item);
@@ -313,7 +326,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     draft
     .AddMoney(money)
     .AddCOD(COD)
-    .SendMailTo(trans, MailReceiver(receive, rc.GetCounter()), MailSender(player), body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
+    .SendMailTo(trans, MailReceiver(receive, receiverGuid.GetCounter()), MailSender(player), body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
 
     player->SaveInventoryAndGoldToDB(trans);
     CharacterDatabase.CommitTransaction(trans);
@@ -586,7 +599,6 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
         return;
 
     Player* player = _player;
-    player->_LoadMail();
 
     uint8 mailsCount = 0;
     uint32 realCount = 0;
@@ -776,8 +788,6 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
 void WorldSession::HandleQueryNextMailTime(WorldPacket& /*recvData*/)
 {
     WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 8);
-
-    _player->_LoadMail();
 
     if (_player->unReadMails > 0)
     {

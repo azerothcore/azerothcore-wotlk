@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -36,7 +47,7 @@ public:
         {
             me->SetDisableGravity(true);
             if (me->IsSummon())
-                if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                     me->GetMotionMaster()->MovePoint(0, *owner);
         }
 
@@ -49,7 +60,7 @@ public:
                 cow->CastSpell(cow, 44460, true);
                 cow->DespawnOrUnsummon(10000);
                 if (me->IsSummon())
-                    if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                    if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                         owner->CastSpell(owner, 44463, true);
             }
         }
@@ -99,13 +110,13 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void setphase(short phase)
+        void setphase(short newPhase)
         {
-            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummoner() : nullptr;
+            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummonerUnit() : nullptr;
             if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            switch (phase)
+            switch (newPhase)
             {
                 case 1:
                     me->MonsterWhisper("You think that you can get rid of me through meditation?", summoner->ToPlayer());
@@ -258,11 +269,6 @@ public:
 ## npc_plaguehound_tracker
 ######*/
 
-enum Plaguehound
-{
-    QUEST_SNIFF_OUT_ENEMY        = 11253
-};
-
 class npc_plaguehound_tracker : public CreatureScript
 {
 public:
@@ -276,7 +282,7 @@ public:
         {
             ObjectGuid summonerGUID;
             if (me->IsSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                     if (summoner->GetTypeId() == TYPEID_PLAYER)
                         summonerGUID = summoner->GetGUID();
 

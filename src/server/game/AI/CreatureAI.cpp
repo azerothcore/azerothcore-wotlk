@@ -1,8 +1,19 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Creature.h"
 #include "CreatureAI.h"
@@ -13,6 +24,21 @@
 #include "Player.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
+
+class PhasedRespawn : public BasicEvent
+{
+public:
+    PhasedRespawn(Creature& owner) : BasicEvent(), _owner(owner) {}
+
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    {
+        _owner.RespawnOnEvade();
+        return true;
+    }
+
+private:
+    Creature& _owner;
+};
 
 //Disable CreatureAI when charmed
 void CreatureAI::OnCharmed(bool /*apply*/)
@@ -51,11 +77,11 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
             creature->AI()->AttackStart(nearTarget);
         else if (creature->IsSummon())
         {
-            if (Unit* summoner = creature->ToTempSummon()->GetSummoner())
+            if (Unit* summoner = creature->ToTempSummon()->GetSummonerUnit())
             {
                 Unit* target = summoner->getAttackerForHelper();
-                if (!target && summoner->CanHaveThreatList() && !summoner->getThreatManager().isThreatListEmpty())
-                    target = summoner->getThreatManager().getHostilTarget();
+                if (!target && summoner->CanHaveThreatList() && !summoner->getThreatMgr().isThreatListEmpty())
+                    target = summoner->getThreatMgr().getHostilTarget();
                 if (target && (creature->IsFriendlyTo(summoner) || creature->IsHostileTo(target)))
                     creature->AI()->AttackStart(target);
             }
@@ -170,10 +196,21 @@ void CreatureAI::EnterEvadeMode()
         }
     }
 
-    Reset();
-
-    if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
-        me->GetVehicleKit()->Reset(true);
+    // despawn bosses at reset - only verified tbc/woltk bosses with this reset type - add bosses in last line respectively (dungeon/raid) and increase array limit
+    CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(me->GetEntry());
+    if (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET))
+    {
+        me->DespawnOnEvade();
+        me->m_Events.AddEvent(new PhasedRespawn(*me), me->m_Events.CalculateTime(20000));
+    }
+    else // bosses will run back to the spawnpoint at reset
+    {
+        Reset();
+        if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+        {
+            me->GetVehicleKit()->Reset(true);
+        }
+    }
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
@@ -223,7 +260,7 @@ bool CreatureAI::UpdateVictim()
     // xinef: if we have any victim, just return true
     else if (me->GetVictim() && me->GetExactDist(me->GetVictim()) < 30.0f)
         return true;
-    else if (me->getThreatManager().isThreatListEmpty())
+    else if (me->getThreatMgr().isThreatListEmpty())
     {
         EnterEvadeMode();
         return false;
@@ -241,6 +278,7 @@ bool CreatureAI::_EnterEvadeMode()
     // don't remove clone caster on evade (to be verified)
     me->RemoveEvadeAuras();
 
+    me->ClearComboPointHolders(); // Remove all combo points targeting this unit
     // sometimes bosses stuck in combat?
     me->DeleteThreatList();
     me->CombatStop(true);

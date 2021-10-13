@@ -1,12 +1,23 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Log.h"
 #include "AppenderConsole.h"
 #include "AppenderFile.h"
-#include "Common.h"
 #include "Config.h"
 #include "Errors.h"
 #include "LogMessage.h"
@@ -158,16 +169,16 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
     logger = std::make_unique<Logger>(name, level);
     //fprintf(stdout, "Log::CreateLoggerFromConfig: Created Logger %s, Level %u\n", name.c_str(), level);
 
-    for (std::string_view appenderName : Acore::Tokenize(tokens[1], ' ', false))
+    for (std::string_view appendName : Acore::Tokenize(tokens[1], ' ', false))
     {
-        if (Appender* appender = GetAppenderByName(appenderName))
+        if (Appender* appender = GetAppenderByName(appendName))
         {
             logger->addAppender(appender->getId(), appender);
             //fprintf(stdout, "Log::CreateLoggerFromConfig: Added Appender %s to Logger %s\n", appender->getName().c_str(), name.c_str());
         }
         else
         {
-            fprintf(stderr, "Error while configuring Appender %s in Logger %s. Appender does not exist\n", std::string(appenderName).c_str(), name.c_str());
+            fprintf(stderr, "Error while configuring Appender %s in Logger %s. Appender does not exist\n", std::string(appendName).c_str(), name.c_str());
         }
     }
 }
@@ -218,6 +229,11 @@ void Log::RegisterAppender(uint8 index, AppenderCreatorFn appenderCreateFn)
 }
 
 void Log::outMessage(std::string const& filter, LogLevel level, std::string&& message)
+{
+    write(std::make_unique<LogMessage>(level, filter, std::move(message)));
+}
+
+void Log::_outMessageFmt(std::string const& filter, LogLevel level, std::string&& message)
 {
     write(std::make_unique<LogMessage>(level, filter, std::move(message)));
 }
