@@ -1063,9 +1063,9 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         const_cast<CreatureTemplate*>(cInfo)->InhabitType = INHABIT_ANYWHERE;
     }
 
-    if (!(cInfo->InhabitType & INHABIT_GROUND) && !(cInfo->InhabitType & INHABIT_WATER) && !(cInfo->InhabitType & INHABIT_AIR))
+    if (cInfo->InhabitType == INHABIT_ROOT)
     {
-        LOG_ERROR("sql.sql", "Creature (Entry: %u) does not have at least one valid `InhabitType` set (GROUND, WATER or AIR) and may show unexpected behavior.", cInfo->Entry);
+        LOG_ERROR("sql.sql", "Creature (Entry: %u) only has INHABIT_ROOT(8) as `InhabitType`, creature will not behave correctly.", cInfo->Entry);
         const_cast<CreatureTemplate*>(cInfo)->InhabitType = INHABIT_ANYWHERE;
     }
 
