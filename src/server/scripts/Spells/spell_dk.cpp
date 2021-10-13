@@ -585,8 +585,8 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
-            if (!spellInfo || !eventInfo.GetActionTarget())
+            const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
+            if (!spellInfo || !eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo())
                 return false;
 
             if (!roll_chance_f(eventInfo.GetActor()->GetUnitCriticalChance(BASE_ATTACK, eventInfo.GetActionTarget())))
@@ -660,7 +660,7 @@ public:
         void HandleProc(ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->IsTargetingArea())
+            if (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea())
                 DropCharge();
         }
 
@@ -689,7 +689,7 @@ public:
         void HandleProc(ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            if (eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetDamageInfo()->GetSpellInfo() || eventInfo.GetDamageInfo()->GetSpellInfo()->Dispel != DISPEL_DISEASE))
+            if (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetSpellInfo() || eventInfo.GetSpellInfo()->Dispel != DISPEL_DISEASE))
                 SetDuration(0);
         }
 
@@ -770,7 +770,7 @@ public:
             if (!eventInfo.GetActor() || !eventInfo.GetActionTarget() || !eventInfo.GetActionTarget()->IsAlive() || eventInfo.GetActor()->GetTypeId() != TYPEID_PLAYER)
                 return false;
 
-            const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            const SpellInfo* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return true;
 
@@ -815,7 +815,7 @@ public:
                 return;
 
             dancingRuneWeapon->SetOrientation(dancingRuneWeapon->GetAngle(target));
-            if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+            if (const SpellInfo* procSpell = eventInfo.GetSpellInfo())
             {
                 // xinef: ugly hack
                 if (!procSpell->IsAffectingArea())
@@ -823,7 +823,7 @@ public:
                 dancingRuneWeapon->CastSpell(target, procSpell->Id, true, nullptr, aurEff, dancingRuneWeapon->GetGUID());
                 GetUnitOwner()->SetFloatValue(UNIT_FIELD_COMBATREACH, 0.01f);
             }
-            else
+            else if (eventInfo.GetDamageInfo())
             {
                 target = player->GetMeleeHitRedirectTarget(target);
                 CalcDamageInfo damageInfo;
@@ -1305,7 +1305,15 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 bp = int32(eventInfo.GetDamageInfo()->GetDamage() * 1.5f);
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 bp = static_cast<int32>(damageInfo->GetDamage() * 1.5f);
             GetTarget()->CastCustomSpell(SPELL_DK_BLOOD_GORGED_HEAL, SPELLVALUE_BASE_POINT0, bp, _procTarget, true, nullptr, aurEff);
         }
 
