@@ -205,6 +205,9 @@ std::string CreateDumpString(char const* tableName, QueryResult result)
         if (i == 0) ss << '\'';
         else ss << ", '";
 
+        if (i == 73) ss << "NULL";
+        if (i == 77) ss << "NULL";
+
         std::string s = fields[i].GetString();
         CharacterDatabase.EscapeString(s);
         ss << s;
@@ -337,10 +340,10 @@ bool PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const* tab
                     break;
                 case DTT_CHARACTER:
                     {
-                        if (result->GetFieldCount() <= 74)          // avoid crashes on next check
+                        if (result->GetFieldCount() <= 76)          // avoid crashes on next check
                             LOG_FATAL("entities.player.dump", "PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
 
-                        if (result->Fetch()[74].GetUInt32())        // characters.deleteInfos_Account - if filled error
+                        if (result->Fetch()[76].GetUInt32())        // characters.deleteInfos_Account - if filled error
                             return false;
                         break;
                     }
