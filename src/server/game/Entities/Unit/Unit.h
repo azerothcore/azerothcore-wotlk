@@ -228,6 +228,17 @@ enum ShapeshiftForm
     FORM_SPIRITOFREDEMPTION = 0x20
 };
 
+// UNIT_FIELD_BYTES_1 (UNIT_BYTES_1_OFFSET_ANIM_TIER)
+enum class AnimationTier : uint8
+{
+    Ground      = 0, // plays ground tier animations
+    Swim        = 1, // falls back to ground tier animations, not handled by the client, should never appear in sniffs, will prevent tier change animations from playing correctly if used
+    Hover       = 2, // plays flying tier animations or falls back to ground tier animations, automatically enables hover clientside when entering visibility with this value
+    Fly         = 3, // plays flying tier animations
+    Submerged   = 4
+};
+
+
 // low byte (0 from 0..3) of UNIT_FIELD_BYTES_2
 enum SheathState
 {
@@ -1637,6 +1648,9 @@ public:
     [[nodiscard]] bool IsSitState() const;
     [[nodiscard]] bool IsStandState() const;
     void SetStandState(uint8 state);
+
+    void SetAnimationTier(AnimationTier tier);
+    AnimationTier GetAnimationTier() const { return static_cast<AnimationTier>(GetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER)); }
 
     void  SetStandFlags(uint8 flags) { SetByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
     void  RemoveStandFlags(uint8 flags) { RemoveByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }

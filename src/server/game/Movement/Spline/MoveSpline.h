@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYSERVER_MOVEPLINE_H
-#define TRINITYSERVER_MOVEPLINE_H
+#ifndef AZEROTHSERVER_MOVEPLINE_H
+#define AZEROTHSERVER_MOVEPLINE_H
 
 #include "MoveSplineInitArgs.h"
 #include "Spline.h"
@@ -122,7 +122,8 @@ namespace Movement
         [[nodiscard]] int32 currentPathIdx() const;
 
         [[nodiscard]] bool HasAnimation() const { return splineflags.animation; }
-        [[nodiscard]] uint8 GetAnimationType() const { return splineflags.animId; }
+        // [[nodiscard]] AnimationTier GetAnimationTier() const { return static_cast<AnimationTier>(splineflags.animTier); }
+        [[nodiscard]] uint8 GetAnimationType() const { return splineflags.animTier; } // Only used in Unit::UpdateSplineMovement. TODO: Swap with GetAnimationTier
 
         bool onTransport;
         [[nodiscard]] std::string ToString() const;
@@ -132,4 +133,4 @@ namespace Movement
         }
     };
 }
-#endif // TRINITYSERVER_MOVEPLINE_H
+#endif // AZEROTHSERVER_MOVEPLINE_H

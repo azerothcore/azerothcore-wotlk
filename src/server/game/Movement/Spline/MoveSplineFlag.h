@@ -92,7 +92,7 @@ namespace Movement
         [[nodiscard]] bool isLinear() const { return !isSmooth(); }
         [[nodiscard]] bool isFacing() const { return raw() & Mask_Final_Facing; }
 
-        [[nodiscard]] uint8 getAnimationId() const { return animId; }
+        [[nodiscard]] uint8 getAnimationId() const { return animTier; }
         [[nodiscard]] bool hasAllFlags(uint32 f) const { return (raw() & f) == f; }
         [[nodiscard]] bool hasFlag(uint32 f) const { return (raw() & f) != 0; }
         uint32 operator & (uint32 f) const { return (raw() & f); }
@@ -115,7 +115,7 @@ namespace Movement
         void EnableTransportEnter() { raw() = (raw() & ~TransportExit) | TransportEnter; }
         void EnableTransportExit() { raw() = (raw() & ~TransportEnter) | TransportExit; }
 
-        uint8 animId              : 8;
+        uint8 animTier           : 8;
         bool done                : 1;
         bool falling             : 1;
         bool no_spline           : 1;
