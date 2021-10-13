@@ -207,7 +207,10 @@ std::string CreateDumpString(char const* tableName, QueryResult result)
 
         // 73 - characters.order
         // 77 - character.deleteDate
-        if (i == 73 || i == 77) ss << "NULL";
+        if (i == 73 || i == 77)
+        {
+            ss << "NULL";
+        }
 
         std::string s = fields[i].GetString();
         CharacterDatabase.EscapeString(s);
