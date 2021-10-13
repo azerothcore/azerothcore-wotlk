@@ -1063,6 +1063,12 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         const_cast<CreatureTemplate*>(cInfo)->InhabitType = INHABIT_ANYWHERE;
     }
 
+    if (!(cInfo->InhabitType & INHABIT_GROUND) && !(cInfo->InhabitType & INHABIT_WATER) && !(cInfo->InhabitType & INHABIT_AIR))
+    {
+        LOG_ERROR("sql.sql", "Creature (Entry: %u) does not have at least one valid `InhabitType` set (GROUND, WATER or AIR) and may show unexpected behavior.", cInfo->Entry);
+        const_cast<CreatureTemplate*>(cInfo)->InhabitType = INHABIT_ANYWHERE;
+    }
+
     if (cInfo->HoverHeight < 0.0f)
     {
         LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong value (%f) in `HoverHeight`", cInfo->Entry, cInfo->HoverHeight);
