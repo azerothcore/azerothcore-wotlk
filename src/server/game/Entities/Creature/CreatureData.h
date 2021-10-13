@@ -73,11 +73,11 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_DUNGEON_BOSS                    = 0x10000000,   // creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)
     CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING              = 0x20000000,   // creature ignore pathfinding
     CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK              = 0x40000000,   // creature is immune to knockback effects
-    CREATURE_FLAG_EXTRA_UNUSED_32                       = 0x80000000,
+    CREATURE_FLAG_EXTRA_HARD_RESET                      = 0x80000000,
 
     // Masks
     CREATURE_FLAG_EXTRA_UNUSED                          = (CREATURE_FLAG_EXTRA_UNUSED_12 | CREATURE_FLAG_EXTRA_UNUSED_25 | CREATURE_FLAG_EXTRA_UNUSED_26 |
-                                                           CREATURE_FLAG_EXTRA_UNUSED_27 | CREATURE_FLAG_EXTRA_UNUSED_28 | CREATURE_FLAG_EXTRA_UNUSED_32),
+                                                           CREATURE_FLAG_EXTRA_UNUSED_27 | CREATURE_FLAG_EXTRA_UNUSED_28),
     CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS))
 };
 
@@ -176,6 +176,8 @@ struct CreatureTemplate
         // if can tame exotic then can tame any tameable
         return exotic || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_EXOTIC) == 0;
     }
+
+    [[nodiscard]] bool HasFlagsExtra (uint32 flag) const { return (flags_extra & flag) != 0; }
 
     void InitializeQueryData();
 };
