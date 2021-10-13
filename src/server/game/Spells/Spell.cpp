@@ -5896,7 +5896,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (Creature* pet = m_caster->GetGuardianPet())
                     {
                         if (pet->IsAlive())
+                        {
                             return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                        }
                     }
                     else if (Player* player = m_caster->ToPlayer())
                     {
