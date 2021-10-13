@@ -751,6 +751,9 @@ public:
 
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
         }
 
         void EnterEvadeMode() override
@@ -825,6 +828,14 @@ public:
 
                         CastFires(false);
                         events.RepeatEvent(15000);
+                        break;
+                    }
+                    case 4:
+                    {
+                        me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        if (Unit* target = me->SelectNearestPlayer(30.0f))
+                            AttackStart(target);
                         break;
                     }
             }
@@ -910,6 +921,8 @@ public:
                 me->PlayDirectSound(11968);
                 float x, y, z;
                 GetPosToLand(x, y, z);
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
                 me->GetMotionMaster()->MovePoint(8, x, y, z);
             }
         }
@@ -918,12 +931,10 @@ public:
         {
             if (type == POINT_MOTION_TYPE && point == 8)
             {
-                me->SetDisableGravity(false);
                 me->RemoveAllAuras();
-                me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
-                me->SetReactState(REACT_AGGRESSIVE);
-                if (Unit* target = me->SelectNearestPlayer(30.0f))
-                    AttackStart(target);
+                me->SetCanFly(false);
+                me->SetDisableGravity(false);
+                events.ScheduleEvent(4, 2000);
             }
         }
 
