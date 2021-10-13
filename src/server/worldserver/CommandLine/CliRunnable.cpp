@@ -147,7 +147,7 @@ void CliThread()
     if (sConfigMgr->GetOption<bool>("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
-#if ACORE_PLATFORM == ACORE_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
     if (sConfigMgr->GetBoolDefault("FlashAtStart", true))
     {
         FLASHWINFO fInfo;
