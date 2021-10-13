@@ -4401,6 +4401,11 @@ public:
     {
         PrepareSpellScript(spell_item_linken_boomerang_SpellScript)
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({SPELL_DISARM, SPELL_STUN});
+        }
+
         void OnEffectHitTargetDisarm(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
