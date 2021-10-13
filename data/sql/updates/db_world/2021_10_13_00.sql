@@ -1,3 +1,19 @@
+-- DB update 2021_10_12_03 -> 2021_10_13_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_10_12_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_10_12_03 2021_10_13_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1633950727186349900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1633950727186349900');
 
 -- Server-side spell 'Summon Darrowshire Poltergeinst (DND)'
@@ -22,3 +38,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (@NPC_GHOST, 0, 4, 'You must save him!', 12, 0, 100, 0, 0, 0, 7206, 0, 'Darrowshire Poltergeist'),
 (@NPC_GHOST, 0, 5, 'I was devoured by Horgus! I can still feel his teeth upon me!', 12, 0, 100, 0, 0, 0, 7211, 0, 'Darrowshire Poltergeist'),
 (@NPC_GHOST, 0, 6, 'Beware Marduk! Beware, or your strength will wither.', 12, 0, 100, 0, 0, 0, 7210, 0, 'Darrowshire Poltergeist');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_10_13_00' WHERE sql_rev = '1633950727186349900';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
