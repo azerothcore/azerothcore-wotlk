@@ -52,12 +52,9 @@ enum BG_SA_GateState
     BG_SA_GATE_DESTROYED    = 3
 };
 
-enum BG_SA_Timers
-{
-    BG_SA_BOAT_START    =  60 * IN_MILLISECONDS,
-    BG_SA_WARMUPLENGTH  = 120 * IN_MILLISECONDS,
-    BG_SA_ROUNDLENGTH   = 600 * IN_MILLISECONDS
-};
+static constexpr Milliseconds BG_SA_BOAT_START    = std::chrono::milliseconds(1min);
+static constexpr Milliseconds BG_SA_WARMUPLENGTH  = std::chrono::milliseconds(2min);
+static constexpr Milliseconds BG_SA_ROUNDLENGTH   = std::chrono::milliseconds(10min);
 
 enum BG_SA_WorldStates
 {
@@ -415,7 +412,7 @@ float const BG_SA_GYOrientation[BG_SA_MAX_GY] =
 struct BG_SA_RoundScore
 {
     TeamId winner;
-    uint32 time;
+    Milliseconds time;
 };
 
 const float SOTADefPortalDest[5][4] =
@@ -598,9 +595,9 @@ private:
     /// Id of attacker team
     TeamId Attackers;
     /// Totale elapsed time of current round
-    uint32 TotalTime;
+    Milliseconds TotalTime;
     /// Max time of round
-    uint32 EndRoundTimer;
+    Milliseconds EndRoundTimer;
     /// For know if boats has start moving or not yet
     bool ShipsStarted;
     /// Status of each gate (Destroy/Damage/Intact)
