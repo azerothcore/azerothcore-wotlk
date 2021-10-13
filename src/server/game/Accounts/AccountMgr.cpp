@@ -393,7 +393,7 @@ void AccountMgr::LoadRBAC()
 
 void AccountMgr::UpdateAccountAccess(rbac::RBACData* rbac, uint32 accountId, uint8 securityLevel, int32 realmId)
 {
-    if (rbac && securityLevel != rbac->GetSecurityLevel())
+    if (rbac && securityLevel == rbac->GetSecurityLevel())
         rbac->SetSecurityLevel(securityLevel);
 
     LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
@@ -443,7 +443,7 @@ bool AccountMgr::HasPermission(uint32 accountId, uint32 permissionId, uint32 rea
         return false;
     }
 
-    rbac::RBACData rbac(accountId, "", realmId, GetSecurity(accountId, realmId));
+    rbac::RBACData rbac(accountId, "", realmId, GetSecurity(accountId));
     rbac.LoadFromDB();
     bool hasPermission = rbac.HasPermission(permissionId);
 
@@ -454,8 +454,8 @@ bool AccountMgr::HasPermission(uint32 accountId, uint32 permissionId, uint32 rea
 
 void AccountMgr::ClearRBAC()
 {
-    for (std::pair<uint32 const, rbac::RBACPermission*>& permission : _permissions)
-        delete permission.second;
+    for (rbac::RBACPermissionsContainer::iterator itr = _permissions.begin(); itr != _permissions.end(); ++itr)
+        delete itr->second;
 
     _permissions.clear();
     _defaultPermissions.clear();
