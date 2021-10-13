@@ -1,8 +1,19 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "Cell.h"
 #include "CellImpl.h"
@@ -671,7 +682,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                         if (Player* player = (*itr)->ToUnit()->GetCharmerOrOwnerPlayerOrPlayerItself())
                         {
-                            player->GroupEventHappens(e.action.quest.quest, me);
+                            player->GroupEventHappens(e.action.quest.quest, GetBaseObject());
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS: Player %s credited quest %u",
                                            (*itr)->GetGUID().ToString().c_str(), e.action.quest.quest);
                         }
@@ -1175,13 +1186,27 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 InstanceScript* instance = obj->GetInstanceScript();
                 if (!instance)
                 {
-                    LOG_ERROR("sql.sql", "SmartScript: Event %u attempt to set instance data without instance script. EntryOrGuid %d", e.GetEventType(), e.entryOrGuid);
+                    LOG_ERROR("scripts.ai.sai", "SmartScript: Event %u attempt to set instance data without instance script. EntryOrGuid %d", e.GetEventType(), e.entryOrGuid);
                     break;
                 }
 
-                instance->SetData(e.action.setInstanceData.field, e.action.setInstanceData.data);
-                LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_SET_INST_DATA: Field: %u, data: %u",
-                               e.action.setInstanceData.field, e.action.setInstanceData.data);
+                switch (e.action.setInstanceData.type)
+                {
+                    case 0:
+                    {
+                        instance->SetData(e.action.setInstanceData.field, e.action.setInstanceData.data);
+                        LOG_DEBUG("scripts.ai.sai", "SmartScript::ProcessAction: SMART_ACTION_SET_INST_DATA: Field: %u, data: %u", e.action.setInstanceData.field, e.action.setInstanceData.data);
+                    } break;
+                    case 1:
+                    {
+                        instance->SetBossState(e.action.setInstanceData.field, static_cast<EncounterState>(e.action.setInstanceData.data));
+                        LOG_DEBUG("scripts.ai.sai", "SmartScript::ProcessAction: SMART_ACTION_SET_INST_DATA: SetBossState BossId: %u, State: %u (%s)", e.action.setInstanceData.field, e.action.setInstanceData.data, InstanceScript::GetBossStateName(e.action.setInstanceData.data).c_str());
+                    } break;
+                    default:
+                    {
+                        break;
+                    }
+                }
                 break;
             }
         case SMART_ACTION_SET_INST_DATA64:
