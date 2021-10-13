@@ -238,7 +238,6 @@ enum class AnimationTier : uint8
     Submerged   = 4
 };
 
-
 // low byte (0 from 0..3) of UNIT_FIELD_BYTES_2
 enum SheathState
 {
