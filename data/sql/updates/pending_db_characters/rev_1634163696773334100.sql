@@ -25,3 +25,6 @@ INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
 ('2019_05_12_00.sql', '75DB225858A4D21DA92D21AC292A9DD9A5551BA5', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 ('2019_11_22_00.sql', 'CA433BC426072EF7DDC555B086F65B17BB83CAF5', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 ('2020_01_04_00.sql', '7DA0D914F60BE3827068447FE4EA6AA85266E328', 'ARCHIVED', '2021-10-14 04:13:44', 1);
+
+DELETE FROM `updates_include` WHERE `path`='$/data/sql/archive/db_characters';
+INSERT INTO `updates_include` (`path`, `state`) VALUES ('$/data/sql/archive/db_characters', 'ARCHIVED');

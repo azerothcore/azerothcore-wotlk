@@ -21,3 +21,6 @@ INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
 ('2019_02_08_00.sql', '18FF48FC1B1C238D44198FA1E2D422BAB4C9C338', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 ('2019_02_17_00.sql', '1F4C4A15313A261088E40909DCCAA068EAAAAAAE', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 ('2020_02_07_00.sql', '9549BF7354B4FA5A661EC094A2C3AAF665678152', 'ARCHIVED', '2021-10-14 04:13:44', 1);
+
+DELETE FROM `updates_include` WHERE `path`='$/data/sql/archive/db_auth';
+INSERT INTO `updates_include` (`path`, `state`) VALUES ('$/data/sql/archive/db_auth', 'ARCHIVED');

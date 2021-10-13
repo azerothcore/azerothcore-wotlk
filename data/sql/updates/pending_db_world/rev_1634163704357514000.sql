@@ -961,3 +961,6 @@ INSERT INTO `updates` (`name`, `hash`, `state`, `timestamp`, `speed`) VALUES
 ('2021_01_23_00.sql', '2A3B8994FF0E69734277A6929562B71083F0364B', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 ('2021_01_24_00.sql', '4F7A894C266792852C07DFB734D1187FB8052DB3', 'ARCHIVED', '2021-10-14 04:13:44', 1),
 ('2021_01_24_02.sql', '349ADF9DE79D1C4F8BD47C45E3612C83A54F6F20', 'ARCHIVED', '2021-10-14 04:13:44', 1);
+
+DELETE FROM `updates_include` WHERE `path`='$/data/sql/archive/db_world';
+INSERT INTO `updates_include` (`path`, `state`) VALUES ('$/data/sql/archive/db_world', 'ARCHIVED');
