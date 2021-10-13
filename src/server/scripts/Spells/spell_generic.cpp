@@ -38,6 +38,7 @@
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "Unit.h"
 #include "Vehicle.h"
 #include <array>
 
@@ -3448,6 +3449,37 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_gen_gnomish_transporter_SpellScript();
+    }
+};
+
+// 69641 - Gryphon/Wyvern Pet - Mounting Check Aura
+class spell_gen_gryphon_wyvern_mount_check : public AuraScript
+{
+    PrepareAuraScript(spell_gen_gryphon_wyvern_mount_check);
+
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        Unit* owner = target->GetOwner();
+
+        if (!owner)
+            return;
+
+        if (owner->IsMounted())
+        {
+            target->SetAnimationTier(AnimationTier::Fly);
+            target->SetDisableGravity(true);
+        }
+        else
+        {
+            target->SetAnimationTier(AnimationTier::Ground);
+            target->SetDisableGravity(false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_gryphon_wyvern_mount_check::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
