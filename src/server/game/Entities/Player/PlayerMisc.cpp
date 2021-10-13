@@ -427,12 +427,12 @@ void Player::SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailIt
     if (mailItems.empty())
     {
         // Skip send if empty items
+        FMT_LOG_ERROR("entities.player.items", "> SendItemRetrievalMail: Attempt to send almost with items without items. Player {}", GetGUID().ToString());
         return;
     }
 
-    using SendMailTempate = std::pair<uint32, uint32>;
     using SendMailTempateVector = std::vector<std::pair<uint32, uint32>>;
-    
+
     std::vector<SendMailTempateVector> allItems;
 
     auto AddMailItem = [&allItems](uint32 itemEntry, uint32 itemCount)
