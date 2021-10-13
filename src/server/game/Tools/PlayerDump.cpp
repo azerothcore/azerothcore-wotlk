@@ -205,8 +205,9 @@ std::string CreateDumpString(char const* tableName, QueryResult result)
         if (i == 0) ss << '\'';
         else ss << ", '";
 
-        if (i == 73) ss << "NULL";
-        if (i == 77) ss << "NULL";
+        // 73 - characters.order
+        // 77 - character.deleteDate
+        if (i == 73 || i == 77) ss << "NULL";
 
         std::string s = fields[i].GetString();
         CharacterDatabase.EscapeString(s);
