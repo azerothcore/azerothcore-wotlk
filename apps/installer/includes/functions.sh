@@ -47,7 +47,7 @@ function inst_configureOS() {
 
 function inst_updateRepo() {
     cd "$AC_PATH_ROOT"
-    git pull "$ORIGIN_REMOTE" "$INSTALLER_PULL_FROM"
+    git pull origin $(git rev-parse --abbrev-ref HEAD)
 }
 
 function inst_resetRepo() {
