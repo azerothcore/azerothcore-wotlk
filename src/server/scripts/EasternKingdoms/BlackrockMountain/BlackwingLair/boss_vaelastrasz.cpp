@@ -154,7 +154,7 @@ public:
                             if (Creature* nefarius = me->GetMap()->GetCreature(m_nefariusGuid))
                             {
                                 nefarius->CastSpell(me, SPELL_NEFARIUS_CORRUPTION, TRIGGERED_CAST_DIRECTLY);
-                                nefarius->Yell(SAY_NEFARIAN_VAEL_INTRO, LANG_UNIVERSAL);
+                                nefarius->Yell(SAY_NEFARIAN_VAEL_INTRO);
                                 nefarius->SetStandState(UNIT_STAND_STATE_STAND);
                             }
                             events.ScheduleEvent(EVENT_SPEECH_3, 18000);
