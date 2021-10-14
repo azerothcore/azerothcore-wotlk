@@ -528,9 +528,9 @@ bool ChatHandler::ShowHelpForSubCommands(std::vector<ChatCommand> const& table, 
             continue;
 
         if (m_session)
-            list += "\n    ";
+            list += "\n |- ";
         else
-            list += "\n\r    ";
+            list += "\n\r |- ";
 
         list += table[i].Name;
 

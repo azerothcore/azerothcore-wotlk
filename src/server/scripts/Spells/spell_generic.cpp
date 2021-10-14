@@ -2262,7 +2262,7 @@ public:
         {
             Player* player = GetCaster()->ToPlayer();
             if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
-                Pet::LoadPetFromDB(player, PET_LOAD_SUMMON_PET, 0, player->GetLastPetNumber(), true);
+                Pet::LoadPetFromDB(player, PET_LOAD_BG_RESURRECT, 0, player->GetLastPetNumber(), true);
         }
 
         void Register() override

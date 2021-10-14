@@ -39,6 +39,8 @@ struct GraveyardData
 {
     uint32 safeLocId;
     TeamId teamId;
+
+    [[nodiscard]] bool IsNeutralOrFriendlyToTeam(TeamId playerTeamId) const { return teamId == TEAM_NEUTRAL || playerTeamId == TEAM_NEUTRAL || teamId == playerTeamId; }
 };
 
 typedef std::multimap<uint32, GraveyardData> WGGraveyardContainer;
