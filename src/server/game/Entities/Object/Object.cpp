@@ -23,6 +23,7 @@
 #include "Creature.h"
 #include "DynamicTree.h"
 #include "DynamicVisibility.h"
+#include "GameObjectAI.h"
 #include "GridNotifiers.h"
 #include "Log.h"
 #include "MapMgr.h"
@@ -1671,6 +1672,11 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
     // Creature scripts
     if (Creature const* cObj = obj->ToCreature())
         if (cObj->IsAIEnabled && this->ToPlayer() && !cObj->AI()->CanBeSeen(this->ToPlayer()))
+            return false;
+
+    // Gameobject scripts
+    if (GameObject const* goObj = obj->ToGameObject())
+        if (this->ToPlayer() && !goObj->AI()->CanBeSeen(this->ToPlayer()))
             return false;
 
     // pussywizard: arena spectator
