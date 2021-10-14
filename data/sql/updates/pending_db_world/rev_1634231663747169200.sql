@@ -9,7 +9,7 @@ UPDATE `gameobject_template` SET `type`=3 WHERE `entry`=176214;
 UPDATE `gameobject_template` SET `Data1`=13622 WHERE `entry`=176214;
 UPDATE `gameobject_template` SET `Data0`=43 WHERE `entry`=176214;
 UPDATE `gameobject_template` SET `Data3`=1 WHERE `entry`=176214;
-UPDATE `gameobject_template` SET `Data4`='0', `Data9`='0' WHERE `entry`=176214;
+UPDATE `gameobject_template` SET `Data4`=0, `Data9`=0 WHERE `entry`=176214;
 UPDATE `gameobject_template_addon` SET `faction`=0 WHERE `entry`=176214;
 -- Duplicates
 DELETE FROM `gameobject` WHERE `guid` IN (45512,45514,45853,45868,45934,45936);
