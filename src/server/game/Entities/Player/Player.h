@@ -1580,6 +1580,8 @@ public:
     Mail* GetMail(uint32 id);
 
     PlayerMails const& GetMails() const { return m_mail; }
+    void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337)
+    void SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems); // Item retrieval mails sent by The Postmaster (34337)
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
