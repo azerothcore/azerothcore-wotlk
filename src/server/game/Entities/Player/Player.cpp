@@ -12136,7 +12136,7 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid targetPlayerGUID) const
     if (!grp)
         return ERR_NOT_IN_GROUP;
 
-    if (grp->isLFGGroup())
+    if (grp->isLFGGroup(true))
     {
         ObjectGuid gguid = grp->GetGUID();
         if (!sLFGMgr->GetKicksLeft(gguid))

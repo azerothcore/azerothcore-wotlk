@@ -252,10 +252,15 @@ void Group::LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uin
     sLFGMgr->SetupGroupMember(member.guid, GetGUID());
 }
 
-void Group::ConvertToLFG()
+void Group::ConvertToLFG(bool restricted /*= true*/)
 {
-    m_groupType = GroupType(m_groupType | GROUPTYPE_LFG | GROUPTYPE_LFG_RESTRICTED);
-    m_lootMethod = NEED_BEFORE_GREED;
+    m_groupType = GroupType(m_groupType | GROUPTYPE_LFG);
+    if (restricted)
+    {
+        m_groupType  = GroupType(m_groupType | GROUPTYPE_LFG_RESTRICTED);
+        m_lootMethod = NEED_BEFORE_GREED;
+    }
+
     if (!isBGGroup() && !isBFGroup())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_TYPE);
@@ -525,14 +530,14 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
     BroadcastGroupUpdate();
 
     // LFG group vote kick handled in scripts
-    if (isLFGGroup() && method == GROUP_REMOVEMETHOD_KICK)
+    if (isLFGGroup(true) && method == GROUP_REMOVEMETHOD_KICK)
     {
         sLFGMgr->InitBoot(GetGUID(), kicker, guid, std::string(reason ? reason : ""));
         return m_memberSlots.size() > 0;
     }
 
     // remove member and change leader (if need) only if strong more 2 members _before_ member remove (BG/BF allow 1 member group)
-    if (GetMembersCount() > ((isBGGroup() || isLFGGroup() || isBFGroup()) ? 1u : 2u))
+    if (GetMembersCount() > ((isBGGroup() || isLFGGroup(true) || isBFGroup()) ? 1u : 2u))
     {
         Player* player = ObjectAccessor::FindConnectedPlayer(guid);
         if (player)
@@ -654,7 +659,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             //return false;
         }
 
-        if (isLFGGroup() && GetMembersCount() == 1)
+        if (isLFGGroup(true) && GetMembersCount() == 1)
         {
             Player* leader = ObjectAccessor::FindConnectedPlayer(GetLeaderGUID());
             uint32 mapId = sLFGMgr->GetDungeonMapId(GetGUID());
@@ -666,7 +671,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             }
         }
 
-        if (m_memberMgr.getSize() < ((isLFGGroup() || isBGGroup() || isBFGroup()) ? 1u : 2u))
+        if (m_memberMgr.getSize() < ((isLFGGroup(true) || isBGGroup() || isBFGroup()) ? 1u : 2u))
         {
             Disband();
             return false;
@@ -2118,9 +2123,10 @@ bool Group::IsFull() const
     return isRaidGroup() ? (m_memberSlots.size() >= MAXRAIDSIZE) : (m_memberSlots.size() >= MAXGROUPSIZE);
 }
 
-bool Group::isLFGGroup() const
+bool Group::isLFGGroup(bool restricted /*= false*/) const
 {
-    return m_groupType & GROUPTYPE_LFG;
+    bool isLFG = m_groupType & GROUPTYPE_LFG;
+    return isLFG && (!restricted || (m_groupType & GROUPTYPE_LFG_RESTRICTED) != 0);
 }
 
 bool Group::isRaidGroup() const
