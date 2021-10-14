@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CreatureAI.h"
@@ -82,6 +93,20 @@ void Player::PrepareQuestMenu(ObjectGuid guid)
         else if (GetQuestStatus(quest_id) == QUEST_STATUS_NONE)
             qm.AddMenuItem(quest_id, 2);
     }
+}
+
+bool Player::HasQuest(uint32 questId) const
+{
+    for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (questid == questId)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Player::SendPreparedQuest(ObjectGuid guid)
@@ -652,9 +677,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     RemoveTimedQuest(quest_id);
 
-    std::vector<std::pair<uint32, uint32> > problematicItems;
+    std::vector<std::pair<uint32, uint32>> problematicItems;
 
-    if (quest->GetRewChoiceItemsCount() > 0)
+    if (quest->GetRewChoiceItemsCount())
     {
         if (uint32 itemId = quest->RewardChoiceItemId[reward])
         {
@@ -667,11 +692,13 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                 sScriptMgr->OnQuestRewardItem(this, item, quest->RewardChoiceItemCount[reward]);
             }
             else
-                problematicItems.push_back(std::pair<uint32, uint32>(itemId, quest->RewardChoiceItemCount[reward]));
+            {
+                problematicItems.emplace_back(itemId, quest->RewardChoiceItemCount[reward]);
+            }
         }
     }
 
-    if (quest->GetRewItemsCount() > 0)
+    if (quest->GetRewItemsCount())
     {
         for (uint32 i = 0; i < quest->GetRewItemsCount(); ++i)
         {
@@ -686,7 +713,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                     sScriptMgr->OnQuestRewardItem(this, item, quest->RewardItemIdCount[i]);
                 }
                 else
-                    problematicItems.push_back(std::pair<uint32, uint32>(itemId, quest->RewardItemIdCount[i]));
+                    problematicItems.emplace_back(itemId, quest->RewardItemIdCount[i]);
             }
         }
     }
@@ -694,21 +721,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // Xinef: send items that couldn't be added properly by mail
     if (!problematicItems.empty())
     {
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-        MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */ );
-        MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed."); // This is the text used in Cataclysm, it probably wasn't changed.
-
-        for (std::vector<std::pair<uint32, uint32> >::const_iterator itr = problematicItems.begin(); itr != problematicItems.end(); ++itr)
-        {
-            if(Item* item = Item::CreateItem(itr->first, itr->second))
-            {
-                item->SaveToDB(trans);
-                draft.AddItem(item);
-            }
-        }
-
-        draft.SendMailTo(trans, MailReceiver(this, GetGUID().GetCounter()), sender);
-        CharacterDatabase.CommitTransaction(trans);
+        SendItemRetrievalMail(problematicItems);
     }
 
     RewardReputation(quest);
@@ -1780,7 +1793,6 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
                     CompleteQuest(questid);
                 else
                     AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
-                return;
             }
         }
     }
@@ -1822,7 +1834,6 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
                     m_QuestStatusSave[questid] = true;
                     IncompleteQuest(questid);
                 }
-                return;
             }
         }
     }

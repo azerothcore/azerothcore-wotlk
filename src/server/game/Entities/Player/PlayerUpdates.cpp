@@ -1,5 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BattlefieldMgr.h"
@@ -91,6 +104,7 @@ void Player::Update(uint32 p_time)
         }
     }
 
+    time_t lastTick = m_Last_tick;
     if (now > m_Last_tick)
     {
         // Update items that have just a limited lifetime
@@ -209,7 +223,7 @@ void Player::Update(uint32 p_time)
 
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
     {
-        if (now > m_Last_tick && _restTime > 0) // freeze update
+        if (now > lastTick && _restTime > 0) // freeze update
         {
             time_t currTime = time(nullptr);
             time_t timeDiff = currTime - _restTime;
@@ -1452,6 +1466,7 @@ void Player::UpdatePvP(bool state, bool _override)
     }
 
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
+    sScriptMgr->OnPlayerPVPFlagChange(this, state);
 }
 
 void Player::UpdatePotionCooldown(Spell* spell)
@@ -1804,8 +1819,7 @@ void Player::UpdateForQuestWorldObjects()
 
     UpdateData  udata;
     WorldPacket packet;
-    for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin();
-         itr != m_clientGUIDs.end(); ++itr)
+    for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
     {
         if ((*itr).IsGameObject())
         {
@@ -1814,8 +1828,7 @@ void Player::UpdateForQuestWorldObjects()
         }
         else if ((*itr).IsCreatureOrVehicle())
         {
-            Creature* obj =
-                ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
+            Creature* obj = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
             if (!obj)
                 continue;
 
@@ -1823,23 +1836,15 @@ void Player::UpdateForQuestWorldObjects()
             if (!obj->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
                 continue;
 
-            SpellClickInfoMapBounds clickPair =
-                sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
-            for (SpellClickInfoContainer::const_iterator _itr = clickPair.first;
-                 _itr != clickPair.second; ++_itr)
+            SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(obj->GetEntry());
+            for (SpellClickInfoContainer::const_iterator _itr = clickPair.first; _itr != clickPair.second; ++_itr)
             {
-                //! This code doesn't look right, but it was logically converted
-                //! to condition system to do the exact same thing it did
-                //! before. It definitely needs to be overlooked for intended
-                //! functionality.
-                ConditionList conds =
-                    sConditionMgr->GetConditionsForSpellClickEvent(
-                        obj->GetEntry(), _itr->second.spellId);
+                //! This code doesn't look right, but it was logically converted to condition system to do the exact
+                //! same thing it did before. It definitely needs to be overlooked for intended functionality.
+                ConditionList conds = sConditionMgr->GetConditionsForSpellClickEvent(obj->GetEntry(), _itr->second.spellId);
                 bool buildUpdateBlock = false;
-                for (ConditionList::const_iterator jtr = conds.begin();
-                     jtr != conds.end() && !buildUpdateBlock; ++jtr)
-                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED ||
-                        (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
+                for (ConditionList::const_iterator jtr = conds.begin(); jtr != conds.end() && !buildUpdateBlock; ++jtr)
+                    if ((*jtr)->ConditionType == CONDITION_QUESTREWARDED || (*jtr)->ConditionType == CONDITION_QUESTTAKEN)
                         buildUpdateBlock = true;
 
                 if (buildUpdateBlock)
