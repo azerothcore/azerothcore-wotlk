@@ -124,7 +124,8 @@ public:
                 // Start encounter
                 InstanceScript* instance = creature->GetInstanceScript();
                 if (instance)
-                    instance->SetGuidData(DATA_EVENSTARTER, player->GetGUID());
+                    instance->SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
+                creature->AI()->Talk(0);
                 break;
         }
         return true;
@@ -159,13 +160,12 @@ public:
             Voidwalkers = false;
             // Reset his gossip menu
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
             me->setFaction(FACTION_FRIEND);
 
             // was set before event start, so set again
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
 
-            if (instance->GetData(DATA_GHOSTKILL) >= 7)
+            if (instance->GetData(TYPE_TOMB_OF_SEVEN) == DONE) // what is this trying to do? Probably some kind of crash recovery
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
             else
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -189,12 +189,6 @@ public:
             if (me->IsAlive())
                 me->GetMotionMaster()->MoveTargetedHome();
             me->SetLootRecipient(nullptr);
-            instance->SetGuidData(DATA_EVENSTARTER, ObjectGuid::Empty);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetData(DATA_GHOSTKILL, 1);
         }
 
         void UpdateAI(uint32 diff) override
