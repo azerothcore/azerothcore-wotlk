@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `character_stats` (
   `spellPower` INT unsigned NOT NULL DEFAULT 0,
   `resilience` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`blockPct` >= 0 and `dodgePct` >= 0 and `parryPct` >= 0 and `critPct` >= 0 and `rangedCritPct` >= 0 and `spellCritPct` >= 0)
+  CHECK (`blockPct` >= 0 and `dodgePct` >= 0 and `parryPct` >= 0 and `critPct` >= 0 and `rangedCritPct` >= 0 and `spellCritPct` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Дамп данных таблицы _acore_characters.character_stats: ~0 rows (приблизительно)

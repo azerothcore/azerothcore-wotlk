@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `item_enchantment_template` (
   `ench` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `chance` float NOT NULL DEFAULT 0,
   PRIMARY KEY (`entry`,`ench`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`chance` >= 0)
+  CHECK (`chance` >= 0)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=FIXED COMMENT='Item Random Enchantment System';
 
 -- Дамп данных таблицы _acore_world.item_enchantment_template: 28 606 rows

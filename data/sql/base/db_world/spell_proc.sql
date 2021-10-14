@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `spell_proc` (
   `cooldown` float NOT NULL DEFAULT 0,
   `charges` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`spellId`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`cooldown` >= 0)
+  CHECK (`cooldown` >= 0)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Дамп данных таблицы _acore_world.spell_proc: 0 rows

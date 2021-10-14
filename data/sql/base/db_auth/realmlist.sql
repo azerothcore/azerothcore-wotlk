@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `realmlist` (
   `gamebuild` INT unsigned NOT NULL DEFAULT 12340,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_name` (`name`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`population` >= 0)
+  CHECK (`population` >= 0)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='Realm System';
 
 -- Дамп данных таблицы _acore_auth.realmlist: ~0 rows (приблизительно)

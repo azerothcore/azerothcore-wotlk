@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `pool_creature` (
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`guid`),
   KEY `idx_guid` (`guid`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`chance` >= 0)
+  CHECK (`chance` >= 0)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Дамп данных таблицы _acore_world.pool_creature: 958 rows

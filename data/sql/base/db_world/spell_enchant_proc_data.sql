@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `spell_enchant_proc_data` (
   `PPMChance` float NOT NULL DEFAULT 0,
   `procEx` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`entry`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`PPMChance` >= 0)
+  CHECK (`PPMChance` >= 0)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Spell enchant proc data';
 
 -- Дамп данных таблицы _acore_world.spell_enchant_proc_data: 42 rows

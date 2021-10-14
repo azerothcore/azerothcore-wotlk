@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `creature_text` (
   `TextRange` TINYINT unsigned NOT NULL DEFAULT 0,
   `comment` varchar(255) DEFAULT '',
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`Probability` >= 0)
+  CHECK (`Probability` >= 0)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Дамп данных таблицы _acore_world.creature_text: 17 879 rows

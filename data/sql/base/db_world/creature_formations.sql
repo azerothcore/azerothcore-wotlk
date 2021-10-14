@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `creature_formations` (
   `point_1` SMALLINT unsigned NOT NULL DEFAULT 0,
   `point_2` SMALLINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`memberGUID`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`dist` >= 0 and `angle` >= 0)
+  CHECK (`dist` >= 0 and `angle` >= 0)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- Дамп данных таблицы _acore_world.creature_formations: 1 715 rows

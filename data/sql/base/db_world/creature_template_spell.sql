@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_spell` (
   `Spell` mediumint(8) unsigned DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`CreatureID`,`Index`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`Index` >= 0 and `Index` <= 7)
+  CHECK (`Index` >= 0 and `Index` <= 7)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Дамп данных таблицы _acore_world.creature_template_spell: ~9 509 rows (приблизительно)

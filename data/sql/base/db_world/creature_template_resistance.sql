@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
   `Resistance` SMALLINT DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`CreatureID`,`School`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`School` >= 1 and `School` <= 6)
+  CHECK (`School` >= 1 and `School` <= 6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Дамп данных таблицы _acore_world.creature_template_resistance: ~1 600 rows (приблизительно)
