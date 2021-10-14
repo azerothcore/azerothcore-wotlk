@@ -182,7 +182,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetSpellInfo() && eventInfo.GetDamageInfo()->GetSpellInfo()->Id == SPELL_WARRIOR_SPELL_REFLECTION;
+            return eventInfo.GetSpellInfo() && eventInfo.GetSpellInfo()->Id == SPELL_WARRIOR_SPELL_REFLECTION;
         }
 
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -812,14 +812,25 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             _procTarget = eventInfo.GetActor()->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
-            return _procTarget && !eventInfo.GetDamageInfo()->GetSpellInfo();
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetSpellInfo())
+            {
+                return false;
+            }
+
+            return _procTarget && !damageInfo->GetSpellInfo();
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 damage = eventInfo.GetDamageInfo()->GetDamage();
-            GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, nullptr, aurEff);
+            if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
+            {
+                int32 damage = damageInfo->GetUnmitigatedDamage();
+                GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, nullptr, aurEff);
+            }
         }
 
         void Register() override

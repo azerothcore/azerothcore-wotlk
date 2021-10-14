@@ -272,7 +272,7 @@ namespace lfg
 
     void LFGMgr::Update(uint32 tdiff, uint8 task)
     {
-        if (!isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
+        if (!isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
 
         if (task == 0)
@@ -394,6 +394,8 @@ namespace lfg
         LfgDungeonSet const& dungeons = GetDungeonsByRandom(0);
         LfgLockMap lock;
 
+        bool onlySeasonalBosses = m_options == LFG_OPTION_ENABLE_SEASONAL_BOSSES;
+
         float avgItemLevel = player->GetAverageItemLevelForDF();
 
         for (LfgDungeonSet::const_iterator it = dungeons.begin(); it != dungeons.end(); ++it)
@@ -405,7 +407,7 @@ namespace lfg
             DungeonProgressionRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty));
 
             uint32 lockData = 0;
-            if (dungeon->expansion > expansion)
+            if (dungeon->expansion > expansion || (onlySeasonalBosses && !dungeon->seasonal))
                 lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
             else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, player))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
@@ -2653,13 +2655,13 @@ namespace lfg
     {
         switch (dungeonId)
         {
-            case 285: // The Headless Horseman
+            case LFG_DUNGEON_HEADLESS_HORSEMAN:
                 return IsHolidayActive(HOLIDAY_HALLOWS_END);
-            case 286: // The Frost Lord Ahune
+            case LFG_DUNGEON_FROST_LORD_AHUNE:
                 return IsHolidayActive(HOLIDAY_FIRE_FESTIVAL);
-            case 287: // Coren Direbrew
+            case LFG_DUNGEON_COREN_DIREBREW:
                 return IsHolidayActive(HOLIDAY_BREWFEST);
-            case 288: // The Crown Chemical Co.
+            case LFG_DUNGEON_CROWN_CHEMICAL_CO:
                 return IsHolidayActive(HOLIDAY_LOVE_IS_IN_THE_AIR);
         }
         return false;

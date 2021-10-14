@@ -23,6 +23,7 @@
 #include "Creature.h"
 #include "DynamicTree.h"
 #include "DynamicVisibility.h"
+#include "GameObjectAI.h"
 #include "GridNotifiers.h"
 #include "Log.h"
 #include "MapMgr.h"
@@ -1673,6 +1674,11 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         if (cObj->IsAIEnabled && this->ToPlayer() && !cObj->AI()->CanBeSeen(this->ToPlayer()))
             return false;
 
+    // Gameobject scripts
+    if (GameObject const* goObj = obj->ToGameObject())
+        if (this->ToPlayer() && !goObj->AI()->CanBeSeen(this->ToPlayer()))
+            return false;
+
     // pussywizard: arena spectator
     if (obj->GetTypeId() == TYPEID_PLAYER)
         if (((const Player*)obj)->IsSpectator() && ((const Player*)obj)->FindMap()->IsBattleArena())
@@ -2503,6 +2509,13 @@ void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureL
     Cell::VisitGridObjects(this, searcher, maxSearchRange);
 }
 
+void WorldObject::GetDeadCreatureListInGrid(std::list<Creature*>& creaturedeadList, float maxSearchRange, bool alive /*= false*/) const
+{
+    Acore::AllDeadCreaturesInRange check(this, maxSearchRange, alive);
+    Acore::CreatureListSearcher<Acore::AllDeadCreaturesInRange> searcher(this, creaturedeadList, check);
+    Cell::VisitGridObjects(this, searcher, maxSearchRange);
+}
+
 /*
 namespace Acore
 {
@@ -2668,9 +2681,18 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, 
     }
 
     // still not in LoS, give up and return first position found
-    x = first_x;
-    y = first_y;
-    z = first_z;
+    if (startPos)
+    {
+        x = searcher->GetPositionX();
+        y = searcher->GetPositionY();
+        z = searcher->GetPositionZ();
+    }
+    else
+    {
+        x = first_x;
+        y = first_y;
+        z = first_z;
+    }
 }
 
 void WorldObject::GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d /*= 0*/, float relAngle /*= 0*/, float controlZ /*= 0*/) const

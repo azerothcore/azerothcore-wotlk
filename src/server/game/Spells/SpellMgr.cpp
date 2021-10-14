@@ -3201,7 +3201,6 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 64422: // Sonic Screech (Auriaya)
-            case 13877: // Blade Flurry (Rogue Spell) should ignore armor and share damage to 2nd mob
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
@@ -3276,6 +3275,9 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 50315: // Disco Ball
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_PVP_FLAG;
+                break;
+            case 14183: // Premeditation
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_BREAK_STEALTH;
                 break;
 
             // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
@@ -3450,16 +3452,6 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectMiscValueB[0] = 64;
-    });
-
-    ApplySpellFix({
-        45257,  // Using Steam Tonk Controller
-        45440,  // Steam Tonk Controller
-        60256,  // Collect Sample
-        45634   // Neural Needle
-        }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;    // Crashes client on pressing ESC
     });
 
     ApplySpellFix({
@@ -6780,7 +6772,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
         spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
     });
 
     // Still At It
@@ -7026,12 +7017,6 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 47424 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
-    });
-
-    // Leading the Charge (13380), All Infra-Green bomber quests
-    ApplySpellFix({ 59059 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
     });
 
     // Dark Horizon (12664), Reunited (12663)
@@ -7393,6 +7378,12 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 23595 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectBasePoints[EFFECT_0] = 1;
+    });
+
+    // Eye of Kilrogg Passive
+    ApplySpellFix({ 2585 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)

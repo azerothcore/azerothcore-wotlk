@@ -36,8 +36,9 @@ namespace lfg
 
     enum LfgOptions
     {
-        LFG_OPTION_ENABLE_DUNGEON_FINDER             = 0x01,
-        LFG_OPTION_ENABLE_RAID_BROWSER               = 0x02,
+        LFG_OPTION_ENABLE_DUNGEON_FINDER                = 0x01,
+        LFG_OPTION_ENABLE_RAID_BROWSER                  = 0x02,
+        LFG_OPTION_ENABLE_SEASONAL_BOSSES               = 0x04
     };
 
     enum LFGMgrEnum
@@ -137,6 +138,14 @@ namespace lfg
         LFG_UPDATE_FLAG_AREA          = 0x20,
         LFG_UPDATE_FLAG_STATUS        = 0x40,
         LFG_UPDATE_FLAG_BINDED        = 0x80
+    };
+
+    enum LfgSeasonalDungeons
+    {
+        LFG_DUNGEON_HEADLESS_HORSEMAN   = 285,
+        LFG_DUNGEON_FROST_LORD_AHUNE    = 286,
+        LFG_DUNGEON_COREN_DIREBREW      = 287,
+        LFG_DUNGEON_CROWN_CHEMICAL_CO   = 288
     };
 
     struct RBEntryInfo

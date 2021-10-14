@@ -105,6 +105,17 @@ public:
         SummonList summons;
         ObjectGuid InvokerGUID;
 
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_FROST_LORD_AHUNE;
+        }
+
         void StartPhase1()
         {
             me->CastSpell(me, SPELL_AHUNES_SHIELD, true);
@@ -300,7 +311,7 @@ public:
                         if (player->GetGroup() && !finished)
                         {
                             finished = true;
-                            sLFGMgr->FinishDungeon(player->GetGroup()->GetGUID(), 286, me->FindMap());
+                            sLFGMgr->FinishDungeon(player->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_FROST_LORD_AHUNE, me->FindMap());
                         }
                     }
         }
