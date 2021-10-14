@@ -3467,12 +3467,10 @@ class spell_gen_gryphon_wyvern_mount_check : public AuraScript
 
         if (owner->IsMounted())
         {
-            target->SetAnimationTier(AnimationTier::Fly);
             target->SetDisableGravity(true);
         }
         else
         {
-            target->SetAnimationTier(AnimationTier::Ground);
             target->SetDisableGravity(false);
         }
     }
