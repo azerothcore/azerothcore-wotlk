@@ -52,9 +52,9 @@ enum BG_SA_GateState
     BG_SA_GATE_DESTROYED    = 3
 };
 
-static constexpr Milliseconds BG_SA_BOAT_START    = std::chrono::milliseconds(1min);
-static constexpr Milliseconds BG_SA_WARMUPLENGTH  = std::chrono::milliseconds(2min);
-static constexpr Milliseconds BG_SA_ROUNDLENGTH   = std::chrono::milliseconds(10min);
+static constexpr Milliseconds BG_SA_BOAT_START    = 1min;
+static constexpr Milliseconds BG_SA_WARMUPLENGTH  = 2min;
+static constexpr Milliseconds BG_SA_ROUNDLENGTH   = 10min;
 
 enum BG_SA_WorldStates
 {
