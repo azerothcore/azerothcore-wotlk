@@ -148,7 +148,7 @@ void CliThread()
         printf("\a");                                       // \a = Alert
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-    if (sConfigMgr->GetBoolDefault("FlashAtStart", true))
+    if (sConfigMgr->GetOption<bool>("FlashAtStart", true))
     {
         FLASHWINFO fInfo;
         fInfo.cbSize = sizeof(FLASHWINFO);
