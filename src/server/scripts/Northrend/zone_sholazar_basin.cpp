@@ -841,7 +841,7 @@ public:
 ## npc_jungle_punch_target
 #####*/
 
-#define SAY_OFFER "Care to try Grimbooze Thunderbrew's new jungle punch?"
+constexpr auto SAY_OFFER = "Care to try Grimbooze Thunderbrew's new jungle punch?";
 
 enum JunglePunch
 {

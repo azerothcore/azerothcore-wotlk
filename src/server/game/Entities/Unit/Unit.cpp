@@ -20100,7 +20100,9 @@ void Unit::TextEmote(std::string_view text, WorldObject const* target /*= nullpt
 void Unit::Whisper(std::string_view text, Language language, Player* target, bool isBossWhisper /*= false*/)
 {
     if (!target)
+    {
         return;
+    }
 
     LocaleConstant locale = target->GetSession()->GetSessionDbLocaleIndex();
     WorldPacket data;
@@ -20140,7 +20142,9 @@ void Unit::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, boo
 void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/)
 {
     if (!target)
+    {
         return;
+    }
 
     BroadcastText const* bct = sObjectMgr->GetBroadcastText(textId);
     if (!bct)

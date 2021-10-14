@@ -8798,7 +8798,9 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, target);
 #ifdef ELUNA
     if (!sEluna->OnChat(this, CHAT_MSG_WHISPER, language, _text, target))
+    {
         return;
+    }
 #endif
 
     WorldPacket data;
@@ -8820,15 +8822,21 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
 
     // announce afk or dnd message
     if (target->isAFK())
+    {
         ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_AFK, target->GetName().c_str(), target->autoReplyMsg.c_str());
+    }
     else if (target->isDND())
+    {
         ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_DND, target->GetName().c_str(), target->autoReplyMsg.c_str());
+    }
 }
 
 void Player::Whisper(uint32 textId, Player* target, bool /*isBossWhisper = false*/)
 {
     if (!target)
+    {
         return;
+    }
 
     BroadcastText const* bct = sObjectMgr->GetBroadcastText(textId);
     if (!bct)
