@@ -1753,6 +1753,17 @@ public:
             }
         }
 
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_COREN_DIREBREW;
+        }
+
         void Reset() override
         {
             _events.Reset();

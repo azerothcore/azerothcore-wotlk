@@ -16,6 +16,7 @@
  */
 
 #include "CellImpl.h"
+#include "GameObjectAI.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
 #include "Group.h"
@@ -987,7 +988,7 @@ public:
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
-                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 285, me->FindMap());
+                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_HEADLESS_HORSEMAN, me->FindMap());
         }
 
         void KilledUnit(Unit*  /*who*/) override
@@ -1427,6 +1428,27 @@ public:
             horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
 
         return true;
+    }
+
+    struct go_loosely_turned_soilAI : public GameObjectAI
+    {
+        go_loosely_turned_soilAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
+
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_HEADLESS_HORSEMAN;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_loosely_turned_soilAI(go);
     }
 };
 
