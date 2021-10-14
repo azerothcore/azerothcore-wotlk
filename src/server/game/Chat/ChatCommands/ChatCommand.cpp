@@ -152,7 +152,7 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
     uint32 zoneId = player->GetZoneId();
     std::string areaName = "Unknown";
     std::string zoneName = "Unknown";
-    LocaleConstant locale = GetSessionDbcLocale();
+    LocaleConstant locale = sWorld->GetDefaultDbcLocale();
 
     if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId))
     {
