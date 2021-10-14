@@ -287,6 +287,15 @@ enum costumedOrphan
     ACTION_START_EVENT                      = 1,
     DATA_EVENT                              = 1,
     DATA_ALLOW_START                        = 2,
+
+    // Talks
+    TALK_SHADE_CONFLAGRATION                = 0,
+    TALK_SHADE_PREPARE                      = 1,
+    TALK_SHADE_START_EVENT                  = 2,
+    TALK_SHADE_MORE_FIRES                   = 3,
+    TALK_SHADE_FAILED                       = 4,
+    TALK_SHADE_DEFEATED                     = 5,
+    TALK_SHADE_DEATH                        = 6,
 };
 
 class spell_hallows_end_bucket_lands : public SpellScriptLoader
@@ -671,7 +680,7 @@ public:
                 {
                     me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                     target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
-                    me->MonsterSay("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
+                    Talk(TALK_SHADE_CONFLAGRATION);
                 }
 
                 context.Repeat(12s);
@@ -775,8 +784,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case 1:
-                    me->MonsterYell("Prepare yourselves, the bells have tolled! Shelter your weak, your young and your old! Each of you shall pay the final sum! Cry for mercy; the reckoning has come!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(11966);
+                    Talk(TALK_SHADE_PREPARE);
                     break;
                 case 2:
                     {
@@ -817,13 +825,11 @@ public:
                         }
                         if (counter == 5)
                         {
-                            me->MonsterYell("The sky is dark. The fire burns. You strive in vain as Fate's wheel turns.", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(12570);
+                            Talk(TALK_SHADE_START_EVENT);
                         }
                         else if (counter == 15)
                         {
-                            me->MonsterYell("The town still burns. A cleansing fire! Time is short, I'll soon retire!", LANG_UNIVERSAL, 0);
-                            me->PlayDirectSound(12571);
+                            Talk(TALK_SHADE_MORE_FIRES);
                         }
 
                         CastFires(false);
@@ -907,8 +913,7 @@ public:
         {
             if (failed)
             {
-                me->MonsterYell("Fire consumes! You've tried and failed. Let there be no doubt, justice prevailed!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(11967);
+                Talk(TALK_SHADE_FAILED);
                 for (ObjectGuid const& guid : unitList)
                     if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                         c->RemoveAllAuras();
@@ -917,8 +922,7 @@ public:
             }
             else
             {
-                me->MonsterYell("My flames have died, left not a spark! I shall send you now to the lifeless dark!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(11968);
+                Talk(TALK_SHADE_DEFEATED);
                 float x, y, z;
                 GetPosToLand(x, y, z);
                 me->GetMotionMaster()->Clear();
@@ -940,8 +944,7 @@ public:
 
         void JustDied(Unit*  /*killer*/) override
         {
-            me->MonsterYell("So eager you are, for my blood to spill. Yet to vanquish me, 'tis my head you must kill!", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(11969);
+            Talk(TALK_SHADE_DEATH);
             float x, y, z;
             GetPosToLand(x, y, z);
             me->CastSpell(x, y, z, SPELL_SUMMON_LANTERN, true);
