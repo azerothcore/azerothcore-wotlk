@@ -2069,7 +2069,7 @@ public:
 
         // Output IV. LANG_PINFO_MUTED if mute is applied
         if (muteTime > 0s)
-            handler->PSendSysMessage(LANG_PINFO_MUTE, muteReason.c_str(), secsToTimeString(muteTime.count(), true).c_str(), muteLeft.c_str(), muteBy.c_str());
+            handler->PSendSysMessage(LANG_PINFO_MUTED, muteReason.c_str(), Acore::Time::ToTimeString(muteTime), muteLeft.c_str(), muteBy.c_str());
 
         // Output V. LANG_PINFO_ACC_ACCOUNT
         handler->PSendSysMessage(LANG_PINFO_ACC_ACCOUNT, userName.c_str(), accId, security);
@@ -2309,8 +2309,8 @@ public:
 
         if (!sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
         {
-            // You has disabled % s\'s chat for %s. Reason: %s.
-            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(targetName).c_str(), Acore::Time::ToTimeString(duration).c_str(), muteReasonStr.c_str());
+            // You has muted %s\'s chat for %u minutes. Reason: %s.
+            handler->PSendSysMessage(LANG_YOU_DISABLE_CHAT, handler->playerLink(targetName).c_str(), *muteTime, muteReasonStr.c_str());
         }
 
         return true;

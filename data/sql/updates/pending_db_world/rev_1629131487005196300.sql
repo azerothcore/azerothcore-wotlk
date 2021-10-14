@@ -10,7 +10,7 @@ UPDATE `acore_string` SET `content_default` = '│ Muted: (Reason: %s, Time: %s,
 `locale_esES` = NULL,
 `locale_esMX` = NULL,
 `locale_ruRU` = NULL
-WHERE `entry` = 550;
+WHERE `entry` = 35403;
 
 -- LANG_COMMAND_DISABLE_CHAT_DELAYED
 UPDATE `acore_string` SET `content_default` = '%s has muted %s\'s chat for %s, effective at the player\'s next login. Reason: %s.',

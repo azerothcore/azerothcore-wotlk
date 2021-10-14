@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "MuteMgr.h"
@@ -51,7 +63,7 @@ void MuteMgr::MutePlayer(std::string const& targetName, Seconds muteTime, std::s
 
     if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
     {
-        sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), GetPlayerLink().c_str(), muteTime.count(), muteReason.c_str());
+        sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), GetPlayerLink().c_str(), Acore::Time::ToTimeString(muteTime).c_str(), muteReason.c_str());
     }
 
     if (targetSession)
@@ -81,7 +93,7 @@ void MuteMgr::SetMuteTime(uint32 accountID, uint64 muteDate)
         _listSessions.erase(accountID);
     }
 
-    FMT_LOG_INFO("server", "> MuteMgr:: Set mute {} for account id {}", Acore::Time::TimeToHumanReadable(muteDate), accountID);
+    FMT_LOG_DEBUG("entities.player.session", "> MuteMgr:: Set mute {} for account id {}", Acore::Time::TimeToHumanReadable(muteDate), accountID);
 
     _listSessions.emplace(accountID, muteDate);
 }
@@ -139,15 +151,7 @@ void MuteMgr::CheckMuteExpired(uint32 accountID)
 
 std::string const MuteMgr::GetMuteTimeString(uint32 accountID)
 {
-    uint64 muteDate = GetMuteDate(accountID);
-
-    if (!muteDate)
-    {
-        // Return empry string if no data
-        return "";
-    }
-
-    return secsToTimeString(muteDate - time(nullptr), true);
+    return Acore::Time::ToTimeString<Seconds>(GetMuteDate(accountID) - time(nullptr));
 }
 
 bool MuteMgr::CanSpeak(uint32 accountID)
@@ -185,8 +189,6 @@ void MuteMgr::LoginAccount(uint32 accountID)
         mutedate = time(nullptr);
     }
 
-    FMT_LOG_INFO("server", "TimeToHumanReadable: {}", Acore::Time::TimeToHumanReadable(mutedate + uint64(mutetime)));
-
     UpdateMuteAccount(accountID, mutedate);
     SetMuteTime(accountID, mutedate + uint64(mutetime));
 }
@@ -200,7 +202,7 @@ void MuteMgr::UpdateMuteAccount(uint32 accountID, uint64 muteDate)
     LoginDatabase.Execute(stmt);
 }
 
-Optional<std::tuple<uint64, Seconds, std::string, std::string>> MuteMgr::GetMuteInfo(uint32 accountID)
+Optional<MuteInfo> MuteMgr::GetMuteInfo(uint32 accountID)
 {
     //
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE);
