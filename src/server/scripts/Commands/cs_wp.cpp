@@ -212,7 +212,7 @@ public:
         target->LoadPath(pathid);
         target->SetDefaultMovementType(WAYPOINT_MOTION_TYPE);
         target->GetMotionMaster()->Initialize();
-        target->MonsterSay("Path loaded.", LANG_UNIVERSAL, nullptr);
+        target->Say("Path loaded.", LANG_UNIVERSAL);
 
         return true;
     }
@@ -265,7 +265,7 @@ public:
                 target->SetDefaultMovementType(IDLE_MOTION_TYPE);
                 target->GetMotionMaster()->MoveTargetedHome();
                 target->GetMotionMaster()->Initialize();
-                target->MonsterSay("Path unloaded.", LANG_UNIVERSAL, nullptr);
+                target->Say("Path unloaded.", LANG_UNIVERSAL);
                 return true;
             }
             handler->PSendSysMessage("%s%s|r", "|cffff33ff", "Target have no loaded path.");

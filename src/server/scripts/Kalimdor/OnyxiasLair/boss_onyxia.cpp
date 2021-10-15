@@ -467,7 +467,7 @@ public:
                 case EVENT_PHASE_2_STEP_ACROSS:
                     {
                         me->SetFacingTo(OnyxiaMoveData[CurrentWP].o);
-                        me->MonsterTextEmote("Onyxia takes in a deep breath...", 0, true);
+                        me->TextEmote("Onyxia takes in a deep breath...", nullptr, true);
                         me->CastSpell(me, OnyxiaMoveData[CurrentWP].spellId, false);
 
                         events.ScheduleEvent(EVENT_SPELL_BREATH, 8250);

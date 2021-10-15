@@ -98,7 +98,7 @@ public:
                     {
                         cr->DespawnOrUnsummon(5000);
                         cr->RemoveAllAuras();
-                        cr->MonsterSay("You have my thanks for saving my existence in this timeline. Now i must report back to my superiors. They must know immediately of what i just experienced.", LANG_UNIVERSAL, 0);
+                        cr->Say("You have my thanks for saving my existence in this timeline. Now i must report back to my superiors. They must know immediately of what i just experienced.", LANG_UNIVERSAL);
                     }
                 }
             }
