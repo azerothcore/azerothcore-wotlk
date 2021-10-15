@@ -88,7 +88,7 @@ enum BWLMisc
     DATA_EGG_EVENT              = 2,
     TALK_EGG_BROKEN_RAND        = 3,
 
-    SAY_NEFARIAN_VAEL_INTRO     = 100003, // latest id in broadcast_text atm
+    SAY_NEFARIAN_VAEL_INTRO     = 14
 };
 
 template <class AI, class T>

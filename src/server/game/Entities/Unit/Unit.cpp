@@ -21,6 +21,8 @@
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
@@ -1308,7 +1310,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
         Unit::CalcAbsorbResist(dmgInfo);
         damageInfo->absorb = dmgInfo.GetAbsorb();
         damageInfo->resist = dmgInfo.GetResist();
-        damage = dmgInfo.GetDamage();
+        damageInfo->damage = dmgInfo.GetDamage();
     }
     else
         damageInfo->damage = 0;
@@ -2269,10 +2271,35 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
     if (attType != BASE_ATTACK && attType != OFF_ATTACK)
         return;                                             // ignore ranged case
 
+    bool meleeAttack = true;
+
     // melee attack spell casted at main hand attack only - no normal melee dmg dealt
     if (attType == BASE_ATTACK && m_currentSpells[CURRENT_MELEE_SPELL] && !extra)
-        m_currentSpells[CURRENT_MELEE_SPELL]->cast();
-    else
+    {
+        meleeAttack = false; // The melee attack is replaced by the melee spell
+
+        Spell* meleeSpell = m_currentSpells[CURRENT_MELEE_SPELL];
+        SpellCastResult castResult = meleeSpell->CheckCast(false);
+        if (castResult != SPELL_CAST_OK)
+        {
+            meleeSpell->SendCastResult(castResult);
+            meleeSpell->SendInterrupted(0);
+
+            meleeSpell->finish(false);
+            meleeSpell->SetExecutedCurrently(false);
+
+            if (castResult == SPELL_FAILED_NO_POWER)
+            {
+                // Not enough rage, do a regular melee attack instead
+                meleeAttack = true;
+            }
+        }
+        else
+        {
+            meleeSpell->cast(true);
+        }
+    }
+    if (meleeAttack)
     {
         // attack can be redirected to another target
         victim = GetMeleeHitRedirectTarget(victim);
@@ -8763,7 +8790,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     if (triggerEntry == nullptr)
     {
         // Don't cast unknown spell
-        // LOG_ERROR("entities.unit", "Unit::HandleProcTriggerSpell: Spell %u has 0 in EffectTriggered[%d]. Unhandled custom case?", auraSpellInfo->Id, triggeredByAura->GetEffIndex());
+        LOG_ERROR("entities.unit", "Unit::HandleProcTriggerSpell: Spell %u (effIndex: %u) has unknown TriggerSpell %u. Unhandled custom case?", auraSpellInfo->Id, triggeredByAura->GetEffIndex(), trigger_spell_id);
         return false;
     }
 
@@ -9688,8 +9715,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // set position before any AI calls/assistance
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-
-    if (creature && !IsControllableGuardian())
+    if (creature && !IsControlledByPlayer())
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);
@@ -9700,6 +9726,8 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         creature->SendAIReaction(AI_REACTION_HOSTILE);
         creature->CallAssistance();
         creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
+
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
     }
 
     // delay offhand weapon attack to next attack time
@@ -12791,7 +12819,6 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
 
         SetInCombatWith(victim);
         victim->SetInCombatWith(this);
-        victim->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
         // Xinef: If pet started combat - put owner in combat
         if (Unit* owner = GetOwner())
@@ -16368,8 +16395,20 @@ void Unit::SetContestedPvP(Player* attackedPlayer)
 {
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
 
-    if (!player || (attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->opponent == attackedPlayer))))
+    if (!player || ((attackedPlayer && (attackedPlayer == player || (player->duel && player->duel->opponent == attackedPlayer))) || player->InBattleground()))
         return;
+
+    // check if there any guards that should care about the contested flag on player
+    std::list<Unit*> targets;
+    Acore::NearestVisibleDetectableContestedGuardUnitCheck u_check(this);
+    Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
+    Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
+
+    // return if there are no contested guards found
+    if (!targets.size())
+    {
+        return;
+    }
 
     player->SetContestedPvPTimer(30000);
     if (!player->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
@@ -20045,4 +20084,89 @@ float Unit::GetCollisionHeight() const
         collisionHeight = scaleMod * modelData->CollisionHeight * modelData->Scale * displayInfo->scale;
 
     return collisionHeight == 0.0f ? defaultHeight : collisionHeight;
+}
+
+void Unit::Talk(std::string_view text, ChatMsg msgType, Language language, float textRange, WorldObject const* target)
+{
+    Acore::CustomChatTextBuilder builder(this, msgType, text, language, target);
+    Acore::LocalizedPacketDo<Acore::CustomChatTextBuilder> localizer(builder);
+    Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::CustomChatTextBuilder> > worker(this, textRange, localizer);
+    Cell::VisitWorldObjects(this, worker, textRange);
+}
+
+void Unit::Say(std::string_view text, Language language, WorldObject const* target /*= nullptr*/)
+{
+    Talk(text, CHAT_MSG_MONSTER_SAY, language, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), target);
+}
+
+void Unit::Yell(std::string_view text, Language language, WorldObject const* target /*= nullptr*/)
+{
+    Talk(text, CHAT_MSG_MONSTER_YELL, language, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), target);
+}
+
+void Unit::TextEmote(std::string_view text, WorldObject const* target /*= nullptr*/, bool isBossEmote /*= false*/)
+{
+    Talk(text, isBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+}
+
+void Unit::Whisper(std::string_view text, Language language, Player* target, bool isBossWhisper /*= false*/)
+{
+    if (!target)
+    {
+        return;
+    }
+
+    LocaleConstant locale = target->GetSession()->GetSessionDbLocaleIndex();
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, language, this, target, text, 0, "", locale);
+    target->SendDirectMessage(&data);
+}
+
+void Unit::Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject const* target)
+{
+    if (!sObjectMgr->GetBroadcastText(textId))
+    {
+        LOG_ERROR("entities.unit", "Unit::Talk: `broadcast_text` (ID: %u) was not found", textId);
+        return;
+    }
+
+    Acore::BroadcastTextBuilder builder(this, msgType, textId, getGender(), target);
+    Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> localizer(builder);
+    Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> > worker(this, textRange, localizer);
+    Cell::VisitWorldObjects(this, worker, textRange);
+}
+
+void Unit::Say(uint32 textId, WorldObject const* target /*= nullptr*/)
+{
+    Talk(textId, CHAT_MSG_MONSTER_SAY, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), target);
+}
+
+void Unit::Yell(uint32 textId, WorldObject const* target /*= nullptr*/)
+{
+    Talk(textId, CHAT_MSG_MONSTER_YELL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), target);
+}
+
+void Unit::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool isBossEmote /*= false*/)
+{
+    Talk(textId, isBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+}
+
+void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/)
+{
+    if (!target)
+    {
+        return;
+    }
+
+    BroadcastText const* bct = sObjectMgr->GetBroadcastText(textId);
+    if (!bct)
+    {
+        LOG_ERROR("entities.unit", "Unit::Whisper: `broadcast_text` was not %u found", textId);
+        return;
+    }
+
+    LocaleConstant locale = target->GetSession()->GetSessionDbLocaleIndex();
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
+    target->SendDirectMessage(&data);
 }

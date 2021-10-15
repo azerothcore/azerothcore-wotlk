@@ -1114,6 +1114,30 @@ namespace Acore
         NearestHostileUnitInAttackDistanceCheck(NearestHostileUnitInAttackDistanceCheck const&);
     };
 
+    class NearestVisibleDetectableContestedGuardUnitCheck
+    {
+    public:
+        explicit NearestVisibleDetectableContestedGuardUnitCheck(Unit const* unit) : me(unit) {}
+        bool operator()(Unit* u)
+        {
+            if (!u->CanSeeOrDetect(me, true, true, false))
+            {
+                return false;
+            }
+
+            if (!u->IsContestedGuard())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+    private:
+        Unit const* me;
+        NearestVisibleDetectableContestedGuardUnitCheck(NearestVisibleDetectableContestedGuardUnitCheck const&);
+    };
+
     class AnyAssistCreatureInRangeCheck
     {
     public:
@@ -1325,6 +1349,30 @@ namespace Acore
         const WorldObject* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
+    };
+
+    class AllDeadCreaturesInRange
+    {
+    public:
+        AllDeadCreaturesInRange(WorldObject const* obj, float range, bool reqAlive = true) : _obj(obj), _range(range), _reqAlive(reqAlive) {}
+
+        bool operator()(Unit* unit) const
+        {
+            if (_reqAlive && unit->IsAlive())
+            {
+                return false;
+            }
+            if (!_obj->IsWithinDistInMap(unit, _range))
+            {
+                return false;
+            }
+            return true;
+        }
+
+    private:
+        WorldObject const* _obj;
+        float              _range;
+        bool               _reqAlive;
     };
 
     class PlayerAtMinimumRangeAway

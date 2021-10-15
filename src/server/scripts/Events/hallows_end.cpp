@@ -16,6 +16,7 @@
  */
 
 #include "CellImpl.h"
+#include "GameObjectAI.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
 #include "Group.h"
@@ -1106,7 +1107,7 @@ public:
         void JustDied(Unit*  /*killer*/) override
         {
             summons.DespawnAll();
-            me->MonsterSay("This end have I reached before. What new adventure lies in store?", LANG_UNIVERSAL, 0);
+            me->Say("This end have I reached before. What new adventure lies in store?", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_DEATH);
             std::list<Creature*> unitList;
             me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
@@ -1115,12 +1116,12 @@ public:
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
-                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 285, me->FindMap());
+                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), lfg::LFG_DUNGEON_HEADLESS_HORSEMAN, me->FindMap());
         }
 
         void KilledUnit(Unit*  /*who*/) override
         {
-            me->MonsterYell("Your body lies beaten, battered and broken. Let my curse be your own, fate has spoken.", LANG_UNIVERSAL, 0);
+            me->Yell("Your body lies beaten, battered and broken. Let my curse be your own, fate has spoken.", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_SLAY);
         }
 
@@ -1152,7 +1153,7 @@ public:
                 events.CancelEvent(EVENT_HORSEMAN_WHIRLWIND);
                 events.CancelEvent(EVENT_HORSEMAN_CONFLAGRATION);
                 events.CancelEvent(EVENT_SUMMON_PUMPKIN);
-                me->MonsterYell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL, 0);
+                me->Yell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL);
 
                 if (phase == 1)
                     events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
@@ -1253,23 +1254,23 @@ public:
                         switch (talkCount)
                         {
                             case 1:
-                                player->MonsterSay("Horseman rise...", LANG_UNIVERSAL, 0);
+                                player->Say("Horseman rise...", LANG_UNIVERSAL);
                                 break;
                             case 2:
-                                player->MonsterSay("Your time is nigh...", LANG_UNIVERSAL, 0);
+                                player->Say("Your time is nigh...", LANG_UNIVERSAL);
                                 if (Creature* trigger = me->SummonTrigger(1765.28f, 1347.46f, 17.5514f, 0.0f, 15 * IN_MILLISECONDS))
                                     trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
                                 break;
                             case 3:
                                 me->GetMotionMaster()->MovePath(236820, false);
                                 me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
-                                player->MonsterSay("You felt death once...", LANG_UNIVERSAL, 0);
-                                me->MonsterSay("It is over, your search is done. Let fate choose now, the righteous one.", LANG_UNIVERSAL, 0);
+                                player->Say("You felt death once...", LANG_UNIVERSAL);
+                                me->Say("It is over, your search is done. Let fate choose now, the righteous one.", LANG_UNIVERSAL);
                                 me->PlayDirectSound(SOUND_AGGRO);
                                 break;
                             case 4:
                                 me->CastSpell(me, SPELL_SHAKE_CAMERA_MEDIUM, true);
-                                player->MonsterSay("Now, know demise!", LANG_UNIVERSAL, 0);
+                                player->Say("Now, know demise!", LANG_UNIVERSAL);
                                 talkCount = 0;
                                 return; // pop and return, skip repeat
                         }
@@ -1337,7 +1338,7 @@ public:
                         }
                         else
                         {
-                            me->MonsterSay("Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", LANG_UNIVERSAL, 0);
+                            me->Say("Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", LANG_UNIVERSAL);
                             me->PlayDirectSound(SOUND_SPROUT);
                             events.RepeatEvent(15000);
                             talkCount = 0;
@@ -1477,7 +1478,7 @@ public:
                 }
 
                 me->CastSpell(me, SPELL_HORSEMAN_SPEAKS, true);
-                me->MonsterTextEmote("Headless Horseman laughs", 0);
+                me->TextEmote("Headless Horseman laughs");
                 me->PlayDirectSound(sound);
             }
         }
@@ -1559,6 +1560,27 @@ public:
             horseman->CastSpell(player, SPELL_SUMMONING_RHYME_TARGET, true);
 
         return true;
+    }
+
+    struct go_loosely_turned_soilAI : public GameObjectAI
+    {
+        go_loosely_turned_soilAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
+
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster())
+            {
+                return true;
+            }
+
+            Group const* group = player->GetGroup();
+            return group && sLFGMgr->GetDungeon(group->GetGUID()) == lfg::LFG_DUNGEON_HEADLESS_HORSEMAN;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_loosely_turned_soilAI(go);
     }
 };
 

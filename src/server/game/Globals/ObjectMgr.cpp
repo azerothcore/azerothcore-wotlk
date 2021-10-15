@@ -4874,7 +4874,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
                                          tableName.c_str(), tmp.Talk.ChatType, tmp.id);
                         continue;
                     }
-                    if (!tmp.Talk.TextID)
+                    if (!GetBroadcastText(uint32(tmp.Talk.TextID)))
                     {
                         LOG_ERROR("sql.sql", "Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u",
                                          tableName.c_str(), tmp.Talk.TextID, tmp.id);
@@ -5640,7 +5640,7 @@ void ObjectMgr::LoadGossipText()
         {
             if (gText.Options[i].BroadcastTextID)
             {
-                if (!sObjectMgr->GetBroadcastText(gText.Options[i].BroadcastTextID))
+                if (!GetBroadcastText(gText.Options[i].BroadcastTextID))
                 {
                     LOG_ERROR("sql.sql", "GossipText (Id: %u) in table `npc_text` has non-existing or incompatible BroadcastTextID%u %u.", id, i, gText.Options[i].BroadcastTextID);
                     gText.Options[i].BroadcastTextID = 0;
@@ -8794,7 +8794,7 @@ void ObjectMgr::LoadBroadcastTexts()
         BroadcastText bct;
 
         bct.Id = fields[0].GetUInt32();
-        bct.Language = fields[1].GetUInt32();
+        bct.LanguageID = fields[1].GetUInt32();
         bct.MaleText[DEFAULT_LOCALE] = fields[2].GetString();
         bct.FemaleText[DEFAULT_LOCALE] = fields[3].GetString();
         bct.EmoteId0 = fields[4].GetUInt32();
@@ -8816,10 +8816,10 @@ void ObjectMgr::LoadBroadcastTexts()
             }
         }
 
-        if (!GetLanguageDescByID(bct.Language))
+        if (!GetLanguageDescByID(bct.LanguageID))
         {
-            LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` using Language %u but Language does not exist.", bct.Id, bct.Language);
-            bct.Language = LANG_UNIVERSAL;
+            LOG_DEBUG("misc", "BroadcastText (Id: %u) in table `broadcast_text` using Language %u but Language does not exist.", bct.Id, bct.LanguageID);
+            bct.LanguageID = LANG_UNIVERSAL;
         }
 
         if (bct.EmoteId0)
