@@ -74,6 +74,10 @@ public:
             { "repair",             SEC_GAMEMASTER,         false,  &HandleGearRepairCommand,              "" },
             { "stats",              SEC_PLAYER,             false,  &HandleGearStatsCommand,               "" }
         };
+        static std::vector<ChatCommand> bagsCommandTable =
+        {
+            { "clear",             SEC_GAMEMASTER,         false,  &HandleBagsClearCommand,                "" },
+        };
         static std::vector<ChatCommand> commandTable =
         {
             { "dev",                SEC_ADMINISTRATOR,      false, &HandleDevCommand,                   "" },
@@ -129,7 +133,8 @@ public:
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
             { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
             { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
-            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" }
+            { "string",             SEC_GAMEMASTER,         false, &HandleStringCommand,                "" },
+            { "bags",               SEC_GAMEMASTER,         false, nullptr,                             "", bagsCommandTable },
         };
         return commandTable;
     }
@@ -3448,6 +3453,92 @@ public:
 
         return true;
     }
+
+    static bool HandleBagsClearCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+        {
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+        {
+            return false;
+        }
+
+        uint8 itemQuality = MAX_ITEM_QUALITY;
+        std::string argstr = args;
+        if (argstr == "all")
+        {
+            itemQuality = ITEM_QUALITY_HEIRLOOM;
+        }
+        else if (argstr == "artifact")
+        {
+            itemQuality = ITEM_QUALITY_ARTIFACT;
+        }
+        else if (argstr == "legendary")
+        {
+            itemQuality = ITEM_QUALITY_LEGENDARY;
+        }
+        else if (argstr == "epic")
+        {
+            itemQuality = ITEM_QUALITY_EPIC;
+        }
+        else if (argstr == "rare")
+        {
+            itemQuality = ITEM_QUALITY_RARE;
+        }
+        else if (argstr == "uncommon")
+        {
+            itemQuality = ITEM_QUALITY_UNCOMMON;
+        }
+        else if (argstr == "normal")
+        {
+            itemQuality = ITEM_QUALITY_NORMAL;
+        }
+        else if (argstr == "poor")
+        {
+            itemQuality = ITEM_QUALITY_POOR;
+        }
+
+        if (itemQuality == MAX_ITEM_QUALITY)
+        {
+            return false;
+        }
+
+        // in inventory
+        for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        {
+            if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                if (item->GetTemplate()->Quality <= itemQuality)
+                {
+                    player->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                }
+            }
+        }
+
+        // in inventory bags
+        for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+        {
+            if (Bag* bag = player->GetBagByPos(i))
+            {
+                for (uint32 j = 0; j < bag->GetBagSize(); j++)
+                {
+                    if (Item* item = bag->GetItemByPos(j))
+                    {
+                        if (item->GetTemplate()->Quality <= itemQuality)
+                        {
+                            player->DestroyItem(i, j, true);
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    };
 };
 
 void AddSC_misc_commandscript()
