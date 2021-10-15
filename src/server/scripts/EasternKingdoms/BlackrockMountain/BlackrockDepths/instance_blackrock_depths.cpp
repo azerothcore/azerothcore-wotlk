@@ -629,7 +629,7 @@ public:
 
         bool CheckTombReset(uint32 diff)
         {
-            for (int i = 0; i < TombEventCounter; i++)
+            for (uint8 i = 0; i < TombEventCounter; i++)
             {
                 Creature* boss = instance->GetCreature(TombBossGUIDs[i]);
                 if (boss && boss->IsAlive() && boss->IsInCombat())
@@ -657,7 +657,7 @@ public:
                 }
 
                 // set started bosses in combat if they don't have a target
-                for (int i = 0; i < TombEventCounter; i++)
+                for (uint8 i = 0; i < TombEventCounter; i++)
                 {
                     Creature* boss = instance->GetCreature(TombBossGUIDs[i]);
                     if (boss && !boss->IsInCombat() && boss->IsAlive())
