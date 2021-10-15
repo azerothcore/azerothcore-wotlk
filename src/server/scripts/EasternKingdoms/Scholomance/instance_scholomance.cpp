@@ -104,55 +104,55 @@ public:
         {
             switch (type)
             {
-            case DATA_KIRTONOS_THE_HERALD:
-                switch (data)
-                {
-                case IN_PROGRESS:
-                    // summon kirtonos and close door
-                    if (_kirtonosState == NOT_STARTED)
+                case DATA_KIRTONOS_THE_HERALD:
+                    switch (data)
                     {
-                        instance->SummonCreature(10506, KirtonosSpawn);
-                        if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
-                        {
-                            gate->SetGoState(GO_STATE_READY);
-                        }
-                    }
-                    _kirtonosState = data;
-                    break;
-                case FAIL:
-                    // open door and reset brazier
-                    if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
-                    {
-                        gate->SetGoState(GO_STATE_ACTIVE);
-                    }
+                        case IN_PROGRESS:
+                            // summon kirtonos and close door
+                            if (_kirtonosState == NOT_STARTED)
+                            {
+                                instance->SummonCreature(10506, KirtonosSpawn);
+                                if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
+                                {
+                                    gate->SetGoState(GO_STATE_READY);
+                                }
+                            }
+                            _kirtonosState = data;
+                            break;
+                        case FAIL:
+                            // open door and reset brazier
+                            if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
+                            {
+                                gate->SetGoState(GO_STATE_ACTIVE);
+                            }
 
-                    if (GameObject* brazier = instance->GetGameObject(GetGuidData(GO_BRAZIER_KIRTONOS)))
-                    {
-                        brazier->SetGoState(GO_STATE_READY);
-                        brazier->SetLootState(GO_JUST_DEACTIVATED);
-                        brazier->Respawn();
+                            if (GameObject* brazier = instance->GetGameObject(GetGuidData(GO_BRAZIER_KIRTONOS)))
+                            {
+                                brazier->SetGoState(GO_STATE_READY);
+                                brazier->SetLootState(GO_JUST_DEACTIVATED);
+                                brazier->Respawn();
+                            }
+                            _kirtonosState = NOT_STARTED;
+                            break;
+                        case DONE:
+                            // open door
+                            if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
+                            {
+                                gate->SetGoState(GO_STATE_ACTIVE);
+                            }
+                            [[fallthrough]];
+                        default:
+                            _kirtonosState = data;
+                            break;
                     }
-                    _kirtonosState = NOT_STARTED;
                     break;
-                case DONE:
-                    // open door
-                    if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
-                    {
-                        gate->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    [[fallthrough]];
-                default:
-                    _kirtonosState = data;
+                case DATA_MINI_BOSSES:
+                    ++_miniBosses;
+                    break;
+                case DATA_RAS_HUMAN:
+                    _rasHuman = data;
                     break;
                 }
-                break;
-            case DATA_MINI_BOSSES:
-                ++_miniBosses;
-                break;
-            case DATA_RAS_HUMAN:
-                _rasHuman = data;
-                break;
-            }
 
             SaveToDB();
         }
@@ -677,6 +677,7 @@ public:
                 case 4:
                     me->CastSpell(me->GetVictim(), SHADOWBOLT_VOLLEY_SPELL, true);
                     events.RepeatEvent(urand(11000, 17000));
+                    break;
             }
 
             DoMeleeAttackIfReady();
