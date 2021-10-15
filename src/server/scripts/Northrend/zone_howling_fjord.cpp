@@ -119,16 +119,16 @@ public:
             switch (newPhase)
             {
                 case 1:
-                    me->MonsterWhisper("You think that you can get rid of me through meditation?", summoner->ToPlayer());
+                    me->Whisper("You think that you can get rid of me through meditation?", LANG_UNIVERSAL, summoner->ToPlayer());
                     return;
                 case 2:
-                    me->MonsterWhisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", summoner->ToPlayer());
+                    me->Whisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", LANG_UNIVERSAL, summoner->ToPlayer());
                     return;
                 case 3:
-                    me->MonsterWhisper("You cannot defeat me. I'm an inseparable part of you!", summoner->ToPlayer());
+                    me->Whisper("You cannot defeat me. I'm an inseparable part of you!", LANG_UNIVERSAL, summoner->ToPlayer());
                     return;
                 case 4:
-                    me->MonsterWhisper("NOOOOOOOoooooooooo!", summoner->ToPlayer());
+                    me->Whisper("NOOOOOOOoooooooooo!", LANG_UNIVERSAL, summoner->ToPlayer());
                     me->SetLevel(summoner->getLevel());
                     me->setFaction(14);
                     if (me->GetExactDist(summoner) < 50.0f)

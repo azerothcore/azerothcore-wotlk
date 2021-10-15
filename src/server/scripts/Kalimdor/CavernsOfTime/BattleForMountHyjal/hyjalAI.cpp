@@ -926,7 +926,7 @@ void hyjalAI::WaypointReached(uint32 waypointId)
 {
     if (waypointId == 1 || (waypointId == 0 && me->GetEntry() == THRALL))
     {
-        me->MonsterYell(YELL_HURRY, LANG_UNIVERSAL, nullptr);
+        me->Yell(YELL_HURRY, LANG_UNIVERSAL);
         WaitForTeleport = true;
         TeleportTimer = 20000;
         if (me->GetEntry() == JAINA)

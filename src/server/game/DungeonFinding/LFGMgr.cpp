@@ -2655,13 +2655,13 @@ namespace lfg
     {
         switch (dungeonId)
         {
-            case 285: // The Headless Horseman
+            case LFG_DUNGEON_HEADLESS_HORSEMAN:
                 return IsHolidayActive(HOLIDAY_HALLOWS_END);
-            case 286: // The Frost Lord Ahune
+            case LFG_DUNGEON_FROST_LORD_AHUNE:
                 return IsHolidayActive(HOLIDAY_FIRE_FESTIVAL);
-            case 287: // Coren Direbrew
+            case LFG_DUNGEON_COREN_DIREBREW:
                 return IsHolidayActive(HOLIDAY_BREWFEST);
-            case 288: // The Crown Chemical Co.
+            case LFG_DUNGEON_CROWN_CHEMICAL_CO:
                 return IsHolidayActive(HOLIDAY_LOVE_IS_IN_THE_AIR);
         }
         return false;
