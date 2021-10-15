@@ -2502,6 +2502,17 @@ public:
     // Movement info
     Movement::MoveSpline* movespline;
 
+    virtual void Talk(std::string_view text, ChatMsg msgType, Language language, float textRange, WorldObject const* target);
+    virtual void Say(std::string_view text, Language language, WorldObject const* target = nullptr);
+    virtual void Yell(std::string_view text, Language language, WorldObject const* target = nullptr);
+    virtual void TextEmote(std::string_view text, WorldObject const* target = nullptr, bool isBossEmote = false);
+    virtual void Whisper(std::string_view text, Language language, Player* target, bool isBossWhisper = false);
+    virtual void Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject const* target);
+    virtual void Say(uint32 textId, WorldObject const* target = nullptr);
+    virtual void Yell(uint32 textId, WorldObject const* target = nullptr);
+    virtual void TextEmote(uint32 textId, WorldObject const* target = nullptr, bool isBossEmote = false);
+    virtual void Whisper(uint32 textId, Player* target, bool isBossWhisper = false);
+
     [[nodiscard]] float GetCollisionHeight() const override;
     [[nodiscard]] float GetCollisionWidth() const override;
     [[nodiscard]] float GetCollisionRadius() const override;

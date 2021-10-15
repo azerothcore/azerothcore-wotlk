@@ -58,7 +58,6 @@ enum Says
     // BWL
     SAY_GAMESBEGIN_1           = 12,
     SAY_GAMESBEGIN_2           = 13,
-    // SAY_VAEL_INTRO             = 14, Not used - when he corrupts Vaelastrasz
 
     // Nefarian
     SAY_RANDOM                 = 0,
