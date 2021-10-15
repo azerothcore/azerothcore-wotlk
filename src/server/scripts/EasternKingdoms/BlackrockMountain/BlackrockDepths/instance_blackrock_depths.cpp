@@ -16,6 +16,7 @@
  */
 
 #include "blackrock_depths.h"
+#include "Player.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 
@@ -582,7 +583,7 @@ public:
                     boss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                     // find suitable target here.
 
-                    Unit* target = boss->SelectNearestPlayer(130);
+                    Player* target = boss->SelectNearestPlayer(130);
                     if (target && target->isTargetableForAttack())
                     {
                         boss->AI()->AttackStart(target);
@@ -661,7 +662,7 @@ public:
                     Creature* boss = instance->GetCreature(TombBossGUIDs[i]);
                     if (boss && !boss->IsInCombat() && boss->IsAlive())
                     {
-                        Unit* target = boss->SelectNearestPlayer(130);
+                        Player* target = boss->SelectNearestPlayer(130);
                         if (target && target->isTargetableForAttack())
                         {
                             boss->AI()->AttackStart(target);

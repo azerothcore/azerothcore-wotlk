@@ -5,7 +5,7 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (9034, 9035, 9036)) AND (`so
 DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (9038, 9040)) AND (`source_type` = 0) AND (`id` IN (5));
 
 -- remove the "cannot assist" unit flag
-UPDATE `creature_template` SET  `unit_flags` = 32832 WHERE `entry` IN (9034, 9035, 9036, 9037, 9038, 9039, 9040);
+UPDATE `creature_template` SET  `unit_flags` = `unit_flags`&~(256) WHERE `entry` IN (9034, 9035, 9036, 9037, 9038, 9039, 9040);
 
 -- add doomrel text
 DELETE FROM `creature_text` WHERE `CreatureID` = 9039;
