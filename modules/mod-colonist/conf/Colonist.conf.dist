@@ -1,0 +1,13 @@
+[worldserver]
+
+########################################
+# Colonist module configuration
+########################################
+#
+#    Colonist.Enable
+#        Description: Enable the colonist module and give people titles for early adoption
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+
+Colonist.Enable = 1

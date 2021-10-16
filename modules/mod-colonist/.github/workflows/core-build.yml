@@ -1,0 +1,49 @@
+name: core-build
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [clang]
+    runs-on: ubuntu-latest
+    name: ${{ matrix.compiler }}
+    env:
+      COMPILER: ${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: 'azerothcore/azerothcore-wotlk'
+          ref: 'master'
+          submodules: 'recursive'
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+          path: 'modules/skeleton-module'
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/.ccache
+          key: ccache:${{ matrix.compiler }}:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            ccache:${{ matrix.compiler }}:${{ github.ref }}
+            ccache:${{ matrix.compiler }}
+      - name: Configure OS
+        run: source ./acore.sh install-deps
+        env:
+          CONTINUOUS_INTEGRATION: true
+      - name: Create conf/config.sh
+        run: source ./apps/ci/ci-conf.sh
+      - name: Import db
+        run: source ./apps/ci/ci-import-db.sh
+      - name: Build
+        run: source ./apps/ci/ci-compile.sh
+      - name: Dry run
+        run: source ./apps/ci/ci-worldserver-dry-run.sh
+      - name: Check startup errors
+        run: source ./apps/ci/ci-error-check.sh
+      - name: Run unit tests
+        run: source ./apps/ci/ci-run-unit-tests.sh
