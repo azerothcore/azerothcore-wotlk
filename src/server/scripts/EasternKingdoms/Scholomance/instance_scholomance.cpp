@@ -24,7 +24,7 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
-  // don't change the order, due to the semi-smart way it's designed, the order matters a lot.
+// don't change the order, due to the semi-smart way it's designed, the order matters a lot.
 const uint32 GandlingGateIds[] = {GO_GATE_GANDLING_DOWN_NORTH, GO_GATE_GANDLING_DOWN_EAST, GO_GATE_GANDLING_DOWN_SOUTH,
                                     GO_GATE_GANDLING_UP_NORTH, GO_GATE_GANDLING_UP_EAST, GO_GATE_GANDLING_UP_SOUTH,
                                     GO_GATE_GANDLING_ENTRANCE};
@@ -135,6 +135,7 @@ public:
                         if (Creature* Gandling = instance->GetCreature(GandlingGUID))
                         {
                             Gandling->AI()->Talk(0);
+                            Gandling->AI()->Reset();
                         }
                     }
                     break;
@@ -154,9 +155,6 @@ public:
                 case DATA_RAS_HUMAN:
                     _rasHuman = data;
                     break;
-                case GANDLING_PORTAL_TO_CAST:
-                    _gandlingPortal = data;
-                    break;
             }
 
             SaveToDB();
@@ -172,8 +170,6 @@ public:
                     return _miniBosses;
                 case DATA_RAS_HUMAN:
                     return _rasHuman;
-                case GANDLING_PORTAL_TO_CAST:
-                    return _gandlingPortal;
             }
             return 0;
         }

@@ -32,7 +32,8 @@ enum Spells
 
 enum BossData
 {
-    DATA_PLAYER_KILLED
+    DATA_PLAYER_KILLED,
+    GANDLING_ROOM_TO_USE
 };
 // official timers
 /* enum Timers
@@ -122,9 +123,8 @@ public:
         boss_darkmaster_gandlingAI(Creature* creature) : BossAI(creature, DATA_DARKMASTER_GANDLING), summons(me) { }
 
         SummonList summons;
-        Player* portedPlayer;
         Creature* Guardians[6][3]; // 6 rooms, 3 mobs, access through GuardiansList[NORTH+EAST][1]
-        bool       playersAlive[5]; // 5 man dungeon. Needed to open the gates after someone dies if necessary.
+        uint32 current_room;
 
         // Only the 6 gates that gandling plays with.
         void SetGate(uint8 gate, bool open)
@@ -179,7 +179,7 @@ public:
         void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
-            uint32 room = instance->GetData(GANDLING_PORTAL_TO_CAST);
+            uint32 room = GetData(GANDLING_ROOM_TO_USE);
             if (room < 6)
             {
                 for (uint8 i = 0; i < 3; i++)
@@ -214,17 +214,32 @@ public:
         {
             switch (type)
             {
-            case DATA_PLAYER_KILLED:
-                if (data < 6)
-                {
-                    SetGate(data, OPEN);
-                    for (int i = 0; i < 3; i++)
+                case DATA_PLAYER_KILLED:
+                    if (data < 6)
                     {
-                        if (Guardians[data][i])
-                            Guardians[data][i]->SetInCombatWithZone();
+                        SetGate(data, OPEN);
+                        for (int i = 0; i < 3; i++)
+                        {
+                            if (Guardians[data][i])
+                                Guardians[data][i]->SetInCombatWithZone();
+                        }
                     }
-                }
-                break;
+                    break;
+                case GANDLING_ROOM_TO_USE:
+                    if (data < 6)
+                    {
+                        current_room = data;
+                    }
+                    break;
+            }
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            switch (type)
+            {
+                case GANDLING_ROOM_TO_USE:
+                    return current_room;
             }
         }
 
@@ -256,11 +271,18 @@ public:
         // Finds a random room that is not in use
         uint32 FindRoom()
         {
+            uint32 attempts = 0;
             uint32 room = urand(0, 5);
             do
             {
                 room = (room + 1) % 6;
-            } while (Guardians[room][0] || Guardians[room][1] || Guardians[room][2]);
+                attempts++;
+            } while ((Guardians[room][0] || Guardians[room][1] || Guardians[room][2]) && attempts < 7);
+
+            if (attempts == 7)
+            {
+                room = 7; // used as error
+            }
 
             return room;
         }
@@ -268,6 +290,7 @@ public:
         // spawns the 3 mobs in a given room.
         void SpawnMobsInRoom(uint32 room)
         {
+            LOG_FATAL("entities:unit", "spawning mobs in room %d", room);
             for (uint8 i = 0; i < 3; ++i)
             {
                 if (Creature* summon = me->SummonCreature(NPC_RISEN_GUARDIAN, SummonPos[room*3 + i], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000))
@@ -277,15 +300,16 @@ public:
             }
         }
 
-        // once the spell has hit, close doors, spawn mobs and reset threat if needed.
+        // used for shadow portal
         void SpellHitTarget(Unit* target, const SpellInfo* spellinfo) override
         {
             uint32 room = 0;
             if (spellinfo && spellinfo->Id == SPELL_SHADOW_PORTAL)
             {
-                room = instance->GetData(GANDLING_PORTAL_TO_CAST);
+                room = GetData(GANDLING_ROOM_TO_USE);
                 SetGate(room, CLOSED);
                 SpawnMobsInRoom(room);
+                DoCast(target, GandlingPortalSpells[room], true); // needs triggered somehow.
                 if (target->GetGUID() == me->GetVictim()->GetGUID())
                 {
                     me->AddThreat(me->GetVictim(), -1000000); // drop current player, add a ton to second. This should guarantee that we don't end up with both 1 and 2 in a cage...
@@ -333,8 +357,11 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 15.0, true))
                     {
                         room = FindRoom();
-                        instance->SetData(GANDLING_PORTAL_TO_CAST, room);
-                        DoCast(target, SPELL_SHADOW_PORTAL);
+                        if (room < 6)
+                        {
+                            SetData(GANDLING_ROOM_TO_USE, room);
+                            DoCast(target, SPELL_SHADOW_PORTAL); // don't use triggered here
+                        }
                     }
                     events.ScheduleEvent(SPELL_SHADOW_PORTAL, TIMER_PORTAL);
                     break;
@@ -345,79 +372,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
-
-class spell_scholomance_shadow_portal : public SpellScriptLoader
-{
-public:
-    spell_scholomance_shadow_portal() : SpellScriptLoader("spell_scholomance_shadow_portal") { }
-
-    class spell_scholomance_shadow_portal_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_scholomance_shadow_portal_SpellScript);
-
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            Creature* caster = GetCaster()->ToCreature();
-            uint32 room = 0; // 6 rooms
-
-            if (InstanceScript* instance = caster->GetInstanceScript())
-            {
-                room = instance->GetData(GANDLING_PORTAL_TO_CAST);
-                if (room < 6)
-                {
-                    caster->CastSpell(GetHitUnit(), GandlingPortalSpells[room], true);
-                }
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_scholomance_shadow_portal_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_scholomance_shadow_portal_SpellScript();
-    }
-};
-
-class spell_scholomance_shadow_portal_rooms : public SpellScriptLoader
-{
-public:
-    spell_scholomance_shadow_portal_rooms() : SpellScriptLoader("spell_scholomance_shadow_portal_rooms") { }
-
-    class spell_scholomance_shadow_portal_rooms_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_scholomance_shadow_portal_rooms_SpellScript);
-
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleSendEvent(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            // do nothing here either...
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_scholomance_shadow_portal_rooms_SpellScript::HandleSendEvent, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_scholomance_shadow_portal_rooms_SpellScript();
-    }
 };
 
 class npc_risen_guardian : public CreatureScript
@@ -442,7 +396,7 @@ public:
             Gandling = summoner;
             if (instance)
             {
-                room = instance->GetData(GANDLING_PORTAL_TO_CAST); // it's set just before my spawn
+                room = Gandling->GetAI()->GetData(GANDLING_ROOM_TO_USE); // it's set just before my spawn
             }
         }
 
@@ -465,7 +419,5 @@ public:
 void AddSC_boss_darkmaster_gandling()
 {
     new boss_darkmaster_gandling();
-    new spell_scholomance_shadow_portal();
-    new spell_scholomance_shadow_portal_rooms();
     new npc_risen_guardian();
 }
