@@ -35,8 +35,8 @@ enum BossData
     DATA_PLAYER_KILLED,
     GANDLING_ROOM_TO_USE
 };
-// official timers
-/* enum Timers
+
+enum Timers
 {
     TIMER_ARCANE_MIN = 8000,
     TIMER_ARCANE_MAX = 14000,
@@ -45,18 +45,6 @@ enum BossData
     TIMER_SHIELD_MIN = 30000,
     TIMER_SHIELD_MAX = 40000,
     TIMER_PORTAL = 25000
-};*/
-
-// temp debug timers
- enum Timers
-{
-    TIMER_ARCANE_MIN = 80000,
-    TIMER_ARCANE_MAX = 1400000,
-    TIMER_CURSE_MIN = 100000,
-    TIMER_CURSE_MAX = 1500000,
-    TIMER_SHIELD_MIN = 200000,
-    TIMER_SHIELD_MAX = 2500000,
-    TIMER_PORTAL = 10000
 };
 
  enum IdPortalSpells
