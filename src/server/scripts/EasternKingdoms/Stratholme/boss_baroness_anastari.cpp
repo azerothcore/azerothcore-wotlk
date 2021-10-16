@@ -93,6 +93,8 @@ public:
                     DoCastSelf(SPELL_POSSESS_INV, true);
                     _possessedTargetGuid = possessTarget->GetGUID();
 
+                    // We must keep track of the possesed player, the aura falls off when their health drops below 50%.
+                    // The encounter resumes when the aura falls off.
                     _scheduler.Schedule(1s, [this](TaskContext possessionContext) {
                         if (Player* possessedTarget = ObjectAccessor::GetPlayer(*me, _possessedTargetGuid))
                         {
