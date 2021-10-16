@@ -10,3 +10,6 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 11598) AND (`source_type` = 0
 -- gates
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (177371, 177372, 177373, 177375, 177376, 177377) AND (`source_type` = 1);
 UPDATE `gameobject_template` SET `AIName` = '' WHERE `entry` IN (177371, 177372, 177373, 177375, 177376, 177377);
+
+-- portal spells
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_scholomance_shadow_portal', 'spell_scholomance_shadow_portal_rooms');
