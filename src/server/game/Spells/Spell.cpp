@@ -1428,7 +1428,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                     if (groundOrWaterZ != INVALID_HEIGHT)
                     {
-                        if (abs(abs(unitCaster->GetPositionZ()) - abs(groundOrWaterZ)) <= 40)
+                        if (abs(abs(unitCaster->GetPositionZ()) - abs(groundOrWaterZ)) <= 40) // if we 40 yd from the ground teleport directly to the ground (mimic blizz behaviour?)
                         {
                             pos.m_positionZ = groundOrWaterZ;
                         }
