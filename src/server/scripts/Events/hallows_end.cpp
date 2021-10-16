@@ -382,15 +382,16 @@ public:
         {
         }
 
-        uint32 eventStarted;
         bool allowQuest;
-        ObjectGuid horseGUID;
 
         void Reset() override
         {
-            eventStarted = 0;
             allowQuest = false;
-            horseGUID.Clear();
+        }
+
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            allowQuest = false;
         }
 
         void GetInitXYZ(float& x, float& y, float& z, float& o, uint32& path)
@@ -447,7 +448,6 @@ public:
             if (param == ACTION_START_EVENT)
             {
                 allowQuest = true;
-                eventStarted = 1;
                 float x = 0, y = 0, z = 0, o = 0;
                 uint32 path = 0;
                 GetInitXYZ(x, y, z, o, path);
@@ -455,7 +455,6 @@ public:
                 {
                     cr->GetMotionMaster()->MovePath(path, false);
                     cr->AI()->DoAction(path);
-                    horseGUID = cr->GetGUID();
                 }
             }
         }
@@ -466,19 +465,6 @@ public:
                 return allowQuest;
 
             return 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (eventStarted)
-            {
-                eventStarted += diff;
-                if (eventStarted >= 5 * MINUTE * IN_MILLISECONDS)
-                {
-                    allowQuest = false;
-                    eventStarted = 0;
-                }
-            }
         }
     };
 
