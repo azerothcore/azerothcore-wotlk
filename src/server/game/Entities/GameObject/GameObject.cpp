@@ -393,7 +393,9 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
             map->AddToMap(linkedGO);
         }
         else
+        {
             delete linkedGO;
+        }
     }
 
     // Check if GameObject is Large
