@@ -41,6 +41,18 @@
 #include "TargetedMovementGenerator.h"
 #include "WeatherMgr.h"
 
+static std::array<std::string, MAX_ITEM_QUALITY> itemQualityToString =
+{ {
+        "poor",
+        "normal",
+        "uncommon",
+        "rare",
+        "epic",
+        "legendary",
+        "artifact",
+        "all"
+} };
+
 class misc_commandscript : public CommandScript
 {
 public:
@@ -3469,37 +3481,13 @@ public:
 
         uint8 itemQuality = MAX_ITEM_QUALITY;
         std::string argstr = args;
-        if (argstr == "all")
+        for (uint8 i = ITEM_QUALITY_POOR; i < MAX_ITEM_QUALITY; ++i)
         {
-            itemQuality = ITEM_QUALITY_HEIRLOOM;
-        }
-        else if (argstr == "artifact")
-        {
-            itemQuality = ITEM_QUALITY_ARTIFACT;
-        }
-        else if (argstr == "legendary")
-        {
-            itemQuality = ITEM_QUALITY_LEGENDARY;
-        }
-        else if (argstr == "epic")
-        {
-            itemQuality = ITEM_QUALITY_EPIC;
-        }
-        else if (argstr == "rare")
-        {
-            itemQuality = ITEM_QUALITY_RARE;
-        }
-        else if (argstr == "uncommon")
-        {
-            itemQuality = ITEM_QUALITY_UNCOMMON;
-        }
-        else if (argstr == "normal")
-        {
-            itemQuality = ITEM_QUALITY_NORMAL;
-        }
-        else if (argstr == "poor")
-        {
-            itemQuality = ITEM_QUALITY_POOR;
+            if (argstr == itemQualityToString[i])
+            {
+                itemQuality = i;
+                break;
+            }
         }
 
         if (itemQuality == MAX_ITEM_QUALITY)
@@ -3507,14 +3495,20 @@ public:
             return false;
         }
 
+        std::array<uint32, MAX_ITEM_QUALITY> removedItems = { };
+
         // in inventory
         for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
         {
             if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             {
-                if (item->GetTemplate()->Quality <= itemQuality)
+                if (ItemTemplate const* itemTemplate = item->GetTemplate())
                 {
-                    player->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                    if (itemTemplate->Quality <= itemQuality)
+                    {
+                        player->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                        ++removedItems[itemTemplate->Quality];
+                    }
                 }
             }
         }
@@ -3528,14 +3522,51 @@ public:
                 {
                     if (Item* item = bag->GetItemByPos(j))
                     {
-                        if (item->GetTemplate()->Quality <= itemQuality)
+                        if (ItemTemplate const* itemTemplate = item->GetTemplate())
                         {
-                            player->DestroyItem(i, j, true);
+                            if (itemTemplate->Quality <= itemQuality)
+                            {
+                                player->DestroyItem(i, j, true);
+                                ++removedItems[itemTemplate->Quality];
+                            }
                         }
                     }
                 }
             }
         }
+
+        std::ostringstream str;
+        str << "Removed ";
+        if (itemQuality == ITEM_QUALITY_HEIRLOOM)
+        {
+            str << "all";
+        }
+        else
+        {
+            bool initialize = true;
+            for (uint8 i = ITEM_QUALITY_POOR; i < MAX_ITEM_QUALITY; ++i)
+            {
+                if (uint32 itemCount = removedItems[i])
+                {
+                    std::string itemQualityString = itemQualityToString[i];
+
+                    if (!initialize)
+                    {
+                        str << ", ";
+                    }
+
+                    str << "|c";
+                    str << std::hex << ItemQualityColors[i] << std::dec;
+                    str << itemCount << " " << itemQualityString << "|r";
+
+                    initialize = false;
+                }
+            }
+        }
+
+        str << " items from your bags.";
+
+        handler->SendSysMessage(str.str().c_str());
 
         return true;
     };
