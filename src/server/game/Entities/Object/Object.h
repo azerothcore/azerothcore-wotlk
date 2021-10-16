@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _OBJECT_H
@@ -465,48 +476,33 @@ struct Position
 
     [[nodiscard]] bool IsPositionValid() const;
 
-    [[nodiscard]] float GetExactDist2dSq(float x, float y) const
+    [[nodiscard]] float GetExactDist2dSq(const float x, const float y) const
     {
-        float dx = m_positionX - x;
-        float dy = m_positionY - y;
-        return dx * dx + dy * dy;
-    }
-    [[nodiscard]] float GetExactDist2d(const float x, const float y) const
-    {
-        return sqrt(GetExactDist2dSq(x, y));
-    }
-    float GetExactDist2dSq(const Position* pos) const
-    {
-        float dx = m_positionX - pos->m_positionX;
-        float dy = m_positionY - pos->m_positionY;
-        return dx * dx + dy * dy;
-    }
-    float GetExactDist2d(const Position* pos) const
-    {
-        return sqrt(GetExactDist2dSq(pos));
-    }
-    [[nodiscard]] float GetExactDistSq(float x, float y, float z) const
-    {
-        float dz = m_positionZ - z;
-        return GetExactDist2dSq(x, y) + dz * dz;
-    }
-    [[nodiscard]] float GetExactDist(float x, float y, float z) const
-    {
-        return sqrt(GetExactDistSq(x, y, z));
-    }
-    float GetExactDistSq(const Position* pos) const
-    {
-        float dx = m_positionX - pos->m_positionX;
-        float dy = m_positionY - pos->m_positionY;
-        float dz = m_positionZ - pos->m_positionZ;
-        return dx * dx + dy * dy + dz * dz;
-    }
-    float GetExactDist(const Position* pos) const
-    {
-        return sqrt(GetExactDistSq(pos));
+        float dx = x - m_positionX;
+        float dy = y - m_positionY;
+        return dx*dx + dy*dy;
     }
 
+    float GetExactDist2dSq(Position const& pos) const { return GetExactDist2dSq(pos.m_positionX, pos.m_positionY); }
+    float GetExactDist2dSq(Position const* pos) const { return GetExactDist2dSq(*pos); }
+    float GetExactDist2d(const float x, const float y) const { return std::sqrt(GetExactDist2dSq(x, y)); }
+    float GetExactDist2d(Position const& pos) const { return GetExactDist2d(pos.m_positionX, pos.m_positionY); }
+    float GetExactDist2d(Position const* pos) const { return GetExactDist2d(*pos); }
+
+    float GetExactDistSq(float x, float y, float z) const
+    {
+        float dz = z - m_positionZ;
+        return GetExactDist2dSq(x, y) + dz*dz;
+    }
+
+    float GetExactDistSq(Position const& pos) const { return GetExactDistSq(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
+    float GetExactDistSq(Position const* pos) const { return GetExactDistSq(*pos); }
+    float GetExactDist(float x, float y, float z) const { return std::sqrt(GetExactDistSq(x, y, z)); }
+    float GetExactDist(Position const& pos) const { return GetExactDist(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
+    float GetExactDist(Position const* pos) const { return GetExactDist(*pos); }
+
     void GetPositionOffsetTo(const Position& endPos, Position& retOffset) const;
+    Position GetPositionWithOffset(Position const& offset) const;
 
     float GetAngle(const Position* pos) const;
     [[nodiscard]] float GetAngle(float x, float y) const;
@@ -566,6 +562,81 @@ struct Position
         return fmod(o, 2.0f * static_cast<float>(M_PI));
     }
 };
+
+#define MAPID_INVALID 0xFFFFFFFF
+
+class WorldLocation : public Position
+{
+public:
+    explicit WorldLocation(uint32 _mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+        : Position(x, y, z, o), m_mapId(_mapId) { }
+
+    WorldLocation(uint32 mapId, Position const& position)
+        : Position(position), m_mapId(mapId) { }
+
+    void WorldRelocate(const WorldLocation& loc)
+    {
+        m_mapId = loc.GetMapId();
+        Relocate(loc);
+    }
+
+    void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+    {
+        m_mapId = mapId;
+        Relocate(x, y, z, o);
+    }
+
+    void SetMapId(uint32 mapId)
+    {
+        m_mapId = mapId;
+    }
+
+    [[nodiscard]] uint32 GetMapId() const
+    {
+        return m_mapId;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+        z = m_positionZ;
+    }
+
+    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z, float& o) const
+    {
+        mapId = m_mapId;
+        x = m_positionX;
+        y = m_positionY;
+        z = m_positionZ;
+        o = m_orientation;
+    }
+
+    void GetWorldLocation(WorldLocation* location) const
+    {
+        if (location)
+        {
+            location->Relocate(m_positionX, m_positionY, m_positionZ, m_orientation);
+            location->SetMapId(m_mapId);
+        }
+    }
+
+    [[nodiscard]] WorldLocation GetWorldLocation() const
+    {
+        return *this;
+    }
+
+    uint32 m_mapId;
+};
+
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYStreamer const& streamer);
 ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYStreamer const& streamer);
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZStreamer const& streamer);
@@ -643,86 +714,12 @@ struct MovementInfo
     void OutDebug();
 };
 
-#define MAPID_INVALID 0xFFFFFFFF
-
-class WorldLocation : public Position
-{
-public:
-    explicit WorldLocation(uint32 _mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
-        : Position(x, y, z, o), m_mapId(_mapId) { }
-
-    WorldLocation(uint32 mapId, Position const& position)
-        : Position(position), m_mapId(mapId) { }
-
-    void WorldRelocate(const WorldLocation& loc)
-    {
-        m_mapId = loc.GetMapId();
-        Relocate(loc);
-    }
-
-    void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
-    {
-        m_mapId = mapId;
-        Relocate(x, y, z, o);
-    }
-
-    void SetMapId(uint32 mapId)
-    {
-        m_mapId = mapId;
-    }
-
-    [[nodiscard]] uint32 GetMapId() const
-    {
-        return m_mapId;
-    }
-
-    void GetWorldLocation(uint32& mapId, float& x, float& y) const
-    {
-        mapId = m_mapId;
-        x = m_positionX;
-        y = m_positionY;
-    }
-
-    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z) const
-    {
-        mapId = m_mapId;
-        x = m_positionX;
-        y = m_positionY;
-        z = m_positionZ;
-    }
-
-    void GetWorldLocation(uint32& mapId, float& x, float& y, float& z, float& o) const
-    {
-        mapId = m_mapId;
-        x = m_positionX;
-        y = m_positionY;
-        z = m_positionZ;
-        o = m_orientation;
-    }
-
-    void GetWorldLocation(WorldLocation* location) const
-    {
-        if (location)
-        {
-            location->Relocate(m_positionX, m_positionY, m_positionZ, m_orientation);
-            location->SetMapId(m_mapId);
-        }
-    }
-
-    [[nodiscard]] WorldLocation GetWorldLocation() const
-    {
-        return *this;
-    }
-
-    uint32 m_mapId;
-};
-
 template<class T>
 class GridObject
 {
 public:
     [[nodiscard]] bool IsInGrid() const { return _gridRef.isValid(); }
-    void AddToGrid(GridRefManager<T>& m) { ASSERT(!IsInGrid()); _gridRef.link(&m, (T*)this); }
+    void AddToGrid(GridRefMgr<T>& m) { ASSERT(!IsInGrid()); _gridRef.link(&m, (T*)this); }
     void RemoveFromGrid() { ASSERT(IsInGrid()); _gridRef.unlink(); }
 private:
     GridReference<T> _gridRef;
@@ -940,15 +937,6 @@ public:
 
     virtual uint8 getLevelForTarget(WorldObject const* /*target*/) const { return 1; }
 
-    void MonsterSay(const char* text, uint32 language, WorldObject const* target);
-    void MonsterYell(const char* text, uint32 language, WorldObject const* target);
-    void MonsterTextEmote(const char* text, WorldObject const* target, bool IsBossEmote = false);
-    void MonsterWhisper(const char* text, Player const* target, bool IsBossWhisper = false);
-    void MonsterSay(int32 textId, uint32 language, WorldObject const* target);
-    void MonsterYell(int32 textId, uint32 language, WorldObject const* target);
-    void MonsterTextEmote(int32 textId, WorldObject const* target, bool IsBossEmote = false);
-    void MonsterWhisper(int32 textId, Player const* target, bool IsBossWhisper = false);
-
     void PlayDistanceSound(uint32 sound_id, Player* target = nullptr);
     void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
     void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
@@ -974,7 +962,6 @@ public:
     FlaggedValuesArray32<int32, uint32, ServerSideVisibilityType, TOTAL_SERVERSIDE_VISIBILITY_TYPES> m_serverSideVisibilityDetect;
 
     // Low Level Packets
-    void SendPlaySound(uint32 Sound, bool OnlySelf);
     void SendPlayMusic(uint32 Music, bool OnlySelf);
 
     virtual void SetMap(Map* map);
@@ -1010,6 +997,7 @@ public:
     [[nodiscard]] Player* SelectNearestPlayer(float distance = 0) const;
     void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
     void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
     void DestroyForNearbyPlayers();
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
