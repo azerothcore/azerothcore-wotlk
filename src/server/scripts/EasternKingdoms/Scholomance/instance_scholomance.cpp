@@ -24,11 +24,6 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
-// don't change the order, due to the semi-smart way it's designed, the order matters a lot.
-const uint32 GandlingGateIds[] = {GO_GATE_GANDLING_DOWN_NORTH, GO_GATE_GANDLING_DOWN_EAST, GO_GATE_GANDLING_DOWN_SOUTH,
-                                    GO_GATE_GANDLING_UP_NORTH, GO_GATE_GANDLING_UP_EAST, GO_GATE_GANDLING_UP_SOUTH,
-                                    GO_GATE_GANDLING_ENTRANCE};
-
 class instance_scholomance : public InstanceMapScript
 {
 public:
@@ -46,7 +41,6 @@ public:
             _miniBosses = 0;
             _kirtonosState = 0;
             _rasHuman      = 0;
-            _gandlingPortal = 0;
         }
 
         void OnCreatureCreate(Creature* cr) override
@@ -66,26 +60,26 @@ public:
                 case GO_GATE_KIRTONOS:
                     GateKirtonosGUID = go->GetGUID();
                     break;
-                case GO_GATE_GANDLING_ENTRANCE:
-                    GandlingGatesGUID[6] = go->GetGUID();
-                    break;
-                case GO_GATE_GANDLING_UP_NORTH:
-                    GandlingGatesGUID[UP + NORTH] = go->GetGUID();
-                    break;
-                case GO_GATE_GANDLING_UP_EAST:
-                    GandlingGatesGUID[UP + EAST] = go->GetGUID();
-                    break;
-                case GO_GATE_GANDLING_UP_SOUTH:
-                    GandlingGatesGUID[UP + SOUTH] = go->GetGUID();
-                    break;
                 case GO_GATE_GANDLING_DOWN_NORTH:
-                    GandlingGatesGUID[DOWN + NORTH] = go->GetGUID();
+                    GandlingGatesGUID[0] = go->GetGUID();
                     break;
                 case GO_GATE_GANDLING_DOWN_EAST:
-                    GandlingGatesGUID[DOWN + EAST] = go->GetGUID();
+                    GandlingGatesGUID[1] = go->GetGUID();
                     break;
                 case GO_GATE_GANDLING_DOWN_SOUTH:
-                    GandlingGatesGUID[DOWN + SOUTH] = go->GetGUID();
+                    GandlingGatesGUID[2] = go->GetGUID();
+                    break;
+                case GO_GATE_GANDLING_UP_NORTH:
+                    GandlingGatesGUID[3] = go->GetGUID();
+                    break;
+                case GO_GATE_GANDLING_UP_EAST:
+                    GandlingGatesGUID[4] = go->GetGUID();
+                    break;
+                case GO_GATE_GANDLING_UP_SOUTH:
+                    GandlingGatesGUID[5] = go->GetGUID();
+                    break;
+                case GO_GATE_GANDLING_ENTRANCE:
+                    GandlingGatesGUID[6] = go->GetGUID();
                     break;
             }
         }
@@ -96,25 +90,20 @@ public:
             {
                 case GO_GATE_KIRTONOS:
                     return GateKirtonosGUID;
+                case GO_GATE_GANDLING_DOWN_NORTH:
+                    return GandlingGatesGUID[0];
+                case GO_GATE_GANDLING_DOWN_EAST:
+                    return GandlingGatesGUID[1];
+                case GO_GATE_GANDLING_DOWN_SOUTH:
+                    return GandlingGatesGUID[2];
+                case GO_GATE_GANDLING_UP_NORTH:
+                    return GandlingGatesGUID[3];
+                case GO_GATE_GANDLING_UP_EAST:
+                    return GandlingGatesGUID[4];
+                case GO_GATE_GANDLING_UP_SOUTH:
+                    return GandlingGatesGUID[5];
                 case GO_GATE_GANDLING_ENTRANCE:
                     return GandlingGatesGUID[6];
-                case GO_GATE_GANDLING_UP_NORTH:
-                    return GandlingGatesGUID[UP + NORTH];
-                    break;
-                case GO_GATE_GANDLING_UP_EAST:
-                    return GandlingGatesGUID[UP + EAST];
-                    break;
-                case GO_GATE_GANDLING_UP_SOUTH:
-                    return GandlingGatesGUID[UP + SOUTH];
-                    break;
-                case GO_GATE_GANDLING_DOWN_NORTH:
-                    return GandlingGatesGUID[DOWN + NORTH];
-                    break;
-                case GO_GATE_GANDLING_DOWN_EAST:
-                    return GandlingGatesGUID[DOWN + EAST];
-                    break;
-                case GO_GATE_GANDLING_DOWN_SOUTH:
-                    return GandlingGatesGUID[DOWN + SOUTH];
                 case NPC_DARKMASTER_GANDLING:
                     return GandlingGUID;
             }
@@ -215,7 +204,6 @@ public:
         uint32 _kirtonosState;
         uint32 _miniBosses;
         uint32 _rasHuman;
-        uint32 _gandlingPortal;
     };
 };
 

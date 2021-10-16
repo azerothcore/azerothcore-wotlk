@@ -69,11 +69,13 @@ enum BossData
      SPELL_SHADOW_PORTAL_DOWN_SOUTH  = 17948
  };
 
- // don't change the rooms order, due to the semi-smart way it's designed, the order matters a lot.
+ // don't change the order of these 3 arrays. The order of the arrays should match and match also with scholomance.cpp
+ const uint32 GandlingGateIds[] = {GO_GATE_GANDLING_DOWN_NORTH, GO_GATE_GANDLING_DOWN_EAST, GO_GATE_GANDLING_DOWN_SOUTH,
+                                GO_GATE_GANDLING_UP_NORTH, GO_GATE_GANDLING_UP_EAST, GO_GATE_GANDLING_UP_SOUTH, GO_GATE_GANDLING_ENTRANCE};
+
  const uint32 GandlingPortalSpells[] = {SPELL_SHADOW_PORTAL_DOWN_NORTH, SPELL_SHADOW_PORTAL_DOWN_EAST, SPELL_SHADOW_PORTAL_DOWN_SOUTH,
                                             SPELL_SHADOW_PORTAL_UP_NORTH, SPELL_SHADOW_PORTAL_UP_EAST, SPELL_SHADOW_PORTAL_UP_SOUTH};
 
-  // don't change the order, due to the semi-smart way it's designed, the order matters a lot.
  Position const SummonPos[3 * 6] =
 {
     // The Shadow Vault // down north
@@ -241,6 +243,7 @@ public:
                 case GANDLING_ROOM_TO_USE:
                     return current_room;
             }
+            return 0;
         }
 
         void Reset() override
@@ -290,7 +293,6 @@ public:
         // spawns the 3 mobs in a given room.
         void SpawnMobsInRoom(uint32 room)
         {
-            LOG_FATAL("entities:unit", "spawning mobs in room %d", room);
             for (uint8 i = 0; i < 3; ++i)
             {
                 if (Creature* summon = me->SummonCreature(NPC_RISEN_GUARDIAN, SummonPos[room*3 + i], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000))

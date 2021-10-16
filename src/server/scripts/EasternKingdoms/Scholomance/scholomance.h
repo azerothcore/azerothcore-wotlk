@@ -60,22 +60,6 @@ enum GameobjectIds
     GO_GATE_GANDLING_UP_SOUTH   = 177375
 };
 
-// for gandling, we define the rooms by up/down + direction
-enum Floors
-{
-    DOWN = 0,
-    UP = 3
-};
-
-enum Side
-{
-    NORTH = 0,
-    EAST = 1,
-    SOUTH = 2
-};
-
-extern const uint32 GandlingGateIds[];
-
 enum SpellIds
 {
     SPELL_SUMMON_BONE_MAGE_FRONT_LEFT           = 27696,
