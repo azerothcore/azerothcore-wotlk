@@ -219,7 +219,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     // when u near the shore to be near poly but still in water or str8 into the ocean where u got no near poly to hold onto
     // also we dig only raycasting
     if ((isWaterStart || isWaterEnd) && _useRaycast)
-    {   
+    {
         bool canSwim = creature ? creature->CanSwim() : true;
 
         if (canSwim)
