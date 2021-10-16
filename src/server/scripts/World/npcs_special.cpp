@@ -2492,7 +2492,7 @@ public:
     {
         npc_venomhide_hatchlingAI(Creature* creature) : ScriptedAI(creature) {}
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (summoner->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -2533,7 +2533,7 @@ void AddSC_npcs_special()
     new npc_riggle_bassbait();
     new npc_target_dummy();
     new npc_training_dummy();
-    new new npc_venomhide_hatchling();
+    new npc_venomhide_hatchling();
 
     // Theirs
     new npc_air_force_bots();
