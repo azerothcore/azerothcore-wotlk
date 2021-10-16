@@ -124,7 +124,9 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             _scheduler.Update(diff,
                 std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
