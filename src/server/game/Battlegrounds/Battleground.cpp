@@ -1681,9 +1681,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
     if (respawntime)
         creature->SetRespawnDelay(respawntime);
 
-    // Xinef: Set PVP state for vehicles, should be for all creatures in bg?
-    if (creature->IsVehicle())
-        creature->SetPvP(true);
+    creature->SetPvP(true);
 
     return  creature;
 }
