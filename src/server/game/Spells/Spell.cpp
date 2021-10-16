@@ -1416,19 +1416,26 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                 Position pos = dest._position;
 
-                bool result = unitCaster->MovePositionToFirstCollision(pos, dist, angle);
+                unitCaster->MovePositionToFirstCollision(pos, dist, angle);
 
-                // try to fix Z if player be fallin and MovePositionToFirstCollision failed
-                if (unitCaster->IsFalling() && !result)
+                // fix Z if player be fallin. Z might not be good cuz when we blink we might be in hole in the map u dig so we gotta adjust
+                if (unitCaster->IsFalling())
                 {
                     float groundZ        = 0;
                     float groundOrWaterZ = 0;
 
-                    groundOrWaterZ = unitCaster->GetMapWaterOrGroundLevel(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), &groundZ);
+                    groundOrWaterZ = unitCaster->GetMapWaterOrGroundLevel(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), &groundZ, MAX_HEIGHT);
 
                     if (groundOrWaterZ != INVALID_HEIGHT)
                     {
-                        pos.m_positionZ = groundOrWaterZ;
+                        if (abs(abs(unitCaster->GetPositionZ()) - abs(groundOrWaterZ)) <= 40)
+                        {
+                            pos.m_positionZ = groundOrWaterZ;
+                        }
+                        else
+                        {
+                            pos.m_positionZ = unitCaster->GetPositionZ();
+                        }
                     }
                 }
 

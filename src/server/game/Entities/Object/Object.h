@@ -1069,7 +1069,7 @@ public:
     [[nodiscard]] virtual float GetStationaryZ() const { return GetPositionZ(); }
     [[nodiscard]] virtual float GetStationaryO() const { return GetOrientation(); }
 
-    [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
+    [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr, float maxSearchDist = DEFAULT_MAX_SEARCH_DISTANCE) const;
     [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
 
     [[nodiscard]] float GetFloorZ() const;

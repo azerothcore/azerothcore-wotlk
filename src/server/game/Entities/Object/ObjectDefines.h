@@ -33,6 +33,7 @@
 #define DEFAULT_VISIBILITY_DISTANCE 90.0f // default visible distance, 90 yards on continents
 #define DEFAULT_VISIBILITY_INSTANCE 120.0f // default visible distance in instances, 120 yards
 #define DEFAULT_VISIBILITY_BGARENAS 150.0f // default visible distance in BG/Arenas, 150 yards
+#define DEFAULT_MAX_SEARCH_DISTANCE 50.0f // default search for holes in navmesh when getting ground/water level
 
 #define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // player size, also currently used (correctly?) for any non Unit world objects
 #define DEFAULT_COMBAT_REACH        1.5f

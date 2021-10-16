@@ -1971,12 +1971,12 @@ GridMap* Map::GetGrid(float x, float y)
     return GridMaps[gx][gy];
 }
 
-float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= nullptr*/, bool /*swim = false*/, float collisionHeight) const
+float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= nullptr*/, bool /*swim = false*/, float collisionHeight, float maxSearchDist) const
 {
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(phasemask, x, y, z + Z_OFFSET_FIND_HEIGHT, true, 50.0f);
+        float ground_z = GetHeight(phasemask, x, y, z + Z_OFFSET_FIND_HEIGHT, true, maxSearchDist);
         if (ground)
             *ground = ground_z;
 
@@ -2461,6 +2461,18 @@ bool Map::IsUnderWater(uint32 phaseMask, float x, float y, float z, float collis
 {
     LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(phaseMask, x, y, z, collisionHeight, MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN);
     return liquidData.Status == LIQUID_MAP_UNDER_WATER;
+}
+
+bool Map::IsWaterWalking(uint32 phaseMask, float x, float y, float z, float collisionHeight) const
+{
+    LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(phaseMask, x, y, z, collisionHeight, MAP_ALL_LIQUIDS);
+    return liquidData.Status == LIQUID_MAP_WATER_WALK;
+}
+
+bool Map::IsAboveWater(uint32 phaseMask, float x, float y, float z, float collisionHeight) const
+{
+    LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(phaseMask, x, y, z, collisionHeight, MAP_ALL_LIQUIDS);
+    return liquidData.Status == LIQUID_MAP_ABOVE_WATER;
 }
 
 bool Map::HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const

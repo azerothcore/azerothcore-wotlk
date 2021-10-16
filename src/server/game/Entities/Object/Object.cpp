@@ -1515,7 +1515,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
             if (max_z > INVALID_HEIGHT)
             {
-                if (canSwim && unit->GetMap()->IsInWater(unit->GetPhaseMask(), x, y, max_z - Z_OFFSET_FIND_HEIGHT, unit->GetCollisionHeight()))
+                if (canSwim && unit->GetMap()->IsInWater(unit->GetPhaseMask(), x, y, max_z - Z_OFFSET_FIND_HEIGHT, unit->GetCollisionHeight()) && !unit->GetMap()->IsWaterWalking(unit->GetPhaseMask(), x, y, z, unit->GetCollisionHeight()))
                 {
                     // do not allow creatures to walk on
                     // water level while swimming
@@ -3063,11 +3063,11 @@ float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/,
     return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
 }
 
-float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* ground/* = nullptr*/) const
+float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* ground/* = nullptr*/, float maxSearchDist) const
 {
     return GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, ground,
         isType(TYPEMASK_UNIT) ? !static_cast<Unit const*>(this)->HasAuraType(SPELL_AURA_WATER_WALK) : false,
-        std::max(GetCollisionHeight(),  Z_OFFSET_FIND_HEIGHT));
+        std::max(GetCollisionHeight(),  Z_OFFSET_FIND_HEIGHT), maxSearchDist);
 }
 
 float WorldObject::GetFloorZ() const

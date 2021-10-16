@@ -195,22 +195,58 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         }
     }
 
+    // set whatever we gotta deal with either in the start or end
+    bool isWaterStart = false;
+    bool isWaterEnd   = false;
+
+    if (_source->GetMap()->IsUnderWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight())  ||
+        _source->GetMap()->IsInWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight())     ||
+        _source->GetMap()->IsWaterWalking(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight())||
+        _source->GetMap()->IsAboveWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight()))
+    {
+        isWaterStart = true;
+    }
+
+    if (_source->GetMap()->IsUnderWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight())  ||
+        _source->GetMap()->IsInWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight())     ||
+        _source->GetMap()->IsWaterWalking(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight())||
+        _source->GetMap()->IsAboveWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight()))
+    {
+        isWaterEnd = true;
+    }
+
+    // handle water shortcut: we always fucking with shortcuts when we deal with water cuz we either get fucked over by false positives like
+    // when u near the shore to be near poly but still in water or str8 into the ocean where u got no near poly to hold onto
+    // also we dig only raycasting
+    if ((isWaterStart || isWaterEnd) && _useRaycast)
+    {
+        bool buildShotrcut = false;
+
+        bool canSwim = creature ? creature->CanSwim() : true;
+
+        if (canSwim)
+        {
+            BuildShortcut();
+            _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
+            return;
+        }
+    }
+
     // we may need a better number here
     bool startFarFromPoly = distToStartPoly > 7.0f;
     bool endFarFromPoly   = distToEndPoly > 7.0f;
-
-    // set whatever we in da water (under or not)
-    bool isInOrUnderWaterStart = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight()) || _source->GetMap()->IsInWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight());
-    bool isInOrUnderWaterEnd   = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight()) || _source->GetMap()->IsInWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight());
 
     // create a shortcut if the path begins or end too far
     // away from the desired path points.
     // swimming creatures should not use a shortcut
     // because exiting the water must be done following a proper path
     // we just need to remove/normalize paths between 2 adjacent points
-    if (startFarFromPoly || endFarFromPoly || isInOrUnderWaterStart)
+    if (startFarFromPoly || endFarFromPoly)
     {
         bool buildShotrcut = false;
+
+        bool isInOrUnderWaterStart = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight()) || _source->GetMap()->IsInWater(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight());
+        bool isInOrUnderWaterEnd   = _source->GetMap()->IsUnderWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight()) || _source->GetMap()->IsInWater(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight());
 
         bool isInOrFarUnderWater = startFarFromPoly ? isInOrUnderWaterStart : isInOrUnderWaterEnd;
 
@@ -218,9 +254,9 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
         if (_sourceUnit)
         {
-            bool isInOrUnderWater = (_sourceUnit->CanSwim() && isInOrUnderWaterStart && isInOrUnderWaterEnd) || (isInOrFarUnderWater && _useRaycast);
+            bool isUnderWater = (_sourceUnit->CanSwim() && isInOrUnderWaterStart && isInOrUnderWaterEnd) || (isInOrFarUnderWater && _useRaycast);
 
-            if (isInOrUnderWater || _sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z))
+            if (isUnderWater || _sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z))
             {
                 buildShotrcut = true;
             }
