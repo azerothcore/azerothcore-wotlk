@@ -948,6 +948,19 @@ struct FactionTemplateEntry
         return hostileMask == 0 && friendlyMask == 0;
     }
     [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS) != 0; }
+    [[nodiscard]] bool IsPVPFaction() const
+    {
+        const uint32 pvpFactions[] = {1515, 1641, 412, 1598, 1514, 1642, 1577, 1599, 1214, 1215, 1335, 1554, 1597, 1216, 1217, 1334, 1534, 1596};
+        for (const auto& faction : pvpFactions)
+        {
+            // LOG_FATAL("Entities:unit", "fact %d", fact);
+            if (ID == faction)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 struct GameObjectDisplayInfoEntry
