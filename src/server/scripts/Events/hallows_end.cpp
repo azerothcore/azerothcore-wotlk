@@ -1322,7 +1322,7 @@ public:
                         {
                             me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
                             target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
-                            me->MonsterSay("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
+                            me->Say("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
                         }
 
                         events.RepeatEvent(12500);
