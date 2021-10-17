@@ -56,10 +56,10 @@ bool PetAI::_needToStop()
         if (owner->GetExactDist(me) >= (owner->GetVisibilityRange() - 10.0f))
             return true;
 
-    if (!me->_CanDetectFeignDeathOf(me->GetVictim()))
-        return true;
+    //if (!me->_CanDetectFeignDeathOf(me->GetVictim())) // this checks if they're not guards, which they're obviously not. Therefore... return true here? what the fuck.
+    return true;
 
-    return !me->CanCreatureAttack(me->GetVictim());
+ //   return !me->CanCreatureAttack(me->GetVictim());
 }
 
 void PetAI::_stopAttack()
@@ -469,37 +469,10 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     if (me->HasReactState(REACT_PASSIVE))
         return nullptr;
 
-    // Check pet attackers first so we don't drag a bunch of targets to the owner
-    if (Unit* myAttacker = me->getAttackerForHelper())
-        if (!myAttacker->HasBreakableByDamageCrowdControlAura() && me->_CanDetectFeignDeathOf(myAttacker) && me->CanCreatureAttack(myAttacker))
-            return myAttacker;
-
-    // Check pet's attackers first to prevent dragging mobs back to owner
-    if (me->HasAuraType(SPELL_AURA_MOD_TAUNT))
-    {
-        const Unit::AuraEffectList& tauntAuras = me->GetAuraEffectsByType(SPELL_AURA_MOD_TAUNT);
-        if (!tauntAuras.empty())
-            for (Unit::AuraEffectList::const_reverse_iterator itr = tauntAuras.rbegin(); itr != tauntAuras.rend(); ++itr)
-                if (Unit* caster = (*itr)->GetCaster())
-                    if (me->_CanDetectFeignDeathOf(caster) && me->CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, me->GetGUID()))
-                        return caster;
-    }
-
     // Not sure why we wouldn't have an owner but just in case...
     Unit* owner = me->GetCharmerOrOwner();
     if (!owner)
         return nullptr;
-
-    // Check owner attackers
-    if (Unit* ownerAttacker = owner->getAttackerForHelper())
-        if (!ownerAttacker->HasBreakableByDamageCrowdControlAura() && me->_CanDetectFeignDeathOf(ownerAttacker) && me->CanCreatureAttack(ownerAttacker))
-            return ownerAttacker;
-
-    // Check owner victim
-    // 3.0.2 - Pets now start attacking their owners victim in defensive mode as soon as the hunter does
-    if (Unit* ownerVictim = owner->GetVictim())
-        if (me->_CanDetectFeignDeathOf(ownerVictim) && me->CanCreatureAttack(ownerVictim))
-            return ownerVictim;
 
     // Neither pet or owner had a target and aggressive pets can pick any target
     // To prevent aggressive pets from chain selecting targets and running off, we
