@@ -444,7 +444,7 @@ public:
 
         bool CheckProc(ProcEventInfo& procInfo)
         {
-            SpellInfo const* spellInfo = procInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = procInfo.GetSpellInfo();
             // Xinef: cannot proc from volley damage
             if (spellInfo && (spellInfo->SpellFamilyFlags[0] & 0x2000) && spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
                 return false;
@@ -1370,6 +1370,11 @@ public:
     }
 };
 
+enum LocknLoadSpells
+{
+    SPELL_FROST_TRAP_SLOW = 67035
+};
+
 // -56342 - Lock and Load
 class spell_hun_lock_and_load : public SpellScriptLoader
 {
@@ -1382,19 +1387,54 @@ class spell_hun_lock_and_load : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                return ValidateSpellInfo({ SPELL_LOCK_AND_LOAD_TRIGGER, SPELL_LOCK_AND_LOAD_MARKER });
+                return ValidateSpellInfo({ SPELL_LOCK_AND_LOAD_TRIGGER, SPELL_LOCK_AND_LOAD_MARKER, SPELL_FROST_TRAP_SLOW });
             }
 
             bool CheckTrapProc(ProcEventInfo& eventInfo)
             {
-                // Do not proc on traps for immolation/explosive trap.
                 SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-                if (!spellInfo || !(spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST))
+                if (!spellInfo)
                 {
                     return false;
                 }
 
-                return !eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER);
+                // Black Arrow and Fire traps may trigger on periodic tick only.
+                if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
+                    && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE))
+                {
+                    return true;
+                }
+
+                return IsTargetValid(spellInfo, eventInfo.GetProcTarget()) && !eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER);
+            }
+
+            bool IsTargetValid(SpellInfo const* spellInfo, Unit* target)
+            {
+                if (!spellInfo || !target)
+                {
+                    return false;
+                }
+
+                // Don't check it for fire traps and black arrow, they proc on periodic only and not spell hit.
+                // So it's wrong to check for immunity, it was already checked when the spell was applied.
+                if ((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
+                {
+                    return false;
+                }
+
+                // HitMask for Frost Trap can't be checked correctly as it is.
+                // That's because the talent is triggered by the spell that fires the trap (63487)...
+                // ...and not the actual spell that applies the slow effect (67035).
+                // So the IMMUNE result is never sent by the spell that triggers this.
+                if (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
+                {
+                    if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW))
+                    {
+                        return !target->IsImmunedToSpell(triggerSpell);
+                    }
+                }
+
+                return true;
             }
 
             template <uint32 mask>
@@ -1402,7 +1442,18 @@ class spell_hun_lock_and_load : public SpellScriptLoader
             {
                 PreventDefaultAction();
 
-                if (!(eventInfo.GetTypeMask() & mask))
+                SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+
+                if (!(eventInfo.GetTypeMask() & mask) || !spellInfo)
+                {
+                    return;
+                }
+
+                // Also check if the proc from the fire traps and black arrow actually comes from the periodic ticks here.
+                // Normally this wouldn't be required, but we are circumventing the current proc system limitations.
+                if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
+                    && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
+                    && !(mask & PROC_FLAG_DONE_PERIODIC))
                 {
                     return;
                 }
@@ -1418,8 +1469,11 @@ class spell_hun_lock_and_load : public SpellScriptLoader
 
             void ApplyMarker(ProcEventInfo& eventInfo)
             {
-                Unit* caster = eventInfo.GetActor();
-                caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
+                if (IsTargetValid(eventInfo.GetSpellInfo(), eventInfo.GetProcTarget()))
+                {
+                    Unit* caster = eventInfo.GetActor();
+                    caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
+                }
             }
 
             void Register() override

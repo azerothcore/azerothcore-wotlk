@@ -834,7 +834,7 @@ public:
                     _bFordringMustFallYell = true;
                     if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
-                        tirion->MonsterYell("The Lich King must fall!", LANG_UNIVERSAL, 0);
+                        tirion->Yell("The Lich King must fall!", LANG_UNIVERSAL);
                         tirion->PlayDirectSound(17389);
                     }
                 }
@@ -3536,7 +3536,15 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            int32 heal = int32(eventInfo.GetDamageInfo()->GetDamage() / 2);
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return;
+            }
+
+            int32 heal = static_cast<int32>(damageInfo->GetDamage() / 2);
             GetTarget()->CastCustomSpell(SPELL_DARK_HUNGER_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), true, nullptr, aurEff);
         }
 
