@@ -220,7 +220,7 @@ public:
                             if (pInstance)
                                 if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                                 {
-                                    brann->MonsterYell("What in the name o' Madoran did THAT do? Oh! Wait: I just about got it...", LANG_UNIVERSAL, 0);
+                                    brann->Yell("What in the name o' Madoran did THAT do? Oh! Wait: I just about got it...", LANG_UNIVERSAL);
                                     brann->PlayDirectSound(14276);
                                 }
                         }
@@ -229,7 +229,7 @@ public:
                         {
                             if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                             {
-                                brann->MonsterYell("Ha, that did it! Help's a-comin'! Take this, ya glowin' iron brute!", LANG_UNIVERSAL, 0);
+                                brann->Yell("Ha, that did it! Help's a-comin'! Take this, ya glowin' iron brute!", LANG_UNIVERSAL);
                                 brann->PlayDirectSound(14277);
                             }
                             SummonPhase = PHASE_SUMMON_FRIENDLY_DWARFES;
@@ -276,7 +276,7 @@ public:
                     {
                         if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                         {
-                            brann->MonsterYell("This is a wee bit trickier that before... Oh, bloody--incomin'!", LANG_UNIVERSAL, 0);
+                            brann->Yell("This is a wee bit trickier that before... Oh, bloody--incomin'!", LANG_UNIVERSAL);
                             brann->PlayDirectSound(14275);
                         }
 

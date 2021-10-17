@@ -153,7 +153,7 @@ class boss_archavon : public CreatureScript
                     {
                         char buffer[100];
                         sprintf(buffer, "Archavon the Stone Watcher lunges for %s!", me->GetVictim()->GetName().c_str());
-                        me->MonsterTextEmote(buffer, 0);
+                        me->TextEmote(buffer);
 
                         DoCastVictim(RAID_MODE(SPELL_STOMP_10, SPELL_STOMP_25));
 
