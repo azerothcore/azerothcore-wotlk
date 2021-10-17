@@ -66,7 +66,7 @@ public:
                 if (!me->IsInCombat())
                     if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                         if (Unit* target = owner->GetSelectedUnit())
-                            if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
+                            if (me->CanCreatureAttack(target))
                                 AttackStart(target);
                 _initAttack = false;
             }
@@ -125,7 +125,7 @@ public:
                 if (!me->IsInCombat())
                     if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                         if (Unit* target = owner->GetSelectedUnit())
-                            if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
+                            if (me->CanCreatureAttack(target))
                                 AttackStart(target);
                 _initAttack = false;
             }
