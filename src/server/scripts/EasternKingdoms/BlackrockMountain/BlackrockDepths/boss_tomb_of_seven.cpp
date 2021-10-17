@@ -37,6 +37,11 @@ enum Misc
     DATA_SKILLPOINT_MIN                           = 230
 };
 
+enum Says
+{
+    SAY_START_FIGHT = 0
+};
+
 enum Gossip
 {
     GOSSIP_TEXT_CONTINUE                          = 1828, // Continue...
@@ -135,8 +140,10 @@ public:
                 // Start encounter
                 InstanceScript* instance = creature->GetInstanceScript();
                 if (instance)
+                {
                     instance->SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
-                creature->AI()->Talk(0);
+                }
+                creature->AI()->Talk(SAY_START_FIGHT);
                 break;
         }
         return true;
@@ -177,9 +184,13 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
 
             if (instance->GetData(TYPE_TOMB_OF_SEVEN) == DONE) // what is this trying to do? Probably some kind of crash recovery
+            {
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            }
             else
+            {
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override

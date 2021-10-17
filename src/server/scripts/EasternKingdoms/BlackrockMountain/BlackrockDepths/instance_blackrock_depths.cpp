@@ -356,15 +356,15 @@ public:
                     encounter[3] = data;
                     switch (data)
                     {
-                    case IN_PROGRESS:
-                        HandleGameObject(GoTombExitGUID, false);
-                        HandleGameObject(GoTombEnterGUID, false);
-                        break;
-                    case DONE:
-                        DoRespawnGameObject(GoChestGUID, DAY);
-                        HandleGameObject(GoTombExitGUID, true);
-                        HandleGameObject(GoTombEnterGUID, true);
-                        break;
+                        case IN_PROGRESS:
+                            HandleGameObject(GoTombExitGUID, false);
+                            HandleGameObject(GoTombEnterGUID, false);
+                            break;
+                        case DONE:
+                            DoRespawnGameObject(GoChestGUID, DAY);
+                            HandleGameObject(GoTombExitGUID, true);
+                            HandleGameObject(GoTombEnterGUID, true);
+                            break;
                     }
                     break;
                 case TYPE_LYCEUM:
