@@ -951,10 +951,10 @@ public:
 
             if (success)
             {
-                DoCast(me, faction == ALLIANCE ? SPELL_ALLIANCE_KILL_CREDIT_TORPEDO : SPELL_HORDE_KILL_CREDIT_TORPEDO);
+                DoCast(me, faction == ALLIANCE ? SPELL_ALLIANCE_KILL_CREDIT_TORPEDO : SPELL_HORDE_KILL_CREDIT_TORPEDO, true);
             }
 
-            DoCast(me, SPELL_DETONATE);
+            DoCast(me, SPELL_DETONATE, true);
             me->RemoveAllAuras();
             me->SetVisible(false);
             me->GetMotionMaster()->MoveTargetedHome();
@@ -1054,7 +1054,6 @@ public:
             float verticalSpeed = 40.0f;
             player->KnockbackFrom(caster->GetPositionX(), caster->GetPositionY(), horizontalSpeed, verticalSpeed);
             player->RemoveAurasDueToSpell(SPELL_WARHEAD_FUSE);
-            caster->CastSpell(player, SPELL_PARACHUTE, true);
 
             std::list<Creature*> explosionBunnys;
             caster->GetCreatureListWithEntryInGrid(explosionBunnys, NPC_ALLIANCE_LUMBERBOAT_EXPLOSIONS, 90.0f);
