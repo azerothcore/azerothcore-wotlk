@@ -385,7 +385,7 @@ public:
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
                         me->SetFacingToObject(player);
-                        me->MonsterYell(12389, LANG_UNIVERSAL, player);
+                        // me->Yell(12389, LANG_UNIVERSAL, player); // Doesn't exist
                         SayAshbringer = true;
                     }
 

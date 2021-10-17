@@ -795,7 +795,7 @@ public:
                 case DATA_BRANN_MEMOTESAY:
                     if (Creature* cr = instance->GetCreature(m_brannBronzebeardBaseCamp))
                     {
-                        cr->MonsterTextEmote("Go to your vehicles!", 0, true);
+                        cr->TextEmote("Go to your vehicles!", nullptr, true);
                     }
                     break;
                 case DATA_BRANN_EASY_MODE:
