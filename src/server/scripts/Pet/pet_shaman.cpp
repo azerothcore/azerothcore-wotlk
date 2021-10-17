@@ -49,7 +49,7 @@ public:
 
     struct npc_pet_shaman_earth_elementalAI : public ScriptedAI
     {
-        npc_pet_shaman_earth_elementalAI(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
+        npc_pet_shaman_earth_elementalAI(Creature* creature) : ScriptedAI(creature) { }
 
         void EnterCombat(Unit*) override
         {
@@ -61,16 +61,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (_initAttack)
-            {
-                if (!me->IsInCombat())
-                    if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        if (Unit* target = owner->GetSelectedUnit())
-                            if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
-                                AttackStart(target);
-                _initAttack = false;
-            }
-
             if (!UpdateVictim())
                 return;
 
@@ -87,7 +77,6 @@ public:
 
     private:
         EventMap _events;
-        bool _initAttack;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -103,7 +92,7 @@ public:
 
     struct npc_pet_shaman_fire_elementalAI : public ScriptedAI
     {
-        npc_pet_shaman_fire_elementalAI(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
+        npc_pet_shaman_fire_elementalAI(Creature* creature) : ScriptedAI(creature) { }
 
         void InitializeAI() override { }
 
@@ -120,16 +109,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (_initAttack)
-            {
-                if (!me->IsInCombat())
-                    if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        if (Unit* target = owner->GetSelectedUnit())
-                            if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
-                                AttackStart(target);
-                _initAttack = false;
-            }
-
             if (!UpdateVictim())
                 return;
 
@@ -156,7 +135,6 @@ public:
 
     private:
         EventMap _events;
-        bool _initAttack;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
