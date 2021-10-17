@@ -146,16 +146,6 @@ public:
             events.RescheduleEvent(EVENT_HADRONOX_GRAB, 15000);
         }
 
-        bool AnyPlayerValid() const
-        {
-            Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-                if (me->GetDistance(itr->GetSource()) < 130.0f && itr->GetSource()->IsAlive() && !itr->GetSource()->IsGameMaster() && me->CanCreatureAttack(itr->GetSource()) && me->_CanDetectFeignDeathOf(itr->GetSource()))
-                    return true;
-
-            return false;
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -199,9 +189,10 @@ public:
             EnterEvadeIfOutOfCombatArea();
         }
 
+        // does this even serve a use?
         bool CheckEvadeIfOutOfCombatArea() const override
         {
-            return me->isActiveObject() && !AnyPlayerValid();
+            return me->isActiveObject();
         }
     };
 
