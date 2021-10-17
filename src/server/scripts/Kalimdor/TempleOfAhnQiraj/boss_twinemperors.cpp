@@ -284,22 +284,6 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!who || me->GetVictim())
-            return;
-
-        if (me->_CanDetectFeignDeathOf(who) && me->CanCreatureAttack(who))
-        {
-            if (me->IsWithinDistInMap(who, PULL_RANGE, true, false) && me->GetDistanceZ(who) <= /*CREATURE_Z_ATTACK_RANGE*/7 /*there are stairs*/)
-            {
-                //if (who->HasStealthAura())
-                //    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-                AttackStart(who);
-            }
-        }
-    }
-
     Creature* RespawnNearbyBugsAndGetOne()
     {
         std::list<Creature*> lUnitList;
