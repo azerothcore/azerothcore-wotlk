@@ -2326,13 +2326,6 @@ bool Creature::_IsTargetAcceptable(const Unit* target) const
     return false;
 }
 
-bool Creature::_CanDetectFeignDeathOf(const Unit* target) const
-{
-    if (target->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH))
-        return IsGuard();
-    return true;
-}
-
 void Creature::UpdateMoveInLineOfSightState()
 {
     // xinef: pets, guardians and units with scripts / smartAI should be skipped
