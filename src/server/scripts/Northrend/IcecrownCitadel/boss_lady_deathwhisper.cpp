@@ -470,16 +470,6 @@ public:
             Unit* target = nullptr;
             if (summon->GetEntry() == NPC_VENGEFUL_SHADE)
             {
-                float minrange = 250.0f;
-                Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                    if (Player* p = itr->GetSource())
-                        if (p != me->GetVictim() && summon->GetExactDist(p) < minrange && me->CanCreatureAttack(p) && me->_CanDetectFeignDeathOf(p))
-                        {
-                            target = p;
-                            minrange = summon->GetExactDist(p);
-                        }
-
                 summon->ToTempSummon()->DespawnOrUnsummon(30000);
             }
             else
