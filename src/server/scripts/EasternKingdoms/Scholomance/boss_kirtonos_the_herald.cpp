@@ -135,7 +135,6 @@ public:
                 case INTRO_1:
                     me->GetMotionMaster()->MovePath(KIRTONOS_PATH, false);
                     Talk(EMOTE_SUMMONED);
-                    me->PlayDirectSound(557);
                     break;
                 case INTRO_2:
                     me->GetMotionMaster()->MovePoint(0, PosMove[0]);

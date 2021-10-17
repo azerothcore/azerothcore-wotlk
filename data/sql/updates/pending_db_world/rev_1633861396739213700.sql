@@ -10,4 +10,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = @ENTRY AND `SourceId` = 1;
 
 -- remove "inhabit air"
-UPDATE `creature_template` SET `InhabitType` = 1 WHERE (`entry` = 10506);
+UPDATE `creature_template` SET `InhabitType` = 1 WHERE `entry` = 10506;
+
+-- add sound to emote
+UPDATE `broadcast_text` SET `SoundId` = 557 WHERE `ID` = 5788;
+UPDATE `creature_text` SET `Sound` = 557 WHERE `CreatureID` = 10506;
