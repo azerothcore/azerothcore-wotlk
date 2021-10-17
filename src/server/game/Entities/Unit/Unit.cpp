@@ -13847,7 +13847,7 @@ Unit* Creature::SelectVictim()
     if (!tauntAuras.empty())
         for (Unit::AuraEffectList::const_reverse_iterator itr = tauntAuras.rbegin(); itr != tauntAuras.rend(); ++itr)
             if (Unit* caster = (*itr)->GetCaster())
-                if (_CanDetectFeignDeathOf(caster) && CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, GetGUID()))
+                if (CanIgnoreFeignDeath() && CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, GetGUID()))
                 {
                     target = caster;
                     break;
@@ -13880,7 +13880,7 @@ Unit* Creature::SelectVictim()
     else
         return nullptr;
 
-    if (target && _CanDetectFeignDeathOf(target) && CanCreatureAttack(target))
+    if (target && CanIgnoreFeignDeath() && CanCreatureAttack(target))
     {
         SetInFront(target);
         return target;
@@ -13900,7 +13900,7 @@ Unit* Creature::SelectVictim()
     if (HasReactState(REACT_AGGRESSIVE))
     {
         target = SelectNearestTargetInAttackDistance(std::max<float>(m_CombatDistance, ATTACK_DISTANCE));
-        if (target && _CanDetectFeignDeathOf(target) && CanCreatureAttack(target))
+        if (target && CanIgnoreFeignDeath() && CanCreatureAttack(target))
             return target;
     }
 
