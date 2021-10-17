@@ -842,9 +842,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_REPUTATION              = 7,
     PLAYER_LOGIN_QUERY_LOAD_INVENTORY               = 8,
     PLAYER_LOGIN_QUERY_LOAD_ACTIONS                 = 9,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT              = 10,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_UNREAD_COUNT       = 11,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE               = 12,
+    PLAYER_LOGIN_QUERY_LOAD_MAILS                   = 10,
+    PLAYER_LOGIN_QUERY_LOAD_MAIL_ITEMS              = 11,
     PLAYER_LOGIN_QUERY_LOAD_SOCIAL_LIST             = 13,
     PLAYER_LOGIN_QUERY_LOAD_HOME_BIND               = 14,
     PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS         = 15,
@@ -1160,10 +1159,18 @@ public:
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
     [[nodiscard]] uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
-    void Say(std::string const& text, const uint32 language);
-    void Yell(std::string const& text, const uint32 language);
-    void TextEmote(std::string const& text);
-    void Whisper(std::string const& text, const uint32 language, ObjectGuid receiver);
+    /// Handles said message in regular chat based on declared language and in config pre-defined Range.
+    void Say(std::string_view text, Language language, WorldObject const* = nullptr) override;
+    void Say(uint32 textId, WorldObject const* target = nullptr) override;
+    /// Handles yelled message in regular chat based on declared language and in config pre-defined Range.
+    void Yell(std::string_view text, Language language, WorldObject const* = nullptr) override;
+    void Yell(uint32 textId, WorldObject const* target = nullptr) override;
+    /// Outputs an universal text which is supposed to be an action.
+    void TextEmote(std::string_view text, WorldObject const* = nullptr, bool = false) override;
+    void TextEmote(uint32 textId, WorldObject const* target = nullptr, bool isBossEmote = false) override;
+    /// Handles whispers from Addons and players based on sender, receiver's guid and language.
+    void Whisper(std::string_view text, Language language, Player* receiver, bool = false) override;
+    void Whisper(uint32 textId, Player* target, bool isBossWhisper = false) override;
 
     /*********************************************************/
     /***                    STORAGE SYSTEM                 ***/
@@ -1576,19 +1583,19 @@ public:
 
     void RemoveMail(uint32 id);
 
-    void AddMail(Mail* mail) { totalMailCount++; m_mailCache.push_front(mail); }// for call from WorldSession::SendMailTo
-    uint32 GetMailSize() { return totalMailCount; }
-    uint32 GetMailCacheSize() { return m_mailCache.size();}
+    void AddMail(Mail* mail) { m_mail.push_front(mail); }// for call from WorldSession::SendMailTo
+    uint32 GetMailSize() { return m_mail.size();}
     Mail* GetMail(uint32 id);
 
-    PlayerMails const& GetMails() const { return m_mailCache; }
+    PlayerMails const& GetMails() const { return m_mail; }
+    void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337)
+    void SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems); // Item retrieval mails sent by The Postmaster (34337)
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
     /*********************************************************/
 
     uint8 unReadMails;
-    uint32 totalMailCount;
     time_t m_nextMailDelivereTime;
 
     typedef std::unordered_map<ObjectGuid::LowType, Item*> ItemMap;
@@ -2642,9 +2649,8 @@ public:
     void _LoadAuras(PreparedQueryResult result, uint32 timediff);
     void _LoadGlyphAuras();
     void _LoadInventory(PreparedQueryResult result, uint32 timeDiff);
-    void _LoadMailInit(PreparedQueryResult resultMailCount, PreparedQueryResult resultUnread, PreparedQueryResult resultDelivery);
-    void _LoadMail();
-    void _LoadMailedItems(Mail* mail);
+    void _LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mailItemsResult);
+    static Item* _LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint32 mailId, Mail* mail, Field* fields);
     void _LoadQuestStatus(PreparedQueryResult result);
     void _LoadQuestStatusRewarded(PreparedQueryResult result);
     void _LoadDailyQuestStatus(PreparedQueryResult result);
@@ -2741,7 +2747,7 @@ public:
     uint32 m_GuildIdInvited;
     uint32 m_ArenaTeamIdInvited;
 
-    PlayerMails m_mailCache;
+    PlayerMails m_mail;
     PlayerSpellMap m_spells;
     PlayerTalentMap m_talents;
     uint32 m_lastPotionId;                              // last used health/mana potion in combat, that block next potion use

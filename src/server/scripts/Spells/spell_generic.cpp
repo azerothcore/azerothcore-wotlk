@@ -162,7 +162,7 @@ public:
             caster->CastSpell(target, 52605, true);
             char buff[100];
             sprintf(buff, "%s plants the Flag of Ownership in the corpse of %s.", caster->GetName().c_str(), target->GetName().c_str());
-            caster->MonsterTextEmote(buff, caster);
+            caster->TextEmote(buff, caster);
             haveTarget = true;
         }
 
@@ -773,7 +773,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
             if (!spellInfo)
                 return false;
 
@@ -927,7 +927,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return !eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->IsTargetingArea();
+            return !eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea();
         }
 
         void Register() override
@@ -1694,7 +1694,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
+            if (eventInfo.GetSpellInfo())
                 return false;
 
             // find Mage Armor
@@ -2145,8 +2145,10 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            if (eventInfo.GetDamageInfo()->GetSpellInfo()) // eventInfo.GetSpellInfo()
+            if (eventInfo.GetSpellInfo())
+            {
                 return false;
+            }
 
             if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
                 return false;
@@ -2260,7 +2262,7 @@ public:
         {
             Player* player = GetCaster()->ToPlayer();
             if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
-                Pet::LoadPetFromDB(player, PET_LOAD_SUMMON_PET, 0, player->GetLastPetNumber(), true);
+                Pet::LoadPetFromDB(player, PET_LOAD_BG_RESURRECT, 0, player->GetLastPetNumber(), true);
         }
 
         void Register() override

@@ -314,32 +314,6 @@ public:
 };
 
 // Theirs
-class npc_ghoul_flayer : public CreatureScript
-{
-public:
-    npc_ghoul_flayer() : CreatureScript("npc_ghoul_flayer") { }
-
-    struct npc_ghoul_flayerAI : public ScriptedAI
-    {
-        npc_ghoul_flayerAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override { }
-
-        void EnterCombat(Unit* /*who*/) override { }
-
-        void JustDied(Unit* killer) override
-        {
-            if (killer->GetTypeId() == TYPEID_PLAYER)
-                me->SummonCreature(11064, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_ghoul_flayerAI(creature);
-    }
-};
-
 /*######
 ## npc_augustus_the_touched
 ######*/
@@ -370,47 +344,6 @@ public:
     }
 };
 
-/*######
-## npc_darrowshire_spirit
-######*/
-
-enum DarrowshireSpirit
-{
-    SPELL_SPIRIT_SPAWNIN    = 17321
-};
-
-class npc_darrowshire_spirit : public CreatureScript
-{
-public:
-    npc_darrowshire_spirit() : CreatureScript("npc_darrowshire_spirit") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        SendGossipMenuFor(player, 3873, creature->GetGUID());
-        player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_darrowshire_spiritAI(creature);
-    }
-
-    struct npc_darrowshire_spiritAI : public ScriptedAI
-    {
-        npc_darrowshire_spiritAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override
-        {
-            DoCast(me, SPELL_SPIRIT_SPAWNIN);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        }
-
-        void EnterCombat(Unit* /*who*/) override { }
-    };
-};
-
 void AddSC_eastern_plaguelands()
 {
     // Ours
@@ -418,7 +351,5 @@ void AddSC_eastern_plaguelands()
     new npc_balance_of_light_and_shadow();
 
     // Theirs
-    new npc_ghoul_flayer();
     new npc_augustus_the_touched();
-    new npc_darrowshire_spirit();
 }
