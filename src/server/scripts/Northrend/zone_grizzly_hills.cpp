@@ -1088,7 +1088,6 @@ public:
 
         PrepareAuraScript(spell_z_check_AuraScript);
 
-
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             _posZ = GetTarget()->GetPositionZ();
