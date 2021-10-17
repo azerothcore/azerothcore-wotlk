@@ -1255,7 +1255,7 @@ public:
             return false;
         }
 
-        creature->MonsterSay(args, LANG_UNIVERSAL, nullptr);
+        creature->Say(args, LANG_UNIVERSAL);
 
         // make some emotes
         char lastchar = args[strlen(args) - 1];
@@ -1290,7 +1290,7 @@ public:
             return false;
         }
 
-        creature->MonsterTextEmote(args, 0);
+        creature->TextEmote(args);
 
         return true;
     }
@@ -1352,7 +1352,7 @@ public:
         if (handler->HasLowerSecurity(receiver, ObjectGuid::Empty))
             return false;
 
-        creature->MonsterWhisper(text, receiver);
+        creature->Whisper(text, LANG_UNIVERSAL, receiver);
         return true;
     }
 
@@ -1369,7 +1369,7 @@ public:
             return false;
         }
 
-        creature->MonsterYell(args, LANG_UNIVERSAL, nullptr);
+        creature->Yell(args, LANG_UNIVERSAL, nullptr);
 
         // make an emote
         creature->HandleEmoteCommand(EMOTE_ONESHOT_SHOUT);

@@ -5904,10 +5904,21 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_RESURRECT_PET:
                 {
-                    Creature* pet = m_caster->GetGuardianPet();
-
-                    if (pet && pet->IsAlive())
-                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                    if (Creature* pet = m_caster->GetGuardianPet())
+                    {
+                        if (pet->IsAlive())
+                        {
+                            return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+                        }
+                    }
+                    else if (Player* player = m_caster->ToPlayer())
+                    {
+                        SpellCastResult loadResult = Pet::TryLoadFromDB(player, false, MAX_PET_TYPE, true);
+                        if (loadResult != SPELL_CAST_OK)
+                        {
+                            return loadResult;
+                        }
+                    }
 
                     break;
                 }
