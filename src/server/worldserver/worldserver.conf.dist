@@ -2577,6 +2577,23 @@ Battleground.QueueAnnouncer.SpamProtection.Delay = 30
 Battleground.QueueAnnouncer.PlayerOnly = 0
 
 #
+#    Battleground.QueueAnnouncer.Timed
+#        Description: Enabled battleground queue announcements based on timer
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled - Set Arena.QueueAnnouncer.Timer)
+#
+
+Battleground.QueueAnnouncer.Timed = 0
+
+#
+#    Battleground.QueueAnnouncer.Timer
+#        Description: Set timer for queue announcements
+#        Default:     30000 (30 sec)
+#
+
+Battleground.QueueAnnouncer.Timer = 30000
+
+#
 #    Battleground.PrematureFinishTimer
 #        Description: Time (in milliseconds) before battleground will end prematurely if there are
 #                     not enough players on one team. (Values defined in battleground template)
@@ -2833,23 +2850,6 @@ Arena.QueueAnnouncer.Enable = 0
 #
 
 Arena.QueueAnnouncer.PlayerOnly = 0
-
-#
-#    Battleground.QueueAnnouncer.Timed
-#        Description: Enabled battleground queue announcements based on timer
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled - Set Arena.QueueAnnouncer.Timer)
-#
-
-Battleground.QueueAnnouncer.Timed = 0
-
-#
-#    Battleground.QueueAnnouncer.Timer
-#        Description: Set timer for queue announcements
-#        Default:     30000 (30 sec)
-#
-
-Battleground.QueueAnnouncer.Timer = 30000
 
 #
 #    Arena.ArenaSeason.ID

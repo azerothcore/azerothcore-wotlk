@@ -439,7 +439,7 @@ struct BroadcastText
     }
 
     uint32 Id{0};
-    uint32 Language{0};
+    uint32 LanguageID{0};
     std::vector<std::string> MaleText;
     std::vector<std::string> FemaleText;
     uint32 EmoteId0{0};

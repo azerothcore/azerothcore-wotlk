@@ -132,33 +132,33 @@ public:
             switch (counter)
             {
                 case 1:
-                    me->MonsterTextEmote("Quickly, get me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Quickly, get me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 2:
-                    me->MonsterTextEmote("Find me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Find me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 3:
-                    me->MonsterTextEmote("I think it needs...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("I think it needs...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 4:
-                    me->MonsterTextEmote("Alright, now fetch me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Alright, now fetch me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 5:
-                    me->MonsterTextEmote("Before it thickens, we must add...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("Before it thickens, we must add...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
                 case 6:
-                    me->MonsterTextEmote("It's thickening! Quickly get me some...", player, true);
-                    me->MonsterTextEmote(itemName, player, true);
+                    me->TextEmote("It's thickening! Quickly get me some...", player, true);
+                    me->TextEmote(itemName, player, true);
                     me->CastSpell(player, auraId, true);
                     break;
             }

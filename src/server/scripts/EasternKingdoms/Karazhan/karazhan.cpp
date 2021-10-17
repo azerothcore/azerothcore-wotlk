@@ -490,25 +490,25 @@ public:
             switch(nextStep)
             {
                 case 1:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_1, LANG_UNIVERSAL);
                     return 10000;
                 case 2:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_2, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_2, LANG_UNIVERSAL);
                     return 20000;
                 case 3:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_3, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_3, LANG_UNIVERSAL);
                     return 10000;
                 case 4:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_4, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_4, LANG_UNIVERSAL);
                     return 20000;
                 case 5:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_5, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_5, LANG_UNIVERSAL);
                     return 20000;
                 case 6:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL);
 
                     ATimer = 5500;
                     MTimer = 6600;
@@ -519,7 +519,7 @@ public:
                     me->CastSpell(me, SPELL_MANA_SHIELD, true);
                     return 5500;
                 case 9:
-                    me->MonsterTextEmote(EMOTE_DIALOG_MEDIVH_7, 0, false);
+                    me->TextEmote(EMOTE_DIALOG_MEDIVH_7);
                     me->CastSpell(me, 30972, true);
                     return 10000;
                 case 10:
@@ -529,7 +529,7 @@ public:
                     return 1000;
                 case 11:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->MonsterYell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL, 0);
+                        arca->Yell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL);
                     return 5000;
                 case 12:
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
@@ -540,7 +540,7 @@ public:
                     }
                     return 10000;
                 case 13:
-                    me->MonsterYell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL, 0);
+                    me->Yell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL);
                     return 10000;
                 case 14:
                     if (me->GetMap()->IsDungeon())

@@ -528,9 +528,9 @@ bool ChatHandler::ShowHelpForSubCommands(std::vector<ChatCommand> const& table, 
             continue;
 
         if (m_session)
-            list += "\n    ";
+            list += "\n |- ";
         else
-            list += "\n\r    ";
+            list += "\n\r |- ";
 
         list += table[i].Name;
 
@@ -609,7 +609,7 @@ bool ChatHandler::ShowHelpForCommand(std::vector<ChatCommand> const& table, cons
     return ShowHelpForSubCommands(table, "", cmd);
 }
 
-size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string const& message, uint8 chatTag,
+size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
                                     std::string const& senderName /*= ""*/, std::string const& receiverName /*= ""*/,
                                     uint32 achievementId /*= 0*/, bool gmMessage /*= false*/, std::string const& channelName /*= ""*/)
 {
@@ -689,7 +689,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
     return receiverGUIDPos;
 }
 
-size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string const& message,
+size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message,
                                     uint32 achievementId /*= 0*/, std::string const& channelName /*= ""*/, LocaleConstant locale /*= DEFAULT_LOCALE*/)
 {
     ObjectGuid senderGUID;
