@@ -47,9 +47,9 @@ public:
         {
             switch (cr->GetEntry())
             {
-            case NPC_DARKMASTER_GANDLING:
-                GandlingGUID = cr->GetGUID();
-                break;
+                case NPC_DARKMASTER_GANDLING:
+                    GandlingGUID = cr->GetGUID();
+                    break;
             }
         }
 
@@ -131,14 +131,14 @@ public:
                 case DATA_DARKMASTER_GANDLING:
                     switch (data)
                     {
-                    case DONE:
-                    case NOT_STARTED:
-                    case FAIL:
-                        HandleGameObject(GandlingGatesGUID[6], true);
-                        break;
-                    case IN_PROGRESS:
-                        HandleGameObject(GandlingGatesGUID[6], false);
-                        break;
+                        case DONE:
+                        case NOT_STARTED:
+                        case FAIL:
+                            HandleGameObject(GandlingGatesGUID[6], true);
+                            break;
+                        case IN_PROGRESS:
+                            HandleGameObject(GandlingGatesGUID[6], false);
+                            break;
                     }
                     break;
                 case DATA_RAS_HUMAN:

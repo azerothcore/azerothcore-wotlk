@@ -211,7 +211,9 @@ public:
                         for (int i = 0; i < 3; i++)
                         {
                             if (Guardians[data][i])
+                            {
                                 Guardians[data][i]->SetInCombatWithZone();
+                            }
                         }
                     }
                     break;
@@ -335,7 +337,9 @@ public:
                     break;
                 case SPELL_CURSE_DARKMASTER:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    {
                         DoCast(target, SPELL_CURSE_DARKMASTER);
+                    }
                     events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
                     break;
                 case SPELL_SHADOW_SHIELD:
