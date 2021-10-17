@@ -19,7 +19,7 @@ UPDATE `creature_template` SET `ScriptName` = 'boss_solakar_flamewreath' WHERE `
 
 -- father flame
 UPDATE `gameobject_template` SET `ScriptName` = 'go_father_flame' WHERE `entry` = 175245;
-DELETE FROM `smart_scripts` WHERE `entryorguid` = 175245 AND `source_type` = 1 AND `id` = 0);
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 175245 AND `source_type` = 1 AND `id` = 0;
 
 -- partial cleanup for the eggs
 DELETE FROM `gameobject_template` WHERE `entry` = 175622;
