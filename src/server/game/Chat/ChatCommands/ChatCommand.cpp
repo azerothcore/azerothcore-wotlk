@@ -169,7 +169,7 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
         session.GetAccountId(),
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(),
         player->FindMap() ? player->FindMap()->GetMapName() : "Unknown",
-        areaId, areaName, zoneName,
+        areaId, areaName, zoneId, zoneName,
         (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName() : "",
         targetGuid.ToString());
 
