@@ -26,6 +26,7 @@
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "TaskScheduler.h"
 
 ///////////////////////////////////////
 ////// ITEMS FIXES, BASIC STUFF
@@ -274,6 +275,9 @@ enum costumedOrphan
     SPELL_CREATE_BUCKET                     = 42349,
     SPELL_WATER_SPLASH                      = 42348,
     SPELL_SUMMON_LANTERN                    = 44255,
+    SPELL_HORSEMAN_CONFLAGRATION            = 42380,
+    SPELL_HORSEMAN_CONFLAGRATION_SOUND      = 48149,
+    SPELL_HORSEMAN_CLEAVE                   = 42587,
 
     // NPCs
     NPC_SHADE_OF_HORSEMAN                   = 23543,
@@ -284,6 +288,15 @@ enum costumedOrphan
     ACTION_START_EVENT                      = 1,
     DATA_EVENT                              = 1,
     DATA_ALLOW_START                        = 2,
+
+    // Talks
+    TALK_SHADE_CONFLAGRATION                = 0,
+    TALK_SHADE_PREPARE                      = 1,
+    TALK_SHADE_START_EVENT                  = 2,
+    TALK_SHADE_MORE_FIRES                   = 3,
+    TALK_SHADE_FAILED                       = 4,
+    TALK_SHADE_DEFEATED                     = 5,
+    TALK_SHADE_DEATH                        = 6,
 };
 
 class spell_hallows_end_bucket_lands : public SpellScriptLoader
@@ -330,6 +343,17 @@ public:
     {
         PrepareAuraScript(spell_hallows_end_base_fire_AuraScript);
 
+        void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& /*isPeriodic*/, int32& amplitude)
+        {
+            if (Creature* creature = GetCaster()->ToCreature())
+            {
+                if (!(creature->AI()->GetData(0) % 3))
+                {
+                    amplitude = static_cast<int32>(amplitude * 1.5f);
+                }
+            }
+        }
+
         void HandleEffectPeriodicUpdate(AuraEffect* aurEff)
         {
             // can start from 0
@@ -353,13 +377,14 @@ public:
         void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            target->SetObjectScale(0.5f);
+            target->SetObjectScale(1.0f);
             if (AuraEffect* aEff = GetEffect(EFFECT_0))
                 aEff->SetAmount(1);
         }
 
         void Register() override
         {
+            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_hallows_end_base_fire_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_hallows_end_base_fire_AuraScript::HandleEffectPeriodicUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectApply += AuraEffectApplyFn(spell_hallows_end_base_fire_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
@@ -453,7 +478,7 @@ public:
                 GetInitXYZ(x, y, z, o, path);
                 if (Creature* cr = me->SummonCreature(NPC_SHADE_OF_HORSEMAN, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                 {
-                    cr->GetMotionMaster()->MovePath(path, false);
+                    cr->GetMotionMaster()->MovePath(path, true);
                     cr->AI()->DoAction(path);
                     horseGUID = cr->GetGUID();
                 }
@@ -473,7 +498,7 @@ public:
             if (eventStarted)
             {
                 eventStarted += diff;
-                if (eventStarted >= 5 * MINUTE * IN_MILLISECONDS)
+                if (eventStarted >= 400 * IN_MILLISECONDS)
                 {
                     allowQuest = false;
                     eventStarted = 0;
@@ -564,20 +589,43 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_START_FIRE)
             {
                 me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
                 if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
                 {
-                    me->SetObjectScale(1.5f);
-                    aurEff->SetAmount(2);
+                    int32 amount = 1;
+                    if (Creature* creature = caster->ToCreature())
+                    {
+                        if ((creature->AI()->GetData(0) % 3) > 0)
+                        {
+                            amount = 2;
+                        }
+                    }
+
+                    me->SetObjectScale(0.5f + 0.5f * amount);
+                    aurEff->SetAmount(amount);
                 }
             }
             else if (spellInfo->Id == SPELL_SPREAD_FIRE)
             {
                 me->CastSpell(me, SPELL_FIRE_AURA_BASE, true);
+                if (AuraEffect* aurEff = me->GetAuraEffect(SPELL_FIRE_AURA_BASE, EFFECT_0))
+                {
+                    int32 amount = 0;
+                    if (Creature* creature = caster->ToCreature())
+                    {
+                        if ((creature->AI()->GetData(0) % 3) > 1)
+                        {
+                            amount = 1;
+                        }
+                    }
+
+                    me->SetObjectScale(0.5f + 0.5f * amount);
+                    aurEff->SetAmount(amount);
+                }
             }
             else if (spellInfo->Id == SPELL_WATER_SPLASH)
             {
@@ -616,15 +664,36 @@ public:
             unitList.clear();
             me->CastSpell(me, SPELL_HORSEMAN_MOUNT, true);
             me->SetSpeed(MOVE_WALK, 3.0f, true);
-            Unmount = false;
         }
 
-        bool Unmount;
         EventMap events;
+        uint32 playerCount;
         uint32 counter;
         GuidList unitList;
         int32 pos;
-        void EnterCombat(Unit*) override {}
+        TaskScheduler scheduler;
+
+        void EnterCombat(Unit*) override
+        {
+            scheduler.Schedule(6s, [this](TaskContext context)
+            {
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30.f, true))
+                {
+                    me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
+                    target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
+                    Talk(TALK_SHADE_CONFLAGRATION);
+                }
+
+                context.Repeat(12s);
+            })
+            .Schedule(7s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_HORSEMAN_CLEAVE, true);
+
+                context.Repeat(8s);
+            });
+        }
+
         void MoveInLineOfSight(Unit*  /*who*/) override {}
 
         void DoAction(int32 param) override
@@ -676,17 +745,35 @@ public:
 
         void Reset() override
         {
+            playerCount = 0;
             unitList.clear();
             std::list<Creature*> temp;
             me->GetCreaturesWithEntryInRange(temp, 100.0f, NPC_FIRE_TRIGGER);
             for (std::list<Creature*>::const_iterator itr = temp.begin(); itr != temp.end(); ++itr)
+            {
                 unitList.push_back((*itr)->GetGUID());
+            }
 
             events.ScheduleEvent(1, 3000);
-            events.ScheduleEvent(2, 5000);
-            events.ScheduleEvent(2, 7000);
-            events.ScheduleEvent(2, 10000);
-            events.ScheduleEvent(3, 15000);
+            events.ScheduleEvent(2, 25000);
+            events.ScheduleEvent(2, 43000);
+            events.ScheduleEvent(3, 63000);
+
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
+        }
+
+        void EnterEvadeMode() override
+        {
+            me->DespawnOrUnsummon(1);
+        }
+
+        uint32 GetData(uint32 /*type*/) const override
+        {
+            return playerCount;
         }
 
         void UpdateAI(uint32 diff) override
@@ -698,96 +785,136 @@ public:
             switch (events.ExecuteEvent())
             {
                 case 1:
-                    me->Yell("Prepare yourselves, the bells have tolled! Shelter your weak, your young and your old! Each of you shall pay the final sum! Cry for mercy; the reckoning has come!", LANG_UNIVERSAL);
-                    me->PlayDirectSound(11966);
+                    Talk(TALK_SHADE_PREPARE);
                     break;
                 case 2:
                     {
-                        if (Unit* trigger = getTrigger())
-                            me->CastSpell(trigger, SPELL_START_FIRE, true);
+                        CastFires(true);
                         break;
                     }
                 case 3:
                     {
-                        counter++;
-                        if (counter > 10)
-                        {
-                            if (counter > 12)
-                            {
-                                bool failed = false;
-                                for (ObjectGuid const& guid : unitList)
-                                    if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
-                                        if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
-                                        {
-                                            failed = true;
-                                            break;
-                                        }
+                        bool checkBurningTriggers = false;
+                        for (ObjectGuid const& guid : unitList)
+                            if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
+                                if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                                {
+                                    checkBurningTriggers = true;
+                                    break;
+                                }
 
-                                FinishEvent(failed);
-                            }
+                        if (!checkBurningTriggers)
+                        {
+                            FinishEvent(false);
+                            return;
+                        }
+
+                        counter++;
+                        if (counter > 21)
+                        {
+                            bool failed = false;
+                            for (ObjectGuid const& guid : unitList)
+                                if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
+                                    if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                                    {
+                                        failed = true;
+                                        break;
+                                    }
+
+                            FinishEvent(failed);
                             return;
                         }
                         if (counter == 5)
                         {
-                            me->Yell("The sky is dark. The fire burns. You strive in vain as Fate's wheel turns.", LANG_UNIVERSAL);
-                            me->PlayDirectSound(12570);
+                            Talk(TALK_SHADE_START_EVENT);
                         }
-                        else if (counter == 10)
+                        else if (counter == 15)
                         {
-                            me->Yell("The town still burns. A cleansing fire! Time is short, I'll soon retire!", LANG_UNIVERSAL);
-                            me->PlayDirectSound(12571);
+                            Talk(TALK_SHADE_MORE_FIRES);
                         }
 
-                        if (Unit* trigger = getTrigger())
-                            me->CastSpell(trigger, SPELL_START_FIRE, true);
-                        events.RepeatEvent(12000);
+                        CastFires(false);
+                        events.RepeatEvent(15000);
+                        break;
+                    }
+                    case 4:
+                    {
+                        me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        if (Unit* target = me->SelectNearestPlayer(30.0f))
+                            AttackStart(target);
                         break;
                     }
             }
 
-            if (Unmount)
-            {
-                me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
-                me->RemoveAllAuras();
-                me->Dismount();
-                if (Unit* target = me->SelectNearestPlayer(30.0f))
-                    AttackStart(target);
-            }
-            if (me->IsMounted())
-                return;
-
             if (!UpdateVictim())
                 return;
 
-            // cleave
-            if (!urand(0, 29))
-                me->CastSpell(me->GetVictim(), 15496, false);
-
-            DoMeleeAttackIfReady();
+            scheduler.Update(diff, [this]
+            {
+                DoMeleeAttackIfReady();
+            });
         }
 
-        Unit* getTrigger()
+        void CastFires(bool intial)
         {
-            std::list<Unit*> tmpList;
+            std::vector<Unit*> tmpList;
             for (ObjectGuid const& guid : unitList)
+            {
                 if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
+                {
                     if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                    {
                         tmpList.push_back(c);
+                    }
+                }
+            }
 
             if (tmpList.empty())
-                return nullptr;
+            {
+                return;
+            }
 
-            std::list<Unit*>::const_iterator it2 = tmpList.begin();
-            std::advance(it2, urand(0, tmpList.size() - 1));
-            return (*it2);
+            std::list<Player*> players;
+            Acore::AnyPlayerInObjectRangeCheck checker(me, 60.f);
+            Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Cell::VisitWorldObjects(me, searcher, 60.f);
+            if (players.empty())
+            {
+                return;
+            }
+
+            playerCount = static_cast<uint32>(players.size()) - 1;
+
+            if (!intial)
+            {
+                float playerRate = std::max(0.f, 0.5f - playerCount * 0.25f);
+
+                // If there are more burning triggers than players, do not cast next fire
+                if (tmpList.size() < unitList.size() * playerRate)
+                {
+                    return;
+                }
+            }
+            else
+                playerCount += 1;
+
+            uint32 sizeCount = (playerCount / 3) + 1;
+            if (intial && playerCount > 0)
+            {
+                sizeCount += playerCount % 2;
+            }
+
+            Acore::Containers::RandomResize(tmpList, sizeCount);
+            for (Unit* trigger : tmpList)
+                me->CastSpell(trigger, SPELL_START_FIRE, true);
         }
 
         void FinishEvent(bool failed)
         {
             if (failed)
             {
-                me->Yell("Fire consumes! You've tried and failed. Let there be no doubt, justice prevailed!", LANG_UNIVERSAL);
-                me->PlayDirectSound(11967);
+                Talk(TALK_SHADE_FAILED);
                 for (ObjectGuid const& guid : unitList)
                     if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                         c->RemoveAllAuras();
@@ -796,10 +923,11 @@ public:
             }
             else
             {
-                me->Yell("My flames have died, left not a spark! I shall send you now to the lifeless dark!", LANG_UNIVERSAL);
-                me->PlayDirectSound(11968);
+                Talk(TALK_SHADE_DEFEATED);
                 float x, y, z;
                 GetPosToLand(x, y, z);
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
                 me->GetMotionMaster()->MovePoint(8, x, y, z);
             }
         }
@@ -808,14 +936,16 @@ public:
         {
             if (type == POINT_MOTION_TYPE && point == 8)
             {
-                Unmount = true;
+                me->RemoveAllAuras();
+                me->SetCanFly(false);
+                me->SetDisableGravity(false);
+                events.ScheduleEvent(4, 2000);
             }
         }
 
         void JustDied(Unit*  /*killer*/) override
         {
-            me->Yell("So eager you are, for my blood to spill. Yet to vanquish me, 'tis my head you must kill!", LANG_UNIVERSAL);
-            me->PlayDirectSound(11969);
+            Talk(TALK_SHADE_DEATH);
             float x, y, z;
             GetPosToLand(x, y, z);
             me->CastSpell(x, y, z, SPELL_SUMMON_LANTERN, true);
@@ -830,12 +960,12 @@ public:
             Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
             Cell::VisitWorldObjects(me, searcher, radius);
 
-            for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            for (Player* player : players)
             {
-                (*itr)->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_H);
-                (*itr)->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_A);
-                (*itr)->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_H);
-                (*itr)->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_A);
+                player->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_H);
+                player->AreaExploredOrEventHappens(QUEST_STOP_THE_FIRES_A);
+                player->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_H);
+                player->AreaExploredOrEventHappens(QUEST_LET_THE_FIRES_COME_A);
             }
         }
     };
@@ -914,7 +1044,6 @@ enum headlessHorseman
     SPELL_SUMMONING_RHYME_TARGET                    = 42878,
     SPELL_HEAD_VISUAL                               = 42413,
     SPELL_EARTH_EXPLOSION                           = 42427,
-    SPELL_HORSEMAN_CLEAVE                           = 42587,
     SPELL_HORSEMAN_BODY_REGEN                       = 42403,
     SPELL_HORSEMAN_BODY_REGEN_CONFUSE               = 43105,
     SPELL_HORSEMAN_IMMUNITY                         = 42556,
@@ -926,7 +1055,6 @@ enum headlessHorseman
     SPELL_HORSEMAN_BODY_PHASE                       = 42547,
     SPELL_HORSEMAN_SPEAKS                           = 43129,
     SPELL_HORSEMAN_WHIRLWIND                        = 43116,
-    SPELL_HORSEMAN_CONFLAGRATION                    = 42380,
     SPELL_SUMMON_PUMPKIN                            = 42552,
     SPELL_PUMPKIN_VISUAL                            = 42280,
     SPELL_SQUASH_SOUL                               = 42514,
@@ -1191,7 +1319,11 @@ public:
                 case EVENT_HORSEMAN_CONFLAGRATION:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        {
                             me->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION, false);
+                            target->CastSpell(target, SPELL_HORSEMAN_CONFLAGRATION_SOUND, true);
+                            me->Say("Harken, cur! Tis you I spurn! Now feel... the burn!", LANG_UNIVERSAL, target);
+                        }
 
                         events.RepeatEvent(12500);
                         break;
