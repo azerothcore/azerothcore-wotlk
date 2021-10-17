@@ -1,14 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Util.h"
 #include "Common.h"
 #include "Containers.h"
 #include "IpAddress.h"
-#include "StringConvert.h"
 #include "StringFormat.h"
 #include <algorithm>
 #include <cctype>
@@ -17,9 +27,6 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
-#include <cctype>
-#include <cstdarg>
-#include <ctime>
 #include <utf8.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
@@ -518,7 +525,7 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
     {
         std::wstring const& ending = **itr;
         std::size_t const endLen = ending.length();
-        if (!(endLen <= thisLen))
+        if (endLen > thisLen)
         {
             continue;
         }

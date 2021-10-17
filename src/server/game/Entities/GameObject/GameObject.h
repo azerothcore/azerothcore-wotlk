@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AZEROTHCORE_GAMEOBJECT_H
@@ -492,6 +503,8 @@ struct GameObjectTemplate
     {
         switch (type)
         {
+            case GAMEOBJECT_TYPE_BUTTON:
+                return button.linkedTrap;
             case GAMEOBJECT_TYPE_CHEST:
                 return chest.linkedTrapId;
             case GAMEOBJECT_TYPE_SPELL_FOCUS:
@@ -751,10 +764,12 @@ public:
     [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
-    void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
-    void SetWorldRotation(G3D::Quat const& rot);
+    void SetLocalRotationAngles(float z_rot, float y_rot, float x_rot);
+    void SetLocalRotation(G3D::Quat const& rot);
     void SetTransportPathRotation(float qx, float qy, float qz, float qw);
-    [[nodiscard]] int64 GetPackedWorldRotation() const { return m_packedRotation; }
+    [[nodiscard]] G3D::Quat const& GetLocalRotation() const { return m_localRotation; }
+    [[nodiscard]] int64 GetPackedLocalRotation() const { return m_packedRotation; }
+    [[nodiscard]] G3D::Quat GetWorldRotation() const;
 
     // overwrite WorldObject function for proper name localization
     [[nodiscard]] std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
@@ -795,11 +810,7 @@ public:
             return now;
     }
 
-    void SetRespawnTime(int32 respawn)
-    {
-        m_respawnTime = respawn > 0 ? time(nullptr) + respawn : 0;
-        m_respawnDelayTime = respawn > 0 ? respawn : 0;
-    }
+    void SetRespawnTime(int32 respawn);
     void Respawn();
     [[nodiscard]] bool isSpawned() const
     {
@@ -811,6 +822,7 @@ public:
     void SetSpawnedByDefault(bool b) { m_spawnedByDefault = b; }
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
     void Refresh();
+    void DespawnOrUnsummon(Milliseconds delay = 0ms, Seconds forcedRespawnTime = 0s);
     void Delete();
     void GetFishLoot(Loot* loot, Player* loot_owner);
     void GetFishLootJunk(Loot* loot, Player* loot_owner);
@@ -857,19 +869,24 @@ public:
     [[nodiscard]] uint32 GetUseCount() const { return m_usetimes; }
     [[nodiscard]] uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
 
-    void SaveRespawnTime() override;
+    void SaveRespawnTime() override { SaveRespawnTime(0); }
+    void SaveRespawnTime(uint32 forceDelay);
 
     Loot        loot;
 
     [[nodiscard]] Player* GetLootRecipient() const;
     [[nodiscard]] Group* GetLootRecipientGroup() const;
-    void SetLootRecipient(Unit* unit);
+    void SetLootRecipient(Creature* creature);
+    void SetLootRecipient(Map* map);
     bool IsLootAllowedFor(Player const* player) const;
     [[nodiscard]] bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
     uint32 lootingGroupLowGUID;                         // used to find group which is looting
     void SetLootGenerationTime() { m_lootGenerationTime = time(nullptr); }
     [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
+
+    [[nodiscard]] GameObject* GetLinkedTrap();
+    void SetLinkedTrap(GameObject* linkedTrap) { m_linkedTrap = linkedTrap->GetGUID(); }
 
     [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id) const override;
@@ -945,9 +962,17 @@ public:
     [[nodiscard]] float GetStationaryZ() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetPositionZ(); return GetPositionZ(); }
     [[nodiscard]] float GetStationaryO() const override { if (GetGOInfo()->type != GAMEOBJECT_TYPE_MO_TRANSPORT) return m_stationaryPosition.GetOrientation(); return GetOrientation(); }
 
-    float GetInteractionDistance();
+    [[nodiscard]] float GetInteractionDistance() const;
 
     void UpdateModelPosition();
+
+    [[nodiscard]] bool IsAtInteractDistance(Position const& pos, float radius) const;
+    [[nodiscard]] bool IsAtInteractDistance(Player const* player, SpellInfo const* spell = nullptr) const;
+
+    [[nodiscard]] bool IsWithinDistInMap(Player const* player) const;
+    using WorldObject::IsWithinDistInMap;
+
+    [[nodiscard]] SpellInfo const* GetSpellForLock(Player const* player) const;
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
@@ -958,6 +983,8 @@ protected:
     uint32      m_spellId;
     time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
     uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer
+    uint32      m_despawnDelay;
+    Seconds     m_despawnRespawnTime;                   // override respawn time after delayed despawn
     LootState   m_lootState;
     bool        m_spawnedByDefault;
     uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
@@ -978,13 +1005,16 @@ protected:
     bool m_allowModifyDestructibleBuilding;
 
     int64 m_packedRotation;
-    G3D::Quat m_worldRotation;
+    G3D::Quat m_localRotation;
     Position m_stationaryPosition;
 
     ObjectGuid m_lootRecipient;
-    uint32 m_lootRecipientGroup;
+    ObjectGuid::LowType m_lootRecipientGroup;
     uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
     uint32 m_lootGenerationTime;
+
+    ObjectGuid m_linkedTrap;
+
 private:
     void CheckRitualList();
     void ClearRitualList();

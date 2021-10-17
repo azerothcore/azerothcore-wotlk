@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -13,7 +24,7 @@
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
 #include "GridNotifiers.h"
-#include "MapManager.h"
+#include "MapMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
@@ -239,7 +250,7 @@ public:
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
-                if (Unit* owner = target->ToTempSummon()->GetSummoner())
+                if (Unit* owner = target->ToTempSummon()->GetSummonerUnit())
                     if (owner->GetTypeId() == TYPEID_PLAYER)
                         owner->ToPlayer()->KilledMonsterCredit(23327); // Some trigger, just count
         }
@@ -3066,6 +3077,42 @@ public:
     }
 };
 
+enum QuestShyRotam
+{
+    NPC_SHY_ROTAM = 10737,
+};
+
+// 16796 - Summon Shy-Rotam
+class spell_q5056_summon_shy_rotam : public SpellScriptLoader
+{
+public:
+    spell_q5056_summon_shy_rotam() : SpellScriptLoader("spell_q5056_summon_shy_rotam") {}
+
+    class spell_q5056_summon_shy_rotam_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_q5056_summon_shy_rotam_SpellScript);
+
+        void HandleFinish()
+        {
+            Position shyRotamSpawnPosition = Position(8072.38f, -3833.81f, 690.03f, 4.56f);
+            if (Creature* summon = GetCaster()->SummonCreature(NPC_SHY_ROTAM, shyRotamSpawnPosition, TEMPSUMMON_TIMED_DESPAWN, 15 * MINUTE * IN_MILLISECONDS))
+            {
+                summon->AI()->AttackStart(GetCaster());
+            }
+        }
+
+        void Register() override
+        {
+            AfterCast += SpellCastFn(spell_q5056_summon_shy_rotam_SpellScript::HandleFinish);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_q5056_summon_shy_rotam_SpellScript();
+    };
+};
+
 void AddSC_quest_spell_scripts()
 {
     // Ours
@@ -3137,4 +3184,5 @@ void AddSC_quest_spell_scripts()
     new spell_q12619_emblazon_runeblade_effect();
     new spell_q12919_gymers_grab();
     new spell_q12919_gymers_throw();
+    new spell_q5056_summon_shy_rotam();
 }

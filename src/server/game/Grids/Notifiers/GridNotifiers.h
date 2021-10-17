@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_GRIDNOTIFIERS_H
@@ -13,6 +24,7 @@
 #include "GameObject.h"
 #include "Object.h"
 #include "ObjectGridLoader.h"
+#include "Optional.h"
 #include "Player.h"
 #include "Spell.h"
 #include "Unit.h"
@@ -34,13 +46,14 @@ namespace Acore
         bool i_largeOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) : i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
+        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) :
+            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
         {
             i_visibleNow.clear();
         }
 
         void Visit(GameObjectMapType&);
-        template<class T> void Visit(GridRefManager<T>& m);
+        template<class T> void Visit(GridRefMgr<T>& m);
         void SendToSelf(void);
     };
 
@@ -49,7 +62,7 @@ namespace Acore
         WorldObject& i_object;
 
         explicit VisibleChangesNotifier(WorldObject& object) : i_object(object) {}
-        template<class T> void Visit(GridRefManager<T>&) {}
+        template<class T> void Visit(GridRefMgr<T>&) {}
         void Visit(PlayerMapType&);
         void Visit(CreatureMapType&);
         void Visit(DynamicObjectMapType&);
@@ -57,9 +70,9 @@ namespace Acore
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player& player, bool largeOnly) : VisibleNotifier(player, false, largeOnly) {}
+        PlayerRelocationNotifier(Player& player, bool largeOnly): VisibleNotifier(player, false, largeOnly) { }
 
-        template<class T> void Visit(GridRefManager<T>& m) { VisibleNotifier::Visit(m); }
+        template<class T> void Visit(GridRefMgr<T>& m) { VisibleNotifier::Visit(m); }
         void Visit(PlayerMapType&);
     };
 
@@ -67,7 +80,7 @@ namespace Acore
     {
         Creature& i_creature;
         CreatureRelocationNotifier(Creature& c) : i_creature(c) {}
-        template<class T> void Visit(GridRefManager<T>&) {}
+        template<class T> void Visit(GridRefMgr<T>&) {}
         void Visit(PlayerMapType&);
     };
 
@@ -76,7 +89,7 @@ namespace Acore
         Unit& i_unit;
         bool isCreature;
         explicit AIRelocationNotifier(Unit& unit) : i_unit(unit), isCreature(unit.GetTypeId() == TYPEID_UNIT)  {}
-        template<class T> void Visit(GridRefManager<T>&) {}
+        template<class T> void Visit(GridRefMgr<T>&) {}
         void Visit(CreatureMapType&);
     };
 
@@ -97,7 +110,7 @@ namespace Acore
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
         void Visit(DynamicObjectMapType& m);
-        template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
+        template<class SKIP> void Visit(GridRefMgr<SKIP>&) {}
 
         void SendPacket(Player* player)
         {
@@ -125,7 +138,7 @@ namespace Acore
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
         void Visit(DynamicObjectMapType& m);
-        template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
+        template<class SKIP> void Visit(GridRefMgr<SKIP>&) {}
 
         void SendPacket(Player* player)
         {
@@ -142,7 +155,7 @@ namespace Acore
         uint32 i_timeDiff;
         bool i_largeOnly;
         explicit ObjectUpdater(const uint32 diff, bool largeOnly) : i_timeDiff(diff), i_largeOnly(largeOnly) {}
-        template<class T> void Visit(GridRefManager<T>& m);
+        template<class T> void Visit(GridRefMgr<T>& m);
         void Visit(PlayerMapType&) {}
         void Visit(CorpseMapType&) {}
     };
@@ -168,7 +181,7 @@ namespace Acore
         void Visit(CorpseMapType& m);
         void Visit(DynamicObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -188,7 +201,7 @@ namespace Acore
         void Visit(CorpseMapType& m);
         void Visit(DynamicObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -208,7 +221,7 @@ namespace Acore
         void Visit(GameObjectMapType& m);
         void Visit(DynamicObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Do>
@@ -265,7 +278,7 @@ namespace Acore
                     i_do(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Gameobject searchers
@@ -282,7 +295,7 @@ namespace Acore
 
         void Visit(GameObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Last accepted by Check GO if any (Check can change requirements at each call)
@@ -298,7 +311,7 @@ namespace Acore
 
         void Visit(GameObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -313,7 +326,7 @@ namespace Acore
 
         void Visit(GameObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Functor>
@@ -329,7 +342,7 @@ namespace Acore
                     _func(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
 
     private:
         Functor& _func;
@@ -352,7 +365,7 @@ namespace Acore
         void Visit(CreatureMapType& m);
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Last accepted by Check Unit if any (Check can change requirements at each call)
@@ -369,7 +382,7 @@ namespace Acore
         void Visit(CreatureMapType& m);
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // All accepted by Check units if any
@@ -386,7 +399,7 @@ namespace Acore
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Creature searchers
@@ -403,7 +416,7 @@ namespace Acore
 
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Last accepted by Check Creature if any (Check can change requirements at each call)
@@ -419,7 +432,7 @@ namespace Acore
 
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -434,7 +447,7 @@ namespace Acore
 
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Do>
@@ -453,7 +466,7 @@ namespace Acore
                     i_do(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // Player searchers
@@ -470,7 +483,7 @@ namespace Acore
 
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -485,7 +498,7 @@ namespace Acore
 
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -501,7 +514,7 @@ namespace Acore
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Check>
@@ -517,7 +530,7 @@ namespace Acore
 
         void Visit(PlayerMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Do>
@@ -536,7 +549,7 @@ namespace Acore
                     i_do(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     template<class Do>
@@ -556,7 +569,7 @@ namespace Acore
                     i_do(itr->GetSource());
         }
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+        template<class NOT_INTERESTED> void Visit(GridRefMgr<NOT_INTERESTED>&) {}
     };
 
     // CHECKS && DO classes
@@ -931,7 +944,7 @@ namespace Acore
         bool operator()(Unit* u)
         {
             if (u->isTargetableForAttack(true, i_funit) && i_obj->IsWithinDistInMap(u, i_range) &&
-                (i_funit->IsInCombatWith(u) || i_funit->IsHostileTo(u)) && i_obj->CanSeeOrDetect(u))
+                (i_funit->IsInCombatWith(u) || u->IsHostileTo(i_funit)) && i_obj->CanSeeOrDetect(u))
             {
                 i_range = i_obj->GetDistance(u);        // use found unit range as new range limit for next check
                 return true;
@@ -1099,6 +1112,30 @@ namespace Acore
         Creature const* me;
         float m_range;
         NearestHostileUnitInAttackDistanceCheck(NearestHostileUnitInAttackDistanceCheck const&);
+    };
+
+    class NearestVisibleDetectableContestedGuardUnitCheck
+    {
+    public:
+        explicit NearestVisibleDetectableContestedGuardUnitCheck(Unit const* unit) : me(unit) {}
+        bool operator()(Unit* u)
+        {
+            if (!u->CanSeeOrDetect(me, true, true, false))
+            {
+                return false;
+            }
+
+            if (!u->IsContestedGuard())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+    private:
+        Unit const* me;
+        NearestVisibleDetectableContestedGuardUnitCheck(NearestVisibleDetectableContestedGuardUnitCheck const&);
     };
 
     class AnyAssistCreatureInRangeCheck
@@ -1312,6 +1349,30 @@ namespace Acore
         const WorldObject* m_pObject;
         uint32 m_uiEntry;
         float m_fRange;
+    };
+
+    class AllDeadCreaturesInRange
+    {
+    public:
+        AllDeadCreaturesInRange(WorldObject const* obj, float range, bool reqAlive = true) : _obj(obj), _range(range), _reqAlive(reqAlive) {}
+
+        bool operator()(Unit* unit) const
+        {
+            if (_reqAlive && unit->IsAlive())
+            {
+                return false;
+            }
+            if (!_obj->IsWithinDistInMap(unit, _range))
+            {
+                return false;
+            }
+            return true;
+        }
+
+    private:
+        WorldObject const* _obj;
+        float              _range;
+        bool               _reqAlive;
     };
 
     class PlayerAtMinimumRangeAway

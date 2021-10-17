@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef ACORE_SHAREDDEFINES_H
@@ -548,9 +559,9 @@ enum SpellAttr7
     SPELL_ATTR7_NO_CLIENT_FAIL_WHILE_STUNNED_FLEEING_CONFUSED = 0x00100000, // TITLE Unknown attribute 20@Attr7 DESCRIPTION Invulnerability related?
     SPELL_ATTR7_RETAIN_COOLDOWN_THROUGH_LOAD                  = 0x00200000, // TITLE Unknown attribute 21@Attr7
     SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT       = 0x00400000, // TITLE Ignore cold weather flying restriction DESCRIPTION Set for loaner mounts, allows them to be used despite lacking required flight skill
-    SPELL_ATTR7_NO_ATTACK_DODGE                               = 0x00800000, // TITLE Unknown attribute 23@Attr7 DESCRIPTION Motivate, Mutilate, Shattering Throw
-    SPELL_ATTR7_NO_ATTACK_PARRY                               = 0x01000000, // TITLE Unknown attribute 24@Attr7 DESCRIPTION Motivate, Mutilate, Perform Speech, Shattering Throw
-    SPELL_ATTR7_NO_ATTACK_MISS                                = 0x02000000, // TITLE Unknown attribute 25@Attr7
+    SPELL_ATTR7_NO_ATTACK_DODGE                               = 0x00800000, // TITLE Spell cannot be dodged 23@Attr7 DESCRIPTION Motivate, Mutilate, Shattering Throw
+    SPELL_ATTR7_NO_ATTACK_PARRY                               = 0x01000000, // TITLE Spell cannot be parried 24@Attr7 DESCRIPTION Motivate, Mutilate, Perform Speech, Shattering Throw
+    SPELL_ATTR7_NO_ATTACK_MISS                                = 0x02000000, // TITLE Spell cannot be missed 25@Attr7
     SPELL_ATTR7_TREAT_AS_NPC_AOE                              = 0x04000000, // TITLE Unknown attribute 26@Attr7
     SPELL_ATTR7_BYPASS_NO_RESSURECTION_AURA                   = 0x08000000, // TITLE Unknown attribute 27@Attr7
     SPELL_ATTR7_DO_NOT_COUNT_FOR_PVP_SCOREBOARD               = 0x10000000, // TITLE Consolidate in raid buff frame (client only)
@@ -2463,7 +2474,8 @@ enum LockKeyType
 {
     LOCK_KEY_NONE  = 0,
     LOCK_KEY_ITEM  = 1,
-    LOCK_KEY_SKILL = 2
+    LOCK_KEY_SKILL = 2,
+    LOCK_KEY_SPELL = 3
 };
 
 enum LockType
@@ -2574,7 +2586,7 @@ enum CreatureTypeFlags
     CREATURE_TYPE_FLAG_TAMEABLE                          = 0x00000001,   // Makes the mob tameable (must also be a beast and have family set)
     CREATURE_TYPE_FLAG_VISIBLE_TO_GHOSTS                 = 0x00000002,   // Creature is also visible for not alive player. Allows gossip interaction if npcflag allows?
     CREATURE_TYPE_FLAG_BOSS_MOB                          = 0x00000004,   // Changes creature's visible level to "??" in the creature's portrait - Immune Knockback.
-    CREATURE_TYPE_FLAG_DO_NOT_PLAY_WOUND_PARRY_ANIMATION = 0x00000008,
+    CREATURE_TYPE_FLAG_DO_NOT_PLAY_WOUND_ANIM            = 0x00000008,   // Does not play wound animation on parry
     CREATURE_TYPE_FLAG_NO_FACTION_TOOLTIP                = 0x00000010,
     CREATURE_TYPE_FLAG_MORE_AUDIBLE                      = 0x00000020,   // Sound related
     CREATURE_TYPE_FLAG_SPELL_ATTACKABLE                  = 0x00000040,
@@ -2593,7 +2605,7 @@ enum CreatureTypeFlags
     CREATURE_TYPE_FLAG_COLLIDE_WITH_MISSILES             = 0x00080000,   // Projectiles can collide with this creature - interacts with TARGET_DEST_TRAJ
     CREATURE_TYPE_FLAG_NO_NAME_PLATE                     = 0x00100000,
     CREATURE_TYPE_FLAG_DO_NOT_PLAY_MOUNTED_ANIMATIONS    = 0x00200000,
-    CREATURE_TYPE_FLAG_IS_LINK_ALL                       = 0x00400000,
+    CREATURE_TYPE_FLAG_LINK_ALL                          = 0x00400000,
     CREATURE_TYPE_FLAG_INTERACT_ONLY_WITH_CREATOR        = 0x00800000,
     CREATURE_TYPE_FLAG_DO_NOT_PLAY_UNIT_EVENT_SOUNDS     = 0x01000000,
     CREATURE_TYPE_FLAG_HAS_NO_SHADOW_BLOB                = 0x02000000,
@@ -2602,7 +2614,7 @@ enum CreatureTypeFlags
     CREATURE_TYPE_FLAG_DO_NOT_SHEATHE                    = 0x10000000,
     CREATURE_TYPE_FLAG_DO_NOT_TARGET_ON_INTERACTION      = 0x20000000,
     CREATURE_TYPE_FLAG_DO_NOT_RENDER_OBJECT_NAME         = 0x40000000,
-    CREATURE_TYPE_FLAG_UNIT_IS_QUEST_BOSS                = 0x80000000    // Not verified
+    CREATURE_TYPE_FLAG_QUEST_BOSS                        = 0x80000000    // Not verified
 };
 
 enum CreatureEliteType

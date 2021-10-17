@@ -1,6 +1,19 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
-*/
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "GameEventMgr.h"
 #include "Player.h"
@@ -20,6 +33,7 @@ enum Mistletoe
     SPELL_CREATE_SNOWFLAKES         = 45036
 };
 
+// 26218 - Mistletoe
 class spell_winter_veil_mistletoe : public SpellScriptLoader
 {
 public:
@@ -68,6 +82,7 @@ enum winterWondervoltTrap
     SPELL_WINTER_WONDERVOLT_RED_MAN         = 26273,
 };
 
+// 26275 - PX-238 Winter Wondervolt TRAP
 class spell_winter_wondervolt_trap : public SpellScriptLoader
 {
 public:
@@ -123,6 +138,7 @@ enum crashinTrashin
     RACER_ACHI_CRITERIA                 = 4090,
 };
 
+// 49297 - Racer Rocket Slam
 class spell_winter_veil_racer_rocket_slam : public SpellScriptLoader
 {
 public:
@@ -189,6 +205,7 @@ public:
     }
 };
 
+// 49325 - Racer Slam, resolve
 class spell_winter_veil_racer_slam_hit : public SpellScriptLoader
 {
 public:
@@ -238,6 +255,8 @@ enum airRifle
     SPELL_AIR_RIFLE_PELTED_DAMAGE           = 67531,
 };
 
+/* 65576 - Pelted!
+   67533 - Shoot Air Rifle */
 class spell_winter_veil_shoot_air_rifle : public SpellScriptLoader
 {
 public:
