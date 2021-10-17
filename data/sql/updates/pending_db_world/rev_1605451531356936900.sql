@@ -1,7 +1,8 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1605451531356936900');
 
-UPDATE `creature_template` SET `speed_walk` = 12, `speed_run` = 12, `ScriptName` = 'npc_rocket_propelled_warhead' WHERE `entry` =27593;
+UPDATE `creature_template` SET `speed_walk` = 5, `speed_run` = 5, `ScriptName` = 'npc_rocket_propelled_warhead' WHERE `entry` =27593;
 UPDATE `creature` SET `spawntimesecs` = 1 WHERE `id` =27593;
+UPDATE `creature` SET `position_z` = -0.20 WHERE `id` = 27593;
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_z_check', 'spell_vehicle_warhead_fuse', 'spell_warhead_detonate','spell_warhead_fuse');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES

@@ -1053,6 +1053,7 @@ public:
             float horizontalSpeed = 3.0f;
             float verticalSpeed = 40.0f;
             player->KnockbackFrom(caster->GetPositionX(), caster->GetPositionY(), horizontalSpeed, verticalSpeed);
+            player->RemoveAurasDueToSpell(SPELL_WARHEAD_FUSE);
             caster->CastSpell(player, SPELL_PARACHUTE, true);
 
             std::list<Creature*> explosionBunnys;
