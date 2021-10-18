@@ -12,8 +12,7 @@ INSERT INTO `acore_string` (`entry`,`content_default`) VALUES
 (194, 'Command \'%.*s\' is ambiguous:'),
 (195, '### USAGE: .%.*s ...'),
 (196, 'There is no detailed usage information associated with \'%.*s\'.
-This should never occur for stock AzerothCore commands - if it does, report this as a bug.
-If this is a custom command, use `acore_string` to specify it. Look at cs_achievement.cpp for example usage.'),
+This should never occur for stock AzerothCore commands - if it does, report this as a bug.'),
 (1500, 'Either:'),
 (1501, 'Or:    '),
 (1502, 'Value \'%.*s\' is not valid for type %s.'),
@@ -30,3 +29,9 @@ If this is a custom command, use `acore_string` to specify it. Look at cs_achiev
 (1513, 'Item ID %u does not exist.'),
 (1514, 'Spell ID %u does not exist.'),
 (1515, 'Expected \'%.*s\', got \'%.*s\' instead.');
+
+-- Correct
+UPDATE `command` SET `security`='3' WHERE `name` = 'debug anim';
+UPDATE `command` SET `security`='4' WHERE `name` = 'modify spell';
+UPDATE `command` SET `security`='3' WHERE `name` = 'npc set allowmove';
+UPDATE `command` SET `security`='3' WHERE `name` LIKE '%unban%';

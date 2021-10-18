@@ -59,7 +59,7 @@ public:
         };
         static ChatCommandTable gobjectCommandTable =
         {
-            { "activate",       SEC_ADMINISTRATOR,     false, &HandleGameObjectActivateCommand,  "" },
+            { "activate",       SEC_GAMEMASTER,        false, &HandleGameObjectActivateCommand,  "" },
             { "delete",         SEC_ADMINISTRATOR,     false, &HandleGameObjectDeleteCommand,    "" },
             { "info",           SEC_MODERATOR,         false, &HandleGameObjectInfoCommand,      "" },
             { "move",           SEC_ADMINISTRATOR,     false, &HandleGameObjectMoveCommand,      "" },

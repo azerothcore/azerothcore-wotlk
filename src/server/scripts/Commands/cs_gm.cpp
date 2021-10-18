@@ -52,7 +52,7 @@ public:
             { "ingame",         SEC_PLAYER,          true,  &HandleGMListIngameCommand,        "" },
             { "list",           SEC_GAMEMASTER,      true,  &HandleGMListFullCommand,          "" },
             { "visible",        SEC_GAMEMASTER,      false, &HandleGMVisibleCommand,           "" },
-            { "",               SEC_GAMEMASTER,      false, &HandleGMCommand,                  "" }
+            { "",               SEC_MODERATOR,       false, &HandleGMCommand,                  "" }
         };
         static ChatCommandTable commandTable =
         {

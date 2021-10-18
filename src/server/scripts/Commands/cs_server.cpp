@@ -56,26 +56,26 @@ public:
     {
         static ChatCommandTable serverIdleRestartCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_CONSOLE,        true,  &HandleServerIdleRestartCommand,         "" }
         };
 
         static ChatCommandTable serverIdleShutdownCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_CONSOLE,        true,  &HandleServerIdleShutDownCommand,        "" }
         };
 
         static ChatCommandTable serverRestartCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
         };
 
         static ChatCommandTable serverShutdownCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
+            { "cancel", SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
+            { "",       SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
         };
 
         static ChatCommandTable serverSetCommandTable =

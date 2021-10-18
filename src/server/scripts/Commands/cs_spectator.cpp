@@ -38,16 +38,16 @@ public:
     {
         static ChatCommandTable spectatorCommandTable =
         {
-            { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,                  "" },
-            { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,                    "" },
-            { "spectate",       SEC_CONSOLE,        false, &HandleSpectatorSpectateCommand,                 "" },
-            { "watch",          SEC_CONSOLE,        false, &HandleSpectatorWatchCommand,                    "" },
-            { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,                    "" },
-            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,                         "" }
+            { "version",        SEC_PLAYER,        false, &HandleSpectatorVersionCommand,                  "" },
+            { "reset",          SEC_PLAYER,        false, &HandleSpectatorResetCommand,                    "" },
+            { "spectate",       SEC_PLAYER,        false, &HandleSpectatorSpectateCommand,                 "" },
+            { "watch",          SEC_PLAYER,        false, &HandleSpectatorWatchCommand,                    "" },
+            { "leave",          SEC_PLAYER,        false, &HandleSpectatorLeaveCommand,                    "" },
+            { "",               SEC_PLAYER,        false, &HandleSpectatorCommand,                         "" }
         };
         static ChatCommandTable commandTable =
         {
-            { "spect",          SEC_CONSOLE,        false, nullptr,                                         "", spectatorCommandTable }
+            { "spect",          SEC_PLAYER,        false, nullptr,                                         "", spectatorCommandTable }
         };
         return commandTable;
     }

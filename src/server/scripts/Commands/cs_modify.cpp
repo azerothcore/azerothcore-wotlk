@@ -66,7 +66,7 @@ public:
             { "scale",          SEC_GAMEMASTER,      false, &HandleModifyScaleCommand,         "" },
             { "bit",            SEC_GAMEMASTER,      false, &HandleModifyBitCommand,           "" },
             { "faction",        SEC_ADMINISTRATOR,   false, &HandleModifyFactionCommand,       "" },
-            { "spell",          SEC_GAMEMASTER,      false, &HandleModifySpellCommand,         "" },
+            { "spell",          SEC_CONSOLE,         false, &HandleModifySpellCommand,         "" },
             { "talentpoints",   SEC_GAMEMASTER,      false, &HandleModifyTalentCommand,        "" },
             { "mount",          SEC_GAMEMASTER,      false, &HandleModifyMountCommand,         "" },
             { "honor",          SEC_GAMEMASTER,      false, &HandleModifyHonorCommand,         "" },
