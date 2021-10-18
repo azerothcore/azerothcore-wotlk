@@ -324,7 +324,7 @@ public:
             switch (eventId)
             {
                 case EVENT_ENCOUNTER_START:
-                    me->MonsterSay(ARTORIUS_SAY, LANG_UNIVERSAL, 0);
+                    me->Say(ARTORIUS_SAY);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     events.ScheduleEvent(EVENT_REVEAL, 5000);
@@ -406,7 +406,7 @@ public:
                 if (applyAura)
                 {
                     me->AddAura(ARTORIUS_SPELL_STINGING_TRAUMA, me);
-                    me->MonsterTextEmote(ARTORIUS_WEAKNESS_EMOTE, 0);
+                    me->TextEmote(ARTORIUS_WEAKNESS_EMOTE);
                 }
             }
         }
@@ -687,13 +687,13 @@ public:
             switch (eventId)
             {
                 case EVENT_ENCOUNTER_START:
-                    me->MonsterTextEmote(SIMONE_EMOTE, GetGossipPlayer());
+                    me->TextEmote(SIMONE_EMOTE, GetGossipPlayer());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                     events.ScheduleEvent(SIMONE_EVENT_TALK, 4000);
                     break;
                 case SIMONE_EVENT_TALK:
-                    me->MonsterSay(SIMONE_SAY, LANG_UNIVERSAL, GetGossipPlayer());
+                    me->Say(SIMONE_SAY, GetGossipPlayer());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     if (Precious())
@@ -795,7 +795,7 @@ public:
                 if (Spell->Id == SIMONE_SPELL_WEAKNESS_VIPER_STING)
                 {
                     me->AddAura(SIMONE_SPELL_SILENCE, me);
-                    me->MonsterTextEmote(SIMONE_WEAKNESS_EMOTE, 0);
+                    me->TextEmote(SIMONE_WEAKNESS_EMOTE);
                 }
             }
         }
@@ -925,7 +925,7 @@ public:
             switch (eventId)
             {
                 case EVENT_ENCOUNTER_START:
-                    me->MonsterSay(NELSON_SAY, LANG_UNIVERSAL, 0);
+                    me->Say(NELSON_SAY);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     events.ScheduleEvent(EVENT_REVEAL, 5000);
@@ -978,7 +978,7 @@ public:
                         me->RemoveAllMinionsByEntry(CREEPING_DOOM_ENTRY);
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         me->CombatStop(true);
-                        me->MonsterSay(NELSON_DESPAWN_SAY, LANG_UNIVERSAL, 0);
+                        me->Say(NELSON_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         me->DespawnOrUnsummon(5000);
                         break;
@@ -1013,7 +1013,7 @@ public:
             if (!me->HasAura(NELSON_SPELL_CRIPPLING_CLIP) && Spell->Id == NELSON_WEAKNESS_WING_CLIP)
             {
                 me->AddAura(NELSON_SPELL_CRIPPLING_CLIP, me);
-                me->MonsterTextEmote(NELSON_WEAKNESS_EMOTE, 0);
+                me->TextEmote(NELSON_WEAKNESS_EMOTE);
             }
         }
 
@@ -1100,7 +1100,7 @@ public:
             switch (eventId)
             {
                 case EVENT_ENCOUNTER_START:
-                    me->MonsterSay(FRANKLIN_SAY, LANG_UNIVERSAL, GetGossipPlayer());
+                    me->Say(FRANKLIN_SAY, GetGossipPlayer());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     events.ScheduleEvent(EVENT_REVEAL, 5000);
@@ -1152,7 +1152,7 @@ public:
                         SetHomePosition();
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         me->CombatStop(true);
-                        me->MonsterSay(FRANKLIN_DESPAWN_SAY, LANG_UNIVERSAL, 0);
+                        me->Say(FRANKLIN_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                         me->DespawnOrUnsummon(5000);
                         break;
@@ -1161,7 +1161,7 @@ public:
                     break;
                 case FRANKLIN_EVENT_DEMONIC_ENRAGE:
                     me->CastSpell(me, SPELL_DEMONIC_ENRAGE, false);
-                    me->MonsterTextEmote(FRANKLIN_ENRAGE_EMOTE, 0);
+                    me->TextEmote(FRANKLIN_ENRAGE_EMOTE);
                     events.RepeatEvent(urand(9000, 22000));
                     break;
             }
