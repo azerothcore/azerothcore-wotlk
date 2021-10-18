@@ -186,7 +186,7 @@ public:
 
             summons.DoZoneInCombat(NPC_SANCTUM_SENTRY);
 
-            me->MonsterYell("Some things are better left alone!", LANG_UNIVERSAL, 0);
+            me->Yell("Some things are better left alone!", LANG_UNIVERSAL);
             me->PlayDirectSound(SOUND_AGGRO);
             me->setActive(true);
         }
@@ -198,12 +198,12 @@ public:
 
             if (urand(0, 1))
             {
-                me->MonsterYell("The secret dies with you!", LANG_UNIVERSAL, 0);
+                me->Yell("The secret dies with you!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY1);
             }
             else
             {
-                me->MonsterYell("There is no escape!", LANG_UNIVERSAL, 0);
+                me->Yell("There is no escape!", LANG_UNIVERSAL);
                 me->PlayDirectSound(SOUND_SLAY2);
             }
         }
@@ -216,7 +216,7 @@ public:
             EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
             summons.DoAction(ACTION_DESPAWN_ADDS, pred);
             summons.DespawnAll();
-            me->MonsterTextEmote("Auriaya screams in agony.", 0);
+            me->TextEmote("Auriaya screams in agony.", nullptr, true);
             me->PlayDirectSound(SOUND_DEATH);
         }
 
@@ -240,7 +240,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SUMMON_FERAL_DEFENDER:
-                    me->MonsterTextEmote("Auriaya begins to activate Feral Defender.", 0, true);
+                    me->TextEmote("Auriaya begins to activate Feral Defender.", nullptr, true);
                     me->CastSpell(me, SPELL_ACTIVATE_FERAL_DEFENDER, true);
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
                     events.ScheduleEvent(EVENT_REMOVE_IMMUNE, 3000);
@@ -249,7 +249,7 @@ public:
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
                     break;
                 case EVENT_TERRIFYING_SCREECH:
-                    me->MonsterTextEmote("Auriaya begins to cast Terrifying Screech.", 0, true);
+                    me->TextEmote("Auriaya begins to cast Terrifying Screech.", nullptr, true);
                     me->CastSpell(me, SPELL_TERRIFYING_SCREECH, false);
                     events.RepeatEvent(35000);
                     break;
@@ -273,7 +273,7 @@ public:
                         break;
                     }
                 case EVENT_ENRAGE:
-                    me->MonsterTextEmote("You waste my time!", 0);
+                    me->TextEmote("You waste my time!", nullptr, true);
                     me->PlayDirectSound(SOUND_BERSERK);
                     me->CastSpell(me, SPELL_ENRAGE, true);
                     break;
