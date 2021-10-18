@@ -1063,6 +1063,12 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         const_cast<CreatureTemplate*>(cInfo)->InhabitType = INHABIT_ANYWHERE;
     }
 
+    if (cInfo->InhabitType == INHABIT_ROOT)
+    {
+        LOG_ERROR("sql.sql", "Creature (Entry: %u) only has INHABIT_ROOT(8) as `InhabitType`, creature will not behave correctly.", cInfo->Entry);
+        const_cast<CreatureTemplate*>(cInfo)->InhabitType = INHABIT_ANYWHERE;
+    }
+
     if (cInfo->HoverHeight < 0.0f)
     {
         LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong value (%f) in `HoverHeight`", cInfo->Entry, cInfo->HoverHeight);
