@@ -1695,8 +1695,10 @@ namespace lfg
                 else
                 {
                     // RDF removes all binds to that map
-                    if (randomDungeon  && !sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty()))
+                    if (randomDungeon && !sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty()))
+                    {
                         sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
+                    }
                 }
 
                 playersTeleported.push_back(player);
