@@ -1,6 +1,18 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Hyperlinks.h"
@@ -35,6 +47,7 @@ class HyperlinkDataTokenizer
                     return false;
                 _str = std::string_view();
             }
+
             return true;
         }
 
@@ -47,20 +60,24 @@ class HyperlinkDataTokenizer
 bool Acore::Hyperlinks::LinkTags::achievement::StoreTo(AchievementLinkData& val, std::string_view text)
 {
     HyperlinkDataTokenizer t(text);
-
     uint32 achievementId;
+
     if (!t.TryConsumeTo(achievementId))
         return false;
+
     val.Achievement = sAchievementMgr->GetAchievement(achievementId);
 
     if (!(val.Achievement && t.TryConsumeTo(val.CharacterId) && t.TryConsumeTo(val.IsFinished) && t.TryConsumeTo(val.Month) && t.TryConsumeTo(val.Day)))
         return false;
+
     if ((12 < val.Month) || (31 < val.Day))
         return false;
 
     int8 year;
+
     if (!t.TryConsumeTo(year))
         return false;
+
     if (val.IsFinished) // if finished, year must be >= 0
     {
         if (year < 0)
@@ -233,9 +250,12 @@ bool Acore::Hyperlinks::LinkTags::trade::StoreTo(TradeskillLinkData& val, std::s
 {
     HyperlinkDataTokenizer t(text);
     uint32 spellId;
+
     if (!t.TryConsumeTo(spellId))
         return false;
+
     val.Spell = sSpellMgr->GetSpellInfo(spellId);
+
     return (val.Spell && val.Spell->Effects[0].Effect == SPELL_EFFECT_TRADE_SKILL && t.TryConsumeTo(val.CurValue) &&
         t.TryConsumeTo(val.MaxValue) && t.TryConsumeTo(val.Owner) && t.TryConsumeTo(val.KnownRecipes) && t.IsEmpty());
 }
