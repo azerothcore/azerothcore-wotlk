@@ -235,16 +235,13 @@ void NPCStaveQuestAI::ResetState(uint32 aura = 0)
         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
     }
 
-    if (aura && me->HasAura(aura))
-    {
-        me->RemoveAura(aura);
-    }
+    me->RemoveAura(aura);
 }
 
 void NPCStaveQuestAI::EvadeOnFeignDeath()
 {
     Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
-    if (player && player->HasAura(5384))
+    if (player && player->HasAura(SPELL_FEIGN_DEATH))
     {
         EnterEvadeMode();
     }

@@ -32,8 +32,11 @@ enum Common
     QUEST_STAVE_OF_THE_ANCIENTS               = 7636,
 
     // Spells
+    // Player
+    SPELL_FEIGN_DEATH                         = 5384,
+    // NPC
     SPELL_DEMONIC_ENRAGE                      = 23257,
-    SPELL_FOOLS_PLIGHT                        = 23504
+    SPELL_FOOLS_PLIGHT                        = 23504,
 };
 
 enum NPCArtorius
