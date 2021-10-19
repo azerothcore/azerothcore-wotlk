@@ -25,7 +25,8 @@
 enum Timers
 {
     TIMER_TOMBOFTHESEVEN = 30000,
-    TIMER_TOMB_START     = 1000
+    TIMER_TOMB_START     = 1000,
+    TIMER_TOMB_RESET     = 15000
 };
 
 enum Creatures
@@ -581,13 +582,14 @@ public:
                     ++TombEventCounter;
                     boss->setFaction(FACTION_HOSTILE);
                     boss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    // find suitable target here.
 
+                    // find suitable target here.
                     Player* target = boss->SelectNearestPlayer(130);
-                    if (target && target->isTargetableForAttack())
+                    if (target && boss->CanCreatureAttack(target, true))
                     {
                         boss->AI()->AttackStart(target);
-                        tombResetTimer = TIMER_TOMBOFTHESEVEN + 15000;
+                        boss->AI()->DoZoneInCombat();
+                        tombResetTimer = TIMER_TOMB_RESET;
                     }
                 }
             }
@@ -629,14 +631,23 @@ public:
 
         bool CheckTombReset(uint32 diff)
         {
+            bool anyBossAlive = false; // status of the bosses up until the current one
             for (uint8 i = 0; i < TombEventCounter; i++)
             {
                 Creature* boss = instance->GetCreature(TombBossGUIDs[i]);
-                if (boss && boss->IsAlive() && boss->IsInCombat())
+                if (boss)
                 {
-                    tombResetTimer = TIMER_TOMBOFTHESEVEN + 15000; // have to be longer, for edge case where the boss insta-dies.
-                    return false;
+                    anyBossAlive |= boss->IsAlive();
+                    if (boss->IsAlive() && boss->IsInCombat())
+                    {
+                        tombResetTimer = TIMER_TOMB_RESET;
+                        return false;  // any boss in combat means we shouldn't reset.
+                    }
                 }
+            }
+            if (!anyBossAlive) // no boss alive, put reset timer back up
+            {
+                tombResetTimer = TIMER_TOMB_RESET;
             }
             tombResetTimer -= diff;
             return tombResetTimer < diff;
@@ -654,20 +665,6 @@ public:
                 else
                 {
                     TombTimer -= diff;
-                }
-
-                // set started bosses in combat if they don't have a target
-                for (uint8 i = 0; i < TombEventCounter; i++)
-                {
-                    Creature* boss = instance->GetCreature(TombBossGUIDs[i]);
-                    if (boss && !boss->IsInCombat() && boss->IsAlive())
-                    {
-                        Player* target = boss->SelectNearestPlayer(130);
-                        if (target && target->isTargetableForAttack())
-                        {
-                            boss->AI()->AttackStart(target);
-                        }
-                    }
                 }
 
                 if (CheckTombReset(diff))
