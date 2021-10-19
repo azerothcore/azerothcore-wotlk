@@ -103,4 +103,5 @@ DELETE FROM `linked_respawn` WHERE `guid` IN (SELECT `guid` from `creature` WHER
 INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`)
 SELECT `guid`, CONCAT(@magmadarGUID), CONCAT(0) from `creature` WHERE `id` IN (11671, 11673) AND `map`=409;
 
-
+-- Added "18950 Invisibility and Stealth Detection" to Ancient Core Hounds
+UPDATE `creature_template_addon` SET `auras`='18950' WHERE  `entry`=11673;
