@@ -506,13 +506,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     // checked and error show at loading templates
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction))
     {
-        if (Entry == 3691)
-        {
-            LOG_FATAL("Entities:unit", "for %d, UNIT_FIELD_BYTES_2 is %d, trying to AND it with %d gives %d", Entry, GetUInt32Value(UNIT_FIELD_BYTES_2), (UNIT_BYTE2_FLAG_PVP << 8), GetUInt32Value(UNIT_FIELD_BYTES_2) & (UNIT_BYTE2_FLAG_PVP << 8));
-        }
-        if (factionTemplate->IsPVPFaction() ||
-        (cInfo->flags_extra & (CREATURE_FLAG_EXTRA_GUARD | CREATURE_FLAG_EXTRA_CIVILIAN)) ||
-        (GetUInt32Value(UNIT_FIELD_BYTES_2) & (UNIT_BYTE2_FLAG_PVP << 8)))
+        if (factionTemplate->IsPVPFaction() || (cInfo->flags_extra & (CREATURE_FLAG_EXTRA_GUARD | CREATURE_FLAG_EXTRA_CIVILIAN)))
             SetPvP(true);
         else
             SetPvP(false);
@@ -2484,10 +2478,6 @@ bool Creature::LoadCreaturesAddon(bool reload)
         // 1 Bytes2Flags
         // 2 UnitRename         Pet only, so always 0 for default creature
         // 3 ShapeshiftForm     Must be determined/set by shapeshift spell/aura
-        if (GetEntry() == 3691)
-            LOG_FATAL("Entities:unit", "gettng flags, it's %d", cainfo->bytes2);
-        if (GetEntry() == 4262)
-            LOG_FATAL("Entities:unit", "I can %d detect fd, and I'm a guard %d", CanIgnoreFeignDeath(), IsGuard());
         SetByteValue(UNIT_FIELD_BYTES_2, 0, uint8(cainfo->bytes2 & 0xFF));
         //SetByteValue(UNIT_FIELD_BYTES_2, 1, uint8((cainfo->bytes2 >> 8) & 0xFF));
         //SetByteValue(UNIT_FIELD_BYTES_2, 2, uint8((cainfo->bytes2 >> 16) & 0xFF));
