@@ -23,6 +23,7 @@
 #include "BattlegroundAB.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "DBCEnums.h"
@@ -42,34 +43,6 @@
 #include "SpellMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
-
-namespace Acore
-{
-    class AchievementChatBuilder
-    {
-    public:
-        AchievementChatBuilder(Player const* player, ChatMsg msgType, uint32 textId, uint32 achievementId)
-                : _player(player), _msgType(msgType), _textId(textId), _achievementId(achievementId) { }
-
-        void operator()(WorldPacket& data, LocaleConstant locale)
-        {
-            std::string text = "";
-            BroadcastText const* bct = sObjectMgr->GetBroadcastText(_textId);
-            if (bct)
-            {
-                ObjectMgr::GetLocaleString(_player->getGender() == GENDER_MALE ? bct->MaleText : bct->FemaleText, locale, text);
-            }
-
-            ChatHandler::BuildChatPacket(data, _msgType, LANG_UNIVERSAL, _player, _player, text, _achievementId);
-        }
-
-    private:
-        Player const* _player;
-        ChatMsg _msgType;
-        int32 _textId;
-        uint32 _achievementId;
-    };
-}                                                           // namespace Acore
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
@@ -702,8 +675,8 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId());
     if (guild)
     {
-        Acore::AchievementChatBuilder _builder(GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, achievement->ID);
-        Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> _localizer(_builder);
+        Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->getGender(), GetPlayer(), achievement->ID);
+        Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
         guild->BroadcastWorker(_localizer, GetPlayer());
     }
 
@@ -745,9 +718,10 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
         Cell cell(p);
         cell.SetNoCreate();
 
-        Acore::AchievementChatBuilder _builder(GetPlayer(), CHAT_MSG_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, achievement->ID);
-        Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> _localizer(_builder);
-        Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> > _worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), _localizer);
+        Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->getGender(), GetPlayer(), achievement->ID);
+        Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
+        Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder>> _worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), _localizer);
+        TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> >, WorldTypeMapContainer > message(_worker);
         Cell::VisitWorldObjects(GetPlayer(), _worker, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
     }
 
