@@ -16391,7 +16391,7 @@ bool Unit::IsUnderLastManaUseEffect() const
     return  getMSTimeDiff(m_lastManaUse, World::GetGameTimeMS()) < 5000;
 }
 
-void Unit::SetContestedPvP(Player* attackedPlayer)
+void Unit::SetContestedPvP(Player* attackedPlayer, bool lookForNearContestedGuards)
 {
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
 
@@ -16399,15 +16399,18 @@ void Unit::SetContestedPvP(Player* attackedPlayer)
         return;
 
     // check if there any guards that should care about the contested flag on player
-    std::list<Unit*> targets;
-    Acore::NearestVisibleDetectableContestedGuardUnitCheck u_check(this);
-    Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
-    Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
-
-    // return if there are no contested guards found
-    if (!targets.size())
+    if (lookForNearContestedGuards)
     {
-        return;
+        std::list<Unit*> targets;
+        Acore::NearestVisibleDetectableContestedGuardUnitCheck u_check(this);
+        Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
+        Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
+
+        // return if there are no contested guards found
+        if (!targets.size())
+        {
+            return;
+        }
     }
 
     player->SetContestedPvPTimer(30000);
