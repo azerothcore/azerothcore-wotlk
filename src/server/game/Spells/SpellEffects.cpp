@@ -1,4 +1,4 @@
-    /*
+ /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -302,14 +302,21 @@ void Spell::EffectEnvironmentalDMG(SpellEffIndex /*effIndex*/)
     if (!unitTarget || !unitTarget->IsAlive())
         return;
 
-    uint32 absorb = 0;
-    uint32 resist = 0;
-
-    Unit::CalcAbsorbResist(m_caster, unitTarget, m_spellInfo->GetSchoolMask(), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, m_spellInfo);
-
-    m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, damage + absorb + resist, m_spellInfo->GetSchoolMask(), absorb, resist, false, 0, false);
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    if (unitTarget->IsPlayer())
         unitTarget->ToPlayer()->EnvironmentalDamage(DAMAGE_FIRE, damage);
+    else
+    {
+        DamageInfo dmgInfo(m_caster, unitTarget, damage, m_spellInfo, m_spellInfo->GetSchoolMask(), SPELL_DIRECT_DAMAGE);
+
+        uint32 absorb = dmgInfo.GetAbsorb();
+        uint32 resist = dmgInfo.GetResist();
+        uint32 envDamage = dmgInfo.GetDamage();
+
+        Unit::DealDamageMods(unitTarget, envDamage, &absorb);
+        damage = envDamage;
+
+        m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo, damage, m_spellInfo->GetSchoolMask(), absorb, resist, false, 0, false);
+    }
 }
 
 void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
@@ -3793,6 +3800,8 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
             // xinef: this is wrong
             //ExecuteLogEffectSummonObject(effIndex, linkedGO);
 
+            pGameObj->SetLinkedTrap(linkedGO);
+
             // Wild object not have owner and check clickable by players
             map->AddToMap(linkedGO, true);
         }
@@ -3961,7 +3970,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             if (m_caster->getGender() > 0)
                                 gender = "her";
                             sprintf(buf, "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName().c_str(), gender, gender, urand(1, 10), urand(1, 10));
-                            m_caster->MonsterTextEmote(buf, nullptr);
+                            m_caster->TextEmote(buf);
                             break;
                         }
                     // Roll 'dem Bones - Worn Troll Dice
@@ -3972,7 +3981,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             if (m_caster->getGender() > 0)
                                 gender = "her";
                             sprintf(buf, "%s causually tosses %s [Worn Troll Dice]. One %u and one %u.", m_caster->GetName().c_str(), gender, urand(1, 6), urand(1, 6));
-                            m_caster->MonsterTextEmote(buf, nullptr);
+                            m_caster->TextEmote(buf);
                             break;
                         }
                     // Death Knight Initiate Visual
@@ -5689,6 +5698,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
             // xinef: this is wrong
             //linkedGO->SetOwnerGUID(m_caster->GetGUID());
             //ExecuteLogEffectSummonObject(effIndex, linkedGO);
+            pGameObj->SetLinkedTrap(linkedGO);
 
             cMap->AddToMap(linkedGO, true);
         }
@@ -6382,9 +6392,7 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
         return;
     }
 
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(soundId);
-    unitTarget->ToPlayer()->GetSession()->SendPacket(&data);
+    player->PlayDirectSound(soundId, player);
 }
 
 void Spell::EffectRemoveAura(SpellEffIndex effIndex)

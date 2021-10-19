@@ -1377,7 +1377,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 zone_id = player->GetZoneId();
 
-        GraveyardStruct const* graveyard = sGraveyard->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), teamId);
+        GraveyardStruct const* graveyard = sGraveyard->GetClosestGraveyard(player, teamId);
 
         if (graveyard)
         {
@@ -2691,8 +2691,10 @@ public:
         std::string subject = msgSubject;
         std::string text    = msgText;
 
-        // from console show not existed sender
-        MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
+        ObjectGuid::LowType senderGuid;
+        // If the message is sent from console, set it as sent by the target itself, like the other Customer Support mails.
+        senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : targetGuid.GetCounter();
+        MailSender sender(MAIL_NORMAL, senderGuid, MAIL_STATIONERY_GM);
 
         //- TODO: Fix poor design
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
@@ -2789,8 +2791,10 @@ public:
             }
         }
 
-        // from console show not existed sender
-        MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
+        ObjectGuid::LowType senderGuid;
+        // If the message is sent from console, set it as sent by the target itself, like the other Customer Support mails.
+        senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : receiverGuid.GetCounter();
+        MailSender sender(MAIL_NORMAL, senderGuid, MAIL_STATIONERY_GM);
 
         // fill mail
         MailDraft draft(subject, text);
@@ -3309,7 +3313,7 @@ public:
         }
 
         WorldPacket data(SMSG_PLAY_SOUND, 4);
-        data << uint32(soundId) << handler->GetSession()->GetPlayer()->GetGUID();
+        data << uint32(soundId);
         sWorld->SendGlobalMessage(&data);
 
         handler->PSendSysMessage(LANG_COMMAND_PLAYED_TO_ALL, soundId);

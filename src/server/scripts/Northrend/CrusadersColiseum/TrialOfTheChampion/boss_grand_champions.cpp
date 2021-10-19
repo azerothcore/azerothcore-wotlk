@@ -650,7 +650,7 @@ public:
                     {
                         char buffer[50];
                         sprintf(buffer, "%s is trampled!", me->GetName().c_str());
-                        me->MonsterTextEmote(buffer, 0);
+                        me->TextEmote(buffer);
                     }
                     break;
             }

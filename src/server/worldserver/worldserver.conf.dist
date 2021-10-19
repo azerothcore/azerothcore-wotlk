@@ -1246,11 +1246,13 @@ DeletedCharacterTicketTrace = 0
 #     DungeonFinder.OptionsMask
 #        Description: Dungeon and raid finder system.
 #        Value is a bitmask consisting of:
-#           LFG_OPTION_ENABLE_DUNGEON_FINDER = 1,     Enable the dungeon finder browser
-#           LFG_OPTION_ENABLE_RAID_BROWSER   = 2,     Enable the raid browser
-#        Default:     1
+#           LFG_OPTION_ENABLE_DUNGEON_FINDER    = 1,     Enable the dungeon finder browser
+#           LFG_OPTION_ENABLE_RAID_BROWSER      = 2,     Enable the raid browser
+#           LFG_OPTION_ENABLE_SEASONAL_BOSSES   = 4,     Enable seasonal bosses
 
-DungeonFinder.OptionsMask = 1
+#        Default:     5
+
+DungeonFinder.OptionsMask = 5
 
 #
 #   AccountInstancesPerHour
@@ -2575,6 +2577,23 @@ Battleground.QueueAnnouncer.SpamProtection.Delay = 30
 Battleground.QueueAnnouncer.PlayerOnly = 0
 
 #
+#    Battleground.QueueAnnouncer.Timed
+#        Description: Enabled battleground queue announcements based on timer
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled - Set Arena.QueueAnnouncer.Timer)
+#
+
+Battleground.QueueAnnouncer.Timed = 0
+
+#
+#    Battleground.QueueAnnouncer.Timer
+#        Description: Set timer for queue announcements
+#        Default:     30000 (30 sec)
+#
+
+Battleground.QueueAnnouncer.Timer = 30000
+
+#
 #    Battleground.PrematureFinishTimer
 #        Description: Time (in milliseconds) before battleground will end prematurely if there are
 #                     not enough players on one team. (Values defined in battleground template)
@@ -2831,23 +2850,6 @@ Arena.QueueAnnouncer.Enable = 0
 #
 
 Arena.QueueAnnouncer.PlayerOnly = 0
-
-#
-#    Battleground.QueueAnnouncer.Timed
-#        Description: Enabled battleground queue announcements based on timer
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled - Set Arena.QueueAnnouncer.Timer)
-#
-
-Battleground.QueueAnnouncer.Timed = 0
-
-#
-#    Battleground.QueueAnnouncer.Timer
-#        Description: Set timer for queue announcements
-#        Default:     30000 (30 sec)
-#
-
-Battleground.QueueAnnouncer.Timer = 30000
 
 #
 #    Arena.ArenaSeason.ID

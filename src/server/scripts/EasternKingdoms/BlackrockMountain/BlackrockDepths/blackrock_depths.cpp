@@ -23,7 +23,10 @@
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 
-uint32 braziersUsed = 0;
+enum ShadowforgeBrazier
+{
+    SAY_MAGMUS_BRAZIER_LIT = 0
+};
 
 //go_shadowforge_brazier
 class go_shadowforge_brazier : public GameObjectScript
@@ -35,36 +38,37 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (instance->GetData(TYPE_LYCEUM) == IN_PROGRESS)
-                instance->SetData(TYPE_LYCEUM, DONE);
-            else
-                instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
-            // If used brazier open linked doors (North or South)
-            if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_N))
+            GameObject* northBrazier = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(DATA_SF_BRAZIER_N));
+            GameObject* southBrazier = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(DATA_SF_BRAZIER_S));
+
+            if (!northBrazier || !southBrazier)
             {
-                if (braziersUsed == 0)
-                {
-                    braziersUsed = 1;
-                }
-                else if(braziersUsed == 2)
-                {
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);
-                    braziersUsed = 0;
-                }
+                return false;
             }
-            else if (go->GetGUID() == instance->GetGuidData(DATA_SF_BRAZIER_S))
+
+            // Check if the opposite brazier is lit - if it is, open the gates.
+            if ((go->GetGUID() == northBrazier->GetGUID() && southBrazier->GetGoState() == GO_STATE_ACTIVE)
+                || (go->GetGUID() == southBrazier->GetGUID() && northBrazier->GetGoState() == GO_STATE_ACTIVE))
             {
-                if (braziersUsed == 0)
+                if (instance->GetData(TYPE_LYCEUM) == IN_PROGRESS)
                 {
-                    braziersUsed = 2;
+                    instance->SetData(TYPE_LYCEUM, DONE);
                 }
-                else if (braziersUsed == 1)
+                else
                 {
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
-                    instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);
-                    braziersUsed = 0;
+                    instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
                 }
+
+                if (Creature* magmus = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_MAGMUS)))
+                {
+                    if (magmus->IsAlive())
+                    {
+                        magmus->AI()->Talk(SAY_MAGMUS_BRAZIER_LIT);
+                    }
+                }
+
+                instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_N), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_GOLEM_DOOR_S), true);
             }
         }
         return false;
