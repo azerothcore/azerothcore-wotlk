@@ -17,20 +17,21 @@ EndScriptData */
 
 enum Emotes
 {
-    EMOTE_SERVICE       = 0
+    EMOTE_SERVICE                   = 0
 };
 
 enum Spells
 {
-    SPELL_INFERNO       = 19695,
-    SPELL_IGNITE_MANA   = 19659,
-    SPELL_LIVING_BOMB   = 20475,
-    SPELL_ARMAGEDDON    = 20479,
+    SPELL_INFERNO                   = 19695,
+    SPELL_INFERNO_DUMMY_EFFECT      = 19698, // Server side spell which inflicts damage
+    SPELL_IGNITE_MANA               = 19659,
+    SPELL_LIVING_BOMB               = 20475,
+    SPELL_ARMAGEDDON                = 20479,
 };
 
 enum Events
 {
-    EVENT_INFERNO       = 1,
+    EVENT_INFERNO                   = 1,
     EVENT_IGNITE_MANA,
     EVENT_LIVING_BOMB,
 };
@@ -140,7 +141,68 @@ public:
     }
 };
 
+// 19695 Inferno
+class spell_geddon_inferno : public SpellScriptLoader
+{
+public:
+    spell_geddon_inferno() : SpellScriptLoader("spell_geddon_inferno") { }
+
+    class spell_geddon_inferno_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_geddon_inferno_AuraScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            return ValidateSpellInfo({ SPELL_INFERNO_DUMMY_EFFECT });
+        }
+
+        void PeriodicTick(AuraEffect const* aurEff)
+        {
+            PreventDefaultAction();
+
+            if (Unit* caster = GetUnitOwner())
+            {
+                //The pulses come about 1 second apart and last for 10 seconds. Damage starts at 500 damage per pulse and increases by 500 every other pulse (500, 500, 1000, 1000, 1500, etc.). (Source: Wowwiki)
+                int32 multiplier = 1;
+                switch (aurEff->GetTickNumber())
+                {
+                    case 2:
+                    case 3:
+                        multiplier = 2;
+                        break;
+                    case 4:
+                    case 5:
+                        multiplier = 3;
+                        break;
+                    case 6:
+                    case 7:
+                        multiplier = 4;
+                        break;
+                    case 8:
+                        multiplier = 5;
+                        break;
+                }
+
+                caster->CastCustomSpell(SPELL_INFERNO_DUMMY_EFFECT, SPELLVALUE_BASE_POINT0, 500 * multiplier, caster, TRIGGERED_NONE, nullptr, aurEff);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_geddon_inferno_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_geddon_inferno_AuraScript();
+    }
+};
+
 void AddSC_boss_baron_geddon()
 {
     new boss_baron_geddon();
+
+    // Spells
+    new spell_geddon_inferno();
 }
