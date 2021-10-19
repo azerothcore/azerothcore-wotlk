@@ -15,7 +15,7 @@ CREATE TABLE `quest_money_reward`
 	`Money8` INT NOT NULL DEFAULT '0',
 	`Money9` INT NOT NULL DEFAULT '0',
 	PRIMARY KEY (`Level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `quest_money_reward` VALUES
 (1, 0, 2, 4, 8, 12, 15, 30, 50, 75, 0),
