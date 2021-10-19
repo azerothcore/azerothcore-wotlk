@@ -18,6 +18,13 @@
 #ifndef __ACORE_LANGUAGE_H
 #define __ACORE_LANGUAGE_H
 
+enum BroadcastTextIds
+{
+    BROADCAST_TEXT_ACHIEVEMENT_EARNED   = 29245,
+    BROADCAST_TEXT_CALL_FOR_HELP        = 2541,
+    BROADCAST_TEXT_FLEE_FOR_ASSIST      = 1150
+};
+
 enum AcoreStrings
 {
     // for chat commands
@@ -779,7 +786,7 @@ enum AcoreStrings
     LANG_NEED_CHARACTER_NAME            = 807,
     LANG_PLAYER_NOT_EXIST_OR_OFFLINE    = 808,
     LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND   = 809,
-    LANG_ACHIEVEMENT_EARNED             = 810,
+    // unused                           = 810,
     LANG_GUILD_MASTER                   = 811,
     LANG_GUILD_OFFICER                  = 812,
     LANG_GUILD_VETERAN                  = 813,
@@ -1137,7 +1144,7 @@ enum AcoreStrings
     LANG_BATTLEGROUND                   = 5015,
     LANG_ARENA                          = 5016,
     LANG_RAID                           = 5017,
-    //= 5018,
+    // unused                           = 5018,
     LANG_COMMAND_TEMP_FROZEN_PLAYER     = 5019,
     LANG_NPCINFO_PHASEMASK              = 5020,
     LANG_NPCINFO_ARMOR                  = 5021,
@@ -1149,12 +1156,12 @@ enum AcoreStrings
     LANG_GOINFO_NAME                    = 5027,
     LANG_GOINFO_LOOTID                  = 5028,
     LANG_COMMAND_LOOKUP_MAX_RESULTS     = 5029,
-    LANG_FLEE                           = 5030,
+    // unused                           = 5030,
     LANG_NPCINFO_AIINFO                 = 5031,
     LANG_COMMAND_NO_BATTLEGROUND_FOUND  = 5032,
     LANG_COMMAND_NO_ACHIEVEMENT_CRITERIA_FOUND = 5033,
     LANG_COMMAND_NO_OUTDOOR_PVP_FORUND  = 5034,
-    LANG_CALL_FOR_HELP                  = 5035,
+    // unused                           = 5035,
     LANG_NPCINFO_EQUIPMENT              = 5036,
     LANG_NPCINFO_MECHANIC_IMMUNE        = 5037,
     LANG_NPCINFO_UNIT_FIELD_FLAGS       = 5038,
