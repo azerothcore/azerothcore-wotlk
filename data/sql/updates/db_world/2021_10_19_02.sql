@@ -1,3 +1,19 @@
+-- DB update 2021_10_19_01 -> 2021_10_19_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_10_19_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_10_19_01 2021_10_19_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1634483390934220500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 -- *** Quest "Aces High!" ***
 -- Condition for source Gossip menu condition type Quest taken
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=14 AND `SourceGroup`=10204 AND `SourceEntry` IN (14169,14170) AND `SourceId`=0;
@@ -20,3 +36,13 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,1,2,62,0,100,0,10204,1,0,0,72,0,0,0,0,0,0,7,0,0,0,0,0,0,0,'Corastrasza - Gossip option select 1 - Close Gossip for player'),
 (@ENTRY,0,2,3,61,0,100,0,0,0,0,0,85,61240,0,0,0,0,0,1,0,0,0,0,0,0,0,'Corastrasza - Gossip option select - Cast ''Summon Wyrmrest Skytalon'' on player'),
 (@ENTRY,0,3,0,61,0,100,0,0,0,0,0,85,61244,0,0,0,0,0,1,0,0,0,0,0,0,0,'Corastrasza - Gossip option select - Cast ''Wyrmrest Skytalon Ride Periodic'' on player');
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_10_19_02' WHERE sql_rev = '1634483390934220500';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
