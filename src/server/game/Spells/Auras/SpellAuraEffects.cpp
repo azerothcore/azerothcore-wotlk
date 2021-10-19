@@ -519,17 +519,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         case SPELL_AURA_MANA_SHIELD:
             m_canBeRecalculated = false;
             break;
-        case SPELL_AURA_MOD_BASE_RESISTANCE_PCT:
-            if (!caster)
-                break;
-            if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID)
-            {
-                if (GetId() == 1178 && caster->HasAura(5229) && !caster->HasAura(70726)) // Feral t10 4p
-                    amount -= 48; // percentage
-                else if (GetId() == 9635 && caster->HasAura(5229) && !caster->HasAura(70726)) // Feral t10 4p
-                    amount -= 57; // percentage
-            }
-            break;
         case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
             // Titan's Grip
             if (!caster)
