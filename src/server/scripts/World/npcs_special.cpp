@@ -43,16 +43,17 @@ EndContentData */
 #include "CreatureTextMgr.h"
 #include "DBCStructure.h"
 #include "GameEventMgr.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SmartAI.h"
 #include "SpellAuras.h"
 #include "WaypointMgr.h"
@@ -116,7 +117,7 @@ public:
             {
                 case EVENT_CLEARWATER_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
+                        time_t curtime = GameTime::GetGameTime();
                         tm strdate;
                         localtime_r(&curtime, &strdate);
 
@@ -260,7 +261,7 @@ public:
             {
                 case EVENT_RIGGLE_ANNOUNCE:
                     {
-                        time_t curtime = time(nullptr);
+                        time_t curtime = GameTime::GetGameTime();
                         tm strdate;
                         localtime_r(&curtime, &strdate);
                         if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)

@@ -237,18 +237,6 @@ public:
     /// Get the path where data (dbc, maps) are stored on disk
     std::string const& GetDataPath() const { return m_dataPath; }
 
-    /// When server started?
-    time_t const& GetStartTime() const { return m_startTime; }
-    /// What time is it?
-    time_t const& GetGameTime() const { return m_gameTime; }
-    /// What time is it? in ms
-    static uint32 GetGameTimeMS() { return m_gameMSTime; }
-    /// Uptime (in secs)
-    uint32 GetUptime() const { return uint32(m_gameTime - m_startTime); }
-    /// Update time
-    uint32 GetUpdateTime() const { return m_updateTime; }
-    void SetRecordDiffInterval(int32 t) { if (t >= 0) m_int_configs[CONFIG_INTERVAL_LOG_UPDATE] = (uint32)t; }
-
     /// Next daily quests and random bg reset time
     time_t GetNextDailyQuestsResetTime() const { return m_NextDailyQuestReset; }
     time_t GetNextWeeklyQuestsResetTime() const { return m_NextWeeklyQuestReset; }
@@ -422,12 +410,8 @@ private:
 
     bool m_isClosed;
 
-    time_t m_startTime;
-    time_t m_gameTime;
     IntervalTimer m_timers[WUPDATE_COUNT];
     time_t mail_expire_check_timer;
-    uint32 m_updateTime, m_updateTimeSum;
-    static uint32 m_gameMSTime;
 
     SessionMap m_sessions;
     SessionMap m_offlineSessions;

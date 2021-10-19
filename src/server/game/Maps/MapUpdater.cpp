@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AvgDiffTracker.h"
 #include "LFGMgr.h"
 #include "Map.h"
 #include "MapUpdater.h"
@@ -56,10 +55,7 @@ public:
 
     void call() override
     {
-        uint32 startTime = getMSTime();
         sLFGMgr->Update(m_diff, 1);
-        uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
-        lfgDiffTracker.Update(totalTime);
         m_updater.update_finished();
     }
 private:

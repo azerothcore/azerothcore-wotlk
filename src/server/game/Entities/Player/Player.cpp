@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaSpectator.h"
@@ -31,9 +32,9 @@
 #include "ChannelMgr.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
-#include "Config.h"
 #include "Common.h"
 #include "ConditionMgr.h"
+#include "Config.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
@@ -41,6 +42,7 @@
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GitRevision.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
@@ -51,8 +53,8 @@
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "MapInstanced.h"
@@ -64,12 +66,11 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "PetitionMgr.h"
-#include "Player.h"
 #include "PoolMgr.h"
-#include "QuestDef.h"
 #include "QueryHolder.h"
-#include "ReputationMgr.h"
+#include "QuestDef.h"
 #include "Realm.h"
+#include "ReputationMgr.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
@@ -252,7 +253,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     for (uint8 j = 0; j < PLAYER_MAX_BATTLEGROUND_QUEUES; ++j)
         m_bgBattlegroundQueueID[j] = BATTLEGROUND_QUEUE_NONE;
 
-    m_logintime = time(nullptr);
+    m_logintime = GameTime::GetGameTime();
     m_Last_tick = m_logintime;
     m_Played_time[PLAYED_TIME_TOTAL] = 0;
     m_Played_time[PLAYED_TIME_LEVEL] = 0;
@@ -325,7 +326,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_spellPenetrationItemMod = 0;
 
     // Honor System
-    m_lastHonorUpdateTime = time(nullptr);
+    m_lastHonorUpdateTime = GameTime::GetGameTime();
 
     m_IsBGRandomWinner = false;
 
@@ -591,7 +592,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     }
 
     // Played time
-    m_Last_tick = time(nullptr);
+    m_Last_tick = GameTime::GetGameTime();
     m_Played_time[PLAYED_TIME_TOTAL] = 0;
     m_Played_time[PLAYED_TIME_LEVEL] = 0;
 
@@ -1088,7 +1089,7 @@ void Player::setDeathState(DeathState s, bool /*despawn = false*/)
 void Player::SetRestState(uint32 triggerId)
 {
     _innTriggerId = triggerId;
-    _restTime = time(nullptr);
+    _restTime = GameTime::GetGameTime();
     SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
 }
 
@@ -1409,7 +1410,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         if (MustDelayTeleport())
         {
             SetHasDelayedTeleport(true);
-            SetSemaphoreTeleportNear(time(nullptr));
+            SetSemaphoreTeleportNear(GameTime::GetGameTime());
             //lets save teleport destination for player
             teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
             teleportStore_options = options;
@@ -1431,11 +1432,11 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
         // this will be used instead of the current location in SaveToDB
         teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
-        SetFallInformation(time(nullptr), z);
+        SetFallInformation(GameTime::GetGameTime(), z);
 
         // code for finish transfer called in WorldSession::HandleMovementOpcodes()
         // at client packet MSG_MOVE_TELEPORT_ACK
-        SetSemaphoreTeleportNear(time(nullptr));
+        SetSemaphoreTeleportNear(GameTime::GetGameTime());
         // near teleport, triggering send MSG_MOVE_TELEPORT_ACK from client at landing
         if (!GetSession()->PlayerLogout())
         {
@@ -1471,7 +1472,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             if (MustDelayTeleport())
             {
                 SetHasDelayedTeleport(true);
-                SetSemaphoreTeleportFar(time(nullptr));
+                SetSemaphoreTeleportFar(GameTime::GetGameTime());
                 //lets save teleport destination for player
                 teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
                 teleportStore_options = options;
@@ -1536,7 +1537,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             }
 
             teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
-            SetFallInformation(time(nullptr), z);
+            SetFallInformation(GameTime::GetGameTime(), z);
             // if the player is saved before worldportack (at logout for example)
             // this will be used instead of the current location in SaveToDB
 
@@ -1555,7 +1556,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             // move packet sent by client always after far teleport
             // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
-            SetSemaphoreTeleportFar(time(nullptr));
+            SetSemaphoreTeleportFar(GameTime::GetGameTime());
         }
     }
     return true;
@@ -2651,8 +2652,8 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
 void Player::SendInitialSpells()
 {
-    uint32 curTime = World::GetGameTimeMS();
-    uint32 infTime = World::GetGameTimeMS() + infinityCooldownDelayCheck;
+    uint32 curTime = GameTime::GetGameTimeMS();
+    uint32 infTime = GameTime::GetGameTimeMS() + infinityCooldownDelayCheck;
 
     uint16 spellCount = 0;
 
@@ -2786,7 +2787,7 @@ void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
     sWorld->UpdateGlobalPlayerMails(GetGUID().GetCounter(), GetMailSize(), false);
 
-    if (deliver_time <= time(nullptr))                      // ready now
+    if (deliver_time <= GameTime::GetGameTime())                      // ready now
     {
         ++unReadMails;
         SendNewMail();
@@ -3429,7 +3430,7 @@ void Player::RemoveCategoryCooldown(uint32 cat)
 void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
 {
     // remove cooldowns on spells that have < 10 min CD
-    uint32 infTime = World::GetGameTimeMS() + infinityCooldownDelayCheck;
+    uint32 infTime = GameTime::GetGameTimeMS() + infinityCooldownDelayCheck;
     SpellCooldowns::iterator itr, next;
     for (itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); itr = next)
     {
@@ -3463,7 +3464,7 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
 
 void Player::RemoveAllSpellCooldown()
 {
-    uint32 infTime = World::GetGameTimeMS() + infinityCooldownDelayCheck;
+    uint32 infTime = GameTime::GetGameTimeMS() + infinityCooldownDelayCheck;
     if (!m_spellCooldowns.empty())
     {
         for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
@@ -3482,7 +3483,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
 
     if (result)
     {
-        time_t curTime = time(nullptr);
+        time_t curTime = GameTime::GetGameTime();
 
         do
         {
@@ -3516,8 +3517,8 @@ void Player::_SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout
     stmt->setUInt32(0, GetGUID().GetCounter());
     trans->Append(stmt);
 
-    time_t curTime = time(nullptr);
-    uint32 curMSTime = World::GetGameTimeMS();
+    time_t curTime = GameTime::GetGameTime();
+    uint32 curMSTime = GameTime::GetGameTimeMS();
     uint32 infTime = curMSTime + infinityCooldownDelayCheck;
 
     bool first_round = true;
@@ -3571,7 +3572,7 @@ uint32 Player::resetTalentsCost() const
         return 10 * GOLD;
     else
     {
-        uint64 months = (sWorld->GetGameTime() - m_resetTalentsTime) / MONTH;
+        uint64 months = (GameTime::GetGameTime() - m_resetTalentsTime) / MONTH;
         if (months > 0)
         {
             // This cost will be reduced by a rate of 5 gold per month
@@ -3680,7 +3681,7 @@ bool Player::resetTalents(bool noResetCost)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS, 1);
 
         m_resetTalentsCost = resetCost;
-        m_resetTalentsTime = time(nullptr);
+        m_resetTalentsTime = GameTime::GetGameTime();
     }
 
     return true;
@@ -4218,7 +4219,7 @@ void Player::DeleteOldCharacters(uint32 keepDays)
     LOG_INFO("server.loading", " ");
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_OLD_CHARS);
-    stmt->setUInt32(0, uint32(time(nullptr) - time_t(keepDays * DAY)));
+    stmt->setUInt32(0, uint32(GameTime::GetGameTime() - time_t(keepDays * DAY)));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (result)
@@ -7506,7 +7507,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
         // Xinef: loot was generated and respawntime has passed since then, allow to recreate loot
         // Xinef: to avoid bugs, this rule covers spawned gameobjects only
-        if (go->isSpawnedByDefault() && go->getLootState() == GO_ACTIVATED && !go->loot.isLooted() && go->GetLootGenerationTime() + go->GetRespawnDelay() < time(nullptr))
+        if (go->isSpawnedByDefault() && go->getLootState() == GO_ACTIVATED && !go->loot.isLooted() && go->GetLootGenerationTime() + go->GetRespawnDelay() < GameTime::GetGameTime())
             go->SetLootState(GO_READY);
 
         if (go->getLootState() == GO_READY)
@@ -8548,7 +8549,7 @@ void Player::SendBattlefieldWorldStates()
             SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE, wg->IsWarTime() ? 1 : 0);
 
             for (uint32 i = 0; i < 2; ++i)
-                SendUpdateWorldState(ClockWorldState[i], uint32(time(nullptr) + (wg->GetTimer() / 1000)));
+                SendUpdateWorldState(ClockWorldState[i], uint32(GameTime::GetGameTime() + (wg->GetTimer() / 1000)));
         }
     }
 }
@@ -8897,8 +8898,8 @@ void Player::PetSpellInitialize()
     uint8 cooldownsCount = pet->m_CreatureSpellCooldowns.size();
     data << uint8(cooldownsCount);
 
-    uint32 curTime = World::GetGameTimeMS();
-    uint32 infTime = World::GetGameTimeMS() + infinityCooldownDelayCheck;
+    uint32 curTime = GameTime::GetGameTimeMS();
+    uint32 infTime = GameTime::GetGameTimeMS() + infinityCooldownDelayCheck;
 
     for (CreatureSpellCooldowns::const_iterator itr = pet->m_CreatureSpellCooldowns.begin(); itr != pet->m_CreatureSpellCooldowns.end(); ++itr)
     {
@@ -9000,8 +9001,8 @@ void Player::VehicleSpellInitialize()
     // Cooldowns
     data << uint8(cooldownCount);
 
-    uint32 curTime = World::GetGameTimeMS();
-    uint32 infTime = World::GetGameTimeMS() + infinityCooldownDelayCheck;
+    uint32 curTime = GameTime::GetGameTimeMS();
+    uint32 infTime = GameTime::GetGameTimeMS() + infinityCooldownDelayCheck;
 
     for (CreatureSpellCooldowns::const_iterator itr = vehicle->m_CreatureSpellCooldowns.begin(); itr != vehicle->m_CreatureSpellCooldowns.end(); ++itr)
     {
@@ -10282,7 +10283,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
 void Player::_AddSpellCooldown(uint32 spellid, uint16 categoryId, uint32 itemid, uint32 end_time, bool needSendToClient, bool forceSendToSpectator)
 {
     SpellCooldown sc;
-    sc.end = World::GetGameTimeMS() + end_time;
+    sc.end = GameTime::GetGameTimeMS() + end_time;
     sc.category = categoryId;
     sc.itemid = itemid;
     sc.maxduration = end_time;
@@ -10559,7 +10560,7 @@ void Player::LeaveBattleground(Battleground* bg)
     }
 
     // xinef: reset corpse reclaim time
-    m_deathExpireTime = time(nullptr);
+    m_deathExpireTime = GameTime::GetGameTime();
 
     // pussywizard: clear movement, because after porting player will move to arena cords
     GetMotionMaster()->MovementExpired();
@@ -10857,7 +10858,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     SendEquipmentSetList();
 
     data.Initialize(SMSG_LOGIN_SETTIMESPEED, 4 + 4 + 4);
-    data.AppendPackedTime(sWorld->GetGameTime());
+    data.AppendPackedTime(GameTime::GetGameTime());
     data << float(0.01666667f);                             // game speed
     data << uint32(0);                                      // added in 3.1.2
     GetSession()->SendPacket(&data);
@@ -11041,7 +11042,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
 
         // Don't replace longer cooldowns by equip cooldown if we have any.
         SpellCooldowns::iterator itr = m_spellCooldowns.find(spellData.SpellId);
-        if (itr != m_spellCooldowns.end() && itr->second.itemid == pItem->GetEntry() && itr->second.end > World::GetGameTimeMS() + 30 * IN_MILLISECONDS)
+        if (itr != m_spellCooldowns.end() && itr->second.itemid == pItem->GetEntry() && itr->second.end > GameTime::GetGameTimeMS() + 30 * IN_MILLISECONDS)
             continue;
 
         // xinef: dont apply eqiup cooldown for spells with this attribute
@@ -11345,7 +11346,7 @@ void Player::SetDailyQuestStatus(uint32 quest_id)
                 if (!GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1 + quest_daily_idx))
                 {
                     SetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1 + quest_daily_idx, quest_id);
-                    m_lastDailyQuestTime = time(nullptr);              // last daily quest time
+                    m_lastDailyQuestTime = GameTime::GetGameTime();              // last daily quest time
                     m_DailyQuestChanged = true;
                     break;
                 }
@@ -11354,7 +11355,7 @@ void Player::SetDailyQuestStatus(uint32 quest_id)
         else
         {
             m_DFQuests.insert(quest_id);
-            m_lastDailyQuestTime = time(nullptr);
+            m_lastDailyQuestTime = GameTime::GetGameTime();
             m_DailyQuestChanged = true;
         }
     }
@@ -11581,7 +11582,7 @@ void Player::SummonIfPossible(bool agree, ObjectGuid summoner_guid)
     }
 
     // expire and auto declined
-    if (m_summon_expire < time(nullptr))
+    if (m_summon_expire < GameTime::GetGameTime())
         return;
 
     // drop flag at summon
@@ -12070,7 +12071,7 @@ uint32 Player::GetCorpseReclaimDelay(bool pvp) const
     else if (!sWorld->getBoolConfig(CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVE))
         return 0;
 
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime();
     // 0..2 full period
     // should be ceil(x)-1 but not floor(x)
     uint64 count = (now < m_deathExpireTime - 1) ? (m_deathExpireTime - 1 - now) / DEATH_EXPIRE_STEP : 0;
@@ -12105,7 +12106,7 @@ int32 Player::CalculateCorpseReclaimDelay(bool load)
         }
 
         time_t expected_time = corpse->GetGhostTime() + copseReclaimDelay[count];
-        time_t now = time(nullptr);
+        time_t now = GameTime::GetGameTime();
 
         if (now >= expected_time)
             return -1;
@@ -13817,7 +13818,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setUInt32(index++, m_Played_time[PLAYED_TIME_TOTAL]);
         stmt->setUInt32(index++, m_Played_time[PLAYED_TIME_LEVEL]);
         stmt->setFloat(index++, finiteAlways(_restBonus));
-        stmt->setUInt32(index++, uint32(time(nullptr)));
+        stmt->setUInt32(index++, uint32(GameTime::GetGameTime()));
         stmt->setUInt8(index++,  (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0));
         //save, far from tavern/city
         //save, but in tavern/city
@@ -13956,7 +13957,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->setUInt32(index++, m_Played_time[PLAYED_TIME_TOTAL]);
         stmt->setUInt32(index++, m_Played_time[PLAYED_TIME_LEVEL]);
         stmt->setFloat(index++, finiteAlways(_restBonus));
-        stmt->setUInt32(index++, uint32(time(nullptr)));
+        stmt->setUInt32(index++, uint32(GameTime::GetGameTime()));
         stmt->setUInt8(index++,  (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0));
         //save, far from tavern/city
         //save, but in tavern/city
@@ -14814,7 +14815,7 @@ void Player::_LoadBrewOfTheMonth(PreparedQueryResult result)
         lastEventId = fields[0].GetUInt32();
     }
 
-    time_t curtime = time(nullptr);
+    time_t curtime = GameTime::GetGameTime();
     tm localTime;
     localtime_r(&curtime, &localTime);
 
@@ -14899,7 +14900,7 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
         return false;
 
     if (!apply)
-        SetFallInformation(time(nullptr), GetPositionZ());
+        SetFallInformation(GameTime::GetGameTime(), GetPositionZ());
 
     WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
     data << GetPackGUID();
@@ -15196,7 +15197,7 @@ void Player::SetRestFlag(RestFlag restFlag, uint32 triggerId /*= 0*/)
 
     if (!oldRestMask && _restFlagMask) // only set flag/time on the first rest state
     {
-        _restTime = time(nullptr);
+        _restTime = GameTime::GetGameTime();
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
     }
 
@@ -15336,4 +15337,37 @@ std::string Player::GetPlayerName()
     }
 
     return "|Hplayer:" + name + "|h" + color + name + "|h|r";
+}
+
+void Player::SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay /*= 0*/, bool asSpectator /*= false*/)
+{
+    m_summon_expire = GameTime::GetGameTime() + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
+    m_summon_mapid = mapid;
+    m_summon_x = x;
+    m_summon_y = y;
+    m_summon_z = z;
+    m_summon_asSpectator = asSpectator;
+}
+
+bool Player::IsSummonAsSpectator() const
+{
+    return m_summon_asSpectator && m_summon_expire >= GameTime::GetGameTime();
+}
+
+bool Player::HasSpellCooldown(uint32 spell_id) const
+{
+    SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
+    return itr != m_spellCooldowns.end() && itr->second.end > getMSTime();
+}
+
+bool Player::HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const
+{
+    SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
+    return itr != m_spellCooldowns.end() && itr->second.end > getMSTime() && itr->second.itemid == itemid;
+}
+
+uint32 Player::GetSpellCooldownDelay(uint32 spell_id) const
+{
+    SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
+    return uint32(itr != m_spellCooldowns.end() && itr->second.end > getMSTime() ? itr->second.end - getMSTime() : 0);
 }

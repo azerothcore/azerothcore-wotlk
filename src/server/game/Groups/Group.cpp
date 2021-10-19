@@ -18,6 +18,7 @@
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "InstanceSaveMgr.h"
@@ -2372,4 +2373,15 @@ void Group::ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply)
         slot->flags |= flag;
     else
         slot->flags &= ~flag;
+}
+
+uint32 Group::GetDifficultyChangePreventionTime() const
+{
+    return _difficultyChangePreventionTime > GameTime::GetGameTime() ? _difficultyChangePreventionTime - GameTime::GetGameTime() : 0;
+}
+
+void Group::SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
+{
+    _difficultyChangePreventionTime = GameTime::GetGameTime() + MINUTE;
+    _difficultyChangePreventionType = type;
 }

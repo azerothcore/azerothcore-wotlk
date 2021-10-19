@@ -18,12 +18,13 @@
 #include "CreatureAI.h"
 #include "DisableMgr.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
+#include "GitRevision.h"
 #include "Group.h"
 #include "MapMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
 #include "ReputationMgr.h"
-#include "GitRevision.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
@@ -558,7 +559,7 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
         AddTimedQuest(quest_id);
         questStatusData.Timer = timeAllowed * IN_MILLISECONDS;
-        qtime = static_cast<uint32>(time(nullptr)) + timeAllowed;
+        qtime = static_cast<uint32>(GameTime::GetGameTime()) + timeAllowed;
     }
     else
         questStatusData.Timer = 0;

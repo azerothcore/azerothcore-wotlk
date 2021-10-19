@@ -20,6 +20,7 @@
 #include "Common.h"
 #include "DBCStores.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "MapMgr.h"
 #include "MapReference.h"
 #include "ObjectMgr.h"
@@ -296,7 +297,7 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(time(nullptr), plr->GetPositionZ());
+            plr->SetFallInformation(GameTime::GetGameTime(), plr->GetPositionZ());
         }
 
         if (withAll)
@@ -945,7 +946,7 @@ void StaticTransport::UpdatePassengerPositions()
                 if (passenger->IsInWorld())
                 {
                     GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
-                    passenger->ToPlayer()->SetFallInformation(time(nullptr), z);
+                    passenger->ToPlayer()->SetFallInformation(GameTime::GetGameTime(), z);
                 }
                 break;
             case TYPEID_GAMEOBJECT:
@@ -991,7 +992,7 @@ void StaticTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(time(nullptr), plr->GetPositionZ());
+            plr->SetFallInformation(GameTime::GetGameTime(), plr->GetPositionZ());
         }
 
         if (withAll)

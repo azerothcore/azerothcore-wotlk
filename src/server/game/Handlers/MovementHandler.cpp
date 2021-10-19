@@ -22,10 +22,11 @@
 #include "Chat.h"
 #include "Corpse.h"
 #include "GameGraveyard.h"
+#include "GameTime.h"
 #include "InstanceSaveMgr.h"
 #include "Log.h"
-#include "MathUtil.h"
 #include "MapMgr.h"
+#include "MathUtil.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
@@ -33,10 +34,10 @@
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "Transport.h"
+#include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Vehicle.h"
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 
@@ -166,7 +167,7 @@ void WorldSession::HandleMoveWorldportAck()
             _player->SetIsSpectator(false);
 
         GetPlayer()->SetPendingSpectatorForBG(0);
-        timeWhoCommandAllowed = time(nullptr) + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
+        timeWhoCommandAllowed = GameTime::GetGameTime() + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
 
         if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
         {
@@ -217,7 +218,7 @@ void WorldSession::HandleMoveWorldportAck()
             if (mapDiff->resetTime)
                 if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(mEntry->MapID, diff))
                 {
-                    uint32 timeleft = uint32(timeReset - time(nullptr));
+                    uint32 timeleft = uint32(timeReset - GameTime::GetGameTime());
                     GetPlayer()->SendInstanceResetWarning(mEntry->MapID, diff, timeleft, true);
                 }
         allowMount = mInstance->AllowMount;

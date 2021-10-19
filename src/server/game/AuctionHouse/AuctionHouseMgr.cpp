@@ -18,10 +18,10 @@
 #include "AccountMgr.h"
 #include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
-#include "AvgDiffTracker.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Item.h"
 #include "Logging/Log.h"
 #include "ObjectMgr.h"
@@ -30,6 +30,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "UpdateTime.h"
 #include <vector>
 
 constexpr auto AH_MINIMUM_DEPOSIT = 100;
@@ -162,7 +163,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, Characte
         uint32 deliveryDelay = sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY);
 
         ByteBuffer timePacker;
-        timePacker.AppendPackedTime(time_t(time(nullptr) + deliveryDelay));
+        timePacker.AppendPackedTime(GameTime::GetGameTime() + time_t(deliveryDelay));
 
         if (sendMail) // can be changed in the hook
             MailDraft(auction->BuildAuctionMailSubject(AUCTION_SALE_PENDING),
@@ -465,7 +466,7 @@ bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction)
 
 void AuctionHouseObject::Update()
 {
-    time_t checkTime = sWorld->GetGameTime() + 60;
+    time_t checkTime = GameTime::GetGameTime() + 60;
     ///- Handle expired auctions
 
     // If storage is empty, no need to update. next == nullptr in this case.
@@ -541,7 +542,7 @@ void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, 
 bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player,
         std::wstring const& wsearchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
         uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-        uint32& count, uint32& totalcount, uint8  /*getAll*/)
+        uint32& count, uint32& totalcount, uint8 /*getAll*/)
 {
     uint32 itrcounter = 0;
 
@@ -563,7 +564,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
         return true;
     }
 
-    time_t curTime = sWorld->GetGameTime();
+    time_t curTime = GameTime::GetGameTime();
 
     int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
     int locdbc_idx = player->GetSession()->GetSessionDbcLocale();
@@ -572,7 +573,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
     {
         if (!AsyncAuctionListingMgr::IsAuctionListingAllowed()) // pussywizard: World::Update is waiting for us...
             if ((itrcounter++) % 100 == 0) // check condition every 100 iterations
-                if (avgDiffTracker.getAverage() >= 30 || getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) >= 10) // pussywizard: stop immediately if diff is high or waiting too long
+                if (sWorldUpdateTime.GetAverageUpdateTime() >= 30 || getMSTimeDiff(GameTime::GetGameTimeMS(), GameTime::GetGameTimeMS()) >= 10) // pussywizard: stop immediately if diff is high or waiting too long
                     return false;
 
         AuctionEntry* Aentry = itr->second;
@@ -710,7 +711,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     data << uint32(bid ? GetAuctionOutBid() : 0);
     // Minimal outbid
     data << uint32(buyout);                                         // Auction->buyout
-    data << uint32((expire_time - time(nullptr)) * IN_MILLISECONDS); // time left
+    data << uint32((expire_time - GameTime::GetGameTime()) * IN_MILLISECONDS); // time left
     data << bidder;                                                 // auction->bidder current
     data << uint32(bid);                                            // current bid
     return true;

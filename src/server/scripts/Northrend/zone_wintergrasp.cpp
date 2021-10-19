@@ -21,12 +21,13 @@
 #include "CombatAI.h"
 #include "GameGraveyard.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
 #include "World.h"
@@ -294,7 +295,7 @@ public:
         else
         {
             uint32 timer = wintergrasp->GetTimer() / 1000;
-            player->SendUpdateWorldState(4354, time(nullptr) + timer);
+            player->SendUpdateWorldState(4354, GameTime::GetGameTime() + timer);
             if (timer < 15 * MINUTE)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);

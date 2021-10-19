@@ -18,13 +18,14 @@
 #include "CellImpl.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -117,7 +118,7 @@ public:
                     {
                         if (Aura* aur = player->GetAura(SPELL_RAM_AURA))
                         {
-                            int32 diff = aur->GetApplyTime() - (time(nullptr) - (HOUR * 18) + spellCooldown);
+                            int32 diff = aur->GetApplyTime() - (GameTime::GetGameTime() - (HOUR * 18) + spellCooldown);
                             if (diff > 10) // aura applied later
                                 return;
 
@@ -568,7 +569,7 @@ public:
 
         bool AllowStart()
         {
-            time_t curtime = time(nullptr);
+            time_t curtime = GameTime::GetGameTime();
             tm strDate;
             localtime_r(&curtime, &strDate);
 

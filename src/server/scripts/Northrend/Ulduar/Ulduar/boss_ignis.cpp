@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "ulduar.h"
 #include "Vehicle.h"
+#include "ulduar.h"
 
 #define SPELL_FLAME_JETS_10             62680
 #define SPELL_FLAME_JETS_25             63472
@@ -276,10 +277,10 @@ public:
             if (id == 1337)
             {
                 if (lastShatterMSTime)
-                    if (getMSTimeDiff(lastShatterMSTime, World::GetGameTimeMS()) <= 5000)
+                    if (getMSTimeDiff(lastShatterMSTime, GameTime::GetGameTimeMS()) <= 5000)
                         bShattered = true;
 
-                lastShatterMSTime = World::GetGameTimeMS();
+                lastShatterMSTime = GameTime::GetGameTimeMS();
             }
         }
 

@@ -17,9 +17,10 @@
 
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
+#include "GameTime.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "vault_of_archavon.h"
 
@@ -190,13 +191,13 @@ public:
                 switch (type)
                 {
                     case EVENT_ARCHAVON:
-                        ArchavonDeath = time(nullptr);
+                        ArchavonDeath = GameTime::GetGameTime();
                         break;
                     case EVENT_EMALON:
-                        EmalonDeath = time(nullptr);
+                        EmalonDeath = GameTime::GetGameTime();
                         break;
                     case EVENT_KORALON:
-                        KoralonDeath = time(nullptr);
+                        KoralonDeath = GameTime::GetGameTime();
                         break;
                     default:
                         return;

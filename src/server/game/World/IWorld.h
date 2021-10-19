@@ -317,8 +317,6 @@ enum WorldIntConfigs
     CONFIG_PVP_TOKEN_MAP_TYPE,
     CONFIG_PVP_TOKEN_ID,
     CONFIG_PVP_TOKEN_COUNT,
-    CONFIG_INTERVAL_LOG_UPDATE,
-    CONFIG_MIN_LOG_UPDATE,
     CONFIG_ENABLE_SINFO_LOGIN,
     CONFIG_PLAYER_ALLOW_COMMANDS,
     CONFIG_NUMTHREADS,
@@ -542,12 +540,7 @@ public:
     virtual void SetNewCharString(std::string const& str) = 0;
     virtual std::string const& GetNewCharString() const = 0;
     virtual LocaleConstant GetDefaultDbcLocale() const = 0;
-    virtual std::string const& GetDataPath() const = 0;
-    virtual time_t const& GetStartTime() const = 0;
-    virtual time_t const& GetGameTime() const = 0;
-    virtual uint32 GetUptime() const = 0;
-    virtual uint32 GetUpdateTime() const = 0;
-    virtual void SetRecordDiffInterval(int32 t)  = 0;
+    virtual std::string const& GetDataPath() const = 0;    
     virtual time_t GetNextDailyQuestsResetTime() const = 0;
     virtual time_t GetNextWeeklyQuestsResetTime() const = 0;
     virtual time_t GetNextRandomBGResetTime() const = 0;

@@ -18,17 +18,18 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "Unit.h"
 #include "Vehicle.h"
+#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -720,9 +721,9 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill + 5 < time(nullptr))
+            if (victim->GetTypeId() == TYPEID_PLAYER && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill + 5 < GameTime::GetGameTime())
             {
-                _lastTalkTimeKill = time(nullptr);
+                _lastTalkTimeKill = GameTime::GetGameTime();
                 Talk(SAY_LK_KILL);
             }
         }
@@ -751,7 +752,7 @@ public:
                             events.RescheduleEvent(EVENT_START_ATTACK, 1000);
                         EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
                         summons.DoAction(ACTION_TELEPORT_BACK, pred);
-                        if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff + 5 <= time(nullptr))
+                        if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime())
                             Talk(SAY_LK_FROSTMOURNE_ESCAPE);
                     }
                     break;
@@ -906,9 +907,9 @@ public:
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
-            if (spell->Id == HARVESTED_SOUL_BUFF && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= time(nullptr))
+            if (spell->Id == HARVESTED_SOUL_BUFF && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime())
             {
-                _lastTalkTimeBuff = time(nullptr);
+                _lastTalkTimeBuff = GameTime::GetGameTime();
                 Talk(SAY_LK_FROSTMOURNE_KILL);
             }
         }

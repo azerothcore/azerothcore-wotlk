@@ -21,7 +21,6 @@
 
 namespace lfg
 {
-
     std::string ConcatenateDungeons(LfgDungeonSet const& dungeons)
     {
         std::string dungeonstr = "";

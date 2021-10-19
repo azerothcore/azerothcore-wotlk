@@ -36,6 +36,7 @@
 #include "Formulas.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
+#include "GameTime.h"
 #include "Map.h"
 #include "MapInstanced.h"
 #include "MapMgr.h"
@@ -144,7 +145,7 @@ void BattlegroundMgr::Update(uint32 diff)
     {
         if (m_AutoDistributionTimeChecker < diff)
         {
-            if (time(nullptr) > m_NextAutoDistributionTime)
+            if (GameTime::GetGameTime() > m_NextAutoDistributionTime)
             {
                 sArenaTeamMgr->DistributeArenaPoints();
                 m_NextAutoDistributionTime = m_NextAutoDistributionTime + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
@@ -645,7 +646,7 @@ void BattlegroundMgr::InitAutomaticArenaPointDistribution()
         return;
 
     time_t wstime = time_t(sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME));
-    time_t curtime = time(nullptr);
+    time_t curtime = GameTime::GetGameTime();
     LOG_INFO("server.loading", "Initializing Automatic Arena Point Distribution");
     if (wstime < curtime)
     {
@@ -1026,7 +1027,7 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
     if (bg->isArena() && bg->isRated())
         bg->SetArenaTeamIdForTeam(ginfo->teamId, ginfo->ArenaTeamId);
 
-    ginfo->RemoveInviteTime = World::GetGameTimeMS() + INVITE_ACCEPT_WAIT_TIME;
+    ginfo->RemoveInviteTime = GameTime::GetGameTimeMS() + INVITE_ACCEPT_WAIT_TIME;
 
     // loop through the players
     for (auto itr : ginfo->Players)

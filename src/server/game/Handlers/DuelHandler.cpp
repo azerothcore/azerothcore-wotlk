@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "UpdateData.h"
@@ -41,7 +42,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     LOG_DEBUG("network.opcode", "Player 1 is: %s (%s)", player->GetGUID().ToString().c_str(), player->GetName().c_str());
     LOG_DEBUG("network.opcode", "Player 2 is: %s (%s)", plTarget->GetGUID().ToString().c_str(), plTarget->GetName().c_str());
 
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime();
     player->duel->startTimer = now;
     plTarget->duel->startTimer = now;
 

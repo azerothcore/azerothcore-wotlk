@@ -28,23 +28,24 @@
 #include "Channel.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
-#include "Config.h"
 #include "Common.h"
 #include "ConditionMgr.h"
+#include "Config.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Guild.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
-#include "Language.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "MapMgr.h"
@@ -55,8 +56,8 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "QuestDef.h"
 #include "QueryHolder.h"
+#include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
@@ -4009,7 +4010,7 @@ void Player::AddItemToBuyBackSlot(Item* pItem)
         LOG_DEBUG("entities.player.items", "STORAGE: AddItemToBuyBackSlot item = %u, slot = %u", pItem->GetEntry(), slot);
 
         m_items[slot] = pItem;
-        time_t base = time(nullptr);
+        time_t base = GameTime::GetGameTime();
         uint32 etime = uint32(base - m_logintime + (30 * 3600));
         uint32 eslot = slot - BUYBACK_SLOT_START;
 
@@ -5361,7 +5362,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     SaveRecallPosition();
 
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime();
     time_t logoutTime = time_t(fields[27].GetUInt32());
 
     // since last logout (in seconds)
@@ -5534,7 +5535,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetUInt32Value(PLAYER_CHOSEN_TITLE, curTitle);
 
     // has to be called after last Relocate() in Player::LoadFromDB
-    SetFallInformation(time(nullptr), GetPositionZ());
+    SetFallInformation(GameTime::GetGameTime(), GetPositionZ());
 
     _LoadSpellCooldowns(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS));
 
@@ -6235,7 +6236,7 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
             m->state = MAIL_STATE_UNCHANGED;
 
             // Do not load expired pending sale mail if there is already delivery auction mail
-            if (m->auctionId < 0 && m->expire_time <= time(nullptr))
+            if (m->auctionId < 0 && m->expire_time <= GameTime::GetGameTime())
             {
                 uint32 auctionId = std::abs(m->auctionId);
                 if (pendingAuctions.count(auctionId))
@@ -6349,10 +6350,10 @@ void Player::_LoadQuestStatus(PreparedQueryResult result)
                 {
                     AddTimedQuest(quest_id);
 
-                    if (quest_time <= sWorld->GetGameTime())
+                    if (quest_time <= GameTime::GetGameTime())
                         questStatusData.Timer = 1;
                     else
-                        questStatusData.Timer = uint32((quest_time - sWorld->GetGameTime()) * IN_MILLISECONDS);
+                        questStatusData.Timer = uint32((quest_time - GameTime::GetGameTime()) * IN_MILLISECONDS);
                 }
                 else
                     quest_time = 0;
@@ -6603,7 +6604,7 @@ void Player::SendRaidInfo()
     size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
 
-    time_t now = time(nullptr);
+    time_t now = GameTime::GetGameTime();
 
     for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
     {
@@ -7552,7 +7553,7 @@ void Player::_SaveQuestStatus(CharacterDatabaseTransaction trans)
                 stmt->setUInt32(index++, statusItr->first);
                 stmt->setUInt8(index++, uint8(statusItr->second.Status));
                 stmt->setBool(index++, statusItr->second.Explored);
-                stmt->setUInt32(index++, uint32(statusItr->second.Timer / IN_MILLISECONDS + sWorld->GetGameTime()));
+                stmt->setUInt32(index++, uint32(statusItr->second.Timer / IN_MILLISECONDS + GameTime::GetGameTime()));
 
                 for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
                     stmt->setUInt16(index++, statusItr->second.CreatureOrGOCount[i]);

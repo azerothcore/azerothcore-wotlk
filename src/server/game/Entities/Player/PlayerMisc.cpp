@@ -18,6 +18,7 @@
 #include "MapMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "GameTime.h"
 
 /*********************************************************/
 /***               FLOOD FILTER SYSTEM                 ***/
@@ -29,7 +30,7 @@ void Player::UpdateSpeakTime(uint32 specialMessageLimit)
     if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
         return;
 
-    time_t current = time (nullptr);
+    time_t current = GameTime::GetGameTime();
     if (m_speakTime > current)
     {
         uint32 max_count = specialMessageLimit ? specialMessageLimit : sWorld->getIntConfig(CONFIG_CHATFLOOD_MESSAGE_COUNT);

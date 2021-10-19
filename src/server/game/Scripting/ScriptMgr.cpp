@@ -2948,7 +2948,7 @@ bool ScriptMgr::IsCompletedCriteria(AchievementMgr* mgr, AchievementCriteriaEntr
     return ret;
 }
 
-bool ScriptMgr::IsRealmCompleted(AchievementGlobalMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime)
+bool ScriptMgr::IsRealmCompleted(AchievementGlobalMgr const* globalmgr, AchievementEntry const* achievement, SystemTimePoint completionTime)
 {
     bool ret = true;
 

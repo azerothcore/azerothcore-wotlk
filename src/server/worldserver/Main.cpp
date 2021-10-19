@@ -23,7 +23,6 @@
 #include "AppenderDB.h"
 #include "AsyncAcceptor.h"
 #include "AsyncAuctionListing.h"
-#include "AvgDiffTracker.h"
 #include "Banner.h"
 #include "BattlegroundMgr.h"
 #include "BigNumber.h"
@@ -574,8 +573,6 @@ void WorldUpdateLoop()
         realPrevTime = realCurrTime;
 
         uint32 executionTimeDiff = getMSTimeDiff(realCurrTime, getMSTime());
-        devDiffTracker.Update(executionTimeDiff);
-        avgDiffTracker.Update(executionTimeDiff > WORLD_SLEEP_CONST ? executionTimeDiff : WORLD_SLEEP_CONST);
 
         // we know exactly how long it took to update the world, if the update took less than WORLD_SLEEP_CONST, sleep for WORLD_SLEEP_CONST - world update time
         if (executionTimeDiff < WORLD_SLEEP_CONST)

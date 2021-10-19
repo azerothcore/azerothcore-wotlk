@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PacketLog.h"
 #include "Config.h"
+#include "GameTime.h"
 #include "IpAddress.h"
+#include "PacketLog.h"
 #include "Timer.h"
 #include "WorldPacket.h"
 
@@ -99,7 +100,7 @@ void PacketLog::Initialize()
         header.Build = 12340;
         header.Locale[0] = 'e'; header.Locale[1] = 'n'; header.Locale[2] = 'U'; header.Locale[3] = 'S';
         std::memset(header.SessionKey, 0, sizeof(header.SessionKey));
-        header.SniffStartUnixtime = time(nullptr);
+        header.SniffStartUnixtime = GameTime::GetGameTime();
         header.SniffStartTicks = getMSTime();
         header.OptionalDataSize = 0;
 

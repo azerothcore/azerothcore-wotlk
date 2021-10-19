@@ -65,11 +65,6 @@ public:
     MOCK_METHOD(std::string const&, GetNewCharString, (), (const));
     MOCK_METHOD(LocaleConstant, GetDefaultDbcLocale, (), (const));
     MOCK_METHOD(std::string const&, GetDataPath, (), (const));
-    MOCK_METHOD(time_t const&, GetStartTime, (), (const));
-    MOCK_METHOD(time_t const&, GetGameTime, (), (const));
-    MOCK_METHOD(uint32, GetUptime, (), (const));
-    MOCK_METHOD(uint32, GetUpdateTime, (), (const));
-    MOCK_METHOD(void, SetRecordDiffInterval, (int32 t));
     MOCK_METHOD(time_t, GetNextDailyQuestsResetTime, (), (const));
     MOCK_METHOD(time_t, GetNextWeeklyQuestsResetTime, (), (const));
     MOCK_METHOD(time_t, GetNextRandomBGResetTime, (), (const));

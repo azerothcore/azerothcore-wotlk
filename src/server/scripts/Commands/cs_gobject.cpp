@@ -25,6 +25,7 @@ EndScriptData */
 #include "Chat.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
+#include "GameTime.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
@@ -318,7 +319,7 @@ public:
 
         if (target)
         {
-            int32 curRespawnDelay = int32(target->GetRespawnTimeEx() - time(nullptr));
+            int32 curRespawnDelay = int32(target->GetRespawnTimeEx() - GameTime::GetGameTime());
             if (curRespawnDelay < 0)
                 curRespawnDelay = 0;
 

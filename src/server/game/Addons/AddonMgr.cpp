@@ -19,13 +19,11 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "Timer.h"
-
 #include <list>
 #include <openssl/md5.h>
 
 namespace AddonMgr
 {
-
     // Anonymous namespace ensures file scope of all the stuff inside it, even
     // if you add something more to this namespace somewhere else.
     namespace

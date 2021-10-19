@@ -309,13 +309,9 @@ public:
     bool IsLfgHeroic() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_IS_HEROIC); }
 
     // Difficulty Change
-    uint32 GetDifficultyChangePreventionTime() const { return _difficultyChangePreventionTime > time(nullptr) ? _difficultyChangePreventionTime - time(nullptr) : 0; }
+    uint32 GetDifficultyChangePreventionTime() const;
     DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
-    void SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
-    {
-        _difficultyChangePreventionTime = time(nullptr) + MINUTE;
-        _difficultyChangePreventionType = type;
-    }
+    void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
 
 protected:
     void _homebindIfInstance(Player* player);
