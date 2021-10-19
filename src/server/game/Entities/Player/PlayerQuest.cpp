@@ -752,7 +752,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
     if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(this))
+    {
         moneyRew += rewOrReqMoney;
+    }
 
     if (moneyRew)
     {
@@ -2096,13 +2098,17 @@ void Player::MoneyChanged(uint32 count)
                     if (int32(count) >= -rewOrReqMoney)
                     {
                         if (CanCompleteQuest(questid))
+                        {
                             CompleteQuest(questid);
+                        }
                     }
                 }
                 else if (q_status.Status == QUEST_STATUS_COMPLETE)
                 {
                     if (int32(count) < -rewOrReqMoney)
+                    {
                         IncompleteQuest(questid);
+                    }
                 }
             }
         }
