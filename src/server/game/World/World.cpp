@@ -1937,7 +1937,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initialize game time and timers");
     LOG_INFO("server.loading", " ");
 
-    LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
+    LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES (%u, %u, 0, '%s')",
                            realm.Id.Realm, uint32(GameTime::GetStartTime()), GitRevision::GetFullVersion());       // One-time query
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);

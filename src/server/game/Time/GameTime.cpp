@@ -20,9 +20,9 @@
 
 namespace GameTime
 {
-    time_t const StartTime = GameTime::GetGameTime();
+    time_t const StartTime = time(nullptr);
 
-    time_t GameTime = GameTime::GetGameTime();
+    time_t GameTime = time(nullptr);
     uint32 GameMSTime = 0;
 
     SystemTimePoint GameTimeSystemPoint = SystemTimePoint::min();
