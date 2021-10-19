@@ -6295,6 +6295,7 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
         } while (mailItemsResult->NextRow());
     }
 
+    CharacterDatabase.CommitTransaction(pendingAuctionsTrans);
     UpdateNextMailTimeAndUnreads();
 }
 
