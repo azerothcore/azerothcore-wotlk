@@ -810,11 +810,7 @@ public:
             return now;
     }
 
-    void SetRespawnTime(int32 respawn)
-    {
-        m_respawnTime = respawn > 0 ? time(nullptr) + respawn : 0;
-        m_respawnDelayTime = respawn > 0 ? respawn : 0;
-    }
+    void SetRespawnTime(int32 respawn);
     void Respawn();
     [[nodiscard]] bool isSpawned() const
     {
@@ -826,6 +822,7 @@ public:
     void SetSpawnedByDefault(bool b) { m_spawnedByDefault = b; }
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
     void Refresh();
+    void DespawnOrUnsummon(Milliseconds delay = 0ms, Seconds forcedRespawnTime = 0s);
     void Delete();
     void GetFishLoot(Loot* loot, Player* loot_owner);
     void GetFishLootJunk(Loot* loot, Player* loot_owner);
@@ -872,7 +869,8 @@ public:
     [[nodiscard]] uint32 GetUseCount() const { return m_usetimes; }
     [[nodiscard]] uint32 GetUniqueUseCount() const { return m_unique_users.size(); }
 
-    void SaveRespawnTime() override;
+    void SaveRespawnTime() override { SaveRespawnTime(0); }
+    void SaveRespawnTime(uint32 forceDelay);
 
     Loot        loot;
 
@@ -985,6 +983,8 @@ protected:
     uint32      m_spellId;
     time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
     uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer
+    uint32      m_despawnDelay;
+    Seconds     m_despawnRespawnTime;                   // override respawn time after delayed despawn
     LootState   m_lootState;
     bool        m_spawnedByDefault;
     uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
