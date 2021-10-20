@@ -82,6 +82,8 @@ public:
                     minion->CastSpell(minion, SPELL_QUIET_SUICIDE, true);
                 }
             }
+
+            coreHoundsGuids.clear();
         }
 
         void EnterCombat(Unit* victim) override
