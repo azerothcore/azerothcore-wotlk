@@ -24,63 +24,7 @@
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "Vehicle.h"
-
-// Ours
-enum qRedRocket
-{
-    SPELL_TORPEDO_EXPLODE                       = 49290,
-    SPELL_ALLIANCE_TORPEDO_KILL_CREDIT          = 49510,
-    SPELL_HORDE_TORPEDO_KILL_CREDIT             = 49340,
-};
-
-class npc_riding_the_red_rocket : public CreatureScript
-{
-public:
-    npc_riding_the_red_rocket() : CreatureScript("npc_riding_the_red_rocket") { }
-
-    struct npc_riding_the_red_rocketAI : public VehicleAI
-    {
-        npc_riding_the_red_rocketAI(Creature* creature) : VehicleAI(creature) {}
-
-        void AttackStart(Unit* /*who*/) override {}
-        void EnterCombat(Unit* /*who*/) override {}
-        void EnterEvadeMode() override {}
-
-        void UpdateAI(uint32  /*diff*/) override
-        {
-            if (me->GetDistance(2763, -1596, 0) < 20.0f) // Horde ship
-            {
-                me->CastSpell(me, SPELL_ALLIANCE_TORPEDO_KILL_CREDIT, true);
-                if (Unit* owner = me->GetCharmerOrOwner())
-                {
-                    Position pos(me->GetHomePosition());
-                    owner->ExitVehicle();
-                    me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), false);
-                    owner->CastSpell(owner, SPELL_TORPEDO_EXPLODE, true);
-                    owner->KnockbackFrom(owner->GetPositionX(), owner->GetPositionY(), 5.0f, 50.0f);
-                }
-            }
-            else if (me->GetDistance(2545, -2242, 0) < 20.0f) // Alliance ship
-            {
-                me->CastSpell(me, SPELL_HORDE_TORPEDO_KILL_CREDIT, true);
-                if (Unit* owner = me->GetCharmerOrOwner())
-                {
-                    Position pos(me->GetHomePosition());
-                    owner->ExitVehicle();
-                    me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), false);
-                    owner->CastSpell(owner, SPELL_TORPEDO_EXPLODE, true);
-                    owner->KnockbackFrom(owner->GetPositionX(), owner->GetPositionY(), 5.0f, 50.0f);
-                }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_riding_the_red_rocketAI(creature);
-    }
-};
+#include "CombatAI.h"
 
 // Theirs
 
@@ -942,11 +886,277 @@ public:
     }
 };
 
+/*######
+## Quest: Riding the Red Rocket
+######*/
+
+enum RedRocket
+{
+    SPELL_VEHICLE_WARHEAD_FUSE = 49107,
+    SPELL_ALLIANCE_KILL_CREDIT_TORPEDO = 49510,
+    SPELL_HORDE_KILL_CREDIT_TORPEDO = 49340,
+    NPC_HORDE_LUMBERBOAT = 27702,
+    NPC_ALLIANCE_LUMBERBOAT = 27688,
+    SPELL_DETONATE = 49250
+};
+
+class npc_rocket_propelled_warhead : public CreatureScript
+{
+public:
+    npc_rocket_propelled_warhead() : CreatureScript("npc_rocket_propelled_warhead") { }
+
+    struct npc_rocket_propelled_warheadAI : public VehicleAI
+    {
+        npc_rocket_propelled_warheadAI(Creature* creature) : VehicleAI(creature), _faction(ALLIANCE), _finished(false)
+        {
+        }
+
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
+        {
+            if (apply && who && who->ToPlayer())
+            {
+                DoCast(me, SPELL_VEHICLE_WARHEAD_FUSE);
+                _faction = who->ToPlayer()->GetTeamId();
+            }
+        }
+
+        void JustReachedHome() override
+        {
+            _finished = false;
+            me->SetVisible(true);
+            me->GetMotionMaster()->Clear(true);
+        }
+
+        void DoAction(int32 /*action*/) override
+        {
+            FinishQuest(false, _faction);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* /*spellInfo*/) override
+        {
+            if (caster && (caster->GetEntry() == NPC_HORDE_LUMBERBOAT || caster->GetEntry() == NPC_ALLIANCE_LUMBERBOAT))
+            {
+                FinishQuest(true, _faction);
+            }
+        }
+
+        void FinishQuest(bool success, uint32 faction)
+        {
+            if (_finished)
+            {
+                return;
+            }
+
+            _finished = true;
+
+            if (success)
+            {
+                DoCast(me, faction == ALLIANCE ? SPELL_ALLIANCE_KILL_CREDIT_TORPEDO : SPELL_HORDE_KILL_CREDIT_TORPEDO, true);
+            }
+
+            DoCast(me, SPELL_DETONATE, true);
+            me->RemoveAllAuras();
+            me->SetVisible(false);
+            me->GetMotionMaster()->MoveTargetedHome();
+        }
+
+    private:
+        uint32 _faction;
+        bool _finished;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_rocket_propelled_warheadAI(creature);
+    }
+};
+
+enum WarheadSpells
+{
+    SPELL_WARHEAD_Z_CHECK = 61678,
+    SPELL_WARHEAD_SEEKING_LUMBERSHIP = 49331,
+    SPELL_WARHEAD_FUSE = 49181
+};
+// 49107 - Vehicle: Warhead Fuse
+class spell_vehicle_warhead_fuse : public SpellScriptLoader
+{
+public:
+    spell_vehicle_warhead_fuse() : SpellScriptLoader("spell_vehicle_warhead_fuse") { }
+
+    class spell_vehicle_warhead_fuse_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_vehicle_warhead_fuse_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return sSpellMgr->GetSpellInfo(SPELL_WARHEAD_Z_CHECK)
+                    && sSpellMgr->GetSpellInfo(SPELL_WARHEAD_SEEKING_LUMBERSHIP)
+                    && sSpellMgr->GetSpellInfo(SPELL_WARHEAD_FUSE);
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+            {
+                return;
+            }
+
+            caster->CastSpell(caster, SPELL_WARHEAD_Z_CHECK, true);
+            caster->CastSpell(caster, SPELL_WARHEAD_SEEKING_LUMBERSHIP, true);
+            caster->CastSpell(caster, SPELL_WARHEAD_FUSE, true);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_vehicle_warhead_fuse_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_vehicle_warhead_fuse_SpellScript();
+    }
+};
+
+enum WarheadDenonate
+{
+    SPELL_PARACHUTE = 66154,
+    SPELL_TORPEDO_EXPLOSION = 49290,
+    NPC_ALLIANCE_LUMBERBOAT_EXPLOSIONS = 27689
+};
+// 49250 - Detonate
+class spell_warhead_detonate : public SpellScriptLoader
+{
+public:
+    spell_warhead_detonate() : SpellScriptLoader("spell_warhead_detonate") { }
+
+    class spell_warhead_detonate_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warhead_detonate_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return sSpellMgr->GetSpellInfo(SPELL_PARACHUTE) && sSpellMgr->GetSpellInfo(SPELL_TORPEDO_EXPLOSION);
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            Player* player = GetHitPlayer();
+            if (!player || !caster)
+            {
+                return;
+            }
+
+            player->ExitVehicle();
+            float horizontalSpeed = 3.0f;
+            float verticalSpeed = 40.0f;
+            player->KnockbackFrom(caster->GetPositionX(), caster->GetPositionY(), horizontalSpeed, verticalSpeed);
+            player->RemoveAurasDueToSpell(SPELL_WARHEAD_FUSE);
+
+            std::list<Creature*> explosionBunnys;
+            caster->GetCreatureListWithEntryInGrid(explosionBunnys, NPC_ALLIANCE_LUMBERBOAT_EXPLOSIONS, 90.0f);
+            for (auto itr = explosionBunnys.begin(); itr != explosionBunnys.end(); ++itr)
+            {
+                (*itr)->CastSpell((*itr), SPELL_TORPEDO_EXPLOSION, true);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_warhead_detonate_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_warhead_detonate_SpellScript();
+    }
+};
+
+// 61678 - Z Check
+class spell_z_check : public SpellScriptLoader
+{
+public:
+    spell_z_check() : SpellScriptLoader("spell_z_check") { }
+
+    class spell_z_check_AuraScript : public AuraScript
+    {
+    public:
+        spell_z_check_AuraScript() : AuraScript(), _posZ(0) {}
+
+        PrepareAuraScript(spell_z_check_AuraScript);
+
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            _posZ = GetTarget()->GetPositionZ();
+        }
+
+        void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+        {
+            PreventDefaultAction();
+
+            if (_posZ != GetTarget()->GetPositionZ())
+            {
+                if (Creature* target = GetTarget()->ToCreature())
+                {
+                    target->AI()->DoAction(0);
+                }
+            }
+        }
+
+    private:
+        float _posZ;
+
+        void Register() override
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_z_check_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_z_check_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_z_check_AuraScript();
+    }
+};
+
+// 49181 - Warhead Fuse
+class spell_warhead_fuse : public SpellScriptLoader
+{
+public:
+    spell_warhead_fuse() : SpellScriptLoader("spell_warhead_fuse") { }
+
+    class spell_warhead_fuse_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_warhead_fuse_AuraScript);
+
+        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* rocketUnit = GetTarget()->GetVehicleBase())
+            {
+                if (Creature* rocketCrea = rocketUnit->ToCreature())
+                {
+                    rocketCrea->AI()->DoAction(0);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_warhead_fuse_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_warhead_fuse_AuraScript();
+    }
+};
+
 void AddSC_grizzly_hills()
 {
-    // Ours
-    new npc_riding_the_red_rocket();
-
     // Theirs
     new npc_emily();
     new npc_mrfloppy();
@@ -959,4 +1169,9 @@ void AddSC_grizzly_hills()
     new npc_lake_frog();
     new spell_shredder_delivery();
     new spell_infected_worgen_bite();
+    new npc_rocket_propelled_warhead();
+    new spell_z_check();
+    new spell_warhead_detonate();
+    new spell_vehicle_warhead_fuse();
+    new spell_warhead_fuse();
 }
