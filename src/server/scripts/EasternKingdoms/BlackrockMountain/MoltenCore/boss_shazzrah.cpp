@@ -11,18 +11,17 @@
 
 enum Spells
 {
-    SPELL_ARCANE_EXPLOSION      = 19712,
-    SPELL_SHAZZRAH_CURSE        = 19713,
-    SPELL_MAGIC_GROUNDING       = 19714,
-    SPELL_COUNTERSPELL          = 19715,
-    SPELL_SHAZZRAH_GATE_DUMMY   = 23138, // Teleports to and attacks a random target.
-    SPELL_SHAZZRAH_GATE         = 23139,
+    SPELL_ARCANE_EXPLOSION              = 19712,
+    SPELL_SHAZZRAH_CURSE                = 19713,
+    SPELL_MAGIC_GROUNDING               = 19714,
+    SPELL_COUNTERSPELL                  = 19715,
+    SPELL_SHAZZRAH_GATE_DUMMY           = 23138, // Teleports to and attacks a random target. About every 45 seconds Shazzrah will blink to random target causing a wipe of the threat list (source: wowwwiki)
+    SPELL_SHAZZRAH_GATE                 = 23139,
 };
 
 enum Events
 {
     EVENT_ARCANE_EXPLOSION              = 1,
-    EVENT_ARCANE_EXPLOSION_TRIGGERED,
     EVENT_SHAZZRAH_CURSE,
     EVENT_MAGIC_GROUNDING,
     EVENT_COUNTERSPELL,
@@ -72,12 +71,6 @@ public:
                         events.RepeatEvent(urand(4000, 5000));
                         break;
                     }
-                        // Triggered subsequent to using "Gate of Shazzrah".
-                    case EVENT_ARCANE_EXPLOSION_TRIGGERED:
-                    {
-                        DoCastVictim(SPELL_ARCANE_EXPLOSION);
-                        break;
-                    }
                     case EVENT_SHAZZRAH_CURSE:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_SHAZZRAH_CURSE))
@@ -101,9 +94,7 @@ public:
                     }
                     case EVENT_SHAZZRAH_GATE:
                     {
-                        DoResetThreat();
                         DoCastAOE(SPELL_SHAZZRAH_GATE_DUMMY);
-                        events.ScheduleEvent(EVENT_ARCANE_EXPLOSION_TRIGGERED, 2000);
                         events.RescheduleEvent(EVENT_ARCANE_EXPLOSION, urand(3000, 6000));
                         events.RepeatEvent(45000);
                         break;
@@ -125,7 +116,7 @@ public:
 class spell_shazzrah_gate_dummy : public SpellScriptLoader
 {
 public:
-    spell_shazzrah_gate_dummy() : SpellScriptLoader("spell_shazzrah_gate_dummy") { }
+    spell_shazzrah_gate_dummy() : SpellScriptLoader("spell_shazzrah_gate_dummy") {}
 
     class spell_shazzrah_gate_dummy_SpellScript : public SpellScript
     {
@@ -138,22 +129,54 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
+            Unit* caster = GetCaster();
             if (!targets.empty())
             {
-                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-                targets.clear();
-                targets.push_back(target);
+                targets.remove_if([caster](WorldObject const* target) -> bool
+                {
+                    Player const* plrTarget = target->ToPlayer();
+                    // Should not target non player targets
+                    if (!plrTarget)
+                    {
+                        return true;
+                    }
+
+                    // Should skip current victim
+                    if (caster->GetVictim() == plrTarget)
+                    {
+                        return true;
+                    }
+
+                    // Should not target enemies within melee range
+                    if (plrTarget->IsWithinDistInMap(caster, caster->GetMeleeRange(plrTarget)))
+                    {
+                        return true;
+                    }
+
+                    return false;
+                });
+            }
+
+            if (!targets.empty())
+            {
+                Acore::Containers::RandomResize(targets, 1);
             }
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
         {
-            if (Unit* target = GetHitUnit())
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+            if (!caster || !target)
             {
-                target->CastSpell(GetCaster(), SPELL_SHAZZRAH_GATE, true);
-                if (Creature* creature = GetCaster()->ToCreature())
+                target->CastSpell(caster, SPELL_SHAZZRAH_GATE, true, nullptr, nullptr, caster->GetGUID());
+                caster->CastSpell(caster, SPELL_ARCANE_EXPLOSION);
+
+                if (Creature* creatureCaster = caster->ToCreature())
                 {
-                    creature->AI()->AttackStart(target); // Attack the target which caster will teleport to.
+                    creatureCaster->getThreatMgr().resetAllAggro();
+                    creatureCaster->AI()->AttackStart(target); // Attack the target which caster will teleport to.
                 }
             }
         }
@@ -174,5 +197,7 @@ public:
 void AddSC_boss_shazzrah()
 {
     new boss_shazzrah();
+
+    // Spells
     new spell_shazzrah_gate_dummy();
 }
