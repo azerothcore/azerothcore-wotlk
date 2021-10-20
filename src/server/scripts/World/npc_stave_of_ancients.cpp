@@ -573,12 +573,9 @@ public:
 
         void HandlePetRespawn()
         {
-            if (Precious() && !preciousGUID.IsEmpty())
+            if (Precious() && Precious()->isDead())
             {
-                if (Precious()->isDead())
-                {
-                    RespawnPet();
-                }
+                RespawnPet();
             }
         }
 
