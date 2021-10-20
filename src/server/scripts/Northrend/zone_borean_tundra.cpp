@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -250,53 +261,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_khunok_the_behemothAI(creature);
-    }
-};
-
-/*######
-## npc_corastrasza
-######*/
-
-#define GOSSIP_ITEM_C_1 "I... I think so..."
-
-enum Corastrasza
-{
-    SPELL_SUMMON_WYRMREST_SKYTALON               = 61240,
-    SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC        = 61244,
-
-    QUEST_ACES_HIGH_DAILY                        = 13414,
-    QUEST_ACES_HIGH                              = 13413
-};
-
-class npc_corastrasza : public CreatureScript
-{
-public:
-    npc_corastrasza() : CreatureScript("npc_corastrasza") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_ACES_HIGH) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_ACES_HIGH_DAILY) == QUEST_STATUS_INCOMPLETE) //It's the same dragon for both quests.
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_C_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-
-            player->CastSpell(player, SPELL_SUMMON_WYRMREST_SKYTALON, true);
-            player->CastSpell(player, SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC, true);
-        }
-
-        return true;
     }
 };
 
@@ -1384,7 +1348,6 @@ void AddSC_borean_tundra()
     // Theirs
     new npc_sinkhole_kill_credit();
     new npc_khunok_the_behemoth();
-    new npc_corastrasza();
     new npc_iruk();
     new npc_nerubar_victim();
     new npc_lurgglbr();

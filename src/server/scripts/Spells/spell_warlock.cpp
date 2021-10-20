@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
@@ -19,6 +30,8 @@
 
 enum WarlockSpells
 {
+    SPELL_WARLOCK_DRAIN_SOUL_R1                     = 1120,
+    SPELL_WARLOCK_CREATE_SOULSHARD                  = 43836,
     SPELL_WARLOCK_CURSE_OF_DOOM_EFFECT              = 18662,
     SPELL_WARLOCK_DEMONIC_CIRCLE_SUMMON             = 48018,
     SPELL_WARLOCK_DEMONIC_CIRCLE_TELEPORT           = 48020,
@@ -29,6 +42,8 @@ enum WarlockSpells
     SPELL_WARLOCK_DEMONIC_EMPOWERMENT_FELHUNTER     = 54509,
     SPELL_WARLOCK_DEMONIC_EMPOWERMENT_IMP           = 54444,
     SPELL_WARLOCK_FEL_SYNERGY_HEAL                  = 54181,
+    SPELL_WARLOCK_GLYPH_OF_DRAIN_SOUL_AURA          = 58070,
+    SPELL_WARLOCK_GLYPH_OF_DRAIN_SOUL_PROC          = 58068,
     SPELL_WARLOCK_GLYPH_OF_SHADOWFLAME              = 63311,
     SPELL_WARLOCK_GLYPH_OF_SIPHON_LIFE              = 56216,
     SPELL_WARLOCK_HAUNT                             = 48181,
@@ -43,7 +58,9 @@ enum WarlockSpells
     SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2               = 32553,
     SPELL_WARLOCK_SOULSHATTER                       = 32835,
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 63106,
-    SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117
+    SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
+    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1            = 18213,
+    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371
 };
 
 enum WarlockSpellIcons
@@ -551,45 +568,27 @@ public:
     {
         PrepareSpellScript(spell_warl_banish_SpellScript);
 
-        bool Load() override
-        {
-            _removed = false;
-            return true;
-        }
-
         void HandleBanish(SpellMissInfo missInfo)
         {
-            if (missInfo != SPELL_MISS_NONE)
+            if (missInfo != SPELL_MISS_IMMUNE)
             {
                 return;
             }
 
             if (Unit* target = GetHitUnit())
             {
-                if (target->GetAuraEffect(SPELL_AURA_SCHOOL_IMMUNITY, SPELLFAMILY_WARLOCK, 0, 0x08000000, 0))
+                // Casting Banish on a banished target will remove applied aura
+                if (Aura* banishAura = target->GetAura(GetSpellInfo()->Id, GetCaster()->GetGUID()))
                 {
-                    // No need to remove old aura since its removed due to not stack by current Banish aura
-                    PreventHitDefaultEffect(EFFECT_0);
-                    PreventHitDefaultEffect(EFFECT_1);
-                    PreventHitDefaultEffect(EFFECT_2);
-                    _removed = true;
+                    banishAura->Remove();
                 }
             }
-        }
-
-        void RemoveAura()
-        {
-            if (_removed)
-                PreventHitAura();
         }
 
         void Register() override
         {
             BeforeHit += BeforeSpellHitFn(spell_warl_banish_SpellScript::HandleBanish);
-            AfterHit += SpellHitFn(spell_warl_banish_SpellScript::RemoveAura);
         }
-
-        bool _removed;
     };
 
     SpellScript* GetSpellScript() const override
@@ -857,7 +856,7 @@ public:
             Unit* caster = GetCaster();
             if (Unit* target = GetHitUnit())
             {
-                if (target->CanHaveThreatList() && target->getThreatManager().getThreat(caster) > 0.0f)
+                if (target->CanHaveThreatList() && target->getThreatMgr().getThreat(caster) > 0.0f)
                     caster->CastSpell(target, SPELL_WARLOCK_SOULSHATTER, true);
             }
         }
@@ -891,14 +890,22 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            return eventInfo.GetDamageInfo()->GetDamage() && GetTarget()->IsAlive();
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return false;
+            }
+
+            return GetTarget()->IsAlive();
         }
 
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
-            int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()));
+            int32 amount = CalculatePct(static_cast<int32>(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
             // Glyph of Siphon Life
             if (AuraEffect const* glyph = GetTarget()->GetAuraEffect(SPELL_WARLOCK_GLYPH_OF_SIPHON_LIFE, EFFECT_0))
                 AddPct(amount, glyph->GetAmount());
@@ -1095,14 +1102,22 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             // Xinef: Added charm check
-            return (GetTarget()->GetGuardianPet() || GetTarget()->GetCharm()) && eventInfo.GetDamageInfo()->GetDamage();
+
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+            if (!damageInfo || !damageInfo->GetDamage())
+            {
+                return false;
+            }
+
+            return (GetTarget()->GetGuardianPet() || GetTarget()->GetCharm()) && damageInfo->GetDamage();
         }
 
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
-            int32 heal = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
+            int32 heal = CalculatePct(static_cast<int32>(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
             GetTarget()->CastCustomSpell(SPELL_WARLOCK_FEL_SYNERGY_HEAL, SPELLVALUE_BASE_POINT0, heal, (Unit*)nullptr, true, nullptr, aurEff); // TARGET_UNIT_PET
         }
 
@@ -1374,6 +1389,92 @@ public:
     }
 };
 
+// -1120 - Drain Soul
+class spell_warl_drain_soul : public SpellScriptLoader
+{
+public:
+    spell_warl_drain_soul() : SpellScriptLoader("spell_warl_drain_soul") { }
+
+    class spell_warl_drain_soul_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_warl_drain_soul_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo(
+            {
+                SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1,
+                SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC,
+                SPELL_WARLOCK_CREATE_SOULSHARD,
+                SPELL_WARLOCK_GLYPH_OF_DRAIN_SOUL_AURA,
+                SPELL_WARLOCK_GLYPH_OF_DRAIN_SOUL_PROC
+            });
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            // Drain Soul's proc tries to happen each time the warlock lands a killing blow on a unit while channeling.
+            // Make sure that the dying unit is afflicted by the caster's Drain Soul debuff in order to avoid a false positive.
+
+            Unit* caster = GetCaster();
+            Unit* victim = eventInfo.GetProcTarget();
+
+            if (caster && victim)
+            {
+                return victim->GetAuraApplicationOfRankedSpell(SPELL_WARLOCK_DRAIN_SOUL_R1, caster->GetGUID()) != 0;
+            }
+
+            return false;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* caster = eventInfo.GetActor();
+            // Improved Drain Soul.
+            if (Aura const* impDrainSoul = caster->GetAuraOfRankedSpell(SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1, caster->GetGUID()))
+            {
+                int32 amount = CalculatePct(caster->GetMaxPower(POWER_MANA), impDrainSoul->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                caster->CastCustomSpell(SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC, SPELLVALUE_BASE_POINT0, amount, caster, true, nullptr, aurEff, caster->GetGUID());
+            }
+        }
+
+        void HandleTick(AuraEffect const* aurEff)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetTarget();
+
+            if (caster && caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
+            {
+                if (roll_chance_i(20))
+                {
+                    caster->CastSpell(caster, SPELL_WARLOCK_CREATE_SOULSHARD, aurEff);
+                    // Glyph of Drain Soul - chance to create an additional Soul Shard.
+                    if (AuraEffect* aur = caster->GetAuraEffect(SPELL_WARLOCK_GLYPH_OF_DRAIN_SOUL_AURA, EFFECT_0))
+                    {
+                        if (roll_chance_i(aur->GetMiscValue()))
+                        {
+                            caster->CastSpell(caster, SPELL_WARLOCK_CREATE_SOULSHARD, aur);
+                        }
+                    }
+                }
+            }
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_warl_drain_soul_AuraScript::CheckProc);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_drain_soul_AuraScript::HandleTick, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+            OnEffectProc += AuraEffectProcFn(spell_warl_drain_soul_AuraScript::HandleProc, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_warl_drain_soul_AuraScript();
+    }
+};
 void AddSC_warlock_spell_scripts()
 {
     // Ours
@@ -1406,4 +1507,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_siphon_life();
     new spell_warl_soulshatter();
     new spell_warl_unstable_affliction();
+    new spell_warl_drain_soul();
 }

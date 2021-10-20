@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* ScriptData
@@ -325,7 +336,7 @@ public:
             std::string type;
             parsedStream >> type;
 
-            if (type == "")
+            if (type.empty())
                 break;
 
             if (type == "uint8")
@@ -830,7 +841,7 @@ public:
         if (!target || target->IsTotem() || target->IsPet())
             return false;
 
-        ThreatContainer::StorageType const& threatList = target->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& threatList = target->getThreatMgr().getThreatList();
         ThreatContainer::StorageType::const_iterator itr;
         uint32 count = 0;
         handler->PSendSysMessage("Threat list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
@@ -844,7 +855,7 @@ public:
             }
             handler->PSendSysMessage("   %u.   %s   (%s)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUID().ToString().c_str(), (*itr)->getThreat());
         }
-        ThreatContainer::StorageType const& threatList2 = target->getThreatManager().getOfflineThreatList();
+        ThreatContainer::StorageType const& threatList2 = target->getThreatMgr().getOfflineThreatList();
         for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
         {
             Unit* unit = (*itr)->getTarget();
@@ -865,7 +876,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
             target = handler->GetSession()->GetPlayer();
-        HostileReference* ref = target->getHostileRefManager().getFirst();
+        HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
         handler->PSendSysMessage("Hostil reference list of %s (%s)", target->GetName().c_str(), target->GetGUID().ToString().c_str());
         while (ref)

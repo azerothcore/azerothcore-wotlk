@@ -1,7 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Common.h"
@@ -261,7 +272,7 @@ namespace lfg
 
     void LFGMgr::Update(uint32 tdiff, uint8 task)
     {
-        if (!isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
+        if (!isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
 
         if (task == 0)
@@ -383,6 +394,8 @@ namespace lfg
         LfgDungeonSet const& dungeons = GetDungeonsByRandom(0);
         LfgLockMap lock;
 
+        bool onlySeasonalBosses = m_options == LFG_OPTION_ENABLE_SEASONAL_BOSSES;
+
         float avgItemLevel = player->GetAverageItemLevelForDF();
 
         for (LfgDungeonSet::const_iterator it = dungeons.begin(); it != dungeons.end(); ++it)
@@ -394,7 +407,7 @@ namespace lfg
             DungeonProgressionRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty));
 
             uint32 lockData = 0;
-            if (dungeon->expansion > expansion || dungeon->expansion > sWorld->getIntConfig(CONFIG_LFG_DUNGEON_FINDER_EXPANSION))
+            if (dungeon->expansion > expansion || (onlySeasonalBosses && !dungeon->seasonal))
                 lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
             else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, player))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
@@ -561,6 +574,7 @@ namespace lfg
                         else
                         {
                             rDungeonId = (*dungeons.begin());
+                            sScriptMgr->OnPlayerQueueRandomDungeon(player, rDungeonId);
                         }
                         // No break on purpose (Random can only be dungeon or heroic dungeon)
                         [[fallthrough]];
@@ -1639,8 +1653,10 @@ namespace lfg
         }
 
         bool randomDungeon = false;
+        std::vector<Player*> playersTeleported;
         // Teleport Player
         for (GuidUnorderedSet::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
+        {
             if (Player* player = ObjectAccessor::FindPlayer(*it))
             {
                 if (player->GetGroup() != grp) // pussywizard: could not add because group was full (some shitness happened)
@@ -1677,8 +1693,14 @@ namespace lfg
                     sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
                 }
 
-                TeleportPlayer(player, false, teleportLocation);
+                playersTeleported.push_back(player);
             }
+        }
+
+        for (Player* player : playersTeleported)
+        {
+            TeleportPlayer(player, false, teleportLocation);
+        }
 
         if (randomDungeon)
             grp->AddLfgRandomInstanceFlag();
@@ -2633,13 +2655,13 @@ namespace lfg
     {
         switch (dungeonId)
         {
-            case 285: // The Headless Horseman
+            case LFG_DUNGEON_HEADLESS_HORSEMAN:
                 return IsHolidayActive(HOLIDAY_HALLOWS_END);
-            case 286: // The Frost Lord Ahune
+            case LFG_DUNGEON_FROST_LORD_AHUNE:
                 return IsHolidayActive(HOLIDAY_FIRE_FESTIVAL);
-            case 287: // Coren Direbrew
+            case LFG_DUNGEON_COREN_DIREBREW:
                 return IsHolidayActive(HOLIDAY_BREWFEST);
-            case 288: // The Crown Chemical Co.
+            case LFG_DUNGEON_CROWN_CHEMICAL_CO:
                 return IsHolidayActive(HOLIDAY_LOVE_IS_IN_THE_AIR);
         }
         return false;
