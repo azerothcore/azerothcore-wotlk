@@ -36,9 +36,7 @@ public:
 
     struct boss_lucifronAI : public BossAI
     {
-        boss_lucifronAI(Creature* creature) : BossAI(creature, DATA_LUCIFRON)
-        {
-        }
+        boss_lucifronAI(Creature* creature) : BossAI(creature, DATA_LUCIFRON) {}
 
         void EnterCombat(Unit* /*victim*/) override
         {
@@ -48,46 +46,29 @@ public:
             events.ScheduleEvent(EVENT_SHADOW_SHOCK, 5000);
         }
 
-        void UpdateAI(uint32 diff) override
+        void ExecuteEvent(uint32 eventId) override
         {
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
-            }
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            while (uint32 const eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
+                case EVENT_IMPENDING_DOOM:
                 {
-                    case EVENT_IMPENDING_DOOM:
-                    {
-                        DoCastVictim(SPELL_IMPENDING_DOOM);
-                        events.RepeatEvent(20000);
-                        break;
-                    }
-                    case EVENT_LUCIFRON_CURSE:
-                    {
-                        DoCastVictim(SPELL_LUCIFRON_CURSE);
-                        events.RepeatEvent(20000);
-                        break;
-                    }
-                    case EVENT_SHADOW_SHOCK:
-                    {
-                        DoCastVictim(SPELL_SHADOW_SHOCK);
-                        events.RepeatEvent(5000);
-                        break;
-                    }
+                    DoCastVictim(SPELL_IMPENDING_DOOM);
+                    events.RepeatEvent(20000);
+                    break;
+                }
+                case EVENT_LUCIFRON_CURSE:
+                {
+                    DoCastVictim(SPELL_LUCIFRON_CURSE);
+                    events.RepeatEvent(20000);
+                    break;
+                }
+                case EVENT_SHADOW_SHOCK:
+                {
+                    DoCastVictim(SPELL_SHADOW_SHOCK);
+                    events.RepeatEvent(5000);
+                    break;
                 }
             }
-
-            DoMeleeAttackIfReady();
         }
     };
 
