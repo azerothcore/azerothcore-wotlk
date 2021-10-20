@@ -385,7 +385,7 @@ public:
     {
         uint32 triggerId = trigger->entry;
         // Second trigger happened too early after first, skip for now
-        if (GameTime::GetGameTime() - _triggerTimes[triggerId] < AREATRIGGER_TALK_COOLDOWN)
+        if (GameTime::GetGameTime().count() - _triggerTimes[triggerId] < AREATRIGGER_TALK_COOLDOWN)
             return false;
 
         switch (triggerId)
@@ -402,7 +402,7 @@ public:
                 break;
         }
 
-        _triggerTimes[triggerId] = GameTime::GetGameTime();
+        _triggerTimes[triggerId] = GameTime::GetGameTime().count();
         return false;
     }
 
@@ -442,7 +442,7 @@ public:
             return false;
 
         uint32 triggerId = trigger->entry;
-        if (GameTime::GetGameTime() - _triggerTimes[trigger->entry] < SUMMON_COOLDOWN)
+        if (GameTime::GetGameTime().count() - _triggerTimes[trigger->entry] < SUMMON_COOLDOWN)
             return false;
 
         switch (triggerId)
@@ -471,7 +471,7 @@ public:
 
         player->SummonCreature(NPC_SPOTLIGHT, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000);
         player->AddAura(SPELL_A52_NEURALYZER, player);
-        _triggerTimes[trigger->entry] = GameTime::GetGameTime();
+        _triggerTimes[trigger->entry] = GameTime::GetGameTime().count();
         return false;
     }
 

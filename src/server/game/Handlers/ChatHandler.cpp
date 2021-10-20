@@ -301,7 +301,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
         if (!_player->CanSpeak())
         {
-            std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime());
+            std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
             SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
             return;
         }
@@ -745,7 +745,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 
     if (!GetPlayer()->CanSpeak())
     {
-        std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime());
+        std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
         SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
         return;
     }

@@ -750,7 +750,7 @@ public:
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
 
-        int64 curRespawnDelay = target->GetRespawnTimeEx() - GameTime::GetGameTime();
+        int64 curRespawnDelay = target->GetRespawnTimeEx() - GameTime::GetGameTime().count();
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);

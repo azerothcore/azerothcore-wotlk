@@ -1014,10 +1014,10 @@ public:
             }
             else if (unit->GetTypeId() == TYPEID_UNIT && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
             {
-                if (GameTime::GetGameTime() > (m_conspeedatoryAttempt + DAY))
+                if (GameTime::GetGameTime().count() > (m_conspeedatoryAttempt + DAY))
                 {
                     DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21597 /*CON-SPEED-ATORY_TIMED_CRITERIA*/);
-                    m_conspeedatoryAttempt = GameTime::GetGameTime();
+                    m_conspeedatoryAttempt = GameTime::GetGameTime().count();
                     SaveToDB();
                 }
             }

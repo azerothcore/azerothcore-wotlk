@@ -100,7 +100,7 @@ void PacketLog::Initialize()
         header.Build = 12340;
         header.Locale[0] = 'e'; header.Locale[1] = 'n'; header.Locale[2] = 'U'; header.Locale[3] = 'S';
         std::memset(header.SessionKey, 0, sizeof(header.SessionKey));
-        header.SniffStartUnixtime = GameTime::GetGameTime();
+        header.SniffStartUnixtime = GameTime::GetGameTime().count();
         header.SniffStartTicks = getMSTime();
         header.OptionalDataSize = 0;
 

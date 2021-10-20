@@ -31,7 +31,7 @@ Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type
     m_objectTypeId = TYPEID_CORPSE;
     m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_POSITION);
     m_valuesCount = CORPSE_END;
-    m_time = GameTime::GetGameTime();
+    m_time = GameTime::GetGameTime().count();
     lootRecipient = nullptr;
 }
 
@@ -187,5 +187,5 @@ bool Corpse::IsExpired(time_t t) const
 
 void Corpse::ResetGhostTime()
 {
-    m_time = GameTime::GetGameTime();
+    m_time = GameTime::GetGameTime().count();
 }

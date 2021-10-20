@@ -1296,7 +1296,7 @@ class go_inconspicuous_landmark : public GameObjectScript
 public:
     go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
     {
-        _lastUsedTime = GameTime::GetGameTime();
+        _lastUsedTime = GameTime::GetGameTime().count();
     }
 
     bool OnGossipHello(Player* player, GameObject* /*go*/) override
@@ -1304,10 +1304,10 @@ public:
         if (player->HasItemCount(ITEM_CUERGOS_KEY))
             return true;
 
-        if (_lastUsedTime > GameTime::GetGameTime())
+        if (_lastUsedTime > GameTime::GetGameTime().count())
             return true;
 
-        _lastUsedTime = GameTime::GetGameTime() + MINUTE;
+        _lastUsedTime = GameTime::GetGameTime().count() + MINUTE;
         player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
         return true;
     }

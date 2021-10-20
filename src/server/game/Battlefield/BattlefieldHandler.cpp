@@ -36,7 +36,7 @@ void WorldSession::SendBfInvitePlayerToWar(uint32 BattleId, uint32 ZoneId, uint3
     WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 12);
     data << uint32(BattleId);
     data << uint32(ZoneId);
-    data << uint32((GameTime::GetGameTime() + p_time));
+    data << uint32((GameTime::GetGameTime().count() + p_time));
 
     //Sending the packet to player
     SendPacket(&data);

@@ -118,7 +118,7 @@ public:
                     {
                         if (Aura* aur = player->GetAura(SPELL_RAM_AURA))
                         {
-                            int32 diff = aur->GetApplyTime() - (GameTime::GetGameTime() - (HOUR * 18) + spellCooldown);
+                            int32 diff = aur->GetApplyTime() - (GameTime::GetGameTime().count() - (HOUR * 18) + spellCooldown);
                             if (diff > 10) // aura applied later
                                 return;
 
@@ -569,7 +569,7 @@ public:
 
         bool AllowStart()
         {
-            time_t curtime = GameTime::GetGameTime();
+            time_t curtime = GameTime::GetGameTime().count();
             tm strDate;
             localtime_r(&curtime, &strDate);
 

@@ -83,7 +83,7 @@ public:
             {
                 InstanceSave* save = itr->second.save;
                 uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
-                uint32 ttr = (resetTime >= GameTime::GetGameTime() ? resetTime - GameTime::GetGameTime() : 0);
+                uint32 ttr = (resetTime >= GameTime::GetGameTime().count() ? resetTime - GameTime::GetGameTime().count() : 0);
                 std::string timeleft = GetTimeString(ttr);
                 handler->PSendSysMessage("map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no",  save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
                 counter++;
@@ -127,7 +127,7 @@ public:
                 if (itr->first != player->GetMapId() && (!MapId || MapId == itr->first) && (diff == -1 || diff == save->GetDifficulty()))
                 {
                     uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
-                    uint32 ttr = (resetTime >= GameTime::GetGameTime() ? resetTime - GameTime::GetGameTime() : 0);
+                    uint32 ttr = (resetTime >= GameTime::GetGameTime().count() ? resetTime - GameTime::GetGameTime().count() : 0);
                     std::string timeleft = GetTimeString(ttr);
                     handler->PSendSysMessage("unbinding map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
                     sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player);

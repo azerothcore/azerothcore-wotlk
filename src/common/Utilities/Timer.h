@@ -25,7 +25,7 @@ inline TimePoint GetApplicationStartTime()
 {
     using namespace std::chrono;
 
-    static const steady_clock::time_point ApplicationStartTime = steady_clock::now();
+    static const TimePoint ApplicationStartTime = steady_clock::now();
 
     return ApplicationStartTime;
 }
@@ -35,6 +35,13 @@ inline uint32 getMSTime()
     using namespace std::chrono;
 
     return uint32(duration_cast<milliseconds>(steady_clock::now() - GetApplicationStartTime()).count());
+}
+
+inline Milliseconds GetTimeMS()
+{
+    using namespace std::chrono;
+
+    return duration_cast<milliseconds>(steady_clock::now() - GetApplicationStartTime());
 }
 
 inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)

@@ -94,7 +94,7 @@ InstanceSave* InstanceSaveMgr::AddInstanceSave(uint32 mapId, uint32 instanceId, 
     }
     else
     {
-        resetTime = GameTime::GetGameTime() + 3 * DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
+        resetTime = GameTime::GetGameTime().count() + 3 * DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
         extendedResetTime = 0;
     }
     InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, resetTime, extendedResetTime);
@@ -261,7 +261,7 @@ void InstanceSaveMgr::LoadInstances()
 
 void InstanceSaveMgr::LoadResetTimes()
 {
-    time_t now = GameTime::GetGameTime();
+    time_t now = GameTime::GetGameTime().count();
     time_t today = (now / DAY) * DAY;
 
     // load the global respawn times for raid/heroic instances
@@ -424,7 +424,7 @@ void InstanceSaveMgr::ScheduleReset(time_t time, InstResetEvent event)
 
 void InstanceSaveMgr::Update()
 {
-    time_t now = GameTime::GetGameTime();
+    time_t now = GameTime::GetGameTime().count();
     time_t t;
     bool resetOccurred = false;
 
@@ -523,7 +523,7 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
     if (!mapEntry->Instanceable())
         return;
 
-    time_t now = GameTime::GetGameTime();
+    time_t now = GameTime::GetGameTime().count();
 
     if (!warn)
     {

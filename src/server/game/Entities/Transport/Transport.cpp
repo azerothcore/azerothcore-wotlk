@@ -297,7 +297,7 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(GameTime::GetGameTime(), plr->GetPositionZ());
+            plr->SetFallInformation(GameTime::GetGameTime().count(), plr->GetPositionZ());
         }
 
         if (withAll)
@@ -946,7 +946,7 @@ void StaticTransport::UpdatePassengerPositions()
                 if (passenger->IsInWorld())
                 {
                     GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
-                    passenger->ToPlayer()->SetFallInformation(GameTime::GetGameTime(), z);
+                    passenger->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), z);
                 }
                 break;
             case TYPEID_GAMEOBJECT:
@@ -992,7 +992,7 @@ void StaticTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(GameTime::GetGameTime(), plr->GetPositionZ());
+            plr->SetFallInformation(GameTime::GetGameTime().count(), plr->GetPositionZ());
         }
 
         if (withAll)

@@ -28,14 +28,14 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-inline float GetAge(uint64 t) { return float(GameTime::GetGameTime() - t) / DAY; }
+inline float GetAge(uint64 t) { return float(GameTime::GetGameTime().count() - t) / DAY; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GM ticket
 GmTicket::GmTicket() : _id(0), _type(TICKET_TYPE_OPEN), _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(0), _lastModifiedTime(0),
     _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false), _needResponse(false), _needMoreHelp(false) { }
 
-GmTicket::GmTicket(Player* player) : _type(TICKET_TYPE_OPEN), _createTime(GameTime::GetGameTime()), _lastModifiedTime(GameTime::GetGameTime()),
+GmTicket::GmTicket(Player* player) : _type(TICKET_TYPE_OPEN), _createTime(GameTime::GetGameTime().count()), _lastModifiedTime(GameTime::GetGameTime().count()),
     _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false), _needMoreHelp(false)
 {
     _id = sTicketMgr->GenerateTicketId();
@@ -159,7 +159,7 @@ void GmTicket::SendResponse(WorldSession* session) const
 
 std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) const
 {
-    time_t curTime = GameTime::GetGameTime();
+    time_t curTime = GameTime::GetGameTime().count();
 
     std::stringstream ss;
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTGUID, _id);
@@ -253,12 +253,12 @@ void GmTicket::SetChatLog(std::list<uint32> time, std::string const& log)
 void GmTicket::SetMessage(std::string const& message)
 {
     _message = message;
-    _lastModifiedTime = uint64(GameTime::GetGameTime());
+    _lastModifiedTime = uint64(GameTime::GetGameTime().count());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Ticket manager
-TicketMgr::TicketMgr() : _status(true), _lastTicketId(0), _lastSurveyId(0), _openTicketCount(0), _lastChange(GameTime::GetGameTime()) { }
+TicketMgr::TicketMgr() : _status(true), _lastTicketId(0), _lastSurveyId(0), _openTicketCount(0), _lastChange(GameTime::GetGameTime().count()) { }
 
 TicketMgr::~TicketMgr()
 {
@@ -437,5 +437,5 @@ void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
 
 void TicketMgr::UpdateLastChange()
 {
-    _lastChange = GameTime::GetGameTime();
+    _lastChange = GameTime::GetGameTime().count();
 }

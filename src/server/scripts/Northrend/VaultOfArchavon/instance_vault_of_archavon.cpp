@@ -191,13 +191,13 @@ public:
                 switch (type)
                 {
                     case EVENT_ARCHAVON:
-                        ArchavonDeath = GameTime::GetGameTime();
+                        ArchavonDeath = GameTime::GetGameTime().count();
                         break;
                     case EVENT_EMALON:
-                        EmalonDeath = GameTime::GetGameTime();
+                        EmalonDeath = GameTime::GetGameTime().count();
                         break;
                     case EVENT_KORALON:
-                        KoralonDeath = GameTime::GetGameTime();
+                        KoralonDeath = GameTime::GetGameTime().count();
                         break;
                     default:
                         return;

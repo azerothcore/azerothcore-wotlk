@@ -319,7 +319,7 @@ public:
 
         if (target)
         {
-            int32 curRespawnDelay = int32(target->GetRespawnTimeEx() - GameTime::GetGameTime());
+            int32 curRespawnDelay = int32(target->GetRespawnTimeEx() - GameTime::GetGameTime().count());
             if (curRespawnDelay < 0)
                 curRespawnDelay = 0;
 

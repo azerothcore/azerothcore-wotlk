@@ -164,7 +164,7 @@ public:
         {
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
             {
-                if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > GameTime::GetGameTime())
+                if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > GameTime::GetGameTime().count())
                     return false;
 
                 uint32 form = 0;
@@ -188,7 +188,7 @@ public:
 
                 if (form)
                 {
-                    _swapTime = GameTime::GetGameTime() + 6;
+                    _swapTime = GameTime::GetGameTime().count() + 6;
                     _lastSchool = spellInfo->GetSchoolMask();
                     GetUnitOwner()->RemoveAurasDueToSpell(_lastForm);
                     _lastForm = form;

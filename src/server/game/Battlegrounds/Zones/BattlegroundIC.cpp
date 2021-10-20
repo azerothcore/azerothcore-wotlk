@@ -140,7 +140,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                             {
                                 // Check if creature respawn time is properly saved
                                 RespawnMap::iterator itr = respawnMap.find(catapult->GetGUID());
-                                if (itr == respawnMap.end() || GameTime::GetGameTime() < itr->second)
+                                if (itr == respawnMap.end() || GameTime::GetGameTime().count() < itr->second)
                                     continue;
 
                                 catapult->Relocate(BG_IC_DocksVehiclesCatapults[j].GetPositionX(), BG_IC_DocksVehiclesCatapults[j].GetPositionY(), BG_IC_DocksVehiclesCatapults[j].GetPositionZ(), BG_IC_DocksVehiclesCatapults[j].GetOrientation());
@@ -158,7 +158,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                             {
                                 // Check if creature respawn time is properly saved
                                 RespawnMap::iterator itr = respawnMap.find(glaiveThrower->GetGUID());
-                                if (itr == respawnMap.end() || GameTime::GetGameTime() < itr->second)
+                                if (itr == respawnMap.end() || GameTime::GetGameTime().count() < itr->second)
                                     continue;
 
                                 glaiveThrower->Relocate(BG_IC_DocksVehiclesGlaives[j].GetPositionX(), BG_IC_DocksVehiclesGlaives[j].GetPositionY(), BG_IC_DocksVehiclesGlaives[j].GetPositionZ(), BG_IC_DocksVehiclesGlaives[j].GetOrientation());
@@ -187,7 +187,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                         {
                             // Check if creature respawn time is properly saved
                             RespawnMap::iterator itr = respawnMap.find(siege->GetGUID());
-                            if (itr == respawnMap.end() || GameTime::GetGameTime() < itr->second)
+                            if (itr == respawnMap.end() || GameTime::GetGameTime().count() < itr->second)
                                 continue;
 
                             siege->Relocate(BG_IC_WorkshopVehicles[4].GetPositionX(), BG_IC_WorkshopVehicles[4].GetPositionY(), BG_IC_WorkshopVehicles[4].GetPositionZ(), BG_IC_WorkshopVehicles[4].GetOrientation());
@@ -204,7 +204,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                             {
                                 // Check if creature respawn time is properly saved
                                 RespawnMap::iterator itr = respawnMap.find(demolisher->GetGUID());
-                                if (itr == respawnMap.end() || GameTime::GetGameTime() < itr->second)
+                                if (itr == respawnMap.end() || GameTime::GetGameTime().count() < itr->second)
                                     continue;
 
                                 demolisher->Relocate(BG_IC_WorkshopVehicles[u].GetPositionX(), BG_IC_WorkshopVehicles[u].GetPositionY(), BG_IC_WorkshopVehicles[u].GetPositionZ(), BG_IC_WorkshopVehicles[u].GetOrientation());
@@ -533,7 +533,7 @@ void BattlegroundIC::HandleKillUnit(Creature* unit, Player* killer)
         // Xinef: Add to respawn list
         if (entry == NPC_DEMOLISHER || entry == NPC_SIEGE_ENGINE_H || entry == NPC_SIEGE_ENGINE_A ||
                 entry == NPC_GLAIVE_THROWER_A || entry == NPC_GLAIVE_THROWER_H || entry == NPC_CATAPULT)
-            respawnMap[unit->GetGUID()] = GameTime::GetGameTime() + VEHICLE_RESPAWN_TIME;
+            respawnMap[unit->GetGUID()] = GameTime::GetGameTime().count() + VEHICLE_RESPAWN_TIME;
     }
 }
 
@@ -880,7 +880,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture)
                                 if (!siegeVehicle->IsVehicleInUse())
                                     Unit::Kill(siegeEngine, siegeEngine);
 
-                        respawnMap[siegeEngine->GetGUID()] = GameTime::GetGameTime() + VEHICLE_RESPAWN_TIME;
+                        respawnMap[siegeEngine->GetGUID()] = GameTime::GetGameTime().count() + VEHICLE_RESPAWN_TIME;
                     }
                 }
 

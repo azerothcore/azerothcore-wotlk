@@ -96,7 +96,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
 bool Channel::IsBanned(ObjectGuid guid) const
 {
     BannedContainer::const_iterator itr = bannedStore.find(guid);
-    return itr != bannedStore.end() && itr->second > GameTime::GetGameTime();
+    return itr != bannedStore.end() && itr->second > GameTime::GetGameTime().count();
 }
 
 void Channel::UpdateChannelInDB() const
@@ -426,8 +426,8 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (!IsBanned(victim))
         {
-            bannedStore[victim] = GameTime::GetGameTime() + CHANNEL_BAN_DURATION;
-            AddChannelBanToDB(victim, GameTime::GetGameTime() + CHANNEL_BAN_DURATION);
+            bannedStore[victim] = GameTime::GetGameTime().count() + CHANNEL_BAN_DURATION;
+            AddChannelBanToDB(victim, GameTime::GetGameTime().count() + CHANNEL_BAN_DURATION);
 
             if (notify)
             {
@@ -809,7 +809,7 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
 
         if (!IsAllowedToSpeak(speakDelay))
         {
-            std::string timeStr = secsToTimeString(_lastSpeakTime + speakDelay - GameTime::GetGameTime());
+            std::string timeStr = secsToTimeString(_lastSpeakTime + speakDelay - GameTime::GetGameTime().count());
             if (_channelRights.speakMessage.length() > 0)
                 player->GetSession()->SendNotification("%s", _channelRights.speakMessage.c_str());
             player->GetSession()->SendNotification("You must wait %s before speaking again.", timeStr.c_str());
@@ -828,9 +828,9 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
 
 bool Channel::IsAllowedToSpeak(uint32 speakDelay)
 {
-    if (_lastSpeakTime + speakDelay <= GameTime::GetGameTime())
+    if (_lastSpeakTime + speakDelay <= GameTime::GetGameTime().count())
     {
-        _lastSpeakTime = GameTime::GetGameTime();
+        _lastSpeakTime = GameTime::GetGameTime().count();
         return true;
     }
 

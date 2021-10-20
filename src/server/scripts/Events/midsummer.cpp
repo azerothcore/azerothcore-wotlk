@@ -311,7 +311,7 @@ public:
                 }
 
                 // Achievement
-                if ((GameTime::GetGameTime() - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
+                if ((GameTime::GetGameTime().count() - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
                     target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
             }
         }

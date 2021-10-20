@@ -559,7 +559,7 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
         AddTimedQuest(quest_id);
         questStatusData.Timer = timeAllowed * IN_MILLISECONDS;
-        qtime = static_cast<uint32>(GameTime::GetGameTime()) + timeAllowed;
+        qtime = static_cast<uint32>(GameTime::GetGameTime().count()) + timeAllowed;
     }
     else
         questStatusData.Timer = 0;

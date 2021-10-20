@@ -721,9 +721,9 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill + 5 < GameTime::GetGameTime())
+            if (victim->GetTypeId() == TYPEID_PLAYER && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill + 5 < GameTime::GetGameTime().count())
             {
-                _lastTalkTimeKill = GameTime::GetGameTime();
+                _lastTalkTimeKill = GameTime::GetGameTime().count();
                 Talk(SAY_LK_KILL);
             }
         }
@@ -752,7 +752,7 @@ public:
                             events.RescheduleEvent(EVENT_START_ATTACK, 1000);
                         EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
                         summons.DoAction(ACTION_TELEPORT_BACK, pred);
-                        if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime())
+                        if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime().count())
                             Talk(SAY_LK_FROSTMOURNE_ESCAPE);
                     }
                     break;
@@ -907,9 +907,9 @@ public:
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
-            if (spell->Id == HARVESTED_SOUL_BUFF && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime())
+            if (spell->Id == HARVESTED_SOUL_BUFF && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime().count())
             {
-                _lastTalkTimeBuff = GameTime::GetGameTime();
+                _lastTalkTimeBuff = GameTime::GetGameTime().count();
                 Talk(SAY_LK_FROSTMOURNE_KILL);
             }
         }

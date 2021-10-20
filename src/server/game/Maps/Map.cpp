@@ -2936,7 +2936,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
         // increase current instances (hourly limit)
         // xinef: specific instances are still limited
         if (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance())
-            player->AddInstanceEnterTime(GetInstanceId(), GameTime::GetGameTime());
+            player->AddInstanceEnterTime(GetInstanceId(), GameTime::GetGameTime().count());
 
         if (!playerBind->perm && !mapSave->CanReset() && group && !group->isLFGGroup() && !group->IsLfgRandomInstance())
         {
@@ -3286,7 +3286,7 @@ void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTi
         return;
     }
 
-    time_t now = GameTime::GetGameTime();
+    time_t now = GameTime::GetGameTime().count();
     if (GetInstanceResetPeriod() > 0 && respawnTime - now + 5 >= GetInstanceResetPeriod())
         respawnTime = now + YEAR;
 
@@ -3320,7 +3320,7 @@ void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
         return;
     }
 
-    time_t now = GameTime::GetGameTime();
+    time_t now = GameTime::GetGameTime().count();
     if (GetInstanceResetPeriod() > 0 && respawnTime - now + 5 >= GetInstanceResetPeriod())
         respawnTime = now + YEAR;
 
@@ -3599,7 +3599,7 @@ Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= 
 
 void Map::RemoveOldCorpses()
 {
-    time_t now = GameTime::GetGameTime();
+    time_t now = GameTime::GetGameTime().count();
 
     std::vector<ObjectGuid> corpses;
     corpses.reserve(_corpsesByPlayer.size());

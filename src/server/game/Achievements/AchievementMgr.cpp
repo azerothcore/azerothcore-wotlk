@@ -426,7 +426,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             birthday_tm.tm_year += birthday_login.nth_birthday;
 
             time_t birthday = mktime(&birthday_tm);
-            time_t now = GameTime::GetGameTime();
+            time_t now = GameTime::GetGameTime().count();
             return now <= birthday + DAY && now >= birthday;
         }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE:
@@ -651,7 +651,7 @@ void AchievementMgr::LoadFromDB(PreparedQueryResult achievementResult, PreparedQ
                 continue;
             }
 
-            if (criteria->timeLimit && time_t(date + criteria->timeLimit) < GameTime::GetGameTime())
+            if (criteria->timeLimit && time_t(date + criteria->timeLimit) < GameTime::GetGameTime().count())
                 continue;
 
             CriteriaProgress& progress = m_criteriaProgress[id];
@@ -729,7 +729,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8 + 4 + 8);
     data << GetPlayer()->GetPackGUID();
     data << uint32(achievement->ID);
-    data.AppendPackedTime(GameTime::GetGameTime());
+    data.AppendPackedTime(GameTime::GetGameTime().count());
     data << uint32(0);
     GetPlayer()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
@@ -2078,7 +2078,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     }
 
     progress->changed = true;
-    progress->date = GameTime::GetGameTime(); // set the date to the latest update.
+    progress->date = GameTime::GetGameTime().count(); // set the date to the latest update.
 
     uint32 timeElapsed = 0;
     bool timedCompleted = false;
@@ -2201,7 +2201,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
-    ca.date = GameTime::GetGameTime();
+    ca.date = GameTime::GetGameTime().count();
     ca.changed = true;
 
     sScriptMgr->OnAchievementComplete(GetPlayer(), achievement);

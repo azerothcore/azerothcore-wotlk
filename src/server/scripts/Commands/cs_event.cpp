@@ -116,8 +116,8 @@ public:
         std::string endTimeStr = TimeToTimestampStr(eventData.end);
 
         uint32 delay = sGameEventMgr->NextCheck(eventId);
-        time_t nextTime = GameTime::GetGameTime() + delay;
-        std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(GameTime::GetGameTime() + delay) : "-";
+        time_t nextTime = GameTime::GetGameTime().count() + delay;
+        std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(GameTime::GetGameTime().count() + delay) : "-";
 
         std::string occurenceStr = secsToTimeString(eventData.occurence * MINUTE, true);
         std::string lengthStr = secsToTimeString(eventData.length * MINUTE, true);

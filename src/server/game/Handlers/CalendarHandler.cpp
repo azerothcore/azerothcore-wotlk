@@ -53,7 +53,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     ObjectGuid guid = _player->GetGUID();
     LOG_DEBUG("network", "CMSG_CALENDAR_GET_CALENDAR [%s]", guid.ToString().c_str());
 
-    time_t currTime = GameTime::GetGameTime();
+    time_t currTime = GameTime::GetGameTime().count();
 
     WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR, 1000); // Average size if no instance
 
@@ -255,7 +255,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
-    if (time_t(eventPackedTime) < (GameTime::GetGameTime() - time_t(86400L)))
+    if (time_t(eventPackedTime) < (GameTime::GetGameTime().count() - time_t(86400L)))
     {
         recvData.rfinish();
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_PASSED);
@@ -293,13 +293,13 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
         }
     }
 
-    if (GetCalendarEventCreationCooldown() > GameTime::GetGameTime())
+    if (GetCalendarEventCreationCooldown() > GameTime::GetGameTime().count())
     {
         recvData.rfinish();
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_INTERNAL);
         return;
     }
-    SetCalendarEventCreationCooldown(GameTime::GetGameTime() + CALENDAR_CREATE_EVENT_COOLDOWN);
+    SetCalendarEventCreationCooldown(GameTime::GetGameTime().count() + CALENDAR_CREATE_EVENT_COOLDOWN);
 
     CalendarEvent* calendarEvent = new CalendarEvent(sCalendarMgr->GetFreeEventId(), guid, 0, CalendarEventType(type), dungeonId,
             time_t(eventPackedTime), flags, time_t(unkPackedTime), title, description);
@@ -387,7 +387,7 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
 
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
-    if (time_t(eventPackedTime) < (GameTime::GetGameTime() - time_t(86400L)))
+    if (time_t(eventPackedTime) < (GameTime::GetGameTime().count() - time_t(86400L)))
     {
         recvData.rfinish();
         return;
@@ -444,7 +444,7 @@ void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
 
     // prevent events in the past
     // To Do: properly handle timezones and remove the "- time_t(86400L)" hack
-    if (time_t(eventTime) < (GameTime::GetGameTime() - time_t(86400L)))
+    if (time_t(eventTime) < (GameTime::GetGameTime().count() - time_t(86400L)))
     {
         recvData.rfinish();
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_PASSED);
@@ -489,12 +489,12 @@ void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
             }
         }
 
-        if (GetCalendarEventCreationCooldown() > GameTime::GetGameTime())
+        if (GetCalendarEventCreationCooldown() > GameTime::GetGameTime().count())
         {
             sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_INTERNAL);
             return;
         }
-        SetCalendarEventCreationCooldown(GameTime::GetGameTime() + CALENDAR_CREATE_EVENT_COOLDOWN);
+        SetCalendarEventCreationCooldown(GameTime::GetGameTime().count() + CALENDAR_CREATE_EVENT_COOLDOWN);
 
         CalendarEvent* newEvent = new CalendarEvent(*oldEvent, sCalendarMgr->GetFreeEventId());
         newEvent->SetEventTime(time_t(eventTime));
@@ -628,7 +628,7 @@ void WorldSession::HandleCalendarEventSignup(WorldPacket& recvData)
         }
 
         CalendarInviteStatus status = tentative ? CALENDAR_STATUS_TENTATIVE : CALENDAR_STATUS_SIGNED_UP;
-        CalendarInvite* invite = new CalendarInvite(sCalendarMgr->GetFreeInviteId(), eventId, guid, guid, GameTime::GetGameTime(), status, CALENDAR_RANK_PLAYER, "");
+        CalendarInvite* invite = new CalendarInvite(sCalendarMgr->GetFreeInviteId(), eventId, guid, guid, GameTime::GetGameTime().count(), status, CALENDAR_RANK_PLAYER, "");
         sCalendarMgr->AddInvite(calendarEvent, invite);
         sCalendarMgr->SendCalendarClearPendingAction(guid);
     }
@@ -660,7 +660,7 @@ void WorldSession::HandleCalendarEventRsvp(WorldPacket& recvData)
         if (CalendarInvite* invite = sCalendarMgr->GetInvite(inviteId))
         {
             invite->SetStatus(CalendarInviteStatus(status));
-            invite->SetStatusTime(GameTime::GetGameTime());
+            invite->SetStatusTime(GameTime::GetGameTime().count());
 
             sCalendarMgr->UpdateInvite(invite);
             sCalendarMgr->SendCalendarEventStatus(*calendarEvent, *invite);
@@ -720,7 +720,7 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
         if (CalendarInvite* invite = sCalendarMgr->GetInvite(inviteId))
         {
             invite->SetStatus((CalendarInviteStatus)status);
-            invite->SetStatusTime(GameTime::GetGameTime());
+            invite->SetStatusTime(GameTime::GetGameTime().count());
 
             sCalendarMgr->UpdateInvite(invite);
             sCalendarMgr->SendCalendarEventStatus(*calendarEvent, *invite);
@@ -819,7 +819,7 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
 void WorldSession::SendCalendarRaidLockout(InstanceSave const* save, bool add)
 {
     LOG_DEBUG("network", "%s", add ? "SMSG_CALENDAR_RAID_LOCKOUT_ADDED" : "SMSG_CALENDAR_RAID_LOCKOUT_REMOVED");
-    time_t currTime = GameTime::GetGameTime();
+    time_t currTime = GameTime::GetGameTime().count();
 
     WorldPacket data(SMSG_CALENDAR_RAID_LOCKOUT_REMOVED, (add ? 4 : 0) + 4 + 4 + 4 + 8);
     if (add)
@@ -837,7 +837,7 @@ void WorldSession::SendCalendarRaidLockout(InstanceSave const* save, bool add)
 
 void WorldSession::SendCalendarRaidLockoutUpdated(InstanceSave const* save, bool isExtended)
 {
-    time_t currTime = GameTime::GetGameTime();
+    time_t currTime = GameTime::GetGameTime().count();
     time_t resetTime = isExtended ? save->GetExtendedResetTime() : save->GetResetTime();
     time_t resetTimeOp = isExtended ? save->GetResetTime() : save->GetExtendedResetTime();
     WorldPacket data(SMSG_CALENDAR_RAID_LOCKOUT_UPDATED, 4 + 4 + 4 + 4 + 8);

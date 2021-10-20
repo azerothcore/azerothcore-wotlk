@@ -25,7 +25,7 @@
 #include "QueryResult.h"
 #include <unordered_map>
 
-CalendarInvite::CalendarInvite() : _inviteId(1), _eventId(0), _statusTime(GameTime::GetGameTime()),
+CalendarInvite::CalendarInvite() : _inviteId(1), _eventId(0), _statusTime(GameTime::GetGameTime().count()),
 _status(CALENDAR_STATUS_INVITED), _rank(CALENDAR_RANK_PLAYER), _text("") { }
 
 CalendarInvite::~CalendarInvite()
@@ -360,7 +360,7 @@ uint64 CalendarMgr::GetFreeInviteId()
 
 void CalendarMgr::DeleteOldEvents()
 {
-    time_t oldEventsTime = GameTime::GetGameTime() - CALENDAR_OLD_EVENTS_DELETION_TIME;
+    time_t oldEventsTime = GameTime::GetGameTime().count() - CALENDAR_OLD_EVENTS_DELETION_TIME;
 
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end();)
     {

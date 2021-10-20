@@ -932,7 +932,7 @@ void MovementInfo::OutDebug()
     LOG_INFO("movement", "guid %s", guid.ToString().c_str());
     LOG_INFO("movement", "flags %u", flags);
     LOG_INFO("movement", "flags2 %u", flags2);
-    LOG_INFO("movement", "time %u current time " UI64FMTD "", flags2, uint64(::GameTime::GetGameTime()));
+    LOG_INFO("movement", "time %u current time " UI64FMTD "", flags2, uint64(::GameTime::GetGameTime().count()));
     LOG_INFO("movement", "position: `%s`", pos.ToString().c_str());
 
     if (flags & MOVEMENTFLAG_ONTRANSPORT)

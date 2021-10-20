@@ -4010,7 +4010,7 @@ void Player::AddItemToBuyBackSlot(Item* pItem)
         LOG_DEBUG("entities.player.items", "STORAGE: AddItemToBuyBackSlot item = %u, slot = %u", pItem->GetEntry(), slot);
 
         m_items[slot] = pItem;
-        time_t base = GameTime::GetGameTime();
+        time_t base = GameTime::GetGameTime().count();
         uint32 etime = uint32(base - m_logintime + (30 * 3600));
         uint32 eslot = slot - BUYBACK_SLOT_START;
 
@@ -5362,7 +5362,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     SaveRecallPosition();
 
-    time_t now = GameTime::GetGameTime();
+    time_t now = GameTime::GetGameTime().count();
     time_t logoutTime = time_t(fields[27].GetUInt32());
 
     // since last logout (in seconds)
@@ -5535,7 +5535,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetUInt32Value(PLAYER_CHOSEN_TITLE, curTitle);
 
     // has to be called after last Relocate() in Player::LoadFromDB
-    SetFallInformation(GameTime::GetGameTime(), GetPositionZ());
+    SetFallInformation(GameTime::GetGameTime().count(), GetPositionZ());
 
     _LoadSpellCooldowns(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS));
 
@@ -6236,7 +6236,7 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
             m->state = MAIL_STATE_UNCHANGED;
 
             // Do not load expired pending sale mail if there is already delivery auction mail
-            if (m->auctionId < 0 && m->expire_time <= GameTime::GetGameTime())
+            if (m->auctionId < 0 && m->expire_time <= GameTime::GetGameTime().count())
             {
                 uint32 auctionId = std::abs(m->auctionId);
                 if (pendingAuctions.count(auctionId))
@@ -6351,10 +6351,10 @@ void Player::_LoadQuestStatus(PreparedQueryResult result)
                 {
                     AddTimedQuest(quest_id);
 
-                    if (quest_time <= GameTime::GetGameTime())
+                    if (quest_time <= GameTime::GetGameTime().count())
                         questStatusData.Timer = 1;
                     else
-                        questStatusData.Timer = uint32((quest_time - GameTime::GetGameTime()) * IN_MILLISECONDS);
+                        questStatusData.Timer = uint32((quest_time - GameTime::GetGameTime().count()) * IN_MILLISECONDS);
                 }
                 else
                     quest_time = 0;
@@ -6605,7 +6605,7 @@ void Player::SendRaidInfo()
     size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
 
-    time_t now = GameTime::GetGameTime();
+    time_t now = GameTime::GetGameTime().count();
 
     for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
     {
@@ -7554,7 +7554,7 @@ void Player::_SaveQuestStatus(CharacterDatabaseTransaction trans)
                 stmt->setUInt32(index++, statusItr->first);
                 stmt->setUInt8(index++, uint8(statusItr->second.Status));
                 stmt->setBool(index++, statusItr->second.Explored);
-                stmt->setUInt32(index++, uint32(statusItr->second.Timer / IN_MILLISECONDS + GameTime::GetGameTime()));
+                stmt->setUInt32(index++, uint32(statusItr->second.Timer / IN_MILLISECONDS + GameTime::GetGameTime().count()));
 
                 for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
                     stmt->setUInt16(index++, statusItr->second.CreatureOrGOCount[i]);

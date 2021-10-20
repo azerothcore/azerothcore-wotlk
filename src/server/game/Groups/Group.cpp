@@ -2383,11 +2383,11 @@ void Group::ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply)
 
 uint32 Group::GetDifficultyChangePreventionTime() const
 {
-    return _difficultyChangePreventionTime > GameTime::GetGameTime() ? _difficultyChangePreventionTime - GameTime::GetGameTime() : 0;
+    return _difficultyChangePreventionTime > GameTime::GetGameTime().count() ? _difficultyChangePreventionTime - GameTime::GetGameTime().count() : 0;
 }
 
 void Group::SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
 {
-    _difficultyChangePreventionTime = GameTime::GetGameTime() + MINUTE;
+    _difficultyChangePreventionTime = GameTime::GetGameTime().count() + MINUTE;
     _difficultyChangePreventionType = type;
 }

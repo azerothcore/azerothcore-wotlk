@@ -456,7 +456,7 @@ public:
                 case EVENT_SPAWN_FLAMES_INITIAL:
                     {
                         if (changeAllowedFlameSpreadTime)
-                            allowedFlameSpreadTime = GameTime::GetGameTime();
+                            allowedFlameSpreadTime = GameTime::GetGameTime().count();
 
                         std::vector<Player*> pg;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
@@ -2286,7 +2286,7 @@ public:
     {
         npc_ulduar_flames_initialAI(Creature* pCreature) : NullCreatureAI(pCreature)
         {
-            CreateTime = GameTime::GetGameTime();
+            CreateTime = GameTime::GetGameTime().count();
             events.Reset();
             events.ScheduleEvent(EVENT_FLAMES_SPREAD, 5750);
             if( Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f) )
