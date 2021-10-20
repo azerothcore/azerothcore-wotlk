@@ -91,8 +91,7 @@ public:
             _EnterCombat();
             for (ObjectGuid const& minionGuid : coreHoundsGuids)
             {
-                Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid);
-                if (minion)
+                if (Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid))
                 {
                     if (minion->isDead())
                     {
