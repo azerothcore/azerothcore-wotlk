@@ -195,6 +195,10 @@ public:
                     golemagg->AI()->SetGUID(me->GetGUID(), DATA_GOLEMAGG_CORE_HOUND);
                 }
             }
+            else
+            {
+                DoCastSelf(SPELL_QUIET_SUICIDE);
+            }
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
