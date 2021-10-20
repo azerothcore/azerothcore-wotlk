@@ -1366,6 +1366,11 @@ void ScriptMgr::OnPVPKill(Player* killer, Player* killed)
     FOREACH_SCRIPT(PlayerScript)->OnPVPKill(killer, killed);
 }
 
+void ScriptMgr::OnPlayerPVPFlagChange(Player* player, bool state)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerPVPFlagChange(player, state);
+}
+
 void ScriptMgr::OnCreatureKill(Player* killer, Creature* killed)
 {
 #ifdef ELUNA
@@ -1627,6 +1632,11 @@ void ScriptMgr::OnPlayerUpdateFaction(Player* player)
 void ScriptMgr::OnPlayerAddToBattleground(Player* player, Battleground* bg)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAddToBattleground(player, bg);
+}
+
+void ScriptMgr::OnPlayerQueueRandomDungeon(Player* player, uint32 & rDungeonId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnQueueRandomDungeon(player, rDungeonId);
 }
 
 void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)

@@ -23,6 +23,7 @@
 #include "BattlegroundAB.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "DBCEnums.h"
@@ -42,28 +43,6 @@
 #include "SpellMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
-
-namespace Acore
-{
-    class AchievementChatBuilder
-    {
-    public:
-        AchievementChatBuilder(Player const& player, ChatMsg msgtype, int32 textId, uint32 ach_id)
-            : i_player(player), i_msgtype(msgtype), i_textId(textId), i_achievementId(ach_id) {}
-
-        void operator()(WorldPacket& data, LocaleConstant loc_idx)
-        {
-            std::string text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
-            ChatHandler::BuildChatPacket(data, i_msgtype, LANG_UNIVERSAL, &i_player, &i_player, text, i_achievementId);
-        }
-
-    private:
-        Player const& i_player;
-        ChatMsg i_msgtype;
-        int32 i_textId;
-        uint32 i_achievementId;
-    };
-}                                                           // namespace Acore
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
@@ -696,9 +675,9 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId());
     if (guild)
     {
-        Acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
-        Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> say_do(say_builder);
-        guild->BroadcastWorker(say_do, GetPlayer());
+        Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->getGender(), GetPlayer(), achievement->ID);
+        Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
+        guild->BroadcastWorker(_localizer, GetPlayer());
     }
 
     if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_KILL | ACHIEVEMENT_FLAG_REALM_FIRST_REACH))
@@ -739,11 +718,11 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
         Cell cell(p);
         cell.SetNoCreate();
 
-        Acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
-        Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> say_do(say_builder);
-        Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> > say_worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-        TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
-        Cell::VisitWorldObjects(GetPlayer(), say_worker, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
+        Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->getGender(), GetPlayer(), achievement->ID);
+        Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
+        Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder>> _worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), _localizer);
+        TypeContainerVisitor<Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> >, WorldTypeMapContainer > message(_worker);
+        Cell::VisitWorldObjects(GetPlayer(), _worker, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
     }
 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8 + 4 + 8);
@@ -2320,44 +2299,40 @@ void AchievementMgr::SendAllAchievementData() const
 
 void AchievementMgr::SendRespondInspectAchievements(Player* player) const
 {
-    WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9 + m_completedAchievements.size() * 8 + 4 + 4);
+    WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9 + m_completedAchievements.size() * 8 + 4 + m_criteriaProgress.size() * 38 + 4);
     data << GetPlayer()->GetPackGUID();
-    BuildAllDataPacket(&data, true);
+    BuildAllDataPacket(&data);
     player->GetSession()->SendPacket(&data);
 }
 
 /**
  * used by SMSG_RESPOND_INSPECT_ACHIEVEMENT and SMSG_ALL_ACHIEVEMENT_DATA
  */
-void AchievementMgr::BuildAllDataPacket(WorldPacket* data, bool inspect) const
+void AchievementMgr::BuildAllDataPacket(WorldPacket* data) const
 {
-    if (!m_completedAchievements.empty())
+    for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
     {
-        AchievementEntry const* achievement = nullptr;
-        for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
-        {
-            // Skip hidden achievements
-            achievement = sAchievementStore.LookupEntry(iter->first);
-            if (!achievement || achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
-                continue;
+        // Skip hidden achievements
+        AchievementEntry const* achievement = sAchievementStore.LookupEntry(iter->first);
+        if (!achievement || achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
+            continue;
 
-            *data << uint32(iter->first);
-            data->AppendPackedTime(iter->second.date);
-        }
+        *data << uint32(iter->first);
+        data->AppendPackedTime(iter->second.date);
     }
+
     *data << int32(-1);
 
-    if (!inspect && !m_criteriaProgress.empty())
-        for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
-        {
-            *data << uint32(iter->first);
-            data->appendPackGUID(iter->second.counter);
-            *data << GetPlayer()->GetPackGUID();
-            *data << uint32(0);
-            data->AppendPackedTime(iter->second.date);
-            *data << uint32(0);
-            *data << uint32(0);
-        }
+    for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
+    {
+        *data << uint32(iter->first);
+        data->appendPackGUID(iter->second.counter);
+        *data << GetPlayer()->GetPackGUID();
+        *data << uint32(0);
+        data->AppendPackedTime(iter->second.date);
+        *data << uint32(0);
+        *data << uint32(0);
+    }
 
     *data << int32(-1);
 }
