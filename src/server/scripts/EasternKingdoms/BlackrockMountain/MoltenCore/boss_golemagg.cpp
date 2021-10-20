@@ -92,7 +92,7 @@ public:
             for (ObjectGuid const& minionGuid : coreHoundsGuids)
             {
                 Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid);
-                if (minion && minion->isDead())
+                if (minion && minion->IsAlive())
                 {
                     minion->AI()->DoZoneInCombat();
                     minion->AI()->AttackStart(victim);
