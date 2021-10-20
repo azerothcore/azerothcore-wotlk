@@ -2584,7 +2584,7 @@ void Creature::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs
 {
     for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         if (idSchoolMask & (1 << i))
-            m_ProhibitSchoolTime[i] = GameTime::GetGameTimeMS() + unTimeMs;
+            m_ProhibitSchoolTime[i] = GameTime::GetGameTimeMS().count() + unTimeMs;
 }
 
 bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
@@ -2595,7 +2595,7 @@ bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
 
     for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         if (idSchoolMask & (1 << i))
-            if (m_ProhibitSchoolTime[i] >= GameTime::GetGameTimeMS())
+            if (m_ProhibitSchoolTime[i] >= GameTime::GetGameTimeMS().count())
                 return true;
 
     return false;
@@ -2605,7 +2605,7 @@ void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uin
 {
     CreatureSpellCooldown spellCooldown;
     spellCooldown.category = categoryId;
-    spellCooldown.end = GameTime::GetGameTimeMS() + end_time;
+    spellCooldown.end = GameTime::GetGameTimeMS().count() + end_time;
     m_CreatureSpellCooldowns[spell_id] = std::move(spellCooldown);
 }
 
@@ -2651,13 +2651,13 @@ uint32 Creature::GetSpellCooldown(uint32 spell_id) const
     if (itr == m_CreatureSpellCooldowns.end())
         return 0;
 
-    return itr->second.end > GameTime::GetGameTimeMS() ? itr->second.end - GameTime::GetGameTimeMS() : 0;
+    return itr->second.end > GameTime::GetGameTimeMS().count() ? itr->second.end - GameTime::GetGameTimeMS().count() : 0;
 }
 
 bool Creature::HasSpellCooldown(uint32 spell_id) const
 {
     CreatureSpellCooldowns::const_iterator itr = m_CreatureSpellCooldowns.find(spell_id);
-    return (itr != m_CreatureSpellCooldowns.end() && itr->second.end > GameTime::GetGameTimeMS());
+    return (itr != m_CreatureSpellCooldowns.end() && itr->second.end > GameTime::GetGameTimeMS().count());
 }
 
 bool Creature::HasSpell(uint32 spellID) const

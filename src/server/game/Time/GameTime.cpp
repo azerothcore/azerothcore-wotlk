@@ -67,7 +67,7 @@ namespace GameTime
 
     void UpdateGameTimers()
     {
-        GameTime = GameTime::GetGameTime();
+        GameTime = GetEpochTime();
         GameMSTime = GetTimeMS();
         GameTimeSystemPoint = std::chrono::system_clock::now();
         GameTimeSteadyPoint = std::chrono::steady_clock::now();

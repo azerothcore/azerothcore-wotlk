@@ -547,7 +547,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
             if (!bg)
                 continue;
 
-            uint32 remainingTime = (GameTime::GetGameTimeMS() < ginfo.RemoveInviteTime ? getMSTimeDiff(GameTime::GetGameTimeMS(), ginfo.RemoveInviteTime) : 1);
+            uint32 remainingTime = (GameTime::GetGameTimeMS().count() < ginfo.RemoveInviteTime ? getMSTimeDiff(GameTime::GetGameTimeMS().count(), ginfo.RemoveInviteTime) : 1);
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, i, STATUS_WAIT_JOIN, remainingTime, 0, ginfo.ArenaType, TEAM_NEUTRAL, bg->isRated(), ginfo.BgTypeId);
             SendPacket(&data);
         }
@@ -564,7 +564,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
                 continue;
 
             uint32 avgWaitTime = bgQueue.GetAverageQueueWaitTime(&ginfo);
-            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, i, STATUS_WAIT_QUEUE, avgWaitTime, getMSTimeDiff(ginfo.JoinTime, GameTime::GetGameTimeMS()), ginfo.ArenaType, TEAM_NEUTRAL, ginfo.IsRated);
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, i, STATUS_WAIT_QUEUE, avgWaitTime, getMSTimeDiff(ginfo.JoinTime, GameTime::GetGameTimeMS().count()), ginfo.ArenaType, TEAM_NEUTRAL, ginfo.IsRated);
             SendPacket(&data);
         }
     }

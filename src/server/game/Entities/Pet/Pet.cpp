@@ -1210,7 +1210,7 @@ void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout)
     trans->Append(stmt);
 
     time_t curTime = GameTime::GetGameTime().count();
-    uint32 curMSTime = GameTime::GetGameTimeMS();
+    uint32 curMSTime = GameTime::GetGameTimeMS().count();
     uint32 infTime   = curMSTime + infinityCooldownDelayCheck;
 
     // remove oudated and save active

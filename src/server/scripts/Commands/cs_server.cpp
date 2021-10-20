@@ -232,7 +232,7 @@ public:
             handler->PSendSysMessage("Connected players: %u. Characters in world: %u. Queue: %u.", activeSessionCount, playerCount, queuedSessionCount);
 
         handler->PSendSysMessage("Connection peak: %u.", connPeak);
-        handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(sWorldUpdateTime.GetLastUpdateTime()).c_str());
+        handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(GameTime::GetUptime().count()).c_str());
         handler->PSendSysMessage("Update time diff: %ums, average: %ums.", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetAverageUpdateTime());
 
         //! Can't use sWorld->ShutdownMsg here in case of console command

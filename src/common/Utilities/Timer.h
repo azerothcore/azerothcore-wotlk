@@ -57,6 +57,18 @@ inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
     }
 }
 
+inline Milliseconds GetMSTimeDiff(Milliseconds oldMSTime, Milliseconds newMSTime)
+{
+    if (oldMSTime > newMSTime)
+    {
+        return oldMSTime - newMSTime;
+    }
+    else
+    {
+        return newMSTime - oldMSTime;
+    }
+}
+
 inline uint32 getMSTimeDiff(uint32 oldMSTime, TimePoint newTime)
 {
     using namespace std::chrono;

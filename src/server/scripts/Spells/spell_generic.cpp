@@ -2936,12 +2936,12 @@ public:
         {
             if (GetStackAmount() > stackAmount)
             {
-                _applyTimes.push_back(GameTime::GetGameTimeMS());
+                _applyTimes.push_back(GameTime::GetGameTimeMS().count());
                 stackAmount++;
             }
 
             // pop stack if it expired for us
-            if (_applyTimes.front() + GetMaxDuration() < GameTime::GetGameTimeMS())
+            if (_applyTimes.front() + GetMaxDuration() < GameTime::GetGameTimeMS().count())
             {
                 stackAmount--;
                 ModStackAmount(-1, AURA_REMOVE_BY_EXPIRE);

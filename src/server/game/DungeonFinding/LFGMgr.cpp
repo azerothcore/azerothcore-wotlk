@@ -956,8 +956,10 @@ namespace lfg
                 m_raidBrowserUpdateTimer[team] = 0;
         }
 
-        if (getMSTimeDiff(GameTime::GetGameTimeMS(), getMSTime()) > (70 * 7) / 5) // prevent lagging
+        if (GetMSTimeDiff(GameTime::GetGameTimeMS(), GetTimeMS()) > 98ms) // prevent lagging
+        {
             return;
+        }
 
         ObjectGuid guid, groupGuid, instanceGuid;
         uint8 level, Class, race, talents[3];

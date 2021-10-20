@@ -573,7 +573,7 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
     {
         if (!AsyncAuctionListingMgr::IsAuctionListingAllowed()) // pussywizard: World::Update is waiting for us...
             if ((itrcounter++) % 100 == 0) // check condition every 100 iterations
-                if (sWorldUpdateTime.GetAverageUpdateTime() >= 30 || getMSTimeDiff(GameTime::GetGameTimeMS(), GameTime::GetGameTimeMS()) >= 10) // pussywizard: stop immediately if diff is high or waiting too long
+                if (sWorldUpdateTime.GetAverageUpdateTime() >= 30 || GetMSTimeDiff(GameTime::GetGameTimeMS(), GameTime::GetGameTimeMS()) >= 10ms) // pussywizard: stop immediately if diff is high or waiting too long
                     return false;
 
         AuctionEntry* Aentry = itr->second;

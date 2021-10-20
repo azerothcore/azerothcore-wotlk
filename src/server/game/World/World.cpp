@@ -1941,7 +1941,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", " ");
 
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES (%u, %u, 0, '%s')",
-                           realm.Id.Realm, uint32(GameTime::GetStartTime()), GitRevision::GetFullVersion());       // One-time query
+                           realm.Id.Realm, uint32(GameTime::GetStartTime().count()), GitRevision::GetFullVersion());       // One-time query
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);
@@ -2315,17 +2315,14 @@ void World::Update(uint32 diff)
     /// <li> Update uptime table
     if (m_timers[WUPDATE_UPTIME].Passed())
     {
-        uint32 tmpDiff = GameTime::GetUptime();;
-        uint32 maxOnlinePlayers = GetMaxPlayerCount();
-
         m_timers[WUPDATE_UPTIME].Reset();
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_PLAYERS);
 
-        stmt->setUInt32(0, tmpDiff);
-        stmt->setUInt16(1, uint16(maxOnlinePlayers));
+        stmt->setUInt32(0, uint32(GameTime::GetUptime().count()));
+        stmt->setUInt16(1, uint16(GetMaxPlayerCount()));
         stmt->setUInt32(2, realm.Id.Realm);
-        stmt->setUInt32(3, uint32(GameTime::GetStartTime()));
+        stmt->setUInt32(3, uint32(GameTime::GetStartTime().count()));
 
         LoginDatabase.Execute(stmt);
     }
@@ -2574,16 +2571,16 @@ void World::KickAllLess(AccountTypes sec)
 void World::_UpdateGameTime()
 {
     ///- update the time
-    time_t lastGameTime = GameTime::GetGameTime().count();
+    Seconds lastGameTime = GameTime::GetGameTime();
     GameTime::UpdateGameTimers();
 
-    uint32 elapsed = uint32(GameTime::GetGameTime().count() - lastGameTime);
+    Seconds elapsed = GameTime::GetGameTime() - lastGameTime;
 
     ///- if there is a shutdown timer
-    if (!IsStopped() && m_ShutdownTimer > 0 && elapsed > 0)
+    if (!IsStopped() && m_ShutdownTimer > 0 && elapsed > 0s)
     {
         ///- ... and it is overdue, stop the world (set m_stopEvent)
-        if (m_ShutdownTimer <= elapsed)
+        if (m_ShutdownTimer <= elapsed.count())
         {
             if (!(m_ShutdownMask & SHUTDOWN_MASK_IDLE) || GetActiveAndQueuedSessionCount() == 0)
                 m_stopEvent = true;                         // exist code already set
@@ -2593,7 +2590,7 @@ void World::_UpdateGameTime()
         ///- ... else decrease it and if necessary display a shutdown countdown to the users
         else
         {
-            m_ShutdownTimer -= elapsed;
+            m_ShutdownTimer -= elapsed.count();
 
             ShutdownMsg();
         }

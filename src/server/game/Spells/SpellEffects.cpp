@@ -4328,7 +4328,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     }
 
     // Xinef: Set last sanctuary time
-    unitTarget->m_lastSanctuaryTime = GameTime::GetGameTimeMS();
+    unitTarget->m_lastSanctuaryTime = GameTime::GetGameTimeMS().count();
 
     // Vanish allows to remove all threat and cast regular stealth so other spells can be used
     if (m_caster->GetTypeId() == TYPEID_PLAYER

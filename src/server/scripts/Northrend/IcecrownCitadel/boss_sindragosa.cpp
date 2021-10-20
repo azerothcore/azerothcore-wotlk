@@ -952,7 +952,7 @@ public:
             if (!spellInfo)
                 return false;
 
-            uint32 currMSTime = GameTime::GetGameTimeMS();
+            uint32 currMSTime = GameTime::GetGameTimeMS().count();
             std::map<uint32, uint32>::iterator itr = _lastMSTimeForSpell.find(spellInfo->Id);
             if (itr != _lastMSTimeForSpell.end())
             {

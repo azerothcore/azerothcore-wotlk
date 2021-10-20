@@ -427,9 +427,9 @@ void GameObject::Update(uint32 diff)
                             GameObjectTemplate const* goInfo = GetGOInfo();
                             // Bombs
                             if (goInfo->trap.type == 2)
-                                m_cooldownTime = GameTime::GetGameTimeMS() + 10 * IN_MILLISECONDS; // Hardcoded tooltip value
+                                m_cooldownTime = GameTime::GetGameTimeMS().count() + 10 * IN_MILLISECONDS; // Hardcoded tooltip value
                             else if (GetOwner())
-                                m_cooldownTime = GameTime::GetGameTimeMS() + goInfo->trap.startDelay * IN_MILLISECONDS;
+                                m_cooldownTime = GameTime::GetGameTimeMS().count() + goInfo->trap.startDelay * IN_MILLISECONDS;
 
                             m_lootState = GO_READY;
                             break;
@@ -461,7 +461,7 @@ void GameObject::Update(uint32 diff)
                         }
                     case GAMEOBJECT_TYPE_SUMMONING_RITUAL:
                         {
-                            if (GameTime::GetGameTimeMS() < m_cooldownTime)
+                            if (GameTime::GetGameTimeMS().count() < m_cooldownTime)
                                 return;
                             GameObjectTemplate const* info = GetGOInfo();
                             if (info->summoningRitual.animSpell)
@@ -612,7 +612,7 @@ void GameObject::Update(uint32 diff)
                     GameObjectTemplate const* goInfo = GetGOInfo();
                     if (goInfo->type == GAMEOBJECT_TYPE_TRAP)
                     {
-                        if (GameTime::GetGameTimeMS() < m_cooldownTime)
+                        if (GameTime::GetGameTimeMS().count() < m_cooldownTime)
                             break;
 
                         // Type 2 - Bomb (will go away after casting it's spell)
@@ -670,7 +670,7 @@ void GameObject::Update(uint32 diff)
                             if (goInfo->trap.spellId)
                                 CastSpell(target, goInfo->trap.spellId);
 
-                            m_cooldownTime = GameTime::GetGameTimeMS() + (goInfo->trap.cooldown ? goInfo->trap.cooldown :  uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
+                            m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown :  uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
                             if (goInfo->trap.type == 1)
                                 SetLootState(GO_JUST_DEACTIVATED);
@@ -702,11 +702,11 @@ void GameObject::Update(uint32 diff)
                 {
                     case GAMEOBJECT_TYPE_DOOR:
                     case GAMEOBJECT_TYPE_BUTTON:
-                        if (GetGOInfo()->GetAutoCloseTime() && GameTime::GetGameTimeMS() >= m_cooldownTime)
+                        if (GetGOInfo()->GetAutoCloseTime() && GameTime::GetGameTimeMS().count() >= m_cooldownTime)
                             ResetDoorOrButton();
                         break;
                     case GAMEOBJECT_TYPE_GOOBER:
-                        if (GameTime::GetGameTimeMS() >= m_cooldownTime)
+                        if (GameTime::GetGameTimeMS().count() >= m_cooldownTime)
                         {
                             RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
 
@@ -1324,7 +1324,7 @@ void GameObject::UseDoorOrButton(uint32 time_to_restore, bool alternative /* = f
     SwitchDoorOrButton(true, alternative);
     SetLootState(GO_ACTIVATED, user);
 
-    m_cooldownTime = GameTime::GetGameTimeMS() + time_to_restore;
+    m_cooldownTime = GameTime::GetGameTimeMS().count() + time_to_restore;
 }
 
 void GameObject::SetGoArtKit(uint8 kit)
@@ -1391,10 +1391,10 @@ void GameObject::Use(Unit* user)
     // If cooldown data present in template
     if (uint32 cooldown = GetGOInfo()->GetCooldown())
     {
-        if (GameTime::GetGameTimeMS() < m_cooldownTime)
+        if (GameTime::GetGameTimeMS().count() < m_cooldownTime)
             return;
 
-        m_cooldownTime = GameTime::GetGameTimeMS() + cooldown * IN_MILLISECONDS;
+        m_cooldownTime = GameTime::GetGameTimeMS().count() + cooldown * IN_MILLISECONDS;
     }
 
     switch (GetGoType())
@@ -1428,7 +1428,7 @@ void GameObject::Use(Unit* user)
                 if (goInfo->trap.spellId)
                     CastSpell(user, goInfo->trap.spellId);
 
-                m_cooldownTime = GameTime::GetGameTimeMS() + (goInfo->trap.cooldown ? goInfo->trap.cooldown :  uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
+                m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown :  uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
                 if (goInfo->trap.type == 1)         // Deactivate after trigger
                     SetLootState(GO_JUST_DEACTIVATED);
@@ -1595,7 +1595,7 @@ void GameObject::Use(Unit* user)
                 if (info->goober.customAnim)
                     SendCustomAnim(GetGoAnimProgress());
 
-                m_cooldownTime = GameTime::GetGameTimeMS() + info->GetAutoCloseTime();
+                m_cooldownTime = GameTime::GetGameTimeMS().count() + info->GetAutoCloseTime();
 
                 // cast this spell later if provided
                 spellId = info->goober.spellId;
@@ -1767,7 +1767,7 @@ void GameObject::Use(Unit* user)
                     if (!info->summoningRitual.animSpell)
                         m_cooldownTime = 0;
                     else // channel ready, maintain this
-                        m_cooldownTime = GameTime::GetGameTimeMS() + 5 * IN_MILLISECONDS;
+                        m_cooldownTime = GameTime::GetGameTimeMS().count() + 5 * IN_MILLISECONDS;
                 }
 
                 return;
