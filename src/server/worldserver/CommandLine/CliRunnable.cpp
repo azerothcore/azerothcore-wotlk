@@ -130,6 +130,19 @@ void CliThread()
     if (sConfigMgr->GetOption<bool>("BeepAtStart", true))
         printf("\a"); // \a = Alert
 
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+    if (sConfigMgr->GetOption<bool>("FlashAtStart", true))
+    {
+        FLASHWINFO fInfo;
+        fInfo.cbSize = sizeof(FLASHWINFO);
+        fInfo.dwFlags = FLASHW_TRAY | FLASHW_TIMERNOFG;
+        fInfo.hwnd = GetConsoleWindow();
+        fInfo.uCount = 0;
+        fInfo.dwTimeout = 0;
+        FlashWindowEx(&fInfo);
+    }
+#endif
+
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
     {
