@@ -88,7 +88,7 @@ public:
                     }
                     case EVENT_COUNTERSPELL:
                     {
-                        DoCastVictim(SPELL_COUNTERSPELL);
+                        DoCastAOE(SPELL_COUNTERSPELL);
                         events.RepeatEvent(urand(15000, 18000));
                         break;
                     }
