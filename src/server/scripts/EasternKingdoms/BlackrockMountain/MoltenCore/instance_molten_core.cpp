@@ -49,7 +49,7 @@ public:
             {
                 case NPC_GOLEMAGG_THE_INCINERATOR:
                 {
-                    _golemaggTheIncineratorGUID = creature->GetGUID();
+                    _golemaggGUID = creature->GetGUID();
                     break;
                 }
                 case NPC_MAJORDOMO_EXECUTUS:
@@ -73,11 +73,6 @@ public:
                     AddMinion(creature, true);
                     break;
                 }
-                case NPC_CORE_RAGER:
-                {
-                    _golemagMinionsGuids.insert(creature->GetGUID());
-                    break;
-                }
             }
         }
 
@@ -94,11 +89,6 @@ public:
                 case NPC_FLAMEWALKER:
                 {
                     AddMinion(creature, false);
-                    break;
-                }
-                case NPC_CORE_RAGER:
-                {
-                    _golemagMinionsGuids.erase(creature->GetGUID());
                     break;
                 }
             }
@@ -205,7 +195,7 @@ public:
             switch (type)
             {
                 case DATA_GOLEMAGG:
-                    return _golemaggTheIncineratorGUID;
+                    return _golemaggGUID;
                 case DATA_MAJORDOMO_EXECUTUS:
                     return _majordomoExecutusGUID;
                 case DATA_GARR:
@@ -238,58 +228,13 @@ public:
                 }
             }
 
-            if (bossId == DATA_GOLEMAGG)
-            {
-                switch (state)
-                {
-                    case NOT_STARTED:
-                    case FAIL:
-                    {
-                        for (ObjectGuid const& minionGuid : _golemagMinionsGuids)
-                        {
-                            Creature* golemagMinion = instance->GetCreature(minionGuid);
-                            if (golemagMinion && golemagMinion->isDead())
-                            {
-                                golemagMinion->Respawn();
-                            }
-                        }
-                        break;
-                    }
-                    case IN_PROGRESS:
-                    {
-                        for (ObjectGuid const& minionGuid : _golemagMinionsGuids)
-                        {
-                            Creature* golemagMinion = instance->GetCreature(minionGuid);
-                            if (golemagMinion && golemagMinion->IsAlive())
-                            {
-                                golemagMinion->AI()->DoZoneInCombat(nullptr, 100.0f);
-                            }
-                        }
-                        break;
-                    }
-                    case DONE:
-                    {
-                        for (ObjectGuid const& minionGuid : _golemagMinionsGuids)
-                        {
-                            Creature* golemagMinion = instance->GetCreature(minionGuid);
-                            if (golemagMinion && golemagMinion->IsAlive())
-                            {
-                                Unit::Kill(golemagMinion, golemagMinion, false);
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-            else if (bossId == DATA_MAJORDOMO_EXECUTUS && state == DONE)
+            if (bossId == DATA_MAJORDOMO_EXECUTUS && state == DONE)
             {
                 DoRespawnGameObject(_cacheOfTheFirelordGUID, 7 * DAY);
             }
 
             // Perform needed checks for Majordomu
-            if (state == DONE && bossId < DATA_MAJORDOMO_EXECUTUS)
+            if (bossId < DATA_MAJORDOMO_EXECUTUS && state == DONE)
             {
                 if (GameObject* circle = instance->GetGameObject(_circlesGUIDs[bossId]))
                 {
@@ -389,13 +334,12 @@ public:
 
     private:
         std::unordered_map<uint32/*bossid*/, ObjectGuid/*circleGUID*/> _circlesGUIDs;
-        ObjectGuid _golemaggTheIncineratorGUID;
+        ObjectGuid _golemaggGUID;
         ObjectGuid _majordomoExecutusGUID;
         ObjectGuid _cacheOfTheFirelordGUID;
         ObjectGuid _garrGUID;
 
         GuidSet _garrMinionsGUIDs;
-        GuidSet _golemagMinionsGuids;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

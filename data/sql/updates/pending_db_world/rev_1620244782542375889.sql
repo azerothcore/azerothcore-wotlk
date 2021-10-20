@@ -110,3 +110,9 @@ UPDATE `creature_template_addon` SET `auras`='18950' WHERE  `entry`=11673;
 DELETE FROM `spell_script_names` WHERE `spell_id`=19695 AND `ScriptName`='spell_geddon_inferno';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (19695, 'spell_geddon_inferno');
+
+-- Added "Thrash" aura for Core Rager
+UPDATE `creature_template_addon` SET `auras`='12787 20553' WHERE  `entry`=11672;
+
+-- Added "Magma Splash" aura for Golemagg
+UPDATE `creature_template_addon` SET `auras`='13879' WHERE  `entry`=11988;

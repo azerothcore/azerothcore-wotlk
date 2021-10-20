@@ -15,29 +15,30 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ObjectAccessor.h"
 
 enum Texts
 {
-    EMOTE_LOWHP             = 0,
+    EMOTE_LOWHP                 = 0,
 };
 
 enum Spells
 {
     // Golemagg
-    SPELL_MAGMASPLASH       = 13879,
-    SPELL_PYROBLAST         = 20228,
-    SPELL_EARTHQUAKE        = 19798,
-    SPELL_ENRAGE            = 19953,
-    SPELL_GOLEMAGG_TRUST    = 20553,
+    SPELL_PYROBLAST             = 20228,
+    SPELL_EARTHQUAKE            = 19798,
+    SPELL_ENRAGE                = 19953,
+    SPELL_GOLEMAGG_TRUST        = 20553,
 
     // Core Rager
-    SPELL_MANGLE            = 19820
+    SPELL_QUIET_SUICIDE         = 3617,     // Server side
+    SPELL_MANGLE                = 19820,
+    SPELL_FULL_HEAL             = 17683,
 };
 
-enum Events
+enum Misc
 {
-    EVENT_PYROBLAST     = 1,
-    EVENT_EARTHQUAKE    = 2,
+    DATA_GOLEMAGG_CORE_HOUND    = 1
 };
 
 class boss_golemagg : public CreatureScript
@@ -47,40 +48,74 @@ public:
 
     struct boss_golemaggAI : public BossAI
     {
-        boss_golemaggAI(Creature* creature) : BossAI(creature, DATA_GOLEMAGG)
-        {
-        }
+        boss_golemaggAI(Creature* creature) : BossAI(creature, DATA_GOLEMAGG),
+            earthquakeTimer(0),
+            pyroblastTimer(7000),
+            enraged(false)
+        {}
 
         void Reset() override
         {
-            BossAI::Reset();
-            DoCast(me, SPELL_MAGMASPLASH, true);
-        }
+            earthquakeTimer = 0;
+            pyroblastTimer = 7000;
+            enraged = false;
 
-        void EnterCombat(Unit* victim) override
-        {
-            BossAI::EnterCombat(victim);
-            events.ScheduleEvent(EVENT_PYROBLAST, 7000);
-
-            // The two ragers should join the fight alongside me against my foes.
-            std::list<Creature*> ragers;
-            me->GetCreaturesWithEntryInRange(ragers, 100, NPC_CORE_RAGER);
-            for (Creature* i : ragers)
+            _EnterCombat();
+            for (ObjectGuid const& minionGuid : coreHoundsGuids)
             {
-                if (i && i->IsAlive() && !i->IsInCombat())
+                Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid);
+                if (minion && minion->isDead())
                 {
-                    i->AI()->AttackStart(victim);
+                    minion->Respawn();
                 }
             }
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void JustDied(Unit* /*killer*/) override
         {
-            if (!HealthBelowPct(10) || me->HasAura(SPELL_ENRAGE))
-                return;
+            _JustDied();
+            for (ObjectGuid const& minionGuid : coreHoundsGuids)
+            {
+                Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid);
+                if (minion && minion->IsAlive())
+                {
+                    minion->CastSpell(minion, SPELL_QUIET_SUICIDE, true);
+                }
+            }
+        }
 
-            DoCast(me, SPELL_ENRAGE, true);
-            events.ScheduleEvent(EVENT_EARTHQUAKE, 3000);
+        void EnterCombat(Unit* victim) override
+        {
+            _EnterCombat();
+            for (ObjectGuid const& minionGuid : coreHoundsGuids)
+            {
+                Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid);
+                if (minion && minion->isDead())
+                {
+                    minion->AI()->DoZoneInCombat();
+                    minion->AI()->AttackStart(victim);
+                }
+            }
+
+            pyroblastTimer = 7000;
+        }
+
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (!enraged && me->HealthBelowPctDamaged(10, damage))
+            {
+                DoCastSelf(SPELL_ENRAGE, true);
+                earthquakeTimer = 3000;
+                enraged = true;
+            }
+        }
+
+        void SetGUID(ObjectGuid guid, int32 id) override
+        {
+            if (id == DATA_GOLEMAGG_CORE_HOUND)
+            {
+                coreHoundsGuids.insert(guid);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -88,31 +123,47 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
+            // Should not get impact by cast state
+            if (earthquakeTimer)
+            {
+                if (earthquakeTimer <= diff)
+                {
+                    DoCastAOE(SPELL_EARTHQUAKE);
+                    earthquakeTimer = 3000;
+                }
+                else
+                {
+                    earthquakeTimer -= diff;
+                }
+            }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
             {
-                switch (eventId)
+                return;
+            }
+
+            if (pyroblastTimer <= diff)
+            {
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                 {
-                    case EVENT_PYROBLAST:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                            DoCast(target, SPELL_PYROBLAST);
-                        events.ScheduleEvent(EVENT_PYROBLAST, 7000);
-                        break;
-                    case EVENT_EARTHQUAKE:
-                        DoCastVictim(SPELL_EARTHQUAKE);
-                        events.ScheduleEvent(EVENT_EARTHQUAKE, 3000);
-                        break;
-                    default:
-                        break;
+                    DoCast(target, SPELL_PYROBLAST);
                 }
+
+                pyroblastTimer = 7000;
+            }
+            else
+            {
+                pyroblastTimer -= diff;
             }
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        GuidSet coreHoundsGuids;
+        uint32 earthquakeTimer;
+        uint32 pyroblastTimer;
+        bool enraged;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -128,45 +179,63 @@ public:
 
     struct npc_core_ragerAI : public ScriptedAI
     {
-        npc_core_ragerAI(Creature* creature) : ScriptedAI(creature)
+        npc_core_ragerAI(Creature* creature) : ScriptedAI(creature),
+            instance(creature->GetInstanceScript())
         {
-            instance = creature->GetInstanceScript();
         }
 
         void Reset() override
         {
-            mangleTimer = 7 * IN_MILLISECONDS;               // These times are probably wrong
+            mangleTimer = 7000;               // These times are probably wrong
+
+            if (instance->GetBossState(DATA_GOLEMAGG) != DONE)
+            {
+                if (Creature* golemagg = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_GOLEMAGG)))
+                {
+                    golemagg->AI()->SetGUID(me->GetGUID(), DATA_GOLEMAGG_CORE_HOUND);
+                }
+            }
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
-            if (HealthAbovePct(50) || !instance)
-                return;
-
-            if (Creature* pGolemagg = instance->instance->GetCreature(instance->GetGuidData(DATA_GOLEMAGG)))
+            // Just in case if something will go bad, let players to kill this creature
+            if (instance->GetBossState(DATA_GOLEMAGG) == DONE)
             {
-                if (pGolemagg->IsAlive())
-                {
-                    me->AddAura(SPELL_GOLEMAGG_TRUST, me);
-                    Talk(EMOTE_LOWHP);
-                    me->SetFullHealth();
-                }
+                return;
+            }
+
+            if (me->HealthBelowPctDamaged(50, damage))
+            {
+                damage = 0;
+                DoCastSelf(SPELL_GOLEMAGG_TRUST, true);
+                DoCastSelf(SPELL_FULL_HEAL, true);
+                Talk(EMOTE_LOWHP);
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
 
             // Mangle
             if (mangleTimer <= diff)
             {
                 DoCastVictim(SPELL_MANGLE);
-                mangleTimer = 10 * IN_MILLISECONDS;
+                mangleTimer = 10000;
             }
             else
+            {
                 mangleTimer -= diff;
+            }
 
             DoMeleeAttackIfReady();
         }

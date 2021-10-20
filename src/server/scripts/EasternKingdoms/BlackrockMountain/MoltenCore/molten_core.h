@@ -27,8 +27,8 @@ enum MCData
 
 enum MCActions
 {
-    ACTION_START_RAGNAROS           = -1,
-    ACTION_START_RAGNAROS_ALT       = -2,
+    ACTION_START_RAGNAROS               = -1,
+    ACTION_START_RAGNAROS_ALT           = -2,
 };
 
 Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};
@@ -44,7 +44,6 @@ enum MCCreatures
     NPC_RAGNAROS                    = 11502,
     NPC_FLAMEWAKER_HEALER           = 11663,
     NPC_FLAMEWAKER_ELITE            = 11664,
-    NPC_CORE_RAGER                  = 11672,
     NPC_CORE_HOUND                  = 11671,
 
     // Garr
