@@ -4,13 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/* ScriptData
-SDName: Boss_Gehennas
-SD%Complete: 90
-SDComment: Adds MC NYI
-SDCategory: Molten Core
-EndScriptData */
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "molten_core.h"
@@ -75,7 +68,7 @@ public:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                         {
-                            DoCast(target, SPELL_RAIN_OF_FIRE);
+                            DoCast(target, SPELL_RAIN_OF_FIRE, true);
                         }
                         events.RepeatEvent(6000);
                         break;
