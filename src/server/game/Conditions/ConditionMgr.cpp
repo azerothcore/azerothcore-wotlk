@@ -1532,16 +1532,16 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
 
             switch (spellInfo->Effects[i].Effect)
             {
-            case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-            case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-            case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
-            case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
-            case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
-            case SPELL_EFFECT_APPLY_AREA_AURA_PET:
-            case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
-                continue;
-            default:
-                break;
+                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+                case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+                case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+                case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+                    continue;
+                default:
+                    break;
             }
 
             // Xinef: chain targets are treated as area targets! Apply conditions!
