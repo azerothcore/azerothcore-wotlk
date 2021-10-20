@@ -238,20 +238,7 @@ public:
                 }
             }
 
-            if (state == DONE && bossId < DATA_MAJORDOMO_EXECUTUS)
-            {
-                if (GameObject* circle = instance->GetGameObject(_circlesGUIDs[bossId]))
-                {
-                    circle->SetLootMode(GO_JUST_DEACTIVATED);
-                    _circlesGUIDs[bossId].Clear();
-                }
-
-                if (CheckMajordomoExecutus())
-                {
-                    SummonMajordomoExecutus();
-                }
-            }
-            else if (bossId == DATA_GOLEMAGG)
+            if (bossId == DATA_GOLEMAGG)
             {
                 switch (state)
                 {
@@ -296,10 +283,24 @@ public:
                         break;
                 }
             }
-
-            if (bossId == DATA_MAJORDOMO_EXECUTUS && state == DONE)
+            else if (bossId == DATA_MAJORDOMO_EXECUTUS && state == DONE)
             {
                 DoRespawnGameObject(_cacheOfTheFirelordGUID, 7 * DAY);
+            }
+
+            // Perform needed checks for Majordomu
+            if (state == DONE && bossId < DATA_MAJORDOMO_EXECUTUS)
+            {
+                if (GameObject* circle = instance->GetGameObject(_circlesGUIDs[bossId]))
+                {
+                    circle->SetLootMode(GO_JUST_DEACTIVATED);
+                    _circlesGUIDs[bossId].Clear();
+                }
+
+                if (CheckMajordomoExecutus())
+                {
+                    SummonMajordomoExecutus();
+                }
             }
 
             return true;
@@ -312,14 +313,7 @@ public:
                 return;
             }
 
-            if (GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
-            {
-                instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, MajordomoSummonPos);
-            }
-            else if (TempSummon* summon = instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, RagnarosTelePos))
-            {
-                summon->AI()->DoAction(ACTION_START_RAGNAROS_ALT);
-            }
+            instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE ? MajordomoSummonPos : RagnarosTelePos);
         }
 
         bool CheckMajordomoExecutus() const

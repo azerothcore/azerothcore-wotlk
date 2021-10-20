@@ -76,18 +76,16 @@ constexpr float DEATH_ORIENTATION = 4.0f;
 class boss_ragnaros : public CreatureScript
 {
 public:
-    boss_ragnaros() : CreatureScript("boss_ragnaros")
-    {
-    }
+    boss_ragnaros() : CreatureScript("boss_ragnaros") {}
 
     struct boss_ragnarosAI : public BossAI
     {
         boss_ragnarosAI(Creature* creature) : BossAI(creature, DATA_RAGNAROS),
-                                              _emergeTimer(90000),
-                                              _introState(0),
-                                              _hasYelledMagmaBurst(false),
-                                              _hasSubmergedOnce(false),
-                                              _isBanished(false)
+            _emergeTimer(90000),
+            _introState(0),
+            _hasYelledMagmaBurst(false),
+            _hasSubmergedOnce(false),
+            _isBanished(false)
         {
             creature->SetReactState(REACT_PASSIVE);
             creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
