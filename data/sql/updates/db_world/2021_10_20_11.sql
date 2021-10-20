@@ -1,3 +1,19 @@
+-- DB update 2021_10_20_10 -> 2021_10_20_11
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_10_20_10';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_10_20_10 2021_10_20_11 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1634587367822322400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634587367822322400');
 
 UPDATE `quest_template` SET `RewardMoneyDifficulty`=5 WHERE `id`=1658;
@@ -388,3 +404,13 @@ UPDATE `quest_template` SET `RewardMoneyDifficulty`=5 WHERE `id`=12133;
 UPDATE `quest_template` SET `RewardMoneyDifficulty`=5 WHERE `id`=12155;
 UPDATE `quest_template` SET `RewardMoneyDifficulty`=3 WHERE `id`=12191;
 UPDATE `quest_template` SET `RewardMoneyDifficulty`=5 WHERE `id`=12192;
+
+--
+-- END UPDATING QUERIES
+--
+UPDATE version_db_world SET date = '2021_10_20_11' WHERE sql_rev = '1634587367822322400';
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
