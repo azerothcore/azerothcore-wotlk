@@ -1568,7 +1568,28 @@ namespace lfg
         LFGDungeonData const* dungeon = GetLFGDungeon(proposal.dungeonId);
         ASSERT(dungeon);
 
+        bool isPremadeGroup = false;
         Group* grp = proposal.group ? sGroupMgr->GetGroupByGUID(proposal.group.GetCounter()) : nullptr;
+        if (!grp)
+        {
+            ObjectGuid groupGUID;
+            for (ObjectGuid const& guid : players)
+            {
+                if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
+                {
+                    Group* group = player->GetGroup();
+                    if (!group || (groupGUID && groupGUID != group->GetGUID()))
+                    {
+                        isPremadeGroup = false;
+                        break;
+                    }
+
+                    groupGUID = group->GetGUID();
+                    isPremadeGroup = true;
+                }
+            }
+        }
+
         ObjectGuid oldGroupGUID;
         for (LfgGuidList::const_iterator it = players.begin(); it != players.end(); ++it)
         {
@@ -1578,6 +1599,13 @@ namespace lfg
                 continue;
 
             Group* group = player->GetGroup();
+            if (isPremadeGroup && !grp)
+            {
+                oldGroupGUID = group->GetGUID();
+                grp = group;
+                grp->ConvertToLFG(false);
+                SetState(grp->GetGUID(), LFG_STATE_PROPOSAL);
+            }
 
             // Xinef: Apply Random Buff
             if (grp && !grp->IsLfgWithBuff())
