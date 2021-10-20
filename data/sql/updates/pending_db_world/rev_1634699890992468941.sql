@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634699890992468941'),
 
 -- fixed reference_loot_template id 44011 and 44012
-DELETE FROM `reference_loot_template` WHERE `Entry` IN (44011,44012),
+DELETE FROM `reference_loot_template` WHERE `Entry` IN (44011,44012);
 insert into `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) values
 ('44011','2725','0','0','0','1','1','1','1','Green Hills of Stranglethorn - Page 1'),
 ('44011','2728','0','0','0','1','1','1','1','Green Hills of Stranglethorn - Page 4'),
