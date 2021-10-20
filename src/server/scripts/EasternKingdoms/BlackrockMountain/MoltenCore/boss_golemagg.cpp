@@ -60,7 +60,7 @@ public:
             pyroblastTimer = 7000;
             enraged = false;
 
-            _EnterCombat();
+            _Reset();
             for (ObjectGuid const& minionGuid : coreHoundsGuids)
             {
                 Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid);
