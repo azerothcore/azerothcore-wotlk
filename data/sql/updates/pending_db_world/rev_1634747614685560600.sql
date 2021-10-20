@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634485959723104200');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634747614685560600');
 
 -- *** Quest "The Hunt is on" ***
 -- Gossip is in place options just need to be enabled and conditions added
