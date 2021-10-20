@@ -4,13 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/* ScriptData
-SDName: Instance_Molten_Core
-SD%Complete: 0
-SDComment: Place Holder
-SDCategory: Molten Core
-EndScriptData */
-
 #include "InstanceScript.h"
 #include "molten_core.h"
 #include "ObjectMgr.h"
@@ -80,6 +73,11 @@ public:
                     AddMinion(creature, true);
                     break;
                 }
+                case NPC_CORE_RAGER:
+                {
+                    _golemagMinionsGuids.insert(creature->GetGUID());
+                    break;
+                }
             }
         }
 
@@ -96,6 +94,11 @@ public:
                 case NPC_FLAMEWALKER:
                 {
                     AddMinion(creature, false);
+                    break;
+                }
+                case NPC_CORE_RAGER:
+                {
+                    _golemagMinionsGuids.erase(creature->GetGUID());
                     break;
                 }
             }
@@ -197,7 +200,6 @@ public:
             }
         }
 
-
         ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
@@ -212,7 +214,6 @@ public:
 
             return ObjectGuid::Empty;
         }
-
 
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
@@ -248,6 +249,51 @@ public:
                 if (CheckMajordomoExecutus())
                 {
                     SummonMajordomoExecutus();
+                }
+            }
+            else if (bossId == DATA_GOLEMAGG)
+            {
+                switch (state)
+                {
+                    case NOT_STARTED:
+                    case FAIL:
+                    {
+                        for (ObjectGuid const& minionGuid : _golemagMinionsGuids)
+                        {
+                            Creature* golemagMinion = instance->GetCreature(minionGuid);
+                            if (golemagMinion && golemagMinion->isDead())
+                            {
+                                golemagMinion->Respawn();
+                            }
+                        }
+                        break;
+                    }
+                    case IN_PROGRESS:
+                    {
+                        for (ObjectGuid const& minionGuid : _golemagMinionsGuids)
+                        {
+                            Creature* golemagMinion = instance->GetCreature(minionGuid);
+                            if (golemagMinion && golemagMinion->IsAlive())
+                            {
+                                golemagMinion->AI()->DoZoneInCombat(nullptr, 100.0f);
+                            }
+                        }
+                        break;
+                    }
+                    case DONE:
+                    {
+                        for (ObjectGuid const& minionGuid : _golemagMinionsGuids)
+                        {
+                            Creature* golemagMinion = instance->GetCreature(minionGuid);
+                            if (golemagMinion && golemagMinion->IsAlive())
+                            {
+                                Unit::Kill(golemagMinion, golemagMinion, false);
+                            }
+                        }
+                        break;
+                    }
+                    default:
+                        break;
                 }
             }
 
@@ -353,7 +399,9 @@ public:
         ObjectGuid _majordomoExecutusGUID;
         ObjectGuid _cacheOfTheFirelordGUID;
         ObjectGuid _garrGUID;
+
         GuidSet _garrMinionsGUIDs;
+        GuidSet _golemagMinionsGuids;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

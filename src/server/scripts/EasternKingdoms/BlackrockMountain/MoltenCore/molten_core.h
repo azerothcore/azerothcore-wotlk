@@ -40,7 +40,6 @@ enum MCCreatures
     NPC_SHAZZRAH                    = 12264,
     NPC_BARON_GEDDON                = 12056,
     NPC_SULFURON_HARBINGER          = 12098,
-    NPC_GOLEMAGG_THE_INCINERATOR    = 11988,
     NPC_MAJORDOMO_EXECUTUS          = 12018,
     NPC_RAGNAROS                    = 11502,
     NPC_FLAMEWAKER_HEALER           = 11663,
@@ -55,6 +54,10 @@ enum MCCreatures
     // Gehennas
     NPC_GEHENNAS                    = 12259,
     NPC_FLAMEWALKER                 = 11661,
+
+    // Golemagg
+    NPC_GOLEMAGG_THE_INCINERATOR    = 11988,
+    NPC_CORE_RAGER                  = 11672,
 };
 
 enum MCGameObjects
