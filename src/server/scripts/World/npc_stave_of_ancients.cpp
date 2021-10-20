@@ -16,7 +16,6 @@
  */
 
 #include "CreatureGroups.h"
-#include "CreatureTextMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
@@ -426,15 +425,15 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player *player, Creature * creature) override
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(ARTORIUS_HEAD, 1, true))
         {
-            std::string const& gossipOptionText = sCreatureTextMgr->GetLocalizedChatString(ARTORIUS_GOSSIP_OPTION_TEXT, 0, 0, 0, LOCALE_enUS);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipOptionText, GOSSIP_SENDER_MAIN, 0);
+            uint32 gossipMenuId = creature->GetCreatureTemplate()->GossipMenuId;
+            AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
         }
 
-        SendGossipMenuFor(player, ARTORIUS_GOSSIP_TEXT, creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
     }
@@ -502,13 +501,6 @@ public:
             flaggedForDespawn = true;
         }
     };
-
-    bool OnGossipHello(Player *player, Creature * creature) override
-    {
-        SendGossipMenuFor(player, PRECIOUS_GOSSIP_TEXT, creature->GetGUID());
-
-        return true;
-    }
 };
 
 class npc_simone : public CreatureScript
@@ -820,15 +812,15 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player *player, Creature * creature) override
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(SIMONE_HEAD, 1, true))
         {
-            std::string const& gossipOptionText = sCreatureTextMgr->GetLocalizedChatString(SIMONE_GOSSIP_OPTION_TEXT, 0, 0, 0, LOCALE_enUS);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipOptionText, GOSSIP_SENDER_MAIN, 0);
+            uint32 gossipMenuId = creature->GetCreatureTemplate()->GossipMenuId;
+            AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
         }
 
-        SendGossipMenuFor(player, SIMONE_GOSSIP_TEXT, creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
     }
@@ -1032,15 +1024,15 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player *player, Creature * creature) override
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(NELSON_HEAD, 1, true))
         {
-            std::string const& gossipOptionText = sCreatureTextMgr->GetLocalizedChatString(NELSON_GOSSIP_OPTION_TEXT, 0, 0, 0, LOCALE_enUS);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipOptionText, GOSSIP_SENDER_MAIN, 0);
+            uint32 gossipMenuId = creature->GetCreatureTemplate()->GossipMenuId;
+            AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
         }
 
-        SendGossipMenuFor(player, NELSON_GOSSIP_TEXT, creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
     }
@@ -1198,15 +1190,15 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player *player, Creature * creature) override
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(FRANKLIN_HEAD, 1, true))
         {
-            std::string const& gossipOptionText = sCreatureTextMgr->GetLocalizedChatString(FRANKLIN_GOSSIP_OPTION_TEXT, 0, 0, 0, LOCALE_enUS);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, gossipOptionText, GOSSIP_SENDER_MAIN, 0);
+            uint32 gossipMenuId = creature->GetCreatureTemplate()->GossipMenuId;
+            AddGossipItemFor(player, gossipMenuId, GOSSIP_EVENT_START_OPTION_ID, GOSSIP_SENDER_MAIN, 0);
         }
 
-        SendGossipMenuFor(player, FRANKLIN_GOSSIP_TEXT, creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
     }

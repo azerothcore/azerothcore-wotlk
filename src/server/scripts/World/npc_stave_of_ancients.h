@@ -23,6 +23,10 @@
 
 enum Common
 {
+    // Gossip
+    GOSSIP_EVENT_START_OPTION_ID              = 0,
+
+    // Events
     EVENT_ENCOUNTER_START                     = 1,
     EVENT_REVEAL                              = 2,
     EVENT_FOOLS_PLIGHT                        = 3,
@@ -44,8 +48,6 @@ enum NPCArtorius
     ARTORIUS_EVENT_DEMONIC_DOOM               = 6,
     ARTORIUS_EVENT_DEMONIC_ENRAGE             = 7,
 
-    ARTORIUS_GOSSIP_TEXT                      = 7045,   // npc_text.ID               "How wonderful to see another person in..."
-    ARTORIUS_GOSSIP_OPTION_TEXT               = 14531,  // creature_text.CreatureID  "I know you as Artorius the Doombringer..."
     ARTORIUS_WEAKNESS_EMOTE                   = 9786,   // broadcast_text.ID         "%s is stricken by a virulent poison."
     ARTORIUS_SAY                              = 9787,   // broadcast_text.ID         "Your soul is mine, weakling."
 
@@ -65,8 +67,6 @@ enum NPCSimone
     SIMONE_EVENT_CHAIN_LIGHTNING              = 8,
     SIMONE_EVENT_TEMPTRESS_KISS               = 9,
 
-    SIMONE_GOSSIP_TEXT                        = 7041,   // npc_text.ID               "What a wonderful day to be alive! Look ..."
-    SIMONE_GOSSIP_OPTION_TEXT                 = 14527,  // creature_text.CreatureID  "I am not fooled by your disguise, tempt..."
     SIMONE_EMOTE                              = 9759,   // broadcast_text.ID         "%s laughs at your foolish request."
     SIMONE_SAY                                = 9760,   // broadcast_text.ID         "As you wish, $c."
     SIMONE_WEAKNESS_EMOTE                     = 9762,   // broadcast_text.ID         "%s is silenced by the venomous sting."
@@ -85,8 +85,6 @@ enum NPCSimone
 
 enum NPCPrecious
 {
-    PRECIOUS_GOSSIP_TEXT                      = 7042,   // npc_text.ID               "*GRRRR* *RUFF* *RUFF*"
-
     PRECIOUS_NORMAL_ENTRY                     = 14528,
     PRECIOUS_EVIL_ENTRY                       = 14538
 };
@@ -96,8 +94,6 @@ enum NPCNelson
     NELSON_EVENT_DREADFUL_FRIGHT              = 6,
     NELSON_EVENT_CREEPING_DOOM                = 7,
 
-    NELSON_GOSSIP_TEXT                        = 7044,  // npc_text.ID                "I come to Silithus every year around th..."
-    NELSON_GOSSIP_OPTION_TEXT                 = 14536, // creature_text.CreatureID   "A gnome? How pathetic. Face me, demon!"
     NELSON_SAY                                = 9782,  // broadcast_text.ID          "You dare challenge me? Prepare for an e..."
     NELSON_WEAKNESS_EMOTE                     = 9785,  // breadcast_text.ID          "%s is immobilized."
     NELSON_DESPAWN_SAY                        = 9815,  // breadcast_text.ID          "Only a fool would remain in this battle..."
@@ -121,8 +117,6 @@ enum NPCFranklin
 {
     FRANKLIN_EVENT_DEMONIC_ENRAGE               = 6,
 
-    FRANKLIN_GOSSIP_TEXT                        = 7043,  // npc_text.ID                "Lava? Pay no mind to all of that, frien..."
-    FRANKLIN_GOSSIP_OPTION_TEXT                 = 14529, // creature_text.CreatureID   "So you are Klinfran the Crazed? Sad, I ..."
     FRANKLIN_SAY                                = 9772,  // broadcast_text.ID          "I shall enjoy this, $c."
     FRANKLIN_ENRAGE_EMOTE                       = 9764,  // broadcast_text.ID          "%s goes into a killing frenzy!"
     FRANKLIN_DESPAWN_SAY                        = 9815,  // breadcast_text.ID          "Only a fool would remain in this battle..."
