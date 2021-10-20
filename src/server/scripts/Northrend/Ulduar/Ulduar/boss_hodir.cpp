@@ -227,7 +227,7 @@ public:
         bool bAchievCheese{ true };
         bool bAchievGettingCold{ true };
         bool bAchievCoolestFriends{ true };
-        bool bAchievrare{ true };
+        bool bAchievRare{ true };
         uint16 addSpawnTimer{ 0 };
 
         // Used to make Hodir disengage whenever he leaves his room
@@ -242,7 +242,7 @@ public:
             bAchievCheese = true;
             bAchievGettingCold = true;
             bAchievCoolestFriends = true;
-            bAchievrare = true;
+            bAchievRare = true;
             me->SetSheath(SHEATH_STATE_MELEE);
 
             // Reset the spells cast after wipe
@@ -581,7 +581,7 @@ public:
                         bAchievGettingCold = false;
                         break;
                     case 3:
-                        bAchievrare = false;
+                        bAchievRare = false;
                     case 4:
                         bAchievCoolestFriends = false;
                         break;
@@ -597,7 +597,7 @@ public:
                 case 2:
                     return (bAchievGettingCold ? 1 : 0);
                 case 3:
-                    return (bAchievrare ? 1 : 0);
+                    return (bAchievRare ? 1 : 0);
                 case 4:
                     return (bAchievCoolestFriends ? 1 : 0);
             }
