@@ -9715,13 +9715,9 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // set position before any AI calls/assistance
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-    if (creature && !IsControlledByPlayer())
+    if (creature && !IsPet())
     {
-        // should not let player enter combat by right clicking target - doesn't helps
-        SetInCombatWith(victim);
-        if (victim->GetTypeId() == TYPEID_PLAYER)
-            victim->SetInCombatWith(this);
-        AddThreat(victim, 0.0f);
+        EngageWithTarget(victim);
 
         creature->SendAIReaction(AI_REACTION_HOSTILE);
         creature->CallAssistance();
@@ -13748,13 +13744,17 @@ float Unit::ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask)
 
 //======================================================================
 
-void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
+bool Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask, SpellInfo const* threatSpell)
 {
     // Only mobs can manage threat lists
     if (CanHaveThreatList() && !HasUnitState(UNIT_STATE_EVADE))
     {
         m_ThreatMgr.addThreat(victim, fThreat, schoolMask, threatSpell);
+
+        return true;
     }
+
+    return false;
 }
 
 //======================================================================
@@ -20172,4 +20172,15 @@ void Unit::Whisper(uint32 textId, Player* target, bool isBossWhisper /*= false*/
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
+}
+
+void Unit::EngageWithTarget(Unit* enemy)
+{
+    if (!enemy)
+        return;
+
+    if (!AddThreat(enemy, 0.0f))
+    {
+        SetInCombatWith(enemy);
+    }
 }

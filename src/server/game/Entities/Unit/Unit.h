@@ -1939,6 +1939,7 @@ public:
     bool SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* aurApp = nullptr);
     void RemoveCharmedBy(Unit* charmer);
     void RestoreFaction();
+    void EngageWithTarget(Unit* who); // Adds target to threat list if applicable, otherwise just sets combat state
 
     ControlSet m_Controlled;
     [[nodiscard]] Unit* GetFirstControlled() const;
@@ -2219,7 +2220,7 @@ public:
 
     // Threat related methods
     [[nodiscard]] bool CanHaveThreatList() const;
-    void AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr);
+    bool AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr);
     float ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL);
     void DeleteThreatList();
     void TauntApply(Unit* victim);
