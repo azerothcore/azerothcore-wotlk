@@ -540,7 +540,7 @@ public:
     virtual void SetNewCharString(std::string const& str) = 0;
     virtual std::string const& GetNewCharString() const = 0;
     virtual LocaleConstant GetDefaultDbcLocale() const = 0;
-    virtual std::string const& GetDataPath() const = 0;    
+    virtual std::string const& GetDataPath() const = 0;
     virtual time_t GetNextDailyQuestsResetTime() const = 0;
     virtual time_t GetNextWeeklyQuestsResetTime() const = 0;
     virtual time_t GetNextRandomBGResetTime() const = 0;
