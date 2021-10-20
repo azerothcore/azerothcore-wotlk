@@ -77,60 +77,39 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void ExecuteEvent(uint32 eventId) override
         {
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
-            }
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            while (uint32 const eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
+                case EVENT_INFERNO:
                 {
-                    case EVENT_INFERNO:
-                    {
-                        DoCastSelf(SPELL_INFERNO);
-                        events.RepeatEvent(urand(21000, 26000));
-                        break;
-                    }
-                    case EVENT_IGNITE_MANA:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_IGNITE_MANA))
-                        {
-                            DoCast(target, SPELL_IGNITE_MANA);
-                        }
-
-                        events.RepeatEvent(urand(27000, 32000));
-                        break;
-                    }
-                    case EVENT_LIVING_BOMB:
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                        {
-                            DoCast(target, SPELL_LIVING_BOMB);
-                        }
-
-                        events.RepeatEvent(urand(11000, 16000));
-                        break;
-                    }
+                    DoCastSelf(SPELL_INFERNO);
+                    events.RepeatEvent(urand(21000, 26000));
+                    break;
                 }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
+                case EVENT_IGNITE_MANA:
                 {
-                    return;
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_IGNITE_MANA))
+                    {
+                        DoCast(target, SPELL_IGNITE_MANA);
+                    }
+
+                    events.RepeatEvent(urand(27000, 32000));
+                    break;
+                }
+                case EVENT_LIVING_BOMB:
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    {
+                        DoCast(target, SPELL_LIVING_BOMB);
+                    }
+
+                    events.RepeatEvent(urand(11000, 16000));
+                    break;
                 }
             }
-
-            DoMeleeAttackIfReady();
         }
+
     private:
         bool armageddonCasted;
     };
