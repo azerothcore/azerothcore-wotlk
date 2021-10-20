@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634699890992468941'),
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634699890992468941');
 
 -- fixed reference_loot_template id 44011 and 44012
 DELETE FROM `reference_loot_template` WHERE `Entry` IN (44011,44012);
