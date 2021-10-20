@@ -37,8 +37,6 @@ enum MCCreatures
 {
     NPC_LUCIFRON                    = 12118,
     NPC_MAGMADAR                    = 11982,
-    NPC_GEHENNAS                    = 12259,
-    NPC_GARR                        = 12057,
     NPC_SHAZZRAH                    = 12264,
     NPC_BARON_GEDDON                = 12056,
     NPC_SULFURON_HARBINGER          = 12098,
@@ -49,7 +47,14 @@ enum MCCreatures
     NPC_FLAMEWAKER_ELITE            = 11664,
     NPC_CORE_RAGER                  = 11672,
     NPC_CORE_HOUND                  = 11671,
+
+    // Garr
+    NPC_GARR                        = 12057,
     NPC_FIRESWORN                   = 12099,
+
+    // Gehennas
+    NPC_GEHENNAS                    = 12259,
+    NPC_FLAMEWALKER                 = 11661,
 };
 
 enum MCGameObjects

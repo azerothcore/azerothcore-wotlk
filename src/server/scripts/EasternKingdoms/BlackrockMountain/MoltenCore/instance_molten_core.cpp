@@ -25,6 +25,7 @@ Position const MajordomoSummonPos = {759.542f, -1173.43f, -118.974f, 3.3048f};
 MinionData const minionData[] =
 {
     { NPC_FIRESWORN, DATA_GARR },
+    { NPC_FLAMEWALKER, DATA_GEHENNAS },
     { 0, 0 } // END
 };
 
@@ -74,15 +75,29 @@ public:
                     _garrMinionsGUIDs.insert(creature->GetGUID());
                     break;
                 }
+                case NPC_FLAMEWALKER:
+                {
+                    AddMinion(creature, true);
+                    break;
+                }
             }
         }
 
         void OnCreatureRemove(Creature* creature) override
         {
-            if (creature->GetEntry() == NPC_FIRESWORN)
+            switch (creature->GetEntry())
             {
-                AddMinion(creature, false);
-                _garrMinionsGUIDs.erase(creature->GetGUID());
+                case NPC_FIRESWORN:
+                {
+                    AddMinion(creature, false);
+                    _garrMinionsGUIDs.erase(creature->GetGUID());
+                    break;
+                }
+                case NPC_FLAMEWALKER:
+                {
+                    AddMinion(creature, false);
+                    break;
+                }
             }
         }
 
