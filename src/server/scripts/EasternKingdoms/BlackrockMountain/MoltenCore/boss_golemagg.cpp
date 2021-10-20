@@ -92,8 +92,13 @@ public:
             for (ObjectGuid const& minionGuid : coreHoundsGuids)
             {
                 Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid);
-                if (minion && minion->IsAlive())
+                if (minion)
                 {
+                    if (minion->isDead())
+                    {
+                        minion->Respawn();
+                    }
+
                     minion->AI()->DoZoneInCombat();
                     minion->AI()->AttackStart(victim);
                 }
@@ -186,9 +191,9 @@ public:
         {
         }
 
-        void Reset() override
+        void InitializeAI() override
         {
-            mangleTimer = 7000;               // These times are probably wrong
+            ScriptedAI::InitializeAI();
 
             if (instance->GetBossState(DATA_GOLEMAGG) != DONE)
             {
@@ -197,7 +202,13 @@ public:
                     golemagg->AI()->SetGUID(me->GetGUID(), DATA_GOLEMAGG_CORE_HOUND);
                 }
             }
-            else
+        }
+
+        void Reset() override
+        {
+            mangleTimer = 7000;               // These times are probably wrong
+
+            if (instance->GetBossState(DATA_GOLEMAGG) == DONE)
             {
                 DoCastSelf(SPELL_QUIET_SUICIDE);
             }
