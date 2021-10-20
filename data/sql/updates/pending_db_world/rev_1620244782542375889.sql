@@ -106,9 +106,7 @@ SELECT `guid`, CONCAT(@magmadarGUID), CONCAT(0) from `creature` WHERE `id` IN (1
 -- Added "18950 Invisibility and Stealth Detection" to Ancient Core Hounds
 UPDATE `creature_template_addon` SET `auras`='18950' WHERE  `entry`=11673;
 
--- 19698 Inferno (used by Geddon)
-DELETE FROM `spell_script_names` WHERE `spell_id`=19698 AND `ScriptName`='spell_geddon_inferno';
+-- 19695 Inferno (used by Geddon)
+DELETE FROM `spell_script_names` WHERE `spell_id`=19695 AND `ScriptName`='spell_geddon_inferno';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(19698, 'spell_geddon_inferno');
-
-UPDATE `spell_dbc` SET `Effect_1` = 64, `EffectBasePoints_1` = 19698 WHERE (`ID` = 18947);
+(19695, 'spell_geddon_inferno');
