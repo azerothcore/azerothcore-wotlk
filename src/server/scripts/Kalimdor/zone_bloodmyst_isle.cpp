@@ -87,7 +87,73 @@ public:
     }
 };
 
+
+enum VeridianBroodlingsSpells
+{
+    SPELL_POISON_BOLT = 21067,
+};
+
+enum VeridianBroodlingsEvents
+{
+    EVENT_POISON_BOLT = 1,
+};
+
+class npc_veridian_broodlings : public CreatureScript
+{
+public:
+    npc_veridian_broodlings() : CreatureScript("npc_veridian_broodlings") {}
+
+    struct npc_veridian_broodlingsAI : public ScriptedAI
+    {
+        npc_veridian_broodlingsAI(Creature* creature) : ScriptedAI(creature) {}
+
+        EventMap events;
+
+        void Reset() override
+        {
+            events.Reset();
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            events.ScheduleEvent(EVENT_POISON_BOLT, 2 * IN_MILLISECONDS);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            if (!UpdateVictim())
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_POISON_BOLT:
+                {
+                    if (Unit* target = me->GetVictim())
+                    {
+                        me->CastSpell(target, SPELL_POISON_BOLT);
+                    }
+                    events.ScheduleEvent(EVENT_POISON_BOLT, 3 * IN_MILLISECONDS);
+                    break;
+                }
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_veridian_broodlingsAI(creature);
+    }
+};
+
 void AddSC_bloodmyst_isle()
 {
     new npc_webbed_creature();
+    new npc_veridian_broodlings();
 }
