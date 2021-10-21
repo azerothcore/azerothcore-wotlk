@@ -3455,16 +3455,6 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     ApplySpellFix({
-        45257,  // Using Steam Tonk Controller
-        45440,  // Steam Tonk Controller
-        60256,  // Collect Sample
-        45634   // Neural Needle
-        }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;    // Crashes client on pressing ESC
-    });
-
-    ApplySpellFix({
         40244,  // Simon Game Visual
         40245,  // Simon Game Visual
         40246,  // Simon Game Visual
@@ -3497,6 +3487,12 @@ void SpellMgr::LoadDbcDataCorrections()
         42818,  // Headless Horseman - Wisp Flight Port
         42821   // Headless Horseman - Wisp Flight Missile
         }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RangeIndex = 6; // 100 yards
+    });
+
+    // Headless Horseman - Start Fire
+    ApplySpellFix({ 42132 }, [](SpellEntry* spellInfo)
     {
         spellInfo->RangeIndex = 6; // 100 yards
     });
@@ -6782,7 +6778,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
         spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
     });
 
     // Still At It
@@ -7028,12 +7023,6 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 47424 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
-    });
-
-    // Leading the Charge (13380), All Infra-Green bomber quests
-    ApplySpellFix({ 59059 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
     });
 
     // Dark Horizon (12664), Reunited (12663)
@@ -7401,6 +7390,12 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 2585 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
+    });
+
+    // Conflagration, Horseman's Cleave
+    ApplySpellFix({ 42380, 42587 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
