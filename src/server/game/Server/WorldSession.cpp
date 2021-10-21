@@ -29,6 +29,7 @@
 #include "GuildMgr.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -318,6 +319,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
         ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
 
+        AC_METRIC_DETAILED_TIMER("worldsession_update_opcode_time", AC_METRIC_TAG("opcode", opHandle->Name));
+
         try
         {
             switch (opHandle->Status)
@@ -419,6 +422,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     }
 
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
+
+    AC_METRIC_VALUE("processed_packets", processedPackets);
 
     if (!updater.ProcessUnsafe()) // <=> updater is of type MapSessionFilter
     {
@@ -649,6 +654,8 @@ void WorldSession::LogoutPlayer(bool save)
 
         //! Call script hook before deletion
         sScriptMgr->OnPlayerLogout(_player);
+
+        AC_METRIC_EVENT("player_events", "Logout", _player->GetName());
 
         LOG_INFO("entities.player", "Account: %d (IP: %s) Logout Character:[%s] (%s) Level: %d",
             GetAccountId(), GetRemoteAddress().c_str(), _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), _player->getLevel());

@@ -37,6 +37,7 @@
 #include "GitRevision.h"
 #include "IoContext.h"
 #include "MapMgr.h"
+#include "Metric.h"
 #include "MySQLThreading.h"
 #include "ObjectAccessor.h"
 #include "OpenSSLCrypto.h"
@@ -287,6 +288,22 @@ int main(int argc, char** argv)
     LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
 
     LoadRealmInfo(*ioContext);
+
+    sMetric->Initialize(realm.Name, *ioContext, []()
+    {
+        AC_METRIC_VALUE("online_players", sWorld->GetPlayerCount());
+        //AC_METRIC_VALUE("db_queue_login", uint64(LoginDatabase.QueueSize()));
+        //AC_METRIC_VALUE("db_queue_character", uint64(CharacterDatabase.QueueSize()));
+        //AC_METRIC_VALUE("db_queue_world", uint64(WorldDatabase.QueueSize()));
+    });
+
+    AC_METRIC_EVENT("events", "Worldserver started", "");
+
+    std::shared_ptr<void> sMetricHandle(nullptr, [](void*)
+    {
+        AC_METRIC_EVENT("events", "Worldserver shutdown", "");
+        sMetric->Unload();
+    });
 
     // Loading modules configs
     sConfigMgr->PrintLoadedModulesConfigs();
