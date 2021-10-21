@@ -588,7 +588,6 @@ struct npc_beryl_sorcererAI : public CreatureAI
                         {
                             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                             {
-                                player->CastStop(SPELL_ARCANE_CHAINS, true);
                                 me->CastSpell(player, SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST);
                                 player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
                                 me->DisappearAndDie();
@@ -633,7 +632,6 @@ public:
 
         void Initialize()
         {
-            _chainsCast = false;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0);
         }
@@ -675,7 +673,6 @@ public:
             }
         }
     private:
-        bool _chainsCast;
         EventMap _events;
     };
 
