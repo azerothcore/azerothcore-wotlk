@@ -1843,25 +1843,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     target->RemoveAura(63531);
                 }
             }
-
-            break;
-        case SPELLFAMILY_DRUID:
-            if (!caster)
-                break;
-            // Reduce base armor of bear form and dire bear form
-            if (GetId() == 5229)
-            {
-                if (target->HasAura(70726)) // Item - Druid T10 Feral 4P Bonus
-                {
-                    if (apply)
-                        target->CastSpell(target, 70725, true);
-                }
-                else
-                {
-                    // Enrage armor reduction
-                    target->HandleStatModifier(UNIT_MOD_ARMOR, BASE_PCT, target->GetShapeshiftForm() == FORM_DIREBEAR ? -16.0f : -27.0f, apply);
-                }
-            }
             break;
     }
 }
