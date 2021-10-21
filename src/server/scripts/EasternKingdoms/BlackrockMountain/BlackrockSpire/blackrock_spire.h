@@ -76,7 +76,8 @@ enum CreaturesIds
     NPC_LORD_VICTOR_NEFARIUS        = 10162,
     NPC_SOLAKAR                     = 10264,
     NPC_ROOKERY_GUARDIAN            = 10258,
-    NPC_ROOKERY_HATCHER             = 10683
+    NPC_ROOKERY_HATCHER             = 10683,
+    NPC_ROOKERY_WHELP               = 10161
 };
 
 enum AdditionalData
@@ -86,13 +87,13 @@ enum AdditionalData
     EVENT_PYROGUARD_EMBERSEER       = 4884,
     AREATRIGGER                     = 1,
     AREATRIGGER_DRAGONSPIRE_HALL    = 2046,
-    AREATRIGGER_BLACKROCK_STADIUM   = 2026,
-    DB_ENTRY_ROOKERY_EGG            = 175124
+    AREATRIGGER_BLACKROCK_STADIUM   = 2026
 };
 
 enum GameObjectsIds
 {
     GO_WHELP_SPAWNER                = 175622, // trap spawned by go id 175124
+    GO_ROOKERY_EGG            = 175124,
     // Doors
     GO_EMBERSEER_IN                 = 175244, // First door to Pyroguard Emberseer
     GO_DOORS                        = 175705, // Second door to Pyroguard Emberseer

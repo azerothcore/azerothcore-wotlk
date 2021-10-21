@@ -59,7 +59,7 @@ public:
             CreatureAI::InitializeAI();
             if (Unit* target = me->SelectNearestTarget(500))
             {
-                me->AI()->AttackStart(target);
+                AttackStart(target);
             }
             nearbyEggs.clear();
             targetEgg = nullptr;
@@ -82,7 +82,7 @@ public:
                 return;
             }
 
-            GetCreatureListWithEntryInGrid(nearbyWhelps, me, 10161, 15.0);
+            GetCreatureListWithEntryInGrid(nearbyWhelps, me, NPC_ROOKERY_WHELP, 15.0);
             for (const auto& whelp : nearbyWhelps)
             {
                 if (!whelp->IsInCombat())
@@ -100,33 +100,33 @@ public:
             {
                 switch (eventId)
                 {
-                case SPELL_HATCH_EGG:
-                    if (!targetEgg) // no target, try to find one
-                    {
-                        minDist = 50;
-                        tempDist = 50;
-                        me->GetGameObjectListWithEntryInGrid(nearbyEggs, DB_ENTRY_ROOKERY_EGG, 40);
-                        for (const auto& egg : nearbyEggs)
+                    case SPELL_HATCH_EGG:
+                        if (!targetEgg) // no target, try to find one
                         {
-                            if (egg->isSpawned() && egg->getLootState() == GO_READY)
+                            minDist = 50;
+                            tempDist = 50;
+                            me->GetGameObjectListWithEntryInGrid(nearbyEggs, GO_ROOKERY_EGG, 40);
+                            for (const auto& egg : nearbyEggs)
                             {
-                                tempDist = me->GetDistance2d(egg);
-                                if (tempDist < minDist)
+                                if (egg->isSpawned() && egg->getLootState() == GO_READY)
                                 {
-                                    minDist   = tempDist;
-                                    targetEgg = egg;
+                                    tempDist = me->GetDistance2d(egg);
+                                    if (tempDist < minDist)
+                                    {
+                                        minDist   = tempDist;
+                                        targetEgg = egg;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    if (targetEgg) //have a target, go to it and cast it
-                    {
-                        me->GetMotionMaster()->MovePoint(0, targetEgg->GetPosition());
-                    }
-                    break;
-                default:
-                    break;
+                        if (targetEgg) //have a target, go to it and cast it
+                        {
+                            me->GetMotionMaster()->MovePoint(0, targetEgg->GetPosition());
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -140,19 +140,29 @@ public:
                // targetEgg->SetLootState(GO_JUST_DEACTIVATED); // doesn't seem needed, leave it for now but clean up later
                 targetEgg = nullptr;
                 events.ScheduleEvent(SPELL_HATCH_EGG, urand(6000, 8000));
+                LOG_FATAL("Entities:unit", "stopping!");
             }
             else if(me->HasUnitState(UNIT_STATE_CASTING))
             {
                 me->StopMovingOnCurrentPos();
                 me->SetOrientation(targetPosition.GetOrientation());
+                LOG_FATAL("Entities:unit", "stopping!");
             }
             else if (!targetEgg)
             {
-                me->AI()->AttackStart(me->GetVictim());
-                if (me->GetDistance2d(me->GetVictim()) > 1.0)
+                if (Unit* vict = me->GetVictim())
                 {
-                    me->GetMotionMaster()->MovePoint(0, me->GetVictim()->GetPosition()); // a bit hacky, but needed to start moving once we've summoned an egg
+                    AttackStart(me->GetVictim());
+                    LOG_FATAL("Entities:unit", "trying to attack %s", vict->GetName());
                 }
+                else
+                {
+                    LOG_FATAL("Entities:unit", "no victim");
+                }
+        //        if (me->GetDistance2d(me->GetVictim()) > me->GetMeleeRange(me))
+          //      {
+            //        me->GetMotionMaster()->MovePoint(0, me->GetVictim()->GetPosition()); // a bit hacky, but needed to start moving once we've summoned an egg
+              //  }
             }
             DoMeleeAttackIfReady();
         }
@@ -182,7 +192,7 @@ public:
             Talk(SAY_SUMMON);
             if (Unit* target = me->SelectNearestTarget(500))
             {
-                me->AI()->AttackStart(target);
+                AttackStart(target);
             }
         }
 
@@ -203,13 +213,13 @@ public:
         {
             switch (eventId)
             {
-            case SPELL_WAR_STOMP:
-                DoCastVictim(SPELL_WAR_STOMP);
-                events.ScheduleEvent(SPELL_WAR_STOMP, urand(17000, 20000));
-                break;
+                case SPELL_WAR_STOMP:
+                    DoCastVictim(SPELL_WAR_STOMP);
+                    events.ScheduleEvent(SPELL_WAR_STOMP, urand(17000, 20000));
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         }
 
@@ -228,8 +238,9 @@ public:
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
-
+            }
             while (uint32 eventId = events.ExecuteEvent())
             {
                 ExecuteEvent(eventId);

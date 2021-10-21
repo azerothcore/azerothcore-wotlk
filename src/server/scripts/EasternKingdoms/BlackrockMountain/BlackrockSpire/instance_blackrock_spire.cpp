@@ -28,8 +28,6 @@
 
 uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUMMONER, NPC_BLACKHAND_VETERAN };
 
-uint32 const SolakarWaves = 5;
-
 enum EventIds
 {
     EVENT_DARGONSPIRE_ROOM_STORE           = 1,
@@ -41,13 +39,21 @@ enum EventIds
     EVENT_UROK_DOOMHOWL_SPAWNS_5           = 7,
     EVENT_UROK_DOOMHOWL_SPAWN_IN           = 8,
 
-    EVENT_SOLAKAR_WAVE
+    EVENT_SOLAKAR_WAVE                     = 9
 };
 
 enum Timers
 {
     TIMER_SOLAKAR_WAVE = 30000
 };
+
+enum SolakarWaves
+{
+    MAX_WAVE_COUNT = 5
+};
+
+                Position PosLeft  = Position(78.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
+Position PosRight = Position(84.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
 
 class instance_blackrock_spire : public InstanceMapScript
 {
@@ -316,21 +322,22 @@ public:
                     SolakarState = data;
                     switch(data)
                     {
-                    case IN_PROGRESS:
-                        Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500);
-                        break;
-                    case FAIL:
-                        for (const auto& creature : SolakarSummons)
-                        {
-                            creature->RemoveFromWorld();
-                        }
-                        SolakarSummons.clear();
-                        CurrentSolakarWave = 0;
-                        SetData(DATA_SOLAKAR_FLAMEWREATH, NOT_STARTED);
-                        break;
-                    case DONE:
-                        break;
+                        case IN_PROGRESS:
+                            Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500);
+                            break;
+                        case FAIL:
+                            for (const auto& creature : SolakarSummons)
+                            {
+                                creature->RemoveFromWorld();
+                            }
+                            SolakarSummons.clear();
+                            CurrentSolakarWave = 0;
+                            SetData(DATA_SOLAKAR_FLAMEWREATH, NOT_STARTED);
+                            break;
+                        case DONE:
+                            break;
                     }
+                    break;
                 default:
                     break;
             }
@@ -339,17 +346,20 @@ public:
         uint32 GetData(uint32 type) const override
         {
             if (type == DATA_SOLAKAR_FLAMEWREATH)
+            {
                 return SolakarState;
+            }
             else
+            {
                 return InstanceScript::GetData(type);
+            }
         }
 
         void SummonSolakarWave(uint8 number)
         {
-            if (number < SolakarWaves)
+            if (number < MAX_WAVE_COUNT)
             {
-                Position PosLeft = Position(78, -280, 93, 3 * M_PI / 2.0);
-                Position PosRight = Position(84, -280, 93, 3 * M_PI / 2.0);
+
                 SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_GUARDIAN, PosLeft));
                 SolakarSummons.push_back(instance->SummonCreature(NPC_ROOKERY_HATCHER, PosRight));
                 if (number == 0)
@@ -360,7 +370,7 @@ public:
                     }
                 }
             }
-            else if (number == SolakarWaves)
+            else if (number == MAX_WAVE_COUNT)
             {
                 Position PosSolakar = Position(80, -280, 93, 3 * M_PI / 2.0);
                 SolakarSummons.push_back(instance->SummonCreature(NPC_SOLAKAR, PosSolakar));
@@ -463,9 +473,11 @@ public:
                         break;
                     case EVENT_SOLAKAR_WAVE:
                         SummonSolakarWave(CurrentSolakarWave);
-                        if (CurrentSolakarWave < SolakarWaves)
+                        if (CurrentSolakarWave < MAX_WAVE_COUNT)
+                        {
                             Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, TIMER_SOLAKAR_WAVE);
-                        CurrentSolakarWave++;
+                            CurrentSolakarWave++;
+                        }
                         break;
                     default:
                         break;
@@ -718,7 +730,9 @@ public:
             if (state == GO_ACTIVATED)
             {
                 if (instance->GetData(DATA_SOLAKAR_FLAMEWREATH) == IN_PROGRESS || instance->GetData(DATA_SOLAKAR_FLAMEWREATH) == DONE)
+                {
                     return;
+                }
 
                 instance->SetData(DATA_SOLAKAR_FLAMEWREATH, IN_PROGRESS);
             }
@@ -726,6 +740,7 @@ public:
     }
 };
 
+/*
 class go_rookery_egg : public GameObjectScript
 {
 public:
@@ -750,7 +765,7 @@ public:
         }
     }
 };
-
+*/
 void AddSC_instance_blackrock_spire()
 {
     new instance_blackrock_spire();
