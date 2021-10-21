@@ -5467,7 +5467,7 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     // Food - Bobbing Apple
-    ApplySpellFix({24869}, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 24869 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
         spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
