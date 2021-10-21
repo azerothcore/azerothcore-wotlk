@@ -1063,6 +1063,12 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         const_cast<CreatureTemplate*>(cInfo)->InhabitType = INHABIT_ANYWHERE;
     }
 
+    if (cInfo->InhabitType == INHABIT_ROOT)
+    {
+        LOG_ERROR("sql.sql", "Creature (Entry: %u) only has INHABIT_ROOT(8) as `InhabitType`, creature will not behave correctly.", cInfo->Entry);
+        const_cast<CreatureTemplate*>(cInfo)->InhabitType = INHABIT_ANYWHERE;
+    }
+
     if (cInfo->HoverHeight < 0.0f)
     {
         LOG_ERROR("sql.sql", "Creature (Entry: %u) has wrong value (%f) in `HoverHeight`", cInfo->Entry, cInfo->HoverHeight);
@@ -4044,27 +4050,27 @@ void ObjectMgr::LoadQuests()
                          "ID, QuestType, QuestLevel, MinLevel, QuestSortID, QuestInfoID, SuggestedGroupNum, TimeAllowed, AllowableRaces,"
                          //      9                     10                   11                    12
                          "RequiredFactionId1, RequiredFactionId2, RequiredFactionValue1, RequiredFactionValue2, "
-                         //      13                14              15             16                 17              18           19            20
-                         "RewardNextQuest, RewardXPDifficulty, RewardMoney, RewardBonusMoney, RewardDisplaySpell, RewardSpell, RewardHonor, RewardKillHonor, "
-                         //   21       22       23              24                25               26
+                         //      13                14              15             16                 17                18                 19           20           21
+                         "RewardNextQuest, RewardXPDifficulty, RewardMoney, RewardMoneyDifficulty, RewardBonusMoney,  RewardDisplaySpell, RewardSpell, RewardHonor, RewardKillHonor, "
+                         //   22       23       24              25                26               27
                          "StartItem, Flags, RewardTitle, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
-                         //    27           28           29          30            31              32            33             34
+                         //    28           29           30          31            32              33            34             35
                          "RewardItem1, RewardAmount1, RewardItem2, RewardAmount2, RewardItem3, RewardAmount3, RewardItem4, RewardAmount4, "
-                         //        35                      36                      37                      38                      39                      40                      41                      42                      43                      44                     45                      46
+                         //        36                      37                      38                      39                      40                      41                      42                      43                      44                      45                     46                      47
                          "RewardChoiceItemID1, RewardChoiceItemQuantity1, RewardChoiceItemID2, RewardChoiceItemQuantity2, RewardChoiceItemID3, RewardChoiceItemQuantity3, RewardChoiceItemID4, RewardChoiceItemQuantity4, RewardChoiceItemID5, RewardChoiceItemQuantity5, RewardChoiceItemID6, RewardChoiceItemQuantity6, "
-                         //       47                 48                     49                  50                  51                     52                 53                  54                     55                  56                  57                    58                   59                 60                      61
+                         //       48                 49                     50                  51                  52                     53                 54                  55                     56                  57                  58                    59                   60                 61                      62
                          "RewardFactionID1, RewardFactionValue1, RewardFactionOverride1, RewardFactionID2, RewardFactionValue2, RewardFactionOverride2, RewardFactionID3, RewardFactionValue3, RewardFactionOverride3, RewardFactionID4, RewardFactionValue4, RewardFactionOverride4, RewardFactionID5, RewardFactionValue5,  RewardFactionOverride5,"
-                         //   62        63      64        65
+                         //   62        64      65        66
                          "POIContinent, POIx, POIy, POIPriority, "
-                         //   66          67               68           69                    70
+                         //   67          68               69           70                    71
                          "LogTitle, LogDescription, QuestDescription, AreaDescription, QuestCompletionLog, "
-                         //      71                72                73                74                   75                     76                    77                      78
+                         //      72                73                74                75                   76                     77                    78                      79
                          "RequiredNpcOrGo1, RequiredNpcOrGo2, RequiredNpcOrGo3, RequiredNpcOrGo4, RequiredNpcOrGoCount1, RequiredNpcOrGoCount2, RequiredNpcOrGoCount3, RequiredNpcOrGoCount4, "
-                         //  79          80         81         82           83                  84                 85                  86
+                         //  80          81         82         83           84                  85                 86                  87
                          "ItemDrop1, ItemDrop2, ItemDrop3, ItemDrop4, ItemDropQuantity1, ItemDropQuantity2, ItemDropQuantity3, ItemDropQuantity4, "
-                         //      87               88               89               90               91               92                93                  94                  95                  96                  97                  98
+                         //      88               89               90               91               92               93                94                  95                  96                  97                  98                  99
                          "RequiredItemId1, RequiredItemId2, RequiredItemId3, RequiredItemId4, RequiredItemId5, RequiredItemId6, RequiredItemCount1, RequiredItemCount2, RequiredItemCount3, RequiredItemCount4, RequiredItemCount5, RequiredItemCount6, "
-                         //  99          100             101             102             103
+                         //  100          101             102             103             104
                          "Unknown0, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4"
                          " FROM quest_template");
     if (!result)
@@ -9334,4 +9340,51 @@ void ObjectMgr::LoadCreatureQuestItems()
 
     LOG_INFO("server.loading", ">> Loaded %u creature quest items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+void ObjectMgr::LoadQuestMoneyRewards()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _questMoneyRewards.clear();
+
+    //                                                0       1       2       3       4       5       6       7       8       9       10
+    QueryResult result = WorldDatabase.Query("SELECT `Level`, Money0, Money1, Money2, Money3, Money4, Money5, Money6, Money7, Money8, Money9 FROM `quest_money_reward` ORDER BY `Level`");
+    if (!result)
+    {
+        LOG_ERROR("server.loading", ">> Loaded 0 quest money rewards. DB table `quest_money_reward` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 Level = fields[0].GetUInt32();
+
+        QuestMoneyRewardArray& questMoneyReward = _questMoneyRewards[Level];
+        questMoneyReward.fill(0);
+
+        for (uint8 i = 0; i < MAX_QUEST_MONEY_REWARDS; ++i)
+        {
+            questMoneyReward[i] = fields[1 + i].GetUInt32();
+            ++count;
+        }
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded %u Quest Money Rewards in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const
+{
+    if (questMoneyDifficulty < MAX_QUEST_MONEY_REWARDS)
+    {
+        auto const& itr = _questMoneyRewards.find(level);
+        if (itr != _questMoneyRewards.end())
+        {
+            return itr->second.at(questMoneyDifficulty);
+        }
+    }
+
+    return 0;
 }
