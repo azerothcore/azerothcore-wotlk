@@ -406,7 +406,7 @@ Aura::Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* 
     m_castItemGuid(itemGUID ? itemGUID : castItem ? castItem->GetGUID() : ObjectGuid::Empty), m_castItemEntry(castItem ? castItem->GetEntry() : 0), m_applyTime(time(nullptr)),
     m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0),
     m_casterLevel(caster ? caster->getLevel() : m_spellInfo->SpellLevel), m_procCharges(0), m_stackAmount(1),
-    m_isRemoved(false), m_isSingleTarget(false), m_isUsingCharges(false)
+    m_isRemoved(false), m_isSingleTarget(false), m_isUsingCharges(false), m_triggeredByAuraSpellInfo(nullptr)
 {
     if ((m_spellInfo->ManaPerSecond || m_spellInfo->ManaPerSecondPerLevel) && !m_spellInfo->HasAttribute(SPELL_ATTR2_NO_TARGET_PER_SECOND_COST))
         m_timeCla = 1 * IN_MILLISECONDS;
@@ -2620,6 +2620,16 @@ void Aura::CallScriptAfterEffectProcHandlers(AuraEffect const* aurEff, AuraAppli
 
         (*scritr)->_FinishScriptCall();
     }
+}
+
+void Aura::SetTriggeredByAuraSpellInfo(SpellInfo const* triggeredByAuraSpellInfo)
+{
+    m_triggeredByAuraSpellInfo = triggeredByAuraSpellInfo;
+}
+
+SpellInfo const* Aura::GetTriggeredByAuraSpellInfo() const
+{
+    return m_triggeredByAuraSpellInfo;
 }
 
 UnitAura::UnitAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID /*= ObjectGuid::Empty*/)
