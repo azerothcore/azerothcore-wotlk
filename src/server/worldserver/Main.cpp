@@ -292,9 +292,9 @@ int main(int argc, char** argv)
     sMetric->Initialize(realm.Name, *ioContext, []()
     {
         METRIC_VALUE("online_players", sWorld->GetPlayerCount());
-        //METRIC_VALUE("db_queue_login", uint64(LoginDatabase.QueueSize()));
-        //METRIC_VALUE("db_queue_character", uint64(CharacterDatabase.QueueSize()));
-        //METRIC_VALUE("db_queue_world", uint64(WorldDatabase.QueueSize()));
+        METRIC_VALUE("db_queue_login", uint64(LoginDatabase.QueueSize()));
+        METRIC_VALUE("db_queue_character", uint64(CharacterDatabase.QueueSize()));
+        METRIC_VALUE("db_queue_world", uint64(WorldDatabase.QueueSize()));
     });
 
     METRIC_EVENT("events", "Worldserver started", "");
