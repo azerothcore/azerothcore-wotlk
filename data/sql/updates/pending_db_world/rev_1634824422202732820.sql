@@ -1,4 +1,4 @@
-rev_1634733468020200400.sql
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1634824422202732820');
 
 -- *** Quest "Abduction" ***
 -- Condition for source Spell condition type Object entry guid
