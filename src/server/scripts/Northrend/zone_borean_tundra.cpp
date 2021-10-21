@@ -613,6 +613,12 @@ struct npc_beryl_sorcererAI : public CreatureAI
 };
 
 // NPC 25474: Captured Beryl Sorcerer
+enum CapturedBerylSorcerer
+{
+    EVENT_ADD_ARCANE_CHAINS                        = 1,
+    EVENT_FOLLOW_PLAYER                            = 2
+};
+
 class npc_captured_beryl_sorcerer : public CreatureScript
 {
 public:
@@ -629,6 +635,7 @@ public:
         {
             _chainsCast = false;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0);
         }
 
         void Reset() override
@@ -638,14 +645,22 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (_chainsCast)
-                return;
+            _events.Update(diff);
 
-            if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+            if (uint32 eventId = _events.ExecuteEvent())
             {
-                _chainsCast = true;
-                summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS && TRIGGERED_IGNORE_CAST_ITEM && TRIGGERED_IGNORE_POWER_AND_REAGENT_COST && TRIGGERED_IGNORE_GCD);
-                StartFollow(summoner);
+                switch (eventId)
+                {
+                    case EVENT_ADD_ARCANE_CHAINS:
+                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                            summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS && TRIGGERED_IGNORE_CAST_ITEM && TRIGGERED_IGNORE_POWER_AND_REAGENT_COST && TRIGGERED_IGNORE_GCD);
+                        _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1000);
+                        break;
+                    case EVENT_FOLLOW_PLAYER:
+                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                            StartFollow(summoner);
+                        break;
+                }
             }
         }
 
@@ -661,6 +676,7 @@ public:
         }
     private:
         bool _chainsCast;
+        EventMap _events;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
