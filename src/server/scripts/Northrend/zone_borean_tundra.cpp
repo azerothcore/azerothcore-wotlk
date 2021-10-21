@@ -626,17 +626,23 @@ public:
 
         void Initialize()
         {
-            UpdatePrisoner();
+            _chainsCast = false;
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void Reset() override {}
-
-        void UpdatePrisoner()
+        void Reset() override
         {
-            me->SetReactState(REACT_DEFENSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            Initialize();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_chainsCast)
+                return;
+
             if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
             {
+                _chainsCast = true;
                 summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II);
                 StartFollow(summoner);
             }
@@ -652,6 +658,8 @@ public:
                 me->DespawnOrUnsummon();
             }
         }
+    private:
+        bool _chainsCast;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
