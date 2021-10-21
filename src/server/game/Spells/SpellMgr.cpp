@@ -5466,6 +5466,15 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Effect[1] = 0;
     });
 
+    // Food - Bobbing Apple
+    ApplySpellFix({24869}, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
+        spellInfo->EffectTriggerSpell[1] = 24870; // Well Fed
+        spellInfo->EffectAmplitude[1] = 10000; // 10s
+    });
+
     // Onyxia's Lair, Onyxia, Create Onyxia Spawner
     ApplySpellFix({ 17647 }, [](SpellEntry* spellInfo)
     {
