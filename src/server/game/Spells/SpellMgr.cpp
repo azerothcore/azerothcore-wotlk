@@ -3767,6 +3767,13 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_MASTER;
     });
 
+    // Felstorm Ressurection
+    ApplySpellFix({3488}, [](SpellEntry* spellInfo)
+    {
+        spellInfo->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
+        spellInfo->EffectTriggerSpell[1] = 37493; // Feign Death effect - generic spell
+    });
+
     // Sigil of the Frozen Conscience
     ApplySpellFix({ 54800 }, [](SpellEntry* spellInfo)
     {

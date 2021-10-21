@@ -5503,8 +5503,42 @@ public:
     }
 };
 
+// 3488 - Felstorm Ressurection
+class spell_felstorm_ressurection : public SpellScriptLoader
+{
+public:
+    spell_felstorm_ressurection() : SpellScriptLoader("spell_felstorm_ressurection") {}
+
+    class spell_felstorm_ressurection_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_felstorm_ressurection_SpellScript);
+
+        void HandleDummy()
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (caster->GetEntry() == 771) // despawn effect only on specific entry
+                {
+                    caster->ToCreature()->DespawnOrUnsummon(10 * IN_MILLISECONDS);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            AfterCast += SpellCastFn(spell_felstorm_ressurection_SpellScript::HandleDummy);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_felstorm_ressurection_SpellScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
+    new spell_felstorm_ressurection();
     new spell_gen_5000_gold();
     new spell_gen_model_visible();
     new spell_the_flag_of_ownership();
