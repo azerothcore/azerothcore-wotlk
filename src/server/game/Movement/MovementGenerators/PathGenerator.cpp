@@ -1108,6 +1108,13 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
     // (@todo review this)
     _pathPoints[i] += (_pathPoints[i - 1] - _pathPoints[i]).direction() * (dist - (_pathPoints[i] - target).length());
     _pathPoints.resize(i + 1);
+
+    // we're guessing a position, we should make sure we normalize the path so that we correctly set Z position
+    NormalizePath();
+
+    // this is not strictly necessary, but makes sense?
+    SetEndPosition(_pathPoints[i]);
+    SetActualEndPosition(_pathPoints[i]);
 }
 
 bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
