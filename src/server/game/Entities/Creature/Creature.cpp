@@ -2195,7 +2195,9 @@ void Creature::SendAIReaction(AiReaction reactionType)
 void Creature::CallAssistance(Unit* target /*= nullptr*/)
 {
     if (!target)
+    {
         target = GetVictim();
+    }
 
     if (!m_AlreadyCallAssistance && target && !IsPet() && !IsCharmed())
     {
