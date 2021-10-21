@@ -11477,7 +11477,6 @@ void Player::SetBattlegroundId(uint32 id, BattlegroundTypeId bgTypeId, uint32 qu
     m_bgData.bgIsRandom = isRandom;
 
     m_bgData.bgTeamId = teamId;
-    SetByteValue(PLAYER_BYTES_3, 3, uint8(teamId == TEAM_ALLIANCE ? 1 : 0));
 }
 
 bool Player::GetBGAccessByLevel(BattlegroundTypeId bgTypeId) const

@@ -532,10 +532,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
                 if (Player* player = itr->second)
                 {
-                    WorldPacket status;
-                    sBattlegroundMgr->BuildBattlegroundStatusPacket(&status, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, 0, GetStartTime(), GetArenaType(), player->GetBgTeamId());
-                    player->GetSession()->SendPacket(&status);
-
                     player->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
                     player->ResetAllPowers();
                     // remove auras with duration lower than 30s
@@ -1270,6 +1266,8 @@ void Battleground::AddPlayer(Player* player)
 
     // Xinef: reset all map criterias on map enter
     player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_BG_MAP, GetMapId(), true);
+
+    player->SetByteValue(PLAYER_BYTES_3, 3, uint8(teamId == TEAM_ALLIANCE ? 1 : 0));
 
     // setup BG group membership
     PlayerAddedToBGCheckIfBGIsRunning(player);
