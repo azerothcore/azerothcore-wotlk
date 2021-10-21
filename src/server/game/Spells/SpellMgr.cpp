@@ -3768,7 +3768,7 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     // Felstorm Ressurection
-    ApplySpellFix({3488}, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 3488 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
         spellInfo->EffectTriggerSpell[1] = 37493; // Feign Death effect - generic spell
