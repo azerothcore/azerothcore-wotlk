@@ -590,7 +590,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
                             {
                                 me->CastSpell(player, SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST);
                                 player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
-                                me->DespawnOrUnsummon();
+                                me->DisappearAndDie();
                             }
                         }
                         break;
