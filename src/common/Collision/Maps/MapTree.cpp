@@ -454,7 +454,7 @@ namespace VMAP
             iLoadedTiles[packTileID(tileX, tileY)] = false;
         }
 
-        AC_METRIC_EVENT("map_events", "LoadMapTile",
+        METRIC_EVENT("map_events", "LoadMapTile",
             "Map: " + std::to_string(iMapID) + " TileX: " + std::to_string(tileX) + " TileY: " + std::to_string(tileY));
 
         return result;
@@ -524,7 +524,7 @@ namespace VMAP
         }
         iLoadedTiles.erase(tile);
 
-        AC_METRIC_EVENT("map_events", "UnloadMapTile",
+        METRIC_EVENT("map_events", "UnloadMapTile",
             "Map: " + std::to_string(iMapID) + " TileX: " + std::to_string(tileX) + " TileY: " + std::to_string(tileY));
     }
 

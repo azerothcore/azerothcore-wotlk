@@ -1089,7 +1089,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         sScriptMgr->OnFirstLogin(pCurrChar);
     }
 
-    AC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
+    METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 }
 
 void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)

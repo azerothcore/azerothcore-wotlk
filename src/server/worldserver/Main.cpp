@@ -291,17 +291,17 @@ int main(int argc, char** argv)
 
     sMetric->Initialize(realm.Name, *ioContext, []()
     {
-        AC_METRIC_VALUE("online_players", sWorld->GetPlayerCount());
-        //AC_METRIC_VALUE("db_queue_login", uint64(LoginDatabase.QueueSize()));
-        //AC_METRIC_VALUE("db_queue_character", uint64(CharacterDatabase.QueueSize()));
-        //AC_METRIC_VALUE("db_queue_world", uint64(WorldDatabase.QueueSize()));
+        METRIC_VALUE("online_players", sWorld->GetPlayerCount());
+        //METRIC_VALUE("db_queue_login", uint64(LoginDatabase.QueueSize()));
+        //METRIC_VALUE("db_queue_character", uint64(CharacterDatabase.QueueSize()));
+        //METRIC_VALUE("db_queue_world", uint64(WorldDatabase.QueueSize()));
     });
 
-    AC_METRIC_EVENT("events", "Worldserver started", "");
+    METRIC_EVENT("events", "Worldserver started", "");
 
     std::shared_ptr<void> sMetricHandle(nullptr, [](void*)
     {
-        AC_METRIC_EVENT("events", "Worldserver shutdown", "");
+        METRIC_EVENT("events", "Worldserver shutdown", "");
         sMetric->Unload();
     });
 

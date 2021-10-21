@@ -62,7 +62,7 @@ bool PathGenerator::CalculatePath(float x, float y, float z, float destX, float 
     if (!Acore::IsValidMapCoord(destX, destY, destZ) || !Acore::IsValidMapCoord(x, y, z))
         return false;
 
-    AC_METRIC_DETAILED_EVENT("mmap_events", "CalculatePath", "");
+    METRIC_DETAILED_EVENT("mmap_events", "CalculatePath", "");
 
     G3D::Vector3 dest(destX, destY, destZ);
     SetEndPosition(dest);

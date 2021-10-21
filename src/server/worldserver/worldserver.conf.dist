@@ -3845,7 +3845,7 @@ Metric.OverallStatusInterval = 1
 #    Metric.Threshold.name
 #        Description: Skips sending statistics with a value lower than the config value.
 #                     If the threshold is commented out, the metric will be ignored.
-#                     Only metrics logged with AC_METRIC_DETAILED_TIMER in the sources are affected.
+#                     Only metrics logged with METRIC_DETAILED_TIMER in the sources are affected.
 #                     Disabled by default. Requires WITH_DETAILED_METRICS CMake flag.
 #
 #        Format:      Value as integer
