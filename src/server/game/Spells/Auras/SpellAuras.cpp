@@ -1355,6 +1355,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         else
                             caster->CastSpell(target, 61634, true);
                     }
+
+                    if (Creature* creatureTarget = target->ToCreature())
+                    {
+                        creatureTarget->CallAssistance(caster);
+                    }
                 }
                 switch (GetId())
                 {
