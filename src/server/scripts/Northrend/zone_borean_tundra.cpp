@@ -588,6 +588,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
                         {
                             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                             {
+                                player->CastStop(SPELL_ARCANE_CHAINS, true);
                                 me->CastSpell(player, SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST);
                                 player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
                                 me->DisappearAndDie();
@@ -643,7 +644,7 @@ public:
             if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
             {
                 _chainsCast = true;
-                summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II);
+                summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS && TRIGGERED_IGNORE_CAST_ITEM && TRIGGERED_IGNORE_POWER_AND_REAGENT_COST && TRIGGERED_IGNORE_GCD);
                 StartFollow(summoner);
             }
         }
