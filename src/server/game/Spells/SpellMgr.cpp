@@ -7374,7 +7374,7 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     // 29519 - Silithyst
-    ApplySpellFix({29519}, [](SpellEntry* spellInfo)
+    ApplySpellFix({ 29519 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_DECREASE_SPEED;
         spellInfo->EffectBasePoints[EFFECT_0] = -25;
