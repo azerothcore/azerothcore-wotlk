@@ -265,53 +265,6 @@ public:
 };
 
 /*######
-## npc_corastrasza
-######*/
-
-#define GOSSIP_ITEM_C_1 "I... I think so..."
-
-enum Corastrasza
-{
-    SPELL_SUMMON_WYRMREST_SKYTALON               = 61240,
-    SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC        = 61244,
-
-    QUEST_ACES_HIGH_DAILY                        = 13414,
-    QUEST_ACES_HIGH                              = 13413
-};
-
-class npc_corastrasza : public CreatureScript
-{
-public:
-    npc_corastrasza() : CreatureScript("npc_corastrasza") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_ACES_HIGH) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_ACES_HIGH_DAILY) == QUEST_STATUS_INCOMPLETE) //It's the same dragon for both quests.
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_C_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-
-            player->CastSpell(player, SPELL_SUMMON_WYRMREST_SKYTALON, true);
-            player->CastSpell(player, SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC, true);
-        }
-
-        return true;
-    }
-};
-
-/*######
 ## npc_iruk
 ######*/
 
@@ -1395,7 +1348,6 @@ void AddSC_borean_tundra()
     // Theirs
     new npc_sinkhole_kill_credit();
     new npc_khunok_the_behemoth();
-    new npc_corastrasza();
     new npc_iruk();
     new npc_nerubar_victim();
     new npc_lurgglbr();

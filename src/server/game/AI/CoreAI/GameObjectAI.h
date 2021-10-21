@@ -59,6 +59,7 @@ public:
     virtual void OnStateChanged(uint32 /*state*/, Unit* /*unit*/) {}
     virtual void EventInform(uint32 /*eventId*/) {}
     virtual void SpellHit(Unit* /*unit*/, const SpellInfo* /*spellInfo*/) {}
+    virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
 };
 
 class NullGameObjectAI : public GameObjectAI
