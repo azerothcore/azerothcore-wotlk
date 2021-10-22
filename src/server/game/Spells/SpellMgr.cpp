@@ -3491,6 +3491,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->RangeIndex = 6; // 100 yards
     });
 
+    // Spirit of Kirith
+    ApplySpellFix({ 10853 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->DurationIndex = 3; // 1min
+    });
+
     // Headless Horseman - Start Fire
     ApplySpellFix({ 42132 }, [](SpellEntry* spellInfo)
     {
