@@ -3090,12 +3090,6 @@ public:
             return false;
         }
 
-        if (target->GetTypeId() == TYPEID_PLAYER)
-        {
-            if (handler->HasLowerSecurity(target->ToPlayer()))
-                return false;
-        }
-
         if (target->IsAlive())
         {
             handler->PSendSysMessage(LANG_COMMAND_FREEZE, name.c_str());
