@@ -63,7 +63,7 @@ RealmID = 1
 #    DataDir
 #        Description: Data directory setting.
 #        Important:   DataDir needs to be quoted, as the string might contain space characters.
-#        Example:     "/home/youruser/azerothcore/data"
+#        Example:     "@prefix@\home\youruser\azerothcore\data"
 #        Default:     "."
 
 DataDir = "."
