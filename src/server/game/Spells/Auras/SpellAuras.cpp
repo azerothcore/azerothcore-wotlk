@@ -1563,28 +1563,37 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_MAGE:
+            {
+                // Polymorph
+                if (GetSpellInfo()->SpellFamilyFlags[0] & 0x01000000)
+                {
+                    if (Creature* creatureTarget = target->ToCreature())
+                    {
+                        creatureTarget->SetNoCallAssistance(false);
+                    }
+                }
                 switch (GetId())
                 {
-                    case 66: // Invisibility
-                        if (removeMode != AURA_REMOVE_BY_EXPIRE)
-                            break;
-                        target->CastSpell(target, 32612, true, nullptr, GetEffect(1));
-                        target->CombatStop();
+                case 66: // Invisibility
+                    if (removeMode != AURA_REMOVE_BY_EXPIRE)
                         break;
-                    case 74396: // Fingers of Frost
-                        // Remove the IGNORE_AURASTATE aura
-                        target->RemoveAurasDueToSpell(44544);
+                    target->CastSpell(target, 32612, true, nullptr, GetEffect(1));
+                    target->CombatStop();
+                    break;
+                case 74396: // Fingers of Frost
+                    // Remove the IGNORE_AURASTATE aura
+                    target->RemoveAurasDueToSpell(44544);
+                    break;
+                case 44401: // Missile Barrage
+                case 48108: // Hot Streak
+                case 57761: // Fireball!
+                    if (removeMode != AURA_REMOVE_BY_EXPIRE || aurApp->GetBase()->IsExpired())
                         break;
-                    case 44401: //Missile Barrage
-                    case 48108: //Hot Streak
-                    case 57761: //Fireball!
-                        if (removeMode != AURA_REMOVE_BY_EXPIRE || aurApp->GetBase()->IsExpired())
-                            break;
-                        if (target->HasAura(70752)) //Item - Mage T10 2P Bonus
-                            target->CastSpell(target, 70753, true);
-                        break;
-                    default:
-                        break;
+                    if (target->HasAura(70752)) // Item - Mage T10 2P Bonus
+                        target->CastSpell(target, 70753, true);
+                    break;
+                default:
+                    break;
                 }
                 if (!caster)
                     break;
@@ -1599,6 +1608,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                     caster->CastSpell(target, 55080, true, nullptr, GetEffect(0));
                 }
                 break;
+            }
             case SPELLFAMILY_WARRIOR:
                 if (!caster)
                     break;
