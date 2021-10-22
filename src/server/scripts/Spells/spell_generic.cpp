@@ -5447,52 +5447,6 @@ public:
     }
 };
 
-enum RecallSpellIds
-{
-    SPELL_RECALL_HORDE = 22563,
-    SPELL_RECALL_ALLIANCE = 22564
-};
-
-class spell_gen_recall : public SpellScriptLoader
-{
-public:
-    spell_gen_recall() : SpellScriptLoader("spell_gen_recall") { }
-
-    class spell_gen_recall_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_gen_recall_SpellScript);
-
-        void SetDest(SpellDestination& dest)
-        {
-            Player* player = GetCaster()->ToPlayer();
-            if (!player)
-            {
-                return;
-            }
-
-            TeamId bgTeam = player->GetBgTeamId();
-            if (player->GetTeamId(true) != bgTeam)
-            {
-                if (SpellTargetPosition const* recallSpellTarget = sSpellMgr->GetSpellTargetPosition(bgTeam == TEAM_HORDE ? SPELL_RECALL_HORDE : SPELL_RECALL_ALLIANCE, EFFECT_0))
-                {
-                    Position pos = Position(recallSpellTarget->target_X, recallSpellTarget->target_Y, recallSpellTarget->target_Z, recallSpellTarget->target_Orientation);
-                    dest.Relocate(pos);
-                }
-            }
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_gen_recall_SpellScript::SetDest, EFFECT_0, TARGET_DEST_DB);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_gen_recall_SpellScript();
-    };
-};
-
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_5000_gold();
@@ -5622,5 +5576,4 @@ void AddSC_generic_spell_scripts()
     new spell_gen_eject_passenger();
     new spell_gen_charmed_unit_spell_cooldown();
     new spell_contagion_of_rot();
-    new spell_gen_recall();
 }
