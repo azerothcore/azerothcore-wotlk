@@ -1970,7 +1970,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer) override
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->IsSummon())
             {
