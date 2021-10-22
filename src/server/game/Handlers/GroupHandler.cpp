@@ -356,13 +356,13 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
         return;
 
     // Xinef: do not allow to kick with empty reason, this will resend packet with given reason
-    if (grp->isLFGGroup() && reason.empty())
+    if (grp->isLFGGroup(true) && reason.empty())
     {
         SendPartyResult(PARTY_OP_UNINVITE, name, ERR_VOTE_KICK_REASON_NEEDED);
         return;
     }
 
-    if (grp->IsLeader(guid) && !grp->isLFGGroup())
+    if (grp->IsLeader(guid) && !grp->isLFGGroup(true))
     {
         SendPartyResult(PARTY_OP_UNINVITE, name, ERR_NOT_LEADER);
         return;
@@ -489,7 +489,7 @@ void WorldSession::HandleLootMethodOpcode(WorldPacket& recvData)
 
     /** error handling **/
     // Xinef: Check if group is LFG
-    if (!group->IsLeader(GetPlayer()->GetGUID()) || group->isLFGGroup())
+    if (!group->IsLeader(GetPlayer()->GetGUID()) || group->isLFGGroup(true))
         return;
 
     if (lootMethod > NEED_BEFORE_GREED)

@@ -17,7 +17,7 @@
 
 #include "Cell.h"
 #include "CellImpl.h"
-#include "Chat.h"
+#include "ChatTextBuilder.h"
 #include "CreatureTextMgr.h"
 #include "GameEventMgr.h"
 #include "GossipDef.h"
@@ -36,27 +36,6 @@
 #include "SmartScript.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
-
-class AcoreStringTextBuilder
-{
-public:
-    AcoreStringTextBuilder(WorldObject* obj, ChatMsg msgtype, int32 id, uint32 language, WorldObject* target)
-        : _source(obj), _msgType(msgtype), _textId(id), _language(language), _target(target)
-    {
-    }
-
-    size_t operator()(WorldPacket* data, LocaleConstant locale) const
-    {
-        std::string text = sObjectMgr->GetAcoreString(_textId, locale);
-        return ChatHandler::BuildChatPacket(*data, _msgType, Language(_language), _source, _target, text, 0, "", locale);
-    }
-
-    WorldObject* _source;
-    ChatMsg _msgType;
-    int32 _textId;
-    uint32 _language;
-    WorldObject* _target;
-};
 
 SmartScript::SmartScript()
 {
@@ -259,7 +238,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (IsUnit(*itr))
                         {
-                            (*itr)->SendPlaySound(e.action.sound.sound, e.action.sound.onlySelf > 0);
+                            (*itr)->PlayDirectSound(e.action.sound.sound, e.action.sound.onlySelf ? (*itr)->ToPlayer() : nullptr);
                             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SOUND: target: %s (%s), sound: %u, onlyself: %u",
                                            (*itr)->GetName().c_str(), (*itr)->GetGUID().ToString().c_str(), e.action.sound.sound, e.action.sound.onlySelf);
                         }
@@ -302,7 +281,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsUnit(*itr))
                     {
                         uint32 sound = temp[urand(0, count - 1)];
-                        (*itr)->SendPlaySound(sound, e.action.randomSound.onlySelf > 0);
+                        (*itr)->PlayDirectSound(sound, e.action.randomSound.onlySelf ? (*itr)->ToPlayer() : nullptr);
                         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_SOUND: target: %s (%s), sound: %u, onlyself: %u",
                                        (*itr)->GetName().c_str(), (*itr)->GetGUID().ToString().c_str(), sound, e.action.randomSound.onlySelf);
                     }
@@ -992,7 +971,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 me->DoFleeToGetAssistance();
                 if (e.action.flee.withEmote)
                 {
-                    AcoreStringTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, LANG_FLEE, LANG_UNIVERSAL, nullptr);
+                    Acore::BroadcastTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_FLEE_FOR_ASSIST, me->getGender());
                     sCreatureTextMgr->SendChatPacket(me, builder, CHAT_MSG_MONSTER_EMOTE);
                 }
                 LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_FLEE_FOR_ASSIST: Creature %s DoFleeToGetAssistance", me->GetGUID().ToString().c_str());
@@ -1297,7 +1276,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range);
                         if (e.action.callHelp.withEmote)
                         {
-                            AcoreStringTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, LANG_CALL_FOR_HELP, LANG_UNIVERSAL, nullptr);
+                            Acore::BroadcastTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_CALL_FOR_HELP, LANG_UNIVERSAL, nullptr);
                             sCreatureTextMgr->SendChatPacket(*itr, builder, CHAT_MSG_MONSTER_EMOTE);
                         }
                     }
@@ -1323,10 +1302,21 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 {
-                    if (IsCreature(*itr))
-                        (*itr)->ToCreature()->DespawnOrUnsummon(e.action.forceDespawn.delay + 1);
-                    else if (IsGameObject(*itr))
-                        (*itr)->ToGameObject()->Delete();
+                    if (Creature* creature = (*itr)->ToCreature())
+                    {
+                        creature->DespawnOrUnsummon(e.action.forceDespawn.delay + 1);
+                    }
+                    else if (GameObject* go = (*itr)->ToGameObject())
+                    {
+                        Milliseconds despawnDelay(e.action.forceDespawn.delay);
+
+                        // Wait at least one world update tick before despawn, so it doesn't break linked actions.
+                        if (despawnDelay <= 0ms)
+                        {
+                            despawnDelay = 1ms;
+                        }
+                        go->DespawnOrUnsummon(despawnDelay);
+                    }
                 }
 
                 delete targets;
@@ -3219,6 +3209,54 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
 
                 delete targets;
+                break;
+            }
+        case SMART_ACTION_DO_ACTION:
+            {
+                int32 const actionId = e.action.doAction.isNegative ? -e.action.doAction.actionId : e.action.doAction.actionId;
+                if (!e.action.doAction.instanceTarget)
+                {
+                    ObjectList* targets = GetTargets(e, unit);
+                    if (!targets)
+                    {
+                        break;
+                    }
+
+                    for (WorldObject* objTarget : *targets)
+                    {
+                        if (Creature const* unitTarget = objTarget->ToCreature())
+                        {
+                            if (unitTarget->IsAIEnabled)
+                            {
+                                unitTarget->AI()->DoAction(actionId);
+                            }
+                        }
+                        else if (GameObject const* gobjTarget = objTarget->ToGameObject())
+                        {
+                            gobjTarget->AI()->DoAction(actionId);
+                        }
+                    }
+
+                    delete targets;
+                }
+                else
+                {
+                    InstanceScript* instanceScript = nullptr;
+                    if (WorldObject* baseObj = GetBaseObject())
+                    {
+                        instanceScript = baseObj->GetInstanceScript();
+                    }
+                    // Action is triggered by AreaTrigger
+                    else if (trigger && IsPlayer(unit))
+                    {
+                        instanceScript = unit->GetInstanceScript();
+                    }
+
+                    if (instanceScript)
+                    {
+                        instanceScript->DoAction(actionId);
+                    }
+                }
                 break;
             }
         default:
