@@ -5503,7 +5503,6 @@ public:
     }
 };
 
-
 // 29519 - Silithyst
 class spell_silithyst : public SpellScriptLoader
 {
