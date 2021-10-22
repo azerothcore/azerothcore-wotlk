@@ -225,7 +225,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
 
             if (bIsMaxRangeExceeded)
             {
-                LOG_DEBUG("scripts.ai", "TSCR: FollowerAI failed because player/group was to far away or not found");
+                LOG_DEBUG("scripts.ai", "ASCR FollowerAI failed because player/group was to far away or not found");
                 me->DespawnOrUnsummon();
                 return;
             }
@@ -268,13 +268,13 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
 {
     if (me->GetVictim())
     {
-        LOG_DEBUG("scripts.ai", "TSCR: FollowerAI attempt to StartFollow while in combat.");
+        LOG_DEBUG("scripts.ai", "ASCR FollowerAI attempt to StartFollow while in combat.");
         return;
     }
 
     if (HasFollowState(STATE_FOLLOW_INPROGRESS))
     {
-        LOG_ERROR("entities.unit.ai", "TSCR: FollowerAI attempt to StartFollow while already following.");
+        LOG_ERROR("entities.unit.ai", "ASCR FollowerAI attempt to StartFollow while already following.");
         return;
     }
 
@@ -290,7 +290,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
     {
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
-        LOG_DEBUG("scripts.ai", "TSCR: FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
+        LOG_DEBUG("scripts.ai", "ASCR FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
     }
 
     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -299,7 +299,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
 
     me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-    LOG_DEBUG("scripts.ai", "TSCR: FollowerAI start follow %s (%s)", player->GetName().c_str(), m_uiLeaderGUID.ToString().c_str());
+    LOG_DEBUG("scripts.ai", "ASCR FollowerAI start follow %s (%s)", player->GetName().c_str(), m_uiLeaderGUID.ToString().c_str());
 }
 
 Player* FollowerAI::GetLeaderForFollower()
@@ -318,7 +318,7 @@ Player* FollowerAI::GetLeaderForFollower()
 
                     if (member && me->IsWithinDistInMap(member, MAX_PLAYER_DISTANCE) && member->IsAlive())
                     {
-                        LOG_DEBUG("scripts.ai", "TSCR: FollowerAI GetLeader changed and returned new leader.");
+                        LOG_DEBUG("scripts.ai", "ASCR FollowerAI GetLeader changed and returned new leader.");
                         m_uiLeaderGUID = member->GetGUID();
                         return member;
                     }
@@ -327,7 +327,7 @@ Player* FollowerAI::GetLeaderForFollower()
         }
     }
 
-    LOG_DEBUG("scripts.ai", "TSCR: FollowerAI GetLeader can not find suitable leader.");
+    LOG_DEBUG("scripts.ai", "ASCR FollowerAI GetLeader can not find suitable leader.");
     return nullptr;
 }
 
