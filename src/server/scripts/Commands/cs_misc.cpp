@@ -3051,6 +3051,7 @@ public:
     static bool HandleFreezeCommand(ChatHandler* handler, char const* args)
     {
         std::string name;
+        Unit* target = handler->getSelectedUnit();
         Player* player;
         char const* TargetName = strtok((char*)args, " "); // get entered name
         if (!TargetName) // if no name entered use target
@@ -3069,12 +3070,6 @@ public:
             player = ObjectAccessor::FindPlayerByName(name);
         }
 
-        if (!player)
-        {
-            handler->SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
-            return true;
-        }
-
         if (player == handler->GetSession()->GetPlayer())
         {
             handler->SendSysMessage(LANG_COMMAND_FREEZE_ERROR);
@@ -3088,14 +3083,42 @@ public:
                 Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, player, player);
         }
 
+        if (!target || !handler->GetSession()->GetPlayer()->GetTarget())
+        {
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (target->GetTypeId() == TYPEID_PLAYER)
+        {
+            if (handler->HasLowerSecurity(target->ToPlayer()))
+                return false;
+        }
+
+        if (target->IsAlive())
+        {
+            handler->PSendSysMessage(LANG_COMMAND_FREEZE, name.c_str());
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(9454))
+                Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
+        }
+
         return true;
     }
 
     static bool HandleUnFreezeCommand(ChatHandler* handler, char const* args)
     {
         std::string name;
+        Unit* target = handler->getSelectedUnit();
         Player* player;
         char* targetName = strtok((char*)args, " "); // Get entered name
+
+        if (target->HasAura(9454))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
+            target->RemoveAurasDueToSpell(9454);
+            return true;
+        }
 
         if (targetName)
         {
