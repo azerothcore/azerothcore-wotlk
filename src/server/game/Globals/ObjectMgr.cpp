@@ -1836,6 +1836,8 @@ void ObjectMgr::LoadCreatures()
     QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
                          //   11               12         13       14            15         16         17          18          19                20                   21
                          "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags "
+                         //   22
+                         "creature.ScriptName "
                          "FROM creature "
                          "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
                          "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid");
@@ -1893,6 +1895,7 @@ void ObjectMgr::LoadCreatures()
         data.npcflag            = fields[19].GetUInt32();
         data.unit_flags         = fields[20].GetUInt32();
         data.dynamicflags       = fields[21].GetUInt32();
+        data.scriptId            = GetScriptId(fields[22].GetCString());
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if (!mapEntry)
