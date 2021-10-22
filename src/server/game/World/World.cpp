@@ -1428,7 +1428,6 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_int_configs[CONFIG_LFG_KICK_PREVENTION_TIMER] = sConfigMgr->GetOption<int32>("LFG.KickPreventionTimer", 15 * MINUTE * IN_MILLISECONDS) * IN_MILLISECONDS;
-
     if (m_int_configs[CONFIG_LFG_KICK_PREVENTION_TIMER] > 15 * MINUTE * IN_MILLISECONDS)
     {
         m_int_configs[CONFIG_LFG_KICK_PREVENTION_TIMER] = 15 * MINUTE * IN_MILLISECONDS;
