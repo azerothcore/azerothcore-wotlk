@@ -578,9 +578,7 @@ void Unit::UpdateSplinePosition()
     //    loc.orientation = GetOrientation();
 
     if (GetTypeId() == TYPEID_PLAYER)
-    {
-       UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
-    }
+        UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
     else
         ToCreature()->SetPosition(loc.x, loc.y, loc.z, loc.orientation);
 }
