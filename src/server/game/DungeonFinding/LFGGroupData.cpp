@@ -17,6 +17,7 @@
 
 #include "LFG.h"
 #include "LFGGroupData.h"
+#include "World.h"
 
 namespace lfg
 {
