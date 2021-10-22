@@ -67,10 +67,11 @@ AISpellInfoType* GetAISpellInfo(uint32 i);
 
 bool InstanceHasScript(WorldObject const* obj, char const* scriptName);
 
-template<class AI, class T>
-inline AI* GetInstanceAI(T* obj, char const* scriptName)
+template <class AI, class T> AI* GetInstanceAI(T* obj, char const* scriptName)
 {
-    return InstanceHasScript(obj, scriptName) ? new AI(obj) : nullptr;
-}
+    if (InstanceHasScript(obj, scriptName))
+        return new AI(obj);
 
+    return nullptr;
+}
 #endif
