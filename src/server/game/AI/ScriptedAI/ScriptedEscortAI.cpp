@@ -451,7 +451,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
 {
     if (me->GetVictim())
     {
-        LOG_ERROR("entities.unit.ai", "TSCR ERROR: EscortAI (script: %s, creature entry: %u) attempts to Start while in combat", me->GetScriptName().c_str(), me->GetEntry());
+        LOG_ERROR("entities.unit.ai", "ERROR: EscortAI (script: %s, creature entry: %u) attempts to Start while in combat", me->GetScriptName().c_str(), me->GetEntry());
         return;
     }
 
