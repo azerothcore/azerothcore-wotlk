@@ -591,7 +591,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
                         {
                             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                             {
-                                me->CastSpell(player, SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST);
+                                me->CastSpell(player, SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM));
                                 player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
                                 me->DisappearAndDie();
                             }
@@ -701,7 +701,7 @@ public:
 
         void HandleScriptEffect(SpellEffIndex /* effIndex */)
         {
-            GetHitUnit()->CastSpell(GetCaster(), SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER); // Player cast back 45626 on npc
+            GetHitUnit()->CastSpell(GetCaster(), SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SET_FACING & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_GCD)); // Player cast back 45626 on npc
         }
 
         void Register() override
