@@ -1819,7 +1819,6 @@ public:
                 me->GetMotionMaster()->MovePath(PATH_THASSARIAN, false);
             }
         }
-
     private:
         EventMap   _events;
         ObjectGuid _playerGUID;
@@ -1828,11 +1827,9 @@ public:
         ObjectGuid _leryssaGUID;
         ObjectGuid _arlosGUID;
         bool       _preFightComplete;
-
-    public:
-        bool _arlosInPosition;
-        bool _leryssaInPosition;
-        bool _talbotJustDied;
+        bool       _arlosInPosition;
+        bool       _leryssaInPosition;
+        bool       _talbotJustDied;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1840,7 +1837,6 @@ public:
         return new npc_thassarianAI(creature);
     }
 };
-
 
 // NPC 25250: General Arlos
 class npc_general_arlos : public CreatureScript
