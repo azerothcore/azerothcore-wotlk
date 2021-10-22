@@ -159,7 +159,7 @@ void FollowerAI::EnterEvadeMode()
 
     if (HasFollowState(STATE_FOLLOW_INPROGRESS))
     {
-        LOG_DEBUG("scripts.ai", "ASCR: FollowerAI left combat, returning to CombatStartPosition.");
+        LOG_DEBUG("scripts.ai", "FollowerAI left combat, returning to CombatStartPosition.");
 
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
         {
@@ -185,7 +185,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
         {
             if (HasFollowState(STATE_FOLLOW_COMPLETE) && !HasFollowState(STATE_FOLLOW_POSTEVENT))
             {
-                LOG_DEBUG("scripts.ai", "ASCR: FollowerAI is set completed, despawns.");
+                LOG_DEBUG("scripts.ai", "FollowerAI is set completed, despawns.");
                 me->DespawnOrUnsummon();
                 return;
             }
@@ -196,7 +196,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
             {
                 if (HasFollowState(STATE_FOLLOW_RETURNING))
                 {
-                    LOG_DEBUG("scripts.ai", "ASCR: FollowerAI is returning to leader.");
+                    LOG_DEBUG("scripts.ai", "FollowerAI is returning to leader.");
 
                     RemoveFollowState(STATE_FOLLOW_RETURNING);
                     me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
