@@ -655,7 +655,7 @@ public:
                     case EVENT_ADD_ARCANE_CHAINS:
                         if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
                         {
-                            summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS && TRIGGERED_IGNORE_CAST_ITEM && TRIGGERED_IGNORE_POWER_AND_REAGENT_COST && TRIGGERED_IGNORE_GCD);
+                            summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, (TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS && TRIGGERED_IGNORE_CAST_ITEM && TRIGGERED_IGNORE_POWER_AND_REAGENT_COST && TRIGGERED_IGNORE_GCD));
                             _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1000);
                         }
                         break;
