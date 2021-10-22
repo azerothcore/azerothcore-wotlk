@@ -549,29 +549,32 @@ struct npc_beryl_sorcererAI : public CreatureAI
         void EnterCombat(Unit* who) override
         {
             if (me->IsValidAttackTarget(who))
+            {
                 AttackStart(who);
+            }
 
             _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
         }
 
         void SpellHit(Unit* unit, const SpellInfo* spell) override
         {
-            if (_chainsCast)
-                return;
-
-            if (spell->Id == SPELL_ARCANE_CHAINS)
+            if (spell->Id == SPELL_ARCANE_CHAINS && !_chainsCast)
+            {
                 if (Player* player = unit->ToPlayer())
                 {
                     _playerGUID = player->GetGUID();
                     _chainsCast = true;
                     _events.ScheduleEvent(EVENT_ARCANE_CHAINS, 4000);
                 }
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             _events.Update(diff);
 
@@ -651,12 +654,16 @@ public:
                 {
                     case EVENT_ADD_ARCANE_CHAINS:
                         if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        {
                             summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS && TRIGGERED_IGNORE_CAST_ITEM && TRIGGERED_IGNORE_POWER_AND_REAGENT_COST && TRIGGERED_IGNORE_GCD);
-                        _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1000);
+                            _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1000);
+                        }
                         break;
                     case EVENT_FOLLOW_PLAYER:
                         if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        {
                             StartFollow(summoner);
+                        }
                         break;
                 }
             }
