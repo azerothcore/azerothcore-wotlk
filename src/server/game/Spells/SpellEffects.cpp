@@ -799,7 +799,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
 void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET
             && effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH)
         return;
 
@@ -807,7 +807,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
 
     // todo: move those to spell scripts
     if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_TRIGGER_SPELL
-            && effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
+            && effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
     {
         // special cases
         switch (triggered_spell_id)
@@ -931,7 +931,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
     }
 
     SpellCastTargets targets;
-    if (effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
+    if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
     {
         if (!spellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, effIndex))
             return;

@@ -60,8 +60,7 @@ enum WarlockSpells
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 63106,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1            = 18213,
-    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371,
-    SPELL_WARLOCK_LOCK                              = 24259
+    SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371
 };
 
 enum WarlockSpellIcons
@@ -1477,34 +1476,6 @@ public:
     }
 };
 
-class spell_warl_lock : public SpellScriptLoader
-{
-public:
-    spell_warl_lock() : SpellScriptLoader("spell_warl_lock") { }
-
-    class spell_warl_lock_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_warl_lock_SpellScript);
-
-        void HandleTrigger(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Unit* target = GetHitUnit())
-                    caster->CastSpell(target, SPELL_WARLOCK_LOCK, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_warl_lock_SpellScript::HandleTrigger, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_warl_lock_SpellScript();
-    }
-};
-
 void AddSC_warlock_spell_scripts()
 {
     // Ours
@@ -1538,5 +1509,4 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_soulshatter();
     new spell_warl_unstable_affliction();
     new spell_warl_drain_soul();
-    new spell_warl_lock();
 }
