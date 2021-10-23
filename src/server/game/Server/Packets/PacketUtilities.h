@@ -59,7 +59,7 @@ namespace WorldPackets
         template<std::size_t MaxBytesWithoutNullTerminator>
         struct ByteSize { static bool Validate(std::string const& value) { return value.size() <= MaxBytesWithoutNullTerminator; } };
         struct Utf8 { static bool Validate(std::string const& value); };
-        //struct Hyperlinks { static bool Validate(std::string const& value); };
+        struct Hyperlinks { static bool Validate(std::string const& value); };
         struct NoHyperlinks { static bool Validate(std::string const& value); };
     }
 
