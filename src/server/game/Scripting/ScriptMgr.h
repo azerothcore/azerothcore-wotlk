@@ -511,7 +511,7 @@ public:
      * @param creature Creature.
      * @param player Player.
      */
-    virtual void OnBeforeLootMoney(Creature* creature, Player* player) { }
+    virtual void OnBeforeLootMoney(Creature* /*creature*/, Player* /*player*/) { }
 };
 
 class GameObjectScript : public ScriptObject, public UpdatableScript<GameObject>
